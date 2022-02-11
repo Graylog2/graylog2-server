@@ -11,7 +11,7 @@ public class ViewResolverDecoderTest {
     @Test
     public void testValidResolver() {
         final ViewResolverDecoder decoder = new ViewResolverDecoder("resolver:id");
-        assertTrue(decoder.isResolverId());
+        assertTrue(decoder.isResolverViewId());
         assertEquals("resolver", decoder.getResolverName());
         assertEquals("id", decoder.getViewId());
     }
@@ -19,8 +19,7 @@ public class ViewResolverDecoderTest {
     @Test
     public void testStandardView() {
         final ViewResolverDecoder decoder = new ViewResolverDecoder("62068954bd0cd7035876fcec");
-        assertFalse(decoder.isResolverId());
-
+        assertFalse(decoder.isResolverViewId());
         assertThatThrownBy(decoder::getResolverName)
                 .isExactlyInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(decoder::getViewId)

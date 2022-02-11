@@ -19,7 +19,7 @@ package org.graylog.plugins.views.search.views;
 import java.util.Optional;
 
 /**
- * A generic View resolver interface, which provides the ability to look a view up from an alternate source.
+ * View Resolvers provide a way that plugins can provide custom sources for looking up views.
  */
 public interface ViewResolver {
     Optional<ViewDTO> get(String id);

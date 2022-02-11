@@ -167,7 +167,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
      */
     private ViewDTO resolveView(String id) {
         final ViewResolverDecoder decoder = new ViewResolverDecoder(id);
-        if (decoder.isResolverId()) {
+        if (decoder.isResolverViewId()) {
             final ViewResolver viewResolver = viewResolvers.get(decoder.getResolverName());
             if (viewResolver != null) {
                 return viewResolver.get(decoder.getViewId())

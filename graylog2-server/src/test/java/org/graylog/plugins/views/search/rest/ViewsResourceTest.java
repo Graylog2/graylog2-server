@@ -191,18 +191,25 @@ public class ViewsResourceTest {
 
     @Test
     public void testViewResolver() {
+        // Setup
         final HashMap<String, ViewResolver> viewResolvers = new HashMap<>();
-        final String testViewId = "test.resolved.view.id";
-        when(view.id()).thenReturn(testViewId);
-        viewResolvers.put("", id -> Optional.of(view));
+        final String viewId = "test-view";
+        when(view.id()).thenReturn(viewId);
+        final String resolverName = "test-resolver";
+        viewResolvers.put(resolverName, id -> id.equals(viewId) ? Optional.of(view) : Optional.empty());
         final ViewsTestResource testResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain, viewResolvers);
-
-        // Verify that view not found for invalid id.
-        assertThatThrownBy(() -> this.viewsResource.get("invalid", searchUser))
-                .isInstanceOf(NotFoundException.class);
 
         // Verify that view for valid id is found.
         when(searchUser.canReadView(any())).thenReturn(true);
-        assertEquals(testViewId, testResource.get(testViewId, searchUser).id());
+        assertEquals(viewId, testResource.get(resolverName + ":" + viewId, searchUser).id());
+
+
+        // Verify error paths.
+        assertThatThrownBy(() -> testResource.get("invalid-resolver-name:" + viewId, searchUser))
+                .isExactlyInstanceOf(NotFoundException.class)
+                .hasMessageContaining("Failed to find view resolver");
+        assertThatThrownBy(() -> testResource.get(resolverName + ":invalid-view-id", searchUser))
+                .isExactlyInstanceOf(NotFoundException.class)
+                .hasMessageContaining("Failed to resolve view");
     }
 }
