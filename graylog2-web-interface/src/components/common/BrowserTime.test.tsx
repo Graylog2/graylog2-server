@@ -38,7 +38,7 @@ describe('BrowserTime', () => {
       <BrowserTime dateTime="2020-01-01T10:00:00.000Z" />,
     );
 
-    expect(screen.getByText('2019-12-31 18:00:00')).toBeInTheDocument();
+    expect(screen.getByText('2020-01-01 04:00:00')).toBeInTheDocument();
   });
 
   it('should display browser time in a specific format', () => {
