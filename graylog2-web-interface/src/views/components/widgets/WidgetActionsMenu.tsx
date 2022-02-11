@@ -30,6 +30,7 @@ import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import SearchActions from 'views/actions/SearchActions';
+import type { SearchJson } from 'views/logic/search/Search';
 import Search from 'views/logic/search/Search';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import type { ViewStoreState } from 'views/stores/ViewStore';
@@ -75,7 +76,7 @@ const _onCopyToDashboard = (
     return;
   }
 
-  const addWidgetToDashboard = (dashboard: View) => (searchJson) => {
+  const addWidgetToDashboard = (dashboard: View) => (searchJson: SearchJson) => {
     const search = Search.fromJSON(searchJson);
     const newDashboard = CopyWidgetToDashboard(widgetId, activeView, dashboard.toBuilder().search(search).build());
 
@@ -93,7 +94,13 @@ const _onCopyToDashboard = (
   setShowCopyToDashboard(false);
 };
 
-const _onMoveWidgetToTab = (view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy) => {
+const _onMoveWidgetToTab = (
+  view: ViewStoreState,
+  setShowMoveWidgetToTab: (show: boolean) => void,
+  widgetId: string,
+  queryId: string,
+  keepCopy: boolean,
+) => {
   const { view: activeView } = view;
 
   if (!queryId) {
@@ -103,17 +110,18 @@ const _onMoveWidgetToTab = (view, setShowMoveWidgetToTab, widgetId, queryId, kee
   const newDashboard = MoveWidgetToTab(widgetId, queryId, activeView, keepCopy);
 
   if (newDashboard) {
-    SearchActions.create(newDashboard.search).then((searchResponse) => {
-      const updatedDashboard = newDashboard.toBuilder().search(searchResponse.search).build();
+    SearchActions.create(newDashboard.search)
+      .then((searchResponse) => {
+        const updatedDashboard = newDashboard.toBuilder().search(searchResponse.search).build();
 
-      ViewActions.update(updatedDashboard).then(() => {
+        return ViewActions.update(updatedDashboard);
+      })
+      .then(() => {
         setShowMoveWidgetToTab(false);
 
-        ViewActions.selectQuery(queryId).then(() => {
-          SearchActions.executeWithCurrentState();
-        });
-      });
-    });
+        return ViewActions.selectQuery(queryId);
+      })
+      .then(() => SearchActions.executeWithCurrentState());
   }
 };
 
@@ -142,7 +150,7 @@ const _onDelete = async (widget: Widget, view: View, title: string) => {
   return Promise.reject();
 };
 
-const _onDuplicate = (widgetId, setFocusWidget, title) => {
+const _onDuplicate = (widgetId: string, setFocusWidget: (widgetId: string) => void, title: string) => {
   WidgetActions.duplicate(widgetId).then((newWidget) => {
     TitlesActions.set(TitleTypes.Widget, newWidget.id, `${title} (copy)`).then(() => {
       setFocusWidget(undefined);
@@ -173,8 +181,8 @@ const WidgetActionsMenu = ({
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
 
   const onDuplicate = () => _onDuplicate(widget.id, setWidgetFocusing, title);
-  const onCopyToDashboard = useCallback((widgetId, dashboardId) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
-  const onMoveWidgetToTab = useCallback((widgetId, queryId, keepCopy) => _onMoveWidgetToTab(view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [view]);
+  const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
+  const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToTab(view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [view]);
   const onDelete = useCallback(() => _onDelete(widget, view?.view, title), [title, view?.view, widget]);
 
   return (
