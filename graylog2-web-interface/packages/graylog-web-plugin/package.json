@@ -49,7 +49,7 @@
     "moment": "2.29.1",
     "moment-timezone": "0.5.34",
     "prop-types": "15.8.1",
-    "react": "16.13.1",
+    "react": "16.14.0",
     "react-bootstrap": "0.33.1",
     "react-dom": "16.13.1",
     "react-query": "3.34.14",
