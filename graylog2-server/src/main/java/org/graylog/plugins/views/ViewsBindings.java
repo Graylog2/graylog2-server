@@ -108,6 +108,8 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.WorldMapVisual
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SeriesSortConfig;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
+import org.graylog2.contentpacks.facades.DashboardEntityCreator;
+import org.graylog2.contentpacks.facades.DashboardFacade;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesServiceImpl;
 import org.graylog2.plugin.PluginConfigBean;
@@ -182,6 +184,7 @@ public class ViewsBindings extends ViewsModule {
         bind(QueryValidationService.class).to(QueryValidationServiceImpl.class).in(Scopes.SINGLETON);
         bind(ChunkDecorator.class).to(LegacyChunkDecorator.class);
         bind(MessagesExporter.class).to(DecoratingMessagesExporter.class);
+        bind(DashboardEntityCreator.class).to(DashboardFacade.class);
 
         registerWidgetConfigSubtypes();
 
