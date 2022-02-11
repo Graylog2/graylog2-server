@@ -46,7 +46,6 @@ const EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration';
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 const PERMISSIONS_CONFIG = 'org.graylog2.users.UserAndTeamsConfig';
 
-// eslint-disable-next-line react/destructuring-assignment
 const _getConfig = (configType, configuration) => configuration?.[configType] ?? null;
 
 const _onUpdate = (configType: string) => {

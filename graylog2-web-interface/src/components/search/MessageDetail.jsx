@@ -99,7 +99,6 @@ class MessageDetail extends React.Component {
     const { renderForDisplay, nodes, message, customFieldActions } = this.props;
     const streamIds = Immutable.Set(message.stream_ids);
     const streams = streamIds.map((id) => {
-      // eslint-disable-next-line react/destructuring-assignment
       const stream = this.props.streams.get(id);
 
       if (stream !== undefined) {
