@@ -17,10 +17,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { Spinner } from 'components/common';
-import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-
 import FilterAggregationForm from './FilterAggregationForm';
+import withStreams from './withStreams';
 
 type Props = {
   action: 'create' | 'edit',
@@ -34,14 +32,7 @@ type Props = {
 };
 
 const FilterAggregationFormContainer = (props: Props) => {
-  const { data: fieldTypes } = useFieldTypes([], { type: 'relative', range: 0 });
-  const isLoading = !fieldTypes;
-
-  if (isLoading) {
-    return <Spinner text="Loading Filter & Aggregation Information..." />;
-  }
-
-  return <FilterAggregationForm allFieldTypes={fieldTypes} {...props} />;
+  return <FilterAggregationForm {...props} />;
 };
 
 FilterAggregationFormContainer.propTypes = {
@@ -53,4 +44,4 @@ FilterAggregationFormContainer.propTypes = {
   currentUser: PropTypes.object.isRequired, // Prop is passed down to pluggable entities
 };
 
-export default FilterAggregationFormContainer;
+export default withStreams(FilterAggregationFormContainer);
