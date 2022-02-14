@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.validation;
 
+import com.google.common.collect.Streams;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -25,9 +26,12 @@ import org.apache.lucene.search.AutomatonQuery;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryVisitor;
+import org.apache.lucene.search.RegexpQuery;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 public class LuceneQueryParser {
     private final TermCollectingQueryParser parser;
@@ -43,6 +47,8 @@ public class LuceneQueryParser {
 
         final List<ImmutableToken> availableTokens = new ArrayList<>(this.parser.getTokens());
         builder.tokensBuilder().addAll(availableTokens);
+        final List<ImmutableToken> processedTokens = new ArrayList<>();
+
 
         parsed.visit(new QueryVisitor() {
             @Override
@@ -55,21 +61,23 @@ public class LuceneQueryParser {
                             .field(field)
                             .value(t.text());
 
-                    if (field.equals(ParsedTerm.DEFAULT_FIELD)) {
-                        availableTokens.stream()
+                    if (field.equals(ParsedTerm.DEFAULT_FIELD) || field.equals(ParsedTerm.EXISTS)) {
+                        getStream(availableTokens, processedTokens)
                                 .filter(token -> token.matches(QueryParserConstants.TERM, t.text()))
                                 .findFirst()
                                 .ifPresent(token -> {
                                     termBuilder.tokensBuilder().add(token);
+                                    processedTokens.add(token);
                                     availableTokens.remove(token);
                                 });
                     } else {
-                        availableTokens.stream()
+                        getStream(availableTokens, processedTokens)
                                 .filter(token -> token.kind() == QueryParserConstants.TERM)
                                 .filter(token -> token.image().equals(field))
                                 .findFirst()
                                 .ifPresent(token -> {
                                     termBuilder.tokensBuilder().add(token);
+                                    processedTokens.add(token);
                                     availableTokens.remove(token);
                                 });
                     }
@@ -79,9 +87,10 @@ public class LuceneQueryParser {
 
             @Override
             public void visitLeaf(Query query) {
-                if (query instanceof AutomatonQuery) {
-                    final String field = ((AutomatonQuery) query).getField();
-                    builder.termsBuilder().add(ParsedTerm.create(ParsedTerm.EXISTS, field));
+                if (query instanceof RegexpQuery) {
+                    final RegexpQuery regexpQuery = (RegexpQuery) query;
+                    final String field = regexpQuery.getField();
+                    builder.termsBuilder().add(ParsedTerm.create(field, regexpQuery.getRegexp().text()));
                 }
             }
 
@@ -92,5 +101,13 @@ public class LuceneQueryParser {
             }
         });
         return builder.build();
+    }
+
+    /**
+     * One stream consisting of two lists. First unused, fresh tokens. If no match found there, we can fallback to the
+     * already processed tokens and find a match there.
+     */
+    private Stream<ImmutableToken> getStream(List<ImmutableToken> availableTokens, List<ImmutableToken> processedTokens) {
+        return Streams.concat(availableTokens.stream(), processedTokens.stream());
     }
 }

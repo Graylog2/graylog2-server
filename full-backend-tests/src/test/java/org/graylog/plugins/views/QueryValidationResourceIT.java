@@ -60,4 +60,29 @@ public class QueryValidationResourceIT {
         validatableResponse.assertThat().body("status", equalTo("ERROR"));
         validatableResponse.assertThat().body("explanations.error_message[0]", containsString("Cannot parse query 'foo:', cause: incomplete query, query ended unexpectedly"));
     }
+
+    @ContainerMatrixTest
+    void testOrQuery() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("{\"query\":\"unknown_field:(x OR y)\"}")
+                .post("/search/validate")
+                .then()
+                .statusCode(200);
+        validatableResponse.assertThat().body("status", equalTo("WARNING"));
+        validatableResponse.assertThat().body("explanations.error_message[0]", containsString("Query contains unknown field: unknown_field"));
+    }
+
+    @ContainerMatrixTest
+    void testRegexWithoutFieldName() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("{\"query\":\"/ethernet[0-9]+/\"}")
+                .post("/search/validate")
+                .then()
+                .statusCode(200);
+        validatableResponse.assertThat().body("status", equalTo("OK"));
+    }
 }
