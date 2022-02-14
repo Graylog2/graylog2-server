@@ -20,6 +20,7 @@ import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Binder;
@@ -222,7 +223,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         // Start services.
         final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
-        serviceManager.addListener(serviceManagerListener);
+        serviceManager.addListener(serviceManagerListener, MoreExecutors.directExecutor());
         try {
             leaderElectionService.startAsync().awaitRunning();
             serviceManager.startAsync().awaitHealthy();
