@@ -15,31 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useCallback, useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { LinkContainer } from 'components/common/router';
 import { Col, Row, Button } from 'components/bootstrap';
-import connect from 'stores/connect';
 import { DocumentTitle, PageHeader, IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
-import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
 import ViewList from 'views/components/views/ViewList';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+import useDashboards from 'views/logic/dashboards/useDashboards';
 
 import type View from '../logic/views/View';
 
-type Props = {
-  dashboards: DashboardsStoreState,
-};
-
-const handleSearch = (query: string, page: number, perPage: number) => DashboardsActions.search(query, page, perPage);
-
 // eslint-disable-next-line no-alert
-const defaultDashboardDeletionHook = (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
+const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
 
 const handleViewDelete = async (view: View) => {
   const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.deletingDashboard');
@@ -63,12 +55,16 @@ const handleViewDelete = async (view: View) => {
   return Promise.reject();
 };
 
-const refreshDashboards = () => {
-  DashboardsActions.search();
+type SearchQuery = {
+  query: string,
+  page: number,
+  perPage: number,
 };
 
-const DashboardsPage = ({ dashboards: { list, pagination } }: Props) => {
-  useEffect(refreshDashboards, []);
+const DashboardsPage = () => {
+  const [searchQuery, setSearchQuery] = useState<SearchQuery>({ query: '', page: 1, perPage: 10 });
+  const handleSearch = useCallback((query: string, page: number, perPage: number) => setSearchQuery({ query, page, perPage }), []);
+  const { list, pagination } = useDashboards(searchQuery.query, searchQuery.page, searchQuery.perPage);
 
   return (
     <DocumentTitle title="Dashboards">
@@ -109,4 +105,4 @@ const DashboardsPage = ({ dashboards: { list, pagination } }: Props) => {
 
 DashboardsPage.propTypes = {};
 
-export default connect(DashboardsPage, { dashboards: DashboardsStore });
+export default DashboardsPage;
