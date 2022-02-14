@@ -55,12 +55,12 @@ class StreamRulesEditor extends React.Component {
     streamId: PropTypes.string.isRequired,
     messageId: PropTypes.string,
     index: PropTypes.string,
-  }
+  };
 
   static defaultProps = {
     messageId: '',
     index: '',
-  }
+  };
 
   constructor(props) {
     super(props);

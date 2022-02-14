@@ -72,7 +72,7 @@ class OperatorCompletion implements Completer {
     }
 
     return [];
-  }
+  };
 }
 
 export default OperatorCompletion;

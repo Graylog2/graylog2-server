@@ -90,7 +90,7 @@ class ImportsViewModal extends React.Component {
           </OverlayTrigger>
         </td>
         <td>{upload.collector_name}</td>
-        <td><Timestamp dateTime={upload.created} format="YYYY-MM-DD HH:mm:ss z" /></td>
+        <td><Timestamp dateTime={upload.created} /></td>
         <td>
           <Button bsStyle="info" bsSize="xsmall" onClick={() => this._onApplyButton(upload.rendered_configuration)}>
             Apply

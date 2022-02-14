@@ -81,7 +81,7 @@ class EditQueryParameterModal extends React.Component<Props, State> {
     const { queryParameter } = this.props;
 
     this.setState({ queryParameter });
-  }
+  };
 
   propagateChanges = () => {
     const { queryParameters, onChange, queryParameter: prevQueryParameter } = this.props;

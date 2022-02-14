@@ -1,0 +1,37 @@
+name: Update browserslist DB.
+
+on: 
+  schedule:
+    - cron: '0 0 1/14 * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest 
+    defaults:
+      run:
+        working-directory: graylog2-web-interface
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Yarn cache
+        uses: actions/cache@v2
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('graylog2-web-interface/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+          path: ~/.cache/yarn
+      - name: Install dependencies
+        run: yarn install
+      - name: Updating browserslist db
+        continue-on-error: true
+        run: npx browserslist@latest --update-db
+      - name: Create/Update Pull Request
+        uses: Graylog2/create-pull-request@7380612b49221684fefa025244f2ef4008ae50ad
+        with:
+          title: Updating browserslist DB.
+          body: This PR was created by a job that is running periodically to update the browserslist db automatically. See [here](https://github.com/browserslist/browserslist#browsers-data-updating) for details.
+          author: Dr. Lint-a-lot <garybot2@graylog.com>
+          branch: update/browserslist-db
+          committer: Dr. Lint-a-lot <garybot2@graylog.com>
+          commit-message: Updating browserslist DB.
+          delete-branch: true

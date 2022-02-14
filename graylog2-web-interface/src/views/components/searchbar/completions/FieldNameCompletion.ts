@@ -135,7 +135,7 @@ class FieldNameCompletion implements Completer {
       .map((result) => ({ ...result, meta: `${result.meta} (not in streams)` }));
 
     return [...currentQuery, ...allFields];
-  }
+  };
 }
 
 export default FieldNameCompletion;

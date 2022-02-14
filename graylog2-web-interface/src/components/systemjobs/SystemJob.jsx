@@ -43,7 +43,7 @@ class SystemJob extends React.Component {
       node_id: PropTypes.string,
       started_at: PropTypes.string,
     }).isRequired,
-  }
+  };
 
   _onCancel = (job) => {
     return (e) => {

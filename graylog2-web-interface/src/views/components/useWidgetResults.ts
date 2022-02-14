@@ -36,7 +36,7 @@ const _getDataAndErrors = (widget: Widget, widgetMapping: WidgetMapping, results
   const widgetErrors = results.errors.filter((e) => searchTypeIds.includes(e.searchTypeId));
   let error;
 
-  const data = dataTransformer(widgetData, widget);
+  const data = dataTransformer(widgetData);
 
   if (widgetErrors && widgetErrors.length > 0) {
     error = widgetErrors;

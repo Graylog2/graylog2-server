@@ -84,7 +84,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
     const uniqResults = uniqBy(sortBy(results.flat(), ['score', 'name']), 'name');
 
     callback(null, uniqResults);
-  }
+  };
 
   shouldShowCompletions = (currentLine: number, lines: Array<Array<Line>>) => {
     return this.completers.some((completer) => {
@@ -98,5 +98,5 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
 
       return false;
     });
-  }
+  };
 }

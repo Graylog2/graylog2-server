@@ -53,7 +53,7 @@ class OverlayTrigger extends React.Component<Props, State> {
     rootClose: false,
     container: null,
     testId: undefined,
-  }
+  };
 
   constructor(props) {
     super(props);

@@ -37,7 +37,7 @@ jest.mock('views/actions/QueryValidationActions', () => ({
 class Completer {
   getCompletions = (editor, session, pos, prefix, callback) => {
     callback(null, []);
-  }
+  };
 }
 
 describe('QueryInput', () => {

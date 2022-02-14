@@ -140,7 +140,7 @@ class AddWidgetButton extends React.Component<Props, State> {
     const sortedCreators = sortBy(typeCreators, 'title');
 
     return sortedCreators.map(this._createMenuItem);
-  }
+  };
 
   render() {
     const { overflowingComponents } = this.state;

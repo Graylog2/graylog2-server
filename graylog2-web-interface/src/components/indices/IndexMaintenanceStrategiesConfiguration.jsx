@@ -63,7 +63,7 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
     const timeBasedStrategy = this._getDefaultStrategyConfig(TIME_BASED_ROTATION_STRATEGY);
 
     return { ...activeConfig, max_rotation_period: timeBasedStrategy?.max_rotation_period };
-  }
+  };
 
   _getStrategyConfig = (selectedStrategy) => {
     const { activeStrategy, activeConfig } = this.state;

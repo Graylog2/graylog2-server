@@ -31,6 +31,7 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import DashboardSearchBar from './DashboardSearchBar';
 
 jest.mock('views/components/ViewActionsMenu', () => () => <span>View Actions</span>);
+jest.mock('hooks/useUserDateTime');
 
 jest.mock('views/stores/GlobalOverrideStore', () => ({
   GlobalOverrideStore: MockStore(),
