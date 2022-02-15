@@ -191,16 +191,12 @@ class SourceCodeEditor extends React.Component {
     }
   };
 
-  /* eslint-disable-next-line react/destructuring-assignment */
   isCopyDisabled = () => this.props.readOnly || this.state.selectedText === '';
 
-  /* eslint-disable-next-line react/destructuring-assignment */
   isPasteDisabled = () => this.props.readOnly;
 
-  /* eslint-disable-next-line react/destructuring-assignment */
   isRedoDisabled = () => this.props.readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasRedo();
 
-  /* eslint-disable-next-line react/destructuring-assignment */
   isUndoDisabled = () => this.props.readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasUndo();
 
   handleRedo = () => {
