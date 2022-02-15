@@ -92,20 +92,20 @@ const RolesOverview = () => {
   const { list: roles } = paginatedRoles || {};
   const { page, perPage, query } = pagination;
   const useTeamMembersByRole = getUseTeamMembersHook();
-  const rolesUsersByTeam = useTeamMembersByRole();
+  const teamMembersByRole = useTeamMembersByRole();
 
   useEffect(() => _loadRoles(pagination, setLoading, setPaginatedRoles), [pagination]);
   useEffect(() => _updateListOnRoleDelete(perPage, query, setPagination), [perPage, query]);
 
   const _rolesOverviewItem = useCallback((role) => {
-    const { id } = role;
-    const roleUsers = paginatedRoles?.context.users[id];
-    const users = rolesUsersByTeam.users[id]
-      ? [...rolesUsersByTeam.users[id], ...roleUsers]
-      : paginatedRoles?.context?.users[id];
+    const { id: roleId } = role;
+    const roleUsers = paginatedRoles?.context.users[roleId];
+    const users = teamMembersByRole.users[roleId]
+      ? [...teamMembersByRole.users[roleId], ...roleUsers]
+      : paginatedRoles?.context?.users[roleId];
 
     return <RolesOverviewItem role={role} users={users} />;
-  }, [rolesUsersByTeam, paginatedRoles?.context]);
+  }, [teamMembersByRole, paginatedRoles?.context]);
 
   if (!paginatedRoles) {
     return <Spinner />;
