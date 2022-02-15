@@ -64,7 +64,7 @@ type SearchQuery = {
 const DashboardsPage = () => {
   const [searchQuery, setSearchQuery] = useState<SearchQuery>({ query: '', page: 1, perPage: 10 });
   const handleSearch = useCallback((query: string, page: number, perPage: number) => setSearchQuery({ query, page, perPage }), []);
-  const { list, pagination } = useDashboards(searchQuery.query, searchQuery.page, searchQuery.perPage);
+  const { list, pagination } = useDashboards(searchQuery);
 
   return (
     <DocumentTitle title="Dashboards">

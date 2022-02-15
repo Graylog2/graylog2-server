@@ -4,12 +4,18 @@ import type { DashboardsStoreState } from 'views/stores/DashboardsStore'; import
 
 export type Dashboards = DashboardsStoreState;
 
-const useDashboards = (query: string = '', page: number = 1, perPage: number = 10): Readonly<Dashboards> => {
+type SearchQuery = {
+  query?: string,
+  page?: number,
+  perPage?: number
+};
+
+const useDashboards = (searchQuery: SearchQuery): Readonly<Dashboards> => {
   const dashboards = useStore(DashboardsStore);
 
   useEffect(() => {
-    DashboardsActions.search(query, page, perPage);
-  }, [query, page, perPage]);
+    DashboardsActions.search(searchQuery?.query ?? '', searchQuery?.page ?? 1, searchQuery?.perPage ?? 10);
+  }, [searchQuery]);
 
   return dashboards;
 };
