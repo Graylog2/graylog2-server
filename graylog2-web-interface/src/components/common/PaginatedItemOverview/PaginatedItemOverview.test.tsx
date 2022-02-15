@@ -19,11 +19,31 @@ import React from 'react';
 import { screen, render } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 
-import type { PaginatedListType, DescriptiveItem } from './PaginatedItemOverview';
+import type {
+  PaginatedListType,
+  DescriptiveItem,
+  OverrideItemComponentProps,
+  ResultsWrapperProps,
+} from './PaginatedItemOverview';
 import PaginatedItemOverview from './PaginatedItemOverview';
 
-const examplePaginatedResponse: PaginatedListType = {
+const emptyPaginatedResponse: PaginatedListType = {
   list: Immutable.List<DescriptiveItem>([]),
+  pagination: {
+    query: '',
+    page: 1,
+    perPage: 0,
+    total: 1,
+    count: 1,
+  },
+};
+
+const simplePaginatedResponse: PaginatedListType = {
+  list: Immutable.List<DescriptiveItem>([{
+    id: '1',
+    name: 'Foo',
+    description: 'Bar',
+  }]),
   pagination: {
     query: '',
     page: 1,
@@ -46,8 +66,59 @@ describe('<PaginatedItemOverview>', () => {
     expect(await screen.findByText(/loading/i)).toBeInTheDocument();
     expect(loadHandler).toHaveBeenCalledTimes(1);
 
-    resolvePromise(examplePaginatedResponse);
+    resolvePromise(emptyPaginatedResponse);
 
     expect(await screen.findByText(/no items found to display/i)).toBeInTheDocument();
+  });
+
+  it('uses custom result wrapper', async () => {
+    const myWrapper = ({ children, isEmptyResult }: ResultsWrapperProps) => (
+      <ul>
+        <li>My custom wrapper</li>
+        <li>Empty result {JSON.stringify(isEmptyResult)}</li>
+        <li>{children}</li>
+      </ul>
+    );
+
+    render(
+      <PaginatedItemOverview onLoad={() => Promise.resolve({} as PaginatedListType)}
+                             overrideList={emptyPaginatedResponse}
+                             resultsWrapper={myWrapper} />,
+    );
+
+    expect(await screen.findByText(/my custom wrapper/i)).toBeInTheDocument();
+    expect(await screen.findByText(/no items found to display/i)).toBeInTheDocument();
+    expect(await screen.findByText(/empty result true/i)).toBeInTheDocument();
+  });
+
+  it('uses custom item component', async () => {
+    const itemComponent = ({ item, onDeleteItem }: OverrideItemComponentProps) => (
+      <ul>
+        <li>Custom item component</li>
+        <li>{item.name}</li>
+        <li>{onDeleteItem && <button type="button">Delete</button>}</li>
+      </ul>
+    );
+
+    const { rerender } = render(
+      <PaginatedItemOverview onLoad={() => Promise.resolve(simplePaginatedResponse)}
+                             overrideList={simplePaginatedResponse}
+                             overrideItemComponent={itemComponent} />,
+    );
+
+    expect(await screen.findByText(/custom item component/i)).toBeInTheDocument();
+    expect(await screen.findByText(simplePaginatedResponse.list.get(0).name)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Delete' })).not.toBeInTheDocument();
+
+    rerender(
+      <PaginatedItemOverview onLoad={() => Promise.resolve(simplePaginatedResponse)}
+                             overrideList={simplePaginatedResponse}
+                             onDeleteItem={jest.fn((item) => { console.log(item); })}
+                             overrideItemComponent={itemComponent} />,
+    );
+
+    expect(await screen.findByText(/custom item component/i)).toBeInTheDocument();
+    expect(await screen.findByText(simplePaginatedResponse.list.get(0).name)).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Delete' })).toBeInTheDocument();
   });
 });
