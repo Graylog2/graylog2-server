@@ -79,7 +79,7 @@ const _loadRoles = (pagination, setLoading, setPaginatedRoles) => {
 const _updateListOnRoleDelete = (perPage, query, setPagination) => AuthzRolesActions.delete.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
 
 const getUseTeamMembersHook = () => {
-  const defaultHook = () => ({ leading: false, users: [] });
+  const defaultHook = () => ({ loading: false, users: [] });
   const teamsPlugin = PluginStore.exports('teams');
 
   return teamsPlugin?.[0]?.useTeamMembersByRole || defaultHook;
