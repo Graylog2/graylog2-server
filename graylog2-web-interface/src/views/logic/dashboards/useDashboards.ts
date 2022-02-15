@@ -16,7 +16,9 @@
  */
 import { useEffect } from 'react';
 
-import type { DashboardsStoreState } from 'views/stores/DashboardsStore'; import { useStore } from 'stores/connect'; import { DashboardsStore, DashboardsActions } from 'views/stores/DashboardsStore';
+import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
+import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
+import { useStore } from 'stores/connect';
 
 export type Dashboards = DashboardsStoreState;
 

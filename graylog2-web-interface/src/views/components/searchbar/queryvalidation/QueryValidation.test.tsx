@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { Form, Formik } from 'formik';
 
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import FormWarningsContext from 'contexts/FormWarningsContext'; import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import FormWarningsContext from 'contexts/FormWarningsContext';
+import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { validationError } from 'fixtures/queryValidationState';
 
 jest.mock('views/stores/QueriesStore', () => ({

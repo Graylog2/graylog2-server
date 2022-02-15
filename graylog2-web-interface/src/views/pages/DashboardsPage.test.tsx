@@ -21,12 +21,14 @@ import userEvent from '@testing-library/user-event';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
-import { asMock } from 'helpers/mocking'; import Routes from 'routing/Routes';
+import { asMock } from 'helpers/mocking';
+import Routes from 'routing/Routes';
 import useDashboards from 'views/logic/dashboards/useDashboards';
 import { simpleViewJson } from 'views/test/ViewFixtures';
 import UserDateTimeContext from 'contexts/UserDateTimeContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import { adminUser } from 'fixtures/users'; import type User from 'logic/users/User';
+import { adminUser } from 'fixtures/users';
+import type User from 'logic/users/User';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 
 import DashboardsPage from './DashboardsPage';
@@ -45,7 +47,11 @@ jest.mock('views/stores/ViewManagementStore', () => ({
 
 const WrappedDashboardsPage = ({ currentUser }: { currentUser?: User }) => (
   <CurrentUserContext.Provider value={currentUser}>
-    <UserDateTimeContext.Provider value={{ formatTime: (dateTime) => dateTime.toString(), toUserTimezone: (time) => moment(time), userTimezone: 'Europe/Paris' }}>
+    <UserDateTimeContext.Provider value={{
+      formatTime: (dateTime) => dateTime.toString(),
+      toUserTimezone: (time) => moment(time),
+      userTimezone: 'Europe/Paris',
+    }}>
       <DashboardsPage />
     </UserDateTimeContext.Provider>
   </CurrentUserContext.Provider>
@@ -85,9 +91,12 @@ describe('DashboardsPage', () => {
 
     asMock(Routes.pluginRoute).mockImplementation((key: string) => {
       switch (key) {
-        case 'DASHBOARDS_NEW': return '/dashboards/new';
-        case 'DASHBOARDS_VIEWID': return (id: string) => `/dashboards/${id}`;
-        default: throw Error(`Invalid route: ${key}`);
+        case 'DASHBOARDS_NEW':
+          return '/dashboards/new';
+        case 'DASHBOARDS_VIEWID':
+          return (id: string) => `/dashboards/${id}`;
+        default:
+          throw Error(`Invalid route: ${key}`);
       }
     });
   });
