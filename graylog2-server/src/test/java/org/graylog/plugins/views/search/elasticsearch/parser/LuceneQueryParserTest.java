@@ -108,7 +108,7 @@ class LuceneQueryParserTest {
 
     @Test
     void testLowercaseNegation() throws ParseException {
-        final ParsedQuery query = parser.parse("NOT(foo:bar)");
+        final ParsedQuery query = parser.parse("not(foo:bar)");
         assertThat(query.invalidOperators().size()).isEqualTo(1);
     }
 
