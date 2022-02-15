@@ -20,15 +20,17 @@ import styled, { css } from 'styled-components';
 
 import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { Col, Row } from 'components/bootstrap';
+import {Col, Row, Alert} from 'components/bootstrap';
+import {Link} from 'components/common/router';
+import Routes from 'routing/Routes';
+import AppConfig from 'util/AppConfig';
 
-const BiggerFontSize = styled.div(({ theme }) => css`
-  font-size: ${theme.fonts.size.large};
-`);
-
-const GraylogSecurityHeader = styled.h2`
-  margin-bottom: 10px;
+const StyledH4 = styled.h4`
+  font-weight: bold;
+  margin-bottom: 5px;
 `;
+
+const isCloud = AppConfig.isCloud();
 
 /*
   TODO: This is a placeholder promotional page. We are still waiting on copy from marketing
@@ -37,18 +39,29 @@ const SecurityPage = () => {
   return (
     <DocumentTitle title="Try Graylog Security">
       <div>
-        <PageHeader title="Try Graylog for Security">
-          <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Asperiores at autem dignissimos, doloremque eaque earum eligendi expedita minus molestias nam numquam officia optio provident quaerat qui sint sit ullam veritatis.</span>
+        <PageHeader title="Graylog for Security">
+          <span>Analyst tools that help you use Graylog for Security.</span>
         </PageHeader>
 
         <HideOnCloud>
           <IfPermitted permissions="freelicenses:create">
             <Row className="content">
               <Col md={6}>
-                <GraylogSecurityHeader>Graylog for Security</GraylogSecurityHeader>
-                <BiggerFontSize>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium beatae consequatur ducimus ea eos eveniet, laboriosam molestias nisi, pariatur perferendis porro quae quas quo suscipit veritatis vitae voluptatem voluptates voluptatum!
-                </BiggerFontSize>
+                <Alert bsStyle="danger">
+                  <StyledH4>Graylog for Security is disabled</StyledH4>
+                  <p>
+                    Graylog for Security Analyst Tools are disabled because a valid Graylog for Security license was not found.
+                  </p>
+                  {isCloud
+                    ? (<>Contact your Graylog account manager.</>)
+                    : (
+                      <IfPermitted permissions="licenses:create">
+                        <p>
+                          See <Link to={Routes.pluginRoute('SYSTEM_LICENSES')}>Licenses page</Link> for details.
+                        </p>
+                      </IfPermitted>
+                    )}
+                </Alert>
               </Col>
               <Col md={6}>
                 {/* Put License Status here */}
