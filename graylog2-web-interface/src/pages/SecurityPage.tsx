@@ -18,7 +18,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
+import { DocumentTitle, IfPermitted } from 'components/common';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import {Col, Row, Alert} from 'components/bootstrap';
 import {Link} from 'components/common/router';
@@ -30,27 +30,25 @@ const StyledH4 = styled.h4`
   margin-bottom: 5px;
 `;
 
+const H2 = styled.h2(({ theme }) => css`
+  padding-bottom: ${theme.spacings.sm};
+`);
+
 const isCloud = AppConfig.isCloud();
 
-/*
-  TODO: This is a placeholder promotional page. We are still waiting on copy from marketing
-*/
 const SecurityPage = () => {
   return (
     <DocumentTitle title="Try Graylog Security">
       <div>
-        <PageHeader title="Graylog for Security">
-          <span>Analyst tools that help you use Graylog for Security.</span>
-        </PageHeader>
-
         <HideOnCloud>
           <IfPermitted permissions="freelicenses:create">
             <Row className="content">
-              <Col md={6}>
+              <Col md={12}>
+                <H2>Invalid License for Analyst Tools</H2>
                 <Alert bsStyle="danger">
-                  <StyledH4>Graylog for Security is disabled</StyledH4>
+                  <StyledH4>Analyst Tools are disabled</StyledH4>
                   <p>
-                    Graylog for Security Analyst Tools are disabled because a valid Graylog for Security license was not found.
+                    Analyst Tools are disabled because a valid Graylog for Security license was not found.
                   </p>
                   {isCloud
                     ? (<>Contact your Graylog account manager.</>)
