@@ -91,6 +91,25 @@ describe('<PaginatedItemOverview>', () => {
     expect(await screen.findByText(/empty result true/i)).toBeInTheDocument();
   });
 
+  it('uses default item component', async () => {
+    const { rerender } = render(
+      <PaginatedItemOverview onLoad={() => Promise.resolve(simplePaginatedResponse)} />,
+    );
+
+    const itemName = simplePaginatedResponse.list.get(0).name;
+
+    expect(await screen.findByText(itemName, { exact: false })).toBeInTheDocument();
+    expect(screen.queryByTitle(`Remove ${itemName}`)).not.toBeInTheDocument();
+
+    rerender(
+      <PaginatedItemOverview onLoad={() => Promise.resolve(simplePaginatedResponse)}
+                             onDeleteItem={jest.fn((item) => { console.log(item); })} />,
+    );
+
+    expect(await screen.findByText(simplePaginatedResponse.list.get(0).name, { exact: false })).toBeInTheDocument();
+    expect(await screen.findByTitle(`Remove ${itemName}`)).toBeInTheDocument();
+  });
+
   it('uses custom item component', async () => {
     const itemComponent = ({ item, onDeleteItem }: OverrideItemComponentProps) => (
       <ul>
