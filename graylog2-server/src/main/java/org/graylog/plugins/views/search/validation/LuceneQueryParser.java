@@ -16,22 +16,9 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import com.google.common.collect.Streams;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParserConstants;
-import org.apache.lucene.queryparser.classic.Token;
-import org.apache.lucene.search.AutomatonQuery;
-import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.QueryVisitor;
-import org.apache.lucene.search.RegexpQuery;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 public class LuceneQueryParser {
     private final TermCollectingQueryParser parser;
@@ -45,69 +32,10 @@ public class LuceneQueryParser {
         final Query parsed = parser.parse(query);
         final ParsedQuery.Builder builder = ParsedQuery.builder().query(query);
 
-        final List<ImmutableToken> availableTokens = new ArrayList<>(this.parser.getTokens());
-        builder.tokensBuilder().addAll(availableTokens);
-        final List<ImmutableToken> processedTokens = new ArrayList<>();
-
-
-        parsed.visit(new QueryVisitor() {
-            @Override
-            public void consumeTerms(Query query, Term... terms) {
-                super.consumeTerms(query, terms);
-                for (Term t : terms) {
-                    final String field = t.field();
-
-                    final ParsedTerm.Builder termBuilder = ParsedTerm.builder()
-                            .field(field)
-                            .value(t.text());
-
-                    if (field.equals(ParsedTerm.DEFAULT_FIELD) || field.equals(ParsedTerm.EXISTS)) {
-                        getStream(availableTokens, processedTokens)
-                                .filter(token -> token.matches(QueryParserConstants.TERM, t.text()))
-                                .findFirst()
-                                .ifPresent(token -> {
-                                    termBuilder.tokensBuilder().add(token);
-                                    processedTokens.add(token);
-                                    availableTokens.remove(token);
-                                });
-                    } else {
-                        getStream(availableTokens, processedTokens)
-                                .filter(token -> token.kind() == QueryParserConstants.TERM)
-                                .filter(token -> token.image().equals(field))
-                                .findFirst()
-                                .ifPresent(token -> {
-                                    termBuilder.tokensBuilder().add(token);
-                                    processedTokens.add(token);
-                                    availableTokens.remove(token);
-                                });
-                    }
-                    builder.termsBuilder().add(termBuilder.build());
-                }
-            }
-
-            @Override
-            public void visitLeaf(Query query) {
-                if (query instanceof RegexpQuery) {
-                    final RegexpQuery regexpQuery = (RegexpQuery) query;
-                    final String field = regexpQuery.getField();
-                    builder.termsBuilder().add(ParsedTerm.create(field, regexpQuery.getRegexp().text()));
-                }
-            }
-
-            @Override
-            public QueryVisitor getSubVisitor(BooleanClause.Occur occur, Query parent) {
-                // the default implementation ignores MUST_NOT clauses, we want to collect all, even MUST_NOT
-                return this;
-            }
-        });
+        builder.tokensBuilder().addAll(this.parser.getTokens());
+        final TermCollectingQueryVisitor visitor = new TermCollectingQueryVisitor(this.parser.getTokens());
+        parsed.visit(visitor);
+        builder.termsBuilder().addAll(visitor.getParsedTerms());
         return builder.build();
-    }
-
-    /**
-     * One stream consisting of two lists. First unused, fresh tokens. If no match found there, we can fallback to the
-     * already processed tokens and find a match there.
-     */
-    private Stream<ImmutableToken> getStream(List<ImmutableToken> availableTokens, List<ImmutableToken> processedTokens) {
-        return Streams.concat(availableTokens.stream(), processedTokens.stream());
     }
 }
