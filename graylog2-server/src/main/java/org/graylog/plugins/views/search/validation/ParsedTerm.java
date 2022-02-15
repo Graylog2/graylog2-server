@@ -52,7 +52,7 @@ public abstract class ParsedTerm {
     }
 
     public boolean isInvalidOperator() {
-        return isDefaultField() && ("and".equals(value()) || "or".equals(value()));
+        return isDefaultField() && ("and".equals(value()) || "or".equals(value()) || "not".equals(value()));
     }
 
     public String getRealFieldName() {

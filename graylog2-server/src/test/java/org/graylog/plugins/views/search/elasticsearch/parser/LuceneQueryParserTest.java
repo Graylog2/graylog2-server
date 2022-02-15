@@ -107,6 +107,12 @@ class LuceneQueryParserTest {
     }
 
     @Test
+    void testLowercaseNegation() throws ParseException {
+        final ParsedQuery query = parser.parse("NOT(foo:bar)");
+        assertThat(query.invalidOperators().size()).isEqualTo(1);
+    }
+
+    @Test
     void testRepeatedInvalidTokens() throws ParseException {
         final ParsedQuery query = parser.parse("foo:bar and lorem:ipsum and dolor:sit");
         assertThat(query.invalidOperators().size()).isEqualTo(2);

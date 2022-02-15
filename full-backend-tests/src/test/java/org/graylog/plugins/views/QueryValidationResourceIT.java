@@ -85,4 +85,17 @@ public class QueryValidationResourceIT {
                 .statusCode(200);
         validatableResponse.assertThat().body("status", equalTo("OK"));
     }
+
+    @ContainerMatrixTest
+    void testLowercaseNotOperator() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("{\"query\":\"not(http_response_code:200)\"}")
+                .post("/search/validate")
+                .then()
+                .statusCode(200);
+        validatableResponse.assertThat().body("status", equalTo("WARNING"));
+        validatableResponse.assertThat().body("explanations.error_message[0]", containsString("Query contains invalid operator \"not\". All AND / OR / NOT operators have to be written uppercase"));
+    }
 }

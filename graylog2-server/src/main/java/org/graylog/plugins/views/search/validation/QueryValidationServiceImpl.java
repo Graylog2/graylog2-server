@@ -128,7 +128,7 @@ public class QueryValidationServiceImpl implements QueryValidationService {
 
         final Stream<ValidationMessage> invalidOperatorsStream = invalidOperators.stream()
                 .map(token -> {
-                    final String errorMessage = String.format(Locale.ROOT, "Query contains invalid operator \"%s\". Both AND / OR operators have to be written uppercase", token.value());
+                    final String errorMessage = String.format(Locale.ROOT, "Query contains invalid operator \"%s\". All AND / OR / NOT operators have to be written uppercase", token.value());
                     final ValidationMessage.Builder message = ValidationMessage.builder()
                             .errorType("Invalid operator")
                             .errorMessage(errorMessage);
