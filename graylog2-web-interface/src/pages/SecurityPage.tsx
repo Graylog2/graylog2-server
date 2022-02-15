@@ -61,9 +61,6 @@ const SecurityPage = () => {
                     )}
                 </Alert>
               </Col>
-              <Col md={6}>
-                {/* Put License Status here */}
-              </Col>
             </Row>
           </IfPermitted>
         </HideOnCloud>
