@@ -18,6 +18,7 @@ import React from 'react';
 import { find } from 'lodash';
 import type { IconName } from '@fortawesome/fontawesome-common-types';
 import type { SizeProp } from '@fortawesome/fontawesome-svg-core';
+import type { FontAwesomeIconProps } from '@fortawesome/react-fontawesome';
 
 import deprecationNotice from 'util/deprecationNotice';
 import loadAsync from 'routing/loadAsync';
@@ -63,7 +64,7 @@ const getPrefixForType = (type: IconTypes) => {
   }
 };
 
-type Props = {
+type Props = FontAwesomeIconProps & {
   className?: string,
   'data-testid'?: string,
   /** Name of Font Awesome 5 Icon without `fa-` prefix */
@@ -78,7 +79,7 @@ type Props = {
   type?: IconTypes,
   fixedWidth?: boolean,
   inverse?: boolean,
-  style?: React.CSSProperties
+  style?: React.CSSProperties,
 }
 
 /**
@@ -89,7 +90,23 @@ type Props = {
  * Visit [React FontAwesome Features](https://github.com/FortAwesome/react-fontawesome#features) for more information.
  */
 
-const Icon = ({ name, type, size, className, spin, fixedWidth, inverse, style, 'data-testid': testId }: Props) => {
+const Icon = ({
+  name,
+  type,
+  size,
+  className,
+  spin,
+  fixedWidth,
+  inverse,
+  style,
+  'data-testid': testId,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
+  onFocus,
+  tabIndex,
+  title,
+}: Props) => {
   const iconName = cleanIconName(name, type);
   const prefix = getPrefixForType(type);
 
@@ -101,7 +118,13 @@ const Icon = ({ name, type, size, className, spin, fixedWidth, inverse, style, '
                            inverse={inverse}
                            size={size}
                            spin={spin}
-                           style={style} />
+                           style={style}
+                           onClick={onClick}
+                           onMouseEnter={onMouseEnter}
+                           onMouseLeave={onMouseLeave}
+                           tabIndex={tabIndex}
+                           title={title}
+                           onFocus={onFocus} />
   );
 };
 
