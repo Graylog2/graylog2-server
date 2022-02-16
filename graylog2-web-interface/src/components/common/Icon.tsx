@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { SyntheticEvent } from 'react';
 import React from 'react';
 import { find } from 'lodash';
 import type { IconName } from '@fortawesome/fontawesome-common-types';
 import type { SizeProp } from '@fortawesome/fontawesome-svg-core';
-import type { FontAwesomeIconProps } from '@fortawesome/react-fontawesome';
 
 import deprecationNotice from 'util/deprecationNotice';
 import loadAsync from 'routing/loadAsync';
@@ -64,7 +64,7 @@ const getPrefixForType = (type: IconTypes) => {
   }
 };
 
-type Props = FontAwesomeIconProps & {
+type Props = {
   className?: string,
   'data-testid'?: string,
   /** Name of Font Awesome 5 Icon without `fa-` prefix */
@@ -80,6 +80,12 @@ type Props = FontAwesomeIconProps & {
   fixedWidth?: boolean,
   inverse?: boolean,
   style?: React.CSSProperties,
+  onClick?: (event: SyntheticEvent) => void,
+  onMouseEnter?: (event: SyntheticEvent) => void,
+  onMouseLeave?: (event: SyntheticEvent) => void,
+  onFocus?: (event: SyntheticEvent) => void,
+  tabIndex?: number,
+  title?: string,
 }
 
 /**
@@ -137,6 +143,12 @@ Icon.defaultProps = {
   spin: false,
   style: undefined,
   type: 'solid',
+  onClick: undefined,
+  onMouseEnter: undefined,
+  onMouseLeave: undefined,
+  onFocus: undefined,
+  tabIndex: undefined,
+  title: undefined,
 };
 
 export type { IconName };
