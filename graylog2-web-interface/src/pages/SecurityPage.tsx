@@ -16,11 +16,10 @@
  */
 
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-import { DocumentTitle, IfPermitted } from 'components/common';
-import HideOnCloud from 'util/conditional/HideOnCloud';
-import { Col, Row, Alert } from 'components/bootstrap';
+import { IfPermitted, PageHeader } from 'components/common';
+import { Alert } from 'components/bootstrap';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
@@ -30,42 +29,31 @@ const StyledH4 = styled.h4`
   margin-bottom: 5px;
 `;
 
-const H2 = styled.h2(({ theme }) => css`
-  padding-bottom: ${theme.spacings.sm};
-`);
+const StyledAlert = styled(Alert)`
+  margin-top: 15px;
+`;
 
 const isCloud = AppConfig.isCloud();
 
 const SecurityPage = () => {
   return (
-    <DocumentTitle title="Try Graylog Security">
-      <div>
-        <HideOnCloud>
-          <IfPermitted permissions="freelicenses:create">
-            <Row className="content">
-              <Col md={12}>
-                <H2>Invalid License for Analyst Tools</H2>
-                <Alert bsStyle="danger">
-                  <StyledH4>Analyst Tools are disabled</StyledH4>
-                  <p>
-                    Analyst Tools are disabled because a valid Graylog for Security license was not found.
-                  </p>
-                  {isCloud
-                    ? (<>Contact your Graylog account manager.</>)
-                    : (
-                      <IfPermitted permissions="licenses:create">
-                        <p>
-                          See <Link to={Routes.pluginRoute('SYSTEM_LICENSES')}>Licenses page</Link> for details.
-                        </p>
-                      </IfPermitted>
-                    )}
-                </Alert>
-              </Col>
-            </Row>
-          </IfPermitted>
-        </HideOnCloud>
-      </div>
-    </DocumentTitle>
+    <PageHeader title="Invalid License for Analyst Tools">
+      <StyledAlert bsStyle="danger" className="tm">
+        <StyledH4>Analyst Tools are disabled</StyledH4>
+        <p>
+          Analyst Tools are disabled because a valid Graylog for Security license was not found.
+        </p>
+        {isCloud
+          ? (<>Contact your Graylog account manager.</>)
+          : (
+            <IfPermitted permissions="licenses:create">
+              <p>
+                See <Link to={Routes.pluginRoute('SYSTEM_LICENSES')}>Licenses page</Link> for details.
+              </p>
+            </IfPermitted>
+          )}
+      </StyledAlert>
+    </PageHeader>
   );
 };
 
