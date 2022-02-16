@@ -378,12 +378,12 @@ class NotificationsFactory {
 
       case 'archiving_summary':
         return {
-          title: 'Some archiving jobs did not complete successfully',
+          title: 'The following indices could not be archived yet (but will still be retried)',
           description: (
             <span>
-              Recent failed attempts: {' '}
               <ul>
-                {notification.details.archiveErrors.map((error) => <li key={error.id}>{error}</li>)}
+                {/* eslint-disable-next-line react/no-array-index-key */}
+                {notification.details.archiveErrors.map((error, idx) => <li key={idx}>{error}</li>)}
               </ul>
             </span>
           ),
