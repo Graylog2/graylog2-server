@@ -103,7 +103,7 @@ describe('<PaginatedItemOverview>', () => {
 
     rerender(
       <PaginatedItemOverview onLoad={() => Promise.resolve(simplePaginatedResponse)}
-                             onDeleteItem={jest.fn((item) => { console.log(item); })} />,
+                             onDeleteItem={jest.fn()} />,
     );
 
     expect(await screen.findByText(simplePaginatedResponse.list.get(0).name, { exact: false })).toBeInTheDocument();
@@ -132,7 +132,7 @@ describe('<PaginatedItemOverview>', () => {
     rerender(
       <PaginatedItemOverview onLoad={() => Promise.resolve(simplePaginatedResponse)}
                              overrideList={simplePaginatedResponse}
-                             onDeleteItem={jest.fn((item) => { console.log(item); })}
+                             onDeleteItem={jest.fn()}
                              overrideItemComponent={itemComponent} />,
     );
 
