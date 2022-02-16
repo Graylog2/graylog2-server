@@ -21,9 +21,9 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
-import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.security.UserContext;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
@@ -40,7 +40,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -48,10 +47,14 @@ import javax.annotation.Nullable;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -100,7 +103,11 @@ public class ViewsResourceTest {
 
     class ViewsTestResource extends ViewsResource {
         ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain) {
-            super(viewService, clusterEventBus, searchDomain);
+            this(viewService, clusterEventBus, userService, searchDomain, new HashMap<>());
+        }
+
+        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain, Map<String, ViewResolver> viewResolvers) {
+            super(viewService, clusterEventBus, searchDomain, viewResolvers);
             this.userService = userService;
         }
 
@@ -182,5 +189,27 @@ public class ViewsResourceTest {
         final DashboardDeletedEvent dashboardDeletedEvent = eventCaptor.getValue();
 
         assertThat(dashboardDeletedEvent.dashboardId()).isEqualTo("foobar");
+    }
+
+    @Test
+    public void testViewResolver() {
+        // Setup
+        final String viewId = "test-view";
+        when(view.id()).thenReturn(viewId);
+        final String resolverName = "test-resolver";
+        final Map<String, ViewResolver> viewResolvers = new HashMap<>();
+        viewResolvers.put(resolverName, id -> id.equals(viewId) ? Optional.of(view) : Optional.empty());
+        final ViewsResource testResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain, viewResolvers);
+
+        // Verify that view for valid id is found.
+        when(searchUser.canReadView(any())).thenReturn(true);
+        assertEquals(viewId, testResource.get(resolverName + ":" + viewId, searchUser).id());
+
+
+        // Verify error paths for invalid resolver names and view ids.
+        assertThrows(NotFoundException.class,
+                () -> testResource.get("invalid-resolver-name:" + viewId, searchUser));
+        assertThrows(NotFoundException.class,
+                () -> testResource.get(resolverName + ":invalid-view-id", searchUser));
     }
 }

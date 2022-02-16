@@ -28,6 +28,7 @@ import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.realm.AuthorizingRealm;
+import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
@@ -508,5 +509,16 @@ public abstract class Graylog2Module extends AbstractModule {
         TypeLiteral<Class<?>> keyType = new TypeLiteral<Class<?>>() {};
         TypeLiteral<ClusterConfigValidator> valueType = new TypeLiteral<ClusterConfigValidator>() {};
         return MapBinder.newMapBinder(binder(), keyType, valueType);
+    }
+
+    protected MapBinder<String, ViewResolver> viewResolverBinder() {
+        return MapBinder.newMapBinder(binder(),
+                TypeLiteral.get(String.class),
+                new TypeLiteral<ViewResolver>() {});
+    }
+
+    protected void installViewResolver(String name,
+                                       Class<? extends ViewResolver> resolverClass) {
+        viewResolverBinder().addBinding(name).to(resolverClass);
     }
 }
