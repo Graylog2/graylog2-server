@@ -20,8 +20,8 @@ import styled, { css } from 'styled-components';
 
 import { DocumentTitle, IfPermitted } from 'components/common';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import {Col, Row, Alert} from 'components/bootstrap';
-import {Link} from 'components/common/router';
+import { Col, Row, Alert } from 'components/bootstrap';
+import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
 
