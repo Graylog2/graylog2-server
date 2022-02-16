@@ -75,6 +75,7 @@ import {
   showDashboardsPath,
   newSearchPath,
   showSearchPath,
+  showViewsPath,
 } from 'views/Constants';
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
@@ -125,9 +126,14 @@ const exports: PluginExports = {
 
     { path: newSearchPath, component: NewSearchRedirectPage, parentComponent: null },
     { path: showSearchPath, component: ShowViewPage, parentComponent: App },
-    { path: `${Routes.unqualified.stream_search(':streamId')}/new`, component: NewSearchRedirectPage, parentComponent: null },
+    {
+      path: `${Routes.unqualified.stream_search(':streamId')}/new`,
+      component: NewSearchRedirectPage,
+      parentComponent: null,
+    },
     { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: App },
     { path: extendedSearchPath, component: NewSearchPage, parentComponent: App },
+    { path: showViewsPath, component: ShowViewPage, parentComponent: App },
   ],
   enterpriseWidgets: [
     {
@@ -216,13 +222,21 @@ const exports: PluginExports = {
       type: 'aggregate',
       title: 'Show top values',
       handler: AggregateActionHandler,
-      isEnabled: (({ field, type, contexts: { analysisDisabledFields } }) => (!isFunction(field) && !type.isCompound() && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
+      isEnabled: (({
+        field,
+        type,
+        contexts: { analysisDisabledFields },
+      }) => (!isFunction(field) && !type.isCompound() && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
       resetFocus: true,
     },
     {
       type: 'statistics',
       title: 'Statistics',
-      isEnabled: (({ field, type, contexts: { analysisDisabledFields } }) => (!isFunction(field) && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
+      isEnabled: (({
+        field,
+        type,
+        contexts: { analysisDisabledFields },
+      }) => (!isFunction(field) && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
       handler: FieldStatisticsHandler,
       resetFocus: false,
     },

@@ -18,7 +18,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import URI from 'urijs';
 
 import AppConfig from 'util/AppConfig';
-import { extendedSearchPath } from 'views/Constants';
+import { extendedSearchPath, viewsPath } from 'views/Constants';
 import type { TimeRangeTypes } from 'views/logic/queries/Query';
 
 type RoutesRelativeTimeRange = {
@@ -70,7 +70,7 @@ const Routes = {
       LIST: '/system/contentpacks',
       EXPORT: '/system/contentpacks/export',
       CREATE: '/system/contentpacks/create',
-      edit: (contentPackId: string, contentPackRev: string) => { return `/system/contentpacks/${contentPackId}/${contentPackRev}/edit`; },
+      edit: (contentPackId: string, contentPackRev: string) => `/system/contentpacks/${contentPackId}/${contentPackRev}/edit`,
       show: (contentPackId: string) => `/system/contentpacks/${contentPackId}`,
     },
     GROKPATTERNS: '/system/grokpatterns',
@@ -170,6 +170,10 @@ const Routes = {
       NEW_COLLECTOR: '/system/sidecars/collector/new',
       EDIT_COLLECTOR: (collectorId: string) => `/system/sidecars/collector/edit/${collectorId}`,
     },
+  },
+  VIEWS: {
+    LIST: viewsPath,
+    VIEWID: (id: string) => `${viewsPath}/${id}`,
   },
   EXTENDEDSEARCH: extendedSearchPath,
   search_with_query: (query: string, rangeType: TimeRangeTypes, timeRange: RoutesTimeRange) => {
