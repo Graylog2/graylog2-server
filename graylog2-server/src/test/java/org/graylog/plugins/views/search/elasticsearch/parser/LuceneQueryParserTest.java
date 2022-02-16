@@ -45,6 +45,18 @@ class LuceneQueryParserTest {
     }
 
     @Test
+    void getFieldExistPosition() throws ParseException {
+        final ParsedQuery fields = parser.parse("_exists_:lorem");
+        assertThat(fields.allFieldNames()).contains("lorem");
+        final ParsedTerm term = fields.terms().iterator().next();
+        final ImmutableToken fieldNameToken = term.tokens().iterator().next();
+        assertThat(fieldNameToken.beginLine()).isEqualTo(1);
+        assertThat(fieldNameToken.beginColumn()).isEqualTo(9);
+        assertThat(fieldNameToken.endLine()).isEqualTo(1);
+        assertThat(fieldNameToken.endColumn()).isEqualTo(14);
+    }
+
+    @Test
     void getFieldNamesComplex() throws ParseException {
         final ParsedQuery fields = parser.parse("type :( ssh OR login )");
         assertThat(fields.allFieldNames()).contains("type");
@@ -92,6 +104,12 @@ class LuceneQueryParserTest {
             final ParsedTerm invalidOperator = queryWithOr.invalidOperators().iterator().next();
             assertThat(invalidOperator.value()).isEqualTo("or");
         }
+    }
+
+    @Test
+    void testLowercaseNegation() throws ParseException {
+        final ParsedQuery query = parser.parse("not(foo:bar)");
+        assertThat(query.invalidOperators().size()).isEqualTo(1);
     }
 
     @Test
