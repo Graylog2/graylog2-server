@@ -297,6 +297,10 @@ public class DBJobTriggerService {
         return db.remove(query).getN();
     }
 
+    public long countByQuery(Query query) {
+        return db.getCount(query);
+    }
+
     /**
      * Locks and returns the next runnable trigger. The caller needs to take care of releasing the trigger lock.
      *

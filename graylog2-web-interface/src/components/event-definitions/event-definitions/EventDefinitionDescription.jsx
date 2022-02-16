@@ -33,7 +33,7 @@ const DetailTitle = styled.dt`
 `;
 
 const DetailValue = styled.dd(({ theme }) => css`
-  margin-left: 150px;
+  margin-left: 180px;
   word-wrap: break-word;
 
   &:not(:last-child) {
@@ -137,6 +137,8 @@ class EventDefinitionDescription extends React.Component {
               </>
             )}
             {timerange}
+            <DetailTitle>Queued notifications:</DetailTitle>
+            <DetailValue>{scheduleCtx.queued_notifications}</DetailValue>
           </DetailsList>
         </Col>
       </Row>
