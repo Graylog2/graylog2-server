@@ -23,7 +23,7 @@ import type {
   PaginatedListType,
   DescriptiveItem,
   OverrideItemComponentProps,
-  ResultsWrapperProps,
+  ResultsWrapperComponentProps,
 } from './PaginatedItemOverview';
 import PaginatedItemOverview from './PaginatedItemOverview';
 
@@ -72,7 +72,7 @@ describe('<PaginatedItemOverview>', () => {
   });
 
   it('uses custom result wrapper', async () => {
-    const myWrapper = ({ children, isEmptyResult }: ResultsWrapperProps) => (
+    const myWrapper = ({ children, isEmptyResult }: ResultsWrapperComponentProps) => (
       <ul>
         <li>My custom wrapper</li>
         <li>Empty result {JSON.stringify(isEmptyResult)}</li>
@@ -83,7 +83,7 @@ describe('<PaginatedItemOverview>', () => {
     render(
       <PaginatedItemOverview onLoad={() => Promise.resolve({} as PaginatedListType)}
                              overrideList={emptyPaginatedResponse}
-                             resultsWrapper={myWrapper} />,
+                             resultsWrapperComponent={myWrapper} />,
     );
 
     expect(await screen.findByText(/my custom wrapper/i)).toBeInTheDocument();

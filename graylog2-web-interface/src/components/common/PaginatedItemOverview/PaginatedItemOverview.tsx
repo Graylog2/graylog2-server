@@ -37,7 +37,7 @@ export type PaginatedListType = {
   pagination: ListPagination,
 };
 
-export type ResultsWrapperProps = {
+export type ResultsWrapperComponentProps = {
   isEmptyResult: boolean,
   children: React.ReactNode,
 };
@@ -53,7 +53,7 @@ type Props = {
   overrideList?: PaginatedListType,
   onDeleteItem?: (descriptiveItem: DescriptiveItem) => void,
   queryHelper?: React.ReactNode,
-  resultsWrapper?: React.ComponentType<ResultsWrapperProps>,
+  resultsWrapperComponent?: React.ComponentType<ResultsWrapperComponentProps>,
   overrideItemComponent?: React.ComponentType<OverrideItemComponentProps>,
 };
 
@@ -66,7 +66,7 @@ const PaginatedItemOverview = ({
   onDeleteItem,
   queryHelper,
   noDataText,
-  resultsWrapper: ResultsWrapper,
+  resultsWrapperComponent: ResultsWrapperComponent,
   overrideItemComponent: OverrideItemComponent,
 }: Props) => {
   const [paginatedList, setPaginatedList] = useState<PaginatedListType | undefined>();
@@ -114,9 +114,9 @@ const PaginatedItemOverview = ({
                   placeholder="Enter query to filter"
                   queryHelpComponent={queryHelper}
                   searchButtonLabel="Filter" />
-      <ResultsWrapper isEmptyResult={!itemList}>
+      <ResultsWrapperComponent isEmptyResult={!itemList}>
         {itemList ?? emptyResult}
-      </ResultsWrapper>
+      </ResultsWrapperComponent>
     </PaginatedList>
   );
 };
@@ -126,7 +126,7 @@ PaginatedItemOverview.defaultProps = {
   overrideList: undefined,
   noDataText: 'No items found to display.',
   queryHelper: undefined,
-  resultsWrapper: ({ children }) => <div>{children}</div>,
+  resultsWrapperComponent: ({ children }) => <div>{children}</div>,
   overrideItemComponent: undefined,
 };
 
