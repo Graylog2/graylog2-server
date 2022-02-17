@@ -19,11 +19,11 @@ import PropTypes from 'prop-types';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
+import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
 import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
 import EventHandler from 'views/logic/searchtypes/events/EventHandler';
-import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 
 import type { ChartDefinition } from '../ChartData';
 import { chartData } from '../ChartData';
@@ -43,7 +43,12 @@ const getChartColor = (fullData, name) => {
 
 const setChartColor = (chart, colors) => ({ line: { color: colors.get(chart.name) } });
 
-const LineVisualization = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
+const LineVisualization = makeVisualization(({
+  config,
+  data,
+  effectiveTimerange,
+  height,
+}: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || LineVisualizationConfig.empty()) as LineVisualizationConfig;
   const { interpolation = 'linear' } = visualizationConfig;
   const chartGenerator = useCallback((type, name, labels, values): ChartDefinition => ({
@@ -55,7 +60,7 @@ const LineVisualization = makeVisualization(({ config, data, effectiveTimerange,
   }), [interpolation]);
 
   const rows = retrieveChartData(data);
-  const chartDataResult = chartData(config, rows, 'scatter', chartGenerator);
+  const chartDataResult = chartData(rows, { widgetConfig: config, chartType: 'scatter', generator: chartGenerator });
   const layout: { shapes?: Shapes } = {};
 
   if (config.eventAnnotation && data.events) {

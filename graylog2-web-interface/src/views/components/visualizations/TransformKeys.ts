@@ -21,7 +21,7 @@ import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type { ColLeaf, Leaf, Key, Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
-const formatTimestamp = (timestamp, tz = AppConfig.rootTimeZone()): string => {
+const formatTimestamp = (timestamp: moment.MomentInput, tz = AppConfig.rootTimeZone()): string => {
   // the `true` parameter prevents returning the iso string in UTC (http://momentjs.com/docs/#/displaying/as-iso-string/)
   return moment(timestamp).tz(tz).toISOString(true);
 };
@@ -42,12 +42,12 @@ const transformKey = (key: Key, indices: Array<number>, tz: string) => {
   return newKey;
 };
 
-const findIndices = <T>(ary: Array<T>, predicate: (T) => boolean): Array<number> => ary
+const findIndices = <T> (ary: Array<T>, predicate: (T) => boolean): Array<number> => ary
   .map((value, idx) => ({ value, idx }))
   .filter(({ value }) => predicate(value))
   .map(({ idx }) => idx);
 
-export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>): ((Rows) => Rows) => {
+export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>): ((rows: Rows) => Rows) => {
   return (result = []) => {
     const rowIndices = findIndices(rowPivots, (pivot) => (pivot.type === 'time'));
     const columnIndices = findIndices(columnPivots, (pivot) => (pivot.type === 'time'));

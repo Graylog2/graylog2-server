@@ -16,6 +16,7 @@
  */
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 
 import * as fixtures from './TransformKeys.fixtures';
 
@@ -27,7 +28,7 @@ jest.mock('util/AppConfig', () => ({ rootTimeZone: jest.fn(() => 'America/Chicag
 // eslint-disable-next-line global-require
 describe('TransformKeys', () => {
   it('returns original result when no aggregations are present', () => {
-    const rows = [{
+    const rows: Rows = [{
       source: 'row-leaf',
       value: 42,
       key: ['foo'],
@@ -39,7 +40,7 @@ describe('TransformKeys', () => {
   });
 
   it('returns original result when no time aggregations are present', () => {
-    const rows = [{
+    const rows: Rows = [{
       source: 'row-leaf',
       value: 42,
       key: ['foo'],
@@ -52,7 +53,7 @@ describe('TransformKeys', () => {
 
   it('transforms row keys using current user\'s timezone', () => {
     CurrentUserStore.get.mockReturnValue({ timezone: 'Europe/Berlin' });
-    const input = [
+    const input: Rows = [
       {
         source: 'leaf',
         key: ['2018-10-01T15:10:55.323Z'],
@@ -82,7 +83,7 @@ describe('TransformKeys', () => {
 
   it('transforms column keys using current user\'s timezone', () => {
     CurrentUserStore.get.mockReturnValueOnce({ timezone: 'America/Los_Angeles' });
-    const input = [
+    const input: Rows = [
       {
         source: 'leaf',
         key: ['2018-10-01T15:10:55.323Z'],
@@ -113,7 +114,7 @@ describe('TransformKeys', () => {
   it('transforms column keys using AppConfig rootTimeZone if user\'s timezone is null', () => {
     CurrentUserStore.get.mockReturnValueOnce({ timezone: null });
 
-    const input = [
+    const input: Rows = [
       {
         source: 'leaf',
         key: ['2018-10-01T15:10:55.323Z'],

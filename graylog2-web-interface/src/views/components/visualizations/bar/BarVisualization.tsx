@@ -19,10 +19,10 @@ import PropTypes from 'prop-types';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
+import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
 import EventHandler from 'views/logic/searchtypes/events/EventHandler';
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
-import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 
 import { chartData } from '../ChartData';
@@ -80,7 +80,12 @@ type Layout = {
   barmode?: string;
 };
 
-const BarVisualization = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
+const BarVisualization = makeVisualization(({
+  config,
+  data,
+  effectiveTimerange,
+  height,
+}: VisualizationComponentProps) => {
   const visualizationConfig = config.visualizationConfig as BarVisualizationConfig;
   const layout: Layout = {};
 
@@ -90,10 +95,16 @@ const BarVisualization = makeVisualization(({ config, data, effectiveTimerange, 
 
   const opacity = visualizationConfig ? visualizationConfig.opacity : 1.0;
 
-  const _seriesGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values, opacity });
+  const _seriesGenerator = (type, name, labels, values): ChartDefinition => ({
+    type,
+    name,
+    x: labels,
+    y: values,
+    opacity,
+  });
 
   const rows = retrieveChartData(data);
-  const chartDataResult = chartData(config, rows, 'bar', _seriesGenerator);
+  const chartDataResult = chartData(rows, { widgetConfig: config, chartType: 'bar', generator: _seriesGenerator });
 
   if (config.eventAnnotation && data.events) {
     const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events);

@@ -30,9 +30,14 @@ const seriesGenerator = (type, name, labels, values) => ({ type, name, x: labels
 
 const setChartColor = (chart, colors) => ({ marker: { color: colors.get(chart.name) } });
 
-const ScatterVisualization = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
+const ScatterVisualization = makeVisualization(({
+  config,
+  data,
+  effectiveTimerange,
+  height,
+}: VisualizationComponentProps) => {
   const rows = retrieveChartData(data);
-  const chartDataResult = chartData(config, rows, 'scatter', seriesGenerator);
+  const chartDataResult = chartData(rows, { widgetConfig: config, chartType: 'scatter', generator: seriesGenerator });
   const layout: { shapes?: Shapes } = {};
 
   if (config.eventAnnotation && data.events) {

@@ -21,13 +21,13 @@ import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
 import EventHandler from 'views/logic/searchtypes/events/EventHandler';
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
+import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
-import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 
 import type { ChartDefinition } from '../ChartData';
-import XYPlot from '../XYPlot';
 import { chartData } from '../ChartData';
+import XYPlot from '../XYPlot';
 
 const getChartColor = (fullData, name) => {
   const data = fullData.find((d) => (d.name === name));
@@ -43,7 +43,12 @@ const getChartColor = (fullData, name) => {
 
 const setChartColor = (chart, colors) => ({ line: { color: colors.get(chart.name) } });
 
-const AreaVisualization = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
+const AreaVisualization = makeVisualization(({
+  config,
+  data,
+  effectiveTimerange,
+  height,
+}: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || AreaVisualizationConfig.empty()) as AreaVisualizationConfig;
   const { interpolation = 'linear' } = visualizationConfig;
   const chartGenerator = useCallback((type, name, labels, values): ChartDefinition => ({
@@ -57,7 +62,7 @@ const AreaVisualization = makeVisualization(({ config, data, effectiveTimerange,
 
   const rows = retrieveChartData(data);
 
-  const chartDataResult = chartData(config, rows, 'scatter', chartGenerator);
+  const chartDataResult = chartData(rows, { widgetConfig: config, chartType: 'scatter', generator: chartGenerator });
   const layout: { shapes?: Shapes } = {};
 
   if (config.eventAnnotation && data.events) {

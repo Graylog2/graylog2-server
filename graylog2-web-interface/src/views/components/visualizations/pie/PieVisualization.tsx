@@ -77,13 +77,13 @@ const setChartColor = (chart, colorMap) => {
   return { marker: { colors } };
 };
 
-const labelMapper = (data: Array<{ labels: Array<string>}>) => data.reduce((acc, { labels }) => {
+const labelMapper = (data: Array<{ labels: Array<string> }>) => data.reduce((acc, { labels }) => {
   return union(acc, labels);
 }, []);
 
 const PieVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
   const rows = retrieveChartData(data);
-  const transformedData = chartData(config, rows, 'pie', _generateSeries);
+  const transformedData = chartData(rows, { widgetConfig: config, chartType: 'pie', generator: _generateSeries });
 
   return (
     <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} neverHide>
