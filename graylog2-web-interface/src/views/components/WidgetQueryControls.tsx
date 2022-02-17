@@ -36,7 +36,7 @@ import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import { GlobalOverrideStore, GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
-import { PropagateValidationState } from 'views/components/aggregationwizard';
+import { PropagateDisableSubmissionState } from 'views/components/aggregationwizard';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
@@ -151,7 +151,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
 
           return (
             <>
-              <PropagateValidationState formKey="widget-query-controls" />
+              <PropagateDisableSubmissionState formKey="widget-query-controls" disableSubmission={disableSearchSubmit} />
               <WidgetTopRow>
                 <Col md={6}>
                   {!hasTimeRangeOverride && (

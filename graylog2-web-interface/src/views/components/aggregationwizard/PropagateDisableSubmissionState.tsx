@@ -15,17 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useContext, useEffect } from 'react';
-import { useFormikContext } from 'formik';
 
-import ValidationStateContext from '../contexts/ValidationStateContext';
+import DisableSubmissionStateContext from '../contexts/DisableSubmissionStateContext';
 
-const PropagateValidationState = ({ formKey }) => {
-  const { isValid } = useFormikContext();
-  const { setHasErrors } = useContext(ValidationStateContext);
+const PropagateDisableSubmissionState = ({ formKey, disableSubmission }) => {
+  const { setDisabled } = useContext(DisableSubmissionStateContext);
 
-  useEffect(() => setHasErrors(formKey, !isValid), [formKey, isValid, setHasErrors]);
+  useEffect(() => setDisabled(formKey, disableSubmission), [formKey, disableSubmission, setDisabled]);
 
   return null;
 };
 
-export default PropagateValidationState;
+export default PropagateDisableSubmissionState;
