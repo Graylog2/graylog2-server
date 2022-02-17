@@ -146,8 +146,8 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                      onSubmit={(values) => _onSubmit(values, widget)}
                      validateOnMount={false}
                      validateQueryString={_validateQueryString}>
-        {({ dirty, errors, isValid, isSubmitting, isValidating, handleSubmit, values, setFieldValue }) => {
-          const disableSearchSubmit = isSubmitting || isValidating || isValidatingQuery || !isValid;
+        {({ dirty, errors, isValid, isSubmitting, handleSubmit, values, setFieldValue }) => {
+          const disableSearchSubmit = isSubmitting || isValidatingQuery || !isValid;
 
           return (
             <>
