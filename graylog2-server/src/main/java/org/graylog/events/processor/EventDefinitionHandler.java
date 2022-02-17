@@ -294,7 +294,7 @@ public class EventDefinitionHandler {
 
     /**
      * Deletes notification triggers for this event.
-     * This mostly servers as a safety net, when a misconfiguration has lead to a high number of outstanding
+     * This mostly serves as a safety net, when a misconfiguration has lead to a high number of outstanding
      * notifications.
      * Processing these notifications would unnecessarily block the job scheduler and in some cases consume a lot of
      * resources.
