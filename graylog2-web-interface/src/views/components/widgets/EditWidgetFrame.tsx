@@ -27,7 +27,6 @@ import WidgetEditApplyAllChangesProvider from 'views/components/contexts/WidgetE
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
 import WidgetOverrideElements from '../WidgetOverrideElements';
-import WidgetEditApplyAllChangesContext from '../contexts/WidgetEditApplyAllChangesContext';
 import DisableSubmissionStateProvider from '../contexts/DisableSubmissionStateProvider';
 import DisableSubmissionStateContext from '../contexts/DisableSubmissionStateContext';
 
@@ -79,15 +78,11 @@ const EditWidgetFrame = ({ children, onCancel, onFinish }: Props) => {
             </WidgetOverrideElements>
           </Visualization>
           <div>
-            <WidgetEditApplyAllChangesContext.Consumer>
-              {({ isSubmitting }) => (
-                <DisableSubmissionStateContext.Consumer>
-                  {({ disabled: submissionIsDisabled }) => (
-                    <SaveOrCancelButtons onFinish={onFinish} onCancel={onCancel} disableSave={submissionIsDisabled || isSubmitting} />
-                  )}
-                </DisableSubmissionStateContext.Consumer>
+            <DisableSubmissionStateContext.Consumer>
+              {({ disabled }) => (
+                <SaveOrCancelButtons onFinish={onFinish} onCancel={onCancel} disableSave={disabled} />
               )}
-            </WidgetEditApplyAllChangesContext.Consumer>
+            </DisableSubmissionStateContext.Consumer>
           </div>
         </Container>
       </DisableSubmissionStateProvider>

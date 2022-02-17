@@ -28,14 +28,12 @@ type WidgetEditApplyAllChangesContextValue = {
   applyAllWidgetChanges: () => Promise<Widgets | void>,
   bindApplyElementConfigurationChanges: (updateFn: ApplyElementConfigurationChanges) => void,
   bindApplySearchControlsChanges: (updateFn: ApplySearchControlsChanges) => void,
-  isSubmitting: boolean,
 }
 
 const WidgetEditApplyAllChangesContext = React.createContext<WidgetEditApplyAllChangesContextValue>({
   applyAllWidgetChanges: () => Promise.resolve(),
   bindApplyElementConfigurationChanges: () => {},
   bindApplySearchControlsChanges: () => {},
-  isSubmitting: false,
 });
 
 export default singleton('contexts.WidgetEditApplyAllChangesContext', () => WidgetEditApplyAllChangesContext);

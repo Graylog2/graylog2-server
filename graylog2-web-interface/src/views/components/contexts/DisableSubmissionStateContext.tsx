@@ -18,12 +18,12 @@ import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
 
-export type ValidationState = {
+export type DisableSubmissionState = {
   disabled: boolean,
-  setDisabled: (formKey: boolean, disabled: boolean) => void,
+  setDisabled: (formKey: string, disabled: boolean) => void,
 };
 
-const DisableSubmissionStateContext = React.createContext<ValidationState>({
+const DisableSubmissionStateContext = React.createContext<DisableSubmissionState>({
   disabled: false,
   setDisabled: () => {},
 });

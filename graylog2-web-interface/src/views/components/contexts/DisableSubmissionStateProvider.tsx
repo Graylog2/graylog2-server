@@ -34,7 +34,6 @@ const DisableSubmissionStateProvider = ({ children }: Props) => {
       });
     }
   }, [isDisabledMap]);
-  console.log({ isDisabledMap });
   const disabled = Object.values(isDisabledMap).includes(true);
   const contextValue = useMemo(() => ({ disabled, setDisabled }), [disabled, setDisabled]);
 
