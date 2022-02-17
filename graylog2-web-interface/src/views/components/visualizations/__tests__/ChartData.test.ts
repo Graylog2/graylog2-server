@@ -27,21 +27,22 @@ import { chartData, extractSeries, formatSeries, generateChart } from '../ChartD
 import transformKeys from '../TransformKeys';
 
 const cwd = dirname(__filename);
-const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`, 'utf-8'));
+const readFixture = (filename: string) => JSON.parse(readFileSync(`${cwd}/${filename}`, 'utf-8'));
+const formatTime = (timestamp: string) => timestamp;
 
 describe('Chart helper functions', () => {
   const config = AggregationWidgetConfig.builder().build();
 
   describe('chartData', () => {
     it('should not fail for empty data', () => {
-      const result = chartData([], { widgetConfig: config, chartType: 'dummy' });
+      const result = chartData([], { widgetConfig: config, chartType: 'dummy', formatTime });
 
       expect(result).toHaveLength(0);
     });
 
     it('should properly extract series from simplest fixture with one series and one row pivot', () => {
       const input = readFixture('ChartData.test.simplest.json');
-      const result = chartData(input, { widgetConfig: config, chartType: 'dummy' });
+      const result = chartData(input, { widgetConfig: config, chartType: 'dummy', formatTime });
       const expectedResult = [{
         name: 'count()',
         type: 'dummy',
@@ -55,7 +56,7 @@ describe('Chart helper functions', () => {
 
     it('should properly extract series from simplest fixture and include provided chart type', () => {
       const input = readFixture('ChartData.test.simplest.json');
-      const result = chartData(input, { widgetConfig: config, chartType: 'bar' });
+      const result = chartData(input, { widgetConfig: config, chartType: 'bar', formatTime });
       const expectedResult = [{
         name: 'count()',
         type: 'bar',
@@ -69,7 +70,7 @@ describe('Chart helper functions', () => {
 
     it('should remove non-present data points and leave order of values intact', () => {
       const input = readFixture('ChartData.test.withHoles.json');
-      const result = chartData(input, { widgetConfig: config, chartType: 'bar' });
+      const result = chartData(input, { widgetConfig: config, chartType: 'bar', formatTime });
       const expectedResult = [{
         name: 'count()',
         type: 'bar',
@@ -100,7 +101,7 @@ describe('Chart helper functions', () => {
 
     it('should not remove data points with a value of zero', () => {
       const input = readFixture('ChartData.test.withZeros.json');
-      const result = chartData(input, { widgetConfig: config, chartType: 'bar' });
+      const result = chartData(input, { widgetConfig: config, chartType: 'bar', formatTime });
       const expectedResult = [{
         name: 'count()',
         type: 'bar',
@@ -120,7 +121,7 @@ describe('Chart helper functions', () => {
 
     it('should remove data points with a value of null or undefined', () => {
       const input = readFixture('ChartData.test.withNullAndUndefined.json');
-      const result = chartData(input, { widgetConfig: config, chartType: 'bar' });
+      const result = chartData(input, { widgetConfig: config, chartType: 'bar', formatTime });
       const expectedResult = [{
         name: 'count()',
         type: 'bar',
@@ -137,7 +138,7 @@ describe('Chart helper functions', () => {
 
     it('should properly extract series from fixture with two column pivots', () => {
       const input = readFixture('ChartData.test.twoColumnPivots.json');
-      const result = chartData(input, { widgetConfig: config, chartType: 'dummy' });
+      const result = chartData(input, { widgetConfig: config, chartType: 'dummy', formatTime });
       const expectedResult = readFixture('ChartData.test.twoColumnPivots.result.json');
 
       expect(result).toHaveLength(6);
@@ -146,7 +147,7 @@ describe('Chart helper functions', () => {
 
     it('should include chart type in result', () => {
       const input = readFixture('ChartData.test.simple.json');
-      const result = chartData(input, { widgetConfig: config, chartType: 'scatter' });
+      const result = chartData(input, { widgetConfig: config, chartType: 'scatter', formatTime });
       const expectedResult = readFixture('ChartData.test.simple.result.json');
 
       expect(result).toHaveLength(6);
@@ -182,6 +183,7 @@ describe('Chart helper functions', () => {
         chartType: 'heatmap',
         generator: generatorFunction,
         seriesFormatter: formatSeriesCustom,
+        formatTime,
       });
       const expectedResult = readFixture('ChartData.test.oneColumOneRowPivot.result.json');
 
@@ -196,6 +198,7 @@ describe('Chart helper functions', () => {
         widgetConfig: config,
         chartType: 'scatter',
         leafValueMatcher: leafSourceMatcher,
+        formatTime,
       });
       const expectedResult = readFixture('ChartData.test.simple.sourceMatcher.result.json');
 
@@ -212,7 +215,7 @@ describe('Chart helper functions', () => {
         name: md5(JSON.stringify({ type, name, labels, values })),
       });
       const pipeline = flow([
-        transformKeys(config.rowPivots, config.columnPivots),
+        transformKeys(config.rowPivots, config.columnPivots, formatTime),
         extractSeries(),
         formatSeries,
         generateChart('scatter', generatorFunction),

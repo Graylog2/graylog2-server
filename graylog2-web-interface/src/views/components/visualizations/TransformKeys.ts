@@ -14,19 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import moment from 'moment-timezone';
-
-import AppConfig from 'util/AppConfig';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type { ColLeaf, Leaf, Key, Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type { DateTime, DateTimeFormats } from 'util/DateTime';
 
-const formatTimestamp = (timestamp: moment.MomentInput, tz = AppConfig.rootTimeZone()): string => {
-  // the `true` parameter prevents returning the iso string in UTC (http://momentjs.com/docs/#/displaying/as-iso-string/)
-  return moment(timestamp).tz(tz).toISOString(true);
-};
+type TimeFormatter = (time: DateTime, format?: DateTimeFormats) => string;
 
-const transformKey = (key: Key, indices: Array<number>, tz: string) => {
+const transformKey = (key: Key, indices: Array<number>, formatTimestamp: TimeFormatter) => {
   if (indices.length === 0) {
     return key;
   }
@@ -35,7 +29,7 @@ const transformKey = (key: Key, indices: Array<number>, tz: string) => {
 
   indices.forEach((idx) => {
     if (newKey[idx]) {
-      newKey[idx] = formatTimestamp(newKey[idx], tz);
+      newKey[idx] = formatTimestamp(newKey[idx], 'internal');
     }
   });
 
@@ -47,7 +41,7 @@ const findIndices = <T> (ary: Array<T>, predicate: (T) => boolean): Array<number
   .filter(({ value }) => predicate(value))
   .map(({ idx }) => idx);
 
-export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>): ((rows: Rows) => Rows) => {
+export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>, formatTime: TimeFormatter): (rows: Rows) => Rows => {
   return (result = []) => {
     const rowIndices = findIndices(rowPivots, (pivot) => (pivot.type === 'time'));
     const columnIndices = findIndices(columnPivots, (pivot) => (pivot.type === 'time'));
@@ -56,9 +50,6 @@ export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>): ((rows: Ro
       return result;
     }
 
-    const currentUser = CurrentUserStore.get();
-    const timezone = currentUser?.timezone ?? AppConfig.rootTimeZone();
-
     return result.map((row) => {
       if (row.source !== 'leaf') {
         return row;
@@ -66,7 +57,7 @@ export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>): ((rows: Ro
 
       const newRow: Leaf = { ...row };
 
-      newRow.key = transformKey(row.key, rowIndices, timezone);
+      newRow.key = transformKey(row.key, rowIndices, formatTime);
 
       if (columnIndices.length > 0) {
         newRow.values = row.values.map((values) => {
@@ -76,7 +67,7 @@ export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>): ((rows: Ro
 
           const newValues: ColLeaf = { ...values };
 
-          newValues.key = transformKey(values.key, columnIndices, timezone);
+          newValues.key = transformKey(values.key, columnIndices, formatTime);
 
           return newValues;
         });
