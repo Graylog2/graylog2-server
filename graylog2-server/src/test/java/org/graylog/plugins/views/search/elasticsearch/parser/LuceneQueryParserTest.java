@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.validation.ParsedQuery;
 import org.graylog.plugins.views.search.validation.ParsedTerm;
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,7 +50,8 @@ class LuceneQueryParserTest {
         final ParsedQuery fields = parser.parse("_exists_:lorem");
         assertThat(fields.allFieldNames()).contains("lorem");
         final ParsedTerm term = fields.terms().iterator().next();
-        final ImmutableToken fieldNameToken = term.tokens().iterator().next();
+        assertThat(term.keyToken()).isPresent();
+        final ImmutableToken fieldNameToken = term.keyToken().get();
         assertThat(fieldNameToken.beginLine()).isEqualTo(1);
         assertThat(fieldNameToken.beginColumn()).isEqualTo(9);
         assertThat(fieldNameToken.endLine()).isEqualTo(1);
@@ -75,9 +77,8 @@ class LuceneQueryParserTest {
         assertThat(query.invalidOperators().stream().map(ParsedTerm::value).collect(Collectors.toSet())).contains("and");
 
         final ParsedTerm term = query.invalidOperators().iterator().next();
-        final ImmutableToken token = term.tokens().iterator().next();
-        assertThat(token).isNotNull();
-
+        assertThat(term.keyToken()).isPresent();
+        final ImmutableToken token = term.keyToken().get();
         assertThat(token.beginColumn()).isEqualTo(8);
         assertThat(token.beginLine()).isEqualTo(1);
         assertThat(token.endColumn()).isEqualTo(11);
@@ -122,9 +123,9 @@ class LuceneQueryParserTest {
     void testLongStringOfInvalidTokens() throws ParseException {
         final ParsedQuery query = parser.parse("and and and or or or");
         assertThat(query.invalidOperators().size()).isEqualTo(6);
-        assertThat(query.invalidOperators().stream().allMatch(op -> op.tokens().size() == 1)).isTrue();
+        assertThat(query.invalidOperators().stream().allMatch(op -> op.keyToken().isPresent())).isTrue();
         assertThat(query.invalidOperators().stream().allMatch(op -> {
-            final String tokenValue = op.tokens().iterator().next().image();
+            final String tokenValue = op.keyToken().map(ImmutableToken::image).get();
             return tokenValue.equals("or") || tokenValue.equals("and");
         })).isTrue();
     }

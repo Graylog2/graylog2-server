@@ -59,7 +59,7 @@ public class TermCollectingQueryVisitor extends QueryVisitor {
                         .filter(token -> token.matches(QueryParserConstants.TERM, t.text()))
                         .findFirst()
                         .ifPresent(token -> {
-                            termBuilder.tokensBuilder().add(token);
+                            termBuilder.keyToken(token);
                             processedTokens.add(token);
                             availableTokens.remove(token);
                         });
@@ -69,7 +69,7 @@ public class TermCollectingQueryVisitor extends QueryVisitor {
                         .filter(token -> token.image().equals(t.field()))
                         .findFirst()
                         .ifPresent(token -> {
-                            termBuilder.tokensBuilder().add(token);
+                            termBuilder.keyToken(token);
                             processedTokens.add(token);
                             availableTokens.remove(token);
                         });
