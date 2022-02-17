@@ -81,7 +81,7 @@ describe('QueryInput', () => {
     expect(onBlur).toHaveBeenCalledTimes(1);
   });
 
-  describe('on submit', () => {
+  describe('execution', () => {
     it('triggers onExecute on enter', () => {
       const onExecute = jest.fn();
       render(<SimpleQueryInput value="the query" onExecute={onExecute} />);
@@ -92,6 +92,17 @@ describe('QueryInput', () => {
 
       expect(onExecute).toHaveBeenCalledTimes(1);
       expect(onExecute).toHaveBeenCalledWith('the query');
+    });
+
+    it('does not trigger onExecute on enter when execution is disabled', () => {
+      const onExecute = jest.fn();
+      render(<SimpleQueryInput value="the query" onExecute={onExecute} disableExecution />);
+
+      const queryInput = getQueryInput();
+      queryInput.focus();
+      userEvent.type(queryInput, '{enter}');
+
+      expect(onExecute).not.toHaveBeenCalledTimes(1);
     });
 
     it('triggers QueryValidationActions.displayValidationErrors when there in an error', () => {
