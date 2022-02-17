@@ -25,7 +25,6 @@ import usePluginEntities from 'views/logic/usePluginEntities';
 type Inputs = Immutable.Map<string, Input>;
 
 const _inputName = (inputs: Inputs, inputId: string) => {
-  // eslint-disable-next-line react/destructuring-assignment
   const input = inputs.get(inputId);
 
   return input ? <span style={{ wordBreak: 'break-word' }}>{input.title}</span> : 'deleted input';

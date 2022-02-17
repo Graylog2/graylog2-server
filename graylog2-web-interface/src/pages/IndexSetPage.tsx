@@ -74,7 +74,7 @@ class IndexSetPage extends React.Component<Props, State> {
       indices: undefined,
       closedIndices: undefined,
     },
-  }
+  };
 
   constructor(props) {
     super(props);

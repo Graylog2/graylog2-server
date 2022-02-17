@@ -41,7 +41,6 @@ type Props = {
 };
 
 const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string, id: string) => {
-  // eslint-disable-next-line react/destructuring-assignment
   const streamList = streams.map((stream) => {
     if (stream.is_default) {
       return <MenuItem key={stream.id} disabled title="Cannot test against the default stream">{stream.title}</MenuItem>;

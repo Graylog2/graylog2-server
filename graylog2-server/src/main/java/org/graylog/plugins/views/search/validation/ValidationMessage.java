@@ -58,7 +58,7 @@ public abstract class ValidationMessage {
     @JsonProperty
     public abstract String errorMessage();
 
-    public static ValidationMessage fromException(final String query, final Exception exception) {
+    public static ValidationMessage fromException(final Exception exception) {
 
         final String input = exception.toString();
 
@@ -66,7 +66,7 @@ public abstract class ValidationMessage {
 
         errorBuilder.errorType("Query parsing error");
         final String rootCause = getErrorMessage(exception);
-        errorBuilder.errorMessage(String.format(Locale.ROOT, "Cannot parse query '%s', cause: %s", query, rootCause));
+        errorBuilder.errorMessage(String.format(Locale.ROOT, "Cannot parse query, cause: %s", rootCause));
 
         final Matcher positionMatcher = regexPosition.matcher(input);
         if (positionMatcher.find()) {

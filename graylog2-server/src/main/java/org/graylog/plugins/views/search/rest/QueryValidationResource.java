@@ -45,6 +45,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.nullsLast;
 
 @RequiresAuthentication
 @Api(value = "Search/Validation")
@@ -105,9 +107,8 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     private List<ValidationMessageDTO> toExplanations(ValidationResponse response) {
         return response.explanations().stream()
                 .map(this::toExplanation)
-                .sorted(Comparator
-                        .comparing(ValidationMessageDTO::beginLine)
-                        .thenComparing(ValidationMessageDTO::beginColumn))
+                .sorted(Comparator.comparing(ValidationMessageDTO::beginLine, nullsLast(naturalOrder()))
+                        .thenComparing(ValidationMessageDTO::beginColumn, nullsLast(naturalOrder())))
                 .collect(Collectors.toList());
     }
 

@@ -102,7 +102,7 @@ export default class EditableTitle extends React.Component<Props, State> {
     } else {
       this.setState({ value: propsValue });
     }
-  }
+  };
 
   _onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

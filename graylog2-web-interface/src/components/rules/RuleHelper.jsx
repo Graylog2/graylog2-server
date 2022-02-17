@@ -64,13 +64,13 @@ class RuleHelper extends React.Component {
     newState[functionName] = !newState[functionName];
 
     this.setState({ expanded: newState });
-  }
+  };
 
   _functionSignature = (descriptor) => {
     const args = descriptor.params.map((p) => (p.optional ? `[${p.name}]` : p.name));
 
     return `${descriptor.name}(${args.join(', ')}) : ${this._niceType(descriptor.return_type)}`;
-  }
+  };
 
   _parameters = (descriptor) => {
     return descriptor.params.map((p) => {
@@ -83,7 +83,7 @@ class RuleHelper extends React.Component {
         </tr>
       );
     });
-  }
+  };
 
   _renderFunctions = (descriptors) => {
     const { expanded } = this.state;
@@ -127,11 +127,11 @@ class RuleHelper extends React.Component {
         </tbody>
       );
     });
-  }
+  };
 
   _onPageChange = (newPage, pageSize) => {
     this.setState({ currentPage: newPage, pageSize: pageSize });
-  }
+  };
 
   _filterDescriptors = (filter) => {
     const { currentPage, pageBeforeFilter } = this.state;
@@ -162,7 +162,7 @@ class RuleHelper extends React.Component {
       pageBeforeFilter: this.pageBeforeFilter || currentPage,
       currentPage: 1,
     });
-  }
+  };
 
   _onFilterReset = () => {
     const { pageBeforeFilter } = this.state;
@@ -173,7 +173,7 @@ class RuleHelper extends React.Component {
       currentPage: pageBeforeFilter || 1,
       pageBeforeFilter: undefined,
     });
-  }
+  };
 
   render() {
     const { currentPage, filteredDescriptors, pageSize } = this.state;

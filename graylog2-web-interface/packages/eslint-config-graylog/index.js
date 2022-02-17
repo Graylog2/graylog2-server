@@ -107,6 +107,7 @@ module.exports = {
     'no-underscore-dangle': 'off',
     'object-curly-newline': ['error', { multiline: true, consistent: true }],
     'object-shorthand': ['error', 'methods'],
+    'react/destructuring-assignment': 'off',
     'react/forbid-prop-types': 'off',
     'react/function-component-definition': 'off',
     'react/jsx-closing-bracket-location': ['warn', 'after-props'],

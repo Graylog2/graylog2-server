@@ -43,7 +43,7 @@ class TimezoneSelect extends React.Component {
 
   static defaultProps = {
     onChange: () => {},
-  }
+  };
 
   // Some time zones are not stored into any areas, this is the group we use to put them apart in the dropdown
   // https://en.wikipedia.org/wiki/List_of_tz_database_time_zones

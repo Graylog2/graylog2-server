@@ -57,7 +57,6 @@ import org.graylog.plugins.views.search.rest.ExportJobsResource;
 import org.graylog.plugins.views.search.rest.FieldTypesResource;
 import org.graylog.plugins.views.search.rest.MessageExportFormatFilter;
 import org.graylog.plugins.views.search.rest.MessagesResource;
-import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.rest.PivotSeriesFunctionsResource;
 import org.graylog.plugins.views.search.rest.QualifyingViewsResource;
 import org.graylog.plugins.views.search.rest.QueryValidationResource;
@@ -109,6 +108,8 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.WorldMapVisual
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SeriesSortConfig;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
+import org.graylog2.contentpacks.facades.DashboardEntityCreator;
+import org.graylog2.contentpacks.facades.DashboardFacade;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesServiceImpl;
 import org.graylog2.plugin.PluginConfigBean;
@@ -183,6 +184,7 @@ public class ViewsBindings extends ViewsModule {
         bind(QueryValidationService.class).to(QueryValidationServiceImpl.class).in(Scopes.SINGLETON);
         bind(ChunkDecorator.class).to(LegacyChunkDecorator.class);
         bind(MessagesExporter.class).to(DecoratingMessagesExporter.class);
+        bind(DashboardEntityCreator.class).to(DashboardFacade.class);
 
         registerWidgetConfigSubtypes();
 
@@ -227,6 +229,10 @@ public class ViewsBindings extends ViewsModule {
         bind(SearchConfig.class).toProvider(SearchConfigProvider.class);
 
         binder().bind(QuerySuggestionsService.class).toProvider(QuerySuggestionsProvider.class);
+
+        // The ViewResolver binder must be explicitly initialized to avoid an initialization error when
+        // no values are bound.
+        viewResolverBinder();
     }
 
     private void registerExportBackendProvider() {
