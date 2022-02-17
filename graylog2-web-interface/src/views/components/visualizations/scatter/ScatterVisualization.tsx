@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
@@ -22,8 +23,8 @@ import EventHandler from 'views/logic/searchtypes/events/EventHandler';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
+import useChartData from 'views/components/visualizations/useChartData';
 
-import { chartData } from '../ChartData';
 import XYPlot from '../XYPlot';
 
 const seriesGenerator = (type, name, labels, values) => ({ type, name, x: labels, y: values, mode: 'markers' });
@@ -36,8 +37,12 @@ const ScatterVisualization = makeVisualization(({
   effectiveTimerange,
   height,
 }: VisualizationComponentProps) => {
-  const rows = retrieveChartData(data);
-  const chartDataResult = chartData(rows, { widgetConfig: config, chartType: 'scatter', generator: seriesGenerator });
+  const rows = useMemo(() => retrieveChartData(data), [data]);
+  const chartDataResult = useChartData(rows, {
+    widgetConfig: config,
+    chartType: 'scatter',
+    generator: seriesGenerator,
+  });
   const layout: { shapes?: Shapes } = {};
 
   if (config.eventAnnotation && data.events) {

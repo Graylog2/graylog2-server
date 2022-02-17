@@ -21,9 +21,9 @@ import { AggregationType, AggregationResult } from 'views/components/aggregation
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
+import useChartData from 'views/components/visualizations/useChartData';
 
 import type { ChartDefinition, ExtractedSeries, ValuesBySeries } from '../ChartData';
-import { chartData } from '../ChartData';
 import GenericPlot from '../GenericPlot';
 
 const _generateSeriesTitles = (config, x, y) => {
@@ -140,7 +140,7 @@ const _leafSourceMatcher = ({ source }) => source.endsWith('leaf') && source !==
 const HeatmapVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || HeatmapVisualizationConfig.empty()) as HeatmapVisualizationConfig;
   const rows = retrieveChartData(data);
-  const heatmapData = chartData(rows, {
+  const heatmapData = useChartData(rows, {
     widgetConfig: config,
     chartType: 'heatmap',
     generator: _generateSeries(visualizationConfig),

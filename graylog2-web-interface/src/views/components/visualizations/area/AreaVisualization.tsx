@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
@@ -24,9 +24,9 @@ import type { VisualizationComponentProps } from 'views/components/aggregationbu
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
+import useChartData from 'views/components/visualizations/useChartData';
 
 import type { ChartDefinition } from '../ChartData';
-import { chartData } from '../ChartData';
 import XYPlot from '../XYPlot';
 
 const getChartColor = (fullData, name) => {
@@ -60,9 +60,9 @@ const AreaVisualization = makeVisualization(({
     line: { shape: toPlotly(interpolation) },
   }), [interpolation]);
 
-  const rows = retrieveChartData(data);
+  const rows = useMemo(() => retrieveChartData(data), [data]);
 
-  const chartDataResult = chartData(rows, { widgetConfig: config, chartType: 'scatter', generator: chartGenerator });
+  const chartDataResult = useChartData(rows, { widgetConfig: config, chartType: 'scatter', generator: chartGenerator });
   const layout: { shapes?: Shapes } = {};
 
   if (config.eventAnnotation && data.events) {
