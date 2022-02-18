@@ -23,8 +23,8 @@ import { makeVisualization, retrieveChartData } from 'views/components/aggregati
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
 import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
-import EventHandler from 'views/logic/searchtypes/events/EventHandler';
 import useChartData from 'views/components/visualizations/useChartData';
+import useEvents from 'views/components/visualizations/useEvents';
 
 import type { ChartDefinition } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -60,15 +60,16 @@ const LineVisualization = makeVisualization(({
   }), [interpolation]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
-  const chartDataResult = useChartData(rows, { widgetConfig: config, chartType: 'scatter', generator: chartGenerator });
-  const layout: { shapes?: Shapes } = {};
+  const _chartDataResult = useChartData(rows, {
+    widgetConfig: config,
+    chartType: 'scatter',
+    generator: chartGenerator,
+  });
 
-  if (config.eventAnnotation && data.events) {
-    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events);
+  const { eventChartData, shapes } = useEvents(config, data.events);
 
-    chartDataResult.push(eventChartData);
-    layout.shapes = shapes;
-  }
+  const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
+  const layout: { shapes?: Shapes } = shapes ? { shapes } : {};
 
   return (
     <XYPlot config={config}

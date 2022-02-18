@@ -15,11 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { groupBy } from 'lodash';
+import moment from 'moment-timezone';
 
 import type { Event } from './EventHandler';
 import EventHandler from './EventHandler';
 
-const groupByTimestamp = ((es) => groupBy(es, (e) => e.timestamp));
+const formatTimestamp = (timezone: string) => (timestamp: string) => moment(timestamp).tz(timezone).toISOString(true);
+
+const groupByTimestamp = ((es: Event[]) => groupBy(es, (e) => e.timestamp));
 
 describe('EventHandler convert', () => {
   const event: Event = {
@@ -31,13 +34,13 @@ describe('EventHandler convert', () => {
   };
 
   it('should convert events to chart data and shapes', () => {
-    const result = EventHandler.toVisualizationData([event]);
+    const result = EventHandler.toVisualizationData([event], formatTimestamp('UTC'));
 
     expect(result).toMatchSnapshot();
   });
 
   it('should convert events to char data', () => {
-    const result = EventHandler.toChartData(groupByTimestamp([event]), 'UTC');
+    const result = EventHandler.toChartData(groupByTimestamp([event]), formatTimestamp('UTC'));
 
     expect(result).toEqual({
       hovertemplate: '%{text}',
@@ -52,7 +55,7 @@ describe('EventHandler convert', () => {
   });
 
   it('should convert events to char data and use new timezone', () => {
-    const result = EventHandler.toChartData(groupByTimestamp([event]), 'CET');
+    const result = EventHandler.toChartData(groupByTimestamp([event]), formatTimestamp('CET'));
 
     expect(result).toEqual({
       hovertemplate: '%{text}',
@@ -67,7 +70,7 @@ describe('EventHandler convert', () => {
   });
 
   it('should group duplicate events by timestamp and convert events to char data', () => {
-    const result = EventHandler.toChartData(groupByTimestamp([event, event, event]), 'UTC');
+    const result = EventHandler.toChartData(groupByTimestamp([event, event, event]), formatTimestamp('UTC'));
 
     expect(result).toEqual({
       hovertemplate: '%{text}',
@@ -82,7 +85,7 @@ describe('EventHandler convert', () => {
   });
 
   it('should keep the color set by the user', () => {
-    const result = EventHandler.toChartData(groupByTimestamp([event]), 'UTC');
+    const result = EventHandler.toChartData(groupByTimestamp([event]), formatTimestamp('UTC'));
 
     expect(result).toEqual({
       hovertemplate: '%{text}',
@@ -97,7 +100,7 @@ describe('EventHandler convert', () => {
   });
 
   it('should convert events to shape data', () => {
-    const result = EventHandler.toShapeData([event.timestamp], 'UTC');
+    const result = EventHandler.toShapeData([event.timestamp], formatTimestamp('UTC'));
 
     expect(result[0]).toEqual({
       layer: 'below',
@@ -112,7 +115,7 @@ describe('EventHandler convert', () => {
   });
 
   it('should convert events to shape data with new timezone', () => {
-    const result = EventHandler.toShapeData([event.timestamp], 'CET');
+    const result = EventHandler.toShapeData([event.timestamp], formatTimestamp('CET'));
 
     expect(result[0]).toEqual({
       layer: 'below',

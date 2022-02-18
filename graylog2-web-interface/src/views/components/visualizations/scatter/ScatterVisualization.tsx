@@ -19,11 +19,11 @@ import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
-import EventHandler from 'views/logic/searchtypes/events/EventHandler';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import useChartData from 'views/components/visualizations/useChartData';
+import useEvents from 'views/components/visualizations/useEvents';
 
 import XYPlot from '../XYPlot';
 
@@ -38,19 +38,15 @@ const ScatterVisualization = makeVisualization(({
   height,
 }: VisualizationComponentProps) => {
   const rows = useMemo(() => retrieveChartData(data), [data]);
-  const chartDataResult = useChartData(rows, {
+  const _chartDataResult = useChartData(rows, {
     widgetConfig: config,
     chartType: 'scatter',
     generator: seriesGenerator,
   });
-  const layout: { shapes?: Shapes } = {};
+  const { eventChartData, shapes } = useEvents(config, data.events);
 
-  if (config.eventAnnotation && data.events) {
-    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events);
-
-    chartDataResult.push(eventChartData);
-    layout.shapes = shapes;
-  }
+  const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
+  const layout: { shapes?: Shapes } = shapes ? { shapes } : {};
 
   return (
     <XYPlot config={config}

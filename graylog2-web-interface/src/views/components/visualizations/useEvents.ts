@@ -14,21 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext, useMemo } from 'react';
-import type { Optional } from 'utility-types';
+import { useCallback, useContext } from 'react';
 
-import type { ChartDataConfig } from 'views/components/visualizations/ChartData';
-import { chartData } from 'views/components/visualizations/ChartData';
-import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type { Event } from 'views/logic/searchtypes/events/EventHandler';
+import EventHandler from 'views/logic/searchtypes/events/EventHandler';
 import UserDateTimeContext from 'contexts/UserDateTimeContext';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-const useChartData = (rows: Rows, config: Optional<ChartDataConfig, 'formatTime'>) => {
+const useEvents = (config: AggregationWidgetConfig, events: Event[] | undefined) => {
   const { formatTime } = useContext(UserDateTimeContext);
+  const formatTimestamp = useCallback((timestamp: string) => formatTime(timestamp, 'internal'), [formatTime]);
 
-  return useMemo(() => chartData(rows, {
-    formatTime,
-    ...config,
-  }), [config, formatTime, rows]);
+  return (config.eventAnnotation && events)
+    ? EventHandler.toVisualizationData(events, formatTimestamp)
+    : { eventChartData: undefined, shapes: undefined };
 };
 
-export default useChartData;
+export default useEvents;
