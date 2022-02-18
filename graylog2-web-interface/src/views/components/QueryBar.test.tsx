@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
+import { Map as MockMap } from 'immutable';
 import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
 
 import { MockStore } from 'helpers/mocking';
@@ -37,7 +38,7 @@ jest.mock('views/stores/ViewStatesStore', () => ({
   ViewStatesActions: {
     remove: jest.fn(() => Promise.resolve()),
   },
-  ViewStatesStore: MockStore(['getInitialState', () => new Map()]),
+  ViewStatesStore: MockStore(['getInitialState', () => MockMap()]),
 }));
 
 const queries = Immutable.OrderedSet(['foo', 'bar', 'baz']);
