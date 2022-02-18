@@ -70,7 +70,7 @@ const Routes = {
       LIST: '/system/contentpacks',
       EXPORT: '/system/contentpacks/export',
       CREATE: '/system/contentpacks/create',
-      edit: (contentPackId: string, contentPackRev: string) => { return `/system/contentpacks/${contentPackId}/${contentPackRev}/edit`; },
+      edit: (contentPackId: string, contentPackRev: string) => `/system/contentpacks/${contentPackId}/${contentPackRev}/edit`,
       show: (contentPackId: string) => `/system/contentpacks/${contentPackId}`,
     },
     GROKPATTERNS: '/system/grokpatterns',

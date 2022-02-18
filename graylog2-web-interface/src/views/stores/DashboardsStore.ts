@@ -24,7 +24,7 @@ import type { RefluxActions, Store } from 'stores/StoreTypes';
 
 import type { PaginatedViews, SortField, SortOrder } from './ViewManagementStore';
 
-import type View from '../logic/views/View';
+import type { ViewJson } from '../logic/views/View';
 
 type DashboardsActionsType = RefluxActions<{
   search: (query?: string, page?: number, perPage?: number, sortBy?: SortField, order?: SortOrder) => Promise<PaginatedViews>,
@@ -48,7 +48,7 @@ export type Pagination = {
 
 export type DashboardsStoreState = {
   pagination: Pagination;
-  list: Array<View> | undefined;
+  list: Array<ViewJson> | undefined;
 };
 
 const DashboardsStore: Store<DashboardsStoreState> = singletonStore(
@@ -63,7 +63,7 @@ const DashboardsStore: Store<DashboardsStoreState> = singletonStore(
       perPage: 10,
     },
 
-    getInitialState() {
+    getInitialState(): DashboardsStoreState {
       return {
         pagination: this.pagination,
         list: this.dashboards,
