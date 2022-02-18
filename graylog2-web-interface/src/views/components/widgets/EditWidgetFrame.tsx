@@ -27,9 +27,8 @@ import WidgetEditApplyAllChangesProvider from 'views/components/contexts/WidgetE
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
 import WidgetOverrideElements from '../WidgetOverrideElements';
-import WidgetEditApplyAllChangesContext from '../contexts/WidgetEditApplyAllChangesContext';
-import ValidationStateProvider from '../contexts/ValidationStateProvider';
-import ValidationStateContext from '../contexts/ValidationStateContext';
+import DisableSubmissionStateProvider from '../contexts/DisableSubmissionStateProvider';
+import DisableSubmissionStateContext from '../contexts/DisableSubmissionStateContext';
 
 const Container = styled.div`
   display: flex;
@@ -64,7 +63,7 @@ const EditWidgetFrame = ({ children, onCancel, onFinish }: Props) => {
 
   return (
     <WidgetEditApplyAllChangesProvider widget={widget}>
-      <ValidationStateProvider>
+      <DisableSubmissionStateProvider>
         <Container>
           <IfDashboard>
             <QueryControls>
@@ -79,18 +78,14 @@ const EditWidgetFrame = ({ children, onCancel, onFinish }: Props) => {
             </WidgetOverrideElements>
           </Visualization>
           <div>
-            <WidgetEditApplyAllChangesContext.Consumer>
-              {({ isSubmitting }) => (
-                <ValidationStateContext.Consumer>
-                  {({ hasErrors }) => (
-                    <SaveOrCancelButtons onFinish={onFinish} onCancel={onCancel} disableSave={hasErrors || isSubmitting} />
-                  )}
-                </ValidationStateContext.Consumer>
+            <DisableSubmissionStateContext.Consumer>
+              {({ disabled }) => (
+                <SaveOrCancelButtons onFinish={onFinish} onCancel={onCancel} disableSave={disabled} />
               )}
-            </WidgetEditApplyAllChangesContext.Consumer>
+            </DisableSubmissionStateContext.Consumer>
           </div>
         </Container>
-      </ValidationStateProvider>
+      </DisableSubmissionStateProvider>
     </WidgetEditApplyAllChangesProvider>
   );
 };
