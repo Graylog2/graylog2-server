@@ -56,6 +56,17 @@ const viewMetadata = {
 };
 
 describe('QueryBar', () => {
+  let oldWindowConfirm;
+
+  beforeEach(() => {
+    oldWindowConfirm = window.confirm;
+    window.confirm = jest.fn(() => true);
+  });
+
+  afterEach(() => {
+    window.confirm = oldWindowConfirm;
+  });
+
   it('renders existing tabs', async () => {
     render(<QueryBar queries={queries} queryTitles={queryTitles} viewMetadata={viewMetadata} />);
 
@@ -93,11 +104,13 @@ describe('QueryBar', () => {
 
     fireEvent.click(dropdown);
 
-    const closeButton = await screen.findByRole('menuitem', { name: 'Close' });
+    const closeButton = await screen.findByRole('menuitem', { name: 'Delete' });
 
     fireEvent.click(closeButton);
 
     await waitFor(() => expect(setDashboard).toHaveBeenCalled());
     await waitFor(() => expect(ViewActions.search).toHaveBeenCalled());
+
+    expect(window.confirm).toHaveBeenCalled();
   });
 });
