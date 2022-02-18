@@ -56,7 +56,7 @@ class EventDefinitionFormContainer extends React.Component {
       field_spec: {},
       key_spec: [],
       notification_settings: {
-        grace_period_ms: 1000,
+        grace_period_ms: 0,
         // Defaults to system setting for notification backlog size
         backlog_size: null,
       },
