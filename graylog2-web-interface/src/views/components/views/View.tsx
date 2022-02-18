@@ -108,7 +108,7 @@ View.propTypes = {
   summary: PropTypes.string,
   description: PropTypes.string,
   owner: PropTypes.string.isRequired,
-  createdAt: PropTypes.string.isRequired,
+  createdAt: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]).isRequired,
   requires: PropTypes.objectOf(PropTypes.shape({
     name: PropTypes.string.isRequired,
     url: PropTypes.string.isRequired,

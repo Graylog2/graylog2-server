@@ -14,24 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import PropTypes from 'prop-types';
+const iterateConfirmationHooks = async <Args extends Array<any>>(hooks: Array<(...args: Args) => Promise<boolean | null>>, ...args: Args) => {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const hook of hooks) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const result = await hook(...args);
 
-import { Icon } from 'components/common';
-import ActionDropdown from 'views/components/common/ActionDropdown';
+      if (result !== null) {
+        return result === true;
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.trace('Exception occurred in deletion confirmation hook: ', e);
+    }
+  }
 
-type Props = {
-  children: React.ReactElement | React.ReactElement[],
+  return null;
 };
 
-const QueryActionDropdown = ({ children }: Props) => (
-  <ActionDropdown element={<Icon name="chevron-down" data-testid="query-action-dropdown" />}>
-    {children}
-  </ActionDropdown>
-);
-
-QueryActionDropdown.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
-export default QueryActionDropdown;
+export default iterateConfirmationHooks;
