@@ -28,7 +28,7 @@ type Props = {
   tz?: string,
 };
 
-const getUserTimezone = (userTimezone, tzOverride) => {
+const getUserTimezone = (userTimezone: string, tzOverride?: string) => {
   if (tzOverride) {
     return tzOverride;
   }
@@ -41,21 +41,18 @@ const getUserTimezone = (userTimezone, tzOverride) => {
  * Should be used when displaying times and the related components are not a suitable option.
  */
 
-const UserDateTimeProvider = ({ children, tz: tzOverride }: Props) => {
-  const currentUser = useContext(CurrentUserContext);
-  const userTimezone = useMemo(() => getUserTimezone(currentUser?.timezone, tzOverride), [currentUser?.timezone, tzOverride]);
-
+const StaticTimezoneProvider = ({ children, tz }: Props) => {
   const toUserTimezone = useCallback((time: DateTime) => {
-    return toDateObject(time, undefined, userTimezone);
-  }, [userTimezone]);
+    return toDateObject(time, undefined, tz);
+  }, [tz]);
 
   const formatTime = useCallback((time: DateTime, format: DateTimeFormats = 'default') => {
     return toUserTimezone(time).format(DATE_TIME_FORMATS[format]);
   }, [toUserTimezone]);
 
   const contextValue = useMemo(
-    () => ({ toUserTimezone, formatTime, userTimezone }),
-    [toUserTimezone, formatTime, userTimezone],
+    () => ({ toUserTimezone, formatTime, userTimezone: tz }),
+    [toUserTimezone, formatTime, tz],
   );
 
   return (
@@ -64,6 +61,30 @@ const UserDateTimeProvider = ({ children, tz: tzOverride }: Props) => {
     </UserDateTimeContext.Provider>
   );
 };
+
+const CurrentUserDateTimeProvider = ({ children }: Omit<Props, 'tz'>) => {
+  const currentUser = useContext(CurrentUserContext);
+  const userTimezone = useMemo(() => getUserTimezone(currentUser?.timezone), [currentUser?.timezone]);
+
+  return (
+    <StaticTimezoneProvider tz={userTimezone}>
+      {children}
+    </StaticTimezoneProvider>
+  );
+};
+
+const UserDateTimeProvider = ({ children, tz: tzOverride }: Props) => (tzOverride
+  ? (
+    <StaticTimezoneProvider tz={tzOverride}>
+      {children}
+    </StaticTimezoneProvider>
+  )
+  : (
+    <CurrentUserDateTimeProvider>
+      {children}
+    </CurrentUserDateTimeProvider>
+  )
+);
 
 UserDateTimeProvider.defaultProps = {
   tz: undefined,

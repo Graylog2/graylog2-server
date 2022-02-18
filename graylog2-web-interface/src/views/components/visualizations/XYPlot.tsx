@@ -89,7 +89,7 @@ const XYPlot = ({
   const viewType = useContext(ViewTypeContext);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(config.isTimeline
-    ? (from, to) => onZoom(currentQuery, from, to, viewType)
+    ? (from: string, to: string) => onZoom(currentQuery, from, to, viewType)
     : () => true, [config.isTimeline, onZoom]);
 
   if (config.isTimeline && effectiveTimerange) {

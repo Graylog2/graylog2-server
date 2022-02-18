@@ -49,7 +49,7 @@ const LineVisualization = makeVisualization(({
   effectiveTimerange,
   height,
 }: VisualizationComponentProps) => {
-  const visualizationConfig = (config.visualizationConfig || LineVisualizationConfig.empty()) as LineVisualizationConfig;
+  const visualizationConfig = (config.visualizationConfig ?? LineVisualizationConfig.empty()) as LineVisualizationConfig;
   const { interpolation = 'linear' } = visualizationConfig;
   const chartGenerator = useCallback((type, name, labels, values): ChartDefinition => ({
     type,
