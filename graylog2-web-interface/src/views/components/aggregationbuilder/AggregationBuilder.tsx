@@ -108,13 +108,13 @@ const AggregationBuilder = ({
   const VisComponent = _visualizationForType(config.visualization || defaultVisualizationType);
   const { effective_timerange: effectiveTimerange } = data.chart || Object.values(data)[0] || {};
 
-  // TODO: Use Object.fromEntries
-  const rows = Object.entries(data)
-    .map((tuple) => tuple as ([string, RowResult] | ['events', EventResult]))
-    .map(
-      ([key, value]): [string, Rows | Events] => [key, getResult(value)],
-    )
-    .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
+  const rows = Object.fromEntries(
+    Object.entries(data)
+      .map((tuple) => tuple as ([string, RowResult] | ['events', EventResult]))
+      .map(
+        ([key, value]): [string, Rows | Events] => [key, getResult(value)],
+      ),
+  ) as VisualizationResult;
 
   return (
     <FullSizeContainer>
