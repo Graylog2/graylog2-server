@@ -128,7 +128,7 @@ const _onMoveWidgetToTab = (
 const defaultOnDeleteWidget = async (widget: Widget, view: View, title: string) => window.confirm(`Are you sure you want to remove the widget "${title}"?`);
 
 const _onDelete = async (widget: Widget, view: View, title: string) => {
-  const pluggableWidgetDeletionHooks = PluginStore.exports('views.hooks.deletingWidget');
+  const pluggableWidgetDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingWidget');
 
   const widgetDeletionHooks = [...pluggableWidgetDeletionHooks, defaultOnDeleteWidget];
 

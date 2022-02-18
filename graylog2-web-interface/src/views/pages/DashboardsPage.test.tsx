@@ -146,11 +146,11 @@ describe('DashboardsPage', () => {
   });
 
   describe('supports dashboard deletion hook', () => {
-    const deletingDashboard = jest.fn(() => true);
+    const deletingDashboard = jest.fn(() => Promise.resolve(true));
 
     const plugin = {
       exports: {
-        'views.hooks.deletingDashboard': [deletingDashboard],
+        'views.hooks.confirmDeletingDashboard': [deletingDashboard],
       },
     };
 
@@ -176,7 +176,7 @@ describe('DashboardsPage', () => {
     });
 
     it('does not delete dashboard when hook returns false', async () => {
-      asMock(deletingDashboard).mockReturnValue(false);
+      asMock(deletingDashboard).mockResolvedValue(false);
 
       render(<WrappedDashboardsPage />);
 
@@ -209,6 +209,7 @@ describe('DashboardsPage', () => {
 
       render(<WrappedDashboardsPage />);
 
+      /* eslint-disable no-console */
       const oldConsoleWarn = console.warn;
       console.warn = jest.fn();
 
@@ -216,6 +217,7 @@ describe('DashboardsPage', () => {
 
       await waitFor(() => expect(console.warn).toHaveBeenCalledWith('Exception occurred in dashboard deletion hook: ', error));
       console.warn = oldConsoleWarn;
+      /* eslint-enable no-console */
 
       await waitFor(() => expect(deletingDashboard).toHaveBeenCalledWith(simpleDashboardList.list[0]));
 

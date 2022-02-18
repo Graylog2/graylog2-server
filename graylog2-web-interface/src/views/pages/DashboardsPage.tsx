@@ -34,7 +34,7 @@ import type View from '../logic/views/View';
 const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
 
 const handleViewDelete = async (view: View) => {
-  const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.deletingDashboard');
+  const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingDashboard');
 
   const dashboardDeletionHooks = [...pluginDashboardDeletionHooks, defaultDashboardDeletionHook];
 

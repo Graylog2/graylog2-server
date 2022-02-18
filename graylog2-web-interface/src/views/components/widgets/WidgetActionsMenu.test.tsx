@@ -353,7 +353,7 @@ describe('<WidgetActionsMenu />', () => {
       const deletingWidgetHook = jest.fn();
       const plugin = {
         exports: {
-          'views.hooks.deletingWidget': [deletingWidgetHook],
+          'views.hooks.confirmDeletingWidget': [deletingWidgetHook],
         },
       };
 
