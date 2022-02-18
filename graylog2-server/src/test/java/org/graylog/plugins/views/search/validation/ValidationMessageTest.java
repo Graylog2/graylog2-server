@@ -33,13 +33,13 @@ class ValidationMessageTest {
             luceneQueryParser.parse(query);
             fail("Should throw an exception!");
         } catch (ParseException e) {
-            final ValidationMessage validationMessage = ValidationMessage.fromException(query, e);
+            final ValidationMessage validationMessage = ValidationMessage.fromException( e);
             assertThat(validationMessage.beginLine()).isEqualTo(1);
             assertThat(validationMessage.endLine()).isEqualTo(1);
             assertThat(validationMessage.beginColumn()).isEqualTo(0);
             assertThat(validationMessage.endColumn()).isEqualTo(4);
             assertThat(validationMessage.errorType()).isEqualTo("Query parsing error");
-            assertThat(validationMessage.errorMessage()).startsWith("Cannot parse query 'foo:', cause: incomplete query, query ended unexpectedly");
+            assertThat(validationMessage.errorMessage()).startsWith("Cannot parse query, cause: incomplete query, query ended unexpectedly");
         }
     }
 }

@@ -21,14 +21,15 @@ import type { Moment } from 'moment';
 import { relativeDifference, adjustFormat } from 'util/DateTime';
 
 type Props = {
-  dateTime: string | number | Date | Moment,
+  dateTime?: string | number | Date | Moment,
 };
 
 /**
  * This component receives any date time and displays the relative time until now in a human readable format.
  */
 
-const RelativeTime = ({ dateTime }: Props) => {
+const RelativeTime = ({ dateTime: dateTimeProp }: Props) => {
+  const dateTime = dateTimeProp ?? new Date();
   const relativeTime = relativeDifference(dateTime);
   const dateTimeString = adjustFormat(dateTime, 'internal');
 
@@ -45,7 +46,11 @@ RelativeTime.propTypes = {
    * 8601 string, a JS native `Date` object, a moment `Date` object, or
    * a number containing seconds after UNIX epoch.
    */
-  dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.number]).isRequired,
+  dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.number]),
+};
+
+RelativeTime.defaultProps = {
+  dateTime: undefined,
 };
 
 export default RelativeTime;

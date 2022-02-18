@@ -20,7 +20,9 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import org.apache.lucene.queryparser.classic.Token;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
+import java.util.Optional;
 
 @AutoValue
 public abstract class ParsedTerm {
@@ -32,7 +34,7 @@ public abstract class ParsedTerm {
 
     public abstract String value();
 
-    public abstract ImmutableList<ImmutableToken> tokens();
+    public abstract Optional<ImmutableToken> keyToken();
 
     public static ParsedTerm create(final String field, final String value) {
         return builder().field(field).value(value).build();
@@ -71,7 +73,7 @@ public abstract class ParsedTerm {
     public abstract static class Builder {
         public abstract Builder field(@NotNull String field);
         public abstract Builder value(@NotNull String value);
-        public abstract ImmutableList.Builder<ImmutableToken> tokensBuilder();
+        public abstract Builder keyToken(@NotNull ImmutableToken keyToken);
         public abstract ParsedTerm build();
     }
 }

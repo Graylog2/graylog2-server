@@ -33,4 +33,22 @@ describe('RelativeTime', () => {
 
     expect(screen.getByText('a year ago')).toBeInTheDocument();
   });
+
+  it('should display time relative to current time, when date time is not defined', () => {
+    render(<RelativeTime />);
+
+    expect(screen.getByText('a few seconds ago')).toBeInTheDocument();
+  });
+
+  it('should display time relative to current time, when date time is undefined', () => {
+    render(<RelativeTime dateTime={undefined} />);
+
+    expect(screen.getByText('a few seconds ago')).toBeInTheDocument();
+  });
+
+  it('should display time relative to current time, when date time is null', () => {
+    render(<RelativeTime dateTime={null} />);
+
+    expect(screen.getByText('a few seconds ago')).toBeInTheDocument();
+  });
 });
