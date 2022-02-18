@@ -19,7 +19,6 @@ import { useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
 import type * as Immutable from 'immutable';
 import * as ImmutablePropTypes from 'react-immutable-proptypes';
-import type { OrderedSet } from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import connect, { useStore } from 'stores/connect';
@@ -50,6 +49,7 @@ const iterateHooks = async <Args extends Array<any>>(hooks: Array<(...args: Args
         return result === true;
       }
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.warn('Exception occurred in dashboard page deletion hook: ', e);
     }
   }
@@ -87,7 +87,7 @@ const onCloseTab = async (dashboardId: string, queryId: string, currentQuery: st
 };
 
 type Props = {
-  queries: OrderedSet<QueryId>,
+  queries: Immutable.OrderedSet<QueryId>,
   queryTitles: Immutable.Map<string, string>,
   viewMetadata: ViewMetaData,
 };

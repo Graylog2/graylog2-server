@@ -48,6 +48,7 @@ const handleViewDelete = async (view: View) => {
         return result === true ? ViewManagementActions.delete(view) : Promise.reject();
       }
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.warn('Exception occurred in dashboard deletion hook: ', e);
     }
   }

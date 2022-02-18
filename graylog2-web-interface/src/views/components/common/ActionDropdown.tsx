@@ -94,6 +94,10 @@ const FilterProps = ({ children, style }: FilterPropsProps) => (
   </>
 );
 
+FilterProps.defaultProps = {
+  style: {},
+};
+
 class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdownState> {
   target: HTMLElement | undefined | null;
 

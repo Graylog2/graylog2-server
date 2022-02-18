@@ -414,12 +414,12 @@ describe('<WidgetActionsMenu />', () => {
         await waitFor(() => expect(WidgetActions.remove).toHaveBeenCalledWith('widget-id'));
 
         expect(console.warn).toHaveBeenCalledWith('Exception occurred in widget deletion hook: ', e);
-        /* eslint-enable no-console */
 
         expect(deletingWidgetHook).toHaveBeenCalled();
         expect(window.confirm).toHaveBeenCalled();
 
         console.warn = oldConsoleWarn;
+        /* eslint-enable no-console */
       });
     });
   });

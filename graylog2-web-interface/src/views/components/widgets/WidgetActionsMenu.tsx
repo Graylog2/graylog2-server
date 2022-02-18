@@ -184,7 +184,7 @@ const WidgetActionsMenu = ({
   const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
   const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToTab(view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [view]);
   const onDelete = useCallback(() => _onDelete(widget, view?.view, title), [title, view?.view, widget]);
-  const focusWidget = useCallback(() => setWidgetFocusing(widget.id), [widget.id]);
+  const focusWidget = useCallback(() => setWidgetFocusing(widget.id), [setWidgetFocusing, widget.id]);
 
   return (
     <Container>
