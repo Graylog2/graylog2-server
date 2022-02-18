@@ -408,17 +408,17 @@ describe('<WidgetActionsMenu />', () => {
         fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
 
         /* eslint-disable no-console */
-        const oldConsoleWarn = console.warn;
-        console.warn = jest.fn();
+        const oldConsoleTrace = console.trace;
+        console.trace = jest.fn();
 
         await waitFor(() => expect(WidgetActions.remove).toHaveBeenCalledWith('widget-id'));
 
-        expect(console.warn).toHaveBeenCalledWith('Exception occurred in widget deletion hook: ', e);
+        expect(console.trace).toHaveBeenCalledWith('Exception occurred in deletion confirmation hook: ', e);
 
         expect(deletingWidgetHook).toHaveBeenCalled();
         expect(window.confirm).toHaveBeenCalled();
 
-        console.warn = oldConsoleWarn;
+        console.trace = oldConsoleTrace;
         /* eslint-enable no-console */
       });
     });
