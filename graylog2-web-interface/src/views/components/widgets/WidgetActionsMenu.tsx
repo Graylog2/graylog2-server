@@ -39,6 +39,7 @@ import { MenuItem } from 'components/bootstrap';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { useStore } from 'stores/connect';
 import type Widget from 'views/logic/widgets/Widget';
+import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -125,29 +126,15 @@ const _onMoveWidgetToTab = (
   }
 };
 
+// eslint-disable-next-line no-alert
 const defaultOnDeleteWidget = async (widget: Widget, view: View, title: string) => window.confirm(`Are you sure you want to remove the widget "${title}"?`);
 
 const _onDelete = async (widget: Widget, view: View, title: string) => {
   const pluggableWidgetDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingWidget');
 
-  const widgetDeletionHooks = [...pluggableWidgetDeletionHooks, defaultOnDeleteWidget];
+  const result = await iterateConfirmationHooks([...pluggableWidgetDeletionHooks, defaultOnDeleteWidget], widget, view, title);
 
-  // eslint-disable-next-line no-restricted-syntax
-  for (const hook of widgetDeletionHooks) {
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      const result = await hook(widget, view, title);
-
-      if (result !== null) {
-        return result === true ? WidgetActions.remove(widget.id) : Promise.resolve();
-      }
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.warn('Exception occurred in widget deletion hook: ', e);
-    }
-  }
-
-  return Promise.resolve();
+  return result === true ? WidgetActions.remove(widget.id) : Promise.resolve();
 };
 
 const _onDuplicate = (widgetId: string, setFocusWidget: (widgetId: string) => void, title: string) => {

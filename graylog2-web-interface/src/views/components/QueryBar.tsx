@@ -33,29 +33,11 @@ import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { ViewStatesActions, ViewStatesStore } from 'views/stores/ViewStatesStore';
 import type { QueryId } from 'views/logic/queries/Query';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
+import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 
 import QueryTabs from './QueryTabs';
 
 const onTitleChange = (queryId, newTitle) => TitlesActions.set('tab', 'title', newTitle);
-
-const iterateHooks = async <Args extends Array<any>>(hooks: Array<(...args: Args) => Promise<boolean | null>>, ...args: Args) => {
-  // eslint-disable-next-line no-restricted-syntax
-  for (const hook of hooks) {
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      const result = await hook(...args);
-
-      if (result !== null) {
-        return result === true;
-      }
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.warn('Exception occurred in dashboard page deletion hook: ', e);
-    }
-  }
-
-  return null;
-};
 
 // eslint-disable-next-line no-alert
 const defaultConfirm = async () => window.confirm('Do you really want to delete this dashboard page?');
@@ -67,7 +49,7 @@ const onCloseTab = async (dashboardId: string, queryId: string, currentQuery: st
 
   const deletingDashboardPageHooks = PluginStore.exports('views.hooks.confirmDeletingDashboardPage');
   const _widgetIds = widgetIds.map((ids) => ids.toArray()).toObject();
-  const result = await iterateHooks([...deletingDashboardPageHooks, defaultConfirm], dashboardId, queryId, _widgetIds);
+  const result = await iterateConfirmationHooks([...deletingDashboardPageHooks, defaultConfirm], dashboardId, queryId, _widgetIds);
 
   if (result === true) {
     if (queryId === currentQuery) {

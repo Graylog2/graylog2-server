@@ -27,6 +27,7 @@ import DocsHelper from 'util/DocsHelper';
 import ViewList from 'views/components/views/ViewList';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import useDashboards from 'views/logic/dashboards/useDashboards';
+import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 
 import type View from '../logic/views/View';
 
@@ -36,24 +37,9 @@ const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are y
 const handleViewDelete = async (view: View) => {
   const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingDashboard');
 
-  const dashboardDeletionHooks = [...pluginDashboardDeletionHooks, defaultDashboardDeletionHook];
+  const result = await iterateConfirmationHooks([...pluginDashboardDeletionHooks, defaultDashboardDeletionHook], view);
 
-  // eslint-disable-next-line no-restricted-syntax
-  for (const hook of dashboardDeletionHooks) {
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      const result = await hook(view);
-
-      if (result !== null) {
-        return result === true ? ViewManagementActions.delete(view) : Promise.reject();
-      }
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.warn('Exception occurred in dashboard deletion hook: ', e);
-    }
-  }
-
-  return Promise.reject();
+  return result === true ? ViewManagementActions.delete(view) : Promise.reject();
 };
 
 type SearchQuery = {
