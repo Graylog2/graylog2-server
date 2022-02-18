@@ -79,6 +79,7 @@ public class EventDefinitionContextService {
 
     private long getQueuedNotifications(EventDefinitionDto eventDefinition) {
         final DBQuery.Query query = DBQuery.and(
+                DBQuery.is("status", JobTriggerStatus.RUNNABLE),
                 DBQuery.is("data.type", EventNotificationExecutionJob.TYPE_NAME),
                 DBQuery.is("data.event_dto.event_definition_id", eventDefinition.id()));
 
