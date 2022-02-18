@@ -65,10 +65,8 @@ describe('CopyToDashboardForm', () => {
   it('should render the modal with entries', () => {
     const { baseElement } = render(<CopyToDashboardForm dashboards={dashboardState}
                                                         widgetId="widget-id"
-                                                        onCancel={() => {
-                                                        }}
-                                                        onSubmit={() => {
-                                                        }} />);
+                                                        onCancel={() => {}}
+                                                        onSubmit={() => {}} />);
 
     expect(baseElement).not.toBeNull();
   });
@@ -78,8 +76,7 @@ describe('CopyToDashboardForm', () => {
     const { getByText } = render(<CopyToDashboardForm dashboards={dashboardState}
                                                       widgetId="widget-id"
                                                       onCancel={onCancel}
-                                                      onSubmit={() => {
-                                                      }} />);
+                                                      onSubmit={() => {}} />);
     const cancelButton = getByText('Cancel');
 
     fireEvent.click(cancelButton);
@@ -91,8 +88,7 @@ describe('CopyToDashboardForm', () => {
     const onSubmit = jest.fn();
     const { getByText } = render(<CopyToDashboardForm dashboards={dashboardState}
                                                       widgetId="widget-id"
-                                                      onCancel={() => {
-                                                      }}
+                                                      onCancel={() => {}}
                                                       onSubmit={onSubmit} />);
     const submitButton = getByText('Select');
 
@@ -105,8 +101,7 @@ describe('CopyToDashboardForm', () => {
     const onSubmit = jest.fn();
     const { getByText } = render(<CopyToDashboardForm dashboards={dashboardState}
                                                       widgetId="widget-id"
-                                                      onCancel={() => {
-                                                      }}
+                                                      onCancel={() => {}}
                                                       onSubmit={onSubmit} />);
     const firstView = getByText('view 1');
 
@@ -123,10 +118,8 @@ describe('CopyToDashboardForm', () => {
     const { getByPlaceholderText, getByText } = render(
       <CopyToDashboardForm dashboards={dashboardState}
                            widgetId="widget-id"
-                           onCancel={() => {
-                           }}
-                           onSubmit={() => {
-                           }} />,
+                           onCancel={() => {}}
+                           onSubmit={() => {}} />,
     );
 
     expect(DashboardsActions.search).toHaveBeenCalledTimes(1);
