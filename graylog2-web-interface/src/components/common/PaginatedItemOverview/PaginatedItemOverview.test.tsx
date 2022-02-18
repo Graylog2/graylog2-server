@@ -63,12 +63,13 @@ describe('<PaginatedItemOverview>', () => {
 
     render(<PaginatedItemOverview onLoad={loadHandler} />);
 
-    expect(await screen.findByText(/loading/i)).toBeInTheDocument();
+    await screen.findByText(/loading/i);
+
     expect(loadHandler).toHaveBeenCalledTimes(1);
 
     resolvePromise(emptyPaginatedResponse);
 
-    expect(await screen.findByText(/no items found to display/i)).toBeInTheDocument();
+    await screen.findByText(/no items found to display/i);
   });
 
   it('uses custom result wrapper', async () => {
@@ -86,9 +87,9 @@ describe('<PaginatedItemOverview>', () => {
                              resultsWrapperComponent={myWrapper} />,
     );
 
-    expect(await screen.findByText(/my custom wrapper/i)).toBeInTheDocument();
-    expect(await screen.findByText(/no items found to display/i)).toBeInTheDocument();
-    expect(await screen.findByText(/empty result true/i)).toBeInTheDocument();
+    await screen.findByText(/my custom wrapper/i);
+    await screen.findByText(/no items found to display/i);
+    await screen.findByText(/empty result true/i);
   });
 
   it('uses default item component', async () => {
@@ -98,7 +99,8 @@ describe('<PaginatedItemOverview>', () => {
 
     const itemName = simplePaginatedResponse.list.get(0).name;
 
-    expect(await screen.findByText(itemName, { exact: false })).toBeInTheDocument();
+    await screen.findByText(itemName, { exact: false });
+
     expect(screen.queryByTitle(`Remove ${itemName}`)).not.toBeInTheDocument();
 
     rerender(
@@ -106,8 +108,8 @@ describe('<PaginatedItemOverview>', () => {
                              onDeleteItem={jest.fn()} />,
     );
 
-    expect(await screen.findByText(simplePaginatedResponse.list.get(0).name, { exact: false })).toBeInTheDocument();
-    expect(await screen.findByTitle(`Remove ${itemName}`)).toBeInTheDocument();
+    await screen.findByText(simplePaginatedResponse.list.get(0).name, { exact: false });
+    await screen.findByTitle(`Remove ${itemName}`);
   });
 
   it('uses custom item component', async () => {
@@ -125,8 +127,9 @@ describe('<PaginatedItemOverview>', () => {
                              overrideItemComponent={itemComponent} />,
     );
 
-    expect(await screen.findByText(/custom item component/i)).toBeInTheDocument();
-    expect(await screen.findByText(simplePaginatedResponse.list.get(0).name)).toBeInTheDocument();
+    await screen.findByText(/custom item component/i);
+    await screen.findByText(simplePaginatedResponse.list.get(0).name);
+
     expect(screen.queryByRole('button', { name: 'Delete' })).not.toBeInTheDocument();
 
     rerender(
@@ -136,8 +139,8 @@ describe('<PaginatedItemOverview>', () => {
                              overrideItemComponent={itemComponent} />,
     );
 
-    expect(await screen.findByText(/custom item component/i)).toBeInTheDocument();
-    expect(await screen.findByText(simplePaginatedResponse.list.get(0).name)).toBeInTheDocument();
-    expect(await screen.findByRole('button', { name: 'Delete' })).toBeInTheDocument();
+    await screen.findByText(/custom item component/i);
+    await screen.findByText(simplePaginatedResponse.list.get(0).name);
+    await screen.findByRole('button', { name: 'Delete' });
   });
 });
