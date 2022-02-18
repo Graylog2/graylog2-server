@@ -210,13 +210,13 @@ describe('DashboardsPage', () => {
       render(<WrappedDashboardsPage />);
 
       /* eslint-disable no-console */
-      const oldConsoleWarn = console.warn;
-      console.warn = jest.fn();
+      const oldConsoleTrace = console.trace;
+      console.trace = jest.fn();
 
       await clickDashboardAction('foo', 'Delete');
 
-      await waitFor(() => expect(console.warn).toHaveBeenCalledWith('Exception occurred in dashboard deletion hook: ', error));
-      console.warn = oldConsoleWarn;
+      await waitFor(() => expect(console.trace).toHaveBeenCalledWith('Exception occurred in deletion confirmation hook: ', error));
+      console.trace = oldConsoleTrace;
       /* eslint-enable no-console */
 
       await waitFor(() => expect(deletingDashboard).toHaveBeenCalledWith(simpleDashboardList.list[0]));
