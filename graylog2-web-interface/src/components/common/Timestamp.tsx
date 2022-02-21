@@ -23,7 +23,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import { adjustFormat } from 'util/DateTime';
 
 type Props = {
-  dateTime: string | number | Date | Moment,
+  dateTime?: string | number | Date | Moment,
   field?: string,
   format?: DateTimeFormats,
   render?: React.ComponentType<{ value: string, field: string | undefined }>,
@@ -40,8 +40,9 @@ type Props = {
  * from a UTC time that was used in the server.
  *
  */
-const Timestamp = ({ dateTime, field, format, render: Component, tz }: Props) => {
+const Timestamp = ({ dateTime: dateTimeProp, field, format, render: Component, tz }: Props) => {
   const { formatTime: formatWithUserTz } = useUserDateTime();
+  const dateTime = dateTimeProp ?? new Date();
   const formattedDateTime = tz ? adjustFormat(dateTime, format, tz) : formatWithUserTz(dateTime, format);
   const dateTimeString = adjustFormat(dateTime, 'internal');
 
@@ -58,7 +59,7 @@ Timestamp.propTypes = {
    * 8601 string, a JS native `Date` object, a moment `Date` object, or
    * a number containing seconds after UNIX epoch.
    */
-  dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.number]).isRequired,
+  dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.number]),
   /**
    * Format to represent the date time.
    */
@@ -77,6 +78,7 @@ Timestamp.propTypes = {
 };
 
 Timestamp.defaultProps = {
+  dateTime: undefined,
   field: undefined,
   format: 'default',
   render: ({ value }) => value,

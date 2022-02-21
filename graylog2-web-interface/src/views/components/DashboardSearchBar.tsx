@@ -127,57 +127,62 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                                    limitDuration={limitDuration}
                                    onSubmit={submitForm}
                                    validateQueryString={_validateQueryString}>
-                {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue }) => (
-                  <>
-                    <TopRow>
-                      <StyledTimeRangeInput disabled={disableSearch}
-                                            onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                            value={values?.timerange}
-                                            limitDuration={limitDuration}
-                                            hasErrorOnMount={!!errors.timerange}
-                                            noOverride />
-                      <RefreshControlsWrapper>
-                        <RefreshControls />
-                      </RefreshControlsWrapper>
-                    </TopRow>
+                {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue }) => {
+                  const disableSearchSubmit = disableSearch || isSubmitting || isValidating || !isValid;
 
-                    <BottomRow>
-                      <SearchButtonAndQuery>
-                        <SearchButton disabled={disableSearch || isSubmitting || isValidating || !isValid}
-                                      glyph="filter"
-                                      dirty={dirty} />
+                  return (
+                    <>
+                      <TopRow>
+                        <StyledTimeRangeInput disabled={disableSearch}
+                                              onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                              value={values?.timerange}
+                                              limitDuration={limitDuration}
+                                              hasErrorOnMount={!!errors.timerange}
+                                              noOverride />
+                        <RefreshControlsWrapper>
+                          <RefreshControls />
+                        </RefreshControlsWrapper>
+                      </TopRow>
 
-                        <Field name="queryString">
-                          {({ field: { name, value, onChange }, meta: { error } }) => (
-                            <FormWarningsContext.Consumer>
-                              {({ warnings }) => (
-                                <QueryInput value={value}
-                                            timeRange={values?.timerange}
-                                            placeholder="Apply filter to all widgets"
-                                            onChange={(newQuery) => {
-                                              onChange({ target: { value: newQuery, name } });
+                      <BottomRow>
+                        <SearchButtonAndQuery>
+                          <SearchButton disabled={disableSearchSubmit}
+                                        glyph="filter"
+                                        dirty={dirty} />
 
-                                              return Promise.resolve(newQuery);
-                                            }}
-                                            error={error}
-                                            warning={warnings.queryString}
-                                            onExecute={handleSubmit as () => void} />
-                              )}
-                            </FormWarningsContext.Consumer>
-                          )}
-                        </Field>
+                          <Field name="queryString">
+                            {({ field: { name, value, onChange }, meta: { error } }) => (
+                              <FormWarningsContext.Consumer>
+                                {({ warnings }) => (
+                                  <QueryInput value={value}
+                                              timeRange={values?.timerange}
+                                              placeholder="Apply filter to all widgets"
+                                              onChange={(newQuery) => {
+                                                onChange({ target: { value: newQuery, name } });
 
-                        <QueryValidation />
-                      </SearchButtonAndQuery>
+                                                return Promise.resolve(newQuery);
+                                              }}
+                                              disableExecution={disableSearchSubmit}
+                                              error={error}
+                                              warning={warnings.queryString}
+                                              onExecute={handleSubmit as () => void} />
+                                )}
+                              </FormWarningsContext.Consumer>
+                            )}
+                          </Field>
 
-                      {!editing && (
-                      <ViewActionsWrapper>
-                        <ViewActionsMenu />
-                      </ViewActionsWrapper>
-                      )}
-                    </BottomRow>
-                  </>
-                )}
+                          <QueryValidation />
+                        </SearchButtonAndQuery>
+
+                        {!editing && (
+                        <ViewActionsWrapper>
+                          <ViewActionsMenu />
+                        </ViewActionsWrapper>
+                        )}
+                      </BottomRow>
+                    </>
+                  );
+                }}
               </DashboardSearchForm>
             </FormWarningsProvider>
           </FlatContentRow>

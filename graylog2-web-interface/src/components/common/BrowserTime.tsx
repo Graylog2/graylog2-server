@@ -22,14 +22,15 @@ import type { DateTimeFormats } from 'util/DateTime';
 import { formatAsBrowserTime, adjustFormat } from 'util/DateTime';
 
 type Props = {
-  dateTime: string | number | Date | Moment,
+  dateTime?: string | number | Date | Moment,
   format?: DateTimeFormats,
 };
 
 /**
  * This component receives any date time and displays it in the browser time zone.
  */
-const BrowserTime = ({ dateTime, format }: Props) => {
+const BrowserTime = ({ dateTime: dateTimeProp, format }: Props) => {
+  const dateTime = dateTimeProp ?? new Date();
   const dateTimeString = adjustFormat(dateTime, 'internal');
   const timeInBrowserTimeZone = formatAsBrowserTime(dateTime, format);
 
@@ -46,7 +47,7 @@ BrowserTime.propTypes = {
    * 8601 string, a JS native `Date` object, a moment `Date` object, or
    * a number containing seconds after UNIX epoch.
    */
-  dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.number]).isRequired,
+  dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.number]),
   /**
    * Format to use to represent the date time.
    */
@@ -55,6 +56,7 @@ BrowserTime.propTypes = {
 
 BrowserTime.defaultProps = {
   format: 'default',
+  dateTime: undefined,
 };
 
 export default BrowserTime;

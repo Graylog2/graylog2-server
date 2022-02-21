@@ -14,24 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import PropTypes from 'prop-types';
+package org.graylog.plugins.views.search.views;
 
-import { Icon } from 'components/common';
-import ActionDropdown from 'views/components/common/ActionDropdown';
+import java.util.Optional;
 
-type Props = {
-  children: React.ReactElement | React.ReactElement[],
-};
-
-const QueryActionDropdown = ({ children }: Props) => (
-  <ActionDropdown element={<Icon name="chevron-down" data-testid="query-action-dropdown" />}>
-    {children}
-  </ActionDropdown>
-);
-
-QueryActionDropdown.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
-export default QueryActionDropdown;
+/**
+ * View Resolvers provide a way that plugins can provide custom sources for looking up views.
+ */
+public interface ViewResolver {
+    Optional<ViewDTO> get(String id);
+}

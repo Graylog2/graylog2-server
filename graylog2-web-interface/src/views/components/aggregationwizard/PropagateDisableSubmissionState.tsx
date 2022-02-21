@@ -14,18 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useContext, useEffect } from 'react';
 
-import { singleton } from 'logic/singleton';
+import DisableSubmissionStateContext from '../contexts/DisableSubmissionStateContext';
 
-export type ValidationState = {
-  hasErrors: boolean,
-  setHasErrors: (formKey: boolean, hasErrors: boolean) => void,
+const PropagateDisableSubmissionState = ({ formKey, disableSubmission }) => {
+  const { setDisabled } = useContext(DisableSubmissionStateContext);
+
+  useEffect(() => setDisabled(formKey, disableSubmission), [formKey, disableSubmission, setDisabled]);
+
+  return null;
 };
 
-const ValidationStateContext = React.createContext<ValidationState>({
-  hasErrors: false,
-  setHasErrors: () => {},
-});
-
-export default singleton('contexts.ValidationStateContext', () => ValidationStateContext);
+export default PropagateDisableSubmissionState;

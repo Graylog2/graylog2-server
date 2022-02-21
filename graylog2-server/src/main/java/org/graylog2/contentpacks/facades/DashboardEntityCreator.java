@@ -14,24 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import PropTypes from 'prop-types';
+package org.graylog2.contentpacks.facades;
 
-import { Icon } from 'components/common';
-import ActionDropdown from 'views/components/common/ActionDropdown';
+import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog2.contentpacks.model.entities.Entity;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
-type Props = {
-  children: React.ReactElement | React.ReactElement[],
-};
+import java.util.Map;
 
-const QueryActionDropdown = ({ children }: Props) => (
-  <ActionDropdown element={<Icon name="chevron-down" data-testid="query-action-dropdown" />}>
-    {children}
-  </ActionDropdown>
-);
-
-QueryActionDropdown.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
-export default QueryActionDropdown;
+public interface DashboardEntityCreator {
+    NativeEntity<ViewDTO> createNativeEntity(Entity entity, Map<String, ValueReference> parameters,
+                                             Map<EntityDescriptor, Object> nativeEntities, String username);
+}

@@ -31,7 +31,7 @@ import QueryTitleEditModal from './queries/QueryTitleEditModal';
 import AdaptableQueryTabs from './AdaptableQueryTabs';
 
 export interface QueryTabsProps {
-  onRemove: (queryId: string) => Promise<void> | Promise<ViewState>,
+  onRemove: (queryId: string) => Promise<void | ViewState>,
   onSelect: (queryId: string) => Promise<Query> | Promise<string>,
   onTitleChange: (queryId: string, newTitle: string) => Promise<TitlesMap>,
   queries: Immutable.OrderedSet<QueryId>,

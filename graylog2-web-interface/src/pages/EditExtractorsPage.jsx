@@ -63,7 +63,6 @@ const EditExtractorsPage = createReactClass({
   },
 
   _isLoading() {
-    // eslint-disable-next-line react/destructuring-assignment
     return !(this.state.input && this.state.extractor && this.state.exampleMessage);
   },
 

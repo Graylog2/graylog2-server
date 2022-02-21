@@ -22,6 +22,9 @@ import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import type { FieldTypeMappingsList, FieldTypesStoreState } from 'views/stores/FieldTypesStore';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import FieldType from 'views/logic/fieldtypes/FieldType';
+import type { CompletionResult } from 'views/components/searchbar/ace-types';
 
 import FieldNameCompletion from './FieldNameCompletion';
 
@@ -37,11 +40,11 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
   ),
 }));
 
-const _createField = (name) => ({ name, type: { type: 'string' } });
+const _createField = (name: string) => FieldTypeMapping.create(name, FieldType.create('string', []));
 const dummyFields = ['source', 'message', 'timestamp'].map(_createField);
 
-const _createQueryFields = (fields) => ({ get: () => fields }) as unknown as Immutable.Map<string, FieldTypeMappingsList>;
-const _createFieldTypesStoreState = (fields): FieldTypesStoreState => ({ all: fields, queryFields: _createQueryFields(fields) });
+const _createQueryFields = (fields) => ({ get: () => Immutable.List(fields) }) as unknown as Immutable.Map<string, FieldTypeMappingsList>;
+const _createFieldTypesStoreState = (fields: Array<FieldTypeMapping>): FieldTypesStoreState => ({ all: Immutable.List(fields), queryFields: _createQueryFields(fields) });
 
 describe('FieldNameCompletion', () => {
   beforeEach(() => {
@@ -119,19 +122,17 @@ describe('FieldNameCompletion', () => {
   });
 
   describe('considers current query', () => {
-    const completionByName = (fieldName, completions) => completions.find(({ name }) => (name === fieldName));
+    const completionByName = (fieldName: string, completions: CompletionResult[]) => completions.find(({ name }) => (name === fieldName));
 
-    const queryFields = {
-      get: (queryId, _default) => ({
-        query1: ['foo'].map(_createField),
-        query2: ['bar'].map(_createField),
-      }[queryId] || _default),
-    };
+    const queryFields = Immutable.Map({
+      query1: Immutable.List(['foo'].map(_createField)),
+      query2: Immutable.List(['bar'].map(_createField)),
+    });
 
     const all = Immutable.List(['foo', 'bar'].map(_createField));
 
     beforeEach(() => {
-      asMock(FieldTypesStore.getInitialState).mockReturnValue({ all, queryFields } as FieldTypesStoreState);
+      asMock(FieldTypesStore.getInitialState).mockReturnValue({ all, queryFields });
     });
 
     it('scores fields of current query higher', () => {
@@ -139,7 +140,7 @@ describe('FieldNameCompletion', () => {
 
       const completions = completer.getCompletions(null, null, '');
 
-      const completion = (fieldName) => completionByName(fieldName, completions);
+      const completion = (fieldName: string) => completionByName(fieldName, completions);
 
       expect(completion('foo')?.score).toEqual(12);
       expect(completion('foo')?.meta).not.toMatch('(not in streams)');
@@ -155,7 +156,7 @@ describe('FieldNameCompletion', () => {
       callback({ activeQuery: 'query2' } as ViewMetaData);
 
       const completions = completer.getCompletions(null, null, '');
-      const completion = (fieldName) => completionByName(fieldName, completions);
+      const completion = (fieldName: string) => completionByName(fieldName, completions);
 
       expect(completion('foo')?.score).toEqual(3);
       expect(completion('foo')?.meta).toMatch('(not in streams)');

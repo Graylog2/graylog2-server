@@ -21,6 +21,12 @@ import Timestamp from './Timestamp';
 
 jest.mock('hooks/useUserDateTime');
 
+const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
+
+jest.useFakeTimers()
+  // @ts-expect-error
+  .setSystemTime(mockedUnixTime);
+
 describe('Timestamp', () => {
   it('should render date time', () => {
     render(<Timestamp dateTime="2020-01-01T10:00:00.000Z" />);
@@ -38,5 +44,23 @@ describe('Timestamp', () => {
     render(<Timestamp dateTime="2020-01-01T10:00:00.000Z" format="internal" tz="Europe/Moscow" />);
 
     expect(screen.getByText('2020-01-01T13:00:00.000+03:00')).toBeInTheDocument();
+  });
+
+  it('should display current time, when date time is not defined', () => {
+    render(<Timestamp />);
+
+    expect(screen.getByText('2020-01-01 00:00:00')).toBeInTheDocument();
+  });
+
+  it('should display current time, when date time is undefined', () => {
+    render(<Timestamp dateTime={undefined} />);
+
+    expect(screen.getByText('2020-01-01 00:00:00')).toBeInTheDocument();
+  });
+
+  it('should display current time, when date time is null', () => {
+    render(<Timestamp dateTime={null} />);
+
+    expect(screen.getByText('2020-01-01 00:00:00')).toBeInTheDocument();
   });
 });

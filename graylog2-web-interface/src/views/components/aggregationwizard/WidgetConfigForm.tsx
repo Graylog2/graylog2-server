@@ -22,7 +22,7 @@ import styled from 'styled-components';
 
 import type { ConfigurationField } from 'views/types';
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
-import PropagateValidationState from 'views/components/aggregationwizard/PropagateValidationState';
+import PropagateDisableSubmissionState from 'views/components/aggregationwizard/PropagateDisableSubmissionState';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import type { AutoTimeConfig, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -148,7 +148,7 @@ const WidgetConfigForm = ({ children, onSubmit, initialValues, validate, config 
                                     onSubmit={onSubmit}>
       {(...args) => (
         <StyledForm className="form form-horizontal">
-          <PropagateValidationState formKey="widget-config" />
+          <PropagateDisableSubmissionState formKey="widget-config" disableSubmission={!args[0].isValid || args[0].isValidating || args[0].isSubmitting} />
           {typeof children === 'function' ? children(...args) : children}
         </StyledForm>
       )}

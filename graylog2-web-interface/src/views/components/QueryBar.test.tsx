@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
+import { Map as MockMap } from 'immutable';
 import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
 
 import { MockStore } from 'helpers/mocking';
@@ -37,7 +38,7 @@ jest.mock('views/stores/ViewStatesStore', () => ({
   ViewStatesActions: {
     remove: jest.fn(() => Promise.resolve()),
   },
-  ViewStatesStore: MockStore(['getInitialState', () => new Map()]),
+  ViewStatesStore: MockStore(['getInitialState', () => MockMap()]),
 }));
 
 const queries = Immutable.OrderedSet(['foo', 'bar', 'baz']);
@@ -56,6 +57,17 @@ const viewMetadata = {
 };
 
 describe('QueryBar', () => {
+  let oldWindowConfirm;
+
+  beforeEach(() => {
+    oldWindowConfirm = window.confirm;
+    window.confirm = jest.fn(() => true);
+  });
+
+  afterEach(() => {
+    window.confirm = oldWindowConfirm;
+  });
+
   it('renders existing tabs', async () => {
     render(<QueryBar queries={queries} queryTitles={queryTitles} viewMetadata={viewMetadata} />);
 
@@ -93,11 +105,13 @@ describe('QueryBar', () => {
 
     fireEvent.click(dropdown);
 
-    const closeButton = await screen.findByRole('menuitem', { name: 'Close' });
+    const closeButton = await screen.findByRole('menuitem', { name: 'Delete' });
 
     fireEvent.click(closeButton);
 
     await waitFor(() => expect(setDashboard).toHaveBeenCalled());
     await waitFor(() => expect(ViewActions.search).toHaveBeenCalled());
+
+    expect(window.confirm).toHaveBeenCalled();
   });
 });

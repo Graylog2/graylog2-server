@@ -31,7 +31,7 @@ const itemActionsFactory = (view, onViewDelete, setViewToShare) => {
   return (
     <ButtonToolbar>
       <ShareButton entityId={view.id} entityType="dashboard" onClick={() => setViewToShare(view)} />
-      <DropdownButton title="Actions" id={`view-actions-dropdown-${view.id}`} pullRight>
+      <DropdownButton title="Actions" data-testid={`view-actions-dropdown-${view.id}`} id={`view-actions-dropdown-${view.id}`} pullRight>
         <IfPermitted permissions={[`view:edit:${view.id}`, 'view:edit']} anyPermissions>
           <MenuItem onSelect={onViewDelete(view)}>Delete</MenuItem>
         </IfPermitted>
@@ -72,7 +72,7 @@ const ViewList = ({ pagination, handleSearch, handleViewDelete, views }) => {
     handleViewDelete(view).then(() => {
       dispatch({ type: 'viewDelete' });
       execSearch();
-    });
+    }, () => {});
   };
 
   if (!views) {

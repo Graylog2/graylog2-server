@@ -101,7 +101,6 @@ const MessageDetail = ({
 
   const streamIds = Immutable.Set(fields.streams as Array<string>);
   const streamsListItems = streamIds.map((streamId) => {
-    // eslint-disable-next-line react/destructuring-assignment
     const stream = streams.get(streamId);
 
     if (stream !== undefined) {

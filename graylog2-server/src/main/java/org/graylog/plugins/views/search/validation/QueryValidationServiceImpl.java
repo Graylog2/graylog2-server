@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.validation;
 
+import com.google.common.collect.Streams;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.graylog.plugins.views.search.ParameterProvider;
@@ -28,13 +29,13 @@ import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Singleton
 public class QueryValidationServiceImpl implements QueryValidationService {
@@ -78,7 +79,7 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                     : ValidationResponse.warning(explanations);
 
         } catch (ParseException e) {
-            return ValidationResponse.error(toExplanation(rawQuery, e));
+            return ValidationResponse.error(toExplanation(e));
         }
     }
 
@@ -99,22 +100,22 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                         .collect(Collectors.toList());
             }
         }
-        return Collections.singletonList(ValidationMessage.fromException(query, searchException));
+        return Collections.singletonList(ValidationMessage.fromException(searchException));
     }
 
-    private List<ValidationMessage> toExplanation(final String query, final ParseException parseException) {
-        return Collections.singletonList(ValidationMessage.fromException(query, parseException));
+    private List<ValidationMessage> toExplanation(final ParseException parseException) {
+        return Collections.singletonList(ValidationMessage.fromException(parseException));
     }
 
     private List<ValidationMessage> getExplanations(List<ParsedTerm> unknownFields, List<ParsedTerm> invalidOperators) {
-        List<ValidationMessage> messages = new ArrayList<>();
 
-        unknownFields.stream().map(f -> {
+
+        final Stream<ValidationMessage> unknownFieldsStream = unknownFields.stream().map(f -> {
             final ValidationMessage.Builder message = ValidationMessage.builder()
                     .errorType("Unknown field")
                     .errorMessage("Query contains unknown field: " + f.getRealFieldName());
 
-            f.tokens().stream().findFirst().ifPresent(t -> {
+            f.keyToken().ifPresent(t -> {
                 message.beginLine(t.beginLine());
                 message.beginColumn(t.beginColumn());
                 message.endLine(t.endLine());
@@ -122,25 +123,26 @@ public class QueryValidationServiceImpl implements QueryValidationService {
             });
 
             return message.build();
+        });
 
-        }).forEach(messages::add);
-
-        invalidOperators.stream()
-                .map(token -> {
-                    final String errorMessage = String.format(Locale.ROOT, "Query contains invalid operator \"%s\". Both AND / OR operators have to be written uppercase", token.value());
+        final Stream<ValidationMessage> invalidOperatorsStream = invalidOperators.stream()
+                .map(term -> {
+                    final String errorMessage = String.format(Locale.ROOT, "Query contains invalid operator \"%s\". All AND / OR / NOT operators have to be written uppercase", term.value());
                     final ValidationMessage.Builder message = ValidationMessage.builder()
                             .errorType("Invalid operator")
                             .errorMessage(errorMessage);
-                    token.tokens().stream().findFirst().ifPresent(t -> {
+                    term.keyToken().ifPresent(t -> {
                         message.beginLine(t.beginLine());
                         message.beginColumn(t.beginColumn());
                         message.endLine(t.endLine());
                         message.endColumn(t.endColumn());
                     });
                     return message.build();
-                })
-                .forEach(messages::add);
-        return messages;
+                });
+
+        return Streams.concat(unknownFieldsStream, invalidOperatorsStream)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     private List<ParsedTerm> getUnknownFields(ValidationRequest req, ParsedQuery query) {

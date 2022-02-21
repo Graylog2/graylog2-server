@@ -40,7 +40,6 @@ const ExportExtractorsPage = createReactClass({
   },
 
   _isLoading() {
-    // eslint-disable-next-line react/destructuring-assignment
     return !this.state.input;
   },
 

@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import { Spinner } from 'components/common';
@@ -33,10 +33,19 @@ type Props = {
 };
 
 const SaveOrCancelButtons = ({ onFinish, onCancel, disableSave = false }: Props) => {
-  const { applyAllWidgetChanges, isSubmitting } = useContext(WidgetEditApplyAllChangesContext);
-  const _onFinish = () => applyAllWidgetChanges().then(() => {
-    onFinish();
-  });
+  const { applyAllWidgetChanges } = useContext(WidgetEditApplyAllChangesContext);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const _onFinish = () => {
+    setIsSubmitting(true);
+
+    return applyAllWidgetChanges().then(() => {
+      setIsSubmitting(false);
+      onFinish();
+    }).catch(() => {
+      setIsSubmitting(false);
+    });
+  };
 
   return (
     <StyledButtonToolbar className="pull-right">
