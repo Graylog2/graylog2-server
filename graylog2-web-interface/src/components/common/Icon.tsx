@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { SyntheticEvent } from 'react';
+
 import React from 'react';
 import { find } from 'lodash';
 import type { IconName } from '@fortawesome/fontawesome-common-types';
@@ -80,10 +80,10 @@ type Props = {
   fixedWidth?: boolean,
   inverse?: boolean,
   style?: React.CSSProperties,
-  onClick?: (event: SyntheticEvent) => void,
-  onMouseEnter?: (event: SyntheticEvent) => void,
-  onMouseLeave?: (event: SyntheticEvent) => void,
-  onFocus?: (event: SyntheticEvent) => void,
+  onClick?: (event: React.MouseEvent<SVGSVGElement>) => void,
+  onMouseEnter?: (event: React.MouseEvent<SVGSVGElement>) => void,
+  onMouseLeave?: (event: React.MouseEvent<SVGSVGElement>) => void,
+  onFocus?: (event: React.FocusEvent<SVGSVGElement>) => void,
   tabIndex?: number,
   title?: string,
 }
