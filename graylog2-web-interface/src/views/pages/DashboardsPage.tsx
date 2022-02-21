@@ -25,7 +25,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
 import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
-import ViewList from 'views/components/views/ViewList';
+import DashboardList from 'views/components/views/DashboardList';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 
 type Props = {
@@ -34,10 +34,10 @@ type Props = {
 
 const handleSearch = (query, page, perPage) => DashboardsActions.search(query, page, perPage);
 
-const handleViewDelete = (view) => {
+const handleDashboardDelete = (dashboard) => {
   // eslint-disable-next-line no-alert
-  if (window.confirm(`Are you sure you want to delete "${view.title}"?`)) {
-    return ViewManagementActions.delete(view);
+  if (window.confirm(`Are you sure you want to delete "${dashboard.title}"?`)) {
+    return ViewManagementActions.delete(dashboard);
   }
 
   return null;
@@ -76,10 +76,10 @@ const DashboardsPage = ({ dashboards: { list, pagination } }: Props) => {
 
         <Row className="content">
           <Col md={12}>
-            <ViewList views={list}
-                      pagination={pagination}
-                      handleSearch={handleSearch}
-                      handleViewDelete={handleViewDelete} />
+            <DashboardList dashboards={list}
+                           pagination={pagination}
+                           handleSearch={handleSearch}
+                           handleDashboardDelete={handleDashboardDelete} />
           </Col>
         </Row>
       </span>

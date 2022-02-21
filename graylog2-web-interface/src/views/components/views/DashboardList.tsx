@@ -23,21 +23,27 @@ import EntityShareModal from 'components/permissions/EntityShareModal';
 import QueryHelper from 'components/common/QueryHelper';
 import type ViewClass from 'views/logic/views/View';
 
-import View from './View';
+import Dashboard from './Dashboard';
 
 import ViewTypeLabel from '../ViewTypeLabel';
 
-const itemActionsFactory = (view, onViewDelete, setViewToShare) => {
+const ItemActions = ({ dashboard, onDashboardDelete, setDashboardToShare }) => {
   return (
     <ButtonToolbar>
-      <ShareButton entityId={view.id} entityType="dashboard" onClick={() => setViewToShare(view)} />
-      <DropdownButton title="Actions" id={`view-actions-dropdown-${view.id}`} pullRight>
-        <IfPermitted permissions={[`view:edit:${view.id}`, 'view:edit']} anyPermissions>
-          <MenuItem onSelect={onViewDelete(view)}>Delete</MenuItem>
+      <ShareButton entityId={dashboard.id} entityType="dashboard" onClick={() => setDashboardToShare(dashboard)} />
+      <DropdownButton title="Actions" id={`dashboard-actions-dropdown-${dashboard.id}`} pullRight>
+        <IfPermitted permissions={[`view:edit:${dashboard.id}`, 'view:edit']} anyPermissions>
+          <MenuItem onSelect={onDashboardDelete(dashboard)}>Delete</MenuItem>
         </IfPermitted>
       </DropdownButton>
     </ButtonToolbar>
   );
+};
+
+ItemActions.propTypes = {
+  dashboard: PropTypes.object.isRequired,
+  setDashboardToShare: PropTypes.func.isRequired,
+  onDashboardDelete: PropTypes.func.isRequired,
 };
 
 const reducer = (state, action) => {
@@ -51,16 +57,16 @@ const reducer = (state, action) => {
       return { ...state, query: '', page: 1 };
     case 'pageChange':
       return { ...state, page: newPage, perPage: newPerPage };
-    case 'viewDelete':
+    case 'dashboardDelete':
       return { ...state, page: 1 };
     default:
       return state;
   }
 };
 
-const ViewList = ({ pagination, handleSearch, handleViewDelete, views }) => {
+const DashboardList = ({ pagination, handleSearch, handleDashboardDelete, dashboards }) => {
   const [{ query, page, perPage }, dispatch] = useReducer(reducer, { query: '', page: 1, perPage: 10 });
-  const [viewToShare, setViewToShare] = useState<ViewClass>();
+  const [dashboardToShare, setDashboardToShare] = useState<ViewClass>();
 
   const execSearch = useCallback(() => handleSearch(query, page, perPage), [handleSearch, page, perPage, query]);
 
@@ -68,38 +74,38 @@ const ViewList = ({ pagination, handleSearch, handleViewDelete, views }) => {
     execSearch();
   }, [query, page, perPage, execSearch]);
 
-  const onViewDelete = (view) => () => {
-    handleViewDelete(view).then(() => {
-      dispatch({ type: 'viewDelete' });
+  const onDashboardDelete = (dashboard) => () => {
+    handleDashboardDelete(dashboard).then(() => {
+      dispatch({ type: 'dashboardDelete' });
       execSearch();
     });
   };
 
-  if (!views) {
-    return <Spinner text="Loading views..." />;
+  if (!dashboards) {
+    return <Spinner text="Loading dashboards..." />;
   }
 
-  const items = views.map((view) => (
-    <View key={`view-${view.id}`}
-          id={view.id}
-          owner={view.owner}
-          createdAt={view.created_at}
-          title={view.title}
-          summary={view.summary}
-          requires={view.requires}
-          description={view.description}>
-      {itemActionsFactory(view, onViewDelete, setViewToShare)}
-    </View>
+  const items = dashboards.map((dashboard) => (
+    <Dashboard key={`dashboard-${dashboard.id}`}
+               id={dashboard.id}
+               owner={dashboard.owner}
+               createdAt={dashboard.createdAt}
+               title={dashboard.title}
+               summary={dashboard.summary}
+               requires={dashboard.requires}
+               description={dashboard.description}>
+      <ItemActions dashboard={dashboard} onDashboardDelete={onDashboardDelete} setDashboardToShare={setDashboardToShare} />
+    </Dashboard>
   ));
 
   return (
     <>
-      {viewToShare && (
-        <EntityShareModal entityId={viewToShare.id}
+      {dashboardToShare && (
+        <EntityShareModal entityId={dashboardToShare.id}
                           entityType="dashboard"
-                          description={`Search for a User or Team to add as collaborator on this ${ViewTypeLabel({ type: viewToShare.type })}.`}
-                          entityTitle={viewToShare.title}
-                          onClose={() => setViewToShare(undefined)} />
+                          description={`Search for a User or Team to add as collaborator on this ${ViewTypeLabel({ type: dashboardToShare.type })}.`}
+                          entityTitle={dashboardToShare.title}
+                          onClose={() => setDashboardToShare(undefined)} />
       )}
       <PaginatedList onChange={(newPage, newPerPage) => dispatch({ type: 'pageChange', payload: { newPage, newPerPage } })}
                      activePage={pagination.page}
@@ -114,25 +120,25 @@ const ViewList = ({ pagination, handleSearch, handleViewDelete, views }) => {
         </div>
         <EntityList items={items}
                     bsNoItemsStyle="success"
-                    noItemsText="There are no views present/matching the filter!" />
+                    noItemsText="There are no dashboards present/matching the filter!" />
       </PaginatedList>
     </>
   );
 };
 
-ViewList.propTypes = {
-  views: PropTypes.arrayOf(PropTypes.object),
+DashboardList.propTypes = {
+  dashboards: PropTypes.arrayOf(PropTypes.object),
   pagination: PropTypes.shape({
     total: PropTypes.number.isRequired,
     page: PropTypes.number.isRequired,
     perPage: PropTypes.number.isRequired,
   }).isRequired,
   handleSearch: PropTypes.func.isRequired,
-  handleViewDelete: PropTypes.func.isRequired,
+  handleDashboardDelete: PropTypes.func.isRequired,
 };
 
-ViewList.defaultProps = {
-  views: undefined,
+DashboardList.defaultProps = {
+  dashboards: undefined,
 };
 
-export default ViewList;
+export default DashboardList;

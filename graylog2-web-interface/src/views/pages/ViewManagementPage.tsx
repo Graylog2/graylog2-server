@@ -22,7 +22,7 @@ import Routes from 'routing/Routes';
 import { Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { ViewManagementStore, ViewManagementActions } from 'views/stores/ViewManagementStore';
-import ViewList from 'views/components/views/ViewList';
+import DashboardList from 'views/components/views/DashboardList';
 
 const handleSearch = (query, page, perPage) => {
   return ViewManagementActions.search(query, page, perPage);
@@ -59,10 +59,10 @@ const ViewManagementPage = () => {
 
         <Row className="content">
           <Col md={12}>
-            <ViewList views={list}
-                      pagination={pagination}
-                      handleSearch={handleSearch}
-                      handleViewDelete={handleViewDelete} />
+            <DashboardList dashboards={list}
+                           pagination={pagination}
+                           handleSearch={handleSearch}
+                           handleDashboardDelete={handleViewDelete} />
           </Col>
         </Row>
       </span>

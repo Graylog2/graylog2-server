@@ -25,7 +25,7 @@ jest.mock('routing/Routes', () => ({
   EXTENDEDSEARCH: '/extendedsearch',
 }));
 
-jest.mock('views/components/views/ViewList', () => 'view-list');
+jest.mock('views/components/views/DashboardList', () => 'view-list');
 
 jest.mock('components/common', () => ({
   DocumentTitle: mockComponent('DocumentTitle'),
@@ -62,7 +62,7 @@ describe('ViewManagementPage', () => {
     const viewList = wrapper.find('view-list');
 
     expect(viewList).toHaveLength(1);
-    expect(viewList.at(0)).toHaveProp('views', viewsResult.list);
+    expect(viewList.at(0)).toHaveProp('dashboards', viewsResult.list);
     expect(viewList.at(0)).toHaveProp('pagination', viewsResult.pagination);
   });
 
@@ -72,21 +72,21 @@ describe('ViewManagementPage', () => {
     const wrapper = mount(<ViewManagementPage />);
 
     const viewList = wrapper.find('view-list');
-    const { handleViewDelete } = viewList.at(0).props() as { handleViewDelete: (view: { title: string }) => void };
+    const { handleDashboardDelete } = viewList.at(0).props() as { handleDashboardDelete: (view: { title: string }) => void };
 
     const oldConfirm = window.confirm;
     const dummyView = { title: 'Dummy view' };
 
     window.confirm = jest.fn(() => false);
 
-    handleViewDelete(dummyView);
+    handleDashboardDelete(dummyView);
 
     expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Dummy view"?');
     expect(mockViewManagementActions.delete).not.toHaveBeenCalled();
 
     window.confirm = jest.fn(() => true);
 
-    handleViewDelete(dummyView);
+    handleDashboardDelete(dummyView);
 
     expect(mockViewManagementActions.delete).toHaveBeenCalledWith(dummyView);
 
