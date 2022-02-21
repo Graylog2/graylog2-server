@@ -73,6 +73,10 @@ const GraylogClusterTrafficGraph = () => {
   const licensePlugin = PluginStore.exports('license');
 
   useEffect(() => {
+    ClusterTrafficActions.getTraffic();
+  }, []);
+
+  useEffect(() => {
     const _resizeGraphs = () => {
       const { clientWidth } = containerRef.current;
 
@@ -83,7 +87,6 @@ const GraylogClusterTrafficGraph = () => {
       eventThrottler.current.throttle(() => _resizeGraphs());
     };
 
-    ClusterTrafficActions.getTraffic();
     window.addEventListener('resize', _onResize);
 
     if (containerRef) {
