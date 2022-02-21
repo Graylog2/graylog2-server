@@ -30,7 +30,7 @@ const DefaultFieldTypesProvider = ({ children }: { children: React.ReactElement 
   const currentStreams = useMemo(() => filtersToStreamSet(currentQuery.filter).toArray(), [currentQuery.filter]);
   const { data: currentFieldTypes } = useFieldTypes(currentStreams, currentQuery.timerange);
   const { data: allFieldTypes } = useFieldTypes([], currentQuery.timerange);
-  const queryFields = useMemo(() => Immutable.Map({ [currentQuery.id]: Immutable.List(currentFieldTypes) }), [currentFieldTypes]);
+  const queryFields = useMemo(() => Immutable.Map({ [currentQuery.id]: Immutable.List(currentFieldTypes) }), [currentFieldTypes, currentQuery.id]);
   const all = useMemo(() => Immutable.List(allFieldTypes ?? []), [allFieldTypes]);
   const fieldTypes = useMemo(() => ({ all, queryFields }), [all, queryFields]);
 
