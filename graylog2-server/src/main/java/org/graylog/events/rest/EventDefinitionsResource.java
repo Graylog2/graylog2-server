@@ -209,6 +209,16 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         eventDefinitionHandler.unschedule(definitionId);
     }
 
+    @PUT
+    @Path("{definitionId}/clear-notification-queue")
+    @Consumes(MediaType.WILDCARD)
+    @ApiOperation("Disable event definition")
+    @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CLEAR_NOTIFICATION_QUEUE)
+    public void clearNotificationQueue(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
+        checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
+        eventDefinitionHandler.deleteNotificationJobTriggers(definitionId);
+    }
+
     @POST
     @ApiOperation("Execute event definition")
     @Path("{definitionId}/execute")

@@ -172,6 +172,19 @@ public class EventDefinitionHandler {
                 .ifPresent(jobDefinition -> deleteJobDefinitionAndTrigger(jobDefinition, eventDefinition));
     }
 
+    /**
+     * Deletes notification triggers for this event.
+     * <p>
+     * This mostly serves as a safety net, when a misconfiguration has lead to a high number of outstanding
+     * notifications.
+     * <p>
+     * Processing these notifications would unnecessarily block the job scheduler and in some cases consume a lot of
+     * resources.
+     */
+    public void deleteNotificationJobTriggers(String eventDefinitionId) {
+        deleteNotificationJobTriggers(getEventDefinitionOrThrowIAE(eventDefinitionId));
+    }
+
     private EventDefinitionDto createEventDefinition(EventDefinitionDto unsavedEventDefinition, Optional<User> user) {
         EventDefinitionDto eventDefinition;
         if (user.isPresent()) {
@@ -292,13 +305,6 @@ public class EventDefinitionHandler {
         deleteJobDefinition(jobDefinition, eventDefinition);
     }
 
-    /**
-     * Deletes notification triggers for this event.
-     * This mostly serves as a safety net, when a misconfiguration has lead to a high number of outstanding
-     * notifications.
-     * Processing these notifications would unnecessarily block the job scheduler and in some cases consume a lot of
-     * resources.
-     */
     private void deleteNotificationJobTriggers(EventDefinitionDto eventDefinition) {
         final DBQuery.Query query = DBQuery.and(
                 DBQuery.is("data.type", EventNotificationExecutionJob.TYPE_NAME),
