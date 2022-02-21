@@ -34,11 +34,6 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 
 import TrafficGraph from './TrafficGraph';
 
-type Props = {
-  layout: string,
-  children: React.ReactNode
-}
-
 const StyledDl = styled.dl`
   margin-bottom: 0;
 `;
@@ -49,8 +44,28 @@ const StyledH3 = styled.h3(({ theme }: { theme: DefaultTheme }) => css`
   margin-bottom: ${theme.spacings.sm};
 `);
 
-const GraylogClusterOverview = ({ layout, children }: Props) => {
+const Header = () => <StyledH2>Graylog cluster</StyledH2>;
+
+const ClusterInfo = () => {
   const nodes = useStore(NodesStore);
+
+  if (!nodes) {
+    return <Spinner />;
+  }
+
+  const { clusterId, nodeCount } = nodes;
+
+  return (
+    <StyledDl className="system-dl">
+      <dt>Cluster ID:</dt>
+      <dd>{clusterId || 'Not available'}</dd>
+      <dt>Number of nodes:</dt>
+      <dd>{nodeCount}</dd>
+    </StyledDl>
+  );
+};
+
+const GraylogClusterTrafficGraph = () => {
   const { traffic } = useStore(ClusterTrafficStore);
   const [graphWidth, setGraphWidth] = useState(600);
   const eventThrottler = useRef(new EventHandlersThrottler());
@@ -80,98 +95,72 @@ const GraylogClusterOverview = ({ layout, children }: Props) => {
     };
   }, [containerRef]);
 
-  const renderClusterInfo = () => {
-    let content = <Spinner />;
+  const TrafficGraphComponent = licensePlugin[0]?.EnterpriseTrafficGraph || TrafficGraph;
+  let sumOutput = null;
+  let trafficGraph = <Spinner />;
 
-    if (nodes) {
-      const { clusterId, nodeCount } = nodes;
+  if (traffic) {
+    const bytesOut = _.reduce(traffic.output, (result, value) => result + value);
 
-      content = (
-        <StyledDl className="system-dl">
-          <dt>Cluster ID:</dt>
-          <dd>{clusterId || 'Not available'}</dd>
-          <dt>Number of nodes:</dt>
-          <dd>{nodeCount}</dd>
-        </StyledDl>
-      );
-    }
+    sumOutput = <small>Last 30 days: {NumberUtils.formatBytes(bytesOut)}</small>;
 
-    return content;
-  };
-
-  const renderTrafficGraph = () => {
-    const TrafficGraphComponent = licensePlugin[0]?.EnterpriseTrafficGraph || TrafficGraph;
-    let sumOutput = null;
-    let trafficGraph = <Spinner />;
-
-    if (traffic) {
-      const bytesOut = _.reduce(traffic.output, (result, value) => result + value);
-
-      sumOutput = <small>Last 30 days: {NumberUtils.formatBytes(bytesOut)}</small>;
-
-      trafficGraph = (
-        <TrafficGraphComponent traffic={traffic.output}
-                               from={traffic.from}
-                               to={traffic.to}
-                               width={graphWidth} />
-      );
-    }
-
-    return (
-      <>
-        <StyledH3 ref={containerRef}>Outgoing traffic {sumOutput}</StyledH3>
-        {trafficGraph}
-      </>
+    trafficGraph = (
+      <TrafficGraphComponent traffic={traffic.output}
+                             from={traffic.from}
+                             to={traffic.to}
+                             width={graphWidth} />
     );
-  };
+  }
 
-  const renderHeader = () => {
-    return <StyledH2>Graylog cluster</StyledH2>;
-  };
+  return (
+    <>
+      <StyledH3 ref={containerRef}>Outgoing traffic {sumOutput}</StyledH3>
+      {trafficGraph}
+    </>
+  );
+};
 
-  const renderDefaultLayout = () => {
+type Props = {
+  layout: string,
+  children: React.ReactNode
+}
+
+const GraylogClusterOverview = ({ layout, children }: Props) => {
+  if (layout === 'compact') {
     return (
       <Row className="content">
         <Col md={12}>
-          {renderHeader()}
-          {renderClusterInfo()}
-          <hr />
-          {children}
-          <Row>
-            <Col md={12}>
-              {renderTrafficGraph()}
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    );
-  };
-
-  const renderCompactLayout = () => {
-    return (
-      <Row className="content">
-        <Col md={12}>
-          {renderHeader()}
+          <Header />
           <Row>
             <Col md={6}>
-              {renderClusterInfo()}
+              <ClusterInfo />
               <hr />
               {children}
             </Col>
             <Col md={6}>
-              {renderTrafficGraph()}
+              <GraylogClusterTrafficGraph />
             </Col>
           </Row>
         </Col>
       </Row>
     );
-  };
-
-  if (layout === 'compact') {
-    return renderCompactLayout();
   }
 
-  return renderDefaultLayout();
+  return (
+    <Row className="content">
+      <Col md={12}>
+        <Header />
+        <ClusterInfo />
+        <hr />
+        {children}
+        <Row>
+          <Col md={12}>
+            <GraylogClusterTrafficGraph />
+          </Col>
+        </Row>
+      </Col>
+    </Row>
+  );
 };
 
 GraylogClusterOverview.propTypes = {
