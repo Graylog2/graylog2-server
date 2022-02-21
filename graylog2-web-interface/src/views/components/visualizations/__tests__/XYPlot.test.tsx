@@ -122,6 +122,7 @@ describe('XYPlot', () => {
       yaxis: { fixedrange: true, rangemode: 'tozero', tickformat: ',g' },
       xaxis: { fixedrange: true },
       showlegend: false,
+      hovermode: 'x',
     });
 
     expect(genericPlot).toHaveProp('chartData', chartData);
