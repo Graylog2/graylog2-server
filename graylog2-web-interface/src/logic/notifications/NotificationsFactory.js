@@ -378,9 +378,14 @@ class NotificationsFactory {
 
       case 'archiving_summary':
         return {
-          title: 'The following indices could not be archived yet (but will still be retried)',
+          title: 'The following indices could not be archived yet',
           description: (
             <span>
+              There was an error while archiving some indices. Graylog will continue trying to archive those
+              indices and will retain all indices until they are successfully archived.
+              <br />
+              Please check the following error messages as your assistance may be necessary to resolve the issue:
+              <br />
               <ul>
                 {/* eslint-disable-next-line react/no-array-index-key */}
                 {notification.details.archiveErrors.map((error, idx) => <li key={idx}>{error}</li>)}
