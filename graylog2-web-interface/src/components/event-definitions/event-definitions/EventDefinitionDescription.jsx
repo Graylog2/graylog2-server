@@ -23,6 +23,7 @@ import styled, { css } from 'styled-components';
 
 import { Button, Col, Row } from 'components/bootstrap';
 import { Icon, Pluralize, Timestamp } from 'components/common';
+import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 
 const DetailsList = styled.dl`
 `;
@@ -51,6 +52,15 @@ class EventDefinitionDescription extends React.Component {
 
   static defaultProps = {
     context: {},
+  };
+
+  static clearNotifications = (definition) => {
+    return () => {
+      // eslint-disable-next-line no-alert
+      if (window.confirm(`Are you sure you want to clear queued notifications for "${definition.title}"?`)) {
+        EventDefinitionsActions.clearNotificationQueue(definition);
+      }
+    };
   };
 
   constructor() {
@@ -138,7 +148,13 @@ class EventDefinitionDescription extends React.Component {
             )}
             {timerange}
             <DetailTitle>Queued notifications:</DetailTitle>
-            <DetailValue>{scheduleCtx.queued_notifications}</DetailValue>
+            <DetailValue>{scheduleCtx.queued_notifications}
+              {scheduleCtx.queued_notifications > 0 && (
+                <Button bsStyle="link" bsSize="xsmall" onClick={EventDefinitionDescription.clearNotifications(definition)}>
+                  clear
+                </Button>
+              )}
+            </DetailValue>
           </DetailsList>
         </Col>
       </Row>
