@@ -38,13 +38,13 @@ const sourceCompletion = {
 };
 
 class SimpleCompleter implements Completer {
+  // eslint-disable-next-line class-methods-use-this
   getCompletions = () => ([sourceIpCompletion]);
 }
 
 class AsyncCompleter implements Completer {
-  getCompletions = () => {
-    return Promise.resolve([sourceCompletion]);
-  };
+  // eslint-disable-next-line class-methods-use-this
+  getCompletions = () => Promise.resolve([sourceCompletion]);
 }
 
 const EditorMock = {
@@ -98,20 +98,32 @@ describe('SearchAutoCompletions', () => {
     it('should not show completions manually when no Completer provides `shouldShowCompletions`', async () => {
       const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES);
 
-      const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }], null]);
+      const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{
+        type: 'keyword',
+        value: 'http_method:',
+        index: 0,
+        start: 0,
+      }], null]);
 
       expect(result).toBe(false);
     });
 
     it('should not show completions manually when a Completer provides `shouldShowCompletions` which returns false', async () => {
       class ExampleCompleter implements Completer {
+        // eslint-disable-next-line class-methods-use-this
         getCompletions = () => ([sourceIpCompletion]);
 
+        // eslint-disable-next-line class-methods-use-this
         shouldShowCompletions = () => false;
       }
 
       const searchBarAutoCompletions = new SearchBarAutoCompletions([new ExampleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES);
-      const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }], null]);
+      const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{
+        type: 'keyword',
+        value: 'http_method:',
+        index: 0,
+        start: 0,
+      }], null]);
 
       expect(result).toBe(false);
     });
@@ -120,17 +132,28 @@ describe('SearchAutoCompletions', () => {
       const mockShouldShowCompletions = jest.fn(() => true);
 
       class ExampleCompleter implements Completer {
+        // eslint-disable-next-line class-methods-use-this
         getCompletions = () => ([sourceIpCompletion]);
 
         shouldShowCompletions = mockShouldShowCompletions;
       }
 
       const searchBarAutoCompletions = new SearchBarAutoCompletions([new ExampleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES);
-      const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }], null]);
+      const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{
+        type: 'keyword',
+        value: 'http_method:',
+        index: 0,
+        start: 0,
+      }], null]);
 
       expect(mockShouldShowCompletions).toHaveBeenCalledTimes(1);
 
-      expect(mockShouldShowCompletions).toHaveBeenCalledWith(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }], null]);
+      expect(mockShouldShowCompletions).toHaveBeenCalledWith(1, [[{
+        type: 'keyword',
+        value: 'http_method:',
+        index: 0,
+        start: 0,
+      }], null]);
 
       expect(result).toBe(true);
     });
