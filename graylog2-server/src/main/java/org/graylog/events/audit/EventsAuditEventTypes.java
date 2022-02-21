@@ -35,10 +35,11 @@ public class EventsAuditEventTypes implements PluginAuditEventTypes {
     public static final String EVENT_NOTIFICATION_UPDATE = EVENT_NOTIFICATION_PREFIX + "update";
 
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
-        .add(EVENT_DEFINITION_CREATE)
-        .add(EVENT_DEFINITION_DELETE)
-        .add(EVENT_DEFINITION_EXECUTE)
-        .add(EVENT_DEFINITION_UPDATE)
+            .add(EVENT_DEFINITION_CREATE)
+            .add(EVENT_DEFINITION_DELETE)
+            .add(EVENT_DEFINITION_EXECUTE)
+            .add(EVENT_DEFINITION_UPDATE)
+            .add(EVENT_DEFINITION_CLEAR_NOTIFICATION_QUEUE)
         .add(EVENT_NOTIFICATION_CREATE)
         .add(EVENT_NOTIFICATION_DELETE)
         .add(EVENT_NOTIFICATION_UPDATE)
