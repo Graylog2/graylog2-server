@@ -89,7 +89,7 @@ const GraylogClusterTrafficGraph = () => {
 
     window.addEventListener('resize', _onResize);
 
-    if (containerRef) {
+    if (containerRef.current) {
       _resizeGraphs();
     }
 
