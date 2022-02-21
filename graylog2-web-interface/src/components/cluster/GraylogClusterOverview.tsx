@@ -121,7 +121,7 @@ const GraylogClusterTrafficGraph = () => {
 };
 
 type Props = {
-  layout: string,
+  layout?: 'default' | 'compact',
   children: React.ReactNode
 }
 
