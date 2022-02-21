@@ -17,6 +17,7 @@
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type { ColLeaf, Leaf, Key, Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
+import { isValidDate } from 'util/DateTime';
 
 type TimeFormatter = (time: DateTime, format?: DateTimeFormats) => string;
 
@@ -29,14 +30,15 @@ const transformKey = (key: Key, indices: Array<number>, formatTimestamp: TimeFor
 
   indices.forEach((idx) => {
     if (newKey[idx]) {
-      newKey[idx] = formatTimestamp(newKey[idx], 'internal');
+      const value = newKey[idx];
+      newKey[idx] = isValidDate(value) ? formatTimestamp(newKey[idx], 'internal') : value;
     }
   });
 
   return newKey;
 };
 
-const findIndices = <T> (ary: Array<T>, predicate: (T) => boolean): Array<number> => ary
+const findIndices = <T> (ary: Array<T>, predicate: (value: T) => boolean): Array<number> => ary
   .map((value, idx) => ({ value, idx }))
   .filter(({ value }) => predicate(value))
   .map(({ idx }) => idx);

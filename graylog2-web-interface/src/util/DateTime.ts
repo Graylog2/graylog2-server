@@ -89,3 +89,5 @@ export const relativeDifference = (dateTime: DateTime) => {
 
   return validateDateTime(dateObject, dateTime).fromNow();
 };
+
+export const isValidDate = (dateTime: DateTime) => moment(dateTime, Object.values(DATE_TIME_FORMATS), true).isValid();
