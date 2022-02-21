@@ -19,7 +19,7 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
+import { reduce } from 'lodash';
 import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -100,7 +100,7 @@ const GraylogClusterTrafficGraph = () => {
   let trafficGraph = <Spinner />;
 
   if (traffic) {
-    const bytesOut = _.reduce(traffic.output, (result, value) => result + value);
+    const bytesOut = reduce(traffic.output, (result, value) => result + value);
 
     sumOutput = <small>Last 30 days: {NumberUtils.formatBytes(bytesOut)}</small>;
 
