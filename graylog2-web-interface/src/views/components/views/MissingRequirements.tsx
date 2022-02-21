@@ -16,14 +16,13 @@
  */
 import * as React from 'react';
 import * as PropTypes from 'prop-types';
+import { capitalize } from 'lodash';
 
-import { LinkContainer } from 'components/common/router';
+import history from 'util/History';
 import type { PluginMetadata, Requirements } from 'views/logic/views/View';
 import { Col, Row, Button } from 'components/bootstrap';
-import * as URLUtils from 'util/URLUtils';
 import fixup from 'views/pages/StyleFixups.css';
 import View from 'views/logic/views/View';
-import { viewsPath } from 'views/Constants';
 
 type Props = {
   view: View,
@@ -33,8 +32,8 @@ type Props = {
 const MissingRequirements = ({ view, missingRequirements }: Props) => (
   <Row className="content">
     <Col md={6} mdOffset={3} className={fixup.bootstrapHeading}>
-      <h1>View: <em>{view.title}</em></h1>
-      <p>Unfortunately executing this view is not possible. It uses the following capabilities which are not available:</p>
+      <h1>{capitalize(view.type)}: <em>{view.title}</em></h1>
+      <p>Unfortunately executing this {view.type?.toLowerCase()} is not possible. It uses the following capabilities which are not available:</p>
 
       <ul>
         {Object.entries(missingRequirements).map(([require, plugin]: [string, PluginMetadata]) => (
@@ -46,9 +45,7 @@ const MissingRequirements = ({ view, missingRequirements }: Props) => (
     </Col>
 
     <Col md={1} mdOffset={8}>
-      <LinkContainer to={URLUtils.appPrefixed(viewsPath)}>
-        <Button type="submit" bsStyle="success">Back</Button>
-      </LinkContainer>
+      <Button bsStyle="success" onClick={() => history.goBack()}>Back</Button>
     </Col>
   </Row>
 );

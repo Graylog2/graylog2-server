@@ -63,7 +63,7 @@ const DashboardsStore: Store<DashboardsStoreState> = singletonStore(
       perPage: 10,
     },
 
-    getInitialState() {
+    getInitialState(): DashboardsStoreState {
       return {
         pagination: this.pagination,
         list: this.dashboards,

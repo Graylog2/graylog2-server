@@ -29,7 +29,6 @@ import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -80,7 +79,7 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                     : ValidationResponse.warning(explanations);
 
         } catch (ParseException e) {
-            return ValidationResponse.error(toExplanation(rawQuery, e));
+            return ValidationResponse.error(toExplanation(e));
         }
     }
 
@@ -101,11 +100,11 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                         .collect(Collectors.toList());
             }
         }
-        return Collections.singletonList(ValidationMessage.fromException(query, searchException));
+        return Collections.singletonList(ValidationMessage.fromException(searchException));
     }
 
-    private List<ValidationMessage> toExplanation(final String query, final ParseException parseException) {
-        return Collections.singletonList(ValidationMessage.fromException(query, parseException));
+    private List<ValidationMessage> toExplanation(final ParseException parseException) {
+        return Collections.singletonList(ValidationMessage.fromException(parseException));
     }
 
     private List<ValidationMessage> getExplanations(List<ParsedTerm> unknownFields, List<ParsedTerm> invalidOperators) {
@@ -116,7 +115,7 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                     .errorType("Unknown field")
                     .errorMessage("Query contains unknown field: " + f.getRealFieldName());
 
-            f.tokens().stream().findFirst().ifPresent(t -> {
+            f.keyToken().ifPresent(t -> {
                 message.beginLine(t.beginLine());
                 message.beginColumn(t.beginColumn());
                 message.endLine(t.endLine());
@@ -127,12 +126,12 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         });
 
         final Stream<ValidationMessage> invalidOperatorsStream = invalidOperators.stream()
-                .map(token -> {
-                    final String errorMessage = String.format(Locale.ROOT, "Query contains invalid operator \"%s\". All AND / OR / NOT operators have to be written uppercase", token.value());
+                .map(term -> {
+                    final String errorMessage = String.format(Locale.ROOT, "Query contains invalid operator \"%s\". All AND / OR / NOT operators have to be written uppercase", term.value());
                     final ValidationMessage.Builder message = ValidationMessage.builder()
                             .errorType("Invalid operator")
                             .errorMessage(errorMessage);
-                    token.tokens().stream().findFirst().ifPresent(t -> {
+                    term.keyToken().ifPresent(t -> {
                         message.beginLine(t.beginLine());
                         message.beginColumn(t.beginColumn());
                         message.endLine(t.endLine());

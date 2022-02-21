@@ -52,7 +52,7 @@
     "react": "16.14.0",
     "react-bootstrap": "0.33.1",
     "react-dom": "16.14.0",
-    "react-query": "3.34.15",
+    "react-query": "3.34.16",
     "react-router": "5.2.1",
     "react-router-bootstrap": "0.25.0",
     "react-router-dom": "5.3.0",
@@ -60,7 +60,7 @@
     "styled-components": "5.3.3",
     "stylelint-config-graylog": "file:../stylelint-config-graylog",
     "typescript": "4.5.5",
-    "webpack": "5.69.0",
+    "webpack": "5.69.1",
     "webpack-cleanup-plugin": "0.5.1",
     "webpack-cli": "4.9.2",
     "webpack-merge": "4.2.2"

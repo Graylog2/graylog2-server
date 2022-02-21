@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export { default as AggregationWizard } from './AggregationWizard';
-export { default as PropagateValidationState } from './PropagateValidationState';
+export { default as PropagateDisableSubmissionState } from './PropagateDisableSubmissionState';
 
 export type {
   GroupByFormValues,

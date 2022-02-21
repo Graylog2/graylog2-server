@@ -31,7 +31,7 @@ const ItemActions = ({ dashboard, onDashboardDelete, setDashboardToShare }) => {
   return (
     <ButtonToolbar>
       <ShareButton entityId={dashboard.id} entityType="dashboard" onClick={() => setDashboardToShare(dashboard)} />
-      <DropdownButton title="Actions" id={`dashboard-actions-dropdown-${dashboard.id}`} pullRight>
+      <DropdownButton title="Actions" data-testid={`dashboard-actions-dropdown-${dashboard.id}`} id={`dashboard-actions-dropdown-${dashboard.id}`} pullRight>
         <IfPermitted permissions={[`view:edit:${dashboard.id}`, 'view:edit']} anyPermissions>
           <MenuItem onSelect={onDashboardDelete(dashboard)}>Delete</MenuItem>
         </IfPermitted>
@@ -78,7 +78,7 @@ const DashboardList = ({ pagination, handleSearch, handleDashboardDelete, dashbo
     handleDashboardDelete(dashboard).then(() => {
       dispatch({ type: 'dashboardDelete' });
       execSearch();
-    });
+    }, () => {});
   };
 
   if (!dashboards) {

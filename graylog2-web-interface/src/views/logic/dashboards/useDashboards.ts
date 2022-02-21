@@ -14,15 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useEffect } from 'react';
+
+import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
+import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
 import { useStore } from 'stores/connect';
-import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
-import { SearchStore } from 'views/stores/SearchStore';
 
-const useParameters = () => {
-  const { parameterBindings } = useStore(SearchExecutionStateStore);
-  const { search: { parameters } } = useStore(SearchStore);
+export type Dashboards = DashboardsStoreState;
 
-  return { parameterBindings, parameters };
+type SearchQuery = {
+  query?: string,
+  page?: number,
+  perPage?: number
 };
 
-export default useParameters;
+const useDashboards = (searchQuery: SearchQuery): Readonly<Dashboards> => {
+  const dashboards = useStore(DashboardsStore);
+
+  useEffect(() => {
+    DashboardsActions.search(searchQuery?.query ?? '', searchQuery?.page ?? 1, searchQuery?.perPage ?? 10);
+  }, [searchQuery]);
+
+  return dashboards;
+};
+
+export default useDashboards;

@@ -41,6 +41,7 @@ type Props = {
   ) => AutoCompleter,
   completers: Array<Completer>,
   disabled?: boolean,
+  disableExecution?: boolean,
   error?: QueryValidationState,
   onBlur?: (query: string) => void,
   onChange: (query: string) => Promise<string>,
@@ -59,15 +60,19 @@ const defaultCompleterFactory = (
   streams: Array<string>,
 ) => new SearchBarAutoCompletions(completers, timeRange, streams);
 
-const handleExecution = (editor: Editor, onExecute: (query: string) => void, value: string, error: QueryValidationState | undefined) => {
-  if (editor?.completer && editor.completer.popup) {
-    editor.completer.popup.hide();
-  }
-
+const handleExecution = (editor: Editor, onExecute: (query: string) => void, value: string, error: QueryValidationState | undefined, disableExecution: boolean) => {
   if (error) {
     QueryValidationActions.displayValidationErrors();
 
     return;
+  }
+
+  if (disableExecution) {
+    return;
+  }
+
+  if (editor?.completer && editor.completer.popup) {
+    editor.completer.popup.hide();
   }
 
   onExecute(value);
@@ -147,10 +152,11 @@ const QueryInput = ({
   theme,
   value,
   warning,
+  disableExecution,
 }: Props) => {
   const completer = useMemo(() => completerFactory(completers, timeRange, streams), [completerFactory, completers, timeRange, streams]);
   const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor), []);
-  const onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecuteProp, value, error), [onExecuteProp, value, error]);
+  const onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecuteProp, value, error, disableExecution), [onExecuteProp, value, error, disableExecution]);
   const markers = useMemo(() => getMarkers(error, warning), [error, warning]);
   const updateEditorConfiguration = useCallback((node) => _updateEditorConfiguration(node, completer, onExecute), [onExecute, completer]);
 
@@ -196,6 +202,7 @@ QueryInput.propTypes = {
   completerFactory: PropTypes.func,
   completers: PropTypes.array,
   disabled: PropTypes.bool,
+  disableExecution: PropTypes.bool,
   error: PropTypes.object,
   onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,
@@ -212,6 +219,7 @@ QueryInput.defaultProps = {
   className: '',
   completerFactory: defaultCompleterFactory,
   completers: [],
+  disableExecution: false,
   disabled: false,
   error: undefined,
   onBlur: () => {},

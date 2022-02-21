@@ -37,18 +37,38 @@ export type PaginatedListType = {
   pagination: ListPagination,
 };
 
+export type ResultsWrapperComponentProps = {
+  isEmptyResult: boolean,
+  children: React.ReactNode,
+};
+
+export type OverrideItemComponentProps = {
+  item: DescriptiveItem,
+  onDeleteItem: (item: DescriptiveItem) => void,
+};
+
 type Props = {
   noDataText?: string,
   onLoad: (pagination: Pagination, isSubscribed: boolean) => Promise<PaginatedListType>,
   overrideList?: PaginatedListType,
   onDeleteItem?: (descriptiveItem: DescriptiveItem) => void,
   queryHelper?: React.ReactNode,
+  resultsWrapperComponent?: React.ComponentType<ResultsWrapperComponentProps>,
+  overrideItemComponent?: React.ComponentType<OverrideItemComponentProps>,
 };
 
 const pageSizes = [5, 10, 30];
 export const DEFAULT_PAGINATION = { page: INITIAL_PAGE, perPage: pageSizes[0], query: '' };
 
-const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem, queryHelper, noDataText }: Props) => {
+const PaginatedItemOverview = ({
+  onLoad,
+  overrideList,
+  onDeleteItem,
+  queryHelper,
+  noDataText,
+  resultsWrapperComponent: ResultsWrapperComponent,
+  overrideItemComponent: OverrideItemComponent,
+}: Props) => {
   const [paginatedList, setPaginatedList] = useState<PaginatedListType | undefined>();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   useEffect(() => overrideList && setPaginatedList(overrideList), [overrideList]);
@@ -73,7 +93,13 @@ const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem, queryHelper
   let itemList;
 
   if (paginatedList.list && paginatedList.list.size >= 1) {
-    itemList = paginatedList.list.toArray().map((item) => <PaginatedItem key={item.id} onDeleteItem={onDeleteItem} item={item} />);
+    itemList = paginatedList.list.toArray().map((item) => {
+      if (OverrideItemComponent) {
+        return <OverrideItemComponent key={item.id} onDeleteItem={onDeleteItem} item={item} />;
+      }
+
+      return <PaginatedItem key={item.id} onDeleteItem={onDeleteItem} item={item} />;
+    });
   }
 
   return (
@@ -88,9 +114,9 @@ const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem, queryHelper
                   placeholder="Enter query to filter"
                   queryHelpComponent={queryHelper}
                   searchButtonLabel="Filter" />
-      <div>
+      <ResultsWrapperComponent isEmptyResult={!itemList}>
         {itemList ?? emptyResult}
-      </div>
+      </ResultsWrapperComponent>
     </PaginatedList>
   );
 };
@@ -100,6 +126,8 @@ PaginatedItemOverview.defaultProps = {
   overrideList: undefined,
   noDataText: 'No items found to display.',
   queryHelper: undefined,
+  resultsWrapperComponent: ({ children }) => <div>{children}</div>,
+  overrideItemComponent: undefined,
 };
 
 export default PaginatedItemOverview;
