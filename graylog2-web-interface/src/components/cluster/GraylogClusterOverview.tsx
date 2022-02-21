@@ -96,7 +96,7 @@ const GraylogClusterTrafficGraph = () => {
     return () => {
       window.removeEventListener('resize', _onResize);
     };
-  }, [containerRef]);
+  }, []);
 
   const TrafficGraphComponent = licensePlugin[0]?.EnterpriseTrafficGraph || TrafficGraph;
   let sumOutput = null;
