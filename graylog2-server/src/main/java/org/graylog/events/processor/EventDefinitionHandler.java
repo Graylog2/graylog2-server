@@ -313,7 +313,8 @@ public class EventDefinitionHandler {
         final int numberOfDeletedTriggers = jobTriggerService.deleteByQuery(query);
 
         if (numberOfDeletedTriggers > 0) {
-            LOG.info("Deleted {} uncompleted notifications.", numberOfDeletedTriggers);
+            LOG.info("Deleted {} notification triggers for event definition <{}/{}>.",
+                    numberOfDeletedTriggers, eventDefinition.id(), eventDefinition.title());
         }
     }
 
