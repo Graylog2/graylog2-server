@@ -109,8 +109,6 @@ const GraylogClusterTrafficGraph = () => {
 
     trafficGraph = (
       <TrafficGraphComponent traffic={traffic.output}
-                             from={traffic.from}
-                             to={traffic.to}
                              width={graphWidth} />
     );
   }
