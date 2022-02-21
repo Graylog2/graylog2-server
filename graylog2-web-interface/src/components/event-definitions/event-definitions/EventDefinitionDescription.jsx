@@ -54,6 +54,36 @@ class EventDefinitionDescription extends React.Component {
     context: {},
   };
 
+  static renderSchedulingInformation = (definition) => {
+    let schedulingInformation = 'Not scheduled.';
+
+    if (definition.config.search_within_ms && definition.config.execute_every_ms) {
+      const executeEveryFormatted = moment.duration(definition.config.execute_every_ms)
+        .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all', usePlural: false });
+      const searchWithinFormatted = moment.duration(definition.config.search_within_ms)
+        .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
+
+      schedulingInformation = `Runs every ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}.`;
+    }
+
+    return schedulingInformation;
+  };
+
+  static renderNotificationsInformation = (definition) => {
+    let notificationsInformation = <span>Does <b>not</b> trigger any Notifications.</span>;
+
+    if (definition.notifications.length > 0) {
+      notificationsInformation = (
+        <span>
+          Triggers {definition.notifications.length}{' '}
+          <Pluralize singular="Notification" plural="Notifications" value={definition.notifications.length} />.
+        </span>
+      );
+    }
+
+    return notificationsInformation;
+  };
+
   static clearNotifications = (definition) => {
     return () => {
       // eslint-disable-next-line no-alert
@@ -70,36 +100,6 @@ class EventDefinitionDescription extends React.Component {
       showDetails: false,
     };
   }
-
-  renderSchedulingInformation = (definition) => {
-    let schedulingInformation = 'Not scheduled.';
-
-    if (definition.config.search_within_ms && definition.config.execute_every_ms) {
-      const executeEveryFormatted = moment.duration(definition.config.execute_every_ms)
-        .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all', usePlural: false });
-      const searchWithinFormatted = moment.duration(definition.config.search_within_ms)
-        .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
-
-      schedulingInformation = `Runs every ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}.`;
-    }
-
-    return schedulingInformation;
-  };
-
-  renderNotificationsInformation = (definition) => {
-    let notificationsInformation = <span>Does <b>not</b> trigger any Notifications.</span>;
-
-    if (definition.notifications.length > 0) {
-      notificationsInformation = (
-        <span>
-          Triggers {definition.notifications.length}{' '}
-          <Pluralize singular="Notification" plural="Notifications" value={definition.notifications.length} />.
-        </span>
-      );
-    }
-
-    return notificationsInformation;
-  };
 
   renderDetails = (definition, context) => {
     const { showDetails } = this.state;
@@ -175,7 +175,7 @@ class EventDefinitionDescription extends React.Component {
       <>
         <p>{definition.description}</p>
         <p>
-          {this.renderSchedulingInformation(definition)} {this.renderNotificationsInformation(definition)}
+          {EventDefinitionDescription.renderSchedulingInformation(definition)} {EventDefinitionDescription.renderNotificationsInformation(definition)}
           <Button bsStyle="link" bsSize="xsmall" onClick={this.handleDetailsToggle}>
             {showDetails ? 'Hide' : 'Show'} details
           </Button>
