@@ -212,7 +212,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @PUT
     @Path("{definitionId}/clear-notification-queue")
     @Consumes(MediaType.WILDCARD)
-    @ApiOperation("Disable event definition")
+    @ApiOperation("Clear queued notifications for event")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CLEAR_NOTIFICATION_QUEUE)
     public void clearNotificationQueue(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
