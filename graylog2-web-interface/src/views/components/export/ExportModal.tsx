@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useContext, useState } from 'react';
 import type { List } from 'immutable';
-import { Set } from 'immutable';
+import { OrderedSet } from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Field, Formik, Form } from 'formik';
@@ -39,7 +39,7 @@ import ExportSettings from './ExportSettings';
 import ExportStrategy from './ExportStrategy';
 import startDownload from './startDownload';
 
-const DEFAULT_FIELDS = Set([TIMESTAMP_FIELD, SOURCE_FIELD, MESSAGE_FIELD]);
+const DEFAULT_FIELDS = OrderedSet([TIMESTAMP_FIELD, SOURCE_FIELD, MESSAGE_FIELD]);
 
 const Content = styled.div`
   margin-left: 15px;
@@ -53,12 +53,12 @@ export type Props = {
   view: View,
 };
 
-const _getInitialWidgetFields = (selectedWidget: Widget): Set<string> => {
+const _getInitialWidgetFields = (selectedWidget: Widget): OrderedSet<string> => {
   if (selectedWidget.config.showMessageRow) {
-    return Set<string>(selectedWidget.config.fields).add(MESSAGE_FIELD).toSet();
+    return OrderedSet<string>(selectedWidget.config.fields).add(MESSAGE_FIELD).toOrderedSet();
   }
 
-  return Set(selectedWidget.config.fields);
+  return OrderedSet(selectedWidget.config.fields);
 };
 
 const _getInitialFields = (selectedWidget) => {
@@ -123,7 +123,7 @@ const ExportModal = ({ closeModal, view, directExportWidgetId, executionState }:
               <Modal.Body>
                 <Content>
                   {showWidgetSelection && (
-                  <Field name="selectedWidget">
+                  <Field name="selectedWidget" data-testid="selected-widget-field">
                     {({ field: { name, onChange } }) => {
                       const onChangeSelectWidget = ({ value }) => {
                         setSelectedFields(_getInitialFields(value));
