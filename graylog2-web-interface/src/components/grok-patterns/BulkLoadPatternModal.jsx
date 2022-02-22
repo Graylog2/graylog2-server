@@ -27,21 +27,25 @@ class BulkLoadPatternModal extends React.Component {
     onSuccess: PropTypes.func.isRequired,
   };
 
-  state = {
-    replacePatterns: false,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      dropExistingPatterns: false,
+    };
+  }
 
   _onSubmit = (evt) => {
     evt.preventDefault();
 
     const reader = new FileReader();
-    const { replacePatterns } = this.state;
+    const { dropExistingPatterns } = this.state;
     const { onSuccess } = this.props;
 
     reader.onload = (loaded) => {
       const request = loaded.target.result;
 
-      GrokPatternsStore.bulkImport(request, replacePatterns).then(() => {
+      GrokPatternsStore.bulkImport(request, dropExistingPatterns).then(() => {
         UserNotification.success('Grok Patterns imported successfully', 'Success!');
         this.modal.close();
         onSuccess();
@@ -67,11 +71,11 @@ class BulkLoadPatternModal extends React.Component {
                  label="Pattern file"
                  help="A file containing Grok patterns, one per line. Name and patterns should be separated by whitespace."
                  required />
-          <Input id="replace-patterns-checkbox"
+          <Input id="drop-existing-patterns-checkbox"
                  type="checkbox"
-                 name="replace"
-                 label="Replace all existing patterns?"
-                 onChange={(e) => this.setState({ replacePatterns: e.target.checked })} />
+                 name="drop-existing"
+                 label="Drop all existing patterns before import?"
+                 onChange={(e) => this.setState({ dropExistingPatterns: e.target.checked })} />
         </BootstrapModalForm>
       </span>
     );
