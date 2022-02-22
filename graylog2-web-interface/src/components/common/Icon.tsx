@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import React from 'react';
 import { find } from 'lodash';
 import type { IconName } from '@fortawesome/fontawesome-common-types';
@@ -78,7 +79,13 @@ type Props = {
   type?: IconTypes,
   fixedWidth?: boolean,
   inverse?: boolean,
-  style?: React.CSSProperties
+  style?: React.CSSProperties,
+  onClick?: (event: React.MouseEvent<SVGSVGElement>) => void,
+  onMouseEnter?: (event: React.MouseEvent<SVGSVGElement>) => void,
+  onMouseLeave?: (event: React.MouseEvent<SVGSVGElement>) => void,
+  onFocus?: (event: React.FocusEvent<SVGSVGElement>) => void,
+  tabIndex?: number,
+  title?: string,
 }
 
 /**
@@ -89,7 +96,23 @@ type Props = {
  * Visit [React FontAwesome Features](https://github.com/FortAwesome/react-fontawesome#features) for more information.
  */
 
-const Icon = ({ name, type, size, className, spin, fixedWidth, inverse, style, 'data-testid': testId }: Props) => {
+const Icon = ({
+  name,
+  type,
+  size,
+  className,
+  spin,
+  fixedWidth,
+  inverse,
+  style,
+  'data-testid': testId,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
+  onFocus,
+  tabIndex,
+  title,
+}: Props) => {
   const iconName = cleanIconName(name, type);
   const prefix = getPrefixForType(type);
 
@@ -101,7 +124,13 @@ const Icon = ({ name, type, size, className, spin, fixedWidth, inverse, style, '
                            inverse={inverse}
                            size={size}
                            spin={spin}
-                           style={style} />
+                           style={style}
+                           onClick={onClick}
+                           onMouseEnter={onMouseEnter}
+                           onMouseLeave={onMouseLeave}
+                           tabIndex={tabIndex}
+                           title={title}
+                           onFocus={onFocus} />
   );
 };
 
@@ -114,6 +143,12 @@ Icon.defaultProps = {
   spin: false,
   style: undefined,
   type: 'solid',
+  onClick: undefined,
+  onMouseEnter: undefined,
+  onMouseLeave: undefined,
+  onFocus: undefined,
+  tabIndex: undefined,
+  title: undefined,
 };
 
 export type { IconName };
