@@ -193,7 +193,7 @@ export const GrokPatternsStore = singletonStore(
         );
     },
 
-    bulkImport(patterns: string, dropExisting: boolean) {
+    bulkImport(patterns: string, replaceConflictingPatterns: boolean, dropAllExistingPatterns: boolean) {
       const failCallback = (error) => {
         let errorMessage = error.message;
         const errorBody = error.additional.body;
@@ -212,7 +212,7 @@ export const GrokPatternsStore = singletonStore(
           'Could not load Grok patterns');
       };
 
-      const promise = fetchPlainText('POST', `${this.URL}?replace=${String(dropExisting)}`, patterns);
+      const promise = fetchPlainText('POST', `${this.URL}?replace-existing=${String(replaceConflictingPatterns)}&drop-all-existing=${String(dropAllExistingPatterns)}`, patterns);
 
       promise.catch(failCallback);
 

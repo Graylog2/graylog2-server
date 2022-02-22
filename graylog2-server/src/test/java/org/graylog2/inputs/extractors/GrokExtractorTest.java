@@ -224,7 +224,7 @@ public class GrokExtractorTest {
         final EventBus clusterBus = new EventBus();
         final GrokPatternService grokPatternService = new InMemoryGrokPatternService(clusterEventBus);
         try {
-            grokPatternService.saveAll(patternSet, true);
+            grokPatternService.saveAll(patternSet, true, false);
         } catch (Exception e) {
             fail("Could not save grok patter: " + e.getMessage());
         }

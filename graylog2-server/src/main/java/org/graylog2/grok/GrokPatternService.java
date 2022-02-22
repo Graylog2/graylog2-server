@@ -44,7 +44,7 @@ public interface GrokPatternService {
 
     GrokPattern update(GrokPattern pattern) throws ValidationException;
 
-    List<GrokPattern> saveAll(Collection<GrokPattern> patterns, boolean replace) throws ValidationException;
+    List<GrokPattern> saveAll(Collection<GrokPattern> patterns, boolean dropAllExisting, boolean replaceExisting) throws ValidationException;
 
     Map<String, Object> match(GrokPattern pattern, String sampleData) throws GrokException;
 

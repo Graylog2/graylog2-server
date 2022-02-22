@@ -33,6 +33,7 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 
 public class InMemoryGrokPatternServiceTest {
@@ -113,16 +114,20 @@ public class InMemoryGrokPatternServiceTest {
     @Test
     public void saveAll() throws Exception {
         Collection<GrokPattern> patterns = ImmutableList.of(GrokPattern.create("1", ".*"),
-                                                            GrokPattern.create("2", ".+"));
-        final List<GrokPattern> saved = service.saveAll(patterns, false);
+                GrokPattern.create("2", ".+"));
+        final List<GrokPattern> saved = service.saveAll(patterns, false, false);
         assertThat(saved).hasSize(2);
 
-        service.saveAll(patterns, false);
-        // should have added the patterns again
+        // should fail because already exists
+        assertThatThrownBy(() -> service.saveAll(patterns, false, false))
+                .isInstanceOf(ValidationException.class);
+
+        // should add the patterns again
+        service.saveAll(patterns, false, true);
         assertThat(service.loadAll()).hasSize(4);
 
         // replaced all patterns
-        service.saveAll(patterns, true);
+        service.saveAll(patterns, true, false);
         assertThat(service.loadAll()).hasSize(2);
     }
 
@@ -164,8 +169,8 @@ public class InMemoryGrokPatternServiceTest {
     @Test
     public void deleteAll() throws Exception {
         Collection<GrokPattern> patterns = ImmutableList.of(GrokPattern.create("1", ".*"),
-                                                            GrokPattern.create("2", ".+"));
-        final List<GrokPattern> saved = service.saveAll(patterns, false);
+                GrokPattern.create("2", ".+"));
+        final List<GrokPattern> saved = service.saveAll(patterns, false, false);
         assertThat(service.deleteAll()).isEqualTo(2);
         assertThat(service.loadAll()).isEmpty();
     }

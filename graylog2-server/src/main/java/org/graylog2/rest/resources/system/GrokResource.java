@@ -183,8 +183,15 @@ public class GrokResource extends RestResource {
     @ApiOperation("Add a list of new patterns")
     @AuditEvent(type = AuditEventTypes.GROK_PATTERN_IMPORT_CREATE)
     public Response bulkUpdatePatterns(@ApiParam(name = "patterns", required = true) @NotNull GrokPatternList patternList,
-                                       @ApiParam(name = "replace", value = "Replace all patterns with the new ones.")
-                                       @QueryParam("replace") @DefaultValue("false") boolean replace) throws ValidationException {
+                                       // deprecated. used to drop all existing patterns before import
+                                       @Deprecated @QueryParam("replace") @DefaultValue("false")
+                                               boolean deprecatedDropAllExisting,
+                                       @ApiParam(name = "drop-all-existing", value = "Drop all existing patterns before import.")
+                                       @QueryParam("drop-all-existing") @DefaultValue("false")
+                                               boolean dropAllExisting,
+                                       @ApiParam(name = "replace-existing", value = "Replace existing patterns with the same name.")
+                                       @QueryParam("replace-existing") @DefaultValue("false")
+                                               boolean replaceExisting) throws ValidationException {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
         try {
@@ -195,7 +202,8 @@ public class GrokResource extends RestResource {
             throw new ValidationException("Invalid pattern. Did not save any patterns\n" + e.getMessage());
         }
 
-        grokPatternService.saveAll(patternList.patterns(), replace);
+        grokPatternService.saveAll(patternList.patterns(), deprecatedDropAllExisting || dropAllExisting,
+                replaceExisting);
         return Response.accepted().build();
     }
 
@@ -205,8 +213,16 @@ public class GrokResource extends RestResource {
     @ApiOperation("Add a list of new patterns")
     @AuditEvent(type = AuditEventTypes.GROK_PATTERN_IMPORT_CREATE)
     public Response bulkUpdatePatternsFromTextFile(@ApiParam(name = "patterns", required = true) @NotNull InputStream patternsFile,
-                                                   @ApiParam(name = "replace", value = "Replace all patterns with the new ones.")
-                                                   @QueryParam("replace") @DefaultValue("false") boolean replace) throws ValidationException, IOException {
+                                                   // deprecated. used to drop all existing patterns before import
+                                                   @Deprecated @QueryParam("replace") @DefaultValue("false")
+                                                           boolean deprecatedDropAllExisting,
+                                                   @ApiParam(name = "drop-all-existing", value = "Drop all existing patterns before import.")
+                                                   @QueryParam("drop-all-existing") @DefaultValue("false")
+                                                           boolean dropAllExisting,
+                                                   @ApiParam(name = "replace-existing", value = "Replace existing patterns with the same name.")
+                                                   @QueryParam("replace-existing") @DefaultValue("false")
+                                                           boolean replaceExisting
+    ) throws ValidationException, IOException {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
         final List<GrokPattern> grokPatterns = readGrokPatterns(patternsFile);
@@ -220,7 +236,8 @@ public class GrokResource extends RestResource {
                 throw new ValidationException("Invalid pattern. Did not save any patterns\n" + e.getMessage());
             }
 
-            grokPatternService.saveAll(grokPatterns, replace);
+            grokPatternService.saveAll(grokPatterns, deprecatedDropAllExisting || dropAllExisting,
+                    replaceExisting);
         }
 
         return Response.accepted().build();
