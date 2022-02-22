@@ -23,7 +23,7 @@ import EntityShareModal from 'components/permissions/EntityShareModal';
 import QueryHelper from 'components/common/QueryHelper';
 import type ViewClass from 'views/logic/views/View';
 
-import Dashboard from './Dashboard';
+import DashboardListItem from './DashboardListItem';
 
 import ViewTypeLabel from '../ViewTypeLabel';
 
@@ -86,16 +86,16 @@ const DashboardList = ({ pagination, handleSearch, handleDashboardDelete, dashbo
   }
 
   const items = dashboards.map((dashboard) => (
-    <Dashboard key={`dashboard-${dashboard.id}`}
-               id={dashboard.id}
-               owner={dashboard.owner}
-               createdAt={dashboard.createdAt}
-               title={dashboard.title}
-               summary={dashboard.summary}
-               requires={dashboard.requires}
-               description={dashboard.description}>
+    <DashboardListItem key={`dashboard-${dashboard.id}`}
+                       id={dashboard.id}
+                       owner={dashboard.owner}
+                       createdAt={dashboard.createdAt}
+                       title={dashboard.title}
+                       summary={dashboard.summary}
+                       requires={dashboard.requires}
+                       description={dashboard.description}>
       <ItemActions dashboard={dashboard} onDashboardDelete={onDashboardDelete} setDashboardToShare={setDashboardToShare} />
-    </Dashboard>
+    </DashboardListItem>
   ));
 
   return (

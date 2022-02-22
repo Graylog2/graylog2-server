@@ -56,31 +56,29 @@ const createPaginatedDashboards = (count = 1) => {
   };
 };
 
-describe('DashboardList', () => {
-  describe('render the DashboardList', () => {
-    it('should render empty', async () => {
-      const dashboards = createPaginatedDashboards(0);
+describe('render the DashboardList', () => {
+  it('should render empty', async () => {
+    const dashboards = createPaginatedDashboards(0);
 
-      render(
-        <DashboardList dashboards={dashboards.list}
-                       pagination={dashboards.pagination}
-                       handleSearch={() => {}}
-                       handleDashboardDelete={() => {}} />);
+    render(
+      <DashboardList dashboards={dashboards.list}
+                     pagination={dashboards.pagination}
+                     handleSearch={() => {}}
+                     handleDashboardDelete={() => {}} />);
 
-      await screen.findByText('There are no dashboards present/matching the filter!');
-    });
+    await screen.findByText('There are no dashboards present/matching the filter!');
+  });
 
-    it('should render list', async () => {
-      const dashboards = createPaginatedDashboards(3);
+  it('should render list', async () => {
+    const dashboards = createPaginatedDashboards(3);
 
-      render(<DashboardList dashboards={dashboards.list}
-                            pagination={dashboards.pagination}
-                            handleSearch={() => {}}
-                            handleDashboardDelete={() => {}} />);
+    render(<DashboardList dashboards={dashboards.list}
+                          pagination={dashboards.pagination}
+                          handleSearch={() => {}}
+                          handleDashboardDelete={() => {}} />);
 
-      await screen.findByText('search-title-0');
-      await screen.findByText('search-title-1');
-      await screen.findByText('search-title-2');
-    });
+    await screen.findByText('search-title-0');
+    await screen.findByText('search-title-1');
+    await screen.findByText('search-title-2');
   });
 });

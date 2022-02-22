@@ -89,7 +89,7 @@ const Requirements = ({ requires, requirementsProvided }: RequirementsProps) => 
     : null;
 };
 
-const Dashboard = ({ children, id, title, summary, description, owner, requires, createdAt, requirementsProvided }) => (
+const DashboardListItem = ({ children, id, title, summary, description, owner, requires, createdAt, requirementsProvided }) => (
   <EntityListItem title={formatTitle(title, id, isMissingRequirements(requires, requirementsProvided))}
                   titleSuffix={summary}
                   description={(
@@ -101,7 +101,7 @@ const Dashboard = ({ children, id, title, summary, description, owner, requires,
                   actions={children} />
 );
 
-Dashboard.propTypes = {
+DashboardListItem.propTypes = {
   children: PropTypes.node,
   id: PropTypes.string.isRequired,
   title: PropTypes.string,
@@ -116,11 +116,11 @@ Dashboard.propTypes = {
   requirementsProvided: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
-Dashboard.defaultProps = {
+DashboardListItem.defaultProps = {
   children: null,
   title: 'Unnamed Dashboard',
   summary: null,
   description: null,
 };
 
-export default withPluginEntities(Dashboard, { requirementsProvided: 'views.requires.provided' });
+export default withPluginEntities(DashboardListItem, { requirementsProvided: 'views.requires.provided' });
