@@ -17,6 +17,8 @@
 import type {
   PaginatedListType,
   DescriptiveItem,
+  ResultsWrapperComponentProps,
+  OverrideItemComponentProps,
 } from './PaginatedItemOverview';
 import PaginatedItemOverview, {
   DEFAULT_PAGINATION,
@@ -25,6 +27,8 @@ import PaginatedItemOverview, {
 export type {
   PaginatedListType,
   DescriptiveItem,
+  ResultsWrapperComponentProps,
+  OverrideItemComponentProps,
 };
 
 export { DEFAULT_PAGINATION };
