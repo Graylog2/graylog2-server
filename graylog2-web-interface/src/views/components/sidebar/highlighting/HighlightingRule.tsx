@@ -69,7 +69,7 @@ const updateColor = (rule: Rule, newColor: HighlightingColor, hidePopover: () =>
   return HighlightingRulesActions.update(rule, { color: newColor }).then(hidePopover);
 };
 
-const onDelete = (rule) => {
+const onDelete = (rule: Rule) => {
   // eslint-disable-next-line no-alert
   if (window.confirm('Do you really want to remove this highlighting?')) {
     HighlightingRulesActions.remove(rule);
@@ -82,7 +82,7 @@ type RuleColorPreviewProps = {
 };
 
 const RuleColorPreview = ({ color, onChange }: RuleColorPreviewProps) => {
-  const _onChange = useCallback((newColor, ignored, hidePopover) => onChange(StaticColor.create(newColor), hidePopover), [onChange]);
+  const _onChange = useCallback((newColor: string, _ignored: React.ChangeEvent<HTMLInputElement>, hidePopover: () => void) => onChange(StaticColor.create(newColor), hidePopover), [onChange]);
 
   if (color.isStatic()) {
     return (

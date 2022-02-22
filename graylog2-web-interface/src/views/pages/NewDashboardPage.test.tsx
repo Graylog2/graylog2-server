@@ -40,7 +40,7 @@ jest.mock('views/stores/ViewStore', () => ({
 }));
 
 jest.mock('views/logic/views/ViewLoader', () => ({
-  processHooks: jest.fn((promise, loadHooks, executeHooks, query, onSuccess) => Promise.resolve().then(onSuccess)),
+  processHooks: jest.fn((_promise, _loadHooks, _executeHooks, _query, onSuccess) => Promise.resolve().then(onSuccess)),
 }));
 
 jest.mock('routing/withLocation', () => (x) => x);
@@ -110,7 +110,12 @@ describe('NewDashboardPage', () => {
     await findByText('Extended search page');
 
     expect(processHooksAction).toHaveBeenCalled();
-    expect(processHooksAction).toHaveBeenCalledWith(expect.anything(), expect.anything(), expect.anything(), { q: '', rangetype: 'relative', relative: '300' }, expect.anything());
+
+    expect(processHooksAction).toHaveBeenCalledWith(expect.anything(), expect.anything(), expect.anything(), {
+      q: '',
+      rangetype: 'relative',
+      relative: '300',
+    }, expect.anything());
   });
 
   it('should not render transform search view to dashboard view if view search is in JSON format', async () => {

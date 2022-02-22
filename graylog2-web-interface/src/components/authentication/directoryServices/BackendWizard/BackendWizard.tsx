@@ -37,17 +37,9 @@ import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 
 import type { WizardStepsState, WizardFormValues, AuthBackendMeta } from './BackendWizardContext';
 import BackendWizardContext from './BackendWizardContext';
-import {
-  FORM_VALIDATION as SERVER_CONFIG_VALIDATION,
-  STEP_KEY as SERVER_CONFIG_KEY,
-} from './ServerConfigStep';
-import {
-  FORM_VALIDATION as USER_SYNC_VALIDATION,
-  STEP_KEY as USER_SYNC_KEY,
-} from './UserSyncStep';
-import {
-  STEP_KEY as GROUP_SYNC_KEY,
-} from './GroupSyncStep';
+import { FORM_VALIDATION as SERVER_CONFIG_VALIDATION, STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
+import { FORM_VALIDATION as USER_SYNC_VALIDATION, STEP_KEY as USER_SYNC_KEY } from './UserSyncStep';
+import { STEP_KEY as GROUP_SYNC_KEY } from './GroupSyncStep';
 import wizardSteps from './wizardSteps';
 import Sidebar from './Sidebar';
 
@@ -70,7 +62,7 @@ const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: st
 
 const _formatBackendValidationErrors = (backendErrors: { [inputNameJSON: string]: string[] }) => {
   const backendErrorStrings = mapValues(backendErrors, (errorArray) => `Server validation error: ${errorArray.join(' ')}`);
-  const formattedBackendErrors = mapKeys(backendErrorStrings, (value, key) => camelCase(key));
+  const formattedBackendErrors = mapKeys(backendErrorStrings, (_, key) => camelCase(key));
 
   return formattedBackendErrors;
 };
@@ -230,7 +222,7 @@ type Props = {
   authBackendMeta: AuthBackendMeta,
   initialStepKey: $PropertyType<Step, 'key'>,
   initialValues: WizardFormValues,
-  excludedFields: {[ inputName: string ]: boolean },
+  excludedFields: { [inputName: string]: boolean },
   help: { [inputName: string]: React.ReactElement | string | null | undefined },
   onSubmit: (WizardSubmitPayload, WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync?: boolean) => Promise<LoadBackendResponse>,
 };

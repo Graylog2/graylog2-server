@@ -40,7 +40,7 @@ export type CompleterContext = Readonly<{
   tokens: Array<Token>,
   currentTokenIdx: number,
   timeRange?: TimeRange | NoTimeRangeOverride,
-  streams?: Array<string>
+  streams?: Array<string>,
   fieldTypes?: FieldTypes,
 }>;
 
@@ -70,7 +70,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
     this.fieldTypes = fieldTypes;
   }
 
-  getCompletions = async (editor: Editor, session: Session, pos: Position, prefix: string, callback: ResultsCallback) => {
+  getCompletions = async (editor: Editor, _session: Session, pos: Position, prefix: string, callback: ResultsCallback) => {
     // eslint-disable-next-line no-param-reassign
     editor.completer.autoSelect = false;
     const tokens = editor.session.getTokens(pos.row);

@@ -28,37 +28,37 @@ const load = notifyingAction({
 
 const deleteAction = notifyingAction({
   action: AuthzRolesActions.delete,
-  success: (roleId, roleName) => ({
+  success: (_, roleName) => ({
     message: `Role "${roleName}" was deleted successfully`,
   }),
-  error: (error, roleId, roleName) => ({
+  error: (error, _, roleName) => ({
     message: `Deleting role "${roleName}" failed with status: ${error}`,
   }),
 });
 
 const addMembers = notifyingAction({
   action: AuthzRolesActions.addMembers,
-  success: (roleId, usernames) => ({
+  success: (_, usernames) => ({
     message: `Users:"${usernames.join(', ')}" were assigned successfully`,
   }),
-  error: (error, roleId, usernames) => ({
+  error: (error, _, usernames) => ({
     message: `Assigning users "${usernames.join(', ')}" failed with status: ${error}`,
   }),
 });
 
 const removeMember = notifyingAction({
   action: AuthzRolesActions.removeMember,
-  success: (roleId, username) => ({
+  success: (_, username) => ({
     message: `User "${username}" was unassigned successfully`,
   }),
-  error: (error, roleId, username) => ({
+  error: (error, _, username) => ({
     message: `Unassign user "${username}" failed with status: ${error}`,
   }),
 });
 
 const loadUsersForRole = notifyingAction({
   action: AuthzRolesActions.loadUsersForRole,
-  error: (error, username, roleName) => ({
+  error: (error, _, roleName) => ({
     message: `Loading users for role "${roleName}" failed with status: ${error}`,
   }),
 });

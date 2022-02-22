@@ -37,7 +37,15 @@ export type PaginatedRolesResponse = PaginatedListJSON & {
   context?: RoleContext,
 };
 
-const _responseToPaginatedList = ({ count, total, page, per_page, query, roles = [], context = { users: undefined } }: PaginatedRolesResponse) => ({
+const _responseToPaginatedList = ({
+  count,
+  total,
+  page,
+  per_page,
+  query,
+  roles = [],
+  context = { users: undefined },
+}: PaginatedRolesResponse) => ({
   list: Immutable.List(roles.map((r) => Role.fromJSON(r))),
   pagination: {
     query,
@@ -107,7 +115,7 @@ const AuthzRolesStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    loadUsersForRole(roleId: string, roleName: string, { page, perPage, query }: Pagination): Promise<PaginatedUsers> {
+    loadUsersForRole(roleId: string, _: string, { page, perPage, query }: Pagination): Promise<PaginatedUsers> {
       const apiUrl = encodeApiUrl(ApiRoutes.AuthzRolesController.loadUsersForRole, [roleId]);
       const url = PaginationURL(apiUrl, page, perPage, query);
 

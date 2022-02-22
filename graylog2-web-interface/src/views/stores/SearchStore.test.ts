@@ -26,7 +26,7 @@ jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore(
 
 describe('SearchStore', () => {
   it('assigns a new search id when creating a search', () => {
-    asMock(fetch).mockImplementation((method: string, url: string, body: any) => Promise.resolve(body && JSON.parse(body)));
+    asMock(fetch).mockImplementation((_method: string, _url: string, body: any) => Promise.resolve(body && JSON.parse(body)));
     const newSearch = Search.create();
 
     return SearchActions.create(newSearch).then(({ search }) => {

@@ -88,7 +88,7 @@ const validateValuesGrouping = (grouping: ValuesGrouping): GroupByError => {
   return groupByError;
 };
 
-const hasErrors = <T extends {}>(errors: Array<T>): boolean => {
+const hasErrors = <T extends {}> (errors: Array<T>): boolean => {
   return errors.filter((error) => Object.keys(error).length > 0).length > 0;
 };
 
@@ -113,7 +113,7 @@ const validateGroupBy = (values: WidgetConfigFormValues) => {
   return hasErrors(groupByErrors) ? { groupBy: { groupings: groupByErrors } } : emptyErrors;
 };
 
-const addRandomId = <GroupingType extends BaseGrouping>(baseGrouping: Omit<GroupingType, 'id'>) => ({
+const addRandomId = <GroupingType extends BaseGrouping> (baseGrouping: Omit<GroupingType, 'id'>) => ({
   ...baseGrouping,
   id: uuid(),
 });
@@ -204,7 +204,7 @@ const GroupByElement: AggregationElement = {
   }),
   onRemove: ((index, formValues) => {
     const newFormValues = { ...formValues };
-    const newGroupings = formValues.groupBy?.groupings.filter((value, i) => (index !== i));
+    const newGroupings = formValues.groupBy?.groupings.filter((_value, i) => (index !== i));
 
     return ({
       ...newFormValues,

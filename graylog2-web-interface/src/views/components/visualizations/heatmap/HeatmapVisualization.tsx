@@ -39,7 +39,7 @@ const _generateSeriesTitles = (config, x, y) => {
   return y.map(() => columnSeriesTitles);
 };
 
-const _heatmapGenerateSeries = (type, name, x, y, z, idx, total, config, visualizationConfig): ChartDefinition => {
+const _heatmapGenerateSeries = (type, name, x, y, z, idx, _total, config, visualizationConfig): ChartDefinition => {
   const xAxisTitle = get(config, ['rowPivots', idx, 'field']);
   const yAxisTitle = get(config, ['columnPivots', idx, 'field']);
   const zSeriesTitles = _generateSeriesTitles(config, y, x);

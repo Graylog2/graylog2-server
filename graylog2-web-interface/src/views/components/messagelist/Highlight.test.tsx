@@ -24,7 +24,7 @@ import Highlight from './Highlight';
 
 const messageFor = (ranges) => ({ highlight_ranges: ranges } as Message);
 
-const hasBrokenUpText = (text) => (content, node) => {
+const hasBrokenUpText = (text) => (_content, node) => {
   const hasText = (currentNode) => currentNode.textContent === text;
   const nodeHasText = hasText(node);
   const childrenDontHaveText = Array.from(node.children).every(

@@ -45,20 +45,20 @@ const loadActive = notifyingAction({
 
 const update = notifyingAction({
   action: AuthenticationActions.update,
-  success: (authBackendId, authBackend) => ({
+  success: (_, authBackend) => ({
     message: `Authentication service "${authBackend.title}" was updated successfully`,
   }),
-  error: (error, authBackendId, authBackend) => ({
+  error: (error, _, authBackend) => ({
     message: `Updating authentication service "${authBackend.title}" failed with status: ${error}`,
   }),
 });
 
 const deleteBackend = notifyingAction({
   action: AuthenticationActions.delete,
-  success: (authBackendId, authBackendTitle) => ({
+  success: (_, authBackendTitle) => ({
     message: `Authentication service "${authBackendTitle} was deleted successfully`,
   }),
-  error: (error, authBackendId, authBackendTitle) => ({
+  error: (error, _, authBackendTitle) => ({
     message: `Deleting authentication service "${authBackendTitle}" failed with status: ${error}`,
   }),
 });
@@ -82,7 +82,7 @@ const setActiveBackend = notifyingAction({
   success: (authBackendId, authBackendTitle) => ({
     message: `Authentication service "${authBackendTitle} was ${authBackendId ? 'activated' : 'deactivated'} successfully`,
   }),
-  error: (error, authBackendId, authBackendTitle) => ({
+  error: (error, _, authBackendTitle) => ({
     message: `Activating authentication service "${authBackendTitle}" failed with status: ${error}`,
   }),
 });
