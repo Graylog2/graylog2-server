@@ -30,6 +30,7 @@ import DocsHelper from 'util/DocsHelper';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 const Container = styled.div`
   margin-right: 5px;
@@ -160,6 +161,7 @@ const getErrorDocumentationLink = (errorType: string) => {
 };
 
 const QueryValidation = () => {
+  const plugableValidationExplanation = usePluginEntities('views.elements.validationErrorExplanation');
   const [shakingPopover, shake] = useShakeTemporarily();
   const [showExplanation, toggleShow] = useTriggerIfErrorsPersist(shake);
 
@@ -209,17 +211,15 @@ const QueryValidation = () => {
                                      text={<DocumentationIcon name="lightbulb" />} />
                 </Explanation>
               ))}
+              {plugableValidationExplanation.map((PlugableExplanation) => {
+                return <PlugableExplanation explanations={explanations} />;
+              })}
             </div>
           </StyledPopover>
         </Overlay>
       )}
     </>
   );
-};
-
-QueryValidation.defaultProps = {
-  filter: undefined,
-  streams: undefined,
 };
 
 export default QueryValidation;

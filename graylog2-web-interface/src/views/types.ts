@@ -45,6 +45,7 @@ import type { Message } from 'views/components/messagelist/Types';
 import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
 export type BackendWidgetPosition = {
   id: string,
@@ -250,6 +251,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<MessageDetailContextProviderProps>>,
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
+    'views.elements.validationErrorExplanation'?: Array<React.ComponentType<{ explanations: QueryValidationState['explanations'] }>>;
     'views.export.formats'?: Array<ExportFormat>;
     'views.hooks.confirmDeletingDashboard'?: Array<(view: View) => Promise<boolean | null>>,
     'views.hooks.confirmDeletingDashboardPage'?: Array<(dashboardId: string, queryId: string, widgetIds: { [queryId: string]: Array<string> }) => Promise<boolean | null>>,
