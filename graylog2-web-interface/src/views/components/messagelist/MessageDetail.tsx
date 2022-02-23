@@ -32,7 +32,7 @@ import type { Message } from 'views/components/messagelist/Types';
 import type { Input } from 'components/messageloaders/Types';
 import type { Stream } from 'views/stores/StreamsStore';
 import CustomPropTypes from 'views/components/CustomPropTypes';
-import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import { useStore } from 'stores/connect';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import FormatReceivedBy from 'views/components/messagelist/FormatReceivedBy';

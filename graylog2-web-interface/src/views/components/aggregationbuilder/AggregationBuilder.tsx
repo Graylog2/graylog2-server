@@ -20,7 +20,7 @@ import { useContext } from 'react';
 
 import type { WidgetComponentProps } from 'views/types';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { Events } from 'views/logic/searchtypes/events/EventHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
