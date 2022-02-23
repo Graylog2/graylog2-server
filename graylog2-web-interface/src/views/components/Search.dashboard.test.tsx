@@ -28,10 +28,11 @@ import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 import { ViewStore } from 'views/stores/ViewStore';
-import { FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import View from 'views/logic/views/View';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
+import Query, { filtersForQuery } from 'views/logic/queries/Query';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 
 import Search from './Search';
 import WidgetFocusProvider from './contexts/WidgetFocusProvider';
@@ -73,13 +74,7 @@ jest.mock('views/components/SearchResult', () => () => <div>Mocked search result
 jest.mock('views/components/DashboardSearchBar', () => () => <div>Mocked dashboard search bar</div>);
 jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 jest.mock('views/components/contexts/WidgetFocusProvider', () => jest.fn());
-
-jest.mock('views/stores/FieldTypesStore', () => ({
-  FieldTypesStore: MockStore(),
-  FieldTypesActions: {
-    refresh: jest.fn(),
-  },
-}));
+jest.mock('views/logic/queries/useCurrentQuery');
 
 const mockWidgetEditing = () => {
   asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(({ children }) => (
@@ -114,7 +109,6 @@ describe('Dashboard Search', () => {
       activeQuery: 'foobar',
     }));
 
-    FieldTypesActions.all = mockAction(jest.fn(async () => {}));
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
     SearchActions.refresh = mockAction();
 
@@ -129,6 +123,9 @@ describe('Dashboard Search', () => {
         {children}
       </WidgetFocusContext.Provider>
     ));
+
+    const query = Query.builder().id('foobar').filter(filtersForQuery([])).build();
+    asMock(useCurrentQuery).mockReturnValue(query);
   });
 
   const SimpleSearch = (props) => (

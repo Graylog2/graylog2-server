@@ -14,23 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as Immutable from 'immutable';
-
 import asMock from 'helpers/mocking/AsMock';
 import Widget from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
-import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import Series from 'views/logic/aggregationbuilder/Series';
-import Pivot from 'views/logic/aggregationbuilder/Pivot';
 
 import ChartActionHandler from './ChartActionHandler';
 
-import FieldTypeMapping from '../fieldtypes/FieldTypeMapping';
-import FieldType from '../fieldtypes/FieldType';
+import FieldType, { FieldTypes } from '../fieldtypes/FieldType';
 import { createElasticsearchQueryString } from '../queries/Query';
-
-jest.mock('views/stores/FieldTypesStore', () => ({ FieldTypesStore: { getInitialState: jest.fn() } }));
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
@@ -63,97 +56,6 @@ describe('ChartActionHandler', () => {
     }));
   });
 
-  describe('retrieves field type for `timestamp` field', () => {
-    beforeEach(() => {
-      asMock(pivotForField).mockReturnValue(Pivot.create('foo', 'bar'));
-    });
-
-    it('uses Unknown if FieldTypeStore returns nothing', () => {
-      asMock(FieldTypesStore.getInitialState).mockReturnValue(undefined);
-
-      ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: {} });
-
-      expect(pivotForField).toHaveBeenCalledWith('timestamp', FieldType.Unknown);
-    });
-
-    it('uses Unknown if FieldTypeStore returns neither all nor query fields', () => {
-      asMock(FieldTypesStore.getInitialState).mockReturnValue({
-        all: Immutable.List([]),
-        queryFields: Immutable.Map({}),
-      });
-
-      ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: {} });
-
-      expect(pivotForField).toHaveBeenCalledWith('timestamp', FieldType.Unknown);
-    });
-
-    it('from query field types if present', () => {
-      const timestampFieldType = new FieldType('date', [], []);
-
-      asMock(FieldTypesStore.getInitialState).mockReturnValue({
-        all: Immutable.List([]),
-        queryFields: Immutable.fromJS({
-          queryId: [
-            new FieldTypeMapping('otherfield', new FieldType('sometype', [], [])),
-            new FieldTypeMapping('somefield', new FieldType('othertype', [], [])),
-            new FieldTypeMapping('timestamp', timestampFieldType),
-          ],
-        }),
-      });
-
-      ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: {} });
-
-      expect(pivotForField).toHaveBeenCalledWith('timestamp', timestampFieldType);
-    });
-
-    it('from all field types if present', () => {
-      const timestampFieldType = new FieldType('date', [], []);
-
-      asMock(FieldTypesStore.getInitialState).mockReturnValue({
-        all: Immutable.List([
-          new FieldTypeMapping('otherfield', new FieldType('sometype', [], [])),
-          new FieldTypeMapping('somefield', new FieldType('othertype', [], [])),
-          new FieldTypeMapping('timestamp', timestampFieldType),
-        ]),
-        queryFields: Immutable.fromJS({}),
-      });
-
-      ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: {} });
-
-      expect(pivotForField).toHaveBeenCalledWith('timestamp', timestampFieldType);
-    });
-
-    it('uses unknown if not in query field types', () => {
-      asMock(FieldTypesStore.getInitialState).mockReturnValue({
-        all: Immutable.List([]),
-        queryFields: Immutable.fromJS({
-          queryId: [
-            new FieldTypeMapping('otherfield', new FieldType('sometype', [], [])),
-            new FieldTypeMapping('somefield', new FieldType('othertype', [], [])),
-          ],
-        }),
-      });
-
-      ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: {} });
-
-      expect(pivotForField).toHaveBeenCalledWith('timestamp', FieldType.Unknown);
-    });
-
-    it('uses Unknown if not in all field types', () => {
-      asMock(FieldTypesStore.getInitialState).mockReturnValue({
-        all: Immutable.List([
-          new FieldTypeMapping('otherfield', new FieldType('sometype', [], [])),
-          new FieldTypeMapping('somefield', new FieldType('othertype', [], [])),
-        ]),
-        queryFields: Immutable.fromJS({}),
-      });
-
-      ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: {} });
-
-      expect(pivotForField).toHaveBeenCalledWith('timestamp', FieldType.Unknown);
-    });
-  });
-
   describe('Widget creation', () => {
     beforeEach(() => {
       jest.clearAllMocks();
@@ -162,18 +64,7 @@ describe('ChartActionHandler', () => {
     it('should create widget with filter of original widget', () => {
       const filter = "author: 'Vanth'";
       const origWidget = Widget.builder().filter(filter).build();
-      const timestampFieldType = new FieldType('date', [], []);
-
-      asMock(FieldTypesStore.getInitialState).mockReturnValue({
-        all: Immutable.List([]),
-        queryFields: Immutable.fromJS({
-          queryId: [
-            new FieldTypeMapping('otherfield', new FieldType('sometype', [], [])),
-            new FieldTypeMapping('somefield', new FieldType('othertype', [], [])),
-            new FieldTypeMapping('timestamp', timestampFieldType),
-          ],
-        }),
-      });
+      const timestampFieldType = FieldTypes.DATE();
 
       ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: { widget: origWidget } });
 

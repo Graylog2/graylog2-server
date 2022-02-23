@@ -26,11 +26,14 @@ import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
+import { DEFAULT_TIMERANGE } from 'views/Constants';
+import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
 import type { AutoCompleter, Editor } from './ace-types';
 import StyledAceEditor from './queryinput/StyledAceEditor';
 import SearchBarAutoCompletions from './SearchBarAutocompletions';
-import type { Completer } from './SearchBarAutocompletions';
+import type { Completer, FieldTypes } from './SearchBarAutocompletions';
 
 type Props = {
   className?: string
@@ -38,6 +41,7 @@ type Props = {
     completers: Array<Completer>,
     timeRange: TimeRange | NoTimeRangeOverride | undefined,
     streams: Array<string>,
+    fieldTypes: FieldTypes,
   ) => AutoCompleter,
   completers: Array<Completer>,
   disabled?: boolean,
@@ -54,11 +58,7 @@ type Props = {
   warning?: QueryValidationState,
 };
 
-const defaultCompleterFactory = (
-  completers: Array<Completer>,
-  timeRange: TimeRange | NoTimeRangeOverride,
-  streams: Array<string>,
-) => new SearchBarAutoCompletions(completers, timeRange, streams);
+const defaultCompleterFactory = (...args: ConstructorParameters<typeof SearchBarAutoCompletions>) => new SearchBarAutoCompletions(...args);
 
 const handleExecution = (editor: Editor, onExecute: (query: string) => void, value: string, error: QueryValidationState | undefined, disableExecution: boolean) => {
   if (error) {
@@ -154,7 +154,15 @@ const QueryInput = ({
   warning,
   disableExecution,
 }: Props) => {
-  const completer = useMemo(() => completerFactory(completers, timeRange, streams), [completerFactory, completers, timeRange, streams]);
+  const { data: queryFields } = useFieldTypes(streams, isNoTimeRangeOverride(timeRange) ? DEFAULT_TIMERANGE : timeRange);
+  const { data: allFields } = useFieldTypes([], DEFAULT_TIMERANGE);
+  const fieldTypes = useMemo(() => {
+    const queryFieldsByName = Object.fromEntries((queryFields ?? []).map((field) => [field.name, field]));
+    const allFieldsByName = Object.fromEntries((allFields ?? []).map((field) => [field.name, field]));
+
+    return { all: allFieldsByName, query: queryFieldsByName };
+  }, [allFields, queryFields]);
+  const completer = useMemo(() => completerFactory(completers, timeRange, streams, fieldTypes), [completerFactory, completers, timeRange, streams, fieldTypes]);
   const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor), []);
   const onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecuteProp, value, error, disableExecution), [onExecuteProp, value, error, disableExecution]);
   const markers = useMemo(() => getMarkers(error, warning), [error, warning]);

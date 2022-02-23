@@ -51,6 +51,10 @@ const createFieldTypeRequest = (streams: Array<string>, timerange: TimeRange): F
 const fetchAllFieldTypes = (streams: Array<string>, timerange: TimeRange): Promise<Array<FieldTypeMapping>> => fetch('POST', fieldTypesUrl, createFieldTypeRequest(streams, timerange))
   .then(_deserializeFieldTypes);
 
-const useFieldTypes = (streams: Array<string> = [], timerange: TimeRange): { data: FieldTypeMapping[] } => useQuery([streams, timerange], () => fetchAllFieldTypes(streams, timerange));
+const useFieldTypes = (streams: Array<string>, timerange: TimeRange): { data: FieldTypeMapping[] } => useQuery(
+  [streams, timerange],
+  () => fetchAllFieldTypes(streams, timerange),
+  { staleTime: 30000, refetchOnWindowFocus: false, cacheTime: 0 },
+);
 
 export default useFieldTypes;

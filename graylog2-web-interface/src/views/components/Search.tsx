@@ -28,7 +28,6 @@ import type {
   SearchRefreshCondition,
   SearchRefreshConditionArguments,
 } from 'views/logic/hooks/SearchRefreshCondition';
-import { FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchConfigActions, SearchConfigStore } from 'views/stores/SearchConfigStore';
@@ -116,8 +115,6 @@ const _refreshIfNotUndeclared = (searchRefreshHooks: Array<SearchRefreshConditio
 
   return SearchMetadataActions.parseSearch(view.search).then((searchMetadata) => {
     if (_searchRefreshConditionChain(searchRefreshHooks, { view, searchMetadata, executionState })) {
-      FieldTypesActions.refresh();
-
       setHasErrors(false);
 
       return SearchActions.execute(executionState).then(() => {});

@@ -48,7 +48,6 @@ class FilterAggregationForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
     validation: PropTypes.object.isRequired,
-    allFieldTypes: PropTypes.array.isRequired,
     entityTypes: PropTypes.object.isRequired,
     streams: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
@@ -124,7 +123,7 @@ class FilterAggregationForm extends React.Component {
 
   render() {
     const { conditionType } = this.state;
-    const { allFieldTypes, entityTypes, eventDefinition, streams, validation, currentUser } = this.props;
+    const { entityTypes, eventDefinition, streams, validation, currentUser } = this.props;
 
     return (
       <>
@@ -163,7 +162,6 @@ class FilterAggregationForm extends React.Component {
             <Col md={12}>
               <AggregationForm eventDefinition={eventDefinition}
                                validation={validation}
-                               allFieldTypes={allFieldTypes}
                                aggregationFunctions={entityTypes.aggregation_functions}
                                onChange={this.propagateChange} />
             </Col>

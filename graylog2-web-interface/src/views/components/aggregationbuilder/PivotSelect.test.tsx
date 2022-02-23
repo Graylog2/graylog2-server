@@ -29,7 +29,6 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import PivotSelect from './PivotSelect';
 
 jest.mock('stores/connect', () => (x) => x);
-jest.mock('views/stores/FieldTypesStore', () => ({}));
 jest.mock('views/logic/searchtypes/aggregation/PivotGenerator', () => jest.fn());
 
 describe('PivotSelect', () => {
