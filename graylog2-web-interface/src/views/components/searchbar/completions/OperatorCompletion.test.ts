@@ -53,7 +53,7 @@ describe('OperatorCompletion', () => {
 
   it('suggests NOT operator', () => {
     const token = term('N', 0, 0);
-    const results = operatorCompletion.getCompletions(token, null, 'N', [token], 0);
+    const results = operatorCompletion.getCompletions({ currentToken: token, lastToken: null, prefix: 'N', tokens: [token], currentTokenIdx: 0 });
 
     expect(results).toEqual([NOT]);
   });
@@ -61,7 +61,7 @@ describe('OperatorCompletion', () => {
   it('suggests NOT operator after empty term', () => {
     const token = term('N', 1, 1);
     const lastToken = whitespace();
-    const results = operatorCompletion.getCompletions(token, lastToken, 'N', [lastToken, token], 1);
+    const results = operatorCompletion.getCompletions({ currentToken: token, lastToken, prefix: 'N', tokens: [lastToken, token], currentTokenIdx: 1 });
 
     expect(results).toEqual([NOT]);
   });
@@ -71,7 +71,7 @@ describe('OperatorCompletion', () => {
     const token = term(prefix, 2, 4);
     const lastToken = whitespace();
     const tokens = [term('foo'), lastToken, token];
-    const results = operatorCompletion.getCompletions(token, lastToken, prefix, tokens, 2);
+    const results = operatorCompletion.getCompletions({ currentToken: token, lastToken, prefix, tokens, currentTokenIdx: 2 });
 
     expect(results).toEqual([AND]);
   });
@@ -81,7 +81,7 @@ describe('OperatorCompletion', () => {
     const token = term(prefix, 2, 4);
     const lastToken = whitespace();
     const tokens = [term('foo'), lastToken, token];
-    const results = operatorCompletion.getCompletions(token, lastToken, prefix, tokens, 2);
+    const results = operatorCompletion.getCompletions({ currentToken: token, lastToken, prefix, tokens, currentTokenIdx: 2 });
 
     expect(results).toEqual([OR]);
   });
@@ -91,7 +91,7 @@ describe('OperatorCompletion', () => {
     const token = term(prefix, 2, 4);
     const lastToken = whitespace();
     const tokens = [term('foo'), lastToken, token];
-    const results = operatorCompletion.getCompletions(token, lastToken, prefix, tokens, 2);
+    const results = operatorCompletion.getCompletions({ currentToken: token, lastToken, prefix, tokens, currentTokenIdx: 2 });
 
     expect(results).toEqual([OR, NOT]);
   });
@@ -101,7 +101,7 @@ describe('OperatorCompletion', () => {
     const token = term(prefix, 4, 8);
     const lastToken = whitespace();
     const tokens = [term('foo'), whitespace(), and(), whitespace(), token];
-    const results = operatorCompletion.getCompletions(token, lastToken, prefix, tokens, 4);
+    const results = operatorCompletion.getCompletions({ currentToken: token, lastToken, prefix, tokens, currentTokenIdx: 4 });
 
     expect(results).toEqual([NOT]);
   });
@@ -111,7 +111,7 @@ describe('OperatorCompletion', () => {
     const token = term(prefix, 4, 8);
     const lastToken = whitespace();
     const tokens = [term('foo'), whitespace(), or(), whitespace(), token];
-    const results = operatorCompletion.getCompletions(token, lastToken, prefix, tokens, 4);
+    const results = operatorCompletion.getCompletions({ currentToken: token, lastToken, prefix, tokens, currentTokenIdx: 4 });
 
     expect(results).toEqual([]);
   });
@@ -121,14 +121,14 @@ describe('OperatorCompletion', () => {
     const currentToken = term(prefix, 4, 8);
     const lastToken = whitespace();
     const tokens = [term('foo'), whitespace(), or(), whitespace(), currentToken, whitespace(), term('qux')];
-    const results = operatorCompletion.getCompletions(currentToken, lastToken, prefix, tokens, 4);
+    const results = operatorCompletion.getCompletions({ currentToken, lastToken, prefix, tokens, currentTokenIdx: 4 });
 
     expect(results).toEqual([]);
   });
 
   it('does not suggest anything if current token is a keyword without a prefix', () => {
     const token = { index: 0, start: 0, type: 'keyword', value: 'controller:' };
-    const results = operatorCompletion.getCompletions(token, null, 'N', [token], 0);
+    const results = operatorCompletion.getCompletions({ currentToken: token, lastToken: null, prefix: 'N', tokens: [token], currentTokenIdx: 0 });
 
     expect(results).toEqual([]);
   });

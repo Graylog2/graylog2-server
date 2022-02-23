@@ -30,7 +30,7 @@ import { RefreshActions } from 'views/stores/RefreshStore';
 import * as messageList from 'views/components/messagelist';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
-import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 
 import type { MessageListResult } from './MessageList';

@@ -14,18 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import type { Moment } from 'moment';
+import type * as Immutable from 'immutable';
 
-import { singleton } from 'logic/singleton';
-import type { DateTime, DateTimeFormats } from 'util/DateTime';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
-export type UserDateTimeContextType = {
-  formatTime: (time: DateTime, format?: DateTimeFormats) => string,
-  toUserTimezone: (time: DateTime) => Moment,
-  userTimezone: string,
-};
-
-const UserDateTimeContext = React.createContext<UserDateTimeContextType | undefined>(undefined);
-
-export default singleton('contexts.UserDateTimeContext', () => UserDateTimeContext);
+export type FieldTypeMappingsList = Immutable.List<FieldTypeMapping>;

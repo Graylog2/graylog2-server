@@ -15,15 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import { union } from 'lodash';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import PlotLegend from 'views/components/visualizations/PlotLegend';
+import useChartData from 'views/components/visualizations/useChartData';
+import type { Generator } from 'views/components/visualizations/ChartData';
+import type ColorMapper from 'views/components/visualizations/ColorMapper';
 
+import type { ChartConfig } from '../GenericPlot';
 import GenericPlot from '../GenericPlot';
-import { chartData } from '../ChartData';
 
 const maxItemsPerRow = 4;
 
@@ -37,7 +41,7 @@ const _verticalDimensions = (idx, total) => {
   return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
 };
 
-const _horizontalDimensions = (idx, total) => {
+const _horizontalDimensions = (idx: number, total: number) => {
   const position = idx % maxItemsPerRow;
 
   const sliceSize = 1 / Math.min(total, maxItemsPerRow);
@@ -46,7 +50,7 @@ const _horizontalDimensions = (idx, total) => {
   return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
 };
 
-const _generateSeries = (type, name, x, y, z, idx, total) => ({
+const _generateSeries: Generator = (type, name, x, y, z, idx, total) => ({
   type,
   name,
   hole: 0.4,
@@ -58,7 +62,7 @@ const _generateSeries = (type, name, x, y, z, idx, total) => ({
   },
 });
 
-const getChartColor = (fullDataArray, name) => {
+const getChartColor = (fullDataArray: ChartConfig[], name: string) => {
   const fullData = fullDataArray.find((d) => d.labels.indexOf(name) >= 0);
 
   if (fullData && fullData.labels && fullData.marker && fullData.marker.colors) {
@@ -71,19 +75,19 @@ const getChartColor = (fullDataArray, name) => {
   return undefined;
 };
 
-const setChartColor = (chart, colorMap) => {
+const setChartColor = (chart: ChartConfig, colorMap: ColorMapper) => {
   const colors = chart.labels.map((label) => colorMap.get(label));
 
   return { marker: { colors } };
 };
 
-const labelMapper = (data: Array<{ labels: Array<string>}>) => data.reduce((acc, { labels }) => {
+const labelMapper = (data: Array<{ labels: Array<string> }>) => data.reduce((acc, { labels }) => {
   return union(acc, labels);
 }, []);
 
 const PieVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
-  const rows = retrieveChartData(data);
-  const transformedData = chartData(config, rows, 'pie', _generateSeries);
+  const rows = useMemo(() => retrieveChartData(data), [data]);
+  const transformedData = useChartData(rows, { widgetConfig: config, chartType: 'pie', generator: _generateSeries });
 
   return (
     <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} neverHide>

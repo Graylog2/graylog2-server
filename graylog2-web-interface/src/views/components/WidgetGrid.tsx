@@ -24,7 +24,7 @@ import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import { useStore } from 'stores/connect';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';

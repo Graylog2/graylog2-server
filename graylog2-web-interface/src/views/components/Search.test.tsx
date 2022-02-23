@@ -28,7 +28,6 @@ import { SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
-import { FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchMetadataActions, SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import View from 'views/logic/views/View';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
@@ -37,6 +36,8 @@ import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import MockSearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import Query, { filtersForQuery } from 'views/logic/queries/Query';
 
 import Search from './Search';
 
@@ -76,21 +77,6 @@ jest.mock('views/stores/SearchStore', () => ({
   ),
 }));
 
-jest.mock('views/stores/FieldTypesStore', () => ({
-  FieldTypesActions: {},
-  FieldTypesStore: MockStore(
-    'get',
-    ['getInitialState', () => ({
-      all: {},
-      queryFields: {
-        get: jest.fn(() => {
-          return {};
-        }),
-      },
-    })],
-  ),
-}));
-
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: {
     listen: () => jest.fn(),
@@ -117,6 +103,7 @@ jest.mock('views/components/views/CurrentViewTypeProvider', () => jest.fn());
 jest.mock('views/hooks/SyncWithQueryParameters');
 jest.mock('routing/withLocation', () => (Component) => (props) => <Component location={{ query: {}, pathname: '', search: '' }} {...props} />);
 jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
+jest.mock('views/logic/queries/useCurrentQuery');
 
 const mockPromise = <T, >(res: T): Promise<T> => {
   const promise = Promise.resolve(res);
@@ -144,12 +131,12 @@ describe('Search', () => {
       activeQuery: 'foobar',
     }));
 
-    FieldTypesActions.all = mockAction(jest.fn(async () => {}));
-    FieldTypesActions.refresh = mockAction(jest.fn(async () => {}));
     SearchMetadataActions.parseSearch = mockAction(jest.fn(() => mockPromise(SearchMetadata.empty())));
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
     SearchActions.refresh = mockAction();
     asMock(CurrentViewTypeProvider as React.FunctionComponent).mockImplementation(({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
+    const query = Query.builder().id('foobar').filter(filtersForQuery([])).build();
+    asMock(useCurrentQuery).mockReturnValue(query);
   });
 
   const SimpleSearch = (props) => (
@@ -256,25 +243,6 @@ describe('Search', () => {
     cb({ search: {} } as View);
 
     await waitFor(() => expect(SearchActions.execute).toHaveBeenCalled());
-  });
-
-  it('refreshes field types store upon mount', async () => {
-    expect(FieldTypesActions.refresh).not.toHaveBeenCalled();
-
-    render(<SimpleSearch />);
-
-    await waitFor(() => expect(FieldTypesActions.refresh).toHaveBeenCalled());
-  });
-
-  it('refreshes field types upon every search execution', async () => {
-    render(<SimpleSearch />);
-
-    asMock(FieldTypesActions.refresh).mockClear();
-
-    const cb = await newSearchCallback();
-    cb({ search: {} } as View);
-
-    await waitFor(() => expect(FieldTypesActions.refresh).toHaveBeenCalled());
   });
 
   it('refreshing after query change parses search metadata first', async () => {

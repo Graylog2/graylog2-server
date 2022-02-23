@@ -29,11 +29,12 @@ import type { Props as XYPlotProps } from 'views/components/visualizations/XYPlo
 import XYPlot from 'views/components/visualizations/XYPlot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
-import type { RelativeTimeRange } from 'views/logic/queries/Query';
 import Query from 'views/logic/queries/Query';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
+import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
 
 jest.mock('views/stores/CurrentViewStateStore', () => ({
   CurrentViewStateStore: MockStore(
@@ -83,12 +84,14 @@ describe('XYPlot', () => {
 
   const SimpleXYPlot = ({ currentUser: user, ...props }: SimpleXYPlotProps) => (
     <CurrentUserContext.Provider value={user}>
-      <XYPlot chartData={chartData}
-              config={config}
-              getChartColor={getChartColor}
-              setChartColor={setChartColor}
-              currentQuery={currentQuery}
-              {...props} />
+      <UserDateTimeProvider tz="UTC">
+        <XYPlot chartData={chartData}
+                config={config}
+                getChartColor={getChartColor}
+                setChartColor={setChartColor}
+                currentQuery={currentQuery}
+                {...props} />
+      </UserDateTimeProvider>
     </CurrentUserContext.Provider>
   );
 
@@ -136,7 +139,7 @@ describe('XYPlot', () => {
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', expect.objectContaining({
-      xaxis: { range: ['2018-10-12T02:04:21Z', '2018-10-12T10:04:21Z'], type: 'date' },
+      xaxis: { range: ['2018-10-12T02:04:21.723+00:00', '2018-10-12T10:04:21.723+00:00'], type: 'date' },
     }));
 
     genericPlot.get(0).props.onZoom('2018-10-12T04:04:21.723Z', '2018-10-12T08:04:21.723Z');
@@ -152,14 +155,15 @@ describe('XYPlot', () => {
 
   it('uses effective time range from pivot result if all messages are selected', () => {
     const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z', type: 'absolute' };
-    const allMessages: RelativeTimeRange = { type: 'relative', range: 0 };
-    const currentQueryForAllMessages = currentQuery.toBuilder().timerange(allMessages).build();
+    const currentQueryForAllMessages = currentQuery.toBuilder().timerange(ALL_MESSAGES_TIMERANGE).build();
     const user = currentUser.toBuilder().timezone('UTC').build();
-    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} currentQuery={currentQueryForAllMessages} currentUser={user} />);
+    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange}
+                                        currentQuery={currentQueryForAllMessages}
+                                        currentUser={user} />);
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', expect.objectContaining({
-      xaxis: { range: ['2018-10-12T02:04:21Z', '2018-10-12T10:04:21Z'], type: 'date' },
+      xaxis: { range: ['2018-10-12T02:04:21.723+00:00', '2018-10-12T10:04:21.723+00:00'], type: 'date' },
     }));
   });
 

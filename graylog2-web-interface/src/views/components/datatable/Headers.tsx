@@ -23,7 +23,7 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import Value from 'views/components/Value';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type Series from 'views/logic/aggregationbuilder/Series';
-import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 
 import styles from './DataTable.css';

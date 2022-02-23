@@ -37,7 +37,7 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import TimerangeInfo from 'views/components/widgets/TimerangeInfo';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
-import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useWidgetResults from 'views/components/useWidgetResults';
 
 import WidgetFrame from './WidgetFrame';
