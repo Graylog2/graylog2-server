@@ -17,22 +17,20 @@
 
 import React, { useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment-timezone';
 import { merge } from 'lodash';
 
-import AppConfig from 'util/AppConfig';
 import connect from 'stores/connect';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import Query from 'views/logic/queries/Query';
 import type { ViewType } from 'views/logic/views/View';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import PlotLegend from 'views/components/visualizations/PlotLegend';
+import UserDateTimeContext from 'contexts/UserDateTimeContext';
 
 import GenericPlot from './GenericPlot';
-import OnZoom from './OnZoom';
 import type { ChartColor, ChartConfig } from './GenericPlot';
+import OnZoom from './OnZoom';
 
 import CustomPropTypes from '../CustomPropTypes';
 import ViewTypeContext from '../contexts/ViewTypeContext';
@@ -75,12 +73,11 @@ const XYPlot = ({
   plotLayout = {},
   onZoom = OnZoom,
 }: Props) => {
-  const currentUser = useContext(CurrentUserContext);
-  const timezone = currentUser?.timezone ?? AppConfig.rootTimeZone();
+  const { formatTime } = useContext(UserDateTimeContext);
   const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',g' };
   const defaultLayout: {
-    yaxis: { fixedrange?: boolean},
-    legend?: {y?: number},
+    yaxis: { fixedrange?: boolean },
+    legend?: { y?: number },
     showlegend: boolean,
   } = { yaxis, showlegend: false };
 
@@ -92,12 +89,12 @@ const XYPlot = ({
   const viewType = useContext(ViewTypeContext);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(config.isTimeline
-    ? (from, to) => onZoom(currentQuery, from, to, viewType)
+    ? (from: string, to: string) => onZoom(currentQuery, from, to, viewType)
     : () => true, [config.isTimeline, onZoom]);
 
   if (config.isTimeline && effectiveTimerange) {
-    const normalizedFrom = moment.tz(effectiveTimerange.from, timezone).format();
-    const normalizedTo = moment.tz(effectiveTimerange.to, timezone).format();
+    const normalizedFrom = formatTime(effectiveTimerange.from, 'internal');
+    const normalizedTo = formatTime(effectiveTimerange.to, 'internal');
 
     layout.xaxis = {
       range: [normalizedFrom, normalizedTo],

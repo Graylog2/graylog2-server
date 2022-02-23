@@ -21,7 +21,7 @@ import { singleton } from 'logic/singleton';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
 
 export type UserDateTimeContextType = {
-  formatTime: (time: DateTime, format?: DateTimeFormats) => string
+  formatTime: (time: DateTime, format?: DateTimeFormats) => string,
   toUserTimezone: (time: DateTime) => Moment,
   userTimezone: string,
 };
