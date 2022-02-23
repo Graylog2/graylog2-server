@@ -31,8 +31,7 @@ class BulkLoadPatternModal extends React.Component {
     super(props);
 
     this.state = {
-      replaceConflictingPatterns: false,
-      dropAllExistingPatterns: false,
+      importStrategy: 'ABORT_ON_CONFLICT',
     };
   }
 
@@ -40,13 +39,13 @@ class BulkLoadPatternModal extends React.Component {
     evt.preventDefault();
 
     const reader = new FileReader();
-    const { replaceConflictingPatterns, dropAllExistingPatterns } = this.state;
+    const { importStrategy } = this.state;
     const { onSuccess } = this.props;
 
     reader.onload = (loaded) => {
       const request = loaded.target.result;
 
-      GrokPatternsStore.bulkImport(request, replaceConflictingPatterns, dropAllExistingPatterns).then(() => {
+      GrokPatternsStore.bulkImport(request, importStrategy).then(() => {
         UserNotification.success('Grok Patterns imported successfully', 'Success!');
         this.modal.close();
         onSuccess();
@@ -55,6 +54,8 @@ class BulkLoadPatternModal extends React.Component {
 
     reader.readAsText(this.patternFile.getInputDOMNode().files[0]);
   };
+
+  _onImportStrategyChange = (event) => this.setState({ importStrategy: event.target.value });
 
   render() {
     return (
@@ -72,16 +73,25 @@ class BulkLoadPatternModal extends React.Component {
                  label="Pattern file"
                  help="A file containing Grok patterns, one per line. Name and patterns should be separated by whitespace."
                  required />
-          <Input id="replace-conflicting-patterns-checkbox"
-                 type="checkbox"
-                 name="replace-conflicting"
-                 label="Replace existing patterns with the same name?"
-                 onChange={(e) => this.setState({ replaceConflictingPatterns: e.target.checked })} />
-          <Input id="drop-existing-patterns-checkbox"
-                 type="checkbox"
-                 name="drop-existing"
-                 label="Drop all existing patterns before import?"
-                 onChange={(e) => this.setState({ dropAllExistingPatterns: e.target.checked })} />
+          <Input id="abort-on-conflicting-patterns-radio"
+                 type="radio"
+                 name="import-strategy"
+                 value="ABORT_ON_CONFLICT"
+                 label="Abort import if a pattern with the same name already exists"
+                 defaultChecked
+                 onChange={(e) => this._onImportStrategyChange(e)} />
+          <Input id="replace-conflicting-patterns-radio"
+                 type="radio"
+                 name="import-strategy"
+                 value="REPLACE_ON_CONFLICT"
+                 label="Replace existing patterns with the same name"
+                 onChange={(e) => this._onImportStrategyChange(e)} />
+          <Input id="drop-existing-patterns-radio"
+                 type="radio"
+                 name="import-strategy"
+                 value="DROP_ALL_EXISTING"
+                 label="Drop all existing patterns before import"
+                 onChange={(e) => this._onImportStrategyChange(e)} />
         </BootstrapModalForm>
       </span>
     );

@@ -44,6 +44,9 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.graylog2.grok.GrokPatternService.ImportStrategy.ABORT_ON_CONFLICT;
+import static org.graylog2.grok.GrokPatternService.ImportStrategy.DROP_ALL_EXISTING;
+import static org.graylog2.grok.GrokPatternService.ImportStrategy.REPLACE_ON_CONFLICT;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
@@ -105,7 +108,7 @@ public class MongoDbGrokPatternServiceTest {
 
         verify(clusterEventBus, times(1)).post(any(GrokPatternsUpdatedEvent.class));
 
-        assertThat(collection.count()).isEqualTo(1L);
+        assertThat(collection.countDocuments()).isEqualTo(1L);
     }
 
     @Test
@@ -115,7 +118,7 @@ public class MongoDbGrokPatternServiceTest {
         assertThatThrownBy(() -> service.save(GrokPattern.create("NUMBER", "[0-9]+")))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageStartingWith("Grok pattern NUMBER already exists");
-        assertThat(collection.count()).isEqualTo(1L);
+        assertThat(collection.countDocuments()).isEqualTo(1L);
 
         verify(clusterEventBus, times(1)).post(any(GrokPatternsUpdatedEvent.class));
     }
@@ -213,7 +216,7 @@ public class MongoDbGrokPatternServiceTest {
         patternSet.add(GrokPattern.create("POSTFIX_VIRTUAL", "%{POSTFIX_SMTP_DELIVERY}"));
         patternSet.add(GrokPattern.create("POSTFIX_POSTSUPER", "%{POSTFIX_POSTSUPER_ACTION}|%{POSTFIX_POSTSUPER_SUMMARY}"));
 
-        assertThatThrownBy(() -> service.saveAll(patternSet, true, false))
+        assertThatThrownBy(() -> service.saveAll(patternSet, DROP_ALL_EXISTING))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("No definition for key 'GREEDYDATA' found, aborting");
     }
@@ -223,11 +226,11 @@ public class MongoDbGrokPatternServiceTest {
         final List<GrokPattern> grokPatterns = Arrays.asList(
                 GrokPattern.create("NUMBER", "[0-9]+"),
                 GrokPattern.create("INT", "[+-]?%{NUMBER}"));
-        service.saveAll(grokPatterns, false, false);
+        service.saveAll(grokPatterns, ABORT_ON_CONFLICT);
 
         verify(clusterEventBus, times(1)).post(any(GrokPatternsUpdatedEvent.class));
 
-        assertThat(collection.count()).isEqualTo(2L);
+        assertThat(collection.countDocuments()).isEqualTo(2L);
     }
 
     @Test
@@ -237,9 +240,9 @@ public class MongoDbGrokPatternServiceTest {
                 GrokPattern.create("INT", "[+-]?%{NUMBER}"));
         service.save(GrokPattern.create("NUMBER", "[0-9]+"));
 
-        service.saveAll(grokPatterns, true, false);
+        service.saveAll(grokPatterns, DROP_ALL_EXISTING);
 
-        assertThat(collection.count()).isEqualTo(2L);
+        assertThat(collection.countDocuments()).isEqualTo(2L);
         verify(clusterEventBus, times(2)).post(any(GrokPatternsUpdatedEvent.class));
     }
 
@@ -289,59 +292,59 @@ public class MongoDbGrokPatternServiceTest {
     @Test
     @MongoDBFixtures("MongoDbGrokPatternServiceTest.json")
     public void deleteAll() {
-        assertThat(collection.count()).isEqualTo(3);
+        assertThat(collection.countDocuments()).isEqualTo(3);
 
         final int deletedRecords = service.deleteAll();
         assertThat(deletedRecords).isEqualTo(3);
-        assertThat(collection.count()).isEqualTo(0);
+        assertThat(collection.countDocuments()).isEqualTo(0);
         verify(clusterEventBus, times(1)).post(any(GrokPatternsDeletedEvent.class));
     }
 
     @Test
     @MongoDBFixtures("MongoDbGrokPatternServiceTest.json")
     public void delete() {
-        assertThat(collection.count()).isEqualTo(3);
+        assertThat(collection.countDocuments()).isEqualTo(3);
 
         final int deletedRecords = service.delete("56250da2d400000000000001");
         assertThat(deletedRecords).isEqualTo(1);
-        assertThat(collection.count()).isEqualTo(2);
+        assertThat(collection.countDocuments()).isEqualTo(2);
         verify(clusterEventBus, times(1)).post(any(GrokPatternsDeletedEvent.class));
     }
 
     @Test
     @MongoDBFixtures("MongoDbGrokPatternServiceTest.json")
     public void deleteNonExistentGrokPattern() {
-        assertThat(collection.count()).isEqualTo(3);
+        assertThat(collection.countDocuments()).isEqualTo(3);
 
         final int deletedRecords = service.delete("56250da2d4000000deadbeef");
         assertThat(deletedRecords).isEqualTo(0);
-        assertThat(collection.count()).isEqualTo(3);
+        assertThat(collection.countDocuments()).isEqualTo(3);
         verify(clusterEventBus, never()).post(any(GrokPatternsDeletedEvent.class));
     }
 
     @Test
     @MongoDBFixtures("MongoDbGrokPatternServiceTest.json")
     public void saveAllWithoutDropAllExisting() throws ValidationException {
-        assertThat(collection.count()).isEqualTo(3);
+        assertThat(collection.countDocuments()).isEqualTo(3);
 
         final List<GrokPattern> grokPatterns = ImmutableList.of(
                 GrokPattern.create("Test4", "Pattern"),
                 GrokPattern.create("56250da2d400000000000001", "Test", "Pattern", null)
         );
-        final List<GrokPattern> savedGrokPatterns = service.saveAll(grokPatterns, false, false);
+        final List<GrokPattern> savedGrokPatterns = service.saveAll(grokPatterns, ABORT_ON_CONFLICT);
         assertThat(savedGrokPatterns).hasSize(2);
-        assertThat(collection.count()).isEqualTo(4);
+        assertThat(collection.countDocuments()).isEqualTo(4);
     }
 
     @Test
     @MongoDBFixtures("MongoDbGrokPatternServiceTest.json")
     public void saveAllWithDropAllExisting() throws ValidationException {
-        assertThat(collection.count()).isEqualTo(3);
+        assertThat(collection.countDocuments()).isEqualTo(3);
 
         final List<GrokPattern> grokPatterns = ImmutableList.of(GrokPattern.create("Test", "Pattern"));
-        final List<GrokPattern> savedGrokPatterns = service.saveAll(grokPatterns, true, false);
+        final List<GrokPattern> savedGrokPatterns = service.saveAll(grokPatterns, DROP_ALL_EXISTING);
         assertThat(savedGrokPatterns).hasSize(1);
-        assertThat(collection.count()).isEqualTo(1);
+        assertThat(collection.countDocuments()).isEqualTo(1);
     }
 
     @Test
@@ -351,10 +354,10 @@ public class MongoDbGrokPatternServiceTest {
                 GrokPattern.create("INT", "[+-]?%{NUMBER}"));
         service.save(GrokPattern.create("NUMBER", "[0-9]+"));
 
-        assertThatThrownBy(() -> service.saveAll(grokPatterns, false, false))
+        assertThatThrownBy(() -> service.saveAll(grokPatterns, ABORT_ON_CONFLICT))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageStartingWith("The following Grok patterns already exist: NUMBER.");
-        assertThat(collection.count()).isEqualTo(1L);
+        assertThat(collection.countDocuments()).isEqualTo(1L);
 
         verify(clusterEventBus, times(1)).post(any(GrokPatternsUpdatedEvent.class));
     }
@@ -365,7 +368,7 @@ public class MongoDbGrokPatternServiceTest {
 
         final List<GrokPattern> savedPatterns = service.saveAll(Arrays.asList(
                 GrokPattern.create("Test1", ".*?"),
-                GrokPattern.create("Test4", ".*?")), false, true);
+                GrokPattern.create("Test4", ".*?")), REPLACE_ON_CONFLICT);
 
         assertThat(savedPatterns)
                 .hasSize(2)
@@ -392,16 +395,16 @@ public class MongoDbGrokPatternServiceTest {
                 GrokPattern.create("Test", "Pattern"),
                 GrokPattern.create("Test", "")
         );
-        assertThatThrownBy(() -> service.saveAll(grokPatterns, true, false))
+        assertThatThrownBy(() -> service.saveAll(grokPatterns, DROP_ALL_EXISTING))
                 .isInstanceOf(ValidationException.class);
     }
 
     @Test
     public void saveValidGrokPattern() throws ValidationException, NotFoundException {
-        assertThat(collection.count()).isEqualTo(0);
+        assertThat(collection.countDocuments()).isEqualTo(0);
 
         final GrokPattern savedGrokPattern = service.save(GrokPattern.create("Test", "Pattern"));
-        assertThat(collection.count()).isEqualTo(1);
+        assertThat(collection.countDocuments()).isEqualTo(1);
         final GrokPattern grokPattern = service.load(savedGrokPattern.id());
         assertThat(grokPattern).isEqualTo(savedGrokPattern);
 
@@ -410,19 +413,19 @@ public class MongoDbGrokPatternServiceTest {
 
     @Test
     public void saveInvalidGrokPattern() {
-        assertThat(collection.count()).isEqualTo(0);
+        assertThat(collection.countDocuments()).isEqualTo(0);
 
         assertThatThrownBy(() -> service.save(GrokPattern.create("Test", "%{")))
                 .isInstanceOf(ValidationException.class);
-        assertThat(collection.count()).isEqualTo(0);
+        assertThat(collection.countDocuments()).isEqualTo(0);
 
         assertThatThrownBy(() -> service.save(GrokPattern.create("", "[a-z]+")))
                 .isInstanceOf(ValidationException.class);
-        assertThat(collection.count()).isEqualTo(0);
+        assertThat(collection.countDocuments()).isEqualTo(0);
 
         assertThatThrownBy(() -> service.save(GrokPattern.create("Test", "")))
                 .isInstanceOf(IllegalArgumentException.class);
-        assertThat(collection.count()).isEqualTo(0);
+        assertThat(collection.countDocuments()).isEqualTo(0);
 
         verify(clusterEventBus, never()).post(any(GrokPatternsUpdatedEvent.class));
     }
@@ -444,7 +447,7 @@ public class MongoDbGrokPatternServiceTest {
     @Test
     @MongoDBFixtures("MongoDbGrokPatternServiceTest.json")
     public void update() throws ValidationException {
-        assertThat(collection.count()).isEqualTo(3);
+        assertThat(collection.countDocuments()).isEqualTo(3);
 
         GrokPattern toUpdate1 = GrokPattern.builder()
                 .id("56250da2d400000000000001")
@@ -454,7 +457,7 @@ public class MongoDbGrokPatternServiceTest {
         final GrokPattern updatedPattern1 = service.update(toUpdate1);
         assertThat(updatedPattern1.name()).matches(toUpdate1.name());
         assertThat(updatedPattern1.pattern()).matches(toUpdate1.pattern());
-        assertThat(collection.count()).isEqualTo(3);
+        assertThat(collection.countDocuments()).isEqualTo(3);
 
         GrokPattern toUpdate2 = GrokPattern.builder()
                 .id("56250da2d400000000000001")
@@ -464,7 +467,7 @@ public class MongoDbGrokPatternServiceTest {
         final GrokPattern updatedPattern2 = service.update(toUpdate2);
         assertThat(updatedPattern2.name()).matches(toUpdate2.name());
         assertThat(updatedPattern2.pattern()).matches(toUpdate2.pattern());
-        assertThat(collection.count()).isEqualTo(3);
+        assertThat(collection.countDocuments()).isEqualTo(3);
 
         GrokPattern toUpdate3 = GrokPattern.builder()
                 .name("Testxxx")
@@ -477,7 +480,7 @@ public class MongoDbGrokPatternServiceTest {
             thrown = true;
         }
         assertThat(thrown).isTrue();
-        assertThat(collection.count()).isEqualTo(3);
+        assertThat(collection.countDocuments()).isEqualTo(3);
 
         GrokPattern toUpdate4 = GrokPattern.builder()
                 .id("56250da2d400000000000321")
@@ -491,7 +494,7 @@ public class MongoDbGrokPatternServiceTest {
             thrown = true;
         }
         assertThat(thrown).isTrue();
-        assertThat(collection.count()).isEqualTo(3);
+        assertThat(collection.countDocuments()).isEqualTo(3);
 
         verify(clusterEventBus, times(2)).post(any(GrokPatternsUpdatedEvent.class));
     }

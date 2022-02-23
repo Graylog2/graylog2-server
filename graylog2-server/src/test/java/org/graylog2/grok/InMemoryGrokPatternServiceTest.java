@@ -35,6 +35,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
+import static org.graylog2.grok.GrokPatternService.ImportStrategy.ABORT_ON_CONFLICT;
+import static org.graylog2.grok.GrokPatternService.ImportStrategy.DROP_ALL_EXISTING;
+import static org.graylog2.grok.GrokPatternService.ImportStrategy.REPLACE_ON_CONFLICT;
 
 public class InMemoryGrokPatternServiceTest {
 
@@ -115,19 +118,19 @@ public class InMemoryGrokPatternServiceTest {
     public void saveAll() throws Exception {
         Collection<GrokPattern> patterns = ImmutableList.of(GrokPattern.create("1", ".*"),
                 GrokPattern.create("2", ".+"));
-        final List<GrokPattern> saved = service.saveAll(patterns, false, false);
+        final List<GrokPattern> saved = service.saveAll(patterns, ABORT_ON_CONFLICT);
         assertThat(saved).hasSize(2);
 
         // should fail because already exists
-        assertThatThrownBy(() -> service.saveAll(patterns, false, false))
+        assertThatThrownBy(() -> service.saveAll(patterns, ABORT_ON_CONFLICT))
                 .isInstanceOf(ValidationException.class);
 
         // should add the patterns again
-        service.saveAll(patterns, false, true);
+        service.saveAll(patterns, REPLACE_ON_CONFLICT);
         assertThat(service.loadAll()).hasSize(4);
 
         // replaced all patterns
-        service.saveAll(patterns, true, false);
+        service.saveAll(patterns, DROP_ALL_EXISTING);
         assertThat(service.loadAll()).hasSize(2);
     }
 
@@ -170,7 +173,7 @@ public class InMemoryGrokPatternServiceTest {
     public void deleteAll() throws Exception {
         Collection<GrokPattern> patterns = ImmutableList.of(GrokPattern.create("1", ".*"),
                 GrokPattern.create("2", ".+"));
-        final List<GrokPattern> saved = service.saveAll(patterns, false, false);
+        final List<GrokPattern> saved = service.saveAll(patterns, ABORT_ON_CONFLICT);
         assertThat(service.deleteAll()).isEqualTo(2);
         assertThat(service.loadAll()).isEmpty();
     }

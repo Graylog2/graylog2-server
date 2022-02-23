@@ -50,6 +50,8 @@ import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.graylog2.grok.GrokPatternService.ImportStrategy.ABORT_ON_CONFLICT;
+import static org.graylog2.grok.GrokPatternService.ImportStrategy.DROP_ALL_EXISTING;
 
 public class MongoDbGrokPatternService implements GrokPatternService {
     public static final String COLLECTION_NAME = "grok_patterns";
@@ -158,7 +160,7 @@ public class MongoDbGrokPatternService implements GrokPatternService {
     }
 
     @Override
-    public List<GrokPattern> saveAll(Collection<GrokPattern> patterns, boolean dropAllExisting, boolean replaceExisting) throws ValidationException {
+    public List<GrokPattern> saveAll(Collection<GrokPattern> patterns, ImportStrategy importStrategy) throws ValidationException {
 
         final Map<String, GrokPattern> newPatternsByName;
         try {
@@ -170,7 +172,7 @@ public class MongoDbGrokPatternService implements GrokPatternService {
         final Map<String, GrokPattern> existingPatternsByName =
                 loadAll().stream().collect(Collectors.toMap(GrokPattern::name, Function.identity()));
 
-        if (!dropAllExisting && !replaceExisting) {
+        if (importStrategy == ABORT_ON_CONFLICT) {
             final Sets.SetView<String> conflictingNames
                     = Sets.intersection(newPatternsByName.keySet(), existingPatternsByName.keySet());
             if (!conflictingNames.isEmpty()) {
@@ -187,7 +189,7 @@ public class MongoDbGrokPatternService implements GrokPatternService {
             throw new ValidationException("Invalid patterns.\n" + e.getMessage());
         }
 
-        if (dropAllExisting) {
+        if (importStrategy == DROP_ALL_EXISTING) {
             deleteAll();
         }
 
