@@ -123,7 +123,7 @@ const ExportModal = ({ closeModal, view, directExportWidgetId, executionState }:
               <Modal.Body>
                 <Content>
                   {showWidgetSelection && (
-                  <Field name="selectedWidget" data-testid="selected-widget-field">
+                  <Field name="selectedWidget">
                     {({ field: { name, onChange } }) => {
                       const onChangeSelectWidget = ({ value }) => {
                         setSelectedFields(_getInitialFields(value));
