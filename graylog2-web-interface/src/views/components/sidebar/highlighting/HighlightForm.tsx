@@ -47,7 +47,7 @@ type Props = {
 };
 
 const _isRequired = (field) => (value) => {
-  if (!value || value === '') {
+  if (['', null, undefined].includes(value)) {
     return `${field} is required`;
   }
 
