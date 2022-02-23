@@ -32,7 +32,7 @@ import HighlightingRule, {
 } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import HighlightingColorForm, { createNewColor } from 'views/components/sidebar/highlighting/HighlightingColorForm';
 import type { StaticColorObject, GradientColorObject } from 'views/components/sidebar/highlighting/HighlightingColorForm';
-import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import Series, { isFunction } from 'views/logic/aggregationbuilder/Series';
 import inferTypeForSeries from 'views/logic/fieldtypes/InferTypeForSeries';
 import type HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';

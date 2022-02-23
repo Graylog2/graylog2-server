@@ -27,6 +27,7 @@ import { GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import type { SearchStoreState } from 'views/stores/SearchStore';
 import { SearchStore } from 'views/stores/SearchStore';
+import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
 
 import TimerangeInfo from './TimerangeInfo';
 
@@ -93,7 +94,7 @@ describe('TimerangeInfo', () => {
   });
 
   it('should display a All Time', () => {
-    const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 0 }).build();
+    const relativeWidget = widget.toBuilder().timerange(ALL_MESSAGES_TIMERANGE).build();
     render(<TimerangeInfo widget={relativeWidget} />);
 
     expect(screen.getByText('All Time')).toBeInTheDocument();

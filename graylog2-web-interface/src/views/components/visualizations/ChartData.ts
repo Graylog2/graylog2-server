@@ -18,6 +18,7 @@ import { flatten, flow, isEqual, set } from 'lodash';
 
 import type { Key, Leaf, Row, Rows, Value } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { DateTime, DateTimeFormats } from 'util/DateTime';
 
 import transformKeys from './TransformKeys';
 
@@ -46,7 +47,7 @@ export type ChartDefinition = {
 
 export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>];
 export type ExtractedSeries = Array<ChartData>;
-export type ValuesBySeries = { [key: string]: Array<number>};
+export type ValuesBySeries = { [key: string]: Array<number> };
 
 export type KeyJoiner = (keys: Array<any>) => string;
 
@@ -60,7 +61,10 @@ export const flattenLeafs = (leafs: Array<Leaf>, matcher: (value: Value) => bool
   return flatten(leafs.map((l) => l.values.filter((value) => matcher(value)).map((v) => [l.key, v])));
 };
 
-export const formatSeries = ({ valuesBySeries = {}, xLabels = [] }: {valuesBySeries: ValuesBySeries, xLabels: Array<any>}): ExtractedSeries => {
+export const formatSeries = ({
+  valuesBySeries = {},
+  xLabels = [],
+}: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }): ExtractedSeries => {
   return Object.keys(valuesBySeries).map((value) => [
     value,
     xLabels,
@@ -77,7 +81,7 @@ export const getLeafsFromRows = (rows: Rows): Array<Leaf> => {
 
 export const getXLabelsFromLeafs = (leafs: Array<Leaf>): Array<Array<Key>> => leafs.map(({ key }) => key);
 
-export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValueMatcher?: (value: Value) => boolean) => {
+export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValueMatcher: (value: Value) => boolean = undefined) => {
   return (results: Rows) => {
     const leafs = getLeafsFromRows(results);
     const xLabels = getXLabelsFromLeafs(leafs);
@@ -97,7 +101,7 @@ export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValu
   };
 };
 
-export const generateChart = (chartType: string, generator: Generator = _defaultChartGenerator, config?: AggregationWidgetConfig): ((ExtractedSeries) => Array<ChartDefinition>) => {
+export const generateChart = (chartType: string, generator: Generator = _defaultChartGenerator, config: AggregationWidgetConfig = undefined): ((ExtractedSeries) => Array<ChartDefinition>) => {
   return (results: ExtractedSeries) => {
     const allCharts: Array<[string, string, Array<string>, Array<any>, Array<Array<any>>]> = results.map(([value, x, values, z]) => [
       chartType,
@@ -123,18 +127,30 @@ export const removeNulls = (): ((ExtractedSeries) => ExtractedSeries) => {
 
 const doNotSuffixTraceForSingleSeries = (keys) => (keys.length > 1 ? keys.slice(0, -1).join('-') : keys[0]);
 
-export const chartData = (
-  config: AggregationWidgetConfig,
-  data: Rows,
+export type ChartDataConfig = {
+  widgetConfig: AggregationWidgetConfig,
   chartType: string,
-  generator: Generator = _defaultChartGenerator,
-  customSeriesFormatter: (values: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }) => ExtractedSeries = formatSeries,
+  generator?: Generator,
+  seriesFormatter?: (values: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }) => ExtractedSeries,
   leafValueMatcher?: (value: Value) => boolean,
+  formatTime: (time: DateTime, format?: DateTimeFormats) => string,
+};
+
+export const chartData = (
+  data: Rows,
+  {
+    chartType,
+    widgetConfig: config,
+    generator = _defaultChartGenerator,
+    seriesFormatter: customSeriesFormatter = formatSeries,
+    leafValueMatcher,
+    formatTime,
+  }: ChartDataConfig,
 ): Array<ChartDefinition> => {
   const { rowPivots, columnPivots, series } = config;
 
   return flow([
-    transformKeys(rowPivots, columnPivots),
+    transformKeys(rowPivots, columnPivots, formatTime),
     extractSeries(series.length === 1 ? doNotSuffixTraceForSingleSeries : undefined, leafValueMatcher),
     customSeriesFormatter,
     removeNulls(),
