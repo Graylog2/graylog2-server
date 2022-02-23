@@ -19,6 +19,7 @@ package org.graylog.events.context;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
+import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.scheduler.DBJobDefinitionService;
@@ -28,6 +29,7 @@ import org.graylog.scheduler.JobTriggerData;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.JobTriggerStatus;
 import org.joda.time.DateTime;
+import org.mongojack.DBQuery;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -75,6 +77,15 @@ public class EventDefinitionContextService {
         return jobTriggerService.getForJobs(jobDefinitionIds);
     }
 
+    private long getQueuedNotifications(EventDefinitionDto eventDefinition) {
+        final DBQuery.Query query = DBQuery.and(
+                DBQuery.is("status", JobTriggerStatus.RUNNABLE),
+                DBQuery.is("data.type", EventNotificationExecutionJob.TYPE_NAME),
+                DBQuery.is("data.event_dto.event_definition_id", eventDefinition.id()));
+
+        return jobTriggerService.countByQuery(query);
+    }
+
     private ImmutableMap<String, SchedulerCtx> schedulerContext(List<EventDefinitionDto> eventDefinitions) {
         // We try to minimize database queries by fetching all required job definitions and triggers in two requests
         // TODO: Use MongoDB's $lookup aggregation operator once we switch to MongoDB 4.0 to do this with a single database query
@@ -104,7 +115,7 @@ public class EventDefinitionContextService {
             final JobTriggerDto trigger = jobTriggers.get(jobDefinition.id()).get(0);
 
             if (trigger != null) {
-                ctx.put(eventDefinition.id(), SchedulerCtx.scheduled(trigger));
+                ctx.put(eventDefinition.id(), SchedulerCtx.scheduled(trigger, getQueuedNotifications(eventDefinition)));
             }
         }
 
@@ -125,18 +136,21 @@ public class EventDefinitionContextService {
         @JsonProperty("triggered_at")
         public abstract Optional<DateTime> triggeredAt();
 
+        @JsonProperty("queued_notifications")
+        public abstract long queuedNotifications();
+
         @JsonProperty("data")
         public abstract Optional<JobTriggerData> data();
 
         public static SchedulerCtx unscheduled() {
-            return create(false, null);
+            return create(false, null, 0);
         }
 
-        public static SchedulerCtx scheduled(JobTriggerDto trigger) {
-            return create(true, trigger);
+        public static SchedulerCtx scheduled(JobTriggerDto trigger, long queuedNotifications) {
+            return create(true, trigger, queuedNotifications);
         }
 
-        private static SchedulerCtx create(boolean isScheduled, JobTriggerDto trigger) {
+        private static SchedulerCtx create(boolean isScheduled, JobTriggerDto trigger, long queuedNotifications) {
             final Optional<JobTriggerDto> optionalTrigger = Optional.ofNullable(trigger);
 
             return new AutoValue_EventDefinitionContextService_SchedulerCtx(
@@ -144,6 +158,7 @@ public class EventDefinitionContextService {
                     optionalTrigger.map(JobTriggerDto::status),
                     optionalTrigger.map(JobTriggerDto::nextTime),
                     optionalTrigger.flatMap(JobTriggerDto::triggeredAt),
+                    queuedNotifications,
                     optionalTrigger.flatMap(JobTriggerDto::data)
             );
         }
