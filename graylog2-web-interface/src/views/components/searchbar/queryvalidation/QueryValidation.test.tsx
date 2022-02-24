@@ -101,7 +101,7 @@ describe('QueryValidation', () => {
     await openExplanation();
 
     await screen.findByText('Error');
-    await screen.findByText('ParseException');
+    await screen.findByText('Parse Exception');
     await screen.findByText(/Cannot parse 'source: '/);
   });
 
@@ -110,19 +110,19 @@ describe('QueryValidation', () => {
 
     await openExplanation();
 
-    await screen.findByText('ParseException');
-    await screen.findByTitle('ParseException documentation');
+    await screen.findByText('Parse Exception');
+    await screen.findByTitle('Parse Exception documentation');
   });
 
   it('renders plugable validation explanation', async () => {
     const ExampleComponent = ({ validationState }: { validationState: QueryValidationState }) => (
-      <>Plugable validation explanation for {validationState.explanations.map(({ errorType }) => errorType).join()}</>
+      <>Plugable validation explanation for {validationState.explanations.map(({ errorTitle }) => errorTitle).join()}</>
     );
     asMock(usePluginEntities).mockImplementation((entityKey) => (entityKey === 'views.elements.validationErrorExplanation' ? [ExampleComponent] : []));
     render(<SUT error={validationError} />);
 
     await openExplanation();
 
-    await screen.findByText('Plugable validation explanation for ParseException');
+    await screen.findByText('Plugable validation explanation for Parse Exception');
   });
 });

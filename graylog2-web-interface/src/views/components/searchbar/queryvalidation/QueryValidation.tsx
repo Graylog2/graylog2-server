@@ -149,11 +149,11 @@ const useTriggerIfErrorsPersist = (trigger: () => void) => {
 
 const getErrorDocumentationLink = (errorType: string) => {
   switch (errorType) {
-    case 'Unknown field':
+    case 'UNKNOWN_FIELD':
       return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.UNKNOWN_FIELD;
-    case 'ParseException':
+    case 'PARSE_EXCEPTION':
       return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.PARSE_EXCEPTION;
-    case 'Invalid operator':
+    case 'INVALID_OPERATOR':
       return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.INVALID_OPERATOR;
     default:
       return DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE;
@@ -203,11 +203,11 @@ const QueryValidation = () => {
                          title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
                          $shaking={shakingPopover}>
             <div role="alert">
-              {explanations.map(({ errorType, errorMessage }) => (
+              {explanations.map(({ errorType, errorTitle, errorMessage }) => (
                 <Explanation key={errorMessage}>
-                  <span><b>{errorType}</b>: {errorMessage}</span>
+                  <span><b>{errorTitle}</b>: {errorMessage}</span>
                   <DocumentationLink page={getErrorDocumentationLink(errorType)}
-                                     title={`${errorType} documentation`}
+                                     title={`${errorTitle} documentation`}
                                      text={<DocumentationIcon name="lightbulb" />} />
                 </Explanation>
               ))}
