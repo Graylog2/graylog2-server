@@ -18,6 +18,7 @@ package org.graylog2.grok;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
@@ -58,6 +59,7 @@ public class MongoDbGrokPatternService implements GrokPatternService {
     public static final String INDEX_NAME = "idx_name_asc_unique";
 
     private static final Logger log = LoggerFactory.getLogger(MongoDbGrokPatternService.class);
+    public static final int MAX_DISPLAYED_CONFLICTS = 10;
 
     private final JacksonDBCollection<GrokPattern, ObjectId> dbCollection;
     private final ClusterEventBus clusterBus;
@@ -176,8 +178,11 @@ public class MongoDbGrokPatternService implements GrokPatternService {
             final Sets.SetView<String> conflictingNames
                     = Sets.intersection(newPatternsByName.keySet(), existingPatternsByName.keySet());
             if (!conflictingNames.isEmpty()) {
+                final Iterable<String> limited = Iterables.limit(conflictingNames, MAX_DISPLAYED_CONFLICTS);
                 throw new ValidationException("The following Grok patterns already exist: "
-                        + StringUtils.join(conflictingNames, ", ") + ".");
+                        + StringUtils.join(limited, ", ")
+                        + (conflictingNames.size() > MAX_DISPLAYED_CONFLICTS ? " (+ " + (conflictingNames.size() - MAX_DISPLAYED_CONFLICTS) + " more)" : "")
+                        + ".");
             }
         }
 
