@@ -24,6 +24,9 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { validationError } from 'fixtures/queryValidationState';
+import usePluginEntities from 'views/logic/usePluginEntities';
+
+import asMock from '../../../../../test/helpers/mocking/AsMock';
 
 jest.mock('views/stores/QueriesStore', () => ({
   QueriesActions: {
@@ -47,6 +50,7 @@ jest.mock('views/stores/SearchExecutionStateStore', () => ({
   },
 }));
 
+jest.mock('views/logic/usePluginEntities');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('logic/datetimes/DateTime', () => ({}));
 
@@ -108,5 +112,17 @@ describe('QueryValidation', () => {
 
     await screen.findByText('ParseException');
     await screen.findByTitle('ParseException documentation');
+  });
+
+  it('renders plugable validation explanation', async () => {
+    const ExampleComponent = ({ validationState }: { validationState: QueryValidationState }) => (
+      <>Plugable validation explanation for {validationState.explanations.map(({ errorType }) => errorType).join()}</>
+    );
+    asMock(usePluginEntities).mockImplementation((entityKey) => (entityKey === 'views.elements.validationErrorExplanation' ? [ExampleComponent] : []));
+    render(<SUT error={validationError} />);
+
+    await openExplanation();
+
+    await screen.findByText('Plugable validation explanation for ParseException');
   });
 });

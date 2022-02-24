@@ -211,9 +211,8 @@ const QueryValidation = () => {
                                      text={<DocumentationIcon name="lightbulb" />} />
                 </Explanation>
               ))}
-              {plugableValidationExplanation.map((PlugableExplanation) => {
-                return <PlugableExplanation explanations={explanations} />;
-              })}
+              {/* eslint-disable-next-line react/no-array-index-key */}
+              {plugableValidationExplanation.map((PlugableExplanation, index) => <PlugableExplanation validationState={validationState} key={index} />)}
             </div>
           </StyledPopover>
         </Overlay>
