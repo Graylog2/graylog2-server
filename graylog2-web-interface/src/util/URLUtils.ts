@@ -97,7 +97,7 @@ const URLUtils = {
   areCredentialsInURLSupported(): boolean {
     const browser = URLUtils.parser.getBrowser();
 
-    return browser.name !== 'IE' && browser.name !== 'Edge';
+    return browser.name !== 'IE';
   },
   isValidURL(str: string) {
     let isValid = true;
