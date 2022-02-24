@@ -211,8 +211,8 @@ const QueryValidation = () => {
                                      text={<DocumentationIcon name="lightbulb" />} />
                 </Explanation>
               ))}
-              {/* eslint-disable-next-line react/no-array-index-key */}
               {plugableValidationExplanation?.map((PlugableExplanation, index) => (
+                // eslint-disable-next-line react/no-array-index-key
                 <PlugableExplanation validationState={validationState} key={index} />),
               )}
             </div>
