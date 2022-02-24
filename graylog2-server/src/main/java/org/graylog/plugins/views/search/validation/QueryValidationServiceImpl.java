@@ -121,6 +121,7 @@ public class QueryValidationServiceImpl implements QueryValidationService {
 
         final Stream<ValidationMessage> unknownFieldsStream = unknownFields.stream().map(f -> {
             final ValidationMessage.Builder message = ValidationMessage.builder(ValidationType.UNKNOWN_FIELD)
+                    .relatedProperty(f.getRealFieldName())
                     .errorMessage("Query contains unknown field: " + f.getRealFieldName());
 
             f.keyToken().ifPresent(t -> {

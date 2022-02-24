@@ -55,12 +55,10 @@ import static java.util.Comparator.nullsLast;
 public class QueryValidationResource extends RestResource implements PluginRestResource {
 
     private final QueryValidationService queryValidationService;
-    private final PermittedStreams permittedStreams;
 
     @Inject
-    public QueryValidationResource(QueryValidationService queryValidationService, PermittedStreams permittedStreams) {
+    public QueryValidationResource(QueryValidationService queryValidationService) {
         this.queryValidationService = queryValidationService;
-        this.permittedStreams = permittedStreams;
     }
 
     @POST
