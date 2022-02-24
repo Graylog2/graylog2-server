@@ -155,6 +155,8 @@ const getErrorDocumentationLink = (errorType: string) => {
       return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.PARSE_EXCEPTION;
     case 'INVALID_OPERATOR':
       return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.INVALID_OPERATOR;
+    case 'UNDECLARED_PARAMETER':
+      return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.UNDECLARED_PARAMETER;
     default:
       return DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE;
   }
