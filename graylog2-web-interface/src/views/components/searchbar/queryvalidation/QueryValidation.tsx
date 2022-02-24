@@ -212,7 +212,9 @@ const QueryValidation = () => {
                 </Explanation>
               ))}
               {/* eslint-disable-next-line react/no-array-index-key */}
-              {plugableValidationExplanation.map((PlugableExplanation, index) => <PlugableExplanation validationState={validationState} key={index} />)}
+              {plugableValidationExplanation?.map((PlugableExplanation, index) => (
+                <PlugableExplanation validationState={validationState} key={index} />),
+              )}
             </div>
           </StyledPopover>
         </Overlay>
