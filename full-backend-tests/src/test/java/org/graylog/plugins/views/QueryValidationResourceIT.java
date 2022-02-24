@@ -98,4 +98,31 @@ public class QueryValidationResourceIT {
         validatableResponse.assertThat().body("status", equalTo("WARNING"));
         validatableResponse.assertThat().body("explanations.error_message[0]", containsString("Query contains invalid operator \"not\". All AND / OR / NOT operators have to be written uppercase"));
     }
+
+    @ContainerMatrixTest
+    void testQueryParameters() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("{\"query\":\"lorem:$ipsum$ AND\\ndolor:$sit$\"}")
+                .post("/search/validate")
+                .then()
+                .statusCode(200);
+        validatableResponse.assertThat().body("status", equalTo("ERROR"));
+
+        validatableResponse.assertThat().body("explanations.error_message[0]", containsString("Unbound required parameter used: ipsum"));
+        validatableResponse.assertThat().body("explanations.begin_line[0]", equalTo(1));
+        validatableResponse.assertThat().body("explanations.begin_column[0]", equalTo(6));
+        validatableResponse.assertThat().body("explanations.end_line[0]", equalTo(1));
+        validatableResponse.assertThat().body("explanations.end_column[0]", equalTo(13));
+        validatableResponse.assertThat().body("explanations.related_property[0]", equalTo("ipsum"));
+
+        validatableResponse.assertThat().body("explanations.error_message[1]", containsString("Unbound required parameter used: sit"));
+        validatableResponse.assertThat().body("explanations.begin_line[1]", equalTo(2));
+        validatableResponse.assertThat().body("explanations.begin_column[1]", equalTo(6));
+        validatableResponse.assertThat().body("explanations.end_line[1]", equalTo(2));
+        validatableResponse.assertThat().body("explanations.end_column[1]", equalTo(11));
+        validatableResponse.assertThat().body("explanations.related_property[1]", equalTo("sit"));
+
+    }
 }

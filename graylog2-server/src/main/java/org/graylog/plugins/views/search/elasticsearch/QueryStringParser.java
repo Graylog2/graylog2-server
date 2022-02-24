@@ -20,7 +20,9 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import org.graylog.plugins.views.search.QueryMetadata;
+import org.graylog.plugins.views.search.validation.SubstringMultilinePosition;
 
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,11 +35,21 @@ public class QueryStringParser {
             return QueryMetadata.empty();
         }
         final Matcher matcher = PLACEHOLDER_PATTERN.matcher(queryString);
+
         Set<String> paramNames = Sets.newHashSet();
+        Set<QueryParam> params = Sets.newHashSet();
+
         while (matcher.find()) {
             final String name = matcher.group(1);
-            paramNames.add(name);
+            if (!paramNames.contains(name)) { // skip already processed params
+                paramNames.add(name);
+                final List<SubstringMultilinePosition> paramPositions = SubstringMultilinePosition.compute(queryString, "$" + name + "$");
+                params.add(QueryParam.create(name, paramPositions));
+            }
         }
-        return QueryMetadata.builder().usedParameterNames(ImmutableSet.copyOf(paramNames)).build();
+
+        return QueryMetadata.builder()
+                .usedParameters(ImmutableSet.copyOf(params))
+                .build();
     }
 }

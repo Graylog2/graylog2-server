@@ -38,7 +38,7 @@ class ValidationMessageTest {
             assertThat(validationMessage.endLine()).isEqualTo(1);
             assertThat(validationMessage.beginColumn()).isEqualTo(0);
             assertThat(validationMessage.endColumn()).isEqualTo(4);
-            assertThat(validationMessage.errorType()).isEqualTo("Query parsing error");
+            assertThat(validationMessage.validationType()).isEqualTo(ValidationType.QUERY_PARSING_ERROR);
             assertThat(validationMessage.errorMessage()).startsWith("Cannot parse query, cause: incomplete query, query ended unexpectedly");
         }
     }

@@ -19,8 +19,10 @@ package org.graylog.plugins.views.search;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.views.search.elasticsearch.QueryParam;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableSet.of;
 
@@ -28,7 +30,13 @@ import static com.google.common.collect.ImmutableSet.of;
 public abstract class QueryMetadata {
 
     @JsonProperty("used_parameters_names")
-    public abstract ImmutableSet<String> usedParameterNames();
+    public ImmutableSet<String> usedParameterNames() {
+        return usedParameters().stream().map(QueryParam::name).collect(ImmutableSet.toImmutableSet());
+    }
+
+
+    @JsonProperty("used_parameters")
+    public abstract ImmutableSet<QueryParam> usedParameters();
 
     public static QueryMetadata empty() {
         return QueryMetadata.builder().build();
@@ -36,15 +44,16 @@ public abstract class QueryMetadata {
 
     public static Builder builder() {
         return new AutoValue_QueryMetadata.Builder()
-                .usedParameterNames(of());
+                .usedParameters(of());
     }
 
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
     public abstract static class Builder {
-        @JsonProperty("used_parameters_names")
-        public abstract Builder usedParameterNames(Set<String> usedParameterNames);
+
+        @JsonProperty("used_parameters")
+        public abstract Builder usedParameters(Set<QueryParam> usedParameters);
 
         public abstract QueryMetadata build();
     }

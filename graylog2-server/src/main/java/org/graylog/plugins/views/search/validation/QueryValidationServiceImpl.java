@@ -22,6 +22,7 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.errors.UnboundParameterError;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
@@ -43,12 +44,14 @@ public class QueryValidationServiceImpl implements QueryValidationService {
     private final LuceneQueryParser luceneQueryParser;
     private final MappedFieldTypesService mappedFieldTypesService;
     private final QueryStringDecorators queryStringDecorators;
+    private final QueryStringParser queryStringParser;
 
     @Inject
-    public QueryValidationServiceImpl(LuceneQueryParser luceneQueryParser, MappedFieldTypesService mappedFieldTypesService, QueryStringDecorators queryStringDecorators) {
+    public QueryValidationServiceImpl(LuceneQueryParser luceneQueryParser, MappedFieldTypesService mappedFieldTypesService, QueryStringDecorators queryStringDecorators, QueryStringParser queryStringParser) {
         this.luceneQueryParser = luceneQueryParser;
         this.mappedFieldTypesService = mappedFieldTypesService;
         this.queryStringDecorators = queryStringDecorators;
+        this.queryStringParser = queryStringParser;
     }
 
     @Override
@@ -65,7 +68,7 @@ public class QueryValidationServiceImpl implements QueryValidationService {
             // but we want to trigger the decorators as well, because they may trigger additional exceptions
             decoratedQuery(req);
         } catch (SearchException searchException) {
-            return ValidationResponse.error(toExplanation(req.query().queryString(), searchException));
+            return ValidationResponse.error(toExplanation(searchException));
         }
 
         try {
@@ -83,22 +86,28 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         }
     }
 
-    private List<ValidationMessage> toExplanation(String query, SearchException searchException) {
+    private List<ValidationMessage> toExplanation(SearchException searchException) {
         if (searchException.error() instanceof UnboundParameterError) {
             final UnboundParameterError error = (UnboundParameterError) searchException.error();
-            final List<SubstringMultilinePosition> positions = SubstringMultilinePosition.compute(query, "$" + error.parameterName() + "$");
-            if (!positions.isEmpty()) {
-                return positions.stream()
-                        .map(p -> ValidationMessage.builder()
-                                .errorType("Parameter error")
-                                .errorMessage(error.description())
-                                .beginLine(p.getLine())
-                                .endLine(p.getLine())
-                                .beginColumn(p.getBeginColumn())
-                                .endColumn(p.getEndColumn())
-                                .build())
-                        .collect(Collectors.toList());
-            }
+
+            return
+                    error.allUnknownParametersNames().stream()
+                            .flatMap(param -> {
+                                final String errorMessage = "Unbound required parameter used: " + param.name();
+                                return param.positions()
+                                        .stream()
+                                        .map(
+                                                p -> ValidationMessage.builder(ValidationType.UNDECLARED_PARAMETER)
+                                                        .errorMessage(errorMessage)
+                                                        .beginLine(p.getLine())
+                                                        .endLine(p.getLine())
+                                                        .beginColumn(p.getBeginColumn())
+                                                        .endColumn(p.getEndColumn())
+                                                        .relatedProperty(param.name())
+                                                        .build()
+                                        );
+                            })
+                            .collect(Collectors.toList());
         }
         return Collections.singletonList(ValidationMessage.fromException(searchException));
     }
@@ -111,8 +120,7 @@ public class QueryValidationServiceImpl implements QueryValidationService {
 
 
         final Stream<ValidationMessage> unknownFieldsStream = unknownFields.stream().map(f -> {
-            final ValidationMessage.Builder message = ValidationMessage.builder()
-                    .errorType("Unknown field")
+            final ValidationMessage.Builder message = ValidationMessage.builder(ValidationType.UNKNOWN_FIELD)
                     .errorMessage("Query contains unknown field: " + f.getRealFieldName());
 
             f.keyToken().ifPresent(t -> {
@@ -128,8 +136,7 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         final Stream<ValidationMessage> invalidOperatorsStream = invalidOperators.stream()
                 .map(term -> {
                     final String errorMessage = String.format(Locale.ROOT, "Query contains invalid operator \"%s\". All AND / OR / NOT operators have to be written uppercase", term.value());
-                    final ValidationMessage.Builder message = ValidationMessage.builder()
-                            .errorType("Invalid operator")
+                    final ValidationMessage.Builder message = ValidationMessage.builder(ValidationType.INVALID_OPERATOR)
                             .errorMessage(errorMessage);
                     term.keyToken().ifPresent(t -> {
                         message.beginLine(t.beginLine());
