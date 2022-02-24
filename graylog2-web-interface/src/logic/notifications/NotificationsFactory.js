@@ -36,6 +36,7 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'deflector_exists_as_index':
         return {
           title: 'Deflector exists as an index and is not an alias.',
@@ -47,6 +48,7 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'email_transport_configuration_invalid':
         return {
           title: 'Email Transport Configuration is missing or invalid!',
@@ -58,6 +60,7 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'email_transport_failed':
         return {
           title: 'An error occurred while trying to send an email!',
@@ -68,6 +71,7 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'es_cluster_red':
         return {
           title: 'Elasticsearch cluster unhealthy (RED)',
@@ -80,6 +84,7 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'es_open_files':
         return {
           title: 'Elasticsearch nodes with too low open file limit',
@@ -93,12 +98,13 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'es_unavailable':
         return {
           title: 'Elasticsearch cluster unavailable',
           description: (
             <span>
-              Graylog could not successfully connect to the Elasticsearch cluster. If you're using multicast, check that
+              Graylog could not successfully connect to the Elasticsearch cluster. If you are using multicast, check that
               it is working in your network and that Elasticsearch is accessible. Also check that the cluster name setting
               is correct. Read how to fix this in {' '}
               <DocumentationLink page={DocsHelper.PAGES.ES_CLUSTER_UNAVAILABLE}
@@ -106,6 +112,7 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'gc_too_long':
         return {
           title: 'Nodes with too long GC pauses',
@@ -118,11 +125,13 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'generic':
         return {
           title: notification.details.title,
           description: notification.details.description,
         };
+
       case 'index_ranges_recalculation':
         return {
           title: 'Index ranges recalculation required',
@@ -133,6 +142,7 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'input_failed_to_start':
         return {
           title: 'An input has failed to start',
@@ -147,6 +157,7 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'input_failure_shutdown':
         return {
           title: 'An input has shut down due to failures',
@@ -159,6 +170,7 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'journal_uncommitted_messages_deleted':
         return {
           title: 'Uncommited messages deleted from journal',
@@ -170,6 +182,7 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'journal_utilization_too_high':
         return {
           title: 'Journal utilization is too high',
@@ -181,6 +194,7 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'multi_leader':
         return {
           title: 'Multiple Graylog server leaders in the cluster',
@@ -193,6 +207,7 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'no_input_running':
         return {
           title: 'There is a node without any running inputs.',
@@ -206,6 +221,7 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'no_leader':
         return {
           title: 'There was no leader Graylog server node detected in the cluster.',
@@ -219,6 +235,7 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'outdated_version':
         return {
           title: 'You are running an outdated Graylog version.',
@@ -229,31 +246,34 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'output_disabled':
         return {
           title: 'Output disabled',
           description: (
             <span>
-              The output with the id {notification.details.outputId} in stream "{notification.details.streamTitle}"
+              The output with the id {notification.details.outputId} in stream &quot;{notification.details.streamTitle}&quot;
               (id: {notification.details.streamId}) has been disabled for {notification.details.faultPenaltySeconds}
               seconds because there were {notification.details.faultCount} failures.
               (Node: <em>{notification.node_id}</em>, Fault threshold: <em>{notification.details.faultCountThreshold}</em>)
             </span>
           ),
         };
+
       case 'output_failing':
         return {
           title: 'Output failing',
           description: (
             <span>
-              The output "{notification.details.outputTitle}" (id: {notification.details.outputId})
-              in stream "{notification.details.streamTitle}" (id: {notification.details.streamId})
+              The output &quot;{notification.details.outputTitle}&quot; (id: {notification.details.outputId})
+              in stream &quot;{notification.details.streamTitle}&quot; (id: {notification.details.streamId})
               is unable to send messages to the configured destination.
               <br />
               The error message from the output is: <em>{notification.details.errorMessage}</em>
             </span>
           ),
         };
+
       case 'stream_processing_disabled':
         return {
           title: 'Processing of a stream has been disabled due to excessive processing time.',
@@ -267,6 +287,7 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'es_node_disk_watermark_low':
         return {
           title: 'Elasticsearch nodes disk usage above low watermark',
@@ -280,6 +301,7 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'es_node_disk_watermark_high':
         return {
           title: 'Elasticsearch nodes disk usage above high watermark',
@@ -293,6 +315,7 @@ class NotificationsFactory {
             </span>
           ),
         };
+
       case 'es_node_disk_watermark_flood_stage':
         return {
           title: 'Elasticsearch nodes disk usage above flood stage watermark',
@@ -306,7 +329,8 @@ class NotificationsFactory {
             </span>
           ),
         };
-      case 'es_version_mismatch':
+
+      case 'es_version_mismatch': {
         const { initial_version: initialVersion, current_version: currentVersion } = notification.details;
 
         return {
@@ -325,7 +349,9 @@ class NotificationsFactory {
             </span>
           ),
         };
-      case 'legacy_ldap_config_migration':
+      }
+
+      case 'legacy_ldap_config_migration': {
         const { auth_service_id: authServiceId } = notification.details;
         const authServiceLink = <Link to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(authServiceId)}>Authentication Service</Link>;
 
@@ -348,6 +374,26 @@ class NotificationsFactory {
             </span>
           ),
         };
+      }
+
+      case 'archiving_summary':
+        return {
+          title: 'The following indices could not be archived yet',
+          description: (
+            <span>
+              There was an error while archiving some indices. Graylog will continue trying to archive those
+              indices and will retain all indices until they are successfully archived.
+              <br />
+              Please check the following error messages as your assistance may be necessary to resolve the issue:
+              <br />
+              <ul>
+                {/* eslint-disable-next-line react/no-array-index-key */}
+                {notification.details.archiveErrors.map((error, idx) => <li key={idx}>{error}</li>)}
+              </ul>
+            </span>
+          ),
+        };
+
       default:
         return { title: `unknown (${notification.type})`, description: 'unknown' };
     }
