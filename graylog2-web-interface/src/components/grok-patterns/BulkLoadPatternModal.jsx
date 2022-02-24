@@ -57,6 +57,8 @@ class BulkLoadPatternModal extends React.Component {
 
   _onImportStrategyChange = (event) => this.setState({ importStrategy: event.target.value });
 
+  _resetImportStrategy = () => this.setState({ importStrategy: 'ABORT_ON_CONFLICT' });
+
   render() {
     return (
       <span>
@@ -65,6 +67,7 @@ class BulkLoadPatternModal extends React.Component {
         <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                             title="Import Grok patterns from file"
                             submitButtonText="Upload"
+                            onModalClose={this._resetImportStrategy}
                             formProps={{ onSubmit: this._onSubmit }}>
           <Input id="pattern-file"
                  type="file"
