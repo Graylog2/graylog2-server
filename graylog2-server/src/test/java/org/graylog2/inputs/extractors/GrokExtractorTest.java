@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.grok.GrokPatternService.ImportStrategy.DROP_ALL_EXISTING;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -224,7 +225,7 @@ public class GrokExtractorTest {
         final EventBus clusterBus = new EventBus();
         final GrokPatternService grokPatternService = new InMemoryGrokPatternService(clusterEventBus);
         try {
-            grokPatternService.saveAll(patternSet, true);
+            grokPatternService.saveAll(patternSet, DROP_ALL_EXISTING);
         } catch (Exception e) {
             fail("Could not save grok patter: " + e.getMessage());
         }

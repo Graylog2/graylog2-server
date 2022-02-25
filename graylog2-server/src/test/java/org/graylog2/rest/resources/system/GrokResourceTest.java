@@ -94,7 +94,7 @@ public class GrokResourceTest {
         final ByteArrayInputStream inputStream = new ByteArrayInputStream(patterns.getBytes(StandardCharsets.UTF_8));
         final GrokPattern expectedPattern = GrokPattern.create("TEST_PATTERN_0", "Foo");
 
-        final Response response = grokResource.bulkUpdatePatternsFromTextFile(inputStream, true);
+        final Response response = grokResource.bulkUpdatePatternsFromTextFile(inputStream, true, null);
 
         assertThat(response.getStatusInfo()).isEqualTo(Response.Status.ACCEPTED);
         assertThat(response.hasEntity()).isFalse();
@@ -112,7 +112,7 @@ public class GrokResourceTest {
         final ByteArrayInputStream inputStream = new ByteArrayInputStream(patterns.getBytes(StandardCharsets.UTF_8));
         final GrokPattern expectedPattern = GrokPattern.create("TEST_PATTERN_0", "Foo");
 
-        final Response response = grokResource.bulkUpdatePatternsFromTextFile(inputStream, true);
+        final Response response = grokResource.bulkUpdatePatternsFromTextFile(inputStream, true, null);
 
         assertThat(response.getStatusInfo()).isEqualTo(Response.Status.ACCEPTED);
         assertThat(response.hasEntity()).isFalse();
@@ -130,7 +130,7 @@ public class GrokResourceTest {
         final ByteArrayInputStream inputStream = new ByteArrayInputStream(patterns.getBytes(StandardCharsets.UTF_8));
         final GrokPattern expectedPattern = GrokPattern.create("TEST_PATTERN_0", "Foo");
 
-        final Response response = grokResource.bulkUpdatePatternsFromTextFile(inputStream, true);
+        final Response response = grokResource.bulkUpdatePatternsFromTextFile(inputStream, true, null);
 
         assertThat(response.getStatusInfo()).isEqualTo(Response.Status.ACCEPTED);
         assertThat(response.hasEntity()).isFalse();
@@ -150,7 +150,7 @@ public class GrokResourceTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Invalid pattern. Did not save any patterns");
 
-        grokResource.bulkUpdatePatternsFromTextFile(inputStream, true);
+        grokResource.bulkUpdatePatternsFromTextFile(inputStream, true, null);
     }
 
     @Test
@@ -158,7 +158,7 @@ public class GrokResourceTest {
         final String patterns = "# Comment\nHAHAHAHA_THIS_IS_NO_GROK_PATTERN!$%§";
         final ByteArrayInputStream inputStream = new ByteArrayInputStream(patterns.getBytes(StandardCharsets.UTF_8));
 
-        final Response response = grokResource.bulkUpdatePatternsFromTextFile(inputStream, true);
+        final Response response = grokResource.bulkUpdatePatternsFromTextFile(inputStream, true, null);
 
         assertThat(response.getStatusInfo()).isEqualTo(Response.Status.ACCEPTED);
         assertThat(response.hasEntity()).isFalse();
