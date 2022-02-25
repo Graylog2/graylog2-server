@@ -23,6 +23,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.UncheckedExecutionException;
@@ -35,6 +36,8 @@ import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.streams.OutputService;
+import org.graylog2.streams.StreamService;
+import org.graylog2.streams.events.StreamsChangedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +51,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Singleton
 public class OutputRegistry {
@@ -60,6 +64,7 @@ public class OutputRegistry {
     private final NodeId nodeId;
     private final MessageOutputFactory messageOutputFactory;
     private final LoadingCache<String, AtomicInteger> faultCounters;
+    private final StreamService streamService;
     private final long faultCountThreshold;
     private final long faultPenaltySeconds;
 
@@ -69,13 +74,16 @@ public class OutputRegistry {
                           MessageOutputFactory messageOutputFactory,
                           NotificationService notificationService,
                           NodeId nodeId,
-                          EventBus eventBus, @Named("output_fault_count_threshold") long faultCountThreshold,
+                          EventBus eventBus,
+                          StreamService streamService,
+                          @Named("output_fault_count_threshold") long faultCountThreshold,
                           @Named("output_fault_penalty_seconds") long faultPenaltySeconds) {
         this.defaultMessageOutput = defaultMessageOutput;
         this.outputService = outputService;
         this.notificationService = notificationService;
         this.nodeId = nodeId;
         this.messageOutputFactory = messageOutputFactory;
+        this.streamService = streamService;
         this.runningMessageOutputs = CacheBuilder.newBuilder().build();
         this.faultCountThreshold = faultCountThreshold;
         this.faultPenaltySeconds = faultPenaltySeconds;
@@ -99,6 +107,20 @@ public class OutputRegistry {
     @Subscribe
     public void handleOutputChanged(OutputChangedEvent outputChangedEvent) {
         removeOutput(outputChangedEvent.outputId());
+    }
+
+    /**
+     * Whenever a stream changes, this could mean that an output was removed from it. Checks which outputs
+     * are currently assigned to any streams and removes those from the registry which are not expected to be
+     * running.
+     */
+    @Subscribe
+    public void handleStreamChangedEvent(StreamsChangedEvent ignored) {
+        final Set<String> expectedRunningOutputs = streamService.loadAllEnabled().stream()
+                .flatMap(stream -> stream.getOutputs().stream()).map(Output::getId).collect(Collectors.toSet());
+        final Set<String> currentlyRunningOutputs = runningMessageOutputs.asMap().keySet();
+
+        Sets.difference(currentlyRunningOutputs, expectedRunningOutputs).forEach(this::removeOutput);
     }
 
     @Nullable

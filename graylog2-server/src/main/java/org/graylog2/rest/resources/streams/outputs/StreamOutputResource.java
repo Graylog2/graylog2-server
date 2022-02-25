@@ -89,7 +89,7 @@ public class StreamOutputResource extends RestResource {
         final Stream stream = streamService.load(streamid);
         final Set<OutputSummary> outputs = new HashSet<>();
 
-        for (Output output : stream.getOutputs())
+        for (Output output : stream.getOutputs()) {
             outputs.add(OutputSummary.create(
                     output.getId(),
                     output.getTitle(),
@@ -99,6 +99,7 @@ public class StreamOutputResource extends RestResource {
                     new HashMap<>(output.getConfiguration()),
                     output.getContentPack()
             ));
+        }
 
         return OutputListResponse.create(outputs);
     }
@@ -178,7 +179,6 @@ public class StreamOutputResource extends RestResource {
         final Output output = outputService.load(outputId);
 
         streamService.removeOutput(stream, output);
-        outputRegistry.removeOutput(output);
     }
 
     private void checkNotEditable(String streamId, String message) {
