@@ -17,7 +17,6 @@
 
 import React, { useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
-import { merge } from 'lodash';
 
 import connect from 'stores/connect';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -62,6 +61,13 @@ const yLegendPosition = (containerHeight: number) => {
   return -0.14;
 };
 
+type Layout = {
+  yaxis: { fixedrange?: boolean },
+  legend?: { y?: number },
+  showlegend: boolean,
+  hovermode: 'x',
+};
+
 const XYPlot = ({
   config,
   chartData,
@@ -74,18 +80,18 @@ const XYPlot = ({
   onZoom = OnZoom,
 }: Props) => {
   const { formatTime } = useContext(UserDateTimeContext);
-  const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',g' };
-  const defaultLayout: {
-    yaxis: { fixedrange?: boolean },
-    legend?: { y?: number },
-    showlegend: boolean,
-  } = { yaxis, showlegend: false };
+  const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r' };
+  const defaultLayout: Layout = {
+    yaxis,
+    showlegend: false,
+    hovermode: 'x',
+  };
 
   if (height) {
     defaultLayout.legend = { y: yLegendPosition(height) };
   }
 
-  const layout = merge({}, defaultLayout, plotLayout);
+  const layout = { ...defaultLayout, ...plotLayout };
   const viewType = useContext(ViewTypeContext);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(config.isTimeline
