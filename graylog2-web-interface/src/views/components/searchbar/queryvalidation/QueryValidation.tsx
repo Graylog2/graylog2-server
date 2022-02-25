@@ -97,15 +97,10 @@ const shakeAnimation = keyframes`
   }
 `;
 
-const StyledPopover = styled(Popover)(({ $shaking }) => {
-  if ($shaking) {
-    return css`
-      animation: ${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-    `;
-  }
-
-  return '';
-});
+const StyledPopover = styled(Popover)(({ $shaking }) => css`
+  z-index: 2;
+  animation: ${$shaking ? css`${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both` : 'none'};
+`);
 
 const ExplanationTitle = ({ title }: { title: string }) => (
   <Title>
