@@ -44,7 +44,7 @@ describe('CopyToDashboardForm', () => {
   const view2 = View.builder().type(View.Type.Dashboard).id('view-2').title('view 2')
     .search(Search.create())
     .build();
-  const dashboardList = [view1.toJSON(), view2.toJSON()];
+  const dashboardList = [view1, view2];
   const dashboardState: DashboardsStoreState = {
     list: dashboardList,
     pagination: {

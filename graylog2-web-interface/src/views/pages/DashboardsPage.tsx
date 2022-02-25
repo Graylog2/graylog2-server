@@ -24,7 +24,7 @@ import { DocumentTitle, PageHeader, IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import ViewList from 'views/components/views/ViewList';
+import DashboardList from 'views/components/views/DashboardList';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import useDashboards from 'views/logic/dashboards/useDashboards';
 import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
@@ -34,7 +34,7 @@ import type View from '../logic/views/View';
 // eslint-disable-next-line no-alert
 const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
 
-const handleViewDelete = async (view: View) => {
+const handleDashboardDelete = async (view: View) => {
   const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingDashboard');
 
   const result = await iterateConfirmationHooks([...pluginDashboardDeletionHooks, defaultDashboardDeletionHook], view);
@@ -79,10 +79,10 @@ const DashboardsPage = () => {
 
         <Row className="content">
           <Col md={12}>
-            <ViewList views={list}
-                      pagination={pagination}
-                      handleSearch={handleSearch}
-                      handleViewDelete={handleViewDelete} />
+            <DashboardList dashboards={list}
+                           pagination={pagination}
+                           handleSearch={handleSearch}
+                           handleDashboardDelete={handleDashboardDelete} />
           </Col>
         </Row>
       </span>

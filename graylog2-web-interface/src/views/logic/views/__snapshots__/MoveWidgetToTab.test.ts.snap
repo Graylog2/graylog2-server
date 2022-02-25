@@ -2,7 +2,7 @@
 
 exports[`MoveWidgetToTab should copy a Widget to a dashboard 1`] = `
 Object {
-  "created_at": "2020-05-27T12:32:49.786Z",
+  "created_at": 2020-05-27T12:32:49.786Z,
   "description": "move widget to tab",
   "id": "5ece5e1b74ff709b0b0dc69b",
   "owner": "admin",
@@ -118,7 +118,7 @@ Object {
 
 exports[`MoveWidgetToTab should move a Widget to a dashboard 1`] = `
 Object {
-  "created_at": "2020-05-27T12:32:49.786Z",
+  "created_at": 2020-05-27T12:32:49.786Z,
   "description": "move widget to tab",
   "id": "5ece5e1b74ff709b0b0dc69b",
   "owner": "admin",
@@ -196,7 +196,7 @@ Object {
 
 exports[`MoveWidgetToTab should provide a default position in case the widgets position cannot be found 1`] = `
 Object {
-  "created_at": "2020-05-27T12:32:49.786Z",
+  "created_at": 2020-05-27T12:32:49.786Z,
   "description": "move widget to tab",
   "id": "5ece5e1b74ff709b0b0dc69b",
   "owner": "admin",
@@ -274,7 +274,7 @@ Object {
 
 exports[`MoveWidgetToTab should work when titles are empty 1`] = `
 Object {
-  "created_at": "2020-05-27T12:32:49.786Z",
+  "created_at": 2020-05-27T12:32:49.786Z,
   "description": "move widget to tab",
   "id": "5ece5e1b74ff709b0b0dc69b",
   "owner": "admin",

@@ -78,7 +78,7 @@ describe('ShowViewPage', () => {
     properties: List<any>(),
     state: {},
     dashboard_state: { widgets: [], positions: [] },
-    created_at: new Date(),
+    created_at: '2022-01-01 00:00:00',
     owner: 'admin',
     requires: {},
   } as ViewJson;
@@ -96,7 +96,9 @@ describe('ShowViewPage', () => {
   });
 
   it('renders Spinner while loading', async () => {
-    const mockGet = () => new Promise<ViewJson>((resolve) => setTimeout(resolve, 30000, viewJson));
+    const mockGet = () => new Promise<ViewJson>((resolve) => {
+      setTimeout(resolve, 30000, viewJson);
+    });
 
     asMock(ViewManagementActions.get).mockImplementation(mockAction(mockGet));
 
@@ -123,7 +125,9 @@ describe('ShowViewPage', () => {
 
     await waitFor(() => {
       expect(ErrorsActions.report).toHaveBeenCalledTimes(1);
+    });
 
+    await waitFor(() => {
       expect(ErrorsActions.report).toHaveBeenCalledWith({
         error,
         type: NotFoundErrorType,
