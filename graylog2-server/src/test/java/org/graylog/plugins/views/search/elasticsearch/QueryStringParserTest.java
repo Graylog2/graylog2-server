@@ -33,6 +33,11 @@ public class QueryStringParserTest {
     }
 
     @Test
+    void testRepeatedParamUsage() {
+        assertThat(parse("foo:$bar$ AND lorem:$bar")).containsExactly("bar");
+    }
+
+    @Test
     void testStringsContainingDollars() {
         assertThat(parse("foo:bar$")).isEmpty();
         assertThat(parse("foo:bar$ OR foo:$baz")).isEmpty();
