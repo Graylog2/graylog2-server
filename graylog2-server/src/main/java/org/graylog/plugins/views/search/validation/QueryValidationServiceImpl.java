@@ -22,7 +22,6 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.errors.UnboundParameterError;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
@@ -44,14 +43,12 @@ public class QueryValidationServiceImpl implements QueryValidationService {
     private final LuceneQueryParser luceneQueryParser;
     private final MappedFieldTypesService mappedFieldTypesService;
     private final QueryStringDecorators queryStringDecorators;
-    private final QueryStringParser queryStringParser;
 
     @Inject
-    public QueryValidationServiceImpl(LuceneQueryParser luceneQueryParser, MappedFieldTypesService mappedFieldTypesService, QueryStringDecorators queryStringDecorators, QueryStringParser queryStringParser) {
+    public QueryValidationServiceImpl(LuceneQueryParser luceneQueryParser, MappedFieldTypesService mappedFieldTypesService, QueryStringDecorators queryStringDecorators) {
         this.luceneQueryParser = luceneQueryParser;
         this.mappedFieldTypesService = mappedFieldTypesService;
         this.queryStringDecorators = queryStringDecorators;
-        this.queryStringParser = queryStringParser;
     }
 
     @Override

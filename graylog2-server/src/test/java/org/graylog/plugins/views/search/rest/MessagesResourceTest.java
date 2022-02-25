@@ -81,8 +81,7 @@ public class MessagesResourceTest {
         final QueryValidationServiceImpl validationService = new QueryValidationServiceImpl(
                 new LuceneQueryParser(),
                 (streamIds, timeRange) -> Collections.emptySet(),
-                new QueryStringDecorators(Collections.emptySet()),
-                new QueryStringParser());
+                new QueryStringDecorators(Collections.emptySet()));
 
         sut = new MessagesTestResource(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, mock(ObjectMapper.class), eventBus, validationService);
 
