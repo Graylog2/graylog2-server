@@ -519,6 +519,6 @@ public abstract class Graylog2Module extends AbstractModule {
 
     protected void installViewResolver(String name,
                                        Class<? extends ViewResolver> resolverClass) {
-        viewResolverBinder().addBinding(name).to(resolverClass);
+        viewResolverBinder().addBinding(name).to(resolverClass).asEagerSingleton();
     }
 }

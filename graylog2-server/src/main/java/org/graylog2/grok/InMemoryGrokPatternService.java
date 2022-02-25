@@ -39,6 +39,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
+import static org.graylog2.grok.GrokPatternService.ImportStrategy.ABORT_ON_CONFLICT;
+import static org.graylog2.grok.GrokPatternService.ImportStrategy.DROP_ALL_EXISTING;
+
 public class InMemoryGrokPatternService implements GrokPatternService {
     // poor man's id generator
     private final AtomicLong idGen = new AtomicLong(0);
@@ -124,7 +127,17 @@ public class InMemoryGrokPatternService implements GrokPatternService {
 
     @Override
     public List<GrokPattern> saveAll(Collection<GrokPattern> patterns,
-                                     boolean replace) throws ValidationException {
+                                     ImportStrategy importStrategy) throws ValidationException {
+
+        if (importStrategy == ABORT_ON_CONFLICT) {
+            for (GrokPattern pattern : loadAll()) {
+                final boolean patternExists = patterns.stream().anyMatch(p -> p.name().equals(pattern.name()));
+                if (patternExists) {
+                    throw new ValidationException("Grok pattern " + pattern.name() + " already exists");
+                }
+            }
+        }
+
         try {
             if (!validateAll(patterns)) {
                 throw new ValidationException("Patterns invalid.");
@@ -133,7 +146,7 @@ public class InMemoryGrokPatternService implements GrokPatternService {
             throw new ValidationException("Invalid patterns.\n" + e.getMessage());
         }
 
-        if (replace) {
+        if (importStrategy == DROP_ALL_EXISTING) {
             deleteAll();
         }
 

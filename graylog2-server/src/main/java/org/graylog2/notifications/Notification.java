@@ -71,7 +71,8 @@ public interface Notification extends Persisted {
         ES_VERSION_MISMATCH,
         LEGACY_LDAP_CONFIG_MIGRATION,
         MULTI_LEADER,
-        NO_LEADER
+        NO_LEADER,
+        ARCHIVING_SUMMARY
     }
 
     enum Severity {
