@@ -55,7 +55,6 @@ public class QueryParser {
         return queryStringStreams
                 .map(queryStringParser::parse)
                 .reduce(QueryMetadata.builder().build(), (meta1, meta2) -> QueryMetadata.builder().usedParameters(
-                        // TODO: this would create duplicated items!
                         Sets.union(meta1.usedParameters(), meta2.usedParameters())
                 ).build());
     }

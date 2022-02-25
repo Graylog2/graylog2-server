@@ -99,10 +99,10 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                                         .map(
                                                 p -> ValidationMessage.builder(ValidationType.UNDECLARED_PARAMETER)
                                                         .errorMessage(errorMessage)
-                                                        .beginLine(p.getLine())
-                                                        .endLine(p.getLine())
-                                                        .beginColumn(p.getBeginColumn())
-                                                        .endColumn(p.getEndColumn())
+                                                        .beginLine(p.line())
+                                                        .endLine(p.line())
+                                                        .beginColumn(p.beginColumn())
+                                                        .endColumn(p.endColumn())
                                                         .relatedProperty(param.name())
                                                         .build()
                                         );

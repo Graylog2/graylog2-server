@@ -22,10 +22,14 @@ import com.google.common.collect.Sets;
 import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.validation.SubstringMultilinePosition;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class QueryStringParser {
     private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$([a-zA-Z_]\\w*)\\$");
@@ -34,22 +38,28 @@ public class QueryStringParser {
         if (Strings.isNullOrEmpty(queryString)) {
             return QueryMetadata.empty();
         }
-        final Matcher matcher = PLACEHOLDER_PATTERN.matcher(queryString);
 
-        Set<String> paramNames = Sets.newHashSet();
-        Set<QueryParam> params = Sets.newHashSet();
+        Map<String, List<SubstringMultilinePosition>> positions = new LinkedHashMap<>();
 
-        while (matcher.find()) {
-            final String name = matcher.group(1);
-            if (!paramNames.contains(name)) { // skip already processed params
-                paramNames.add(name);
-                final List<SubstringMultilinePosition> paramPositions = SubstringMultilinePosition.compute(queryString, "$" + name + "$");
-                params.add(QueryParam.create(name, paramPositions));
+        final String[] lines = queryString.split("\n");
+
+        for (int line = 0; line < lines.length; line++) {
+            final String currentLine = lines[line];
+            final Matcher matcher = PLACEHOLDER_PATTERN.matcher(currentLine);
+            while (matcher.find()) {
+                final String name = matcher.group(1);
+                if (!positions.containsKey(name)) {
+                    positions.put(name, new ArrayList<>());
+                }
+                positions.get(name).add(SubstringMultilinePosition.create(line + 1, matcher.start(), matcher.end()));
             }
         }
+        final ImmutableSet<QueryParam> params = positions.entrySet().stream()
+                .map(entry -> QueryParam.create(entry.getKey(), entry.getValue()))
+                .collect(ImmutableSet.toImmutableSet());
 
         return QueryMetadata.builder()
-                .usedParameters(ImmutableSet.copyOf(params))
+                .usedParameters(params)
                 .build();
     }
 }
