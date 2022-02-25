@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import uuid from 'uuid/v4';
 
 import type { QueryId } from 'views/logic/queries/Query';
 import type { WidgetId } from 'views/logic/views/types';
@@ -75,7 +74,7 @@ const _setWidgetTitle = (titlesMap: TitlesMap, widgetID: WidgetId, newTitle: str
 
 const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View, widgetTitle: string | undefined | null, oldPosition: WidgetPosition): View => {
   const viewState = dashboard.state.get(targetQueryId);
-  const newWidget = widget.toBuilder().id(uuid()).build();
+  const newWidget = widget?.id ? widget : widget.toBuilder().newId().build();
   const newWidgets = viewState.widgets.push(newWidget);
   const { widgetPositions } = viewState;
   const widgetPositionsMap = oldPosition ? {
