@@ -17,6 +17,7 @@
 package org.graylog2.outputs;
 
 import com.google.common.collect.Iterables;
+import com.google.common.eventbus.EventBus;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.outputs.MessageOutput;
@@ -56,10 +57,12 @@ public class OutputRegistryTest {
     private Output output;
     @Mock
     private OutputService outputService;
+    @Mock
+    private EventBus eventBus;
 
     @Test
     public void testMessageOutputsIncludesDefault() {
-        OutputRegistry registry = new OutputRegistry(messageOutput, null, null, null, null, FAULT_COUNT_THRESHOLD, FAULT_PENALTY_SECONDS);
+        OutputRegistry registry = new OutputRegistry(messageOutput, null, null, null, null, eventBus, FAULT_COUNT_THRESHOLD, FAULT_PENALTY_SECONDS);
 
         Set<MessageOutput> outputs = registry.getMessageOutputs();
         assertSame("we should only have the default MessageOutput", Iterables.getOnlyElement(outputs, null), messageOutput);
@@ -67,7 +70,7 @@ public class OutputRegistryTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testThrowExceptionForUnknownOutputType() throws MessageOutputConfigurationException {
-        OutputRegistry registry = new OutputRegistry(null, null, messageOutputFactory, null, null, FAULT_COUNT_THRESHOLD, FAULT_PENALTY_SECONDS);
+        OutputRegistry registry = new OutputRegistry(null, null, messageOutputFactory, null, null, eventBus, FAULT_COUNT_THRESHOLD, FAULT_PENALTY_SECONDS);
 
         registry.launchOutput(output, null);
     }
@@ -79,7 +82,7 @@ public class OutputRegistryTest {
         when(messageOutputFactory.fromStreamOutput(eq(output), eq(stream), any(Configuration.class))).thenReturn(messageOutput);
         when(outputService.load(eq(outputId))).thenReturn(output);
 
-        final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, messageOutputFactory, null, null, FAULT_COUNT_THRESHOLD, FAULT_PENALTY_SECONDS);
+        final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, messageOutputFactory, null, null, eventBus, FAULT_COUNT_THRESHOLD, FAULT_PENALTY_SECONDS);
         assertEquals(0, outputRegistry.getRunningMessageOutputs().size());
 
         MessageOutput result = outputRegistry.getOutputForIdAndStream(outputId, stream);
@@ -95,7 +98,7 @@ public class OutputRegistryTest {
         final Stream stream = mock(Stream.class);
         when(outputService.load(eq(outputId))).thenThrow(NotFoundException.class);
 
-        final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, null, null, null, FAULT_COUNT_THRESHOLD, FAULT_PENALTY_SECONDS);
+        final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, null, null, null, eventBus, FAULT_COUNT_THRESHOLD, FAULT_PENALTY_SECONDS);
 
         MessageOutput messageOutput = outputRegistry.getOutputForIdAndStream(outputId, stream);
 
@@ -110,7 +113,7 @@ public class OutputRegistryTest {
         when(messageOutputFactory.fromStreamOutput(eq(output), any(Stream.class), any(Configuration.class))).thenThrow(new MessageOutputConfigurationException());
         when(outputService.load(eq(outputId))).thenReturn(output);
 
-        final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, messageOutputFactory, null, null, FAULT_COUNT_THRESHOLD, FAULT_PENALTY_SECONDS);
+        final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, messageOutputFactory, null, null, eventBus, FAULT_COUNT_THRESHOLD, FAULT_PENALTY_SECONDS);
         assertEquals(0, outputRegistry.getRunningMessageOutputs().size());
 
         MessageOutput result = outputRegistry.getOutputForIdAndStream(outputId, stream);

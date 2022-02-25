@@ -23,6 +23,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.notifications.Notification;
@@ -67,7 +69,7 @@ public class OutputRegistry {
                           MessageOutputFactory messageOutputFactory,
                           NotificationService notificationService,
                           NodeId nodeId,
-                          @Named("output_fault_count_threshold") long faultCountThreshold,
+                          EventBus eventBus, @Named("output_fault_count_threshold") long faultCountThreshold,
                           @Named("output_fault_penalty_seconds") long faultPenaltySeconds) {
         this.defaultMessageOutput = defaultMessageOutput;
         this.outputService = outputService;
@@ -85,6 +87,18 @@ public class OutputRegistry {
                         return new AtomicInteger(0);
                     }
                 });
+
+        eventBus.register(this);
+    }
+
+    /**
+     * Stops the output and removes it from the registry.
+     * It will be restarted automatically by the {@link OutputRouter}
+     * via {@link #getOutputForIdAndStream(String, Stream)}
+     */
+    @Subscribe
+    public void handleOutputChanged(OutputChangedEvent outputChangedEvent) {
+        removeOutput(outputChangedEvent.outputId());
     }
 
     @Nullable
@@ -163,12 +177,16 @@ public class OutputRegistry {
     }
 
     public void removeOutput(Output output) {
-        final MessageOutput messageOutput = runningMessageOutputs.getIfPresent(output.getId());
+        removeOutput(output.getId());
+    }
+
+    private void removeOutput(String outputId) {
+        final MessageOutput messageOutput = runningMessageOutputs.getIfPresent(outputId);
         if (messageOutput != null) {
             messageOutput.stop();
         }
 
-        runningMessageOutputs.invalidate(output.getId());
-        faultCounters.invalidate(output.getId());
+        runningMessageOutputs.invalidate(outputId);
+        faultCounters.invalidate(outputId);
     }
 }

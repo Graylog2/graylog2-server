@@ -86,7 +86,7 @@ public class OutputFacadeTest {
 
     @Before
     public void setUp() throws Exception {
-        outputService = new OutputServiceImpl(mongodb.mongoConnection(), new MongoJackObjectMapperProvider(objectMapper), streamService, outputRegistry);
+        outputService = new OutputServiceImpl(mongodb.mongoConnection(), new MongoJackObjectMapperProvider(objectMapper), streamService, outputRegistry, null);
         pluginMetaData = new HashSet<>();
         outputFactories = new HashMap<>();
         outputFactories2 = new HashMap<>();

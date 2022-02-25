@@ -26,6 +26,8 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.outputs.OutputChangedEvent;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
@@ -47,17 +49,20 @@ public class OutputServiceImpl implements OutputService {
     private final DBCollection dbCollection;
     private final StreamService streamService;
     private final OutputRegistry outputRegistry;
+    private final ClusterEventBus clusterEventBus;
 
     @Inject
     public OutputServiceImpl(MongoConnection mongoConnection,
                              MongoJackObjectMapperProvider mapperProvider,
                              StreamService streamService,
-                             OutputRegistry outputRegistry) {
+                             OutputRegistry outputRegistry,
+                             ClusterEventBus clusterEventBus) {
         this.streamService = streamService;
         final String collectionName = OutputImpl.class.getAnnotation(CollectionName.class).value();
         this.dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
         this.coll = JacksonDBCollection.wrap(dbCollection, OutputImpl.class, String.class, mapperProvider.get());
         this.outputRegistry = outputRegistry;
+        this.clusterEventBus = clusterEventBus;
     }
 
     @Override
@@ -109,10 +114,16 @@ public class OutputServiceImpl implements OutputService {
     @Override
     public Output update(String id, Map<String, Object> deltas) {
         DBUpdate.Builder update = new DBUpdate.Builder();
-        for (Map.Entry<String, Object> fields : deltas.entrySet())
+        for (Map.Entry<String, Object> fields : deltas.entrySet()) {
             update = update.set(fields.getKey(), fields.getValue());
+        }
 
-        return coll.findAndModify(DBQuery.is(OutputImpl.FIELD_ID, id), null, null, false, update, true, false);
+        final OutputImpl updatedOutput =
+                coll.findAndModify(DBQuery.is(OutputImpl.FIELD_ID, id), null, null, false, update, true, false);
+
+        this.clusterEventBus.post(OutputChangedEvent.create(updatedOutput.getId()));
+
+        return updatedOutput;
     }
 
     @Override
