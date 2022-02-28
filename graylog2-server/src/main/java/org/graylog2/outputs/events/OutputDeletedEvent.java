@@ -14,19 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.outputs;
+package org.graylog2.outputs.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-public abstract class OutputChangedEvent {
+public abstract class OutputDeletedEvent {
     @JsonProperty("output_id")
     public abstract String outputId();
 
     @JsonCreator
-    public static OutputChangedEvent create(@JsonProperty("output_id") String outputId) {
-        return new AutoValue_OutputChangedEvent(outputId);
+    public static OutputDeletedEvent create(@JsonProperty("output_id") String outputId) {
+        return new AutoValue_OutputDeletedEvent(outputId);
     }
 }

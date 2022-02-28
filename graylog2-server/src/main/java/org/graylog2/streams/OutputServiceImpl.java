@@ -27,8 +27,8 @@ import org.graylog2.database.CollectionName;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.outputs.OutputChangedEvent;
-import org.graylog2.outputs.OutputRegistry;
+import org.graylog2.outputs.events.OutputChangedEvent;
+import org.graylog2.outputs.events.OutputDeletedEvent;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
@@ -48,20 +48,17 @@ public class OutputServiceImpl implements OutputService {
     private final JacksonDBCollection<OutputImpl, String> coll;
     private final DBCollection dbCollection;
     private final StreamService streamService;
-    private final OutputRegistry outputRegistry;
     private final ClusterEventBus clusterEventBus;
 
     @Inject
     public OutputServiceImpl(MongoConnection mongoConnection,
                              MongoJackObjectMapperProvider mapperProvider,
                              StreamService streamService,
-                             OutputRegistry outputRegistry,
                              ClusterEventBus clusterEventBus) {
         this.streamService = streamService;
         final String collectionName = OutputImpl.class.getAnnotation(CollectionName.class).value();
         this.dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
         this.coll = JacksonDBCollection.wrap(dbCollection, OutputImpl.class, String.class, mapperProvider.get());
-        this.outputRegistry = outputRegistry;
         this.clusterEventBus = clusterEventBus;
     }
 
@@ -107,8 +104,9 @@ public class OutputServiceImpl implements OutputService {
     @Override
     public void destroy(Output model) throws NotFoundException {
         coll.removeById(model.getId());
-        outputRegistry.removeOutput(model);
         streamService.removeOutputFromAllStreams(model);
+
+        this.clusterEventBus.post(OutputDeletedEvent.create(model.getId()));
     }
 
     @Override

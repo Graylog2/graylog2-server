@@ -30,6 +30,8 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.outputs.events.OutputChangedEvent;
+import org.graylog2.outputs.events.OutputDeletedEvent;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Output;
@@ -115,12 +117,21 @@ public class OutputRegistry {
      * running.
      */
     @Subscribe
-    public void handleStreamChangedEvent(StreamsChangedEvent ignored) {
+    public void handleStreamsChanged(StreamsChangedEvent streamsChangedEvent) {
+        if (streamsChangedEvent.streamIds().isEmpty()) {
+            return;
+        }
+
         final Set<String> expectedRunningOutputs = streamService.loadAllEnabled().stream()
                 .flatMap(stream -> stream.getOutputs().stream()).map(Output::getId).collect(Collectors.toSet());
         final Set<String> currentlyRunningOutputs = runningMessageOutputs.asMap().keySet();
 
         Sets.difference(currentlyRunningOutputs, expectedRunningOutputs).forEach(this::removeOutput);
+    }
+
+    @Subscribe
+    public void handleOutputDeleted(OutputDeletedEvent outputDeletedEvent) {
+        removeOutput(outputDeletedEvent.outputId());
     }
 
     @Nullable
