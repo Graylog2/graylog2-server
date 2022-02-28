@@ -161,7 +161,7 @@ class Output extends React.Component {
     const { streamId } = this.props;
     let deleteFromStreamButton;
 
-    if (streamId !== null && streamId !== undefined) {
+    if (streamId) {
       deleteFromStreamButton = (
         <IfPermitted permissions="stream_outputs:delete">
           {' '}
