@@ -17,6 +17,7 @@
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import * as Immutable from 'immutable';
+import { List as MockList } from 'immutable';
 
 import { ViewMetaData, ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { FieldTypeMappingsList, FieldTypesStore, FieldTypesStoreState } from 'views/stores/FieldTypesStore';
@@ -26,7 +27,7 @@ import FieldNameCompletion from './FieldNameCompletion';
 jest.mock('views/stores/FieldTypesStore', () => ({
   FieldTypesStore: MockStore(
     'listen',
-    ['getInitialState', jest.fn(() => ({ all: [], queryFields: { get: () => [] } }))],
+    ['getInitialState', jest.fn(() => ({ all: [], queryFields: { get: () => MockList() } }))],
   ),
 }));
 
@@ -39,8 +40,11 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
 const _createField = (name) => ({ name, type: { type: 'string' } });
 const dummyFields = ['source', 'message', 'timestamp'].map(_createField);
 
-const _createQueryFields = (fields) => ({ get: () => fields }) as unknown as Immutable.Map<string, FieldTypeMappingsList>;
-const _createFieldTypesStoreState = (fields): FieldTypesStoreState => ({ all: fields, queryFields: _createQueryFields(fields) });
+const _createQueryFields = (fields) => ({ get: () => Immutable.List(fields) }) as unknown as Immutable.Map<string, FieldTypeMappingsList>;
+const _createFieldTypesStoreState = (fields): FieldTypesStoreState => ({
+  all: fields,
+  queryFields: _createQueryFields(fields),
+});
 
 describe('FieldNameCompletion', () => {
   beforeEach(() => {
@@ -115,8 +119,8 @@ describe('FieldNameCompletion', () => {
 
     const queryFields = {
       get: (queryId, _default) => ({
-        query1: ['foo'].map(_createField),
-        query2: ['bar'].map(_createField),
+        query1: Immutable.List(['foo'].map(_createField)),
+        query2: Immutable.List(['bar'].map(_createField)),
       }[queryId] || _default),
     };
 
