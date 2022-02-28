@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.validation.ValidationMessage;
 import org.graylog.plugins.views.search.validation.ValidationRequest;
 import org.graylog.plugins.views.search.validation.ValidationResponse;
 import org.graylog.plugins.views.search.validation.ValidationStatus;
+import org.graylog.plugins.views.search.validation.ValidationType;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -54,12 +55,10 @@ import static java.util.Comparator.nullsLast;
 public class QueryValidationResource extends RestResource implements PluginRestResource {
 
     private final QueryValidationService queryValidationService;
-    private final PermittedStreams permittedStreams;
 
     @Inject
-    public QueryValidationResource(QueryValidationService queryValidationService, PermittedStreams permittedStreams) {
+    public QueryValidationResource(QueryValidationService queryValidationService) {
         this.queryValidationService = queryValidationService;
-        this.permittedStreams = permittedStreams;
     }
 
     @POST
@@ -113,7 +112,20 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     }
 
     private ValidationMessageDTO toExplanation(ValidationMessage message) {
-        return ValidationMessageDTO.create(message.beginLine(), message.beginColumn(), message.endLine(), message.endColumn(), message.errorType(), message.errorMessage());
+        final ValidationTypeDTO validationType = convert(message.validationType());
+        return ValidationMessageDTO.create(
+                validationType,
+                message.beginLine(),
+                message.beginColumn(),
+                message.endLine(),
+                message.endColumn(),
+                message.errorMessage(),
+                message.relatedProperty()
+        );
+    }
+
+    private ValidationTypeDTO convert(ValidationType validationType) {
+        return ValidationTypeDTO.from(validationType);
     }
 
     private RelativeRange defaultTimeRange() {

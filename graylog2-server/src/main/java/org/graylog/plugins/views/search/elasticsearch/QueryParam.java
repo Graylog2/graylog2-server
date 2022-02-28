@@ -14,22 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.validation;
+package org.graylog.plugins.views.search.elasticsearch;
 
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.search.validation.SubstringMultilinePosition;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @AutoValue
-public abstract class SubstringMultilinePosition {
-    public abstract int line();
+public abstract class QueryParam {
+    public abstract String name();
+    public abstract List<SubstringMultilinePosition> positions();
 
-    public abstract int beginColumn();
-
-    public abstract int endColumn();
-
-    public static SubstringMultilinePosition create(int line, int beginColumn, int endColumn) {
-        return new AutoValue_SubstringMultilinePosition(line, beginColumn, endColumn);
+    public static QueryParam create(final String name, final List<SubstringMultilinePosition> positions) {
+        return new AutoValue_QueryParam(name, positions);
     }
 }

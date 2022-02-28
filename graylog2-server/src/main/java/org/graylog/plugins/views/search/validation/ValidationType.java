@@ -16,20 +16,9 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import com.google.auto.value.AutoValue;
-
-import java.util.ArrayList;
-import java.util.List;
-
-@AutoValue
-public abstract class SubstringMultilinePosition {
-    public abstract int line();
-
-    public abstract int beginColumn();
-
-    public abstract int endColumn();
-
-    public static SubstringMultilinePosition create(int line, int beginColumn, int endColumn) {
-        return new AutoValue_SubstringMultilinePosition(line, beginColumn, endColumn);
-    }
+public enum ValidationType {
+    UNDECLARED_PARAMETER,
+    QUERY_PARSING_ERROR,
+    UNKNOWN_FIELD,
+    INVALID_OPERATOR,
 }

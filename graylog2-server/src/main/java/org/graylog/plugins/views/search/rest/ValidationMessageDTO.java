@@ -27,6 +27,9 @@ import javax.annotation.Nullable;
 public abstract class ValidationMessageDTO {
 
     @JsonProperty
+    public abstract ValidationTypeDTO errorType();
+
+    @JsonProperty
     @Nullable
     public abstract Integer beginLine();
 
@@ -43,16 +46,19 @@ public abstract class ValidationMessageDTO {
     @Nullable
     public abstract Integer endColumn();
 
-
     @JsonProperty
     @Nullable
-    public abstract String errorType();
+    public abstract String errorTitle();
 
     @JsonProperty
     public abstract String errorMessage();
 
+    @Nullable
+    @JsonProperty
+    public abstract String relatedProperty();
 
-    public static ValidationMessageDTO create(Integer beginLine, Integer beginColumn, Integer endLine, Integer endColumn, String errorType, String errorMessage) {
-        return new AutoValue_ValidationMessageDTO(beginLine, beginColumn, endLine, endColumn, errorType, errorMessage);
+
+    public static ValidationMessageDTO create(ValidationTypeDTO validationType, Integer beginLine, Integer beginColumn, Integer endLine, Integer endColumn, String errorMessage, String relatedProperty) {
+        return new AutoValue_ValidationMessageDTO(validationType, beginLine, beginColumn, endLine, endColumn, validationType.errorTitle(), errorMessage, relatedProperty);
     }
 }
