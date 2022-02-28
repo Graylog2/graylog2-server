@@ -35,6 +35,7 @@ import org.graylog2.contentpacks.model.entities.OutputEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.outputs.LoggingOutput;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.outputs.MessageOutput;
@@ -83,7 +84,7 @@ public class OutputFacadeTest {
 
     @Before
     public void setUp() throws Exception {
-        outputService = new OutputServiceImpl(mongodb.mongoConnection(), new MongoJackObjectMapperProvider(objectMapper), streamService, null);
+        outputService = new OutputServiceImpl(mongodb.mongoConnection(), new MongoJackObjectMapperProvider(objectMapper), streamService, new ClusterEventBus());
         pluginMetaData = new HashSet<>();
         outputFactories = new HashMap<>();
         outputFactories2 = new HashMap<>();
