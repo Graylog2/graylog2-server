@@ -18,14 +18,9 @@ import React from 'react';
 import { mount, shallow } from 'wrappedEnzyme';
 
 import 'helpers/mocking/react-dom_mock';
-import * as URLUtils from 'util/URLUtils';
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 
 describe('<ContentPacksList />', () => {
-  // TODO: Should be replaced with call to `jest.mock` instead.
-  // eslint-disable-next-line import/no-named-as-default-member
-  URLUtils.areCredentialsInURLSupported = jest.fn(() => { return false; });
-
   const contentPacks = [
     { id: '1', rev: 1, title: 'UFW Grok Patterns', summary: 'Grok Patterns to extract informations from UFW logfiles', version: '1.0' },
     { id: '2', rev: 1, title: 'Rails Log Patterns', summary: 'Patterns to retreive rails production logs', version: '2.1' },

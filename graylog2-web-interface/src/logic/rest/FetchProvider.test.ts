@@ -27,7 +27,6 @@ const mockLogout = jest.fn();
 jest.mock('stores/sessions/SessionStore', () => ({
   SessionStore: {
     isLoggedIn: jest.fn(() => true),
-    getSessionId: jest.fn(() => 'foobar'),
   },
   SessionActions: {
     logout: mockLogout,
@@ -47,7 +46,7 @@ const setUpServer = () => {
   const app = express();
 
   app.use(formidableMiddleware());
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,no-console
   app.use((err, req, res, next) => console.error(err));
 
   app.get('/test1', (req, res) => {
@@ -141,7 +140,7 @@ describe('FetchProvider', () => {
     expect(error.name).toEqual('FetchError');
     expect(error.message).toEqual('There was an error fetching a resource: Unauthorized. Additional information: Not available');
 
-    expect(mockLogout).toHaveBeenCalledWith('foobar');
+    expect(mockLogout).toHaveBeenCalled();
   });
 
   it('supports uploading form data without content type', async () => {
