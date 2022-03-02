@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { ElasticsearchQueryString } from 'views/logic/queries/Query';
 import { Button } from 'components/bootstrap';
@@ -34,7 +34,7 @@ const Wrapper = styled.div`
   }
 `;
 
-const TimeRangeInfo = styled.div(({ theme }) => `
+const QueryInfo = styled.div(({ theme }) => css`
   margin-left: 10px;
   border: 1px dashed ${theme.colors.input.border};
   display: flex;
@@ -51,6 +51,12 @@ const TimeRangeInfo = styled.div(({ theme }) => `
   }
 `);
 
+const StyledQueryInput = styled(QueryInput)`
+  &&.ace-queryinput {
+    border: none;
+  }
+`;
+
 const ResetButton = styled(Button)`
   margin-left: 5px;
 `;
@@ -62,12 +68,18 @@ type Props = {
 
 const WidgetQueryOverride = ({ value, onReset }: Props) => (
   <Wrapper>
-    <TimeRangeInfo>
-      <QueryInput onChange={() => Promise.resolve('')} onExecute={() => {}} disabled value={value.query_string} />
+    <QueryInfo>
+      <StyledQueryInput onChange={() => Promise.resolve('')}
+                        onExecute={() => {}}
+                        disabled
+                        value={value.query_string}
+                        height={34}
+                        wrapEnabled={false}
+                        maxLines={1} />
       <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-query">
         Reset Global Filter
       </ResetButton>
-    </TimeRangeInfo>
+    </QueryInfo>
   </Wrapper>
 );
 

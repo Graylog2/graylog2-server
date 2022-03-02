@@ -18,12 +18,14 @@ import styled, { css } from 'styled-components';
 
 import AceEditor from './ace';
 
-const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
+const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme, $height }) => ({
   // NOTE: After setting the prop we need to swap them back so AceEditor uses the proper styles
   theme: aceTheme, /* stylelint-disable-line */
   $scTheme: theme,
-}))(({ $scTheme, disabled, value }) => css`
+  $height,
+}))(({ $scTheme, $height, disabled, value }) => css`
   &.ace-queryinput {
+    ${$height ? `height: ${$height}px !important` : ''};
     min-height: 34px;
     width: 100% !important;
     background-color: ${$scTheme.colors.input.background};
