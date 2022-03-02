@@ -136,6 +136,7 @@
     "@types/react-select": "^5.0.1",
     "@types/react-sticky-el": "^1.0.3",
     "@types/react-window": "^1.8.3",
+    "@types/styled-components": "^5.1.24",
     "@types/ua-parser-js": "^0.7.36",
     "@types/urijs": "^1.19.15",
     "assets-webpack-plugin": "^7.1.1",
