@@ -137,7 +137,8 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
     }
 
     protected boolean testAgainstRunningESMongoDB() {
-        return !isBlank(System.getenv("GRAYLOG_TEST_WITH_RUNNING_ES_AND_MONGODB"));
+        final String value = System.getenv("GRAYLOG_TEST_WITH_RUNNING_ES_AND_MONGODB");
+        return !isBlank(value) && Boolean.parseBoolean(value);
     }
 
     @Override
