@@ -19,6 +19,7 @@ import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Formik, Form, Field } from 'formik';
+import isNil from 'lodash/isNil';
 
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import { Input, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
@@ -46,7 +47,7 @@ type Props = {
   rule: HighlightingRule | null | undefined,
 };
 
-const _isRequired = (field) => (value) => {
+const _isRequired = (field) => (value: string) => {
   if (['', null, undefined].includes(value)) {
     return `${field} is required`;
   }
@@ -129,7 +130,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
             validateOnMount
             initialValues={{
               field: rule?.field,
-              value: rule?.value,
+              value: isNil(rule?.value) ? '' : String(rule?.value),
               condition: rule?.condition ?? 'equal',
               color: colorToObject(rule?.color),
             }}>

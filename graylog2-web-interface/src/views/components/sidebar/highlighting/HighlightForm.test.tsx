@@ -43,6 +43,13 @@ const rule = HighlightingRule.builder()
   .value('noob')
   .build();
 
+const ruleWithValueFalse = rule.toBuilder()
+  .value(false)
+  .build();
+const ruleWithValueZero = rule.toBuilder()
+  .value(0)
+  .build();
+
 describe('HighlightForm', () => {
   const fieldTypes: FieldTypes = {
     all: Immutable.List([FieldTypeMapping.create('foob', FieldType.create('long', [Properties.Numeric]))]),
@@ -53,6 +60,11 @@ describe('HighlightForm', () => {
       <HighlightForm {...props} />
     </FieldTypesContext.Provider>
   );
+
+  const triggerSaveButtonClick = async () => {
+    const elem = await screen.findByText('Save');
+    fireEvent.click(elem);
+  };
 
   it('should render for edit', async () => {
     const { findByText, findByDisplayValue } = render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
@@ -84,11 +96,9 @@ describe('HighlightForm', () => {
   });
 
   it('should fire remove action when saving a existing rule', async () => {
-    const { findByText } = render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
+    render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
 
-    const elem = await findByText('Save');
-
-    fireEvent.click(elem);
+    await triggerSaveButtonClick();
 
     await waitFor(() => expect(HighlightingRulesActions.update)
       .toBeCalledWith(rule, { field: rule.field, value: rule.value, condition: rule.condition, color: rule.color }));
@@ -122,5 +132,23 @@ describe('HighlightForm', () => {
       .toBeCalledWith(rule, expect.objectContaining({
         color: expect.objectContaining({ gradient: 'Viridis' }),
       })));
+  });
+
+  it('should be able to click submit when has value 0 with type number', async () => {
+    render(<HighlightFormWithContext onClose={() => {}} rule={ruleWithValueZero} />);
+
+    await triggerSaveButtonClick();
+
+    await waitFor(() => expect(HighlightingRulesActions.update)
+      .toBeCalledWith(ruleWithValueZero, { field: ruleWithValueZero.field, value: '0', condition: ruleWithValueZero.condition, color: ruleWithValueZero.color }));
+  });
+
+  it('should be able to click submit when has value false  with type boolean', async () => {
+    render(<HighlightFormWithContext onClose={() => {}} rule={ruleWithValueFalse} />);
+
+    await triggerSaveButtonClick();
+
+    await waitFor(() => expect(HighlightingRulesActions.update)
+      .toBeCalledWith(ruleWithValueFalse, { field: ruleWithValueFalse.field, value: 'false', condition: ruleWithValueFalse.condition, color: ruleWithValueFalse.color }));
   });
 });
