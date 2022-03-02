@@ -84,8 +84,7 @@ public class GracefulShutdown implements Runnable {
     private void doRun(boolean exit) {
         LOG.info("Graceful shutdown initiated.");
 
-        // Trigger a lifecycle change. Some services are listening for those and will halt operation accordingly.
-        serverStatus.shutdown();
+        serverStatus.overrideLoadBalancerDead();
 
         // Give possible load balancers time to recognize state change. State is DEAD because of HALTING.
         LOG.info("Node status: [{}]. Waiting <{}sec> for possible load balancers to recognize state change.",
@@ -94,6 +93,9 @@ public class GracefulShutdown implements Runnable {
         Uninterruptibles.sleepUninterruptibly(configuration.getLoadBalancerRecognitionPeriodSeconds(), TimeUnit.SECONDS);
 
         activityWriter.write(new Activity("Graceful shutdown initiated.", GracefulShutdown.class));
+
+        // Trigger a lifecycle change. Some services are listening for those and will halt operation accordingly.
+        serverStatus.shutdown();
 
         /*
          * Wait a second to give for example the calling REST call some time to respond
