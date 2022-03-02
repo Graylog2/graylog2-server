@@ -14,18 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.models.system.sessions.responses;
+package org.graylog2.shared.security;
 
-import org.apache.shiro.session.Session;
+import org.apache.shiro.authc.AuthenticationToken;
 
-/**
- * Factory to create a JSON response for a given session. A plugin may provide a custom implementation, if additional
- * attributes are required in the response.
- */
-public interface SessionResponseFactory {
-    /**
-     * Create a JSON response for the given session.
-     * @return
-     */
-    SessionResponse forSession(Session session);
+public interface RemoteAddressAuthenticationToken extends AuthenticationToken {
+    String getRemoteAddr();
 }

@@ -16,16 +16,13 @@
  */
 package org.graylog2.rest.models.system.sessions.responses;
 
-import org.apache.shiro.session.Session;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-/**
- * Factory to create a JSON response for a given session. A plugin may provide a custom implementation, if additional
- * attributes are required in the response.
- */
-public interface SessionResponseFactory {
-    /**
-     * Create a JSON response for the given session.
-     * @return
-     */
-    SessionResponse forSession(Session session);
+import java.util.Date;
+
+public interface SessionResponse {
+    Date validUntil();
+
+    @JsonIgnore
+    String getAuthenticationToken();
 }

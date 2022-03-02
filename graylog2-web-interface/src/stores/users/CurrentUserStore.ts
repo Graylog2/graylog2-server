@@ -50,7 +50,7 @@ export const CurrentUserStore = singletonStore(
     },
 
     sessionUpdate(sessionInfo) {
-      if (sessionInfo.sessionId && sessionInfo.username) {
+      if (sessionInfo.username) {
         const { username } = sessionInfo;
 
         this.update(username);

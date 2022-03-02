@@ -39,12 +39,12 @@ public class DefaultSessionResponseFactory implements SessionResponseFactory {
     }
 
     @Override
-    public JsonNode forSession(Session session) {
+    public SessionResponse forSession(Session session) {
         Date validUntil = getValidUntil(session);
         String id = session.getId().toString();
         String userId = getSubjectFromSession(session).getPrincipal().toString();
         String username = String.valueOf(session.getAttribute("username"));
-        return toJsonNode(DefaultSessionResponse.create(validUntil, id, username, userId));
+        return DefaultSessionResponse.create(validUntil, id, username, userId);
     }
 
     protected Date getValidUntil(Session session) {

@@ -22,7 +22,7 @@ import { NavDropdown, MenuItem } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import history from 'util/History';
-import { SessionActions, SessionStore } from 'stores/sessions/SessionStore';
+import { SessionActions } from 'stores/sessions/SessionStore';
 
 import ThemeModeToggle from './ThemeModeToggle';
 
@@ -41,7 +41,10 @@ const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
     : 'Edit profile';
 
   const onLogoutClicked = () => {
-    SessionActions.logout.triggerPromise(SessionStore.getSessionId()).then(() => {
+    SessionActions.logout().then(() => {
+      /* In some cases, when the authentication info is set externally (e.g. trusted headers), we need to retrigger a
+         session validation, so we are not stuck at the login screen. */
+      SessionActions.validate();
       history.push(Routes.STARTPAGE);
     });
   };
