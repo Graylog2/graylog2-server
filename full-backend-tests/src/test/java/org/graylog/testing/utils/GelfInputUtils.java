@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (C) 2020 Graylog, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,22 +16,23 @@
  */
 package org.graylog.testing.utils;
 
- import com.google.common.collect.ImmutableMap;
- import io.restassured.specification.RequestSpecification;
- import org.graylog2.inputs.gelf.http.GELFHttpInput;
- import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
- import org.slf4j.Logger;
- import org.slf4j.LoggerFactory;
+import com.google.common.collect.ImmutableMap;
+import io.restassured.specification.RequestSpecification;
+import org.graylog2.inputs.gelf.http.GELFHttpInput;
+import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
- import java.util.ArrayList;
+import java.util.ArrayList;
 
- import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 
 public final class GelfInputUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(GelfInputUtils.class);
 
-    private GelfInputUtils() { }
+    private GelfInputUtils() {
+    }
 
     public static void createGelfHttpInput(int mappedPort, int gelfHttpPort, RequestSpecification requestSpecification) {
 
