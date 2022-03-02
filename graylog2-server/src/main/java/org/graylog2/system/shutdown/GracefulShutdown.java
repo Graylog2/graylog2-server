@@ -39,7 +39,6 @@ import static org.graylog2.audit.AuditEventTypes.NODE_SHUTDOWN_COMPLETE;
 @Singleton
 public class GracefulShutdown implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(GracefulShutdown.class);
-    private static final int SLEEP_SECS = 1;
 
     private final Configuration configuration;
     private final BufferSynchronizerService bufferSynchronizerService;
@@ -96,12 +95,6 @@ public class GracefulShutdown implements Runnable {
 
         // Trigger a lifecycle change. Some services are listening for those and will halt operation accordingly.
         serverStatus.shutdown();
-
-        /*
-         * Wait a second to give for example the calling REST call some time to respond
-         * to the client. Using a latch or something here might be a bit over-engineered.
-         */
-        Uninterruptibles.sleepUninterruptibly(SLEEP_SECS, TimeUnit.SECONDS);
 
         // Stop REST API service to avoid changes from outside.
         jerseyService.stopAsync();
