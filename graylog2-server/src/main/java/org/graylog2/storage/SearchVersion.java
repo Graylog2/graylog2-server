@@ -116,4 +116,8 @@ public abstract class SearchVersion {
     public boolean isElasticsearch() {
         return this.distribution().equals(Distribution.ELASTICSEARCH);
     }
+
+    public boolean isOpenSearch() {
+        return this.distribution().equals(Distribution.OPENSEARCH);
+    }
 }
