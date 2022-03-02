@@ -44,21 +44,21 @@ type Props = {
     fieldTypes: FieldTypes,
   ) => AutoCompleter,
   completers: Array<Completer>,
-  disabled?: boolean,
   disableExecution?: boolean,
+  disabled?: boolean,
   error?: QueryValidationState,
+  height?: number,
+  maxLines?: number,
   onBlur?: (query: string) => void,
   onChange: (query: string) => Promise<string>,
   onExecute: (query: string) => void,
   placeholder?: string,
   streams?: Array<string>,
-  timeRange?: TimeRange | NoTimeRangeOverride,
   theme: DefaultTheme,
+  timeRange?: TimeRange | NoTimeRangeOverride,
   value: string,
   warning?: QueryValidationState,
-  maxLines?: number,
   wrapEnabled?: boolean,
-  height?: number,
 };
 
 const defaultCompleterFactory = (...args: ConstructorParameters<typeof SearchBarAutoCompletions>) => new SearchBarAutoCompletions(...args);
@@ -144,21 +144,21 @@ const QueryInput = ({
   className,
   completerFactory = defaultCompleterFactory,
   completers,
+  disableExecution,
   disabled,
   error,
+  height,
+  maxLines,
   onBlur,
   onChange,
   onExecute: onExecuteProp,
   placeholder,
   streams,
-  timeRange,
   theme,
+  timeRange,
   value,
   warning,
-  disableExecution,
-  maxLines,
   wrapEnabled,
-  height,
 }: Props) => {
   const { data: queryFields } = useFieldTypes(streams, isNoTimeRangeOverride(timeRange) ? DEFAULT_TIMERANGE : timeRange);
   const { data: allFields } = useFieldTypes([], DEFAULT_TIMERANGE);
@@ -177,35 +177,30 @@ const QueryInput = ({
   return (
     <UserPreferencesContext.Consumer>
       {({ enableSmartSearch = true }) => (
-        <StyledAceEditor mode="lucene"
-                         disabled={disabled}
-                         className={className}
+        <StyledAceEditor $height={height}
                          aceTheme="ace-queryinput" // NOTE: is usually just `theme` but we need that prop for styled-components
-                         ref={updateEditorConfiguration}
-                         onLoad={onLoadEditor}
-                         readOnly={disabled}
-                         onBlur={onBlur}
-                         onChange={onChange}
-                         value={value}
-                         name="QueryEditor"
-                         showGutter={false}
-                         showPrintMargin={false}
-                         highlightActiveLine={false}
-                         minLines={1}
-                         maxLines={maxLines}
+                         className={className}
+                         disabled={disabled}
+                         editorProps={{ $blockScrolling: Infinity, selectionStyle: 'line' }}
                          enableBasicAutocompletion={enableSmartSearch}
                          enableLiveAutocompletion={enableSmartSearch}
-                         editorProps={{
-                           $blockScrolling: Infinity,
-                           selectionStyle: 'line',
-                         }}
-                         setOptions={{
-                           indentedSoftWrap: false,
-                         }}
                          fontSize={theme.fonts.size.large}
-                         placeholder={placeholder}
+                         highlightActiveLine={false}
                          markers={markers}
-                         $height={height}
+                         maxLines={maxLines}
+                         minLines={1}
+                         mode="lucene"
+                         name="QueryEditor"
+                         onBlur={onBlur}
+                         onChange={onChange}
+                         onLoad={onLoadEditor}
+                         placeholder={placeholder}
+                         readOnly={disabled}
+                         ref={updateEditorConfiguration}
+                         setOptions={{indentedSoftWrap: false }}
+                         showGutter={false}
+                         showPrintMargin={false}
+                         value={value}
                          wrapEnabled={wrapEnabled} />
       )}
     </UserPreferencesContext.Consumer>
@@ -216,9 +211,11 @@ QueryInput.propTypes = {
   className: PropTypes.string,
   completerFactory: PropTypes.func,
   completers: PropTypes.array,
-  disabled: PropTypes.bool,
   disableExecution: PropTypes.bool,
+  disabled: PropTypes.bool,
   error: PropTypes.object,
+  height: PropTypes.number,
+  maxLines: PropTypes.number,
   onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,
   onExecute: PropTypes.func.isRequired,
@@ -228,9 +225,7 @@ QueryInput.propTypes = {
   timeRange: PropTypes.object,
   value: PropTypes.string,
   warning: PropTypes.object,
-  maxLines: PropTypes.number,
   wrapEnabled: PropTypes.bool,
-  height: PropTypes.number,
 };
 
 QueryInput.defaultProps = {
@@ -240,15 +235,15 @@ QueryInput.defaultProps = {
   disableExecution: false,
   disabled: false,
   error: undefined,
+  height: undefined,
+  maxLines: 4,
   onBlur: () => {},
   placeholder: '',
   streams: undefined,
   timeRange: undefined,
   value: '',
   warning: undefined,
-  maxLines: 4,
   wrapEnabled: true,
-  height: undefined,
 };
 
 export default withPluginEntities(withTheme(QueryInput), { completers: 'views.completers' });
