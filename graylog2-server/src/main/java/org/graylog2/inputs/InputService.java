@@ -17,6 +17,7 @@
 package org.graylog2.inputs;
 
 import org.graylog2.database.NotFoundException;
+import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.Extractor;
@@ -36,6 +37,8 @@ public interface InputService extends PersistedService {
     Input create(String id, Map<String, Object> fields);
 
     Input create(Map<String, Object> fields);
+
+    <T extends Persisted> String saveWithoutEvents(T model) throws ValidationException;
 
     String update(Input model) throws ValidationException;
 

@@ -19,6 +19,7 @@ package org.graylog2.shared.inputs;
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.graylog2.Configuration;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -41,15 +42,17 @@ public class InputLauncher {
     private final PersistedInputs persistedInputs;
     private final InputRegistry inputRegistry;
     private final ExecutorService executor;
+    private final Configuration configuration;
 
     @Inject
     public InputLauncher(IOState.Factory<MessageInput> inputStateFactory, InputBuffer inputBuffer, PersistedInputs persistedInputs,
-                         InputRegistry inputRegistry, MetricRegistry metricRegistry) {
+                         InputRegistry inputRegistry, MetricRegistry metricRegistry, Configuration configuration) {
         this.inputStateFactory = inputStateFactory;
         this.inputBuffer = inputBuffer;
         this.persistedInputs = persistedInputs;
         this.inputRegistry = inputRegistry;
         this.executor = executorService(metricRegistry);
+        this.configuration = configuration;
     }
 
     private ExecutorService executorService(final MetricRegistry metricRegistry) {
@@ -69,8 +72,9 @@ public class InputLauncher {
             inputRegistry.add(inputState);
         } else {
             inputState = inputRegistry.getInputState(input.getId());
-            if (inputState.getState() == IOState.Type.RUNNING || inputState.getState() == IOState.Type.STARTING)
+            if (inputState.getState() == IOState.Type.RUNNING || inputState.getState() == IOState.Type.STARTING) {
                 return inputState;
+            }
             inputState.setStoppable(input);
         }
 
@@ -113,8 +117,20 @@ public class InputLauncher {
 
     public void launchAllPersisted() {
         for (MessageInput input : persistedInputs) {
-            input.initialize();
-            launch(input);
+            if (shouldStartAutomatically(input)) {
+                LOG.info("Launching input [{}/{}/{}] - desired state is {}",
+                        input.getName(), input.getTitle(), input.getId(), input.getDesiredState());
+                input.initialize();
+                launch(input);
+            } else {
+                LOG.info("Not auto-starting input [{}/{}/{}] - desired state is {}",
+                        input.getName(), input.getTitle(), input.getId(), input.getDesiredState());
+            }
         }
+    }
+
+
+    public boolean shouldStartAutomatically(MessageInput input) {
+        return configuration.getAutoRestartInputs() || input.getDesiredState().equals(IOState.Type.RUNNING);
     }
 }
