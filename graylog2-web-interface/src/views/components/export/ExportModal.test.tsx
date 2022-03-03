@@ -203,11 +203,12 @@ describe('ExportModal', () => {
     );
   });
 
-  it('initial fields should be  in the same direction as in widgetConfig where are more than 8 fields', async () => {
+  it('initial fields should keep order when there are more than 8 fields in widget config', async () => {
+    const fieldList = [
+      'timestamp', 'source', 'gl2_processing_timestamp', 'streams', 'gl2_accounted_message_size', 'controller', 'ingest_time', 'gl2_receive_timestamp', 'user_id',
+    ];
     const widgetConfig = new MessagesWidgetConfig(
-      [
-        'timestamp', 'source', 'gl2_processing_timestamp', 'streams', 'gl2_accounted_message_size', 'controller', 'ingest_time', 'gl2_receive_timestamp', 'user_id',
-      ],
+      fieldList,
       false,
       false,
       [],
@@ -231,9 +232,7 @@ describe('ExportModal', () => {
     expect(exportSearchTypeMessages).toHaveBeenCalledWith(
       {
         ...payload,
-        fields_in_order: [
-          'timestamp', 'source', 'gl2_processing_timestamp', 'streams', 'gl2_accounted_message_size', 'controller', 'ingest_time', 'gl2_receive_timestamp', 'user_id',
-        ],
+        fields_in_order: fieldList,
       },
       'search-id',
       'search-type-id-1',
