@@ -67,13 +67,13 @@ describe('HighlightForm', () => {
   };
 
   it('should render for edit', async () => {
-    const { findByText, findByDisplayValue } = render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
+    const { findByText } = render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
 
     const form = await findByText('Edit Highlighting Rule');
-    const value = await findByDisplayValue(rule.value);
+    const input = await screen.findByLabelText('Value');
 
+    expect(input).toHaveValue(String(rule.value));
     expect(form).toBeInTheDocument();
-    expect(value).toBeInTheDocument();
   });
 
   it('should render for new', async () => {
