@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useContext } from 'react';
+import { useCallback, useMemo, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
 
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
@@ -62,16 +62,23 @@ const handleExecution = (
 
 // This function takes care of all editor configuration options, which do not rely on external data.
 // It will only run once, on mount, which is important for e.g. the event listeners.
-const _onLoadEditor = (editor) => {
+const _onLoadEditor = (editor, isInitialTokenizerUpdate: React.MutableRefObject<boolean>) => {
   if (editor) {
     editor.commands.removeCommands(['find', 'indent', 'outdent']);
 
     editor.session.on('tokenizerUpdate', (input, { bgTokenizer: { currentLine, lines } }) => {
-      editor.completers.forEach((completer) => {
-        if (completer?.shouldShowCompletions(currentLine, lines)) {
-          editor.execCommand('startAutocomplete');
-        }
-      });
+      if (!isInitialTokenizerUpdate.current) {
+        editor.completers.forEach((completer) => {
+          if (completer?.shouldShowCompletions(currentLine, lines)) {
+            editor.execCommand('startAutocomplete');
+          }
+        });
+      }
+
+      if (isInitialTokenizerUpdate.current) {
+        // eslint-disable-next-line no-param-reassign
+        isInitialTokenizerUpdate.current = false;
+      }
     });
 
     editor.renderer.setScrollMargin(6, 5);
@@ -144,9 +151,10 @@ const QueryInput = ({
   warning,
   wrapEnabled,
 }: Props) => {
+  const isInitialTokenizerUpdate = useRef(true);
   const { enableSmartSearch } = useContext(UserPreferencesContext);
   const completer = useCompleter({ streams, timeRange, completerFactory });
-  const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor), []);
+  const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor, isInitialTokenizerUpdate), []);
   const onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecuteProp, value, error, disableExecution), [onExecuteProp, value, error, disableExecution]);
   const updateEditorConfiguration = useCallback((node) => _updateEditorConfiguration(node, completer, onExecute), [onExecute, completer]);
 
