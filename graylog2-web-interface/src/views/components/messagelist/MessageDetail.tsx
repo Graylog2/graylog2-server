@@ -117,7 +117,7 @@ const MessageDetail = ({
     const rawTimestamp = fields.timestamp;
 
     timestamp.push(<dt key={`dt-${rawTimestamp}`}>Timestamp</dt>);
-    timestamp.push(<dd key={`dd-${rawTimestamp}`}><Timestamp dateTime={rawTimestamp} /></dd>);
+    timestamp.push(<dd key={`dd-${rawTimestamp}`}><Timestamp dateTime={rawTimestamp} format="complete" /></dd>);
   }
 
   const messageTitle = _formatMessageTitle(index, id);
