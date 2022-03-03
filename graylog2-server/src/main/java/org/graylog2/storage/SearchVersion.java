@@ -112,4 +112,12 @@ public abstract class SearchVersion {
     public String toString() {
         return distribution() + ":" + version();
     }
+
+    public boolean isElasticsearch() {
+        return this.distribution().equals(Distribution.ELASTICSEARCH);
+    }
+
+    public boolean isOpenSearch() {
+        return this.distribution().equals(Distribution.OPENSEARCH);
+    }
 }
