@@ -28,7 +28,6 @@ import org.bson.types.ObjectId;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.streams.outputs.OutputListResponse;
@@ -63,15 +62,12 @@ import java.util.Set;
 public class StreamOutputResource extends RestResource {
     private final OutputService outputService;
     private final StreamService streamService;
-    private final OutputRegistry outputRegistry;
 
     @Inject
     public StreamOutputResource(OutputService outputService,
-                                StreamService streamService,
-                                OutputRegistry outputRegistry) {
+                                StreamService streamService) {
         this.outputService = outputService;
         this.streamService = streamService;
-        this.outputRegistry = outputRegistry;
     }
 
     @GET
