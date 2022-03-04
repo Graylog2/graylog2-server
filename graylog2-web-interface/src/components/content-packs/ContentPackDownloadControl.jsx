@@ -17,13 +17,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { qualifyUrlWithSessionCredentials } from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import { Modal, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import * as URLUtils from 'util/URLUtils';
-import { SessionStore } from 'stores/sessions/SessionStore';
 
 class ContentPackDownloadControl extends React.Component {
   static propTypes = {
@@ -40,7 +38,7 @@ class ContentPackDownloadControl extends React.Component {
   _getDownloadUrl() {
     const { contentPackId, revision } = this.props;
 
-    return qualifyUrlWithSessionCredentials(ApiRoutes.ContentPacksController.downloadRev(contentPackId, revision).url, SessionStore.getSessionId());
+    return qualifyUrl(ApiRoutes.ContentPacksController.downloadRev(contentPackId, revision).url);
   }
 
   _closeModal() {
@@ -52,10 +50,7 @@ class ContentPackDownloadControl extends React.Component {
   }
 
   render() {
-    const infoText = (URLUtils.areCredentialsInURLSupported()
-      ? 'Please right click the download link below and choose "Save Link As..." to download the JSON file.'
-      : 'Please click the download link below. Your browser may ask for your username and password to '
-      + 'download the JSON file.');
+    const infoText = 'Please right click the download link below and choose "Save Link As..." to download the JSON file.';
 
     return (
       <BootstrapModalWrapper ref={(node) => { this.downloadModal = node; }} bsSize="large">

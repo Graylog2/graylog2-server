@@ -55,7 +55,12 @@ export type Generator = (type: string, name: string, labels: Array<string>, valu
 
 const _defaultKeyJoiner = (keys) => keys.join('-');
 
-const _defaultChartGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values });
+const _defaultChartGenerator = (type, name, labels, values): ChartDefinition => ({
+  type,
+  name,
+  x: labels,
+  y: values,
+});
 
 export const flattenLeafs = (leafs: Array<Leaf>, matcher: (value: Value) => boolean = ({ source }) => source.endsWith('leaf')): Array<any> => {
   return flatten(leafs.map((l) => l.values.filter((value) => matcher(value)).map((v) => [l.key, v])));

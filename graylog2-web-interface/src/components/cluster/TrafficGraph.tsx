@@ -26,9 +26,10 @@ import GenericPlot from 'views/components/visualizations/GenericPlot';
 type Props = {
   traffic: { [key: string]: number },
   width: number,
+  layoutExtension?: {},
 };
 
-const TrafficGraph = ({ width, traffic }: Props) => {
+const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
   if (!traffic) {
     return <Spinner />;
   }
@@ -63,6 +64,7 @@ const TrafficGraph = ({ width, traffic }: Props) => {
       hoverformat: '.4s',
       tickformat: 's',
     },
+    ...layoutExtension,
   };
 
   return (
@@ -76,6 +78,11 @@ const TrafficGraph = ({ width, traffic }: Props) => {
 TrafficGraph.propTypes = {
   traffic: PropTypes.object.isRequired, // traffic is: {"2017-11-15T15:00:00.000Z": 68287229, ...}
   width: PropTypes.number.isRequired,
+  layoutExtension: PropTypes.object,
+};
+
+TrafficGraph.defaultProps = {
+  layoutExtension: {},
 };
 
 export default TrafficGraph;

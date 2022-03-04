@@ -16,7 +16,6 @@
  */
 import Qs from 'qs';
 import URI from 'urijs';
-import UAParser from 'ua-parser-js';
 
 import AppConfig from 'util/AppConfig';
 
@@ -35,7 +34,6 @@ const qualifyRelativeURLWithCurrentHostname = (url: string): string => {
 };
 
 const URLUtils = {
-  parser: new UAParser(),
   qualifyUrl(url: string) {
     const parsedUrl = new URI(url);
 
@@ -94,11 +92,6 @@ const URLUtils = {
 
     return joinedPath.replace(/[/]+/g, '/');
   },
-  areCredentialsInURLSupported(): boolean {
-    const browser = URLUtils.parser.getBrowser();
-
-    return browser.name !== 'IE' && browser.name !== 'Edge';
-  },
   isValidURL(str: string) {
     let isValid = true;
 
@@ -119,30 +112,15 @@ const URLUtils = {
   },
 };
 
-export const qualifyUrlWithSessionCredentials = (url: string, sessionId: string) => {
-  let result = new URI(URLUtils.qualifyUrl(url));
-
-  if (URLUtils.areCredentialsInURLSupported()) {
-    const trimmedSessionId = sessionId !== undefined ? sessionId : '';
-
-    result = result.username(trimmedSessionId)
-      .password('session');
-  }
-
-  return result.toString();
-};
-
 export default URLUtils;
 
 export const {
-  parser,
   appPrefixed,
   getParsedHash,
   getParsedSearch,
   qualifyUrl,
   replaceHashParam,
   concatURLPath,
-  areCredentialsInURLSupported,
   isValidURL,
   hasAcceptedProtocol,
 } = URLUtils;

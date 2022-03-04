@@ -43,6 +43,7 @@ import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import useParameters from 'views/hooks/useParameters';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
+import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
@@ -152,6 +153,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
           return (
             <>
               <PropagateDisableSubmissionState formKey="widget-query-controls" disableSubmission={disableSearchSubmit} />
+              <ValidateOnParameterChange parameters={parameters} parameterBindings={parameterBindings} />
               <WidgetTopRow>
                 <Col md={6}>
                   {!hasTimeRangeOverride && (

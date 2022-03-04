@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -51,7 +52,17 @@ describe('DateTime utils', () => {
   const moscowTZ = 'Europe/Moscow';
 
   const invalidDate = '2020-00-00T04:00:00.000Z';
-  const expectErrorForInvalidDate = (action: () => any) => expect(action).toThrowError(`Date time ${invalidDate} is not valid.`);
+
+  const expectErrorForInvalidDate = (message = `Date time ${invalidDate} is not valid.`) => expect(console.error).toHaveBeenCalledWith(message);
+  const original = console.error;
+
+  beforeEach(() => {
+    console.error = jest.fn();
+  });
+
+  afterEach(() => {
+    console.error = original;
+  });
 
   describe('toDateObject', () => {
     it.each(exampleUTCInput)('should transform %s to moment object', (type: any, input) => {
@@ -70,11 +81,14 @@ describe('DateTime utils', () => {
     });
 
     it('should validate date based on defined format', () => {
-      expect(() => toDateObject('2020-01-01T10:00:00.000Z', ['date'])).toThrowError('Date time 2020-01-01T10:00:00.000Z is not valid. Expected formats: YYYY-MM-DD.');
+      toDateObject('2020-01-01T10:00:00.000Z', ['date']);
+
+      expect(console.error).toHaveBeenCalledWith('Date time 2020-01-01T10:00:00.000Z is not valid. Expected formats: YYYY-MM-DD.');
     });
 
     it('should throw an error for an invalid date', () => {
-      expectErrorForInvalidDate(() => toDateObject(invalidDate));
+      toDateObject(invalidDate);
+      expectErrorForInvalidDate();
     });
   });
 
@@ -91,12 +105,14 @@ describe('DateTime utils', () => {
       expect(parseFromIsoString(exampleBerlinTime, moscowTZ).format(DATE_TIME_FORMATS.internal)).toBe('2020-01-01T12:00:00.000+03:00');
     });
 
-    it('should throw an error when provided date string is not an ISO 8601 date', () => {
-      expect(() => parseFromIsoString('2020-01-01T04:00:00.000')).toThrow(new Error('Date time 2020-01-01T04:00:00.000 is not valid. Expected formats: YYYY-MM-DDTHH:mm:ss.SSSZ.'));
+    it('should log an error when provided date string is not an ISO 8601 date', () => {
+      parseFromIsoString('2020-01-01T04:00:00.000');
+      expectErrorForInvalidDate('Date time 2020-01-01T04:00:00.000 is not valid. Expected formats: YYYY-MM-DDTHH:mm:ss.SSSZ.');
     });
 
     it('should throw an error for an invalid date', () => {
-      expectErrorForInvalidDate(() => parseFromIsoString(invalidDate));
+      parseFromIsoString(invalidDate);
+      expectErrorForInvalidDate('Date time 2020-00-00T04:00:00.000Z is not valid. Expected formats: YYYY-MM-DDTHH:mm:ss.SSSZ.');
     });
   });
 
@@ -120,7 +136,8 @@ describe('DateTime utils', () => {
     });
 
     it('should throw an error for an invalid date', () => {
-      expectErrorForInvalidDate(() => adjustFormat(invalidDate));
+      adjustFormat(invalidDate);
+      expectErrorForInvalidDate();
     });
   });
 
@@ -134,7 +151,8 @@ describe('DateTime utils', () => {
     });
 
     it('should throw an error for an invalid date', () => {
-      expectErrorForInvalidDate(() => formatAsBrowserTime(invalidDate));
+      formatAsBrowserTime(invalidDate);
+      expectErrorForInvalidDate();
     });
   });
 
@@ -144,7 +162,8 @@ describe('DateTime utils', () => {
     });
 
     it('should throw an error for an invalid date', () => {
-      expectErrorForInvalidDate(() => relativeDifference(invalidDate));
+      relativeDifference(invalidDate);
+      expectErrorForInvalidDate();
     });
   });
 });

@@ -119,9 +119,10 @@ describe('XYPlot', () => {
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', {
-      yaxis: { fixedrange: true, rangemode: 'tozero', tickformat: ',g' },
+      yaxis: { fixedrange: true, rangemode: 'tozero', tickformat: ',~r' },
       xaxis: { fixedrange: true },
       showlegend: false,
+      hovermode: 'x',
     });
 
     expect(genericPlot).toHaveProp('chartData', chartData);

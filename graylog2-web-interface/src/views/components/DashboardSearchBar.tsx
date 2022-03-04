@@ -41,6 +41,7 @@ import useParameters from 'views/hooks/useParameters';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
+import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -132,6 +133,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
 
                   return (
                     <>
+                      <ValidateOnParameterChange parameters={parameters} parameterBindings={parameterBindings} />
                       <TopRow>
                         <StyledTimeRangeInput disabled={disableSearch}
                                               onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}

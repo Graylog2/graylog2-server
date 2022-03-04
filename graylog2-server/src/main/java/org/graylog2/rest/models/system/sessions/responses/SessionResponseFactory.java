@@ -16,7 +16,6 @@
  */
 package org.graylog2.rest.models.system.sessions.responses;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.shiro.session.Session;
 
 /**
@@ -26,6 +25,7 @@ import org.apache.shiro.session.Session;
 public interface SessionResponseFactory {
     /**
      * Create a JSON response for the given session.
+     * @return
      */
-    JsonNode forSession(Session session);
+    SessionResponse forSession(Session session);
 }

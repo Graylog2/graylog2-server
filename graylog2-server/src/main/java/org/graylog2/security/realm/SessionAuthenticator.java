@@ -59,6 +59,7 @@ public class SessionAuthenticator extends AuthenticatingRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         SessionIdToken sessionIdToken = (SessionIdToken) token;
         final Subject subject = new Subject.Builder().sessionId(sessionIdToken.getSessionId()).buildSubject();
+
         final Session session = subject.getSession(false);
         if (session == null) {
             LOG.debug("Invalid session. Either it has expired or did not exist.");

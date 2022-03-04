@@ -35,7 +35,7 @@ export type PluginMetadata = {
   name: string,
   url: string,
 };
-export type Requirements = { [key: string]: PluginMetadata };
+export type Requirements = { [key: string]: PluginMetadata } | {};
 export type ViewStateMap = Immutable.Map<QueryId, ViewState>;
 
 export type SearchType = 'SEARCH';
@@ -65,7 +65,7 @@ export type ViewJson = {
   search_id: string,
   properties: Properties,
   state: { [key: string]: ViewStateJson },
-  created_at: Date,
+  created_at: string,
   owner: string,
   requires: Requirements,
 };
@@ -216,6 +216,7 @@ export default class View {
   static fromJSON(value: ViewJson): View {
     const { id, type, title, summary, description, properties, state, created_at, owner, requires } = value;
     const viewState: ViewStateMap = Immutable.Map(state).map(ViewState.fromJSON).toMap();
+    const createdAtDate = new Date(created_at);
 
     return View.create()
       .toBuilder()
@@ -226,7 +227,7 @@ export default class View {
       .description(description)
       .properties(properties)
       .state(viewState)
-      .createdAt(created_at)
+      .createdAt(createdAtDate)
       .owner(owner)
       .requires(requires)
       .build();

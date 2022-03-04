@@ -52,6 +52,7 @@ import useParameters from 'views/hooks/useParameters';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 
+import ValidateOnParameterChange from './searchbar/ValidateOnParameterChange';
 import SearchBarForm from './searchbar/SearchBarForm';
 
 type Props = {
@@ -152,6 +153,7 @@ const SearchBar = ({
 
                   return (
                     <>
+                      <ValidateOnParameterChange parameterBindings={parameterBindings} parameters={parameters} />
                       <TopRow>
                         <Col md={5}>
                           <TimeRangeInput disabled={disableSearch}

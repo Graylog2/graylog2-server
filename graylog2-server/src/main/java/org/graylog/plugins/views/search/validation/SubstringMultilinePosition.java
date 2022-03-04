@@ -16,44 +16,20 @@
  */
 package org.graylog.plugins.views.search.validation;
 
+import com.google.auto.value.AutoValue;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class SubstringMultilinePosition {
-    private final int line;
-    private final int columnStart;
-    private final int columnEnd;
+@AutoValue
+public abstract class SubstringMultilinePosition {
+    public abstract int line();
 
-    private SubstringMultilinePosition(int line, int columnStart, int columnEnd) {
-        this.line = line;
-        this.columnStart = columnStart;
-        this.columnEnd = columnEnd;
-    }
+    public abstract int beginColumn();
 
-    public static List<SubstringMultilinePosition> compute(final String input, final String substring) {
-        final List<SubstringMultilinePosition> positions = new ArrayList<>();
-        final String[] lines = input.split("\n");
-        for (int line = 0; line < lines.length; line++) {
-            int startPosition = 0;
-            while ((startPosition = lines[line].indexOf(substring, startPosition)) > 0) {
-                final int endPosition = startPosition + substring.length();
-                positions.add(new SubstringMultilinePosition(line + 1, startPosition, endPosition));
-                startPosition = endPosition;
-            }
+    public abstract int endColumn();
 
-        }
-        return positions;
-    }
-
-    public int getLine() {
-        return line;
-    }
-
-    public int getBeginColumn() {
-        return columnStart;
-    }
-
-    public int getEndColumn() {
-        return columnEnd;
+    public static SubstringMultilinePosition create(int line, int beginColumn, int endColumn) {
+        return new AutoValue_SubstringMultilinePosition(line, beginColumn, endColumn);
     }
 }

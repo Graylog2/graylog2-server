@@ -24,7 +24,7 @@ import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
 import { asMock } from 'helpers/mocking';
 import Routes from 'routing/Routes';
 import useDashboards from 'views/logic/dashboards/useDashboards';
-import { simpleViewJson } from 'views/test/ViewFixtures';
+import { simpleView } from 'views/test/ViewFixtures';
 import UserDateTimeContext from 'contexts/UserDateTimeContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { adminUser } from 'fixtures/users';
@@ -67,7 +67,7 @@ const noDashboards: DashboardsStoreState = {
 };
 
 const simpleDashboardList: DashboardsStoreState = {
-  list: [simpleViewJson()],
+  list: [simpleView()],
   pagination: { count: 1, page: 1, perPage: 10, total: 1 },
 };
 
@@ -76,7 +76,7 @@ const mockDashboards = (dashboardState: DashboardsStoreState) => {
 };
 
 const clickDashboardAction = async (dashboardId: string, action: string) => {
-  const actionsButton = (await screen.findAllByTestId(`view-actions-dropdown-${dashboardId}`))[0];
+  const actionsButton = (await screen.findAllByTestId(`dashboard-actions-dropdown-${dashboardId}`))[0];
   userEvent.click(actionsButton);
 
   userEvent.click((await screen.findAllByRole('menuitem', { name: action }))[0]);
@@ -115,7 +115,6 @@ describe('DashboardsPage', () => {
 
   it('shows list of dashboards', async () => {
     mockDashboards(simpleDashboardList);
-
     render(<WrappedDashboardsPage />);
 
     await screen.findByRole('link', { name: 'Foo' });
