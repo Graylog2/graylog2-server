@@ -28,7 +28,6 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.outputs.MessageOutputFactory;
-import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.rest.models.streams.outputs.OutputListResponse;
@@ -64,15 +63,12 @@ import java.util.Set;
 public class OutputResource extends RestResource {
     private final OutputService outputService;
     private final MessageOutputFactory messageOutputFactory;
-    private final OutputRegistry outputRegistry;
 
     @Inject
     public OutputResource(OutputService outputService,
-                          MessageOutputFactory messageOutputFactory,
-                          OutputRegistry outputRegistry) {
+                          MessageOutputFactory messageOutputFactory) {
         this.outputService = outputService;
         this.messageOutputFactory = messageOutputFactory;
-        this.outputRegistry = outputRegistry;
     }
 
     @GET
@@ -83,7 +79,7 @@ public class OutputResource extends RestResource {
         checkPermission(RestPermissions.OUTPUTS_READ);
         final Set<OutputSummary> outputs = new HashSet<>();
 
-        for (Output output : outputService.loadAll())
+        for (Output output : outputService.loadAll()) {
             outputs.add(OutputSummary.create(
                     output.getId(),
                     output.getTitle(),
@@ -93,6 +89,7 @@ public class OutputResource extends RestResource {
                     new HashMap<>(output.getConfiguration()),
                     output.getContentPack()
             ));
+        }
 
         return OutputListResponse.create(outputs);
     }
@@ -142,15 +139,15 @@ public class OutputResource extends RestResource {
                 .build(output.getId());
 
         return Response.created(outputUri).entity(
-                        OutputSummary.create(
-                                output.getId(),
-                                output.getTitle(),
-                                output.getType(),
-                                output.getCreatorUserId(),
-                                new DateTime(output.getCreatedAt()),
-                                new HashMap<>(output.getConfiguration()),
-                                output.getContentPack()
-                        )
+                OutputSummary.create(
+                        output.getId(),
+                        output.getTitle(),
+                        output.getType(),
+                        output.getCreatorUserId(),
+                        new DateTime(output.getCreatedAt()),
+                        new HashMap<>(output.getConfiguration()),
+                        output.getContentPack()
+                )
         ).build();
     }
 
@@ -190,8 +187,8 @@ public class OutputResource extends RestResource {
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_OUTPUT_UPDATE)
     public Output update(@ApiParam(name = "outputId", value = "The id of the output that should be deleted", required = true)
-                           @PathParam("outputId") String outputId,
-                           @ApiParam(name = "JSON body", required = true) Map<String, Object> deltas) throws ValidationException, NotFoundException {
+                         @PathParam("outputId") String outputId,
+                         @ApiParam(name = "JSON body", required = true) Map<String, Object> deltas) throws ValidationException, NotFoundException {
         checkPermission(RestPermissions.OUTPUTS_EDIT, outputId);
         final Output oldOutput = outputService.load(outputId);
         final AvailableOutputSummary outputSummary = messageOutputFactory.getAvailableOutputs().get(oldOutput.getType());
@@ -207,10 +204,6 @@ public class OutputResource extends RestResource {
             deltas.put("configuration", ConfigurationMapConverter.convertValues(configuration, outputSummary.requestedConfiguration()));
         }
 
-        final Output output = this.outputService.update(outputId, deltas);
-
-        this.outputRegistry.removeOutput(oldOutput);
-
-        return output;
+        return this.outputService.update(outputId, deltas);
     }
 }
