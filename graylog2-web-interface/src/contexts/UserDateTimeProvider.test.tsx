@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -34,7 +35,7 @@ jest.useFakeTimers()
 describe('DateTimeProvider', () => {
   const user = alice.toBuilder().timezone('Europe/Berlin').build();
   const invalidDate = '2020-00-00T04:00:00.000Z';
-  const expectErrorForInvalidDate = (action: () => any) => expect(action).toThrowError(`Date time ${invalidDate} is not valid.`);
+  const expectErrorForInvalidDate = () => expect(console.error).toHaveBeenCalledWith(`Date time ${invalidDate} is not valid.`);
 
   const renderSUT = (currentUser: User = user, tzOverride = undefined) => {
     let contextValue;
@@ -55,6 +56,16 @@ describe('DateTimeProvider', () => {
 
     return contextValue;
   };
+
+  const original = console.error;
+
+  beforeEach(() => {
+    console.error = jest.fn();
+  });
+
+  afterEach(() => {
+    console.error = original;
+  });
 
   describe('userTimezone value should', () => {
     it('provide user timezone', () => {
@@ -77,9 +88,10 @@ describe('DateTimeProvider', () => {
       expect(formatTime('2021-03-27T14:32:31.894Z')).toBe('2021-03-27 15:32:31');
     });
 
-    it('throw an error for an invalid date', () => {
+    it('log an error for an invalid date', () => {
       const { formatTime } = renderSUT();
-      expectErrorForInvalidDate(() => formatTime(invalidDate));
+      formatTime(invalidDate);
+      expectErrorForInvalidDate();
     });
 
     it('respect timezone override', () => {
@@ -98,9 +110,10 @@ describe('DateTimeProvider', () => {
       expect(result.format(DATE_TIME_FORMATS.internal)).toBe('2021-03-27T15:32:31.894+01:00');
     });
 
-    it('throw an error for an invalid date', () => {
+    it('log an error for an invalid date', () => {
       const { toUserTimezone } = renderSUT();
-      expectErrorForInvalidDate(() => toUserTimezone(invalidDate));
+      toUserTimezone(invalidDate);
+      expectErrorForInvalidDate();
     });
 
     it('respect timezone override', () => {
