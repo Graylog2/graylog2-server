@@ -23,10 +23,13 @@ import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import Widget from 'views/logic/widgets/Widget';
-import mockComponent from 'helpers/mocking/MockComponent';
 
 import WidgetQueryControls from './WidgetQueryControls';
 import WidgetContext from './contexts/WidgetContext';
+
+jest.mock('hooks/useUserDateTime');
+jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
+jest.mock('views/components/searchbar/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
@@ -65,9 +68,6 @@ jest.mock('moment', () => {
 
   return Object.assign(() => mockMoment('2019-10-10T12:26:31.146Z'), mockMoment);
 });
-
-jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
-jest.mock('views/components/searchbar/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {
