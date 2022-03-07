@@ -30,10 +30,11 @@ import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
-import type { AutoCompleter, Editor } from './ace-types';
-import StyledAceEditor from './queryinput/StyledAceEditor';
-import SearchBarAutoCompletions from './SearchBarAutocompletions';
-import type { Completer, FieldTypes } from './SearchBarAutocompletions';
+import StyledAceEditor from './StyledAceEditor';
+
+import type { AutoCompleter, Editor } from '../ace-types';
+import SearchBarAutoCompletions from '../SearchBarAutocompletions';
+import type { Completer, FieldTypes } from '../SearchBarAutocompletions';
 
 type Props = {
   className?: string
