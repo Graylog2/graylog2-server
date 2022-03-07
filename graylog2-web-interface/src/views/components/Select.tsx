@@ -22,6 +22,7 @@ import ReactSelect, { components as Components, createFilter } from 'react-selec
 import CreatableSelect from 'react-select/creatable';
 import { Overlay } from 'react-overlays';
 import { useTheme } from 'styled-components';
+import { List } from 'react-virtualized';
 
 export type Option = { [key: string]: any };
 
@@ -43,6 +44,23 @@ const OverlayInner = ({ children, style }: {
       (child) => React.cloneElement(child, { style: { ...style, ...child.props.style } }))}
   </>
 );
+
+const CustomMenuList = ({ children }: { children: React.ReactElement}) => {
+  const rows = children;
+
+  const rowRenderer = ({ key, index, style }) => {
+    return <div key={key} style={style}>{rows[index]}</div>;
+  };
+
+  return (
+    <List style={{ width: '100%' }}
+          width={300}
+          height={300}
+          rowHeight={30}
+          rowCount={rows.length}
+          rowRenderer={rowRenderer} />
+  );
+};
 
 const getRefContainerWidth = (selectRef, allowOptionCreation) => {
   const currentRef = selectRef?.current;
@@ -193,6 +211,7 @@ const Select = ({
     Menu,
     MultiValueRemove,
     MultiValue: components.MultiValue || ValueWithTitle,
+    MenuList: CustomMenuList,
   };
   const _styles = {
     ...styles,
