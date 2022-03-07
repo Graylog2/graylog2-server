@@ -22,21 +22,21 @@ import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.Aggregation;
 import io.searchbox.core.search.aggregation.MetricAggregation;
 import one.util.streamex.EntryStream;
-import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
-import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.metrics.min.MinAggregationBuilder;
-import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.metrics.min.MinAggregationBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
+import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -186,16 +186,29 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     }
 
     private AbsoluteRange extractEffectiveTimeRange(SearchResult queryResult, Query query, Pivot pivot) {
+        if (queryResult.getTotal() != 0) {
+            return getAbsoluteRangeFromAggregations(queryResult, query, pivot);
+        } else {
+            return getAbsoluteRangeFromPivot(query, pivot);
+        }
+    }
+
+    private AbsoluteRange getAbsoluteRangeFromPivot(final Query query, final Pivot pivot) {
+        final TimeRange pivotRange = query.effectiveTimeRange(pivot);
+        return AbsoluteRange.create(pivotRange.getFrom(), pivotRange.getTo());
+    }
+
+    private AbsoluteRange getAbsoluteRangeFromAggregations(final SearchResult queryResult, final Query query, final Pivot pivot) {
         final Double from = queryResult.getAggregations().getMinAggregation("timestamp-min").getMin();
         final Double to = queryResult.getAggregations().getMaxAggregation("timestamp-max").getMax();
         final TimeRange pivotRange = query.effectiveTimeRange(pivot);
         return AbsoluteRange.create(
                 isAllMessagesTimeRange(pivotRange) && from != null
                         ? new DateTime(from.longValue(), DateTimeZone.UTC)
-                        : query.effectiveTimeRange(pivot).getFrom(),
+                        : pivotRange.getFrom(),
                 isAllMessagesTimeRange(pivotRange) && to != null
                         ? new DateTime(to.longValue(), DateTimeZone.UTC)
-                        : query.effectiveTimeRange(pivot).getTo()
+                        : pivotRange.getTo()
         );
     }
 
