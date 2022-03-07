@@ -47,6 +47,7 @@ class DocsHelper {
       UNKNOWN_FIELD: 'query-language#unknown-field',
       PARSE_EXCEPTION: 'query-language#parse-exception',
       INVALID_OPERATOR: 'query-language#invalid-operator',
+      UNDECLARED_PARAMETER: 'query-language#undeclared-parameter',
     },
     SEARCH_QUERY_LANGUAGE: 'query-language',
     STREAMS: 'streams',
