@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useTheme } from 'styled-components';
 
@@ -29,6 +29,7 @@ export type BaseProps = {
   error?: QueryValidationState,
   height?: number,
   maxLines?: number,
+  onLoad?: (editor: Editor) => void,
   placeholder?: string,
   value: string,
   warning?: QueryValidationState,
@@ -41,7 +42,6 @@ type EnabledInputProps = BaseProps & {
   onBlur?: (query: string) => void,
   onChange: (query: string) => Promise<string>,
   onExecute: (editor: Editor) => void,
-  onLoad: (editor: Editor) => void,
 };
 type DisabledInputProps = BaseProps & { disabled: true };
 type Props = EnabledInputProps | DisabledInputProps
@@ -84,9 +84,17 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
     value,
     warning,
     wrapEnabled,
+    onLoad,
   } = props;
   const theme = useTheme();
   const markers = useMemo(() => getMarkers(error, warning), [error, warning]);
+  const _onLoad = useCallback((editor) => {
+    if (editor) {
+      editor.renderer.setScrollMargin(6, 5);
+      editor.renderer.setPadding(12);
+      onLoad?.(editor);
+    }
+  }, [onLoad]);
 
   const commonProps = {
     $height: height,
@@ -109,6 +117,7 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
     showPrintMargin: false,
     value,
     wrapEnabled,
+    onLoad: _onLoad,
   };
 
   if (isDisabledInput(props)) {
@@ -120,7 +129,6 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
       onBlur,
       onChange,
       onExecute,
-      onLoad,
       enableAutocompletion,
     } = props;
 
@@ -130,8 +138,7 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
                        enableLiveAutocompletion={enableAutocompletion}
                        onBlur={onBlur}
                        onChange={onChange}
-                       onExecute={onExecute}
-                       onLoad={onLoad} />
+                       onExecute={onExecute} />
     );
   }
 
