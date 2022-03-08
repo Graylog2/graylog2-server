@@ -42,6 +42,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -79,7 +80,7 @@ public class RotationStrategyResource extends RestResource {
                 .stream()
                 .filter(this::isEnabledRotationStrategy)
                 .map(this::getRotationStrategyDescription)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         return RotationStrategies.create(strategies.size(), strategies);
     }
