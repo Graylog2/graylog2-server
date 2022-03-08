@@ -46,7 +46,7 @@ const useLoadHealthAndName = () => {
 };
 
 const IndexerClusterHealth = () => {
-  const { health, loading, error } = useLoadHealthAndName();
+  const { health, name, loading, error } = useLoadHealthAndName();
 
   return (
     <Row className="content">
@@ -57,7 +57,7 @@ const IndexerClusterHealth = () => {
           The possible Elasticsearch cluster states and more related information is available in the{' '}
           <DocumentationLink page={DocsHelper.PAGES.CONFIGURING_ES} text="Graylog documentation" />.
         </SmallSupportLink>
-        {health && <IndexerClusterHealthSummary health={health} />}
+        {health && <IndexerClusterHealthSummary health={health} name={name} />}
         {loading && <Spinner />}
         {error && <IndexerClusterHealthError error={error} />}
       </Col>

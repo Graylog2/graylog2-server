@@ -19,17 +19,18 @@ import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
 import { Icon } from 'components/common';
+import type FetchError from 'logic/errors/FetchError';
 
 const ESClusterError = styled(Alert)`
   margin-top: 10px;
   margin-bottom: 5px;
 `;
 
-const IndexerClusterHealthError = ({ error }: { error: Error }) => {
+const IndexerClusterHealthError = ({ error }: { error: FetchError }) => {
   return (
     <ESClusterError bsStyle="danger">
-      <Icon name="exclamation-triangle" /> &nbsp;{'Could not retrieve Elasticsearch cluster health'}{' '}
-      {`Fetching Elasticsearch cluster health failed: ${error.message}`}
+      <Icon name="exclamation-triangle" /> &nbsp;
+      Could not retrieve Elasticsearch cluster health. Fetching Elasticsearch cluster health failed: {error.message}
     </ESClusterError>
   );
 };
