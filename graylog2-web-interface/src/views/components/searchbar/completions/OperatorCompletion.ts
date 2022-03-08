@@ -52,6 +52,7 @@ const _lastNonEmptyToken = (tokens: Array<Token>, currentTokenIdx: number): Toke
 };
 
 class OperatorCompletion implements Completer {
+  // eslint-disable-next-line class-methods-use-this
   getCompletions = ({ currentToken, lastToken, prefix, tokens, currentTokenIdx }: CompleterContext): Array<CompletionResult> => {
     if (currentToken?.type === 'keyword') {
       return [];
