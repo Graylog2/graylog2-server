@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useContext } from 'react';
 import { Form, Formik } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
@@ -23,13 +23,16 @@ import moment from 'moment';
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/bootstrap';
 import { Icon, KeyCapture } from 'components/common';
 import { availableTimeRangeTypes } from 'views/Constants';
-import DateTime from 'logic/datetimes/DateTime';
 import type { AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelative } from 'views/typeGuards/timeRange';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
 import type { RelativeTimeRangeClassified } from 'views/components/searchbar/date-time-picker/types';
 import validateTimeRange from 'views/components/TimeRangeValidation';
+import type { DateTimeFormats, DateTime } from 'util/DateTime';
+import { toDateObject } from 'util/DateTime';
+import UserDateTimeContext from 'contexts/UserDateTimeContext';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import migrateTimeRangeToNewType from './migrateTimeRangeToNewType';
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
@@ -62,11 +65,11 @@ type TimeRangeTabsArguments = {
   tabs: Array<TimeRangeType>,
 }
 
-const DEFAULT_RANGES = {
+const createDefaultRanges = (formatTime: (time: DateTime, format: DateTimeFormats) => string) => ({
   absolute: {
     type: 'absolute',
-    from: DateTime.now().subtract(300, 'seconds').format(DateTime.Formats.TIMESTAMP),
-    to: DateTime.now().format(DateTime.Formats.TIMESTAMP),
+    from: formatTime(toDateObject(new Date()).subtract(300, 'seconds'), 'complete'),
+    to: formatTime(toDateObject(new Date()), 'complete'),
   },
   relative: {
     type: 'relative',
@@ -82,7 +85,7 @@ const DEFAULT_RANGES = {
     keyword: 'Last five minutes',
   },
   disabled: undefined,
-};
+});
 
 const timeRangeTypes = {
   absolute: TabAbsoluteTimeRange,
@@ -186,10 +189,12 @@ const TimeRangeDropdown = ({
   position,
   limitDuration,
 }: TimeRangeDropdownProps) => {
+  const { formatTime, userTimezone } = useUserDateTime();
   const [validatingKeyword, setValidatingKeyword] = useState(false);
   const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
 
   const positionIsBottom = position === 'bottom';
+  const defaultRanges = createDefaultRanges(formatTime);
 
   const handleNoOverride = () => {
     setCurrentTimeRange({});
@@ -236,7 +241,7 @@ const TimeRangeDropdown = ({
             if ('type' in nextTimeRange) {
               setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab));
             } else {
-              setFieldValue('nextTimeRange', DEFAULT_RANGES[nextTab]);
+              setFieldValue('nextTimeRange', defaultRanges[nextTab]);
             }
 
             setActiveTab(nextTab);
@@ -269,7 +274,7 @@ const TimeRangeDropdown = ({
 
                 <Row className="row-sm">
                   <Col md={6}>
-                    <Timezone>All timezones using: <b>{DateTime.getUserTimezone()}</b></Timezone>
+                    <Timezone>All timezones using: <b>{userTimezone}</b></Timezone>
                   </Col>
                   <Col md={6}>
                     <div className="pull-right">
