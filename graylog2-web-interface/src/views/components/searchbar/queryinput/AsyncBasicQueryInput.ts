@@ -16,6 +16,6 @@
  */
 import loadAsync from 'routing/loadAsync';
 
-const AsyncDisabledQueryInput = loadAsync(() => import('./DisabledQueryInput'));
+const AsyncBasicQueryInput = loadAsync(() => import('./BasicQueryInput'));
 
-export default AsyncDisabledQueryInput;
+export default AsyncBasicQueryInput;

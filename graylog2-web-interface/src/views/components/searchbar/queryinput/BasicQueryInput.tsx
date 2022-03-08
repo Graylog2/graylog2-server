@@ -24,7 +24,7 @@ import type { QueryValidationState } from 'views/components/searchbar/queryvalid
 import StyledAceEditor from './StyledAceEditor';
 import type { Editor } from './ace-types';
 
-export type BaseQueryInputProps = {
+export type BaseProps = {
   className?: string
   error?: QueryValidationState,
   height?: number,
@@ -35,16 +35,19 @@ export type BaseQueryInputProps = {
   wrapEnabled?: boolean,
 };
 
-type EnabledInputProps = BaseQueryInputProps & {
+type EnabledInputProps = BaseProps & {
   disabled: false,
   enableAutocompletion?: boolean,
   onBlur?: (query: string) => void,
-  onChange?: (query: string) => Promise<string>,
-  onExecute?: (editor: Editor) => void,
-  onLoad?: (editor: Editor) => void,
+  onChange: (query: string) => Promise<string>,
+  onExecute: (editor: Editor) => void,
+  onLoad: (editor: Editor) => void,
 };
-type DisabledInputProps = BaseQueryInputProps & { disabled: true };
+type DisabledInputProps = BaseProps & { disabled: true };
 type Props = EnabledInputProps | DisabledInputProps
+
+const isEnabledInput = (props: Props): props is EnabledInputProps => !props.disabled;
+const isDisabledInput = (props: Props): props is DisabledInputProps => props.disabled;
 
 const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryValidationState | undefined) => {
   const markerClassName = 'ace_marker';
@@ -68,11 +71,9 @@ const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryVal
   ];
 };
 
-const isEnabledInput = (props: Props): props is EnabledInputProps => !props.disabled;
-const isDisabledInput = (props: Props): props is DisabledInputProps => props.disabled;
-
-// Base query input component which is being implemented by the `QueryInput` and `DeactivatedQueryInput`. Should not be used directly, outside this directory.
-const BaseQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
+// Basic query input component which is being implemented by the `QueryInput` component.
+// This is just a very basic query input which can be implemented for example to display a read only query.
+const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
   const {
     className,
     disabled,
@@ -102,7 +103,7 @@ const BaseQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
     name: 'QueryEditor',
     placeholder,
     readOnly: disabled,
-    ref: ref,
+    ref,
     setOptions: { indentedSoftWrap: false },
     showGutter: false,
     showPrintMargin: false,
@@ -137,7 +138,7 @@ const BaseQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
   return null;
 });
 
-BaseQueryInput.propTypes = {
+BasicQueryInput.propTypes = {
   className: PropTypes.string,
   // @ts-ignore
   disabled: PropTypes.bool,
@@ -155,21 +156,21 @@ BaseQueryInput.propTypes = {
   wrapEnabled: PropTypes.bool,
 };
 
-BaseQueryInput.defaultProps = {
+BasicQueryInput.defaultProps = {
   className: '',
   disabled: false,
   enableAutocompletion: false,
   error: undefined,
   height: undefined,
   maxLines: 4,
-  onBlur: () => {},
-  onChange: () => Promise.resolve(''),
-  onExecute: () => {},
-  onLoad: () => {},
+  onBlur: undefined,
+  onChange: undefined,
+  onExecute: undefined,
+  onLoad: undefined,
   placeholder: '',
   value: '',
   warning: undefined,
   wrapEnabled: true,
 };
 
-export default BaseQueryInput;
+export default BasicQueryInput;

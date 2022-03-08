@@ -28,8 +28,8 @@ import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
 import type { AutoCompleter, Editor } from './ace-types';
-import type { BaseQueryInputProps } from './BaseQueryInput';
-import BaseQueryInput from './BaseQueryInput';
+import type { BaseProps } from './BasicQueryInput';
+import BaseQueryInput from './BasicQueryInput';
 
 import SearchBarAutoCompletions from '../SearchBarAutocompletions';
 import type { Completer, FieldTypes } from '../SearchBarAutocompletions';
@@ -112,7 +112,7 @@ const useCompleter = ({ streams, timeRange, completerFactory }: Pick<Props, 'str
   return useMemo(() => completerFactory(completers, timeRange, streams, fieldTypes), [completerFactory, timeRange, streams, fieldTypes]);
 };
 
-type Props = BaseQueryInputProps & {
+type Props = BaseProps & {
   completerFactory?: (
     completers: Array<Completer>,
     timeRange: TimeRange | NoTimeRangeOverride | undefined,
