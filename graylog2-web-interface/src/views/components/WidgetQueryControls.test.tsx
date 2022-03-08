@@ -30,7 +30,7 @@ import WidgetContext from './contexts/WidgetContext';
 
 jest.mock('hooks/useUserDateTime');
 jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
-jest.mock('views/components/searchbar/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
+jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
