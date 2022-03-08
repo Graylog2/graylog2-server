@@ -26,7 +26,7 @@ export default class AddToQueryHandler extends QueryManipulationHandler {
   formatTimestampForES = (value: string) => {
     const utc = moment(value).tz('UTC');
 
-    return `"${utc.format('YYYY-MM-DD hh:mm:ss.SSS')}"`;
+    return `"${utc.format('YYYY-MM-DDThh:mm:ss.SSS[Z]')}"`;
   };
 
   formatNewQuery = (oldQuery: string, field: string, value: string, type: FieldType) => {
