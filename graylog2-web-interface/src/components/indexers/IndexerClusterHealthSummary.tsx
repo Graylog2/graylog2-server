@@ -44,7 +44,7 @@ const IndexerClusterHealthSummary = ({ health, name }: {
 }) => {
   const formattedHealthStatus = health.status.toLowerCase();
 
-  const _alertClassForHealth = () => {
+  const alertClassForHealth = () => {
     switch (formattedHealthStatus) {
       case 'green': return 'success';
       case 'yellow': return 'warning';
@@ -53,8 +53,8 @@ const IndexerClusterHealthSummary = ({ health, name }: {
     }
   };
 
-  const _formatTextForHealth = useMemo(() => {
-    const text = `Elasticsearch cluster is ${formattedHealthStatus}.`;
+  const formattedTextForHealth = useMemo(() => {
+    const text = `Elasticsearch cluster ${name?.name || ''} is ${formattedHealthStatus}.`;
 
     switch (formattedHealthStatus) {
       case 'green': return text;
@@ -62,9 +62,9 @@ const IndexerClusterHealthSummary = ({ health, name }: {
       case 'red': return <strong>{text}</strong>;
       default: return text;
     }
-  }, [formattedHealthStatus]);
+  }, [formattedHealthStatus, name]);
 
-  const _iconNameForHealth = () => {
+  const iconNameForHealth = () => {
     switch (formattedHealthStatus) {
       case 'green': return 'check-circle';
       case 'yellow': return 'exclamation-triangle';
@@ -74,9 +74,8 @@ const IndexerClusterHealthSummary = ({ health, name }: {
   };
 
   return (
-    <ESClusterStatus bsStyle={_alertClassForHealth()}>
-      <Icon name={_iconNameForHealth()} /> &nbsp;{_formatTextForHealth}{' '}
-      {name?.name && `Name: ${name.name}`}{' '},
+    <ESClusterStatus bsStyle={alertClassForHealth()}>
+      <Icon name={iconNameForHealth()} /> &nbsp;{formattedTextForHealth}{' '}
       Shards:{' '}
       {health.shards.active} active,{' '}
       {health.shards.initializing} initializing,{' '}
