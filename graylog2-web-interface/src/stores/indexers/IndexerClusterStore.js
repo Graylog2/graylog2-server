@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import Reflux from 'reflux';
 
 import * as URLUtils from 'util/URLUtils';
@@ -33,23 +34,6 @@ export const IndexerClusterStore = singletonStore(
   'core.IndexerCluster',
   () => Reflux.createStore({
     listenables: [IndexerClusterActions],
-    state: {},
-    init() {
-      this.update();
-    },
-    update() {
-      Promise.all([
-        this.health().then((health) => {
-          this.state.health = health;
-        }),
-        this.name().then((response) => {
-          this.state.name = response.name;
-        }),
-      ]).then(() => this.trigger(this.state));
-    },
-    getInitialState() {
-      return this.state;
-    },
     health() {
       const url = URLUtils.qualifyUrl(ApiRoutes.IndexerClusterApiController.health().url);
       const promise = fetch('GET', url);
