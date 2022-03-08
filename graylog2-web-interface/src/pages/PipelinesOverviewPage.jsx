@@ -28,7 +28,7 @@ import CreatePipelineButton from '../components/pipelines/CreatePipelineButton';
 
 const PipelinesOverviewPage = () => (
   <DocumentTitle title="Pipelines">
-    <div>
+    <div data-capture-group="system-pipelines-overview-page">
       <PageHeader title="Pipelines overview"
                   subactions={(<CreatePipelineButton />)}>
         <span>

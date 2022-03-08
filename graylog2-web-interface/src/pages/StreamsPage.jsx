@@ -61,7 +61,7 @@ const StreamsPage = createReactClass({
 
     return (
       <DocumentTitle title="Streams">
-        <div>
+        <div data-capture-group="streams-page">
           <PageHeader title="Streams">
             <span>
               You can route incoming messages into streams by applying rules against them. Messages matching

@@ -29,7 +29,7 @@ import HideOnCloud from 'util/conditional/HideOnCloud';
 const SystemOverviewPage = () => {
   return (
     <DocumentTitle title="System overview">
-      <span>
+      <span data-capture-group="system-overview-page">
         <IfPermitted permissions="notifications:read">
           <NotificationsList />
         </IfPermitted>

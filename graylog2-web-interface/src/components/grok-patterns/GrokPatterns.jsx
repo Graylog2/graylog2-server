@@ -193,7 +193,7 @@ class GrokPatterns extends React.Component {
     );
 
     return (
-      <div>
+      <div data-capture-group="system-grok-patterns-page">
         <PageHeader title="Grok patterns">
           <span>
             This is a list of grok patterns you can use in your Graylog grok extractors. You can add

@@ -27,24 +27,26 @@ import DocumentationLink from 'components/support/DocumentationLink';
 
 const UsersOverviewPage = () => (
   <DocumentTitle title="Users Overview">
-    <PageHeader title="Users Overview"
-                subactions={(
-                  <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
-                    <Button bsStyle="success">Create User</Button>
-                  </LinkContainer>
-                )}>
-      <span>Overview of Graylog&apos;s registered users.</span>
+    <div data-capture-group="system-users-overview-page">
+      <PageHeader title="Users Overview"
+                  subactions={(
+                    <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
+                      <Button bsStyle="success">Create User</Button>
+                    </LinkContainer>
+                  )}>
+        <span>Overview of Graylog&apos;s registered users.</span>
 
-      <span>
-        Learn more in the{' '}
-        <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                           text="documentation" />
-      </span>
+        <span>
+          Learn more in the{' '}
+          <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
+                             text="documentation" />
+        </span>
 
-      <UserOverviewLinks />
-    </PageHeader>
+        <UserOverviewLinks />
+      </PageHeader>
 
-    <UsersOverview />
+      <UsersOverview />
+    </div>
   </DocumentTitle>
 );
 

@@ -49,7 +49,7 @@ class IndicesPage extends React.Component {
 
     return (
       <DocumentTitle title="Indices and Index Sets">
-        <span>
+        <span data-capture-group="system-indices-page">
           {pageHeader}
 
           <Row className="content">

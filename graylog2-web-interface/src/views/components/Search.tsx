@@ -192,7 +192,7 @@ const Search = () => {
                     <DefaultFieldTypesProvider>
                       <ViewAdditionalContextProvider>
                         <HighlightingRulesProvider>
-                          <GridContainer id="main-row" interactive={interactive}>
+                          <GridContainer id="main-row" interactive={interactive} data-capture-group="search-page">
                             <IfInteractive>
                               <ConnectedSidebar>
                                 <FieldsOverview />
