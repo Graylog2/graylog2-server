@@ -26,7 +26,7 @@ import RefreshControls from 'views/components/searchbar/RefreshControls';
 import { FlatContentRow, Spinner } from 'components/common';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import SearchButton from 'views/components/searchbar/SearchButton';
-import QueryInput from 'views/components/searchbar/AsyncQueryInput';
+import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
 import ViewActionsMenu from 'views/components/ViewActionsMenu';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';

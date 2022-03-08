@@ -15,13 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
-import type { DefaultTheme } from 'styled-components';
-import { withTheme } from 'styled-components';
+import { useCallback, useMemo, useContext } from 'react';
 import PropTypes from 'prop-types';
 
-import { themePropTypes } from 'theme';
-import withPluginEntities from 'views/logic/withPluginEntities';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
@@ -29,42 +25,24 @@ import type { QueryValidationState } from 'views/components/searchbar/queryvalid
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
-import StyledAceEditor from './StyledAceEditor';
+import type { AutoCompleter, Editor } from './ace-types';
+import type { BaseQueryInputProps } from './BaseQueryInput';
+import BaseQueryInput from './BaseQueryInput';
 
-import type { AutoCompleter, Editor } from '../ace-types';
 import SearchBarAutoCompletions from '../SearchBarAutocompletions';
 import type { Completer, FieldTypes } from '../SearchBarAutocompletions';
 
-type Props = {
-  className?: string
-  completerFactory: (
-    completers: Array<Completer>,
-    timeRange: TimeRange | NoTimeRangeOverride | undefined,
-    streams: Array<string>,
-    fieldTypes: FieldTypes,
-  ) => AutoCompleter,
-  completers: Array<Completer>,
-  disableExecution?: boolean,
-  disabled?: boolean,
-  error?: QueryValidationState,
-  height?: number,
-  maxLines?: number,
-  onBlur?: (query: string) => void,
-  onChange: (query: string) => Promise<string>,
-  onExecute: (query: string) => void,
-  placeholder?: string,
-  streams?: Array<string>,
-  theme: DefaultTheme,
-  timeRange?: TimeRange | NoTimeRangeOverride,
-  value: string,
-  warning?: QueryValidationState,
-  wrapEnabled?: boolean,
-};
-
 const defaultCompleterFactory = (...args: ConstructorParameters<typeof SearchBarAutoCompletions>) => new SearchBarAutoCompletions(...args);
 
-const handleExecution = (editor: Editor, onExecute: (query: string) => void, value: string, error: QueryValidationState | undefined, disableExecution: boolean) => {
+const handleExecution = (
+  editor: Editor,
+  onExecute: (query: string) => void,
+  value: string,
+  error: QueryValidationState | undefined,
+  disableExecution: boolean,
+) => {
   if (error) {
     QueryValidationActions.displayValidationErrors();
 
@@ -119,48 +97,8 @@ const _updateEditorConfiguration = (node, completer, onExecute) => {
   }
 };
 
-const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryValidationState | undefined) => {
-  const markerClassName = 'ace_marker';
-  const createMarkers = (explanations = [], className = '') => explanations.map(({
-    beginLine,
-    beginColumn,
-    endLine,
-    endColumn,
-  }) => ({
-    startRow: beginLine,
-    startCol: beginColumn,
-    endRow: endLine,
-    endCol: endColumn,
-    type: 'background',
-    className,
-  }));
-
-  return [
-    ...createMarkers(errors?.explanations, `${markerClassName} ace_validation_error`),
-    ...createMarkers(warnings?.explanations, `${markerClassName} ace_validation_warning`),
-  ];
-};
-
-const QueryInput = ({
-  className,
-  completerFactory = defaultCompleterFactory,
-  completers,
-  disableExecution,
-  disabled,
-  error,
-  height,
-  maxLines,
-  onBlur,
-  onChange,
-  onExecute: onExecuteProp,
-  placeholder,
-  streams,
-  theme,
-  timeRange,
-  value,
-  warning,
-  wrapEnabled,
-}: Props) => {
+const useCompleter = ({ streams, timeRange, completerFactory }: Pick<Props, 'streams' | 'timeRange' | 'completerFactory'>) => {
+  const completers = usePluginEntities('views.completers') ?? [];
   const { data: queryFields } = useFieldTypes(streams, isNoTimeRangeOverride(timeRange) ? DEFAULT_TIMERANGE : timeRange);
   const { data: allFields } = useFieldTypes([], DEFAULT_TIMERANGE);
   const fieldTypes = useMemo(() => {
@@ -169,52 +107,73 @@ const QueryInput = ({
 
     return { all: allFieldsByName, query: queryFieldsByName };
   }, [allFields, queryFields]);
-  const completer = useMemo(() => completerFactory(completers, timeRange, streams, fieldTypes), [completerFactory, completers, timeRange, streams, fieldTypes]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useMemo(() => completerFactory(completers, timeRange, streams, fieldTypes), [completerFactory, timeRange, streams, fieldTypes]);
+};
+
+type Props = BaseQueryInputProps & {
+  completerFactory?: (
+    completers: Array<Completer>,
+    timeRange: TimeRange | NoTimeRangeOverride | undefined,
+    streams: Array<string>,
+    fieldTypes: FieldTypes,
+  ) => AutoCompleter,
+  disableExecution?: boolean,
+  onBlur?: (query: string) => void,
+  onChange: (query: string) => Promise<string>,
+  onExecute: (query: string) => void,
+  streams?: Array<string> | undefined,
+  timeRange?: TimeRange | NoTimeRangeOverride | undefined,
+};
+
+const QueryInput = ({
+  className,
+  completerFactory = defaultCompleterFactory,
+  disableExecution,
+  error,
+  height,
+  maxLines,
+  onBlur,
+  onChange,
+  onExecute: onExecuteProp,
+  placeholder,
+  streams,
+  timeRange,
+  value,
+  warning,
+  wrapEnabled,
+}: Props) => {
+  const { enableSmartSearch } = useContext(UserPreferencesContext);
+  const completer = useCompleter({ streams, timeRange, completerFactory });
   const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor), []);
   const onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecuteProp, value, error, disableExecution), [onExecuteProp, value, error, disableExecution]);
-  const markers = useMemo(() => getMarkers(error, warning), [error, warning]);
   const updateEditorConfiguration = useCallback((node) => _updateEditorConfiguration(node, completer, onExecute), [onExecute, completer]);
 
   return (
-    <UserPreferencesContext.Consumer>
-      {({ enableSmartSearch = true }) => (
-        <StyledAceEditor $height={height}
-                         aceTheme="ace-queryinput" // NOTE: is usually just `theme` but we need that prop for styled-components
-                         className={className}
-                         disabled={disabled}
-                         editorProps={{ $blockScrolling: Infinity, selectionStyle: 'line' }}
-                         enableBasicAutocompletion={enableSmartSearch}
-                         enableLiveAutocompletion={enableSmartSearch}
-                         fontSize={theme.fonts.size.large}
-                         highlightActiveLine={false}
-                         markers={markers}
-                         maxLines={maxLines}
-                         minLines={1}
-                         mode="lucene"
-                         name="QueryEditor"
-                         onBlur={onBlur}
-                         onChange={onChange}
-                         onLoad={onLoadEditor}
-                         placeholder={placeholder}
-                         readOnly={disabled}
-                         ref={updateEditorConfiguration}
-                         setOptions={{ indentedSoftWrap: false }}
-                         showGutter={false}
-                         showPrintMargin={false}
-                         value={value}
-                         wrapEnabled={wrapEnabled} />
-      )}
-    </UserPreferencesContext.Consumer>
+    <BaseQueryInput height={height}
+                    className={className}
+                    disabled={false}
+                    enableAutocompletion={enableSmartSearch}
+                    error={error}
+                    warning={warning}
+                    maxLines={maxLines}
+                    onBlur={onBlur}
+                    onExecute={onExecute}
+                    onChange={onChange}
+                    onLoad={onLoadEditor}
+                    placeholder={placeholder}
+                    ref={updateEditorConfiguration}
+                    value={value}
+                    wrapEnabled={wrapEnabled} />
   );
 };
 
 QueryInput.propTypes = {
   className: PropTypes.string,
   completerFactory: PropTypes.func,
-  completers: PropTypes.array,
   disableExecution: PropTypes.bool,
-  disabled: PropTypes.bool,
-  error: PropTypes.object,
+  error: PropTypes.any,
   height: PropTypes.number,
   maxLines: PropTypes.number,
   onBlur: PropTypes.func,
@@ -222,29 +181,26 @@ QueryInput.propTypes = {
   onExecute: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
   streams: PropTypes.array,
-  theme: themePropTypes.isRequired,
   timeRange: PropTypes.object,
   value: PropTypes.string,
-  warning: PropTypes.object,
+  warning: PropTypes.any,
   wrapEnabled: PropTypes.bool,
 };
 
 QueryInput.defaultProps = {
   className: '',
   completerFactory: defaultCompleterFactory,
-  completers: [],
   disableExecution: false,
-  disabled: false,
   error: undefined,
   height: undefined,
-  maxLines: 4,
-  onBlur: () => {},
+  maxLines: undefined,
+  onBlur: undefined,
   placeholder: '',
   streams: undefined,
   timeRange: undefined,
   value: '',
   warning: undefined,
-  wrapEnabled: true,
+  wrapEnabled: undefined,
 };
 
-export default withPluginEntities(withTheme(QueryInput), { completers: 'views.completers' });
+export default QueryInput;

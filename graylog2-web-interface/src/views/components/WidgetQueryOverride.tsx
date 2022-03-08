@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 import type { ElasticsearchQueryString } from 'views/logic/queries/Query';
 import { Button } from 'components/bootstrap';
 
-import QueryInput from './searchbar/AsyncQueryInput';
+import DisabledQueryInput from './searchbar/queryinput/AsyncDisabledQueryInput';
 
 const Wrapper = styled.div`
   width: 25%;
@@ -51,7 +51,7 @@ const QueryInfo = styled.div(({ theme }) => css`
   }
 `);
 
-const StyledQueryInput = styled(QueryInput)`
+const StyledDisabledQueryInput = styled(DisabledQueryInput)`
   &&.ace-queryinput {
     border: none;
   }
@@ -69,13 +69,10 @@ type Props = {
 const WidgetQueryOverride = ({ value, onReset }: Props) => (
   <Wrapper>
     <QueryInfo>
-      <StyledQueryInput onChange={() => Promise.resolve('')}
-                        onExecute={() => {}}
-                        disabled
-                        value={value.query_string}
-                        height={34}
-                        wrapEnabled={false}
-                        maxLines={1} />
+      <StyledDisabledQueryInput value={value.query_string}
+                                height={34}
+                                wrapEnabled={false}
+                                maxLines={1} />
       <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-query">
         Reset Global Filter
       </ResetButton>

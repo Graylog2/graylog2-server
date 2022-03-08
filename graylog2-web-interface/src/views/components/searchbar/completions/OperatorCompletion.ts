@@ -17,7 +17,7 @@
 import { trim } from 'lodash';
 
 import type { Completer, CompleterContext } from '../SearchBarAutocompletions';
-import type { CompletionResult, Token } from '../ace-types';
+import type { CompletionResult, Token } from '../queryinput/ace-types';
 
 const combiningOperators: Array<CompletionResult> = [
   {
