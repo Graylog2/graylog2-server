@@ -22,15 +22,13 @@ import type { DefaultTheme } from 'styled-components';
 import { withTheme } from 'styled-components';
 import ReactSelect, { components as Components, createFilter } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
-import { List } from 'react-virtualized';
 
 import { themePropTypes } from 'theme';
+import CustomMenuList from 'components/common/CustomMenuList';
 
 import Icon from './Icon';
 
 export const CONTROL_CLASS = 'common-select-control';
-
-const REACT_SELECT_MAX_OPTIONS_LENGTH = 1000;
 
 type Option = { [key: string]: any }
 
@@ -256,23 +254,6 @@ type State = {
   value: any,
 };
 
-const CustomMenuList = (props) => {
-  const rows = props.children;
-
-  const rowRenderer = ({ key, index, isScrolling, isVisible, style }) => {
-    return <div key={key} style={style}>{rows[index]}</div>;
-  };
-
-  return (
-    <List style={{ width: '100%' }}
-          width={300}
-          height={300}
-          rowHeight={30}
-          rowCount={rows.length}
-          rowRenderer={rowRenderer} />
-  );
-};
-
 class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
   static propTypes = {
     /** Specifies if the user can create new entries in `multi` Selects. */
@@ -427,9 +408,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       customComponents.SingleValue = CustomSingleValue(valueRenderer);
     }
 
-    if (this.props.options.length > REACT_SELECT_MAX_OPTIONS_LENGTH) {
-      customComponents.MenuList = CustomMenuList;
-    }
+    customComponents.MenuList = CustomMenuList;
 
     return customComponents;
   };
