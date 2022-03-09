@@ -19,9 +19,9 @@ import moment from 'moment-timezone';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
 import type { ActionHandler } from 'views/components/actions/ActionHandler';
+import { DATE_TIME_FORMATS } from 'util/DateTime';
 
 import QueryManipulationHandler from './QueryManipulationHandler';
-import { DATE_TIME_FORMATS } from 'util/DateTime';
 
 const formatTimestampForES = (value: string) => {
   const utc = moment(value).tz('UTC');
@@ -39,7 +39,6 @@ const formatNewQuery = (oldQuery: string, field: string, value: string, type: Fi
 };
 
 export default class AddToQueryHandler extends QueryManipulationHandler {
-
   handle: ActionHandler<{}> = ({ queryId, field, value = '', type }) => {
     const oldQuery = this.currentQueryString(queryId);
     const newQuery = formatNewQuery(oldQuery, field, value, type);
