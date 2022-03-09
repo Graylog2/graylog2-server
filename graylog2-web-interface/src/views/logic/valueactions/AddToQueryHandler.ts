@@ -21,26 +21,28 @@ import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
 import type { ActionHandler } from 'views/components/actions/ActionHandler';
 
 import QueryManipulationHandler from './QueryManipulationHandler';
+import { DATE_TIME_FORMATS } from 'util/DateTime';
+
+const formatTimestampForES = (value: string) => {
+  const utc = moment(value).tz('UTC');
+
+  return `"${utc.format(DATE_TIME_FORMATS.internalES)}"`;
+};
+
+const formatNewQuery = (oldQuery: string, field: string, value: string, type: FieldType) => {
+  const predicateValue = type.type === 'date'
+    ? formatTimestampForES(value)
+    : escape(value);
+  const fieldPredicate = `${field}:${predicateValue}`;
+
+  return addToQuery(oldQuery, fieldPredicate);
+};
 
 export default class AddToQueryHandler extends QueryManipulationHandler {
-  formatTimestampForES = (value: string) => {
-    const utc = moment(value).tz('UTC');
-
-    return `"${utc.format('YYYY-MM-DDThh:mm:ss.SSS[Z]')}"`;
-  };
-
-  formatNewQuery = (oldQuery: string, field: string, value: string, type: FieldType) => {
-    const predicateValue = type.type === 'date'
-      ? this.formatTimestampForES(value)
-      : escape(value);
-    const fieldPredicate = `${field}:${predicateValue}`;
-
-    return addToQuery(oldQuery, fieldPredicate);
-  };
 
   handle: ActionHandler<{}> = ({ queryId, field, value = '', type }) => {
     const oldQuery = this.currentQueryString(queryId);
-    const newQuery = this.formatNewQuery(oldQuery, field, value, type);
+    const newQuery = formatNewQuery(oldQuery, field, value, type);
 
     return this.updateQueryString(queryId, newQuery);
   };
