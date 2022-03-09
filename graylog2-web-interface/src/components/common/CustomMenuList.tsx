@@ -14,6 +14,7 @@ const CustomMenuList = ({ children, ...rest }: { children: React.ReactElement}) 
 
   return (
     <List style={{ width: '100%' }}
+          data-testid="react-virtualized-list"
           width={300}
           height={300}
           rowHeight={30}
