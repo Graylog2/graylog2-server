@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState, useContext } from 'react';
+import { useCallback, useState } from 'react';
 import { Form, Formik } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
@@ -31,7 +31,6 @@ import type { RelativeTimeRangeClassified } from 'views/components/searchbar/dat
 import validateTimeRange from 'views/components/TimeRangeValidation';
 import type { DateTimeFormats, DateTime } from 'util/DateTime';
 import { toDateObject } from 'util/DateTime';
-import UserDateTimeContext from 'contexts/UserDateTimeContext';
 import useUserDateTime from 'hooks/useUserDateTime';
 
 import migrateTimeRangeToNewType from './migrateTimeRangeToNewType';
