@@ -43,7 +43,7 @@ public abstract class SearchTypeExecutionState {
     public abstract Optional<Integer> offset();
 
     @Nullable
-    @JsonProperty
+    @JsonProperty("after")
     public abstract List<Object> searchAfter();
 
     public static SearchTypeExecutionState.Builder builder() {
@@ -57,7 +57,7 @@ public abstract class SearchTypeExecutionState {
         public abstract Builder limit(Integer limit);
         @JsonProperty
         public abstract Builder offset(Integer offset);
-        @JsonProperty
+        @JsonProperty("after")
         public abstract Builder searchAfter(@Nullable List<Object> searchAfter);
 
         @JsonCreator
