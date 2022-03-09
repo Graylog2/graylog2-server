@@ -21,8 +21,8 @@ import org.graylog2.configuration.validators.RotationStrategyValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 
 public class RotationStrategyValidatorTest {
     private final RotationStrategyValidator validator = new RotationStrategyValidator();
@@ -38,31 +38,38 @@ public class RotationStrategyValidatorTest {
     @Test
     void emptySet() {
         Assertions.assertThrows(ValidationException.class, () -> {
-            validator.validate(PARAM, new HashSet<>());
+            validator.validate(PARAM, new ArrayList<>());
+        });
+    }
+
+    @Test
+    void duplicates() {
+        Assertions.assertThrows(ValidationException.class, () -> {
+            validator.validate(PARAM, Arrays.asList("1", "1"));
         });
     }
 
     @Test
     void invalidStrategy() {
         Assertions.assertThrows(ValidationException.class, () -> {
-            validator.validate(PARAM, new HashSet<>(Arrays.asList("invalid-strategy")));
+            validator.validate(PARAM, Arrays.asList("invalid-strategy"));
         });
         Assertions.assertThrows(ValidationException.class, () -> {
-            validator.validate(PARAM, new HashSet<>(Arrays.asList(
+            validator.validate(PARAM, Arrays.asList(
                     TimeBasedRotationStrategy.NAME,
-                    "invalid-strategy")));
+                    "invalid-strategy"));
         });
     }
 
     @Test
     void validStrategy() throws ValidationException {
-        validator.validate(PARAM, new HashSet<>(Arrays.asList(
+        validator.validate(PARAM, Arrays.asList(
                 TimeBasedRotationStrategy.NAME
-        )));
-        validator.validate(PARAM, new HashSet<>(Arrays.asList(
+        ));
+        validator.validate(PARAM, Arrays.asList(
                 TimeBasedRotationStrategy.NAME,
                 SizeBasedRotationStrategy.NAME,
                 MessageCountRotationStrategy.NAME
-        )));
+        ));
     }
 }
