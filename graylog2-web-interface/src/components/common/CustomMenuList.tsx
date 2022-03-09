@@ -4,9 +4,9 @@ import { components as Components } from 'react-select';
 
 const REACT_SELECT_MAX_OPTIONS_LENGTH = 1000;
 
-const CustomMenuList = ({ children }: { children: React.ReactElement}) => {
+const CustomMenuList = ({ children, ...rest }: { children: React.ReactElement}) => {
   const rows = React.Children.toArray(children);
-  if (rows.length < REACT_SELECT_MAX_OPTIONS_LENGTH) return Components.MenuList;
+  if (rows.length < REACT_SELECT_MAX_OPTIONS_LENGTH) return <Components.MenuList {...rest}>{children}</Components.MenuList>;
 
   const rowRenderer = ({ key, index, style }) => {
     return <div key={key} style={style}>{rows[index]}</div>;

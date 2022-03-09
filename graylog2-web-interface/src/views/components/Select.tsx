@@ -184,7 +184,6 @@ const Select = ({
   ignoreCase = true,
   ignoreAccents = false,
   allowOptionCreation = false,
-  options,
   ...rest
 }: Props) => {
   const theme = useTheme();
@@ -241,7 +240,6 @@ const Select = ({
 
   const selectProps: React.ComponentProps<typeof ReactSelect> | React.ComponentProps<typeof CreatableSelect> = {
     ...rest,
-    options,
     components: _components,
     filterOption,
     styles: _styles,
