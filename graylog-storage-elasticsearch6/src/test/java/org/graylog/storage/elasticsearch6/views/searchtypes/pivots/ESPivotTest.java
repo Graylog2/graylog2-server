@@ -376,12 +376,10 @@ public class ESPivotTest {
     }
 
     @Test
-    public void searchResultForAllMessagesIncludesPivotTimerangeForNoDocuments() throws InvalidRangeParametersException {
+    public void searchResultForAllMessagesIncludesPivotTimerangeForNoDocuments() {
         when(queryResult.getTotal()).thenReturn(0L);
-        final TimeRange pivotRange = mock(TimeRange.class);
+        final TimeRange pivotRange = AbsoluteRange.create(DateTime.parse("1970-01-01T00:00:00.000Z"), DateTime.parse("2020-01-09T15:44:25.408Z"));
         when(query.effectiveTimeRange(pivot)).thenReturn(pivotRange);
-        when(pivotRange.getFrom()).thenReturn(DateTime.parse("1970-01-01T00:00:00.000Z"));
-        when(pivotRange.getTo()).thenReturn(DateTime.parse("2020-01-09T15:44:25.408Z"));
         final SearchType.Result result = this.esPivot.doExtractResult(job, query, pivot, queryResult, aggregations, queryContext);
         final PivotResult pivotResult = (PivotResult) result;
 
