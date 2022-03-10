@@ -72,6 +72,7 @@ import org.graylog2.shared.messageq.MessageQueueModule;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.shared.security.RestrictToLeaderFeature;
 import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.storage.CheckSearchVersionDynamicFeature;
 import org.graylog2.streams.DefaultStreamChangeHandler;
 import org.graylog2.streams.StreamRouter;
 import org.graylog2.streams.StreamRouterEngine;
@@ -184,6 +185,7 @@ public class ServerBindings extends Graylog2Module {
         final Multibinder<Class<? extends DynamicFeature>> dynamicFeatures = jerseyDynamicFeatureBinder();
         dynamicFeatures.addBinding().toInstance(MetricsDynamicBinding.class);
         dynamicFeatures.addBinding().toInstance(RestrictToLeaderFeature.class);
+        dynamicFeatures.addBinding().toInstance(CheckSearchVersionDynamicFeature.class);
     }
 
     private void bindExceptionMappers() {
