@@ -56,11 +56,7 @@ const _streamFilters = (selectedStreams: Array<string>) => {
 };
 
 export const filtersForQuery = (streams: Array<string> | null | undefined): FilterType | null | undefined => {
-  if (!streams || streams.length === 0) {
-    return null;
-  }
-
-  const streamFilters = _streamFilters(streams);
+  const streamFilters = _streamFilters(streams ?? []);
 
   return Immutable.Map({
     type: 'or',
@@ -149,6 +145,7 @@ export default class Query {
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const { id, query, timerange, filter, searchTypes } = this._value;
+
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const builder = Query.builder()
       .id(id)

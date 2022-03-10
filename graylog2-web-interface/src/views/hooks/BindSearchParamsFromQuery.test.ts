@@ -63,6 +63,12 @@ describe('BindSearchParamsFromQuery should', () => {
     expect(QueriesActions.update).not.toHaveBeenCalled();
   });
 
+  it('not update query when query is already up to date', async () => {
+    await bindSearchParamsFromQuery(defaultInput);
+
+    expect(QueriesActions.update).not.toHaveBeenCalled();
+  });
+
   it('update query string with provided query param', async () => {
     const input = {
       ...defaultInput,
