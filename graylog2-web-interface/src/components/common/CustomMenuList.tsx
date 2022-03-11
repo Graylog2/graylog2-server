@@ -17,26 +17,41 @@
 import React from 'react';
 import { List } from 'react-virtualized';
 import { components as Components } from 'react-select';
+import type { Props } from 'react-select/creatable';
 
 const REACT_SELECT_MAX_OPTIONS_LENGTH = 1000;
 
-const CustomMenuList = ({ children, ...rest }: { children: React.ReactElement}) => {
+const CustomMenuList = ({ children, innerProps, ...rest }: Props.MenuList) => {
   const rows = React.Children.toArray(children);
-  if (rows.length < REACT_SELECT_MAX_OPTIONS_LENGTH) return <Components.MenuList {...rest}>{children}</Components.MenuList>;
+
+  if (rows.length < REACT_SELECT_MAX_OPTIONS_LENGTH) {
+    return (
+      <Components.MenuList {...rest}
+                           innerProps={{
+                             ...innerProps,
+                             'data-testid': 'react-select-list',
+                           }}>
+        {children}
+      </Components.MenuList>
+    );
+  }
 
   const rowRenderer = ({ key, index, style }) => {
-    return <div key={key} style={style}>{rows[index]}</div>;
+    return <div data-testid="react-virtualized-list-item" key={key} style={style}>{rows[index]}</div>;
   };
 
   return (
     <List style={{ width: '100%' }}
-          data-testid="react-virtualized-list"
           width={300}
           height={300}
           rowHeight={30}
           rowCount={rows.length}
           rowRenderer={rowRenderer} />
   );
+};
+
+CustomMenuList.defaultProps = {
+  innerProps: {},
 };
 
 export default CustomMenuList;

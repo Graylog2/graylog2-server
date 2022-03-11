@@ -413,16 +413,6 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     return customComponents;
   };
 
-  getValue = () => {
-    const { value } = this.state;
-
-    return value;
-  };
-
-  clearValue = () => {
-    this.setState({ value: undefined });
-  };
-
   _extractOptionValue = (onChangeValue: Option | Array<Option>) => {
     const { multi, valueKey, delimiter } = this.props;
 
