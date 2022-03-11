@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.github.zafarkhaja.semver.expr.LexerException;
 import com.google.auto.value.AutoValue;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -63,28 +64,36 @@ public class SearchVersionResource extends RestResource implements PluginRestRes
     @ApiOperation(value = "Confirms whether the current search version satisfies a given distribution and Semantic Versioning version")
     public SatisfiesVersionResponse satisfiesVersion(@ApiParam(name = "distribution", required = true) @PathParam("distribution") String distribution,
                                                      @ApiParam(name = "version") @QueryParam("version") String version) {
-
-        final SearchVersion currentVersion = versionProvider.get();
-
+        // if no version provided give default to only check distribution
         if (version == null || version.isEmpty()) {
             version = ">0";
         }
-        final SearchVersionRange requiredVersion;
+
+        // attempt to parse a SearchVersion.Distribution from provided distribution string
         final SearchVersion.Distribution requiredDistribution;
         try {
             requiredDistribution = SearchVersion.Distribution.valueOf(distribution.toUpperCase(Locale.ENGLISH));
-            requiredVersion = SearchVersionRange.of(requiredDistribution, version);
-        } catch (Exception e) {
-            LOG.error("Unable to create a search version range for distribution {} and SemVer expression {}",
-                    distribution, version);
-            throw new InternalServerErrorException(
-                    StringUtils.f("Unable to create a search version range for distribution %s and SemVer expression %s",
-                            distribution, version));
+        } catch (IllegalArgumentException e) {
+            LOG.error("Unsupported distribution {}. Valid values are [opensearch, elasticsearch].", distribution);
+            throw new InternalServerErrorException(StringUtils.f(
+                    "Unsupported distribution %s. Valid values are [opensearch, elasticsearch].", distribution));
         }
 
-        boolean satisfied = currentVersion.satisfies(requiredVersion);
-        LOG.debug("Checking current version {} satisfies required version {} {}",
-                currentVersion, requiredDistribution, version);
+        final SearchVersion currentVersion = versionProvider.get();
+        final SearchVersionRange requiredVersion = SearchVersionRange.of(requiredDistribution, version);
+        final boolean satisfied;
+        try {
+            LOG.debug("Checking current version {} satisfies required version {} {}",
+                    currentVersion, requiredDistribution, version);
+            satisfied = currentVersion.satisfies(requiredVersion);
+        } catch (LexerException e) {
+            // catch invalid SemVer expression
+            LOG.error("Unable to create a search version range for SemVer expression {}", version);
+            throw new InternalServerErrorException(
+                    StringUtils.f("Unable to create a search version range for SemVer expression %s", version));
+        }
+
+        // create and send response
         String errorMessage = "";
         if (!satisfied) {
             errorMessage = StringUtils.f("Current search version %s does not satisfy required version %s %s",
