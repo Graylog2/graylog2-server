@@ -108,7 +108,7 @@ abstract class SatisfiesVersionResponse {
     @AutoValue.Builder
     public abstract static class Builder {
 
-        @JsonProperty("supported")
+        @JsonProperty("satisfied")
         public abstract SatisfiesVersionResponse.Builder satisfied(boolean satisfied);
 
         @JsonProperty("errorMessage")
