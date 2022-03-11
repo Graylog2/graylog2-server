@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog2.rest.resources.system;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -19,18 +35,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.Locale;
 
-@Api(value = "System/SearchVersion", description = "Checks system search version")
+@Api(value = "System/SearchVersion", description = "Checks system search version requirements")
 @Path("/system/searchVersion")
 @Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class SearchVersionResource extends RestResource implements PluginRestResource {
 
@@ -42,35 +58,37 @@ public class SearchVersionResource extends RestResource implements PluginRestRes
         this.versionProvider = versionProvider;
     }
 
-    @PUT
-    @Path("/satisfiesVersion")
+    @GET
+    @Path("/satisfiesVersion/{distribution}")
     @ApiOperation(value = "Confirms whether the current search version satisfies a given distribution and Semantic Versioning version")
-    public SatisfiesVersionResponse satisfiesVersion(@ApiParam(name = "requiredVersion", required = true) SatisfiesVersionRequest request) {
+    public SatisfiesVersionResponse satisfiesVersion(@ApiParam(name = "distribution", required = true) @PathParam("distribution") String distribution,
+                                                     @ApiParam(name = "version") @QueryParam("version") String version) {
 
         final SearchVersion currentVersion = versionProvider.get();
-        final String requiredDistributionStr = request.distribution();
-        final String requiredVersionExpression = request.expression();
 
+        if (version == null || version.isEmpty()) {
+            version = ">0";
+        }
         final SearchVersionRange requiredVersion;
         final SearchVersion.Distribution requiredDistribution;
         try {
-            requiredDistribution = SearchVersion.Distribution.valueOf(requiredDistributionStr.toUpperCase(Locale.ENGLISH));
-            requiredVersion = SearchVersionRange.of(requiredDistribution, requiredVersionExpression);
+            requiredDistribution = SearchVersion.Distribution.valueOf(distribution.toUpperCase(Locale.ENGLISH));
+            requiredVersion = SearchVersionRange.of(requiredDistribution, version);
         } catch (Exception e) {
             LOG.error("Unable to create a search version range for distribution {} and SemVer expression {}",
-                    requiredDistributionStr, requiredVersionExpression);
+                    distribution, version);
             throw new InternalServerErrorException(
                     StringUtils.f("Unable to create a search version range for distribution %s and SemVer expression %s",
-                            requiredDistributionStr, requiredVersionExpression));
+                            distribution, version));
         }
 
         boolean satisfied = currentVersion.satisfies(requiredVersion);
         LOG.debug("Checking current version {} satisfies required version {} {}",
-                currentVersion, requiredDistribution, requiredVersionExpression);
+                currentVersion, requiredDistribution, version);
         String errorMessage = "";
         if (!satisfied) {
             errorMessage = StringUtils.f("Current search version %s does not satisfy required version %s %s",
-                    currentVersion, requiredDistribution, requiredVersionExpression);
+                    currentVersion, requiredDistribution, version);
         }
         return SatisfiesVersionResponse.Builder.create().satisfied(satisfied).errorMessage(errorMessage).build();
     }
@@ -104,33 +122,3 @@ abstract class SatisfiesVersionResponse {
         }
     }
 }
-
-@AutoValue
-@JsonAutoDetect
-@JsonDeserialize(builder = SatisfiesVersionRequest.Builder.class)
-abstract class SatisfiesVersionRequest {
-
-    @JsonProperty("distribution")
-    public abstract String distribution();
-
-    @JsonProperty("expression")
-    public abstract String expression();
-
-    @AutoValue.Builder
-    public abstract static class Builder {
-
-        @JsonProperty("distribution")
-        public abstract SatisfiesVersionRequest.Builder distribution(String distribution);
-
-        @JsonProperty("expression")
-        public abstract SatisfiesVersionRequest.Builder expression(String expression);
-
-        public abstract SatisfiesVersionRequest build();
-
-        @JsonCreator
-        public static SatisfiesVersionRequest.Builder create() {
-            return new AutoValue_SatisfiesVersionRequest.Builder();
-        }
-    }
-}
-
