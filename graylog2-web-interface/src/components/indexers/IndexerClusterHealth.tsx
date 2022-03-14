@@ -14,39 +14,40 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useQueries } from 'react-query';
 
 import { Spinner } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
 import { DocumentationLink, SmallSupportLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import { IndexerClusterHealthSummary } from 'components/indexers';
-import { IndexerClusterActions } from 'stores/indexers/IndexerClusterStore';
+import { getIndexerClusterHealth, getIndexerClusterName } from 'components/indexers/api';
+import type FetchError from 'logic/errors/FetchError';
+import { GET_INDEXER_CLUSTER_HEALTH, GET_INDEXER_CLUSTER_NAME } from 'logic/reactQueryKeys';
 
 import IndexerClusterHealthError from './IndexerClusterHealthError';
 
 const useLoadHealthAndName = () => {
-  const [state, setState] = useState({ health: undefined, name: undefined, error: undefined, loading: false });
+  const [
+    { data: healthData, isFetching: healthIsFetching, error: healthError, isSuccess: healthIsSuccess },
+    { data: nameData, isFetching: nameIsFetching, error: nameError, isSuccess: nameIsSuccess },
+  ] = useQueries([
+    { queryKey: GET_INDEXER_CLUSTER_HEALTH, queryFn: getIndexerClusterHealth },
+    { queryKey: GET_INDEXER_CLUSTER_NAME, queryFn: getIndexerClusterName },
+  ]);
 
-  useEffect(() => {
-    setState({ health: undefined, name: undefined, error: undefined, loading: true });
-
-    Promise.all([
-      IndexerClusterActions.health(),
-      IndexerClusterActions.name(),
-    ]).then(([healthResponse, nameResponse]) => setState({ health: healthResponse, name: nameResponse, error: undefined, loading: false }))
-      .catch(
-        (error) => {
-          setState({ health: undefined, name: undefined, error, loading: false });
-        },
-      );
-  }, [setState]);
-
-  return state;
+  return ({
+    health: healthData,
+    name: nameData,
+    error: (healthError || nameError) as FetchError,
+    loading: healthIsFetching || nameIsFetching,
+    isSuccess: healthIsSuccess && nameIsSuccess,
+  });
 };
 
 const IndexerClusterHealth = () => {
-  const { health, name, loading, error } = useLoadHealthAndName();
+  const { health, name, loading, error, isSuccess } = useLoadHealthAndName();
 
   return (
     <Row className="content">
@@ -57,7 +58,7 @@ const IndexerClusterHealth = () => {
           The possible Elasticsearch cluster states and more related information is available in the{' '}
           <DocumentationLink page={DocsHelper.PAGES.CONFIGURING_ES} text="Graylog documentation" />.
         </SmallSupportLink>
-        {health && <IndexerClusterHealthSummary health={health} name={name} />}
+        {isSuccess && <IndexerClusterHealthSummary health={health} name={name} />}
         {loading && <Spinner />}
         {error && <IndexerClusterHealthError error={error} />}
       </Col>
