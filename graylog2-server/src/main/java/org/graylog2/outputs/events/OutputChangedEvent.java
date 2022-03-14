@@ -14,30 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.models.system.indices;
+package org.graylog2.outputs.events;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
-
-import java.util.List;
 
 @AutoValue
-@WithBeanGetter
-@JsonAutoDetect
-public abstract class RotationStrategies {
-    @JsonProperty
-    public int total() {
-        return strategies().size();
-    }
-
-    @JsonProperty
-    public abstract List<RotationStrategyDescription> strategies();
+public abstract class OutputChangedEvent {
+    @JsonProperty("output_id")
+    public abstract String outputId();
 
     @JsonCreator
-    public static RotationStrategies create(@JsonProperty("strategies") List<RotationStrategyDescription> strategies) {
-        return new AutoValue_RotationStrategies(strategies);
+    public static OutputChangedEvent create(@JsonProperty("output_id") String outputId) {
+        return new AutoValue_OutputChangedEvent(outputId);
     }
 }

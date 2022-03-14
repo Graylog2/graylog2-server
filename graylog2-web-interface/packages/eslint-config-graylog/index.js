@@ -42,7 +42,10 @@ module.exports = {
       files: ['*.js', '*.jsx'],
     },
     {
-      files: ['*.test.js', '*.test.jsx', '*.test.ts', '*.test.tsx'],
+      files: [
+        '*.test.js', '*.test.jsx', '*.test.ts', '*.test.tsx',
+        '*.it.js', '*.it.jsx', '*.it.ts', '*.it.tsx',
+      ],
       plugins: [
         'jest',
         'testing-library',
