@@ -19,6 +19,7 @@ import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import type { Theme as DefaultSelectTheme } from 'react-select';
 import ReactSelect, { components as Components, createFilter } from 'react-select';
+import type { Props as RSProps } from 'react-select/creatable';
 import CreatableSelect from 'react-select/creatable';
 import { Overlay } from 'react-overlays';
 import { useTheme } from 'styled-components';
@@ -152,7 +153,7 @@ type Props = {
   value?: Object | Array<Object> | null | undefined,
 };
 
-const ValueWithTitle = (props: React.ComponentProps<typeof Components.MultiValue>) => {
+const ValueWithTitle = (props: RSProps.MultiValue) => {
   const { data: { label } } = props;
 
   return <Components.MultiValue {...props} innerProps={{ title: label }} />;

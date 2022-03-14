@@ -254,6 +254,27 @@ type State = {
   value: any,
 };
 
+const getCustomComponents = (inputProps?: { [key: string]: any }, optionRenderer?: (option: Option) => React.ReactElement,
+  valueRenderer?: (option: Option) => React.ReactElement): any => {
+  const customComponents: { [key: string]: any } = {};
+
+  if (inputProps) {
+    customComponents.Input = CustomInput(inputProps);
+  }
+
+  if (optionRenderer) {
+    customComponents.Option = CustomOption(optionRenderer);
+  }
+
+  if (valueRenderer) {
+    customComponents.SingleValue = CustomSingleValue(valueRenderer);
+  }
+
+  customComponents.MenuList = CustomMenuList;
+
+  return customComponents;
+};
+
 class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
   static propTypes = {
     /** Specifies if the user can create new entries in `multi` Selects. */
@@ -373,7 +394,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     const { inputProps, optionRenderer, value, valueRenderer } = props;
 
     this.state = {
-      customComponents: this.getCustomComponents(inputProps, optionRenderer, valueRenderer),
+      customComponents: getCustomComponents(inputProps, optionRenderer, valueRenderer),
       value,
     };
   }
@@ -388,30 +409,9 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     if (!isEqual(inputProps, nextProps.inputProps)
       || optionRenderer !== nextProps.optionRenderer
       || valueRenderer !== nextProps.valueRenderer) {
-      this.setState({ customComponents: this.getCustomComponents(inputProps, optionRenderer, valueRenderer) });
+      this.setState({ customComponents: getCustomComponents(inputProps, optionRenderer, valueRenderer) });
     }
   }
-
-  getCustomComponents = (inputProps?: { [key: string]: any }, optionRenderer?: (option: Option) => React.ReactElement,
-    valueRenderer?: (option: Option) => React.ReactElement): any => {
-    const customComponents: { [key: string]: any } = {};
-
-    if (inputProps) {
-      customComponents.Input = CustomInput(inputProps);
-    }
-
-    if (optionRenderer) {
-      customComponents.Option = CustomOption(optionRenderer);
-    }
-
-    if (valueRenderer) {
-      customComponents.SingleValue = CustomSingleValue(valueRenderer);
-    }
-
-    customComponents.MenuList = CustomMenuList;
-
-    return customComponents;
-  };
 
   _extractOptionValue = (onChangeValue: Option | Array<Option>) => {
     const { multi, valueKey, delimiter } = this.props;
