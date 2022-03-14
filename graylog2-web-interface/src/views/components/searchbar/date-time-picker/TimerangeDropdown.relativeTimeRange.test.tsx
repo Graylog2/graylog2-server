@@ -35,6 +35,7 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   ),
 }));
 
+jest.mock('hooks/useUserDateTime');
 jest.mock('stores/tools/ToolsStore', () => ({}));
 
 const defaultProps = {
