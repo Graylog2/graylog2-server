@@ -28,6 +28,7 @@ public enum ValidationTypeDTO {
     QUERY_PARSING_ERROR(ValidationType.QUERY_PARSING_ERROR),
     UNKNOWN_FIELD(ValidationType.UNKNOWN_FIELD),
     INVALID_OPERATOR(ValidationType.INVALID_OPERATOR),
+    MISSING_LICENSE(ValidationType.MISSING_LICENSE),
     ;
 
     private final ValidationType internalType;

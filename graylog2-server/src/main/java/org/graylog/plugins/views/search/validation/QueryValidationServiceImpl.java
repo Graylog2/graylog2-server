@@ -21,7 +21,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.elasticsearch.QueryParam;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.errors.MissingEnterpriseLicenseException;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.errors.UnboundParameterError;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
@@ -34,6 +36,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -66,6 +69,14 @@ public class QueryValidationServiceImpl implements QueryValidationService {
             decoratedQuery(req);
         } catch (SearchException searchException) {
             return ValidationResponse.error(toExplanation(searchException));
+        } catch (MissingEnterpriseLicenseException licenseException) {
+            return ValidationResponse.error(
+                    paramsToValidationErrors(
+                            licenseException.getQueryParams(),
+                            ValidationType.MISSING_LICENSE,
+                            param -> "Search parameter used without enterprise license: " + param.name()
+                    ));
+
         }
 
         try {
@@ -86,27 +97,32 @@ public class QueryValidationServiceImpl implements QueryValidationService {
     private List<ValidationMessage> toExplanation(SearchException searchException) {
         if (searchException.error() instanceof UnboundParameterError) {
             final UnboundParameterError error = (UnboundParameterError) searchException.error();
-
-            return
-                    error.allUnknownParametersNames().stream()
-                            .flatMap(param -> {
-                                final String errorMessage = "Unbound required parameter used: " + param.name();
-                                return param.positions()
-                                        .stream()
-                                        .map(
-                                                p -> ValidationMessage.builder(ValidationType.UNDECLARED_PARAMETER)
-                                                        .errorMessage(errorMessage)
-                                                        .beginLine(p.line())
-                                                        .endLine(p.line())
-                                                        .beginColumn(p.beginColumn())
-                                                        .endColumn(p.endColumn())
-                                                        .relatedProperty(param.name())
-                                                        .build()
-                                        );
-                            })
-                            .collect(Collectors.toList());
+            return paramsToValidationErrors(
+                    error.allUnknownParameters(),
+                    ValidationType.UNDECLARED_PARAMETER,
+                    param -> "Unbound required parameter used: " + param.name()
+            );
         }
         return Collections.singletonList(ValidationMessage.fromException(searchException));
+    }
+
+    private List<ValidationMessage> paramsToValidationErrors(final Set<QueryParam> params, final ValidationType errorType, final Function<QueryParam, String> messageBuilder) {
+        return params.stream()
+                .flatMap(param -> {
+                    final String errorMessage = messageBuilder.apply(param);
+                    return param.positions()
+                            .stream()
+                            .map(p -> ValidationMessage.builder(errorType)
+                                    .errorMessage(errorMessage)
+                                    .beginLine(p.line())
+                                    .endLine(p.line())
+                                    .beginColumn(p.beginColumn())
+                                    .endColumn(p.endColumn())
+                                    .relatedProperty(param.name())
+                                    .build()
+                            );
+                })
+                .collect(Collectors.toList());
     }
 
     private List<ValidationMessage> toExplanation(final ParseException parseException) {

@@ -39,7 +39,7 @@ public class UnboundParameterError extends QueryError {
     }
 
     @JsonIgnore
-    public Set<QueryParam> allUnknownParametersNames() {
+    public Set<QueryParam> allUnknownParameters() {
         return allUnknownParameters;
     }
 }
