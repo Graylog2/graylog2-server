@@ -18,6 +18,8 @@ package org.graylog.plugins.views.search.db;
 
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchSummary;
+import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.joda.time.DateTime;
@@ -32,7 +34,11 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,7 +63,7 @@ public class SearchesCleanUpJobTest {
 
     @Before
     public void setup() {
-        this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4));
+        this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4), testViewResolvers());
     }
 
     @Test
@@ -172,5 +178,24 @@ public class SearchesCleanUpJobTest {
         final ArgumentCaptor<String> deletedSearchId = ArgumentCaptor.forClass(String.class);
         verify(searchDbService, times(1)).delete(deletedSearchId.capture());
         assertThat(deletedSearchId.getValue()).isEqualTo("This search is expired and should be deleted");
+    }
+
+    private HashMap<String, ViewResolver> testViewResolvers() {
+        final HashMap<String, ViewResolver> viewResolvers = new HashMap<>();
+        viewResolvers.put("test-resolver", new TestViewResolver());
+
+        return viewResolvers;
+    }
+
+    private static class TestViewResolver implements ViewResolver {
+        @Override
+        public Optional<ViewDTO> get(String id) {
+            return Optional.empty();
+        }
+
+        @Override
+        public Set<String> getSearchIds() {
+            return Collections.singleton("resolved-view-search-id");
+        }
     }
 }
