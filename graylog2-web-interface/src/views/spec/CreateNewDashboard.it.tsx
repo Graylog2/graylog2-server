@@ -92,7 +92,7 @@ jest.mock('stores/sessions/SessionStore', () => ({
   },
 }));
 
-jest.mock('views/components/searchbar/QueryInput', () => () => <span>Query Editor</span>);
+jest.mock('views/components/searchbar/queryinput/QueryInput', () => () => <span>Query Editor</span>);
 
 jest.unmock('logic/rest/FetchProvider');
 
