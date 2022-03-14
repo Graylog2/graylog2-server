@@ -16,7 +16,7 @@
  */
 import * as Immutable from 'immutable';
 
-import type { CompletionResult, Token } from '../ace-types';
+import type { CompletionResult, Token } from '../queryinput/ace-types';
 import type { Completer, CompleterContext } from '../SearchBarAutocompletions';
 
 type Suggestion = Readonly<{

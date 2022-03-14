@@ -24,7 +24,7 @@ import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
 import type { Completer, CompleterContext, FieldTypes } from '../SearchBarAutocompletions';
-import type { Token, Line, CompletionResult } from '../ace-types';
+import type { Token, Line, CompletionResult } from '../queryinput/ace-types';
 
 const SUGGESTIONS_PAGE_SIZE = 50;
 

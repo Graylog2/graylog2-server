@@ -53,6 +53,7 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESCount
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.junit.After;
@@ -384,20 +385,15 @@ public class ESPivotTest {
 
     @Test
     public void searchResultForAllMessagesIncludesPivotTimerangeForNoDocuments() throws InvalidRangeParametersException {
-        DateTimeUtils.setCurrentMillisFixed(1578584665408L);
-        final long documentCount = 0;
-        returnDocumentCount(queryResult, documentCount);
-        final Aggregations mockMetricAggregation = createTimestampRangeAggregations(0d, 0d);
-        when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
-        when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(0));
-
+        returnDocumentCount(queryResult, 0);
+        final TimeRange pivotRange = AbsoluteRange.create(DateTime.parse("1970-01-01T00:00:00.000Z"), DateTime.parse("2020-01-09T15:44:25.408Z"));
+        when(query.effectiveTimeRange(pivot)).thenReturn(pivotRange);
         final SearchType.Result result = this.esPivot.doExtractResult(job, query, pivot, queryResult, aggregations, queryContext);
-
         final PivotResult pivotResult = (PivotResult) result;
-
         assertThat(pivotResult.effectiveTimerange()).isEqualTo(AbsoluteRange.create(
                 DateTime.parse("1970-01-01T00:00:00.000Z"),
                 DateTime.parse("2020-01-09T15:44:25.408Z")
         ));
     }
+
 }

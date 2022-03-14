@@ -28,7 +28,7 @@ import type {
   AutoCompleter,
   Token,
   Line,
-} from './ace-types';
+} from './queryinput/ace-types';
 
 export type FieldTypes = { all: FieldIndex, query: FieldIndex };
 type FieldIndex = { [fieldName: string]: FieldTypeMapping };

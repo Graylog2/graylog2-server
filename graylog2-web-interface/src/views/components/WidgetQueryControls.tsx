@@ -49,7 +49,7 @@ import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
-import QueryInput from './searchbar/AsyncQueryInput';
+import QueryInput from './searchbar/queryinput/AsyncQueryInput';
 import SearchBarForm, { normalizeSearchBarFormValues } from './searchbar/SearchBarForm';
 import WidgetQueryOverride from './WidgetQueryOverride';
 
