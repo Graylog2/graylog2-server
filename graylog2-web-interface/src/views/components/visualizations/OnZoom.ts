@@ -14,25 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import moment from 'moment-timezone';
-
-import AppConfig from 'util/AppConfig';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import type Query from 'views/logic/queries/Query';
 import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type { DateTimeFormats } from 'util/DateTime';
 
-const onZoom = (currentQuery: Query, from: string, to: string, viewType: ViewType | undefined | null) => {
-  const currentUser = CurrentUserStore.get();
-  const timezone = currentUser?.timezone ?? AppConfig.rootTimeZone();
-
+const onZoom = (currentQuery: Query, from: string, to: string, viewType: ViewType | undefined | null, formatTime: (dateTime: string, format: DateTimeFormats) => string) => {
   const newTimeRange = {
     type: 'absolute',
-    from: moment.tz(from, timezone).toISOString(),
-    to: moment.tz(to, timezone).toISOString(),
+    from: formatTime(from, 'internal'),
+    to: formatTime(to, 'internal'),
   };
 
   const action = viewType === View.Type.Dashboard

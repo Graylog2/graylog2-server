@@ -21,12 +21,6 @@ import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 
 import OnZoom from './OnZoom';
 
-const mockGetTimezone = jest.fn(() => ({ timezone: 'UTC' }));
-
-jest.mock('stores/users/CurrentUserStore', () => ({
-  CurrentUserStore: { get: () => mockGetTimezone() },
-}));
-
 jest.mock('views/stores/QueriesStore', () => ({
   QueriesActions: {
     query: jest.fn(() => Promise.resolve()),
@@ -41,14 +35,16 @@ jest.mock('views/stores/GlobalOverrideStore', () => ({
 }));
 
 describe('OnZoom', () => {
+  const formatTime = (time) => time;
+
   it('sets the global override timerange if called from a dashboard', async () => {
     const query = Query.builder().build();
 
-    await OnZoom(query, '2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', View.Type.Dashboard);
+    OnZoom(query, '2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', View.Type.Dashboard, formatTime);
 
     expect(GlobalOverrideActions.timerange).toHaveBeenCalledWith({
-      from: '2020-01-10T13:23:42.000Z',
-      to: '2020-01-10T14:23:42.000Z',
+      from: '2020-01-10 13:23:42.000',
+      to: '2020-01-10 14:23:42.000',
       type: 'absolute',
     });
   });
@@ -56,24 +52,11 @@ describe('OnZoom', () => {
   it('sets the query timerange if called from a dashboard', async () => {
     const query = Query.builder().id('query1').build();
 
-    await OnZoom(query, '2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', View.Type.Search);
+    OnZoom(query, '2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', View.Type.Search, formatTime);
 
     expect(QueriesActions.timerange).toHaveBeenCalledWith('query1', {
-      from: '2020-01-10T13:23:42.000Z',
-      to: '2020-01-10T14:23:42.000Z',
-      type: 'absolute',
-    });
-  });
-
-  it('converts the passed time stamps from the user\'s time range to UTC', async () => {
-    mockGetTimezone.mockReturnValue({ timezone: 'CET' });
-    const query = Query.builder().id('query1').build();
-
-    await OnZoom(query, '2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', View.Type.Search);
-
-    expect(QueriesActions.timerange).toHaveBeenCalledWith('query1', {
-      from: '2020-01-10T12:23:42.000Z',
-      to: '2020-01-10T13:23:42.000Z',
+      from: '2020-01-10 13:23:42.000',
+      to: '2020-01-10 14:23:42.000',
       type: 'absolute',
     });
   });
