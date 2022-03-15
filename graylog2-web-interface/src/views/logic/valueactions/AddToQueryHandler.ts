@@ -26,7 +26,7 @@ import QueryManipulationHandler from './QueryManipulationHandler';
 const formatTimestampForES = (value: string) => {
   const utc = moment(value).tz('UTC');
 
-  return `"${utc.format(DATE_TIME_FORMATS.internalES)}"`;
+  return `"${utc.format(DATE_TIME_FORMATS.internalIndexer)}"`;
 };
 
 const formatNewQuery = (oldQuery: string, field: string, value: string, type: FieldType) => {
