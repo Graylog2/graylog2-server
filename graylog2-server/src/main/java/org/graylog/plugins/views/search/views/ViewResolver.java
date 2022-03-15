@@ -25,6 +25,8 @@ import java.util.Set;
 public interface ViewResolver {
     Optional<ViewDTO> get(String id);
 
+    Set<ViewDTO> getBySearchId(String searchId);
+
     /**
      * @return A set of all search ids referenced by resolvable views.
      * The search ids must be returned to prevent the searches from being automatically deleted by periodically by
