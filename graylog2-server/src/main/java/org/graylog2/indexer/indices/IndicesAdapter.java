@@ -18,6 +18,7 @@ package org.graylog2.indexer.indices;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
+import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.joda.time.DateTime;
@@ -83,6 +84,8 @@ public interface IndicesAdapter {
     Optional<IndexStatistics> getIndexStats(String index);
 
     JsonNode getIndexStats(Collection<String> index);
+
+    IndicesBlockStatus getIndicesBlocksStatus(List<String> indices);
 
     boolean exists(String indexName) throws IOException;
 
