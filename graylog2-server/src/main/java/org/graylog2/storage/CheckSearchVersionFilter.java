@@ -29,6 +29,7 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
+import java.util.Locale;
 
 @Provider
 public class CheckSearchVersionFilter implements ContainerRequestFilter {
@@ -46,11 +47,13 @@ public class CheckSearchVersionFilter implements ContainerRequestFilter {
 
     private void checkVersion(final RequiresSearchVersion annotation) {
 
-        final SearchVersionRange requiredVersion = SearchVersionRange.of(SearchVersion.Distribution.valueOf(annotation.distribution()), annotation.expression());
+        final SearchVersionRange requiredVersion = SearchVersionRange.of(SearchVersion.Distribution.valueOf(
+                annotation.distribution().toUpperCase(Locale.ENGLISH)), annotation.expression());
         final String message = annotation.message();
-        LOG.debug("Checking current version {} satisfies required version {} {}", versionProvider.get(),
+        final SearchVersion currentVersion = versionProvider.get();
+        LOG.debug("Checking current version {} satisfies required version {} {}", currentVersion,
                 requiredVersion.distribution(), requiredVersion.expression());
-        if (!versionProvider.get().satisfies(requiredVersion)) {
+        if (!currentVersion.satisfies(requiredVersion)) {
             LOG.error(message);
             throw new InternalServerErrorException(message);
         }
