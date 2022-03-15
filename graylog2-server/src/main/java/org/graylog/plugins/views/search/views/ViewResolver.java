@@ -26,8 +26,9 @@ public interface ViewResolver {
     Optional<ViewDTO> get(String id);
 
     /**
-     * @return A set of all search ids referenced by resolvable views. These must be returned to prevent the searches
-     * from being automatically deleted by periodic Graylog search maintenance.
+     * @return A set of all search ids referenced by resolvable views.
+     * The search ids must be returned to prevent the searches from being automatically deleted by periodically by
+     * {@link org.graylog.plugins.views.search.db.SearchesCleanUpJob}.
      */
     Set<String> getSearchIds();
 }
