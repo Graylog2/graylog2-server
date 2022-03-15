@@ -17,8 +17,6 @@
 package org.graylog.plugins.views.search.db;
 
 import org.graylog.plugins.views.search.SearchRequirements;
-import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.testing.inject.TestPasswordSecretModule;
 import org.graylog.testing.mongodb.MongoDBFixtures;
@@ -41,8 +39,6 @@ import org.mockito.ArgumentCaptor;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -83,7 +79,7 @@ public class SearchesCleanUpJobWithDBServicesTest {
                 )
         );
         this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4),
-                testViewResolvers());
+                new HashMap<>());
     }
 
     @After
@@ -118,24 +114,5 @@ public class SearchesCleanUpJobWithDBServicesTest {
         verify(searchDbService, times(2)).delete(idCaptor.capture());
 
         assertThat(idCaptor.getAllValues()).containsExactly("5b3b44ca77196aa4679e4da1", "5b3b44ca77196aa4679e4da2");
-    }
-
-    private HashMap<String, ViewResolver> testViewResolvers() {
-        final HashMap<String, ViewResolver> viewResolvers = new HashMap<>();
-        viewResolvers.put("test-resolver", new TestViewResolver());
-
-        return viewResolvers;
-    }
-
-    private static class TestViewResolver implements ViewResolver {
-        @Override
-        public Optional<ViewDTO> get(String id) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Set<String> getSearchIds() {
-            return Collections.singleton("resolved-view-search-id");
-        }
     }
 }
