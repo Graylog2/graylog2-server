@@ -361,7 +361,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
         return client.execute((c, requestOptions) -> {
             final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
-            final BlockSettingsParser blockSettingsParser = new BlockSettingsParser(); //TODO: make it a bean?
+            final BlockSettingsParser blockSettingsParser = new BlockSettingsParser();
             return blockSettingsParser.parseBlockSettings(settingsResponse);
         });
     }
