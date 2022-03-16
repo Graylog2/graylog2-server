@@ -137,14 +137,17 @@ class NotificationsFactory {
           title: notification.details.title,
           description: (
             <span>
-              {notification.details.description}<br/>
-              {notification.details.blockDetails?.length>0 &&
+              {notification.details.description}<br />
+              {notification.details.blockDetails?.length > 0
+                && (
                 <ul>
-                  {notification.details.blockDetails.map((line) => <li>
-                    {line[0]}: {line[1]}
-                  </li>)}
+                  {notification.details.blockDetails.map((line) => (
+                    <li>
+                      {line[0]}: {line[1]}
+                    </li>
+                  ))}
                 </ul>
-              }
+                )}
             </span>
           ),
         };
