@@ -22,14 +22,14 @@ import org.graylog.plugins.views.search.elasticsearch.QueryParam;
 import javax.annotation.Nonnull;
 
 public class EmptyParameterError extends QueryError {
-    private final QueryParam param;
+    private final QueryParam parameterUsage;
 
-    public EmptyParameterError(@Nonnull Query query, String description, QueryParam param) {
+    public EmptyParameterError(@Nonnull Query query, String description, QueryParam parameterUsage) {
         super(query, description);
-        this.param = param;
+        this.parameterUsage = parameterUsage;
     }
 
-    public QueryParam getParam() {
-        return param;
+    public QueryParam getParameterUsage() {
+        return parameterUsage;
     }
 }
