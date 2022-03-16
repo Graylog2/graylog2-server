@@ -17,6 +17,7 @@
 package org.graylog2.storage;
 
 import org.graylog2.configuration.validators.SearchVersionRange;
+import org.graylog2.shared.utilities.StringUtils;
 import org.graylog2.storage.providers.ElasticsearchVersionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,9 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 @Provider
 public class CheckSearchVersionFilter implements ContainerRequestFilter {
@@ -47,13 +50,12 @@ public class CheckSearchVersionFilter implements ContainerRequestFilter {
 
     private void checkVersion(final RequiresSearchVersion annotation) {
 
-        final SearchVersionRange requiredVersion = SearchVersionRange.of(SearchVersion.Distribution.valueOf(
-                annotation.distribution().toUpperCase(Locale.ENGLISH)), annotation.expression());
+        final Set<SearchVersionRange> supportedVersions = parseDistributionStrings(annotation.distributions());
         final String message = annotation.message();
         final SearchVersion currentVersion = versionProvider.get();
-        LOG.debug("Checking current version {} satisfies required version {} {}", currentVersion,
-                requiredVersion.distribution(), requiredVersion.expression());
-        if (!currentVersion.satisfies(requiredVersion)) {
+        LOG.debug("Checking current version {} satisfies required version [{}]", currentVersion,
+                String.join(", ", annotation.distributions()));
+        if (!currentVersion.satisfies(supportedVersions)) {
             LOG.error(message);
             throw new InternalServerErrorException(message);
         }
@@ -66,5 +68,21 @@ public class CheckSearchVersionFilter implements ContainerRequestFilter {
         } else if (resourceInfo.getResourceClass().isAnnotationPresent(RequiresSearchVersion.class)) {
             checkVersion(resourceInfo.getResourceClass().getAnnotation(RequiresSearchVersion.class));
         }
+    }
+
+    private Set<SearchVersionRange> parseDistributionStrings(String[] distributions) throws IllegalArgumentException {
+        final Set<SearchVersionRange> validVersions = new HashSet<>();
+        final String defaultVersionExpression = ">0";
+        for (String distribution : distributions) {
+            String[] distroAndVersion = distribution.split(" ");
+            if (distroAndVersion.length > 2) {
+                throw new IllegalArgumentException(StringUtils.f(
+                        "Invalid distribution '%s'. RequiresSearchVersion distribution must be in the form of 'DISTRIBUTION' or 'DISTRIBUTION VERSION'", distribution));
+            }
+            final SearchVersion.Distribution distro = SearchVersion.Distribution.valueOf(distroAndVersion[0].toUpperCase(Locale.ENGLISH));
+            final String version = distroAndVersion.length == 1 ? defaultVersionExpression : distroAndVersion[1];
+            validVersions.add(SearchVersionRange.of(distro, version));
+        }
+        return validVersions;
     }
 }

@@ -99,7 +99,7 @@ public class CheckSearchVersionDynamicFeatureTest {
         }
     }
 
-    @RequiresSearchVersion(distribution = "OpenSearch", message = "OpenSearch required")
+    @RequiresSearchVersion(distributions = {"OpenSearch"}, message = "OpenSearch required")
     private static class TestResourceWithClassAnnotation {
         @GET
         public String methodWithoutAnnotation() {
@@ -109,7 +109,7 @@ public class CheckSearchVersionDynamicFeatureTest {
 
     private static class TestResourceWithMethodAnnotation {
         @GET
-        @RequiresSearchVersion(distribution = "OpenSearch", message = "OpenSearch required")
+        @RequiresSearchVersion(distributions = {"OpenSearch"}, message = "OpenSearch required")
         public String methodWithAnnotation() {
             return "foobar";
         }
