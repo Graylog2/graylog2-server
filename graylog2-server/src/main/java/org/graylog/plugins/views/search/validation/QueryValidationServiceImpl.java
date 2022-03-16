@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.elasticsearch.QueryParam;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.MissingEnterpriseLicenseException;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.errors.UnboundParameterError;
@@ -102,6 +103,12 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                     ValidationType.UNDECLARED_PARAMETER,
                     param -> "Unbound required parameter used: " + param.name()
             );
+        } else if (searchException.error() instanceof EmptyParameterError) {
+            final EmptyParameterError error = (EmptyParameterError) searchException.error();
+            return paramsToValidationErrors(
+                    Collections.singleton(error.getParam()),
+                    ValidationType.EMPTY_PARAMETER,
+                    param -> error.description());
         }
         return Collections.singletonList(ValidationMessage.fromException(searchException));
     }
