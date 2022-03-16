@@ -14,109 +14,134 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { screen, render, act, within, waitFor } from 'wrappedTestingLibrary';
 
-import 'helpers/mocking/react-dom_mock';
 import UrlWhiteListForm from './UrlWhiteListForm';
 
+const config = {
+  entries: [
+    {
+      id: 'f7033f1f-d50f-4323-96df-294ede41d951',
+      value: 'http://localhost:8080/system/',
+      title: 'testam',
+      type: 'regex',
+    },
+    {
+      id: '636a2d40-c4c5-40b9-ab3a-48cf7978e9af',
+      value: 'http://localhost:8080/system/',
+      title: 'test',
+      type: 'regex',
+    },
+    {
+      id: 'f28fd891-5f2d-4128-9a94-e97c1ab07a1f',
+      value: 'http://localhost:8080/system/',
+      title: 'test2',
+      type: 'literal',
+    },
+  ],
+  disabled: false,
+};
+
 describe('UrlWhitelistForm', () => {
-  let wrapper;
-  const setState = jest.fn();
-  const useStateSpy: jest.SpyInstance<[any, React.Dispatch<any>]> = jest.spyOn(React, 'useState');
-
-  useStateSpy.mockImplementation((init) => [init, setState]);
-  const onUpdate = jest.fn();
-  const config = {
-    entries: [
-      {
-        id: 'f7033f1f-d50f-4323-96df-294ede41d951',
-        value: 'http://localhost:8080/system/',
-        title: 'testam',
-        type: 'regex',
-      },
-      {
-        id: '636a2d40-c4c5-40b9-ab3a-48cf7978e9af',
-        value: 'http://localhost:8080/system/',
-        title: 'test',
-        type: 'regex',
-      },
-      {
-        id: 'f28fd891-5f2d-4128-9a94-e97c1ab07a1f',
-        value: 'http://localhost:8080/system/',
-        title: 'test',
-        type: 'literal',
-      },
-    ],
-    disabled: false,
-  };
-
   afterEach(() => {
     jest.clearAllMocks();
+    jest.useRealTimers();
   });
 
   describe('render the UrlWhitelistForm component', () => {
-    it('should create new instance', () => {
-      wrapper = mount(<UrlWhiteListForm urls={config.entries}
-                                        disabled={config.disabled}
-                                        onUpdate={() => {}} />);
+    it('should show allow list toggle and url table', () => {
+      render(<UrlWhiteListForm urls={config.entries}
+                               disabled={config.disabled}
+                               onUpdate={() => {}} />);
 
-      expect(wrapper).toExist();
+      expect(screen.getByRole('checkbox', { name: /disable whitelist/i })).toBeInTheDocument();
+
+      config.entries.forEach(({ title }) => {
+        expect(screen.getByDisplayValue(title)).toBeInTheDocument();
+      });
     });
 
-    it('should display Url form list table', () => {
-      wrapper = mount(<UrlWhiteListForm urls={config.entries}
-                                        disabled={config.disabled}
-                                        onUpdate={onUpdate} />);
+    it('should validate and update on input change', async () => {
+      jest.useFakeTimers();
 
-      expect(wrapper.find('.form-group')).toBeDefined();
+      const onUpdate = jest.fn();
 
-      const title = wrapper.find('input#title-input0').at(0);
+      render(<UrlWhiteListForm urls={config.entries}
+                               disabled={config.disabled}
+                               onUpdate={onUpdate} />);
 
-      expect(title.instance()?.value).toBe(config.entries[0].title);
-    });
+      expect(screen.queryByDisplayValue(/foobar/i)).not.toBeInTheDocument();
 
-    it('should validate and update on input change', () => {
-      wrapper = mount(<UrlWhiteListForm urls={config.entries}
-                                        disabled={config.disabled}
-                                        onUpdate={onUpdate} />);
+      const titleInput = screen.getByDisplayValue(config.entries[0].title);
 
-      const title = wrapper.find('input#title-input0').at(0);
-      const instance = title.instance();
+      userEvent.clear(titleInput);
+      userEvent.type(titleInput, 'foobar');
 
-      if (instance) {
-        instance.value = 'world';
-      }
+      // Regex entries are debounced
+      act(() => {
+        jest.advanceTimersByTime(500);
+      });
 
-      title.simulate('change');
+      expect(onUpdate).toHaveBeenCalledTimes(2);
 
-      expect(onUpdate).toHaveBeenCalled();
+      const expectedEntry = { ...config.entries[0], title: 'foobar' };
+
+      expect(onUpdate).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          entries: expect.arrayContaining([expectedEntry]),
+        }),
+        true,
+      );
     });
 
     it('should add a new row to the form', () => {
-      wrapper = mount(<UrlWhiteListForm urls={config.entries}
-                                        disabled={config.disabled}
-                                        onUpdate={onUpdate} />);
+      const onUpdate = jest.fn();
 
-      const button = wrapper.find('button').at(0);
+      render(<UrlWhiteListForm urls={config.entries}
+                               disabled={config.disabled}
+                               onUpdate={onUpdate} />);
 
-      button.simulate('click');
-      const listItems = wrapper.find('tbody>tr');
+      expect(screen.queryByRole('cell', { name: String(config.entries.length + 1) })).not.toBeInTheDocument();
 
-      expect(listItems.length).toBe(config.entries.length + 1);
+      const button = screen.getAllByRole('button', { name: /add url/i })[0];
+
+      expect(button).toBeInTheDocument();
+
+      userEvent.click(button);
+
+      expect(screen.getByRole('cell', { name: String(config.entries.length + 1) })).toBeInTheDocument();
+
+      expect(onUpdate).toHaveBeenCalledTimes(2);
     });
 
-    it('should delete a row', () => {
-      wrapper = mount(<UrlWhiteListForm urls={config.entries}
-                                        disabled={config.disabled}
-                                        onUpdate={onUpdate} />);
+    it('should delete a row', async () => {
+      const onUpdate = jest.fn();
 
-      const deleteButton = wrapper.find('svg.fa-trash-alt').at(0);
+      render(<UrlWhiteListForm urls={config.entries}
+                               disabled={config.disabled}
+                               onUpdate={onUpdate} />);
 
-      deleteButton.simulate('click');
-      const listItems = wrapper.find('tbody>tr');
+      expect(screen.getByDisplayValue(config.entries[0].title)).toBeInTheDocument();
 
-      expect(listItems.length).toBe(config.entries.length - 1);
+      const row = screen.getByRole('row', { name: /1/i, exact: true });
+      const deleteButton = within(row).getByRole('button', { name: /delete entry/i });
+
+      expect(deleteButton).toBeInTheDocument();
+
+      userEvent.click(deleteButton);
+
+      expect(screen.queryByDisplayValue(config.entries[0].title)).not.toBeInTheDocument();
+
+      await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(2));
+
+      expect(onUpdate).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          entries: config.entries.filter(({ id }) => id !== config.entries[0].id),
+        }),
+        true,
+      );
     });
   });
 });
