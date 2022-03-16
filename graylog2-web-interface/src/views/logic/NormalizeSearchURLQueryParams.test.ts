@@ -19,12 +19,17 @@ import * as Immutable from 'immutable';
 import normalizeSearchURLQueryParams from './NormalizeSearchURLQueryParams';
 
 describe('NormalizeSearchURLQueryParams', () => {
+  const emptyFilter = Immutable.Map({
+    type: 'or',
+    filters: Immutable.List(),
+  });
+
   it('should normalize relative time range with only a start', async () => {
     const result = normalizeSearchURLQueryParams({ rangetype: 'relative', relative: '600' });
 
     expect(result).toEqual({
       queryString: undefined,
-      streamsFilter: null,
+      streamsFilter: emptyFilter,
       timeRange: { type: 'relative', range: 600 },
     });
   });
@@ -34,7 +39,7 @@ describe('NormalizeSearchURLQueryParams', () => {
 
     expect(result).toEqual({
       queryString: undefined,
-      streamsFilter: null,
+      streamsFilter: emptyFilter,
       timeRange: { type: 'relative', from: 600 },
     });
   });
@@ -44,7 +49,7 @@ describe('NormalizeSearchURLQueryParams', () => {
 
     expect(result).toEqual({
       queryString: undefined,
-      streamsFilter: null,
+      streamsFilter: emptyFilter,
       timeRange: { type: 'relative', from: 600, to: 300 },
     });
   });
@@ -58,7 +63,7 @@ describe('NormalizeSearchURLQueryParams', () => {
 
     expect(result).toEqual({
       queryString: undefined,
-      streamsFilter: null,
+      streamsFilter: emptyFilter,
       timeRange: { type: 'absolute', from: '2020-01-01T10:00:00.850Z', to: '2020-01-02T10:00:00.000Z' },
     });
   });
@@ -68,7 +73,7 @@ describe('NormalizeSearchURLQueryParams', () => {
 
     expect(result).toEqual({
       queryString: undefined,
-      streamsFilter: null,
+      streamsFilter: emptyFilter,
       timeRange: { type: 'keyword', keyword: 'yesterday' },
     });
   });
@@ -81,7 +86,7 @@ describe('NormalizeSearchURLQueryParams', () => {
         query_string: 'http_method:GET',
         type: 'elasticsearch',
       },
-      streamsFilter: null,
+      streamsFilter: emptyFilter,
       timeRange: undefined,
     });
   });
