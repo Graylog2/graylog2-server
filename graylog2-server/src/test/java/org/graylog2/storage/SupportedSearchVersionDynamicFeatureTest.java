@@ -33,7 +33,7 @@ import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class CheckSearchVersionDynamicFeatureTest {
+public class SupportedSearchVersionDynamicFeatureTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -41,11 +41,11 @@ public class CheckSearchVersionDynamicFeatureTest {
     private ResourceInfo resourceInfo;
     @Mock
     private FeatureContext featureContext;
-    private CheckSearchVersionDynamicFeature checkSearchVersionDynamicFeature;
+    private SupportedSearchVersionDynamicFeature supportedSearchVersionDynamicFeature;
 
     @Before
     public void setUp() throws Exception {
-        checkSearchVersionDynamicFeature = new CheckSearchVersionDynamicFeature();
+        supportedSearchVersionDynamicFeature = new SupportedSearchVersionDynamicFeature();
     }
 
     @Test
@@ -53,9 +53,19 @@ public class CheckSearchVersionDynamicFeatureTest {
         final Method method = TestResourceWithMethodAnnotation.class.getMethod("methodWithAnnotation");
         when(resourceInfo.getResourceMethod()).thenReturn(method);
 
-        checkSearchVersionDynamicFeature.configure(resourceInfo, featureContext);
+        supportedSearchVersionDynamicFeature.configure(resourceInfo, featureContext);
 
-        verify(featureContext, only()).register(CheckSearchVersionFilter.class);
+        verify(featureContext, only()).register(SupportedSearchVersionFilter.class);
+    }
+
+    @Test
+    public void configureRegistersResponseFilterIfMultipleAnnotationsPresent() throws Exception {
+        final Class clazz = TestResourceWithMultipleAnnotations.class;
+        when(resourceInfo.getResourceClass()).thenReturn(clazz);
+
+        supportedSearchVersionDynamicFeature.configure(resourceInfo, featureContext);
+
+        verify(featureContext, only()).register(SupportedSearchVersionFilter.class);
     }
 
     @Test
@@ -63,9 +73,9 @@ public class CheckSearchVersionDynamicFeatureTest {
         final Class clazz = TestResourceWithClassAnnotation.class;
         when(resourceInfo.getResourceClass()).thenReturn(clazz);
 
-        checkSearchVersionDynamicFeature.configure(resourceInfo, featureContext);
+        supportedSearchVersionDynamicFeature.configure(resourceInfo, featureContext);
 
-        verify(featureContext, only()).register(CheckSearchVersionFilter.class);
+        verify(featureContext, only()).register(SupportedSearchVersionFilter.class);
     }
 
     @Test
@@ -75,9 +85,9 @@ public class CheckSearchVersionDynamicFeatureTest {
         final Method method = TestResourceWithMethodAnnotation.class.getMethod("methodWithAnnotation");
         when(resourceInfo.getResourceMethod()).thenReturn(method);
 
-        checkSearchVersionDynamicFeature.configure(resourceInfo, featureContext);
+        supportedSearchVersionDynamicFeature.configure(resourceInfo, featureContext);
 
-        verify(featureContext, only()).register(CheckSearchVersionFilter.class);
+        verify(featureContext, only()).register(SupportedSearchVersionFilter.class);
     }
 
     @Test
@@ -87,9 +97,9 @@ public class CheckSearchVersionDynamicFeatureTest {
         when(resourceInfo.getResourceMethod()).thenReturn(method);
         when(resourceInfo.getResourceClass()).thenReturn(clazz);
 
-        checkSearchVersionDynamicFeature.configure(resourceInfo, featureContext);
+        supportedSearchVersionDynamicFeature.configure(resourceInfo, featureContext);
 
-        verify(featureContext, never()).register(CheckSearchVersionFilter.class);
+        verify(featureContext, never()).register(SupportedSearchVersionFilter.class);
     }
 
     private static class TestResourceWithOutAnnotation {
@@ -99,7 +109,7 @@ public class CheckSearchVersionDynamicFeatureTest {
         }
     }
 
-    @RequiresSearchVersion(distributions = {"OpenSearch"}, message = "OpenSearch required")
+    @SupportedSearchVersion(distribution = SearchVersion.Distribution.OPENSEARCH)
     private static class TestResourceWithClassAnnotation {
         @GET
         public String methodWithoutAnnotation() {
@@ -109,8 +119,17 @@ public class CheckSearchVersionDynamicFeatureTest {
 
     private static class TestResourceWithMethodAnnotation {
         @GET
-        @RequiresSearchVersion(distributions = {"OpenSearch"}, message = "OpenSearch required")
+        @SupportedSearchVersion(distribution = SearchVersion.Distribution.OPENSEARCH)
         public String methodWithAnnotation() {
+            return "foobar";
+        }
+    }
+
+    @SupportedSearchVersion(distribution = SearchVersion.Distribution.OPENSEARCH)
+    @SupportedSearchVersion(distribution = SearchVersion.Distribution.ELASTICSEARCH)
+    private static class TestResourceWithMultipleAnnotations {
+        @GET
+        public String methodWithOutAnnotation() {
             return "foobar";
         }
     }

@@ -21,14 +21,16 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.FeatureContext;
 import java.lang.reflect.Method;
 
-public class CheckSearchVersionDynamicFeature implements DynamicFeature {
+public class SupportedSearchVersionDynamicFeature implements DynamicFeature {
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
         final Method resourceMethod = resourceInfo.getResourceMethod();
         final Class resourceClass = resourceInfo.getResourceClass();
-        if ((resourceMethod != null && resourceMethod.isAnnotationPresent(RequiresSearchVersion.class))
-                || (resourceClass != null && resourceClass.isAnnotationPresent(RequiresSearchVersion.class))) {
-            context.register(CheckSearchVersionFilter.class);
+        if ((resourceMethod != null && (resourceMethod.isAnnotationPresent(SupportedSearchVersion.class)
+                || resourceMethod.isAnnotationPresent(SupportedSearchVersions.class)))
+                || (resourceClass != null && (resourceClass.isAnnotationPresent(SupportedSearchVersion.class)
+                || resourceClass.isAnnotationPresent(SupportedSearchVersions.class)))) {
+            context.register(SupportedSearchVersionFilter.class);
         }
     }
 }

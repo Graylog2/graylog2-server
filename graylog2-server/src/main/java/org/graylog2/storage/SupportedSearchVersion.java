@@ -17,21 +17,21 @@
 package org.graylog2.storage;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
  * Ensures classes and methods that rely on specific back end search distributions are accessible only if a supported
- * distribution is running on the server. Each distribution string should be in the form of "DISTRIBUTION" or
- * "DISTRIBUTION EXPRESSION" where DISTRIBUTION is a supported {@link SearchVersion.Distribution} and EXPRESSION is an
- * optional <a href="https://semver.org/">semantic versioning</a> expression if a specific version of a distribution is
- * required.
+ * distribution is running on the server. Version is an optional <a href="https://semver.org/">semantic versioning</a>
+ * expression if a specific version of a distribution is required.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
-public @interface RequiresSearchVersion {
-    String[] distributions();
+@Repeatable(value = SupportedSearchVersions.class)
+public @interface SupportedSearchVersion {
+    SearchVersion.Distribution distribution();
 
-    String message();
+    String version() default ">0";
 }

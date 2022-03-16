@@ -38,7 +38,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class CheckSearchVersionFilterTest {
+public class SupportedSearchVersionFilterTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -52,11 +52,11 @@ public class CheckSearchVersionFilterTest {
     private final SearchVersion openSearchV1 = SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.forIntegers(1, 0));
     private final SearchVersion elasticSearchV6 = SearchVersion.create(SearchVersion.Distribution.ELASTICSEARCH, Version.forIntegers(6, 0));
     private final SearchVersion elasticSearchV7 = SearchVersion.create(SearchVersion.Distribution.ELASTICSEARCH, Version.forIntegers(7, 0));
-    private CheckSearchVersionFilter filter;
+    private SupportedSearchVersionFilter filter;
 
     @Before
     public void setUp() throws Exception {
-        filter = new CheckSearchVersionFilter(resourceInfo, versionProvider);
+        filter = new SupportedSearchVersionFilter(resourceInfo, versionProvider);
     }
 
     @Test
@@ -105,12 +105,13 @@ public class CheckSearchVersionFilterTest {
             filter.filter(requestContext);
         });
 
-        assertTrue(exception.getMessage().contains("OpenSearch required"));
+        assertTrue(exception.getMessage().contains("OpenSearch"));
         verify(versionProvider, times(1)).get();
     }
 
     @Test
     public void testFilterWithInvalidVersion() throws Exception {
+
         final Method resourceMethod = TestResourceWithMethodAnnotationRequiresES7.class.getMethod("methodWithAnnotation");
         when(resourceInfo.getResourceMethod()).thenReturn(resourceMethod);
         when(versionProvider.get()).thenReturn(elasticSearchV6);
@@ -119,7 +120,7 @@ public class CheckSearchVersionFilterTest {
             filter.filter(requestContext);
         });
 
-        assertTrue(exception.getMessage().contains("Elasticsearch 7 required"));
+        assertTrue(exception.getMessage().contains("Elasticsearch ^7"));
         verify(versionProvider, times(1)).get();
     }
 
@@ -145,7 +146,7 @@ public class CheckSearchVersionFilterTest {
             filter.filter(requestContext);
         });
 
-        assertTrue(exception.getMessage().contains("Elasticsearch ^6 or OpenSearch 1.1 required"));
+        assertTrue(exception.getMessage().contains("Elasticsearch ^6") && exception.getMessage().contains("OpenSearch 1.0"));
         verify(versionProvider, times(1)).get();
     }
 
@@ -156,7 +157,7 @@ public class CheckSearchVersionFilterTest {
         }
     }
 
-    @RequiresSearchVersion(distributions = {"OpenSearch"}, message = "OpenSearch required")
+    @SupportedSearchVersion(distribution = SearchVersion.Distribution.OPENSEARCH)
     private static class TestResourceWithClassAnnotation {
         @GET
         public String methodWithoutAnnotation() {
@@ -166,7 +167,7 @@ public class CheckSearchVersionFilterTest {
 
     private static class TestResourceWithMethodAnnotation {
         @GET
-        @RequiresSearchVersion(distributions = {"OpenSearch"}, message = "OpenSearch required")
+        @SupportedSearchVersion(distribution = SearchVersion.Distribution.OPENSEARCH)
         public String methodWithAnnotation() {
             return "foobar";
         }
@@ -174,7 +175,7 @@ public class CheckSearchVersionFilterTest {
 
     private static class TestResourceWithMethodAnnotationRequiresES7 {
         @GET
-        @RequiresSearchVersion(distributions = {"Elasticsearch ^7"}, message = "Elasticsearch 7 required")
+        @SupportedSearchVersion(distribution = SearchVersion.Distribution.ELASTICSEARCH, version = "^7")
         public String methodWithAnnotation() {
             return "foobar";
         }
@@ -182,7 +183,8 @@ public class CheckSearchVersionFilterTest {
 
     private static class TestResourceWithMultipleSupportedVersions {
         @GET
-        @RequiresSearchVersion(distributions = {"Elasticsearch ^6", "OpenSearch 1.0"}, message = "Elasticsearch ^6 or OpenSearch 1.1 required")
+        @SupportedSearchVersion(distribution = SearchVersion.Distribution.OPENSEARCH, version = "1.0")
+        @SupportedSearchVersion(distribution = SearchVersion.Distribution.ELASTICSEARCH, version = "^6")
         public String methodWithAnnotation() {
             return "foobar";
         }
