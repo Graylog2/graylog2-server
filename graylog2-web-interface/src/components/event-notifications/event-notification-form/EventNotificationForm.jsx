@@ -46,6 +46,18 @@ class EventNotificationForm extends React.Component {
     formId: undefined,
   };
 
+  constructor(props){
+    super(props);
+
+    this.state = {
+      isSubmitEnabled: true,
+    }
+  }
+
+  setIsSubmitEnabled = (enabled) => {
+    this.setState({ isSubmitEnabled: enabled })
+  };
+
   handleSubmit = (event) => {
     const { notification, onSubmit } = this.props;
 
@@ -95,6 +107,7 @@ class EventNotificationForm extends React.Component {
 
   render() {
     const { action, embedded, formId, notification, onCancel, validation, testResult } = this.props;
+    const { isSubmitEnabled } = this.state;
 
     const notificationPlugin = this.getNotificationPlugin(notification.config.type);
     const notificationFormComponent = notificationPlugin.formComponent
@@ -102,6 +115,7 @@ class EventNotificationForm extends React.Component {
         config: notification.config,
         onChange: this.handleConfigChange,
         validation: validation,
+        setIsSubmitEnabled: this.setIsSubmitEnabled,
       })
       : null;
 
@@ -170,7 +184,7 @@ class EventNotificationForm extends React.Component {
 
             {!embedded && (
               <ButtonToolbar>
-                <Button bsStyle="primary" type="submit">{action === 'create' ? 'Create' : 'Update'}</Button>
+                <Button bsStyle="primary" type="submit" disabled={!isSubmitEnabled}>{action === 'create' ? 'Create' : 'Update'}</Button>
                 <Button onClick={onCancel}>Cancel</Button>
               </ButtonToolbar>
             )}

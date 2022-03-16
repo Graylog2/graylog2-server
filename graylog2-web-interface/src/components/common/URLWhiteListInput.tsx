@@ -31,12 +31,13 @@ type Props = {
   validationMessage: string,
   validationState: string,
   url: string,
+  setIsSubmitEnabled: (enabled: boolean) => void,
   labelClassName: string,
   wrapperClassName: string,
   urlType: React.ComponentProps<typeof URLWhiteListFormModal>['urlType'],
 };
 
-const URLWhiteListInput = ({ label, onChange, validationMessage, validationState, url, labelClassName, wrapperClassName, urlType }: Props) => {
+const URLWhiteListInput = ({ label, onChange, validationMessage, validationState, url, setIsSubmitEnabled, labelClassName, wrapperClassName, urlType }: Props) => {
   const [isWhitelisted, setIsWhitelisted] = useState(false);
   const [currentValidationState, setCurrentValidationState] = useState(validationState);
   const [ownValidationMessage, setOwnValidationMessage] = useState(validationMessage);
@@ -59,12 +60,14 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
       promise.then((result) => {
         if (!result.is_whitelisted && validationState === null) {
           setCurrentValidationState('error');
+          setIsSubmitEnabled(false);
           const message = isValidURL(url) ? `URL ${url} is not whitelisted` : `URL ${url} is not a valid URL.`;
 
           setOwnValidationMessage(message);
         } else {
           setOwnValidationMessage(validationMessage);
           setCurrentValidationState(validationState);
+          setIsSubmitEnabled(true);
         }
 
         setIsWhitelisted(result.is_whitelisted);

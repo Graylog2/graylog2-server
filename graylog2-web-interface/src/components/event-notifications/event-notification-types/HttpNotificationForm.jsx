@@ -26,6 +26,7 @@ class HttpNotificationForm extends React.Component {
     config: PropTypes.object.isRequired,
     validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
+    setIsSubmitEnabled: PropTypes.func,
   };
 
   propagateChange = (key, value) => {
@@ -47,13 +48,14 @@ class HttpNotificationForm extends React.Component {
   };
 
   render() {
-    const { config, validation } = this.props;
+    const { config, validation, setIsSubmitEnabled  } = this.props;
 
     return (
       <URLWhiteListInput label="URL"
                          onChange={this.handleChange}
                          validationState={validation.errors.url ? 'error' : null}
                          validationMessage={lodash.get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs.')}
+                         setIsSubmitEnabled={setIsSubmitEnabled}
                          url={config.url} />
     );
   }
