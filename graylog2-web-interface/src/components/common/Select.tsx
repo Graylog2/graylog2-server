@@ -566,7 +566,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       return <CreatableSelect {...selectProps} />;
     }
 
-    return <ReactSelect {...selectProps} />;
+    return <ReactSelect key={value} {...selectProps} />;
   }
 }
 
