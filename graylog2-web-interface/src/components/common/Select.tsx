@@ -447,7 +447,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     const { options, displayKey, valueKey, delimiter, allowCreate } = this.props;
 
     if (value === undefined || value === null || (typeof value === 'string' && value === '')) {
-      return '';
+      return [];
     }
 
     if (allowCreate && typeof value === 'string') {
