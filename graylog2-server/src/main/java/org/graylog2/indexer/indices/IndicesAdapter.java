@@ -106,4 +106,6 @@ public interface IndicesAdapter {
     boolean isOpen(String index);
 
     boolean isClosed(String index);
+
+    String getIndexId(String index);
 }
