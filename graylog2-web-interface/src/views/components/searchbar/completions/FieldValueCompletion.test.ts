@@ -356,11 +356,20 @@ describe('FieldValueCompletion', () => {
       expect(result).toEqual(false);
     });
 
-    it('returns true if current token is a keyword and ends with :', async () => {
+    it('returns true if current token is a keyword and ends with ":"', async () => {
       const completer = new FieldValueCompletion();
       const result = completer.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }, null]]);
 
       expect(result).toEqual(true);
+    });
+
+    it('returns false if current token is a keyword that ends with ":" which is already followed by a term', async () => {
+      const completer = new FieldValueCompletion();
+      const result = completer.shouldShowCompletions(1, [[
+        { type: 'keyword', value: 'http_method:', index: 0, start: 0 },
+        { type: 'term', value: 'POST' }, null]]);
+
+      expect(result).toEqual(false);
     });
 
     it('returns true if current token is a keyword in a complex query and ends with :', async () => {
