@@ -14,19 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import { QueriesActions } from 'views/stores/QueriesStore';
 import type Query from 'views/logic/queries/Query';
 import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
-import type { DateTimeFormats } from 'util/DateTime';
+import { adjustFormat, toUTCFromTz } from 'util/DateTime';
 
-const onZoom = (currentQuery: Query, from: string, to: string, viewType: ViewType | undefined | null, formatTime: (dateTime: string, format: DateTimeFormats) => string) => {
+const onZoom = (currentQuery: Query, from: string, to: string, viewType: ViewType | undefined | null, userTz: string) => {
   const newTimeRange = {
     type: 'absolute',
-    from: formatTime(from, 'internal'),
-    to: formatTime(to, 'internal'),
+    from: adjustFormat(toUTCFromTz(from, userTz), 'internal'),
+    to: adjustFormat(toUTCFromTz(to, userTz), 'internal'),
   };
 
   const action = viewType === View.Type.Dashboard

@@ -138,8 +138,8 @@ describe('XYPlot', () => {
 
     expect(QueriesActions.timerange).toHaveBeenCalledWith('dummyquery', {
       type: 'absolute',
-      from: '2018-10-12T00:04:21.723-04:00',
-      to: '2018-10-12T04:04:21.723-04:00',
+      from: '2018-10-12T04:04:21.723+00:00',
+      to: '2018-10-12T08:04:21.723+00:00',
     });
   });
 

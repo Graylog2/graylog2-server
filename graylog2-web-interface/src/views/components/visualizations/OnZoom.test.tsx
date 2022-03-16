@@ -35,16 +35,14 @@ jest.mock('views/stores/GlobalOverrideStore', () => ({
 }));
 
 describe('OnZoom', () => {
-  const formatTime = (time) => time;
-
   it('sets the global override timerange if called from a dashboard', async () => {
     const query = Query.builder().build();
 
-    OnZoom(query, '2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', View.Type.Dashboard, formatTime);
+    OnZoom(query, '2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', View.Type.Dashboard, 'Europe/Berlin');
 
     expect(GlobalOverrideActions.timerange).toHaveBeenCalledWith({
-      from: '2020-01-10 13:23:42.000',
-      to: '2020-01-10 14:23:42.000',
+      from: '2020-01-10T12:23:42.000+00:00',
+      to: '2020-01-10T13:23:42.000+00:00',
       type: 'absolute',
     });
   });
@@ -52,11 +50,11 @@ describe('OnZoom', () => {
   it('sets the query timerange if called from a dashboard', async () => {
     const query = Query.builder().id('query1').build();
 
-    OnZoom(query, '2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', View.Type.Search, formatTime);
+    OnZoom(query, '2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', View.Type.Search, 'Europe/Berlin');
 
     expect(QueriesActions.timerange).toHaveBeenCalledWith('query1', {
-      from: '2020-01-10 13:23:42.000',
-      to: '2020-01-10 14:23:42.000',
+      from: '2020-01-10T12:23:42.000+00:00',
+      to: '2020-01-10T13:23:42.000+00:00',
       type: 'absolute',
     });
   });
