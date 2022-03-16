@@ -21,9 +21,22 @@ import java.util.Set;
 
 /**
  * View Resolvers provide a way that plugins can provide custom sources for looking up views.
+ *
+ * Each resolvable view must also have a corresponding {@link org.graylog.plugins.views.search.Search} saved in the
+ * database. The ViewResolver methods pertaining to search records must be implemented in order for runtime
+ * operation of views to work correctly.
+ *
+ * See https://github.com/Graylog2/graylog2-server/pull/12280 and
+ * https://github.com/Graylog2/graylog2-server/pull/12287 for more information.
  */
 public interface ViewResolver {
     Optional<ViewDTO> get(String id);
+
+    /**
+     * @param searchId A search id.
+     * @return the corresponding {@link ViewDTO} for supplied searchId.
+     */
+    Set<ViewDTO> getBySearchId(String searchId);
 
     /**
      * @return A set of all search ids referenced by resolvable views.

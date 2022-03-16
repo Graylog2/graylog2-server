@@ -225,6 +225,10 @@ public class ViewsResourceTest {
         public Set<String> getSearchIds() {
             return null;
         }
-    }
 
+        @Override
+        public Set<ViewDTO> getBySearchId(String searchId) {
+            return Collections.emptySet();
+        }
+    }
 }
