@@ -443,11 +443,11 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
 
   // Using ReactSelect.Creatable now needs to get values as objects or they are not display
   // This method takes care of formatting a string value into options react-select supports.
-  _formatInputValue = (value: OptionValue): Array<Option> => {
+  _formatInputValue = (value: OptionValue): Array<Option> | string => {
     const { options, displayKey, valueKey, delimiter, allowCreate } = this.props;
 
     if (value === undefined || value === null || (typeof value === 'string' && value === '')) {
-      return undefined;
+      return '';
     }
 
     if (allowCreate && typeof value === 'string') {
@@ -566,7 +566,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       return <CreatableSelect {...selectProps} />;
     }
 
-    return <ReactSelect key={value} {...selectProps} />;
+    return <ReactSelect {...selectProps} />;
   }
 }
 
