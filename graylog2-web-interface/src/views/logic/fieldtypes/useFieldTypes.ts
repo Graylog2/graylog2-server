@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useQuery } from 'react-query';
 
 import type { TimeRange } from 'views/logic/queries/Query';
@@ -23,7 +23,7 @@ import fetch from 'logic/rest/FetchProvider';
 import type { FieldTypeMappingJSON } from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { adjustFormat, toUTCFromTz } from 'util/DateTime';
-import UserDateTimeContext from 'contexts/UserDateTimeContext';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 const fieldTypesUrl = qualifyUrl('/views/fields');
 
@@ -68,7 +68,7 @@ const normalizeTimeRange = (timerange: TimeRange, userTz: string): TimeRange => 
 };
 
 const useFieldTypes = (streams: Array<string>, timerange: TimeRange): { data: FieldTypeMapping[] } => {
-  const { userTimezone } = useContext(UserDateTimeContext);
+  const { userTimezone } = useUserDateTime();
   const _timerange = useMemo(() => normalizeTimeRange(timerange, userTimezone), [timerange, userTimezone]);
 
   return useQuery(
