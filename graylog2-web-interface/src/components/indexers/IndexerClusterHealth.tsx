@@ -22,19 +22,36 @@ import { Row, Col } from 'components/bootstrap';
 import { DocumentationLink, SmallSupportLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import { IndexerClusterHealthSummary } from 'components/indexers';
-import { getIndexerClusterHealth, getIndexerClusterName } from 'components/indexers/api';
 import type FetchError from 'logic/errors/FetchError';
-import { GET_INDEXER_CLUSTER_HEALTH, GET_INDEXER_CLUSTER_NAME } from 'logic/reactQueryKeys';
+import ApiRoutes from 'routing/ApiRoutes';
+import fetch from 'logic/rest/FetchProvider';
+import * as URLUtils from 'util/URLUtils';
 
 import IndexerClusterHealthError from './IndexerClusterHealthError';
 
+const GET_INDEXER_CLUSTER_HEALTH = 'indexerCluster.health';
+const GET_INDEXER_CLUSTER_NAME = 'indexerCluster.name';
+
+const getIndexerClusterHealth = () => {
+  const url = URLUtils.qualifyUrl(ApiRoutes.IndexerClusterApiController.health().url);
+
+  return fetch('GET', url);
+};
+
+const getIndexerClusterName = () => {
+  const url = URLUtils.qualifyUrl(ApiRoutes.IndexerClusterApiController.name().url);
+
+  return fetch('GET', url);
+};
+
 const useLoadHealthAndName = () => {
+  const options = { refetchInterval: 5000, retry: 0 };
   const [
     { data: healthData, isFetching: healthIsFetching, error: healthError, isSuccess: healthIsSuccess },
     { data: nameData, isFetching: nameIsFetching, error: nameError, isSuccess: nameIsSuccess },
   ] = useQueries([
-    { queryKey: GET_INDEXER_CLUSTER_HEALTH, queryFn: getIndexerClusterHealth },
-    { queryKey: GET_INDEXER_CLUSTER_NAME, queryFn: getIndexerClusterName },
+    { queryKey: GET_INDEXER_CLUSTER_HEALTH, queryFn: getIndexerClusterHealth, ...options },
+    { queryKey: GET_INDEXER_CLUSTER_NAME, queryFn: getIndexerClusterName, ...options },
   ]);
 
   return ({
@@ -59,7 +76,7 @@ const IndexerClusterHealth = () => {
           <DocumentationLink page={DocsHelper.PAGES.CONFIGURING_ES} text="Graylog documentation" />.
         </SmallSupportLink>
         {isSuccess && <IndexerClusterHealthSummary health={health} name={name} />}
-        {loading && <Spinner />}
+        {loading && <p><Spinner /></p>}
         {error && <IndexerClusterHealthError error={error} />}
       </Col>
     </Row>
