@@ -28,7 +28,7 @@ public class BlockSettingsParser {
 
     static final String BLOCK_SETTINGS_PREFIX = "index.blocks.";
 
-    public IndicesBlockStatus parseBlockSettings(final GetSettingsResponse settingsResponse) {
+    public static IndicesBlockStatus parseBlockSettings(final GetSettingsResponse settingsResponse) {
         IndicesBlockStatus result = new IndicesBlockStatus();
         final ImmutableOpenMap<String, Settings> indexToSettingsMap = settingsResponse.getIndexToSettings();
         final String[] indicesInResponse = indexToSettingsMap.keys().toArray(String.class);

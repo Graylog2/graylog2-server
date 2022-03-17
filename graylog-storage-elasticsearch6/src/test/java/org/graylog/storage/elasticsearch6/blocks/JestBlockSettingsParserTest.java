@@ -35,34 +35,32 @@ import static org.mockito.Mockito.when;
 
 public class JestBlockSettingsParserTest {
 
-    private JestBlockSettingsParser toTest;
     private JestResult jestResult;
-    private ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Before
     public void setUp() {
-        toTest = new JestBlockSettingsParser();
         jestResult = mock(JestResult.class);
     }
 
     @Test
     public void noBlockedIndicesIdentifiedIfEmptyResponseParsed() throws Exception {
         when(jestResult.getJsonObject()).thenReturn(mapper.readTree("{}"));
-        final IndicesBlockStatus indicesBlockStatus = toTest.parseBlockSettings(jestResult, Collections.singletonList("graylog_0"));
+        final IndicesBlockStatus indicesBlockStatus = JestBlockSettingsParser.parseBlockSettings(jestResult, Collections.singletonList("graylog_0"));
         assertNotNull(indicesBlockStatus);
         assertEquals(0, indicesBlockStatus.countBlockedIndices());
     }
 
     @Test
     public void noBlockedIndicesIdentifiedIfEmptyListOfIndicesProvided() {
-        final IndicesBlockStatus indicesBlockStatus = toTest.parseBlockSettings(jestResult, Collections.emptyList());
+        final IndicesBlockStatus indicesBlockStatus = JestBlockSettingsParser.parseBlockSettings(jestResult, Collections.emptyList());
         assertNotNull(indicesBlockStatus);
         assertEquals(0, indicesBlockStatus.countBlockedIndices());
     }
 
     @Test
     public void noBlockedIndicesIdentifiedIfNullListOfIndicesProvided() {
-        final IndicesBlockStatus indicesBlockStatus = toTest.parseBlockSettings(jestResult, null);
+        final IndicesBlockStatus indicesBlockStatus = JestBlockSettingsParser.parseBlockSettings(jestResult, null);
         assertNotNull(indicesBlockStatus);
         assertEquals(0, indicesBlockStatus.countBlockedIndices());
     }
@@ -81,7 +79,7 @@ public class JestBlockSettingsParserTest {
                 "  }  \n" +
                 "}";
         when(jestResult.getJsonObject()).thenReturn(mapper.readTree(json));
-        final IndicesBlockStatus indicesBlockStatus = toTest.parseBlockSettings(jestResult, Collections.singletonList("graylog_0"));
+        final IndicesBlockStatus indicesBlockStatus = JestBlockSettingsParser.parseBlockSettings(jestResult, Collections.singletonList("graylog_0"));
         assertNotNull(indicesBlockStatus);
         assertEquals(0, indicesBlockStatus.countBlockedIndices());
     }
@@ -100,7 +98,7 @@ public class JestBlockSettingsParserTest {
                 "  }  \n" +
                 "}";
         when(jestResult.getJsonObject()).thenReturn(mapper.readTree(json));
-        final IndicesBlockStatus indicesBlockStatus = toTest.parseBlockSettings(jestResult, Collections.singletonList("graylog_0"));
+        final IndicesBlockStatus indicesBlockStatus = JestBlockSettingsParser.parseBlockSettings(jestResult, Collections.singletonList("graylog_0"));
         assertNotNull(indicesBlockStatus);
         final Set<String> blockedIndices = indicesBlockStatus.getBlockedIndices();
         assertEquals(1, indicesBlockStatus.countBlockedIndices());
@@ -143,7 +141,7 @@ public class JestBlockSettingsParserTest {
 
                 "}";
         when(jestResult.getJsonObject()).thenReturn(mapper.readTree(json));
-        final IndicesBlockStatus indicesBlockStatus = toTest.parseBlockSettings(jestResult, Arrays.asList("graylog_0", "unblocked1", "unblocked2"));
+        final IndicesBlockStatus indicesBlockStatus = JestBlockSettingsParser.parseBlockSettings(jestResult, Arrays.asList("graylog_0", "unblocked1", "unblocked2"));
         assertNotNull(indicesBlockStatus);
         final Set<String> blockedIndices = indicesBlockStatus.getBlockedIndices();
         assertEquals(1, indicesBlockStatus.countBlockedIndices());

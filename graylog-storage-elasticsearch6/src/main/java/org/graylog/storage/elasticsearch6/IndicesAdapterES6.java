@@ -579,8 +579,7 @@ public class IndicesAdapterES6 implements IndicesAdapter {
                 .addIndex(indices)
                 .build();
         final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't check settings of indices " + indices);
-        final JestBlockSettingsParser blockSettingsParser = new JestBlockSettingsParser();
-        return blockSettingsParser.parseBlockSettings(jestResult, indices);
+        return JestBlockSettingsParser.parseBlockSettings(jestResult, indices);
     }
 
     @Override

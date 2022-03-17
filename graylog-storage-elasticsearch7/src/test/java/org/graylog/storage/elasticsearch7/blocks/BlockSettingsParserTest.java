@@ -20,7 +20,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Settings;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -33,17 +32,10 @@ import static org.junit.Assert.assertTrue;
 
 public class BlockSettingsParserTest {
 
-    private BlockSettingsParser toTest;
-
-    @Before
-    public void setUp() {
-        toTest = new BlockSettingsParser();
-    }
-
     @Test
     public void noBlockedIndicesIdentifiedIfEmptyResponseParsed() {
         GetSettingsResponse emptyResponse = new GetSettingsResponse(ImmutableOpenMap.of(), ImmutableOpenMap.of());
-        final IndicesBlockStatus indicesBlockStatus = toTest.parseBlockSettings(emptyResponse);
+        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(emptyResponse);
         assertNotNull(indicesBlockStatus);
         assertEquals(0, indicesBlockStatus.countBlockedIndices());
     }
@@ -53,7 +45,7 @@ public class BlockSettingsParserTest {
         ImmutableOpenMap.Builder<String, Settings> settingsBuilder = new ImmutableOpenMap.Builder<>();
         settingsBuilder.put("index_0", Settings.builder().build());
         GetSettingsResponse emptySettingsResponse = new GetSettingsResponse(settingsBuilder.build(), ImmutableOpenMap.of());
-        final IndicesBlockStatus indicesBlockStatus = toTest.parseBlockSettings(emptySettingsResponse);
+        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(emptySettingsResponse);
         assertNotNull(indicesBlockStatus);
         assertEquals(0, indicesBlockStatus.countBlockedIndices());
     }
@@ -73,7 +65,7 @@ public class BlockSettingsParserTest {
                 .put("index.blocks.read_only_allow_delete", true)
                 .build());
         GetSettingsResponse settingsResponse = new GetSettingsResponse(settingsBuilder.build(), ImmutableOpenMap.of());
-        final IndicesBlockStatus indicesBlockStatus = toTest.parseBlockSettings(settingsResponse);
+        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(settingsResponse);
         assertNotNull(indicesBlockStatus);
         assertEquals(3, indicesBlockStatus.countBlockedIndices());
         final Set<String> blockedIndices = indicesBlockStatus.getBlockedIndices();
