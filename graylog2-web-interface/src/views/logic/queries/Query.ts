@@ -119,6 +119,8 @@ export type TimeRange = RelativeTimeRange | AbsoluteTimeRange | KeywordTimeRange
 
 export type NoTimeRangeOverride = {};
 
+const isNullish = (o: any) => (o === null || o === undefined);
+
 export default class Query {
   private _value: InternalState;
 
@@ -151,12 +153,14 @@ export default class Query {
     const { id, query, timerange, filter, searchTypes } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return Query.builder()
+    const builder = Query.builder()
       .id(id)
       .query(query)
       .timerange(timerange)
       .filter(filter)
       .searchTypes(searchTypes);
+
+    return filter ? builder.filter(filter) : builder;
   }
 
   equals(other: any): boolean {
@@ -171,7 +175,7 @@ export default class Query {
     if (this.id !== other.id
       || !isDeepEqual(this.query, other.query)
       || !isDeepEqual(this.timerange, other.timerange)
-      || !isDeepEqual(this.filter, other.filter)
+      || !((isNullish(this.filter) && isNullish(other.filter)) || isDeepEqual(this.filter, other.filter))
       || !isDeepEqual(this.searchTypes, other.searchTypes)) {
       return false;
     }
