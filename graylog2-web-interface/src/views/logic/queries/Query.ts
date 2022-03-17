@@ -56,7 +56,11 @@ const _streamFilters = (selectedStreams: Array<string>) => {
 };
 
 export const filtersForQuery = (streams: Array<string> | null | undefined): FilterType | null | undefined => {
-  const streamFilters = _streamFilters(streams ?? []);
+  if (!streams || streams.length === 0) {
+    return null;
+  }
+
+  const streamFilters = _streamFilters(streams);
 
   return Immutable.Map({
     type: 'or',
@@ -147,13 +151,12 @@ export default class Query {
     const { id, query, timerange, filter, searchTypes } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    const builder = Query.builder()
+    return Query.builder()
       .id(id)
       .query(query)
       .timerange(timerange)
+      .filter(filter)
       .searchTypes(searchTypes);
-
-    return filter ? builder.filter(filter) : builder;
   }
 
   equals(other: any): boolean {

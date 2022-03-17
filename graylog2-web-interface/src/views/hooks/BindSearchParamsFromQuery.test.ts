@@ -34,10 +34,6 @@ jest.mock('views/stores/QueriesStore', () => ({
 describe('BindSearchParamsFromQuery should', () => {
   const query = Query.builder()
     .id(MOCK_VIEW_QUERY_ID)
-    .filter(Immutable.Map({
-      type: 'or',
-      filters: Immutable.List(),
-    }))
     .build();
   const search = Search.create()
     .toBuilder()
