@@ -30,7 +30,7 @@ public class JestBlockSettingsParser {
     static final Collection<String> POSSIBLE_BLOCKS = Arrays.asList("read_only", "read_only_allow_delete", "read", "write", "metadata");
     static final String BLOCK_SETTINGS_PREFIX = "index.blocks.";
 
-    public IndicesBlockStatus parseBlockSettings(final JestResult jestResult, final List<String> indices) {
+    public static IndicesBlockStatus parseBlockSettings(final JestResult jestResult, final List<String> indices) {
         final IndicesBlockStatus indicesBlockStatus = new IndicesBlockStatus();
         if (indices == null || indices.isEmpty() || jestResult == null) {
             return indicesBlockStatus;
