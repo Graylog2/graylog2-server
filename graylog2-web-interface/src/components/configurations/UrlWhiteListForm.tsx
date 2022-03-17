@@ -28,6 +28,7 @@ import { Button, Table } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import type { Url, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
 import ToolsStore from 'stores/tools/ToolsStore';
+import { isValidURL } from 'util/URLUtils';
 
 type Props = {
   urls: Array<Url>,
@@ -63,20 +64,6 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
     setValidationState(validationUpdate);
     stateUpdate.entries.splice(idx, 1);
     setConfig(stateUpdate);
-  };
-
-  const validURL = (str: string) => {
-    let isValid = true;
-
-    try {
-      // @ts-ignore
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const test = new URL(str);
-    } catch (e) {
-      isValid = false;
-    }
-
-    return isValid;
   };
 
   const _isFormValid = (): boolean => {
@@ -118,7 +105,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
         break;
       case 'value':
         if (type === literal) {
-          const result = validURL(value) ? { valid: true } : { valid: false };
+          const result = isValidURL(value) ? { valid: true } : { valid: false };
 
           _updateValidationError(idx, type, name, result, value);
         } else if (type === regex && value.trim().length > 0) {
