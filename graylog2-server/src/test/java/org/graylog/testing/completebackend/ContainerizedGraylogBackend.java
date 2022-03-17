@@ -124,8 +124,8 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         return node.apiPort();
     }
 
-    public void printServerLog() {
-        node.printLog();
+    public String getLogs() {
+        return node.getLogs();
     }
 
     @Override

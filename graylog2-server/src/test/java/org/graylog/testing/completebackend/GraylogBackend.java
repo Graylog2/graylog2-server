@@ -33,4 +33,6 @@ public interface GraylogBackend {
     void importElasticsearchFixture(String resourcePath, Class<?> testClass);
 
     Network network();
+
+    String getLogs();
 }

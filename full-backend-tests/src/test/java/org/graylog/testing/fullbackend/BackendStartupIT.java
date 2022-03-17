@@ -16,10 +16,11 @@
  */
 package org.graylog.testing.fullbackend;
 
+import io.restassured.RestAssured;
+import io.restassured.config.FailureConfig;
+import io.restassured.listener.ResponseValidationFailureListener;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.SearchUtils;
@@ -34,20 +35,27 @@ class BackendStartupIT {
 
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
+    private final ResponseValidationFailureListener printServerLogOnFailure;
 
     public BackendStartupIT(GraylogBackend sut, RequestSpecification requestSpec) {
         this.sut = sut;
         this.requestSpec = requestSpec;
+        this.printServerLogOnFailure = (reqSpec, respSpec, resp) -> {
+            System.out.println("------------------------ Output from graylog docker container start ------------------------");
+            System.out.println(this.sut.getLogs());
+            System.out.println("------------------------ Output from graylog docker container ends  ------------------------");
+        };
     }
 
     @ContainerMatrixTest
     void canReachApi() {
         given()
+                .config(RestAssured.config().failureConfig(FailureConfig.failureConfig().with().failureListeners(printServerLogOnFailure)))
                 .spec(requestSpec)
                 .when()
                 .get()
                 .then()
-                .statusCode(200);
+                .statusCode(500);
     }
 
     @ContainerMatrixTest
