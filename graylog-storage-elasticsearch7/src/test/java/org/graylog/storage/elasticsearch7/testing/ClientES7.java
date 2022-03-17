@@ -271,6 +271,17 @@ public class ClientES7 implements Client {
                 "Unable to reset index block for " + index);
     }
 
+    @Override
+    public void setIndexBlock(String index) {
+        final UpdateSettingsRequest request = new UpdateSettingsRequest(index)
+                .settings(Collections.singletonMap(
+                        "index.blocks.read_only_allow_delete", true
+                ));
+
+        client.execute((c, requestOptions) -> c.indices().putSettings(request, requestOptions),
+                "Unable to set index block for " + index);
+    }
+
     private void waitForResult(Callable<Boolean> task) {
         final Retryer<Boolean> retryer = RetryerBuilder.<Boolean>newBuilder()
                 .retryIfResult(result -> result == null || !result)
