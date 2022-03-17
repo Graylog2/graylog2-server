@@ -47,8 +47,8 @@ const getIndexerClusterName = () => {
 const useLoadHealthAndName = () => {
   const options = { refetchInterval: 5000, retry: 0 };
   const [
-    { data: healthData, isFetching: healthIsFetching, error: healthError, isSuccess: healthIsSuccess },
-    { data: nameData, isFetching: nameIsFetching, error: nameError, isSuccess: nameIsSuccess },
+    { data: healthData, isFetching: healthIsFetching, error: healthError, isSuccess: healthIsSuccess, isRefetching: healthIsRefetching },
+    { data: nameData, isFetching: nameIsFetching, error: nameError, isSuccess: nameIsSuccess, isRefetching: nameIsRefetching },
   ] = useQueries([
     { queryKey: GET_INDEXER_CLUSTER_HEALTH, queryFn: getIndexerClusterHealth, ...options },
     { queryKey: GET_INDEXER_CLUSTER_NAME, queryFn: getIndexerClusterName, ...options },
@@ -58,7 +58,7 @@ const useLoadHealthAndName = () => {
     health: healthData,
     name: nameData,
     error: (healthError || nameError) as FetchError,
-    loading: healthIsFetching || nameIsFetching,
+    loading: (healthIsFetching || nameIsFetching) && !healthIsRefetching && !nameIsRefetching,
     isSuccess: healthIsSuccess && nameIsSuccess,
   });
 };
