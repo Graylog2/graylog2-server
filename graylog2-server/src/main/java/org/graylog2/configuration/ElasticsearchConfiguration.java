@@ -94,7 +94,7 @@ public class ElasticsearchConfiguration {
     /**
      * Provides a hard upper limit for the retention period of any index set at configuration time.
      * <p>
-     * This setting is used to validate the value a user chooses for {@code max_number_of_indices} when configuring
+     * This setting is used to validate the value a users chooses for {@code max_number_of_indices} when configuring
      * an index set. However, it is only in effect, when a <em>time-based rotation strategy</em> is chosen, because
      * otherwise it would be hard to calculate the effective retention period at configuration time.
      * <p>
