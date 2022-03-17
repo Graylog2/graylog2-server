@@ -69,6 +69,7 @@ import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.Search
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.sort.SortBuilders;
 import org.graylog.storage.elasticsearch6.indices.GetSingleAlias;
+import org.graylog.storage.elasticsearch6.jest.JestFuture;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMapping;
@@ -103,6 +104,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -340,7 +345,13 @@ public class IndicesAdapterES6 implements IndicesAdapter {
                 .onlyExpungeDeletes(false)
                 .build();
 
-        JestUtils.execute(jestClient, requestConfig, request, () -> "Couldn't force merge index " + index);
+        try {
+            final JestFuture<JestResult> future = new JestFuture<>();
+            JestUtils.executeAsync(jestClient, requestConfig, request, future);
+            future.getBlocking(timeout);
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            throw new RuntimeException("Couldn't force merge index " + index, e);
+        }
     }
 
     @Override

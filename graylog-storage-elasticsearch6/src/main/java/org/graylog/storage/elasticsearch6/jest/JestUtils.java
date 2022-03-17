@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.searchbox.action.Action;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
+import io.searchbox.client.JestResultHandler;
 import io.searchbox.client.http.JestHttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.graylog2.indexer.ElasticsearchException;
@@ -83,6 +84,20 @@ public class JestUtils {
             return ((JestHttpClient) client).execute(request, requestConfig);
         } else {
             return client.execute(request);
+        }
+    }
+
+
+    public static <T extends JestResult> void executeAsync(JestClient client, RequestConfig requestConfig,
+                                                           Action<T> request, JestResultHandler<T> resultHandler) {
+        try {
+            if (client instanceof JestHttpClient) {
+                ((JestHttpClient) client).executeAsync(request, resultHandler, requestConfig);
+            } else {
+                client.executeAsync(request, resultHandler);
+            }
+        } catch (IOException e) {
+            resultHandler.failed(e);
         }
     }
 
