@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useContext, useRef } from 'react';
+import { useCallback, useMemo, useContext, useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { delay } from 'lodash';
 
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
@@ -134,6 +135,28 @@ type Props = BaseProps & {
   timeRange?: TimeRange | NoTimeRangeOverride | undefined,
 };
 
+const useRetryExecutionWhenDisabled = (disableExecution, value, onExecuteProp, error) => {
+  const [retryExecution, setRetryExecution] = useState<undefined | { editor: Editor, value: string }>();
+
+  useEffect(() => {
+    if (retryExecution && disableExecution) {
+      delay(() => setRetryExecution(undefined), 500);
+    }
+  }, [retryExecution, disableExecution]);
+
+  useEffect(() => {
+    if (retryExecution && !disableExecution) {
+      if (value === retryExecution.value) {
+        handleExecution(retryExecution.editor, onExecuteProp, value, error, disableExecution);
+      }
+
+      setRetryExecution(undefined);
+    }
+  }, [disableExecution, error, onExecuteProp, retryExecution, value]);
+
+  return setRetryExecution;
+};
+
 const QueryInput = ({
   className,
   completerFactory = defaultCompleterFactory,
@@ -155,7 +178,15 @@ const QueryInput = ({
   const { enableSmartSearch } = useContext(UserPreferencesContext);
   const completer = useCompleter({ streams, timeRange, completerFactory });
   const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor, isInitialTokenizerUpdate), []);
-  const onExecute = useCallback((editor: Editor) => handleExecution(editor, onExecuteProp, value, error, disableExecution), [onExecuteProp, value, error, disableExecution]);
+  const setRetryExecution = useRetryExecutionWhenDisabled(disableExecution, value, onExecuteProp, error);
+
+  const onExecute = useCallback((editor: Editor) => {
+    if (disableExecution) {
+      setRetryExecution({ editor, value });
+    }
+
+    handleExecution(editor, onExecuteProp, value, error, disableExecution);
+  }, [setRetryExecution, onExecuteProp, value, error, disableExecution]);
   const updateEditorConfiguration = useCallback((node) => _updateEditorConfiguration(node, completer, onExecute), [onExecute, completer]);
 
   return (
