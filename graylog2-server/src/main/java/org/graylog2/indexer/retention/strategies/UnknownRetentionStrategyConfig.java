@@ -37,7 +37,7 @@ public abstract class UnknownRetentionStrategyConfig implements RetentionStrateg
 
     @JsonCreator
     public static UnknownRetentionStrategyConfig create() {
-        return new AutoValue_UnknownRetentionStrategyConfig(UnknownRetentionStrategyConfig.class.getCanonicalName());
+        return new AutoValue_UnknownRetentionStrategyConfig(UnknownRetentionStrategyConfig.class.getCanonicalName(), 0);
     }
 
 

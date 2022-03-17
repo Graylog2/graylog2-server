@@ -22,7 +22,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = RetentionStrategyConfig.TYPE_FIELD, visible = true)
 public interface RetentionStrategyConfig {
     String TYPE_FIELD = "type";
+    String MAX_NUMBER_OF_INDEXES_FIELD = "max_number_of_indices";
 
     @JsonProperty(TYPE_FIELD)
     String type();
+
+    @JsonProperty(MAX_NUMBER_OF_INDEXES_FIELD)
+    int maxNumberOfIndices();
 }

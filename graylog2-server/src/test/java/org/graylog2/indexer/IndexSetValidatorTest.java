@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer;
 
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.joda.time.Duration;
 import org.junit.Before;
@@ -42,11 +43,14 @@ public class IndexSetValidatorTest {
     @Mock
     private IndexSetRegistry indexSetRegistry;
 
+    @Mock
+    private ElasticsearchConfiguration elasticsearchConfiguration;
+
     private IndexSetValidator validator;
 
     @Before
     public void setUp() throws Exception {
-        this.validator = new IndexSetValidator(indexSetRegistry);
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration);
     }
 
     @Test
