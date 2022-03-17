@@ -14,12 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.validation;
+package org.graylog2.storage;
 
-public enum ValidationType {
-    UNDECLARED_PARAMETER,
-    QUERY_PARSING_ERROR,
-    UNKNOWN_FIELD,
-    INVALID_OPERATOR,
-    MISSING_LICENSE,
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface SupportedSearchVersions {
+    SupportedSearchVersion[] value();
 }

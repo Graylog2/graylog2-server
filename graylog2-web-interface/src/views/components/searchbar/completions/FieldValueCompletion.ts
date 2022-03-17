@@ -201,10 +201,13 @@ class FieldValueCompletion implements Completer {
     }
 
     const previousToken = currentLineTokens[currentTokenIndex - 1];
+    const nextToken = currentLineTokens[currentTokenIndex + 1];
+
     const currentTokenIsFieldName = currentToken?.type === 'keyword' && currentToken?.value.endsWith(':');
     const currentTokenIsFieldValue = currentToken?.type === 'term' && previousToken?.type === 'keyword';
+    const nextTokenIsTerm = nextToken?.type === 'term';
 
-    return currentTokenIsFieldName || currentTokenIsFieldValue;
+    return (currentTokenIsFieldName || currentTokenIsFieldValue) && !nextTokenIsTerm;
   };
 }
 

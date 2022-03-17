@@ -204,5 +204,10 @@ public class SearchesCleanUpJobTest {
         public Set<String> getSearchIds() {
             return Collections.singleton(IN_USE_RESOLVER_SEARCH_ID);
         }
+
+        @Override
+        public Set<ViewDTO> getBySearchId(String searchId) {
+            return Collections.emptySet();
+        }
     }
 }

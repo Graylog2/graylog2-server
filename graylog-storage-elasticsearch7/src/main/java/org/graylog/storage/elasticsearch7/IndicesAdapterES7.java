@@ -518,4 +518,13 @@ public class IndicesAdapterES7 implements IndicesAdapter {
             throw new IllegalStateException("Unable to parse invalid index state: " + state);
         }
     }
+
+    @Override
+    public String getIndexId(String index) {
+        final GetSettingsRequest request = new GetSettingsRequest().indices(index)
+                .indicesOptions(IndicesOptions.fromOptions(true, true, true, true));
+        final GetSettingsResponse response = client.execute((c, requestOptions) -> c.indices().getSettings(request, requestOptions),
+                "Unable to retrieve settings for index/alias " + index);
+        return response.getSetting(index, "index.uuid");
+    }
 }
