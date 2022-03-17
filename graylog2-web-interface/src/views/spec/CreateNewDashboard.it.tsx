@@ -29,6 +29,7 @@ import viewsBindings from 'views/bindings';
 import StreamsContext from 'contexts/StreamsContext';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import { SearchMetadataActions, SearchMetadataStore } from 'views/stores/SearchMetadataStore';
+import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
 
 jest.mock('views/stores/DashboardsStore', () => ({
   DashboardsActions: {
@@ -70,7 +71,7 @@ jest.mock('views/stores/SearchMetadataStore', () => ({
 declare global {
   namespace NodeJS {
     interface Global {
-      api_url: string
+      api_url: string;
     }
   }
 }
@@ -113,11 +114,13 @@ describe('Create a new dashboard', () => {
   afterAll(() => PluginStore.unregister(viewsPlugin));
 
   const SimpleAppRouter = () => (
-    <CurrentUserProvider>
-      <StreamsContext.Provider value={[{ id: 'stream-1' }]}>
-        <AppRouter />
-      </StreamsContext.Provider>
-    </CurrentUserProvider>
+    <UserDateTimeProvider tz="Africa/Abidjan">
+      <CurrentUserProvider>
+        <StreamsContext.Provider value={[{ id: 'stream-1' }]}>
+          <AppRouter />
+        </StreamsContext.Provider>
+      </CurrentUserProvider>
+    </UserDateTimeProvider>
   );
 
   it('using Dashboards Page', async () => {
