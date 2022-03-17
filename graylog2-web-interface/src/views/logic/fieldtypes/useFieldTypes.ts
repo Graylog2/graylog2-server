@@ -55,7 +55,7 @@ const fetchAllFieldTypes = (streams: Array<string>, timerange: TimeRange): Promi
   .then(_deserializeFieldTypes);
 
 const normalizeTimeRange = (timerange: TimeRange, userTz: string): TimeRange => {
-  switch (timerange.type) {
+  switch (timerange?.type) {
     case 'absolute':
       return {
         type: 'absolute',
