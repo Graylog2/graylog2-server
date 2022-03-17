@@ -263,7 +263,6 @@ public class IndexSetsResource extends RestResource {
 
         final IndexSetConfig indexSetConfig = updateRequest.toIndexSetConfig(id, oldConfig);
 
-        // TODO: don't run conflict checks for updates
         final Optional<IndexSetValidator.Violation> violation = indexSetValidator.validate(indexSetConfig);
         if (violation.isPresent()) {
             throw new BadRequestException(violation.get().message());
