@@ -81,8 +81,8 @@ describe('EditWidgetFrame', () => {
         <ViewTypeContext.Provider value="DASHBOARD">
           <WidgetContext.Provider value={widget}>
             <EditWidgetFrame onCancel={() => {}} onFinish={() => {}}>
-              <>Hello World!</>
-              <>These are some buttons!</>
+              Hello World!
+              These are some buttons!
             </EditWidgetFrame>
           </WidgetContext.Provider>
         </ViewTypeContext.Provider>
