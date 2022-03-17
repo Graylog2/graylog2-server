@@ -34,7 +34,7 @@ const StyledRow = styled(Row)(({ $hasFocusedWidget }: { $hasFocusedWidget: boole
   position: relative;
 `);
 
-const DisabledSearchOverlay = styled.div(({ theme }) => css`
+const DisableResultsOverlay = styled.div(({ theme }) => css`
   background: ${chroma(theme.colors.brand.tertiary).alpha(0.25).css()};
 
   position: absolute;
@@ -70,7 +70,7 @@ const SearchResult = React.memo(({ hasErrors }: Props) => {
 
   return (
     <StyledRow $hasFocusedWidget={hasFocusedWidget}>
-      {(hasErrors && !hasFocusedWidget) && <DisabledSearchOverlay />}
+      {(hasErrors && !hasFocusedWidget) && <DisableResultsOverlay data-testid="disable-results-overlay" />}
       <StyledCol>
         <Query />
         <SearchLoadingIndicator />
