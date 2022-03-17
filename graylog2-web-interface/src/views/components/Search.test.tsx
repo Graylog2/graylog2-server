@@ -35,20 +35,16 @@ import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvi
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
-import MockSearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import Query, { filtersForQuery } from 'views/logic/queries/Query';
+import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 import Search from './Search';
 
 import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
 
-jest.mock('views/components/contexts/SearchPageLayoutProvider', () => jest.fn(
-  jest.requireActual('views/components/contexts/SearchPageLayoutProvider').default,
-));
-
 jest.mock('util/History');
-jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 
 jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: MockStore(
@@ -101,21 +97,18 @@ jest.mock('views/components/DashboardSearchBar', () => ({ onExecute }: { onExecu
 jest.mock('views/stores/SearchMetadataStore');
 jest.mock('views/components/views/CurrentViewTypeProvider', () => jest.fn());
 jest.mock('views/hooks/SyncWithQueryParameters');
-jest.mock('routing/withLocation', () => (Component) => (props) => <Component location={{ query: {}, pathname: '', search: '' }} {...props} />);
+
+jest.mock('routing/withLocation', () => (Component) => (props) => (
+  <Component location={{ query: {}, pathname: '', search: '' }} {...props} />
+));
+
 jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
 jest.mock('views/logic/queries/useCurrentQuery');
-
-const mockPromise = <T, >(res: T): Promise<T> => {
-  const promise = Promise.resolve(res);
-
-  // @ts-ignore
-  promise.then = (x) => x(res);
-
-  return promise;
-};
+jest.mock('views/logic/usePluginEntities');
 
 describe('Search', () => {
   beforeEach(() => {
+    asMock(usePluginEntities).mockReturnValue([]);
     WidgetStore.listen = jest.fn(() => jest.fn());
     QueryFiltersStore.listen = jest.fn(() => jest.fn());
     SearchActions.execute = mockAction(jest.fn(async () => ({} as SearchExecutionResult)));
@@ -131,25 +124,21 @@ describe('Search', () => {
       activeQuery: 'foobar',
     }));
 
-    SearchMetadataActions.parseSearch = mockAction(jest.fn(() => mockPromise(SearchMetadata.empty())));
+    SearchMetadataActions.parseSearch = mockAction(jest.fn(() => Promise.resolve(SearchMetadata.empty())));
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
     SearchActions.refresh = mockAction();
+
     asMock(CurrentViewTypeProvider as React.FunctionComponent).mockImplementation(({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
+
     const query = Query.builder().id('foobar').filter(filtersForQuery([])).build();
     asMock(useCurrentQuery).mockReturnValue(query);
   });
 
-  const SimpleSearch = (props) => (
-    <Search location={{ query: {}, pathname: '/search', search: '' }}
-            searchRefreshHooks={[]}
-            {...props} />
+  const SimpleSearch = () => (
+    <UserDateTimeProvider tz="Europe/Berlin">
+      <Search />
+    </UserDateTimeProvider>
   );
-
-  const newSearchCallback = async () => {
-    await waitFor(() => expect(ViewActions.search.completed.listen).toHaveBeenCalled());
-
-    return asMock(ViewActions.search.completed.listen).mock.calls[0][0];
-  };
 
   it('register a WindowLeaveMessage', async () => {
     render(<SimpleSearch />);
@@ -199,9 +188,15 @@ describe('Search', () => {
   });
 
   it('registers to ViewActions.search.completed even if search refresh condition fails', async () => {
-    render(<SimpleSearch searchRefreshHools={[() => false]} />);
+    const failingSearchRefreshHook = jest.fn(() => false);
 
-    await waitFor(() => expect(ViewActions.search.completed.listen).toHaveBeenCalled());
+    asMock(usePluginEntities).mockImplementation((type) => (type === 'views.hooks.searchRefresh' ? [failingSearchRefreshHook] : []));
+
+    render(<SimpleSearch />);
+
+    await waitFor(() => expect(failingSearchRefreshHook).toHaveBeenCalled());
+
+    expect(ViewActions.search.completed.listen).toHaveBeenCalled();
   });
 
   it('unregisters from ViewActions.search.completed upon unmount', async () => {
@@ -234,13 +229,11 @@ describe('Search', () => {
   it('updating search in view triggers search execution', async () => {
     render(<SimpleSearch />);
 
-    const cb = await newSearchCallback();
-
     asMock(SearchActions.execute).mockClear();
 
     expect(SearchActions.execute).not.toHaveBeenCalled();
 
-    cb({ search: {} } as View);
+    ViewActions.search({} as View['search']);
 
     await waitFor(() => expect(SearchActions.execute).toHaveBeenCalled());
   });
@@ -255,21 +248,5 @@ describe('Search', () => {
     await waitFor(() => expect(SearchMetadataActions.parseSearch).toHaveBeenCalled());
 
     expect(SearchActions.execute).toHaveBeenCalled();
-  });
-
-  it('changing current query in view does not trigger search execution', async () => {
-    const MockTest = <div>Test</div>;
-
-    asMock(MockSearchPageLayoutProvider).mockReturnValue(MockTest);
-
-    render(<SimpleSearch />);
-
-    asMock(SearchActions.execute).mockClear();
-
-    expect(SearchActions.execute).not.toHaveBeenCalled();
-
-    await ViewActions.selectQuery('someQuery');
-
-    expect(SearchActions.execute).not.toHaveBeenCalled();
   });
 });

@@ -38,6 +38,7 @@ import type { ViewStoreState } from 'views/stores/ViewStore';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import viewsBindings from 'views/bindings';
 import DataTable from 'views/components/datatable/DataTable';
+import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -52,7 +53,6 @@ const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
-jest.mock('hooks/useUserDateTime');
 
 const MockWidgetStoreState = Immutable.Map();
 
@@ -143,22 +143,24 @@ describe('Aggregation Widget', () => {
     viewType,
     ...props
   }: AggregationWidgetProps) => (
-    <ViewTypeContext.Provider value={viewType}>
-      {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
-      <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
-        <WidgetFocusContext.Provider value={widgetFocusContextState}>
-          <WidgetContext.Provider value={propsWidget}>
-            <Widget widget={propsWidget}
-                    id="widgetId"
-                    fields={Immutable.List([])}
-                    onPositionsChange={() => {}}
-                    title="Widget Title"
-                    position={new WidgetPosition(1, 1, 1, 1)}
-                    {...props} />
-          </WidgetContext.Provider>
-        </WidgetFocusContext.Provider>
-      </FieldTypesContext.Provider>
-    </ViewTypeContext.Provider>
+    <UserDateTimeProvider tz="Africa/Abidjan">
+      <ViewTypeContext.Provider value={viewType}>
+        {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
+        <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
+          <WidgetFocusContext.Provider value={widgetFocusContextState}>
+            <WidgetContext.Provider value={propsWidget}>
+              <Widget widget={propsWidget}
+                      id="widgetId"
+                      fields={Immutable.List([])}
+                      onPositionsChange={() => {}}
+                      title="Widget Title"
+                      position={new WidgetPosition(1, 1, 1, 1)}
+                      {...props} />
+            </WidgetContext.Provider>
+          </WidgetFocusContext.Provider>
+        </FieldTypesContext.Provider>
+      </ViewTypeContext.Provider>
+    </UserDateTimeProvider>
   );
 
   const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: 'Update Preview' });

@@ -22,11 +22,9 @@ import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 import MockStore from 'helpers/mocking/StoreMock';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
-import type {
-  WidgetEditingState,
-  WidgetFocusingState,
-} from 'views/components/contexts/WidgetFocusContext';
+import type { WidgetEditingState, WidgetFocusingState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
 
 import DashboardSearchBar from './DashboardSearchBar';
 
@@ -69,11 +67,17 @@ const config = {
   surrounding_timerange_options: { PT1S: 'One second', PT2S: 'Two seconds' },
 };
 
+const SimpleDashboardSearchBar = (props: React.ComponentProps<typeof DashboardSearchBar>) => (
+  <UserDateTimeProvider tz="Europe/Berlin">
+    <DashboardSearchBar {...props} />
+  </UserDateTimeProvider>
+);
+
 describe('DashboardSearchBar', () => {
   const onExecute = jest.fn();
 
   it('should render the DashboardSearchBar', async () => {
-    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+    render(<SimpleDashboardSearchBar onExecute={onExecute} config={config} />);
 
     await screen.findByLabelText('Open Time Range Selector');
     await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
@@ -82,13 +86,13 @@ describe('DashboardSearchBar', () => {
   });
 
   it('defaults to no override being selected', async () => {
-    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+    render(<SimpleDashboardSearchBar onExecute={onExecute} config={config} />);
 
     await screen.findByText('No Override');
   });
 
   it('should refresh search when button is clicked', async () => {
-    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+    render(<SimpleDashboardSearchBar onExecute={onExecute} config={config} />);
 
     const searchButton = await screen.findByTitle('Perform search');
 
@@ -100,7 +104,7 @@ describe('DashboardSearchBar', () => {
   });
 
   it('should call onExecute and set global override when search is performed', async () => {
-    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+    render(<SimpleDashboardSearchBar onExecute={onExecute} config={config} />);
 
     const timeRangeInput = await screen.findByText(/no override/i);
 
@@ -121,19 +125,15 @@ describe('DashboardSearchBar', () => {
     const focusedWidget: WidgetEditingState = { id: 'foo', editing: true, focusing: true };
     const widgetFocusContext = {
       focusedWidget,
-      setWidgetFocusing: () => {
-      },
-      setWidgetEditing: () => {
-      },
-      unsetWidgetFocusing: () => {
-      },
-      unsetWidgetEditing: () => {
-      },
+      setWidgetFocusing: () => {},
+      setWidgetEditing: () => {},
+      unsetWidgetFocusing: () => {},
+      unsetWidgetEditing: () => {},
     };
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <DashboardSearchBar onExecute={onExecute} config={config} />
+        <SimpleDashboardSearchBar onExecute={onExecute} config={config} />
       </WidgetFocusContext.Provider>,
     );
 
@@ -148,19 +148,15 @@ describe('DashboardSearchBar', () => {
     const focusedWidget: WidgetFocusingState = { id: 'foo', editing: false, focusing: true };
     const widgetFocusContext = {
       focusedWidget,
-      setWidgetFocusing: () => {
-      },
-      setWidgetEditing: () => {
-      },
-      unsetWidgetFocusing: () => {
-      },
-      unsetWidgetEditing: () => {
-      },
+      setWidgetFocusing: () => {},
+      setWidgetEditing: () => {},
+      unsetWidgetFocusing: () => {},
+      unsetWidgetEditing: () => {},
     };
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <DashboardSearchBar onExecute={onExecute} config={config} />
+        <SimpleDashboardSearchBar onExecute={onExecute} config={config} />
       </WidgetFocusContext.Provider>,
     );
 

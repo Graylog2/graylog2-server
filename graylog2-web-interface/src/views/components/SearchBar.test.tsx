@@ -21,11 +21,10 @@ import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 import { SearchActions } from 'views/stores/SearchStore';
 import MockQuery from 'views/logic/queries/Query';
-import type {
-  WidgetEditingState, WidgetFocusingState,
-} from 'views/components/contexts/WidgetFocusContext';
+import type { WidgetEditingState, WidgetFocusingState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
+import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
 
 import SearchBar from './SearchBar';
 
@@ -59,7 +58,11 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   },
 }));
 
-jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => jest.fn(() => <div>Saved Search Controls</div>));
+jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => jest.fn(() => (
+  <div>Saved Search
+    Controls
+  </div>
+)));
 
 jest.mock('views/stores/CurrentQueryStore', () => ({
   CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder()
@@ -69,8 +72,18 @@ jest.mock('views/stores/CurrentQueryStore', () => ({
     .build()]),
 }));
 
-jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest.fn(() => Promise.resolve({ status: 'OK', explanations: [] })));
+jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest.fn(() => Promise.resolve({
+  status: 'OK',
+  explanations: [],
+})));
+
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
+
+const SimpleSearchBar = (props: React.ComponentProps<typeof SearchBar>) => (
+  <UserDateTimeProvider tz="Europe/Berlin">
+    <SearchBar {...props} />
+  </UserDateTimeProvider>
+);
 
 describe('SearchBar', () => {
   const config = {
@@ -86,7 +99,7 @@ describe('SearchBar', () => {
   });
 
   it('should render the SearchBar', async () => {
-    render(<SearchBar config={config} />);
+    render(<SimpleSearchBar config={config} />);
 
     const timeRangeButton = await screen.findByLabelText('Open Time Range Selector');
     const timeRangeDisplay = screen.getByLabelText('Search Time Range, Opens Time Range Selector On Click');
@@ -104,7 +117,7 @@ describe('SearchBar', () => {
   });
 
   it('should update query when search is performed', async () => {
-    render(<SearchBar config={config} />);
+    render(<SimpleSearchBar config={config} />);
 
     const searchButton = await screen.findByTitle('Perform search');
 
@@ -116,7 +129,7 @@ describe('SearchBar', () => {
   });
 
   it('date exceeding limitDuration should render with error Icon & search button disabled', async () => {
-    render(<SearchBar config={{ ...config, query_time_range_limit: 'PT1M' }} />);
+    render(<SimpleSearchBar config={{ ...config, query_time_range_limit: 'PT1M' }} />);
 
     const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
     const searchButton = screen.getByTitle('Perform search');
@@ -137,7 +150,7 @@ describe('SearchBar', () => {
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <SearchBar config={config} />
+        <SimpleSearchBar config={config} />
       </WidgetFocusContext.Provider>,
     );
 
@@ -159,7 +172,7 @@ describe('SearchBar', () => {
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <SearchBar config={config} />
+        <SimpleSearchBar config={config} />
       </WidgetFocusContext.Provider>,
     );
 
@@ -169,7 +182,7 @@ describe('SearchBar', () => {
   });
 
   it('should validate query on mount', async () => {
-    render(<SearchBar config={config} />);
+    render(<SimpleSearchBar config={config} />);
 
     await waitFor(() => expect(validateQuery).toHaveBeenCalled());
   });
