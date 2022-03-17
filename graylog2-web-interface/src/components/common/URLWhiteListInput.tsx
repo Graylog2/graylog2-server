@@ -31,7 +31,7 @@ type Props = {
   validationMessage: string,
   validationState: string,
   url: string,
-  setIsSubmitEnabled: (enabled: boolean) => void,
+  setIsSubmitEnabled?: (enabled: boolean) => void,
   labelClassName: string,
   wrapperClassName: string,
   urlType: React.ComponentProps<typeof URLWhiteListFormModal>['urlType'],
@@ -73,7 +73,7 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
         setIsWhitelisted(result.is_whitelisted);
       });
     }
-  }, [url, validationMessage, validationState]);
+  }, [url, validationMessage, validationState, setIsSubmitEnabled]);
 
   const onUpdate = () => {
     triggerInput(urlInputRef.current.getInputDOMNode());
@@ -136,6 +136,7 @@ URLWhiteListInput.propTypes = {
     PropTypes.string,
   ]),
   url: PropTypes.string,
+  setIsSubmitEnabled: PropTypes.func,
   labelClassName: PropTypes.string,
   wrapperClassName: PropTypes.string,
   urlType: PropTypes.oneOf(['regex', 'literal']),
@@ -148,6 +149,7 @@ URLWhiteListInput.defaultProps = {
   labelClassName: '',
   wrapperClassName: '',
   urlType: 'literal',
+  setIsSubmitEnabled: () => {},
 };
 
 export default URLWhiteListInput;

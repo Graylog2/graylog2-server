@@ -29,6 +29,10 @@ class HttpNotificationForm extends React.Component {
     setIsSubmitEnabled: PropTypes.func,
   };
 
+  static defaultConfig = {
+    url: '',
+  };
+
   propagateChange = (key, value) => {
     const { config, onChange } = this.props;
     const nextConfig = lodash.cloneDeep(config);
@@ -43,12 +47,8 @@ class HttpNotificationForm extends React.Component {
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
   };
 
-  static defaultConfig = {
-    url: '',
-  };
-
   render() {
-    const { config, validation, setIsSubmitEnabled  } = this.props;
+    const { config, validation, setIsSubmitEnabled } = this.props;
 
     return (
       <URLWhiteListInput label="URL"
@@ -60,5 +60,9 @@ class HttpNotificationForm extends React.Component {
     );
   }
 }
+
+HttpNotificationForm.defaultProps = {
+  setIsSubmitEnabled: () => {},
+};
 
 export default HttpNotificationForm;
