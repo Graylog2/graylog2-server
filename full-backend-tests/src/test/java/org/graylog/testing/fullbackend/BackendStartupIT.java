@@ -41,6 +41,7 @@ class BackendStartupIT {
     @ContainerMatrixTest
     void canReachApi() {
         given()
+                .config(sut.withGraylogBackendFailureConfig())
                 .spec(requestSpec)
                 .when()
                 .get()
