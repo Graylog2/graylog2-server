@@ -21,4 +21,5 @@ public enum ValidationType {
     QUERY_PARSING_ERROR,
     UNKNOWN_FIELD,
     INVALID_OPERATOR,
+    MISSING_LICENSE,
 }

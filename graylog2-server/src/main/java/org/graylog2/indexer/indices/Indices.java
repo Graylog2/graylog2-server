@@ -351,4 +351,11 @@ public class Indices {
     public IndexRangeStats indexRangeStatsOfIndex(String index) {
         return indicesAdapter.indexRangeStatsOfIndex(index);
     }
+
+    /**
+     * Returns ES UUID of the index; null if it does not exist
+     */
+    public String getIndexId(String indexName) {
+        return indicesAdapter.getIndexId(indexName);
+    }
 }

@@ -23,8 +23,6 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import { alice as currentUser } from 'fixtures/users';
 import asMock from 'helpers/mocking/AsMock';
 import { StoreMock as MockStore } from 'helpers/mocking';
-import type User from 'logic/users/User';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import type { Props as XYPlotProps } from 'views/components/visualizations/XYPlot';
 import XYPlot from 'views/components/visualizations/XYPlot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -32,7 +30,6 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Query from 'views/logic/queries/Query';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { SearchActions } from 'views/stores/SearchStore';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
 import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
 
@@ -45,10 +42,6 @@ jest.mock('views/stores/CurrentViewStateStore', () => ({
     },
     ],
   ),
-}));
-
-jest.mock('stores/users/CurrentUserStore', () => ({
-  CurrentUserStore: MockStore('get'),
 }));
 
 jest.mock('views/stores/SearchStore', () => ({
@@ -70,7 +63,6 @@ describe('XYPlot', () => {
   const setChartColor = () => ({});
   const chartData = [{ y: [23, 42], name: 'count()' }];
   type SimpleXYPlotProps = {
-    currentUser?: User,
     config?: $PropertyType<XYPlotProps, 'chartData'>,
     chartData?: $PropertyType<XYPlotProps, 'chartData'>,
     currentQuery?: $PropertyType<XYPlotProps, 'currentQuery'>,
@@ -78,21 +70,20 @@ describe('XYPlot', () => {
     getChartColor?: $PropertyType<XYPlotProps, 'getChartColor'>,
     height?: $PropertyType<XYPlotProps, 'height'>,
     setChartColor?: $PropertyType<XYPlotProps, 'setChartColor'>,
+    tz?: string,
     plotLayout?: $PropertyType<XYPlotProps, 'plotLayout'>,
     onZoom?: $PropertyType<XYPlotProps, 'onZoom'>,
   };
 
-  const SimpleXYPlot = ({ currentUser: user, ...props }: SimpleXYPlotProps) => (
-    <CurrentUserContext.Provider value={user}>
-      <UserDateTimeProvider tz="UTC">
-        <XYPlot chartData={chartData}
-                config={config}
-                getChartColor={getChartColor}
-                setChartColor={setChartColor}
-                currentQuery={currentQuery}
-                {...props} />
-      </UserDateTimeProvider>
-    </CurrentUserContext.Provider>
+  const SimpleXYPlot = ({ tz = 'UTC', ...props }: SimpleXYPlotProps) => (
+    <UserDateTimeProvider tz={tz}>
+      <XYPlot chartData={chartData}
+              config={config}
+              getChartColor={getChartColor}
+              setChartColor={setChartColor}
+              currentQuery={currentQuery}
+              {...props} />
+    </UserDateTimeProvider>
   );
 
   SimpleXYPlot.defaultProps = {
@@ -133,14 +124,12 @@ describe('XYPlot', () => {
   });
 
   it('adds zoom handler for timeline plot', () => {
-    CurrentUserStore.get.mockReturnValue({ timezone: 'UTC' });
     const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z', type: 'absolute' };
-    const user = currentUser.toBuilder().timezone('UTC').build();
-    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} currentUser={user} />);
+    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} tz="America/New_York" />);
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', expect.objectContaining({
-      xaxis: { range: ['2018-10-12T02:04:21.723+00:00', '2018-10-12T10:04:21.723+00:00'], type: 'date' },
+      xaxis: { range: ['2018-10-11T22:04:21.723-04:00', '2018-10-12T06:04:21.723-04:00'], type: 'date' },
     }));
 
     genericPlot.get(0).props.onZoom('2018-10-12T04:04:21.723Z', '2018-10-12T08:04:21.723Z');
@@ -149,8 +138,8 @@ describe('XYPlot', () => {
 
     expect(QueriesActions.timerange).toHaveBeenCalledWith('dummyquery', {
       type: 'absolute',
-      from: '2018-10-12T04:04:21.723Z',
-      to: '2018-10-12T08:04:21.723Z',
+      from: '2018-10-12T04:04:21.723+00:00',
+      to: '2018-10-12T08:04:21.723+00:00',
     });
   });
 
