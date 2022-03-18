@@ -47,15 +47,21 @@ class HttpNotificationForm extends React.Component {
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
   };
 
+  onValidationChange = (validationState) => {
+    const { setIsSubmitEnabled } = this.props;
+
+    setIsSubmitEnabled(validationState !== 'error');
+  };
+
   render() {
-    const { config, validation, setIsSubmitEnabled } = this.props;
+    const { config, validation } = this.props;
 
     return (
       <URLWhiteListInput label="URL"
                          onChange={this.handleChange}
                          validationState={validation.errors.url ? 'error' : null}
                          validationMessage={lodash.get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs.')}
-                         setIsSubmitEnabled={setIsSubmitEnabled}
+                         onValidationChange={this.onValidationChange}
                          url={config.url} />
     );
   }

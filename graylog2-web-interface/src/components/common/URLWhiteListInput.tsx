@@ -31,13 +31,13 @@ type Props = {
   validationMessage: string,
   validationState: string,
   url: string,
-  setIsSubmitEnabled?: (enabled: boolean) => void,
+  onValidationChange?: (validationState: string) => void,
   labelClassName: string,
   wrapperClassName: string,
   urlType: React.ComponentProps<typeof URLWhiteListFormModal>['urlType'],
 };
 
-const URLWhiteListInput = ({ label, onChange, validationMessage, validationState, url, setIsSubmitEnabled, labelClassName, wrapperClassName, urlType }: Props) => {
+const URLWhiteListInput = ({ label, onChange, validationMessage, validationState, url, onValidationChange, labelClassName, wrapperClassName, urlType }: Props) => {
   const [isWhitelisted, setIsWhitelisted] = useState(false);
   const [currentValidationState, setCurrentValidationState] = useState(validationState);
   const [ownValidationMessage, setOwnValidationMessage] = useState(validationMessage);
@@ -60,20 +60,20 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
       promise.then((result) => {
         if (!result.is_whitelisted && validationState === null) {
           setCurrentValidationState('error');
-          setIsSubmitEnabled(false);
+          onValidationChange('error');
           const message = isValidURL(url) ? `URL ${url} is not whitelisted` : `URL ${url} is not a valid URL.`;
 
           setOwnValidationMessage(message);
         } else {
           setOwnValidationMessage(validationMessage);
           setCurrentValidationState(validationState);
-          setIsSubmitEnabled(true);
+          onValidationChange(validationState);
         }
 
         setIsWhitelisted(result.is_whitelisted);
       });
     }
-  }, [url, validationMessage, validationState, setIsSubmitEnabled]);
+  }, [url, validationMessage, validationState, onValidationChange]);
 
   const onUpdate = () => {
     triggerInput(urlInputRef.current.getInputDOMNode());
@@ -136,7 +136,7 @@ URLWhiteListInput.propTypes = {
     PropTypes.string,
   ]),
   url: PropTypes.string,
-  setIsSubmitEnabled: PropTypes.func,
+  onValidationChange: PropTypes.func,
   labelClassName: PropTypes.string,
   wrapperClassName: PropTypes.string,
   urlType: PropTypes.oneOf(['regex', 'literal']),
@@ -149,7 +149,7 @@ URLWhiteListInput.defaultProps = {
   labelClassName: '',
   wrapperClassName: '',
   urlType: 'literal',
-  setIsSubmitEnabled: () => {},
+  onValidationChange: () => {},
 };
 
 export default URLWhiteListInput;
