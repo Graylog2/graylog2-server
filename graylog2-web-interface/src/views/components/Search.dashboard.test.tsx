@@ -33,7 +33,6 @@ import View from 'views/logic/views/View';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import Query, { filtersForQuery } from 'views/logic/queries/Query';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
-import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
 
 import Search from './Search';
 import WidgetFocusProvider from './contexts/WidgetFocusProvider';
@@ -129,14 +128,8 @@ describe('Dashboard Search', () => {
     asMock(useCurrentQuery).mockReturnValue(query);
   });
 
-  const SimpleSearch = () => (
-    <UserDateTimeProvider tz="Europe/Berlin">
-      <Search />
-    </UserDateTimeProvider>
-  );
-
   it('should list tabs for dashboard pages', async () => {
-    render(<SimpleSearch />);
+    render(<Search />);
 
     await screen.findByRole('button', { name: 'First dashboard page' });
 
@@ -145,7 +138,7 @@ describe('Dashboard Search', () => {
 
   it('should not list tabs for pages when focusing a widget', async () => {
     mockWidgetEditing();
-    render(<SimpleSearch />);
+    render(<Search />);
 
     await screen.findByText('Mocked search results');
 
@@ -154,14 +147,14 @@ describe('Dashboard Search', () => {
   });
 
   it('should display dashboard search bar', async () => {
-    render(<SimpleSearch />);
+    render(<Search />);
 
     await screen.findByText('Mocked dashboard search bar');
   });
 
   it('should not display dashboard search bar on widget edit', async () => {
     mockWidgetEditing();
-    render(<SimpleSearch />);
+    render(<Search />);
 
     await screen.findByText('Mocked search results');
 

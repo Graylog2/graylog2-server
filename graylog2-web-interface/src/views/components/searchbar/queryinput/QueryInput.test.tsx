@@ -20,7 +20,6 @@ import userEvent from '@testing-library/user-event';
 
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import { validationError } from 'fixtures/queryValidationState';
-import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
 
 import QueryInput from './QueryInput';
 
@@ -41,13 +40,11 @@ describe('QueryInput', () => {
   const getQueryInput = () => screen.getByRole('textbox');
 
   const SimpleQueryInput = (props: Partial<React.ComponentProps<typeof QueryInput>>) => (
-    <UserDateTimeProvider tz="Asia/Kuala_Lumpur">
-      <QueryInput value=""
-                  onChange={() => Promise.resolve('')}
-                  onExecute={() => {}}
-                  completerFactory={() => new Completer()}
-                  {...props} />
-    </UserDateTimeProvider>
+    <QueryInput value=""
+                onChange={() => Promise.resolve('')}
+                onExecute={() => {}}
+                completerFactory={() => new Completer()}
+                {...props} />
   );
 
   afterEach(() => {

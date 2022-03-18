@@ -24,7 +24,6 @@ import MockQuery from 'views/logic/queries/Query';
 import type { WidgetEditingState, WidgetFocusingState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
-import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
 
 import SearchBar from './SearchBar';
 
@@ -79,12 +78,6 @@ jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest
 
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
-const SimpleSearchBar = (props: React.ComponentProps<typeof SearchBar>) => (
-  <UserDateTimeProvider tz="Europe/Berlin">
-    <SearchBar {...props} />
-  </UserDateTimeProvider>
-);
-
 describe('SearchBar', () => {
   const config = {
     analysis_disabled_fields: ['full_message', 'message'],
@@ -99,7 +92,7 @@ describe('SearchBar', () => {
   });
 
   it('should render the SearchBar', async () => {
-    render(<SimpleSearchBar config={config} />);
+    render(<SearchBar config={config} />);
 
     const timeRangeButton = await screen.findByLabelText('Open Time Range Selector');
     const timeRangeDisplay = screen.getByLabelText('Search Time Range, Opens Time Range Selector On Click');
@@ -117,7 +110,7 @@ describe('SearchBar', () => {
   });
 
   it('should update query when search is performed', async () => {
-    render(<SimpleSearchBar config={config} />);
+    render(<SearchBar config={config} />);
 
     const searchButton = await screen.findByTitle('Perform search');
 
@@ -129,7 +122,7 @@ describe('SearchBar', () => {
   });
 
   it('date exceeding limitDuration should render with error Icon & search button disabled', async () => {
-    render(<SimpleSearchBar config={{ ...config, query_time_range_limit: 'PT1M' }} />);
+    render(<SearchBar config={{ ...config, query_time_range_limit: 'PT1M' }} />);
 
     const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
     const searchButton = screen.getByTitle('Perform search');
@@ -150,7 +143,7 @@ describe('SearchBar', () => {
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <SimpleSearchBar config={config} />
+        <SearchBar config={config} />
       </WidgetFocusContext.Provider>,
     );
 
@@ -172,7 +165,7 @@ describe('SearchBar', () => {
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <SimpleSearchBar config={config} />
+        <SearchBar config={config} />
       </WidgetFocusContext.Provider>,
     );
 
@@ -182,7 +175,7 @@ describe('SearchBar', () => {
   });
 
   it('should validate query on mount', async () => {
-    render(<SimpleSearchBar config={config} />);
+    render(<SearchBar config={config} />);
 
     await waitFor(() => expect(validateQuery).toHaveBeenCalled());
   });
