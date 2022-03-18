@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import styled, { css } from 'styled-components';
+import chroma from 'chroma-js';
 
 import Spinner from 'components/common/Spinner';
 import Query from 'views/components/Query';
@@ -30,6 +31,18 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 const StyledRow = styled(Row)(({ $hasFocusedWidget }: { $hasFocusedWidget: boolean }) => css`
   height: ${$hasFocusedWidget ? '100%' : 'auto'};
   overflow: ${$hasFocusedWidget ? 'auto' : 'visible'};
+  position: relative;
+`);
+
+const DisableResultsOverlay = styled.div(({ theme }) => css`
+  background: ${chroma(theme.colors.brand.tertiary).alpha(0.25).css()};
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
 `);
 
 const StyledCol = styled(Col)`
@@ -49,19 +62,17 @@ type Props = {
 const SearchResult = React.memo(({ hasErrors }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
+  const hasFocusedWidget = !!focusedWidget?.id;
 
   if (!fieldTypes) {
     return <Spinner />;
   }
 
-  const hasFocusedWidget = !!focusedWidget?.id;
-
-  const content = hasErrors ? null : <Query />;
-
   return (
     <StyledRow $hasFocusedWidget={hasFocusedWidget}>
+      {(hasErrors && !hasFocusedWidget) && <DisableResultsOverlay data-testid="disable-results-overlay" />}
       <StyledCol>
-        {content}
+        <Query />
         <SearchLoadingIndicator />
       </StyledCol>
     </StyledRow>
