@@ -36,6 +36,7 @@ import org.graylog2.plugin.inputs.transports.GeneratorTransport;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -80,7 +81,7 @@ public class InternalMetricsTransport extends GeneratorTransport {
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getValue()));
 
         return InternalMetrics.builder()
-                .timestamp(new DateTime())
+                .timestamp(new DateTime(DateTimeZone.UTC))
                 .gauges(gauges)
                 .build();
     }
