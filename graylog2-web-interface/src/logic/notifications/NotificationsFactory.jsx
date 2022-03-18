@@ -138,16 +138,13 @@ class NotificationsFactory {
           description: (
             <span>
               {notification.details.description}<br />
-              {notification.details.blockDetails?.length > 0
-                && (
+              {notification.details.blockDetails?.length > 0 && (
                 <ul>
                   {notification.details.blockDetails.map((line) => (
-                    <li>
-                      {line[0]}: {line[1]}
-                    </li>
+                    <li>{line[0]}: {line[1]}</li>
                   ))}
                 </ul>
-                )}
+              )}
             </span>
           ),
         };
