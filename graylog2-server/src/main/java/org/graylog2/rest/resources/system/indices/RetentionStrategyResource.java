@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.rest.models.system.indices.RetentionStrategies;
@@ -58,14 +59,17 @@ public class RetentionStrategyResource extends RestResource {
 
     private final Map<String, Provider<RetentionStrategy>> retentionStrategies;
     private final ObjectMapper objectMapper;
+    private final ClusterConfigService clusterConfigService;
     private final ElasticsearchConfiguration elasticsearchConfiguration;
 
     @Inject
     public RetentionStrategyResource(Map<String, Provider<RetentionStrategy>> retentionStrategies,
                                      ObjectMapper objectMapper,
+                                     ClusterConfigService clusterConfigService,
                                      ElasticsearchConfiguration elasticsearchConfiguration) {
         this.retentionStrategies = requireNonNull(retentionStrategies);
         this.objectMapper = objectMapper;
+        this.clusterConfigService = requireNonNull(clusterConfigService);
         this.elasticsearchConfiguration = elasticsearchConfiguration;
     }
 
