@@ -56,7 +56,9 @@ class MongoDBFixturesWithClassLifecycleIT {
     }
 
     private void assertTokenPresent() {
-        List<?> tokens = given().spec(requestSpec)
+        List<?> tokens = given()
+                .config(sut.withGraylogBackendFailureConfig())
+                .spec(requestSpec)
                 .when()
                 .get("users/local:admin/tokens")
                 .then()

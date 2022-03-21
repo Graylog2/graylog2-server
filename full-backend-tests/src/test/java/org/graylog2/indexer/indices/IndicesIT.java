@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.apache.commons.codec.binary.Base64;
 import org.graylog.storage.elasticsearch6.IndexingHelper;
 import org.graylog.storage.elasticsearch6.IndicesAdapterES6;
 import org.graylog.storage.elasticsearch6.NodeAdapterES6;
@@ -490,6 +491,14 @@ public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
                 .containsOnly(index1);
         assertThat(indices.getIndices(indexSet, "close"))
                 .containsOnly(index2);
+    }
+
+    @ContainerMatrixTest
+    public void testIndexId() {
+        final String index = createRandomIndex("indices_it_");
+        String uuid = indices.getIndexId(index);
+        assertThat(uuid).isNotEmpty();
+        assert(Base64.isBase64(uuid));
     }
 
     @ContainerMatrixTest
