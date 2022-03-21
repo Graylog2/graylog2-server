@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { render, RenderOptions } from '@testing-library/react';
+import type * as React from 'react';
+import type { RenderOptions } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
 import 'jest-styled-components';
@@ -27,7 +28,7 @@ export const renderWithWrapper = (Component: React.ReactElement<any>, options?: 
   ...options,
 });
 
-export function asElement<T extends new(...args: any) => any>(elem: any, elementType: T): InstanceType<T> {
+export function asElement<T extends new(...args: any) => any> (elem: any, elementType: T): InstanceType<T> {
   if (elem && elem instanceof elementType) {
     // @ts-ignore
     return elem as T;
