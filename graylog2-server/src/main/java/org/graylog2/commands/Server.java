@@ -181,15 +181,9 @@ public class Server extends ServerBootstrap {
                 new GRNTypesModule(),
                 new SecurityModule(),
                 new PrometheusMetricsModule(),
-                new ClusterConfigValidatorModule()
+                new ClusterConfigValidatorModule(),
+                new MapWidgetModule()
         );
-
-        if (!isMigrationCommand()) {
-            modules.add(
-                    new MapWidgetModule()
-            );
-        }
-
         return modules.build();
     }
 
