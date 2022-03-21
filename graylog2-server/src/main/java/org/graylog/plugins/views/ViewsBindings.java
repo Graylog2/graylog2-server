@@ -92,6 +92,9 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
 import org.graylog.plugins.views.search.validation.QueryValidationService;
 import org.graylog.plugins.views.search.validation.QueryValidationServiceImpl;
+import org.graylog.plugins.views.search.validation.subvalidators.LuceneQuerySubValidator;
+import org.graylog.plugins.views.search.validation.subvalidators.UnknownFieldsIdentifier;
+import org.graylog.plugins.views.search.validation.subvalidators.ValidationExplanationCreator;
 import org.graylog.plugins.views.search.views.RequiresParameterSupport;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
@@ -181,6 +184,9 @@ public class ViewsBindings extends ViewsModule {
 
         bind(SearchJobService.class).to(InMemorySearchJobService.class).in(Scopes.SINGLETON);
         bind(MappedFieldTypesService.class).to(MappedFieldTypesServiceImpl.class).in(Scopes.SINGLETON);
+        bind(UnknownFieldsIdentifier.class).in(Scopes.SINGLETON);
+        bind(ValidationExplanationCreator.class).in(Scopes.SINGLETON);
+        bind(LuceneQuerySubValidator.class).in(Scopes.SINGLETON);
         bind(QueryValidationService.class).to(QueryValidationServiceImpl.class).in(Scopes.SINGLETON);
         bind(ChunkDecorator.class).to(LegacyChunkDecorator.class);
         bind(MessagesExporter.class).to(DecoratingMessagesExporter.class);

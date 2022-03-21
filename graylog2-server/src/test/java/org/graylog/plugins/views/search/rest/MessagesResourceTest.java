@@ -22,7 +22,6 @@ import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.export.AuditContext;
 import org.graylog.plugins.views.search.export.CommandFactory;
@@ -34,6 +33,9 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.validation.LuceneQueryParser;
 import org.graylog.plugins.views.search.validation.QueryValidationService;
 import org.graylog.plugins.views.search.validation.QueryValidationServiceImpl;
+import org.graylog.plugins.views.search.validation.subvalidators.LuceneQuerySubValidator;
+import org.graylog.plugins.views.search.validation.subvalidators.UnknownFieldsIdentifier;
+import org.graylog.plugins.views.search.validation.subvalidators.ValidationExplanationCreator;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeEach;
@@ -79,8 +81,7 @@ public class MessagesResourceTest {
         SearchDomain searchDomain = mock(SearchDomain.class);
 
         final QueryValidationServiceImpl validationService = new QueryValidationServiceImpl(
-                new LuceneQueryParser(),
-                (streamIds, timeRange) -> Collections.emptySet(),
+                new LuceneQuerySubValidator(new LuceneQueryParser(), new UnknownFieldsIdentifier((streamIds, timeRange) -> Collections.emptySet()), new ValidationExplanationCreator()),
                 new QueryStringDecorators(Collections.emptySet()));
 
         sut = new MessagesTestResource(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, mock(ObjectMapper.class), eventBus, validationService);
