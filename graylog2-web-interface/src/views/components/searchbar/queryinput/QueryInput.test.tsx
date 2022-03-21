@@ -40,6 +40,8 @@ describe('QueryInput', () => {
   const SimpleQueryInput = (props) => (
     <QueryInput value=""
                 onChange={() => Promise.resolve('')}
+                validate={() => Promise.resolve({})}
+                isValidating={false}
                 onExecute={() => {}}
                 completerFactory={() => new Completer()}
                 {...props} />

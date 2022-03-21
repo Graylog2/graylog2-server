@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useContext, useRef, useEffect, useState } from 'react';
+import { useCallback, useMemo, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { delay } from 'lodash';
+import { isEmpty } from 'lodash';
+import type { FormikErrors } from 'formik';
 
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
@@ -37,28 +38,56 @@ import type { Completer, FieldTypes } from '../SearchBarAutocompletions';
 
 const defaultCompleterFactory = (...args: ConstructorParameters<typeof SearchBarAutoCompletions>) => new SearchBarAutoCompletions(...args);
 
-const handleExecution = (
+const displayValidationErrors = () => {
+  QueryValidationActions.displayValidationErrors();
+};
+
+const handleExecution = ({
+  editor,
+  onExecute,
+  value,
+  error,
+  disableExecution,
+  isValidating,
+  validate,
+}: {
   editor: Editor,
   onExecute: (query: string) => void,
   value: string,
   error: QueryValidationState | undefined,
   disableExecution: boolean,
-) => {
+  isValidating: boolean,
+  validate: () => Promise<FormikErrors<{}>>,
+}) => {
+  const execute = () => {
+    if (editor?.completer && editor.completer.popup) {
+      editor.completer.popup.hide();
+    }
+
+    onExecute(value);
+  };
+
+  if (isValidating) {
+    validate().then((errors) => {
+      if (isEmpty(errors)) {
+        execute();
+      } else {
+        displayValidationErrors();
+      }
+    });
+
+    return;
+  }
+
   if (error) {
-    QueryValidationActions.displayValidationErrors();
+    displayValidationErrors();
+  }
 
+  if (disableExecution || error) {
     return;
   }
 
-  if (disableExecution) {
-    return;
-  }
-
-  if (editor?.completer && editor.completer.popup) {
-    editor.completer.popup.hide();
-  }
-
-  onExecute(value);
+  execute();
 };
 
 // This function takes care of all editor configuration options, which do not rely on external data.
@@ -128,33 +157,13 @@ type Props = BaseProps & {
     fieldTypes: FieldTypes,
   ) => AutoCompleter,
   disableExecution?: boolean,
+  isValidating?: boolean,
   onBlur?: (query: string) => void,
   onChange: (query: string) => Promise<string>,
   onExecute: (query: string) => void,
   streams?: Array<string> | undefined,
   timeRange?: TimeRange | NoTimeRangeOverride | undefined,
-};
-
-const useRetryExecutionWhenDisabled = (disableExecution, value, onExecuteProp, error) => {
-  const [retryExecution, setRetryExecution] = useState<undefined | { editor: Editor, value: string }>();
-
-  useEffect(() => {
-    if (retryExecution && disableExecution) {
-      delay(() => setRetryExecution(undefined), 500);
-    }
-  }, [retryExecution, disableExecution]);
-
-  useEffect(() => {
-    if (retryExecution && !disableExecution) {
-      if (value === retryExecution.value) {
-        handleExecution(retryExecution.editor, onExecuteProp, value, error, disableExecution);
-      }
-
-      setRetryExecution(undefined);
-    }
-  }, [disableExecution, error, onExecuteProp, retryExecution, value]);
-
-  return setRetryExecution;
+  validate: () => Promise<FormikErrors<{}>>,
 };
 
 const QueryInput = ({
@@ -163,6 +172,7 @@ const QueryInput = ({
   disableExecution,
   error,
   height,
+  isValidating,
   maxLines,
   onBlur,
   onChange,
@@ -171,6 +181,7 @@ const QueryInput = ({
   streams,
   timeRange,
   value,
+  validate,
   warning,
   wrapEnabled,
 }: Props) => {
@@ -178,15 +189,15 @@ const QueryInput = ({
   const { enableSmartSearch } = useContext(UserPreferencesContext);
   const completer = useCompleter({ streams, timeRange, completerFactory });
   const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor, isInitialTokenizerUpdate), []);
-  const setRetryExecution = useRetryExecutionWhenDisabled(disableExecution, value, onExecuteProp, error);
-
-  const onExecute = useCallback((editor: Editor) => {
-    if (disableExecution) {
-      setRetryExecution({ editor, value });
-    }
-
-    handleExecution(editor, onExecuteProp, value, error, disableExecution);
-  }, [setRetryExecution, onExecuteProp, value, error, disableExecution]);
+  const onExecute = useCallback((editor: Editor) => handleExecution({
+    editor,
+    onExecute: onExecuteProp,
+    value,
+    error,
+    disableExecution,
+    isValidating,
+    validate,
+  }), [onExecuteProp, value, error, disableExecution, isValidating, validate]);
   const updateEditorConfiguration = useCallback((node) => _updateEditorConfiguration(node, completer, onExecute), [onExecute, completer]);
 
   return (
@@ -214,6 +225,7 @@ QueryInput.propTypes = {
   disableExecution: PropTypes.bool,
   error: PropTypes.any,
   height: PropTypes.number,
+  isValidating: PropTypes.bool.isRequired,
   maxLines: PropTypes.number,
   onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,
@@ -224,6 +236,7 @@ QueryInput.propTypes = {
   value: PropTypes.string,
   warning: PropTypes.any,
   wrapEnabled: PropTypes.bool,
+  validate: PropTypes.func.isRequired,
 };
 
 QueryInput.defaultProps = {
