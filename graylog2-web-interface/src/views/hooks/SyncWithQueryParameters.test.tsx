@@ -34,6 +34,7 @@ jest.mock('views/actions/QueriesActions', () => ({
   QueriesActions: {
     update: mockAction(),
     query: mockAction(),
+    timerange: mockAction(),
   },
 }));
 
@@ -198,6 +199,7 @@ describe('SyncWithQueryParameters', () => {
 
       expect(QueriesActions.update.completed.listen).toHaveBeenCalled();
       expect(QueriesActions.query.completed.listen).toHaveBeenCalled();
+      expect(QueriesActions.timerange.completed.listen).toHaveBeenCalled();
     });
   });
 });
