@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
@@ -28,17 +28,24 @@ const ESClusterStatus = styled(Alert)`
   margin-bottom: 5px;
 `;
 
-class IndexerClusterHealthSummary extends React.Component {
-  static propTypes = {
-    health: PropTypes.object.isRequired,
-  };
+const IndexerClusterHealthSummary = ({ health, name }: {
+  health: {
+    status: string,
+    shards: {
+      active: string,
+      initializing: string,
+      relocating: string,
+      unassigned: string
+    }
+  },
+  name?: {
+    name: string
+  }
+}) => {
+  const formattedHealthStatus = health.status.toLowerCase();
 
-  _formatHealthStatus = ({ status }) => {
-    return status.toLowerCase();
-  };
-
-  _alertClassForHealth = (health) => {
-    switch (this._formatHealthStatus(health)) {
+  const alertClassForHealth = () => {
+    switch (formattedHealthStatus) {
       case 'green': return 'success';
       case 'yellow': return 'warning';
       case 'red': return 'danger';
@@ -46,19 +53,19 @@ class IndexerClusterHealthSummary extends React.Component {
     }
   };
 
-  _formatTextForHealth = (health) => {
-    const text = `Elasticsearch cluster is ${this._formatHealthStatus(health)}.`;
+  const formattedTextForHealth = useMemo(() => {
+    const text = `Elasticsearch cluster ${name?.name || ''} is ${formattedHealthStatus}.`;
 
-    switch (this._formatHealthStatus(health)) {
+    switch (formattedHealthStatus) {
       case 'green': return text;
       case 'yellow':
       case 'red': return <strong>{text}</strong>;
       default: return text;
     }
-  };
+  }, [formattedHealthStatus, name]);
 
-  _iconNameForHealth = (health) => {
-    switch (this._formatHealthStatus(health)) {
+  const iconNameForHealth = () => {
+    switch (formattedHealthStatus) {
       case 'green': return 'check-circle';
       case 'yellow': return 'exclamation-triangle';
       case 'red': return 'ambulance';
@@ -66,21 +73,26 @@ class IndexerClusterHealthSummary extends React.Component {
     }
   };
 
-  render() {
-    const { health } = this.props;
+  return (
+    <ESClusterStatus bsStyle={alertClassForHealth()}>
+      <Icon name={iconNameForHealth()} /> &nbsp;{formattedTextForHealth}{' '}
+      Shards:{' '}
+      {health.shards.active} active,{' '}
+      {health.shards.initializing} initializing,{' '}
+      {health.shards.relocating} relocating,{' '}
+      {health.shards.unassigned} unassigned,{' '}
+      <DocumentationLink page={DocsHelper.PAGES.CLUSTER_STATUS_EXPLAINED} text="What does this mean?" />
+    </ESClusterStatus>
+  );
+};
 
-    return (
-      <ESClusterStatus bsStyle={this._alertClassForHealth(health)}>
-        <Icon name={this._iconNameForHealth(health)} /> &nbsp;{this._formatTextForHealth(health)}{' '}
-        Shards:{' '}
-        {health.shards.active} active,{' '}
-        {health.shards.initializing} initializing,{' '}
-        {health.shards.relocating} relocating,{' '}
-        {health.shards.unassigned} unassigned,{' '}
-        <DocumentationLink page={DocsHelper.PAGES.CLUSTER_STATUS_EXPLAINED} text="What does this mean?" />
-      </ESClusterStatus>
-    );
-  }
-}
+IndexerClusterHealthSummary.defaultProps = {
+  name: undefined,
+};
+
+IndexerClusterHealthSummary.propTypes = {
+  health: PropTypes.object.isRequired,
+  name: PropTypes.object,
+};
 
 export default IndexerClusterHealthSummary;
