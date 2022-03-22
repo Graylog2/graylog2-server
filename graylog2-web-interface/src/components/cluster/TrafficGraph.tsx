@@ -17,11 +17,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import moment from 'moment';
-import crossfilter from 'crossfilter';
 
 import { Spinner } from 'components/common';
 import GenericPlot from 'views/components/visualizations/GenericPlot';
+import { getUnixTraffic } from 'util/TrafficUtils';
 
 type Props = {
   traffic: { [key: string]: number },
@@ -34,12 +33,7 @@ const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
     return <Spinner />;
   }
 
-  const ndx = crossfilter(_.map(traffic, (value, key) => ({ ts: key, bytes: value })));
-  const dailyTraffic = ndx.dimension((d) => moment(d.ts).format('YYYY-MM-DD'));
-
-  const dailySums = dailyTraffic.group().reduceSum((d) => d.bytes);
-  const t = _.mapKeys(dailySums.all(), (entry) => moment.utc(entry.key, 'YYYY-MM-DD').toISOString());
-  const unixTraffic = _.mapValues(t, (val) => val.value);
+  const unixTraffic = getUnixTraffic(traffic);
   const chartData = [{
     type: 'bar',
     x: Object.keys(unixTraffic),
