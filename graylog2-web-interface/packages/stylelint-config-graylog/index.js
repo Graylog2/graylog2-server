@@ -29,6 +29,7 @@ module.exports = {
     'function-whitespace-after': null,
     'max-empty-lines': 2,
     'no-descending-specificity': null,
+    'no-empty-first-line': null,
     'no-empty-source': null,
     'no-eol-whitespace': [
       true, {
