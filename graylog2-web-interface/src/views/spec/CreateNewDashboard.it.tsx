@@ -70,7 +70,7 @@ jest.mock('views/stores/SearchMetadataStore', () => ({
 declare global {
   namespace NodeJS {
     interface Global {
-      api_url: string
+      api_url: string;
     }
   }
 }

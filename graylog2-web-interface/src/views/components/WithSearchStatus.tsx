@@ -28,7 +28,7 @@ const _disableSearch = (undeclaredParameters, parameterBindings, usedParameters)
   const bindingsMap = getParameterBindingsAsMap(parameterBindings);
   const missingValues = usedParameters.filter((param) => (param.needsBinding && !param.optional)).map((p) => bindingsMap.get(p.name)).filter((value) => !trim(value));
 
-  return undeclaredParameters.size > 0 || missingValues.size > 0;
+  return missingValues.size > 0;
 };
 
 type SearchStatusProps = {
