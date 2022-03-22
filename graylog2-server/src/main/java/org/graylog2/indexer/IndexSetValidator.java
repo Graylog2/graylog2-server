@@ -113,7 +113,7 @@ public class IndexSetValidator {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         if (now.plus(effectiveRetentionPeriod).isAfter(now.plus(maxRetentionPeriod))) {
             return Violation.create(
-                    StringUtils.f("Index retention setting %s=%d would result in an effective index retention period of %s. This exceeds the configured maximum of %s=%s).",
+                    StringUtils.f("Index retention setting %s=%d would result in an effective index retention period of %s. This exceeds the configured maximum of %s=%s.",
                             RetentionStrategyConfig.MAX_NUMBER_OF_INDEXES_FIELD, config.retentionStrategy().maxNumberOfIndices(), effectiveRetentionPeriod,
                             ElasticsearchConfiguration.MAX_INDEX_RETENTION_PERIOD, maxRetentionPeriod));
         }
