@@ -16,12 +16,13 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.validation.subvalidators.LuceneQuerySubValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
