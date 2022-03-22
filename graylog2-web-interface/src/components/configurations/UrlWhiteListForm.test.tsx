@@ -177,9 +177,9 @@ describe('UrlWhitelistForm', () => {
 
       userEvent.click(deleteButton);
 
-      expect(screen.queryByDisplayValue(config.entries[0].title)).not.toBeInTheDocument();
-
       await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(2));
+
+      expect(screen.queryByDisplayValue(config.entries[0].title)).not.toBeInTheDocument();
 
       expect(onUpdate).toHaveBeenLastCalledWith(
         expect.objectContaining({
