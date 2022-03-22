@@ -19,7 +19,6 @@ import PropTypes from 'prop-types';
 
 import { Spinner } from 'components/common';
 import GenericPlot from 'views/components/visualizations/GenericPlot';
-import { getUnixTraffic } from 'util/TrafficUtils';
 
 type Props = {
   traffic: { [key: string]: number },
@@ -32,11 +31,10 @@ const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
     return <Spinner />;
   }
 
-  const unixTraffic = getUnixTraffic(traffic);
   const chartData = [{
     type: 'bar',
-    x: Object.keys(unixTraffic),
-    y: Object.values(unixTraffic),
+    x: Object.keys(traffic),
+    y: Object.values(traffic),
   }];
   const layout = {
     showlegend: false,
