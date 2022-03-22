@@ -78,7 +78,8 @@ public class IndexSetValidator {
             return Violation.create("Index prefix \"" + newConfig.indexPrefix() + "\" would conflict with an existing index set!");
         }
 
-        // Check if an existing index set has a more generic index prefix.
+        // Check if the new index set configuration has a more generic index prefix than an existing index set,
+        // or vice versa.
         // Example: new=graylog_foo existing=graylog => graylog is more generic so this is an error
         // Example: new=gray        existing=graylog => gray    is more generic so this is an error
         // This avoids problems with wildcard matching like "graylog_*".
