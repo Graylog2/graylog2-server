@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
 
 import { Spinner } from 'components/common';
 import GenericPlot from 'views/components/visualizations/GenericPlot';
