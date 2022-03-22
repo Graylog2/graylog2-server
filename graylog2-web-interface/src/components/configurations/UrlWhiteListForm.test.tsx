@@ -18,6 +18,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { screen, render, act, within, waitFor } from 'wrappedTestingLibrary';
 
+import type { Url } from 'stores/configurations/ConfigurationsStore';
+
 import UrlWhiteListForm from './UrlWhiteListForm';
 
 const config = {
@@ -52,18 +54,22 @@ describe('UrlWhitelistForm', () => {
 
   describe('render the UrlWhitelistForm component', () => {
     it('should show allow list toggle and url table', () => {
+      const onUpdate = jest.fn();
+
       render(<UrlWhiteListForm urls={config.entries}
                                disabled={config.disabled}
-                               onUpdate={() => {}} />);
+                               onUpdate={onUpdate} />);
 
       expect(screen.getByRole('checkbox', { name: /disable whitelist/i })).toBeInTheDocument();
 
       config.entries.forEach(({ title }) => {
         expect(screen.getByDisplayValue(title)).toBeInTheDocument();
       });
+
+      expect(onUpdate).toHaveBeenCalledTimes(1);
     });
 
-    it('should validate and update on input change', async () => {
+    it('should update on input change', async () => {
       jest.useFakeTimers();
 
       const onUpdate = jest.fn();
@@ -142,6 +148,27 @@ describe('UrlWhitelistForm', () => {
         }),
         true,
       );
+    });
+
+    it('should validate entries on change', async () => {
+      const onUpdate = jest.fn();
+
+      render(<UrlWhiteListForm urls={config.entries}
+                               onUpdate={onUpdate} />);
+
+      expect(onUpdate).toHaveBeenCalledTimes(1);
+      expect(onUpdate).toHaveBeenLastCalledWith(expect.any(Object), true);
+
+      const titleInput = screen.getByDisplayValue(config.entries[2].title);
+
+      expect(titleInput).toBeInTheDocument();
+
+      userEvent.clear(titleInput);
+
+      await screen.findByText(/Required field/i);
+
+      expect(onUpdate).toHaveBeenCalledTimes(2);
+      expect(onUpdate).toHaveBeenLastCalledWith(expect.any(Object), false);
     });
   });
 });
