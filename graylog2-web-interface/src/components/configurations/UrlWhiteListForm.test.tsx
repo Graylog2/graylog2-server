@@ -22,23 +22,29 @@ import type { Url } from 'stores/configurations/ConfigurationsStore';
 
 import UrlWhiteListForm from './UrlWhiteListForm';
 
+const mockTestRegexValidity = jest.fn(() => Promise.resolve({ is_valid: true }));
+
+jest.mock('stores/tools/ToolsStore', () => ({
+  testRegexValidity: () => mockTestRegexValidity(),
+}));
+
 const config = {
   entries: [
     {
       id: 'f7033f1f-d50f-4323-96df-294ede41d951',
-      value: 'http://localhost:8080/system/',
+      value: 'http://localhost:8080/system/1',
       title: 'testam',
       type: 'regex',
     },
     {
       id: '636a2d40-c4c5-40b9-ab3a-48cf7978e9af',
-      value: 'http://localhost:8080/system/',
+      value: 'http://localhost:8080/system/2',
       title: 'test',
       type: 'regex',
     },
     {
       id: 'f28fd891-5f2d-4128-9a94-e97c1ab07a1f',
-      value: 'http://localhost:8080/system/',
+      value: 'http://localhost:8080/system/3',
       title: 'test2',
       type: 'literal',
     },
@@ -87,12 +93,45 @@ describe('UrlWhitelistForm', () => {
 
       // Regex entries are debounced
       act(() => {
-        jest.advanceTimersByTime(500);
+        jest.runAllTimers();
       });
 
       expect(onUpdate).toHaveBeenCalledTimes(2);
 
       const expectedEntry = { ...config.entries[0], title: 'foobar' };
+
+      expect(onUpdate).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          entries: expect.arrayContaining([expectedEntry]),
+        }),
+        true,
+      );
+    });
+
+    it('should call api to check regex value', async () => {
+      jest.useFakeTimers();
+
+      const onUpdate = jest.fn();
+
+      render(<UrlWhiteListForm urls={config.entries}
+                               disabled={config.disabled}
+                               onUpdate={onUpdate} />);
+
+      const urlInput = screen.getByDisplayValue(config.entries[0].value);
+
+      userEvent.clear(urlInput);
+      userEvent.type(urlInput, 'https://graylog.org');
+
+      // Regex entries are debounced
+      act(() => {
+        jest.runAllTimers();
+      });
+
+      await waitFor(() => expect(mockTestRegexValidity).toHaveBeenCalledTimes(1));
+
+      expect(onUpdate).toHaveBeenCalledTimes(2);
+
+      const expectedEntry = { ...config.entries[0], value: 'https://graylog.org' };
 
       expect(onUpdate).toHaveBeenLastCalledWith(
         expect.objectContaining({
