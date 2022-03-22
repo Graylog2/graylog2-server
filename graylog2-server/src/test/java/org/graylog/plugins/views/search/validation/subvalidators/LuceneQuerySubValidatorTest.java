@@ -80,7 +80,7 @@ public class LuceneQuerySubValidatorTest {
     }
 
     @Test
-    public void returnsWarningOnNoProblems() throws Exception {
+    public void returnsWarningOnValidationProblems() throws Exception {
         final ImmutableList<ParsedTerm> parsedQueryTerms = ImmutableList.of(ParsedTerm.create("field", "value"));
         final List<ParsedTerm> invalidOperators = Collections.singletonList(ParsedTerm.create("invalidOperator", "val"));
         final List<ParsedTerm> unknownFields = Collections.singletonList(ParsedTerm.create("unknownField", "nvmd"));
