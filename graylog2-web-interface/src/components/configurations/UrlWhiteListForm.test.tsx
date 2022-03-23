@@ -16,7 +16,7 @@
  */
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { screen, render, act, within, waitFor } from 'wrappedTestingLibrary';
+import { screen, render, within, waitFor } from 'wrappedTestingLibrary';
 
 import type { Url } from 'stores/configurations/ConfigurationsStore';
 
@@ -53,8 +53,13 @@ const config = {
 };
 
 describe('UrlWhitelistForm', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
+    jest.runOnlyPendingTimers();
     jest.useRealTimers();
   });
 
@@ -76,29 +81,26 @@ describe('UrlWhitelistForm', () => {
     });
 
     it('should update on input change', async () => {
-      jest.useFakeTimers();
-
       const onUpdate = jest.fn();
+      const nextValue = 'foobar';
 
       render(<UrlWhiteListForm urls={config.entries}
                                disabled={config.disabled}
                                onUpdate={onUpdate} />);
 
-      expect(screen.queryByDisplayValue(/foobar/i)).not.toBeInTheDocument();
+      expect(screen.queryByDisplayValue(nextValue)).not.toBeInTheDocument();
 
       const titleInput = screen.getByDisplayValue(config.entries[0].title);
 
       userEvent.clear(titleInput);
-      userEvent.type(titleInput, 'foobar');
+      userEvent.type(titleInput, nextValue);
 
-      // Regex entries are debounced
-      act(() => {
-        jest.runAllTimers();
-      });
+      const numberCalls = 2; // First render + debounce
+      await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(numberCalls));
 
-      expect(onUpdate).toHaveBeenCalledTimes(2);
+      expect(mockTestRegexValidity).toHaveBeenCalledTimes(numberCalls - 1);
 
-      const expectedEntry = { ...config.entries[0], title: 'foobar' };
+      const expectedEntry = { ...config.entries[0], title: nextValue };
 
       expect(onUpdate).toHaveBeenLastCalledWith(
         expect.objectContaining({
@@ -109,9 +111,8 @@ describe('UrlWhitelistForm', () => {
     });
 
     it('should call api to check regex value', async () => {
-      jest.useFakeTimers();
-
       const onUpdate = jest.fn();
+      const nextValue = 'https://graylog.org';
 
       render(<UrlWhiteListForm urls={config.entries}
                                disabled={config.disabled}
@@ -120,18 +121,14 @@ describe('UrlWhitelistForm', () => {
       const urlInput = screen.getByDisplayValue(config.entries[0].value);
 
       userEvent.clear(urlInput);
-      userEvent.type(urlInput, 'https://graylog.org');
+      userEvent.type(urlInput, nextValue);
 
-      // Regex entries are debounced
-      act(() => {
-        jest.runAllTimers();
-      });
+      const numberCalls = 2; // First render + debounce
+      await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(numberCalls));
 
-      await waitFor(() => expect(mockTestRegexValidity).toHaveBeenCalledTimes(1));
+      expect(mockTestRegexValidity).toHaveBeenCalledTimes(numberCalls - 1);
 
-      expect(onUpdate).toHaveBeenCalledTimes(2);
-
-      const expectedEntry = { ...config.entries[0], value: 'https://graylog.org' };
+      const expectedEntry = { ...config.entries[0], value: nextValue };
 
       expect(onUpdate).toHaveBeenLastCalledWith(
         expect.objectContaining({

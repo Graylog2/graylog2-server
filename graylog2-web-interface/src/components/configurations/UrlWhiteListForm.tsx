@@ -36,9 +36,41 @@ type Props = {
   onUpdate: (config: WhiteListConfig, valid: boolean) => void,
 };
 
+type ValidationResult = {
+  title: { valid: boolean },
+  value: { valid: boolean },
+};
+
 const StyledTable = styled(Table)`
   margin-top: 10px;
 `;
+
+const validateUrlEntry = async (idx: number, entry: Url, callback?: (...any) => void): Promise<ValidationResult> => {
+  const validationResult = {
+    title: { valid: false },
+    value: { valid: false },
+  };
+
+  validationResult.title = entry.title.trim().length <= 0 ? { valid: false } : { valid: true };
+
+  let valueValidation = { valid: false };
+
+  if (entry.type === 'literal') {
+    valueValidation = isValidURL(entry.value) ? { valid: true } : { valid: false };
+  } else if (entry.type === 'regex' && entry.value.trim().length > 0) {
+    valueValidation = (await ToolsStore.testRegexValidity(entry.value)).is_valid ? { valid: true } : { valid: false };
+  }
+
+  validationResult.value = valueValidation;
+
+  if (typeof callback === 'function') {
+    callback(idx, entry, validationResult);
+  }
+
+  return validationResult;
+};
+
+const debouncedValidateUrlEntry = debounce(validateUrlEntry, 200);
 
 const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   const literal = 'literal';
@@ -78,64 +110,30 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
     return isValid;
   };
 
-  const _updateState = (idx: number, type: string, name: string, value: string) => {
+  const _updateState = (idx: number, nextEntry: Url) => {
     const stateUpdate = cloneDeep(config);
-
-    stateUpdate.entries[idx][name] = value;
-    stateUpdate.entries[idx] = { ...stateUpdate.entries[idx], type };
+    stateUpdate.entries[idx] = nextEntry;
     setConfig(stateUpdate);
   };
 
-  const _updateValidationError = (idx: number, type: string, name: string, result: Object, value: string) => {
-    const validationUpdate = cloneDeep(validationState);
+  const _updateValidationError = (idx: number, nextEntry: Url, entryValidation: ValidationResult) => {
+    setValidationState((prevValidationState) => {
+      const nextValidationState = cloneDeep(prevValidationState);
+      nextValidationState.errors[idx] = entryValidation;
 
-    validationUpdate.errors[idx] = { ...validationUpdate.errors[idx], [name]: result };
-    setValidationState(validationUpdate);
-    _updateState(idx, type, name, value);
+      return nextValidationState;
+    });
+
+    _updateState(idx, nextEntry);
   };
 
-  const _validate = (name: string, idx: number, type: string, value: string): void => {
-    switch (name) {
-      case 'title': {
-        const result = value.trim().length <= 0 ? { valid: false } : { valid: true };
-
-        _updateValidationError(idx, type, name, result, value);
-      }
-
-        break;
-      case 'value':
-        if (type === literal) {
-          const result = isValidURL(value) ? { valid: true } : { valid: false };
-
-          _updateValidationError(idx, type, name, result, value);
-        } else if (type === regex && value.trim().length > 0) {
-          const promise = ToolsStore.testRegexValidity(value);
-
-          promise.then((result) => {
-            const res = result.is_valid ? { valid: true } : { valid: false };
-
-            _updateValidationError(idx, type, name, res, value);
-          });
-        } else {
-          const res = { valid: false };
-
-          _updateValidationError(idx, type, name, res, value);
-        }
-
-        break;
-      default:
-        break;
-    }
+  const _validate = async (name: string, idx: number, type: string, value: string): Promise<void> => {
+    const nextEntry = { ...config.entries[idx], [name]: value };
+    await debouncedValidateUrlEntry(idx, nextEntry, _updateValidationError);
   };
-
-  const debouncedValidate = debounce(_validate, 500);
 
   const _onInputChange = (event: React.ChangeEvent<HTMLInputElement>, idx: number, type: string) => {
-    if (type === regex) {
-      debouncedValidate(event.target.name, idx, type, getValueFromInput(event.target));
-    } else {
-      _validate(event.target.name, idx, type, getValueFromInput(event.target));
-    }
+    _validate(event.target.name, idx, type, getValueFromInput(event.target));
   };
 
   const _onUpdateType = (idx: number, type: string) => {
