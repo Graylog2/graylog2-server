@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import uuid from 'uuid/v4';
-import { cloneDeep, debounce } from 'lodash';
+import { cloneDeep, debounce, map } from 'lodash';
 import styled from 'styled-components';
 
 import Input from 'components/bootstrap/Input';
@@ -29,12 +29,6 @@ import { getValueFromInput } from 'util/FormsUtils';
 import type { Url, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
 import ToolsStore from 'stores/tools/ToolsStore';
 import { isValidURL } from 'util/URLUtils';
-
-type Props = {
-  urls: Array<Url>,
-  disabled: boolean,
-  onUpdate: (config: WhiteListConfig, valid: boolean) => void,
-};
 
 type ValidationResult = {
   title: { valid: boolean },
@@ -72,7 +66,14 @@ const validateUrlEntry = async (idx: number, entry: Url, callback?: (...any) => 
 
 const debouncedValidateUrlEntry = debounce(validateUrlEntry, 200);
 
-const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
+type Props = {
+  urls: Array<Url>,
+  disabled: boolean,
+  onUpdate: (config: WhiteListConfig, valid: boolean) => void,
+  shouldValidateOnMount: boolean,
+};
+
+const UrlWhiteListForm = ({ urls, onUpdate, disabled, shouldValidateOnMount }: Props) => {
   const literal = 'literal';
   const regex = 'regex';
   const options = [{ value: literal, label: 'Exact match' }, { value: regex, label: 'Regex' }];
@@ -80,6 +81,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   let inputs = {};
   const [config, setConfig] = useState<WhiteListConfig>({ entries: urls, disabled });
   const [validationState, setValidationState] = useState({ errors: [] });
+  const isMounted = useRef<boolean>(false);
 
   const _onAdd = (event: Event) => {
     event.preventDefault();
@@ -98,7 +100,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
     setConfig(stateUpdate);
   };
 
-  const _isFormValid = (): boolean => {
+  const hasValidationErrors = useCallback(() => {
     let isValid = true;
 
     if (validationState.errors.length > 0
@@ -108,7 +110,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
     }
 
     return isValid;
-  };
+  }, [validationState]);
 
   const _updateState = (idx: number, nextEntry: Url) => {
     const stateUpdate = cloneDeep(config);
@@ -197,9 +199,21 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   };
 
   useEffect(() => {
-    const valid = _isFormValid();
+    const isConfigValid = () => {
+      return config.entries.every(async (entry, idx) => {
+        const entryValidation = await validateUrlEntry(idx, entry, _updateValidationError);
+
+        return map(entryValidation, 'valid').some((valid) => !!valid);
+      });
+    };
+
+    const valid = !isMounted.current && shouldValidateOnMount ? isConfigValid() : hasValidationErrors();
 
     onUpdate(config, valid);
+
+    if (!isMounted.current) {
+      isMounted.current = true;
+    }
   }, [config]);
 
   return (
@@ -234,12 +248,14 @@ UrlWhiteListForm.propTypes = {
   urls: PropTypes.array,
   disabled: PropTypes.bool,
   onUpdate: PropTypes.func,
+  shouldValidateOnMount: PropTypes.bool,
 };
 
 UrlWhiteListForm.defaultProps = {
   urls: [],
   disabled: false,
   onUpdate: () => {},
+  shouldValidateOnMount: false,
 };
 
 export default UrlWhiteListForm;

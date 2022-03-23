@@ -118,7 +118,7 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
                             submitButtonDisabled={!isValid}
                             submitButtonText="Save">
           <h3>Whitelist URLs</h3>
-          <UrlWhiteListForm urls={entries} disabled={disabled} onUpdate={handleUpdate} />
+          <UrlWhiteListForm urls={entries} disabled={disabled} onUpdate={handleUpdate} shouldValidateOnMount />
         </BootstrapModalForm>
       </>
     );

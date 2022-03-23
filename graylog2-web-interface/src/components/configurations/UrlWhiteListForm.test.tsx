@@ -206,5 +206,28 @@ describe('UrlWhitelistForm', () => {
       expect(onUpdate).toHaveBeenCalledTimes(2);
       expect(onUpdate).toHaveBeenLastCalledWith(expect.any(Object), false);
     });
+
+    it('should validate entries on mount', async () => {
+      const invalidEntry: Array<Url> = [
+        {
+          id: 'f7033f1f-d50f-4323-96df-294ede41d312',
+          title: '',
+          value: 'http://',
+          type: 'literal',
+        },
+      ];
+
+      const onUpdate = jest.fn();
+
+      render(<UrlWhiteListForm urls={invalidEntry}
+                               onUpdate={onUpdate}
+                               shouldValidateOnMount />);
+
+      expect(onUpdate).toHaveBeenCalledTimes(2);
+
+      await screen.findByText(/not a valid url/i);
+
+      expect(onUpdate).toHaveBeenLastCalledWith(expect.any(Object), false);
+    });
   });
 });
