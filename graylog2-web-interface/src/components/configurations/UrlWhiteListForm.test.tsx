@@ -63,54 +63,102 @@ describe('UrlWhitelistForm', () => {
     jest.useRealTimers();
   });
 
-  describe('render the UrlWhitelistForm component', () => {
-    it('should show allow list toggle and url table', () => {
-      const onUpdate = jest.fn();
+  it('should show allow list toggle and url table', () => {
+    const onUpdate = jest.fn();
 
-      render(<UrlWhiteListForm urls={config.entries}
-                               disabled={config.disabled}
-                               onUpdate={onUpdate} />);
+    render(<UrlWhiteListForm urls={config.entries}
+                             disabled={config.disabled}
+                             onUpdate={onUpdate} />);
 
-      expect(screen.getByRole('checkbox', { name: /disable whitelist/i })).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: /disable whitelist/i })).toBeInTheDocument();
 
-      config.entries.forEach(({ title }) => {
-        expect(screen.getByDisplayValue(title)).toBeInTheDocument();
-      });
-
-      expect(onUpdate).toHaveBeenCalledTimes(1);
+    config.entries.forEach(({ title }) => {
+      expect(screen.getByDisplayValue(title)).toBeInTheDocument();
     });
 
-    it('should update on input change', async () => {
-      const onUpdate = jest.fn();
-      const nextValue = 'foobar';
+    expect(onUpdate).toHaveBeenCalledTimes(1);
+  });
 
-      render(<UrlWhiteListForm urls={config.entries}
-                               disabled={config.disabled}
-                               onUpdate={onUpdate} />);
+  it('should update on input change', async () => {
+    const onUpdate = jest.fn();
+    const nextValue = 'foobar';
 
-      expect(screen.queryByDisplayValue(nextValue)).not.toBeInTheDocument();
+    render(<UrlWhiteListForm urls={config.entries}
+                             disabled={config.disabled}
+                             onUpdate={onUpdate} />);
 
-      const titleInput = screen.getByDisplayValue(config.entries[0].title);
+    expect(screen.queryByDisplayValue(nextValue)).not.toBeInTheDocument();
 
-      userEvent.clear(titleInput);
-      userEvent.type(titleInput, nextValue);
+    const titleInput = screen.getByDisplayValue(config.entries[0].title);
 
-      const numberCalls = 2; // First render + debounce
-      await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(numberCalls));
+    userEvent.clear(titleInput);
+    userEvent.type(titleInput, nextValue);
 
-      expect(mockTestRegexValidity).toHaveBeenCalledTimes(numberCalls - 1);
+    const numberCalls = 2; // First render + debounce
+    await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(numberCalls));
 
-      const expectedEntry = { ...config.entries[0], title: nextValue };
+    expect(mockTestRegexValidity).toHaveBeenCalledTimes(numberCalls - 1);
 
-      expect(onUpdate).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          entries: expect.arrayContaining([expectedEntry]),
-        }),
-        true,
-      );
-    });
+    const expectedEntry = { ...config.entries[0], title: nextValue };
 
-    it('should call api to check regex value', async () => {
+    expect(onUpdate).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        entries: expect.arrayContaining([expectedEntry]),
+      }),
+      true,
+    );
+  });
+
+  it('should add a new row to the form', () => {
+    const onUpdate = jest.fn();
+
+    render(<UrlWhiteListForm urls={config.entries}
+                             disabled={config.disabled}
+                             onUpdate={onUpdate} />);
+
+    expect(screen.queryByRole('cell', { name: String(config.entries.length + 1) })).not.toBeInTheDocument();
+
+    const button = screen.getAllByRole('button', { name: /add url/i })[0];
+
+    expect(button).toBeInTheDocument();
+
+    userEvent.click(button);
+
+    expect(screen.getByRole('cell', { name: String(config.entries.length + 1) })).toBeInTheDocument();
+
+    expect(onUpdate).toHaveBeenCalledTimes(2);
+  });
+
+  it('should delete a row', async () => {
+    const onUpdate = jest.fn();
+
+    render(<UrlWhiteListForm urls={config.entries}
+                             disabled={config.disabled}
+                             onUpdate={onUpdate} />);
+
+    expect(screen.getByDisplayValue(config.entries[0].title)).toBeInTheDocument();
+
+    const row = screen.getByRole('row', { name: /1/i, exact: true });
+    const deleteButton = within(row).getByRole('button', { name: /delete entry/i });
+
+    expect(deleteButton).toBeInTheDocument();
+
+    userEvent.click(deleteButton);
+
+    await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(2));
+
+    expect(screen.queryByDisplayValue(config.entries[0].title)).not.toBeInTheDocument();
+
+    expect(onUpdate).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        entries: config.entries.filter(({ id }) => id !== config.entries[0].id),
+      }),
+      true,
+    );
+  });
+
+  describe('validates entries', () => {
+    it('should call api to validate regex url', async () => {
       const onUpdate = jest.fn();
       const nextValue = 'https://graylog.org';
 
@@ -138,55 +186,7 @@ describe('UrlWhitelistForm', () => {
       );
     });
 
-    it('should add a new row to the form', () => {
-      const onUpdate = jest.fn();
-
-      render(<UrlWhiteListForm urls={config.entries}
-                               disabled={config.disabled}
-                               onUpdate={onUpdate} />);
-
-      expect(screen.queryByRole('cell', { name: String(config.entries.length + 1) })).not.toBeInTheDocument();
-
-      const button = screen.getAllByRole('button', { name: /add url/i })[0];
-
-      expect(button).toBeInTheDocument();
-
-      userEvent.click(button);
-
-      expect(screen.getByRole('cell', { name: String(config.entries.length + 1) })).toBeInTheDocument();
-
-      expect(onUpdate).toHaveBeenCalledTimes(2);
-    });
-
-    it('should delete a row', async () => {
-      const onUpdate = jest.fn();
-
-      render(<UrlWhiteListForm urls={config.entries}
-                               disabled={config.disabled}
-                               onUpdate={onUpdate} />);
-
-      expect(screen.getByDisplayValue(config.entries[0].title)).toBeInTheDocument();
-
-      const row = screen.getByRole('row', { name: /1/i, exact: true });
-      const deleteButton = within(row).getByRole('button', { name: /delete entry/i });
-
-      expect(deleteButton).toBeInTheDocument();
-
-      userEvent.click(deleteButton);
-
-      await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(2));
-
-      expect(screen.queryByDisplayValue(config.entries[0].title)).not.toBeInTheDocument();
-
-      expect(onUpdate).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          entries: config.entries.filter(({ id }) => id !== config.entries[0].id),
-        }),
-        true,
-      );
-    });
-
-    it('should validate entries on change', async () => {
+    it('should validate title', async () => {
       const onUpdate = jest.fn();
 
       render(<UrlWhiteListForm urls={config.entries}
@@ -207,7 +207,7 @@ describe('UrlWhitelistForm', () => {
       expect(onUpdate).toHaveBeenLastCalledWith(expect.any(Object), false);
     });
 
-    it('should validate new entry if given', async () => {
+    it('should validate new entry on first render', async () => {
       const entries: Array<Url> = [
         {
           id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
