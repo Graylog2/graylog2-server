@@ -70,10 +70,10 @@ type Props = {
   urls: Array<Url>,
   disabled: boolean,
   onUpdate: (config: WhiteListConfig, valid: boolean) => void,
-  shouldValidateOnMount: boolean,
+  newEntryId?: string,
 };
 
-const UrlWhiteListForm = ({ urls, onUpdate, disabled, shouldValidateOnMount }: Props) => {
+const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
   const literal = 'literal';
   const regex = 'regex';
   const options = [{ value: literal, label: 'Exact match' }, { value: regex, label: 'Regex' }];
@@ -199,17 +199,25 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, shouldValidateOnMount }: P
   };
 
   useEffect(() => {
-    const isConfigValid = () => {
-      return config.entries.every(async (entry, idx) => {
-        const entryValidation = await validateUrlEntry(idx, entry, _updateValidationError);
+    const isNewEntryValid = async () => {
+      const newEntryIdx = config.entries.findIndex((entry) => entry.id === newEntryId);
 
-        return map(entryValidation, 'valid').some((valid) => !!valid);
-      });
+      if (newEntryIdx < 0) {
+        return false;
+      }
+
+      const newEntry = config.entries[newEntryIdx];
+      const entryValidation = await validateUrlEntry(newEntryIdx, newEntry, _updateValidationError);
+
+      return map(entryValidation, 'valid').some((valid) => !!valid);
     };
 
-    const valid = !isMounted.current && shouldValidateOnMount ? isConfigValid() : hasValidationErrors();
+    const propagateUpdate = async (firstRender) => {
+      const valid = firstRender && newEntryId ? await isNewEntryValid() : hasValidationErrors();
+      onUpdate(config, valid);
+    };
 
-    onUpdate(config, valid);
+    propagateUpdate(!isMounted.current);
 
     if (!isMounted.current) {
       isMounted.current = true;
@@ -248,14 +256,14 @@ UrlWhiteListForm.propTypes = {
   urls: PropTypes.array,
   disabled: PropTypes.bool,
   onUpdate: PropTypes.func,
-  shouldValidateOnMount: PropTypes.bool,
+  newEntryId: PropTypes.string,
 };
 
 UrlWhiteListForm.defaultProps = {
   urls: [],
   disabled: false,
   onUpdate: () => {},
-  shouldValidateOnMount: false,
+  newEntryId: undefined,
 };
 
 export default UrlWhiteListForm;

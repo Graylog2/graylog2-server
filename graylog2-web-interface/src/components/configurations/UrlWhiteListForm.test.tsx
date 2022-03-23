@@ -207,8 +207,14 @@ describe('UrlWhitelistForm', () => {
       expect(onUpdate).toHaveBeenLastCalledWith(expect.any(Object), false);
     });
 
-    it('should validate entries on mount', async () => {
-      const invalidEntry: Array<Url> = [
+    it('should validate new entry if given', async () => {
+      const entries: Array<Url> = [
+        {
+          id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
+          title: 'A valid URL',
+          value: 'https://graylog.org',
+          type: 'literal',
+        },
         {
           id: 'f7033f1f-d50f-4323-96df-294ede41d312',
           title: '',
@@ -219,14 +225,15 @@ describe('UrlWhitelistForm', () => {
 
       const onUpdate = jest.fn();
 
-      render(<UrlWhiteListForm urls={invalidEntry}
+      render(<UrlWhiteListForm urls={entries}
                                onUpdate={onUpdate}
-                               shouldValidateOnMount />);
+                               newEntryId="f7033f1f-d50f-4323-96df-294ede41d312" />);
 
-      expect(onUpdate).toHaveBeenCalledTimes(2);
-
+      await screen.findByText(/required field/i);
       await screen.findByText(/not a valid url/i);
 
+      expect(mockTestRegexValidity).not.toHaveBeenCalled();
+      expect(onUpdate).toHaveBeenCalledTimes(2);
       expect(onUpdate).toHaveBeenLastCalledWith(expect.any(Object), false);
     });
   });

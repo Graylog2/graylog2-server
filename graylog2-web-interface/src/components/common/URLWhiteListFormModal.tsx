@@ -42,6 +42,7 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
   const prevNewUrlEntry = useRef<string>();
   const [config, setConfig] = useState<WhiteListConfig>({ entries: [], disabled: false });
   const [isValid, setIsValid] = useState<boolean>(false);
+  const [newUrlEntryId, setNewUrlEntryId] = useState<string | undefined>();
 
   const { configuration } = useStore<ConfigurationsStoreState>(ConfigurationsStore);
   const urlWhiteListConfig = configuration[URL_WHITELIST_CONFIG];
@@ -55,7 +56,9 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
   }, [currentUser]);
 
   const setDefaultWhiteListState = useCallback((defaultUrlWhiteListConfig) => {
-    const defaultConfig = { entries: [...defaultUrlWhiteListConfig.entries, { id: uuid(), title: '', value: newUrlEntry, type: urlType ?? 'literal' }], disabled: defaultUrlWhiteListConfig.disabled };
+    const id = uuid();
+    const defaultConfig = { entries: [...defaultUrlWhiteListConfig.entries, { id: id, title: '', value: newUrlEntry, type: urlType ?? 'literal' }], disabled: defaultUrlWhiteListConfig.disabled };
+    setNewUrlEntryId(id);
     setConfig(defaultConfig);
   }, [newUrlEntry, urlType]);
 
@@ -118,7 +121,7 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
                             submitButtonDisabled={!isValid}
                             submitButtonText="Save">
           <h3>Whitelist URLs</h3>
-          <UrlWhiteListForm urls={entries} disabled={disabled} onUpdate={handleUpdate} shouldValidateOnMount />
+          <UrlWhiteListForm key={newUrlEntryId} urls={entries} disabled={disabled} onUpdate={handleUpdate} newEntryId={newUrlEntryId} />
         </BootstrapModalForm>
       </>
     );
