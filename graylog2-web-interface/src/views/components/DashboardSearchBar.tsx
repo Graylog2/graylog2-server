@@ -128,7 +128,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                                    limitDuration={limitDuration}
                                    onSubmit={submitForm}
                                    validateQueryString={_validateQueryString}>
-                {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue }) => {
+                {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
                   const disableSearchSubmit = disableSearch || isSubmitting || isValidating || !isValid;
 
                   return (
@@ -166,6 +166,8 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                                               }}
                                               disableExecution={disableSearchSubmit}
                                               error={error}
+                                              isValidating={isValidating}
+                                              validate={validateForm}
                                               warning={warnings.queryString}
                                               onExecute={handleSubmit as () => void} />
                                 )}
@@ -177,9 +179,9 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                         </SearchButtonAndQuery>
 
                         {!editing && (
-                        <ViewActionsWrapper>
-                          <ViewActionsMenu />
-                        </ViewActionsWrapper>
+                          <ViewActionsWrapper>
+                            <ViewActionsMenu />
+                          </ViewActionsWrapper>
                         )}
                       </BottomRow>
                     </>

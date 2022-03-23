@@ -42,6 +42,8 @@ describe('QueryInput', () => {
   const SimpleQueryInput = (props: Partial<React.ComponentProps<typeof QueryInput>>) => (
     <QueryInput value=""
                 onChange={() => Promise.resolve('')}
+                validate={() => Promise.resolve({})}
+                isValidating={false}
                 onExecute={() => {}}
                 completerFactory={() => new Completer()}
                 {...props} />
