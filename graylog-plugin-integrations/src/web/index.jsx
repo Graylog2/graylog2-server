@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import 'webpack-entry';
+import './webpack-entry';
 
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
