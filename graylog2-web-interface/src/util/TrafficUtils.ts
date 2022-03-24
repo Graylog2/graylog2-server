@@ -22,7 +22,7 @@ type Traffic = {
    [key: string]: number,
 }
 
-export const getUnixTraffic = (traffic: Traffic) => {
+export const formatTrafficData = (traffic: Traffic) => {
   const ndx = crossfilter(_.map(traffic, (value, key) => ({ ts: key, bytes: value })));
   const dailyTraffic = ndx.dimension((d) => moment(d.ts).format('YYYY-MM-DD'));
 
@@ -33,5 +33,5 @@ export const getUnixTraffic = (traffic: Traffic) => {
 };
 
 export default {
-  getUnixTraffic,
+  formatTrafficData,
 };

@@ -31,7 +31,7 @@ import { Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { ClusterTrafficActions, ClusterTrafficStore } from 'stores/cluster/ClusterTrafficStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
-import { getUnixTraffic } from 'util/TrafficUtils';
+import { formatTrafficData } from 'util/TrafficUtils';
 
 import TrafficGraph from './TrafficGraph';
 
@@ -108,7 +108,7 @@ const GraylogClusterTrafficGraph = () => {
 
     sumOutput = <small>Last 30 days: {NumberUtils.formatBytes(bytesOut)}</small>;
 
-    const unixTraffic = getUnixTraffic(traffic.output);
+    const unixTraffic = formatTrafficData(traffic.output);
 
     trafficGraph = (
       <TrafficGraphComponent traffic={unixTraffic}
