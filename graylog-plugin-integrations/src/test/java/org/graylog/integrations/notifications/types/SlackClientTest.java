@@ -16,113 +16,88 @@
  */
 package org.graylog.integrations.notifications.types;
 
-import okhttp3.Call;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
-import okhttp3.Protocol;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
-import okio.Buffer;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
+import org.junit.rules.Timeout;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 public class SlackClientTest {
-
-    private OkHttpClient mockHttpClient;
     private static final String TEST_MESSAGE = "Henry Hühnchen(little chicken)";
     private static final String TEST_MESSAGE_1 = "{\"link_names\":false,\"channel\":null,\"text\":\"Henry Hühnchen(little chicken)\"}";
 
+    @Rule
+    public Timeout timout = Timeout.seconds(10);
+
+    private final MockWebServer server = new MockWebServer();
+    private final OkHttpClient httpClient = new OkHttpClient();
 
     @Before
-    public void setUp() throws Exception {
-        mockHttpClient = getMockHttpClient(200);
+    public void setUp() throws IOException {
+        server.start();
     }
 
     @After
-    public void tearDown() {
-        mockHttpClient = null;
+    public void tearDown() throws IOException {
+        server.shutdown();
     }
-
 
     @Test
     public void send_sendsHttpRequestAsExpected_whenInputIsGood() throws Exception {
-        SlackClient slackClient = new SlackClient(mockHttpClient);
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(TEST_MESSAGE_1));
+
+        SlackClient slackClient = new SlackClient(httpClient);
         SlackMessage message = new SlackMessage(TEST_MESSAGE);
-        slackClient.send(message, "http://url.com/");
+        slackClient.send(message, server.url("/").toString());
 
-        ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
-        verify(mockHttpClient, times(1)).newCall(requestCaptor.capture());
+        final RecordedRequest recordedRequest = server.takeRequest();
 
-        assertThat(requestCaptor.getValue()).isNotNull();
-        Request sent = requestCaptor.getValue();
-        assertThat(sent.url().toString()).isEqualTo("http://url.com/");
-        assertThat(sent.method()).isEqualTo("POST");
-        assertThat(sent.body()).isNotNull();
-        Buffer buffer = new Buffer();
-        sent.body().writeTo(buffer);
-        assertThat(buffer.readUtf8()).isEqualTo(TEST_MESSAGE_1);
-
+        assertThat(recordedRequest.getMethod()).isEqualTo("POST");
+        assertThat(recordedRequest.getBody()).isNotNull();
+        assertThat(recordedRequest.getBody().readUtf8()).isEqualTo(TEST_MESSAGE_1);
     }
 
     @Test(expected = TemporaryEventNotificationException.class)
     public void send_throwsTempNotifException_whenHttpClientThrowsIOException() throws Exception {
+        final OkHttpClient httpClient =
+                this.httpClient.newBuilder().readTimeout(1, TimeUnit.MILLISECONDS).build();
 
-        final OkHttpClient okHttpClient = mock(OkHttpClient.class);
-        final Call remoteCall = mock(Call.class);
-        when(remoteCall.execute()).thenThrow(new IOException("Request timeout"));
-        when(okHttpClient.newCall(any())).thenReturn(remoteCall);
-
-
-        SlackClient slackClient = new SlackClient(okHttpClient);
+        SlackClient slackClient = new SlackClient(httpClient);
         SlackMessage message = new SlackMessage(TEST_MESSAGE);
-        slackClient.send(message, "http://url.com/");
+        slackClient.send(message, server.url("/").toString());
     }
 
     @Test(expected = PermanentEventNotificationException.class)
     public void send_throwsPermNotifException_whenPostReturnsHttp402() throws Exception {
+        server.enqueue(new MockResponse().setResponseCode(402).setBody(TEST_MESSAGE_1));
 
-        final OkHttpClient okHttpClient = getMockHttpClient(402);
-        SlackClient slackClient = new SlackClient(okHttpClient);
-        SlackMessage message = new SlackMessage("Henry Hühnchen(little chicken)");
-        slackClient.send(message, "http://url.com/");
+        SlackClient slackClient = new SlackClient(httpClient);
+        slackClient.send(new SlackMessage(TEST_MESSAGE), server.url("/").toString());
     }
 
+    @Test
+    public void doesNotFollowRedirects() {
+        server.enqueue(new MockResponse().setResponseCode(302)
+                .setHeader("Location", server.url("/redirected")));
+        server.enqueue(new MockResponse().setResponseCode(200));
 
-    private static OkHttpClient getMockHttpClient(int httpCode) throws IOException {
-        final OkHttpClient okHttpClient = mock(OkHttpClient.class);
-
-        final Call remoteCall = mock(Call.class);
-
-        final Response response = new Response.Builder()
-                .request(new Request.Builder().url("http://url.com/").build())
-                .protocol(Protocol.HTTP_1_1)
-                .code(httpCode).message("").body(
-                        ResponseBody.create(
-                                MediaType.parse("application/json"),
-                                "{\"key\": \"val\"}"
-                        ))
-                .build();
-
-        when(remoteCall.execute()).thenReturn(response);
-        when(okHttpClient.newCall(any())).thenReturn(remoteCall);
-
-        return okHttpClient;
+        SlackClient slackClient = new SlackClient(httpClient);
+        assertThatThrownBy(() -> slackClient.send(new SlackMessage(TEST_MESSAGE), server.url("/").toString()))
+                .isInstanceOf(PermanentEventNotificationException.class)
+                .hasMessageContaining("[2xx] but got [302]");
     }
-
 
 }
