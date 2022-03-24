@@ -22,6 +22,7 @@ import {
   relativeDifference,
   formatAsBrowserTime,
   adjustFormat,
+  toUTCFromTz,
   DATE_TIME_FORMATS, getBrowserTimezone, parseFromIsoString, toDateObject,
 } from 'util/DateTime';
 
@@ -164,6 +165,16 @@ describe('DateTime utils', () => {
     it('should throw an error for an invalid date', () => {
       relativeDifference(invalidDate);
       expectErrorForInvalidDate();
+    });
+  });
+
+  describe('toUTCFromTz', () => {
+    it('should transform time to UTC based on defined tz', () => {
+      expect(adjustFormat(toUTCFromTz('2020-01-01T10:00:00.000', moscowTZ), 'internal')).toBe('2020-01-01T07:00:00.000+00:00');
+    });
+
+    it('should prioritize time zone of date time over provided time zone when calculating UTC time', () => {
+      expect(adjustFormat(toUTCFromTz('2020-01-01T12:00:00.000+02:00', 'Europe/Berlin'), 'internal')).toBe('2020-01-01T10:00:00.000+00:00');
     });
   });
 });

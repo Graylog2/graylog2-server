@@ -46,7 +46,7 @@ export type Props = {
   height?: number;
   setChartColor?: (config: ChartConfig, color: ColorMapper) => ChartColor,
   plotLayout?: any,
-  onZoom?: (query: Query, from: string, to: string, viewType: ViewType | undefined | null) => boolean,
+  onZoom?: (query: Query, from: string, to: string, viewType: ViewType | undefined | null, userTimezone: string) => boolean,
 };
 
 const yLegendPosition = (containerHeight: number) => {
@@ -79,7 +79,7 @@ const XYPlot = ({
   plotLayout = {},
   onZoom = OnZoom,
 }: Props) => {
-  const { formatTime } = useContext(UserDateTimeContext);
+  const { formatTime, userTimezone } = useContext(UserDateTimeContext);
   const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r' };
   const defaultLayout: Layout = {
     yaxis,
@@ -95,7 +95,7 @@ const XYPlot = ({
   const viewType = useContext(ViewTypeContext);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(config.isTimeline
-    ? (from: string, to: string) => onZoom(currentQuery, from, to, viewType)
+    ? (from: string, to: string) => onZoom(currentQuery, from, to, viewType, userTimezone)
     : () => true, [config.isTimeline, onZoom]);
 
   if (config.isTimeline && effectiveTimerange) {

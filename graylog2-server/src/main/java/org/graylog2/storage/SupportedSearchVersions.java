@@ -14,8 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import loadAsync from 'routing/loadAsync';
+package org.graylog2.storage;
 
-const QueryInput = loadAsync(() => import('./QueryInput'));
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-export default QueryInput;
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface SupportedSearchVersions {
+    SupportedSearchVersion[] value();
+}

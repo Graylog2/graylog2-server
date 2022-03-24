@@ -205,7 +205,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         return viewWithRequirements;
     }
 
-    private ViewDTO requirementsForView(ViewDTO view) {
+    public ViewDTO requirementsForView(ViewDTO view) {
         return viewRequirementsFactory.create(view)
                 .rebuildRequirements(ViewDTO::requires, (v, newRequirements) -> v.toBuilder().requires(newRequirements).build());
     }

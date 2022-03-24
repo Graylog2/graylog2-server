@@ -14,12 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.validation;
+import loadAsync from 'routing/loadAsync';
 
-public enum ValidationType {
-    UNDECLARED_PARAMETER,
-    QUERY_PARSING_ERROR,
-    UNKNOWN_FIELD,
-    INVALID_OPERATOR,
-    MISSING_LICENSE,
-}
+const AsyncQueryInput = loadAsync(() => import('./QueryInput'));
+
+export default AsyncQueryInput;

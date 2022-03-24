@@ -16,7 +16,7 @@
  */
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import type { CompletionResult } from 'views/components/searchbar/ace-types';
+import type { CompletionResult } from 'views/components/searchbar/queryinput/ace-types';
 
 import FieldNameCompletion from './FieldNameCompletion';
 
