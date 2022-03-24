@@ -68,14 +68,15 @@ import org.graylog2.plugin.Version;
 import org.graylog2.plugin.system.NodeIdPersistenceException;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
+import org.graylog2.shared.bindings.IsDevelopmentBindings;
 import org.graylog2.shared.bindings.PluginBindings;
 import org.graylog2.shared.metrics.MetricRegistryFactory;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.utilities.ExceptionUtils;
+import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.UnsupportedSearchException;
 import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
-import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -205,7 +206,8 @@ public abstract class CmdLineTool implements CliCommand {
     /**
      * Things that have to run before the guice injector is created.
      * This call happens *after* the configuration file has been parsed.
-     * @param plugins  The already loaded plugins
+     *
+     * @param plugins The already loaded plugins
      */
     protected void beforeInjectorCreation(Set<Plugin> plugins) {
     }
@@ -292,6 +294,7 @@ public abstract class CmdLineTool implements CliCommand {
         beforeInjectorCreation(plugins);
 
         injector = setupInjector(
+                new IsDevelopmentBindings(),
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
                 new PluginBindings(plugins),
                 binder -> binder.bind(MetricRegistry.class).toInstance(metricRegistry)

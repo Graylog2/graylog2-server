@@ -49,6 +49,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.GenericBindings;
 import org.graylog2.shared.bindings.GenericInitializerBindings;
+import org.graylog2.shared.bindings.IsDevelopmentBindings;
 import org.graylog2.shared.bindings.SchedulerBindings;
 import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.bindings.SharedPeriodicalBindings;
@@ -137,6 +138,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
     private Injector getPreflightInjector(List<PreflightCheckModule> preflightCheckModules) {
         final Injector injector = Guice.createInjector(
+                new IsDevelopmentBindings(),
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
                 new ServerStatusBindings(capabilities()),
                 new ConfigurationModule(configuration),
@@ -168,9 +170,9 @@ public abstract class ServerBootstrap extends CmdLineTool {
         final NodeId nodeId = injector.getInstance(NodeId.class);
         final String systemInformation = Tools.getSystemInformation();
         final Map<String, Object> auditEventContext = ImmutableMap.of(
-            "version", version.toString(),
-            "java", systemInformation,
-            "node_id", nodeId.toString()
+                "version", version.toString(),
+                "java", systemInformation,
+                "node_id", nodeId.toString()
         );
         auditEventSender.success(AuditActor.system(nodeId), NODE_STARTUP_INITIATE, auditEventContext);
 
