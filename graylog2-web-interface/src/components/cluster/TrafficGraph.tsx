@@ -47,6 +47,10 @@ const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
         text: 'Time',
       },
     },
+    hovermode: 'x',
+    hoverlabel: {
+      namelength: -1,
+    },
     yaxis: {
       title: {
         text: 'Bytes',
