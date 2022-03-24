@@ -7470,11 +7470,11 @@ graceful-fs@^4.2.9:
     "@babel/preset-env" "7.16.11"
     "@babel/preset-typescript" "7.16.7"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-09b211c3-2c09-4096-8ba8-5280fb4f92c2-1647945488853/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-09b211c3-2c09-4096-8ba8-5280fb4f92c2-1647945488853/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.5.1"
     moment "2.29.1"
     moment-timezone "0.5.34"
@@ -7488,7 +7488,6 @@ graceful-fs@^4.2.9:
     react-router-dom "5.3.0"
     reflux "0.2.13"
     styled-components "5.3.3"
-    stylelint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-09b211c3-2c09-4096-8ba8-5280fb4f92c2-1647945488853/node_modules/stylelint-config-graylog"
     typescript "4.5.5"
     webpack "5.69.1"
     webpack-cleanup-plugin "0.5.1"
@@ -10355,9 +10354,9 @@ minimist-options@4.1.0:
     kind-of "^6.0.3"
 
 minimist@^1.1.1, minimist@^1.2.0, minimist@^1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
-  integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.6.tgz#8637a5b759ea0d6e98702cfb3a9283323c93af44"
+  integrity sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==
 
 minipass-collect@^1.0.2:
   version "1.0.2"
