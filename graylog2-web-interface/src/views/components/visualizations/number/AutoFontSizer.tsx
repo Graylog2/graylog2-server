@@ -26,10 +26,15 @@ import styled from 'styled-components';
 const TOLERANCE = 0.05;
 const CHILD_SIZE_RATIO = 0.8; // Proportion of the child size in relation to the container
 
-const FontSize = styled.div<{ fontSize: number }>`
+const FontSize = styled.div<{ fontSize: number, $center: boolean }>`
   height: 100%;
   width: 100%;
   font-size: ${(props) => `${props.fontSize}px`};
+  ${(props) => (props.$center ? `
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  ` : '')}
 `;
 
 type ElementWithDimensions = {
@@ -42,6 +47,7 @@ type Props = {
   target?: React.Ref<any> | ElementWithDimensions,
   height: number,
   width: number,
+  center?: boolean,
 };
 
 const _multiplierForElement = (element, targetWidth, targetHeight) => {
@@ -84,13 +90,13 @@ const useAutoFontSize = (target, _container, height, width) => {
   return fontSize;
 };
 
-const AutoFontSizer = ({ children, target, height, width }: Props) => {
+const AutoFontSizer = ({ children, target, height, width, center }: Props) => {
   const _container = useRef<HTMLElement | undefined>();
   const fontSize = useAutoFontSize(target, _container, height, width);
   const _mixedContainer: { current } = _container;
 
   return (
-    <FontSize fontSize={fontSize} ref={_mixedContainer}>
+    <FontSize $center={center} fontSize={fontSize} ref={_mixedContainer}>
       {children}
     </FontSize>
   );
@@ -98,6 +104,7 @@ const AutoFontSizer = ({ children, target, height, width }: Props) => {
 
 AutoFontSizer.defaultProps = {
   target: null,
+  center: false,
 };
 
 export default AutoFontSizer;
