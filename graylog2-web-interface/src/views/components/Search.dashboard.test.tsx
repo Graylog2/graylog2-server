@@ -128,14 +128,8 @@ describe('Dashboard Search', () => {
     asMock(useCurrentQuery).mockReturnValue(query);
   });
 
-  const SimpleSearch = (props) => (
-    <Search location={{ query: {}, pathname: '/search', search: '' }}
-            searchRefreshHooks={[]}
-            {...props} />
-  );
-
   it('should list tabs for dashboard pages', async () => {
-    render(<SimpleSearch />);
+    render(<Search />);
 
     await screen.findByRole('button', { name: 'First dashboard page' });
 
@@ -144,7 +138,7 @@ describe('Dashboard Search', () => {
 
   it('should not list tabs for pages when focusing a widget', async () => {
     mockWidgetEditing();
-    render(<SimpleSearch />);
+    render(<Search />);
 
     await screen.findByText('Mocked search results');
 
@@ -153,14 +147,14 @@ describe('Dashboard Search', () => {
   });
 
   it('should display dashboard search bar', async () => {
-    render(<SimpleSearch />);
+    render(<Search />);
 
     await screen.findByText('Mocked dashboard search bar');
   });
 
   it('should not display dashboard search bar on widget edit', async () => {
     mockWidgetEditing();
-    render(<SimpleSearch />);
+    render(<Search />);
 
     await screen.findByText('Mocked search results');
 

@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.elasticsearch.QueryParam;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.MissingEnterpriseLicenseException;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.errors.UnboundParameterError;
@@ -68,7 +69,7 @@ public class QueryValidationServiceImpl implements QueryValidationService {
             // but we want to trigger the decorators as well, because they may trigger additional exceptions
             decoratedQuery(req);
         } catch (SearchException searchException) {
-            return ValidationResponse.error(toExplanation(searchException));
+            return convert(searchException);
         } catch (MissingEnterpriseLicenseException licenseException) {
             return ValidationResponse.error(
                     paramsToValidationErrors(
@@ -76,7 +77,6 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                             ValidationType.MISSING_LICENSE,
                             param -> "Search parameter used without enterprise license: " + param.name()
                     ));
-
         }
 
         try {
@@ -94,16 +94,22 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         }
     }
 
-    private List<ValidationMessage> toExplanation(SearchException searchException) {
+    private ValidationResponse convert(SearchException searchException) {
         if (searchException.error() instanceof UnboundParameterError) {
             final UnboundParameterError error = (UnboundParameterError) searchException.error();
-            return paramsToValidationErrors(
+            return ValidationResponse.error(paramsToValidationErrors(
                     error.allUnknownParameters(),
                     ValidationType.UNDECLARED_PARAMETER,
                     param -> "Unbound required parameter used: " + param.name()
-            );
+            ));
+        } else if (searchException.error() instanceof EmptyParameterError) {
+            final EmptyParameterError error = (EmptyParameterError) searchException.error();
+            return ValidationResponse.warning(paramsToValidationErrors(
+                    Collections.singleton(error.getParameterUsage()),
+                    ValidationType.EMPTY_PARAMETER,
+                    param -> error.description()));
         }
-        return Collections.singletonList(ValidationMessage.fromException(searchException));
+        return ValidationResponse.error(Collections.singletonList(ValidationMessage.fromException(searchException)));
     }
 
     private List<ValidationMessage> paramsToValidationErrors(final Set<QueryParam> params, final ValidationType errorType, final Function<QueryParam, String> messageBuilder) {

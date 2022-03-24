@@ -14,19 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import _ from 'lodash';
+import moment from 'moment';
+import crossfilter from 'crossfilter';
 
-import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+type Traffic = {
+   [key: string]: number,
+}
 
-// eslint-disable-next-line import/prefer-default-export
-export const validationError: QueryValidationState = {
-  status: 'ERROR',
-  explanations: [{
-    errorType: 'QUERY_PARSING_ERROR',
-    errorTitle: 'Parse Exception',
-    errorMessage: "Cannot parse 'source: '",
-    beginLine: 1,
-    endLine: 1,
-    beginColumn: 1,
-    endColumn: 5,
-  }],
+export const formatTrafficData = (traffic: Traffic) => {
+  const ndx = crossfilter(_.map(traffic, (value, key) => ({ ts: key, bytes: value })));
+  const dailyTraffic = ndx.dimension((d) => moment(d.ts).format('YYYY-MM-DD'));
+
+  const dailySums = dailyTraffic.group().reduceSum((d) => d.bytes);
+  const t = _.mapKeys(dailySums.all(), (entry) => moment.utc(entry.key, 'YYYY-MM-DD').toISOString());
+
+  return _.mapValues(t, (val) => val.value);
+};
+
+export default {
+  formatTrafficData,
 };

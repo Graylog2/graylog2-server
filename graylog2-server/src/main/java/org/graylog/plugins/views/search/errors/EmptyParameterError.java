@@ -17,11 +17,19 @@
 package org.graylog.plugins.views.search.errors;
 
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.elasticsearch.QueryParam;
 
 import javax.annotation.Nonnull;
 
 public class EmptyParameterError extends QueryError {
-    public EmptyParameterError(@Nonnull Query query, String description) {
+    private final QueryParam parameterUsage;
+
+    public EmptyParameterError(@Nonnull Query query, String description, QueryParam parameterUsage) {
         super(query, description);
+        this.parameterUsage = parameterUsage;
+    }
+
+    public QueryParam getParameterUsage() {
+        return parameterUsage;
     }
 }

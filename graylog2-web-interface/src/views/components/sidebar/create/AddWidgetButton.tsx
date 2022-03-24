@@ -151,7 +151,7 @@ class AddWidgetButton extends React.Component<Props, State> {
 
     return (
       <>
-        <SectionInfo>Use the following options to add an aggregation or parameters (enterprise) to your search.</SectionInfo>
+        <SectionInfo>Use the following options to add an aggregation, log view (enterprise feature) or parameters (enterprise feature) to your search.</SectionInfo>
         <Group>
           <SectionSubheadline>Generic</SectionSubheadline>
           {generic}

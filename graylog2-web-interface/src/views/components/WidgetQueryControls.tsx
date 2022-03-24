@@ -147,7 +147,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                      onSubmit={(values) => _onSubmit(values, widget)}
                      validateOnMount={false}
                      validateQueryString={_validateQueryString}>
-        {({ dirty, errors, isValid, isSubmitting, handleSubmit, values, setFieldValue }) => {
+        {({ dirty, errors, isValid, isSubmitting, handleSubmit, values, setFieldValue, validateForm }) => {
           const disableSearchSubmit = isSubmitting || isValidatingQuery || !isValid;
 
           return (
@@ -194,7 +194,9 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                                     placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
                                     error={error}
                                     disableExecution={disableSearchSubmit}
+                                    isValidating={isValidatingQuery}
                                     warning={warnings.queryString}
+                                    validate={validateForm}
                                     onChange={(newQuery) => {
                                       onChange({ target: { value: newQuery, name } });
 
