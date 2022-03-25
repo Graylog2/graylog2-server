@@ -60,7 +60,6 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     public static final String NAME = "time";
 
     private final Indices indices;
-    private Map<String, DateTime> lastRotation;
     private Map<String, DateTime> anchor;
 
     @Inject
@@ -69,7 +68,6 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
                                      ElasticsearchConfiguration elasticsearchConfiguration) {
         super(auditEventSender, nodeId, elasticsearchConfiguration);
         this.anchor = new ConcurrentHashMap<>();
-        this.lastRotation = new ConcurrentHashMap<>();
         this.indices = requireNonNull(indices, "indices must not be null");
     }
 
@@ -81,6 +79,14 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     @Override
     public RotationStrategyConfig defaultConfiguration() {
         return TimeBasedRotationStrategyConfig.createDefault(elasticsearchConfiguration.getMaxWriteIndexAge());
+    }
+
+    /**
+     * Resets internal state. After a reset, the rotation strategy will behave like it would after a server restart.
+     * I.e. no previous anchor points will be available, so rotation uses the index creation dates as reference points.
+     */
+    public void reset() {
+        this.anchor.clear();
     }
 
     /**
@@ -195,15 +201,14 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         final Period normalizedPeriod = rotationPeriod.normalizedStandard();
 
         // when first started, we might not know the last rotation time, look up the creation time of the index instead.
-        if (!lastRotation.containsKey(indexSetId)) {
+        if (!anchor.containsKey(indexSetId)) {
             indices.indexCreationDate(index).ifPresent(creationDate -> {
                 final DateTime currentAnchor = determineRotationPeriodAnchor(creationDate, normalizedPeriod);
                 anchor.put(indexSetId, currentAnchor);
-                lastRotation.put(indexSetId, creationDate);
             });
 
             // still not able to figure out the last rotation time, we'll rotate forcibly
-            if (!lastRotation.containsKey(indexSetId)) {
+            if (!anchor.containsKey(indexSetId)) {
                 return new SimpleResult(true, "No known previous rotation time, forcing index rotation now.");
             }
         }
@@ -227,7 +232,6 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
 
         final DateTime nextAnchor = currentAnchor.withPeriodAdded(normalizedPeriod, multiplicator - 1);
         anchor.put(indexSetId, nextAnchor);
-        lastRotation.put(indexSetId, now);
         final String message = new MessageFormat("Rotation period {0} elapsed, next rotation at {1} {2}", Locale.ENGLISH)
                 .format(new Object[]{now,
                         nextAnchor,
