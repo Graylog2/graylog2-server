@@ -18,10 +18,11 @@ package org.graylog.plugins.views.search.permissions;
 
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.rest.PermittedStreams;
-import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog2.plugin.database.users.User;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -35,7 +36,8 @@ class SearchUserTest {
     }
 
     private SearchUser searchUser(String username) {
-        return new SearchUser(mockUser(username), (perm) -> true, (perm, id) -> true, Mockito.mock(PermittedStreams.class));
+        return new SearchUser(mockUser(username), (perm) -> true, (perm, id) -> true, Mockito.mock(PermittedStreams.class),
+                new HashMap<>());
     }
 
     @Test
