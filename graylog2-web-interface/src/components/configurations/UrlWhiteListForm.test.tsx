@@ -17,6 +17,7 @@
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { screen, render, within, waitFor } from 'wrappedTestingLibrary';
+import selectEvent from 'react-select-event';
 
 import type { Url } from 'stores/configurations/ConfigurationsStore';
 
@@ -100,6 +101,34 @@ describe('UrlWhitelistForm', () => {
     expect(mockTestRegexValidity).toHaveBeenCalledTimes(numberCalls - 1);
 
     const expectedEntry = { ...config.entries[0], title: nextValue };
+
+    expect(onUpdate).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        entries: expect.arrayContaining([expectedEntry]),
+      }),
+      true,
+    );
+  });
+
+  it('should update type changes', async () => {
+    const onUpdate = jest.fn();
+
+    render(<UrlWhiteListForm urls={config.entries}
+                             disabled={config.disabled}
+                             onUpdate={onUpdate} />);
+
+    const row = screen.getByRole('row', { name: /3/i, exact: true });
+    const select = within(row).getByText(/exact match/i);
+
+    await selectEvent.openMenu(select);
+    await selectEvent.select(select, 'Regex');
+
+    const numberCalls = 2; // First render + debounce
+    await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(numberCalls));
+
+    expect(mockTestRegexValidity).toHaveBeenCalledTimes(numberCalls - 1);
+
+    const expectedEntry = { ...config.entries[0], type: 'regex' };
 
     expect(onUpdate).toHaveBeenLastCalledWith(
       expect.objectContaining({
@@ -205,6 +234,34 @@ describe('UrlWhitelistForm', () => {
 
       expect(onUpdate).toHaveBeenCalledTimes(2);
       expect(onUpdate).toHaveBeenLastCalledWith(expect.any(Object), false);
+    });
+
+    it('should validate entry after type changes', async () => {
+      const onUpdate = jest.fn();
+      mockTestRegexValidity.mockImplementationOnce(() => Promise.resolve({ is_valid: false }));
+
+      render(<UrlWhiteListForm urls={config.entries}
+                               disabled={config.disabled}
+                               onUpdate={onUpdate} />);
+
+      const row = screen.getByRole('row', { name: /3/i, exact: true });
+      const select = within(row).getByText(/exact match/i);
+
+      await selectEvent.openMenu(select);
+      await selectEvent.select(select, 'Regex');
+
+      await screen.findByText(/not a valid java regular expression/);
+
+      expect(mockTestRegexValidity).toHaveBeenCalledTimes(1);
+
+      const expectedEntry = { ...config.entries[0], type: 'regex' };
+
+      expect(onUpdate).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          entries: expect.arrayContaining([expectedEntry]),
+        }),
+        false,
+      );
     });
 
     it('should validate new entry on first render', async () => {

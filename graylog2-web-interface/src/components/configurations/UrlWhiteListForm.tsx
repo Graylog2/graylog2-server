@@ -129,19 +129,17 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
     _updateState(idx, nextEntry);
   };
 
-  const _validate = async (name: string, idx: number, type: string, value: string): Promise<void> => {
+  const _validate = async (name: string, idx: number, value: string): Promise<void> => {
     const nextEntry = { ...config.entries[idx], [name]: value };
     await debouncedValidateUrlEntry(idx, nextEntry, _updateValidationError);
   };
 
-  const _onInputChange = (event: React.ChangeEvent<HTMLInputElement>, idx: number, type: string) => {
-    _validate(event.target.name, idx, type, getValueFromInput(event.target));
+  const _onInputChange = (event: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    _validate(event.target.name, idx, getValueFromInput(event.target));
   };
 
   const _onUpdateType = (idx: number, type: string) => {
-    const stateUpdate = cloneDeep(config);
-
-    _validate('value', idx, type, stateUpdate.entries[idx].value);
+    _validate('type', idx, type);
   };
 
   const _getErrorMessage = (type: string) => {
@@ -160,7 +158,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
                    help={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'Required field' : null}
                    name="title"
                    bsStyle={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'error' : null}
-                   onChange={(event) => _onInputChange(event, idx, url.type)}
+                   onChange={(event) => _onInputChange(event, idx)}
                    defaultValue={url.title}
                    required />
           </td>
@@ -171,7 +169,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
                    help={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? _getErrorMessage(url.type) : null}
                    name="value"
                    bsStyle={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? 'error' : null}
-                   onChange={(event) => _onInputChange(event, idx, url.type)}
+                   onChange={(event) => _onInputChange(event, idx)}
                    defaultValue={url.value}
                    required />
           </td>
