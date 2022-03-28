@@ -250,7 +250,7 @@ describe('UrlWhitelistForm', () => {
       await selectEvent.openMenu(select);
       await selectEvent.select(select, 'Regex');
 
-      await screen.findByText(/not a valid java regular expression/);
+      await screen.findByText(/not a valid java regular expression/i);
 
       expect(mockTestRegexValidity).toHaveBeenCalledTimes(1);
 
