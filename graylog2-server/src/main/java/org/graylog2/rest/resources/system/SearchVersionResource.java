@@ -41,7 +41,6 @@ import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.Locale;
 
@@ -61,9 +60,16 @@ public class SearchVersionResource extends RestResource implements PluginRestRes
 
     @GET
     @Path("/satisfiesVersion/{distribution}")
+    @ApiOperation(value = "Confirms whether the current search version satisfies a given distribution")
+    public SatisfiesVersionResponse satisfiesVersion(@ApiParam(name = "distribution", required = true) @PathParam("distribution") String distribution) {
+        return satisfiesVersion(distribution, "");
+    }
+
+    @GET
+    @Path("/satisfiesVersion/{distribution}/{version}")
     @ApiOperation(value = "Confirms whether the current search version satisfies a given distribution and Semantic Versioning version")
     public SatisfiesVersionResponse satisfiesVersion(@ApiParam(name = "distribution", required = true) @PathParam("distribution") String distribution,
-                                                     @ApiParam(name = "version") @QueryParam("version") String version) {
+                                                     @ApiParam(name = "version", required = true) @PathParam("version") String version) {
         // if no version provided give default to only check distribution
         if (version == null || version.isEmpty()) {
             version = ">0";

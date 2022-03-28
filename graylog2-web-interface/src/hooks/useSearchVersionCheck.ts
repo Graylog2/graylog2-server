@@ -38,7 +38,7 @@ export const fetchSearchVersionCheck = async ({ queryKey }) => {
   }
 };
 
-const useSearchVersionCheck = (distribution: 'opensearch' | 'elasticsearch', version?: number) => {
+const useSearchVersionCheck = (distribution: 'opensearch' | 'elasticsearch', version?: string) => {
   const MAIN_KEY = 'SearchVersionQuery';
   const queryKey = version ? [MAIN_KEY, { distribution, version }] : [MAIN_KEY, { distribution, version: null }];
   const { data, isLoading, error } = useQuery<VersionCheckType, Error>(queryKey, fetchSearchVersionCheck);

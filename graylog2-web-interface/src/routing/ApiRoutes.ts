@@ -283,8 +283,8 @@ const ApiRoutes = {
     all: (page: number) => { return { url: `/system/messages?page=${page}` }; },
   },
   SystemSearchVersionApiController: {
-    satisfiesVersion: (distribution: 'opensearch' | 'elasticsearch', version?: number) => {
-      return { url: `/system/searchVersion/satisfiesVersion/${distribution}${version ? `version${version}` : ''}` };
+    satisfiesVersion: (distribution: 'opensearch' | 'elasticsearch', version?: string) => {
+      return { url: `/system/searchVersion/satisfiesVersion/${distribution}${version ? `/${version}` : ''}` };
     },
   },
   ToolsApiController: {
