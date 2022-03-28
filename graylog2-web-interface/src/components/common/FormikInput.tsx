@@ -21,7 +21,7 @@ import { Field, useFormikContext } from 'formik';
 
 import { Input } from 'components/bootstrap';
 
-type Props = {
+type BaseProps = {
   autoComplete?: string,
   buttonAfter?: React.ReactElement | string,
   bsSize?: 'large' | 'small' | 'xsmall',
@@ -42,6 +42,12 @@ type Props = {
   required?: boolean,
   formGroupClassName?: string,
 };
+
+type TextareaProps = BaseProps & {
+  type: 'textarea',
+  rows?: number
+};
+type Props = BaseProps | TextareaProps;
 
 const checkboxProps = (value) => {
   return { defaultChecked: value ?? false };
