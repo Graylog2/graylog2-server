@@ -31,6 +31,7 @@ export const DATE_TIME_FORMATS = {
   internal: 'YYYY-MM-DDTHH:mm:ss.SSSZ', // ISO 8601, internal default, not really nice to read. Mostly used communication with the API.
   internalIndexer: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]', // ISO 8601, used for ES search queries, when a timestamp has to be reformatted
   date: 'YYYY-MM-DD',
+  hourAndMinute: 'HH:mm',
 };
 
 const DEFAULT_OUTPUT_TZ = 'UTC';
