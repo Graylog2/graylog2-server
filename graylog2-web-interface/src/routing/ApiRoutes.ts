@@ -284,7 +284,7 @@ const ApiRoutes = {
   },
   SystemSearchVersionApiController: {
     satisfiesVersion: (distribution: 'opensearch' | 'elasticsearch', version?: string) => {
-      return { url: `/system/searchVersion/satisfiesVersion/${distribution}${version ? `/${version}` : ''}` };
+      return { url: `/system/searchVersion/satisfiesVersion/${distribution}${version ? `?version=${version}` : ''}` };
     },
   },
   ToolsApiController: {
