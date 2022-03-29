@@ -20,17 +20,17 @@ import { render, screen } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import AppConfig from 'util/AppConfig';
 
-import ShowOnCloud from './ShowOnCloud';
+import OnlyOnCloud from './OnlyOnCloud';
 
 jest.mock('util/AppConfig', () => ({
   isCloud: jest.fn(() => false),
 }));
 
-describe('ShowOnCloud', () => {
+describe('OnlyOnCloud', () => {
   it('display children on cloud', () => {
     asMock(AppConfig.isCloud).mockReturnValue(true);
 
-    render(<ShowOnCloud>The Content</ShowOnCloud>);
+    render(<OnlyOnCloud>The Content</OnlyOnCloud>);
 
     expect(screen.getByText('The Content')).toBeInTheDocument();
   });
@@ -38,7 +38,7 @@ describe('ShowOnCloud', () => {
   it('do not display children when not on cloud', () => {
     asMock(AppConfig.isCloud).mockReturnValue(false);
 
-    render(<ShowOnCloud>The Content</ShowOnCloud>);
+    render(<OnlyOnCloud>The Content</OnlyOnCloud>);
 
     expect(screen.queryByText('The Content')).not.toBeInTheDocument();
   });

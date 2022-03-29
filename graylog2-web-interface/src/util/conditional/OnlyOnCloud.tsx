@@ -18,7 +18,7 @@ import React from 'react';
 
 import AppConfig from '../AppConfig';
 
-const ShowOnCloud: React.FunctionComponent = ({ children }) => {
+const OnlyOnCloud: React.FunctionComponent = ({ children }) => {
   if (!AppConfig.isCloud()) {
     return null;
   }
@@ -27,4 +27,4 @@ const ShowOnCloud: React.FunctionComponent = ({ children }) => {
   return <>{children}</>;
 };
 
-export default ShowOnCloud;
+export default OnlyOnCloud;

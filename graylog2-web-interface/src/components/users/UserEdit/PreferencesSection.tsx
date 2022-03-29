@@ -24,7 +24,7 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 import type User from 'logic/users/User';
 import type { PreferencesUpdateMap } from 'stores/users/PreferencesStore';
 import { PreferencesActions } from 'stores/users/PreferencesStore';
-import ShowOnCloud from 'util/conditional/ShowOnCloud';
+import OnlyOnCloud from 'util/conditional/OnlyOnCloud';
 
 type Props = {
   user: User,
@@ -85,7 +85,7 @@ const PreferencesSection = ({ user }: Props) => {
                                value={user.preferences?.[PREFERENCES_THEME_MODE] ?? 'Not configured'}
                                help="Can be changed by using the toggle in the user dropdown" />
 
-            <ShowOnCloud>
+            <OnlyOnCloud>
               <Input id="user-diagnostics-controls"
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9"
@@ -96,7 +96,7 @@ const PreferencesSection = ({ user }: Props) => {
                                  type="checkbox"
                                  help="Will not identify your user information in usage diagnostics" />
               </Input>
-            </ShowOnCloud>
+            </OnlyOnCloud>
 
             <Row className="no-bm">
               <Col xs={12}>
