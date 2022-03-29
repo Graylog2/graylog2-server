@@ -20,7 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.function.Predicate;
 
 import static com.google.common.collect.ImmutableSet.copyOf;
 import static org.assertj.core.api.Assertions.assertThat;
