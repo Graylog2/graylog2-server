@@ -282,6 +282,11 @@ const ApiRoutes = {
   SystemMessagesApiController: {
     all: (page: number) => { return { url: `/system/messages?page=${page}` }; },
   },
+  SystemSearchVersionApiController: {
+    satisfiesVersion: (distribution: 'opensearch' | 'elasticsearch', version?: string) => {
+      return { url: `/system/searchVersion/satisfiesVersion/${distribution}${version ? `?version=${version}` : ''}` };
+    },
+  },
   ToolsApiController: {
     grokTest: () => { return { url: '/tools/grok_tester' }; },
     jsonTest: () => { return { url: '/tools/json_tester' }; },
