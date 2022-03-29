@@ -48,8 +48,8 @@ public interface ViewResolver {
     Set<String> getSearchIds();
 
     /**
-     * A method to return whether the current user is authorized to read the current view and its related objects
-     * (such as the backing {@link org.graylog.plugins.views.search.Search} record).
+     * A method to return whether the current user is authorized to read the current resolved view and its related
+     * objects (such as the backing {@link org.graylog.plugins.views.search.Search} record).
      *
      * This method accepts two permissions tester predicates, to allow each implementation to perform any combination
      * of permission checks needed.

@@ -71,7 +71,7 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
                 return viewResolver.canReadView(viewId, isPermitted, isPermittedEntity);
             } else {
                 // Resolved view could not be found, so permissions cannot be checked.
-                LOG.info("View resolver [{}] could not be found.", decoder.getResolverName());
+                LOG.error("View resolver [{}] could not be found.", decoder.getResolverName());
                 return false;
             }
         }
