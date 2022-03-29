@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 @AutoValue
@@ -76,16 +77,16 @@ public abstract class ExecutionStateGlobalOverride {
         }
 
         @JsonProperty
-        public abstract Builder timerange(TimeRange timerange);
+        public abstract Builder timerange(@Nullable TimeRange timerange);
 
         @JsonProperty
-        public abstract Builder query(BackendQuery query);
+        public abstract Builder query(@Nullable BackendQuery query);
 
         @JsonProperty
-        public abstract Builder limit(Integer limit);
+        public abstract Builder limit(@Nullable Integer limit);
 
         @JsonProperty
-        public abstract Builder offset(Integer offset);
+        public abstract Builder offset(@Nullable Integer offset);
 
         @JsonProperty
         public abstract Builder keepSearchTypes(ImmutableSet<String> keepSearchTypes);
