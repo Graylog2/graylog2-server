@@ -63,18 +63,22 @@ export const validateQuery = ({
     if (result) {
       const explanations = result.explanations?.map(({
         error_type: errorType,
+        error_title: errorTitle,
         error_message: errorMessage,
         begin_line: beginLine,
         end_line: endLine,
         begin_column: beginColumn,
         end_column: endColumn,
+        related_property: relatedProperty,
       }) => ({
         errorMessage,
         errorType,
+        errorTitle,
         beginLine: beginLine ? beginLine - 1 : 0,
         endLine: endLine ? endLine - 1 : 0,
         beginColumn,
         endColumn,
+        relatedProperty,
       }));
 
       return ({

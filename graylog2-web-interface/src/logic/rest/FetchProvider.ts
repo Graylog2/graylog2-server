@@ -22,6 +22,7 @@ import history from 'util/History';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 
 const reportServerSuccess = () => {
+  // eslint-disable-next-line global-require
   const { ServerAvailabilityActions } = require('stores/sessions/ServerAvailabilityStore');
   ServerAvailabilityActions.reportSuccess();
 };
@@ -33,11 +34,12 @@ const emptyToUndefined = (s: any) => (s && s !== '' ? s : undefined);
 const onServerError = async (error: Response | undefined, onUnauthorized = defaultOnUnauthorizedError) => {
   const contentType = error.headers?.get('Content-Type');
   const response = await (contentType?.startsWith('application/json') ? error.json().then((body) => body) : error?.text?.());
+  // eslint-disable-next-line global-require
   const { SessionStore, SessionActions } = require('stores/sessions/SessionStore');
   const fetchError = new FetchError(error.statusText, error.status, emptyToUndefined(response));
 
   if (SessionStore.isLoggedIn() && error.status === 401) {
-    SessionActions.logout(SessionStore.getSessionId());
+    SessionActions.logout();
   }
 
   // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
@@ -46,6 +48,7 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
   }
 
   if (error && !error.status) {
+    // eslint-disable-next-line global-require
     const { ServerAvailabilityActions } = require('stores/sessions/ServerAvailabilityStore');
     ServerAvailabilityActions.reportError(fetchError);
   }
@@ -100,24 +103,6 @@ export class Builder {
 
     this.responseHandler = (response) => response;
     this.errorHandler = undefined;
-  }
-
-  authenticated() {
-    const { SessionStore } = require('stores/sessions/SessionStore');
-    const token = SessionStore.getSessionId();
-
-    return this.session(token);
-  }
-
-  session(sessionId) {
-    const buffer = Buffer.from(`${sessionId}:session`);
-
-    this.options = {
-      ...this.options,
-      Authorization: `Basic ${buffer.toString('base64')}`,
-    };
-
-    return this;
   }
 
   setHeader(header, value) {
@@ -183,6 +168,12 @@ export class Builder {
     return this;
   }
 
+  ignoreUnauthorized() {
+    this.errorHandler = (error) => onServerError(error, () => {});
+
+    return this;
+  }
+
   noSessionExtension() {
     this.options = {
       ...this.options,
@@ -211,6 +202,7 @@ export class Builder {
 }
 
 function queuePromiseIfNotLoggedin(promise) {
+  // eslint-disable-next-line global-require
   const { SessionStore, SessionActions } = require('stores/sessions/SessionStore');
 
   if (!SessionStore.isLoggedIn()) {
@@ -226,7 +218,6 @@ function queuePromiseIfNotLoggedin(promise) {
 
 export default function fetch(method, url, body?) {
   const promise = () => new Builder(method, url)
-    .authenticated()
     .json(body)
     .build();
 
@@ -235,7 +226,6 @@ export default function fetch(method, url, body?) {
 
 export function fetchPlainText(method, url, body) {
   const promise = () => new Builder(method, url)
-    .authenticated()
     .plaintext(body)
     .build();
 
@@ -244,7 +234,6 @@ export function fetchPlainText(method, url, body) {
 
 export function fetchPeriodically(method, url, body?) {
   const promise = () => new Builder(method, url)
-    .authenticated()
     .noSessionExtension()
     .json(body)
     .build();
@@ -254,7 +243,6 @@ export function fetchPeriodically(method, url, body?) {
 
 export function fetchFile(method, url, body, mimeType = 'text/csv') {
   const promise = () => new Builder(method, url)
-    .authenticated()
     .file(body, mimeType)
     .build();
 

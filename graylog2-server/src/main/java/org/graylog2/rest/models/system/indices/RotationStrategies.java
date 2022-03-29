@@ -22,21 +22,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
-import java.util.Set;
+import java.util.List;
 
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
 public abstract class RotationStrategies {
     @JsonProperty
-    public abstract int total();
+    public int total() {
+        return strategies().size();
+    }
 
     @JsonProperty
-    public abstract Set<RotationStrategyDescription> strategies();
+    public abstract List<RotationStrategyDescription> strategies();
 
     @JsonCreator
-    public static RotationStrategies create(@JsonProperty("total") int total,
-                                            @JsonProperty("strategies") Set<RotationStrategyDescription> strategies) {
-        return new AutoValue_RotationStrategies(total, strategies);
+    public static RotationStrategies create(@JsonProperty("strategies") List<RotationStrategyDescription> strategies) {
+        return new AutoValue_RotationStrategies(strategies);
     }
 }

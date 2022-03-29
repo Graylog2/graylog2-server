@@ -32,14 +32,18 @@ class Completer {
   getCompletions = (editor, session, pos, prefix, callback) => {
     callback(null, []);
   };
+
+  shouldShowCompletions: () => true;
 }
 
 describe('QueryInput', () => {
   const getQueryInput = () => screen.getByRole('textbox');
 
-  const SimpleQueryInput = (props) => (
+  const SimpleQueryInput = (props: Partial<React.ComponentProps<typeof QueryInput>>) => (
     <QueryInput value=""
                 onChange={() => Promise.resolve('')}
+                validate={() => Promise.resolve({})}
+                isValidating={false}
                 onExecute={() => {}}
                 completerFactory={() => new Completer()}
                 {...props} />

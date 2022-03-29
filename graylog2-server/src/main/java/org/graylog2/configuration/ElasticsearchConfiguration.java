@@ -17,21 +17,21 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.converters.StringSetConverter;
+import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
-import com.google.common.collect.Sets;
 import org.graylog2.configuration.validators.RotationStrategyValidator;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.joda.time.Period;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 public class ElasticsearchConfiguration {
     public static final String DEFAULT_EVENTS_INDEX_PREFIX = "default_events_index_prefix";
@@ -86,9 +86,8 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "retention_strategy", required = true)
     private String retentionStrategy = "delete";
 
-    @Parameter(value = "enabled_index_rotation_strategies", converter = StringSetConverter.class, validators = RotationStrategyValidator.class)
-    private Set<String> enabledRotationStrategies = Sets.newHashSet(
-            MessageCountRotationStrategy.NAME, SizeBasedRotationStrategy.NAME, TimeBasedRotationStrategy.NAME);
+    @Parameter(value = "enabled_index_rotation_strategies", converter = StringListConverter.class, validators = RotationStrategyValidator.class)
+    private List<String> enabledRotationStrategies = Arrays.asList(TimeBasedRotationStrategy.NAME, MessageCountRotationStrategy.NAME, SizeBasedRotationStrategy.NAME);
 
     @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "rotation_strategy")
@@ -170,7 +169,7 @@ public class ElasticsearchConfiguration {
         return templateName;
     }
 
-    public Set<String> getEnabledRotationStrategies() {
+    public List<String> getEnabledRotationStrategies() {
         return enabledRotationStrategies;
     }
 

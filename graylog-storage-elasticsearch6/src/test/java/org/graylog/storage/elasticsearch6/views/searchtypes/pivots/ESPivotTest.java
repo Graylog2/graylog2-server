@@ -26,19 +26,9 @@ import io.searchbox.core.search.aggregation.MaxAggregation;
 import io.searchbox.core.search.aggregation.MetricAggregation;
 import io.searchbox.core.search.aggregation.MinAggregation;
 import org.assertj.core.api.AbstractCharSequenceAssert;
-import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders;
-import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivot;
-import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivotBucketSpecHandler;
-import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
-import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.buckets.ESTimeHandler;
-import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.buckets.ESValuesHandler;
-import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESCountHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
@@ -47,9 +37,20 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivot;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivotBucketSpecHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.buckets.ESTimeHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.buckets.ESValuesHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESCountHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.junit.After;
@@ -375,16 +376,11 @@ public class ESPivotTest {
     }
 
     @Test
-    public void searchResultForAllMessagesIncludesPivotTimerangeForNoDocuments() throws InvalidRangeParametersException {
-        DateTimeUtils.setCurrentMillisFixed(1578584665408L);
-        final long documentCount = 0;
-        when(queryResult.getTotal()).thenReturn(documentCount);
-        final MetricAggregation mockMetricAggregation = createTimestampRangeAggregations(null, null);
-        when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
-        when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(0));
-
+    public void searchResultForAllMessagesIncludesPivotTimerangeForNoDocuments() {
+        when(queryResult.getTotal()).thenReturn(0L);
+        final TimeRange pivotRange = AbsoluteRange.create(DateTime.parse("1970-01-01T00:00:00.000Z"), DateTime.parse("2020-01-09T15:44:25.408Z"));
+        when(query.effectiveTimeRange(pivot)).thenReturn(pivotRange);
         final SearchType.Result result = this.esPivot.doExtractResult(job, query, pivot, queryResult, aggregations, queryContext);
-
         final PivotResult pivotResult = (PivotResult) result;
 
         assertThat(pivotResult.effectiveTimerange()).isEqualTo(AbsoluteRange.create(

@@ -43,12 +43,13 @@ import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import useParameters from 'views/hooks/useParameters';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
+import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
-import QueryInput from './searchbar/AsyncQueryInput';
+import QueryInput from './searchbar/queryinput/AsyncQueryInput';
 import SearchBarForm, { normalizeSearchBarFormValues } from './searchbar/SearchBarForm';
 import WidgetQueryOverride from './WidgetQueryOverride';
 
@@ -146,12 +147,13 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                      onSubmit={(values) => _onSubmit(values, widget)}
                      validateOnMount={false}
                      validateQueryString={_validateQueryString}>
-        {({ dirty, errors, isValid, isSubmitting, handleSubmit, values, setFieldValue }) => {
+        {({ dirty, errors, isValid, isSubmitting, handleSubmit, values, setFieldValue, validateForm }) => {
           const disableSearchSubmit = isSubmitting || isValidatingQuery || !isValid;
 
           return (
             <>
               <PropagateDisableSubmissionState formKey="widget-query-controls" disableSubmission={disableSearchSubmit} />
+              <ValidateOnParameterChange parameters={parameters} parameterBindings={parameterBindings} />
               <WidgetTopRow>
                 <Col md={6}>
                   {!hasTimeRangeOverride && (
@@ -192,7 +194,9 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                                     placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
                                     error={error}
                                     disableExecution={disableSearchSubmit}
+                                    isValidating={isValidatingQuery}
                                     warning={warnings.queryString}
+                                    validate={validateForm}
                                     onChange={(newQuery) => {
                                       onChange({ target: { value: newQuery, name } });
 

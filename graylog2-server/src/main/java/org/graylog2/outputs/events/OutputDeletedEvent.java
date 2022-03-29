@@ -14,8 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import loadAsync from 'routing/loadAsync';
+package org.graylog2.outputs.events;
 
-const QueryInput = loadAsync(() => import('./QueryInput'));
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-export default QueryInput;
+@AutoValue
+public abstract class OutputDeletedEvent {
+    @JsonProperty("output_id")
+    public abstract String outputId();
+
+    @JsonCreator
+    public static OutputDeletedEvent create(@JsonProperty("output_id") String outputId) {
+        return new AutoValue_OutputDeletedEvent(outputId);
+    }
+}

@@ -19,6 +19,9 @@ import nodeFetch from 'node-fetch';
 import formidableMiddleware from 'express-formidable';
 import FormData from 'form-data';
 
+import ErrorsActions from 'actions/errors/ErrorsActions';
+import { asMock } from 'helpers/mocking';
+
 import fetch, { Builder, fetchFile } from './FetchProvider';
 
 jest.unmock('./FetchProvider');
@@ -27,7 +30,6 @@ const mockLogout = jest.fn();
 jest.mock('stores/sessions/SessionStore', () => ({
   SessionStore: {
     isLoggedIn: jest.fn(() => true),
-    getSessionId: jest.fn(() => 'foobar'),
   },
   SessionActions: {
     logout: mockLogout,
@@ -41,13 +43,17 @@ jest.mock('stores/sessions/ServerAvailabilityStore', () => ({
   },
 }));
 
+jest.mock('actions/errors/ErrorsActions', () => ({
+  report: jest.fn(),
+}));
+
 const PORT = 0;
 
 const setUpServer = () => {
   const app = express();
 
   app.use(formidableMiddleware());
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,no-console
   app.use((err, req, res, next) => console.error(err));
 
   app.get('/test1', (req, res) => {
@@ -82,6 +88,10 @@ const setUpServer = () => {
     res.status(401).end();
   });
 
+  app.get('/simulatesUnauthorized', (req, res) => {
+    res.status(403).end();
+  });
+
   app.put('/uploadFile', (req, res) => {
     const contentType = req.header('Content-Type');
 
@@ -113,6 +123,10 @@ describe('FetchProvider', () => {
     baseUrl = `http://localhost:${port}`;
   });
 
+  beforeEach(() => {
+    asMock(ErrorsActions.report).mockClear();
+  });
+
   afterAll(() => {
     server.close();
   });
@@ -141,7 +155,7 @@ describe('FetchProvider', () => {
     expect(error.name).toEqual('FetchError');
     expect(error.message).toEqual('There was an error fetching a resource: Unauthorized. Additional information: Not available');
 
-    expect(mockLogout).toHaveBeenCalledWith('foobar');
+    expect(mockLogout).toHaveBeenCalled();
   });
 
   it('supports uploading form data without content type', async () => {
@@ -164,5 +178,31 @@ describe('FetchProvider', () => {
 
     expect(error.status).toEqual(undefined);
     expect(error.message).toEqual('There was an error fetching a resource: undefined. Additional information: Not available');
+  });
+
+  it('reports 403 by default', async () => {
+    const promise = new Builder('GET', `${baseUrl}/simulatesUnauthorized`)
+      .json()
+      .build();
+    const error = await promise.catch((e) => e);
+
+    expect(error.status).toEqual(403);
+    expect(error.message).toEqual('There was an error fetching a resource: Forbidden. Additional information: Not available');
+
+    expect(ErrorsActions.report).toHaveBeenCalledWith(expect.objectContaining({
+      type: 'UnauthorizedError',
+    }));
+  });
+
+  it('allows ignoring 403', async () => {
+    const promise = new Builder('GET', `${baseUrl}/simulatesUnauthorized`)
+      .json()
+      .ignoreUnauthorized()
+      .build();
+    const error = await promise.catch((e) => e);
+
+    expect(error.message).toEqual('There was an error fetching a resource: Forbidden. Additional information: Not available');
+
+    expect(ErrorsActions.report).not.toHaveBeenCalled();
   });
 });

@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.security;
 
+import com.google.common.base.Strings;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.DefaultSecurityManager;
@@ -32,12 +33,14 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -45,8 +48,10 @@ import static java.util.Objects.requireNonNull;
 // Give this a higher priority so it's run before the authentication filter
 @Priority(Priorities.AUTHENTICATION - 10)
 public class ShiroSecurityContextFilter implements ContainerRequestFilter {
+    public static final String SESSION_COOKIE_NAME = "authentication";
+
     private final DefaultSecurityManager securityManager;
-    private Provider<Request> grizzlyRequestProvider;
+    private final Provider<Request> grizzlyRequestProvider;
     private final Set<IpSubnet> trustedProxies;
 
     @Inject
@@ -62,6 +67,7 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext) throws IOException {
         final boolean secure = requestContext.getSecurityContext().isSecure();
         final MultivaluedMap<String, String> headers = requestContext.getHeaders();
+        final Map<String, Cookie> cookies = requestContext.getCookies();
         final Request grizzlyRequest = grizzlyRequestProvider.get();
 
         final String host = RestTools.getRemoteAddrFromRequest(grizzlyRequest, trustedProxies);
@@ -78,17 +84,19 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
             }
 
             securityContext = createSecurityContext(split[0],
-                                                    split[1],
-                                                    secure,
-                                                    SecurityContext.BASIC_AUTH,
-                                                    host,
-                                                    grizzlyRequest.getRemoteAddr(),
-                                                    headers);
+                    split[1],
+                    secure,
+                    SecurityContext.BASIC_AUTH,
+                    host,
+                    grizzlyRequest.getRemoteAddr(),
+                    headers,
+                    cookies);
 
         } else {
             securityContext = createSecurityContext(null, null, secure, null, host,
-                                                    grizzlyRequest.getRemoteAddr(),
-                                                    headers);
+                    grizzlyRequest.getRemoteAddr(),
+                    headers,
+                    cookies);
         }
 
         requestContext.setSecurityContext(securityContext);
@@ -108,23 +116,9 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
                                                   String authcScheme,
                                                   String host,
                                                   String remoteAddr,
-                                                  MultivaluedMap<String, String> headers) {
-        final AuthenticationToken authToken;
-        if ("session".equalsIgnoreCase(credential)) {
-            // Basic auth: undefined:session is sent when the UI doesn't have a valid session id,
-            // we don't want to create a SessionIdToken in that case but fall back to looking at the headers instead
-            if ("undefined".equalsIgnoreCase(userName)) {
-                authToken = new HttpHeadersToken(headers, host, remoteAddr);
-            } else {
-                authToken = new SessionIdToken(userName, host);
-            }
-        } else if ("token".equalsIgnoreCase(credential)) {
-            authToken = new AccessTokenAuthToken(userName, host);
-        } else if (userName == null) { // without a username we default to using the header environment as potentially containing tokens used by plugins
-            authToken = new HttpHeadersToken(headers, host, remoteAddr);
-        } else { // otherwise we use the "standard" username/password combination
-            authToken = new UsernamePasswordToken(userName, credential, host);
-        }
+                                                  MultivaluedMap<String, String> headers,
+                                                  Map<String, Cookie> cookies) {
+        final AuthenticationToken authToken = createAuthenticationToken(userName, credential, host, remoteAddr, cookies);
 
         final Subject subject = new Subject.Builder(securityManager)
                 .host(host)
@@ -132,5 +126,23 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
                 .buildSubject();
 
         return new ShiroSecurityContext(subject, authToken, isSecure, authcScheme, headers);
+    }
+
+    private AuthenticationToken createAuthenticationToken(String userName, String credential, String host, String remoteAddr, Map<String, Cookie> cookies) {
+        if ("session".equalsIgnoreCase(credential)) {
+            return new SessionIdToken(userName, host, remoteAddr);
+        }
+        if ("token".equalsIgnoreCase(credential)) {
+            return new AccessTokenAuthToken(userName, host);
+        }
+        if (!Strings.isNullOrEmpty(userName) && !Strings.isNullOrEmpty(credential)) {
+            return new UsernamePasswordToken(userName, credential, host);
+        }
+        if (cookies.containsKey(SESSION_COOKIE_NAME)) {
+            final Cookie authenticationCookie = cookies.get(SESSION_COOKIE_NAME);
+            return new SessionIdToken(authenticationCookie.getValue(), host, remoteAddr);
+        }
+
+        return new PossibleTrustedHeaderToken(host, remoteAddr);
     }
 }

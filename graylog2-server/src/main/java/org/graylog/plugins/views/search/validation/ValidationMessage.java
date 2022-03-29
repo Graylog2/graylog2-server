@@ -52,19 +52,21 @@ public abstract class ValidationMessage {
     public abstract Integer endColumn();
 
     @JsonProperty
+    public abstract String errorMessage();
+
     @Nullable
-    public abstract String errorType();
+    @JsonProperty
+    public abstract String relatedProperty();
 
     @JsonProperty
-    public abstract String errorMessage();
+    public abstract ValidationType validationType();
 
     public static ValidationMessage fromException(final Exception exception) {
 
         final String input = exception.toString();
 
-        final ValidationMessage.Builder errorBuilder = builder();
+        final ValidationMessage.Builder errorBuilder = builder(ValidationType.QUERY_PARSING_ERROR);
 
-        errorBuilder.errorType("Query parsing error");
         final String rootCause = getErrorMessage(exception);
         errorBuilder.errorMessage(String.format(Locale.ROOT, "Cannot parse query, cause: %s", rootCause));
 
@@ -90,8 +92,9 @@ public abstract class ValidationMessage {
         return rootCause;
     }
 
-    public static Builder builder() {
-        return new AutoValue_ValidationMessage.Builder();
+    public static Builder builder(ValidationType validationType) {
+        return new AutoValue_ValidationMessage.Builder()
+                .validationType(validationType);
     }
 
 
@@ -106,14 +109,13 @@ public abstract class ValidationMessage {
 
         public abstract Builder endColumn(int column);
 
-        public abstract Builder errorType(@Nullable String errorType);
-
         public abstract Builder errorMessage(String errorMessage);
 
-        public abstract Optional<String> errorMessage();
+        public abstract Builder relatedProperty(String relatedProperty);
+
+        public abstract Builder validationType(ValidationType undeclaredParameter);
 
         public abstract ValidationMessage build();
-
     }
 
 

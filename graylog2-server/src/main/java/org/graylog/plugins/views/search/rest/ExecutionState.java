@@ -31,17 +31,20 @@ import java.util.Map;
 @JsonAutoDetect
 @JsonDeserialize(builder = ExecutionState.Builder.class)
 public abstract class ExecutionState {
+    @JsonProperty
+    public abstract ImmutableMap<String, Parameter.Binding> parameterBindings();
 
-    public abstract ImmutableMap<String,  Parameter.Binding> parameterBindings();
-
+    @JsonProperty
     public abstract ImmutableMap<String, ExecutionStateGlobalOverride> queries();
 
+    @JsonProperty
     public abstract ExecutionStateGlobalOverride globalOverride();
 
+    @JsonProperty
     public abstract ImmutableMap<String, Object> additionalParameters();
 
     public static ExecutionState empty() {
-       return builder().build();
+        return builder().build();
     }
 
     public static Builder builder() {
@@ -66,10 +69,10 @@ public abstract class ExecutionState {
         @JsonProperty
         public abstract ImmutableMap.Builder<String, ExecutionStateGlobalOverride> queriesBuilder();
 
-        public abstract ImmutableMap.Builder<String,  Parameter.Binding> parameterBindingsBuilder();
+        public abstract ImmutableMap.Builder<String, Parameter.Binding> parameterBindingsBuilder();
 
         @JsonProperty("parameter_bindings")
-        public Builder withParameterBindings(Map<String,  Parameter.Binding> values) {
+        public Builder withParameterBindings(Map<String, Parameter.Binding> values) {
             values.forEach((s, o) -> parameterBindingsBuilder().put(s, o));
             return this;
         }

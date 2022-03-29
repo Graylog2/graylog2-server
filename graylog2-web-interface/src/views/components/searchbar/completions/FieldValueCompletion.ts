@@ -24,7 +24,7 @@ import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
 import type { Completer, CompleterContext, FieldTypes } from '../SearchBarAutocompletions';
-import type { Token, Line, CompletionResult } from '../ace-types';
+import type { Token, Line, CompletionResult } from '../queryinput/ace-types';
 
 const SUGGESTIONS_PAGE_SIZE = 50;
 
@@ -201,10 +201,13 @@ class FieldValueCompletion implements Completer {
     }
 
     const previousToken = currentLineTokens[currentTokenIndex - 1];
+    const nextToken = currentLineTokens[currentTokenIndex + 1];
+
     const currentTokenIsFieldName = currentToken?.type === 'keyword' && currentToken?.value.endsWith(':');
     const currentTokenIsFieldValue = currentToken?.type === 'term' && previousToken?.type === 'keyword';
+    const nextTokenIsTerm = nextToken?.type === 'term';
 
-    return currentTokenIsFieldName || currentTokenIsFieldValue;
+    return (currentTokenIsFieldName || currentTokenIsFieldValue) && !nextTokenIsTerm;
   };
 }
 

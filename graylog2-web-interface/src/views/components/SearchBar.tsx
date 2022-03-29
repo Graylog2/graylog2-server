@@ -30,7 +30,7 @@ import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import SavedSearchControls from 'views/components/searchbar/saved-search/SavedSearchControls';
 import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
-import QueryInput from 'views/components/searchbar/AsyncQueryInput';
+import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
 import ScrollToHint from 'views/components/common/ScrollToHint';
@@ -52,6 +52,7 @@ import useParameters from 'views/hooks/useParameters';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 
+import ValidateOnParameterChange from './searchbar/ValidateOnParameterChange';
 import SearchBarForm from './searchbar/SearchBarForm';
 
 type Props = {
@@ -147,11 +148,12 @@ const SearchBar = ({
                              limitDuration={limitDuration}
                              onSubmit={_onSubmit}
                              validateQueryString={_validateQueryString}>
-                {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue }) => {
+                {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
                   const disableSearchSubmit = disableSearch || isSubmitting || isValidating || !isValid;
 
                   return (
                     <>
+                      <ValidateOnParameterChange parameterBindings={parameterBindings} parameters={parameters} />
                       <TopRow>
                         <Col md={5}>
                           <TimeRangeInput disabled={disableSearch}
@@ -199,6 +201,7 @@ const SearchBar = ({
                                               streams={values.streams}
                                               placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
                                               error={error}
+                                              isValidating={isValidating}
                                               warning={warnings.queryString}
                                               onChange={(newQuery) => {
                                                 onChange({ target: { value: newQuery, name } });
@@ -206,6 +209,7 @@ const SearchBar = ({
                                                 return Promise.resolve(newQuery);
                                               }}
                                               disableExecution={disableSearchSubmit}
+                                              validate={validateForm}
                                               onExecute={handleSubmit as () => void} />
                                 )}
                               </FormWarningsContext.Consumer>

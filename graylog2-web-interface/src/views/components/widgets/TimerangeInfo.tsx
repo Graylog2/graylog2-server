@@ -25,6 +25,7 @@ import { useStore } from 'stores/connect';
 import { SearchStore } from 'views/stores/SearchStore';
 import { GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import useUserDateTime from 'hooks/useUserDateTime';
+import type { DateTime } from 'util/DateTime';
 
 type Props = {
   className?: string,
@@ -47,15 +48,17 @@ const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
   const { result, widgetMapping } = useStore(SearchStore);
   const globalOverride = useStore(GlobalOverrideStore);
 
+  const toLocalTimeWithMS = (dateTime: DateTime) => formatTime(dateTime, 'complete');
+  const toInternalTime = (dateTime: DateTime) => formatTime(dateTime, 'internal');
   const globalTimerangeString = globalOverride?.timerange
-    ? `Global Override: ${timerangeToString(globalOverride.timerange, formatTime)}` : undefined;
+    ? `Global Override: ${timerangeToString(globalOverride.timerange, toLocalTimeWithMS)}` : undefined;
 
-  const configuredTimerange = timerangeToString(widget.timerange || DEFAULT_TIMERANGE, formatTime);
+  const configuredTimerange = timerangeToString(widget.timerange || DEFAULT_TIMERANGE, toLocalTimeWithMS);
 
   const searchTypeId = widgetId ? widgetMapping?.get(widgetId)?.first() : undefined;
 
   const effectiveTimerange = (activeQuery && searchTypeId) ? getEffectiveWidgetTimerange(result, activeQuery, searchTypeId) : undefined;
-  const effectiveTimerangeString = effectiveTimerange ? timerangeToString(effectiveTimerange, formatTime) : 'Effective widget time range is currently not available.';
+  const effectiveTimerangeString = effectiveTimerange ? timerangeToString(effectiveTimerange, toInternalTime) : 'Effective widget time range is currently not available.';
 
   return (
     <Wrapper className={className}>

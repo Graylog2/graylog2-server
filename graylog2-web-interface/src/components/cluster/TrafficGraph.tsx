@@ -16,9 +16,6 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
-import moment from 'moment';
-import crossfilter from 'crossfilter';
 
 import { Spinner } from 'components/common';
 import GenericPlot from 'views/components/visualizations/GenericPlot';
@@ -26,23 +23,18 @@ import GenericPlot from 'views/components/visualizations/GenericPlot';
 type Props = {
   traffic: { [key: string]: number },
   width: number,
+  layoutExtension?: {},
 };
 
-const TrafficGraph = ({ width, traffic }: Props) => {
+const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
   if (!traffic) {
     return <Spinner />;
   }
 
-  const ndx = crossfilter(_.map(traffic, (value, key) => ({ ts: key, bytes: value })));
-  const dailyTraffic = ndx.dimension((d) => moment(d.ts).format('YYYY-MM-DD'));
-
-  const dailySums = dailyTraffic.group().reduceSum((d) => d.bytes);
-  const t = _.mapKeys(dailySums.all(), (entry) => moment.utc(entry.key, 'YYYY-MM-DD').toISOString());
-  const unixTraffic = _.mapValues(t, (val) => val.value);
   const chartData = [{
     type: 'bar',
-    x: Object.keys(unixTraffic),
-    y: Object.values(unixTraffic),
+    x: Object.keys(traffic),
+    y: Object.values(traffic),
   }];
   const layout = {
     showlegend: false,
@@ -55,6 +47,10 @@ const TrafficGraph = ({ width, traffic }: Props) => {
         text: 'Time',
       },
     },
+    hovermode: 'x',
+    hoverlabel: {
+      namelength: -1,
+    },
     yaxis: {
       title: {
         text: 'Bytes',
@@ -63,6 +59,7 @@ const TrafficGraph = ({ width, traffic }: Props) => {
       hoverformat: '.4s',
       tickformat: 's',
     },
+    ...layoutExtension,
   };
 
   return (
@@ -76,6 +73,11 @@ const TrafficGraph = ({ width, traffic }: Props) => {
 TrafficGraph.propTypes = {
   traffic: PropTypes.object.isRequired, // traffic is: {"2017-11-15T15:00:00.000Z": 68287229, ...}
   width: PropTypes.number.isRequired,
+  layoutExtension: PropTypes.object,
+};
+
+TrafficGraph.defaultProps = {
+  layoutExtension: {},
 };
 
 export default TrafficGraph;

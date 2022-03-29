@@ -26,7 +26,7 @@ import RefreshControls from 'views/components/searchbar/RefreshControls';
 import { FlatContentRow, Spinner } from 'components/common';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import SearchButton from 'views/components/searchbar/SearchButton';
-import QueryInput from 'views/components/searchbar/AsyncQueryInput';
+import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
 import ViewActionsMenu from 'views/components/ViewActionsMenu';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
@@ -41,6 +41,7 @@ import useParameters from 'views/hooks/useParameters';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
+import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -127,11 +128,12 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                                    limitDuration={limitDuration}
                                    onSubmit={submitForm}
                                    validateQueryString={_validateQueryString}>
-                {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue }) => {
+                {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
                   const disableSearchSubmit = disableSearch || isSubmitting || isValidating || !isValid;
 
                   return (
                     <>
+                      <ValidateOnParameterChange parameters={parameters} parameterBindings={parameterBindings} />
                       <TopRow>
                         <StyledTimeRangeInput disabled={disableSearch}
                                               onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
@@ -164,6 +166,8 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                                               }}
                                               disableExecution={disableSearchSubmit}
                                               error={error}
+                                              isValidating={isValidating}
+                                              validate={validateForm}
                                               warning={warnings.queryString}
                                               onExecute={handleSubmit as () => void} />
                                 )}
@@ -175,9 +179,9 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                         </SearchButtonAndQuery>
 
                         {!editing && (
-                        <ViewActionsWrapper>
-                          <ViewActionsMenu />
-                        </ViewActionsWrapper>
+                          <ViewActionsWrapper>
+                            <ViewActionsMenu />
+                          </ViewActionsWrapper>
                         )}
                       </BottomRow>
                     </>

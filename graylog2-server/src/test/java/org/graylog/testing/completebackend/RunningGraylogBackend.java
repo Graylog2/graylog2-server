@@ -73,4 +73,9 @@ public class RunningGraylogBackend implements GraylogBackend {
     public Network network() {
         throw new NotImplementedException("Feature not implemented on Running backends (no container)");
     }
+
+    @Override
+    public String getLogs() {
+        return "noop -> because the server is running, check the logs in the console ;-)";
+    }
 }
