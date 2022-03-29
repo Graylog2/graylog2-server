@@ -214,6 +214,7 @@ public class SearchesCleanUpJobTest {
 
         @Override
         public boolean canReadView(String viewId, Predicate<String> permissionTester, BiPredicate<String, String> entityPermissionsTester) {
+            // Not used in this test.
             return false;
         }
     }
