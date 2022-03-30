@@ -99,7 +99,7 @@ FormikInput.propTypes = {
   error: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   formGroupClassName: PropTypes.string,
   help: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  label: PropTypes.string,
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   labelClassName: PropTypes.string,
   maxLength: PropTypes.number,
   minLength: PropTypes.number,
