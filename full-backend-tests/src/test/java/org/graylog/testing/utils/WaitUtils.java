@@ -18,24 +18,33 @@ package org.graylog.testing.utils;
 
 import org.glassfish.jersey.internal.util.Producer;
 
+import java.util.Optional;
+
 import static org.junit.Assert.fail;
 
 public final class WaitUtils {
 
-    private WaitUtils() {}
+    private static final int TIMEOUT_MS = 10000;
+    private static final int WAIT_MS = 500;
+
+    private WaitUtils() {
+    }
 
     public static void waitFor(Producer<Boolean> predicate, String timeoutErrorMessage) {
-        int timeOutMs = 10000;
+        waitForObject(() -> predicate.call() ? Optional.of(true) : Optional.empty(), timeoutErrorMessage);
+    }
+
+    public static <T> T waitForObject(Producer<Optional<T>> predicate, String timeoutErrorMessage) {
         int msPassed = 0;
-        int waitMs = 500;
-        while (msPassed <= timeOutMs) {
-            if (predicate.call()) {
-                return;
+        while (msPassed <= TIMEOUT_MS) {
+            final Optional<T> result = predicate.call();
+            if (result != null && result.isPresent()) {
+                return result.get();
             }
-            msPassed += waitMs;
-            wait(waitMs);
+            msPassed += WAIT_MS;
+            wait(WAIT_MS);
         }
-        fail(timeoutErrorMessage);
+        throw new AssertionError(timeoutErrorMessage);
     }
 
     private static void wait(int waitMs) {

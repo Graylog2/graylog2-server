@@ -43,6 +43,22 @@ public class QueryValidationResourceIT {
         this.requestSpec = requestSpec;
     }
 
+    @BeforeAll
+    public void importMessage() {
+        int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
+        GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
+        GelfInputUtils.postMessage(mappedPort,
+                "{\"short_message\":\"query-validation-test\", \"host\":\"example.org\", \"level\":3}",
+                requestSpec);
+
+        // mainly because of the waiting logic
+        final boolean isMessagePresent = SearchUtils.waitForMessage(requestSpec, "query-validation-test");
+        assertThat(isMessagePresent).isTrue();
+
+        SearchUtils.waitForFieldTypeDefinition(requestSpec, "level");
+    }
+
+
     @ContainerMatrixTest
     void testMinimalisticRequest() {
         final ValidatableResponse validatableResponse = given()
