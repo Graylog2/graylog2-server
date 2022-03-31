@@ -77,7 +77,8 @@ public class InternalMetricsTransport extends GeneratorTransport {
 
     private InternalMetrics captureInternalMetrics() {
         Map<String, Object> gauges = metricRegistry.getGauges()
-                .entrySet().stream()
+                .entrySet()
+                .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getValue()));
 
         return InternalMetrics.builder()
@@ -103,8 +104,8 @@ public class InternalMetricsTransport extends GeneratorTransport {
             c.addField(new NumberField(
                     CK_SLEEP,
                     "Sleep time",
-                    25,
-                    "How many milliseconds to sleep between generating messages.",
+                    1000,
+                    "How many milliseconds to sleep between collecting metrics.",
                     ConfigurationField.Optional.NOT_OPTIONAL,
                     NumberField.Attribute.ONLY_POSITIVE
             ));

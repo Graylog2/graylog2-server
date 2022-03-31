@@ -18,6 +18,7 @@ package org.graylog2.inputs.codecs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.assistedinject.Assisted;
+import org.graylog2.inputs.internal.InternalMetricsInput;
 import org.graylog2.inputs.transports.InternalMetrics;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
@@ -28,6 +29,8 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.journal.RawMessage;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +38,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Locale;
 
 @Codec(name = "graylog-internal-metrics", displayName = "Graylog Internal Metrics")
 public class InternalMetricsCodec extends AbstractCodec {
@@ -61,8 +65,9 @@ public class InternalMetricsCodec extends AbstractCodec {
     }
 
     private Message createMessage(InternalMetrics state) {
-        final Message message = new Message("Internal metrics", "MetricsFactory", state.timestamp());
-        state.gauges().forEach(message::addField);
+        final String messageText = String.format(Locale.ROOT, "Graylog internal metrics %s", state.timestamp().toString(ISODateTimeFormat.dateTime().withZoneUTC()));
+        final Message message = new Message(messageText, InternalMetricsInput.class.getSimpleName(), state.timestamp());
+        message.addFields(state.gauges());
         return message;
     }
 
