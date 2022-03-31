@@ -197,4 +197,16 @@ class LuceneQueryParserTest {
         assertThatThrownBy(() -> parser.parse("\n\n\n"))
                 .hasMessageContaining("Cannot parse '\n\n\n': Encountered \"<EOF>\" at line 4, column 0.");
     }
+
+    @Test
+    void testValueTokenSimple() throws ParseException {
+        final ParsedQuery query = parser.parse("foo:bar AND lorem:ipsum");
+        assertThat(query.terms().size()).isEqualTo(2);
+        final ParsedTerm fooTerm = query.terms().get(0);
+        assertThat(fooTerm.keyToken().get().image()).isEqualTo("foo");
+        assertThat(fooTerm.valueToken().get().image()).isEqualTo("bar");
+        final ParsedTerm loremTerm = query.terms().get(1);
+        assertThat(loremTerm.keyToken().get().image()).isEqualTo("lorem");
+        assertThat(loremTerm.valueToken().get().image()).isEqualTo("ipsum");
+    }
 }
