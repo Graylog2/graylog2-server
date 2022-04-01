@@ -20,11 +20,11 @@ import styled from 'styled-components';
 
 import { HelpBlock } from 'components/bootstrap';
 
-export const ErrorMessage = styled.span(({ theme }) => `
+const ErrorMessage = styled.span(({ theme }) => `
   color: ${theme.colors.variant.danger};
 `);
 
-export const HelpMessage = styled.span<{ hasError: boolean }>(({ theme, hasError }) => `
+const HelpMessage = styled.span<{ hasError: boolean }>(({ theme, hasError }) => `
   color: ${hasError ? theme.colors.gray[50] : 'inherit'};
 `);
 
