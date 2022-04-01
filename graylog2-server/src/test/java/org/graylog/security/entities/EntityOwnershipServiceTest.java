@@ -27,6 +27,8 @@ import org.graylog2.plugin.database.users.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -38,11 +40,45 @@ class EntityOwnershipServiceTest {
     private EntityOwnershipService entityOwnershipService;
     private DBGrantService dbGrantService;
     private GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
+    private InOrder grnRegistryInOrderVerification;
 
     @BeforeEach
     void setUp() {
         this.dbGrantService = mock(DBGrantService.class);
         this.entityOwnershipService = new EntityOwnershipService(dbGrantService, grnRegistry);
+        this.grnRegistryInOrderVerification = Mockito.inOrder(dbGrantService);
+    }
+
+    @Test
+    void registersNewEntityForEachType() {
+        final User mockUser = mock(User.class);
+        when(mockUser.getName()).thenReturn("mockuser");
+        when(mockUser.getId()).thenReturn("mockuser");
+        final String id = "1234";
+
+
+        for (GRNType type : GRNTypes.builtinTypes()) {
+            entityOwnershipService.registerNewEntity(id, mockUser, type);
+            ArgumentCaptor<GrantDTO> grant = ArgumentCaptor.forClass(GrantDTO.class);
+            ArgumentCaptor<User> user = ArgumentCaptor.forClass(User.class);
+            grnRegistryInOrderVerification.verify(dbGrantService).create(grant.capture(), user.capture());
+
+            assertThat(grant.getValue()).satisfies(g -> {
+                assertThat(g.capability()).isEqualTo(Capability.OWN);
+                assertThat(g.target().type()).isEqualTo(type.type());
+                assertThat(g.target().entity()).isEqualTo(id);
+                assertThat(g.grantee().type()).isEqualTo(GRNTypes.USER.type());
+                assertThat(g.grantee().entity()).isEqualTo("mockuser");
+            });
+        }
+    }
+
+    @Test
+    void unregistersEntityForEachType() {
+        for (GRNType type : GRNTypes.builtinTypes()) {
+            entityOwnershipService.unregisterEntity("1234", type);
+            assertGrantRemoval(type, "1234");
+        }
     }
 
     @Test
@@ -98,7 +134,7 @@ class EntityOwnershipServiceTest {
 
     private void assertGrantRemoval(GRNType grnType, String entity) {
         ArgumentCaptor<GRN> argCaptor = ArgumentCaptor.forClass(GRN.class);
-        verify(dbGrantService).deleteForTarget(argCaptor.capture());
+        grnRegistryInOrderVerification.verify(dbGrantService).deleteForTarget(argCaptor.capture());
 
         assertThat(argCaptor.getValue()).satisfies(grn -> {
             assertThat(grn.grnType()).isEqualTo(grnType);

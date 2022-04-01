@@ -18,6 +18,7 @@ package org.graylog.security.entities;
 
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
+import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
@@ -67,6 +68,17 @@ public class EntityOwnershipService {
     public void registerNewStream(String id, User user) {
         final GRN grn = grnRegistry.newGRN(GRNTypes.STREAM, id);
         registerNewEntity(grn, user);
+    }
+
+    //TODO: this method could replace all methods from registerNew... family, so that we don't have to add two methods and tests for each new GRN Type in the future
+    public void registerNewEntity(final String id, final User user, final GRNType grnType) {
+        final GRN grn = grnRegistry.newGRN(grnType, id);
+        registerNewEntity(grn, user);
+    }
+
+    //TODO: this method could replace all methods from unregister... family, so that we don't have to add two methods and tests for each new GRN Type in the future
+    public void unregisterEntity(final String id, final GRNType grnType) {
+        removeGrantsForTarget(grnRegistry.newGRN(grnType, id));
     }
 
     private void registerNewEntity(GRN entity, User user) {
