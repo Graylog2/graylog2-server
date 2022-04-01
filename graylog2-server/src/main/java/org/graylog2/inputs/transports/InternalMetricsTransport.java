@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 public class InternalMetricsTransport extends GeneratorTransport {
 
     public static final String CK_SLEEP = "sleep";
+    public static final int DEFAULT_SLEEP_TIME = 1000;
 
     private final MetricRegistry metricRegistry;
     private final ObjectMapper objectMapper;
@@ -56,7 +57,7 @@ public class InternalMetricsTransport extends GeneratorTransport {
         this.metricRegistry = metricRegistry;
         this.objectMapper = objectMapper;
 
-        sleepMs = configuration.intIsSet(CK_SLEEP) ? configuration.getInt(CK_SLEEP) : 0;
+        sleepMs = configuration.intIsSet(CK_SLEEP) ? configuration.getInt(CK_SLEEP) : DEFAULT_SLEEP_TIME;
 
     }
 
@@ -104,7 +105,7 @@ public class InternalMetricsTransport extends GeneratorTransport {
             c.addField(new NumberField(
                     CK_SLEEP,
                     "Sleep time",
-                    1000,
+                    DEFAULT_SLEEP_TIME,
                     "How many milliseconds to sleep between collecting metrics.",
                     ConfigurationField.Optional.NOT_OPTIONAL,
                     NumberField.Attribute.ONLY_POSITIVE
