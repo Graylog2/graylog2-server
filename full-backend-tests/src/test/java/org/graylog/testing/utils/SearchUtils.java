@@ -18,10 +18,13 @@ package org.graylog.testing.utils;
 
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.backenddriver.SearchDriver;
+import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public final class SearchUtils {
 
@@ -31,23 +34,29 @@ public final class SearchUtils {
     public static List<String> searchForAllMessages(RequestSpecification requestSpecification) {
         List<String> messages = new ArrayList<>();
 
-        WaitUtils.waitFor(() -> captureMessages(messages::addAll, requestSpecification), "Timed out waiting for messages to be present");
+        WaitUtils.waitFor(() -> captureMessages(list -> list.stream().map(m -> (String) m.message().get("message")).forEach(messages::add), requestSpecification), "Timed out waiting for messages to be present");
 
         return messages;
     }
 
     public static boolean waitForMessage(RequestSpecification requestSpecification, String message) {
-        WaitUtils.waitFor(() -> captureMessage(requestSpecification, message), "Timed out waiting for message to be present");
+        WaitUtils.waitFor(() -> captureMessage(requestSpecification, m -> message.equals(m.message().get("message"))), "Timed out waiting for message to be present");
         return true;
     }
 
-    private static boolean captureMessage(RequestSpecification requestSpecification, String message) {
-        return SearchDriver.searchAllMessages(requestSpecification).contains(message);
+    public static boolean waitForMessage(RequestSpecification requestSpecification, Predicate<ResultMessageSummary> messageFilter) {
+        AtomicReference<ResultMessageSummary> messageReference = new AtomicReference<>();
+        WaitUtils.waitFor(() -> captureMessage(requestSpecification, messageFilter), "Timed out waiting for message to be present");
+        return true;
     }
 
-    private static boolean captureMessages(Consumer<List<String>> messagesCaptor,
+    private static boolean captureMessage(RequestSpecification requestSpecification, Predicate<ResultMessageSummary> messageFilter) {
+        return SearchDriver.searchAllMessages(requestSpecification).stream().anyMatch(messageFilter);
+    }
+
+    private static boolean captureMessages(Consumer<List<ResultMessageSummary>> messagesCaptor,
                                            RequestSpecification requestSpecification) {
-        List<String> messages = SearchDriver.searchAllMessages(requestSpecification);
+        List<ResultMessageSummary> messages = SearchDriver.searchAllMessages(requestSpecification);
         if (!messages.isEmpty()) {
             messagesCaptor.accept(messages);
             return true;

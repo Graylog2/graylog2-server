@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.testing.utils.JsonUtils;
 import org.graylog.testing.utils.RangeUtils;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,11 +52,11 @@ public class SearchDriver {
      * @param requestSpec @see io.restassured.specification.RequestSpecification
      * @return all messages' "message" field as List<String>
      */
-    public static List<String> searchAllMessages(RequestSpecification requestSpec) {
+    public static List<ResultMessageSummary> searchAllMessages(RequestSpecification requestSpec) {
         return searchAllMessagesInTimeRange(requestSpec, RangeUtils.allMessagesTimeRange());
     }
 
-    public static List<String> searchAllMessagesInTimeRange(RequestSpecification requestSpec, TimeRange timeRange) {
+    public static List<ResultMessageSummary> searchAllMessagesInTimeRange(RequestSpecification requestSpec, TimeRange timeRange) {
         String queryId = "query-id";
         String messageListId = "message-list-id";
 
@@ -76,7 +77,7 @@ public class SearchDriver {
             LOG.warn("Failed to obtain messages: {}", errors);
         }
 
-        return response.getList(allMessagesJsonPath(queryId, messageListId), String.class);
+        return response.getList(allMessagesJsonPath(queryId, messageListId), ResultMessageSummary.class);
     }
 
     private static String allMessagesJson(String queryId, String messageListId, TimeRange timeRange) {
@@ -97,6 +98,6 @@ public class SearchDriver {
 
     @SuppressWarnings("SameParameterValue")
     private static String allMessagesJsonPath(String queryId, String messageListId) {
-        return "results." + queryId + ".search_types." + messageListId + ".messages.message.message";
+        return "results." + queryId + ".search_types." + messageListId + ".messages";
     }
 }

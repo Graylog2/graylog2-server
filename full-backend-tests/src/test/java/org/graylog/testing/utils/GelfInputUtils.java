@@ -17,13 +17,17 @@
 package org.graylog.testing.utils;
 
 import com.google.common.collect.ImmutableMap;
-import io.restassured.specification.RequestSpecification;
+import io.restassured.specification. RequestSpecification;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
+import org.graylog2.rest.models.system.inputs.responses.InputStateSummary;
+import org.graylog2.rest.models.system.inputs.responses.InputStatesList;
+import org.graylog2.rest.models.system.inputs.responses.InputSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+import java.util.Optional;
 
 import static io.restassured.RestAssured.given;
 
@@ -35,33 +39,29 @@ public final class GelfInputUtils {
     }
 
     public static void createGelfHttpInput(int mappedPort, int gelfHttpPort, RequestSpecification requestSpecification) {
+        final boolean anyInputListensOnGelfPort = getInputStates(requestSpecification).states().stream()
+                .anyMatch(input -> Optional.of(input)
+                        .map(InputStateSummary::messageInput)
+                        .map(InputSummary::attributes)
+                        .map(attrs -> attrs.get("port"))
+                        .filter(port -> port.equals(gelfHttpPort))
+                        .isPresent()
+                );
+        if (anyInputListensOnGelfPort) {
+            createInput(requestSpecification, GELFHttpInput.class, ImmutableMap.of("bind_address", "0.0.0.0", "port", gelfHttpPort), "Integration test GELF input");
+        }
+        waitForGelfInputOnPort(mappedPort, requestSpecification);
+    }
 
-        final ArrayList<Integer> inputs = given()
+    public static InputStatesList getInputStates(RequestSpecification requestSpecification) {
+        return given()
                 .spec(requestSpecification)
                 .expect()
                 .response()
                 .statusCode(200)
                 .when()
                 .get("/system/inputstates")
-                .body().jsonPath().get("states.message_input.attributes.port");
-
-        if (!inputs.contains(gelfHttpPort)) {
-            InputCreateRequest request = InputCreateRequest.create(
-                    "Integration test GELF input",
-                    GELFHttpInput.class.getName(),
-                    true,
-                    ImmutableMap.of("bind_address", "0.0.0.0", "port", gelfHttpPort),
-                    null);
-
-            given()
-                    .spec(requestSpecification)
-                    .body(request)
-                    .expect().response().statusCode(201)
-                    .when()
-                    .post("/system/inputs");
-        }
-
-        waitForGelfInputOnPort(mappedPort, requestSpecification);
+                .body().as(InputStatesList.class);
     }
 
     private static void waitForGelfInputOnPort(int mappedPort, RequestSpecification requestSpecification) {
@@ -98,5 +98,21 @@ public final class GelfInputUtils {
                 .expect().response().statusCode(202)
                 .when()
                 .post();
+    }
+
+    public static void createInput(RequestSpecification requestSpec, Class<? extends MessageInput> inputClass, ImmutableMap<String, Object> configuration, String title) {
+        InputCreateRequest request = InputCreateRequest.create(
+                title,
+                inputClass.getName(),
+                true,
+                configuration,
+                null);
+
+        given()
+                .spec(requestSpec)
+                .body(request)
+                .expect().response().statusCode(201)
+                .when()
+                .post("/system/inputs");
     }
 }
