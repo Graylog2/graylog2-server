@@ -45,6 +45,7 @@ class Input extends React.Component {
     labelClassName: PropTypes.string,
     bsStyle: PropTypes.oneOf(['success', 'warning', 'error']),
     formGroupClassName: PropTypes.string,
+    inputDescClassName: PropTypes.string,
     value: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -79,6 +80,7 @@ class Input extends React.Component {
     labelClassName: undefined,
     name: undefined,
     formGroupClassName: undefined,
+    inputDescClassName: undefined,
     bsStyle: null,
     value: undefined,
     placeholder: '',
@@ -128,6 +130,7 @@ class Input extends React.Component {
       bsStyle,
       formGroupClassName,
       wrapperClassName,
+      inputDescClassName,
       label,
       labelClassName,
       error,
@@ -155,33 +158,33 @@ class Input extends React.Component {
         {label && <ControlLabel className={labelClassName}>{label}</ControlLabel>}
         <InputWrapper className={wrapperClassName}>
           {input}
-          <InputDescription error={error} help={help} />
+          <InputDescription error={error} help={help} className={inputDescClassName} />
         </InputWrapper>
       </FormGroup>
     );
   };
 
   _renderCheckboxGroup = (controlProps) => {
-    const { id, bsStyle, formGroupClassName, wrapperClassName, label, error, help } = this.props;
+    const { id, bsStyle, formGroupClassName, inputDescClassName, wrapperClassName, label, error, help } = this.props;
 
     return (
       <FormGroup controlId={id} validationState={error ? 'error' : bsStyle} bsClass={formGroupClassName}>
         <InputWrapper className={wrapperClassName}>
           <Checkbox inputRef={(ref) => { this.input = ref; }} {...controlProps}>{label}</Checkbox>
-          <InputDescription error={error} help={help} />
+          <InputDescription error={error} help={help} className={inputDescClassName} />
         </InputWrapper>
       </FormGroup>
     );
   };
 
   _renderRadioGroup = (controlProps) => {
-    const { id, bsStyle, formGroupClassName, wrapperClassName, label, error, help } = this.props;
+    const { id, bsStyle, formGroupClassName, inputDescClassName, wrapperClassName, label, error, help } = this.props;
 
     return (
       <FormGroup controlId={id} validationState={error ? 'error' : bsStyle} bsClass={formGroupClassName}>
         <InputWrapper className={wrapperClassName}>
           <Radio inputRef={(ref) => { this.input = ref; }} {...controlProps}>{label}</Radio>
-          <InputDescription error={error} help={help} />
+          <InputDescription error={error} help={help} className={inputDescClassName} />
         </InputWrapper>
       </FormGroup>
     );
