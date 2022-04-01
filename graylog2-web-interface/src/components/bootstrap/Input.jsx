@@ -191,7 +191,22 @@ class Input extends React.Component {
   };
 
   render() {
-    const { id, type, label, name, children, ...controlProps } = this.props;
+    const {
+      id,
+      type,
+      bsStyle,
+      formGroupClassName,
+      wrapperClassName,
+      label,
+      labelClassName, inputDescClassName,
+      name,
+      error,
+      help,
+      children,
+      addonAfter,
+      buttonAfter,
+      ...controlProps
+    } = this.props;
 
     controlProps.type = type;
     controlProps.label = label;
