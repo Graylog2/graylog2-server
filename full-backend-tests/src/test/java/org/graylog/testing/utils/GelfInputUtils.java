@@ -47,7 +47,7 @@ public final class GelfInputUtils {
                         .filter(port -> port.equals(gelfHttpPort))
                         .isPresent()
                 );
-        if (anyInputListensOnGelfPort) {
+        if (!anyInputListensOnGelfPort) {
             createInput(requestSpecification, GELFHttpInput.class, ImmutableMap.of("bind_address", "0.0.0.0", "port", gelfHttpPort), "Integration test GELF input");
         }
         waitForGelfInputOnPort(mappedPort, requestSpecification);
