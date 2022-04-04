@@ -149,6 +149,8 @@ const CollectorForm = createReactClass({
 
     options.push({ value: 'linux', label: 'Linux' });
     options.push({ value: 'windows', label: 'Windows' });
+    options.push({ value: 'darwin', label: 'Darwin' });
+    options.push({ value: 'freebsd', label: 'FreeBSD' });
 
     return options;
   },
