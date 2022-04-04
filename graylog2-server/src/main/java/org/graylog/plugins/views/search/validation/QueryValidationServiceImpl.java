@@ -193,27 +193,21 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                 .collect(Collectors.toList());
     }
 
-    private List<ValidationMessage> validateQueryValues(String rawQuery, String decorated, Set<MappedFieldTypeDTO> availableFields) {
-        try {
-            final ParsedQuery parsedQuery = luceneQueryParser.parse(decorated);
-            final Map<String, MappedFieldTypeDTO> fields = availableFields.stream().collect(Collectors.toMap(MappedFieldTypeDTO::name, Function.identity()));
+    private List<ValidationMessage> validateQueryValues(String rawQuery, String decorated, Set<MappedFieldTypeDTO> availableFields) throws ParseException {
+        final ParsedQuery parsedQuery = luceneQueryParser.parse(decorated);
+        final Map<String, MappedFieldTypeDTO> fields = availableFields.stream().collect(Collectors.toMap(MappedFieldTypeDTO::name, Function.identity()));
 
-            return parsedQuery.terms().stream()
-                    .map(term -> {
-                        final MappedFieldTypeDTO fieldType = fields.get(term.getRealFieldName());
-                        final Optional<String> typeName = Optional.ofNullable(fieldType)
-                                .map(MappedFieldTypeDTO::type)
-                                .map(FieldTypes.Type::type);
-                        return typeName.flatMap(type -> fieldTypeValidation.validateFieldValueType(term, type));
-                    })
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toList());
-        } catch (ParseException e) {
-            // TODO! Handle exception!
-        }
-
-        return Collections.emptyList();
+        return parsedQuery.terms().stream()
+                .map(term -> {
+                    final MappedFieldTypeDTO fieldType = fields.get(term.getRealFieldName());
+                    final Optional<String> typeName = Optional.ofNullable(fieldType)
+                            .map(MappedFieldTypeDTO::type)
+                            .map(FieldTypes.Type::type);
+                    return typeName.flatMap(type -> fieldTypeValidation.validateFieldValueType(term, type));
+                })
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
     }
 
     private String decoratedQuery(ValidationRequest req) {

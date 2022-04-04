@@ -20,6 +20,7 @@ import com.google.common.net.InetAddresses;
 import org.joda.time.DateTime;
 
 import javax.inject.Singleton;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -66,16 +67,15 @@ public class FieldTypeValidationImpl implements FieldTypeValidation {
         if (!typeMatching(detectedFieldType, t.value())) {
             final ValidationMessage.Builder builder = ValidationMessage.builder(ValidationType.INVALID_VALUE_TYPE)
                     .errorMessage(String.format(Locale.ROOT, "Type of %s is %s, cannot use value %s", t.getRealFieldName(), detectedFieldType, t.value()));
-            Stream.of(t.valueToken(), t.keyToken())
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .findFirst()
-                    .ifPresent(token -> {
-                        builder.beginLine(token.beginLine());
-                        builder.beginColumn(token.beginColumn());
-                        builder.endLine(token.endLine());
-                        builder.endColumn(token.endColumn());
-                    });
+
+            // prefer value token, accept key token as fallback
+            Optional<ImmutableToken> tokenWithPositions = t.valueToken().isPresent() ? t.valueToken() : t.keyToken();
+            tokenWithPositions.ifPresent(token -> {
+                builder.beginLine(token.beginLine());
+                builder.beginColumn(token.beginColumn());
+                builder.endLine(token.endLine());
+                builder.endColumn(token.endColumn());
+            });
             return Optional.of(builder.build());
         }
         return Optional.empty();
@@ -84,15 +84,7 @@ public class FieldTypeValidationImpl implements FieldTypeValidation {
     private boolean typeMatching(String type, String value) {
         return Optional.ofNullable(type)
                 .map(VALIDATION_FUNCTIONS::get)
-                .map(validator -> validateValue(validator, value))
+                .map(validator -> validator.test(value))
                 .orElse(true);
-    }
-
-    private Boolean validateValue(Predicate<String> validator, String value) {
-        try {
-            return validator.test(value);
-        } catch (Exception e) {
-            return false;
-        }
     }
 }
