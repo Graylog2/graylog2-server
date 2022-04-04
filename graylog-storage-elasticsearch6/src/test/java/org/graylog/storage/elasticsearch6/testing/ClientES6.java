@@ -91,11 +91,12 @@ public class ClientES6 implements Client {
 
     @Override
     public void deleteIndices(String... indices) {
-        for (String index : indices)
+        for (String index : indices) {
             if (indicesExists(index)) {
                 final DeleteIndex deleteIndex = new DeleteIndex.Builder(index).build();
                 executeWithExpectedSuccess(deleteIndex, "failed to delete index " + index);
             }
+        }
     }
 
     @Override
@@ -281,9 +282,20 @@ public class ClientES6 implements Client {
                 new io.searchbox.indices.settings.UpdateSettings.Builder(Collections.singletonMap(
                         "index.blocks.read_only_allow_delete", null
                 ))
-                .addIndex(index);
+                        .addIndex(index);
 
         executeWithExpectedSuccess(request.build(), "Unable to reset index block for " + index);
+    }
+
+    @Override
+    public void setIndexBlock(String index) {
+        final io.searchbox.indices.settings.UpdateSettings.Builder request =
+                new io.searchbox.indices.settings.UpdateSettings.Builder(Collections.singletonMap(
+                        "index.blocks.read_only_allow_delete", true
+                ))
+                        .addIndex(index);
+
+        executeWithExpectedSuccess(request.build(), "Unable to set index block for " + index);
     }
 
     private void waitForResult(Callable<Boolean> task) {
