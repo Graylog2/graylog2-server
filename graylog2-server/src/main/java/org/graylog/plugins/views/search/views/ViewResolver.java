@@ -18,6 +18,8 @@ package org.graylog.plugins.views.search.views;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 /**
  * View Resolvers provide a way that plugins can provide custom sources for looking up views.
@@ -44,4 +46,22 @@ public interface ViewResolver {
      * {@link org.graylog.plugins.views.search.db.SearchesCleanUpJob}.
      */
     Set<String> getSearchIds();
+
+    /**
+     * A method to return whether the current user is authorized to read the current resolved view and its related
+     * objects (such as the backing {@link org.graylog.plugins.views.search.Search} record).
+     *
+     * This method accepts two permissions tester predicates, to allow each implementation to perform any combination
+     * of permission checks needed.
+     *
+     * @param viewId                  The id of the view.
+     * @param permissionTester        A predicate, which tests a single string permission parameter.
+     *                                For example, is the user authorized to read a view based on having of a
+     *                                particular permission?
+     * @param entityPermissionsTester A bi-predicate which tests two parameters (the permission to test and the id of
+     *                                the entity). For example, is the user authorized to read a view based on having
+     *                                a particular permission and/or having access to a particular entity?
+     */
+    boolean canReadView(String viewId, Predicate<String> permissionTester,
+                        BiPredicate<String, String> entityPermissionsTester);
 }

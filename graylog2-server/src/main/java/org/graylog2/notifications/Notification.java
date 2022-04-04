@@ -65,6 +65,7 @@ public interface Notification extends Persisted {
         OUTPUT_FAILING,
         INDEX_RANGES_RECALCULATION,
         GENERIC,
+        ES_INDEX_BLOCKED,
         ES_NODE_DISK_WATERMARK_LOW,
         ES_NODE_DISK_WATERMARK_HIGH,
         ES_NODE_DISK_WATERMARK_FLOOD_STAGE,
