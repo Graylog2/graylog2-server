@@ -33,6 +33,7 @@ import org.graylog2.bindings.providers.DefaultStreamProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
+import org.graylog2.cluster.leader.FakeLeaderElectionModule;
 import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokModule;
@@ -126,7 +127,11 @@ public class ServerBindings extends Graylog2Module {
         install(new GrokModule());
         install(new LookupModule(configuration));
         install(new FieldTypesModule());
-        install(new LeaderElectionModule(configuration));
+        if (isMigrationCommand) {
+            install(new FakeLeaderElectionModule());
+        } else {
+            install(new LeaderElectionModule(configuration));
+        }
 
         // Just to create the binders so they are present in the injector. Prevents a server startup error when no
         // outputs are bound that implement MessageOutput.Factory2.
