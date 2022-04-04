@@ -99,6 +99,10 @@ const AppConfig = {
     return appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.notifications'] ?? {};
   },
 
+  cloudSettings(): { posthog_api_host?: string; posthog_api_key?: string } {
+    return appConfig()?.pluginUISettings?.['org.graylog.plugins.cloud'] ?? {};
+  },
+
 };
 
 export default AppConfig;
