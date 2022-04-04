@@ -202,10 +202,10 @@ class LuceneQueryParserTest {
     void testValueTokenSimple() throws ParseException {
         final ParsedQuery query = parser.parse("foo:bar AND lorem:ipsum");
         assertThat(query.terms().size()).isEqualTo(2);
-        final ParsedTerm fooTerm = query.terms().get(0);
+        final ParsedTerm fooTerm = query.terms().stream().filter(t -> t.field().equals("foo")).findFirst().get();
         assertThat(fooTerm.keyToken().get().image()).isEqualTo("foo");
         assertThat(fooTerm.valueToken().get().image()).isEqualTo("bar");
-        final ParsedTerm loremTerm = query.terms().get(1);
+        final ParsedTerm loremTerm = query.terms().stream().filter(t -> t.field().equals("lorem")).findFirst().get();
         assertThat(loremTerm.keyToken().get().image()).isEqualTo("lorem");
         assertThat(loremTerm.valueToken().get().image()).isEqualTo("ipsum");
     }
