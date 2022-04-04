@@ -42,7 +42,8 @@ public class BuiltinCapabilities {
                                 ViewsRestPermissions.VIEW_READ,
                                 RestPermissions.EVENT_DEFINITIONS_READ,
                                 RestPermissions.EVENT_NOTIFICATIONS_READ,
-                                RestPermissions.OUTPUTS_READ
+                                RestPermissions.OUTPUTS_READ,
+                                RestPermissions.SEARCH_FILTERS_READ
                         )
                 ))
                 .put(Capability.MANAGE, CapabilityDescriptor.create(
@@ -63,7 +64,9 @@ public class BuiltinCapabilities {
                                 RestPermissions.EVENT_NOTIFICATIONS_READ,
                                 RestPermissions.EVENT_NOTIFICATIONS_EDIT,
                                 RestPermissions.OUTPUTS_READ,
-                                RestPermissions.OUTPUTS_EDIT
+                                RestPermissions.OUTPUTS_EDIT,
+                                RestPermissions.SEARCH_FILTERS_READ,
+                                RestPermissions.SEARCH_FILTERS_EDIT
                         )
                 ))
                 .put(Capability.OWN, CapabilityDescriptor.create(
@@ -90,7 +93,10 @@ public class BuiltinCapabilities {
                                 RestPermissions.EVENT_NOTIFICATIONS_DELETE,
                                 RestPermissions.OUTPUTS_READ,
                                 RestPermissions.OUTPUTS_EDIT,
-                                RestPermissions.OUTPUTS_TERMINATE
+                                RestPermissions.OUTPUTS_TERMINATE,
+                                RestPermissions.SEARCH_FILTERS_READ,
+                                RestPermissions.SEARCH_FILTERS_EDIT,
+                                RestPermissions.SEARCH_FILTERS_DELETE
                         )
                 ))
                 .build();
