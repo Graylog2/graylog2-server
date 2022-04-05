@@ -74,7 +74,7 @@ public final class SessionIdToken implements HostAuthenticationToken, RemoteAddr
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("sessionId", sessionId)
+                .add("hashcode", hashCode())
                 .add("host", host)
                 .toString();
     }
