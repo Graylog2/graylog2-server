@@ -26,4 +26,5 @@ jobs:
       - name: Reviewbot
         uses: Graylog2/reviewbot@v1
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           prefix: graylog2-web-interface
