@@ -27,6 +27,9 @@ public class IndexHtmlGeneratorProvider implements Provider<IndexHtmlGenerator> 
     public IndexHtmlGeneratorProvider(Provider<DevelopmentIndexHtmlGenerator> developmentIndexHtmlGeneratorProvider,
                                       Provider<ProductionIndexHtmlGenerator> productionIndexHtmlGeneratorProvider,
                                       @Named("isDevelopmentServer") Boolean isDevelopmentServer) {
+        // In development mode we use an external process to provide the web interface.
+        // To avoid errors because of missing production web assets, we use a different implementation for
+        // generating the "index.html" page.
         this.indexHtmlGeneratorProvider = isDevelopmentServer
                 ? developmentIndexHtmlGeneratorProvider
                 : productionIndexHtmlGeneratorProvider;
