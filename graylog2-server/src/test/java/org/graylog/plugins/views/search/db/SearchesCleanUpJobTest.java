@@ -39,6 +39,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -208,6 +210,12 @@ public class SearchesCleanUpJobTest {
         @Override
         public Set<ViewDTO> getBySearchId(String searchId) {
             return Collections.emptySet();
+        }
+
+        @Override
+        public boolean canReadView(String viewId, Predicate<String> permissionTester, BiPredicate<String, String> entityPermissionsTester) {
+            // Not used in this test.
+            return false;
         }
     }
 }

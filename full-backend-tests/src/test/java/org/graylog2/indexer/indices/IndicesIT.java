@@ -52,6 +52,7 @@ import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
@@ -71,6 +72,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -83,6 +85,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -188,6 +192,25 @@ public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
         final String index = client().createRandomIndex(prefix);
         indicesToCleanUp.add(index);
         return index;
+    }
+
+    @ContainerMatrixTest
+    public void testGetIndicesBlocksStatus() {
+        final String index = createRandomIndex("indices_it_");
+
+        IndicesBlockStatus indicesBlocksStatus = indices.getIndicesBlocksStatus(Collections.singletonList(index));
+        assertEquals(0, indicesBlocksStatus.countBlockedIndices());
+
+        client().setIndexBlock(index);
+        indicesBlocksStatus = indices.getIndicesBlocksStatus(Collections.singletonList(index));
+        assertEquals(1, indicesBlocksStatus.countBlockedIndices());
+        final Collection<String> indexBlocks = indicesBlocksStatus.getIndexBlocks(index);
+        assertEquals(1, indexBlocks.size());
+        assertTrue(indexBlocks.contains("index.blocks.read_only_allow_delete"));
+
+        client().resetIndexBlock(index);
+        indicesBlocksStatus = indices.getIndicesBlocksStatus(Collections.singletonList(index));
+        assertEquals(0, indicesBlocksStatus.countBlockedIndices());
     }
 
     @ContainerMatrixTest

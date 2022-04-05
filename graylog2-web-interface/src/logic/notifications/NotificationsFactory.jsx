@@ -132,6 +132,23 @@ class NotificationsFactory {
           description: notification.details.description,
         };
 
+      case 'es_index_blocked':
+        return {
+          title: notification.details.title,
+          description: (
+            <span>
+              {notification.details.description}<br />
+              {notification.details.blockDetails?.length > 0 && (
+                <ul>
+                  {notification.details.blockDetails.map((line) => (
+                    <li>{line[0]}: {line[1]}</li>
+                  ))}
+                </ul>
+              )}
+            </span>
+          ),
+        };
+
       case 'index_ranges_recalculation':
         return {
           title: 'Index ranges recalculation required',
