@@ -21,13 +21,13 @@ import PropTypes from 'prop-types';
 
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import { filtersToStreamSet } from 'views/logic/queries/Query';
-import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import type { RelativeTimeRange } from 'views/logic/queries/Query';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 
 import FieldTypesContext from './FieldTypesContext';
 
 const defaultId = '';
-const defaultTimeRange: AbsoluteTimeRange = { type: 'absolute', from: 'now-15m', to: 'now' };
+const defaultTimeRange: RelativeTimeRange = { type: 'relative', from: 300 };
 
 const DefaultFieldTypesProvider = ({ children }: { children: React.ReactElement }) => {
   const currentQuery = useCurrentQuery();
