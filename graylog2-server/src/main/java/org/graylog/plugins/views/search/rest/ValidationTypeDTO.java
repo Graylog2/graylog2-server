@@ -25,9 +25,11 @@ import java.util.Locale;
 public enum ValidationTypeDTO {
 
     UNDECLARED_PARAMETER(ValidationType.UNDECLARED_PARAMETER),
+    EMPTY_PARAMETER(ValidationType.EMPTY_PARAMETER),
     QUERY_PARSING_ERROR(ValidationType.QUERY_PARSING_ERROR),
     UNKNOWN_FIELD(ValidationType.UNKNOWN_FIELD),
     INVALID_OPERATOR(ValidationType.INVALID_OPERATOR),
+    MISSING_LICENSE(ValidationType.MISSING_LICENSE),
     ;
 
     private final ValidationType internalType;

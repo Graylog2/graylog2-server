@@ -16,20 +16,25 @@
  */
 package org.graylog.plugins.views.search.errors;
 
-import org.graylog.plugins.views.search.Query;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.QueryParam;
 
-import javax.annotation.Nonnull;
+import java.util.Optional;
 
-public class EmptyParameterError extends QueryError {
-    private final QueryParam parameterUsage;
+public class MissingEnterpriseLicenseException extends IllegalStateException {
 
-    public EmptyParameterError(@Nonnull Query query, String description, QueryParam parameterUsage) {
-        super(query, description);
-        this.parameterUsage = parameterUsage;
+    private ImmutableSet<QueryParam> queryParams;
+
+    public MissingEnterpriseLicenseException(final String message) {
+        super(message);
     }
 
-    public QueryParam getParameterUsage() {
-        return parameterUsage;
+    public MissingEnterpriseLicenseException(String s, ImmutableSet<QueryParam> queryParams) {
+        this(s);
+        this.queryParams = queryParams;
+    }
+    
+    public ImmutableSet<QueryParam> getQueryParams() {
+        return Optional.ofNullable(queryParams).orElse(ImmutableSet.of());
     }
 }

@@ -24,6 +24,7 @@ RUN \
   echo "export GRAYLOG_UID=${GRAYLOG_UID}"         >> /etc/profile.d/graylog.sh && \
   echo "export GRAYLOG_GID=${GRAYLOG_GID}"         >> /etc/profile.d/graylog.sh && \
   echo "export GRAYLOG_REPORT_DISABLE_SANDBOX=true" >> /etc/profile.d/graylog.sh && \
+  echo "export GRAYLOG_REPORT_GENERATION_TIMEOUT_SECONDS=600" >> /etc/profile.d/graylog.sh && \
   echo "export PATH=${GRAYLOG_HOME}/bin:${PATH}"   >> /etc/profile.d/graylog.sh && \
   apt-get update  > /dev/null && \
   apt-get install --no-install-recommends --assume-yes \

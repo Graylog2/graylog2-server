@@ -14,19 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import loadAsync from 'routing/loadAsync';
 
-import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+const AsyncQueryInput = loadAsync(() => import('./QueryInput'));
 
-// eslint-disable-next-line import/prefer-default-export
-export const validationError: QueryValidationState = {
-  status: 'ERROR',
-  explanations: [{
-    errorType: 'QUERY_PARSING_ERROR',
-    errorTitle: 'Parse Exception',
-    errorMessage: "Cannot parse 'source: '",
-    beginLine: 1,
-    endLine: 1,
-    beginColumn: 1,
-    endColumn: 5,
-  }],
-};
+export default AsyncQueryInput;

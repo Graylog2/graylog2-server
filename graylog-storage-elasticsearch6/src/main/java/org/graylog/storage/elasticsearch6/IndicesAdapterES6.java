@@ -689,9 +689,15 @@ public class IndicesAdapterES6 implements IndicesAdapter {
 
     private String getIndexState(String index) {
         final State request = new State.Builder().indices(index).withMetadata().build();
-
         final JestResult response = JestUtils.execute(jestClient, request, () -> "Failed to get index metadata");
-
         return response.getJsonObject().path("metadata").path("indices").path(index).path("state").asText();
+    }
+
+    @Override
+    public String getIndexId(String index) {
+        final State request = new State.Builder().indices(index).withMetadata().build();
+        final JestResult response = JestUtils.execute(jestClient, request, () -> "Failed to get index metadata");
+        return response.getJsonObject().path("metadata").path("indices").path(index)
+                .path("settings").path("index").path("uuid").asText();
     }
 }

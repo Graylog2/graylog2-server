@@ -22,10 +22,7 @@ import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 import MockStore from 'helpers/mocking/StoreMock';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
-import type {
-  WidgetEditingState,
-  WidgetFocusingState,
-} from 'views/components/contexts/WidgetFocusContext';
+import type { WidgetEditingState, WidgetFocusingState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import DashboardSearchBar from './DashboardSearchBar';
@@ -121,14 +118,10 @@ describe('DashboardSearchBar', () => {
     const focusedWidget: WidgetEditingState = { id: 'foo', editing: true, focusing: true };
     const widgetFocusContext = {
       focusedWidget,
-      setWidgetFocusing: () => {
-      },
-      setWidgetEditing: () => {
-      },
-      unsetWidgetFocusing: () => {
-      },
-      unsetWidgetEditing: () => {
-      },
+      setWidgetFocusing: () => {},
+      setWidgetEditing: () => {},
+      unsetWidgetFocusing: () => {},
+      unsetWidgetEditing: () => {},
     };
 
     render(
@@ -148,14 +141,10 @@ describe('DashboardSearchBar', () => {
     const focusedWidget: WidgetFocusingState = { id: 'foo', editing: false, focusing: true };
     const widgetFocusContext = {
       focusedWidget,
-      setWidgetFocusing: () => {
-      },
-      setWidgetEditing: () => {
-      },
-      unsetWidgetFocusing: () => {
-      },
-      unsetWidgetEditing: () => {
-      },
+      setWidgetFocusing: () => {},
+      setWidgetEditing: () => {},
+      unsetWidgetFocusing: () => {},
+      unsetWidgetEditing: () => {},
     };
 
     render(
