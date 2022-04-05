@@ -67,7 +67,7 @@ public final class SessionIdToken implements HostAuthenticationToken {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("sessionId", sessionId)
+                .add("hashcode", hashCode())
                 .add("host", host)
                 .toString();
     }
