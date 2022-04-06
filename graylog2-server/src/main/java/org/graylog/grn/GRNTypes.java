@@ -31,6 +31,7 @@ public class GRNTypes {
     public static final GRNType STREAM = GRNType.create("stream", "streams:");
     public static final GRNType TEAM = GRNType.create("team", "teams:");
     public static final GRNType USER = GRNType.create("user", "users:");
+    public static final GRNType SEARCH_FILTER = GRNType.create("search_filter", "search_filters:");
 
     // TODO This is essentially the same as org.graylog2.contentpacks.model.ModelTypes
     // TODO find a way to unify these
@@ -47,6 +48,7 @@ public class GRNTypes {
             .add(STREAM)
             .add(TEAM)
             .add(USER)
+            .add(SEARCH_FILTER)
             .build();
 
     /**
