@@ -49,16 +49,10 @@ type Props = {
   dirty: boolean,
 };
 
-const onButtonClick = (e: MouseEvent, disabled: Boolean, onClick?: () => void) => {
+const onButtonClick = (e: MouseEvent, disabled: Boolean) => {
   if (disabled) {
     e.preventDefault();
     QueryValidationActions.displayValidationErrors();
-
-    return;
-  }
-
-  if (typeof onClick === 'function') {
-    onClick();
   }
 };
 
@@ -88,7 +82,9 @@ const CleanSearchButton = ({ disabled, glyph, className }: { disabled: boolean, 
 const SearchButton = ({ dirty, disabled, ...rest }: Props) => {
   const className = disabled ? 'disabled' : '';
 
-  return dirty ? <DirtySearchButton className={className} disabled={disabled} {...rest} /> : <CleanSearchButton className={className} disabled={disabled} {...rest} />;
+  return dirty
+    ? <DirtySearchButton className={className} disabled={disabled} {...rest} />
+    : <CleanSearchButton className={className} disabled={disabled} {...rest} />;
 };
 
 SearchButton.defaultProps = {

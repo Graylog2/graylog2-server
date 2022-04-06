@@ -144,7 +144,11 @@ const SearchBar = ({
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
   const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
 
-  const _onSubmit = (values: SearchBarFormValues) => onSubmit(values, currentQuery);
+  const _onSubmit = (values: SearchBarFormValues, ...rest) => {
+    console.log({ rest });
+
+    return onSubmit(values, currentQuery);
+  };
 
   return (
     <WidgetFocusContext.Consumer>

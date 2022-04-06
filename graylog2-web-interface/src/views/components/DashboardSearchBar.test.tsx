@@ -69,6 +69,10 @@ const config = {
 describe('DashboardSearchBar', () => {
   const onExecute = jest.fn();
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should render the DashboardSearchBar', async () => {
     render(<DashboardSearchBar onExecute={onExecute} config={config} />);
 
@@ -84,7 +88,7 @@ describe('DashboardSearchBar', () => {
     await screen.findByText('No Override');
   });
 
-  it('should refresh search when button is clicked', async () => {
+  it('should call onExecute when there are no changes', async () => {
     render(<DashboardSearchBar onExecute={onExecute} config={config} />);
 
     const searchButton = await screen.findByTitle('Perform search');
@@ -93,7 +97,7 @@ describe('DashboardSearchBar', () => {
 
     userEvent.click(searchButton);
 
-    await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(onExecute).toHaveBeenCalledTimes(1));
   });
 
   it('should call onExecute and set global override when search is performed', async () => {
@@ -112,6 +116,7 @@ describe('DashboardSearchBar', () => {
     userEvent.click(searchButton);
 
     await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'relative', from: 300 }, ''));
+    await waitFor(() => expect(onExecute).toHaveBeenCalledTimes(1));
   }, applyTimeoutMultiplier(10000));
 
   it('should hide the save and load controls if a widget is being edited', async () => {
