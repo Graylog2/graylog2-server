@@ -108,6 +108,8 @@ public interface User extends Persisted {
 
     AccountStatus getAccountStatus();
 
+    boolean isServiceAccount();
+
     enum AccountStatus {
         @JsonProperty("enabled")
         ENABLED,

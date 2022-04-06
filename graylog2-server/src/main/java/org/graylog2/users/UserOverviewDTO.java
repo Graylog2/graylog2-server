@@ -50,6 +50,7 @@ public abstract class UserOverviewDTO {
     private static final String FIELD_LAST_ACTIVITY = "last_activity";
     private static final String FIELD_CLIENT_ADDRESS = "client_address";
     private static final String FIELD_ACCOUNT_STATUS = "account_status";
+    private static final String FIELD_SERVICE_ACCOUNT = "service_account";
 
     @Id
     @ObjectId
@@ -99,6 +100,10 @@ public abstract class UserOverviewDTO {
     @JsonProperty(FIELD_ACCOUNT_STATUS)
     public abstract User.AccountStatus accountStatus();
 
+    @Nullable
+    @JsonProperty(FIELD_SERVICE_ACCOUNT)
+    public abstract Boolean serviceAccount();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -113,7 +118,8 @@ public abstract class UserOverviewDTO {
         public static Builder create() {
             return new AutoValue_UserOverviewDTO.Builder()
                     .accountStatus(User.AccountStatus.ENABLED)
-                    .roles(Collections.emptySet());
+                    .roles(Collections.emptySet())
+                    .serviceAccount(false);
         }
 
         @Id
@@ -157,6 +163,9 @@ public abstract class UserOverviewDTO {
 
         @JsonProperty(FIELD_ACCOUNT_STATUS)
         public abstract Builder accountStatus(User.AccountStatus accountStatus);
+
+        @JsonProperty(FIELD_SERVICE_ACCOUNT)
+        public abstract Builder serviceAccount(boolean isServiceAccount);
 
         @JsonIgnore
         public Builder fillSession(Optional<MongoDbSession> session) {
