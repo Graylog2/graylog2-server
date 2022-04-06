@@ -225,6 +225,17 @@ public class UsersResource extends RestResource {
         if (roles != null) {
             try {
                 final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
+                List<String> unknownRoles = new ArrayList<>();
+                roles.forEach(roleName -> {
+                    if (!nameMap.containsKey(roleName.toLowerCase(Locale.US))) {
+                        unknownRoles.add(roleName);
+                    }
+                });
+                if (!unknownRoles.isEmpty()) {
+                    throw new BadRequestException(
+                        String.format(Locale.ENGLISH,"Invalid role names: %s", StringUtils.join(unknownRoles, ", "))
+                    );
+                }
                 final Iterable<String> roleIds = Iterables.transform(roles, Roles.roleNameToIdFunction(nameMap));
                 user.setRoleIds(Sets.newHashSet(roleIds));
             } catch (org.graylog2.database.NotFoundException e) {
@@ -295,6 +306,7 @@ public class UsersResource extends RestResource {
                 user.setSessionTimeoutMs(sessionTimeoutMs);
             }
         }
+        user.setServiceAccount(cr.isServiceAccount());
         userService.save(user);
     }
 
