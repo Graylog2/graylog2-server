@@ -209,4 +209,14 @@ class LuceneQueryParserTest {
         assertThat(loremTerm.keyToken().get().image()).isEqualTo("lorem");
         assertThat(loremTerm.valueToken().get().image()).isEqualTo("ipsum");
     }
+
+    @Test
+    void testValueTokenAnalyzed() throws ParseException {
+        // we are using standard analyzer in the parser, which means that values are processed by the lowercase filter
+        // This can lead to mismatches in equals during the value token recognition. This tests ensures that
+        // uppercase values are correctly recognized and assigned
+        final ParsedQuery query = parser.parse("foo:BAR");
+        final ParsedTerm term = query.terms().iterator().next();
+        assertThat(term.valueToken().get().image()).isEqualTo("BAR");
+    }
 }
