@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.errors.MissingEnterpriseLicenseException
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.errors.UnboundParameterError;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog.plugins.views.search.validation.fields.UnknownFieldsIdentifier;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 
@@ -41,7 +42,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,13 +52,19 @@ public class QueryValidationServiceImpl implements QueryValidationService {
     private final MappedFieldTypesService mappedFieldTypesService;
     private final QueryStringDecorators queryStringDecorators;
     private final FieldTypeValidation fieldTypeValidation;
+    private final UnknownFieldsIdentifier unknownFieldsIdentifier;
 
     @Inject
-    public QueryValidationServiceImpl(LuceneQueryParser luceneQueryParser, MappedFieldTypesService mappedFieldTypesService, QueryStringDecorators queryStringDecorators, FieldTypeValidation fieldTypeValidation) {
+    public QueryValidationServiceImpl(LuceneQueryParser luceneQueryParser,
+                                      MappedFieldTypesService mappedFieldTypesService,
+                                      QueryStringDecorators queryStringDecorators,
+                                      FieldTypeValidation fieldTypeValidation,
+                                      UnknownFieldsIdentifier unknownFieldsIdentifier) {
         this.luceneQueryParser = luceneQueryParser;
         this.mappedFieldTypesService = mappedFieldTypesService;
         this.queryStringDecorators = queryStringDecorators;
         this.fieldTypeValidation = fieldTypeValidation;
+        this.unknownFieldsIdentifier = unknownFieldsIdentifier;
     }
 
     @Override
@@ -88,7 +94,7 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         try {
             final ParsedQuery parsedQuery = luceneQueryParser.parse(rawQuery);
             Set<MappedFieldTypeDTO> availableFields = mappedFieldTypesService.fieldTypesByStreamIds(req.streams(), req.timerange());
-            final List<ParsedTerm> unknownFields = getUnknownFields(req, parsedQuery);
+            final List<ParsedTerm> unknownFields = unknownFieldsIdentifier.identifyUnknownFields(req, parsedQuery.terms());
             final List<ParsedTerm> invalidOperators = parsedQuery.invalidOperators();
             final List<ValidationMessage> explanations = getExplanations(unknownFields, invalidOperators);
 
@@ -178,18 +184,6 @@ public class QueryValidationServiceImpl implements QueryValidationService {
 
         return Streams.concat(unknownFieldsStream, invalidOperatorsStream)
                 .distinct()
-                .collect(Collectors.toList());
-    }
-
-    private List<ParsedTerm> getUnknownFields(ValidationRequest req, ParsedQuery query) {
-        final Set<String> availableFields = mappedFieldTypesService.fieldTypesByStreamIds(req.streams(), req.timerange())
-                .stream()
-                .map(MappedFieldTypeDTO::name)
-                .collect(Collectors.toSet());
-
-        return query.terms().stream()
-                .filter(t -> !t.isDefaultField())
-                .filter(term -> !availableFields.contains(term.getRealFieldName()))
                 .collect(Collectors.toList());
     }
 
