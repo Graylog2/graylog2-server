@@ -105,4 +105,6 @@ public interface User extends Persisted {
     void setRoleIds(Set<String> roles);
 
     boolean isServiceAccount();
+
+    void setServiceAccount(boolean isServiceAccount);
 }
