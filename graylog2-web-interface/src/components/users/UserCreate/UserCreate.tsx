@@ -38,6 +38,7 @@ import LastNameFormGroup from './LastNameFormGroup';
 import EmailFormGroup from './EmailFormGroup';
 import PasswordFormGroup, { validatePasswords } from './PasswordFormGroup';
 import UsernameFormGroup from './UsernameFormGroup';
+import ServiceAccountFormGroup from './ServiceAccountFormGroup';
 
 import { Headline } from '../../common/Section/SectionComponent';
 
@@ -113,11 +114,7 @@ const UserCreate = () => {
     if (isCloud && oktaUserForm) {
       const { fields: { username: CloudUserNameFormGroup } } = oktaUserForm;
 
-      return (
-        <>
-          {CloudUserNameFormGroup && <CloudUserNameFormGroup />}
-        </>
-      );
+      return CloudUserNameFormGroup && <CloudUserNameFormGroup />;
     }
 
     return (
@@ -129,11 +126,7 @@ const UserCreate = () => {
     if (isCloud && oktaUserForm) {
       const { fields: { email: CloudEmailFormGroup } } = oktaUserForm;
 
-      return (
-        <>
-          {CloudEmailFormGroup && <CloudEmailFormGroup />}
-        </>
-      );
+      return CloudEmailFormGroup && <CloudEmailFormGroup />;
     }
 
     return (
@@ -184,6 +177,7 @@ const UserCreate = () => {
                 <Headline>Settings</Headline>
                 <TimeoutFormGroup />
                 <TimezoneFormGroup />
+                <ServiceAccountFormGroup />
               </div>
               <div>
                 <Headline>Roles</Headline>
