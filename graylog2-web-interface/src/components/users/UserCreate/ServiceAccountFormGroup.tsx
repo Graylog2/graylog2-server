@@ -27,7 +27,7 @@ const ServiceAccountFormGroup = () => (
     <FormikFormGroup label="service account"
                      type="checkbox"
                      name="service_account"
-                     help="When checked, the account will be set as Service account." />
+                     help="When checked, the account will be set as Service account and self-edit is not allowed." />
   </Input>
 );
 
