@@ -18,11 +18,17 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.utils.GelfInputUtils;
+import org.graylog.testing.utils.SearchUtils;
+import org.junit.jupiter.api.BeforeAll;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
+import static org.graylog.testing.graylognode.NodeContainerConfig.GELF_HTTP_PORT;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -30,9 +36,26 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class QueryValidationResourceIT {
 
     private final RequestSpecification requestSpec;
+    private final GraylogBackend sut;
 
-    public QueryValidationResourceIT(RequestSpecification requestSpec) {
+    public QueryValidationResourceIT(GraylogBackend sut, RequestSpecification requestSpec) {
+        this.sut = sut;
         this.requestSpec = requestSpec;
+    }
+
+    @BeforeAll
+    public void importMessage() {
+        int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
+        GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
+        GelfInputUtils.postMessage(mappedPort,
+                "{\"short_message\":\"query-validation-test\", \"host\":\"example.org\", \"level\":3}",
+                requestSpec);
+
+        // mainly because of the waiting logic
+        final boolean isMessagePresent = SearchUtils.waitForMessage(requestSpec, "query-validation-test");
+        assertThat(isMessagePresent).isTrue();
+
+        SearchUtils.waitForFieldTypeDefinition(requestSpec, "level");
     }
 
 
@@ -97,5 +120,18 @@ public class QueryValidationResourceIT {
                 .statusCode(200);
         validatableResponse.assertThat().body("status", equalTo("WARNING"));
         validatableResponse.assertThat().body("explanations.error_message[0]", containsString("Query contains invalid operator \"not\". All AND / OR / NOT operators have to be written uppercase"));
+    }
+
+    @ContainerMatrixTest
+    void testInvalidValueType() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("{\"query\":\"timestamp:AAA\"}")
+                .post("/search/validate")
+                .then()
+                .statusCode(200);
+        validatableResponse.assertThat().body("status", equalTo("WARNING"));
+        validatableResponse.assertThat().body("explanations.error_type[0]", equalTo("INVALID_VALUE_TYPE"));
     }
 }

@@ -30,6 +30,7 @@ public enum ValidationTypeDTO {
     UNKNOWN_FIELD(ValidationType.UNKNOWN_FIELD),
     INVALID_OPERATOR(ValidationType.INVALID_OPERATOR),
     MISSING_LICENSE(ValidationType.MISSING_LICENSE),
+    INVALID_VALUE_TYPE(ValidationType.INVALID_VALUE_TYPE),
     ;
 
     private final ValidationType internalType;

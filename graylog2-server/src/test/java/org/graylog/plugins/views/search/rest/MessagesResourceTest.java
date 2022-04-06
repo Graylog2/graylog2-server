@@ -22,7 +22,6 @@ import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.export.AuditContext;
 import org.graylog.plugins.views.search.export.CommandFactory;
@@ -31,9 +30,12 @@ import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.validation.FieldTypeValidation;
 import org.graylog.plugins.views.search.validation.LuceneQueryParser;
+import org.graylog.plugins.views.search.validation.ParsedTerm;
 import org.graylog.plugins.views.search.validation.QueryValidationService;
 import org.graylog.plugins.views.search.validation.QueryValidationServiceImpl;
+import org.graylog.plugins.views.search.validation.ValidationMessage;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,6 +44,7 @@ import org.mockito.ArgumentCaptor;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -81,7 +84,7 @@ public class MessagesResourceTest {
         final QueryValidationServiceImpl validationService = new QueryValidationServiceImpl(
                 new LuceneQueryParser(),
                 (streamIds, timeRange) -> Collections.emptySet(),
-                new QueryStringDecorators(Collections.emptySet()));
+                new QueryStringDecorators(Collections.emptySet()), (t, detectedFieldType) -> Optional.empty());
 
         sut = new MessagesTestResource(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, mock(ObjectMapper.class), eventBus, validationService);
 

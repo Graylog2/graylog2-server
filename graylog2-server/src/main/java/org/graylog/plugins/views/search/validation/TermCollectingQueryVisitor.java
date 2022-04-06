@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.validation;
 import com.google.common.collect.Streams;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParserConstants;
+import org.apache.lucene.search.AutomatonQuery;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
@@ -28,6 +29,7 @@ import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -72,6 +74,19 @@ public class TermCollectingQueryVisitor extends QueryVisitor {
                             termBuilder.keyToken(token);
                             processedTokens.add(token);
                             availableTokens.remove(token);
+
+                            final String value = t.text();
+                            availableTokens.stream()
+                                    .filter(v -> v.kind() == QueryParserConstants.TERM)
+                                    .filter(v -> v.image().equals(value))
+                                    .findFirst()
+                                    .ifPresent(valueToken -> {
+                                        termBuilder.valueToken(valueToken);
+                                        processedTokens.add(valueToken);
+                                        availableTokens.remove(valueToken);
+                                    });
+
+
                         });
             }
             parsedTerms.add(termBuilder.build());

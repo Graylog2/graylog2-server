@@ -120,6 +120,20 @@ class LuceneQueryParserTest {
     }
 
     @Test
+    void testRangeQuery() throws ParseException {
+        final ParsedQuery query = parser.parse("http_response_code:[500 TO 504]");
+        assertThat(query.terms().get(0).value()).isEqualTo("500");
+        assertThat(query.terms().get(1).value()).isEqualTo("504");
+    }
+
+
+    @Test
+    void testGtQuery() throws ParseException {
+        final ParsedQuery query = parser.parse("http_response_code:>400");
+        assertThat(query.terms().get(0).value()).isEqualTo("400");
+    }
+
+    @Test
     void testLongStringOfInvalidTokens() throws ParseException {
         final ParsedQuery query = parser.parse("and and and or or or");
         assertThat(query.invalidOperators().size()).isEqualTo(6);
@@ -182,5 +196,17 @@ class LuceneQueryParserTest {
     void testEmptyQueryNewlines() {
         assertThatThrownBy(() -> parser.parse("\n\n\n"))
                 .hasMessageContaining("Cannot parse '\n\n\n': Encountered \"<EOF>\" at line 4, column 0.");
+    }
+
+    @Test
+    void testValueTokenSimple() throws ParseException {
+        final ParsedQuery query = parser.parse("foo:bar AND lorem:ipsum");
+        assertThat(query.terms().size()).isEqualTo(2);
+        final ParsedTerm fooTerm = query.terms().stream().filter(t -> t.field().equals("foo")).findFirst().get();
+        assertThat(fooTerm.keyToken().get().image()).isEqualTo("foo");
+        assertThat(fooTerm.valueToken().get().image()).isEqualTo("bar");
+        final ParsedTerm loremTerm = query.terms().stream().filter(t -> t.field().equals("lorem")).findFirst().get();
+        assertThat(loremTerm.keyToken().get().image()).isEqualTo("lorem");
+        assertThat(loremTerm.valueToken().get().image()).isEqualTo("ipsum");
     }
 }
