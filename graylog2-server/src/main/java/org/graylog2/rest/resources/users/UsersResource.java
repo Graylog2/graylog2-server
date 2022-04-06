@@ -418,6 +418,9 @@ public class UsersResource extends RestResource {
                 user.setSessionTimeoutMs(sessionTimeoutMs);
             }
         }
+
+        user.setServiceAccount(cr.isServiceAccount());
+
         userManagementService.update(user, cr);
     }
 
