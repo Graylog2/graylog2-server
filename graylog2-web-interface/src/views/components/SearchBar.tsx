@@ -161,7 +161,7 @@ const SearchBar = ({
 
                   return (
                     <>
-                      <ValidateOnParameterChange parameterBindings={parameterBindings} parameters={parameters} />
+                      <ValidateOnParameterChange parameters={parameters} />
                       <Container>
                         <Row>
                           <Col md={5}>
