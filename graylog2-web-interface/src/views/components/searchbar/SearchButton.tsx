@@ -61,11 +61,6 @@ const COMMON_PROPS = {
   bsStyle: 'success',
 };
 
-const COMMON_PROPS = {
-  type: 'submit',
-  bsStyle: 'success',
-};
-
 const DirtySearchButton = ({ glyph, className, disabled }: { disabled: boolean, glyph: IconName, className: string }) => (
   <DirtyButton onClick={(e) => onButtonClick(e, disabled)}
                title="Perform search (changes were made after last search execution)"

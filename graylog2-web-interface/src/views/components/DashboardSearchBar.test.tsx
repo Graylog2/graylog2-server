@@ -71,6 +71,10 @@ describe('DashboardSearchBar', () => {
     jest.clearAllMocks();
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should render the DashboardSearchBar', async () => {
     render(<DashboardSearchBar config={config} />);
 
