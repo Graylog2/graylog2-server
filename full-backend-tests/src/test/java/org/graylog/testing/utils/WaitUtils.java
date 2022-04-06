@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 public final class WaitUtils {
 
     private static final int TIMEOUT_MS = 10000;
-    private static final int WAIT_MS = 500;
+    private static final int SLEEP_MS = 500;
 
     private WaitUtils() {
     }
@@ -41,15 +41,15 @@ public final class WaitUtils {
             if (result != null && result.isPresent()) {
                 return result.get();
             }
-            msPassed += WAIT_MS;
-            wait(WAIT_MS);
+            msPassed += SLEEP_MS;
+            sleep();
         }
         throw new AssertionError(timeoutErrorMessage);
     }
 
-    private static void wait(int waitMs) {
+    private static void sleep() {
         try {
-            Thread.sleep(waitMs);
+            Thread.sleep(WaitUtils.SLEEP_MS);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
