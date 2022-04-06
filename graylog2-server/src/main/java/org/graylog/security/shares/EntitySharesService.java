@@ -269,11 +269,11 @@ public class EntitySharesService {
         return shareRequest.selectedGranteeCapabilities().get();
     }
 
-    private ImmutableSet<ActiveShare> getActiveShares(GRN ownedEntity, User sharingUser, Set<GRN> avialableGranteeGRNs) {
+    private ImmutableSet<ActiveShare> getActiveShares(GRN ownedEntity, User sharingUser, Set<GRN> availableGranteeGRNs) {
         final List<GrantDTO> activeGrants = grantService.getForTargetExcludingGrantee(ownedEntity, grnRegistry.ofUser(sharingUser));
 
         return activeGrants.stream()
-                .filter(grant -> avialableGranteeGRNs.contains(grant.grantee()))
+                .filter(grant -> availableGranteeGRNs.contains(grant.grantee()))
                 .map(grant -> ActiveShare.create(grnRegistry.newGRN("grant", grant.id()).toString(), grant.grantee(), grant.capability()))
                 .collect(ImmutableSet.toImmutableSet());
     }
