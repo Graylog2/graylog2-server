@@ -221,7 +221,8 @@ public class RolesResource extends RestResource {
                     false,
                     null,
                     null,
-                    user.getAccountStatus()));
+                    user.getAccountStatus(),
+                    user.isServiceAccount()));
         }
 
         return RoleMembershipResponse.create(role.getName(), userSummaries);

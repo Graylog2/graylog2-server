@@ -395,6 +395,11 @@ public class UserImpl extends PersistedImpl implements User {
         return Boolean.valueOf(String.valueOf(fields.get(SERVICE_ACCOUNT)));
     }
 
+    @Override
+    public void setServiceAccount(final boolean isServiceAccount) {
+        fields.put(SERVICE_ACCOUNT, isServiceAccount);
+    }
+
     public static class LocalAdminUser extends UserImpl {
         public static final String LOCAL_ADMIN_ID = "local:admin";
         private final Configuration configuration;

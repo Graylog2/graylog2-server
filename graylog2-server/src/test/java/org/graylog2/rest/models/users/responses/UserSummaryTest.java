@@ -52,7 +52,8 @@ class UserSummaryTest {
             true,
             null,
             null,
-            User.AccountStatus.ENABLED
+            User.AccountStatus.ENABLED,
+            false
     );
 
     @Test

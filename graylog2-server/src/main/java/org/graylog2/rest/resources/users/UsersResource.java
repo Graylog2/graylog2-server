@@ -300,6 +300,7 @@ public class UsersResource extends RestResource {
         user.setEmail(cr.email());
         user.setPermissions(cr.permissions());
         setUserRoles(cr.roles(), user);
+        user.setServiceAccount(cr.isServiceAccount());
 
         if (cr.timezone() != null) {
             user.setTimeZone(cr.timezone());
@@ -701,7 +702,8 @@ public class UsersResource extends RestResource {
                 sessionActive,
                 lastActivity,
                 clientAddress,
-                user.getAccountStatus()
+                user.getAccountStatus(),
+                user.isServiceAccount()
         );
     }
 
