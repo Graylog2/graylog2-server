@@ -16,17 +16,26 @@
  */
 package org.graylog2.plugin.database.users;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.shiro.authz.Permission;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.rest.models.users.requests.Startpage;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public interface User extends Persisted {
     boolean isReadOnly();
+
+    @Nullable
+    String getAuthServiceId();
+
+    @Nullable
+    String getAuthServiceUid();
 
     String getFullName();
 
@@ -46,6 +55,8 @@ public interface User extends Persisted {
 
     List<String> getPermissions();
 
+    Set<Permission> getObjectPermissions();
+
     Map<String, Object> getPreferences();
 
     Startpage getStartpage();
@@ -57,6 +68,10 @@ public interface User extends Persisted {
     void setPermissions(List<String> permissions);
 
     void setPreferences(Map<String, Object> preferences);
+
+    void setAuthServiceId(@Nullable String authServiceId);
+
+    void setAuthServiceUid(@Nullable String authServiceUid);
 
     void setEmail(String email);
 
@@ -88,4 +103,6 @@ public interface User extends Persisted {
     Set<String> getRoleIds();
 
     void setRoleIds(Set<String> roles);
+
+    boolean isServiceAccount();
 }
