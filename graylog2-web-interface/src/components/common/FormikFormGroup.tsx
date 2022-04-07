@@ -38,6 +38,7 @@ type Props = {
   minLength?: number,
   maxLength?: number,
   required?: boolean,
+  checked?: boolean,
   bsSize?: 'large' | 'small' | 'xsmall',
   validate?: (any) => string | undefined,
 };
@@ -69,6 +70,7 @@ FormikFormGroup.defaultProps = {
   minLength: undefined,
   maxLength: undefined,
   required: false,
+  checked: undefined,
   validate: () => undefined,
 };
 
