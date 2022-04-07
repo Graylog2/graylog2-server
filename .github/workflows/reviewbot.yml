@@ -13,7 +13,9 @@ jobs:
         working-directory: graylog2-web-interface
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Set up Yarn cache
         uses: actions/cache@v2
         with:
