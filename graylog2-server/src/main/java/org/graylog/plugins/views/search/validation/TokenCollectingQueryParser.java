@@ -21,9 +21,9 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 
 import java.util.List;
 
-public class TermCollectingQueryParser extends QueryParser {
+public class TokenCollectingQueryParser extends QueryParser {
 
-    public TermCollectingQueryParser(String defaultFieldName, Analyzer analyzer) {
+    public TokenCollectingQueryParser(String defaultFieldName, Analyzer analyzer) {
         super(new CollectingQueryParserTokenManager(defaultFieldName, analyzer));
         init(defaultFieldName, analyzer);
     }
