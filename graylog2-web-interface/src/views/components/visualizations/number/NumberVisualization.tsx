@@ -80,7 +80,7 @@ const _extractValueAndField = (rows: Rows) => {
   if (results.source == 'leaf') {
     const leaf = results.values.find((f) => f.source === 'row-leaf');
 
-    if (leaf && leaf.source == 'row-leaf') {
+    if (leaf && leaf.source === 'row-leaf') {
       return { value: leaf.value, field: leaf.key[0] };
     }
   }
@@ -107,7 +107,7 @@ const NumberVisualization = ({ config, currentView, fields, data }: Props) => {
 
   const field = _extractFirstSeriesName(config);
 
-  useEffect(onRenderComplete, [onRenderComplete]);
+  useEffect(onRenderComplete, []);
   const { activeQuery } = currentView;
   const chartRows = retrieveChartData(data);
   const trendRows = data.trend;
