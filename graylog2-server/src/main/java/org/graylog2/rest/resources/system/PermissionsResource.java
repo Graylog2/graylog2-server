@@ -40,7 +40,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @RequiresAuthentication
 @Api(value = "System/Permissions", description = "Retrieval of system permissions.")
-    @Path("/system/permissions")
+@Path("/system/permissions")
 @Produces(APPLICATION_JSON)
 public class PermissionsResource extends RestResource {
     private final Permissions permissions;

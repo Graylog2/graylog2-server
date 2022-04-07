@@ -81,6 +81,8 @@ public class SessionsResource extends RestResource {
     private final SessionResponseFactory sessionResponseFactory;
     private final CookieFactory cookieFactory;
 
+    private static final String USERNAME = "username";
+
     @Inject
     public SessionsResource(UserService userService,
                             DefaultSecurityManager securityManager,
@@ -115,6 +117,8 @@ public class SessionsResource extends RestResource {
                                          required = true)
                                @NotNull JsonNode createRequest) {
 
+        rejectServiceAccount(createRequest);
+
         final SecurityContext securityContext = requestContext.getSecurityContext();
         if (!(securityContext instanceof ShiroSecurityContext)) {
             throw new InternalServerErrorException("Unsupported SecurityContext class, this is a bug!");
@@ -145,6 +149,15 @@ public class SessionsResource extends RestResource {
             }
         } catch (AuthenticationServiceUnavailableException e) {
             throw new ServiceUnavailableException("Authentication service unavailable");
+        }
+    }
+
+    private void rejectServiceAccount(JsonNode createRequest) {
+        if (createRequest.has(USERNAME)) {
+            final User user = userService.load(createRequest.get(USERNAME).asText());
+            if (user.isServiceAccount()) {
+                throw new BadRequestException("Cannot login with service account " + user.getName());
+            }
         }
     }
 
