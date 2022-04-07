@@ -100,9 +100,8 @@ public abstract class UserOverviewDTO {
     @JsonProperty(FIELD_ACCOUNT_STATUS)
     public abstract User.AccountStatus accountStatus();
 
-    @Nullable
     @JsonProperty(FIELD_SERVICE_ACCOUNT)
-    public abstract Boolean serviceAccount();
+    public abstract boolean serviceAccount();
 
     public static Builder builder() {
         return Builder.create();

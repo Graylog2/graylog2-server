@@ -120,7 +120,7 @@ public abstract class UserSummary {
                                      @JsonProperty("last_activity") @Nullable Date lastActivity,
                                      @JsonProperty("client_address") @Nullable String clientAddress,
                                      @JsonProperty("account_status") User.AccountStatus accountStatus,
-                                     @JsonProperty("service_account") boolean isServiceAccount) {
+                                     @JsonProperty("service_account") Boolean isServiceAccount) {
         return new AutoValue_UserSummary(id,
                                          username,
                                          email,
@@ -138,6 +138,6 @@ public abstract class UserSummary {
                                          lastActivity,
                                          clientAddress,
                                          accountStatus,
-                                         isServiceAccount);
+                                         isServiceAccount != null && isServiceAccount);
     }
 }
