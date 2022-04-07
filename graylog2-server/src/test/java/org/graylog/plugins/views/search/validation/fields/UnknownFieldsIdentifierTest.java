@@ -16,69 +16,72 @@
  */
 package org.graylog.plugins.views.search.validation.fields;
 
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog.plugins.views.search.validation.LuceneQueryParser;
+import org.graylog.plugins.views.search.validation.ParsedQuery;
 import org.graylog.plugins.views.search.validation.ParsedTerm;
+import org.graylog.plugins.views.search.validation.ValidationMessage;
 import org.graylog.plugins.views.search.validation.ValidationRequest;
+import org.graylog.plugins.views.search.validation.ValidationType;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class UnknownFieldsIdentifierTest {
 
-    private UnknownFieldsIdentifier toTest;
-    private MappedFieldTypesService mappedFieldTypesService;
-    private MappedFieldTypeDTO existingFieldTypeDTO;
-    private ValidationRequest validationRequest;
+    private UnknownFieldsIdentifier sut;
+    private LuceneQueryParser parser;
 
     @BeforeEach
     public void setUp() {
-        validationRequest = mock(ValidationRequest.class);
-        existingFieldTypeDTO = MappedFieldTypeDTO.create("existingField", FieldTypes.Type.builder().type("date").build());
-        mappedFieldTypesService = mock(MappedFieldTypesService.class);
-        when(mappedFieldTypesService.fieldTypesByStreamIds(any(), any())).thenReturn(Collections.singleton(existingFieldTypeDTO));
-
-        toTest = new UnknownFieldsIdentifier(mappedFieldTypesService);
+        MappedFieldTypesService mappedFieldTypesService = (streamIds, timeRange) -> Collections.singleton(MappedFieldTypeDTO.create("existingField", FieldTypes.Type.builder().type("date").build()));
+        sut = new UnknownFieldsIdentifier(mappedFieldTypesService);
+        parser = new LuceneQueryParser();
     }
 
     @Test
-    public void returnsEmptyListOnNullRequest() {
-        final List<ParsedTerm> result = toTest.identifyUnknownFields(null, Collections.emptyList());
+    public void returnsEmptyListOnNullRequest() throws ParseException {
+        final List<ValidationMessage> result = sut.validate(null, parser.parse("foo:bar"));
         assertTrue(result.isEmpty());
     }
 
     @Test
-    public void returnsEmptyListOnNullTerms() {
-        final List<ParsedTerm> result = toTest.identifyUnknownFields(validationRequest, null);
+    public void returnsEmptyListOnNullQuery() throws InvalidRangeParametersException {
+        final List<ValidationMessage> result = sut.validate(validationRequest(), null);
         assertTrue(result.isEmpty());
     }
 
     @Test
-    public void identifiesUnknownFields() {
+    public void identifiesUnknownFields() throws InvalidRangeParametersException, ParseException {
 
-        final ParsedTerm unknownField = ParsedTerm.create("unknownField", "lalala");
-        Collection<ParsedTerm> parsedQueryTerms = Arrays.asList(
-                ParsedTerm.create("existingField", "papapa"),
-                unknownField,
-                ParsedTerm.create(ParsedTerm.DEFAULT_FIELD, "123")
-        );
+        final ParsedQuery query = parser.parse("existingField: papapaa OR unknownField:lalala OR 123");
 
-        final List<ParsedTerm> result = toTest.identifyUnknownFields(validationRequest, parsedQueryTerms);
+        final List<ValidationMessage> result = sut.validate(validationRequest(), query);
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertTrue(result.contains(unknownField));
+        final ValidationMessage unknownTerm = result.iterator().next();
+        assertThat(unknownTerm.validationType()).isEqualTo(ValidationType.UNKNOWN_FIELD);
+        assertThat(unknownTerm.relatedProperty()).isEqualTo("unknownField");
+    }
 
+    private ValidationRequest validationRequest() throws InvalidRangeParametersException {
+        return ValidationRequest.builder()
+                .query(ElasticsearchQueryString.of(""))
+                .timerange(RelativeRange.create(300))
+                .streams(Collections.emptySet())
+                .build();
     }
 }
