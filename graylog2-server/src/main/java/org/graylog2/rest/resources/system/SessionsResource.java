@@ -80,6 +80,8 @@ public class SessionsResource extends RestResource {
     private final ActorAwareAuthenticationTokenFactory tokenFactory;
     private final SessionResponseFactory sessionResponseFactory;
 
+    private static final String USERNAME = "username";
+
     @Inject
     public SessionsResource(UserService userService, DefaultSecurityManager securityManager,
             ShiroAuthenticationFilter authenticationFilter, @Named("trusted_proxies") Set<IpSubnet> trustedSubnets,
@@ -107,6 +109,8 @@ public class SessionsResource extends RestResource {
                                               required = true)
                                       @NotNull JsonNode createRequest) {
 
+        rejectServiceAccount(createRequest);
+
         final SecurityContext securityContext = requestContext.getSecurityContext();
         if (!(securityContext instanceof ShiroSecurityContext)) {
             throw new InternalServerErrorException("Unsupported SecurityContext class, this is a bug!");
@@ -129,6 +133,15 @@ public class SessionsResource extends RestResource {
             return sessionResponseFactory.forSession(session.get());
         } else {
             throw new NotAuthorizedException("Invalid credentials.", "Basic realm=\"Graylog Server session\"");
+        }
+    }
+
+    private void rejectServiceAccount(JsonNode createRequest) {
+        if (createRequest.has(USERNAME)) {
+            final User user = userService.load(createRequest.get(USERNAME).asText());
+            if (user.isServiceAccount()) {
+                throw new BadRequestException("Cannot login with service account " + user.getName());
+            }
         }
     }
 
