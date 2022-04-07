@@ -388,6 +388,7 @@ public class UsersResource extends RestResource {
         }
 
         if (isPermitted(USERS_ROLESEDIT, user.getName())) {
+            checkAdminRoleForServiceAccount(cr, user);
             setUserRoles(cr.roles(), user);
         }
 
@@ -422,6 +423,17 @@ public class UsersResource extends RestResource {
         user.setServiceAccount(cr.isServiceAccount());
 
         userManagementService.update(user, cr);
+    }
+
+    private void checkAdminRoleForServiceAccount(ChangeUserRequest cr, User user) {
+        if (user.isServiceAccount() && cr.roles() != null && cr.roles().contains("Admin")) {
+            throw new BadRequestException("Cannot assign Admin role to service account");
+        }
+        if (cr.isServiceAccount()) {
+            if (user.getRoleIds().contains(roleService.getAdminRoleObjectId())) {
+                throw new BadRequestException("Cannot make Admin into service account");
+            }
+        }
     }
 
     @DELETE
