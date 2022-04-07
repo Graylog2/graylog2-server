@@ -53,7 +53,9 @@ const SettingsSection = ({
             <TimeoutFormGroup />
           </IfPermitted>
           <TimezoneFormGroup />
-          <ServiceAccountFormGroup />
+          <IfPermitted permissions="user:edit">
+            <ServiceAccountFormGroup />
+          </IfPermitted>
           <StartpageFormGroup userId={id} permissions={permissions} />
 
           <Row className="no-bm">
