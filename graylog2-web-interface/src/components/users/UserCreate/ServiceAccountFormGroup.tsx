@@ -53,9 +53,10 @@ const ServiceAccountFormGroup = () => {
                    labelClassName="col-sm-3"
                    wrapperClassName="col-sm-9"
                    label="Service Account">
-              <Input label="service account"
+              <Input label="Service Account"
                      id="service_account"
                      type="checkbox"
+                     wrapperClassName="col-sm-9"
                      name="service_account"
                      checked={value ?? false}
                      help="When checked, the account will be set as Service account and self-edit is not allowed."
@@ -65,7 +66,7 @@ const ServiceAccountFormGroup = () => {
                                    title="Are you sure?"
                                    onConfirm={handleCheckServiceAccount}
                                    onCancel={handleCancel}>
-              Setting this account as Service Account will make it not self editable, this implies that login with this user will also be disabled. Do you wish to proceed?
+              Setting this account as Service account will make it not self editable, this implies that login with this user will also be disabled. Do you wish to proceed?
             </BootstrapModalConfirm>
           </>
         );
