@@ -20,6 +20,7 @@ import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog.plugins.views.search.validation.ParsedQuery;
 import org.graylog.plugins.views.search.validation.ParsedTerm;
 import org.graylog.plugins.views.search.validation.QueryValidator;
+import org.graylog.plugins.views.search.validation.ValidationContext;
 import org.graylog.plugins.views.search.validation.ValidationMessage;
 import org.graylog.plugins.views.search.validation.ValidationRequest;
 import org.graylog.plugins.views.search.validation.ValidationType;
@@ -36,16 +37,13 @@ import java.util.stream.Stream;
 @Singleton
 public class UnknownFieldsIdentifier implements QueryValidator {
 
-    private final MappedFieldTypesService mappedFieldTypesService;
-
     @Inject
-    public UnknownFieldsIdentifier(final MappedFieldTypesService mappedFieldTypesService) {
-        this.mappedFieldTypesService = mappedFieldTypesService;
+    public UnknownFieldsIdentifier() {
     }
 
     @Override
-    public List<ValidationMessage> validate(ValidationRequest request, ParsedQuery query) {
-        return identifyUnknownFields(request, query).stream().map(f -> {
+    public List<ValidationMessage> validate(ValidationContext context) {
+        return identifyUnknownFields(context).stream().map(f -> {
             final ValidationMessage.Builder message = ValidationMessage.builder(ValidationType.UNKNOWN_FIELD)
                     .relatedProperty(f.getRealFieldName())
                     .errorMessage("Query contains unknown field: " + f.getRealFieldName());
@@ -59,16 +57,13 @@ public class UnknownFieldsIdentifier implements QueryValidator {
         }).collect(Collectors.toList());
     }
 
-    private List<ParsedTerm> identifyUnknownFields(final ValidationRequest req, final ParsedQuery query) {
-        if (req == null || query == null) {
-            return Collections.emptyList();
-        }
-        final Set<String> availableFields = mappedFieldTypesService.fieldTypesByStreamIds(req.streams(), req.timerange())
+    private List<ParsedTerm> identifyUnknownFields(final ValidationContext context) {
+        final Set<String> availableFields = context.availableFields()
                 .stream()
                 .map(MappedFieldTypeDTO::name)
                 .collect(Collectors.toSet());
 
-        return query.terms().stream()
+        return context.query().terms().stream()
                 .filter(t -> !t.isDefaultField())
                 .filter(term -> !availableFields.contains(term.getRealFieldName()))
                 .collect(Collectors.toList());

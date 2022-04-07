@@ -17,59 +17,54 @@
 package org.graylog.plugins.views.search.validation.fields;
 
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.validation.LuceneQueryParser;
-import org.graylog.plugins.views.search.validation.ParsedQuery;
-import org.graylog.plugins.views.search.validation.ParsedTerm;
+import org.graylog.plugins.views.search.validation.QueryValidator;
+import org.graylog.plugins.views.search.validation.TestValidationContext;
+import org.graylog.plugins.views.search.validation.ValidationContext;
 import org.graylog.plugins.views.search.validation.ValidationMessage;
-import org.graylog.plugins.views.search.validation.ValidationRequest;
 import org.graylog.plugins.views.search.validation.ValidationType;
-import org.graylog2.indexer.fieldtypes.FieldTypes;
-import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UnknownFieldsIdentifierTest {
 
-    private UnknownFieldsIdentifier sut;
-    private LuceneQueryParser parser;
+    private QueryValidator sut;
 
     @BeforeEach
     public void setUp() {
-        MappedFieldTypesService mappedFieldTypesService = (streamIds, timeRange) -> Collections.singleton(MappedFieldTypeDTO.create("existingField", FieldTypes.Type.builder().type("date").build()));
-        sut = new UnknownFieldsIdentifier(mappedFieldTypesService);
-        parser = new LuceneQueryParser();
+        sut = new UnknownFieldsIdentifier();
     }
 
-    @Test
-    public void returnsEmptyListOnNullRequest() throws ParseException {
-        final List<ValidationMessage> result = sut.validate(null, parser.parse("foo:bar"));
-        assertTrue(result.isEmpty());
-    }
 
     @Test
-    public void returnsEmptyListOnNullQuery() throws InvalidRangeParametersException {
-        final List<ValidationMessage> result = sut.validate(validationRequest(), null);
-        assertTrue(result.isEmpty());
+    void testAllFieldsKnown() {
+        final ValidationContext context = TestValidationContext.create("foo: bar OR lorem:ipsum")
+                .knownMappedField("foo", "string")
+                .knownMappedField("lorem", "string")
+                .build();
+
+        final List<ValidationMessage> messages = sut.validate(context);
+        assertThat(messages).isEmpty();
+
     }
 
     @Test
     public void identifiesUnknownFields() throws InvalidRangeParametersException, ParseException {
 
-        final ParsedQuery query = parser.parse("existingField: papapaa OR unknownField:lalala OR 123");
+        final ValidationContext context = TestValidationContext.create("existingField: papapaa OR unknownField:lalala OR 123")
+                .knownMappedField("existingField", "date")
+                .build();
 
-        final List<ValidationMessage> result = sut.validate(validationRequest(), query);
+        final List<ValidationMessage> result = sut.validate(context);
+
         assertNotNull(result);
         assertEquals(1, result.size());
         final ValidationMessage unknownTerm = result.iterator().next();
@@ -77,11 +72,4 @@ public class UnknownFieldsIdentifierTest {
         assertThat(unknownTerm.relatedProperty()).isEqualTo("unknownField");
     }
 
-    private ValidationRequest validationRequest() throws InvalidRangeParametersException {
-        return ValidationRequest.builder()
-                .query(ElasticsearchQueryString.of(""))
-                .timerange(RelativeRange.create(300))
-                .streams(Collections.emptySet())
-                .build();
-    }
 }

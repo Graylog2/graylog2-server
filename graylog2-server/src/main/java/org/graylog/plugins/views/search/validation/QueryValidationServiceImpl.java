@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import com.google.common.collect.Streams;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.graylog.plugins.views.search.ParameterProvider;
@@ -44,7 +43,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Singleton
 public class QueryValidationServiceImpl implements QueryValidationService {
@@ -95,9 +93,17 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         try {
             final ParsedQuery parsedQuery = luceneQueryParser.parse(rawQuery);
             Set<MappedFieldTypeDTO> availableFields = mappedFieldTypesService.fieldTypesByStreamIds(req.streams(), req.timerange());
+
+            final ValidationContext context = ValidationContext.builder()
+                    .request(req)
+                    .query(parsedQuery)
+                    .availableFields(availableFields)
+                    .build();
+
+
             final List<ValidationMessage> explanations = new ArrayList<>();
 
-            explanations.addAll(unknownFieldsIdentifier.validate(req, parsedQuery));
+            explanations.addAll(unknownFieldsIdentifier.validate(context));
             explanations.addAll(invalidOperators(parsedQuery.invalidOperators()));
             explanations.addAll(validateQueryValues(rawQuery, decorated, availableFields));
 

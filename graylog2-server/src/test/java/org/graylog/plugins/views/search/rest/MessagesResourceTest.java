@@ -85,7 +85,7 @@ public class MessagesResourceTest {
                 new LuceneQueryParser(),
                 mappedFieldTypesService,
                 new QueryStringDecorators(Collections.emptySet()), (t, detectedFieldType) -> Optional.empty(),
-                new UnknownFieldsIdentifier(mappedFieldTypesService));
+                new UnknownFieldsIdentifier());
 
         sut = new MessagesTestResource(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, mock(ObjectMapper.class), eventBus, validationService);
 
