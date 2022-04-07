@@ -57,7 +57,6 @@ import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.MongoDbSession;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.ChangeUserRequest;
 import org.graylog2.shared.users.Role;
@@ -99,7 +98,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -421,14 +419,6 @@ public class UsersResource extends RestResource {
             }
         }
 
-        if (user.isServiceAccount() && !cr.isServiceAccount()) {
-            // restore permissions that were removed from the service account user
-            final Set<String> selfEditPermissions = new Permissions(new HashSet<>()).userSelfEditPermissions(user.getName());
-            final List<String> userPermissions = user.getPermissions();
-            if (user.getPermissions().addAll(selfEditPermissions)) {
-                user.setPermissions(userPermissions);
-            }
-        }
         user.setServiceAccount(cr.isServiceAccount());
 
         userManagementService.update(user, cr);
