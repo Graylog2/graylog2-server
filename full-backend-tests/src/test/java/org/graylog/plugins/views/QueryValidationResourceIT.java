@@ -18,6 +18,7 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+import org.checkerframework.checker.units.qual.A;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -30,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.graylog.testing.graylognode.NodeContainerConfig.GELF_HTTP_PORT;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = CLASS)
@@ -133,5 +135,20 @@ public class QueryValidationResourceIT {
                 .statusCode(200);
         validatableResponse.assertThat().body("status", equalTo("WARNING"));
         validatableResponse.assertThat().body("explanations.error_type[0]", equalTo("INVALID_VALUE_TYPE"));
+    }
+
+    @ContainerMatrixTest
+    void testQuotedDefaultField() {
+        given()
+                .spec(requestSpec)
+                .when()
+                .body("{\"query\": \"\\\"A or B\\\"\"}")
+                .post("/search/validate")
+                .then()
+                .statusCode(200)
+                .log().ifStatusCodeMatches(not(200))
+                .log().ifValidationFails()
+                // if the validation correctly recognizes the quoted text, it should not warn about lowercase or
+                .assertThat().body("status", equalTo("OK"));
     }
 }
