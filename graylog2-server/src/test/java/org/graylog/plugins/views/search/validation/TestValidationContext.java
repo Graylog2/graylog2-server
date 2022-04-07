@@ -30,19 +30,21 @@ import java.util.Set;
 
 public class TestValidationContext {
 
-    private final String query;
+    public static final LuceneQueryParser LUCENE_QUERY_PARSER = new LuceneQueryParser();
+
+    private final String queryString;
     private final Set<MappedFieldTypeDTO> fields;
     private TimeRange timeRange;
     private final Set<String> streams;
 
-    private TestValidationContext(String query) {
-        this.query = query;
+    private TestValidationContext(String queryString) {
+        this.queryString = queryString;
         this.fields = new HashSet<>();
         this.streams = new HashSet<>();
     }
 
-    public static TestValidationContext create(String query) {
-        return new TestValidationContext(query);
+    public static TestValidationContext create(String queryString) {
+        return new TestValidationContext(queryString);
     }
 
     public TestValidationContext knownMappedField(final String name, final String type) {
@@ -60,12 +62,11 @@ public class TestValidationContext {
         return this;
     }
 
-
     public ValidationContext build() {
         return ValidationContext.builder()
                 .query(parseQuery())
                 .request(ValidationRequest.builder()
-                        .query(ElasticsearchQueryString.of(query))
+                        .query(ElasticsearchQueryString.of(queryString))
                         .streams(streams)
                         //.parameters()
                         //.filter()
@@ -83,10 +84,9 @@ public class TestValidationContext {
         }
     }
 
-
     private ParsedQuery parseQuery() {
         try {
-            return new LuceneQueryParser().parse(query);
+            return LUCENE_QUERY_PARSER.parse(queryString);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }

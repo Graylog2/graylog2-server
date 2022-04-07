@@ -43,7 +43,6 @@ public class UnknownFieldsIdentifierTest {
         sut = new UnknownFieldsIdentifier();
     }
 
-
     @Test
     void testAllFieldsKnown() {
         final ValidationContext context = TestValidationContext.create("foo: bar OR lorem:ipsum")
@@ -53,12 +52,10 @@ public class UnknownFieldsIdentifierTest {
 
         final List<ValidationMessage> messages = sut.validate(context);
         assertThat(messages).isEmpty();
-
     }
 
     @Test
     public void identifiesUnknownFields() throws InvalidRangeParametersException, ParseException {
-
         final ValidationContext context = TestValidationContext.create("existingField: papapaa OR unknownField:lalala OR 123")
                 .knownMappedField("existingField", "date")
                 .build();
@@ -71,5 +68,4 @@ public class UnknownFieldsIdentifierTest {
         assertThat(unknownTerm.validationType()).isEqualTo(ValidationType.UNKNOWN_FIELD);
         assertThat(unknownTerm.relatedProperty()).isEqualTo("unknownField");
     }
-
 }
