@@ -87,6 +87,7 @@ public class UserImpl extends PersistedImpl implements User {
     public static final String SESSION_TIMEOUT = "session_timeout_ms";
     public static final String STARTPAGE = "startpage";
     public static final String ROLES = "roles";
+    public static final String SERVICE_ACCOUNT = "service_account";
 
     public static final int MAX_USERNAME_LENGTH = 100;
     public static final int MAX_EMAIL_LENGTH = 254;
