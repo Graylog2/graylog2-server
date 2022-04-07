@@ -30,12 +30,11 @@ import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.plugins.views.search.validation.FieldTypeValidation;
 import org.graylog.plugins.views.search.validation.LuceneQueryParser;
-import org.graylog.plugins.views.search.validation.ParsedTerm;
 import org.graylog.plugins.views.search.validation.QueryValidationService;
 import org.graylog.plugins.views.search.validation.QueryValidationServiceImpl;
-import org.graylog.plugins.views.search.validation.ValidationMessage;
+import org.graylog.plugins.views.search.validation.fields.UnknownFieldsIdentifier;
+import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,10 +80,12 @@ public class MessagesResourceTest {
         executionGuard = mock(SearchExecutionGuard.class);
         SearchDomain searchDomain = mock(SearchDomain.class);
 
+        final MappedFieldTypesService mappedFieldTypesService = (streamIds, timeRange) -> Collections.emptySet();
         final QueryValidationServiceImpl validationService = new QueryValidationServiceImpl(
                 new LuceneQueryParser(),
-                (streamIds, timeRange) -> Collections.emptySet(),
-                new QueryStringDecorators(Collections.emptySet()), (t, detectedFieldType) -> Optional.empty());
+                mappedFieldTypesService,
+                new QueryStringDecorators(Collections.emptySet()), (t, detectedFieldType) -> Optional.empty(),
+                new UnknownFieldsIdentifier(mappedFieldTypesService));
 
         sut = new MessagesTestResource(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, mock(ObjectMapper.class), eventBus, validationService);
 
