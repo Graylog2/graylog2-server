@@ -35,11 +35,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Singleton
-public class UnknownFieldsIdentifier implements QueryValidator {
-
-    @Inject
-    public UnknownFieldsIdentifier() {
-    }
+public class UnknownFieldsValidator implements QueryValidator {
 
     @Override
     public List<ValidationMessage> validate(ValidationContext context) {

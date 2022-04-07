@@ -27,7 +27,7 @@ import org.graylog.plugins.views.search.errors.MissingEnterpriseLicenseException
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.errors.UnboundParameterError;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
-import org.graylog.plugins.views.search.validation.fields.UnknownFieldsIdentifier;
+import org.graylog.plugins.views.search.validation.fields.UnknownFieldsValidator;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 
@@ -58,7 +58,7 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                                       MappedFieldTypesService mappedFieldTypesService,
                                       QueryStringDecorators queryStringDecorators,
                                       FieldTypeValidation fieldTypeValidation,
-                                      UnknownFieldsIdentifier unknownFieldsIdentifier) {
+                                      UnknownFieldsValidator unknownFieldsIdentifier) {
         this.luceneQueryParser = luceneQueryParser;
         this.mappedFieldTypesService = mappedFieldTypesService;
         this.queryStringDecorators = queryStringDecorators;

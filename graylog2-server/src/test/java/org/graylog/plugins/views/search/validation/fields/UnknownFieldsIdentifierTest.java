@@ -17,8 +17,6 @@
 package org.graylog.plugins.views.search.validation.fields;
 
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.validation.LuceneQueryParser;
 import org.graylog.plugins.views.search.validation.QueryValidator;
 import org.graylog.plugins.views.search.validation.TestValidationContext;
 import org.graylog.plugins.views.search.validation.ValidationContext;
@@ -40,7 +38,7 @@ public class UnknownFieldsIdentifierTest {
 
     @BeforeEach
     public void setUp() {
-        sut = new UnknownFieldsIdentifier();
+        sut = new UnknownFieldsValidator();
     }
 
     @Test
