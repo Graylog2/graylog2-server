@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 /**
  * This component will calculate the largest possible font size for the provided child.
@@ -29,8 +29,8 @@ const CHILD_SIZE_RATIO = 0.8; // Proportion of the child size in relation to the
 const FontSize = styled.div<{ fontSize: number, $center: boolean }>`
   height: 100%;
   width: 100%;
-  font-size: ${(props) => `${props.fontSize}px`};
-  ${(props) => (props.$center ? `
+  font-size: ${(props) => css`${props.fontSize}px`};
+  ${(props) => (props.$center ? css`
     display: flex;
     justify-content: center;
     align-items: center;
