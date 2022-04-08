@@ -53,7 +53,7 @@ const ServiceAccountFormGroup = () => {
                    labelClassName="col-sm-3"
                    wrapperClassName="col-sm-9"
                    label="Service Account">
-              <Input label="User is a Service account"
+              <Input label="User is a Service Account"
                      id="service_account"
                      type="checkbox"
                      wrapperClassName="col-sm-9"
