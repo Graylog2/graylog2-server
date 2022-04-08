@@ -190,6 +190,15 @@ public class NodeContainerFactory {
             if (!containerFileExists(container, containerPath)) {
                 LOG.error("Mandatory file {} does not exist in container at {}", filename, containerPath);
             }
+            // fix to duplicate files for Docker on OSX, system.arch is aarch64 instead or arm64
+            if(filename.endsWith("_arm64")) {
+                final String aarch64Path = containerPath.replaceAll("_arm64", "_aarch64");
+                container.copyFileToContainer(MountableFile.forHostPath(originalPath), aarch64Path);
+                if (!containerFileExists(container, aarch64Path)) {
+                    LOG.error("Mandatory file {} does not exist in container at {}", filename, aarch64Path);
+                }
+
+            }
         });
 
         return container;
