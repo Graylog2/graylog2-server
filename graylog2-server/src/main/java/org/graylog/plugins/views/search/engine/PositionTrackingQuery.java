@@ -18,7 +18,9 @@ package org.graylog.plugins.views.search.engine;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class PositionTrackingQuery {
     private final List<QueryFragment> fragments;
@@ -48,8 +50,8 @@ public class PositionTrackingQuery {
     private String concatFragments(Function<QueryFragment, String> supplier) {
         int line = 1;
         final StringBuilder stringBuilder = new StringBuilder();
-        for (QueryFragment fragment: fragments) {
-            if(line != fragment.getLine()) {
+        for (QueryFragment fragment : fragments) {
+            if (line != fragment.getLine()) {
                 stringBuilder.append("\n");
                 line = fragment.getLine();
             }
@@ -58,4 +60,23 @@ public class PositionTrackingQuery {
         return stringBuilder.toString();
     }
 
+    public Optional<QueryPosition> backtrackPosition(int line, int interpolatedBeginColumn, int interpolatedEndColumn) {
+        final List<QueryFragment> lineFragments = this.fragments.stream().filter(f -> f.getLine() == line).collect(Collectors.toList());
+        int linePosition = 0;
+        for (QueryFragment fragment : lineFragments) {
+            if (interpolatedBeginColumn >= linePosition && interpolatedEndColumn <= linePosition + fragment.originalLength()) {
+                if (fragment.isInterpolated()) { // we can't map 1:1 interpolated and original positions, let's use the whole fragment
+                    return Optional.of(new QueryPosition(fragment.getLine(), fragment.getOriginalBeginColumn(), fragment.getOriginalEndColumn()));
+                } else { // we can map exactly the positions
+                    final int offsetStart = interpolatedBeginColumn - linePosition;
+                    final int offsetEnd = linePosition + fragment.interpolatedLength() - interpolatedEndColumn;
+                    final int globalOriginalStart = fragment.getOriginalBeginColumn() + offsetStart;
+                    final int globalOriginalEnd = fragment.getOriginalBeginColumn() + fragment.originalLength() - offsetEnd;
+                    return Optional.of(new QueryPosition(line, globalOriginalStart, globalOriginalEnd));
+                }
+            }
+            linePosition = linePosition + fragment.interpolatedLength();
+        }
+        return Optional.empty();
+    }
 }

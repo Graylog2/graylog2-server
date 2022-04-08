@@ -50,4 +50,16 @@ public class QueryFragment {
     public int getOriginalEndColumn() {
         return originalEndColumn;
     }
+
+    public int originalLength() {
+        return originalContent.length();
+    }
+
+    public int interpolatedLength() {
+        return interpolatedContent.length();
+    }
+
+    public boolean isInterpolated() {
+        return !originalContent.equals(interpolatedContent);
+    }
 }
