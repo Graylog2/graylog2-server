@@ -18,11 +18,10 @@ package org.graylog.plugins.views.search.validation;
 
 import com.google.common.collect.Streams;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParserConstants;
-import org.apache.lucene.search.AutomatonQuery;
 import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryVisitor;
@@ -31,9 +30,7 @@ import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Stream;
 
 public class TermCollectingQueryVisitor extends QueryVisitor {
@@ -120,6 +117,8 @@ public class TermCollectingQueryVisitor extends QueryVisitor {
             processTerms(((WildcardQuery) query).getTerm());
         } else if (query instanceof PrefixQuery) {
             processTerms(((PrefixQuery) query).getPrefix());
+        } else if (query instanceof FuzzyQuery) {
+            processTerms(((FuzzyQuery) query).getTerm());
         } else {
             throw new IllegalArgumentException("Unrecognized query type: " + query.getClass().getName());
         }

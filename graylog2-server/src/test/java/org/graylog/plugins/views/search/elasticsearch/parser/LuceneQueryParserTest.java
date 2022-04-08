@@ -23,7 +23,6 @@ import org.graylog.plugins.views.search.validation.ParsedQuery;
 import org.graylog.plugins.views.search.validation.ParsedTerm;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -218,5 +217,13 @@ class LuceneQueryParserTest {
         final ParsedQuery query = parser.parse("foo:BAR");
         final ParsedTerm term = query.terms().iterator().next();
         assertThat(term.valueToken().get().image()).isEqualTo("BAR");
+    }
+
+    @Test
+    void testFuzzyQuery() throws ParseException {
+        final ParsedQuery query = parser.parse("fuzzy~");
+        final ParsedTerm term = query.terms().iterator().next();
+        assertThat(term.field()).isEqualTo("_default_");
+        assertThat(term.value()).isEqualTo("fuzzy");
     }
 }
