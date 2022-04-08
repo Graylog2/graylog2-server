@@ -67,14 +67,12 @@ const config = {
 };
 
 describe('DashboardSearchBar', () => {
-  const onExecute = jest.fn();
-
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('should render the DashboardSearchBar', async () => {
-    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+    render(<DashboardSearchBar config={config} />);
 
     await screen.findByLabelText('Open Time Range Selector');
     await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
@@ -83,13 +81,13 @@ describe('DashboardSearchBar', () => {
   });
 
   it('defaults to no override being selected', async () => {
-    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+    render(<DashboardSearchBar config={config} />);
 
     await screen.findByText('No Override');
   });
 
-  it('should call onExecute when there are no changes', async () => {
-    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+  it('should call SearchActions.refresh on submit when there are no changes', async () => {
+    render(<DashboardSearchBar config={config} />);
 
     const searchButton = await screen.findByTitle('Perform search');
 
@@ -97,11 +95,11 @@ describe('DashboardSearchBar', () => {
 
     userEvent.click(searchButton);
 
-    await waitFor(() => expect(onExecute).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
   });
 
-  it('should call onExecute and set global override when search is performed', async () => {
-    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+  it('should call SearchActions.refresh and set global override on submit when there are changes', async () => {
+    render(<DashboardSearchBar config={config} />);
 
     const timeRangeInput = await screen.findByText(/no override/i);
 
@@ -116,7 +114,7 @@ describe('DashboardSearchBar', () => {
     userEvent.click(searchButton);
 
     await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'relative', from: 300 }, ''));
-    await waitFor(() => expect(onExecute).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
   }, applyTimeoutMultiplier(10000));
 
   it('should hide the save and load controls if a widget is being edited', async () => {
@@ -131,7 +129,7 @@ describe('DashboardSearchBar', () => {
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <DashboardSearchBar onExecute={onExecute} config={config} />
+        <DashboardSearchBar config={config} />
       </WidgetFocusContext.Provider>,
     );
 
@@ -154,7 +152,7 @@ describe('DashboardSearchBar', () => {
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <DashboardSearchBar onExecute={onExecute} config={config} />
+        <DashboardSearchBar config={config} />
       </WidgetFocusContext.Provider>,
     );
 
