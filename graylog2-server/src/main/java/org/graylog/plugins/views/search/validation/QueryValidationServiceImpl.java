@@ -22,6 +22,8 @@ import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.elasticsearch.QueryParam;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
+import org.graylog.plugins.views.search.engine.QueryPosition;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.MissingEnterpriseLicenseException;
 import org.graylog.plugins.views.search.errors.SearchException;
@@ -170,8 +172,9 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         return Collections.singletonList(ValidationMessage.fromException(parseException));
     }
 
-    private List<ValidationMessage> validateQueryValues(String rawQuery, String decorated, Set<MappedFieldTypeDTO> availableFields) throws ParseException {
-        final ParsedQuery parsedQuery = luceneQueryParser.parse(decorated);
+
+    private List<ValidationMessage> validateQueryValues(String rawQuery, PositionTrackingQuery decorated, Set<MappedFieldTypeDTO> availableFields) throws ParseException {
+        final ParsedQuery parsedQuery = luceneQueryParser.parse(decorated.getInterpolatedQuery());
         final Map<String, MappedFieldTypeDTO> fields = availableFields.stream().collect(Collectors.toMap(MappedFieldTypeDTO::name, Function.identity()));
 
         return parsedQuery.terms().stream()
@@ -180,16 +183,29 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                     final Optional<String> typeName = Optional.ofNullable(fieldType)
                             .map(MappedFieldTypeDTO::type)
                             .map(FieldTypes.Type::type);
-                    return typeName.flatMap(type -> fieldTypeValidation.validateFieldValueType(term, type));
+                    return typeName.flatMap(type -> fieldTypeValidation.validateFieldValueType(term, type))
+                            .map(validation -> {
+                                final Optional<QueryPosition> backtrackedPosition = decorated.backtrackPosition(validation.beginLine(), validation.beginColumn(), validation.endColumn());
+
+                                return ValidationMessage.builder(validation.validationType())
+                                        .errorMessage(validation.errorMessage())
+                                        .relatedProperty(validation.relatedProperty())
+                                        .beginLine(validation.beginLine())
+                                        .beginColumn(backtrackedPosition.map(QueryPosition::getBeginColumn).orElse(validation.beginColumn()))
+                                        .endLine(validation.endLine())
+                                        .endColumn(backtrackedPosition.map(QueryPosition::getEndColumn).orElse(validation.endColumn()))
+                                        .build();
+                            });
                 })
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
     }
 
-    private String decoratedQuery(ValidationRequest req) {
+    private PositionTrackingQuery decoratedQuery(ValidationRequest req) {
         ParameterProvider parameterProvider = (name) -> req.parameters().stream().filter(p -> Objects.equals(p.name(), name)).findFirst();
         final Query query = Query.builder().query(req.query()).timerange(req.timerange()).build();
-        return this.queryStringDecorators.decorate(req.getCombinedQueryWithFilter(), parameterProvider, query);
+        return this.queryStringDecorators.decorateWithPositions(req.getCombinedQueryWithFilter(), parameterProvider, query);
     }
+
 }
