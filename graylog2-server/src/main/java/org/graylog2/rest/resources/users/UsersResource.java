@@ -63,6 +63,7 @@ import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.RoleService;
+import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.UserOverviewDTO;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -293,7 +294,7 @@ public class UsersResource extends RestResource {
             LOG.error(msg);
             throw new BadRequestException(msg);
         }
-        if (cr.roles() != null && cr.roles().contains("Admin") && cr.isServiceAccount()) {
+        if (cr.roles() != null && cr.roles().contains(RoleServiceImpl.ADMIN_ROLENAME) && cr.isServiceAccount()) {
             throw new BadRequestException("Cannot assign Admin role to service account");
         }
 
@@ -425,7 +426,7 @@ public class UsersResource extends RestResource {
     }
 
     private void checkAdminRoleForServiceAccount(ChangeUserRequest cr, User user) {
-        if (user.isServiceAccount() && cr.roles() != null && cr.roles().contains("Admin")) {
+        if (user.isServiceAccount() && cr.roles() != null && cr.roles().contains(RoleServiceImpl.ADMIN_ROLENAME)) {
             throw new BadRequestException("Cannot assign Admin role to service account");
         }
         if (cr.isServiceAccount()) {
