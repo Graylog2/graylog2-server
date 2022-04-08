@@ -99,7 +99,7 @@ const defaultOnSubmit = ({ timerange, streams, queryString }, currentQuery: Quer
     .build();
 
   if (!currentQuery.equals(newQuery)) {
-    return QueriesActions.update(newQuery.id, newQuery);
+    return QueriesActions.forceUpdate(newQuery.id, newQuery);
   }
 
   return SearchActions.refresh();
