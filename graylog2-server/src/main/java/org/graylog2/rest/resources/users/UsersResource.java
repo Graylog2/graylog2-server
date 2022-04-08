@@ -52,6 +52,7 @@ import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.RoleService;
+import org.graylog2.users.RoleServiceImpl;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +94,7 @@ import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENLIST;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
+import static org.graylog2.users.RoleServiceImpl.ADMIN_ROLENAME;
 
 @RequiresAuthentication
 @Path("/users")
@@ -186,6 +188,9 @@ public class UsersResource extends RestResource {
             final String msg = "Cannot create user " + cr.username() + ". Username is already taken.";
             LOG.error(msg);
             throw new BadRequestException(msg);
+        }
+        if (cr.roles() != null && cr.roles().contains(RoleServiceImpl.ADMIN_ROLENAME) && cr.isServiceAccount()) {
+            throw new BadRequestException("Cannot assign Admin role to service account");
         }
 
         // Create user.
@@ -302,7 +307,7 @@ public class UsersResource extends RestResource {
     }
 
     private void checkAdminRoleForServiceAccount(ChangeUserRequest cr, User user) {
-        if (user.isServiceAccount() && cr.roles() != null && cr.roles().contains("Admin")) {
+        if (user.isServiceAccount() && cr.roles() != null && cr.roles().contains(ADMIN_ROLENAME)) {
             throw new BadRequestException("Cannot assign Admin role to service account");
         }
         if (cr.isServiceAccount()) {
