@@ -295,6 +295,9 @@ public class UsersResource extends RestResource {
             LOG.error(msg);
             throw new BadRequestException(msg);
         }
+        if (cr.roles() != null && cr.roles().contains("Admin") && cr.isServiceAccount()) {
+            throw new BadRequestException("Cannot assign Admin role to service account");
+        }
 
         // Create user.
         User user = userManagementService.create();
