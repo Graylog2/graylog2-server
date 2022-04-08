@@ -84,7 +84,11 @@ const _onSubmit = (values, widget: Widget) => {
   const { timerange, streams, queryString } = values;
   const newWidget = updateWidgetSearchControls(widget, { timerange, streams, queryString });
 
-  return WidgetActions.update(widget.id, newWidget);
+  if (!widget.equals(newWidget)) {
+    return WidgetActions.update(widget.id, newWidget);
+  }
+
+  return SearchActions.refresh();
 };
 
 const _resetTimeRangeOverride = () => GlobalOverrideActions.resetTimeRange().then(SearchActions.refresh);
