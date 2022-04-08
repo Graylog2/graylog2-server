@@ -37,24 +37,21 @@ const _disableSearch = (_undeclaredParameters: Immutable.Set<string>, parameterB
 type SearchStatusProps = {
   config: SearchesConfig;
   disableSearch?: boolean;
-  onExecute: () => void;
 }
 
 type WrapperProps = {
   config: SearchesConfig;
   isDisabled: boolean;
-  onExecute: () => void;
 };
 
 type ResultProps = {
   config?: SearchesConfig;
   isDisabled?: boolean;
-  onExecute: () => void;
 };
 
 const WithSearchStatus = (Component: React.ComponentType<Partial<SearchStatusProps>>): React.ComponentType<ResultProps> => connect(
-  ({ config, isDisabled, onExecute }: WrapperProps) => {
-    return <Component disableSearch={isDisabled} onExecute={onExecute} config={config} />;
+  ({ config, isDisabled }: WrapperProps) => {
+    return <Component disableSearch={isDisabled} config={config} />;
   },
   {
     searchMetadata: SearchMetadataStore,
