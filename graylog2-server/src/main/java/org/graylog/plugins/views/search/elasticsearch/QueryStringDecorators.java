@@ -18,29 +18,28 @@ package org.graylog.plugins.views.search.elasticsearch;
 
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.Set;
 
-public class QueryStringDecorators implements QueryStringDecorator {
+public class QueryStringDecorators {
     private final Set<QueryStringDecorator> queryDecorators;
-
-    public static class Fake extends QueryStringDecorators {
-        public Fake() {
-            super(Collections.emptySet());
-        }
-    }
 
     @Inject
     public QueryStringDecorators(Set<QueryStringDecorator> queryDecorators) {
         this.queryDecorators = queryDecorators;
     }
 
-    @Override
     public String decorate(String queryString, ParameterProvider job, Query query) {
-        return this.queryDecorators.isEmpty() ? queryString : this.queryDecorators.stream()
-                .reduce(queryString, (prev, decorator) -> decorator.decorate(prev, job, query), String::concat);
+        return decorateWithPositions(queryString, job, query).getInterpolatedQuery();
+    }
+
+    public PositionTrackingQuery decorateWithPositions(String queryString, ParameterProvider job, Query query) {
+        return this.queryDecorators.stream()
+                .findFirst()
+                .map(decorator -> decorator.decorate(queryString, job, query))
+                .orElseGet(() -> PositionTrackingQuery.of(queryString));
     }
 }

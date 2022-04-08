@@ -52,6 +52,7 @@ import org.mockito.junit.MockitoRule;
 
 import javax.inject.Provider;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -66,7 +67,7 @@ import static org.mockito.Mockito.when;
 
 public class ElasticsearchBackendUsingCorrectIndicesTest {
     private static Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = ImmutableMap.of(
-            MessageList.NAME, () -> new ESMessageList(new QueryStringDecorators.Fake())
+            MessageList.NAME, () -> new ESMessageList(new QueryStringDecorators(Collections.emptySet()))
     );
 
     @Rule
@@ -97,7 +98,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
         this.backend = new ElasticsearchBackend(handlers,
                 client,
                 indexLookup,
-                new QueryStringDecorators.Fake(),
+                new QueryStringDecorators(Collections.emptySet()),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 false);
     }

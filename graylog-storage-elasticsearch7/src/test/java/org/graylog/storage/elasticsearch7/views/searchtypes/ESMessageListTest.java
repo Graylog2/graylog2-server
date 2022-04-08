@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
@@ -84,7 +85,7 @@ public class ESMessageListTest {
 
     @Test
     public void appliesDecoratorsToQueryStringIfHighlightingActivated() {
-        final QueryStringDecorator queryStringDecorator = (String queryString, ParameterProvider job, Query query) -> "Foobar!";
+        final QueryStringDecorator queryStringDecorator = (String queryString, ParameterProvider job, Query query) -> PositionTrackingQuery.of("Foobar!");
 
         final MessageList messageList = someMessageList();
 

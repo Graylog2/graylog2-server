@@ -93,7 +93,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase {
         this.elasticsearchBackend = new ElasticsearchBackend(elasticSearchTypeHandlers,
                 client,
                 indexLookup,
-                new QueryStringDecorators.Fake(),
+                new QueryStringDecorators(Collections.emptySet()),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 false);
     }

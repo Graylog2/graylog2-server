@@ -93,7 +93,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
         this.elasticsearchBackend = new ElasticsearchBackend(elasticSearchTypeHandlers,
                 jestClient,
                 indexLookup,
-                new QueryStringDecorators.Fake(),
+                new QueryStringDecorators(Collections.emptySet()),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 false, objectMapper);
     }
