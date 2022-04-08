@@ -19,11 +19,8 @@ import { Field, useFormikContext } from 'formik';
 
 import Select from 'components/common/Select';
 import { Input } from 'components/bootstrap';
-import {
-  GroupByFormValues,
-  MetricFormValues,
-  WidgetConfigFormValues,
-} from 'views/components/aggregationwizard/WidgetConfigForm';
+
+import type { GroupByFormValues, MetricFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
 
 type Props = {
   index: number,
@@ -59,8 +56,18 @@ type Option = {
 const Sort = React.memo(({ index }: Props) => {
   const { values, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const { metrics = [], groupBy: { groupings = [] } = {} } = values;
-  const metricsOptions: Array<OptionValue> = metrics.map(formatSeries).map(({ field, label }) => ({ type: 'metric', field, label }));
-  const rowPivotOptions: Array<OptionValue> = groupings.filter((grouping) => (grouping.direction === 'row')).map(formatGrouping).map((groupBy) => ({ type: 'groupBy', field: groupBy, label: groupBy }));
+  const metricsOptions: Array<OptionValue> = metrics.map(formatSeries)
+    .map(({ field, label }) => ({
+      type: 'metric',
+      field,
+      label,
+    }));
+  const rowPivotOptions: Array<OptionValue> = groupings.filter((grouping) => (grouping.direction === 'row'))
+    .map(formatGrouping).map((groupBy) => ({
+      type: 'groupBy',
+      field: groupBy,
+      label: groupBy,
+    }));
   const options = [
     ...metricsOptions,
     ...rowPivotOptions,
@@ -69,7 +76,8 @@ const Sort = React.memo(({ index }: Props) => {
   const numberIndexedOptions: Array<Option> = options.map((option, idx) => ({ label: option.label, value: idx }));
 
   const currentSort = values.sort[index];
-  const selectedOption = currentSort ? options.findIndex((option) => (option.type === currentSort.type && option.field === currentSort.field)) : undefined;
+  const optionIndex = options.findIndex((option) => (option.type === currentSort.type && option.field === currentSort.field));
+  const selectedOption = optionIndex > -1 ? optionIndex : undefined;
 
   return (
     <div data-testid={`sort-element-${index}`}>
