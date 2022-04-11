@@ -146,7 +146,7 @@ public class SessionsResource extends RestResource {
     private void rejectServiceAccount(JsonNode createRequest) {
         if (createRequest.has(USERNAME)) {
             final User user = userService.load(createRequest.get(USERNAME).asText());
-            if (user.isServiceAccount()) {
+            if ((user != null) && user.isServiceAccount()) {
                 throw new BadRequestException("Cannot login with service account " + user.getName());
             }
         }

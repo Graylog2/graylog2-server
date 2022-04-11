@@ -421,7 +421,10 @@ public class UsersResource extends RestResource {
                 user.setSessionTimeoutMs(sessionTimeoutMs);
             }
         }
-        user.setServiceAccount(cr.isServiceAccount());
+        if (cr.isServiceAccount() != null) {
+            user.setServiceAccount(cr.isServiceAccount());
+        }
+
         userService.save(user);
     }
 
@@ -429,7 +432,7 @@ public class UsersResource extends RestResource {
         if (user.isServiceAccount() && cr.roles() != null && cr.roles().contains(RoleServiceImpl.ADMIN_ROLENAME)) {
             throw new BadRequestException("Cannot assign Admin role to service account");
         }
-        if (cr.isServiceAccount()) {
+        if (cr.isServiceAccount() != null && cr.isServiceAccount()) {
             if (user.getRoleIds().contains(roleService.getAdminRoleObjectId())) {
                 throw new BadRequestException("Cannot make Admin into service account");
             }
