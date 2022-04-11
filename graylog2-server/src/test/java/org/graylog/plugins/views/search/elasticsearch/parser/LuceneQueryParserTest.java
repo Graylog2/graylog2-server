@@ -23,7 +23,6 @@ import org.graylog.plugins.views.search.validation.ParsedQuery;
 import org.graylog.plugins.views.search.validation.ParsedTerm;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -182,5 +181,13 @@ class LuceneQueryParserTest {
     void testEmptyQueryNewlines() {
         assertThatThrownBy(() -> parser.parse("\n\n\n"))
                 .hasMessageContaining("Cannot parse '\n\n\n': Encountered \"<EOF>\" at line 4, column 0.");
+    }
+
+    @Test
+    void testFuzzyQuery() throws ParseException {
+        final ParsedQuery query = parser.parse("fuzzy~");
+        final ParsedTerm term = query.terms().iterator().next();
+        assertThat(term.field()).isEqualTo("_default_");
+        assertThat(term.value()).isEqualTo("fuzzy");
     }
 }
