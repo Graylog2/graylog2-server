@@ -51,8 +51,7 @@ import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import useParameters from 'views/hooks/useParameters';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
-import SearchFilterBar from 'views/components/SearchFilterBar';
-import useFeature from 'hooks/useFeature';
+import PluggableSearchBarControls from 'views/components/searchbar/PluggableSearchControls';
 
 import ValidateOnParameterChange from './searchbar/ValidateOnParameterChange';
 import SearchBarForm from './searchbar/SearchBarForm';
@@ -117,7 +116,7 @@ const SearchBar = ({
   onSubmit = defaultProps.onSubmit,
 }: Props) => {
   const { parameterBindings, parameters } = useParameters();
-  const hasSearchFilterFeature = useFeature('search_filter');
+
   const _validateQueryString = useCallback((values: SearchBarFormValues) => {
     const request = {
       timeRange: values?.timerange,
@@ -230,7 +229,7 @@ const SearchBar = ({
                             </ViewActionsWrapper>
                           )}
                         </BottomRow>
-                        {hasSearchFilterFeature && <SearchFilterBar />}
+                        <PluggableSearchBarControls />
                       </Container>
                     </>
                   );

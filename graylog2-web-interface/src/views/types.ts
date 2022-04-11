@@ -238,6 +238,7 @@ interface MessageRowOverrideProps {
 interface SearchBarControl {
   component: React.ComponentType;
   id: string;
+  placement: 'left' | 'right';
 }
 
 declare module 'graylog-web-plugin/plugin' {
