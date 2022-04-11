@@ -25,13 +25,12 @@ import { IfPermitted } from 'components/common';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { StartpageStore } from 'stores/users/StartpageStore';
 import type { Stream } from 'stores/streams/StreamsStore';
-import type User from 'logic/users/User';
 
 import StreamForm from './StreamForm';
 
 type Props = {
   stream: Stream,
-  user: User,
+  user: { id: string, read_only: boolean },
   indexSets: Array<{}>,
   onDelete: (stream: Stream) => void,
   onClone: (streamId: string, newStream: Stream) => void,
