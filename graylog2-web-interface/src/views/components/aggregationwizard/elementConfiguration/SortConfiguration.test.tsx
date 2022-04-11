@@ -33,7 +33,7 @@ describe('SortConfiguration', () => {
                         onSubmit={onSubmit}
                         validate={validate}
                         config={config}>
-        <SortConfiguration index={0} />
+        <SortConfiguration />
       </WidgetConfigForm>
     ));
 
