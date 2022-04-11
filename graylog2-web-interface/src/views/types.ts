@@ -235,6 +235,11 @@ interface MessageRowOverrideProps {
   renderMessageRow: () => React.ReactNode,
 }
 
+interface SearchBarControl {
+  component: React.ComponentType;
+  id: string;
+}
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -248,7 +253,8 @@ declare module 'graylog-web-plugin/plugin' {
     'views.completers'?: Array<Completer>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
-    'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<MessageDetailContextProviderProps>>,
+    'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<MessageDetailContextProviderProps>>;
+    'views.components.searchBar'?: Array<SearchBarControl>;
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
     'views.elements.validationErrorExplanation'?: Array<React.ComponentType<{ validationState: QueryValidationState }>>;

@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type React from 'react';
-
 import type { ThemeMode } from 'theme/constants';
 import type { Colors, ColorVariants, ThemeColorModes } from 'theme/colors';
 
@@ -67,14 +65,9 @@ interface PublicNotificationsType {
   hooks?: PublicNotificationsHooks;
 }
 
-interface SearchFilterBarType {
-  SearchFilterComponent?: React.FunctionComponent;
-}
-
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     'customization.theme.customizer'?: Array<CustomizationType>;
     'customization.publicNotifications'?: Array<PublicNotificationsType>;
-    'views.components.searchFilterBar'?: Array<SearchFilterBarType>
   }
 }

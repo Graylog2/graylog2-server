@@ -24,6 +24,6 @@ window.appConfig = {
   },
   isCloud: false,
   featureFlags: {
-    // search_filter: 'on',
+    search_filter: 'on',
   },
 };

@@ -98,11 +98,11 @@ const SearchFilterBanner = () => {
 };
 
 const SearchFilterBar = () => {
-  const searchFilterBars = usePluginEntities('views.components.searchFilterBar') as [{ SearchFilterComponent: React.FunctionComponent }];
+  const searchFilterBars = usePluginEntities('views.components.searchBar');
   const withPlugin = useMemo(() => !!searchFilterBars.length, [searchFilterBars]);
 
   return withPlugin ? (
-    <>{searchFilterBars.map(({ SearchFilterComponent }) => (<SearchFilterComponent />))}</>
+    <>{searchFilterBars.map(({ id, component: SearchFilterComponent }) => (<SearchFilterComponent key={id} />))}</>
   ) : <SearchFilterBanner />;
 };
 
