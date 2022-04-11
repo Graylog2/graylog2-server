@@ -40,7 +40,6 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.rest.models.users.requests.ChangePasswordRequest;
-import org.graylog2.rest.models.users.requests.ChangeUserRequest;
 import org.graylog2.rest.models.users.requests.CreateUserRequest;
 import org.graylog2.rest.models.users.requests.PermissionEditRequest;
 import org.graylog2.rest.models.users.requests.Startpage;
@@ -59,11 +58,13 @@ import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.MongoDbSession;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.users.ChangeUserRequest;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.RoleService;
+import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.UserOverviewDTO;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -295,6 +296,9 @@ public class UsersResource extends RestResource {
             LOG.error(msg);
             throw new BadRequestException(msg);
         }
+        if (cr.roles() != null && cr.roles().contains(RoleServiceImpl.ADMIN_ROLENAME) && cr.isServiceAccount()) {
+            throw new BadRequestException("Cannot assign Admin role to service account");
+        }
 
         // Create user.
         User user = userManagementService.create();
@@ -304,6 +308,7 @@ public class UsersResource extends RestResource {
         user.setEmail(cr.email());
         user.setPermissions(cr.permissions());
         setUserRoles(cr.roles(), user);
+        user.setServiceAccount(cr.isServiceAccount());
 
         if (cr.timezone() != null) {
             user.setTimeZone(cr.timezone());
@@ -387,6 +392,7 @@ public class UsersResource extends RestResource {
         }
 
         if (isPermitted(USERS_ROLESEDIT, user.getName())) {
+            checkAdminRoleForServiceAccount(cr, user);
             setUserRoles(cr.roles(), user);
         }
 
@@ -417,7 +423,23 @@ public class UsersResource extends RestResource {
                 user.setSessionTimeoutMs(sessionTimeoutMs);
             }
         }
-        userManagementService.update(user);
+
+        if (cr.isServiceAccount() != null) {
+            user.setServiceAccount(cr.isServiceAccount());
+        }
+
+        userManagementService.update(user, cr);
+    }
+
+    private void checkAdminRoleForServiceAccount(ChangeUserRequest cr, User user) {
+        if (user.isServiceAccount() && cr.roles() != null && cr.roles().contains(RoleServiceImpl.ADMIN_ROLENAME)) {
+            throw new BadRequestException("Cannot assign Admin role to service account");
+        }
+        if (cr.isServiceAccount() != null && cr.isServiceAccount()) {
+            if (user.getRoleIds().contains(roleService.getAdminRoleObjectId())) {
+                throw new BadRequestException("Cannot make Admin into service account");
+            }
+        }
     }
 
     @DELETE
@@ -726,7 +748,8 @@ public class UsersResource extends RestResource {
                 sessionActive,
                 lastActivity,
                 clientAddress,
-                user.getAccountStatus()
+                user.getAccountStatus(),
+                user.isServiceAccount()
         );
     }
 
