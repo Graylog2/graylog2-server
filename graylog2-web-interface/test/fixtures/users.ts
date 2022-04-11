@@ -39,6 +39,7 @@ export const viewsManager: UserJSON = {
   username: 'betty',
   client_address: '127.0.0.1',
   account_status: 'enabled',
+  service_account: false,
 };
 
 export const admin: UserJSON = {
@@ -59,6 +60,7 @@ export const admin: UserJSON = {
   timezone: 'UTC',
   username: 'alonzo',
   account_status: 'enabled',
+  service_account: false,
 };
 
 export const alice = User.builder()
