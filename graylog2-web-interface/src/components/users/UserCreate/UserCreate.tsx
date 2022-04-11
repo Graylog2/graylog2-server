@@ -39,6 +39,7 @@ import LastNameFormGroup from './LastNameFormGroup';
 import EmailFormGroup from './EmailFormGroup';
 import PasswordFormGroup, { validatePasswords } from './PasswordFormGroup';
 import UsernameFormGroup from './UsernameFormGroup';
+import ServiceAccountFormGroup from './ServiceAccountFormGroup';
 
 import { Headline } from '../../common/Section/SectionComponent';
 
@@ -134,7 +135,7 @@ const UserCreate = () => {
 
       return (
         <>
-          {CloudEmailFormGroup && <CloudEmailFormGroup /> }
+          {CloudEmailFormGroup && <CloudEmailFormGroup />}
         </>
       );
     }
@@ -189,6 +190,7 @@ const UserCreate = () => {
                 <Headline>Settings</Headline>
                 <TimeoutFormGroup />
                 <TimezoneFormGroup />
+                <ServiceAccountFormGroup />
               </div>
               <div>
                 <Headline>Roles</Headline>

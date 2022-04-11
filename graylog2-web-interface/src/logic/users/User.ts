@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
-import { PreferencesMap } from 'stores/users/PreferencesStore';
+import type { PreferencesMap } from 'stores/users/PreferencesStore';
 
-import { AccountStatus } from './UserOverview';
+import type { AccountStatus } from './UserOverview';
 
 type StartPage = {
   id: string;
@@ -46,6 +46,7 @@ export type UserJSON = {
   timezone: string | null | undefined;
   username: string;
   account_status: AccountStatus;
+  service_account: boolean;
 };
 
 type InternalState = {
@@ -55,6 +56,7 @@ type InternalState = {
   firstName: string;
   lastName: string;
   email: string;
+  grnPermissions: Immutable.List<string>;
   permissions: Immutable.List<string>;
   timezone: string | null | undefined;
   preferences: PreferencesMap;
@@ -67,6 +69,7 @@ type InternalState = {
   clientAddress: string;
   lastActivity: string | null | undefined;
   accountStatus: AccountStatus;
+  serviceAccount: boolean;
 };
 
 export default class User {
@@ -91,6 +94,8 @@ export default class User {
     clientAddress: $PropertyType<InternalState, 'clientAddress'>,
     lastActivity: $PropertyType<InternalState, 'lastActivity'>,
     accountStatus: $PropertyType<InternalState, 'accountStatus'>,
+    serviceAccount: $PropertyType<InternalState, 'serviceAccount'>,
+    grnPermissions: $PropertyType<InternalState, 'grnPermissions'>,
   ) {
     this._value = {
       id,
@@ -111,6 +116,8 @@ export default class User {
       clientAddress,
       lastActivity,
       accountStatus,
+      grnPermissions,
+      serviceAccount,
     };
   }
 
@@ -136,6 +143,10 @@ export default class User {
 
   get email() {
     return this._value.email;
+  }
+
+  get grnPermissions() {
+    return this._value.grnPermissions;
   }
 
   get permissions() {
@@ -164,6 +175,10 @@ export default class User {
 
   get accountStatus() {
     return this._value.accountStatus;
+  }
+
+  get serviceAccount() {
+    return this._value.serviceAccount;
   }
 
   get sessionTimeoutMs() {
@@ -235,6 +250,7 @@ export default class User {
       lastName,
       email,
       permissions,
+      grnPermissions,
       timezone,
       preferences,
       roles,
@@ -246,6 +262,7 @@ export default class User {
       clientAddress,
       lastActivity,
       accountStatus,
+      serviceAccount,
     } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -258,6 +275,7 @@ export default class User {
       email,
       permissions,
       timezone,
+      grnPermissions,
       preferences,
       roles,
       readOnly,
@@ -268,6 +286,7 @@ export default class User {
       clientAddress,
       lastActivity,
       accountStatus,
+      serviceAccount,
     }));
   }
 
@@ -290,6 +309,8 @@ export default class User {
     clientAddress: $PropertyType<InternalState, 'clientAddress'>,
     lastActivity: $PropertyType<InternalState, 'lastActivity'>,
     accountStatus: $PropertyType<InternalState, 'accountStatus'>,
+    serviceAccount: $PropertyType<InternalState, 'serviceAccount'>,
+    grnPermissions: $PropertyType<InternalState, 'grnPermissions'>,
   ) {
     return new User(
       id,
@@ -310,6 +331,8 @@ export default class User {
       clientAddress,
       lastActivity,
       accountStatus,
+      serviceAccount,
+      grnPermissions,
     );
   }
 
@@ -326,6 +349,7 @@ export default class User {
       firstName,
       lastName,
       email,
+      grnPermissions,
       permissions,
       timezone,
       preferences,
@@ -338,6 +362,7 @@ export default class User {
       clientAddress,
       lastActivity,
       accountStatus,
+      serviceAccount,
     } = this._value;
 
     return {
@@ -347,6 +372,7 @@ export default class User {
       first_name: firstName,
       last_name: lastName,
       email,
+      grn_permissions: grnPermissions ? grnPermissions.toJS() : [],
       permissions: permissions ? permissions.toArray() : [],
       timezone,
       preferences,
@@ -359,6 +385,7 @@ export default class User {
       client_address: clientAddress,
       last_activity: lastActivity,
       account_status: accountStatus,
+      service_account: serviceAccount,
     };
   }
 
@@ -370,6 +397,7 @@ export default class User {
       first_name,
       last_name,
       email,
+      grn_permissions,
       permissions,
       timezone,
       preferences,
@@ -382,6 +410,7 @@ export default class User {
       client_address,
       last_activity,
       account_status,
+      service_account,
     } = value;
 
     return User.create(
@@ -403,6 +432,8 @@ export default class User {
       client_address,
       last_activity,
       account_status,
+      service_account,
+      Immutable.List(grn_permissions),
     );
   }
 
@@ -444,6 +475,10 @@ class Builder {
 
   email(value: $PropertyType<InternalState, 'email'>) {
     return new Builder(this.value.set('email', value));
+  }
+
+  grnPermissions(value: $PropertyType<InternalState, 'grnPermissions'>) {
+    return new Builder(this.value.set('grnPermissions', value));
   }
 
   permissions(value: $PropertyType<InternalState, 'permissions'>) {
@@ -494,6 +529,10 @@ class Builder {
     return new Builder(this.value.set('accountStatus', value));
   }
 
+  serviceAccount(value: $PropertyType<InternalState, 'serviceAccount'>) {
+    return new Builder(this.value.set('serviceAccount', value));
+  }
+
   build() {
     const {
       id,
@@ -514,6 +553,8 @@ class Builder {
       clientAddress,
       lastActivity,
       accountStatus,
+      serviceAccount,
+      grnPermissions,
     } = this.value.toObject();
 
     return new User(
@@ -535,6 +576,8 @@ class Builder {
       clientAddress,
       lastActivity,
       accountStatus,
+      serviceAccount,
+      grnPermissions,
     );
   }
 }

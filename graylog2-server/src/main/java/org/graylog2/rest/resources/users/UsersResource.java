@@ -295,6 +295,9 @@ public class UsersResource extends RestResource {
             LOG.error(msg);
             throw new BadRequestException(msg);
         }
+        if (cr.roles() != null && cr.roles().contains(RoleServiceImpl.ADMIN_ROLENAME) && cr.isServiceAccount()) {
+            throw new BadRequestException("Cannot assign Admin role to service account");
+        }
 
         // Create user.
         User user = userManagementService.create();
@@ -304,6 +307,7 @@ public class UsersResource extends RestResource {
         user.setEmail(cr.email());
         user.setPermissions(cr.permissions());
         setUserRoles(cr.roles(), user);
+        user.setServiceAccount(cr.isServiceAccount());
 
         if (cr.timezone() != null) {
             user.setTimeZone(cr.timezone());
@@ -387,6 +391,7 @@ public class UsersResource extends RestResource {
         }
 
         if (isPermitted(USERS_ROLESEDIT, user.getName())) {
+            checkAdminRoleForServiceAccount(cr, user);
             setUserRoles(cr.roles(), user);
         }
 
@@ -417,7 +422,23 @@ public class UsersResource extends RestResource {
                 user.setSessionTimeoutMs(sessionTimeoutMs);
             }
         }
+
+        if (cr.isServiceAccount() != null) {
+            user.setServiceAccount(cr.isServiceAccount());
+        }
+
         userManagementService.update(user);
+    }
+
+    private void checkAdminRoleForServiceAccount(ChangeUserRequest cr, User user) {
+        if (user.isServiceAccount() && cr.roles() != null && cr.roles().contains(RoleServiceImpl.ADMIN_ROLENAME)) {
+            throw new BadRequestException("Cannot assign Admin role to service account");
+        }
+        if (cr.isServiceAccount() != null && cr.isServiceAccount()) {
+            if (user.getRoleIds().contains(roleService.getAdminRoleObjectId())) {
+                throw new BadRequestException("Cannot make Admin into service account");
+            }
+        }
     }
 
     @DELETE
@@ -726,7 +747,8 @@ public class UsersResource extends RestResource {
                 sessionActive,
                 lastActivity,
                 clientAddress,
-                user.getAccountStatus()
+                user.getAccountStatus(),
+                user.isServiceAccount()
         );
     }
 
