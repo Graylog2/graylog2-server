@@ -20,6 +20,7 @@ import styled from 'styled-components';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import SearchFilterBanner from 'views/components/searchbar/SearchFilterBanner';
 import useFeature from 'hooks/useFeature';
+import type { SearchBarControl } from 'views/types';
 
 const Container = styled.div`
   display: flex;
@@ -36,7 +37,7 @@ const PluggableSearchBarControls = () => {
   const hasSearchFilterFeature = useFeature('search_filter');
   const leftControls = searchBarControls.filter(({ placement }) => placement === 'left');
   const rightControls = searchBarControls.filter(({ placement }) => placement === 'right');
-  const renderControls = (controls) => controls?.map(({ component: ControlComponent, id }) => <ControlComponent key={id} />);
+  const renderControls = (controls: Array<SearchBarControl>) => controls?.map(({ component: ControlComponent, id }) => <ControlComponent key={id} />);
 
   return (
     // eslint-disable-next-line react/jsx-no-useless-fragment

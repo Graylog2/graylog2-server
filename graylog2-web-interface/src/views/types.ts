@@ -235,7 +235,7 @@ interface MessageRowOverrideProps {
   renderMessageRow: () => React.ReactNode,
 }
 
-interface SearchBarControl {
+export interface SearchBarControl {
   component: React.ComponentType;
   id: string;
   placement: 'left' | 'right';
