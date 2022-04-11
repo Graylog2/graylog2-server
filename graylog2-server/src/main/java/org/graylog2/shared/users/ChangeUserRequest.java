@@ -68,7 +68,8 @@ public abstract class ChangeUserRequest {
     public abstract List<String> roles();
 
     @JsonProperty
-    public abstract boolean isServiceAccount();
+    @Nullable
+    public abstract Boolean isServiceAccount();
 
     @JsonCreator
     public static ChangeUserRequest create(@JsonProperty("email") @Nullable @Email String email,
@@ -80,7 +81,6 @@ public abstract class ChangeUserRequest {
                                            @JsonProperty("session_timeout_ms") @Nullable @Min(1) Long sessionTimeoutMs,
                                            @JsonProperty("roles") @Nullable List<String> roles,
                                            @JsonProperty("service_account") @Nullable Boolean isServiceAccount) {
-        return new AutoValue_ChangeUserRequest(email, firstName, lastName, permissions, timezone, startpage, sessionTimeoutMs, roles,
-                isServiceAccount != null && isServiceAccount);
+        return new AutoValue_ChangeUserRequest(email, firstName, lastName, permissions, timezone, startpage, sessionTimeoutMs, roles, isServiceAccount);
     }
 }
