@@ -77,13 +77,13 @@ const SearchFilterBanner = () => {
     <Container>
       <Col>
         <StyledControlLabel>
-          Custom filters
+          Filters
         </StyledControlLabel>
         <ButtonGroup>
-          <Button disabled>
+          <Button disabled bsSize="small">
             <Icon name="plus" />
           </Button>
-          <Button disabled>
+          <Button disabled bsSize="small">
             <Icon name="folder" />
           </Button>
         </ButtonGroup>
