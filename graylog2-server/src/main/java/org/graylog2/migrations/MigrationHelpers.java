@@ -32,6 +32,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 
 public class MigrationHelpers {
@@ -96,7 +97,7 @@ public class MigrationHelpers {
             previousUser = userService.load(userName);
             if (previousUser == null
                     || !previousUser.getRoleIds().containsAll(expectedRoles)
-                    || (isServiceAccount && !previousUser.isServiceAccount())) {
+                    || !Objects.equals(isServiceAccount, previousUser.isServiceAccount())) {
                 final String msg = "Invalid user '" + userName + "', fixing it.";
                 LOG.error(msg);
                 throw new IllegalArgumentException(msg);
