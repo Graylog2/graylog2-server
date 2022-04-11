@@ -23,4 +23,7 @@ window.appConfig = {
     'org.graylog.plugins.customization.notifications': {},
   },
   isCloud: false,
+  featureFlags: {
+    // search_filter: 'on',
+  },
 };
