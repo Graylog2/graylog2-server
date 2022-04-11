@@ -123,7 +123,7 @@ public class UsersResourceTest {
         return CreateUserRequest.create(USERNAME, PASSWORD, EMAIL,
                                         FIRST_NAME, LAST_NAME, Collections.singletonList(""),
                                         TIMEZONE, SESSION_TIMEOUT,
-                                        startPage, Collections.emptyList());
+                                        startPage, Collections.emptyList(), false);
     }
 
     /**
