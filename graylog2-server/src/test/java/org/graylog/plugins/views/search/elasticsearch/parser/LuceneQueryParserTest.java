@@ -23,7 +23,6 @@ import org.graylog.plugins.views.search.validation.ParsedQuery;
 import org.graylog.plugins.views.search.validation.ParsedTerm;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -120,6 +119,20 @@ class LuceneQueryParserTest {
     }
 
     @Test
+    void testRangeQuery() throws ParseException {
+        final ParsedQuery query = parser.parse("http_response_code:[500 TO 504]");
+        assertThat(query.terms().get(0).value()).isEqualTo("500");
+        assertThat(query.terms().get(1).value()).isEqualTo("504");
+    }
+
+
+    @Test
+    void testGtQuery() throws ParseException {
+        final ParsedQuery query = parser.parse("http_response_code:>400");
+        assertThat(query.terms().get(0).value()).isEqualTo("400");
+    }
+
+    @Test
     void testLongStringOfInvalidTokens() throws ParseException {
         final ParsedQuery query = parser.parse("and and and or or or");
         assertThat(query.invalidOperators().size()).isEqualTo(6);
@@ -182,5 +195,35 @@ class LuceneQueryParserTest {
     void testEmptyQueryNewlines() {
         assertThatThrownBy(() -> parser.parse("\n\n\n"))
                 .hasMessageContaining("Cannot parse '\n\n\n': Encountered \"<EOF>\" at line 4, column 0.");
+    }
+
+    @Test
+    void testValueTokenSimple() throws ParseException {
+        final ParsedQuery query = parser.parse("foo:bar AND lorem:ipsum");
+        assertThat(query.terms().size()).isEqualTo(2);
+        final ParsedTerm fooTerm = query.terms().stream().filter(t -> t.field().equals("foo")).findFirst().get();
+        assertThat(fooTerm.keyToken().get().image()).isEqualTo("foo");
+        assertThat(fooTerm.valueToken().get().image()).isEqualTo("bar");
+        final ParsedTerm loremTerm = query.terms().stream().filter(t -> t.field().equals("lorem")).findFirst().get();
+        assertThat(loremTerm.keyToken().get().image()).isEqualTo("lorem");
+        assertThat(loremTerm.valueToken().get().image()).isEqualTo("ipsum");
+    }
+
+    @Test
+    void testValueTokenAnalyzed() throws ParseException {
+        // we are using standard analyzer in the parser, which means that values are processed by the lowercase filter
+        // This can lead to mismatches in equals during the value token recognition. This tests ensures that
+        // uppercase values are correctly recognized and assigned
+        final ParsedQuery query = parser.parse("foo:BAR");
+        final ParsedTerm term = query.terms().iterator().next();
+        assertThat(term.valueToken().get().image()).isEqualTo("BAR");
+    }
+
+    @Test
+    void testFuzzyQuery() throws ParseException {
+        final ParsedQuery query = parser.parse("fuzzy~");
+        final ParsedTerm term = query.terms().iterator().next();
+        assertThat(term.field()).isEqualTo("_default_");
+        assertThat(term.value()).isEqualTo("fuzzy");
     }
 }

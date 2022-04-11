@@ -66,7 +66,7 @@ public final class AccessTokenAuthToken implements HostAuthenticationToken {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("token", token)
+                .add("hashcode", hashCode())
                 .add("host", host)
                 .toString();
     }

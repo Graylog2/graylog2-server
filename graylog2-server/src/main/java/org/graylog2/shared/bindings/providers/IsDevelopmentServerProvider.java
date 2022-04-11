@@ -14,14 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.validation;
+package org.graylog2.shared.bindings.providers;
 
-public enum ValidationType {
-    UNDECLARED_PARAMETER,
-    EMPTY_PARAMETER,
-    QUERY_PARSING_ERROR,
-    UNKNOWN_FIELD,
-    INVALID_OPERATOR,
-    MISSING_LICENSE,
-    INVALID_VALUE_TYPE,
+import javax.inject.Provider;
+
+public class IsDevelopmentServerProvider implements Provider<Boolean> {
+    private final boolean isDevelopmentServer;
+
+    public IsDevelopmentServerProvider() {
+        final String development = System.getenv("DEVELOPMENT");
+        this.isDevelopmentServer = !(development == null || development.equalsIgnoreCase("false"));
+    }
+
+    @Override
+    public Boolean get() {
+        return this.isDevelopmentServer;
+    }
 }

@@ -46,7 +46,7 @@
     "javascript-natural-sort": "0.7.1",
     "jest-preset-graylog": "file:../jest-preset-graylog",
     "jquery": "3.5.1",
-    "moment": "2.29.1",
+    "moment": "2.29.2",
     "moment-timezone": "0.5.34",
     "prop-types": "15.8.1",
     "react": "16.14.0",
@@ -59,7 +59,7 @@
     "reflux": "0.2.13",
     "styled-components": "5.3.3",
     "typescript": "4.5.5",
-    "webpack": "5.71.0",
+    "webpack": "5.72.0",
     "webpack-cleanup-plugin": "0.5.1",
     "webpack-cli": "4.9.2",
     "webpack-merge": "4.2.2"
