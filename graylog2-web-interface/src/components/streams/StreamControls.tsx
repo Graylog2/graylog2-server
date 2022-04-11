@@ -25,6 +25,7 @@ import { IfPermitted } from 'components/common';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { StartpageStore } from 'stores/users/StartpageStore';
 import type { Stream } from 'stores/streams/StreamsStore';
+import { LinkContainer } from 'components/common/router';
 
 import StreamForm from './StreamForm';
 
@@ -87,9 +88,11 @@ const StreamControls = ({
         </IfPermitted>
         <HideOnCloud>
           <IfPermitted permissions="stream_outputs:read">
-            <MenuItem key={`manageOutputs-${stream.id}`} href={Routes.stream_outputs(stream.id)}>
-              Manage Outputs
-            </MenuItem>
+            <LinkContainer to={Routes.stream_outputs(stream.id)}>
+              <MenuItem key={`manageOutputs-${stream.id}`}>
+                Manage Outputs
+              </MenuItem>
+            </LinkContainer>
           </IfPermitted>
         </HideOnCloud>
         <MenuItem key={`setAsStartpage-${stream.id}`} onSelect={_setStartpage} disabled={user.read_only}>
