@@ -40,6 +40,7 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.rest.models.users.requests.ChangePasswordRequest;
+import org.graylog2.rest.models.users.requests.ChangeUserRequest;
 import org.graylog2.rest.models.users.requests.CreateUserRequest;
 import org.graylog2.rest.models.users.requests.PermissionEditRequest;
 import org.graylog2.rest.models.users.requests.Startpage;
@@ -58,7 +59,6 @@ import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.MongoDbSession;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.shared.users.ChangeUserRequest;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserManagementService;
@@ -428,7 +428,7 @@ public class UsersResource extends RestResource {
             user.setServiceAccount(cr.isServiceAccount());
         }
 
-        userManagementService.update(user, cr);
+        userManagementService.update(user);
     }
 
     private void checkAdminRoleForServiceAccount(ChangeUserRequest cr, User user) {
