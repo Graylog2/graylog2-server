@@ -32,6 +32,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 
 public class MigrationHelpers {
@@ -86,10 +87,18 @@ public class MigrationHelpers {
     @Nullable
     public String ensureUser(String userName, String password, String firstName, String lastName, String email,
                              Set<String> expectedRoles) {
+        return ensureUser(userName, password, firstName, lastName, email, expectedRoles, false);
+    }
+
+    @Nullable
+    public String ensureUser(String userName, String password, String firstName, String lastName, String email,
+                             Set<String> expectedRoles, boolean isServiceAccount) {
         User previousUser = null;
         try {
             previousUser = userService.load(userName);
-            if (previousUser == null || !previousUser.getRoleIds().containsAll(expectedRoles)) {
+            if (previousUser == null
+                    || !previousUser.getRoleIds().containsAll(expectedRoles)
+                    || !Objects.equals(isServiceAccount, previousUser.isServiceAccount())) {
                 final String msg = "Invalid user '" + userName + "', fixing it.";
                 LOG.error(msg);
                 throw new IllegalArgumentException(msg);
@@ -100,6 +109,7 @@ public class MigrationHelpers {
             if (previousUser != null) {
                 fixedUser = previousUser;
                 fixedUser.setRoleIds(expectedRoles);
+                fixedUser.setServiceAccount(isServiceAccount);
             } else {
                 fixedUser = userService.create();
                 fixedUser.setName(userName);
@@ -109,6 +119,7 @@ public class MigrationHelpers {
                 fixedUser.setPermissions(Collections.emptyList());
                 fixedUser.setRoleIds(expectedRoles);
                 fixedUser.setTimeZone(DateTimeZone.UTC);
+                fixedUser.setServiceAccount(isServiceAccount);
             }
             try {
                 return userService.save(fixedUser);
