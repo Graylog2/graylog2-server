@@ -30,6 +30,7 @@ import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.RestTools;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
 import org.graylog2.rest.models.system.sessions.responses.SessionValidationResponse;
@@ -80,6 +81,8 @@ public class SessionsResource extends RestResource {
     private final ActorAwareAuthenticationTokenFactory tokenFactory;
     private final SessionResponseFactory sessionResponseFactory;
 
+    private static final String USERNAME = "username";
+
     @Inject
     public SessionsResource(UserService userService, DefaultSecurityManager securityManager,
             ShiroAuthenticationFilter authenticationFilter, @Named("trusted_proxies") Set<IpSubnet> trustedSubnets,
@@ -107,6 +110,8 @@ public class SessionsResource extends RestResource {
                                               required = true)
                                       @NotNull JsonNode createRequest) {
 
+        rejectServiceAccount(createRequest);
+
         final SecurityContext securityContext = requestContext.getSecurityContext();
         if (!(securityContext instanceof ShiroSecurityContext)) {
             throw new InternalServerErrorException("Unsupported SecurityContext class, this is a bug!");
@@ -129,6 +134,15 @@ public class SessionsResource extends RestResource {
             return sessionResponseFactory.forSession(session.get());
         } else {
             throw new NotAuthorizedException("Invalid credentials.", "Basic realm=\"Graylog Server session\"");
+        }
+    }
+
+    private void rejectServiceAccount(JsonNode createRequest) {
+        if (createRequest.has(USERNAME)) {
+            final User user = userService.load(createRequest.get(USERNAME).asText());
+            if ((user != null) && user.isServiceAccount()) {
+                throw new BadRequestException("Cannot login with service account " + user.getName());
+            }
         }
     }
 

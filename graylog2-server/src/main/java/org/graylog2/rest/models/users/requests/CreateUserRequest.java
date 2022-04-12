@@ -33,6 +33,7 @@ import java.util.List;
 @AutoValue
 @WithBeanGetter
 public abstract class CreateUserRequest {
+
     @JsonProperty
     public abstract String username();
 
@@ -64,6 +65,9 @@ public abstract class CreateUserRequest {
     @Nullable
     public abstract List<String> roles();
 
+    @JsonProperty
+    public abstract boolean isServiceAccount();
+
     @JsonCreator
     public static CreateUserRequest create(@JsonProperty("username") @NotEmpty String username,
                                            @JsonProperty("password") @NotEmpty String password,
@@ -73,7 +77,10 @@ public abstract class CreateUserRequest {
                                            @JsonProperty("timezone") @Nullable String timezone,
                                            @JsonProperty("session_timeout_ms") @Nullable @Min(1) Long sessionTimeoutMs,
                                            @JsonProperty("startpage") @Nullable Startpage startpage,
-                                           @JsonProperty("roles") @Nullable List<String> roles) {
-        return new AutoValue_CreateUserRequest(username, password, email, fullName, permissions, timezone, sessionTimeoutMs, startpage, roles);
+                                           @JsonProperty("roles") @Nullable List<String> roles,
+                                           @JsonProperty("service_account") @Nullable Boolean isServiceAccount) {
+        return new AutoValue_CreateUserRequest(username, password, email, fullName,
+                                               permissions, timezone, sessionTimeoutMs, startpage, roles,
+                isServiceAccount != null && isServiceAccount);
     }
 }

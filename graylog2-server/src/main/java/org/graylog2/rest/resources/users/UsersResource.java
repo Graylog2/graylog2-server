@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
@@ -51,6 +52,7 @@ import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.RoleService;
+import org.graylog2.users.RoleServiceImpl;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +76,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -91,6 +94,7 @@ import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENLIST;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
+import static org.graylog2.users.RoleServiceImpl.ADMIN_ROLENAME;
 
 @RequiresAuthentication
 @Path("/users")
@@ -98,7 +102,7 @@ import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
 @Produces(MediaType.APPLICATION_JSON)
 @Api(value = "Users", description = "User accounts")
 public class UsersResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UsersResource.class);
 
     private final UserService userService;
     private final AccessTokenService accessTokenService;
@@ -185,6 +189,9 @@ public class UsersResource extends RestResource {
             LOG.error(msg);
             throw new BadRequestException(msg);
         }
+        if (rolesContainAdmin(cr.roles()) && cr.isServiceAccount()) {
+            throw new BadRequestException("Cannot assign Admin role to service account");
+        }
 
         // Create user.
         User user = userService.create();
@@ -194,6 +201,7 @@ public class UsersResource extends RestResource {
         user.setEmail(cr.email());
         user.setPermissions(cr.permissions());
         setUserRoles(cr.roles(), user);
+        user.setServiceAccount(cr.isServiceAccount());
 
         if (cr.timezone() != null) {
             user.setTimeZone(cr.timezone());
@@ -263,6 +271,7 @@ public class UsersResource extends RestResource {
         }
 
         if (isPermitted(USERS_ROLESEDIT, user.getName())) {
+            checkAdminRoleForServiceAccount(cr, user);
             setUserRoles(cr.roles(), user);
         }
 
@@ -293,7 +302,26 @@ public class UsersResource extends RestResource {
                 user.setSessionTimeoutMs(sessionTimeoutMs);
             }
         }
+        if (cr.isServiceAccount() != null) {
+            user.setServiceAccount(cr.isServiceAccount());
+        }
+
         userService.save(user);
+    }
+
+    private boolean rolesContainAdmin(List<String> roles) {
+        return roles != null && roles.stream().anyMatch(RoleServiceImpl.ADMIN_ROLENAME::equalsIgnoreCase);
+    }
+
+    private void checkAdminRoleForServiceAccount(ChangeUserRequest cr, User user) {
+        if (user.isServiceAccount() && rolesContainAdmin(cr.roles())) {
+            throw new BadRequestException("Cannot assign Admin role to service account");
+        }
+        if (cr.isServiceAccount() != null && cr.isServiceAccount()) {
+            if (user.getRoleIds().contains(roleService.getAdminRoleObjectId())) {
+                throw new BadRequestException("Cannot make Admin into service account");
+            }
+        }
     }
 
     @DELETE
@@ -546,7 +574,8 @@ public class UsersResource extends RestResource {
                 roleNames,
                 sessionActive,
                 lastActivity,
-                clientAddress
+                clientAddress,
+                user.isServiceAccount()
         );
     }
 

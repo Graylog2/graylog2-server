@@ -87,6 +87,7 @@ public class UserImpl extends PersistedImpl implements User {
     public static final String SESSION_TIMEOUT = "session_timeout_ms";
     public static final String STARTPAGE = "startpage";
     public static final String ROLES = "roles";
+    public static final String SERVICE_ACCOUNT = "service_account";
 
     public static final int MAX_USERNAME_LENGTH = 100;
     public static final int MAX_EMAIL_LENGTH = 254;
@@ -165,7 +166,7 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public List<String> getPermissions() {
-        final Set<String> permissionSet = new HashSet<>(this.permissions.userSelfEditPermissions(getName()));
+        final Set<String> permissionSet = isServiceAccount() ? new HashSet<>() : new HashSet<>(this.permissions.userSelfEditPermissions(getName()));
         @SuppressWarnings("unchecked")
         final List<String> permissions = (List<String>) fields.get(PERMISSIONS);
         if (permissions != null) {
@@ -328,6 +329,16 @@ public class UserImpl extends PersistedImpl implements User {
             startpageMap.put("id", startpage.id());
         }
         this.fields.put(STARTPAGE, startpageMap);
+    }
+
+    @Override
+    public boolean isServiceAccount()  {
+        return Boolean.valueOf(String.valueOf(fields.get(SERVICE_ACCOUNT)));
+    }
+
+    @Override
+    public void setServiceAccount(final boolean isServiceAccount) {
+        fields.put(SERVICE_ACCOUNT, isServiceAccount);
     }
 
     public static class LocalAdminUser extends UserImpl {

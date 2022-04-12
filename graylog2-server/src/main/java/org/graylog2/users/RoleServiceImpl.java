@@ -57,7 +57,7 @@ public class RoleServiceImpl implements RoleService {
     private static final String NAME_LOWER = "name_lower";
     private static final String READ_ONLY = "read_only";
 
-    private static final String ADMIN_ROLENAME = "Admin";
+    public static final String ADMIN_ROLENAME = "Admin";
     private static final String READER_ROLENAME = "Reader";
 
     private final JacksonDBCollection<RoleImpl, ObjectId> dbCollection;
