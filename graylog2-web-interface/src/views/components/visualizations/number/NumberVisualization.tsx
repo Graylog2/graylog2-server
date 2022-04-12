@@ -56,12 +56,8 @@ const SingleItemGrid = styled.div`
 `;
 
 const NumberBox = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
   height: 100%;
   width: 100%;
-  text-align: center;
   padding-bottom: 10px;
 `;
 
@@ -125,7 +121,7 @@ const NumberVisualization = ({ config, currentView, fields, data }: Props) => {
       <NumberBox>
         <SizeMe monitorHeight monitorWidth>
           {({ size }) => (
-            <AutoFontSizer height={size.height} width={size.width}>
+            <AutoFontSizer height={size.height} width={size.width} center>
               <CustomHighlighting field={field} value={value}>
                 <Value field={field}
                        type={fieldTypeFor(field, fields)}
