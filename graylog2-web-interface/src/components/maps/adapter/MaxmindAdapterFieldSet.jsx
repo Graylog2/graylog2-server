@@ -88,7 +88,7 @@ class MaxmindAdapterFieldSet extends React.Component {
                   value={config.database_type} />
         </Input>
         <TimeUnitInput label="Refresh file"
-                       help={'If enabled, the database file is checked for modifications and refreshed when it changed on disk.'}
+                       help="If enabled, the database file is checked for modifications and refreshed when it changed on disk."
                        update={this.updateCheckInterval}
                        value={config.check_interval}
                        unit={config.check_interval_unit || 'MINUTES'}
