@@ -14,21 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.validation;
+package org.graylog2.shared.bindings.providers;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.queryparser.classic.QueryParser;
+import javax.inject.Provider;
 
-import java.util.List;
+public class IsDevelopmentServerProvider implements Provider<Boolean> {
+    private final boolean isDevelopmentServer;
 
-public class TermCollectingQueryParser extends QueryParser {
-
-    public TermCollectingQueryParser(String defaultFieldName, Analyzer analyzer) {
-        super(new CollectingQueryParserTokenManager(defaultFieldName, analyzer));
-        init(defaultFieldName, analyzer);
+    public IsDevelopmentServerProvider() {
+        final String development = System.getenv("DEVELOPMENT");
+        this.isDevelopmentServer = !(development == null || development.equalsIgnoreCase("false"));
     }
 
-    public List<ImmutableToken> getTokens() {
-        return ((CollectingQueryParserTokenManager) super.token_source).getTokens();
+    @Override
+    public Boolean get() {
+        return this.isDevelopmentServer;
     }
 }

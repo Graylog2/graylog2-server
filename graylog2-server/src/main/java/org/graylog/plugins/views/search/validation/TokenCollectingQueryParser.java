@@ -16,12 +16,19 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-public enum ValidationType {
-    UNDECLARED_PARAMETER,
-    EMPTY_PARAMETER,
-    QUERY_PARSING_ERROR,
-    UNKNOWN_FIELD,
-    INVALID_OPERATOR,
-    MISSING_LICENSE,
-    INVALID_VALUE_TYPE,
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.queryparser.classic.QueryParser;
+
+import java.util.List;
+
+public class TokenCollectingQueryParser extends QueryParser {
+
+    public TokenCollectingQueryParser(String defaultFieldName, Analyzer analyzer) {
+        super(new CollectingQueryParserTokenManager(defaultFieldName, analyzer));
+        init(defaultFieldName, analyzer);
+    }
+
+    public List<ImmutableToken> getTokens() {
+        return ((CollectingQueryParserTokenManager) super.token_source).getTokens();
+    }
 }

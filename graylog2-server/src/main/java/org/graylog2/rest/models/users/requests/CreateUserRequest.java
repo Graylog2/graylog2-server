@@ -68,6 +68,9 @@ public abstract class CreateUserRequest {
     @Nullable
     public abstract List<String> roles();
 
+    @JsonProperty
+    public abstract boolean isServiceAccount();
+
     @JsonCreator
     public static CreateUserRequest create(@JsonProperty("username") @NotEmpty String username,
                                            @JsonProperty("password") @NotEmpty String password,
@@ -78,8 +81,10 @@ public abstract class CreateUserRequest {
                                            @JsonProperty("timezone") @Nullable String timezone,
                                            @JsonProperty("session_timeout_ms") @Nullable @Min(1) Long sessionTimeoutMs,
                                            @JsonProperty("startpage") @Nullable Startpage startpage,
-                                           @JsonProperty("roles") @Nullable List<String> roles) {
+                                           @JsonProperty("roles") @Nullable List<String> roles,
+                                           @JsonProperty("service_account") @Nullable Boolean isServiceAccount) {
         return new AutoValue_CreateUserRequest(username, password, email, firstName, lastName,
-                                               permissions, timezone, sessionTimeoutMs, startpage, roles);
+                                               permissions, timezone, sessionTimeoutMs, startpage, roles,
+                isServiceAccount != null && isServiceAccount);
     }
 }

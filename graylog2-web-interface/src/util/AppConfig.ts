@@ -18,7 +18,6 @@ import * as Immutable from 'immutable';
 
 declare global {
   const DEVELOPMENT: boolean | undefined;
-  const GRAYLOG_API_URL: string | undefined;
   const FEATURES: string | undefined;
   const IS_CLOUD: boolean | undefined;
 }
@@ -52,12 +51,6 @@ const getEnabledFeatures = () => {
 const AppConfig = {
   features: getEnabledFeatures(),
   gl2ServerUrl() {
-    if (typeof (GRAYLOG_API_URL) !== 'undefined') {
-      // The GRAYLOG_API_URL variable will be set by webpack via the DefinePlugin.
-      // eslint-disable-next-line no-undef
-      return GRAYLOG_API_URL;
-    }
-
     return appConfig().gl2ServerUrl;
   },
 

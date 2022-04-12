@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.validation;
 
 import com.google.auto.value.AutoValue;
+import org.apache.lucene.queryparser.classic.QueryParserConstants;
 
 @AutoValue
 public abstract class ImmutableToken {
@@ -53,5 +54,10 @@ public abstract class ImmutableToken {
 
     public boolean matches(int tokenType, String tokenValue) {
         return kind() == tokenType && image().equals(tokenValue);
+    }
+
+
+    public boolean isInvalidOperator() {
+        return kind() == QueryParserConstants.TERM && ("and".equals(image()) || "or".equals(image()) || "not".equals(image()));
     }
 }

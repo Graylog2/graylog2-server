@@ -28,14 +28,19 @@ import org.graylog.plugins.views.search.errors.MissingEnterpriseLicenseException
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.errors.UnboundParameterError;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog.plugins.views.search.validation.fields.UnknownFieldsIdentifier;
+import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -47,12 +52,20 @@ public class QueryValidationServiceImpl implements QueryValidationService {
     private final LuceneQueryParser luceneQueryParser;
     private final MappedFieldTypesService mappedFieldTypesService;
     private final QueryStringDecorators queryStringDecorators;
+    private final FieldTypeValidation fieldTypeValidation;
+    private final UnknownFieldsIdentifier unknownFieldsIdentifier;
 
     @Inject
-    public QueryValidationServiceImpl(LuceneQueryParser luceneQueryParser, MappedFieldTypesService mappedFieldTypesService, QueryStringDecorators queryStringDecorators) {
+    public QueryValidationServiceImpl(LuceneQueryParser luceneQueryParser,
+                                      MappedFieldTypesService mappedFieldTypesService,
+                                      QueryStringDecorators queryStringDecorators,
+                                      FieldTypeValidation fieldTypeValidation,
+                                      UnknownFieldsIdentifier unknownFieldsIdentifier) {
         this.luceneQueryParser = luceneQueryParser;
         this.mappedFieldTypesService = mappedFieldTypesService;
         this.queryStringDecorators = queryStringDecorators;
+        this.fieldTypeValidation = fieldTypeValidation;
+        this.unknownFieldsIdentifier = unknownFieldsIdentifier;
     }
 
     @Override
@@ -65,9 +78,9 @@ public class QueryValidationServiceImpl implements QueryValidationService {
             return ValidationResponse.ok();
         }
 
+        String decorated;
         try {
-            // but we want to trigger the decorators as well, because they may trigger additional exceptions
-            decoratedQuery(req);
+            decorated = decoratedQuery(req);
         } catch (SearchException searchException) {
             return convert(searchException);
         } catch (MissingEnterpriseLicenseException licenseException) {
@@ -81,9 +94,12 @@ public class QueryValidationServiceImpl implements QueryValidationService {
 
         try {
             final ParsedQuery parsedQuery = luceneQueryParser.parse(rawQuery);
-            final List<ParsedTerm> unknownFields = getUnknownFields(req, parsedQuery);
-            final List<ParsedTerm> invalidOperators = parsedQuery.invalidOperators();
-            final List<ValidationMessage> explanations = getExplanations(unknownFields, invalidOperators);
+            Set<MappedFieldTypeDTO> availableFields = mappedFieldTypesService.fieldTypesByStreamIds(req.streams(), req.timerange());
+            final List<ParsedTerm> unknownFields = unknownFieldsIdentifier.identifyUnknownFields(req, parsedQuery.terms());
+
+            final List<ValidationMessage> explanations = getExplanations(unknownFields);
+            explanations.addAll(invalidOperators(parsedQuery.invalidOperators()));
+            explanations.addAll(validateQueryValues(rawQuery, decorated, availableFields));
 
             return explanations.isEmpty()
                     ? ValidationResponse.ok()
@@ -92,6 +108,19 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         } catch (ParseException e) {
             return ValidationResponse.error(toExplanation(e));
         }
+    }
+
+    private List<ValidationMessage> invalidOperators(List<ImmutableToken> invalidOperators) {
+        return invalidOperators.stream().map(token -> {
+            final String errorMessage = String.format(Locale.ROOT, "Query contains invalid operator \"%s\". All AND / OR / NOT operators have to be written uppercase", token.image());
+            return ValidationMessage.builder(ValidationType.INVALID_OPERATOR)
+                    .errorMessage(errorMessage)
+                    .beginLine(token.beginLine())
+                    .beginColumn(token.beginColumn())
+                    .endLine(token.endLine())
+                    .endColumn(token.endColumn())
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     private ValidationResponse convert(SearchException searchException) {
@@ -135,10 +164,8 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         return Collections.singletonList(ValidationMessage.fromException(parseException));
     }
 
-    private List<ValidationMessage> getExplanations(List<ParsedTerm> unknownFields, List<ParsedTerm> invalidOperators) {
-
-
-        final Stream<ValidationMessage> unknownFieldsStream = unknownFields.stream().map(f -> {
+    private List<ValidationMessage> getExplanations(List<ParsedTerm> unknownFields) {
+         return unknownFields.stream().map(f -> {
             final ValidationMessage.Builder message = ValidationMessage.builder(ValidationType.UNKNOWN_FIELD)
                     .relatedProperty(f.getRealFieldName())
                     .errorMessage("Query contains unknown field: " + f.getRealFieldName());
@@ -151,36 +178,23 @@ public class QueryValidationServiceImpl implements QueryValidationService {
             });
 
             return message.build();
-        });
-
-        final Stream<ValidationMessage> invalidOperatorsStream = invalidOperators.stream()
-                .map(term -> {
-                    final String errorMessage = String.format(Locale.ROOT, "Query contains invalid operator \"%s\". All AND / OR / NOT operators have to be written uppercase", term.value());
-                    final ValidationMessage.Builder message = ValidationMessage.builder(ValidationType.INVALID_OPERATOR)
-                            .errorMessage(errorMessage);
-                    term.keyToken().ifPresent(t -> {
-                        message.beginLine(t.beginLine());
-                        message.beginColumn(t.beginColumn());
-                        message.endLine(t.endLine());
-                        message.endColumn(t.endColumn());
-                    });
-                    return message.build();
-                });
-
-        return Streams.concat(unknownFieldsStream, invalidOperatorsStream)
-                .distinct()
-                .collect(Collectors.toList());
+        }).collect(Collectors.toList());
     }
 
-    private List<ParsedTerm> getUnknownFields(ValidationRequest req, ParsedQuery query) {
-        final Set<String> availableFields = mappedFieldTypesService.fieldTypesByStreamIds(req.streams(), req.timerange())
-                .stream()
-                .map(MappedFieldTypeDTO::name)
-                .collect(Collectors.toSet());
+    private List<ValidationMessage> validateQueryValues(String rawQuery, String decorated, Set<MappedFieldTypeDTO> availableFields) throws ParseException {
+        final ParsedQuery parsedQuery = luceneQueryParser.parse(decorated);
+        final Map<String, MappedFieldTypeDTO> fields = availableFields.stream().collect(Collectors.toMap(MappedFieldTypeDTO::name, Function.identity()));
 
-        return query.terms().stream()
-                .filter(t -> !t.isDefaultField())
-                .filter(term -> !availableFields.contains(term.getRealFieldName()))
+        return parsedQuery.terms().stream()
+                .map(term -> {
+                    final MappedFieldTypeDTO fieldType = fields.get(term.getRealFieldName());
+                    final Optional<String> typeName = Optional.ofNullable(fieldType)
+                            .map(MappedFieldTypeDTO::type)
+                            .map(FieldTypes.Type::type);
+                    return typeName.flatMap(type -> fieldTypeValidation.validateFieldValueType(term, type));
+                })
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toList());
     }
 
