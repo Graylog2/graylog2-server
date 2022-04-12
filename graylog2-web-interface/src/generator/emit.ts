@@ -17,7 +17,7 @@
 import * as ts from 'typescript';
 import { chunk } from 'lodash';
 
-import { Api, Route, Operation, Parameter, Type, EnumType, TypeLiteral, Model } from 'generator/Api';
+import type { Api, Route, Operation, Parameter, Type, EnumType, TypeLiteral, Model } from 'generator/Api';
 
 const REQUEST_FUNCTION_NAME = '__request__';
 const REQUEST_FUNCTION_IMPORT = 'routing/request';
@@ -35,8 +35,10 @@ const typeMappings = {
 
 const emitNumberOrString = (type) => {
   switch (type) {
-    case 'number': return (number: unknown) => ts.factory.createNumericLiteral(number as number);
-    default: return (text: unknown) => ts.factory.createStringLiteral(text as string, true);
+    case 'number':
+      return (number: unknown) => ts.factory.createNumericLiteral(number as number);
+    default:
+      return (text: unknown) => ts.factory.createStringLiteral(text as string, true);
   }
 };
 
@@ -174,9 +176,12 @@ const emitInitializer = (type: Type, defaultValue: string) => {
 
   if (typeName && isBoolean(typeName)) {
     switch (defaultValue) {
-      case 'true': return ts.factory.createTrue();
-      case 'false': return ts.factory.createFalse();
-      default: throw new Error(`Invalid boolean value: ${defaultValue}`);
+      case 'true':
+        return ts.factory.createTrue();
+      case 'false':
+        return ts.factory.createFalse();
+      default:
+        throw new Error(`Invalid boolean value: ${defaultValue}`);
     }
   }
 
@@ -215,17 +220,27 @@ const assertUnreachable = (ignored: never, message: string): never => {
 
 function emitType(type: Type) {
   switch (type.type) {
-    case 'array': return ts.factory.createArrayTypeNode(emitType(type.items));
-    case 'enum': return emitEnumType(type);
-    case 'type_literal': return emitTypeLiteral(type);
-    case 'type_reference': return ts.factory.createTypeReferenceNode(type.name);
-    default: assertUnreachable(type, 'Unexpected type');
+    case 'array':
+      return ts.factory.createArrayTypeNode(emitType(type.items));
+    case 'enum':
+      return emitEnumType(type);
+    case 'type_literal':
+      return emitTypeLiteral(type);
+    case 'type_reference':
+      return ts.factory.createTypeReferenceNode(type.name);
+    default:
+      assertUnreachable(type, 'Unexpected type');
   }
 
   return undefined;
 }
 
-const emitFunctionParameter = ({ name, required, type, defaultValue }: Parameter) => ts.factory.createParameterDeclaration(
+const emitFunctionParameter = ({
+  name,
+  required,
+  type,
+  defaultValue,
+}: Parameter) => ts.factory.createParameterDeclaration(
   undefined,
   undefined,
   undefined,
@@ -249,7 +264,15 @@ const bannedFunctionNames = {
 
 const unbanFunctionname = (nickname: string): string => (Object.keys(bannedFunctionNames).includes(nickname) ? bannedFunctionNames[nickname] : nickname);
 
-const emitRoute = ({ nickname, parameters: rawParameters = [], method, type, path: operationPath, summary, produces }: Operation, path: string, assignedNames: Array<string>) => {
+const emitRoute = ({
+  nickname,
+  parameters: rawParameters = [],
+  method,
+  type,
+  path: operationPath,
+  summary,
+  produces,
+}: Operation, path: string, assignedNames: Array<string>) => {
   const parameters = rawParameters.map((parameter) => ({ ...parameter, name: cleanParameterName(parameter.name) }));
   const queryParameters = parameters.filter((parameter) => parameter.paramType === 'query');
   const bodyParameter = parameters.filter((parameter) => parameter.paramType === 'body');
