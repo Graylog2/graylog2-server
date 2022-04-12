@@ -75,6 +75,10 @@ public abstract class Query implements ContentPackable<QueryEntity> {
     @JsonProperty
     public abstract Filter filter();
 
+    @Nullable
+    @JsonProperty
+    public abstract Set<String> streams();
+
     @Nonnull
     @JsonProperty
     public abstract BackendQuery query();
@@ -159,6 +163,7 @@ public abstract class Query implements ContentPackable<QueryEntity> {
                 .timerange(EmptyTimeRange.emptyTimeRange())
                 .query(ElasticsearchQueryString.empty())
                 .filter(null)
+                .streams(Collections.emptySet())
                 .build();
     }
 
@@ -212,6 +217,9 @@ public abstract class Query implements ContentPackable<QueryEntity> {
 
         @JsonProperty
         public abstract Builder filter(Filter filter);
+
+        @JsonProperty
+        public abstract Builder streams(Set<String> streams);
 
         @JsonProperty
         public abstract Builder query(BackendQuery query);
