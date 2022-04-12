@@ -16,15 +16,18 @@
  */
 import * as React from 'react';
 import { trim } from 'lodash';
+import type * as Immutable from 'immutable';
 
 import connect from 'stores/connect';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
 import { getParameterBindingsAsMap } from 'views/logic/search/SearchExecutionState';
 import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import type { SearchesConfig } from 'components/search/SearchConfig';
+import type Parameter from 'views/logic/parameters/Parameter';
 
-const _disableSearch = (undeclaredParameters, parameterBindings, usedParameters) => {
+const _disableSearch = (_undeclaredParameters: Immutable.Set<string>, parameterBindings: ParameterBindings, usedParameters: Immutable.Set<Parameter>) => {
   const bindingsMap = getParameterBindingsAsMap(parameterBindings);
   const missingValues = usedParameters.filter((param) => (param.needsBinding && !param.optional)).map((p) => bindingsMap.get(p.name)).filter((value) => !trim(value));
 

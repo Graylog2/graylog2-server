@@ -88,7 +88,7 @@ const setUpServer = () => {
     res.status(401).end();
   });
 
-  app.get('/simulatesUnauthorized', (req, res) => {
+  app.get('/simulatesUnauthorized', (_req, res) => {
     res.status(403).end();
   });
 
