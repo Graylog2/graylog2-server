@@ -91,6 +91,7 @@ class BootstrapModalForm extends React.Component {
     const { onSubmitForm } = this.props;
 
     if (typeof onSubmitForm === 'function') {
+      event.preventDefault();
       onSubmitForm(event);
     }
   };
@@ -135,9 +136,7 @@ class BootstrapModalForm extends React.Component {
           </Modal.Body>
           <Modal.Footer>
             <Button type="button" onClick={this.onModalCancel}>{cancelButtonText}</Button>
-            {/* We are not using type=submit here, because when this form is being rendered inside another form */}
-            {/* the submit button can influence the parent form, even though this form is in a portal */}
-            <Button type="button" onClick={this.submit} disabled={submitButtonDisabled} bsStyle="primary">{submitButtonText}</Button>
+            <Button type="submit" disabled={submitButtonDisabled} bsStyle="primary">{submitButtonText}</Button>
           </Modal.Footer>
         </form>
       </BootstrapModalWrapper>
