@@ -38,13 +38,17 @@ const PluggableSearchBarControls = () => {
   const leftControls = searchBarControls.filter(({ placement }) => placement === 'left');
   const rightControls = searchBarControls.filter(({ placement }) => placement === 'right');
   const renderControls = (controls: Array<SearchBarControl>) => controls?.map(({ component: ControlComponent, id }) => <ControlComponent key={id} />);
+  const hasEnterpriseSearchFilters = searchBarControls.find((control) => control.id === 'search-filters');
 
   return (
     // eslint-disable-next-line react/jsx-no-useless-fragment
     <Container>
       <LeftCol>
         {hasSearchFilterFeature && (
-          leftControls?.length ? renderControls(leftControls) : <SearchFilterBanner />
+          <>
+            {renderControls(leftControls)}
+            {!hasEnterpriseSearchFilters && <SearchFilterBanner />}
+          </>
         )}
       </LeftCol>
       <div>{renderControls(rightControls)}</div>
