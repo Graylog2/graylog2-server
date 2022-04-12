@@ -16,11 +16,15 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useMemo, useState } from 'react';
 
 import usePluginEntities from 'views/logic/usePluginEntities';
 import SearchFilterBanner from 'views/components/searchbar/SearchFilterBanner';
 import useFeature from 'hooks/useFeature';
 import type { SearchBarControl } from 'views/types';
+import Store from 'logic/local-storage/Store';
+
+const LOCAL_STORAGE_ITEM = 'search_filter_preview_viewed';
 
 const Container = styled.div`
   display: flex;
@@ -33,21 +37,25 @@ const LeftCol = styled.div`
 `;
 
 const PluggableSearchBarControls = () => {
+  const [isBannerHidden, setIsBannerHidden] = useState(Store.get(LOCAL_STORAGE_ITEM));
   const searchBarControls = usePluginEntities('views.components.searchBar');
   const hasSearchFilterFeature = useFeature('search_filter');
-  const leftControls = searchBarControls.filter(({ placement }) => placement === 'left');
-  const rightControls = searchBarControls.filter(({ placement }) => placement === 'right');
+  const existingControls = searchBarControls.map((controlFn) => controlFn()).filter((control) => !!control);
+  const leftControls = existingControls.filter(({ placement }) => placement === 'left');
+  const rightControls = existingControls.filter(({ placement }) => placement === 'right');
   const renderControls = (controls: Array<SearchBarControl>) => controls?.map(({ component: ControlComponent, id }) => <ControlComponent key={id} />);
-  const hasEnterpriseSearchFilters = searchBarControls.find((control) => control.id === 'search-filters');
+  const hasEnterpriseSearchFilters = existingControls.find((control) => control.id === 'search-filters');
+  const shouldRenderContainer = useMemo(() => (
+    (hasEnterpriseSearchFilters || !isBannerHidden) && hasSearchFilterFeature
+  ), [hasEnterpriseSearchFilters, isBannerHidden, hasSearchFilterFeature]);
 
-  return (
-    // eslint-disable-next-line react/jsx-no-useless-fragment
+  return shouldRenderContainer && (
     <Container>
       <LeftCol>
         {hasSearchFilterFeature && (
           <>
             {renderControls(leftControls)}
-            {!hasEnterpriseSearchFilters && <SearchFilterBanner />}
+            {!hasEnterpriseSearchFilters && <SearchFilterBanner setHidden={setIsBannerHidden} />}
           </>
         )}
       </LeftCol>

@@ -16,7 +16,7 @@
  */
 
 import type { Dispatch } from 'react';
-import React, { useState } from 'react';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Col, Button, ControlLabel, ButtonGroup, Popover } from 'components/bootstrap';
@@ -69,30 +69,25 @@ const PopoverHelp = ({ setHidden }: { setHidden: Dispatch<boolean> }) => {
   );
 };
 
-const SearchFilterBanner = () => {
-  const [hidden, setHidden] = useState(false);
-  if ((Store.get(LOCAL_STORAGE_ITEM) || hidden)) return null;
-
-  return (
-    <Container>
-      <Col>
-        <StyledControlLabel>
-          Filters
-        </StyledControlLabel>
-        <ButtonGroup>
-          <Button disabled bsSize="small">
-            <Icon name="plus" />
-          </Button>
-          <Button disabled bsSize="small">
-            <Icon name="folder" />
-          </Button>
-        </ButtonGroup>
-      </Col>
-      <Col>
-        <PopoverHelp setHidden={setHidden} />
-      </Col>
-    </Container>
-  );
-};
+const SearchFilterBanner = ({ setHidden }: { setHidden: Dispatch<boolean>}) => (
+  <Container>
+    <Col>
+      <StyledControlLabel>
+        Filters
+      </StyledControlLabel>
+      <ButtonGroup>
+        <Button disabled bsSize="small">
+          <Icon name="plus" />
+        </Button>
+        <Button disabled bsSize="small">
+          <Icon name="folder" />
+        </Button>
+      </ButtonGroup>
+    </Col>
+    <Col>
+      <PopoverHelp setHidden={setHidden} />
+    </Col>
+  </Container>
+);
 
 export default SearchFilterBanner;
