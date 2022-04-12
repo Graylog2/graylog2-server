@@ -73,11 +73,9 @@ class LuceneQueryParserTest {
     void unknownTerm() throws ParseException {
         final ParsedQuery query = parser.parse("foo:bar and");
         assertThat(query.allFieldNames()).contains("foo");
-        assertThat(query.invalidOperators().stream().map(ParsedTerm::value).collect(Collectors.toSet())).contains("and");
+        assertThat(query.invalidOperators().stream().map(ImmutableToken::image).collect(Collectors.toSet())).contains("and");
 
-        final ParsedTerm term = query.invalidOperators().iterator().next();
-        assertThat(term.keyToken()).isPresent();
-        final ImmutableToken token = term.keyToken().get();
+        final ImmutableToken token = query.invalidOperators().iterator().next();
         assertThat(token.beginColumn()).isEqualTo(8);
         assertThat(token.beginLine()).isEqualTo(1);
         assertThat(token.endColumn()).isEqualTo(11);
@@ -94,15 +92,15 @@ class LuceneQueryParserTest {
         {
             final ParsedQuery queryWithAnd = parser.parse("foo:bar and");
             assertThat(queryWithAnd.invalidOperators()).isNotEmpty();
-            final ParsedTerm invalidOperator = queryWithAnd.invalidOperators().iterator().next();
-            assertThat(invalidOperator.value()).isEqualTo("and");
+            final ImmutableToken invalidOperator = queryWithAnd.invalidOperators().iterator().next();
+            assertThat(invalidOperator.image()).isEqualTo("and");
         }
 
         {
             final ParsedQuery queryWithOr = parser.parse("foo:bar or");
             assertThat(queryWithOr.invalidOperators()).isNotEmpty();
-            final ParsedTerm invalidOperator = queryWithOr.invalidOperators().iterator().next();
-            assertThat(invalidOperator.value()).isEqualTo("or");
+            final ImmutableToken invalidOperator = queryWithOr.invalidOperators().iterator().next();
+            assertThat(invalidOperator.image()).isEqualTo("or");
         }
     }
 
@@ -136,9 +134,8 @@ class LuceneQueryParserTest {
     void testLongStringOfInvalidTokens() throws ParseException {
         final ParsedQuery query = parser.parse("and and and or or or");
         assertThat(query.invalidOperators().size()).isEqualTo(6);
-        assertThat(query.invalidOperators().stream().allMatch(op -> op.keyToken().isPresent())).isTrue();
-        assertThat(query.invalidOperators().stream().allMatch(op -> {
-            final String tokenValue = op.keyToken().map(ImmutableToken::image).get();
+        assertThat(query.invalidOperators().stream().allMatch(token -> {
+            final String tokenValue = token.image();
             return tokenValue.equals("or") || tokenValue.equals("and");
         })).isTrue();
     }
