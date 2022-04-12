@@ -17,7 +17,7 @@
 /* eslint-disable no-console */
 import fs from 'fs';
 
-import { Model, Api, Route, Operation, Parameter, Type } from 'generator/Api';
+import type { Model, Api, Route, Operation, Parameter, Type } from 'generator/Api';
 
 const apiFile = '/api.json';
 
@@ -212,13 +212,25 @@ function mergeValues(enumValues: Array<string>, defaultValue: string) {
   return [...new Set(enumValues).add(defaultValue)];
 }
 
-function createParameter({ name, description, paramType, type, required, defaultValue, enum: enumValues }: RawParameter): Parameter {
+function createParameter({
+  name,
+  description,
+  paramType,
+  type,
+  required,
+  defaultValue,
+  enum: enumValues,
+}: RawParameter): Parameter {
   let parameter: Parameter = {
     name,
     description,
     paramType,
     required,
-    type: createType(typeof type === 'string' ? { type: type as Primitives, enum: mergeValues(enumValues, defaultValue), defaultValue } : type),
+    type: createType(typeof type === 'string' ? {
+      type: type as Primitives,
+      enum: mergeValues(enumValues, defaultValue),
+      defaultValue,
+    } : type),
   };
 
   if (defaultValue !== undefined) {
