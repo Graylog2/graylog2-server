@@ -1,8 +1,8 @@
-name: Fix linter hints
+name: Updating yarn lockfile
 
 on:
   schedule:
-    - cron: '0 */8 * * *'
+    - cron: '0 */12 * * *'
 
 jobs:
   build:
@@ -22,18 +22,13 @@ jobs:
           path: ~/.cache/yarn
       - name: Install dependencies
         run: yarn install
-      - name: Resetting lockfile
-        run: git checkout yarn.lock
-      - name: Run lint --fix
-        continue-on-error: true
-        run: yarn lint --fix
       - name: Create/Update Pull Request
         uses: Graylog2/create-pull-request@7380612b49221684fefa025244f2ef4008ae50ad
         with:
-          title: Fixing linter hints automatically
-          body: This PR was created by a job that is running periodically to find and fix linter hints.
-          author: Dr. Lint-a-lot <garybot2@graylog.com>
-          branch: fix/linter-hints
-          committer: Dr. Lint-a-lot <garybot2@graylog.com>
-          commit-message: Running lint --fix
+          title: Updating yarn lockfile
+          body: This PR was created by a job that is running periodically to update the yarn lockfile after transitive dependencies have been updated.
+          author: Gary Bot <garybot2@graylog.com>
+          branch: update-yarn-lockfile
+          committer: Gary Bot <garybot2@graylog.com>
+          commit-message: Updating yarn lockfile
           delete-branch: true
