@@ -32,10 +32,6 @@ const Container = styled.div`
   justify-content: space-between;
 `;
 
-const LeftCol = styled.div`
-  flex-grow: 1;
-`;
-
 const PluggableSearchBarControls = () => {
   const [isBannerHidden, setIsBannerHidden] = useState(Store.get(LOCAL_STORAGE_ITEM));
   const searchBarControls = usePluginEntities('views.components.searchBar');
@@ -51,14 +47,14 @@ const PluggableSearchBarControls = () => {
 
   return shouldRenderContainer && (
     <Container>
-      <LeftCol>
+      <div>
         {hasSearchFilterFeature && (
           <>
             {renderControls(leftControls)}
             {!hasEnterpriseSearchFilters && <SearchFilterBanner setHidden={setIsBannerHidden} />}
           </>
         )}
-      </LeftCol>
+      </div>
       <div>{renderControls(rightControls)}</div>
     </Container>
   );
