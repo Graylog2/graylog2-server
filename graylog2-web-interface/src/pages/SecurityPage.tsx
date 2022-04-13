@@ -18,15 +18,20 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { IfPermitted, PageHeader } from 'components/common';
+import { IfPermitted } from 'components/common';
 import { Alert } from 'components/bootstrap';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
 
+const StyledH2 = styled.h2`
+  font-weight: bold;
+  margin-bottom: 15px;
+`;
+
 const StyledH4 = styled.h4`
   font-weight: bold;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 `;
 
 const StyledAlert = styled(Alert)`
@@ -35,25 +40,36 @@ const StyledAlert = styled(Alert)`
 
 const isCloud = AppConfig.isCloud();
 
+const LinkTo = () => {
+  if (Routes.pluginRoute('SYSTEM_LICENSES', false)) {
+    return (
+      <IfPermitted permissions="licenses:create">
+        <p>
+          See <Link to={Routes.pluginRoute('SYSTEM_LICENSES')}>Licenses page</Link> for details.
+        </p>
+      </IfPermitted>
+    );
+  }
+
+  return (
+    <p>
+      Please see <a href="https://www.graylog.org/products/enterprise" rel="noopener noreferrer" target="_blank">our product page</a> for details.
+    </p>
+  );
+};
+
 const SecurityPage = () => {
   return (
-    <PageHeader title="Invalid License for Analyst Tools">
-      <StyledAlert bsStyle="danger" className="tm">
-        <StyledH4>Analyst Tools are disabled</StyledH4>
-        <p>
-          Analyst Tools are disabled because a valid Graylog for Security license was not found.
-        </p>
-        {isCloud
-          ? (<>Contact your Graylog account manager.</>)
-          : (
-            <IfPermitted permissions="licenses:create">
-              <p>
-                See <Link to={Routes.pluginRoute('SYSTEM_LICENSES')}>Licenses page</Link> for details.
-              </p>
-            </IfPermitted>
-          )}
-      </StyledAlert>
-    </PageHeader>
+    <StyledAlert bsStyle="danger" className="tm">
+      <StyledH2>Invalid License for Analyst Tools</StyledH2>
+      <StyledH4>Analyst Tools are disabled</StyledH4>
+      <p>
+        Analyst Tools are disabled because a valid Graylog for Security license was not found{Routes.pluginRoute('SYSTEM_LICENSES', false) ? '' : ' and the enterprise plugin is not installed'}.
+      </p>
+      {isCloud
+        ? (<>Contact your Graylog account manager.</>)
+        : (<LinkTo />)}
+    </StyledAlert>
   );
 };
 
