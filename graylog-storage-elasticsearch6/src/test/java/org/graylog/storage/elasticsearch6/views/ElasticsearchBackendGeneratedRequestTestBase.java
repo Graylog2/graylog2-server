@@ -55,6 +55,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -93,7 +94,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
         this.elasticsearchBackend = new ElasticsearchBackend(elasticSearchTypeHandlers,
                 jestClient,
                 indexLookup,
-                new QueryStringDecorators(Collections.emptySet()),
+                new QueryStringDecorators(Optional.empty()),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 false, objectMapper);
     }

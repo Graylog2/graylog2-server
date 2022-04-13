@@ -33,7 +33,7 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.validation.LuceneQueryParser;
 import org.graylog.plugins.views.search.validation.QueryValidationService;
 import org.graylog.plugins.views.search.validation.QueryValidationServiceImpl;
-import org.graylog.plugins.views.search.validation.fields.UnknownFieldsValidator;
+import org.graylog.plugins.views.search.validation.fields.UnknownFieldsIdentifier;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
@@ -84,8 +84,8 @@ public class MessagesResourceTest {
         final QueryValidationServiceImpl validationService = new QueryValidationServiceImpl(
                 new LuceneQueryParser(),
                 mappedFieldTypesService,
-                new QueryStringDecorators(Collections.emptySet()), (t, detectedFieldType) -> Optional.empty(),
-                new UnknownFieldsValidator());
+                new QueryStringDecorators(Optional.empty()), (t, detectedFieldType) -> Optional.empty(),
+                new UnknownFieldsIdentifier(mappedFieldTypesService));
 
         sut = new MessagesTestResource(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, mock(ObjectMapper.class), eventBus, validationService);
 

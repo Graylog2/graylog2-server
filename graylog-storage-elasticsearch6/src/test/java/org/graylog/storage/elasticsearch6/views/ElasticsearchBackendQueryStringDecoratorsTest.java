@@ -55,13 +55,12 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
     @BeforeEach
     void setUp() {
         final QueryStringDecorator decorator = (queryString, job, query) -> PositionTrackingQuery.of("decorated");
-        final Set<QueryStringDecorator> decorators = Collections.singleton(decorator);
         final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
         this.backend = new ElasticsearchBackend(
                 Collections.emptyMap(),
                 mock(JestClient.class),
                 mock(IndexLookup.class),
-                new QueryStringDecorators(decorators),
+                new QueryStringDecorators(Optional.of(decorator)),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 true,
                 new ObjectMapperProvider().get());

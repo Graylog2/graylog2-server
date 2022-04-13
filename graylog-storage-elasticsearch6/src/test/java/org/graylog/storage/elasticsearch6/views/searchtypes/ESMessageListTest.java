@@ -50,7 +50,7 @@ public class ESMessageListTest {
 
     @Test
     public void includesCustomNameInResultIfPresent() {
-        final ESMessageList esMessageList = new ESMessageList(new QueryStringDecorators(Collections.emptySet()));
+        final ESMessageList esMessageList = new ESMessageList(new QueryStringDecorators(Optional.empty()));
         final MessageList messageList = someMessageList().toBuilder().name("customResult").build();
 
         final SearchResult result = new MockSearchResult(Collections.emptyList(), (long)0);
@@ -182,7 +182,7 @@ public class ESMessageListTest {
                                                                     Set<QueryStringDecorator> decorators,
                                                                     ESGeneratedQueryContext context) {
         ESMessageList sut = new ESMessageList(
-                new QueryStringDecorators(decorators),
+                new QueryStringDecorators(Optional.empty()),
                 new LegacyDecoratorProcessor.Fake(),
                 allowHighlighting);
 

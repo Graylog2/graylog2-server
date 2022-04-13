@@ -51,6 +51,7 @@ import org.mockito.junit.MockitoRule;
 import javax.inject.Provider;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -61,7 +62,7 @@ import static org.mockito.Mockito.when;
 
 public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBackendTestBase {
     private static Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = ImmutableMap.of(
-            MessageList.NAME, () -> new ESMessageList(new QueryStringDecorators(Collections.emptySet()))
+            MessageList.NAME, () -> new ESMessageList(new QueryStringDecorators(Optional.empty()))
     );
 
     @Rule
@@ -89,7 +90,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         this.backend = new ElasticsearchBackend(handlers,
                 jestClient,
                 indexLookup,
-                new QueryStringDecorators(Collections.emptySet()),
+                new QueryStringDecorators(Optional.empty()),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 false, objectMapper);
     }

@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -80,7 +81,7 @@ public class ElasticsearchBackendErrorHandlingTest {
                 ),
                 client,
                 indexLookup,
-                new QueryStringDecorators(Collections.emptySet()),
+                new QueryStringDecorators(Optional.empty()),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 false);
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any())).thenReturn(Collections.emptySet());

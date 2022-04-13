@@ -22,14 +22,15 @@ import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 
 import javax.inject.Inject;
-import java.util.Set;
+import java.util.Optional;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class QueryStringDecorators {
-    private final Set<QueryStringDecorator> queryDecorators;
+    private  Optional<QueryStringDecorator> decorator;
 
     @Inject
-    public QueryStringDecorators(Set<QueryStringDecorator> queryDecorators) {
-        this.queryDecorators = queryDecorators;
+    public QueryStringDecorators(Optional<QueryStringDecorator> queryDecorators) {
+        this.decorator = queryDecorators;
     }
 
     public String decorate(String queryString, ParameterProvider job, Query query) {
@@ -37,8 +38,7 @@ public class QueryStringDecorators {
     }
 
     public PositionTrackingQuery decorateWithPositions(String queryString, ParameterProvider job, Query query) {
-        return this.queryDecorators.stream()
-                .findFirst()
+        return this.decorator
                 .map(decorator -> decorator.decorate(queryString, job, query))
                 .orElseGet(() -> PositionTrackingQuery.of(queryString));
     }
