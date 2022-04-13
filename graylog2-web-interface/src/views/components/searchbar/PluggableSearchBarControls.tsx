@@ -43,7 +43,7 @@ const PluggableSearchBarControls = () => {
   const hasEnterpriseSearchFilters = existingControls.find((control) => control.id === 'search-filters');
   const shouldRenderContainer = (hasEnterpriseSearchFilters || !isBannerHidden) && hasSearchFilterFeature;
 
-  if (shouldRenderContainer) return null;
+  if (!shouldRenderContainer) return null;
 
   return (
     <Container>
