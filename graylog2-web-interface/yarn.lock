@@ -4203,9 +4203,9 @@ camelize@^1.0.0:
   integrity sha1-FkpUg+Yw+kMh5a8HAg5TGDGyYJs=
 
 caniuse-lite@^1.0.30001214, caniuse-lite@^1.0.30001286, caniuse-lite@^1.0.30001304:
-  version "1.0.30001312"
-  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001312.tgz"
-  integrity sha512-Wiz1Psk2MEK0pX3rUzWaunLTZzqS2JYZFzNKqAiJGiuxIjRPLgV6+VDPOg6lQOUxmDwhTlh198JsTTi8Hzw6aQ==
+  version "1.0.30001331"
+  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001331.tgz"
+  integrity sha512-Y1xk6paHpUXKP/P6YjQv1xqyTbgAP05ycHBcRdQjTcyXlWol868sJJPlmk5ylOekw2BrucWes5jk+LvVd7WZ5Q==
 
 canvas-fit@^1.5.0:
   version "1.5.0"
@@ -7465,16 +7465,16 @@ graceful-fs@^4.2.9:
   integrity sha512-NtNxqUcXgpW2iMrfqSfR73Glt39K+BLwWsPs94yR63v45T0Wbej7eRmL5cWfwEgqXnmjQp3zaJTshdRW/qC2ZQ==
 
 "graylog-web-plugin@file:packages/graylog-web-plugin":
-  version "4.3.0-SNAPSHOT"
+  version "4.4.0-SNAPSHOT"
   dependencies:
     "@babel/preset-env" "7.16.11"
     "@babel/preset-typescript" "7.16.7"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-09b211c3-2c09-4096-8ba8-5280fb4f92c2-1647945488853/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-014f1897-5631-49d6-a0e8-56f6f7998a5d-1649851256387/node_modules/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-09b211c3-2c09-4096-8ba8-5280fb4f92c2-1647945488853/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-014f1897-5631-49d6-a0e8-56f6f7998a5d-1649851256387/node_modules/jest-preset-graylog"
     jquery "3.5.1"
     moment "2.29.1"
     moment-timezone "0.5.34"
@@ -7488,7 +7488,6 @@ graceful-fs@^4.2.9:
     react-router-dom "5.3.0"
     reflux "0.2.13"
     styled-components "5.3.3"
-    stylelint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.3.0-SNAPSHOT-09b211c3-2c09-4096-8ba8-5280fb4f92c2-1647945488853/node_modules/stylelint-config-graylog"
     typescript "4.5.5"
     webpack "5.69.1"
     webpack-cleanup-plugin "0.5.1"
