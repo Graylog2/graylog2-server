@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import joptsimple.internal.Strings;
 import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.contentpack.entities.HttpEventNotificationConfigEntity;
 import org.graylog.events.event.EventDto;
@@ -32,6 +33,8 @@ import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.rest.ValidationResult;
 
+import javax.annotation.Nullable;
+
 @AutoValue
 @JsonTypeName(HTTPEventNotificationConfig.TYPE_NAME)
 @JsonDeserialize(builder = HTTPEventNotificationConfig.Builder.class)
@@ -39,6 +42,21 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
     public static final String TYPE_NAME = "http-notification-v1";
 
     private static final String FIELD_URL = "url";
+    private static final String FIELD_BASIC_AUTH = "basic_auth";
+    private static final String FIELD_APIKEY = "apikey";
+    private static final String FIELD_APIKEY_VALUE = "apikey_value";
+
+    @JsonProperty(FIELD_BASIC_AUTH)
+    @Nullable
+    public abstract String basicAuth();
+
+    @JsonProperty(FIELD_APIKEY)
+    @Nullable
+    public abstract String apiKey();
+
+    @JsonProperty(FIELD_APIKEY_VALUE)
+    @Nullable
+    public abstract String apiKeyValue();
 
     @JsonProperty(FIELD_URL)
     public abstract String url();
@@ -59,6 +77,12 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
         if (url().isEmpty()) {
             validation.addError(FIELD_URL, "HTTP Notification url cannot be empty.");
         }
+        if (Strings.isNullOrEmpty(apiKey()) && !Strings.isNullOrEmpty(apiKeyValue())) {
+            validation.addError(FIELD_APIKEY, "HTTP Notification cannot specify API key value without API key");
+        }
+        if (!Strings.isNullOrEmpty(apiKey()) && Strings.isNullOrEmpty(apiKeyValue())) {
+            validation.addError(FIELD_APIKEY, "HTTP Notification cannot specify API key without API key value");
+        }
 
         return validation;
     }
@@ -70,6 +94,18 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
             return new AutoValue_HTTPEventNotificationConfig.Builder()
                     .type(TYPE_NAME);
         }
+
+        @JsonProperty(FIELD_BASIC_AUTH)
+        @Nullable
+        public abstract Builder basicAuth(String basicAuth);
+
+        @JsonProperty(FIELD_APIKEY)
+        @Nullable
+        public abstract Builder apiKey(String apiKey);
+
+        @JsonProperty(FIELD_APIKEY_VALUE)
+        @Nullable
+        public abstract Builder apiKeyValue(String apiKeyValue);
 
         @JsonProperty(FIELD_URL)
         public abstract Builder url(String url);
