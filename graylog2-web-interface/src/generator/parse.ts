@@ -41,6 +41,11 @@ const typeMappings = {
 const isPrimitiveType = (type: RawType): type is PrimitiveType => ('type' in type && Object.keys(primitiveTypeMappings).includes(type.type));
 const mapPrimitiveType = (type: keyof typeof primitiveTypeMappings) => primitiveTypeMappings[type];
 const isEnumType = (type: RawType): type is EnumType => ('enum' in type && type.enum !== undefined);
+const unknownType = {
+  type: 'type_reference',
+  name: 'unknown',
+  optional: false,
+};
 
 type Primitives = keyof typeof primitiveTypeMappings;
 
@@ -128,12 +133,12 @@ function createTypeLiteralNode(properties: Record<string, Type>, additionalPrope
 
 const wrapAdditionalProperties = (additionalProperties: RawModel['additional_properties']) => (typeof additionalProperties === 'string' ? ({ type: additionalProperties }) : additionalProperties);
 
-function createType(_typeDefinition: RawType): Type {
-  if ('$ref' in _typeDefinition) {
-    return createType({ type: _typeDefinition.$ref });
+function createType(rawTypeDefinition: RawType): Type {
+  if ('$ref' in rawTypeDefinition) {
+    return createType({ type: rawTypeDefinition.$ref });
   }
 
-  const { type: rawType } = _typeDefinition;
+  const { type: rawType } = rawTypeDefinition;
   const isOptional = rawType && rawType.endsWith('>');
 
   const cleanType = rawType ? rawType.replace(/>/g, '') : rawType;
@@ -143,7 +148,7 @@ function createType(_typeDefinition: RawType): Type {
     return createTypeReference(stripURN(type));
   }
 
-  const typeDefinition = { ..._typeDefinition, type };
+  const typeDefinition = { ...rawTypeDefinition, type };
 
   if (isEnumType(typeDefinition)) {
     return createEnumType(typeDefinition);
@@ -154,7 +159,7 @@ function createType(_typeDefinition: RawType): Type {
   }
 
   if (isArrayType(typeDefinition)) {
-    return createArray(createType(wrapAdditionalProperties(typeDefinition.items)));
+    return createArray(typeDefinition.items === undefined ? unknownType : createType(wrapAdditionalProperties(typeDefinition.items)));
   }
 
   if (isObjectType(typeDefinition)) {
