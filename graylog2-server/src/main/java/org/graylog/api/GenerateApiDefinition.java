@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
@@ -59,12 +60,25 @@ public class GenerateApiDefinition {
         return resources.build();
     }
 
+    private static boolean deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        return directoryToBeDeleted.delete();
+    }
+
     public static void main(String[] args) throws IOException {
         if (args.length < 2) {
-           bail("Syntax: " + GenerateApiDefinition.class.getSimpleName() + " <outdir> <package1> ... <packageN>");
+            bail("Syntax: " + GenerateApiDefinition.class.getSimpleName() + " <outdir> <package1> ... <packageN>");
         }
         final String targetName = args[0];
-        Files.createDirectories(Paths.get(targetName));
+        final Path targetPath = Paths.get(targetName);
+        
+        deleteDirectory(targetPath.toFile());
+        Files.createDirectories(targetPath);
         log("Generating Swagger definition for API ...");
         final String[] packageNames = Arrays.stream(args).skip(1).toArray(String[]::new);
 
@@ -91,12 +105,12 @@ public class GenerateApiDefinition {
     }
 
     private static String pathFromApi(Map<String, Object> api) {
-        return (String)api.get("path");
+        return (String) api.get("path");
     }
 
     private static List<Map<String, Object>> retrieveApis(Map<String, Object> overview) {
         return overview.containsKey("apis")
-                ? (List<Map<String, Object>>)overview.get("apis")
+                ? (List<Map<String, Object>>) overview.get("apis")
                 : Collections.emptyList();
     }
 
