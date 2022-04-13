@@ -45,7 +45,7 @@ const unknownType = {
   type: 'type_reference',
   name: 'unknown',
   optional: false,
-};
+} as const;
 
 type Primitives = keyof typeof primitiveTypeMappings;
 
