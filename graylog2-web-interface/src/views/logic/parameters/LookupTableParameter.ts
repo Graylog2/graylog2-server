@@ -46,7 +46,8 @@ export default class LookupTableParameter extends Parameter {
     this._value2 = { lookupTable, key };
   }
 
-  static create(_: string, name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, lookupTable: string, key: string): LookupTableParameter {
+  static create(_type: string, name: string, title: string, description: string, dataType: string, defaultValue: any,
+    optional: boolean, lookupTable: string, key: string): LookupTableParameter {
     return new LookupTableParameter(name, title, description, dataType, defaultValue, optional, lookupTable, key);
   }
 

@@ -115,7 +115,11 @@ const AuthzRolesStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    loadUsersForRole(roleId: string, _: string, { page, perPage, query }: Pagination): Promise<PaginatedUsers> {
+    loadUsersForRole(roleId: string, _roleName: string, {
+      page,
+      perPage,
+      query,
+    }: Pagination): Promise<PaginatedUsers> {
       const apiUrl = encodeApiUrl(ApiRoutes.AuthzRolesController.loadUsersForRole, [roleId]);
       const url = PaginationURL(apiUrl, page, perPage, query);
 

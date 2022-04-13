@@ -62,7 +62,7 @@ const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: st
 
 const _formatBackendValidationErrors = (backendErrors: { [inputNameJSON: string]: string[] }) => {
   const backendErrorStrings = mapValues(backendErrors, (errorArray) => `Server validation error: ${errorArray.join(' ')}`);
-  const formattedBackendErrors = mapKeys(backendErrorStrings, (_, key) => camelCase(key));
+  const formattedBackendErrors = mapKeys(backendErrorStrings, (_value, key) => camelCase(key));
 
   return formattedBackendErrors;
 };
