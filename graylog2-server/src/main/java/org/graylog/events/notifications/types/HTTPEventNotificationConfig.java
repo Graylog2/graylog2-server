@@ -115,8 +115,11 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
 
     @Override
     public EventNotificationConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
-       return HttpEventNotificationConfigEntity.builder()
-           .url(ValueReference.of(url()))
-           .build();
+        return HttpEventNotificationConfigEntity.builder()
+                .basicAuth(basicAuth())
+                .apiKey(apiKey())
+                .apiKeyValue(apiKeyValue())
+                .url(ValueReference.of(url()))
+                .build();
     }
 }

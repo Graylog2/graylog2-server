@@ -18,6 +18,7 @@ package org.graylog.events.notifications.types;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -40,6 +41,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -96,8 +99,22 @@ public class HTTPEventNotification implements EventNotification {
         } catch (JsonProcessingException e) {
             throw new PermanentEventNotificationException("Unable to serialize notification", e);
         }
-        final Request request = new Request.Builder()
-                .url(httpUrl)
+
+        final Request.Builder builder = new Request.Builder();
+        if (!Strings.isNullOrEmpty(config.basicAuth())) {
+            String basicAuth = "Basic"+ Base64.getEncoder().encodeToString(config.basicAuth().getBytes(StandardCharsets.UTF_8));
+            builder.addHeader("Authorization", basicAuth);
+        }
+
+        if (!Strings.isNullOrEmpty(config.apiKey())) {
+            HttpUrl urlWithApiKey = httpUrl.newBuilder().addQueryParameter(config.apiKey(), config.apiKeyValue()).build();
+            builder.url(urlWithApiKey);
+        }
+        else {
+            builder.url(httpUrl);
+        }
+
+        final Request request = builder
                 .post(RequestBody.create(CONTENT_TYPE, body))
                 .build();
 
