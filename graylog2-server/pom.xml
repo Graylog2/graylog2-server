@@ -1036,9 +1036,19 @@
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
-                                <phase>compile</phase>
+                                <phase>test</phase>
                                 <configuration>
                                     <arguments>tsc</arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>Generate backend API types</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>process-classes</phase>
+                                <configuration>
+                                    <arguments>generate:apidefs</arguments>
                                 </configuration>
                             </execution>
                         </executions>
