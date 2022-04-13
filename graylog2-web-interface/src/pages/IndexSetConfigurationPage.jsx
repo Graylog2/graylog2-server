@@ -101,6 +101,7 @@ const IndexSetConfigurationPage = createReactClass({
           <Row className="content">
             <Col md={12}>
               <IndexSetConfigurationForm indexSet={indexSet}
+                                         retentionStrategiesContext={this.state.retentionStrategiesContext}
                                          rotationStrategies={this.state.rotationStrategies}
                                          retentionStrategies={this.state.retentionStrategies}
                                          cancelLink={this._formCancelLink()}

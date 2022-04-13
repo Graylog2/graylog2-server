@@ -83,6 +83,9 @@ export interface RetentionStrategy {
   default_config: RetentionStrategyConfig,
   json_schema: RetentionJsonSchema,
 }
+export interface RetentionStrategyContext {
+  max_index_retention_period: string,
+}
 export interface RotationStrategyResponse {
   total: number,
   strategies: Array<RotationStrategy>,

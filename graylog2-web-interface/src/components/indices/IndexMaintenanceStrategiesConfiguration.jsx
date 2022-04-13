@@ -21,6 +21,7 @@ import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
 const TIME_BASED_ROTATION_STRATEGY = 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy';
+const NOOP_RETENTION_STRATEGY = 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy';
 
 class IndexMaintenanceStrategiesConfiguration extends React.Component {
   static propTypes = {
@@ -29,8 +30,17 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
     selectPlaceholder: PropTypes.string.isRequired,
     pluginExports: PropTypes.array.isRequired,
     strategies: PropTypes.array.isRequired,
+    retentionStrategiesContext: PropTypes.shape({
+      max_index_retention_period: PropTypes.string,
+    }),
     activeConfig: PropTypes.object.isRequired,
     updateState: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    retentionStrategiesContext: {
+      max_index_retention_period: undefined,
+    },
   };
 
   constructor(props) {
