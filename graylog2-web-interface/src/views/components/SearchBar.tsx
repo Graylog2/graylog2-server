@@ -51,7 +51,7 @@ import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import useParameters from 'views/hooks/useParameters';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
-import PluggableSearchBarControls from 'views/components/searchbar/PluggableSearchControls';
+import PluggableSearchBarControls from 'views/components/searchbar/PluggableSearchBarControls';
 
 import ValidateOnParameterChange from './searchbar/ValidateOnParameterChange';
 import SearchBarForm from './searchbar/SearchBarForm';

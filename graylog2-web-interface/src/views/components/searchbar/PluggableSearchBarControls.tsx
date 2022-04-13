@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import usePluginEntities from 'views/logic/usePluginEntities';
 import SearchFilterBanner from 'views/components/searchbar/SearchFilterBanner';
@@ -41,11 +41,11 @@ const PluggableSearchBarControls = () => {
   const rightControls = existingControls.filter(({ placement }) => placement === 'right');
   const renderControls = (controls: Array<SearchBarControl>) => controls?.map(({ component: ControlComponent, id }) => <ControlComponent key={id} />);
   const hasEnterpriseSearchFilters = existingControls.find((control) => control.id === 'search-filters');
-  const shouldRenderContainer = useMemo(() => (
-    (hasEnterpriseSearchFilters || !isBannerHidden) && hasSearchFilterFeature
-  ), [hasEnterpriseSearchFilters, isBannerHidden, hasSearchFilterFeature]);
+  const shouldRenderContainer = (hasEnterpriseSearchFilters || !isBannerHidden) && hasSearchFilterFeature;
 
-  return shouldRenderContainer && (
+  if (shouldRenderContainer) return null;
+
+  return (
     <Container>
       <div>
         {hasSearchFilterFeature && (
