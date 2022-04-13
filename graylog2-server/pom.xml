@@ -889,7 +889,7 @@
                 <configuration>
                     <mainClass>org.graylog.api.GenerateApiDefinition</mainClass>
                     <arguments>
-                        <argument>target/swagger</argument>
+                        <argument>${project.build.directory}/swagger</argument>
                         <argument>org.graylog</argument>
                         <argument>org.graylog2</argument>
                     </arguments>
