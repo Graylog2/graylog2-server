@@ -81,7 +81,7 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
             validation.addError(FIELD_APIKEY, "HTTP Notification cannot specify API key value without API key");
         }
         if (!Strings.isNullOrEmpty(apiKey()) && Strings.isNullOrEmpty(apiKeyValue())) {
-            validation.addError(FIELD_APIKEY, "HTTP Notification cannot specify API key without API key value");
+            validation.addError(FIELD_APIKEY_VALUE, "HTTP Notification cannot specify API key without API key value");
         }
 
         return validation;

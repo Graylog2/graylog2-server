@@ -38,6 +38,14 @@ public class NotificationDtoTest {
                 .build();
     }
 
+    private NotificationDto getHttpNotification(HTTPEventNotificationConfig config) {
+        return NotificationDto.builder()
+                .title("Foobar")
+                .description("")
+                .config(config)
+                .build();
+    }
+
     private NotificationDto getEmailNotification() {
         return NotificationDto.builder()
                 .title("Foobar")
@@ -105,7 +113,7 @@ public class NotificationDtoTest {
         final NotificationDto emptyNotification = getEmailNotification().toBuilder().config(emptyConfig).build();
         final ValidationResult validationResult = emptyNotification.validate();
         assertThat(validationResult.failed()).isTrue();
-        assertThat(validationResult.getErrors().size()).isEqualTo(3);
+        assertThat(validationResult.getErrors()).hasSize(3);
         assertThat(validationResult.getErrors()).containsOnlyKeys("subject", "body", "recipients");
     }
 
@@ -127,7 +135,26 @@ public class NotificationDtoTest {
 
         final ValidationResult validationResult = validNotification.validate();
         assertThat(validationResult.failed()).isFalse();
-        assertThat(validationResult.getErrors().size()).isEqualTo(0);
+        assertThat(validationResult.getErrors()).isEmpty();
+    }
+
+    @Test
+    public void testValidateHttpNotificationWithApiKey() {
+        HTTPEventNotificationConfig httpConfig = HTTPEventNotificationConfig.Builder.create()
+                .url("http://localhost")
+                .apiKey("xxx")
+                .build();
+        NotificationDto notification = getHttpNotification(httpConfig);
+        ValidationResult validationResult = notification.validate();
+        assertThat(validationResult.getErrors()).containsOnlyKeys("apikey_value");
+
+        httpConfig = HTTPEventNotificationConfig.Builder.create()
+                .url("http://localhost")
+                .apiKeyValue("xxx")
+                .build();
+        notification = getHttpNotification(httpConfig);
+        validationResult = notification.validate();
+        assertThat(validationResult.getErrors()).containsOnlyKeys("apikey");
     }
 
     @Test
@@ -136,7 +163,7 @@ public class NotificationDtoTest {
 
         final ValidationResult validationResult = validNotification.validate();
         assertThat(validationResult.failed()).isFalse();
-        assertThat(validationResult.getErrors().size()).isEqualTo(0);
+        assertThat(validationResult.getErrors()).isEmpty();
     }
 
     @Test
@@ -145,6 +172,6 @@ public class NotificationDtoTest {
 
         final ValidationResult validationResult = validNotification.validate();
         assertThat(validationResult.failed()).isFalse();
-        assertThat(validationResult.getErrors().size()).isEqualTo(0);
+        assertThat(validationResult.getErrors()).isEmpty();
     }
 }
