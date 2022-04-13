@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.engine;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -61,7 +62,10 @@ public class PositionTrackingQuery {
     }
 
     public Optional<QueryPosition> backtrackPosition(int line, int interpolatedBeginColumn, int interpolatedEndColumn) {
-        final List<QueryFragment> lineFragments = this.fragments.stream().filter(f -> f.getLine() == line).collect(Collectors.toList());
+        final List<QueryFragment> lineFragments = this.fragments.stream()
+                .filter(f -> f.getLine() == line)
+                .sorted(Comparator.comparing(QueryFragment::getOriginalBeginColumn))
+                .collect(Collectors.toList());
         int linePosition = 0;
         for (QueryFragment fragment : lineFragments) {
             if (interpolatedBeginColumn >= linePosition && interpolatedEndColumn <= linePosition + fragment.originalLength()) {
