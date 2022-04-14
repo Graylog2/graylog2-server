@@ -263,6 +263,10 @@ const prefixUrlWithoutHostname = (url: string, prefix: string) => {
 };
 
 const qualifyUrls = (routes, appPrefix): typeof routes => {
+  if (appPrefix === '/') {
+    return routes;
+  }
+
   const qualifiedRoutes = {};
 
   Object.keys(routes).forEach((routeName) => {
