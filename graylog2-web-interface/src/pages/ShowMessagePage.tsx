@@ -65,19 +65,22 @@ const useMessage = (index: string, messageId: string) => {
   const [inputs, setInputs] = useState<Immutable.Map<string, Input>>(Immutable.Map());
 
   useEffect(() => {
-    MessagesActions.loadMessage(index, messageId)
-      .then((_message) => {
-        setMessage(_message);
+    const fetchData = async () => {
+      const _message = await MessagesActions.loadMessage(index, messageId);
+      setMessage(_message);
 
-        return _message.source_input_id ? InputsActions.get(_message.source_input_id) : Promise.resolve();
-      })
-      .then((input) => {
+      if (_message.source_input_id) {
+        const input = await InputsActions.get(_message.source_input_id);
+
         if (input) {
           const newInputs = Immutable.Map({ [input.id]: input });
 
           setInputs(newInputs);
         }
-      });
+      }
+    };
+
+    fetchData();
   }, [index, messageId, setMessage, setInputs]);
 
   return { message, inputs };
