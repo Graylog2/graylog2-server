@@ -26,6 +26,7 @@ const lightThemeRatio = ['0.22', '0.55', '0.88'];
 const darkThemeRatio = ['0.15', '0.55', '0.95'];
 
 function lighten(color, ratio) { return chroma.mix(color, '#fff', ratio).hex(); }
+
 function darken(color, ratio) { return chroma.mix(color, '#000', ratio).hex(); }
 
 const generateGrayScale = (colorStart, colorEnd) => {
@@ -117,7 +118,7 @@ const generateVariantColors = (mode: ThemeMode, variant) => {
 };
 
 const generateInputColors = (
-  mode: ThemeMode,
+  _mode: ThemeMode,
   global: $PropertyType<Colors, 'global'>,
   gray: $PropertyType<Colors, 'gray'>,
   variant: $PropertyType<Colors, 'variant'>,

@@ -128,7 +128,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
   closeOnChildSelect = (child: React.ReactElement, updateDepth: number) => {
     if (child.props?.onSelect) {
       return {
-        onSelect: (eventKey: string | null | undefined, event: SyntheticEvent<HTMLButtonElement>) => {
+        onSelect: (_eventKey: string | null | undefined, event: SyntheticEvent<HTMLButtonElement>) => {
           child.props.onSelect();
           this._onToggle(event);
         },

@@ -21,7 +21,7 @@ export default {
   convert(result) {
     const fieldNames = Immutable.Map().withMutations((map) => {
       _.forEach(result.messages, (msg) => {
-        _.forOwn(msg.message, (value, field) => {
+        _.forOwn(msg.message, (_value, field) => {
           // add occurrences
           map.mergeWith((oldVal: number, newVal: number) => oldVal + newVal, Immutable.Map([[field, 1]]));
         });
