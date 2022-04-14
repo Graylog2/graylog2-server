@@ -34,6 +34,7 @@ import StreamsStore from 'stores/streams/StreamsStore';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import { MessagesActions } from 'stores/messages/MessagesStore';
 import { NodesActions } from 'stores/nodes/NodesStore';
+import { isLocalNode } from 'views/hooks/useIsLocalNode';
 
 type Props = {
   params: {
@@ -69,7 +70,7 @@ const useMessage = (index: string, messageId: string) => {
       const _message = await MessagesActions.loadMessage(index, messageId);
       setMessage(_message);
 
-      if (_message.source_input_id) {
+      if (_message.source_input_id && await isLocalNode(_message.fields.gl2_source_node)) {
         const input = await InputsActions.get(_message.source_input_id);
 
         if (input) {
