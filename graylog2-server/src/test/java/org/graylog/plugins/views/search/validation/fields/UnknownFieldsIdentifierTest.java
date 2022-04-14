@@ -16,69 +16,54 @@
  */
 package org.graylog.plugins.views.search.validation.fields;
 
-import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
-import org.graylog.plugins.views.search.validation.ParsedTerm;
-import org.graylog.plugins.views.search.validation.ValidationRequest;
-import org.graylog2.indexer.fieldtypes.FieldTypes;
-import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.graylog.plugins.views.search.validation.QueryValidator;
+import org.graylog.plugins.views.search.validation.TestValidationContext;
+import org.graylog.plugins.views.search.validation.ValidationContext;
+import org.graylog.plugins.views.search.validation.ValidationMessage;
+import org.graylog.plugins.views.search.validation.ValidationType;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class UnknownFieldsIdentifierTest {
 
-    private UnknownFieldsIdentifier toTest;
-    private MappedFieldTypesService mappedFieldTypesService;
-    private MappedFieldTypeDTO existingFieldTypeDTO;
-    private ValidationRequest validationRequest;
+    private QueryValidator sut;
 
     @BeforeEach
     public void setUp() {
-        validationRequest = mock(ValidationRequest.class);
-        existingFieldTypeDTO = MappedFieldTypeDTO.create("existingField", FieldTypes.Type.builder().type("date").build());
-        mappedFieldTypesService = mock(MappedFieldTypesService.class);
-        when(mappedFieldTypesService.fieldTypesByStreamIds(any(), any())).thenReturn(Collections.singleton(existingFieldTypeDTO));
-
-        toTest = new UnknownFieldsIdentifier(mappedFieldTypesService);
+        sut = new UnknownFieldsValidator();
     }
 
     @Test
-    public void returnsEmptyListOnNullRequest() {
-        final List<ParsedTerm> result = toTest.identifyUnknownFields(null, Collections.emptyList());
-        assertTrue(result.isEmpty());
+    void testAllFieldsKnown() {
+        final ValidationContext context = TestValidationContext.create("foo: bar OR lorem:ipsum")
+                .knownMappedField("foo", "string")
+                .knownMappedField("lorem", "string")
+                .build();
+
+        final List<ValidationMessage> messages = sut.validate(context);
+        assertThat(messages).isEmpty();
     }
 
     @Test
-    public void returnsEmptyListOnNullTerms() {
-        final List<ParsedTerm> result = toTest.identifyUnknownFields(validationRequest, null);
-        assertTrue(result.isEmpty());
-    }
+    public void identifiesUnknownFields() throws InvalidRangeParametersException, ParseException {
+        final ValidationContext context = TestValidationContext.create("existingField: papapaa OR unknownField:lalala OR 123")
+                .knownMappedField("existingField", "date")
+                .build();
 
-    @Test
-    public void identifiesUnknownFields() {
+        final List<ValidationMessage> result = sut.validate(context);
 
-        final ParsedTerm unknownField = ParsedTerm.create("unknownField", "lalala");
-        Collection<ParsedTerm> parsedQueryTerms = Arrays.asList(
-                ParsedTerm.create("existingField", "papapa"),
-                unknownField,
-                ParsedTerm.create(ParsedTerm.DEFAULT_FIELD, "123")
-        );
-
-        final List<ParsedTerm> result = toTest.identifyUnknownFields(validationRequest, parsedQueryTerms);
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertTrue(result.contains(unknownField));
-
+        final ValidationMessage unknownTerm = result.iterator().next();
+        assertThat(unknownTerm.validationType()).isEqualTo(ValidationType.UNKNOWN_FIELD);
+        assertThat(unknownTerm.relatedProperty()).isEqualTo("unknownField");
     }
 }
