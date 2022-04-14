@@ -22,7 +22,6 @@ module.exports = {
     'src/**/*.{js,jsx,ts,tsx}',
   ],
   setupFiles: [
-    'jest-localstorage-mock',
     require.resolve('./lib/setup-files/mock-FetchProvider.js'),
     require.resolve('./lib/setup-files/mock-Version.js'),
     require.resolve('./lib/setup-files/mock-IntersectionObserver.js'),
