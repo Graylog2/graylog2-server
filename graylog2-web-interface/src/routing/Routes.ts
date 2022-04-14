@@ -254,19 +254,28 @@ const Routes = {
   filtered_metrics: (nodeId: string, filter: string) => `${Routes.SYSTEM.METRICS(nodeId)}?filter=${filter}`,
 } as const;
 
+const prefixUrlWithoutHostname = (url: string, prefix: string) => {
+  const uri = new URI(url);
+
+  return uri.directory(`${prefix}/${uri.directory()}`)
+    .normalizePath()
+    .resource();
+};
+
 const qualifyUrls = (routes, appPrefix): typeof routes => {
   const qualifiedRoutes = {};
 
   Object.keys(routes).forEach((routeName) => {
     switch (typeof routes[routeName]) {
       case 'string':
-        qualifiedRoutes[routeName] = new URI(`${appPrefix}/${routes[routeName]}`).normalizePath().resource();
+        qualifiedRoutes[routeName] = prefixUrlWithoutHostname(routes[routeName], appPrefix);
+
         break;
       case 'function':
         qualifiedRoutes[routeName] = (...params) => {
           const result = routes[routeName](...params);
 
-          return new URI(`${appPrefix}/${result}`).normalizePath().resource();
+          return prefixUrlWithoutHostname(result, appPrefix);
         };
 
         break;
