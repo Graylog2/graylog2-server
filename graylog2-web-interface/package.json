@@ -107,7 +107,7 @@
     "typeahead.js": "^0.11.1",
     "urijs": "^1.19.6",
     "utility-types": "^3.10.0",
-    "uuid": "^3.2.1",
+    "uuid": "8.3.2",
     "whatwg-fetch": "^3.6.2"
   },
   "devDependencies": {
