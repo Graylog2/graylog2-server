@@ -262,36 +262,33 @@ const prefixUrlWithoutHostname = (url: string, prefix: string) => {
     .resource();
 };
 
-const qualifyUrls = (routes, appPrefix): typeof routes => {
+type RouteFunction<P extends Array<any>> = (...args: P) => string;
+type RouteMapEntry = string | RouteFunction<any> | RouteMap;
+type RouteMap = { [routeName: string]: RouteMapEntry };
+
+const isLiteralRoute = (entry: RouteMapEntry): entry is string => (typeof entry === 'string');
+const isRouteFunction = (entry: RouteMapEntry): entry is RouteFunction<any> => (typeof entry === 'function');
+
+const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string): R => {
   if (appPrefix === '/') {
     return routes;
   }
 
-  const qualifiedRoutes = {};
-
-  Object.keys(routes).forEach((routeName) => {
-    switch (typeof routes[routeName]) {
-      case 'string':
-        qualifiedRoutes[routeName] = prefixUrlWithoutHostname(routes[routeName], appPrefix);
-
-        break;
-      case 'function':
-        qualifiedRoutes[routeName] = (...params) => {
-          const result = routes[routeName](...params);
-
-          return prefixUrlWithoutHostname(result, appPrefix);
-        };
-
-        break;
-      case 'object':
-        qualifiedRoutes[routeName] = qualifyUrls(routes[routeName], appPrefix);
-        break;
-      default:
-        break;
+  return Object.fromEntries(Object.entries(routes).map(([routeName, routeValue]) => {
+    if (isLiteralRoute(routeValue)) {
+      return [routeName, prefixUrlWithoutHostname(routeValue, appPrefix)];
     }
-  });
 
-  return qualifiedRoutes;
+    if (isRouteFunction(routeValue)) {
+      return [routeName, (...params: Parameters<typeof routeValue>) => {
+        const result = routeValue(...params);
+
+        return prefixUrlWithoutHostname(result, appPrefix);
+      }];
+    }
+
+    return [routeName, qualifyUrls(routeValue, appPrefix)];
+  }));
 };
 
 const qualifiedRoutes: typeof Routes = AppConfig.gl2AppPathPrefix() ? qualifyUrls(Routes, AppConfig.gl2AppPathPrefix()) : Routes;
@@ -314,7 +311,7 @@ const unqualified = Routes;
  * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES_PIPELINEID')(123)}>...</LinkContainer>
  *
  */
-const pluginRoute = (routeKey, throwError = true) => {
+const pluginRoute = (routeKey: string, throwError: boolean = true) => {
   const pluginRoutes = {};
 
   PluginStore.exports('routes').forEach((route) => {
@@ -349,7 +346,7 @@ const pluginRoute = (routeKey, throwError = true) => {
   return route;
 };
 
-const getPluginRoute = (routeKey) => pluginRoute(routeKey, false);
+const getPluginRoute = (routeKey: string) => pluginRoute(routeKey, false);
 
 /**
  * Exported constants for using strings to check if a plugin is registered by it's description.
