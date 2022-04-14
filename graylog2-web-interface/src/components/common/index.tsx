@@ -26,6 +26,7 @@ export { default as Center } from './Center';
 export { default as ClipboardButton } from './ClipboardButton';
 export { default as ColorPicker } from './ColorPicker';
 export { default as ColorPickerPopover } from './ColorPickerPopover';
+export { default as ConfirmDialog } from './ConfirmDialog';
 export { default as ConfirmLeaveDialog } from './ConfirmLeaveDialog';
 export { default as ContentHeadRow } from './ContentHeadRow';
 export { default as ControlledTableList } from './ControlledTableList';
