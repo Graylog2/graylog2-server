@@ -14,19 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import uuid from 'uuid/v4';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { TIMESTAMP_FIELD, DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
+import generateId from 'logic/generateId';
 
 import pivotForField from './searchtypes/aggregation/PivotGenerator';
 import AggregationWidget from './aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from './aggregationbuilder/AggregationWidgetConfig';
 import MessageWidget from './widgets/MessagesWidget';
 import MessageWidgetConfig from './widgets/MessagesWidgetConfig';
+import type { Decorator } from './widgets/MessagesWidgetConfig';
 import Series from './aggregationbuilder/Series';
 import FieldType from './fieldtypes/FieldType';
-import type { Decorator } from './widgets/MessagesWidgetConfig';
 
 const widgetsKey = 'enterpriseWidgets' as const;
 
@@ -49,7 +49,7 @@ export function widgetDefinition(type: string) {
   throw new Error(`Neither a widget of type "${type}" nor a default widget are registered!`);
 }
 
-export const resultHistogram = (id: string = uuid()) => AggregationWidget.builder()
+export const resultHistogram = (id: string = generateId()) => AggregationWidget.builder()
   .id(id)
   .config(
     AggregationWidgetConfig.builder()
@@ -67,7 +67,7 @@ export const resultHistogram = (id: string = uuid()) => AggregationWidget.builde
   )
   .build();
 
-export const allMessagesTable = (id: string = uuid(), decorators: Array<Decorator>) => MessageWidget.builder()
+export const allMessagesTable = (id: string = generateId(), decorators: Array<Decorator> = []) => MessageWidget.builder()
   .id(id)
   .config(MessageWidgetConfig.builder()
     .fields(DEFAULT_MESSAGE_FIELDS)

@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { Map } from 'immutable';
-import uuid from 'uuid/v4';
 
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import { singleton } from 'logic/singleton';
+import generateId from 'logic/generateId';
 import isDeepEqual from 'stores/isDeepEqual';
 
 export type WidgetState = {
@@ -180,7 +180,7 @@ class Builder {
   }
 
   newId() {
-    return this.id(uuid());
+    return this.id(generateId());
   }
 
   type(value: string) {

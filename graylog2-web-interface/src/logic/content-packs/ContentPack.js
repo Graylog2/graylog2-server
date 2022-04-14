@@ -16,9 +16,10 @@
  */
 import { Map, Set } from 'immutable';
 import { concat, remove } from 'lodash';
-import uuid from 'uuid/v4';
 
 import Entity from './Entity';
+
+import generateId from '../generateId';
 
 export default class ContentPack {
   constructor(v, id, rev, name, summary, description, vendor, url, parameters, entitieValues) {
@@ -183,7 +184,7 @@ export default class ContentPack {
     // eslint-disable-next-line no-use-before-define
     return new Builder()
       .v(1)
-      .id(uuid())
+      .id(generateId())
       .rev(1)
       .name('')
       .summary('')

@@ -17,21 +17,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import uuid from 'uuid/v4';
 
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import connect from 'stores/connect';
 import PermissionsMixin from 'util/PermissionsMixin';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-import { FilterPreviewStore, FilterPreviewActions } from 'stores/event-definitions/FilterPreviewStore';
+import { FilterPreviewActions, FilterPreviewStore } from 'stores/event-definitions/FilterPreviewStore';
 
 import FilterPreview from './FilterPreview';
 
+import generateId from '../../../logic/generateId';
+
 class FilterPreviewContainer extends React.Component {
   state = {
-    queryId: uuid(),
-    searchTypeId: uuid(),
+    queryId: generateId(),
+    searchTypeId: generateId(),
   };
 
   fetchSearch = lodash.debounce((config) => {
@@ -82,8 +83,18 @@ class FilterPreviewContainer extends React.Component {
   componentDidUpdate(prevProps) {
     const { eventDefinition } = this.props;
 
-    const { query: prevQuery, query_parameters: prevQueryParameters, streams: prevStreams, search_within_ms: prevSearchWithin } = prevProps.eventDefinition.config;
-    const { query, query_parameters: queryParameters, streams, search_within_ms: searchWithin } = eventDefinition.config;
+    const {
+      query: prevQuery,
+      query_parameters: prevQueryParameters,
+      streams: prevStreams,
+      search_within_ms: prevSearchWithin,
+    } = prevProps.eventDefinition.config;
+    const {
+      query,
+      query_parameters: queryParameters,
+      streams,
+      search_within_ms: searchWithin,
+    } = eventDefinition.config;
 
     if (query !== prevQuery || queryParameters !== prevQueryParameters || !lodash.isEqual(streams, prevStreams) || searchWithin !== prevSearchWithin) {
       this.fetchSearch(eventDefinition.config);

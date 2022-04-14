@@ -17,7 +17,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import uuid from 'uuid/v4';
 import moment from 'moment';
 
 import { MultiSelect, TimeUnitInput } from 'components/common';
@@ -35,6 +34,7 @@ import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/Loo
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
+import generateId from '../../../logic/generateId';
 
 export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 
@@ -112,8 +112,8 @@ class FilterForm extends React.Component {
       searchWithinMsUnit: searchWithin.unit,
       executeEveryMsDuration: executeEvery.duration,
       executeEveryMsUnit: executeEvery.unit,
-      queryId: uuid(),
-      searchTypeId: uuid(),
+      queryId: generateId(),
+      searchTypeId: generateId(),
       queryParameterStash: {}, // keep already defined parameters around to ease editing
     };
   }
