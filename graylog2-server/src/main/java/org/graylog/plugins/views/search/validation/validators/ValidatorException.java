@@ -20,11 +20,10 @@ import org.graylog.plugins.views.search.validation.ValidationResponse;
 
 public class ValidatorException extends RuntimeException {
 
-
-    private ValidationResponse validationResponse;
+    private final ValidationResponse validationResponse;
 
     public ValidatorException(ValidationResponse response) {
-        super(response.toString());
+        this.validationResponse = response;
     }
 
     public ValidationResponse getResponse() {

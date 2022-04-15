@@ -64,8 +64,8 @@ public class FieldValueTypeValidator implements QueryValidator {
 
     @Override
     public List<ValidationMessage> validate(ValidationContext context) {
-        PositionTrackingQuery decorated = decoratedQuery(context.request());
         try {
+            PositionTrackingQuery decorated = decoratedQuery(context.request());
             return validateQueryValues(decorated, context.availableFields());
         } catch (ParseException e) {
             throw new ValidatorException(ValidationResponse.error(Collections.singletonList(ValidationMessage.fromException(e))));
