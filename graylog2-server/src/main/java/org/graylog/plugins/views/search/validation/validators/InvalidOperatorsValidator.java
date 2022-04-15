@@ -21,6 +21,7 @@ import org.graylog.plugins.views.search.validation.ImmutableToken;
 import org.graylog.plugins.views.search.validation.QueryValidator;
 import org.graylog.plugins.views.search.validation.ValidationContext;
 import org.graylog.plugins.views.search.validation.ValidationMessage;
+import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog.plugins.views.search.validation.ValidationType;
 
 import javax.inject.Singleton;
@@ -44,7 +45,7 @@ public class InvalidOperatorsValidator implements QueryValidator {
                 .filter(this::isInvalidOperator)
                 .map(token -> {
                     final String errorMessage = String.format(Locale.ROOT, "Query contains invalid operator \"%s\". All AND / OR / NOT operators have to be written uppercase", token.image());
-                    return ValidationMessage.builder(ValidationType.INVALID_OPERATOR)
+                    return ValidationMessage.builder(ValidationStatus.WARNING, ValidationType.INVALID_OPERATOR)
                             .errorMessage(errorMessage)
                             .relatedProperty(token.image())
                             .beginLine(token.beginLine())

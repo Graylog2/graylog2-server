@@ -28,44 +28,37 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @AutoValue
 public abstract class ValidationMessage {
 
     private static final Pattern regexPosition = Pattern.compile(".*at line (\\d+), column (\\d+).", Pattern.MULTILINE | Pattern.DOTALL);
 
-    @JsonProperty
     @Nullable
     public abstract Integer beginLine();
 
-    @JsonProperty
     @Nullable
     public abstract Integer beginColumn();
 
-
-    @JsonProperty
     @Nullable
     public abstract Integer endLine();
 
-    @JsonProperty
     @Nullable
     public abstract Integer endColumn();
 
-    @JsonProperty
     public abstract String errorMessage();
 
     @Nullable
-    @JsonProperty
     public abstract String relatedProperty();
 
-    @JsonProperty
+    public abstract ValidationStatus validationStatus();
+
     public abstract ValidationType validationType();
 
     public static ValidationMessage fromException(final Exception exception) {
 
         final String input = exception.toString();
 
-        final ValidationMessage.Builder errorBuilder = builder(ValidationType.QUERY_PARSING_ERROR);
+        final ValidationMessage.Builder errorBuilder = builder(ValidationStatus.ERROR, ValidationType.QUERY_PARSING_ERROR);
 
         final String rootCause = getErrorMessage(exception);
         errorBuilder.errorMessage(String.format(Locale.ROOT, "Cannot parse query, cause: %s", rootCause));
@@ -92,8 +85,9 @@ public abstract class ValidationMessage {
         return rootCause;
     }
 
-    public static Builder builder(ValidationType validationType) {
+    public static Builder builder(ValidationStatus status, ValidationType validationType) {
         return new AutoValue_ValidationMessage.Builder()
+                .validationStatus(status)
                 .validationType(validationType);
     }
 
@@ -113,7 +107,9 @@ public abstract class ValidationMessage {
 
         public abstract Builder relatedProperty(String relatedProperty);
 
-        public abstract Builder validationType(ValidationType undeclaredParameter);
+        public abstract Builder validationType(ValidationType validationType);
+
+        public abstract Builder validationStatus(ValidationStatus validationStatus);
 
         public abstract ValidationMessage build();
     }

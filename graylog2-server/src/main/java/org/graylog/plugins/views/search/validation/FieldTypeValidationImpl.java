@@ -65,7 +65,7 @@ public class FieldTypeValidationImpl implements FieldTypeValidation {
     @Override
     public Optional<ValidationMessage> validateFieldValueType(ParsedTerm t, String detectedFieldType) {
         if (!typeMatching(detectedFieldType, t.value())) {
-            final ValidationMessage.Builder builder = ValidationMessage.builder(ValidationType.INVALID_VALUE_TYPE)
+            final ValidationMessage.Builder builder = ValidationMessage.builder(ValidationStatus.WARNING, ValidationType.INVALID_VALUE_TYPE)
                     .errorMessage(String.format(Locale.ROOT, "Type of %s is %s, cannot use value %s", t.getRealFieldName(), detectedFieldType, t.value()));
 
             // prefer value token, accept key token as fallback

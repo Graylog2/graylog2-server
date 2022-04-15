@@ -20,7 +20,7 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.elasticsearch.QueryParam;
-import org.graylog.plugins .views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.engine.QueryPosition;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
@@ -36,6 +36,7 @@ import org.graylog.plugins.views.search.validation.ValidationContext;
 import org.graylog.plugins.views.search.validation.ValidationMessage;
 import org.graylog.plugins.views.search.validation.ValidationRequest;
 import org.graylog.plugins.views.search.validation.ValidationResponse;
+import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog.plugins.views.search.validation.ValidationType;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 
@@ -68,26 +69,24 @@ public class FieldValueTypeValidator implements QueryValidator {
             PositionTrackingQuery decorated = decoratedQuery(context.request());
             return validateQueryValues(decorated, context.availableFields());
         } catch (ParseException e) {
-            throw new ValidatorException(ValidationResponse.error(Collections.singletonList(ValidationMessage.fromException(e))));
+            return Collections.singletonList(ValidationMessage.fromException(e));
         } catch (SearchException searchException) {
-            throw new ValidatorException(convert(searchException));
+            return convert(searchException);
         } catch (MissingEnterpriseLicenseException licenseException) {
-            throw new ValidatorException(ValidationResponse.error(
-                    paramsToValidationMessages(
-                            licenseException.getQueryParams(),
-                            ValidationType.MISSING_LICENSE,
-                            param -> "Search parameter used without enterprise license: " + param.name()
-                    )));
+            return paramsToValidationMessages(
+                    ValidationStatus.ERROR,
+                    licenseException.getQueryParams(),
+                    ValidationType.MISSING_LICENSE,
+                    param -> "Search parameter used without enterprise license: " + param.name()
+            );
         }
     }
-
 
     private PositionTrackingQuery decoratedQuery(ValidationRequest req) {
         ParameterProvider parameterProvider = (name) -> req.parameters().stream().filter(p -> Objects.equals(p.name(), name)).findFirst();
         final Query query = Query.builder().query(req.query()).timerange(req.timerange()).build();
         return this.queryStringDecorators.decorateWithPositions(req.getCombinedQueryWithFilter(), parameterProvider, query);
     }
-
 
     private List<ValidationMessage> validateQueryValues(PositionTrackingQuery decorated, Set<MappedFieldTypeDTO> availableFields) throws ParseException {
         final ParsedQuery parsedQuery = luceneQueryParser.parse(decorated.getInterpolatedQuery());
@@ -104,7 +103,7 @@ public class FieldValueTypeValidator implements QueryValidator {
 
                                 final Optional<QueryPosition> backtrackedPosition = decorated.backtrackPosition(validation.beginLine(), validation.beginColumn(), validation.endColumn());
 
-                                return ValidationMessage.builder(validation.validationType())
+                                return ValidationMessage.builder(ValidationStatus.WARNING, validation.validationType())
                                         .errorMessage(validation.errorMessage())
                                         .relatedProperty(validation.relatedProperty())
                                         .beginLine(validation.beginLine())
@@ -120,31 +119,33 @@ public class FieldValueTypeValidator implements QueryValidator {
     }
 
 
-    private ValidationResponse convert(SearchException searchException) {
+    private List<ValidationMessage> convert(SearchException searchException) {
         if (searchException.error() instanceof UnboundParameterError) {
             final UnboundParameterError error = (UnboundParameterError) searchException.error();
-            return ValidationResponse.error(paramsToValidationMessages(
+            return paramsToValidationMessages(
+                    ValidationStatus.ERROR,
                     error.allUnknownParameters(),
                     ValidationType.UNDECLARED_PARAMETER,
                     param -> "Unbound required parameter used: " + param.name()
-            ));
+            );
         } else if (searchException.error() instanceof EmptyParameterError) {
             final EmptyParameterError error = (EmptyParameterError) searchException.error();
-            return ValidationResponse.warning(paramsToValidationMessages(
+            return paramsToValidationMessages(
+                    ValidationStatus.WARNING,
                     Collections.singleton(error.getParameterUsage()),
                     ValidationType.EMPTY_PARAMETER,
-                    param -> error.description()));
+                    param -> error.description());
         }
-        return ValidationResponse.error(Collections.singletonList(ValidationMessage.fromException(searchException)));
+        return Collections.singletonList(ValidationMessage.fromException(searchException));
     }
 
-    private List<ValidationMessage> paramsToValidationMessages(final Set<QueryParam> params, final ValidationType errorType, final Function<QueryParam, String> messageBuilder) {
+    private List<ValidationMessage> paramsToValidationMessages(ValidationStatus validationStatus, final Set<QueryParam> params, final ValidationType errorType, final Function<QueryParam, String> messageBuilder) {
         return params.stream()
                 .flatMap(param -> {
                     final String errorMessage = messageBuilder.apply(param);
                     return param.positions()
                             .stream()
-                            .map(p -> ValidationMessage.builder(errorType)
+                            .map(p -> ValidationMessage.builder(validationStatus, errorType)
                                     .errorMessage(errorMessage)
                                     .beginLine(p.line())
                                     .endLine(p.line())

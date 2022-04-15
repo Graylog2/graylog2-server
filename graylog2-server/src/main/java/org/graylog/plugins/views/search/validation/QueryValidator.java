@@ -16,10 +16,8 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import org.graylog.plugins.views.search.validation.validators.ValidatorException;
-
 import java.util.List;
 
 public interface QueryValidator {
-    List<ValidationMessage> validate(ValidationContext context) throws ValidatorException;
+    List<ValidationMessage> validate(ValidationContext context);
 }

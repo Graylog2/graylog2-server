@@ -16,14 +16,10 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import org.apache.commons.lang3.StringUtils;
-import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
-import org.graylog.plugins.views.search.validation.validators.ValidatorException;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,53 +28,42 @@ import java.util.stream.Collectors;
 public class QueryValidationServiceImpl implements QueryValidationService {
 
     private final LuceneQueryParser luceneQueryParser;
-    private final MappedFieldTypesService mappedFieldTypesService;
+    private final MappedFieldTypesService fields;
     private final Set<QueryValidator> validators;
 
     @Inject
     public QueryValidationServiceImpl(LuceneQueryParser luceneQueryParser,
-                                      MappedFieldTypesService mappedFieldTypesService,
+                                      MappedFieldTypesService fields,
                                       Set<QueryValidator> validators) {
         this.luceneQueryParser = luceneQueryParser;
-        this.mappedFieldTypesService = mappedFieldTypesService;
+        this.fields = fields;
         this.validators = validators;
     }
 
     @Override
     public ValidationResponse validate(ValidationRequest req) {
 
-        final String rawQuery = req.query().queryString();
-
-        if (StringUtils.isEmpty(rawQuery)) {
+        if (req.isEmptyQuery()) {
             return ValidationResponse.ok();
         }
 
         try {
-            final ParsedQuery parsedQuery = luceneQueryParser.parse(rawQuery);
-            Set<MappedFieldTypeDTO> availableFields = mappedFieldTypesService.fieldTypesByStreamIds(req.streams(), req.timerange());
+            final ParsedQuery parsedQuery = luceneQueryParser.parse(req.rawQuery());
 
             final ValidationContext context = ValidationContext.builder()
                     .request(req)
                     .query(parsedQuery)
-                    .availableFields(availableFields)
+                    .availableFields(fields.fieldTypesByStreamIds(req.streams(), req.timerange()))
                     .build();
 
             final List<ValidationMessage> explanations = validators.stream()
                     .flatMap(val -> val.validate(context).stream())
                     .collect(Collectors.toList());
 
-            return explanations.isEmpty()
-                    ? ValidationResponse.ok()
-                    : ValidationResponse.warning(explanations);
+            return ValidationResponse.withDetectedStatus(explanations);
 
-        } catch (ValidatorException e) {
-          return e.getResponse();
         } catch (Exception e) {
-            return ValidationResponse.error(toExplanation(e));
+            return ValidationResponse.error(ValidationMessage.fromException(e));
         }
-    }
-
-    private List<ValidationMessage> toExplanation(final Exception parseException) {
-        return Collections.singletonList(ValidationMessage.fromException(parseException));
     }
 }

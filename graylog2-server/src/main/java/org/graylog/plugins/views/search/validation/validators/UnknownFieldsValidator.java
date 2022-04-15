@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.validation.QueryValidator;
 import org.graylog.plugins.views.search.validation.ValidationContext;
 import org.graylog.plugins.views.search.validation.ValidationMessage;
 import org.graylog.plugins.views.search.validation.ValidationRequest;
+import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog.plugins.views.search.validation.ValidationType;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 
@@ -40,7 +41,7 @@ public class UnknownFieldsValidator implements QueryValidator {
     @Override
     public List<ValidationMessage> validate(ValidationContext context) {
         return identifyUnknownFields(context).stream().map(f -> {
-            final ValidationMessage.Builder message = ValidationMessage.builder(ValidationType.UNKNOWN_FIELD)
+            final ValidationMessage.Builder message = ValidationMessage.builder(ValidationStatus.WARNING, ValidationType.UNKNOWN_FIELD)
                     .relatedProperty(f.getRealFieldName())
                     .errorMessage("Query contains unknown field: " + f.getRealFieldName());
             f.keyToken().ifPresent(t -> {
