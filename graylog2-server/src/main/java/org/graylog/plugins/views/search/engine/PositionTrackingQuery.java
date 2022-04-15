@@ -64,7 +64,7 @@ public class PositionTrackingQuery {
         final List<QueryFragment> lineFragments = this.fragments.stream().filter(f -> f.getLine() == interpolated.beginLine()).collect(Collectors.toList());
         int linePosition = 0;
         for (QueryFragment fragment : lineFragments) {
-            if (interpolated.beginLine() >= linePosition && interpolated.endColumn() <= linePosition + fragment.originalLength()) {
+            if (interpolated.beginColumn()  >= linePosition && interpolated.endColumn() <= linePosition + fragment.originalLength()) {
                 if (fragment.isInterpolated()) { // we can't map 1:1 interpolated and original positions, let's use the whole fragment
                     return QueryPosition.create(fragment.getLine(), fragment.getOriginalBeginColumn(), fragment.getLine(), fragment.getOriginalEndColumn());
                 } else { // we can map exactly the positions
