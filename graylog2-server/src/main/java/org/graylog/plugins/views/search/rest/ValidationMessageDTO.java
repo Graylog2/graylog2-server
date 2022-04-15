@@ -37,7 +37,6 @@ public abstract class ValidationMessageDTO {
     @Nullable
     public abstract Integer beginColumn();
 
-
     @JsonProperty
     @Nullable
     public abstract Integer endLine();
@@ -56,7 +55,6 @@ public abstract class ValidationMessageDTO {
     @Nullable
     @JsonProperty
     public abstract String relatedProperty();
-
 
     public static ValidationMessageDTO create(ValidationTypeDTO validationType, Integer beginLine, Integer beginColumn, Integer endLine, Integer endColumn, String errorMessage, String relatedProperty) {
         return new AutoValue_ValidationMessageDTO(validationType, beginLine, beginColumn, endLine, endColumn, validationType.errorTitle(), errorMessage, relatedProperty);
