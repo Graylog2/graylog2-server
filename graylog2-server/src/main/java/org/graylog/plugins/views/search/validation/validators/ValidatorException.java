@@ -16,8 +16,18 @@
  */
 package org.graylog.plugins.views.search.validation.validators;
 
+import org.graylog.plugins.views.search.validation.ValidationResponse;
+
 public class ValidatorException extends RuntimeException {
-    public ValidatorException(Throwable throwable) {
-        super(throwable);
+
+
+    private ValidationResponse validationResponse;
+
+    public ValidatorException(ValidationResponse response) {
+        super(response.toString());
+    }
+
+    public ValidationResponse getResponse() {
+        return this.validationResponse;
     }
 }

@@ -19,11 +19,14 @@ package org.graylog.plugins.views.search.validation.validators;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.elasticsearch.QueryParam;
+import org.graylog.plugins .views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.engine.QueryPosition;
+import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.MissingEnterpriseLicenseException;
 import org.graylog.plugins.views.search.errors.SearchException;
+import org.graylog.plugins.views.search.errors.UnboundParameterError;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog.plugins.views.search.validation.FieldTypeValidation;
 import org.graylog.plugins.views.search.validation.LuceneQueryParser;
@@ -37,6 +40,7 @@ import org.graylog.plugins.views.search.validation.ValidationType;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -64,7 +68,16 @@ public class FieldValueTypeValidator implements QueryValidator {
         try {
             return validateQueryValues(decorated, context.availableFields());
         } catch (ParseException e) {
-            throw new ValidatorException(e);
+            throw new ValidatorException(ValidationResponse.error(Collections.singletonList(ValidationMessage.fromException(e))));
+        } catch (SearchException searchException) {
+            throw new ValidatorException(convert(searchException));
+        } catch (MissingEnterpriseLicenseException licenseException) {
+            throw new ValidatorException(ValidationResponse.error(
+                    paramsToValidationMessages(
+                            licenseException.getQueryParams(),
+                            ValidationType.MISSING_LICENSE,
+                            param -> "Search parameter used without enterprise license: " + param.name()
+                    )));
         }
     }
 
@@ -103,6 +116,44 @@ public class FieldValueTypeValidator implements QueryValidator {
                 })
                 .filter(Optional::isPresent)
                 .map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
+
+    private ValidationResponse convert(SearchException searchException) {
+        if (searchException.error() instanceof UnboundParameterError) {
+            final UnboundParameterError error = (UnboundParameterError) searchException.error();
+            return ValidationResponse.error(paramsToValidationMessages(
+                    error.allUnknownParameters(),
+                    ValidationType.UNDECLARED_PARAMETER,
+                    param -> "Unbound required parameter used: " + param.name()
+            ));
+        } else if (searchException.error() instanceof EmptyParameterError) {
+            final EmptyParameterError error = (EmptyParameterError) searchException.error();
+            return ValidationResponse.warning(paramsToValidationMessages(
+                    Collections.singleton(error.getParameterUsage()),
+                    ValidationType.EMPTY_PARAMETER,
+                    param -> error.description()));
+        }
+        return ValidationResponse.error(Collections.singletonList(ValidationMessage.fromException(searchException)));
+    }
+
+    private List<ValidationMessage> paramsToValidationMessages(final Set<QueryParam> params, final ValidationType errorType, final Function<QueryParam, String> messageBuilder) {
+        return params.stream()
+                .flatMap(param -> {
+                    final String errorMessage = messageBuilder.apply(param);
+                    return param.positions()
+                            .stream()
+                            .map(p -> ValidationMessage.builder(errorType)
+                                    .errorMessage(errorMessage)
+                                    .beginLine(p.line())
+                                    .endLine(p.line())
+                                    .beginColumn(p.beginColumn())
+                                    .endColumn(p.endColumn())
+                                    .relatedProperty(param.name())
+                                    .build()
+                            );
+                })
                 .collect(Collectors.toList());
     }
 }

@@ -17,12 +17,6 @@
 package org.graylog.plugins.views.search.validation;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.graylog.plugins.views.search.elasticsearch.QueryParam;
-import org.graylog.plugins.views.search.errors.EmptyParameterError;
-import org.graylog.plugins.views.search.errors.MissingEnterpriseLicenseException;
-import org.graylog.plugins.views.search.errors.SearchException;
-import org.graylog.plugins.views.search.errors.UnboundParameterError;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog.plugins.views.search.validation.validators.ValidatorException;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
@@ -32,7 +26,6 @@ import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -53,8 +46,7 @@ public class QueryValidationServiceImpl implements QueryValidationService {
 
     @Override
     public ValidationResponse validate(ValidationRequest req) {
-        // caution, there are two validation steps!
-        // the validation uses query with _non_replaced parameters, as is, to be able to track the exact positions of errors
+
         final String rawQuery = req.query().queryString();
 
         if (StringUtils.isEmpty(rawQuery)) {
@@ -79,55 +71,11 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                     ? ValidationResponse.ok()
                     : ValidationResponse.warning(explanations);
 
-        } catch (ParseException | ValidatorException e) {
+        } catch (ValidatorException e) {
+          return e.getResponse();
+        } catch (Exception e) {
             return ValidationResponse.error(toExplanation(e));
-        } catch (SearchException searchException) {
-            return convert(searchException);
-        } catch (MissingEnterpriseLicenseException licenseException) {
-            return ValidationResponse.error(
-                    paramsToValidationMessages(
-                            licenseException.getQueryParams(),
-                            ValidationType.MISSING_LICENSE,
-                            param -> "Search parameter used without enterprise license: " + param.name()
-                    ));
         }
-    }
-
-    private ValidationResponse convert(SearchException searchException) {
-        if (searchException.error() instanceof UnboundParameterError) {
-            final UnboundParameterError error = (UnboundParameterError) searchException.error();
-            return ValidationResponse.error(paramsToValidationMessages(
-                    error.allUnknownParameters(),
-                    ValidationType.UNDECLARED_PARAMETER,
-                    param -> "Unbound required parameter used: " + param.name()
-            ));
-        } else if (searchException.error() instanceof EmptyParameterError) {
-            final EmptyParameterError error = (EmptyParameterError) searchException.error();
-            return ValidationResponse.warning(paramsToValidationMessages(
-                    Collections.singleton(error.getParameterUsage()),
-                    ValidationType.EMPTY_PARAMETER,
-                    param -> error.description()));
-        }
-        return ValidationResponse.error(Collections.singletonList(ValidationMessage.fromException(searchException)));
-    }
-
-    private List<ValidationMessage> paramsToValidationMessages(final Set<QueryParam> params, final ValidationType errorType, final Function<QueryParam, String> messageBuilder) {
-        return params.stream()
-                .flatMap(param -> {
-                    final String errorMessage = messageBuilder.apply(param);
-                    return param.positions()
-                            .stream()
-                            .map(p -> ValidationMessage.builder(errorType)
-                                    .errorMessage(errorMessage)
-                                    .beginLine(p.line())
-                                    .endLine(p.line())
-                                    .beginColumn(p.beginColumn())
-                                    .endColumn(p.endColumn())
-                                    .relatedProperty(param.name())
-                                    .build()
-                            );
-                })
-                .collect(Collectors.toList());
     }
 
     private List<ValidationMessage> toExplanation(final Exception parseException) {
