@@ -30,6 +30,7 @@ import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.rest.SeriesDescription;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.validation.QueryValidator;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.VersionAwareModule;
@@ -98,6 +99,14 @@ public abstract class ViewsModule extends VersionAwareModule {
 
     protected OptionalBinder<QueryStringDecorator> esQueryDecoratorBinder() {
         return OptionalBinder.newOptionalBinder(binder(), QueryStringDecorator.class);
+    }
+
+    protected void registerQueryValidator(Class<? extends QueryValidator> validator) {
+        queryValidatorMultibinder().addBinding().to(validator);
+    }
+
+    protected Multibinder<QueryValidator> queryValidatorMultibinder() {
+        return Multibinder.newSetBinder(binder(), QueryValidator.class);
     }
 
 }

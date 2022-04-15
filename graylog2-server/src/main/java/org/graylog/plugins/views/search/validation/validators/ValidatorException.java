@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.validation;
+package org.graylog.plugins.views.search.validation.validators;
 
-import org.graylog.plugins.views.search.validation.validators.ValidatorException;
-
-import java.util.List;
-
-public interface QueryValidator {
-    List<ValidationMessage> validate(ValidationContext context) throws ValidatorException;
+public class ValidatorException extends RuntimeException {
+    public ValidatorException(Throwable throwable) {
+        super(throwable);
+    }
 }

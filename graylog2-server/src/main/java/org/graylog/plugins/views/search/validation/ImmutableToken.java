@@ -55,9 +55,4 @@ public abstract class ImmutableToken {
     public boolean matches(int tokenType, String tokenValue) {
         return kind() == tokenType && image().equals(tokenValue);
     }
-
-
-    public boolean isInvalidOperator() {
-        return kind() == QueryParserConstants.TERM && ("and".equals(image()) || "or".equals(image()) || "not".equals(image()));
-    }
 }
