@@ -54,10 +54,10 @@ class InvalidOperatorsValidatorTest {
         assertThat(message.relatedProperty()).isEqualTo("and");
 
 
-        assertThat(message.beginColumn()).isEqualTo(8);
-        assertThat(message.beginLine()).isEqualTo(1);
-        assertThat(message.endColumn()).isEqualTo(11);
-        assertThat(message.endLine()).isEqualTo(1);
+        assertThat(message.position().beginColumn()).isEqualTo(8);
+        assertThat(message.position().beginLine()).isEqualTo(1);
+        assertThat(message.position().endColumn()).isEqualTo(11);
+        assertThat(message.position().endLine()).isEqualTo(1);
     }
 
 

@@ -20,9 +20,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.Position;
+import org.graylog.plugins.views.search.engine.QueryPosition;
 import org.graylog2.shared.utilities.ExceptionUtils;
 
 import javax.annotation.Nullable;
+import java.awt.*;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -33,17 +36,7 @@ public abstract class ValidationMessage {
 
     private static final Pattern regexPosition = Pattern.compile(".*at line (\\d+), column (\\d+).", Pattern.MULTILINE | Pattern.DOTALL);
 
-    @Nullable
-    public abstract Integer beginLine();
-
-    @Nullable
-    public abstract Integer beginColumn();
-
-    @Nullable
-    public abstract Integer endLine();
-
-    @Nullable
-    public abstract Integer endColumn();
+    public abstract QueryPosition position();
 
     public abstract String errorMessage();
 
@@ -65,11 +58,12 @@ public abstract class ValidationMessage {
 
         final Matcher positionMatcher = regexPosition.matcher(input);
         if (positionMatcher.find()) {
-            errorBuilder.beginLine(1);
-            errorBuilder.beginColumn(0);
-
-            errorBuilder.endLine(Integer.parseInt(positionMatcher.group(1)));
-            errorBuilder.endColumn(Integer.parseInt(positionMatcher.group(2)));
+            errorBuilder.position(QueryPosition.builder()
+                    .beginLine(1)
+                    .beginColumn(0)
+                    .endLine(Integer.parseInt(positionMatcher.group(1)))
+                    .endColumn(Integer.parseInt(positionMatcher.group(2)))
+                    .build());
         }
 
         return errorBuilder.build();
@@ -91,17 +85,13 @@ public abstract class ValidationMessage {
                 .validationType(validationType);
     }
 
+    public abstract Builder toBuilder();
+
 
     @AutoValue.Builder
     public abstract static class Builder {
 
-        public abstract Builder beginLine(int line);
-
-        public abstract Builder beginColumn(int column);
-
-        public abstract Builder endLine(int line);
-
-        public abstract Builder endColumn(int column);
+        public abstract Builder position(QueryPosition position);
 
         public abstract Builder errorMessage(String errorMessage);
 
@@ -113,6 +103,4 @@ public abstract class ValidationMessage {
 
         public abstract ValidationMessage build();
     }
-
-
 }

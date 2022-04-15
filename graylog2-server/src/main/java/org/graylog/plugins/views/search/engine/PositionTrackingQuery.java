@@ -60,23 +60,23 @@ public class PositionTrackingQuery {
         return stringBuilder.toString();
     }
 
-    public Optional<QueryPosition> backtrackPosition(int line, int interpolatedBeginColumn, int interpolatedEndColumn) {
-        final List<QueryFragment> lineFragments = this.fragments.stream().filter(f -> f.getLine() == line).collect(Collectors.toList());
+    public QueryPosition backtrackPosition(QueryPosition interpolated) {
+        final List<QueryFragment> lineFragments = this.fragments.stream().filter(f -> f.getLine() == interpolated.beginLine()).collect(Collectors.toList());
         int linePosition = 0;
         for (QueryFragment fragment : lineFragments) {
-            if (interpolatedBeginColumn >= linePosition && interpolatedEndColumn <= linePosition + fragment.originalLength()) {
+            if (interpolated.beginLine() >= linePosition && interpolated.endColumn() <= linePosition + fragment.originalLength()) {
                 if (fragment.isInterpolated()) { // we can't map 1:1 interpolated and original positions, let's use the whole fragment
-                    return Optional.of(new QueryPosition(fragment.getLine(), fragment.getOriginalBeginColumn(), fragment.getOriginalEndColumn()));
+                    return QueryPosition.create(fragment.getLine(), fragment.getOriginalBeginColumn(), fragment.getLine(), fragment.getOriginalEndColumn());
                 } else { // we can map exactly the positions
-                    final int offsetStart = interpolatedBeginColumn - linePosition;
-                    final int offsetEnd = linePosition + fragment.interpolatedLength() - interpolatedEndColumn;
+                    final int offsetStart = interpolated.beginColumn() - linePosition;
+                    final int offsetEnd = linePosition + fragment.interpolatedLength() - interpolated.endColumn();
                     final int globalOriginalStart = fragment.getOriginalBeginColumn() + offsetStart;
                     final int globalOriginalEnd = fragment.getOriginalBeginColumn() + fragment.originalLength() - offsetEnd;
-                    return Optional.of(new QueryPosition(line, globalOriginalStart, globalOriginalEnd));
+                    return QueryPosition.create(interpolated.beginLine(), globalOriginalStart, interpolated.endLine(), globalOriginalEnd);
                 }
             }
             linePosition = linePosition + fragment.interpolatedLength();
         }
-        return Optional.empty();
+        throw new IllegalArgumentException("Failed to backtrack position: " + interpolated);
     }
 }

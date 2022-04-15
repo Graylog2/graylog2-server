@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.validation.validators;
 
 import org.apache.lucene.queryparser.classic.QueryParserConstants;
+import org.graylog.plugins.views.search.engine.QueryPosition;
 import org.graylog.plugins.views.search.validation.ImmutableToken;
 import org.graylog.plugins.views.search.validation.QueryValidator;
 import org.graylog.plugins.views.search.validation.ValidationContext;
@@ -48,10 +49,7 @@ public class InvalidOperatorsValidator implements QueryValidator {
                     return ValidationMessage.builder(ValidationStatus.WARNING, ValidationType.INVALID_OPERATOR)
                             .errorMessage(errorMessage)
                             .relatedProperty(token.image())
-                            .beginLine(token.beginLine())
-                            .beginColumn(token.beginColumn())
-                            .endLine(token.endLine())
-                            .endColumn(token.endColumn())
+                            .position(QueryPosition.from(token))
                             .build();
                 }).collect(Collectors.toList());
     }

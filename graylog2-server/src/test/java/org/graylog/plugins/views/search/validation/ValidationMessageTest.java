@@ -34,10 +34,10 @@ class ValidationMessageTest {
             fail("Should throw an exception!");
         } catch (ParseException e) {
             final ValidationMessage validationMessage = ValidationMessage.fromException( e);
-            assertThat(validationMessage.beginLine()).isEqualTo(1);
-            assertThat(validationMessage.endLine()).isEqualTo(1);
-            assertThat(validationMessage.beginColumn()).isEqualTo(0);
-            assertThat(validationMessage.endColumn()).isEqualTo(4);
+            assertThat(validationMessage.position().beginLine()).isEqualTo(1);
+            assertThat(validationMessage.position().endLine()).isEqualTo(1);
+            assertThat(validationMessage.position().beginColumn()).isEqualTo(0);
+            assertThat(validationMessage.position().endColumn()).isEqualTo(4);
             assertThat(validationMessage.validationType()).isEqualTo(ValidationType.QUERY_PARSING_ERROR);
             assertThat(validationMessage.errorMessage()).startsWith("Cannot parse query, cause: incomplete query, query ended unexpectedly");
         }

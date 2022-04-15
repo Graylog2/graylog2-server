@@ -35,7 +35,6 @@ import org.graylog.plugins.views.search.validation.QueryValidator;
 import org.graylog.plugins.views.search.validation.ValidationContext;
 import org.graylog.plugins.views.search.validation.ValidationMessage;
 import org.graylog.plugins.views.search.validation.ValidationRequest;
-import org.graylog.plugins.views.search.validation.ValidationResponse;
 import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog.plugins.views.search.validation.ValidationType;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
@@ -99,19 +98,9 @@ public class FieldValueTypeValidator implements QueryValidator {
                             .map(MappedFieldTypeDTO::type)
                             .map(FieldTypes.Type::type);
                     return typeName.flatMap(type -> fieldTypeValidation.validateFieldValueType(term, type))
-                            .map(validation -> {
-
-                                final Optional<QueryPosition> backtrackedPosition = decorated.backtrackPosition(validation.beginLine(), validation.beginColumn(), validation.endColumn());
-
-                                return ValidationMessage.builder(ValidationStatus.WARNING, validation.validationType())
-                                        .errorMessage(validation.errorMessage())
-                                        .relatedProperty(validation.relatedProperty())
-                                        .beginLine(validation.beginLine())
-                                        .beginColumn(backtrackedPosition.map(QueryPosition::getBeginColumn).orElse(validation.beginColumn()))
-                                        .endLine(validation.endLine())
-                                        .endColumn(backtrackedPosition.map(QueryPosition::getEndColumn).orElse(validation.endColumn()))
-                                        .build();
-                            });
+                            .map(validation -> validation.toBuilder()
+                                    .position(decorated.backtrackPosition(validation.position()))
+                                    .build());
                 })
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -145,12 +134,9 @@ public class FieldValueTypeValidator implements QueryValidator {
                     final String errorMessage = messageBuilder.apply(param);
                     return param.positions()
                             .stream()
-                            .map(p -> ValidationMessage.builder(validationStatus, errorType)
+                            .map(pos -> ValidationMessage.builder(validationStatus, errorType)
                                     .errorMessage(errorMessage)
-                                    .beginLine(p.line())
-                                    .endLine(p.line())
-                                    .beginColumn(p.beginColumn())
-                                    .endColumn(p.endColumn())
+                                    .position(QueryPosition.from(pos))
                                     .relatedProperty(param.name())
                                     .build()
                             );
