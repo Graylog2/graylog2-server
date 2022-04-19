@@ -23,7 +23,6 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import AggregationBuilder from './AggregationBuilder';
 import EmptyAggregationContent from './EmptyAggregationContent';
 
-import EmptyResultWidget from '../widgets/EmptyResultWidget';
 import OnVisualizationConfigChangeContext from '../aggregationwizard/OnVisualizationConfigChangeContext';
 
 const mockDummyVisualization = () => 'dummy-visualization';
@@ -58,7 +57,7 @@ describe('AggregationBuilder', () => {
                                               fields={{}}
                                               data={{ chart: { total: 42, rows: [{ value: 3.1415926 }] } }} />);
 
-    expect(wrapper.find(EmptyResultWidget)).toHaveLength(0);
+    expect(wrapper.find(EmptyAggregationContent)).toHaveLength(0);
     expect(wrapper.find(EmptyAggregationContent)).toHaveLength(0);
 
     const dummyVisualization = wrapper.find(mockDummyVisualization);

@@ -21,7 +21,6 @@ import type { PluginExports } from 'graylog-web-plugin/plugin';
 import type { WidgetComponentProps } from 'views/types';
 import Routes from 'routing/Routes';
 import App from 'routing/App';
-import AppConfig from 'util/AppConfig';
 import { MessageListHandler } from 'views/logic/searchtypes/messages';
 import { MessageList } from 'views/components/widgets';
 import AddToTableActionHandler from 'views/logic/fieldactions/AddToTableActionHandler';
@@ -48,7 +47,6 @@ import DataTable from 'views/components/datatable/DataTable';
 import FieldStatisticsHandler from 'views/logic/fieldactions/FieldStatisticsHandler';
 import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHandler';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
-import AggregationControls from 'views/components/aggregationbuilder/AggregationControls';
 import EditMessageList from 'views/components/widgets/EditMessageList';
 import { DashboardsPage, ShowViewPage, NewSearchPage, NewDashboardPage, StreamSearchPage } from 'views/pages';
 import AddMessageCountActionHandler from 'views/logic/fieldactions/AddMessageCountActionHandler';
@@ -157,9 +155,7 @@ const exports: PluginExports = {
       defaultWidth: 4,
       reportStyle: () => ({ width: 600 }),
       visualizationComponent: AggregationBuilder,
-      editComponent: AppConfig.isFeatureEnabled('legacy-aggregation-wizard')
-        ? AggregationControls
-        : AggregationWizard,
+      editComponent: AggregationWizard,
       needsControlledHeight: (widget: Widget) => {
         const widgetVisualization = get(widget, 'config.visualization');
         const flexibleHeightWidgets = [
