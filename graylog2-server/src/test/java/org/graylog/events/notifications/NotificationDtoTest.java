@@ -21,6 +21,7 @@ import org.graylog.events.legacy.LegacyAlarmCallbackEventNotificationConfig;
 import org.graylog.events.notifications.types.EmailEventNotificationConfig;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.graylog2.security.encryption.EncryptedValue;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -150,7 +151,7 @@ public class NotificationDtoTest {
 
         httpConfig = HTTPEventNotificationConfig.Builder.create()
                 .url("http://localhost")
-                .apiKeyValue("xxx")
+                .apiKeyValue(EncryptedValue.builder().value("xxx").salt("123").isDeleteValue(false).isKeepValue(false).build())
                 .build();
         notification = getHttpNotification(httpConfig);
         validationResult = notification.validate();

@@ -34,6 +34,7 @@ import org.graylog.events.notifications.NotificationTestData;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog2.plugin.MessageSummary;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.slf4j.Logger;
@@ -61,16 +62,19 @@ public class HTTPEventNotification implements EventNotification {
     private final OkHttpClient httpClient;
     private final UrlWhitelistService whitelistService;
     private final UrlWhitelistNotificationService urlWhitelistNotificationService;
+    private final EncryptedValueService encryptedValueService;
 
     @Inject
     public HTTPEventNotification(EventNotificationService notificationCallbackService, ObjectMapper objectMapper,
-            final OkHttpClient httpClient, UrlWhitelistService whitelistService,
-            UrlWhitelistNotificationService urlWhitelistNotificationService) {
+                                 final OkHttpClient httpClient, UrlWhitelistService whitelistService,
+                                 UrlWhitelistNotificationService urlWhitelistNotificationService,
+                                 EncryptedValueService encryptedValueService) {
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapper = objectMapper;
         this.httpClient = httpClient;
         this.whitelistService = whitelistService;
         this.urlWhitelistNotificationService = urlWhitelistNotificationService;
+        this.encryptedValueService = encryptedValueService;
     }
 
     @Override
@@ -101,13 +105,14 @@ public class HTTPEventNotification implements EventNotification {
         }
 
         final Request.Builder builder = new Request.Builder();
-        if (!Strings.isNullOrEmpty(config.basicAuth())) {
-            String basicAuth = "Basic"+ Base64.getEncoder().encodeToString(config.basicAuth().getBytes(StandardCharsets.UTF_8));
-            builder.addHeader("Authorization", basicAuth);
+        final String basicAuthHeaderValue = getBasicAuthHeaderValue(config);
+        if (!Strings.isNullOrEmpty(basicAuthHeaderValue)) {
+            builder.addHeader("Authorization", basicAuthHeaderValue);
         }
 
         if (!Strings.isNullOrEmpty(config.apiKey())) {
-            HttpUrl urlWithApiKey = httpUrl.newBuilder().addQueryParameter(config.apiKey(), config.apiKeyValue()).build();
+            final String apiKeyValue = getApiKeyValue(config);
+            HttpUrl urlWithApiKey = httpUrl.newBuilder().addQueryParameter(config.apiKey(), apiKeyValue).build();
             builder.url(urlWithApiKey);
         }
         else {
@@ -137,5 +142,20 @@ public class HTTPEventNotification implements EventNotification {
                 "\" is trying to access a URL which is not whitelisted. Please check your configuration. [url: \"" +
                 url + "\"]";
         urlWhitelistNotificationService.publishWhitelistFailure(description);
+    }
+
+    private String getBasicAuthHeaderValue(HTTPEventNotificationConfig config) {
+        if (config.basicAuth() == null) {
+            return null;
+        }
+        String credentials = encryptedValueService.decrypt(config.basicAuth());
+        return "Basic " + com.unboundid.util.Base64.encode(credentials.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private  String getApiKeyValue(HTTPEventNotificationConfig config) {
+        if (config.apiKeyValue() == null) {
+            return null;
+        }
+        return encryptedValueService.decrypt(config.apiKeyValue());
     }
 }

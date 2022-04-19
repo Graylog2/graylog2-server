@@ -26,7 +26,6 @@ import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 
 @AutoValue
@@ -37,21 +36,6 @@ public abstract class HttpEventNotificationConfigEntity implements EventNotifica
     public static final String TYPE_NAME = "http-notification-v1";
 
     private static final String FIELD_URL = "url";
-    private static final String FIELD_BASIC_AUTH = "basic_auth";
-    private static final String FIELD_APIKEY = "apikey";
-    private static final String FIELD_APIKEY_VALUE = "apikey_value";
-
-    @JsonProperty(FIELD_BASIC_AUTH)
-    @Nullable
-    public abstract String basicAuth();
-
-    @JsonProperty(FIELD_APIKEY)
-    @Nullable
-    public abstract String apiKey();
-
-    @JsonProperty(FIELD_APIKEY_VALUE)
-    @Nullable
-    public abstract String apiKeyValue();
 
     @JsonProperty(FIELD_URL)
     public abstract ValueReference url();
@@ -63,22 +47,13 @@ public abstract class HttpEventNotificationConfigEntity implements EventNotifica
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public abstract static class Builder implements EventNotificationConfigEntity.Builder<Builder> {
+    public static abstract class Builder implements EventNotificationConfigEntity.Builder<Builder> {
 
         @JsonCreator
         public static Builder create() {
             return new AutoValue_HttpEventNotificationConfigEntity.Builder()
                     .type(TYPE_NAME);
         }
-
-        @JsonProperty(FIELD_BASIC_AUTH)
-        public abstract Builder basicAuth(String basicAuth);
-
-        @JsonProperty(FIELD_APIKEY)
-        public abstract Builder apiKey(String apiKey);
-
-        @JsonProperty(FIELD_APIKEY_VALUE)
-        public abstract Builder apiKeyValue(String apiKeyValue);
 
         @JsonProperty(FIELD_URL)
         public abstract Builder url(ValueReference url);
@@ -89,9 +64,6 @@ public abstract class HttpEventNotificationConfigEntity implements EventNotifica
     @Override
     public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         return HTTPEventNotificationConfig.builder()
-                .basicAuth(basicAuth())
-                .apiKey(apiKey())
-                .apiKeyValue(apiKeyValue())
                 .url(url().asString(parameters))
                 .build();
     }

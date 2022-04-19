@@ -32,7 +32,9 @@ import org.graylog.scheduler.JobTriggerData;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.graylog2.security.encryption.EncryptedValue;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 @AutoValue
@@ -48,7 +50,7 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
 
     @JsonProperty(FIELD_BASIC_AUTH)
     @Nullable
-    public abstract String basicAuth();
+    public abstract EncryptedValue basicAuth();
 
     @JsonProperty(FIELD_APIKEY)
     @Nullable
@@ -56,7 +58,7 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
 
     @JsonProperty(FIELD_APIKEY_VALUE)
     @Nullable
-    public abstract String apiKeyValue();
+    public abstract EncryptedValue apiKeyValue();
 
     @JsonProperty(FIELD_URL)
     public abstract String url();
@@ -70,6 +72,7 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
         return Builder.create();
     }
 
+    public abstract Builder toBuilder();
     @JsonIgnore
     public ValidationResult validate() {
         final ValidationResult validation = new ValidationResult();
@@ -77,18 +80,32 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
         if (url().isEmpty()) {
             validation.addError(FIELD_URL, "HTTP Notification url cannot be empty.");
         }
-        if (Strings.isNullOrEmpty(apiKey()) && !Strings.isNullOrEmpty(apiKeyValue())) {
+        if (Strings.isNullOrEmpty(apiKey()) && (apiKeyValue() != null) && apiKeyValue().isSet()) {
             validation.addError(FIELD_APIKEY, "HTTP Notification cannot specify API key value without API key");
         }
-        if (!Strings.isNullOrEmpty(apiKey()) && Strings.isNullOrEmpty(apiKeyValue())) {
+        if (!Strings.isNullOrEmpty(apiKey()) && (apiKeyValue() == null)) {
             validation.addError(FIELD_APIKEY_VALUE, "HTTP Notification cannot specify API key without API key value");
         }
 
         return validation;
     }
 
+    @Override
+    @JsonIgnore
+    public EventNotificationConfig prepareConfigUpdate(@Nonnull EventNotificationConfig newConfig) {
+        final HTTPEventNotificationConfig newHttpConfig = (HTTPEventNotificationConfig) newConfig;
+        if (newHttpConfig.basicAuth() != null && newHttpConfig.basicAuth().isDeleteValue()) {
+            return newHttpConfig.toBuilder().basicAuth(null).build();
+        }
+        if (newHttpConfig.apiKeyValue() != null && newHttpConfig.apiKeyValue().isKeepValue()) {
+            // If the client secret should be kept, use the value from the existing config
+            return newHttpConfig.toBuilder().apiKeyValue(apiKeyValue()).build();
+        }
+        return newHttpConfig;
+    }
+
     @AutoValue.Builder
-    public static abstract class Builder implements EventNotificationConfig.Builder<Builder> {
+    public abstract static class Builder implements EventNotificationConfig.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_HTTPEventNotificationConfig.Builder()
@@ -96,16 +113,13 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
         }
 
         @JsonProperty(FIELD_BASIC_AUTH)
-        @Nullable
-        public abstract Builder basicAuth(String basicAuth);
+        public abstract Builder basicAuth(EncryptedValue basicAuth);
 
         @JsonProperty(FIELD_APIKEY)
-        @Nullable
         public abstract Builder apiKey(String apiKey);
 
         @JsonProperty(FIELD_APIKEY_VALUE)
-        @Nullable
-        public abstract Builder apiKeyValue(String apiKeyValue);
+        public abstract Builder apiKeyValue(EncryptedValue apiKeyValue);
 
         @JsonProperty(FIELD_URL)
         public abstract Builder url(String url);
@@ -116,9 +130,6 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
     @Override
     public EventNotificationConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         return HttpEventNotificationConfigEntity.builder()
-                .basicAuth(basicAuth())
-                .apiKey(apiKey())
-                .apiKeyValue(apiKeyValue())
                 .url(ValueReference.of(url()))
                 .build();
     }

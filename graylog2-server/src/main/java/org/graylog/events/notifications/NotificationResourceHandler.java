@@ -60,10 +60,10 @@ public class NotificationResourceHandler {
     public NotificationDto create(NotificationDto unsavedDto, Optional<User> user) {
         final NotificationDto dto;
         if (user.isPresent()) {
-            dto = notificationService.saveWithOwnership(unsavedDto, user.get());
+            dto = notificationService.saveWithOwnership(prepareUpdate(unsavedDto), user.get());
             LOG.debug("Created notification definition <{}/{}> with user <{}>", dto.id(), dto.title(), user.get());
         } else {
-            dto = notificationService.save(unsavedDto);
+            dto = notificationService.save(prepareUpdate(unsavedDto));
             LOG.debug("Created notification definition <{}/{}> without user", dto.id(), dto.title());
         }
 
@@ -86,6 +86,17 @@ public class NotificationResourceHandler {
         }
 
         return dto;
+    }
+
+    private NotificationDto prepareUpdate(NotificationDto newDto) {
+        if (newDto.id() == null) {
+            // It's not an update
+            return newDto;
+        }
+        final NotificationDto existingDto = notificationService.get(newDto.id())
+                .orElseThrow(() -> new IllegalArgumentException("Couldn't find notification for ID " + newDto.id()));
+        EventNotificationConfig newConfig = existingDto.config().prepareConfigUpdate(newDto.config());
+        return newDto.toBuilder().config(newConfig).build();
     }
 
     /**
