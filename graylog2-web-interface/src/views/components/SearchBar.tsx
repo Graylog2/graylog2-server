@@ -53,6 +53,7 @@ import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import PluggableSearchBarControls from 'views/components/searchbar/PluggableSearchBarControls';
 import { SearchActions } from 'views/stores/SearchStore';
+import PluggableSearchBarControls from 'views/components/searchbar/PluggableSearchBarControls';
 
 import ValidateOnParameterChange from './searchbar/ValidateOnParameterChange';
 import SearchBarForm from './searchbar/SearchBarForm';
