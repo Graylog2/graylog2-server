@@ -30,7 +30,7 @@ type MetricError = {
   percentile?: string,
 };
 
-const hasErrors = <T extends {}>(errors: Array<T>): boolean => {
+const hasErrors = <T extends {}> (errors: Array<T>): boolean => {
   return errors.filter((error) => Object.keys(error).length > 0).length > 0;
 };
 
@@ -104,7 +104,7 @@ const MetricElement: AggregationElement = {
     .series(metricsToSeries(formValues.metrics)),
   onRemove: ((index, formValues) => ({
     ...formValues,
-    metrics: formValues.metrics.filter((value, i) => index !== i),
+    metrics: formValues.metrics.filter((_value, i) => index !== i),
   })),
   component: MetricsConfiguration,
   validate: validateMetrics,

@@ -31,7 +31,7 @@ const SUGGESTIONS_PAGE_SIZE = 50;
 type SuggestionsResponse = {
   field: string,
   input: string,
-  suggestions: Array<{ value: string, occurrence: number}> | undefined,
+  suggestions: Array<{ value: string, occurrence: number }> | undefined,
   sum_other_docs_count: number,
 }
 

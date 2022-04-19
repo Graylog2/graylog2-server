@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import com.google.common.collect.Streams;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.graylog.plugins.views.search.ParameterProvider;
@@ -28,12 +27,13 @@ import org.graylog.plugins.views.search.errors.MissingEnterpriseLicenseException
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.errors.UnboundParameterError;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
-import org.graylog.plugins.views.search.validation.fields.UnknownFieldsIdentifier;
+import org.graylog.plugins.views.search.validation.fields.UnknownFieldsValidator;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -43,7 +43,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Singleton
 public class QueryValidationServiceImpl implements QueryValidationService {
@@ -52,14 +51,14 @@ public class QueryValidationServiceImpl implements QueryValidationService {
     private final MappedFieldTypesService mappedFieldTypesService;
     private final QueryStringDecorators queryStringDecorators;
     private final FieldTypeValidation fieldTypeValidation;
-    private final UnknownFieldsIdentifier unknownFieldsIdentifier;
+    private final QueryValidator unknownFieldsIdentifier;
 
     @Inject
     public QueryValidationServiceImpl(LuceneQueryParser luceneQueryParser,
                                       MappedFieldTypesService mappedFieldTypesService,
                                       QueryStringDecorators queryStringDecorators,
                                       FieldTypeValidation fieldTypeValidation,
-                                      UnknownFieldsIdentifier unknownFieldsIdentifier) {
+                                      UnknownFieldsValidator unknownFieldsIdentifier) {
         this.luceneQueryParser = luceneQueryParser;
         this.mappedFieldTypesService = mappedFieldTypesService;
         this.queryStringDecorators = queryStringDecorators;
@@ -94,10 +93,18 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         try {
             final ParsedQuery parsedQuery = luceneQueryParser.parse(rawQuery);
             Set<MappedFieldTypeDTO> availableFields = mappedFieldTypesService.fieldTypesByStreamIds(req.streams(), req.timerange());
-            final List<ParsedTerm> unknownFields = unknownFieldsIdentifier.identifyUnknownFields(req, parsedQuery.terms());
-            final List<ParsedTerm> invalidOperators = parsedQuery.invalidOperators();
-            final List<ValidationMessage> explanations = getExplanations(unknownFields, invalidOperators);
 
+            final ValidationContext context = ValidationContext.builder()
+                    .request(req)
+                    .query(parsedQuery)
+                    .availableFields(availableFields)
+                    .build();
+
+
+            final List<ValidationMessage> explanations = new ArrayList<>();
+
+            explanations.addAll(unknownFieldsIdentifier.validate(context));
+            explanations.addAll(invalidOperators(parsedQuery.invalidOperators()));
             explanations.addAll(validateQueryValues(rawQuery, decorated, availableFields));
 
             return explanations.isEmpty()
@@ -107,6 +114,19 @@ public class QueryValidationServiceImpl implements QueryValidationService {
         } catch (ParseException e) {
             return ValidationResponse.error(toExplanation(e));
         }
+    }
+
+    private List<ValidationMessage> invalidOperators(List<ImmutableToken> invalidOperators) {
+        return invalidOperators.stream().map(token -> {
+            final String errorMessage = String.format(Locale.ROOT, "Query contains invalid operator \"%s\". All AND / OR / NOT operators have to be written uppercase", token.image());
+            return ValidationMessage.builder(ValidationType.INVALID_OPERATOR)
+                    .errorMessage(errorMessage)
+                    .beginLine(token.beginLine())
+                    .beginColumn(token.beginColumn())
+                    .endLine(token.endLine())
+                    .endColumn(token.endColumn())
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     private ValidationResponse convert(SearchException searchException) {
@@ -148,43 +168,6 @@ public class QueryValidationServiceImpl implements QueryValidationService {
 
     private List<ValidationMessage> toExplanation(final ParseException parseException) {
         return Collections.singletonList(ValidationMessage.fromException(parseException));
-    }
-
-    private List<ValidationMessage> getExplanations(List<ParsedTerm> unknownFields, List<ParsedTerm> invalidOperators) {
-
-
-        final Stream<ValidationMessage> unknownFieldsStream = unknownFields.stream().map(f -> {
-            final ValidationMessage.Builder message = ValidationMessage.builder(ValidationType.UNKNOWN_FIELD)
-                    .relatedProperty(f.getRealFieldName())
-                    .errorMessage("Query contains unknown field: " + f.getRealFieldName());
-
-            f.keyToken().ifPresent(t -> {
-                message.beginLine(t.beginLine());
-                message.beginColumn(t.beginColumn());
-                message.endLine(t.endLine());
-                message.endColumn(t.endColumn());
-            });
-
-            return message.build();
-        });
-
-        final Stream<ValidationMessage> invalidOperatorsStream = invalidOperators.stream()
-                .map(term -> {
-                    final String errorMessage = String.format(Locale.ROOT, "Query contains invalid operator \"%s\". All AND / OR / NOT operators have to be written uppercase", term.value());
-                    final ValidationMessage.Builder message = ValidationMessage.builder(ValidationType.INVALID_OPERATOR)
-                            .errorMessage(errorMessage);
-                    term.keyToken().ifPresent(t -> {
-                        message.beginLine(t.beginLine());
-                        message.beginColumn(t.beginColumn());
-                        message.endLine(t.endLine());
-                        message.endColumn(t.endColumn());
-                    });
-                    return message.build();
-                });
-
-        return Streams.concat(unknownFieldsStream, invalidOperatorsStream)
-                .distinct()
-                .collect(Collectors.toList());
     }
 
     private List<ValidationMessage> validateQueryValues(String rawQuery, String decorated, Set<MappedFieldTypeDTO> availableFields) throws ParseException {

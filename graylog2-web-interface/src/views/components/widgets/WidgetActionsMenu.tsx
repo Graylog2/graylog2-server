@@ -28,12 +28,12 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
+import type { ViewStoreState } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import SearchActions from 'views/actions/SearchActions';
 import type { SearchJson } from 'views/logic/search/Search';
 import Search from 'views/logic/search/Search';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
-import type { ViewStoreState } from 'views/stores/ViewStore';
 import IfSearch from 'views/components/search/IfSearch';
 import { MenuItem } from 'components/bootstrap';
 import { WidgetActions } from 'views/stores/WidgetStore';
@@ -127,7 +127,7 @@ const _onMoveWidgetToTab = (
 };
 
 // eslint-disable-next-line no-alert
-const defaultOnDeleteWidget = async (widget: Widget, view: View, title: string) => window.confirm(`Are you sure you want to remove the widget "${title}"?`);
+const defaultOnDeleteWidget = async (_widget: Widget, _view: View, title: string) => window.confirm(`Are you sure you want to remove the widget "${title}"?`);
 
 const _onDelete = async (widget: Widget, view: View, title: string) => {
   const pluggableWidgetDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingWidget');

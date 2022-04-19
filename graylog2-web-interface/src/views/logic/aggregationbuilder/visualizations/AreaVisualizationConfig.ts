@@ -59,7 +59,7 @@ export default class AreaVisualizationConfig extends VisualizationConfig {
     return { interpolation };
   }
 
-  static fromJSON(type: string, value: AreaVisualizationConfigJSON = { interpolation: 'linear' }) {
+  static fromJSON(_type: string, value: AreaVisualizationConfigJSON = { interpolation: 'linear' }) {
     const { interpolation = 'linear' } = value;
 
     return AreaVisualizationConfig.create(interpolation);

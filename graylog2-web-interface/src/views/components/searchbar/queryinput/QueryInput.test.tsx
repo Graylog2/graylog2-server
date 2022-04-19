@@ -29,7 +29,7 @@ jest.mock('views/actions/QueryValidationActions', () => ({
 
 class Completer {
   // eslint-disable-next-line class-methods-use-this
-  getCompletions = (editor, session, pos, prefix, callback) => {
+  getCompletions = (_editor, _session, _pos, _prefix, callback) => {
     callback(null, []);
   };
 

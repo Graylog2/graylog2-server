@@ -21,12 +21,12 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
 
 public class LuceneQueryParser {
-    private final TermCollectingQueryParser parser;
+    private final TokenCollectingQueryParser parser;
     private final StandardAnalyzer analyzer;
 
     public LuceneQueryParser() {
         analyzer = new StandardAnalyzer();
-        this.parser = new TermCollectingQueryParser(ParsedTerm.DEFAULT_FIELD, analyzer);
+        this.parser = new TokenCollectingQueryParser(ParsedTerm.DEFAULT_FIELD, analyzer);
         this.parser.setSplitOnWhitespace(true);
     }
 

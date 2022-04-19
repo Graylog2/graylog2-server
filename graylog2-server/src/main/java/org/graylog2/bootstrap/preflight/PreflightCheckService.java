@@ -26,8 +26,8 @@ import java.util.Map;
 public class PreflightCheckService {
     private static final Logger LOG = LoggerFactory.getLogger(PreflightCheckService.class);
 
-    private Map<String, PreflightCheck> preflightChecks;
-    private boolean skipPreflightChecks;
+    private final Map<String, PreflightCheck> preflightChecks;
+    private final boolean skipPreflightChecks;
 
     @Inject
     public PreflightCheckService(Map<String, PreflightCheck> preflightChecks,
@@ -36,11 +36,22 @@ public class PreflightCheckService {
         this.skipPreflightChecks = skipPreflightChecks;
     }
 
-    public void runChecks() {
+    /**
+     * Performs preflight checks. In case of a failure, logs the cause of it.
+     *
+     * @throws PreflightCheckException If a preflight check failed.
+     */
+    public void runChecks() throws PreflightCheckException {
         if (skipPreflightChecks) {
             LOG.info("Skipping preflight checks");
             return;
         }
-        preflightChecks.values().forEach(PreflightCheck::runCheck);
+
+        try {
+            preflightChecks.values().forEach(PreflightCheck::runCheck);
+        } catch (PreflightCheckException e) {
+            LOG.error("Preflight check failed with error: {}", e.getLocalizedMessage());
+            throw e;
+        }
     }
 }

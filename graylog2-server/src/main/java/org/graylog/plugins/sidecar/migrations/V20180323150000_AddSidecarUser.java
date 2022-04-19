@@ -64,6 +64,7 @@ public class V20180323150000_AddSidecarUser extends Migration {
                 "sidecar@graylog.local",
                 Sets.newHashSet(
                         roleId,
-                        roleService.getReaderRoleObjectId()));
+                        roleService.getReaderRoleObjectId()),
+                true); // service account
     }
 }
