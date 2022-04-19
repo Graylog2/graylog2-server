@@ -188,9 +188,10 @@ public class ViewsBindings extends ViewsModule {
         bind(MappedFieldTypesService.class).to(MappedFieldTypesServiceImpl.class).in(Scopes.SINGLETON);
         bind(FieldTypeValidation.class).to(FieldTypeValidationImpl.class).in(Scopes.SINGLETON);
 
+        // The order of injections is significant!
+        registerQueryValidator(FieldValueTypeValidator.class);
         registerQueryValidator(UnknownFieldsValidator.class);
         registerQueryValidator(InvalidOperatorsValidator.class);
-        registerQueryValidator(FieldValueTypeValidator.class);
 
         bind(QueryValidationService.class).to(QueryValidationServiceImpl.class).in(Scopes.SINGLETON);
         bind(ChunkDecorator.class).to(LegacyChunkDecorator.class);
