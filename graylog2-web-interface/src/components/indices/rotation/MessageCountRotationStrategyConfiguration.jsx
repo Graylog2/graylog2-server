@@ -44,16 +44,15 @@ class MessageCountRotationStrategyConfiguration extends React.Component {
   render() {
     return (
       <div>
-        <fieldset>
-
-          <Input type="number"
-                 id="max-docs-per-index"
-                 label="Max documents per index"
-                 onChange={this._onInputUpdate('max_docs_per_index')}
-                 value={this.state.max_docs_per_index}
-                 help="Maximum number of documents in an index before it gets rotated"
-                 required />
-        </fieldset>
+        <Input type="number"
+               id="max-docs-per-index"
+               label="Max documents per index"
+               labelClassName="col-sm-3"
+               wrapperClassName="col-sm-9"
+               onChange={this._onInputUpdate('max_docs_per_index')}
+               value={this.state.max_docs_per_index}
+               help="Maximum number of documents in an index before it gets rotated"
+               required />
       </div>
     );
   }

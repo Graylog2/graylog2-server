@@ -49,16 +49,16 @@ class SizeBasedRotationStrategyConfiguration extends React.Component {
   render() {
     return (
       <div>
-        <fieldset>
-          <Input type="number"
-                 id="max-size"
-                 label="Max size per index (in bytes)"
-                 onChange={this._onInputUpdate('max_size')}
-                 value={this.state.max_size}
-                 help="Maximum size of an index before it gets rotated"
-                 addonAfter={this._formatSize()}
-                 required />
-        </fieldset>
+        <Input type="number"
+               id="max-size"
+               label="Max size per index (in bytes)"
+               onChange={this._onInputUpdate('max_size')}
+               labelClassName="col-sm-3"
+               wrapperClassName="col-sm-9"
+               value={this.state.max_size}
+               help="Maximum size of an index before it gets rotated"
+               addonAfter={this._formatSize()}
+               required />
       </div>
     );
   }

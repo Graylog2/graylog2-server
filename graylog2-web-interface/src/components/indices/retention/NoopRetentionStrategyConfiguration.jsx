@@ -15,15 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
 
+const StyledAlert = styled(Alert)`
+  overflow: auto;
+`;
 class NoopRetentionStrategyConfiguration extends React.Component {
   render() {
     return (
-      <Alert>
+      <StyledAlert>
         This retention strategy is not configurable because it does not do anything.
-      </Alert>
+      </StyledAlert>
     );
   }
 }

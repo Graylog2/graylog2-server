@@ -44,15 +44,15 @@ class ClosingRetentionStrategyConfiguration extends React.Component {
   render() {
     return (
       <div>
-        <fieldset>
-          <Input type="number"
-                 id="max-number-of-indices"
-                 label="Max number of indices"
-                 onChange={this._onInputUpdate('max_number_of_indices')}
-                 value={this.state.max_number_of_indices}
-                 help={<span>Maximum number of indices to keep before <strong>closing</strong> the oldest ones</span>}
-                 required />
-        </fieldset>
+        <Input type="number"
+               id="max-number-of-indices"
+               label="Max number of indices"
+               labelClassName="col-sm-3"
+               wrapperClassName="col-sm-9"
+               onChange={this._onInputUpdate('max_number_of_indices')}
+               value={this.state.max_number_of_indices}
+               help={<span>Maximum number of indices to keep before <strong>closing</strong> the oldest ones</span>}
+               required />
       </div>
     );
   }
