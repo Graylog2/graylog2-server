@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.validation;
 
+import org.graylog.plugins.views.search.validation.validators.ValidationErrors;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 
 import javax.inject.Inject;
@@ -63,7 +64,7 @@ public class QueryValidationServiceImpl implements QueryValidationService {
             return ValidationResponse.withDetectedStatus(explanations);
 
         } catch (Exception e) {
-            return ValidationResponse.error(ValidationMessage.fromException(e));
+            return ValidationResponse.error(ValidationErrors.create(e));
         }
     }
 }

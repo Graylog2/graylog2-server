@@ -17,7 +17,10 @@
 package org.graylog.plugins.views.search.validation;
 
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.graylog.plugins.views.search.validation.validators.ValidationErrors;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -33,7 +36,12 @@ class ValidationMessageTest {
             luceneQueryParser.parse(query);
             fail("Should throw an exception!");
         } catch (ParseException e) {
-            final ValidationMessage validationMessage = ValidationMessage.fromException( e);
+            final List<ValidationMessage> errors = ValidationErrors.create(e);
+
+            assertThat(errors.size()).isEqualTo(1);
+
+            final ValidationMessage validationMessage = errors.iterator().next();
+
             assertThat(validationMessage.position().beginLine()).isEqualTo(1);
             assertThat(validationMessage.position().endLine()).isEqualTo(1);
             assertThat(validationMessage.position().beginColumn()).isEqualTo(0);

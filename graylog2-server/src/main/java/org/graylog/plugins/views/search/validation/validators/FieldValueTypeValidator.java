@@ -19,14 +19,10 @@ package org.graylog.plugins.views.search.validation.validators;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.elasticsearch.QueryParam;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
-import org.graylog.plugins.views.search.engine.QueryPosition;
-import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.MissingEnterpriseLicenseException;
 import org.graylog.plugins.views.search.errors.SearchException;
-import org.graylog.plugins.views.search.errors.UnboundParameterError;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog.plugins.views.search.validation.FieldTypeValidation;
 import org.graylog.plugins.views.search.validation.LuceneQueryParser;
@@ -35,12 +31,9 @@ import org.graylog.plugins.views.search.validation.QueryValidator;
 import org.graylog.plugins.views.search.validation.ValidationContext;
 import org.graylog.plugins.views.search.validation.ValidationMessage;
 import org.graylog.plugins.views.search.validation.ValidationRequest;
-import org.graylog.plugins.views.search.validation.ValidationStatus;
-import org.graylog.plugins.views.search.validation.ValidationType;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -68,16 +61,12 @@ public class FieldValueTypeValidator implements QueryValidator {
             PositionTrackingQuery decorated = decoratedQuery(context.request());
             return validateQueryValues(decorated, context.availableFields());
         } catch (ParseException e) {
-            return Collections.singletonList(ValidationMessage.fromException(e));
-        } catch (SearchException searchException) {
-            return convert(searchException);
-        } catch (MissingEnterpriseLicenseException licenseException) {
-            return paramsToValidationMessages(
-                    ValidationStatus.ERROR,
-                    licenseException.getQueryParams(),
-                    ValidationType.MISSING_LICENSE,
-                    param -> "Search parameter used without enterprise license: " + param.name()
-            );
+            return ValidationErrors.create(e);
+        } catch (SearchException e) {
+            return ValidationErrors.create(e);
+        } catch (MissingEnterpriseLicenseException e) {
+            return ValidationErrors.create(e);
+
         }
     }
 
@@ -104,43 +93,6 @@ public class FieldValueTypeValidator implements QueryValidator {
                 })
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
-    }
-
-
-    private List<ValidationMessage> convert(SearchException searchException) {
-        if (searchException.error() instanceof UnboundParameterError) {
-            final UnboundParameterError error = (UnboundParameterError) searchException.error();
-            return paramsToValidationMessages(
-                    ValidationStatus.ERROR,
-                    error.allUnknownParameters(),
-                    ValidationType.UNDECLARED_PARAMETER,
-                    param -> "Unbound required parameter used: " + param.name()
-            );
-        } else if (searchException.error() instanceof EmptyParameterError) {
-            final EmptyParameterError error = (EmptyParameterError) searchException.error();
-            return paramsToValidationMessages(
-                    ValidationStatus.WARNING,
-                    Collections.singleton(error.getParameterUsage()),
-                    ValidationType.EMPTY_PARAMETER,
-                    param -> error.description());
-        }
-        return Collections.singletonList(ValidationMessage.fromException(searchException));
-    }
-
-    private List<ValidationMessage> paramsToValidationMessages(ValidationStatus validationStatus, final Set<QueryParam> params, final ValidationType errorType, final Function<QueryParam, String> messageBuilder) {
-        return params.stream()
-                .flatMap(param -> {
-                    final String errorMessage = messageBuilder.apply(param);
-                    return param.positions()
-                            .stream()
-                            .map(pos -> ValidationMessage.builder(validationStatus, errorType)
-                                    .errorMessage(errorMessage)
-                                    .position(QueryPosition.from(pos))
-                                    .relatedProperty(param.name())
-                                    .build()
-                            );
-                })
                 .collect(Collectors.toList());
     }
 }

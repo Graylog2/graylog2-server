@@ -28,8 +28,6 @@ import java.util.regex.Pattern;
 @AutoValue
 public abstract class ValidationMessage {
 
-    private static final Pattern regexPosition = Pattern.compile(".*at line (\\d+), column (\\d+).", Pattern.MULTILINE | Pattern.DOTALL);
-
     public abstract QueryPosition position();
 
     public abstract String errorMessage();
@@ -40,38 +38,6 @@ public abstract class ValidationMessage {
     public abstract ValidationStatus validationStatus();
 
     public abstract ValidationType validationType();
-
-    public static ValidationMessage fromException(final Exception exception) {
-
-        final String input = exception.toString();
-
-        final ValidationMessage.Builder errorBuilder = builder(ValidationStatus.ERROR, ValidationType.QUERY_PARSING_ERROR);
-
-        final String rootCause = getErrorMessage(exception);
-        errorBuilder.errorMessage(String.format(Locale.ROOT, "Cannot parse query, cause: %s", rootCause));
-
-        final Matcher positionMatcher = regexPosition.matcher(input);
-        if (positionMatcher.find()) {
-            errorBuilder.position(QueryPosition.builder()
-                    .beginLine(1)
-                    .beginColumn(0)
-                    .endLine(Integer.parseInt(positionMatcher.group(1)))
-                    .endColumn(Integer.parseInt(positionMatcher.group(2)))
-                    .build());
-        }
-
-        return errorBuilder.build();
-    }
-
-    private static String getErrorMessage(Exception exception) {
-        final String rootCause = ExceptionUtils.getRootCauseMessage(exception);
-
-        if (rootCause.contains("Encountered \"<EOF>\"")) {
-            return "incomplete query, query ended unexpectedly";
-        }
-
-        return rootCause;
-    }
 
     public static Builder builder(ValidationStatus status, ValidationType validationType) {
         return new AutoValue_ValidationMessage.Builder()
