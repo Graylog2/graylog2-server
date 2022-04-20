@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
 import styled from 'styled-components';
 import moment from 'moment';
+import { merge } from 'lodash';
 
 import connect from 'stores/connect';
 import { Spinner, FlatContentRow } from 'components/common';
@@ -48,14 +49,13 @@ import type { SearchBarFormValues } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
-import useParameters from 'views/hooks/useParameters';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
-import PluggableSearchBarControls from 'views/components/searchbar/PluggableSearchBarControls';
 import { SearchActions } from 'views/stores/SearchStore';
+import usePluginEntities from 'views/logic/usePluginEntities';
 import PluggableSearchBarControls from 'views/components/searchbar/PluggableSearchBarControls';
+import useParameters from 'views/hooks/useParameters';
 
-import ValidateOnParameterChange from './searchbar/ValidateOnParameterChange';
 import SearchBarForm from './searchbar/SearchBarForm';
 
 type Props = {
@@ -63,7 +63,7 @@ type Props = {
   config: SearchesConfig,
   currentQuery: Query,
   disableSearch?: boolean,
-  onSubmit?: (update: { timerange: SearchBarFormValues['timerange'], streams: Array<string>, queryString: string }, query: Query) => Promise<any>,
+  onSubmit?: (update: SearchBarFormValues, searchBarPlugins: any, query: Query) => Promise<any>
   queryFilters: Immutable.Map<QueryId, FilterType>,
 };
 
@@ -80,7 +80,7 @@ const FlexCol = styled(Col)`
 
 const StreamWrap = styled.div`
   flex: 1;
-  
+
   > div {
     margin-right: 18px;
   }
@@ -92,7 +92,13 @@ const SearchButtonAndQuery = styled.div`
   align-items: flex-start;
 `;
 
-const defaultOnSubmit = ({ timerange, streams, queryString }, currentQuery: Query) => {
+const defaultOnSubmit = async (values: SearchBarFormValues, pluginSubmitHandler: Array<(values: SearchBarFormValues) => Promise<void>>, currentQuery: Query) => {
+  const { timerange, streams, queryString } = values;
+
+  if (pluginSubmitHandler?.length) {
+    await pluginSubmitHandler.forEach((onSubmit) => onSubmit(values));
+  }
+
   const newQuery = currentQuery.toBuilder()
     .timerange(timerange)
     .filter(filtersForQuery(streams))
@@ -113,6 +119,39 @@ const defaultProps = {
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
+const useInitialSearchBarValues = ({ currentQuery, queryFilters }: { currentQuery: Query | undefined, queryFilters: Immutable.Map<QueryId, FilterType> }) => { // todo check undefined
+  const searchBarPlugins = usePluginEntities('views.components.searchBar');
+  const { id, query, timerange } = currentQuery ?? {};
+  const { query_string: queryString } = query ?? {};
+  const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
+
+  let initialValues = { timerange, streams, queryString };
+
+  if (searchBarPlugins?.length) {
+    const initialValuesFromPlugins = searchBarPlugins.map((pluginData) => pluginData()).filter((pluginData) => !!pluginData).reduce((result, { useInitialValues }) => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      return { ...result, ...(useInitialValues?.() ?? {}) };
+    }, {});
+
+    initialValues = { ...initialValues, ...initialValuesFromPlugins };
+  }
+
+  return initialValues;
+};
+
+const _validateQueryString = (values: SearchBarFormValues, searchBarPlugins) => {
+  const pluggableQueryValidationPayload = searchBarPlugins?.map(({ validationPayload }) => validationPayload?.(values)) ?? [];
+
+  const request = {
+    timeRange: values?.timerange,
+    streams: values?.streams,
+    queryString: values?.queryString,
+    ...(merge(...pluggableQueryValidationPayload)),
+  };
+
+  return debouncedValidateQuery(request);
+};
+
 const SearchBar = ({
   availableStreams,
   config,
@@ -121,31 +160,19 @@ const SearchBar = ({
   queryFilters,
   onSubmit = defaultProps.onSubmit,
 }: Props) => {
-  const { parameterBindings, parameters } = useParameters();
-
-  const _validateQueryString = useCallback((values: SearchBarFormValues) => {
-    const request = {
-      timeRange: values?.timerange,
-      streams: values?.streams,
-      queryString: values?.queryString,
-      parameterBindings,
-      parameters,
-    };
-
-    return debouncedValidateQuery(request);
-  }, [parameterBindings, parameters]);
+  const { parameters } = useParameters();
+  const searchBarPlugins = usePluginEntities('views.components.searchBar');
+  const initialValues = useInitialSearchBarValues({ queryFilters, currentQuery });
+  const pluginSubmitHandler = useMemo(() => searchBarPlugins?.map((pluginFn) => pluginFn()?.onSubmit).filter((pluginData) => !!pluginData), [searchBarPlugins]);
+  const _onSubmit = useCallback((values: SearchBarFormValues) => onSubmit(values, pluginSubmitHandler, currentQuery), [currentQuery, onSubmit, pluginSubmitHandler]);
 
   if (!currentQuery || !config) {
     return <Spinner />;
   }
 
-  const { id, query, timerange } = currentQuery;
-  const { query_string: queryString } = query;
+  const { query } = currentQuery;
 
-  const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
   const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
-
-  const _onSubmit = (values: SearchBarFormValues) => onSubmit(values, currentQuery);
 
   return (
     <WidgetFocusContext.Consumer>
@@ -153,91 +180,89 @@ const SearchBar = ({
         <ScrollToHint value={query.query_string}>
           <FlatContentRow>
             <FormWarningsProvider>
-              <SearchBarForm initialValues={{ timerange, streams, queryString }}
+              <SearchBarForm initialValues={initialValues}
                              limitDuration={limitDuration}
                              onSubmit={_onSubmit}
-                             validateQueryString={_validateQueryString}>
+                             validateQueryString={(values) => _validateQueryString(values, searchBarPlugins)}>
                 {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
                   const disableSearchSubmit = disableSearch || isSubmitting || isValidating || !isValid;
 
                   return (
-                    <>
+                    <Container>
                       <ValidateOnParameterChange parameters={parameters} />
-                      <Container>
-                        <Row>
-                          <Col md={5}>
-                            <TimeRangeInput disabled={disableSearch}
-                                            limitDuration={limitDuration}
-                                            onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                            value={values?.timerange}
-                                            hasErrorOnMount={!!errors.timerange} />
-                          </Col>
+                      <Row>
+                        <Col md={5}>
+                          <TimeRangeInput disabled={disableSearch}
+                                          limitDuration={limitDuration}
+                                          onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                          value={values?.timerange}
+                                          hasErrorOnMount={!!errors.timerange} />
+                        </Col>
 
-                          <Col mdHidden lgHidden>
-                            <HorizontalSpacer />
-                          </Col>
+                        <Col mdHidden lgHidden>
+                          <HorizontalSpacer />
+                        </Col>
 
-                          <FlexCol md={7}>
-                            <StreamWrap>
-                              <Field name="streams">
-                                {({ field: { name, value, onChange } }) => (
-                                  <StreamsFilter value={value}
-                                                 streams={availableStreams}
-                                                 onChange={(newStreams) => onChange({
-                                                   target: {
-                                                     value: newStreams,
-                                                     name,
-                                                   },
-                                                 })} />
-                                )}
-                              </Field>
-                            </StreamWrap>
-
-                            <RefreshControls />
-                          </FlexCol>
-                        </Row>
-                        <BottomRow>
-                          <SearchButtonAndQuery>
-                            <SearchButton disabled={disableSearchSubmit}
-                                          dirty={dirty} />
-
-                            <Field name="queryString">
-                              {({ field: { name, value, onChange }, meta: { error } }) => (
-                                <FormWarningsContext.Consumer>
-                                  {({ warnings }) => (
-                                    <QueryInput value={value}
-                                                timeRange={values.timerange}
-                                                streams={values.streams}
-                                                placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
-                                                error={error}
-                                                isValidating={isValidating}
-                                                warning={warnings.queryString}
-                                                onChange={(newQuery) => {
-                                                  onChange({ target: { value: newQuery, name } });
-
-                                                  return Promise.resolve(newQuery);
-                                                }}
-                                                disableExecution={disableSearchSubmit}
-                                                validate={validateForm}
-                                                onExecute={handleSubmit as () => void} />
-                                  )}
-                                </FormWarningsContext.Consumer>
+                        <FlexCol md={7}>
+                          <StreamWrap>
+                            <Field name="streams">
+                              {({ field: { name, value, onChange } }) => (
+                                <StreamsFilter value={value}
+                                               streams={availableStreams}
+                                               onChange={(newStreams) => onChange({
+                                                 target: {
+                                                   value: newStreams,
+                                                   name,
+                                                 },
+                                               })} />
                               )}
                             </Field>
+                          </StreamWrap>
 
-                            <QueryValidation />
+                          <RefreshControls />
+                        </FlexCol>
+                      </Row>
+                      <BottomRow>
+                        <SearchButtonAndQuery>
+                          <SearchButton disabled={disableSearchSubmit}
+                                        dirty={dirty} />
 
-                          </SearchButtonAndQuery>
+                          <Field name="queryString">
+                            {({ field: { name, value, onChange }, meta: { error } }) => (
+                              <FormWarningsContext.Consumer>
+                                {({ warnings }) => (
+                                  <QueryInput value={value}
+                                              timeRange={values.timerange}
+                                              streams={values.streams}
+                                              placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
+                                              error={error}
+                                              isValidating={isValidating}
+                                              warning={warnings.queryString}
+                                              onChange={(newQuery) => {
+                                                onChange({ target: { value: newQuery, name } });
 
-                          {!editing && (
-                            <ViewActionsWrapper>
-                              <SavedSearchControls />
-                            </ViewActionsWrapper>
-                          )}
-                        </BottomRow>
-                        <PluggableSearchBarControls />
-                      </Container>
-                    </>
+                                                return Promise.resolve(newQuery);
+                                              }}
+                                              disableExecution={disableSearchSubmit}
+                                              validate={validateForm}
+                                              onExecute={handleSubmit as () => void} />
+                                )}
+                              </FormWarningsContext.Consumer>
+                            )}
+                          </Field>
+
+                          <QueryValidation />
+
+                        </SearchButtonAndQuery>
+
+                        {!editing && (
+                        <ViewActionsWrapper>
+                          <SavedSearchControls />
+                        </ViewActionsWrapper>
+                        )}
+                      </BottomRow>
+                      <PluggableSearchBarControls />
+                    </Container>
                   );
                 }}
               </SearchBarForm>

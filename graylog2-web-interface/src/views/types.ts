@@ -46,6 +46,7 @@ import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import type { SearchBarFormValues } from 'views/Constants';
 
 export type BackendWidgetPosition = {
   id: string,
@@ -233,7 +234,10 @@ interface MessageRowOverrideProps {
 export interface SearchBarControl {
   component: React.ComponentType;
   id: string;
+  onSubmit?: (values: SearchBarFormValues) => Promise<void>,
+  onValidate?: () => FormikErrors<{}> | undefined,
   placement: 'left' | 'right';
+  useInitialValues?: () => ({ [key: string]: any }),
 }
 
 declare module 'graylog-web-plugin/plugin' {
