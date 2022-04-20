@@ -62,33 +62,33 @@ class InvalidOperatorsValidatorTest {
 
 
     @Test
-    void testInvalidOperators() {
-        {
+    void testInvalidOperatorNoOperatorPresent() {
+        final ValidationContext context = TestValidationContext.create("foo:bar baz")
+                .build();
+        assertThat(sut.validate(context)).isEmpty();
+    }
 
-            final ValidationContext context = TestValidationContext.create("foo:bar baz")
-                    .build();
-            assertThat(sut.validate(context)).isEmpty();
-        }
+    @Test
+    void testInvalidOperatorLowercaseAnd() {
+        final ValidationContext context = TestValidationContext.create("foo:bar and")
+                .build();
+        final List<ValidationMessage> messages = sut.validate(context);
+        assertThat(messages.size()).isEqualTo(1);
+        final ValidationMessage message = messages.iterator().next();
+        assertThat(message.validationType()).isEqualTo(ValidationType.INVALID_OPERATOR);
+        assertThat(message.relatedProperty()).isEqualTo("and");
+    }
 
-        {
-            final ValidationContext context = TestValidationContext.create("foo:bar and")
-                    .build();
-            final List<ValidationMessage> messages = sut.validate(context);
-            assertThat(messages.size()).isEqualTo(1);
-            final ValidationMessage message = messages.iterator().next();
-            assertThat(message.validationType()).isEqualTo(ValidationType.INVALID_OPERATOR);
-            assertThat(message.relatedProperty()).isEqualTo("and");
-        }
 
-        {
-            final ValidationContext context = TestValidationContext.create("foo:bar or")
-                    .build();
-            final List<ValidationMessage> messages = sut.validate(context);
-            assertThat(messages.size()).isEqualTo(1);
-            final ValidationMessage message = messages.iterator().next();
-            assertThat(message.validationType()).isEqualTo(ValidationType.INVALID_OPERATOR);
-            assertThat(message.relatedProperty()).isEqualTo("or");
-        }
+    @Test
+    void testInvalidOperatorLowercaseOr() {
+        final ValidationContext context = TestValidationContext.create("foo:bar or")
+                .build();
+        final List<ValidationMessage> messages = sut.validate(context);
+        assertThat(messages.size()).isEqualTo(1);
+        final ValidationMessage message = messages.iterator().next();
+        assertThat(message.validationType()).isEqualTo(ValidationType.INVALID_OPERATOR);
+        assertThat(message.relatedProperty()).isEqualTo("or");
     }
 
     @Test
