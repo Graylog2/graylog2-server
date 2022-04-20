@@ -16,18 +16,12 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.Position;
 import org.graylog.plugins.views.search.engine.QueryPosition;
 import org.graylog2.shared.utilities.ExceptionUtils;
 
 import javax.annotation.Nullable;
-import java.awt.*;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
