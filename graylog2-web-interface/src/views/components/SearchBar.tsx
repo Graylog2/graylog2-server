@@ -145,13 +145,19 @@ const useInitialSearchBarValues = ({ currentQuery, queryFilters }: { currentQuer
   }, [timerange, queryString, id, queryFilters]);
 };
 
-const _validateQueryString = (values: SearchBarFormValues, searchBarPlugins) => {
-  const pluggableQueryValidationPayload = searchBarPlugins?.map((pluginData) => pluginData()).filter((pluginData) => !!pluginData).map(({ validationPayload }) => validationPayload?.(values)).filter((pluginData) => !!pluginData) ?? [];
+const pluginValidationData = (values: SearchBarFormValues, searchBarPlugins: Array<() => SearchBarControl>) => {
+  const existingPluginData: Array<SearchBarControl> = searchBarPlugins?.map((pluginData) => pluginData()).filter((pluginData) => !!pluginData);
+  const pluggableQueryValidationPayload: Array<{ [key: string ]: any }> = existingPluginData.map(({ validationPayload }) => validationPayload?.(values)).filter((pluginValidationPayload) => !!pluginValidationPayload) ?? [];
+
+  return merge({}, ...pluggableQueryValidationPayload);
+};
+
+const _validateQueryString = (values: SearchBarFormValues, searchBarPlugins: Array<() => SearchBarControl>) => {
   const request = {
     timeRange: values?.timerange,
     streams: values?.streams,
     queryString: values?.queryString,
-    ...(merge({}, ...pluggableQueryValidationPayload)),
+    ...pluginValidationData(values, searchBarPlugins),
   };
 
   return debouncedValidateQuery(request);

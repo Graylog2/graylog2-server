@@ -139,7 +139,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false }: P
 
                   return (
                     <Container>
-                      <ValidateOnParameterChange parameters={parameters} parameterBindings={parameterBindings} />
+                      <ValidateOnParameterChange parameters={parameters} />
                       <TopRow>
                         <StyledTimeRangeInput disabled={disableSearch}
                                               onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}

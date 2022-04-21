@@ -237,6 +237,7 @@ export interface SearchBarControl {
   onValidate?: () => FormikErrors<{}> | undefined,
   placement: 'left' | 'right';
   useInitialValues?: () => ({ [key: string]: any }),
+  validationPayload: (values: SearchBarFormValues) => { [key: string]: any },
 }
 
 declare module 'graylog-web-plugin/plugin' {

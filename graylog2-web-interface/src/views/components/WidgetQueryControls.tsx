@@ -163,7 +163,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
           return (
             <Container>
               <PropagateDisableSubmissionState formKey="widget-query-controls" disableSubmission={disableSearchSubmit} />
-              <ValidateOnParameterChange parameters={parameters} parameterBindings={parameterBindings} />
+              <ValidateOnParameterChange parameters={parameters} />
               <WidgetTopRow>
                 <Col md={6}>
                   {!hasTimeRangeOverride && (
