@@ -56,6 +56,7 @@ import usePluginEntities from 'views/logic/usePluginEntities';
 import PluggableSearchBarControls from 'views/components/searchbar/PluggableSearchBarControls';
 import useParameters from 'views/hooks/useParameters';
 import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
+import type { SearchBarControl } from 'views/types';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -120,24 +121,28 @@ const defaultProps = {
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
+const useInitialValuesFromPlugins = (searchBarPlugins: Array<() => SearchBarControl>) => {
+  const existingPlugins = searchBarPlugins.map((pluginData) => pluginData()).filter((pluginData) => !!pluginData) ?? [];
+  const initialValuesHandler = existingPlugins.map(({ useInitialValues }) => useInitialValues)?.filter((handler) => !!handler);
+
+  return initialValuesHandler.reduce((result, useInitialValues) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    return { ...result, ...(useInitialValues?.() ?? {}) };
+  }, {});
+};
+
 const useInitialSearchBarValues = ({ currentQuery, queryFilters }: { currentQuery: Query | undefined, queryFilters: Immutable.Map<QueryId, FilterType> }) => { // todo check undefined
   const searchBarPlugins = usePluginEntities('views.components.searchBar');
   const { id, query, timerange } = currentQuery ?? {};
   const { query_string: queryString } = query ?? {};
-  const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
+  const initialValuesFromPlugins = useInitialValuesFromPlugins(searchBarPlugins);
 
-  let initialValues = { timerange, streams, queryString };
+  return useMemo(() => {
+    const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
 
-  if (searchBarPlugins?.length) {
-    const initialValuesFromPlugins = searchBarPlugins.map((pluginData) => pluginData()).filter((pluginData) => !!pluginData).reduce((result, { useInitialValues }) => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      return { ...result, ...(useInitialValues?.() ?? {}) };
-    }, {});
-
-    initialValues = { ...initialValues, ...initialValuesFromPlugins };
-  }
-
-  return initialValues;
+    return ({ timerange, streams, queryString, ...initialValuesFromPlugins });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timerange, queryString, id, queryFilters]);
 };
 
 const _validateQueryString = (values: SearchBarFormValues, searchBarPlugins) => {
@@ -146,7 +151,7 @@ const _validateQueryString = (values: SearchBarFormValues, searchBarPlugins) => 
     timeRange: values?.timerange,
     streams: values?.streams,
     queryString: values?.queryString,
-    ...(merge(...pluggableQueryValidationPayload)),
+    ...(merge({}, ...pluggableQueryValidationPayload)),
   };
 
   return debouncedValidateQuery(request);
