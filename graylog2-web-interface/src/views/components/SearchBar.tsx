@@ -21,7 +21,6 @@ import * as Immutable from 'immutable';
 import { Field } from 'formik';
 import styled from 'styled-components';
 import moment from 'moment';
-import { merge } from 'lodash';
 
 import connect from 'stores/connect';
 import { Spinner, FlatContentRow } from 'components/common';
@@ -59,13 +58,18 @@ import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnPara
 import type { SearchBarControl } from 'views/types';
 
 import SearchBarForm from './searchbar/SearchBarForm';
+import {
+  executePluggableSubmitHandler,
+  usePluggableInitialValues,
+  pluggableValidationPayload,
+} from './searchbar/pluggableSearchBarControlsHandler';
 
 type Props = {
   availableStreams: Array<{ key: string, value: string }>,
   config: SearchesConfig,
   currentQuery: Query,
   disableSearch?: boolean,
-  onSubmit?: (update: SearchBarFormValues, searchBarPlugins: any, query: Query) => Promise<any>
+  onSubmit?: (update: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, query: Query) => Promise<any>
   queryFilters: Immutable.Map<QueryId, FilterType>,
 };
 
@@ -94,12 +98,10 @@ const SearchButtonAndQuery = styled.div`
   align-items: flex-start;
 `;
 
-const defaultOnSubmit = async (values: SearchBarFormValues, pluginSubmitHandler: Array<(values: SearchBarFormValues) => Promise<void>>, currentQuery: Query) => {
+const defaultOnSubmit = async (values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentQuery: Query) => {
   const { timerange, streams, queryString } = values;
 
-  if (pluginSubmitHandler?.length) {
-    await pluginSubmitHandler.forEach((onSubmit) => onSubmit(values));
-  }
+  await executePluggableSubmitHandler(values, pluggableSearchBarControls);
 
   const newQuery = currentQuery.toBuilder()
     .timerange(timerange)
@@ -121,21 +123,10 @@ const defaultProps = {
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
-const useInitialValuesFromPlugins = (searchBarPlugins: Array<() => SearchBarControl>) => {
-  const existingPlugins = searchBarPlugins.map((pluginData) => pluginData()).filter((pluginData) => !!pluginData) ?? [];
-  const initialValuesHandler = existingPlugins.map(({ useInitialValues }) => useInitialValues)?.filter((handler) => !!handler);
-
-  return initialValuesHandler.reduce((result, useInitialValues) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    return { ...result, ...(useInitialValues?.() ?? {}) };
-  }, {});
-};
-
 const useInitialSearchBarValues = ({ currentQuery, queryFilters }: { currentQuery: Query | undefined, queryFilters: Immutable.Map<QueryId, FilterType> }) => { // todo check undefined
-  const searchBarPlugins = usePluginEntities('views.components.searchBar');
   const { id, query, timerange } = currentQuery ?? {};
   const { query_string: queryString } = query ?? {};
-  const initialValuesFromPlugins = useInitialValuesFromPlugins(searchBarPlugins);
+  const initialValuesFromPlugins = usePluggableInitialValues();
 
   return useMemo(() => {
     const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
@@ -145,19 +136,12 @@ const useInitialSearchBarValues = ({ currentQuery, queryFilters }: { currentQuer
   }, [timerange, queryString, id, queryFilters]);
 };
 
-const pluginValidationData = (values: SearchBarFormValues, searchBarPlugins: Array<() => SearchBarControl>) => {
-  const existingPluginData: Array<SearchBarControl> = searchBarPlugins?.map((pluginData) => pluginData()).filter((pluginData) => !!pluginData);
-  const pluggableQueryValidationPayload: Array<{ [key: string ]: any }> = existingPluginData.map(({ validationPayload }) => validationPayload?.(values)).filter((pluginValidationPayload) => !!pluginValidationPayload) ?? [];
-
-  return merge({}, ...pluggableQueryValidationPayload);
-};
-
-const _validateQueryString = (values: SearchBarFormValues, searchBarPlugins: Array<() => SearchBarControl>) => {
+const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>) => {
   const request = {
     timeRange: values?.timerange,
     streams: values?.streams,
     queryString: values?.queryString,
-    ...pluginValidationData(values, searchBarPlugins),
+    ...pluggableValidationPayload(values, pluggableSearchBarControls),
   };
 
   return debouncedValidateQuery(request);
@@ -172,10 +156,9 @@ const SearchBar = ({
   onSubmit = defaultProps.onSubmit,
 }: Props) => {
   const { parameters } = useParameters();
-  const searchBarPlugins = usePluginEntities('views.components.searchBar');
+  const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialSearchBarValues({ queryFilters, currentQuery });
-  const pluginSubmitHandler = useMemo(() => searchBarPlugins?.map((pluginFn) => pluginFn()?.onSubmit).filter((pluginData) => !!pluginData), [searchBarPlugins]);
-  const _onSubmit = useCallback((values: SearchBarFormValues) => onSubmit(values, pluginSubmitHandler, currentQuery), [currentQuery, onSubmit, pluginSubmitHandler]);
+  const _onSubmit = useCallback((values: SearchBarFormValues) => onSubmit(values, pluggableSearchBarControls, currentQuery), [currentQuery, onSubmit, pluggableSearchBarControls]);
 
   if (!currentQuery || !config) {
     return <Spinner />;
@@ -194,7 +177,7 @@ const SearchBar = ({
               <SearchBarForm initialValues={initialValues}
                              limitDuration={limitDuration}
                              onSubmit={_onSubmit}
-                             validateQueryString={(values) => _validateQueryString(values, searchBarPlugins)}>
+                             validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls)}>
                 {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
                   const disableSearchSubmit = disableSearch || isSubmitting || isValidating || !isValid;
 
