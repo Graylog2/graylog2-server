@@ -123,7 +123,7 @@ const defaultProps = {
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
-const useInitialSearchBarValues = ({ currentQuery, queryFilters }: { currentQuery: Query | undefined, queryFilters: Immutable.Map<QueryId, FilterType> }) => { // todo check undefined
+const useInitialFormValues = ({ currentQuery, queryFilters }: { currentQuery: Query | undefined, queryFilters: Immutable.Map<QueryId, FilterType> }) => { // todo check undefined
   const { id, query, timerange } = currentQuery ?? {};
   const { query_string: queryString } = query ?? {};
   const initialValuesFromPlugins = usePluggableInitialValues();
@@ -157,7 +157,7 @@ const SearchBar = ({
 }: Props) => {
   const { parameters } = useParameters();
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
-  const initialValues = useInitialSearchBarValues({ queryFilters, currentQuery });
+  const initialValues = useInitialFormValues({ queryFilters, currentQuery });
   const _onSubmit = useCallback((values: SearchBarFormValues) => onSubmit(values, pluggableSearchBarControls, currentQuery), [currentQuery, onSubmit, pluggableSearchBarControls]);
 
   if (!currentQuery || !config) {

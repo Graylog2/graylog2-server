@@ -37,7 +37,7 @@ import type {
   WidgetConfigFormValues,
 } from 'views/components/aggregationwizard';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
-import type { TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import type View from 'views/logic/views/View';
 import type User from 'logic/users/User';
 import type { Message } from 'views/components/messagelist/Types';
@@ -45,7 +45,6 @@ import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
-import type { SearchBarFormValues } from 'views/Constants';
 
 export type BackendWidgetPosition = {
   id: string,
@@ -233,11 +232,11 @@ interface MessageRowOverrideProps {
 export interface SearchBarControl {
   component: React.ComponentType;
   id: string;
-  onSubmit?: (values: SearchBarFormValues) => Promise<void>,
+  onSubmit?: (values: { timerange: TimeRange | NoTimeRangeOverride, streams?: Array<string>, queryString: string }) => Promise<void>,
   onValidate?: () => FormikErrors<{}> | undefined,
   placement: 'left' | 'right';
   useInitialValues?: () => ({ [key: string]: any }),
-  validationPayload: (values: SearchBarFormValues) => { [key: string]: any },
+  validationPayload: (values: { timerange: TimeRange | NoTimeRangeOverride, streams?: Array<string>, queryString: string }) => { [key: string]: any },
 }
 
 declare module 'graylog-web-plugin/plugin' {
