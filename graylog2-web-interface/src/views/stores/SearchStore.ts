@@ -139,6 +139,13 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
       return promise;
     },
 
+    refresh() {
+      const promise = Promise.resolve();
+      SearchActions.refresh.promise(promise);
+
+      return promise;
+    },
+
     trackJobStatus(job: SearchJobResult, search: Search) {
       return new Bluebird((resolve) => {
         if (job && job.execution.done) {

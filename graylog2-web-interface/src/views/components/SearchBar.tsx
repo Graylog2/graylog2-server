@@ -52,6 +52,7 @@ import useParameters from 'views/hooks/useParameters';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import PluggableSearchBarControls from 'views/components/searchbar/PluggableSearchBarControls';
+import { SearchActions } from 'views/stores/SearchStore';
 
 import ValidateOnParameterChange from './searchbar/ValidateOnParameterChange';
 import SearchBarForm from './searchbar/SearchBarForm';
@@ -97,7 +98,11 @@ const defaultOnSubmit = ({ timerange, streams, queryString }, currentQuery: Quer
     .query(createElasticsearchQueryString(queryString))
     .build();
 
-  return QueriesActions.update(newQuery.id, newQuery);
+  if (!currentQuery.equals(newQuery)) {
+    return QueriesActions.forceUpdate(newQuery.id, newQuery);
+  }
+
+  return SearchActions.refresh();
 };
 
 const defaultProps = {

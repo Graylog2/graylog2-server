@@ -212,11 +212,10 @@ const Search = () => {
                               <IfInteractive>
                                 <HeaderElements />
                                 <IfDashboard>
-                                  {!editingWidget
-                                  && <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />}
+                                  {!editingWidget && <DashboardSearchBarWithStatus />}
                                 </IfDashboard>
                                 <IfSearch>
-                                  <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                                  <SearchBarWithStatus />
                                 </IfSearch>
 
                                 <QueryBarElements />

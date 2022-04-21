@@ -19,6 +19,7 @@ import uuid from 'uuid/v4';
 
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import { singleton } from 'logic/singleton';
+import isDeepEqual from 'stores/isDeepEqual';
 
 export type WidgetState = {
   id: string;
@@ -75,6 +76,23 @@ class Widget {
   // eslint-disable-next-line class-methods-use-this
   get isExportable() {
     return false;
+  }
+
+  equals(other: any): boolean {
+    if (other === undefined) {
+      return false;
+    }
+
+    if (!(other instanceof Widget)) {
+      return false;
+    }
+
+    return this.id === other.id
+      && this.filter === other.filter
+      && isDeepEqual(this.config, other.config)
+      && isDeepEqual(this.timerange, other.timerange)
+      && isDeepEqual(this.query, other.query)
+      && isDeepEqual(this.streams, other.streams);
   }
 
   duplicate(newId: string): Widget {
