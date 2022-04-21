@@ -42,9 +42,8 @@ export const validateQuery = ({
   queryString,
   timeRange,
   streams,
-  parameters,
-  parameterBindings,
   filter,
+  ...rest
 }: ValidationQuery): Promise<QueryValidationState> => {
   if (!queryExists(queryString) && !queryExists(filter)) {
     return Promise.resolve({ status: 'OK', explanations: [] });
@@ -55,8 +54,7 @@ export const validateQuery = ({
     timerange: timeRange ? onSubmittingTimerange(timeRange) : undefined,
     streams,
     filter,
-    parameters,
-    parameter_bindings: parameterBindings,
+    ...rest,
   };
 
   return fetch('POST', qualifyUrl('/search/validate'), payload).then((result) => {

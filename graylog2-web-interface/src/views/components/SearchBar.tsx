@@ -55,6 +55,7 @@ import { SearchActions } from 'views/stores/SearchStore';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import PluggableSearchBarControls from 'views/components/searchbar/PluggableSearchBarControls';
 import useParameters from 'views/hooks/useParameters';
+import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -140,8 +141,7 @@ const useInitialSearchBarValues = ({ currentQuery, queryFilters }: { currentQuer
 };
 
 const _validateQueryString = (values: SearchBarFormValues, searchBarPlugins) => {
-  const pluggableQueryValidationPayload = searchBarPlugins?.map(({ validationPayload }) => validationPayload?.(values)) ?? [];
-
+  const pluggableQueryValidationPayload = searchBarPlugins?.map((pluginData) => pluginData()).filter((pluginData) => !!pluginData).map(({ validationPayload }) => validationPayload?.(values)).filter((pluginData) => !!pluginData) ?? [];
   const request = {
     timeRange: values?.timerange,
     streams: values?.streams,
