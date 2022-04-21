@@ -20,7 +20,6 @@ import type { FormikErrors } from 'formik';
 
 import type Widget from 'views/logic/widgets/Widget';
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
-import type { SearchRefreshCondition } from 'views/logic/hooks/SearchRefreshCondition';
 import type { VisualizationComponent } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { WidgetActionType } from 'views/components/widgets/Types';
 import type { Creator } from 'views/components/sidebar/create/AddWidgetButton';
@@ -264,7 +263,6 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.confirmDeletingWidget'?: Array<(widget: Widget, view: View, title: string) => Promise<boolean | null>>,
     'views.hooks.executingView'?: Array<ViewHook>;
     'views.hooks.loadingView'?: Array<ViewHook>;
-    'views.hooks.searchRefresh'?: Array<SearchRefreshCondition>;
     'views.hooks.copyWidgetToDashboard'?: Array<CopyWidgetToDashboardHook>;
     'views.hooks.removingWidget'?: Array<RemovingWidgetHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
