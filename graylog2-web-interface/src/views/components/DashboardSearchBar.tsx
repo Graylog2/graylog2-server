@@ -46,6 +46,7 @@ import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnPara
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
 import DashboardSearchForm from './DashboardSearchBarForm';
+import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
 
 type Props = {
   config: SearchesConfig,
@@ -56,6 +57,11 @@ type Props = {
   disableSearch?: boolean,
   onExecute: () => Promise<void>,
 };
+
+const Container = styled.div`
+  display: grid;
+  row-gap: 10px;
+`;
 
 const TopRow = styled.div(({ theme }) => css`
   display: flex;
@@ -132,7 +138,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                   const disableSearchSubmit = disableSearch || isSubmitting || isValidating || !isValid;
 
                   return (
-                    <>
+                    <Container>
                       <ValidateOnParameterChange parameters={parameters} parameterBindings={parameterBindings} />
                       <TopRow>
                         <StyledTimeRangeInput disabled={disableSearch}
@@ -184,7 +190,8 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                           </ViewActionsWrapper>
                         )}
                       </BottomRow>
-                    </>
+                      <PluggableSearchBarControls />
+                    </Container>
                   );
                 }}
               </DashboardSearchForm>
