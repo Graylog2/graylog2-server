@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect, useContext, useState, useMemo } from 'react';
+import { useCallback, useEffect, useContext, useMemo } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
@@ -143,7 +143,6 @@ const useRefreshSearchOn = (_actions: Array<RefluxActions<any>>, refresh: () => 
 };
 
 const Search = () => {
-  const [hasErrors] = useState(false);
   const refreshSearch = useCallback(
     () => _refreshSearch(SearchExecutionStateStore.getInitialState()),
     [],
@@ -203,7 +202,7 @@ const Search = () => {
                                 </IfDashboard>
                               </IfInteractive>
                               <HighlightMessageInQuery>
-                                <SearchResult hasErrors={hasErrors} />
+                                <SearchResult />
                               </HighlightMessageInQuery>
                             </SearchArea>
                           </GridContainer>

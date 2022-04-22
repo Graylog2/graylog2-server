@@ -34,17 +34,6 @@ const StyledRow = styled(Row)(({ $hasFocusedWidget }: { $hasFocusedWidget: boole
   position: relative;
 `);
 
-const DisableResultsOverlay = styled.div(({ theme }) => css`
-  background: ${chroma(theme.colors.brand.tertiary).alpha(0.25).css()};
-
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-`);
-
 const StyledCol = styled(Col)`
   height: 100%;
 `;
@@ -55,11 +44,7 @@ const SearchLoadingIndicator = () => {
   return (searchLoadingState.isLoading && <LoadingIndicator text="Updating search results..." />);
 };
 
-type Props = {
-  hasErrors: boolean,
-};
-
-const SearchResult = React.memo(({ hasErrors }: Props) => {
+const SearchResult = React.memo(() => {
   const fieldTypes = useContext(FieldTypesContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
   const hasFocusedWidget = !!focusedWidget?.id;
@@ -70,7 +55,6 @@ const SearchResult = React.memo(({ hasErrors }: Props) => {
 
   return (
     <StyledRow $hasFocusedWidget={hasFocusedWidget}>
-      {(hasErrors && !hasFocusedWidget) && <DisableResultsOverlay data-testid="disable-results-overlay" />}
       <StyledCol>
         <Query />
         <SearchLoadingIndicator />
