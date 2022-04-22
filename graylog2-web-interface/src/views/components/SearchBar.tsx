@@ -68,7 +68,6 @@ type Props = {
   availableStreams: Array<{ key: string, value: string }>,
   config: SearchesConfig,
   currentQuery: Query,
-  disableSearch?: boolean,
   onSubmit?: (update: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, query: Query) => Promise<any>
   queryFilters: Immutable.Map<QueryId, FilterType>,
 };
@@ -117,7 +116,6 @@ const defaultOnSubmit = async (values: SearchBarFormValues, pluggableSearchBarCo
 };
 
 const defaultProps = {
-  disableSearch: false,
   onSubmit: defaultOnSubmit,
 };
 
@@ -151,7 +149,6 @@ const SearchBar = ({
   availableStreams,
   config,
   currentQuery,
-  disableSearch = defaultProps.disableSearch,
   queryFilters,
   onSubmit = defaultProps.onSubmit,
 }: Props) => {
@@ -179,15 +176,14 @@ const SearchBar = ({
                              onSubmit={_onSubmit}
                              validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls)}>
                 {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
-                  const disableSearchSubmit = disableSearch || isSubmitting || isValidating || !isValid;
+                  const disableSearchSubmit = isSubmitting || isValidating || !isValid;
 
                   return (
                     <Container>
                       <ValidateOnParameterChange parameters={parameters} />
                       <Row>
                         <Col md={5}>
-                          <TimeRangeInput disabled={disableSearch}
-                                          limitDuration={limitDuration}
+                          <TimeRangeInput limitDuration={limitDuration}
                                           onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                           value={values?.timerange}
                                           hasErrorOnMount={!!errors.timerange} />
@@ -269,7 +265,6 @@ const SearchBar = ({
 };
 
 SearchBar.propTypes = {
-  disableSearch: PropTypes.bool,
   onSubmit: PropTypes.func,
 };
 

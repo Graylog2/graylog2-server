@@ -121,7 +121,7 @@ const useInitialFormValues = (timerange, queryString) => {
   }, [queryString, timerange]);
 };
 
-const DashboardSearchBar = ({ config, disableSearch = false }: Props) => {
+const DashboardSearchBar = ({ config }: Props) => {
   const { timerange, query: { query_string: queryString = '' } = {} } = useStore(GlobalOverrideStore) ?? {};
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
 
@@ -152,14 +152,13 @@ const DashboardSearchBar = ({ config, disableSearch = false }: Props) => {
                                    onSubmit={submitForm}
                                    validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls)}>
                 {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
-                  const disableSearchSubmit = disableSearch || isSubmitting || isValidating || !isValid;
+                  const disableSearchSubmit = isSubmitting || isValidating || !isValid;
 
                   return (
                     <Container>
                       <ValidateOnParameterChange parameters={parameters} />
                       <TopRow>
-                        <StyledTimeRangeInput disabled={disableSearch}
-                                              onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                        <StyledTimeRangeInput onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                               value={values?.timerange}
                                               limitDuration={limitDuration}
                                               hasErrorOnMount={!!errors.timerange}
@@ -218,14 +217,6 @@ const DashboardSearchBar = ({ config, disableSearch = false }: Props) => {
       )}
     </WidgetFocusContext.Consumer>
   );
-};
-
-DashboardSearchBar.propTypes = {
-  disableSearch: PropTypes.bool,
-};
-
-DashboardSearchBar.defaultProps = {
-  disableSearch: false,
 };
 
 export default DashboardSearchBar;
