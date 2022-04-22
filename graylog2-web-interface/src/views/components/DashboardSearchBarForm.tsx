@@ -26,6 +26,7 @@ import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validate from 'views/components/searchbar/validate';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
 
@@ -45,6 +46,7 @@ type Props = {
 const _isFunction = (children: Props['children']): children is (props: FormikProps<DashboardFormValues>) => React.ReactElement => isFunction(children);
 
 const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQueryString, children }: Props) => {
+  const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const _onSubmit = useCallback(({ timerange, ...rest }: DashboardFormValues) => {
     return onSubmit({
       timerange: isNoTimeRangeOverride(timerange) ? undefined : onSubmittingTimerange(timerange),
@@ -60,8 +62,8 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
   };
 
   const { setFieldWarning } = useContext(FormWarningsContext);
-  const _validate = useCallback((values: DashboardFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString),
-    [limitDuration, setFieldWarning, validateQueryString]);
+  const _validate = useCallback((values: DashboardFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls),
+    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls]);
 
   return (
     <Formik<DashboardFormValues> initialValues={_initialValues}

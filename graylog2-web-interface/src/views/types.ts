@@ -233,7 +233,7 @@ export interface SearchBarControl {
   component: React.ComponentType;
   id: string;
   onSubmit?: (values: { timerange: TimeRange | NoTimeRangeOverride, streams?: Array<string>, queryString: string }) => Promise<void>,
-  onValidate?: () => FormikErrors<{}> | undefined,
+  onValidate?: (values: { timerange: TimeRange | NoTimeRangeOverride, streams?: Array<string>, queryString: string }) => Promise<FormikErrors<{}>>,
   placement: 'left' | 'right';
   useInitialValues?: () => ({ [key: string]: any }),
   validationPayload: (values: { timerange: TimeRange | NoTimeRangeOverride, streams?: Array<string>, queryString: string }) => { [key: string]: any },

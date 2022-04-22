@@ -19,8 +19,11 @@ import { isEmpty } from 'lodash';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validateTimeRange from 'views/components/TimeRangeValidation';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import type { SearchBarControl } from 'views/types';
+import { validatePluggableValues } from 'views/components/searchbar/pluggableSearchBarControlsHandler';
 
 type FormValues = {
+  queryString: string,
   timerange: TimeRange | NoTimeRangeOverride,
 }
 
@@ -29,6 +32,7 @@ const validate = async <T extends FormValues>(
   limitDuration: number,
   setFieldWarning: (fieldName: string, warning: unknown) => void,
   validateQueryString: (values: T) => Promise<QueryValidationState>,
+  pluggableSearchBarControls: Array<() => SearchBarControl>,
 ) => {
   const { timerange: nextTimeRange } = values;
   let errors = {};
@@ -37,6 +41,13 @@ const validate = async <T extends FormValues>(
 
   if (!isEmpty(timeRangeErrors)) {
     errors = { ...errors, timerange: timeRangeErrors };
+  }
+
+  const pluggableSearchBarControlsErrors = await validatePluggableValues(values, pluggableSearchBarControls);
+  console.log(pluggableSearchBarControlsErrors);
+
+  if (!isEmpty(pluggableSearchBarControlsErrors)) {
+    errors = { ...errors, ...pluggableSearchBarControlsErrors };
   }
 
   const queryValidation = await validateQueryString(values);

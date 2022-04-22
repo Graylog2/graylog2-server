@@ -27,6 +27,7 @@ import type { SearchBarFormValues } from 'views/Constants';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validate from 'views/components/searchbar/validate';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 type Props = {
   children: ((props: FormikProps<SearchBarFormValues>) => React.ReactNode) | React.ReactNode,
@@ -47,6 +48,7 @@ const _isFunction = (children: Props['children']): children is (props: FormikPro
 export const normalizeSearchBarFormValues = ({ timerange, ...rest }: SearchBarFormValues) => ({ timerange: onSubmittingTimerange(timerange), ...rest });
 
 const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef, validateQueryString }: Props) => {
+  const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const { setFieldWarning } = useContext(FormWarningsContext);
   const _onSubmit = useCallback((values: SearchBarFormValues) => {
     return onSubmit(normalizeSearchBarFormValues(values));
@@ -60,8 +62,8 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
     });
   }, [initialValues]);
 
-  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString),
-    [limitDuration, setFieldWarning, validateQueryString]);
+  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls),
+    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls]);
 
   return (
     <Formik<SearchBarFormValues> initialValues={_initialValues}

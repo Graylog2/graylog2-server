@@ -35,3 +35,14 @@ export const pluggableValidationPayload = (values: FormValues, pluggableSearchBa
 
   return merge({}, ...pluggableQueryValidationPayload);
 };
+
+export const validatePluggableValues = async (values: FormValues, pluggableSearchBarControls: Array<() => SearchBarControl>) => {
+  const existingPluginData: Array<SearchBarControl> = pluggableSearchBarControls?.map((pluginData) => pluginData()).filter((pluginData) => !!pluginData) ?? [];
+  const validationHandler = existingPluginData.map(({ onValidate }) => onValidate).filter((onValidate) => !!onValidate) ?? [];
+  const executableValidationHandler = validationHandler.map((onValidate) => new Promise((resolve) => {
+    resolve(onValidate(values));
+  }));
+  const errors = await Promise.all(executableValidationHandler);
+
+  return merge({}, ...errors);
+};
