@@ -19,5 +19,5 @@ package org.graylog.plugins.views.search.validation;
 import java.util.Optional;
 
 public interface FieldTypeValidation {
-    Optional<ValidationMessage> validateFieldValueType(ParsedTerm t, String detectedFieldType);
+    Optional<ValidationMessage> validateFieldValueType(ParsedTerm term, String detectedFieldType);
 }

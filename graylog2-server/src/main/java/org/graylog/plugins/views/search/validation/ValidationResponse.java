@@ -21,7 +21,6 @@ import com.google.auto.value.AutoValue;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 @AutoValue
 public abstract class ValidationResponse {
@@ -31,8 +30,21 @@ public abstract class ValidationResponse {
 
     public abstract List<ValidationMessage> explanations();
 
-    static ValidationResponse create(ValidationStatus status, List<ValidationMessage> explanations) {
+    private static ValidationResponse create(ValidationStatus status, List<ValidationMessage> explanations) {
         return new AutoValue_ValidationResponse(status, explanations);
+    }
+
+    public static ValidationResponse withDetectedStatus(List<ValidationMessage> explanations) {
+        if (anyMatch(explanations, ValidationStatus.ERROR)) {
+            return error(explanations);
+        } else if (anyMatch(explanations, ValidationStatus.WARNING)) {
+            return warning(explanations);
+        }
+        return ok();
+    }
+
+    private static boolean anyMatch(List<ValidationMessage> explanations, ValidationStatus error) {
+        return explanations.stream().anyMatch(e -> e.validationStatus() == error);
     }
 
     public static ValidationResponse ok() {
@@ -41,6 +53,10 @@ public abstract class ValidationResponse {
 
     public static ValidationResponse error(List<ValidationMessage> explanations) {
         return create(ValidationStatus.ERROR, explanations);
+    }
+
+    public static ValidationResponse error(ValidationMessage error) {
+        return error(Collections.singletonList(error));
     }
 
     public static ValidationResponse warning(List<ValidationMessage> explanations) {

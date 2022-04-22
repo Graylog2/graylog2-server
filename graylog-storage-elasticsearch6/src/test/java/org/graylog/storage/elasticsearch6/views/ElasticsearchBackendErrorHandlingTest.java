@@ -44,6 +44,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -82,7 +83,7 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
                 ),
                 jestClient,
                 indexLookup,
-                new QueryStringDecorators(Collections.emptySet()),
+                new QueryStringDecorators(Optional.empty()),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 false,
                 objectMapper);

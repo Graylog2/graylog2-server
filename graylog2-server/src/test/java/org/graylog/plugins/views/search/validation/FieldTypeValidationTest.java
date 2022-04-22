@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.views.search.validation;
 
+ import org.apache.lucene.queryparser.classic.QueryParserConstants;
+import org.apache.lucene.queryparser.classic.Token;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,8 +41,14 @@ class FieldTypeValidationTest {
     }
 
     private ParsedTerm term(String value) {
+        final Token token = Token.newToken(QueryParserConstants.TERM, "foo");
+        token.beginLine = 1;
+        token.beginColumn = 0;
+        token.endLine = 1;
+        token.endColumn = 3;
         return ParsedTerm.builder()
                 .field("foo")
+                .valueToken(ImmutableToken.create(token))
                 .value(value)
                 .build();
     }

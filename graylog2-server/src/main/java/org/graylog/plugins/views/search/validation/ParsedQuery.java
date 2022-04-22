@@ -42,12 +42,6 @@ public abstract class ParsedQuery {
                 .collect(Collectors.toSet());
     }
 
-    public List<ImmutableToken> invalidOperators() {
-        return tokens().stream()
-                .filter(ImmutableToken::isInvalidOperator)
-                .collect(Collectors.toList());
-    }
-
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder query(@NotNull String query);

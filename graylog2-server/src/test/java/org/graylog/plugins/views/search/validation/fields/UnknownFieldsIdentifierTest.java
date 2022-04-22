@@ -22,6 +22,7 @@ import org.graylog.plugins.views.search.validation.TestValidationContext;
 import org.graylog.plugins.views.search.validation.ValidationContext;
 import org.graylog.plugins.views.search.validation.ValidationMessage;
 import org.graylog.plugins.views.search.validation.ValidationType;
+import org.graylog.plugins.views.search.validation.validators.UnknownFieldsValidator;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

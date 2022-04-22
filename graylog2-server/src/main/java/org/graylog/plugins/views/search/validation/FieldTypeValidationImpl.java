@@ -17,17 +17,15 @@
 package org.graylog.plugins.views.search.validation;
 
 import com.google.common.net.InetAddresses;
+import org.graylog.plugins.views.search.engine.QueryPosition;
 import org.joda.time.DateTime;
 
-import javax.inject.Singleton;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 public class FieldTypeValidationImpl implements FieldTypeValidation {
 
@@ -63,19 +61,18 @@ public class FieldTypeValidationImpl implements FieldTypeValidation {
     }
 
     @Override
-    public Optional<ValidationMessage> validateFieldValueType(ParsedTerm t, String detectedFieldType) {
-        if (!typeMatching(detectedFieldType, t.value())) {
-            final ValidationMessage.Builder builder = ValidationMessage.builder(ValidationType.INVALID_VALUE_TYPE)
-                    .errorMessage(String.format(Locale.ROOT, "Type of %s is %s, cannot use value %s", t.getRealFieldName(), detectedFieldType, t.value()));
+    public Optional<ValidationMessage> validateFieldValueType(ParsedTerm term, String detectedFieldType) {
+        if (!typeMatching(detectedFieldType, term.value())) {
+            final ValidationMessage.Builder builder = ValidationMessage.builder(ValidationStatus.WARNING, ValidationType.INVALID_VALUE_TYPE)
+                    .errorMessage(String.format(Locale.ROOT, "Type of %s is %s, cannot use value %s", term.getRealFieldName(), detectedFieldType, term.value()));
 
             // prefer value token, accept key token as fallback
-            Optional<ImmutableToken> tokenWithPositions = t.valueToken().isPresent() ? t.valueToken() : t.keyToken();
-            tokenWithPositions.ifPresent(token -> {
-                builder.beginLine(token.beginLine());
-                builder.beginColumn(token.beginColumn());
-                builder.endLine(token.endLine());
-                builder.endColumn(token.endColumn());
-            });
+            Optional<ImmutableToken> tokenWithPositions = term.valueToken().isPresent() ? term.valueToken() : term.keyToken();
+
+            tokenWithPositions
+                    .map(QueryPosition::from)
+                    .ifPresent(builder::position);
+
             return Optional.of(builder.build());
         }
         return Optional.empty();

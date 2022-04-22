@@ -70,53 +70,6 @@ class LuceneQueryParserTest {
     }
 
     @Test
-    void unknownTerm() throws ParseException {
-        final ParsedQuery query = parser.parse("foo:bar and");
-        assertThat(query.allFieldNames()).contains("foo");
-        assertThat(query.invalidOperators().stream().map(ImmutableToken::image).collect(Collectors.toSet())).contains("and");
-
-        final ImmutableToken token = query.invalidOperators().iterator().next();
-        assertThat(token.beginColumn()).isEqualTo(8);
-        assertThat(token.beginLine()).isEqualTo(1);
-        assertThat(token.endColumn()).isEqualTo(11);
-        assertThat(token.endLine()).isEqualTo(1);
-    }
-
-    @Test
-    void testInvalidOperators() throws ParseException {
-        {
-            final ParsedQuery query = parser.parse("foo:bar baz");
-            assertThat(query.invalidOperators()).isEmpty();
-        }
-
-        {
-            final ParsedQuery queryWithAnd = parser.parse("foo:bar and");
-            assertThat(queryWithAnd.invalidOperators()).isNotEmpty();
-            final ImmutableToken invalidOperator = queryWithAnd.invalidOperators().iterator().next();
-            assertThat(invalidOperator.image()).isEqualTo("and");
-        }
-
-        {
-            final ParsedQuery queryWithOr = parser.parse("foo:bar or");
-            assertThat(queryWithOr.invalidOperators()).isNotEmpty();
-            final ImmutableToken invalidOperator = queryWithOr.invalidOperators().iterator().next();
-            assertThat(invalidOperator.image()).isEqualTo("or");
-        }
-    }
-
-    @Test
-    void testLowercaseNegation() throws ParseException {
-        final ParsedQuery query = parser.parse("not(foo:bar)");
-        assertThat(query.invalidOperators().size()).isEqualTo(1);
-    }
-
-    @Test
-    void testRepeatedInvalidTokens() throws ParseException {
-        final ParsedQuery query = parser.parse("foo:bar and lorem:ipsum and dolor:sit");
-        assertThat(query.invalidOperators().size()).isEqualTo(2);
-    }
-
-    @Test
     void testRangeQuery() throws ParseException {
         final ParsedQuery query = parser.parse("http_response_code:[500 TO 504]");
         assertThat(query.terms().get(0).value()).isEqualTo("500");
@@ -128,16 +81,6 @@ class LuceneQueryParserTest {
     void testGtQuery() throws ParseException {
         final ParsedQuery query = parser.parse("http_response_code:>400");
         assertThat(query.terms().get(0).value()).isEqualTo("400");
-    }
-
-    @Test
-    void testLongStringOfInvalidTokens() throws ParseException {
-        final ParsedQuery query = parser.parse("and and and or or or");
-        assertThat(query.invalidOperators().size()).isEqualTo(6);
-        assertThat(query.invalidOperators().stream().allMatch(token -> {
-            final String tokenValue = token.image();
-            return tokenValue.equals("or") || tokenValue.equals("and");
-        })).isTrue();
     }
 
     @Test

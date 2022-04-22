@@ -20,5 +20,5 @@ import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 
 public interface QueryStringDecorator {
-    String decorate(String queryString, ParameterProvider parameterProvider, Query query);
+    PositionTrackingQuery decorate(String queryString, ParameterProvider parameterProvider, Query query);
 }
