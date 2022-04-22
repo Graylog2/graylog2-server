@@ -22,7 +22,6 @@ import styled, { css } from 'styled-components';
 import PageContentLayout from 'components/layout/PageContentLayout';
 import connect, { useStore } from 'stores/connect';
 import Sidebar from 'views/components/sidebar/Sidebar';
-import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -105,9 +104,6 @@ const _refreshSearch = (executionState: SearchExecutionState) => {
   });
 };
 
-const SearchBarWithStatus = WithSearchStatus(SearchBar);
-const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
-
 const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode }) => {
   const { view } = useStore(ViewStore);
   const { searchesClusterConfig } = useStore(SearchConfigStore) ?? {};
@@ -143,10 +139,7 @@ const useRefreshSearchOn = (_actions: Array<RefluxActions<any>>, refresh: () => 
 };
 
 const Search = () => {
-  const refreshSearch = useCallback(
-    () => _refreshSearch(SearchExecutionStateStore.getInitialState()),
-    [],
-  );
+  const refreshSearch = useCallback(() => _refreshSearch(SearchExecutionStateStore.getInitialState()), []);
 
   useRefreshSearchOn([SearchActions.refresh, ViewActions.search], refreshSearch);
 
@@ -189,10 +182,10 @@ const Search = () => {
                               <IfInteractive>
                                 <HeaderElements />
                                 <IfDashboard>
-                                  {!editingWidget && <DashboardSearchBarWithStatus />}
+                                  {!editingWidget && <DashboardSearchBar />}
                                 </IfDashboard>
                                 <IfSearch>
-                                  <SearchBarWithStatus />
+                                  <SearchBar />
                                 </IfSearch>
 
                                 <QueryBarElements />

@@ -22,7 +22,7 @@ import { Field } from 'formik';
 import styled from 'styled-components';
 import moment from 'moment';
 
-import connect from 'stores/connect';
+import connect, { useStore } from 'stores/connect';
 import { Spinner, FlatContentRow } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
 import BottomRow from 'views/components/searchbar/BottomRow';
@@ -43,7 +43,6 @@ import QueryValidation from 'views/components/searchbar/queryvalidation/QueryVal
 import type { FilterType, QueryId } from 'views/logic/queries/Query';
 import type Query from 'views/logic/queries/Query';
 import { createElasticsearchQueryString, filtersForQuery, filtersToStreamSet } from 'views/logic/queries/Query';
-import type { SearchesConfig } from 'components/search/SearchConfig';
 import type { SearchBarFormValues } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import FormWarningsContext from 'contexts/FormWarningsContext';
@@ -56,6 +55,7 @@ import PluggableSearchBarControls from 'views/components/searchbar/PluggableSear
 import useParameters from 'views/hooks/useParameters';
 import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
 import type { SearchBarControl } from 'views/types';
+import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 import {
@@ -66,7 +66,6 @@ import {
 
 type Props = {
   availableStreams: Array<{ key: string, value: string }>,
-  config: SearchesConfig,
   currentQuery: Query,
   onSubmit?: (update: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, query: Query) => Promise<any>
   queryFilters: Immutable.Map<QueryId, FilterType>,
@@ -147,11 +146,11 @@ const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarCon
 
 const SearchBar = ({
   availableStreams,
-  config,
   currentQuery,
   queryFilters,
   onSubmit = defaultProps.onSubmit,
 }: Props) => {
+  const { searchesClusterConfig: config } = useStore(SearchConfigStore);
   const { parameters } = useParameters();
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });

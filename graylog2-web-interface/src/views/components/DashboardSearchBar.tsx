@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useMemo, useCallback } from 'react';
-import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
@@ -31,7 +30,6 @@ import ViewActionsMenu from 'views/components/ViewActionsMenu';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import BottomRow from 'views/components/searchbar/BottomRow';
 import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
-import type { SearchesConfig } from 'components/search/SearchConfig';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
@@ -48,16 +46,12 @@ import {
 } from 'views/components/searchbar/pluggableSearchBarControlsHandler';
 import type { SearchBarControl } from 'views/types';
 import usePluginEntities from 'views/logic/usePluginEntities';
+import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
 import DashboardSearchForm from './DashboardSearchBarForm';
 import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
-
-type Props = {
-  config: SearchesConfig,
-  disableSearch?: boolean,
-};
 
 const Container = styled.div`
   display: grid;
@@ -121,7 +115,8 @@ const useInitialFormValues = (timerange, queryString) => {
   }, [queryString, timerange]);
 };
 
-const DashboardSearchBar = ({ config }: Props) => {
+const DashboardSearchBar = () => {
+  const { searchesClusterConfig: config } = useStore(SearchConfigStore);
   const { timerange, query: { query_string: queryString = '' } = {} } = useStore(GlobalOverrideStore) ?? {};
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
 
