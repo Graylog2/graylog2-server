@@ -11,14 +11,12 @@ type FormValues = {
 }
 
 export const usePluggableInitialValues = () => {
-  const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
-  const existingPlugins = pluggableSearchBarControls.map((pluginData) => pluginData()).filter((pluginData) => !!pluginData) ?? [];
-  const initialValuesHandler = existingPlugins.map(({ useInitialValues }) => useInitialValues)?.filter((handler) => !!handler);
+  const pluggableSearchBarControls = usePluginEntities('views.components.searchBar') ?? [];
+  const initialValuesHandler = pluggableSearchBarControls?.map((pluginFn) => pluginFn()?.useInitialValues).filter((useInitialValues) => !!useInitialValues);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const initialValues = initialValuesHandler.map((useInitialValues) => useInitialValues());
 
-  return initialValuesHandler.reduce((result, useInitialValues) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    return { ...result, ...(useInitialValues?.() ?? {}) };
-  }, {});
+  return merge({}, ...initialValues);
 };
 
 export const executePluggableSubmitHandler = async (values: FormValues, pluggableSearchBarControls: Array<() => SearchBarControl>) => {
@@ -29,16 +27,15 @@ export const executePluggableSubmitHandler = async (values: FormValues, pluggabl
   }
 };
 
-export const pluggableValidationPayload = (values: FormValues, pluggableSearchBarControls: Array<() => SearchBarControl>) => {
-  const existingPluginData: Array<SearchBarControl> = pluggableSearchBarControls?.map((pluginData) => pluginData()).filter((pluginData) => !!pluginData);
-  const pluggableQueryValidationPayload: Array<{ [key: string ]: any }> = existingPluginData.map(({ validationPayload }) => validationPayload?.(values)).filter((pluginValidationPayload) => !!pluginValidationPayload) ?? [];
+export const pluggableValidationPayload = (values: FormValues, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
+  const validationPayloadHandler = pluggableSearchBarControls.map((pluginFn) => pluginFn()?.validationPayload).filter((validationPayloadFn) => !!validationPayloadFn);
+  const validationPayload: Array<{ [key: string ]: any }> = validationPayloadHandler.map((validationPayloadFn) => validationPayloadFn(values));
 
-  return merge({}, ...pluggableQueryValidationPayload);
+  return merge({}, ...validationPayload);
 };
 
-export const validatePluggableValues = async (values: FormValues, pluggableSearchBarControls: Array<() => SearchBarControl>) => {
-  const existingPluginData: Array<SearchBarControl> = pluggableSearchBarControls?.map((pluginData) => pluginData()).filter((pluginData) => !!pluginData) ?? [];
-  const validationHandler = existingPluginData.map(({ onValidate }) => onValidate).filter((onValidate) => !!onValidate) ?? [];
+export const validatePluggableValues = async (values: FormValues, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
+  const validationHandler = pluggableSearchBarControls.map((pluginFn) => pluginFn()?.onValidate).filter((onValidate) => !!onValidate);
   const executableValidationHandler = validationHandler.map((onValidate) => new Promise((resolve) => {
     resolve(onValidate(values));
   }));
