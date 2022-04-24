@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import styled, { css } from 'styled-components';
-import chroma from 'chroma-js';
 
 import Spinner from 'components/common/Spinner';
 import Query from 'views/components/Query';
