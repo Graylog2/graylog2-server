@@ -363,6 +363,11 @@
             <artifactId>lucene-queryparser</artifactId>
             <version>${lucene.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+        </dependency>
+
 
         <!-- Logging dependencies -->
         <dependency>
@@ -735,6 +740,11 @@
                     <artifactId>buildnumber-maven-plugin</artifactId>
                     <version>1.4</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -865,6 +875,26 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>org.graylog.api.GenerateApiDefinition</mainClass>
+                    <arguments>
+                        <argument>${project.build.directory}/swagger</argument>
+                        <argument>org.graylog</argument>
+                        <argument>org.graylog2</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -941,6 +971,7 @@
                         <executions>
                             <execution>
                                 <id>install node and yarn</id>
+                                <phase>compile</phase>
                                 <goals>
                                     <goal>install-node-and-yarn</goal>
                                 </goals>
@@ -948,6 +979,7 @@
 
                             <execution>
                                 <id>yarn install</id>
+                                <phase>compile</phase>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
@@ -959,6 +991,7 @@
 
                             <execution>
                                 <id>yarn run build</id>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
@@ -969,10 +1002,10 @@
 
                             <execution>
                                 <id>yarn run check-production-build</id>
+                                <phase>verify</phase>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
-                                <phase>test</phase>
                                 <configuration>
                                     <arguments>run check-production-build</arguments>
                                 </configuration>
@@ -1006,6 +1039,16 @@
                                 <phase>test</phase>
                                 <configuration>
                                     <arguments>tsc</arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>Generate backend API types</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>process-classes</phase>
+                                <configuration>
+                                    <arguments>generate:apidefs</arguments>
                                 </configuration>
                             </execution>
                         </executions>
