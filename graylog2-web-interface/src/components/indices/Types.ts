@@ -25,6 +25,7 @@ export type IndicesConfigurationStoreState = {
   rotationStrategies: any,
   activeRetentionConfig: any,
   retentionStrategies: any,
+  retentionStrategiesContext: RetentionStrategyContext,
 }
 export type SizeBasedRotationStrategyConfig = {
   type: string,
@@ -84,7 +85,7 @@ export interface RetentionStrategy {
   json_schema: RetentionJsonSchema,
 }
 export interface RetentionStrategyContext {
-  max_index_retention_period: string,
+  max_index_retention_period?: string,
 }
 export interface RotationStrategyResponse {
   total: number,
@@ -93,6 +94,7 @@ export interface RotationStrategyResponse {
 export interface RetentionStrategyResponse {
   total: number,
   strategies: Array<RetentionStrategy>,
+  context: RetentionStrategyContext,
 }
 
 export const SizeBasedRotationStrategyConfigPropType = PropTypes.exact({

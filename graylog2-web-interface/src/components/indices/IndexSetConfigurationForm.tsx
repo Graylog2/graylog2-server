@@ -17,7 +17,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import moment from 'moment';
-import lodash from 'lodash';
 import { Formik, Form, Field } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -47,9 +46,30 @@ type Unit = 'seconds' | 'minutes';
 type State = {
   indexSet: IndexSet,
   fieldTypeRefreshIntervalUnit: Unit,
-  validationErrors: {
-    [key: string]: string,
-  },
+};
+
+const _validateIndexPrefix = (value) => {
+  let error;
+
+  if (value.length === 0) {
+    error = 'Invalid index prefix: cannot be empty';
+  } else if (value.indexOf('_') === 0 || value.indexOf('-') === 0 || value.indexOf('+') === 0) {
+    error = 'Invalid index prefix: must start with a letter or number';
+  } else if (value.toLocaleLowerCase() !== value) {
+    error = 'Invalid index prefix: must be lower case';
+  } else if (!value.match(/^[a-z0-9][a-z0-9_\-+]*$/)) {
+    error = 'Invalid index prefix: must only contain letters, numbers, \'_\', \'-\' and \'+\'';
+  }
+
+  return error;
+};
+
+const _getRotationConfigState = (strategy: string, data: string) => {
+  return { rotation_strategy_class: strategy, rotation_strategy: data };
+};
+
+const _getRetentionConfigState = (strategy: string, data: string) => {
+  return { retention_strategy_class: strategy, retention_strategy: data };
 };
 
 class IndexSetConfigurationForm extends React.Component<Props, State> {
@@ -76,102 +96,17 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
     this.state = {
       indexSet: indexSet,
       fieldTypeRefreshIntervalUnit: 'seconds',
-      validationErrors: {},
     };
   }
 
-  _updateConfig = (fieldName: string, value: (string | boolean | number)) => {
-    // Use `setState()` with updater function so consecutive calls to `_updateConfig()` always refer to the state
-    // at the time the change is applied, resulting in all different keys of the object being updated.
-    this.setState((state) => {
-      const config = lodash.cloneDeep(state.indexSet);
-
-      config[fieldName] = value;
-
-      return { indexSet: config };
-    });
-  };
-
-  _validateIndexPrefix = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
-    const { validationErrors } = this.state;
-
-    if (value.match(/^[a-z0-9][a-z0-9_\-+]*$/)) {
-      if (validationErrors[event.target.name]) {
-        const nextValidationErrors = { ...validationErrors };
-
-        delete nextValidationErrors[event.target.name];
-        this.setState({ validationErrors: nextValidationErrors });
-      }
-    } else {
-      const nextValidationErrors = { ...validationErrors };
-
-      if (value.length === 0) {
-        nextValidationErrors[event.target.name] = 'Invalid index prefix: cannot be empty';
-      } else if (value.indexOf('_') === 0 || value.indexOf('-') === 0 || value.indexOf('+') === 0) {
-        nextValidationErrors[event.target.name] = 'Invalid index prefix: must start with a letter or number';
-      } else if (value.toLocaleLowerCase() !== value) {
-        nextValidationErrors[event.target.name] = 'Invalid index prefix: must be lower case';
-      } else {
-        nextValidationErrors[event.target.name] = 'Invalid index prefix: must only contain letters, numbers, \'_\', \'-\' and \'+\'';
-      }
-
-      this.setState({ validationErrors: nextValidationErrors });
-    }
-
-    this._onInputChange(event);
-  };
-
-  _onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this._updateConfig(event.target.name, event.target.value);
-  };
-
-  _onDisableOptimizationClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this._updateConfig(event.target.name, event.target.checked);
-  };
-
-  // _saveConfiguration = (event: React.FormEvent<HTMLFormElement>) => {
   _saveConfiguration = (values) => {
-    // event.preventDefault();
-    const { indexSet, validationErrors } = this.state;
     const { onUpdate } = this.props;
-    const invalidFields = Object.keys(validationErrors);
-
-    if (invalidFields.length !== 0) {
-      document.getElementsByName(invalidFields[0])[0].focus();
-
-      return;
-    }
 
     onUpdate(values);
   };
 
-  _updateRotationConfigState = (strategy: string, data: string) => {
-    this._updateConfig('rotation_strategy_class', strategy);
-    this._updateConfig('rotation_strategy', data);
-  };
-
-  _updateRetentionConfigState = (strategy: string, data: string) => {
-    this._updateConfig('retention_strategy_class', strategy);
-    this._updateConfig('retention_strategy', data);
-  };
-
-  _getRotationConfigState = (strategy: string, data: string) => {
-    return { rotation_strategy_class: strategy, rotation_strategy: data };
-  };
-
-  _getRetentionConfigState = (strategy: string, data: string) => {
-    return { retention_strategy_class: strategy, retention_strategy: data };
-  };
-
-  _onFieldTypeRefreshIntervalChange = (value: number, unit: Unit) => {
-    this._updateConfig('field_type_refresh_interval', moment.duration(value, unit).asMilliseconds());
-    this.setState({ fieldTypeRefreshIntervalUnit: unit });
-  };
-
   render() {
     const { indexSet, fieldTypeRefreshIntervalUnit } = this.state;
-    const { validationErrors } = this.state;
     const {
       rotationStrategies,
       retentionStrategies,
@@ -202,7 +137,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
                                                  pluginExports={PluginStore.exports('indexRotationConfig')}
                                                  strategies={rotationStrategies}
                                                  activeConfig={activeConfig}
-                                                 getState={this._getRotationConfigState} />
+                                                 getState={_getRotationConfigState} />
       );
     } else {
       rotationConfig = (<Spinner />);
@@ -226,7 +161,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
                                                  strategies={retentionStrategies}
                                                  retentionStrategiesContext={retentionStrategiesContext}
                                                  activeConfig={activeConfig}
-                                                 getState={this._getRetentionConfigState} />
+                                                 getState={_getRetentionConfigState} />
       );
     } else {
       retentionConfig = (<Spinner />);
@@ -247,12 +182,12 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
           <FormikFormGroup type="text"
                            label="Index prefix"
                            name="index_prefix"
-                           help={validationErrors.index_prefix ? validationErrors.index_prefix : indexPrefixHelp}
+                           help={indexPrefixHelp}
+                           validate={_validateIndexPrefix}
                            required />
           <FormikFormGroup type="text"
                            label="Analyzer"
                            name="index_analyzer"
-                           onChange={this._onInputChange}
                            help="Elasticsearch analyzer for this index set."
                            required />
         </span>
@@ -265,7 +200,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
           {/* <form className="form" onSubmit={this._saveConfiguration}> */}
           <Formik onSubmit={this._saveConfiguration}
                   initialValues={indexSet}>
-            {({ isSubmitting, isValid, setFieldValue }) => (
+            {({ isValid, setFieldValue }) => (
               <Form>
                 <Row>
                   <Col md={12}>
@@ -348,7 +283,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
 
                 <Row>
                   <Col md={12}>
-                    <Button type="submit" bsStyle="primary" style={{ marginRight: 10 }}>Save</Button>
+                    <Button type="submit" bsStyle="primary" disabled={!isValid} style={{ marginRight: 10 }}>Save</Button>
                     <LinkContainer to={cancelLink}>
                       <Button bsStyle="default">Cancel</Button>
                     </LinkContainer>
