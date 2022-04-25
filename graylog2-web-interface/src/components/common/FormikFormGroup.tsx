@@ -40,6 +40,7 @@ type Props = {
   required?: boolean,
   bsSize?: 'large' | 'small' | 'xsmall',
   validate?: (any) => string | undefined,
+  rows?: number,
 };
 
 /** Displays the FormikInput with a specific layout */
@@ -70,6 +71,7 @@ FormikFormGroup.defaultProps = {
   maxLength: undefined,
   required: false,
   validate: () => undefined,
+  rows: undefined,
 };
 
 export default FormikFormGroup;
