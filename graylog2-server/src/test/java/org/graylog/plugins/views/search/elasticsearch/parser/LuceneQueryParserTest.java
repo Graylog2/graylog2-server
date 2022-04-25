@@ -32,6 +32,13 @@ class LuceneQueryParserTest {
 
     private final LuceneQueryParser parser = new LuceneQueryParser();
 
+
+    @Test
+    void testSuperSimpleQuery() throws ParseException {
+        final ParsedQuery fields = parser.parse("foo:bar");
+        assertThat(fields.allFieldNames()).contains("foo");
+    }
+
     @Test
     void getFieldNamesSimple() throws ParseException {
         final ParsedQuery fields = parser.parse("foo:bar AND lorem:ipsum");

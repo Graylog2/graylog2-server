@@ -35,7 +35,7 @@ public class LuceneQueryParser {
         final ParsedQuery.Builder builder = ParsedQuery.builder().query(query);
 
         builder.tokensBuilder().addAll(this.parser.getTokens());
-        final TermCollectingQueryVisitor visitor = new TermCollectingQueryVisitor(this.parser.getTokens(), analyzer);
+        final TermCollectingQueryVisitor visitor = new TermCollectingQueryVisitor(analyzer, this.parser.getTokenLookup());
         parsed.visit(visitor);
         builder.termsBuilder().addAll(visitor.getParsedTerms());
         return builder.build();
