@@ -175,7 +175,6 @@ const webpackConfig = {
     modules: [APP_PATH, 'node_modules', path.resolve(ROOT_PATH, 'public')],
     alias: {
       theme: path.resolve(APP_PATH, 'theme'),
-      '@graylog/server-api': path.resolve(ROOT_PATH, 'target', 'api'),
     },
   },
   resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')] },
