@@ -138,9 +138,15 @@ const IndexMaintenanceStrategiesConfiguration = ({ title, description, selectPla
   return (
     <span>
       <StyledH3>{title}</StyledH3>
-      <StyledAlert bsStyle="info">
+      <StyledAlert>
         <Icon name="info-circle" />{' '} {description}
       </StyledAlert>
+      {maxRetentionPeriod && rotationStrategyClass === TIME_BASED_ROTATION_STRATEGY && (
+      <StyledAlert bsStyle="warning">
+        <Icon name="exclamation-triangle" />{' '} The effective retention period value calculated from the <b>Rotation period</b> and the
+        <b> max number of indices</b> should not be greater than the <b>Max retention period</b> of <b>{maxRetentionPeriod}</b> set by the Administrator.
+      </StyledAlert>
+      )}
       <Input id="strategy-select"
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9"
