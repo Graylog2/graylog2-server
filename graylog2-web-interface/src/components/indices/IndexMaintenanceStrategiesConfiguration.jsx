@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useFormikContext } from 'formik';
 import styled from 'styled-components';
 
@@ -37,39 +37,58 @@ const StyledAlert = styled(Alert)`
   margin-left: 15px;
 `;
 
-const IndexMaintenanceStrategiesConfiguration = ({ title, description, selectPlaceholder, pluginExports, strategies, retentionStrategiesContext, activeConfig: { strategy, config }, getState }) => {
-  const [activeStrategy, setActiveStrategy] = useState(strategy);
-  const [activeConfig, setActiveConfig] = useState(config);
+const _getStrategyJsonSchema = (selectedStrategy, strategies) => {
+  const result = strategies.filter((s) => s.type === selectedStrategy)[0];
+
+  return result ? result.json_schema : undefined;
+};
+
+const _getDefaultStrategyConfig = (selectedStrategy, strategies) => {
+  const result = strategies.filter((s) => s.type === selectedStrategy)[0];
+
+  return result ? result.default_config : undefined;
+};
+
+const _getTimeBaseStrategyWithElasticLimit = (activeConfig, strategies) => {
+  const timeBasedStrategy = _getDefaultStrategyConfig(TIME_BASED_ROTATION_STRATEGY, strategies);
+
+  return { ...activeConfig, max_rotation_period: timeBasedStrategy?.max_rotation_period };
+};
+
+const _getStrategyConfig = (selectedStrategy, activeStrategy, activeConfig, strategies) => {
+  if (activeStrategy === selectedStrategy) {
+    // If the newly selected strategy is the current active strategy, we use the active configuration.
+    return activeStrategy === TIME_BASED_ROTATION_STRATEGY ? _getTimeBaseStrategyWithElasticLimit(activeConfig, strategies) : activeConfig;
+  }
+
+  // If the newly selected strategy is not the current active strategy, we use the selected strategy's default config.
+  return _getDefaultStrategyConfig(selectedStrategy, strategies);
+};
+
+const _getConfigurationComponent = (selectedStrategy, pluginExports, strategies, strategy, config, onConfigUpdate) => {
+  if (!selectedStrategy || selectedStrategy.length < 1) {
+    return null;
+  }
+
+  const strategyPlugin = pluginExports.filter((exportedStrategy) => exportedStrategy.type === selectedStrategy)[0];
+
+  if (!strategyPlugin) {
+    return null;
+  }
+
+  const strategyConfig = _getStrategyConfig(selectedStrategy, strategy, config, strategies);
+  const element = React.createElement(strategyPlugin.configComponent, {
+    config: strategyConfig,
+    jsonSchema: _getStrategyJsonSchema(selectedStrategy, strategies),
+    updateConfig: onConfigUpdate,
+  });
+
+  return (<span key={strategy.type}>{element}</span>);
+};
+
+const IndexMaintenanceStrategiesConfiguration = ({ title, description, selectPlaceholder, pluginExports, strategies, retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod }, activeConfig: { strategy, config }, getState }) => {
   const [newStrategy, setNewStrategy] = useState(strategy);
-  const { setValues, values } = useFormikContext();
-
-  const _getDefaultStrategyConfig = (selectedStrategy) => {
-    const result = strategies.filter((s) => s.type === selectedStrategy)[0];
-
-    return result ? result.default_config : undefined;
-  };
-
-  const _getStrategyJsonSchema = (selectedStrategy) => {
-    const result = strategies.filter((s) => s.type === selectedStrategy)[0];
-
-    return result ? result.json_schema : undefined;
-  };
-
-  const _getTimeBaseStrategyWithElasticLimit = () => {
-    const timeBasedStrategy = _getDefaultStrategyConfig(TIME_BASED_ROTATION_STRATEGY);
-
-    return { ...activeConfig, max_rotation_period: timeBasedStrategy?.max_rotation_period };
-  };
-
-  const _getStrategyConfig = (selectedStrategy) => {
-    if (activeStrategy === selectedStrategy) {
-      // If the newly selected strategy is the current active strategy, we use the active configuration.
-      return activeStrategy === TIME_BASED_ROTATION_STRATEGY ? _getTimeBaseStrategyWithElasticLimit() : activeConfig;
-    }
-
-    // If the newly selected strategy is not the current active strategy, we use the selected strategy's default config.
-    return _getDefaultStrategyConfig(selectedStrategy);
-  };
+  const { setValues, values, values: { rotation_strategy_class: rotationStrategyClass } } = useFormikContext();
 
   const _onSelect = (selectedStrategy) => {
     if (!selectedStrategy || selectedStrategy.length < 1) {
@@ -78,29 +97,29 @@ const IndexMaintenanceStrategiesConfiguration = ({ title, description, selectPla
       return;
     }
 
-    const newConfig = _getStrategyConfig(selectedStrategy);
+    const newConfig = _getStrategyConfig(selectedStrategy, strategy, config, strategies);
 
     setNewStrategy(selectedStrategy);
     setValues({ ...values, ...getState(selectedStrategy, newConfig) });
   };
 
-  const _addConfigType = (selectedStrategy, data) => {
+  const _onConfigUpdate = useCallback((newConfig) => {
+    const _addConfigType = (selectedStrategy, data) => {
     // The config object needs to have the "type" field set to the "default_config.type" to make the REST call work.
-    const result = strategies.filter((s) => s.type === selectedStrategy)[0];
-    const copy = data;
+      const result = strategies.filter((s) => s.type === selectedStrategy)[0];
+      const copy = data;
 
-    if (result) {
-      copy.type = result.default_config.type;
-    }
+      if (result) {
+        copy.type = result.default_config.type;
+      }
 
-    return copy;
-  };
+      return copy;
+    };
 
-  const _onConfigUpdate = (newConfig) => {
     const configuration = _addConfigType(newStrategy, newConfig);
 
     setValues({ ...values, ...getState(newStrategy, configuration) });
-  };
+  }, [getState, newStrategy, setValues, strategies, values]);
 
   const _availableSelectOptions = () => {
     return pluginExports
@@ -108,27 +127,6 @@ const IndexMaintenanceStrategiesConfiguration = ({ title, description, selectPla
       .map((c) => {
         return { value: c.type, label: c.displayName };
       });
-  };
-
-  const _getConfigurationComponent = (selectedStrategy) => {
-    if (!selectedStrategy || selectedStrategy.length < 1) {
-      return null;
-    }
-
-    const strategy = pluginExports.filter((exportedStrategy) => exportedStrategy.type === selectedStrategy)[0];
-
-    if (!strategy) {
-      return null;
-    }
-
-    const strategyConfig = _getStrategyConfig(selectedStrategy);
-    const element = React.createElement(strategy.configComponent, {
-      config: strategyConfig,
-      jsonSchema: _getStrategyJsonSchema(selectedStrategy),
-      updateConfig: _onConfigUpdate,
-    });
-
-    return (<span key={strategy.type}>{element}</span>);
   };
 
   const _activeSelection = () => {
@@ -157,7 +155,7 @@ const IndexMaintenanceStrategiesConfiguration = ({ title, description, selectPla
                       value={_activeSelection()}
                       onChange={_onSelect} />
       </Input>
-      {_getConfigurationComponent(_activeSelection())}
+      {_getConfigurationComponent(_activeSelection(), pluginExports, strategies, strategy, config, _onConfigUpdate)}
     </span>
   );
 };
