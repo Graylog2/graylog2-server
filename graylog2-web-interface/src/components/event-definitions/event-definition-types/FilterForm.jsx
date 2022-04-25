@@ -42,6 +42,17 @@ const LOOKUP_PERMISSIONS = [
   'lookuptables:read',
 ];
 
+const _buildNewParameter = (name) => {
+  return ({
+    name: name,
+    embryonic: true,
+    type: 'lut-parameter-v1',
+    data_type: 'any',
+    title: 'new title',
+    // has no binding, no need to set binding property
+  });
+};
+
 class FilterForm extends React.Component {
   formatStreamIds = lodash.memoize(
     (streamIds) => {
@@ -155,7 +166,7 @@ class FilterForm extends React.Component {
         if (queryParameterStash[np]) {
           newParameters.push(queryParameterStash[np]);
         } else {
-          newParameters.push(this._buildNewParameter(np));
+          newParameters.push(_buildNewParameter(np));
         }
       }
     });
@@ -170,17 +181,6 @@ class FilterForm extends React.Component {
     const { currentUser } = this.props;
 
     return isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS);
-  };
-
-  _buildNewParameter = (name) => {
-    return ({
-      name: name,
-      embryonic: true,
-      type: 'lut-parameter-v1',
-      data_type: 'any',
-      title: 'new title',
-      // has no binding, no need to set binding property
-    });
   };
 
   handleQueryChange = (event) => {

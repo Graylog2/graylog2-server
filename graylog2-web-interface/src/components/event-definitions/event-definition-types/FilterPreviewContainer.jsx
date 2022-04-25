@@ -21,23 +21,26 @@ import lodash from 'lodash';
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import connect from 'stores/connect';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { FilterPreviewActions, FilterPreviewStore } from 'stores/event-definitions/FilterPreviewStore';
 import generateId from 'logic/generateId';
 
 import FilterPreview from './FilterPreview';
 
-class FilterPreviewContainer extends React.Component {
-  state = {
-    queryId: generateId(),
-    searchTypeId: generateId(),
-  };
+const isPermittedToSeePreview = (currentUser, config) => {
+  const missingPermissions = config.streams.some((stream) => {
+    return !isPermitted(currentUser.permissions, `streams:read:${stream}`);
+  });
 
+  return !missingPermissions;
+};
+
+class FilterPreviewContainer extends React.Component {
   fetchSearch = lodash.debounce((config) => {
     const { currentUser } = this.props;
 
-    if (!this.isPermittedToSeePreview(currentUser, config)) {
+    if (!isPermittedToSeePreview(currentUser, config)) {
       return;
     }
 
@@ -73,6 +76,15 @@ class FilterPreviewContainer extends React.Component {
     currentUser: PropTypes.object.isRequired,
   };
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      queryId: generateId(),
+      searchTypeId: generateId(),
+    };
+  }
+
   componentDidMount() {
     const { eventDefinition } = this.props;
 
@@ -100,14 +112,6 @@ class FilterPreviewContainer extends React.Component {
     }
   }
 
-  isPermittedToSeePreview = (currentUser, config) => {
-    const missingPermissions = config.streams.some((stream) => {
-      return !PermissionsMixin.isPermitted(currentUser.permissions, `streams:read:${stream}`);
-    });
-
-    return !missingPermissions;
-  };
-
   render() {
     const { eventDefinition, filterPreview, currentUser } = this.props;
     const { queryId, searchTypeId } = this.state;
@@ -124,7 +128,7 @@ class FilterPreviewContainer extends React.Component {
     return (
       <FilterPreview eventDefinition={eventDefinition}
                      isFetchingData={isLoading}
-                     displayPreview={this.isPermittedToSeePreview(currentUser, eventDefinition.config)}
+                     displayPreview={isPermittedToSeePreview(currentUser, eventDefinition.config)}
                      searchResult={searchResult}
                      errors={errors} />
     );
