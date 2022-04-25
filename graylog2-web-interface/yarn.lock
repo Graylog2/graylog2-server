@@ -7448,11 +7448,11 @@ graceful-fs@^4.2.9:
     "@babel/preset-env" "7.16.11"
     "@babel/preset-typescript" "7.16.7"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:packages/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-321f674c-de8c-474c-b227-c9ab163ddab4-1649930226828/node_modules/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:packages/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-321f674c-de8c-474c-b227-c9ab163ddab4-1649930226828/node_modules/jest-preset-graylog"
     jquery "3.5.1"
     moment "2.29.2"
     moment-timezone "0.5.34"
@@ -8968,11 +8968,6 @@ jest-leak-detector@^27.0.2:
     jest-get-type "^27.0.1"
     pretty-format "^27.0.2"
 
-jest-localstorage-mock@^2.4.0:
-  version "2.4.3"
-  resolved "https://registry.yarnpkg.com/jest-localstorage-mock/-/jest-localstorage-mock-2.4.3.tgz#29a77a892acdbe2303436a5eb28d03997d98a430"
-  integrity sha512-UgifkHKoWVRUoSqO4Z4Z+Hl1NbiYBVDlmkmulFFeRRneGECWAlAdGWJdyz+2NisjOZnnQoxQl0s5dQ7ch62Jxw==
-
 jest-matcher-utils@^27.0.2:
   version "27.0.2"
   resolved "https://registry.yarnpkg.com/jest-matcher-utils/-/jest-matcher-utils-27.0.2.tgz#f14c060605a95a466cdc759acc546c6f4cbfc4f0"
@@ -9051,7 +9046,6 @@ jest-pnp-resolver@^1.2.2:
     jest-environment-jsdom "^27.0.3"
     jest-enzyme "^7.1.2"
     jest-junit "13.1.0"
-    jest-localstorage-mock "^2.4.0"
     jest-styled-components "7.0.7"
     react-select-event "^5.0.0"
 
