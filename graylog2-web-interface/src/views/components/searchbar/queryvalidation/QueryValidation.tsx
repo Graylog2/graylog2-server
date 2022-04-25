@@ -200,8 +200,9 @@ const QueryValidation = () => {
                          title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
                          $shaking={shakingPopover}>
             <div role="alert">
-              {explanations.map(({ errorType, errorTitle, errorMessage }) => (
-                <Explanation key={errorMessage}>
+              {explanations.map(({ errorType, errorTitle, errorMessage }, index) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <Explanation key={index}>
                   <span><b>{errorTitle}</b>: {errorMessage}</span>
                   <DocumentationLink page={getErrorDocumentationLink(errorType)}
                                      title={`${errorTitle} documentation`}
