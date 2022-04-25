@@ -17,9 +17,9 @@
 import { Map, Set } from 'immutable';
 import { concat, remove } from 'lodash';
 
-import Entity from './Entity';
+import generateId from 'logic/generateId';
 
-import generateId from '../generateId';
+import Entity from './Entity';
 
 export default class ContentPack {
   constructor(v, id, rev, name, summary, description, vendor, url, parameters, entitieValues) {

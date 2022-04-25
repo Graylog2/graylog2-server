@@ -31,10 +31,10 @@ import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { isPermitted } from 'util/PermissionsMixin';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
+import generateId from 'logic/generateId';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
-import generateId from '../../../logic/generateId';
 
 export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 

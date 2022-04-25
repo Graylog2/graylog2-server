@@ -24,10 +24,9 @@ import connect from 'stores/connect';
 import PermissionsMixin from 'util/PermissionsMixin';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { FilterPreviewActions, FilterPreviewStore } from 'stores/event-definitions/FilterPreviewStore';
+import generateId from 'logic/generateId';
 
 import FilterPreview from './FilterPreview';
-
-import generateId from '../../../logic/generateId';
 
 class FilterPreviewContainer extends React.Component {
   state = {
