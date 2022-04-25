@@ -109,7 +109,7 @@ public class NotificationResourceHandler {
         // Grab the old record so we can revert to it if something goes wrong
         final Optional<NotificationDto> oldDto = notificationService.get(updatedDto.id());
 
-        final NotificationDto dto = notificationService.save(updatedDto);
+        final NotificationDto dto = notificationService.save(prepareUpdate(updatedDto));
 
         LOG.debug("Updated notification definition <{}/{}>", dto.id(), dto.title());
 

@@ -94,14 +94,29 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
     @JsonIgnore
     public EventNotificationConfig prepareConfigUpdate(@Nonnull EventNotificationConfig newConfig) {
         final HTTPEventNotificationConfig newHttpConfig = (HTTPEventNotificationConfig) newConfig;
-        if (newHttpConfig.basicAuth() != null && newHttpConfig.basicAuth().isDeleteValue()) {
-            return newHttpConfig.toBuilder().basicAuth(null).build();
+        EncryptedValue newBasicAuth = newHttpConfig.basicAuth();
+        if (newHttpConfig.basicAuth() != null) {
+            if (newHttpConfig.basicAuth().isKeepValue()) {
+                // If the client secret should be kept, use the value from the existing config
+                newBasicAuth = basicAuth();
+            }
+            else if (newHttpConfig.basicAuth().isDeleteValue()) {
+                newBasicAuth = EncryptedValue.createUnset();
+            }
         }
-        if (newHttpConfig.apiKeyValue() != null && newHttpConfig.apiKeyValue().isKeepValue()) {
-            // If the client secret should be kept, use the value from the existing config
-            return newHttpConfig.toBuilder().apiKeyValue(apiKeyValue()).build();
+
+        EncryptedValue newApiKeyValue = newHttpConfig.apiKeyValue();
+        if (newHttpConfig.apiKeyValue() != null) {
+            if (newHttpConfig.apiKeyValue().isKeepValue()) {
+                // If the client secret should be kept, use the value from the existing config
+                newApiKeyValue = apiKeyValue();
+            }
+            else if (newHttpConfig.apiKeyValue().isDeleteValue()) {
+                newApiKeyValue = EncryptedValue.createUnset();
+            }
         }
-        return newHttpConfig;
+
+        return newHttpConfig.toBuilder().apiKeyValue(newApiKeyValue).basicAuth(newBasicAuth).build();
     }
 
     @AutoValue.Builder
