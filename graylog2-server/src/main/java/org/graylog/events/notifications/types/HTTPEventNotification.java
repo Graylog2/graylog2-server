@@ -145,7 +145,7 @@ public class HTTPEventNotification implements EventNotification {
     }
 
     private String getBasicAuthHeaderValue(HTTPEventNotificationConfig config) {
-        if (config.basicAuth() == null) {
+        if (config.basicAuth() == null || (!config.basicAuth().isSet())) {
             return null;
         }
         String credentials = encryptedValueService.decrypt(config.basicAuth());
@@ -153,7 +153,7 @@ public class HTTPEventNotification implements EventNotification {
     }
 
     private  String getApiKeyValue(HTTPEventNotificationConfig config) {
-        if (config.apiKeyValue() == null) {
+        if (config.apiKeyValue() == null || (!config.apiKeyValue().isSet())) {
             return null;
         }
         return encryptedValueService.decrypt(config.apiKeyValue());
