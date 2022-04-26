@@ -43,7 +43,7 @@ public class TokenCollectingQueryParser extends QueryParser {
         this(new CollectingQueryParserTokenManager(defaultFieldName, analyzer), defaultFieldName, analyzer);
     }
 
-    private TokenCollectingQueryParser(CollectingQueryParserTokenManager collectingQueryParserTokenManager, String defaultFieldName, Analyzer analyzer) {
+    TokenCollectingQueryParser(CollectingQueryParserTokenManager collectingQueryParserTokenManager, String defaultFieldName, Analyzer analyzer) {
         super(collectingQueryParserTokenManager);
         this.tokenManager = collectingQueryParserTokenManager;
         this.init(defaultFieldName, analyzer);
