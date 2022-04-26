@@ -15,37 +15,45 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
+import { useMemo } from 'react';
 
 import SearchPageLayoutContext from './SearchPageLayoutContext';
 import SearchPageLayoutState from './SearchPageLayoutState';
 
 type Props = {
-  children: React.ReactElement,
+  children: React.ReactNode
+  setLayoutState: (stateKey: string, value: boolean) => void,
+  getLayoutState: (stateKey: string, defaultValue: boolean) => boolean,
 };
 
-const SearchPageLayoutProvider = ({ children }: Props) => {
+const SearchPageLayoutProvider = ({ getLayoutState, setLayoutState, children }: Props) => {
+  const searchPageLayoutContextValue = useMemo(() => {
+    const config = {
+      sidebar: { isPinned: getLayoutState('sidebarIsPinned', false) },
+    };
+    const actions = { toggleSidebarPinning: () => setLayoutState('sidebarIsPinned', !config.sidebar.isPinned) };
+
+    return ({
+      config,
+      actions,
+    });
+  }, [getLayoutState, setLayoutState]);
+
   return (
-    <SearchPageLayoutState>
-      {({ getLayoutState, setLayoutState }) => {
-        const config = {
-          sidebar: { isPinned: getLayoutState('sidebarIsPinned', false) },
-        };
-        const actions = { toggleSidebarPinning: () => setLayoutState('sidebarIsPinned', !config.sidebar.isPinned) };
-
-        return (
-          <SearchPageLayoutContext.Provider value={{ config, actions }}>
-            {children}
-          </SearchPageLayoutContext.Provider>
-        );
-      }}
-
-    </SearchPageLayoutState>
+    <SearchPageLayoutContext.Provider value={searchPageLayoutContextValue}>
+      {children}
+    </SearchPageLayoutContext.Provider>
   );
 };
 
-SearchPageLayoutProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-};
+const SearchPageLayoutStateProvider = ({ children }: { children: React.ReactNode }) => (
+  <SearchPageLayoutState>
+    {({ getLayoutState, setLayoutState }) => (
+      <SearchPageLayoutProvider getLayoutState={getLayoutState} setLayoutState={setLayoutState}>
+        {children}
+      </SearchPageLayoutProvider>
+    )}
+  </SearchPageLayoutState>
+);
 
-export default SearchPageLayoutProvider;
+export default SearchPageLayoutStateProvider;

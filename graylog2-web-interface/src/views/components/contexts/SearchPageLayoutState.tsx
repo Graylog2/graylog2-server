@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type * as React from 'react';
-import { useContext, useState } from 'react';
+import { useContext, useState, useCallback } from 'react';
 
 import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
@@ -80,19 +80,19 @@ const SearchPageLayoutState = ({ children }: Props) => {
     sidebarIsPinned: _userSidebarPinningPref(currentUser, userPreferences, viewType),
   });
 
-  const _onSidebarPinningChange = (newIsPinned) => _updateUserSidebarPinningPref(currentUser, userPreferences, viewType, newIsPinned);
+  const _onSidebarPinningChange = useCallback((newIsPinned) => _updateUserSidebarPinningPref(currentUser, userPreferences, viewType, newIsPinned), [currentUser, userPreferences, viewType]);
 
-  const getLayoutState = (stateKey: string, defaultValue: boolean) => {
+  const getLayoutState = useCallback((stateKey: string, defaultValue: boolean) => {
     return state[stateKey] ?? defaultValue;
-  };
+  }, [state]);
 
-  const setLayoutState = (stateKey: string, value: boolean) => {
+  const setLayoutState = useCallback((stateKey: string, value: boolean) => {
     if (stateKey === 'sidebarIsPinned') {
       _onSidebarPinningChange(value);
     }
 
     setState({ ...state, [stateKey]: value });
-  };
+  }, [_onSidebarPinningChange, state]);
 
   return children({ getLayoutState, setLayoutState });
 };
