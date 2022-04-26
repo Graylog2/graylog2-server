@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { createContext, useState } from 'react';
+import * as React from 'react';
+import { createContext, useState, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 import Store from 'logic/local-storage/Store';
@@ -26,27 +27,34 @@ export const ScratchpadProvider = ({ children, loginName }) => {
   const scratchpadStore = Store.get(localStorageItem) || {};
   const [isScratchpadVisible, setVisibility] = useState(scratchpadStore.opened || false);
 
-  const toggleScratchpadVisibility = () => {
+  const toggleScratchpadVisibility = useCallback(() => {
     const currentStorage = Store.get(localStorageItem);
 
     Store.set(localStorageItem, { ...currentStorage, opened: !isScratchpadVisible });
     setVisibility(!isScratchpadVisible);
-  };
+  }, [isScratchpadVisible, localStorageItem]);
 
-  const setScratchpadVisibility = (opened) => {
+  const setScratchpadVisibility = useCallback((opened) => {
     const currentStorage = Store.get(localStorageItem);
 
     Store.set(localStorageItem, { ...currentStorage, opened });
     setVisibility(opened);
-  };
+  }, [localStorageItem]);
+
+  const scratchpadContextValue = useMemo(() => ({
+    isScratchpadVisible,
+    localStorageItem,
+    setScratchpadVisibility,
+    toggleScratchpadVisibility,
+  }), [
+    isScratchpadVisible,
+    localStorageItem,
+    setScratchpadVisibility,
+    toggleScratchpadVisibility,
+  ]);
 
   return (
-    <ScratchpadContext.Provider value={{
-      isScratchpadVisible,
-      localStorageItem,
-      setScratchpadVisibility,
-      toggleScratchpadVisibility,
-    }}>
+    <ScratchpadContext.Provider value={scratchpadContextValue}>
       {children}
     </ScratchpadContext.Provider>
   );
