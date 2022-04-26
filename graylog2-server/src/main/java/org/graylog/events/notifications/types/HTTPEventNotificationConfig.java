@@ -45,20 +45,20 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
 
     private static final String FIELD_URL = "url";
     private static final String FIELD_BASIC_AUTH = "basic_auth";
-    private static final String FIELD_APIKEY = "apikey";
-    private static final String FIELD_APIKEY_VALUE = "apikey_value";
+    private static final String FIELD_API_KEY = "api_key";
+    private static final String FIELD_API_SECRET = "api_secret";
 
     @JsonProperty(FIELD_BASIC_AUTH)
     @Nullable
     public abstract EncryptedValue basicAuth();
 
-    @JsonProperty(FIELD_APIKEY)
+    @JsonProperty(FIELD_API_KEY)
     @Nullable
     public abstract String apiKey();
 
-    @JsonProperty(FIELD_APIKEY_VALUE)
+    @JsonProperty(FIELD_API_SECRET)
     @Nullable
-    public abstract EncryptedValue apiKeyValue();
+    public abstract EncryptedValue apiSecret();
 
     @JsonProperty(FIELD_URL)
     public abstract String url();
@@ -80,11 +80,11 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
         if (url().isEmpty()) {
             validation.addError(FIELD_URL, "HTTP Notification url cannot be empty.");
         }
-        if (Strings.isNullOrEmpty(apiKey()) && (apiKeyValue() != null) && apiKeyValue().isSet()) {
-            validation.addError(FIELD_APIKEY, "HTTP Notification cannot specify API key value without API key");
+        if (Strings.isNullOrEmpty(apiKey()) && (apiSecret() != null && apiSecret().isSet())) {
+            validation.addError(FIELD_API_KEY, "HTTP Notification cannot specify API key value without API key");
         }
-        if (!Strings.isNullOrEmpty(apiKey()) && (apiKeyValue() == null) || !apiKeyValue().isSet()) {
-            validation.addError(FIELD_APIKEY_VALUE, "HTTP Notification cannot specify API key without API key value");
+        if (!Strings.isNullOrEmpty(apiKey()) && (apiSecret() == null || !apiSecret().isSet())) {
+            validation.addError(FIELD_API_SECRET, "HTTP Notification cannot specify API key without API key value");
         }
 
         return validation;
@@ -105,18 +105,18 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
             }
         }
 
-        EncryptedValue newApiKeyValue = newHttpConfig.apiKeyValue();
-        if (newHttpConfig.apiKeyValue() != null) {
-            if (newHttpConfig.apiKeyValue().isKeepValue()) {
+        EncryptedValue newApiKeyValue = newHttpConfig.apiSecret();
+        if (newHttpConfig.apiSecret() != null) {
+            if (newHttpConfig.apiSecret().isKeepValue()) {
                 // If the client secret should be kept, use the value from the existing config
-                newApiKeyValue = apiKeyValue();
+                newApiKeyValue = apiSecret();
             }
-            else if (newHttpConfig.apiKeyValue().isDeleteValue()) {
+            else if (newHttpConfig.apiSecret().isDeleteValue()) {
                 newApiKeyValue = EncryptedValue.createUnset();
             }
         }
 
-        return newHttpConfig.toBuilder().apiKeyValue(newApiKeyValue).basicAuth(newBasicAuth).build();
+        return newHttpConfig.toBuilder().apiSecret(newApiKeyValue).basicAuth(newBasicAuth).build();
     }
 
     @AutoValue.Builder
@@ -130,11 +130,11 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
         @JsonProperty(FIELD_BASIC_AUTH)
         public abstract Builder basicAuth(EncryptedValue basicAuth);
 
-        @JsonProperty(FIELD_APIKEY)
+        @JsonProperty(FIELD_API_KEY)
         public abstract Builder apiKey(String apiKey);
 
-        @JsonProperty(FIELD_APIKEY_VALUE)
-        public abstract Builder apiKeyValue(EncryptedValue apiKeyValue);
+        @JsonProperty(FIELD_API_SECRET)
+        public abstract Builder apiSecret(EncryptedValue apiKeyValue);
 
         @JsonProperty(FIELD_URL)
         public abstract Builder url(String url);

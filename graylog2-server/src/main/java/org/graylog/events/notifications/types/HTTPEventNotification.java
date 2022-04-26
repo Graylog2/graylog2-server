@@ -152,9 +152,9 @@ public class HTTPEventNotification implements EventNotification {
     }
 
     private  String getApiKeyValue(HTTPEventNotificationConfig config) {
-        if (config.apiKeyValue() == null || (!config.apiKeyValue().isSet())) {
+        if (config.apiSecret() == null || (!config.apiSecret().isSet())) {
             return null;
         }
-        return encryptedValueService.decrypt(config.apiKeyValue());
+        return encryptedValueService.decrypt(config.apiSecret());
     }
 }

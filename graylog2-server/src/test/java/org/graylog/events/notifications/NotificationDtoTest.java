@@ -147,15 +147,15 @@ public class NotificationDtoTest {
                 .build();
         NotificationDto notification = getHttpNotification(httpConfig);
         ValidationResult validationResult = notification.validate();
-        assertThat(validationResult.getErrors()).containsOnlyKeys("apikey_value");
+        assertThat(validationResult.getErrors()).containsOnlyKeys("api_secret");
 
         httpConfig = HTTPEventNotificationConfig.Builder.create()
                 .url("http://localhost")
-                .apiKeyValue(EncryptedValue.builder().value("xxx").salt("123").isDeleteValue(false).isKeepValue(false).build())
+                .apiSecret(EncryptedValue.builder().value("xxx").salt("123").isDeleteValue(false).isKeepValue(false).build())
                 .build();
         notification = getHttpNotification(httpConfig);
         validationResult = notification.validate();
-        assertThat(validationResult.getErrors()).containsOnlyKeys("apikey");
+        assertThat(validationResult.getErrors()).containsOnlyKeys("api_key");
     }
 
     @Test
