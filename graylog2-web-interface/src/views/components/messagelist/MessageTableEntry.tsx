@@ -19,8 +19,8 @@ import { useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
-import { AdditionalContext } from 'src/views/logic/ActionContext';
 
+import { AdditionalContext } from 'views/logic/ActionContext';
 import { useStore } from 'stores/connect';
 import type { Stream } from 'views/stores/StreamsStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
