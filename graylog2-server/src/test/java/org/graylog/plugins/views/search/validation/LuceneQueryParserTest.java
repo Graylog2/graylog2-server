@@ -51,17 +51,17 @@ class LuceneQueryParserTest {
     void getFieldExistPosition() throws ParseException {
         final ParsedQuery fields = parser.parse("_exists_:lorem");
         assertThat(fields.allFieldNames()).contains("lorem");
-
-        fields.terms()
-                .forEach(term -> assertThat(term.keyToken())
-                        .hasValueSatisfying(t -> {
+        assertThat(fields.terms())
+                .hasSize(1)
+                .extracting(ParsedTerm::keyToken)
+                .hasOnlyOneElementSatisfying(term ->
+                        assertThat(term).hasValueSatisfying(t -> {
                             assertThat(t.beginLine()).isEqualTo(1);
                             assertThat(t.beginColumn()).isEqualTo(9);
                             assertThat(t.endLine()).isEqualTo(1);
                             assertThat(t.endColumn()).isEqualTo(14);
                         }));
     }
-
 
     @Test
     void getFieldNamesComplex() throws ParseException {
@@ -81,7 +81,6 @@ class LuceneQueryParserTest {
         assertThat(query.terms()).extracting(ParsedTerm::value).contains("500", "504");
     }
 
-
     @Test
     void testGtQuery() throws ParseException {
         final ParsedQuery query = parser.parse("http_response_code:>400");
@@ -91,7 +90,6 @@ class LuceneQueryParserTest {
     @Test
     void testMultilineQuery() throws ParseException {
         final ParsedQuery query = parser.parse("foo:bar AND\nlorem:ipsum");
-
 
         assertThat(query.tokens())
                 .anySatisfy(token -> {
@@ -124,7 +122,7 @@ class LuceneQueryParserTest {
                 "OR not_existing_field:test");
 
         assertThat(query.tokens())
-                .anySatisfy(token -> {
+                .anySatisfy( token -> {
                     assertThat(token.image()).isEqualTo("not_existing_field");
                     assertThat(token.beginLine()).isEqualTo(3);
                     assertThat(token.beginColumn()).isEqualTo(3);
@@ -139,7 +137,6 @@ class LuceneQueryParserTest {
                 .hasMessageContaining("Cannot parse 'foo:': Encountered \"<EOF>\" at line 1, column 4.");
     }
 
-
     @Test
     void testEmptyQueryNewlines() {
         assertThatThrownBy(() -> parser.parse("\n\n\n"))
@@ -152,6 +149,7 @@ class LuceneQueryParserTest {
         assertThat(query.terms().size()).isEqualTo(2);
 
         assertThat(query.terms())
+                .hasSize(2)
                 .anySatisfy(term -> {
                     assertThat(term.field()).isEqualTo("foo");
                     assertThat(term.keyToken()).map(ImmutableToken::image).hasValue("foo");
@@ -173,14 +171,14 @@ class LuceneQueryParserTest {
 
         assertThat(query.terms())
                 .extracting(ParsedTerm::valueToken)
-                .anySatisfy(token -> assertThat(token).map(ImmutableToken::image).hasValue("BAR"));
+                .hasOnlyOneElementSatisfying(token -> assertThat(token).map(ImmutableToken::image).hasValue("BAR"));
     }
 
     @Test
     void testFuzzyQuery() throws ParseException {
         final ParsedQuery query = parser.parse("fuzzy~");
         assertThat(query.terms())
-                .anySatisfy(term -> {
+                .hasOnlyOneElementSatisfying(term -> {
                     assertThat(term.field()).isEqualTo("_default_");
                     assertThat(term.value()).isEqualTo("fuzzy");
                 });
