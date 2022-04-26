@@ -18,6 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
+import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { FormikFormGroup, FormikInput, Spinner, TimeUnitInput } from 'components/common';
@@ -47,6 +48,9 @@ type State = {
   indexSet: IndexSet,
   fieldTypeRefreshIntervalUnit: Unit,
 };
+const StyledButton = styled(Button)`
+  margin-right:10px;
+`;
 
 const _validateIndexPrefix = (value) => {
   let error;
@@ -197,7 +201,6 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
     return (
       <Row>
         <Col md={8}>
-          {/* <form className="form" onSubmit={this._saveConfiguration}> */}
           <Formik onSubmit={this._saveConfiguration}
                   initialValues={indexSet}>
             {({ isValid, setFieldValue }) => (
@@ -283,7 +286,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
 
                 <Row>
                   <Col md={12}>
-                    <Button type="submit" bsStyle="primary" disabled={!isValid} style={{ marginRight: 10 }}>Save</Button>
+                    <StyledButton type="submit" bsStyle="primary" disabled={!isValid} style={{ marginRight: 10 }}>Save</StyledButton>
                     <LinkContainer to={cancelLink}>
                       <Button bsStyle="default">Cancel</Button>
                     </LinkContainer>
