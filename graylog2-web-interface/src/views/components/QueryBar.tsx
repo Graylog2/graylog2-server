@@ -37,7 +37,7 @@ import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 
 import QueryTabs from './QueryTabs';
 
-const onTitleChange = (queryId, newTitle) => TitlesActions.set('tab', 'title', newTitle);
+const onTitleChange = (_queryId: string, newTitle: string) => TitlesActions.set('tab', 'title', newTitle);
 
 // eslint-disable-next-line no-alert
 const defaultConfirm = async () => window.confirm('Do you really want to delete this dashboard page?');
@@ -120,4 +120,8 @@ QueryBar.propTypes = {
   }).isRequired,
 };
 
-export default connect(QueryBar, { queries: QueryIdsStore, queryTitles: QueryTitlesStore, viewMetadata: ViewMetadataStore });
+export default connect(QueryBar, {
+  queries: QueryIdsStore,
+  queryTitles: QueryTitlesStore,
+  viewMetadata: ViewMetadataStore,
+});

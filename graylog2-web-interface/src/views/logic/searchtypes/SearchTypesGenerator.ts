@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import uuid from 'uuid/v4';
 
 import type Widget from 'views/logic/widgets/Widget';
 import type { SearchTypeList } from 'views/logic/queries/Query';
 import type { SearchType } from 'views/logic/queries/SearchType';
+import generateId from 'logic/generateId';
 
 import { widgetDefinition } from '../Widgets';
 import searchTypeDefinition from '../SearchType';
@@ -44,7 +44,7 @@ export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType =
       .searchTypes(widget)
       .map((searchType) => ({
 
-        id: uuid(),
+        id: generateId(),
         timerange: widget.timerange,
         query: widget.query,
         streams: widget.streams,

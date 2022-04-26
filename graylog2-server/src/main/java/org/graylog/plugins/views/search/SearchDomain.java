@@ -21,12 +21,15 @@ import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.permissions.SearchPermissions;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewService;
 
 import javax.inject.Inject;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -34,14 +37,16 @@ public class SearchDomain {
     private final SearchDbService dbService;
     private final SearchExecutionGuard executionGuard;
     private final ViewService viewService;
+    private final Map<String, ViewResolver> viewResolvers;
 
     @Inject
     public SearchDomain(SearchDbService dbService,
                         SearchExecutionGuard executionGuard,
-                        ViewService viewService) {
+                        ViewService viewService, Map<String, ViewResolver> viewResolvers) {
         this.dbService = dbService;
         this.executionGuard = executionGuard;
         this.viewService = viewService;
+        this.viewResolvers = viewResolvers;
     }
 
     public Optional<Search> getForUser(String id, SearchUser searchUser) {
@@ -78,8 +83,12 @@ public class SearchDomain {
         if (searchPermissions.owns(search)) {
             return true;
         }
+
         // Allowed if permissions exist for a referencing view
-        final Collection<ViewDTO> views = viewService.forSearch(search.id());
+        final Set<ViewDTO> views = new HashSet<>();
+        views.addAll(viewService.forSearch(search.id()));
+        views.addAll(viewResolvers.values().stream()
+                .flatMap(viewResolver -> viewResolver.getBySearchId(search.id()).stream()).collect(Collectors.toSet()));
         if (views.isEmpty())
             return false;
 

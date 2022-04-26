@@ -46,7 +46,8 @@ export default class LookupTableParameter extends Parameter {
     this._value2 = { lookupTable, key };
   }
 
-  static create(type: string, name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, lookupTable: string, key: string): LookupTableParameter {
+  static create(_type: string, name: string, title: string, description: string, dataType: string, defaultValue: any,
+    optional: boolean, lookupTable: string, key: string): LookupTableParameter {
     return new LookupTableParameter(name, title, description, dataType, defaultValue, optional, lookupTable, key);
   }
 
@@ -56,7 +57,17 @@ export default class LookupTableParameter extends Parameter {
     const { lookupTable, key } = this._value2;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({ type, name, title, description, dataType, defaultValue, optional, lookupTable, key }));
+    return new Builder(Immutable.Map({
+      type,
+      name,
+      title,
+      description,
+      dataType,
+      defaultValue,
+      optional,
+      lookupTable,
+      key,
+    }));
   }
 
   // screw you eslint, using param.constructor.needsBinding() is ugly

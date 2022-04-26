@@ -136,6 +136,9 @@ export const EventDefinitionsStore = singletonStore(
         this.propagateChanges();
 
         return response;
+      }).catch((error) => {
+        UserNotification.error(`Fetching event definitions failed with status: ${error}`,
+          'Could not retrieve event definitions');
       });
 
       EventDefinitionsActions.listPaginated.promise(promise);

@@ -93,6 +93,17 @@ export const QueriesStore: QueriesStoreType = singletonStore(
 
       return promise;
     },
+
+    // Similar to the update action, but it is skipping the equality check.
+    forceUpdate(queryId: QueryId, query: Query) {
+      const newQueries = this.queries.set(queryId, query);
+      const promise: Promise<QueriesList> = this._propagateQueryChange(newQueries).then(() => newQueries);
+
+      QueriesActions.forceUpdate.promise(promise);
+
+      return promise;
+    },
+
     update(queryId: QueryId, query: Query) {
       const newQueries = this.queries.set(queryId, query);
       const promise: Promise<QueriesList> = this.queries.get(queryId).equals(query)

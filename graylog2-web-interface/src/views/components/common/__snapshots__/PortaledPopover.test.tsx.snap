@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`PortaledPopover renders popover element after being clicked 1`] = `"<div class=\\"arrow\\"></div><h3 class=\\"popover-title\\">A title</h3><div class=\\"popover-content\\">popover-component</div>"`;

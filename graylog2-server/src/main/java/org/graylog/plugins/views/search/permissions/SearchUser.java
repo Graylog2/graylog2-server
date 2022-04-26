@@ -22,25 +22,34 @@ import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewLike;
+import org.graylog.plugins.views.search.views.ViewResolver;
+import org.graylog.plugins.views.search.views.ViewResolverDecoder;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 public class SearchUser implements SearchPermissions, StreamPermissions, ViewPermissions {
+    private static final Logger LOG = LoggerFactory.getLogger(SearchUser.class);
     private final User currentUser;
     private final Predicate<String> isPermitted;
     private final BiPredicate<String, String> isPermittedEntity;
     private final UserStreams userStreams;
+    private final Map<String, ViewResolver> viewResolvers;
 
-    public SearchUser(User currentUser, Predicate<String> isPermitted, BiPredicate<String, String> isPermittedEntity, PermittedStreams permittedStreams) {
+    public SearchUser(User currentUser, Predicate<String> isPermitted, BiPredicate<String, String> isPermittedEntity,
+                      PermittedStreams permittedStreams, Map<String, ViewResolver> viewResolvers) {
         this.currentUser = currentUser;
         this.isPermitted = isPermitted;
         this.isPermittedEntity = isPermittedEntity;
         this.userStreams = new UserStreams(this, permittedStreams);
+        this.viewResolvers = viewResolvers;
     }
 
     public Optional<DateTimeZone> timeZone() {
@@ -53,6 +62,21 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
 
     public boolean canReadView(ViewLike view) {
         final String viewId = view.id();
+
+        // If a resolved view id is provided, delegate the permissions check to the resolver.
+        final ViewResolverDecoder decoder = new ViewResolverDecoder(viewId);
+        if (decoder.isResolverViewId()) {
+            final ViewResolver viewResolver = viewResolvers.get(decoder.getResolverName());
+            if (viewResolver != null) {
+                return viewResolver.canReadView(viewId, isPermitted, isPermittedEntity);
+            } else {
+                // Resolved view could not be found, so permissions cannot be checked.
+                LOG.error("View resolver [{}] could not be found.", decoder.getResolverName());
+                return false;
+            }
+        }
+
+        // Proceed to standard views permission check.
         return isPermitted(ViewsRestPermissions.VIEW_READ, viewId)
                 || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, viewId));
     }

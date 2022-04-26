@@ -18,6 +18,8 @@ package org.graylog.plugins.views.search.db;
 
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchSummary;
+import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.joda.time.DateTime;
@@ -32,10 +34,17 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -44,6 +53,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class SearchesCleanUpJobTest {
+    public static final String IN_USE_SEARCH_ID = "This search is in use";
+    public static final String IN_USE_RESOLVER_SEARCH_ID = "in-use-resolver-search-id";
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -57,7 +68,7 @@ public class SearchesCleanUpJobTest {
 
     @Before
     public void setup() {
-        this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4));
+        this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4), testViewResolvers());
     }
 
     @Test
@@ -100,32 +111,36 @@ public class SearchesCleanUpJobTest {
 
     @Test
     public void testForReferencedSearches() {
-        final String searchId = "This search is in use";
         final ViewSummaryDTO view = mock(ViewSummaryDTO.class);
-        when(view.searchId()).thenReturn(searchId);
+        when(view.searchId()).thenReturn(IN_USE_SEARCH_ID);
         when(viewService.streamAll()).thenReturn(Stream.of(view));
 
         final Search search = mock(Search.class);
         when(search.createdAt()).thenReturn(DateTime.now(DateTimeZone.UTC).minus(Duration.standardDays(30)));
-        when(search.id()).thenReturn(searchId);
+        when(search.id()).thenReturn(IN_USE_SEARCH_ID);
 
         when(searchDbService.streamAll()).thenReturn(Stream.of(search));
 
         this.searchesCleanUpJob.doRun();
+
+        // Verify that search ids for standard views and resolved views are passed in as neverDeleteIds.
+        final ArgumentCaptor<HashSet<String>> searchIdsCaptor = ArgumentCaptor.forClass((Class) Set.class);
+        verify(searchDbService, times(1)).getExpiredSearches(searchIdsCaptor.capture(), any());
+        assertTrue(searchIdsCaptor.getValue().contains(IN_USE_SEARCH_ID));
+        assertTrue(searchIdsCaptor.getValue().contains(IN_USE_RESOLVER_SEARCH_ID));
 
         verify(searchDbService, never()).delete(any());
     }
 
     @Test
     public void testForMixedReferencedNonReferencedExpiredAndNonexpiredSearches() {
-        final String searchId = "This search is in use";
         final ViewSummaryDTO view = mock(ViewSummaryDTO.class);
-        when(view.searchId()).thenReturn(searchId);
+        when(view.searchId()).thenReturn(IN_USE_SEARCH_ID);
         when(viewService.streamAll()).thenReturn(Stream.of(view));
 
         final SearchSummary search1 = mock(SearchSummary.class);
         when(search1.createdAt()).thenReturn(DateTime.now(DateTimeZone.UTC).minus(Duration.standardDays(30)));
-        when(search1.id()).thenReturn(searchId);
+        when(search1.id()).thenReturn(IN_USE_SEARCH_ID);
 
         final SearchSummary search2 = mock(SearchSummary.class);
         when(search2.createdAt()).thenReturn(DateTime.now(DateTimeZone.UTC).minus(Duration.standardHours(2)));
@@ -172,5 +187,35 @@ public class SearchesCleanUpJobTest {
         final ArgumentCaptor<String> deletedSearchId = ArgumentCaptor.forClass(String.class);
         verify(searchDbService, times(1)).delete(deletedSearchId.capture());
         assertThat(deletedSearchId.getValue()).isEqualTo("This search is expired and should be deleted");
+    }
+
+    private HashMap<String, ViewResolver> testViewResolvers() {
+        final HashMap<String, ViewResolver> viewResolvers = new HashMap<>();
+        viewResolvers.put("test-resolver", new TestViewResolver());
+
+        return viewResolvers;
+    }
+
+    private static class TestViewResolver implements ViewResolver {
+        @Override
+        public Optional<ViewDTO> get(String id) {
+            return Optional.empty();
+        }
+
+        @Override
+        public Set<String> getSearchIds() {
+            return Collections.singleton(IN_USE_RESOLVER_SEARCH_ID);
+        }
+
+        @Override
+        public Set<ViewDTO> getBySearchId(String searchId) {
+            return Collections.emptySet();
+        }
+
+        @Override
+        public boolean canReadView(String viewId, Predicate<String> permissionTester, BiPredicate<String, String> entityPermissionsTester) {
+            // Not used in this test.
+            return false;
+        }
     }
 }

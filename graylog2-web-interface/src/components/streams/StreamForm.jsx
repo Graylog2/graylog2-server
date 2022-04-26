@@ -23,6 +23,25 @@ import { Select, Spinner } from 'components/common';
 import * as FormsUtils from 'util/FormsUtils';
 import { IndexSetsActions } from 'stores/indices/IndexSetsStore';
 
+const _getValuesFromProps = (props) => {
+  let defaultIndexSetId = props.stream.index_set_id;
+
+  if (!defaultIndexSetId && props.indexSets && props.indexSets.length > 0) {
+    const defaultIndexSet = props.indexSets.find((indexSet) => indexSet.default);
+
+    if (defaultIndexSet) {
+      defaultIndexSetId = defaultIndexSet.id;
+    }
+  }
+
+  return {
+    title: props.stream.title,
+    description: props.stream.description,
+    removeMatchesFromDefaultStream: props.stream.remove_matches_from_default_stream,
+    indexSetId: defaultIndexSetId,
+  };
+};
+
 class StreamForm extends React.Component {
   static propTypes = {
     onSubmit: PropTypes.func.isRequired,
@@ -42,31 +61,12 @@ class StreamForm extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = this._getValuesFromProps(props);
+    this.state = _getValuesFromProps(props);
     this.modal = undefined;
   }
 
   _resetValues = () => {
-    this.setState(this._getValuesFromProps(this.props));
-  };
-
-  _getValuesFromProps = (props) => {
-    let defaultIndexSetId = props.stream.index_set_id;
-
-    if (!defaultIndexSetId && props.indexSets && props.indexSets.length > 0) {
-      const defaultIndexSet = props.indexSets.find((indexSet) => indexSet.default);
-
-      if (defaultIndexSet) {
-        defaultIndexSetId = defaultIndexSet.id;
-      }
-    }
-
-    return {
-      title: props.stream.title,
-      description: props.stream.description,
-      removeMatchesFromDefaultStream: props.stream.remove_matches_from_default_stream,
-      indexSetId: defaultIndexSetId,
-    };
+    this.setState(_getValuesFromProps(this.props));
   };
 
   _onSubmit = () => {
@@ -84,12 +84,14 @@ class StreamForm extends React.Component {
     this.modal.close();
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => {
     this._resetValues();
     IndexSetsActions.list(false);
     this.modal.open();
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   close = () => {
     this.modal.close();
   };
@@ -155,7 +157,6 @@ class StreamForm extends React.Component {
                autoFocus />
         <Input id="Description"
                type="text"
-               required
                label="Description"
                name="description"
                value={description}

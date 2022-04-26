@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect, useContext, useState } from 'react';
+import { useCallback, useEffect, useContext, useState, useMemo } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
@@ -133,9 +133,14 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
   const { view } = useStore(ViewStore);
   const { searchesClusterConfig } = useStore(SearchConfigStore) ?? {};
   const currentUser = useContext(CurrentUserContext);
+  const contextValue = useMemo(() => ({
+    view,
+    analysisDisabledFields: searchesClusterConfig?.analysis_disabled_fields,
+    currentUser,
+  }), [currentUser, searchesClusterConfig?.analysis_disabled_fields, view]);
 
   return (
-    <AdditionalContext.Provider value={{ view, analysisDisabledFields: searchesClusterConfig?.analysis_disabled_fields, currentUser }}>
+    <AdditionalContext.Provider value={contextValue}>
       {children}
     </AdditionalContext.Provider>
   );
@@ -143,7 +148,7 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
-const useRefreshSearchOn = (actions: Array<RefluxActions<any>>, refresh: () => Promise<any>) => {
+const useRefreshSearchOn = (_actions: Array<RefluxActions<any>>, refresh: () => Promise<any>) => {
   useEffect(() => {
     let storeListenersUnsubscribes = Immutable.List<() => void>();
 
@@ -179,7 +184,12 @@ const Search = () => {
       <SynchronizeUrl />
       <WidgetFocusProvider>
         <WidgetFocusContext.Consumer>
-          {({ focusedWidget: { focusing: focusingWidget, editing: editingWidget } = { focusing: false, editing: false } }) => (
+          {({
+            focusedWidget: { focusing: focusingWidget, editing: editingWidget } = {
+              focusing: false,
+              editing: false,
+            },
+          }) => (
             <CurrentViewTypeProvider>
               <IfInteractive>
                 <IfDashboard>
@@ -202,10 +212,10 @@ const Search = () => {
                               <IfInteractive>
                                 <HeaderElements />
                                 <IfDashboard>
-                                  {!editingWidget && <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />}
+                                  {!editingWidget && <DashboardSearchBarWithStatus />}
                                 </IfDashboard>
                                 <IfSearch>
-                                  <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                                  <SearchBarWithStatus />
                                 </IfSearch>
 
                                 <QueryBarElements />

@@ -146,8 +146,8 @@ const getErrorDocumentationLink = (errorType: string) => {
   switch (errorType) {
     case 'UNKNOWN_FIELD':
       return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.UNKNOWN_FIELD;
-    case 'PARSE_EXCEPTION':
-      return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.PARSE_EXCEPTION;
+    case 'QUERY_PARSING_ERROR':
+      return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.QUERY_PARSING_ERROR;
     case 'INVALID_OPERATOR':
       return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.INVALID_OPERATOR;
     case 'UNDECLARED_PARAMETER':

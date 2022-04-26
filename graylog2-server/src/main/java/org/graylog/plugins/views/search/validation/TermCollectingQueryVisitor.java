@@ -17,9 +17,11 @@
 package org.graylog.plugins.views.search.validation;
 
 import com.google.common.collect.Streams;
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParserConstants;
 import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryVisitor;
@@ -33,12 +35,14 @@ import java.util.stream.Stream;
 
 public class TermCollectingQueryVisitor extends QueryVisitor {
 
+    private final Analyzer analyzer;
     private final List<ImmutableToken> availableTokens;
     private final List<ImmutableToken> processedTokens = new ArrayList<>();
     private final List<ParsedTerm> parsedTerms = new ArrayList<>();
 
-    public TermCollectingQueryVisitor(List<ImmutableToken> availableTokens) {
+    public TermCollectingQueryVisitor(List<ImmutableToken> availableTokens, Analyzer analyzer) {
         this.availableTokens = new ArrayList<>(availableTokens);
+        this.analyzer = analyzer;
     }
 
     @Override
@@ -72,10 +76,31 @@ public class TermCollectingQueryVisitor extends QueryVisitor {
                             termBuilder.keyToken(token);
                             processedTokens.add(token);
                             availableTokens.remove(token);
+
+                            final String value = t.text();
+                            availableTokens.stream()
+                                    .filter(v -> v.kind() == QueryParserConstants.TERM)
+                                    .filter(v -> normalize(t.field(), v.image()).equals(value))
+                                    .findFirst()
+                                    .ifPresent(valueToken -> {
+                                        termBuilder.valueToken(valueToken);
+                                        processedTokens.add(valueToken);
+                                        availableTokens.remove(valueToken);
+                                    });
+
+
                         });
             }
             parsedTerms.add(termBuilder.build());
         }
+    }
+
+    /**
+     * To be able to compare token values with query values, we first need to normalize the value, using the same analyzer
+     * For example using the StandardAnalyzer, it could mean difference like lowercase conversion
+     */
+    private String normalize(String fieldName, String value) {
+        return analyzer.normalize(fieldName, value).utf8ToString();
     }
 
     @Override
@@ -92,6 +117,8 @@ public class TermCollectingQueryVisitor extends QueryVisitor {
             processTerms(((WildcardQuery) query).getTerm());
         } else if (query instanceof PrefixQuery) {
             processTerms(((PrefixQuery) query).getPrefix());
+        } else if (query instanceof FuzzyQuery) {
+            processTerms(((FuzzyQuery) query).getTerm());
         } else {
             throw new IllegalArgumentException("Unrecognized query type: " + query.getClass().getName());
         }

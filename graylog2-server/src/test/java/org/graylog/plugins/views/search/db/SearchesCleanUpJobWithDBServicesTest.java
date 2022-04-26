@@ -38,6 +38,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 
 import java.util.Collections;
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -77,7 +78,8 @@ public class SearchesCleanUpJobWithDBServicesTest {
                         dto -> new SearchRequirements(Collections.emptySet(), dto)
                 )
         );
-        this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4));
+        this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4),
+                new HashMap<>());
     }
 
     @After
@@ -113,5 +115,4 @@ public class SearchesCleanUpJobWithDBServicesTest {
 
         assertThat(idCaptor.getAllValues()).containsExactly("5b3b44ca77196aa4679e4da1", "5b3b44ca77196aa4679e4da2");
     }
-
 }

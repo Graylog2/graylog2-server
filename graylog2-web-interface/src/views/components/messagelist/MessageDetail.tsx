@@ -61,7 +61,7 @@ type Props = {
   expandAllRenderAsync?: boolean,
   fields: FieldTypeMappingsList,
   inputs?: Immutable.Map<string, Input>,
-  message?: Message,
+  message: Message,
   showTimestamp?: boolean,
   streams?: Immutable.Map<string, Stream>,
 };
@@ -142,7 +142,7 @@ const MessageDetail = ({
                               streams={allStreams} />
               <MessageDetailsTitle>
                 <Icon name="envelope" />
-              &nbsp;
+                &nbsp;
                 {messageTitle}
               </MessageDetailsTitle>
             </Col>
@@ -151,7 +151,12 @@ const MessageDetail = ({
             <Col md={3}>
               <MessageMetadata timestamp={timestamp}
                                index={index}
-                               receivedBy={<FormatReceivedBy isLocalNode={isLocalNode} inputs={inputs} sourceNodeId={gl2_source_node} sourceInputId={gl2_source_input} />}
+                               receivedBy={(
+                                 <FormatReceivedBy isLocalNode={isLocalNode}
+                                                   inputs={inputs}
+                                                   sourceNodeId={gl2_source_node}
+                                                   sourceInputId={gl2_source_input} />
+                               )}
                                streams={streamsListItems} />
               <MessageAugmentations message={message} />
             </Col>
@@ -174,7 +179,7 @@ MessageDetail.propTypes = {
   expandAllRenderAsync: PropTypes.bool,
   fields: ImmutablePropTypes.list,
   inputs: ImmutablePropTypes.map,
-  message: CustomPropTypes.Message,
+  message: CustomPropTypes.Message.isRequired,
   showTimestamp: PropTypes.bool,
   streams: ImmutablePropTypes.map,
 };
@@ -187,7 +192,6 @@ MessageDetail.defaultProps = {
   expandAllRenderAsync: false,
   fields: Immutable.List(),
   inputs: Immutable.Map(),
-  message: {} as Message,
   showTimestamp: true,
   streams: Immutable.Map(),
 };

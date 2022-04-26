@@ -29,6 +29,7 @@ export const DATE_TIME_FORMATS = {
   withTz: 'YYYY-MM-DD HH:mm:ss Z', // includes the time zone
   readable: 'dddd D MMMM YYYY, HH:mm ZZ', // easy to read
   internal: 'YYYY-MM-DDTHH:mm:ss.SSSZ', // ISO 8601, internal default, not really nice to read. Mostly used communication with the API.
+  internalIndexer: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]', // ISO 8601, used for ES search queries, when a timestamp has to be reformatted
   date: 'YYYY-MM-DD',
 };
 
@@ -92,3 +93,13 @@ export const relativeDifference = (dateTime: DateTime) => {
 };
 
 export const isValidDate = (dateTime: DateTime) => moment(dateTime, Object.values(DATE_TIME_FORMATS), true).isValid();
+
+// This function allows transforming a date time, which does not contain a time zone like `2010-01-01 10:00:00`, to UTC.
+// For this calculation it is necessary to define the time zone of the provided date time.
+export const toUTCFromTz = (dateTime: string, sourceTimezone: string) => {
+  if (!sourceTimezone) {
+    throw new Error('It is required to define the time zone of the date time provided for internalUTCTime.');
+  }
+
+  return moment.tz(dateTime, sourceTimezone);
+};

@@ -59,7 +59,7 @@ export default class WorldMapVisualizationConfig extends VisualizationConfig {
     };
   }
 
-  static fromJSON(type: string, value: WorldMapVisualizationConfigJson) {
+  static fromJSON(_type: string, value: WorldMapVisualizationConfigJson) {
     const { viewport } = value;
 
     return WorldMapVisualizationConfig.builder()

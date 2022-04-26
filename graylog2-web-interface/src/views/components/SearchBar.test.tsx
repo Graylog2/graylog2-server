@@ -21,9 +21,7 @@ import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 import { SearchActions } from 'views/stores/SearchStore';
 import MockQuery from 'views/logic/queries/Query';
-import type {
-  WidgetEditingState, WidgetFocusingState,
-} from 'views/components/contexts/WidgetFocusContext';
+import type { WidgetEditingState, WidgetFocusingState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 
@@ -59,7 +57,9 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   },
 }));
 
-jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => jest.fn(() => <div>Saved Search Controls</div>));
+jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => jest.fn(() => (
+  <div>Saved Search Controls</div>
+)));
 
 jest.mock('views/stores/CurrentQueryStore', () => ({
   CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder()
@@ -69,7 +69,11 @@ jest.mock('views/stores/CurrentQueryStore', () => ({
     .build()]),
 }));
 
-jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest.fn(() => Promise.resolve({ status: 'OK', explanations: [] })));
+jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest.fn(() => Promise.resolve({
+  status: 'OK',
+  explanations: [],
+})));
+
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
 describe('SearchBar', () => {
@@ -103,7 +107,7 @@ describe('SearchBar', () => {
     expect(metaButtons).not.toBeNull();
   });
 
-  it('should update query when search is performed', async () => {
+  it('should refresh search, when search is performed and there are no changes.', async () => {
     render(<SearchBar config={config} />);
 
     const searchButton = await screen.findByTitle('Perform search');

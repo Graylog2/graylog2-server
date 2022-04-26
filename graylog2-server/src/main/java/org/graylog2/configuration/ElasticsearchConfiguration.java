@@ -29,6 +29,7 @@ import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.joda.time.Period;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -36,6 +37,7 @@ import java.util.Locale;
 public class ElasticsearchConfiguration {
     public static final String DEFAULT_EVENTS_INDEX_PREFIX = "default_events_index_prefix";
     public static final String DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX = "default_system_events_index_prefix";
+    public static final String MAX_INDEX_RETENTION_PERIOD = "max_index_retention_period";
 
     @Parameter(value = "elasticsearch_disable_version_check")
     private boolean disableVersionCheck = false;
@@ -88,6 +90,24 @@ public class ElasticsearchConfiguration {
 
     @Parameter(value = "enabled_index_rotation_strategies", converter = StringListConverter.class, validators = RotationStrategyValidator.class)
     private List<String> enabledRotationStrategies = Arrays.asList(TimeBasedRotationStrategy.NAME, MessageCountRotationStrategy.NAME, SizeBasedRotationStrategy.NAME);
+
+    /**
+     * Provides a hard upper limit for the retention period of any index set at configuration time.
+     * <p>
+     * This setting is used to validate the value a user chooses for {@code max_number_of_indices} when configuring
+     * an index set. However, it is only in effect, when a <em>time-based rotation strategy</em> is chosen, because
+     * otherwise it would be hard to calculate the effective retention period at configuration time.
+     * <p>
+     * If a rotation strategy other than time-based is selected and/or no value is provided for this setting, no upper
+     * limit for index retention will be enforced.
+     */
+    @Parameter(value = MAX_INDEX_RETENTION_PERIOD)
+    private Period maxIndexRetentionPeriod = null;
+
+    @Nullable
+    public Period getMaxIndexRetentionPeriod() {
+        return maxIndexRetentionPeriod;
+    }
 
     @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "rotation_strategy")

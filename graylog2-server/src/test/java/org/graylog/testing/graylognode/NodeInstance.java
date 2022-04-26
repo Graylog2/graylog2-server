@@ -68,8 +68,8 @@ public class NodeInstance implements Closeable {
         return container.getMappedPort(originalPort);
     }
 
-    public void printLog() {
-        System.out.println(container.getLogs());
+    public String getLogs() {
+        return container.getLogs();
     }
 
     @Override

@@ -22,7 +22,11 @@ import {
   relativeDifference,
   formatAsBrowserTime,
   adjustFormat,
-  DATE_TIME_FORMATS, getBrowserTimezone, parseFromIsoString, toDateObject,
+  toUTCFromTz,
+  DATE_TIME_FORMATS,
+  getBrowserTimezone,
+  parseFromIsoString,
+  toDateObject,
 } from 'util/DateTime';
 
 const mockRootTimeZone = 'America/Chicago';
@@ -65,7 +69,7 @@ describe('DateTime utils', () => {
   });
 
   describe('toDateObject', () => {
-    it.each(exampleUTCInput)('should transform %s to moment object', (type: any, input) => {
+    it.each(exampleUTCInput)('should transform %s to moment object', (_type: any, input) => {
       const result = toDateObject(input);
 
       expect(moment.isMoment(result)).toBe(true);
@@ -123,7 +127,7 @@ describe('DateTime utils', () => {
   });
 
   describe('adjustFormat', () => {
-    it.each(exampleUTCInput)('should adjust time for %s', (type: any, input) => {
+    it.each(exampleUTCInput)('should adjust time for %s', (_type: any, input) => {
       expect(adjustFormat(input, 'internal')).toBe('2020-01-01T10:00:00.000+00:00');
     });
 
@@ -142,7 +146,7 @@ describe('DateTime utils', () => {
   });
 
   describe('formatAsBrowserTime', () => {
-    it.each(exampleUTCInput)('should return browser time for $type', (type: any, input) => {
+    it.each(exampleUTCInput)('should return browser time for $type', (_type: any, input) => {
       expect(formatAsBrowserTime(input)).toBe('2020-01-01 04:00:00');
     });
 
@@ -157,13 +161,23 @@ describe('DateTime utils', () => {
   });
 
   describe('relativeDifference', () => {
-    it.each(exampleUTCInput)('should return relative time for $type', (type: any, input) => {
+    it.each(exampleUTCInput)('should return relative time for $type', (_type: any, input) => {
       expect(relativeDifference(input)).toBe('in 10 hours');
     });
 
     it('should throw an error for an invalid date', () => {
       relativeDifference(invalidDate);
       expectErrorForInvalidDate();
+    });
+  });
+
+  describe('toUTCFromTz', () => {
+    it('should transform time to UTC based on defined tz', () => {
+      expect(adjustFormat(toUTCFromTz('2020-01-01T10:00:00.000', moscowTZ), 'internal')).toBe('2020-01-01T07:00:00.000+00:00');
+    });
+
+    it('should prioritize time zone of date time over provided time zone when calculating UTC time', () => {
+      expect(adjustFormat(toUTCFromTz('2020-01-01T12:00:00.000+02:00', 'Europe/Berlin'), 'internal')).toBe('2020-01-01T10:00:00.000+00:00');
     });
   });
 });

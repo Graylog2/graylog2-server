@@ -168,6 +168,12 @@ export class Builder {
     return this;
   }
 
+  ignoreUnauthorized() {
+    this.errorHandler = (error) => onServerError(error, () => {});
+
+    return this;
+  }
+
   noSessionExtension() {
     this.options = {
       ...this.options,

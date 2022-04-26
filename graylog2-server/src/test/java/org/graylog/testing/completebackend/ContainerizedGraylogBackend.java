@@ -17,6 +17,10 @@
 package org.graylog.testing.completebackend;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.restassured.RestAssured;
+import io.restassured.config.FailureConfig;
+import io.restassured.config.RestAssuredConfig;
+import io.restassured.listener.ResponseValidationFailureListener;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog.testing.graylognode.ExecutableNotFoundException;
@@ -124,8 +128,8 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         return node.apiPort();
     }
 
-    public void printServerLog() {
-        node.printLog();
+    public String getLogs() {
+        return node.getLogs();
     }
 
     @Override

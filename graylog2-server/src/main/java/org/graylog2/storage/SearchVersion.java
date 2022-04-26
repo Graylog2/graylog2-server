@@ -22,6 +22,7 @@ import org.graylog2.configuration.validators.SearchVersionRange;
 import org.graylog2.indexer.ElasticsearchException;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -57,6 +58,15 @@ public abstract class SearchVersion {
 
     public boolean satisfies(SearchVersionRange range) {
         return satisfies(range.distribution(), range.expression());
+    }
+
+    public boolean satisfies(Collection<SearchVersionRange> ranges) {
+        for (SearchVersionRange range : ranges) {
+            if (satisfies(range)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static SearchVersion elasticsearch(final String version) {

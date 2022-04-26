@@ -50,6 +50,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -64,6 +67,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class ViewsResourceTest {
+    public static final String VIEW_ID = "test-view";
+
     @Before
     public void setUpInjector() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
@@ -194,22 +199,44 @@ public class ViewsResourceTest {
     @Test
     public void testViewResolver() {
         // Setup
-        final String viewId = "test-view";
-        when(view.id()).thenReturn(viewId);
+        when(view.id()).thenReturn(VIEW_ID);
         final String resolverName = "test-resolver";
         final Map<String, ViewResolver> viewResolvers = new HashMap<>();
-        viewResolvers.put(resolverName, id -> id.equals(viewId) ? Optional.of(view) : Optional.empty());
+        viewResolvers.put(resolverName, new TestViewResolver());
         final ViewsResource testResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain, viewResolvers);
 
         // Verify that view for valid id is found.
         when(searchUser.canReadView(any())).thenReturn(true);
-        assertEquals(viewId, testResource.get(resolverName + ":" + viewId, searchUser).id());
+        assertEquals(VIEW_ID, testResource.get(resolverName + ":" + VIEW_ID, searchUser).id());
 
 
         // Verify error paths for invalid resolver names and view ids.
         assertThrows(NotFoundException.class,
-                () -> testResource.get("invalid-resolver-name:" + viewId, searchUser));
+                () -> testResource.get("invalid-resolver-name:" + VIEW_ID, searchUser));
         assertThrows(NotFoundException.class,
                 () -> testResource.get(resolverName + ":invalid-view-id", searchUser));
+    }
+
+    class TestViewResolver implements ViewResolver {
+        @Override
+        public Optional<ViewDTO> get(String id) {
+            return id.equals(VIEW_ID) ? Optional.of(view) : Optional.empty();
+        }
+
+        @Override
+        public Set<String> getSearchIds() {
+            return null;
+        }
+
+        @Override
+        public Set<ViewDTO> getBySearchId(String searchId) {
+            return Collections.emptySet();
+        }
+
+        @Override
+        public boolean canReadView(String viewId, Predicate<String> permissionTester, BiPredicate<String, String> entityPermissionsTester) {
+            // Not used in this test.
+            return false;
+        }
     }
 }

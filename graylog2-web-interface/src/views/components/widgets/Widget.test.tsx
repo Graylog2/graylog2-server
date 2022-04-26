@@ -43,7 +43,7 @@ import WidgetContext from '../contexts/WidgetContext';
 import type { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
 
-jest.mock('../searchbar/QueryInput', () => mockComponent('QueryInput'));
+jest.mock('../searchbar/queryinput/QueryInput', () => mockComponent('QueryInput'));
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
 jest.mock('views/components/useWidgetResults');

@@ -17,6 +17,7 @@
 package org.graylog.testing.utils;
 
 import io.restassured.specification.RequestSpecification;
+import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog.testing.backenddriver.SearchDriver;
 
 import java.util.ArrayList;
@@ -53,5 +54,13 @@ public final class SearchUtils {
             return true;
         }
         return false;
+    }
+
+    public static MappedFieldTypeDTO waitForFieldTypeDefinition(RequestSpecification requestSpecification, String fieldName) {
+        return WaitUtils.waitForObject(() -> SearchDriver.getFieldTypes(requestSpecification)
+                        .stream()
+                        .filter(t -> t.name().equals(fieldName))
+                        .findFirst()
+                , "Timed out waiting for field definition");
     }
 }

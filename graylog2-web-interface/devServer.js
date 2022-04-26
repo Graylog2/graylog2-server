@@ -57,6 +57,12 @@ app.use('/api', proxy(apiUrl, {
   parseReqBody: false,
 }));
 
+app.use('/config.js', proxy(apiUrl, {
+  // proxy all requests to /config.js to the server backend API
+  proxyReqPathResolver: () => '/config.js',
+  parseReqBody: false,
+}));
+
 app.use(compress()); // Enables compression middleware
 app.use(history()); // Enables HTML5 History API middleware
 

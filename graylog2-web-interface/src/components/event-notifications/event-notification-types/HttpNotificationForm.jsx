@@ -26,6 +26,11 @@ class HttpNotificationForm extends React.Component {
     config: PropTypes.object.isRequired,
     validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
+    setIsSubmitEnabled: PropTypes.func,
+  };
+
+  static defaultConfig = {
+    url: '',
   };
 
   propagateChange = (key, value) => {
@@ -42,8 +47,10 @@ class HttpNotificationForm extends React.Component {
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
   };
 
-  static defaultConfig = {
-    url: '',
+  onValidationChange = (validationState) => {
+    const { setIsSubmitEnabled } = this.props;
+
+    setIsSubmitEnabled(validationState !== 'error');
   };
 
   render() {
@@ -54,9 +61,14 @@ class HttpNotificationForm extends React.Component {
                          onChange={this.handleChange}
                          validationState={validation.errors.url ? 'error' : null}
                          validationMessage={lodash.get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs.')}
+                         onValidationChange={this.onValidationChange}
                          url={config.url} />
     );
   }
 }
+
+HttpNotificationForm.defaultProps = {
+  setIsSubmitEnabled: () => {},
+};
 
 export default HttpNotificationForm;

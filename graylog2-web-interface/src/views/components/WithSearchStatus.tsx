@@ -16,42 +16,42 @@
  */
 import * as React from 'react';
 import { trim } from 'lodash';
+import type * as Immutable from 'immutable';
 
 import connect from 'stores/connect';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
 import { getParameterBindingsAsMap } from 'views/logic/search/SearchExecutionState';
 import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import type { SearchesConfig } from 'components/search/SearchConfig';
+import type Parameter from 'views/logic/parameters/Parameter';
 
-const _disableSearch = (undeclaredParameters, parameterBindings, usedParameters) => {
+const _disableSearch = (_undeclaredParameters: Immutable.Set<string>, parameterBindings: ParameterBindings, usedParameters: Immutable.Set<Parameter>) => {
   const bindingsMap = getParameterBindingsAsMap(parameterBindings);
   const missingValues = usedParameters.filter((param) => (param.needsBinding && !param.optional)).map((p) => bindingsMap.get(p.name)).filter((value) => !trim(value));
 
-  return undeclaredParameters.size > 0 || missingValues.size > 0;
+  return missingValues.size > 0;
 };
 
 type SearchStatusProps = {
   config: SearchesConfig;
   disableSearch?: boolean;
-  onExecute: () => void;
 }
 
 type WrapperProps = {
   config: SearchesConfig;
   isDisabled: boolean;
-  onExecute: () => void;
 };
 
 type ResultProps = {
   config?: SearchesConfig;
   isDisabled?: boolean;
-  onExecute: () => void;
 };
 
 const WithSearchStatus = (Component: React.ComponentType<Partial<SearchStatusProps>>): React.ComponentType<ResultProps> => connect(
-  ({ config, isDisabled, onExecute }: WrapperProps) => {
-    return <Component disableSearch={isDisabled} onExecute={onExecute} config={config} />;
+  ({ config, isDisabled }: WrapperProps) => {
+    return <Component disableSearch={isDisabled} config={config} />;
   },
   {
     searchMetadata: SearchMetadataStore,

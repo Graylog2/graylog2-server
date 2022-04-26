@@ -115,10 +115,10 @@ public class QueryValidationResource extends RestResource implements PluginRestR
         final ValidationTypeDTO validationType = convert(message.validationType());
         return ValidationMessageDTO.create(
                 validationType,
-                message.beginLine(),
-                message.beginColumn(),
-                message.endLine(),
-                message.endColumn(),
+                message.position().beginLine(),
+                message.position().beginColumn(),
+                message.position().endLine(),
+                message.position().endColumn(),
                 message.errorMessage(),
                 message.relatedProperty()
         );

@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import uuid from 'uuid/v4';
 
 import type { ActionContexts } from 'views/types';
 import type { FieldName, FieldValue } from 'views/logic/fieldtypes/FieldType';
-import type { QueryId } from 'views/logic/queries/Query';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
+import type { QueryId } from 'views/logic/queries/Query';
+import generateId from 'logic/generateId';
 
 export type ActionComponentProps = {
   onClose: () => void,
@@ -66,13 +66,17 @@ type ComponentsHandlerAction = {
   component: ActionComponentType,
 };
 
-export type HandlerAction<Contexts> = (FunctionHandlerAction<Contexts> | ComponentsHandlerAction) & ActionDefinitionBase<Contexts>;
+export type HandlerAction<Contexts> =
+  (FunctionHandlerAction<Contexts> | ComponentsHandlerAction)
+  & ActionDefinitionBase<Contexts>;
 
 export type ExternalLinkAction<Contexts> = {
   linkTarget: (args: ActionHandlerArguments<Contexts>) => string,
 } & ActionDefinitionBase<Contexts>;
 
-export type ActionDefinition<Contexts = ActionContexts> = (HandlerAction<Contexts> | ExternalLinkAction<Contexts>) & ActionConditions<Contexts>;
+export type ActionDefinition<Contexts = ActionContexts> =
+  (HandlerAction<Contexts> | ExternalLinkAction<Contexts>)
+  & ActionConditions<Contexts>;
 
 export function isExternalLinkAction<T>(action: ActionDefinition<T>): action is ExternalLinkAction<T> {
   return 'linkTarget' in action;
@@ -87,7 +91,7 @@ export function createHandlerFor<T>(action: ActionDefinitionBase<T> & HandlerAct
     const ActionComponent = action.component;
 
     return ({ queryId, field, value, type }) => {
-      const id = uuid();
+      const id = generateId();
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const onClose = () => setActionComponents(({ [id]: _, ...rest }) => rest);
       const renderedComponent = (

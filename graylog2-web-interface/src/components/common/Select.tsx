@@ -17,10 +17,10 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import type { Theme as SelectTheme } from 'react-select';
+import ReactSelect, { components as Components, createFilter } from 'react-select';
 import { isEqual } from 'lodash';
 import type { DefaultTheme } from 'styled-components';
 import { withTheme } from 'styled-components';
-import ReactSelect, { components as Components, createFilter } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
 import { themePropTypes } from 'theme';
@@ -440,7 +440,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     const { options, displayKey, valueKey, delimiter, allowCreate } = this.props;
 
     if (value === undefined || value === null || (typeof value === 'string' && value === '')) {
-      return undefined;
+      return [];
     }
 
     if (allowCreate && typeof value === 'string') {

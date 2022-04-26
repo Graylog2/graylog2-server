@@ -21,6 +21,7 @@ import { mount } from 'wrappedEnzyme';
 import { StoreMock as mockStore, asMock } from 'helpers/mocking';
 import View from 'views/logic/views/View';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
+import type { TimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
 import { GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
@@ -40,7 +41,7 @@ jest.mock('views/stores/GlobalOverrideStore', () => ({
 
 describe('DrilldownContextProvider', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const Consumer = ({ streams, timerange, query }) => null;
+  const Consumer = (_props: { streams: Array<string>, timerange: TimeRange, query: ElasticsearchQueryString }) => null;
 
   const TestComponent = () => {
     const { streams, timerange, query } = useContext(DrilldownContext);
