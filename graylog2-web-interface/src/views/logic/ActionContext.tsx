@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext, useMemo } from 'react';
 
 import type { ActionContexts } from 'views/types';
 import { singleton } from 'logic/singleton';
@@ -27,15 +28,16 @@ type Props = {
 };
 
 const AdditionalContext = {
-  Provider: ({ children, value }: Props) => (
-    <ActionContext.Consumer>
-      {(contexts) => (
-        <ActionContext.Provider value={{ ...contexts, ...value }}>
-          {children}
-        </ActionContext.Provider>
-      )}
-    </ActionContext.Consumer>
-  ),
+  Provider: ({ children, value }: Props) => {
+    const contexts = useContext(ActionContext);
+    const newActionContextValue = useMemo(() => ({ ...contexts, ...value }), [contexts, value]);
+
+    return (
+      <ActionContext.Provider value={newActionContextValue}>
+        {children}
+      </ActionContext.Provider>
+    );
+  },
   Consumer: ActionContext.Consumer,
 };
 
