@@ -138,6 +138,7 @@ export const RotationPropertiesPropType = PropTypes.exact({
   max_rotation_period: JsonSchemaStringPropertyTypePropType,
   type: JsonSchemaStringPropertyTypePropType.isRequired,
   max_size: JsonSchemaStringPropertyTypePropType,
+  max_docs_per_index: JsonSchemaStringPropertyTypePropType,
 });
 export const RotationJsonSchemaPropType = PropTypes.exact({
   type: PropTypes.string,

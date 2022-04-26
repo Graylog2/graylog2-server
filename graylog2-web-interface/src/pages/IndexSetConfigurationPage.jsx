@@ -106,7 +106,7 @@ IndexSetConfigurationPage.propTypes = {
   location: PropTypes.object.isRequired,
   retentionStrategies: PropTypes.arrayOf(RetentionStrategyPropType),
   rotationStrategies: PropTypes.arrayOf(RotationStrategyPropType),
-  indexSet: IndexSetPropType.isRequired,
+  indexSet: IndexSetPropType,
   retentionStrategiesContext: PropTypes.shape({
     max_index_retention_period: PropTypes.string,
   }),
@@ -115,6 +115,7 @@ IndexSetConfigurationPage.propTypes = {
 IndexSetConfigurationPage.defaultProps = {
   retentionStrategies: undefined,
   rotationStrategies: undefined,
+  indexSet: undefined,
   retentionStrategiesContext: {
     max_index_retention_period: undefined,
   },
