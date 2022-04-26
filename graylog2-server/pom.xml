@@ -971,7 +971,6 @@
                         <executions>
                             <execution>
                                 <id>install node and yarn</id>
-                                <phase>compile</phase>
                                 <goals>
                                     <goal>install-node-and-yarn</goal>
                                 </goals>
@@ -991,7 +990,7 @@
 
                             <execution>
                                 <id>yarn run build</id>
-                                <phase>package</phase>
+                                <phase>process-test-sources</phase>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
@@ -1049,6 +1048,25 @@
                                 <phase>process-classes</phase>
                                 <configuration>
                                     <arguments>generate:apidefs</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <phase>process-test-resources</phase>
+                                <configuration>
+                                    <outputDirectory>${basedir}/target/classes/web-interface/assets</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${webInterface.path}/target/web/build</directory>
+                                        </resource>
+                                    </resources>
                                 </configuration>
                             </execution>
                         </executions>
