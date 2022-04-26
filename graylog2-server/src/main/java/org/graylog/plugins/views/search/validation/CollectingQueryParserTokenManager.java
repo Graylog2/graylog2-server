@@ -30,7 +30,7 @@ public class CollectingQueryParserTokenManager extends QueryParserTokenManager {
 
     private final List<ImmutableToken> tokens = new LinkedList<>();
 
-    public CollectingQueryParserTokenManager(String f, Analyzer a) {
+    public CollectingQueryParserTokenManager() {
         super(new FastCharStream(new StringReader("")));
     }
 

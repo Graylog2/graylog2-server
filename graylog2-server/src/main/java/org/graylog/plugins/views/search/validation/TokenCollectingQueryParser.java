@@ -40,7 +40,7 @@ public class TokenCollectingQueryParser extends QueryParser {
     private final Map<Query, Collection<ImmutableToken>> tokenLookup = new IdentityHashMap<>();
 
     public TokenCollectingQueryParser(String defaultFieldName, Analyzer analyzer) {
-        this(new CollectingQueryParserTokenManager(defaultFieldName, analyzer), defaultFieldName, analyzer);
+        this(new CollectingQueryParserTokenManager(), defaultFieldName, analyzer);
     }
 
     TokenCollectingQueryParser(CollectingQueryParserTokenManager collectingQueryParserTokenManager, String defaultFieldName, Analyzer analyzer) {
