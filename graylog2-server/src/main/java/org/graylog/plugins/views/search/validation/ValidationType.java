@@ -23,4 +23,5 @@ public enum ValidationType {
     UNKNOWN_FIELD,
     INVALID_OPERATOR,
     MISSING_LICENSE,
+    INVALID_VALUE_TYPE,
 }

@@ -27,8 +27,8 @@ const SearchActions = {
 const loadSUT = () => require('./SearchLoadingStateStore');
 
 jest.mock('logic/singleton', () => ({
-  singletonActions: (key, target) => target(),
-  singletonStore: (key, target) => target(),
+  singletonActions: (_key, target) => target(),
+  singletonStore: (_key, target) => target(),
 }));
 
 describe('SearchLoadingStateStore', () => {

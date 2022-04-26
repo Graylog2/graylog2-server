@@ -108,6 +108,9 @@ public abstract class UserSummary {
     @JsonProperty("account_status")
     public abstract User.AccountStatus accountStatus();
 
+    @JsonProperty("service_account")
+    public abstract boolean isServiceAccount();
+
     @JsonCreator
     public static UserSummary create(@JsonProperty("id") @Nullable String id,
                                      @JsonProperty("username") String username,
@@ -127,25 +130,27 @@ public abstract class UserSummary {
                                      @JsonProperty("session_active") boolean sessionActive,
                                      @JsonProperty("last_activity") @Nullable Date lastActivity,
                                      @JsonProperty("client_address") @Nullable String clientAddress,
-                                     @JsonProperty("account_status") User.AccountStatus accountStatus) {
+                                     @JsonProperty("account_status") User.AccountStatus accountStatus,
+                                     @JsonProperty("service_account") Boolean isServiceAccount) {
         return new AutoValue_UserSummary(id,
-                                         username,
-                                         email,
-                                         firstName,
-                                         lastName,
-                                         fullName,
-                                         permissions,
-                                         grnPermissions,
-                                         preferences,
-                                         timezone,
-                                         sessionTimeoutMs,
-                                         readOnly,
-                                         external,
-                                         startpage,
-                                         roles,
-                                         sessionActive,
-                                         lastActivity,
-                                         clientAddress,
-                                         accountStatus);
+                username,
+                email,
+                firstName,
+                lastName,
+                fullName,
+                permissions,
+                grnPermissions,
+                preferences,
+                timezone,
+                sessionTimeoutMs,
+                readOnly,
+                external,
+                startpage,
+                roles,
+                sessionActive,
+                lastActivity,
+                clientAddress,
+                accountStatus,
+                isServiceAccount != null && isServiceAccount);
     }
 }

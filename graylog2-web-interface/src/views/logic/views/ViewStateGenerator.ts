@@ -19,8 +19,8 @@ import * as Immutable from 'immutable';
 import { DecoratorsActions } from 'stores/decorators/DecoratorsStore';
 
 import View from './View';
-import ViewState from './ViewState';
 import type { ViewType } from './View';
+import ViewState from './ViewState';
 
 import { resultHistogram, allMessagesTable } from '../Widgets';
 import WidgetPosition from '../widgets/WidgetPosition';
@@ -61,7 +61,7 @@ const _defaultWidgets: DefaultWidgets = {
     return { titles, widgets, positions };
   },
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  [View.Type.Dashboard]: async (streamId: string | undefined | null) => {
+  [View.Type.Dashboard]: async (_streamId: string | undefined | null) => {
     const widgets = [];
     const titles = {};
     const positions = {};

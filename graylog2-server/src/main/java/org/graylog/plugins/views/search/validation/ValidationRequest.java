@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.validation;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
@@ -62,6 +63,14 @@ public abstract class ValidationRequest {
 
     public static Builder builder() {
         return new AutoValue_ValidationRequest.Builder().parameters(ImmutableSet.<Parameter>builder().build());
+    }
+
+    public boolean isEmptyQuery() {
+        return StringUtils.isEmpty(query().queryString());
+    }
+
+    public String rawQuery() {
+        return query().queryString();
     }
 
     @AutoValue.Builder

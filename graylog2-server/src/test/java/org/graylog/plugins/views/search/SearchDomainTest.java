@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -241,6 +243,11 @@ public class SearchDomainTest {
         @Override
         public Set<String> getSearchIds() {
             return Collections.emptySet();
+        }
+
+        @Override
+        public boolean canReadView(String viewId, Predicate<String> permissionTester, BiPredicate<String, String> entityPermissionsTester) {
+            return false;
         }
 
         @Override

@@ -52,6 +52,12 @@ import SearchButton from './searchbar/SearchButton';
 import QueryInput from './searchbar/queryinput/AsyncQueryInput';
 import SearchBarForm, { normalizeSearchBarFormValues } from './searchbar/SearchBarForm';
 import WidgetQueryOverride from './WidgetQueryOverride';
+import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
+
+const Container = styled.div`
+  display: grid;
+  row-gap: 10px;
+`;
 
 const SecondRow = styled.div`
   display: flex;
@@ -84,7 +90,11 @@ const _onSubmit = (values, widget: Widget) => {
   const { timerange, streams, queryString } = values;
   const newWidget = updateWidgetSearchControls(widget, { timerange, streams, queryString });
 
-  return WidgetActions.update(widget.id, newWidget);
+  if (!widget.equals(newWidget)) {
+    return WidgetActions.update(widget.id, newWidget);
+  }
+
+  return SearchActions.refresh();
 };
 
 const _resetTimeRangeOverride = () => GlobalOverrideActions.resetTimeRange().then(SearchActions.refresh);
@@ -147,11 +157,11 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                      onSubmit={(values) => _onSubmit(values, widget)}
                      validateOnMount={false}
                      validateQueryString={_validateQueryString}>
-        {({ dirty, errors, isValid, isSubmitting, handleSubmit, values, setFieldValue }) => {
+        {({ dirty, errors, isValid, isSubmitting, handleSubmit, values, setFieldValue, validateForm }) => {
           const disableSearchSubmit = isSubmitting || isValidatingQuery || !isValid;
 
           return (
-            <>
+            <Container>
               <PropagateDisableSubmissionState formKey="widget-query-controls" disableSubmission={disableSearchSubmit} />
               <ValidateOnParameterChange parameters={parameters} parameterBindings={parameterBindings} />
               <WidgetTopRow>
@@ -194,7 +204,9 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                                     placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
                                     error={error}
                                     disableExecution={disableSearchSubmit}
+                                    isValidating={isValidatingQuery}
                                     warning={warnings.queryString}
+                                    validate={validateForm}
                                     onChange={(newQuery) => {
                                       onChange({ target: { value: newQuery, name } });
 
@@ -211,7 +223,8 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                 {hasQueryOverride
                   && <WidgetQueryOverride value={globalOverride?.query} onReset={_resetQueryOverride} />}
               </SecondRow>
-            </>
+              <PluggableSearchBarControls />
+            </Container>
           );
         }}
       </SearchBarForm>

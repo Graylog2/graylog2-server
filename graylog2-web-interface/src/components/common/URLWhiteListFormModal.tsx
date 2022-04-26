@@ -16,18 +16,18 @@
  */
 import React, { useCallback, useContext, useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import uuid from 'uuid/v4';
 
 import { useStore } from 'stores/connect';
 import { Button } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
 import type { ConfigurationsStoreState, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
+import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 // Explicit import to fix eslint import/no-cycle
 import IfPermitted from 'components/common/IfPermitted';
 import { isPermitted } from 'util/PermissionsMixin';
-import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import CurrentUserContext from 'contexts/CurrentUserContext';
+import generateId from 'logic/generateId';
 
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 
@@ -42,6 +42,7 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
   const prevNewUrlEntry = useRef<string>();
   const [config, setConfig] = useState<WhiteListConfig>({ entries: [], disabled: false });
   const [isValid, setIsValid] = useState<boolean>(false);
+  const [newUrlEntryId, setNewUrlEntryId] = useState<string | undefined>();
 
   const { configuration } = useStore<ConfigurationsStoreState>(ConfigurationsStore);
   const urlWhiteListConfig = configuration[URL_WHITELIST_CONFIG];
@@ -55,7 +56,17 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
   }, [currentUser]);
 
   const setDefaultWhiteListState = useCallback((defaultUrlWhiteListConfig) => {
-    const defaultConfig = { entries: [...defaultUrlWhiteListConfig.entries, { id: uuid(), title: '', value: newUrlEntry, type: urlType ?? 'literal' }], disabled: defaultUrlWhiteListConfig.disabled };
+    const id = generateId();
+    const defaultConfig = {
+      entries: [...defaultUrlWhiteListConfig.entries, {
+        id: id,
+        title: '',
+        value: newUrlEntry,
+        type: urlType ?? 'literal',
+      }],
+      disabled: defaultUrlWhiteListConfig.disabled,
+    };
+    setNewUrlEntryId(id);
     setConfig(defaultConfig);
   }, [newUrlEntry, urlType]);
 
@@ -118,7 +129,11 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
                             submitButtonDisabled={!isValid}
                             submitButtonText="Save">
           <h3>Whitelist URLs</h3>
-          <UrlWhiteListForm urls={entries} disabled={disabled} onUpdate={handleUpdate} />
+          <UrlWhiteListForm key={newUrlEntryId}
+                            urls={entries}
+                            disabled={disabled}
+                            onUpdate={handleUpdate}
+                            newEntryId={newUrlEntryId} />
         </BootstrapModalForm>
       </>
     );

@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -53,14 +54,13 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
 
     @BeforeEach
     void setUp() {
-        final QueryStringDecorator decorator = (queryString, job, query) -> "decorated";
-        final Set<QueryStringDecorator> decorators = Collections.singleton(decorator);
+        final QueryStringDecorator decorator = (queryString, job, query) -> PositionTrackingQuery.of("decorated");
         final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
         this.backend = new ElasticsearchBackend(
                 Collections.emptyMap(),
                 mock(JestClient.class),
                 mock(IndexLookup.class),
-                new QueryStringDecorators(decorators),
+                new QueryStringDecorators(Optional.of(decorator)),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 true,
                 new ObjectMapperProvider().get());

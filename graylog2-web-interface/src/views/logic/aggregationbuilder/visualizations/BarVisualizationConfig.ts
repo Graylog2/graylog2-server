@@ -59,7 +59,7 @@ export default class BarVisualizationConfig extends VisualizationConfig {
     };
   }
 
-  static fromJSON(type: string, value: BarVisualizationConfigType) {
+  static fromJSON(_type: string, value: BarVisualizationConfigType) {
     const { barmode } = value;
 
     return BarVisualizationConfig.create(barmode);

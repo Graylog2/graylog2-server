@@ -89,8 +89,10 @@ jest.mock('views/components/common/WindowLeaveMessage', () => jest.fn(mockCompon
 jest.mock('views/components/WithSearchStatus', () => (x) => x);
 jest.mock('views/components/SearchBar', () => mockComponent('SearchBar'));
 
-jest.mock('views/components/DashboardSearchBar', () => ({ onExecute }: { onExecute: (view: View) => Promise<void> }) => (
-  <button type="button" onClick={() => onExecute({ search: {} } as View)}>Execute Query</button>
+const mockRefreshSearch = () => SearchActions.refresh();
+
+jest.mock('views/components/DashboardSearchBar', () => () => (
+  <button type="button" onClick={mockRefreshSearch}>Execute Query</button>
 ));
 
 jest.mock('views/stores/SearchMetadataStore');

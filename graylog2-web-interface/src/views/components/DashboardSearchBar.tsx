@@ -42,10 +42,12 @@ import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
+import { SearchActions } from 'views/stores/SearchStore';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
 import DashboardSearchForm from './DashboardSearchBarForm';
+import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
 
 type Props = {
   config: SearchesConfig,
@@ -54,8 +56,12 @@ type Props = {
     query: QueryString,
   },
   disableSearch?: boolean,
-  onExecute: () => Promise<void>,
 };
+
+const Container = styled.div`
+  display: grid;
+  row-gap: 10px;
+`;
 
 const TopRow = styled.div(({ theme }) => css`
   display: flex;
@@ -95,9 +101,9 @@ const SearchButtonAndQuery = styled.div`
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
-const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onExecute: performSearch }: Props) => {
+const DashboardSearchBar = ({ config, globalOverride, disableSearch = false }: Props) => {
   const submitForm = useCallback(({ timerange, queryString }) => GlobalOverrideActions.set(timerange, queryString)
-    .then(() => performSearch()), [performSearch]);
+    .then(() => SearchActions.refresh()), []);
 
   const { parameterBindings, parameters } = useParameters();
   const _validateQueryString = useCallback((values: DashboardFormValues) => {
@@ -128,11 +134,11 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                                    limitDuration={limitDuration}
                                    onSubmit={submitForm}
                                    validateQueryString={_validateQueryString}>
-                {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue }) => {
+                {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
                   const disableSearchSubmit = disableSearch || isSubmitting || isValidating || !isValid;
 
                   return (
-                    <>
+                    <Container>
                       <ValidateOnParameterChange parameters={parameters} parameterBindings={parameterBindings} />
                       <TopRow>
                         <StyledTimeRangeInput disabled={disableSearch}
@@ -166,6 +172,8 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                                               }}
                                               disableExecution={disableSearchSubmit}
                                               error={error}
+                                              isValidating={isValidating}
+                                              validate={validateForm}
                                               warning={warnings.queryString}
                                               onExecute={handleSubmit as () => void} />
                                 )}
@@ -177,12 +185,13 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                         </SearchButtonAndQuery>
 
                         {!editing && (
-                        <ViewActionsWrapper>
-                          <ViewActionsMenu />
-                        </ViewActionsWrapper>
+                          <ViewActionsWrapper>
+                            <ViewActionsMenu />
+                          </ViewActionsWrapper>
                         )}
                       </BottomRow>
-                    </>
+                      <PluggableSearchBarControls />
+                    </Container>
                   );
                 }}
               </DashboardSearchForm>
@@ -196,7 +205,6 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
 
 DashboardSearchBar.propTypes = {
   disableSearch: PropTypes.bool,
-  onExecute: PropTypes.func.isRequired,
 };
 
 DashboardSearchBar.defaultProps = {

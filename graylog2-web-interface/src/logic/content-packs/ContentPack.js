@@ -16,7 +16,8 @@
  */
 import { Map, Set } from 'immutable';
 import { concat, remove } from 'lodash';
-import uuid from 'uuid/v4';
+
+import generateId from 'logic/generateId';
 
 import Entity from './Entity';
 
@@ -183,7 +184,7 @@ export default class ContentPack {
     // eslint-disable-next-line no-use-before-define
     return new Builder()
       .v(1)
-      .id(uuid())
+      .id(generateId())
       .rev(1)
       .name('')
       .summary('')

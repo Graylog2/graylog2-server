@@ -77,4 +77,38 @@ describe('Routes', () => {
       expect(uri.hasQuery('interval', 'hour')).toBeTruthy();
     });
   });
+
+  describe('with `/` prefix', () => {
+    beforeAll(() => {
+      jest.resetModules();
+
+      window.appConfig = {
+        gl2AppPathPrefix: '/',
+      } as AppConfigs;
+
+      Routes = jest.requireActual('./Routes').default;
+    });
+
+    it('returns a route from constant', () => {
+      expect(Routes.SEARCH).toMatch('/search');
+    });
+
+    it('returns correct route for getting started page', () => {
+      expect(Routes.GETTING_STARTED).toMatch('/gettingstarted');
+    });
+
+    it('returns a route from function', () => {
+      expect(Routes.node('id')).toMatch('/system/nodes/id');
+    });
+
+    it('routes contain query parameters', () => {
+      const uri = URI(Routes.search('', { rangetype: 'relative', relative: 300 }, 'hour'));
+
+      expect(uri.path()).toMatch('/search');
+      expect(uri.hasQuery('q', '')).toBeTruthy();
+      expect(uri.hasQuery('rangetype', 'relative')).toBeTruthy();
+      expect(uri.hasQuery('relative', '300')).toBeTruthy();
+      expect(uri.hasQuery('interval', 'hour')).toBeTruthy();
+    });
+  });
 });

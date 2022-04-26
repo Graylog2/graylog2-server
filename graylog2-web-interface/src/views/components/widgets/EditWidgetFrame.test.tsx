@@ -22,6 +22,7 @@ import MockStore from 'helpers/mocking/StoreMock';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import Widget from 'views/logic/widgets/Widget';
+import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
 import EditWidgetFrame from './EditWidgetFrame';
 
@@ -37,7 +38,7 @@ jest.mock('views/stores/WidgetStore', () => ({
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
   SearchActions: {
-    refresh: jest.fn(),
+    refresh: jest.fn(() => Promise.resolve()),
   },
 }));
 
@@ -73,6 +74,8 @@ describe('EditWidgetFrame', () => {
     const widget = Widget.builder()
       .id('deadbeef')
       .type('dummy')
+      .query(createElasticsearchQueryString())
+      .timerange({ type: 'relative', from: 300 })
       .config({})
       .build();
     const renderSUT = () => render((
@@ -86,7 +89,7 @@ describe('EditWidgetFrame', () => {
       </ViewTypeContext.Provider>
     ));
 
-    it('performs search when clicking on search button', async () => {
+    it('refreshes search after clicking on search button, when there are no changes', async () => {
       renderSUT();
       const searchButton = screen.getByTitle(/Perform search/);
 
@@ -102,7 +105,6 @@ describe('EditWidgetFrame', () => {
 
       expect(reactSelect).not.toBeNull();
 
-      // Flow is not parsing the jest assertion before
       if (reactSelect) {
         await selectEvent.select(reactSelect, 'PFLog');
       }

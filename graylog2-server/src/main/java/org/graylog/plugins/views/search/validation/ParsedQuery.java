@@ -18,8 +18,6 @@ package org.graylog.plugins.views.search.validation;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import org.apache.lucene.queryparser.classic.Token;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -40,15 +38,8 @@ public abstract class ParsedQuery {
 
     public Set<String> allFieldNames() {
         return terms().stream()
-                .filter(t -> !t.isInvalidOperator())
                 .map(ParsedTerm::getRealFieldName)
                 .collect(Collectors.toSet());
-    }
-
-    public List<ParsedTerm> invalidOperators() {
-        return terms().stream()
-                .filter(ParsedTerm::isInvalidOperator)
-                .collect(Collectors.toList());
     }
 
     @AutoValue.Builder

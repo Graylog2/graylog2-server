@@ -90,8 +90,13 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
+import org.graylog.plugins.views.search.validation.FieldTypeValidation;
+import org.graylog.plugins.views.search.validation.FieldTypeValidationImpl;
 import org.graylog.plugins.views.search.validation.QueryValidationService;
 import org.graylog.plugins.views.search.validation.QueryValidationServiceImpl;
+import org.graylog.plugins.views.search.validation.validators.FieldValueTypeValidator;
+import org.graylog.plugins.views.search.validation.validators.InvalidOperatorsValidator;
+import org.graylog.plugins.views.search.validation.validators.UnknownFieldsValidator;
 import org.graylog.plugins.views.search.views.RequiresParameterSupport;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
@@ -181,6 +186,13 @@ public class ViewsBindings extends ViewsModule {
 
         bind(SearchJobService.class).to(InMemorySearchJobService.class).in(Scopes.SINGLETON);
         bind(MappedFieldTypesService.class).to(MappedFieldTypesServiceImpl.class).in(Scopes.SINGLETON);
+        bind(FieldTypeValidation.class).to(FieldTypeValidationImpl.class).in(Scopes.SINGLETON);
+
+        // The order of injections is significant!
+        registerQueryValidator(FieldValueTypeValidator.class);
+        registerQueryValidator(UnknownFieldsValidator.class);
+        registerQueryValidator(InvalidOperatorsValidator.class);
+
         bind(QueryValidationService.class).to(QueryValidationServiceImpl.class).in(Scopes.SINGLETON);
         bind(ChunkDecorator.class).to(LegacyChunkDecorator.class);
         bind(MessagesExporter.class).to(DecoratingMessagesExporter.class);

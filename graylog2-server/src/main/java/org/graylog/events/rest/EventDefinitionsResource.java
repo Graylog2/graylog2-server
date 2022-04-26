@@ -110,7 +110,12 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public PaginatedResponse<EventDefinitionDto> list(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                       @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                       @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query) {
-        final SearchQuery searchQuery = searchQueryParser.parse(query);
+        SearchQuery searchQuery;
+        try {
+            searchQuery = searchQueryParser.parse(query);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
+        }
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(searchQuery, event -> {
             return isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
         }, "title", page, perPage);

@@ -107,7 +107,7 @@ describe('SearchBar', () => {
     expect(metaButtons).not.toBeNull();
   });
 
-  it('should update query when search is performed', async () => {
+  it('should refresh search, when search is performed and there are no changes.', async () => {
     render(<SearchBar config={config} />);
 
     const searchButton = await screen.findByTitle('Perform search');

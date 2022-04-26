@@ -46,20 +46,20 @@ const loadByUsername = notifyingAction({
 
 const update = notifyingAction({
   action: UsersActions.update,
-  success: (userId, payload, fullName) => ({
+  success: (_userId, _payload, fullName) => ({
     message: `User "${fullName}" was updated successfully`,
   }),
-  error: (error, userId, payload, fullName) => ({
+  error: (error, _userId, _payload, fullName) => ({
     message: `Updating user "${fullName}" failed with status: ${error}`,
   }),
 });
 
 const deleteAction = notifyingAction({
   action: UsersActions.delete,
-  success: (userId, fullName) => ({
+  success: (_userId, fullName) => ({
     message: `User "${fullName}" was deleted successfully`,
   }),
-  error: (error, userId, fullName) => ({
+  error: (error, _userId, fullName) => ({
     message: `Deleting user "${fullName}" failed with status: ${error}`,
   }),
 });
@@ -76,7 +76,7 @@ const changePassword = notifyingAction({
 
 const createToken = notifyingAction({
   action: UsersActions.createToken,
-  success: (userId, tokenName) => ({
+  success: (_userId, tokenName) => ({
     message: `Token "${tokenName}" created successfully`,
   }),
   error: (error, userId, tokenName) => ({
@@ -93,10 +93,10 @@ const loadTokens = notifyingAction({
 
 const deleteToken = notifyingAction({
   action: UsersActions.deleteToken,
-  success: (userId, tokenId, tokenName) => ({
+  success: (_userId, _tokenId, tokenName) => ({
     message: `Token "${tokenName}" deleted successfully`,
   }),
-  error: (error, userId, tokenId, tokenName) => ({
+  error: (error, userId, _tokenId, tokenName) => ({
     message: `Deleting token "${tokenName}" for user with id "${userId}" failed with status: ${error}`,
   }),
 });

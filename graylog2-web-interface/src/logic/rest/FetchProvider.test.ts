@@ -19,6 +19,9 @@ import nodeFetch from 'node-fetch';
 import formidableMiddleware from 'express-formidable';
 import FormData from 'form-data';
 
+import ErrorsActions from 'actions/errors/ErrorsActions';
+import { asMock } from 'helpers/mocking';
+
 import fetch, { Builder, fetchFile } from './FetchProvider';
 
 jest.unmock('./FetchProvider');
@@ -40,6 +43,10 @@ jest.mock('stores/sessions/ServerAvailabilityStore', () => ({
   },
 }));
 
+jest.mock('actions/errors/ErrorsActions', () => ({
+  report: jest.fn(),
+}));
+
 const PORT = 0;
 
 const setUpServer = () => {
@@ -47,25 +54,25 @@ const setUpServer = () => {
 
   app.use(formidableMiddleware());
   // eslint-disable-next-line @typescript-eslint/no-unused-vars,no-console
-  app.use((err, req, res, next) => console.error(err));
+  app.use((err, _req, _res, _next) => console.error(err));
 
-  app.get('/test1', (req, res) => {
+  app.get('/test1', (_req, res) => {
     res.send({ text: 'test' });
   });
 
-  app.post('/test2', (req, res) => {
+  app.post('/test2', (_req, res) => {
     res.send({ text: 'test' });
   });
 
-  app.post('/test3', (req, res) => {
+  app.post('/test3', (_req, res) => {
     res.send('"uuid-beef-feed"');
   });
 
-  app.post('/test4', (req, res) => {
+  app.post('/test4', (_req, res) => {
     res.send(undefined);
   });
 
-  app.delete('/test5', (req, res) => {
+  app.delete('/test5', (_req, res) => {
     res.status(204).end();
   });
 
@@ -77,8 +84,12 @@ const setUpServer = () => {
     }
   });
 
-  app.get('/simulatesSessionExpiration', (req, res) => {
+  app.get('/simulatesSessionExpiration', (_req, res) => {
     res.status(401).end();
+  });
+
+  app.get('/simulatesUnauthorized', (_req, res) => {
+    res.status(403).end();
   });
 
   app.put('/uploadFile', (req, res) => {
@@ -93,7 +104,7 @@ const setUpServer = () => {
     res.send(req.fields).end();
   });
 
-  app.post('/errorWithMessage', (req, res) => res.status(500).send({ message: 'The dungeon collapses. You die!' }));
+  app.post('/errorWithMessage', (_req, res) => res.status(500).send({ message: 'The dungeon collapses. You die!' }));
 
   return app.listen(PORT, () => {});
 };
@@ -112,6 +123,10 @@ describe('FetchProvider', () => {
     baseUrl = `http://localhost:${port}`;
   });
 
+  beforeEach(() => {
+    asMock(ErrorsActions.report).mockClear();
+  });
+
   afterAll(() => {
     server.close();
   });
@@ -122,7 +137,7 @@ describe('FetchProvider', () => {
     ['POST with text', 'POST', 'test3', 'uuid-beef-feed'],
     ['POST without content', 'POST', 'test4', null],
     ['DELETE without content and status 204', 'DELETE', 'test5', null],
-  ])('should receive a %s', async (text, method, url, expectedResponse) => {
+  ])('should receive a %s', async (_text, method, url, expectedResponse) => {
     return fetch(method, `${baseUrl}/${url}`).then((response) => {
       expect(response).toStrictEqual(expectedResponse);
     });
@@ -163,5 +178,31 @@ describe('FetchProvider', () => {
 
     expect(error.status).toEqual(undefined);
     expect(error.message).toEqual('There was an error fetching a resource: undefined. Additional information: Not available');
+  });
+
+  it('reports 403 by default', async () => {
+    const promise = new Builder('GET', `${baseUrl}/simulatesUnauthorized`)
+      .json()
+      .build();
+    const error = await promise.catch((e) => e);
+
+    expect(error.status).toEqual(403);
+    expect(error.message).toEqual('There was an error fetching a resource: Forbidden. Additional information: Not available');
+
+    expect(ErrorsActions.report).toHaveBeenCalledWith(expect.objectContaining({
+      type: 'UnauthorizedError',
+    }));
+  });
+
+  it('allows ignoring 403', async () => {
+    const promise = new Builder('GET', `${baseUrl}/simulatesUnauthorized`)
+      .json()
+      .ignoreUnauthorized()
+      .build();
+    const error = await promise.catch((e) => e);
+
+    expect(error.message).toEqual('There was an error fetching a resource: Forbidden. Additional information: Not available');
+
+    expect(ErrorsActions.report).not.toHaveBeenCalled();
   });
 });
