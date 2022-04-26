@@ -84,15 +84,17 @@ const DashboardPageContextProvider = ({ children }: { children: React.ReactNode 
     history.replace(newUri);
   }, [history, query]);
 
-  const setDashboardPageParam = (nextPage) => updatePageParams(nextPage);
-  const unSetDashboardPageParam = () => updatePageParams(undefined);
+  const setDashboardPageParam = useCallback((nextPage) => updatePageParams(nextPage), [updatePageParams]);
+  const unSetDashboardPageParam = useCallback(() => updatePageParams(undefined), [updatePageParams]);
+
+  const dashboardPageContextValue = useMemo(() => ({
+    setDashboardPage: setDashboardPageParam,
+    unsetDashboardPage: unSetDashboardPageParam,
+    dashboardPage: dashboardPage,
+  }), [dashboardPage, setDashboardPageParam, unSetDashboardPageParam]);
 
   return (
-    <DashboardPageContext.Provider value={{
-      setDashboardPage: setDashboardPageParam,
-      unsetDashboardPage: unSetDashboardPageParam,
-      dashboardPage: dashboardPage,
-    }}>
+    <DashboardPageContext.Provider value={dashboardPageContextValue}>
       {children}
     </DashboardPageContext.Provider>
   );
