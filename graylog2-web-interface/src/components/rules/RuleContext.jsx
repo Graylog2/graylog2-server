@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { createContext, useEffect, useRef, useCallback, useState } from 'react';
+import React, { createContext, useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import { RulesActions } from 'stores/rules/RulesStore';
@@ -23,21 +23,31 @@ let VALIDATE_TIMEOUT;
 
 export const PipelineRulesContext = createContext();
 
+const savePipelineRule = (nextRule, callback = () => {}) => {
+  let promise;
+
+  if (nextRule?.id) {
+    promise = RulesActions.update.triggerPromise(nextRule);
+  } else {
+    promise = RulesActions.save.triggerPromise(nextRule);
+  }
+
+  promise.then((response) => callback(response));
+};
+
 export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
   const descriptionRef = useRef();
   const ruleSourceRef = useRef();
   const [, setAceLoaded] = useState(false);
   const [ruleSource, setRuleSource] = useState(rule.source);
 
-  const onAceLoaded = () => setAceLoaded(true);
-
-  const createAnnotations = (nextErrors) => {
+  const createAnnotations = useCallback((nextErrors) => {
     const nextErrorAnnotations = nextErrors.map((e) => {
       return { row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: 'error' };
     });
 
     ruleSourceRef.current.editor.getSession().setAnnotations(nextErrorAnnotations);
-  };
+  }, []);
 
   const validateNewRule = useCallback((callback) => {
     const nextRule = {
@@ -49,7 +59,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
     RulesActions.parse(nextRule, callback);
   }, [rule]);
 
-  const validateBeforeSave = (callback = () => {}) => {
+  const validateBeforeSave = useCallback((callback = () => {}) => {
     const savedRule = {
       ...rule,
       source: ruleSourceRef.current.editor.getSession().getValue(),
@@ -57,27 +67,11 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
     };
 
     RulesActions.parse(savedRule, () => callback(savedRule));
-  };
+  }, [rule]);
 
-  const handleDescription = (newDescription) => {
-    descriptionRef.current.value = newDescription;
-  };
-
-  const savePipelineRule = (nextRule, callback = () => {}) => {
-    let promise;
-
-    if (nextRule?.id) {
-      promise = RulesActions.update.triggerPromise(nextRule);
-    } else {
-      promise = RulesActions.save.triggerPromise(nextRule);
-    }
-
-    promise.then((response) => callback(response));
-  };
-
-  const handleSavePipelineRule = (callback = () => {}) => {
+  const handleSavePipelineRule = useCallback((callback = () => {}) => {
     validateBeforeSave((nextRule) => savePipelineRule(nextRule, callback));
-  };
+  }, [validateBeforeSave]);
 
   useEffect(() => {
     if (ruleSourceRef.current) {
@@ -104,19 +98,28 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
         createAnnotations(nextErrors);
       });
     }, 500);
-  }, [validateNewRule]);
+  }, [validateNewRule, createAnnotations]);
 
-  return (
-    <PipelineRulesContext.Provider value={{
+  const pipelineRulesContextValue = useMemo(() => {
+    return ({
       descriptionRef,
-      handleDescription,
+      handleDescription: (newDescription) => { descriptionRef.current.value = newDescription; },
       handleSavePipelineRule,
       ruleSourceRef,
       usedInPipelines,
-      onAceLoaded,
+      onAceLoaded: () => setAceLoaded(true),
       ruleSource,
       onChangeSource,
-    }}>
+    });
+  }, [
+    handleSavePipelineRule,
+    onChangeSource,
+    ruleSource,
+    usedInPipelines,
+  ]);
+
+  return (
+    <PipelineRulesContext.Provider value={pipelineRulesContextValue}>
       {children}
     </PipelineRulesContext.Provider>
   );
