@@ -28,10 +28,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.views.search.validation.LuceneQueryParser.ANALYZER;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -58,7 +56,9 @@ class TokenCollectingQueryParserTest {
         collectedTokensSimulation.clear();
         final Query query = toTest.newFuzzyQuery(testTerm, 1.0f, 2);
         final Map<Query, Collection<ImmutableToken>> tokenLookup = toTest.getTokenLookup();
-        assertNull(tokenLookup.get(query));
+        assertThat(tokenLookup)
+                .isNotNull()
+                .hasSize(0);
     }
 
     @Test
@@ -70,8 +70,11 @@ class TokenCollectingQueryParserTest {
 
         final Map<Query, Collection<ImmutableToken>> tokenLookup = toTest.getTokenLookup();
         final Collection<ImmutableToken> queryTokens = tokenLookup.get(query);
-        assertEquals(1, queryTokens.size());
-        assertTrue(queryTokens.contains(testToken));
+        assertThat(queryTokens)
+                .isNotNull()
+                .hasSize(1)
+                .contains(testToken);
+
     }
 
     @Test
@@ -90,32 +93,42 @@ class TokenCollectingQueryParserTest {
 
         final Map<Query, Collection<ImmutableToken>> tokenLookup = toTest.getTokenLookup();
         final Collection<ImmutableToken> query1Tokens = tokenLookup.get(query1);
-        assertEquals(1, query1Tokens.size());
-        assertTrue(query1Tokens.contains(testToken1));
+        assertThat(query1Tokens)
+                .isNotNull()
+                .hasSize(1)
+                .contains(testToken1);
         final Collection<ImmutableToken> query2Tokens = tokenLookup.get(query2);
-        assertEquals(1, query2Tokens.size());
-        assertTrue(query2Tokens.contains(testToken2));
+        assertThat(query2Tokens)
+                .isNotNull()
+                .hasSize(1)
+                .contains(testToken2);
         final Collection<ImmutableToken> query3Tokens = tokenLookup.get(query3);
-        assertEquals(2, query3Tokens.size());
-        assertTrue(query3Tokens.contains(testToken3_1));
-        assertTrue(query3Tokens.contains(testToken3_2));
+        assertThat(query3Tokens)
+                .isNotNull()
+                .hasSize(2)
+                .contains(testToken3_1)
+                .contains(testToken3_2);
     }
 
     @Test
     void testSeparatesTokensForTwoIdenticalQueries() {
-        final ImmutableToken testToken1 = ImmutableToken.create(Token.newToken(QueryParserConstants.TERM, "blah1"));
+        final ImmutableToken testToken1 = ImmutableToken.create(Token.newToken(QueryParserConstants.TERM, "blah"));
         collectedTokensSimulation.add(testToken1);
         final Query query1 = toTest.newPrefixQuery(testTerm);
-        final ImmutableToken testToken2 = ImmutableToken.create(Token.newToken(QueryParserConstants.TERM, "blah2"));
+        final ImmutableToken testToken2 = ImmutableToken.create(Token.newToken(QueryParserConstants.TERM, "blah"));
         collectedTokensSimulation.add(testToken2);
         final Query query2 = toTest.newPrefixQuery(testTerm);
 
         final Map<Query, Collection<ImmutableToken>> tokenLookup = toTest.getTokenLookup();
         final Collection<ImmutableToken> query1Tokens = tokenLookup.get(query1);
-        assertEquals(1, query1Tokens.size());
-        assertTrue(query1Tokens.contains(testToken1));
+        assertThat(query1Tokens)
+                .isNotNull()
+                .hasSize(1)
+                .contains(testToken1);
         final Collection<ImmutableToken> query2Tokens = tokenLookup.get(query2);
-        assertEquals(1, query2Tokens.size());
-        assertTrue(query2Tokens.contains(testToken2));
+        assertThat(query2Tokens)
+                .isNotNull()
+                .hasSize(1)
+                .contains(testToken2);
     }
 }
