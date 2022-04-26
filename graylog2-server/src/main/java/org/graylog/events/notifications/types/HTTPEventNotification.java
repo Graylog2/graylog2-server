@@ -43,7 +43,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
