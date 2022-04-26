@@ -880,7 +880,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>process-classes</phase>
+                        <phase>compile</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
@@ -989,8 +989,30 @@
                             </execution>
 
                             <execution>
+                                <id>Generate backend API types</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <arguments>generate:apidefs</arguments>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>yarn tsc</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <arguments>tsc</arguments>
+                                </configuration>
+                            </execution>
+
+                            <execution>
                                 <id>yarn run build</id>
-                                <phase>process-test-sources</phase>
+                                <phase>compile</phase>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
@@ -1030,26 +1052,6 @@
                                     <arguments>test:integration</arguments>
                                 </configuration>
                             </execution>
-                            <execution>
-                                <id>yarn tsc</id>
-                                <goals>
-                                    <goal>yarn</goal>
-                                </goals>
-                                <phase>test</phase>
-                                <configuration>
-                                    <arguments>tsc</arguments>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>Generate backend API types</id>
-                                <goals>
-                                    <goal>yarn</goal>
-                                </goals>
-                                <phase>process-classes</phase>
-                                <configuration>
-                                    <arguments>generate:apidefs</arguments>
-                                </configuration>
-                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
@@ -1059,7 +1061,7 @@
                                 <goals>
                                     <goal>copy-resources</goal>
                                 </goals>
-                                <phase>process-test-resources</phase>
+                                <phase>compile</phase>
                                 <configuration>
                                     <outputDirectory>${basedir}/target/classes/web-interface/assets</outputDirectory>
                                     <resources>
