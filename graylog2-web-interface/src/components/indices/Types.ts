@@ -96,7 +96,9 @@ export interface RetentionStrategyResponse {
   strategies: Array<RetentionStrategy>,
   context: RetentionStrategyContext,
 }
-
+export const RetentionStrategiesContextPropType = PropTypes.shape({
+  max_index_retention_period: PropTypes.string,
+});
 export const SizeBasedRotationStrategyConfigPropType = PropTypes.exact({
   type: PropTypes.string.isRequired,
   max_size: PropTypes.number.isRequired,
