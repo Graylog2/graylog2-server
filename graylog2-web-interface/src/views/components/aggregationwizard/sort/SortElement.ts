@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import uuid from 'uuid/v4';
-
 import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import generateId from 'logic/generateId';
 
 import SortsConfiguration from './SortsConfiguration';
 
@@ -68,7 +67,7 @@ const validateSorts = (values: WidgetConfigFormValues) => {
 
 const addRandomId = (baseSort = {}) => ({
   ...baseSort,
-  id: uuid(),
+  id: generateId(),
 });
 
 const configTypeToFormValueType = (type: 'pivot' | 'series') => {

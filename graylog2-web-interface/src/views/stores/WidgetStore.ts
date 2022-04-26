@@ -16,13 +16,13 @@
  */
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
-import uuid from 'uuid/v4';
 import { get, isEqual } from 'lodash';
 
 import type { RefluxActions } from 'stores/StoreTypes';
 import type Widget from 'views/logic/widgets/Widget';
 import { singletonActions, singletonStore } from 'logic/singleton';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+import generateId from 'logic/generateId';
 
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
@@ -110,7 +110,7 @@ export const WidgetStore = singletonStore(
         throw new Error(`Unable to duplicate widget with id "${widgetId}", it is not found.`);
       }
 
-      const duplicatedWidget = widget.duplicate(uuid());
+      const duplicatedWidget = widget.duplicate(generateId());
       const newWidgets = this.widgets.set(duplicatedWidget.id, duplicatedWidget);
       const promise = this._updateWidgets(newWidgets);
 

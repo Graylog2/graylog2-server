@@ -16,7 +16,6 @@
  */
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
-import uuid from 'uuid/v4';
 import { cloneDeep, debounce, map } from 'lodash';
 import styled from 'styled-components';
 
@@ -29,6 +28,7 @@ import { getValueFromInput } from 'util/FormsUtils';
 import type { Url, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
 import ToolsStore from 'stores/tools/ToolsStore';
 import { isValidURL } from 'util/URLUtils';
+import generateId from 'logic/generateId';
 
 type ValidationResult = {
   title: { valid: boolean },
@@ -85,7 +85,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
 
   const _onAdd = (event: Event) => {
     event.preventDefault();
-    setConfig({ ...config, entries: [...config.entries, { id: uuid(), title: '', value: '', type: literal }] });
+    setConfig({ ...config, entries: [...config.entries, { id: generateId(), title: '', value: '', type: literal }] });
   };
 
   const _onRemove = (event: MouseEvent, idx: number) => {
@@ -105,7 +105,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
 
     if (validationState.errors.length > 0
       && validationState.errors.find(((el) => (el && el.title && el.title.valid) === false
-      || (el && el.value && el.value.valid === false)))) {
+        || (el && el.value && el.value.valid === false)))) {
       isValid = false;
     }
 

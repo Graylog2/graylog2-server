@@ -22,7 +22,7 @@ import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackSelection from 'components/content-packs/ContentPackSelection';
 import Entity from 'logic/content-packs/Entity';
 
-jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
+jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 
 describe('<ContentPackSelection />', () => {
   it('should render with empty content pack', () => {
@@ -178,7 +178,7 @@ describe('<ContentPackSelection />', () => {
       /*
        * reset the search
        */
-      wrapper.find("button[children='Reset']").simulate('click');
+      wrapper.find('button[children=\'Reset\']').simulate('click');
       /* Open menu to show all checkboxes */
       wrapper.find('div.fa-stack').simulate('click');
 
