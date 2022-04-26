@@ -17,14 +17,9 @@
 package org.graylog.plugins.views.search.validation;
 
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.graylog.plugins.views.search.validation.ImmutableToken;
-import org.graylog.plugins.views.search.validation.LuceneQueryParser;
-import org.graylog.plugins.views.search.validation.ParsedQuery;
-import org.graylog.plugins.views.search.validation.ParsedTerm;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -56,14 +51,17 @@ class LuceneQueryParserTest {
     void getFieldExistPosition() throws ParseException {
         final ParsedQuery fields = parser.parse("_exists_:lorem");
         assertThat(fields.allFieldNames()).contains("lorem");
-        final ParsedTerm term = fields.terms().iterator().next();
-        assertThat(term.keyToken()).isPresent();
-        final ImmutableToken fieldNameToken = term.keyToken().get();
-        assertThat(fieldNameToken.beginLine()).isEqualTo(1);
-        assertThat(fieldNameToken.beginColumn()).isEqualTo(9);
-        assertThat(fieldNameToken.endLine()).isEqualTo(1);
-        assertThat(fieldNameToken.endColumn()).isEqualTo(14);
+
+        fields.terms()
+                .forEach(term -> assertThat(term.keyToken())
+                        .hasValueSatisfying(t -> {
+                            assertThat(t.beginLine()).isEqualTo(1);
+                            assertThat(t.beginColumn()).isEqualTo(9);
+                            assertThat(t.endLine()).isEqualTo(1);
+                            assertThat(t.endColumn()).isEqualTo(14);
+                        }));
     }
+
 
     @Test
     void getFieldNamesComplex() throws ParseException {
@@ -80,44 +78,43 @@ class LuceneQueryParserTest {
     @Test
     void testRangeQuery() throws ParseException {
         final ParsedQuery query = parser.parse("http_response_code:[500 TO 504]");
-        assertThat(query.terms().get(0).value()).isEqualTo("500");
-        assertThat(query.terms().get(1).value()).isEqualTo("504");
+        assertThat(query.terms()).extracting(ParsedTerm::value).contains("500", "504");
     }
 
 
     @Test
     void testGtQuery() throws ParseException {
         final ParsedQuery query = parser.parse("http_response_code:>400");
-        assertThat(query.terms().get(0).value()).isEqualTo("400");
+        assertThat(query.terms()).extracting(ParsedTerm::value).contains("400");
     }
 
     @Test
     void testMultilineQuery() throws ParseException {
         final ParsedQuery query = parser.parse("foo:bar AND\nlorem:ipsum");
 
-        {
-            final ImmutableToken token = query.tokens().stream().filter(t -> t.image().equals("foo")).findFirst().orElseThrow(() -> new IllegalStateException("Expected token not found"));
-            assertThat(token.beginLine()).isEqualTo(1);
-            assertThat(token.beginColumn()).isEqualTo(0);
-            assertThat(token.endLine()).isEqualTo(1);
-            assertThat(token.endColumn()).isEqualTo(3);
-        }
 
-        {
-            final ImmutableToken token = query.tokens().stream().filter(t -> t.image().equals("lorem")).findFirst().orElseThrow(() -> new IllegalStateException("Expected token not found"));
-            assertThat(token.beginLine()).isEqualTo(2);
-            assertThat(token.beginColumn()).isEqualTo(0);
-            assertThat(token.endLine()).isEqualTo(2);
-            assertThat(token.endColumn()).isEqualTo(5);
-        }
-
-        {
-            final ImmutableToken token = query.tokens().stream().filter(t -> t.image().equals("ipsum")).findFirst().orElseThrow(() -> new IllegalStateException("Expected token not found"));
-            assertThat(token.beginLine()).isEqualTo(2);
-            assertThat(token.beginColumn()).isEqualTo(6);
-            assertThat(token.endLine()).isEqualTo(2);
-            assertThat(token.endColumn()).isEqualTo(11);
-        }
+        assertThat(query.tokens())
+                .anySatisfy(token -> {
+                    assertThat(token.image()).isEqualTo("foo");
+                    assertThat(token.beginLine()).isEqualTo(1);
+                    assertThat(token.beginColumn()).isEqualTo(0);
+                    assertThat(token.endLine()).isEqualTo(1);
+                    assertThat(token.endColumn()).isEqualTo(3);
+                })
+                .anySatisfy(token -> {
+                    assertThat(token.image()).isEqualTo("lorem");
+                    assertThat(token.beginLine()).isEqualTo(2);
+                    assertThat(token.beginColumn()).isEqualTo(0);
+                    assertThat(token.endLine()).isEqualTo(2);
+                    assertThat(token.endColumn()).isEqualTo(5);
+                })
+                .anySatisfy(token -> {
+                    assertThat(token.image()).isEqualTo("ipsum");
+                    assertThat(token.beginLine()).isEqualTo(2);
+                    assertThat(token.beginColumn()).isEqualTo(6);
+                    assertThat(token.endLine()).isEqualTo(2);
+                    assertThat(token.endColumn()).isEqualTo(11);
+                });
     }
 
     @Test
@@ -125,15 +122,19 @@ class LuceneQueryParserTest {
         final ParsedQuery query = parser.parse("(\"ssh login\" AND (source:example.org OR source:another.example.org))\n" +
                 "OR (\"login\" AND (source:example1.org OR source:another.example2.org))\n" +
                 "OR not_existing_field:test");
-        final ImmutableToken token = query.tokens().stream().filter(t -> t.image().equals("not_existing_field")).findFirst().orElseThrow(() -> new IllegalStateException("Expected token not found"));
-        assertThat(token.beginLine()).isEqualTo(3);
-        assertThat(token.beginColumn()).isEqualTo(3);
-        assertThat(token.endLine()).isEqualTo(3);
-        assertThat(token.endColumn()).isEqualTo(21);
+
+        assertThat(query.tokens())
+                .anySatisfy(token -> {
+                    assertThat(token.image()).isEqualTo("not_existing_field");
+                    assertThat(token.beginLine()).isEqualTo(3);
+                    assertThat(token.beginColumn()).isEqualTo(3);
+                    assertThat(token.endLine()).isEqualTo(3);
+                    assertThat(token.endColumn()).isEqualTo(21);
+                });
     }
 
     @Test
-    void testMatchingPositions() throws ParseException {
+    void testMatchingPositions() {
         assertThatThrownBy(() -> parser.parse("foo:"))
                 .hasMessageContaining("Cannot parse 'foo:': Encountered \"<EOF>\" at line 1, column 4.");
     }
@@ -149,12 +150,18 @@ class LuceneQueryParserTest {
     void testValueTokenSimple() throws ParseException {
         final ParsedQuery query = parser.parse("foo:bar AND lorem:ipsum");
         assertThat(query.terms().size()).isEqualTo(2);
-        final ParsedTerm fooTerm = query.terms().stream().filter(t -> t.field().equals("foo")).findFirst().get();
-        assertThat(fooTerm.keyToken().get().image()).isEqualTo("foo");
-        assertThat(fooTerm.valueToken().get().image()).isEqualTo("bar");
-        final ParsedTerm loremTerm = query.terms().stream().filter(t -> t.field().equals("lorem")).findFirst().get();
-        assertThat(loremTerm.keyToken().get().image()).isEqualTo("lorem");
-        assertThat(loremTerm.valueToken().get().image()).isEqualTo("ipsum");
+
+        assertThat(query.terms())
+                .anySatisfy(term -> {
+                    assertThat(term.field()).isEqualTo("foo");
+                    assertThat(term.keyToken()).map(ImmutableToken::image).hasValue("foo");
+                    assertThat(term.valueToken()).map(ImmutableToken::image).hasValue("bar");
+                })
+                .anySatisfy(term -> {
+                    assertThat(term.field()).isEqualTo("lorem");
+                    assertThat(term.keyToken()).map(ImmutableToken::image).hasValue("lorem");
+                    assertThat(term.valueToken()).map(ImmutableToken::image).hasValue("ipsum");
+                });
     }
 
     @Test
@@ -163,24 +170,32 @@ class LuceneQueryParserTest {
         // This can lead to mismatches in equals during the value token recognition. This tests ensures that
         // uppercase values are correctly recognized and assigned
         final ParsedQuery query = parser.parse("foo:BAR");
-        final ParsedTerm term = query.terms().iterator().next();
-        assertThat(term.valueToken().get().image()).isEqualTo("BAR");
+
+        assertThat(query.terms())
+                .extracting(ParsedTerm::valueToken)
+                .anySatisfy(token -> assertThat(token).map(ImmutableToken::image).hasValue("BAR"));
     }
 
     @Test
     void testFuzzyQuery() throws ParseException {
         final ParsedQuery query = parser.parse("fuzzy~");
-        final ParsedTerm term = query.terms().iterator().next();
-        assertThat(term.field()).isEqualTo("_default_");
-        assertThat(term.value()).isEqualTo("fuzzy");
+        assertThat(query.terms())
+                .anySatisfy(term -> {
+                    assertThat(term.field()).isEqualTo("_default_");
+                    assertThat(term.value()).isEqualTo("fuzzy");
+                });
     }
 
     @Test
     void testRepeatedQuery() throws ParseException {
         final ParsedQuery parsedQuery = parser.parse("foo:bar AND foo:bar AND something:else");
         assertThat(parsedQuery.terms().size()).isEqualTo(3);
-        final List<ParsedTerm> fooTerms = parsedQuery.terms().stream().filter(t -> t.field().equals("foo")).collect(Collectors.toList());
-        assertThat(fooTerms.get(0).keyToken()).isNotEqualTo(fooTerms.get(1).keyToken());
+        assertThat(parsedQuery.terms())
+                .filteredOn(parsedTerm -> parsedTerm.field().equals("foo"))
+                .extracting(ParsedTerm::keyToken)
+                .extracting(Optional::get)
+                .hasSize(2)
+                .satisfies(keyTokens -> assertThat(keyTokens.get(0)).isNotEqualTo(keyTokens.get(1)));
     }
 
     @Test
