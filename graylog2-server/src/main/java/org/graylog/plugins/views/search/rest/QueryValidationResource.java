@@ -113,15 +113,18 @@ public class QueryValidationResource extends RestResource implements PluginRestR
 
     private ValidationMessageDTO toExplanation(ValidationMessage message) {
         final ValidationTypeDTO validationType = convert(message.validationType());
-        return ValidationMessageDTO.create(
+        final ValidationMessageDTO.Builder builder = ValidationMessageDTO.builder(
                 validationType,
-                message.position().beginLine(),
-                message.position().beginColumn(),
-                message.position().endLine(),
-                message.position().endColumn(),
-                message.errorMessage(),
-                message.relatedProperty()
-        );
+                message.errorMessage());
+
+        message.relatedProperty().ifPresent(builder::relatedProperty);
+        message.position().ifPresent(queryPosition -> {
+            builder.beginLine(queryPosition.beginLine());
+            builder.beginColumn(queryPosition.beginColumn());
+            builder.endLine(queryPosition.endLine());
+            builder.endColumn(queryPosition.endColumn());
+        });
+        return builder.build();
     }
 
     private ValidationTypeDTO convert(ValidationType validationType) {

@@ -182,4 +182,10 @@ class LuceneQueryParserTest {
         final List<ParsedTerm> fooTerms = parsedQuery.terms().stream().filter(t -> t.field().equals("foo")).collect(Collectors.toList());
         assertThat(fooTerms.get(0).keyToken()).isNotEqualTo(fooTerms.get(1).keyToken());
     }
+
+    @Test
+    void testOrQuery() throws ParseException {
+        final ParsedQuery query = parser.parse("unknown_field:(x OR y)");
+        System.out.println(query);
+    }
 }
