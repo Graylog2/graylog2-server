@@ -30,6 +30,7 @@ import org.apache.lucene.search.WildcardQuery;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public class TermCollectingQueryVisitor extends QueryVisitor {
 
     private final Analyzer analyzer;
     private final List<ParsedTerm> parsedTerms = new ArrayList<>();
-    private Map<Query, Collection<ImmutableToken>> tokenLookup;
+    private final Map<Query, Collection<ImmutableToken>> tokenLookup;
 
     public TermCollectingQueryVisitor(Analyzer analyzer, Map<Query, Collection<ImmutableToken>> tokenLookup) {
         this.analyzer = analyzer;
@@ -47,7 +48,7 @@ public class TermCollectingQueryVisitor extends QueryVisitor {
     @Override
     public void consumeTerms(Query query, Term... terms) {
         super.consumeTerms(query, terms);
-        final Collection<ImmutableToken> tokens = tokenLookup.get(query);
+        final Collection<ImmutableToken> tokens = tokenLookup.getOrDefault(query, Collections.emptySet());
         processTerms(tokens, terms);
     }
 

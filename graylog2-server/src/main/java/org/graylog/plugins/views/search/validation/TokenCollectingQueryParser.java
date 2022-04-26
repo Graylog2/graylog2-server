@@ -21,28 +21,37 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class TokenCollectingQueryParser extends QueryParser {
 
+    private final CollectingQueryParserTokenManager tokenManager;
     private final Set<ImmutableToken> processedTokens = new HashSet<>();
-    private final Map<Query, Collection<ImmutableToken>> tokenLookup = new LinkedHashMap<>();
+    private final Map<Query, Collection<ImmutableToken>> tokenLookup = new IdentityHashMap<>();
 
     public TokenCollectingQueryParser(String defaultFieldName, Analyzer analyzer) {
-        super(new CollectingQueryParserTokenManager(defaultFieldName, analyzer));
-        init(defaultFieldName, analyzer);
+        this(new CollectingQueryParserTokenManager(defaultFieldName, analyzer), defaultFieldName, analyzer);
     }
 
+    private TokenCollectingQueryParser(CollectingQueryParserTokenManager collectingQueryParserTokenManager, String defaultFieldName, Analyzer analyzer) {
+        super(collectingQueryParserTokenManager);
+        this.tokenManager = collectingQueryParserTokenManager;
+        this.init(defaultFieldName, analyzer);
+    }
+
+
     public List<ImmutableToken> getTokens() {
-        return ((CollectingQueryParserTokenManager) super.token_source).getTokens();
+        return tokenManager.getTokens();
     }
 
     public Map<Query, Collection<ImmutableToken>> getTokenLookup() {
@@ -99,6 +108,12 @@ public class TokenCollectingQueryParser extends QueryParser {
         return saveQueryLookupTokens(super.newRangeQuery(field, part1, part2, startInclusive, endInclusive));
     }
 
+    @Override
+    protected Query getBooleanQuery(List<BooleanClause> clauses) throws ParseException {
+        final Query delegate = super.getBooleanQuery(clauses);
+        return new FixedBooleanQuery((BooleanQuery) delegate);
+    }
+
     /**
      * This method persists all newly discovered tokens that may be referenced in the query to a lookup for
      * later processing. This is the only place that binds query and its tokens together.
@@ -106,11 +121,10 @@ public class TokenCollectingQueryParser extends QueryParser {
      * This would be also good place to collect all subqueries if needed for any feature.
      */
     private Query saveQueryLookupTokens(Query query) {
-        if (!tokenLookup.containsKey(query)) {
-            final List<ImmutableToken> tokens = ((CollectingQueryParserTokenManager) super.token_source).getTokens();
-            final Collection<ImmutableToken> subtract = CollectionUtils.subtract(tokens, processedTokens);
+        final Collection<ImmutableToken> tokens = CollectionUtils.subtract(tokenManager.getTokens(), processedTokens);
+        if (!tokenLookup.containsKey(query) && !tokens.isEmpty()) {
             processedTokens.addAll(tokens);
-            tokenLookup.put(query, subtract);
+            tokenLookup.put(query, tokens);
         }
         return query;
     }

@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.validation.ParsedQuery;
 import org.graylog.plugins.views.search.validation.ParsedTerm;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -172,5 +173,13 @@ class LuceneQueryParserTest {
         final ParsedTerm term = query.terms().iterator().next();
         assertThat(term.field()).isEqualTo("_default_");
         assertThat(term.value()).isEqualTo("fuzzy");
+    }
+
+    @Test
+    void testRepeatedQuery() throws ParseException {
+        final ParsedQuery parsedQuery = parser.parse("foo:bar AND foo:bar AND something:else");
+        assertThat(parsedQuery.terms().size()).isEqualTo(3);
+        final List<ParsedTerm> fooTerms = parsedQuery.terms().stream().filter(t -> t.field().equals("foo")).collect(Collectors.toList());
+        assertThat(fooTerms.get(0).keyToken()).isNotEqualTo(fooTerms.get(1).keyToken());
     }
 }
