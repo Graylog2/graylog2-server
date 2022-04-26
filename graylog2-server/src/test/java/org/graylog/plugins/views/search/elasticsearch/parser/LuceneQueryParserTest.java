@@ -186,6 +186,9 @@ class LuceneQueryParserTest {
     @Test
     void testOrQuery() throws ParseException {
         final ParsedQuery query = parser.parse("unknown_field:(x OR y)");
-        System.out.println(query);
+        assertThat(query.terms().size()).isEqualTo(2);
+        assertThat(query.terms())
+                .extracting(ParsedTerm::field)
+                .containsOnly("unknown_field");
     }
 }
