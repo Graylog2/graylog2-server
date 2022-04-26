@@ -18,6 +18,7 @@ package org.graylog.plugins.sidecar.rest.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.hash.Hashing;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,6 +43,7 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.utilities.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,8 +69,10 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -83,9 +87,11 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     private static final Pattern VALID_COLLECTOR_NAME_PATTERN = Pattern.compile("^[A-Za-z0-9_.-]+$");
     // exclude special characters from path ; * ? " < > | &
     private static final Pattern VALID_PATH_PATTERN = Pattern.compile("^[^;*?\"<>|&]+$");
-    private static final List<String> VALID_LINUX_SERVICE_TYPES = Arrays.asList("exec");
-    private static final List<String> VALID_WINDOWS_SERVICE_TYPES = Arrays.asList("exec", "svc");
-    private static final List<String> VALID_OPERATING_SYSTEMS = Arrays.asList("linux", "windows");
+    private static final Set<String> VALID_LINUX_SERVICE_TYPES = Collections.singleton("exec");
+    private static final Set<String> VALID_WINDOWS_SERVICE_TYPES = ImmutableSet.of("exec", "svc");
+    private static final Set<String> VALID_DARWIN_SERVICE_TYPES = Collections.singleton("exec");
+    private static final Set<String> VALID_FREEBSD_SERVICE_TYPES = Collections.singleton("exec");
+    private static final List<String> VALID_OPERATING_SYSTEMS = Arrays.asList("linux", "windows", "darwin", "freebsd");
 
     private final CollectorService collectorService;
     private final ConfigurationService configurationService;
@@ -298,10 +304,10 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
         if (toValidate.nodeOperatingSystem() != null) {
             if (!validateOperatingSystem(toValidate.nodeOperatingSystem())) {
-                validation.addError("node_operating_system", "Operating system can only be 'linux' or 'windows'.");
+                validation.addError("node_operating_system", StringUtils.f("Operating system can only be one of %s.", VALID_OPERATING_SYSTEMS));
             }
             if (!validateServiceType(toValidate.serviceType(), toValidate.nodeOperatingSystem())) {
-                validation.addError("service_type", "Linux collectors only support 'Foreground execution' while Windows collectors additionally support 'Windows service'.");
+                validation.addError("service_type", "Only Windows collectors support 'Windows service'.");
             }
             collectorOptional = Optional.ofNullable(collectorService.findByNameAndOs(toValidate.name(), toValidate.nodeOperatingSystem()));
         } else {
@@ -324,15 +330,13 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     private boolean validateServiceType(String type, String operatingSystem) {
         switch(operatingSystem) {
             case "linux":
-                if (VALID_LINUX_SERVICE_TYPES.contains(type)) {
-                    return true;
-                }
-                break;
+                return VALID_LINUX_SERVICE_TYPES.contains(type);
             case "windows":
-                if (VALID_WINDOWS_SERVICE_TYPES.contains(type)) {
-                    return true;
-                }
-                break;
+                return VALID_WINDOWS_SERVICE_TYPES.contains(type);
+            case "darwin":
+                return VALID_DARWIN_SERVICE_TYPES.contains(type);
+            case "freebsd":
+                return VALID_FREEBSD_SERVICE_TYPES.contains(type);
         }
         return false;
     }
