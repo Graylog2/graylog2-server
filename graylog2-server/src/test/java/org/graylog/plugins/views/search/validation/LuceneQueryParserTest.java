@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.elasticsearch.parser;
+package org.graylog.plugins.views.search.validation;
 
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.graylog.plugins.views.search.validation.ImmutableToken;
