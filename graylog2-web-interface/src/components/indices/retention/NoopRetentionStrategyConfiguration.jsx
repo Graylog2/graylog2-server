@@ -22,14 +22,13 @@ import { Alert } from 'components/bootstrap';
 const StyledAlert = styled(Alert)`
   overflow: auto;
 `;
-class NoopRetentionStrategyConfiguration extends React.Component {
-  render() {
-    return (
-      <StyledAlert>
-        This retention strategy is not configurable because it does not do anything.
-      </StyledAlert>
-    );
-  }
-}
+
+const NoopRetentionStrategyConfiguration = () => {
+  return (
+    <StyledAlert>
+      This retention strategy is not configurable because it does not do anything.
+    </StyledAlert>
+  );
+};
 
 export default NoopRetentionStrategyConfiguration;

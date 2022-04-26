@@ -15,47 +15,45 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 
+import { getValueFromInput } from 'util/FormsUtils';
 import { Input } from 'components/bootstrap';
 
-class DeletionRetentionStrategyConfiguration extends React.Component {
-  static propTypes = {
-    config: PropTypes.object.isRequired,
-    jsonSchema: PropTypes.object.isRequired,
-    updateConfig: PropTypes.func.isRequired,
-  };
+const DeletionRetentionStrategyConfiguration = ({ config, updateConfig }) => {
+  const { max_number_of_indices } = config;
+  const [maxNumberOfIndices, setMaxNumberOfIndices] = useState(max_number_of_indices);
 
-  state = {
-    max_number_of_indices: this.props.config.max_number_of_indices,
-  };
-
-  _onInputUpdate = (field) => {
+  const _onInputUpdate = (field) => {
     return (e) => {
       const update = {};
+      const value = getValueFromInput(e.target);
+      update[field] = value;
 
-      update[field] = e.target.value;
-
-      this.setState(update);
-      this.props.updateConfig(update);
+      setMaxNumberOfIndices(value);
+      updateConfig(update);
     };
   };
 
-  render() {
-    return (
-      <div>
-        <Input type="number"
-               id="max-number-of-indices"
-               label="Max number of indices"
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9"
-               onChange={this._onInputUpdate('max_number_of_indices')}
-               value={this.state.max_number_of_indices}
-               help={<span>Maximum number of indices to keep before <strong>deleting</strong> the oldest ones</span>}
-               required />
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <Input type="number"
+             id="max-number-of-indices"
+             label="Max number of indices"
+             labelClassName="col-sm-3"
+             wrapperClassName="col-sm-9"
+             onChange={_onInputUpdate('max_number_of_indices')}
+             value={maxNumberOfIndices}
+             help={<span>Maximum number of indices to keep before <strong>deleting</strong> the oldest ones</span>}
+             required />
+    </div>
+  );
+};
+
+DeletionRetentionStrategyConfiguration.propTypes = {
+  config: PropTypes.object.isRequired,
+  updateConfig: PropTypes.func.isRequired,
+};
 
 export default DeletionRetentionStrategyConfiguration;

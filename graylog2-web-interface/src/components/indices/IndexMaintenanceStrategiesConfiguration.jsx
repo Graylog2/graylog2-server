@@ -117,7 +117,6 @@ const IndexMaintenanceStrategiesConfiguration = ({ title, description, selectPla
     };
 
     const configuration = _addConfigType(newStrategy, newConfig);
-
     setValues({ ...values, ...getState(newStrategy, configuration) });
   }, [getState, newStrategy, setValues, strategies, values]);
 
