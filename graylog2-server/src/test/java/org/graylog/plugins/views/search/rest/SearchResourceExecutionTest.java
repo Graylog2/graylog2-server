@@ -63,9 +63,6 @@ public class SearchResourceExecutionTest {
     public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
-    private PermittedStreams permittedStreams;
-
-    @Mock
     private SearchJobService searchJobService;
 
     @Mock
@@ -73,9 +70,6 @@ public class SearchResourceExecutionTest {
 
     @Mock
     private QueryEngine queryEngine;
-
-    @Mock
-    private SearchDbService searchDbService;
 
     @Mock
     private SearchExecutionGuard executionGuard;
@@ -91,28 +85,20 @@ public class SearchResourceExecutionTest {
 
     private SearchResource searchResource;
 
-    class SearchTestResource extends SearchResource {
-        public SearchTestResource() {
-            super(searchDomain,
-                    new SearchExecutor(searchDomain,
-                            searchJobService,
-                            queryEngine,
-                            executionGuard,
-                            objectMapperProvider.get()),
-                    searchJobService,
-                    eventBus);
-        }
-
-        @Nullable
-        @Override
-        protected User getCurrentUser() {
-            return currentUser;
-        }
-    }
-
     @Before
     public void setUp() {
-        this.searchResource = new SearchTestResource();
+        final SearchExecutor searchExecutor = new SearchExecutor(searchDomain,
+                searchJobService,
+                queryEngine,
+                executionGuard,
+                objectMapperProvider.get());
+
+        this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus) {
+            @Override
+            protected User getCurrentUser() {
+                return currentUser;
+            }
+        };
     }
 
     @Test

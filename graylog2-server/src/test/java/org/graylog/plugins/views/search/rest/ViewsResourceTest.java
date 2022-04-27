@@ -77,9 +77,6 @@ public class ViewsResourceTest {
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
-
     @Mock
     private Subject subject;
 
@@ -174,8 +171,8 @@ public class ViewsResourceTest {
 
     @Test
     public void invalidObjectIdReturnsViewNotFoundException() {
-        expectedException.expect(NotFoundException.class);
-        this.viewsResource.get("invalid", searchUser);
+        assertThatThrownBy(() -> this.viewsResource.get("invalid", searchUser))
+                .isInstanceOf(NotFoundException.class);
     }
 
     @Test

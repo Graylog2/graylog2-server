@@ -42,6 +42,7 @@ import org.mockito.ArgumentCaptor;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -56,7 +57,6 @@ public class MessagesResourceTest {
 
     private MessagesResource sut;
     private User currentUser;
-    private PermittedStreams permittedStreams;
     private SearchExecutionGuard executionGuard;
     private CommandFactory commandFactory;
     @SuppressWarnings("UnstableApiUsage")
@@ -72,8 +72,7 @@ public class MessagesResourceTest {
         when(commandFactory.buildFromRequest(any())).thenReturn(ExportMessagesCommand.withDefaults());
         when(commandFactory.buildWithSearchOnly(any(), any())).thenReturn(ExportMessagesCommand.withDefaults());
         when(commandFactory.buildWithMessageList(any(), any(), any())).thenReturn(ExportMessagesCommand.withDefaults());
-        permittedStreams = mock(PermittedStreams.class);
-        when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("a-default-stream"));
+        final PermittedStreams permittedStreams = new PermittedStreams(() -> Stream.of("a-default-stream"));
         executionGuard = mock(SearchExecutionGuard.class);
         SearchDomain searchDomain = mock(SearchDomain.class);
 

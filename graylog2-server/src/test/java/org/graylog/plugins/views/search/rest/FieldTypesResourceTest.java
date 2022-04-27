@@ -21,53 +21,17 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class FieldTypesResourceTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Mock
-    private MappedFieldTypesService mappedFieldTypesService;
-
-    @Mock
-    private PermittedStreams permittedStreams;
-
-    @Captor
-    private ArgumentCaptor<Set<String>> streamIdCaptor;
-
-    @Captor
-    private ArgumentCaptor<TimeRange> timeRangeArgumentCaptor;
-
-    private FieldTypesResource fieldTypesResource;
-
-    @Before
-    public void setUp() throws Exception {
-        this.fieldTypesResource = new FieldTypesResource(mappedFieldTypesService);
-    }
 
     @Test
     public void allFieldTypesChecksPermissionsForStream() {
@@ -77,14 +41,12 @@ public class FieldTypesResourceTest {
                 .denyStream("2323")
                 .build();
 
-        final MappedFieldTypesService dependency = Mockito.mock(MappedFieldTypesService.class);
-        Mockito.when(dependency.fieldTypesByStreamIds(Mockito.any(), Mockito.any())).thenAnswer(invocation -> {
-            final Collection<String> streamIDs = invocation.getArgument(0);
+        final MappedFieldTypesService fieldTypesService = (streamIds, timeRange) -> {
             // for each streamID return a field that's called exactly like the streamID
-            return streamIDs.stream().map(streamID -> MappedFieldTypeDTO.create(streamID, FieldTypes.Type.builder().type("text").build())).collect(Collectors.toSet());
-        });
+            return streamIds.stream().map(streamID -> MappedFieldTypeDTO.create(streamID, FieldTypes.Type.builder().type("text").build())).collect(Collectors.toSet());
+        };
 
-        final FieldTypesResource resource = new FieldTypesResource(dependency);
+        final FieldTypesResource resource = new FieldTypesResource(fieldTypesService);
         final Set<MappedFieldTypeDTO> fields = resource.allFieldTypes(searchUser);
 
         // field for allowed stream has to be present
@@ -101,15 +63,24 @@ public class FieldTypesResourceTest {
                 .allowStream("4242")
                 .build();
 
-        when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("2323", "4242"));
+        final MappedFieldTypesService fieldTypesService = (streamIds, timeRange) -> {
+            if (ImmutableSet.of("2323", "4242").equals(streamIds) && timeRange.equals(RelativeRange.allTime())) {
+                return Collections.singleton(MappedFieldTypeDTO.create("foobar",
+                        FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
+            } else {
+                return Collections.emptySet();
+            }
+        };
 
-        final Set<MappedFieldTypeDTO> fieldTypes = Collections.singleton(MappedFieldTypeDTO.create("foobar",
-                FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
-        when(mappedFieldTypesService.fieldTypesByStreamIds(eq(ImmutableSet.of("2323", "4242")), eq(RelativeRange.allTime()))).thenReturn(fieldTypes);
+        final FieldTypesResource resource = new FieldTypesResource(fieldTypesService);
+        final Set<MappedFieldTypeDTO> result = resource.allFieldTypes(searchUser);
 
-        final Set<MappedFieldTypeDTO> result = this.fieldTypesResource.allFieldTypes(searchUser);
-
-        assertThat(result).isEqualTo(fieldTypes);
+        assertThat(result)
+                .hasSize(1)
+                .hasOnlyOneElementSatisfying(type -> {
+                    assertThat(type.name()).isEqualTo("foobar");
+                    assertThat(type.type().type()).isEqualTo("long");
+                });
     }
 
     @Test
@@ -121,14 +92,24 @@ public class FieldTypesResourceTest {
 
         final FieldTypesForStreamsRequest request = FieldTypesForStreamsRequest.Builder.builder()
                 .streams(ImmutableSet.of("2323", "4242"))
-                .timerange(RelativeRange.create(300))
+                .timerange(RelativeRange.create(250))
                 .build();
 
-        this.fieldTypesResource.byStreams(request, searchUser);
+        final MappedFieldTypesService mappedFieldTypesService = (streamIds, timeRange) -> {
+            if (timeRange.equals(RelativeRange.create(250))) {
+                return Collections.singleton(MappedFieldTypeDTO.create("foobar",
+                        FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
+            } else {
+                throw new AssertionError("Expected relative range of 250");
+            }
+        };
 
-        verify(this.mappedFieldTypesService, times(1)).fieldTypesByStreamIds(streamIdCaptor.capture(), timeRangeArgumentCaptor.capture());
+        final FieldTypesResource resource = new FieldTypesResource(mappedFieldTypesService);
+        final Set<MappedFieldTypeDTO> result = resource.byStreams(request, searchUser);
 
-        assertThat(timeRangeArgumentCaptor.getValue()).isEqualTo(RelativeRange.create(300));
+        assertThat(result)
+                .hasSize(1)
+                .hasOnlyOneElementSatisfying(type -> assertThat(type.name()).isEqualTo("foobar"));
     }
 
     @Test
@@ -138,28 +119,22 @@ public class FieldTypesResourceTest {
                 .allowStream("4242")
                 .build();
 
+        final FieldTypesForStreamsRequest req = FieldTypesForStreamsRequest.Builder.builder()
+                .streams(ImmutableSet.of("2323", "4242"))
+                .build();
 
-        final MappedFieldTypesService dependency = Mockito.mock(MappedFieldTypesService.class);
-        Mockito.when(dependency.fieldTypesByStreamIds(Mockito.any(), Mockito.any())).thenAnswer(invocation -> {
-            final Collection<String> streamIDs = invocation.getArgument(0);
+        final MappedFieldTypesService fieldTypesService = (streamIds, timeRange) -> {
             // for each streamID return a field that's called exactly like the streamID
-            return streamIDs.stream().map(streamID -> MappedFieldTypeDTO.create(streamID, FieldTypes.Type.builder().type("text").build())).collect(Collectors.toSet());
-        });
+            return streamIds.stream().map(streamID -> MappedFieldTypeDTO.create(streamID, FieldTypes.Type.builder().type("text").build())).collect(Collectors.toSet());
+        };
 
-        final FieldTypesResource resource = new FieldTypesResource(dependency);
+        final FieldTypesResource resource = new FieldTypesResource(fieldTypesService);
+        final Set<MappedFieldTypeDTO> fields = resource.byStreams(req, searchUser);
 
-        final Set<MappedFieldTypeDTO> fields = resource.byStreams(
-                FieldTypesForStreamsRequest.Builder.builder()
-                        .streams(ImmutableSet.of("2323", "4242"))
-                        .build(),
-                searchUser
-        );
-
-        // field for allowed stream has to be present
-        assertThat(fields.stream().anyMatch(f -> f.name().equals("2323"))).isTrue();
-        assertThat(fields.stream().anyMatch(f -> f.name().equals("4242"))).isTrue();
-
-
+        assertThat(fields)
+                .hasSize(2)
+                .extracting(MappedFieldTypeDTO::name)
+                .containsOnly("2323", "4242");
     }
 
     @Test
@@ -170,22 +145,28 @@ public class FieldTypesResourceTest {
                 .allowStream("4242")
                 .build();
 
-        final Set<MappedFieldTypeDTO> fieldTypes = Collections.singleton(MappedFieldTypeDTO.create("foobar",
-                FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
-        when(mappedFieldTypesService.fieldTypesByStreamIds(eq(ImmutableSet.of("2323", "4242")), eq(RelativeRange.allTime()))).thenReturn(fieldTypes);
+        final MappedFieldTypesService fieldTypesService = (streamIds, timeRange) -> {
+            if (ImmutableSet.of("2323", "4242").equals(streamIds) && timeRange.equals(RelativeRange.allTime())) {
+                return Collections.singleton(MappedFieldTypeDTO.create("foobar",
+                        FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
+            } else {
+                throw new AssertionError("Expected allTime range and 2323, 4242 stream IDs");
+            }
+        };
 
-        final Set<MappedFieldTypeDTO> result = this.fieldTypesResource.byStreams(
-                FieldTypesForStreamsRequest.Builder.builder()
-                        .streams(ImmutableSet.of("2323", "4242"))
-                        .build(),
+        final FieldTypesForStreamsRequest request = FieldTypesForStreamsRequest.Builder.builder()
+                .streams(ImmutableSet.of("2323", "4242"))
+                .build();
+
+        final Set<MappedFieldTypeDTO> result = new FieldTypesResource(fieldTypesService).byStreams(
+                request,
                 searchUser
         );
 
-        verify(mappedFieldTypesService, times(1)).fieldTypesByStreamIds(streamIdCaptor.capture(), timeRangeArgumentCaptor.capture());
-
-        assertThat(streamIdCaptor.getValue()).containsExactlyInAnyOrder("2323", "4242");
-        assertThat(timeRangeArgumentCaptor.getValue()).isEqualTo(RelativeRange.allTime());
-        assertThat(result).isEqualTo(fieldTypes);
+        assertThat(result)
+                .hasSize(1)
+                .extracting(MappedFieldTypeDTO::name)
+                .containsOnly("foobar");
     }
 
     @Test
@@ -196,13 +177,13 @@ public class FieldTypesResourceTest {
                 .allowStream("4242")
                 .build();
 
+        final FieldTypesForStreamsRequest req = FieldTypesForStreamsRequest.Builder.builder()
+                .streams(ImmutableSet.of("2323", "4242"))
+                .build();
+
+        final FieldTypesResource resource = new FieldTypesResource((streamIds, timeRange) -> Collections.emptySet());
         assertThatExceptionOfType(MissingStreamPermissionException.class)
-                .isThrownBy(() -> fieldTypesResource.byStreams(
-                        FieldTypesForStreamsRequest.Builder.builder()
-                                .streams(ImmutableSet.of("2323", "4242"))
-                                .build(),
-                        searchUser
-                ))
+                .isThrownBy(() -> resource.byStreams(req, searchUser))
                 .satisfies(ex -> assertThat(ex.streamsWithMissingPermissions()).contains("2323"));
     }
 

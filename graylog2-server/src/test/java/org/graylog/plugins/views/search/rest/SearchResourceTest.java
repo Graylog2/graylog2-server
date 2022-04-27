@@ -54,8 +54,7 @@ public class SearchResourceTest {
     @Mock
     private SearchJobService searchJobService;
 
-    @Mock
-    private SearchUser searchUser;
+    private final SearchUser searchUser = TestSearchUser.builder().build();
 
     @Mock
     private EventBus eventBus;
