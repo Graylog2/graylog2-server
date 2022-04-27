@@ -87,9 +87,10 @@ public class FieldValueTypeValidator implements QueryValidator {
                             .map(MappedFieldTypeDTO::type)
                             .map(FieldTypes.Type::type);
                     return typeName.flatMap(type -> fieldTypeValidation.validateFieldValueType(term, type))
-                            .map(validation -> validation.toBuilder()
-                                    .position(decorated.backtrackPosition(validation.position()))
-                                    .build());
+                            .map(validation -> validation.position()
+                                    .map(decorated::backtrackPosition)
+                                    .map(backtrackedPosition -> validation.toBuilder().position(backtrackedPosition).build())
+                                    .orElse(validation));
                 })
                 .filter(Optional::isPresent)
                 .map(Optional::get)

@@ -65,6 +65,6 @@ public class UnknownFieldsIdentifierTest {
         assertEquals(1, result.size());
         final ValidationMessage unknownTerm = result.iterator().next();
         assertThat(unknownTerm.validationType()).isEqualTo(ValidationType.UNKNOWN_FIELD);
-        assertThat(unknownTerm.relatedProperty()).isEqualTo("unknownField");
+        assertThat(unknownTerm.relatedProperty()).hasValue("unknownField");
     }
 }

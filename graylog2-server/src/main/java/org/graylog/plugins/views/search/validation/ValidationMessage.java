@@ -22,18 +22,18 @@ import org.graylog2.shared.utilities.ExceptionUtils;
 
 import javax.annotation.Nullable;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @AutoValue
 public abstract class ValidationMessage {
 
-    public abstract QueryPosition position();
+    public abstract Optional<QueryPosition> position();
 
     public abstract String errorMessage();
 
-    @Nullable
-    public abstract String relatedProperty();
+    public abstract Optional<String> relatedProperty();
 
     public abstract ValidationStatus validationStatus();
 
