@@ -81,10 +81,10 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
             validation.addError(FIELD_URL, "HTTP Notification url cannot be empty.");
         }
         if (Strings.isNullOrEmpty(apiKey()) && (apiSecret() != null && apiSecret().isSet())) {
-            validation.addError(FIELD_API_KEY, "HTTP Notification cannot specify API key value without API key");
+            validation.addError(FIELD_API_KEY, "HTTP Notification cannot specify API secret without API key");
         }
-        if (!Strings.isNullOrEmpty(apiKey()) && (apiSecret() == null || !apiSecret().isSet())) {
-            validation.addError(FIELD_API_SECRET, "HTTP Notification cannot specify API key without API key value");
+        if (!Strings.isNullOrEmpty(apiKey()) && (apiSecret() == null || (!apiSecret().isSet()) && !apiSecret().isKeepValue())) {
+            validation.addError(FIELD_API_SECRET, "HTTP Notification cannot specify API key without API secret");
         }
 
         return validation;

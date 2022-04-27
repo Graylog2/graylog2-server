@@ -30,6 +30,7 @@ import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationModelData;
 import org.graylog.events.notifications.EventNotificationService;
+import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.notifications.NotificationTestData;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
@@ -144,7 +145,7 @@ public class HTTPEventNotification implements EventNotification {
     }
 
     private String getBasicAuthHeaderValue(HTTPEventNotificationConfig config) {
-        if (config.basicAuth() == null || (!config.basicAuth().isSet())) {
+        if (config.basicAuth() == null || !config.basicAuth().isSet()) {
             return null;
         }
         String credentials = encryptedValueService.decrypt(config.basicAuth());
@@ -152,7 +153,7 @@ public class HTTPEventNotification implements EventNotification {
     }
 
     private  String getApiKeyValue(HTTPEventNotificationConfig config) {
-        if (config.apiSecret() == null || (!config.apiSecret().isSet())) {
+        if (config.apiSecret() == null || !config.apiSecret().isSet()) {
             return null;
         }
         return encryptedValueService.decrypt(config.apiSecret());

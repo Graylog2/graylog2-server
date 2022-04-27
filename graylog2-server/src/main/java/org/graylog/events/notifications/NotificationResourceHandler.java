@@ -88,6 +88,10 @@ public class NotificationResourceHandler {
         return dto;
     }
 
+    /**
+     * Allow subclass to modify the DTO prior to update or test execution.
+     * Mainly intended for handling encrypted values, which are not available to the UI.
+     */
     private NotificationDto prepareUpdate(NotificationDto newDto) {
         if (newDto.id() == null) {
             // It's not an update
@@ -189,11 +193,12 @@ public class NotificationResourceHandler {
      * @throws InternalServerErrorException if the notification definition failed to be executed
      */
     public void test(NotificationDto notificationDto, String userName) throws NotFoundException, InternalServerErrorException {
-        final EventNotification.Factory eventNotificationFactory = eventNotificationFactories.get(notificationDto.config().type());
+        NotificationDto dto = prepareUpdate(notificationDto);
+        final EventNotification.Factory eventNotificationFactory = eventNotificationFactories.get(dto.config().type());
         if (eventNotificationFactory == null) {
-            throw new NotFoundException("Couldn't find factory for notification type <" + notificationDto.config().type() + ">");
+            throw new NotFoundException("Couldn't find factory for notification type <" + dto.config().type() + ">");
         }
-        final EventNotificationContext notificationContext = NotificationTestData.getDummyContext(notificationDto, userName);
+        final EventNotificationContext notificationContext = NotificationTestData.getDummyContext(dto, userName);
         final EventNotification eventNotification = eventNotificationFactory.create();
         try {
             eventNotification.execute(notificationContext);
