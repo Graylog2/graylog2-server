@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useContext, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
+import { chunk } from 'lodash';
 
 import ColorPicker from 'components/common/ColorPicker';
 import Value from 'views/components/Value';
@@ -82,6 +83,7 @@ type Props = {
   children: React.ReactNode,
   config: AggregationWidgetConfig,
   chartData: any,
+  fieldMapper?: (isFunction: boolean) => string,
   labelMapper?: (data: Array<any>) => Array<string> | undefined | null,
   neverHide?: boolean,
 };
@@ -93,8 +95,8 @@ type ColorPickerConfig = {
 
 const isLabelAFunction = (label: string, series: Series) => series.function === label || series.config.name === label;
 
-const legendField = (columnPivots: Array<Pivot>, rowPivots: Array<Pivot>, neverHide: boolean, series: Array<Series>, value: string) => {
-  if (columnPivots.length === 1 && series.length === 1 && !isLabelAFunction(value, series[0])) {
+const legendField = (columnPivots: Array<Pivot>, rowPivots: Array<Pivot>, series: Array<Series>, neverHide: boolean, isFunction: boolean) => {
+  if (columnPivots.length === 1 && series.length === 1 && !isFunction) {
     return columnPivots[0].field;
   }
 
@@ -107,50 +109,26 @@ const legendField = (columnPivots: Array<Pivot>, rowPivots: Array<Pivot>, neverH
 
 const defaultLabelMapper = (data: Array<{ name: string }>) => data.map(({ name }) => name);
 
-const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMapper, neverHide }: Props) => {
+const stringLenSort = (s1: string, s2: string) => {
+  if (s1.length < s2.length) {
+    return -1;
+  }
+
+  if (s1.length === s2.length) {
+    return 0;
+  }
+
+  return 1;
+};
+
+const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMapper, fieldMapper, neverHide }: Props) => {
   const [colorPickerConfig, setColorPickerConfig] = useState<ColorPickerConfig | undefined>();
   const { rowPivots, columnPivots, series } = config;
   const labels: Array<string> = labelMapper(chartData);
   const { activeQuery } = useStore(CurrentViewStateStore);
   const { colors, setColor } = useContext(ChartColorContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
-
-  const chunkCells = (cells, columnCount) => {
-    const { length } = cells;
-    let rowCount;
-
-    if (length <= columnCount) {
-      rowCount = 1;
-    } else {
-      rowCount = Math.round(length / columnCount) + 1;
-    }
-
-    const result = new Array(rowCount);
-
-    for (let row = 0; row < rowCount; row += 1) {
-      result[row] = [];
-
-      for (let column = 0; column < columnCount; column += 1) {
-        if (cells[(rowCount * column) + row]) {
-          result[row][column] = cells[(rowCount * column) + row];
-        }
-      }
-    }
-
-    return result;
-  };
-
-  const stringLenSort = (s1: string, s2: string) => {
-    if (s1.length < s2.length) {
-      return -1;
-    }
-
-    if (s1.length === s2.length) {
-      return 0;
-    }
-
-    return 1;
-  };
+  const defaultFieldMapper = useCallback((isFunction: boolean) => legendField(columnPivots, rowPivots, series, !neverHide, isFunction), [columnPivots, neverHide, rowPivots, series]);
 
   const _onCloseColorPicker = useCallback(() => setColorPickerConfig(undefined), [setColorPickerConfig]);
 
@@ -164,12 +142,14 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
   }, [setColor]);
 
   if (!neverHide && (!focusedWidget || !focusedWidget.editing) && series.length <= 1 && columnPivots.length <= 0) {
+    // eslint-disable-next-line react/jsx-no-useless-fragment
     return <>{children}</>;
   }
 
   const tableCells = labels.sort(stringLenSort).map((value) => {
     const defaultColor = value === eventsDisplayName ? EVENT_COLOR : undefined;
-    const field = legendField(columnPivots, rowPivots, !neverHide, series, value);
+    const isFunction = isLabelAFunction(value, series[0]);
+    const field = (fieldMapper ?? defaultFieldMapper)(isFunction);
     const val = field !== null ? <Value type={FieldType.Unknown} value={value} field={field} queryId={activeQuery}>{value}</Value> : value;
 
     return (
@@ -184,7 +164,7 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
     );
   });
 
-  const result = chunkCells(tableCells, 5).map((cells, index) => (
+  const result = chunk(tableCells, 5).map((cells, index) => (
     // eslint-disable-next-line react/no-array-index-key
     <LegendRow key={index}>
       {cells}
@@ -217,6 +197,7 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
 };
 
 PlotLegend.defaultProps = {
+  fieldMapper: undefined,
   labelMapper: defaultLabelMapper,
   neverHide: false,
 };
