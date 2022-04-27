@@ -35,7 +35,7 @@ const extractDecorators = ({
   fieldValue,
   formatTime,
   fieldTypes,
-  highlightingRules,
+  highlightingRules = [],
 }: {
   fieldName: string,
   fieldValue: any,
