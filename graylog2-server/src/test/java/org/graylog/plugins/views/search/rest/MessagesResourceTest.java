@@ -64,7 +64,6 @@ public class MessagesResourceTest {
 
     @BeforeEach
     void setUp() {
-        GuiceInjectorHolder.createInjector(Collections.emptyList());
         currentUser = mock(User.class);
         when(currentUser.getName()).thenReturn("peterchen");
         MessagesExporter exporter = mock(MessagesExporter.class);

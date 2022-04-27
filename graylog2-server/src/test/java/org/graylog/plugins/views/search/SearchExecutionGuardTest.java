@@ -57,8 +57,6 @@ public class SearchExecutionGuardTest {
 
     @Before
     public void setUp() throws Exception {
-        GuiceInjectorHolder.createInjector(Collections.emptyList());
-
         providedCapabilities = new HashMap<>();
         providedCapabilities.put("my only capability", mock(PluginMetaData.class));
         sut = new SearchExecutionGuard(providedCapabilities);

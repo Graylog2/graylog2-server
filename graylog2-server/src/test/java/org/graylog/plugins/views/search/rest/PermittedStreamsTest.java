@@ -18,7 +18,7 @@ package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.plugin.streams.Stream.NON_MESSAGE_STREAM_IDS;

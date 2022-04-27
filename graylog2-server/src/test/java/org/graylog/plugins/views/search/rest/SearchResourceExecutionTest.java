@@ -24,22 +24,18 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.MockitoAnnotations;
 
-import javax.annotation.Nullable;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.core.Response;
 import java.util.Optional;
@@ -58,9 +54,6 @@ import static org.mockito.Mockito.when;
 
 public class SearchResourceExecutionTest {
     private static final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
     private SearchJobService searchJobService;
@@ -85,8 +78,9 @@ public class SearchResourceExecutionTest {
 
     private SearchResource searchResource;
 
-    @Before
+    @BeforeEach
     public void setUp() {
+        MockitoAnnotations.openMocks(this);
         final SearchExecutor searchExecutor = new SearchExecutor(searchDomain,
                 searchJobService,
                 queryEngine,

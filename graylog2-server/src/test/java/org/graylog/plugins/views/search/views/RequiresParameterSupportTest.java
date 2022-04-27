@@ -21,14 +21,10 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequiresParameterSupport;
 import org.graylog.plugins.views.search.ValueParameter;
 import org.graylog.plugins.views.search.db.SearchDbService;
-import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.MockitoAnnotations;
 
 import java.util.AbstractMap;
 import java.util.Collections;
@@ -36,14 +32,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 public class RequiresParameterSupportTest {
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
-
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private SearchDbService searchDbService;
@@ -52,8 +44,9 @@ public class RequiresParameterSupportTest {
 
     private ViewDTO view;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
         this.requiresParameterSupport = new RequiresParameterSupport(searchDbService, new SearchRequiresParameterSupport(new EnterpriseMetadataSummary()));
 
         this.view = ViewDTO.builder()
@@ -65,15 +58,12 @@ public class RequiresParameterSupportTest {
 
     @Test
     public void throwsExceptionIfSearchIsMissing() {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage(Matchers.allOf(
-                Matchers.startsWith("Search searchId for view"),
-                Matchers.endsWith("is missing.")
-        ));
-
         when(searchDbService.get("searchId")).thenReturn(Optional.empty());
 
-        this.requiresParameterSupport.test(view);
+        assertThatThrownBy(() -> this.requiresParameterSupport.test(view))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageStartingWith("Search searchId for view")
+                .hasMessageEndingWith("is missing.");
     }
 
     @Test

@@ -20,8 +20,7 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.QualifyingViewsService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewParameterSummaryDTO;
-import org.junit.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.List;
@@ -99,12 +98,12 @@ public class QualifyingViewsResourceTest {
 
     private QualifyingViewsService mockViewsService(String... viewIDs) {
         final QualifyingViewsService service = mock(QualifyingViewsService.class);
-        final List<ViewParameterSummaryDTO> views = Stream.of(viewIDs).map(this::createView).collect(Collectors.toList());
-        Mockito.when(service.forValue()).thenReturn(views);
+        final List<ViewParameterSummaryDTO> views = Stream.of(viewIDs).map(this::mockView).collect(Collectors.toList());
+        when(service.forValue()).thenReturn(views);
         return service;
     }
 
-    private ViewParameterSummaryDTO createView(String id) {
+    private ViewParameterSummaryDTO mockView(String id) {
         final ViewParameterSummaryDTO view = mock(ViewParameterSummaryDTO.class);
         when(view.id()).thenReturn(id);
         when(view.type()).thenReturn(ViewDTO.Type.SEARCH);

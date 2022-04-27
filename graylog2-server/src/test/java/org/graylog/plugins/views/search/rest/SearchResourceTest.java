@@ -24,16 +24,15 @@ import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import javax.ws.rs.NotFoundException;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -64,9 +63,9 @@ public class SearchResourceTest {
 
     private SearchResource searchResource;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        GuiceInjectorHolder.createInjector(Collections.emptyList());
+        MockitoAnnotations.openMocks(this);
         this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
     }
 

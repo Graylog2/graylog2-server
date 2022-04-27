@@ -26,14 +26,12 @@ import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.rest.resources.RestResourceBaseTest;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.MockitoAnnotations;
 
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
@@ -51,8 +49,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class SearchExecutorTest extends RestResourceBaseTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private SearchDomain searchDomain;
@@ -71,8 +67,9 @@ public class SearchExecutorTest extends RestResourceBaseTest {
 
     private SearchExecutor searchExecutor;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         this.searchExecutor = new SearchExecutor(searchDomain, searchJobService, queryEngine, searchExecutionGuard, objectMapper);
     }

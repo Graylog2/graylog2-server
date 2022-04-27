@@ -22,7 +22,7 @@ import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Set;
@@ -97,8 +97,9 @@ public class FieldTypesResourceTest {
 
         final MappedFieldTypesService mappedFieldTypesService = (streamIds, timeRange) -> {
             if (timeRange.equals(RelativeRange.create(250))) {
-                return Collections.singleton(MappedFieldTypeDTO.create("foobar",
-                        FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
+                final FieldTypes.Type fieldType = FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"));
+                final MappedFieldTypeDTO field = MappedFieldTypeDTO.create("foobar", fieldType);
+                return Collections.singleton(field);
             } else {
                 throw new AssertionError("Expected relative range of 250");
             }
@@ -125,7 +126,9 @@ public class FieldTypesResourceTest {
 
         final MappedFieldTypesService fieldTypesService = (streamIds, timeRange) -> {
             // for each streamID return a field that's called exactly like the streamID
-            return streamIds.stream().map(streamID -> MappedFieldTypeDTO.create(streamID, FieldTypes.Type.builder().type("text").build())).collect(Collectors.toSet());
+            return streamIds.stream()
+                    .map(streamID -> MappedFieldTypeDTO.create(streamID, FieldTypes.Type.builder().type("text").build()))
+                    .collect(Collectors.toSet());
         };
 
         final FieldTypesResource resource = new FieldTypesResource(fieldTypesService);
@@ -147,8 +150,9 @@ public class FieldTypesResourceTest {
 
         final MappedFieldTypesService fieldTypesService = (streamIds, timeRange) -> {
             if (ImmutableSet.of("2323", "4242").equals(streamIds) && timeRange.equals(RelativeRange.allTime())) {
-                return Collections.singleton(MappedFieldTypeDTO.create("foobar",
-                        FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
+                final FieldTypes.Type fieldType = FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"));
+                final MappedFieldTypeDTO field = MappedFieldTypeDTO.create("foobar", fieldType);
+                return Collections.singleton(field);
             } else {
                 throw new AssertionError("Expected allTime range and 2323, 4242 stream IDs");
             }
