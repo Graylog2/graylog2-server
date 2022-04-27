@@ -43,7 +43,7 @@ public class QualifyingViewsServiceTest {
 
     @Test
     public void returnEmptyListWhenNoSearchesWithParametersArePresent() {
-        final ViewDTO view1 = createView("a-view");
+        final ViewDTO view1 = createView("a-view", "viewWithParameter");
 
         final Search search = Search.builder()
                 .parameters(ImmutableSet.of())
@@ -58,11 +58,11 @@ public class QualifyingViewsServiceTest {
     @Test
     public void returnViewWhenSearchWithParametersIsPresent() {
         final Search search = Search.builder()
-                .id("streamWithParameter")
+                .id("searchWithParameter")
                 .parameters(ImmutableSet.of(ValueParameter.any("foobar")))
                 .build();
 
-        final ViewDTO view1 = createView("streamWithParameter");
+        final ViewDTO view1 = createView("searchWithParameter", "viewWithParameter");
 
         final QualifyingViewsService service = new QualifyingViewsService(mockSearchService(search), mockViewService(view1));
         final Collection<ViewParameterSummaryDTO> result = service.forValue();
@@ -80,7 +80,7 @@ public class QualifyingViewsServiceTest {
     @Test
     public void returnViewWhenBothSearchesWithAndWithoutParametersIsPresent() {
         final Search search1 = Search.builder()
-                .id("streamWithParameter")
+                .id("searchWithParameter")
                 .parameters(ImmutableSet.of(ValueParameter.any("foobar")))
                 .build();
 
@@ -88,8 +88,8 @@ public class QualifyingViewsServiceTest {
                 .parameters(ImmutableSet.of())
                 .build();
 
-        final ViewDTO view1 = createView("streamWithParameter");
-        final ViewDTO view2 = createView("anotherView");
+        final ViewDTO view1 = createView("searchWithParameter", "viewWithParameter");
+        final ViewDTO view2 = createView("anotherView", "viewWithParameter");
 
         final QualifyingViewsService service = new QualifyingViewsService(
                 mockSearchService(search1, search2),
@@ -108,10 +108,10 @@ public class QualifyingViewsServiceTest {
                 );
     }
 
-    private ViewDTO createView(String searchId) {
+    private ViewDTO createView(String searchId, String viewId) {
         return ViewDTO.builder()
                 .searchId(searchId)
-                .id("viewWithParameter")
+                .id(viewId)
                 .type(ViewDTO.Type.SEARCH)
                 .title("My View")
                 .summary("My Summary")
