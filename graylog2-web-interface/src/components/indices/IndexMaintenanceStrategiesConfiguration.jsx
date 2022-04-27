@@ -24,6 +24,7 @@ import { Input, Alert } from 'components/bootstrap';
 import { Select, Icon } from 'components/common';
 
 const TIME_BASED_ROTATION_STRATEGY = 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy';
+const NOOP_RETENTION_STRATEGY = 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy';
 
 const StyledH3 = styled.h3`
   margin-bottom: 10px;
@@ -88,7 +89,7 @@ const _getConfigurationComponent = (selectedStrategy, pluginExports, strategies,
 
 const IndexMaintenanceStrategiesConfiguration = ({ title, description, selectPlaceholder, pluginExports, strategies, retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod }, activeConfig: { strategy, config }, getState }) => {
   const [newStrategy, setNewStrategy] = useState(strategy);
-  const { setValues, values, values: { rotation_strategy_class: rotationStrategyClass } } = useFormikContext();
+  const { setValues, values, values: { rotation_strategy_class: rotationStrategyClass, retention_strategy_class: retentionStrategyClass } } = useFormikContext();
 
   const _onSelect = (selectedStrategy) => {
     if (!selectedStrategy || selectedStrategy.length < 1) {
@@ -132,13 +133,16 @@ const IndexMaintenanceStrategiesConfiguration = ({ title, description, selectPla
     return newStrategy;
   };
 
+  const retentionIsNotNoop = retentionStrategyClass !== NOOP_RETENTION_STRATEGY;
+  const shouldShowMaxRetentionWarning = maxRetentionPeriod && rotationStrategyClass === TIME_BASED_ROTATION_STRATEGY && retentionIsNotNoop;
+
   return (
     <span>
       <StyledH3>{title}</StyledH3>
       <StyledAlert>
         <Icon name="info-circle" />{' '} {description}
       </StyledAlert>
-      {maxRetentionPeriod && rotationStrategyClass === TIME_BASED_ROTATION_STRATEGY && (
+      {shouldShowMaxRetentionWarning && (
       <StyledAlert bsStyle="warning">
         <Icon name="exclamation-triangle" />{' '} The effective retention period value calculated from the <b>Rotation period</b> and the
         <b> max number of indices</b> should not be greater than the <b>Max retention period</b> of <b>{maxRetentionPeriod}</b> set by the Administrator.
