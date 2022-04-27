@@ -387,6 +387,8 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     valueRenderer: undefined,
     menuPlacement: 'auto',
     maxMenuHeight: 300,
+    menuPortalTarget: undefined,
+    ref: undefined,
   };
 
   constructor(props: Props<OptionValue>) {
