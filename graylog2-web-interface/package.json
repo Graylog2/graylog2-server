@@ -51,7 +51,7 @@
     "@react-bootstrap/pagination": "^1.0.0",
     "@react-hook/resize-observer": "^1.2.5",
     "@types/react-color": "^3.0.5",
-    "ace-builds": "1.4.13",
+    "ace-builds": "1.4.14",
     "bluebird": "^3.4.0",
     "bootstrap": "3.4.1",
     "bson-objectid": "^1.2.5",
