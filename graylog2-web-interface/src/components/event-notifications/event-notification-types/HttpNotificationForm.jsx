@@ -130,7 +130,8 @@ class HttpNotificationForm extends React.Component {
                            validationState={validation.errors.url ? 'error' : null}
                            validationMessage={lodash.get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs.')}
                            onValidationChange={this.onValidationChange}
-                           url={config.url} />
+                           url={config.url}
+                           autofocus={false} />
         <Row>
           <Col md={12}>
             {basic_auth?.keep_value ? (

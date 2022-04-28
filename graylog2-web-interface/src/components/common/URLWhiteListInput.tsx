@@ -35,9 +35,10 @@ type Props = {
   labelClassName: string,
   wrapperClassName: string,
   urlType: React.ComponentProps<typeof URLWhiteListFormModal>['urlType'],
+  autofocus: boolean,
 };
 
-const URLWhiteListInput = ({ label, onChange, validationMessage, validationState, url, onValidationChange, labelClassName, wrapperClassName, urlType }: Props) => {
+const URLWhiteListInput = ({ label, onChange, validationMessage, validationState, url, onValidationChange, labelClassName, wrapperClassName, urlType, autofocus }: Props) => {
   const [isWhitelisted, setIsWhitelisted] = useState(false);
   const [currentValidationState, setCurrentValidationState] = useState(validationState);
   const [ownValidationMessage, setOwnValidationMessage] = useState(validationMessage);
@@ -116,7 +117,7 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
            name="url"
            label={label}
            ref={urlInputRef}
-           autoFocus
+           autoFocus={autofocus}
            required
            onChange={onChange}
            help={helpMessage}
@@ -128,6 +129,7 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
 };
 
 URLWhiteListInput.propTypes = {
+  autofocus: PropTypes.bool,
   label: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   validationState: PropTypes.string,
@@ -143,6 +145,7 @@ URLWhiteListInput.propTypes = {
 };
 
 URLWhiteListInput.defaultProps = {
+  autofocus: true,
   url: '',
   validationState: '',
   validationMessage: '',
