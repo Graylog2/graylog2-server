@@ -95,7 +95,7 @@
     "react-mops": "v2.0.0-beta.0",
     "react-overlays": "^0.7.0",
     "react-plotly.js": "2.5.1",
-    "react-resizable": "^1.8.0",
+    "react-resizable": "^3.0.4",
     "react-rnd": "^10.1.1",
     "react-select": "4.3.0",
     "react-sortable-hoc": "^1.7.1",
