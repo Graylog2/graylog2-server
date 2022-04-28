@@ -27,6 +27,7 @@ module.exports = {
     require.resolve('./lib/setup-files/mock-IntersectionObserver.js'),
     require.resolve('./lib/setup-files/mock-moment-timezone.js'),
     require.resolve('./lib/setup-files/console-warnings-fail-tests.js'),
+    require.resolve('./lib/setup-files/mock-crypto-getrandomvalues.js'),
     'jest-canvas-mock',
   ],
   setupFilesAfterEnv: [
