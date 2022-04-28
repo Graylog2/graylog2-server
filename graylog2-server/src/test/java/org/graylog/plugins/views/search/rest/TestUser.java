@@ -14,19 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin.indexer.searches.timeranges;
+package org.graylog.plugins.views.search.rest;
 
-public class InvalidRangeParametersException extends RuntimeException {
-    public InvalidRangeParametersException() {
-        super();
+import org.graylog2.plugin.database.users.User;
+import org.mockito.Mockito;
+
+public class TestUser {
+
+    private String username;
+
+    public static TestUser builder() {
+        return new TestUser();
     }
 
-    public InvalidRangeParametersException(String msg) {
-        super(msg);
+    public TestUser withUsername(final String username) {
+        this.username = username;
+        return this;
     }
 
-    public InvalidRangeParametersException(String message, Throwable cause) {
-        super(message, cause);
+    public User build() {
+        final User user = Mockito.mock(User.class);
+        Mockito.when(user.getName()).thenReturn(username);
+        return user;
     }
 }
-

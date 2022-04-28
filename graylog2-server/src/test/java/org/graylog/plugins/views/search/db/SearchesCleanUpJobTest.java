@@ -25,13 +25,15 @@ import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,7 +46,6 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -52,11 +53,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith({MockitoExtension.class})
+@MockitoSettings(strictness = Strictness.WARN)
 public class SearchesCleanUpJobTest {
     public static final String IN_USE_SEARCH_ID = "This search is in use";
     public static final String IN_USE_RESOLVER_SEARCH_ID = "in-use-resolver-search-id";
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private ViewSummaryService viewService;
@@ -66,7 +67,7 @@ public class SearchesCleanUpJobTest {
 
     private SearchesCleanUpJob searchesCleanUpJob;
 
-    @Before
+    @BeforeEach
     public void setup() {
         this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4), testViewResolvers());
     }
@@ -97,10 +98,13 @@ public class SearchesCleanUpJobTest {
     public void testForNonexpiredSearches() {
         when(viewService.streamAll()).thenReturn(Stream.empty());
 
-        final Search search1 = mock(Search.class);
-        when(search1.createdAt()).thenReturn(DateTime.now(DateTimeZone.UTC).minus(Duration.standardDays(1)));
-        final Search search2 = mock(Search.class);
-        when(search2.createdAt()).thenReturn(DateTime.now(DateTimeZone.UTC).minus(Duration.standardHours(4)));
+        final Search search1 = Search.builder()
+                .createdAt(DateTime.now(DateTimeZone.UTC).minus(Duration.standardDays(1)))
+                .build();
+
+        final Search search2 = Search.builder()
+                .createdAt(DateTime.now(DateTimeZone.UTC).minus(Duration.standardHours(4)))
+                .build();
 
         when(searchDbService.streamAll()).thenReturn(Stream.of(search1, search2));
 
@@ -111,13 +115,17 @@ public class SearchesCleanUpJobTest {
 
     @Test
     public void testForReferencedSearches() {
-        final ViewSummaryDTO view = mock(ViewSummaryDTO.class);
-        when(view.searchId()).thenReturn(IN_USE_SEARCH_ID);
+        final ViewSummaryDTO view = ViewSummaryDTO.builder()
+                .title("my-view")
+                .searchId(IN_USE_SEARCH_ID)
+                .build();
+
         when(viewService.streamAll()).thenReturn(Stream.of(view));
 
-        final Search search = mock(Search.class);
-        when(search.createdAt()).thenReturn(DateTime.now(DateTimeZone.UTC).minus(Duration.standardDays(30)));
-        when(search.id()).thenReturn(IN_USE_SEARCH_ID);
+        final Search search = Search.builder()
+                .id(IN_USE_SEARCH_ID)
+                .createdAt(DateTime.now(DateTimeZone.UTC).minus(Duration.standardDays(30)))
+                .build();
 
         when(searchDbService.streamAll()).thenReturn(Stream.of(search));
 
@@ -126,28 +134,34 @@ public class SearchesCleanUpJobTest {
         // Verify that search ids for standard views and resolved views are passed in as neverDeleteIds.
         final ArgumentCaptor<HashSet<String>> searchIdsCaptor = ArgumentCaptor.forClass((Class) Set.class);
         verify(searchDbService, times(1)).getExpiredSearches(searchIdsCaptor.capture(), any());
-        assertTrue(searchIdsCaptor.getValue().contains(IN_USE_SEARCH_ID));
-        assertTrue(searchIdsCaptor.getValue().contains(IN_USE_RESOLVER_SEARCH_ID));
+        assertThat(searchIdsCaptor.getValue().contains(IN_USE_SEARCH_ID)).isTrue();
+        assertThat(searchIdsCaptor.getValue().contains(IN_USE_RESOLVER_SEARCH_ID)).isTrue();
 
         verify(searchDbService, never()).delete(any());
     }
 
     @Test
     public void testForMixedReferencedNonReferencedExpiredAndNonexpiredSearches() {
-        final ViewSummaryDTO view = mock(ViewSummaryDTO.class);
-        when(view.searchId()).thenReturn(IN_USE_SEARCH_ID);
+        final ViewSummaryDTO view = ViewSummaryDTO.builder()
+                .title("my-view")
+                .searchId(IN_USE_SEARCH_ID)
+                .build();
+
         when(viewService.streamAll()).thenReturn(Stream.of(view));
 
-        final SearchSummary search1 = mock(SearchSummary.class);
-        when(search1.createdAt()).thenReturn(DateTime.now(DateTimeZone.UTC).minus(Duration.standardDays(30)));
-        when(search1.id()).thenReturn(IN_USE_SEARCH_ID);
+        final SearchSummary search1 = SearchSummary.builder()
+                .id(IN_USE_SEARCH_ID)
+                .createdAt(DateTime.now(DateTimeZone.UTC).minus(Duration.standardDays(30)))
+                .build();
 
-        final SearchSummary search2 = mock(SearchSummary.class);
-        when(search2.createdAt()).thenReturn(DateTime.now(DateTimeZone.UTC).minus(Duration.standardHours(2)));
+        final SearchSummary search2 = SearchSummary.builder()
+                .createdAt(DateTime.now(DateTimeZone.UTC).minus(Duration.standardHours(2)))
+                .build();
 
-        final SearchSummary search3 = mock(SearchSummary.class);
-        when(search3.createdAt()).thenReturn(DateTime.now(DateTimeZone.UTC).minus(Duration.standardDays(30)));
-        when(search3.id()).thenReturn("This search is expired and should be deleted");
+        final SearchSummary search3 = SearchSummary.builder()
+                .id("This search is expired and should be deleted")
+                .createdAt(DateTime.now(DateTimeZone.UTC).minus(Duration.standardDays(30)))
+                .build();
 
         when(searchDbService.findSummaries()).thenReturn(Stream.of(search1, search2, search3));
         when(searchDbService.getExpiredSearches(any(), any())).thenCallRealMethod();
@@ -163,9 +177,11 @@ public class SearchesCleanUpJobTest {
     public void testForEmptyViews() {
         when(viewService.streamAll()).thenReturn(Stream.empty());
 
-        final SearchSummary search = mock(SearchSummary.class);
-        when(search.createdAt()).thenReturn(DateTime.now(DateTimeZone.UTC).minus(Duration.standardDays(30)));
-        when(search.id()).thenReturn("This search is expired and should be deleted");
+        final SearchSummary search = SearchSummary.builder()
+                .id("This search is expired and should be deleted")
+                .createdAt(DateTime.now(DateTimeZone.UTC).minus(Duration.standardDays(30)))
+                .build();
+
         when(searchDbService.findSummaries()).thenReturn(Stream.of(search));
         when(searchDbService.getExpiredSearches(any(), any())).thenCallRealMethod();
 
