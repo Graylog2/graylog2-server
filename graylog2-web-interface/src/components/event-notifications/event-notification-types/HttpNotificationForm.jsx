@@ -17,10 +17,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
+import styled from 'styled-components';
 
 import { URLWhiteListInput } from 'components/common';
-import { Button, Col, Input, Row } from 'components/bootstrap';
+import { Button, Col, ControlLabel, Input, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
+
+const StyledButton = styled(Button)`
+  clear: both;
+  display: block;
+  margin-bottom: 15px;
+`;
 
 class HttpNotificationForm extends React.Component {
   static propTypes = {
@@ -43,6 +50,10 @@ class HttpNotificationForm extends React.Component {
     this.state = {
       api_secret: '',
       basic_auth: '',
+      reset: {
+        api_secret: false,
+        basic_auth: false,
+      },
     };
   }
 
@@ -90,11 +101,19 @@ class HttpNotificationForm extends React.Component {
   };
 
   resetSecret = (attribute) => {
+    const { reset } = this.state;
+    reset[attribute] = true;
+    this.setState({ reset });
+
     this.propagateChange(attribute, { delete_value: true });
     this.setState({ [attribute]: '' });
   };
 
   undoResetSecret = (attribute) => {
+    const { reset } = this.state;
+    reset[attribute] = false;
+    this.setState({ reset });
+
     this.propagateChange(attribute, { keep_value: true });
     this.setState({ [attribute]: '******' });
   };
@@ -102,8 +121,7 @@ class HttpNotificationForm extends React.Component {
   render() {
     const { config, validation } = this.props;
     const { api_secret, basic_auth } = config;
-    const basicAuthColumnSize = basic_auth?.keep_value || basic_auth?.delete_value ? 10 : 12;
-    const apiSecretColumnSize = api_secret?.keep_value || api_secret?.delete_value ? 10 : 12;
+    const { reset } = this.state;
 
     return (
       <>
@@ -114,62 +132,66 @@ class HttpNotificationForm extends React.Component {
                            onValidationChange={this.onValidationChange}
                            url={config.url} />
         <Row>
-          <Col md={basicAuthColumnSize}>
-            <Input id="basicAuth"
-                   onChange={this.handleSecretInputChange}
-                   label="Basic Authentication"
-                   type="password"
-                   name="basic_auth"
-                   value={this.state.basic_auth || ''} />
+          <Col md={12}>
+            {basic_auth?.keep_value ? (
+              <>
+                <ControlLabel>Basic Authentication</ControlLabel>
+                <StyledButton bsStyle="danger" type="button" onClick={() => { this.resetSecret('basic_auth'); }}>
+                  Reset Secret
+                </StyledButton>
+              </>
+            ) : (
+              <Input id="basicAuth"
+                     label="Basic Authentication"
+                     name="basic_auth"
+                     type="password"
+                     onChange={this.handleSecretInputChange}
+                     value={this.state.basic_auth || ''}
+                     buttonAfter={reset.basic_auth ? (
+                       <Button type="button" onClick={() => { this.undoResetSecret('basic_auth'); }}>
+                         Undo Reset
+                       </Button>
+                     ) : undefined} />
+            )}
           </Col>
-          {basic_auth?.keep_value === true && (
-            <Col md={2}>
-              <Button bsStyle="danger" type="button" onClick={() => { this.resetSecret('basic_auth'); }}>
-                Reset Secret
-              </Button>
-            </Col>
-          )}
-          {basic_auth?.delete_value === true && (
-            <Col md={2}>
-              <Button type="button" onClick={() => { this.undoResetSecret('basic_auth'); }}>
-                Undo Reset
-              </Button>
-            </Col>
-          )}
         </Row>
-        <Input id="api_key"
-               name="api_key"
-               label="API Key"
-               type="text"
-               onChange={this.handleChange}
-               bsStyle={validation.errors.api_key ? 'error' : null}
-               help={lodash.get(validation, 'errors.api_key[0]', 'The API Key.')}
-               value={config.api_key} />
         <Row>
-          <Col md={apiSecretColumnSize}>
-            <Input id="api_secret"
-                   name="api_secret"
-                   label="API Secret"
-                   type="password"
-                   onChange={this.handleSecretInputChange}
-                   bsStyle={validation.errors.api_secret ? 'error' : null}
-                   help={lodash.get(validation, 'errors.api_secret[0]', 'The API Secret')}
-                   value={this.state.api_secret || ''} />
+          <Col md={12}>
+            <Input id="api_key"
+                   name="api_key"
+                   label="API Key"
+                   type="text"
+                   onChange={this.handleChange}
+                   bsStyle={validation.errors.api_key ? 'error' : null}
+                   help={lodash.get(validation, 'errors.api_key[0]', 'The API Key.')}
+                   value={config.api_key} />
           </Col>
-          {api_secret?.keep_value === true && (
-            <Col md={2}>
-              <Button bsStyle="danger" type="button" onClick={() => { this.resetSecret('api_secret'); }}>
-                Reset Secret
-              </Button>
-            </Col>
-          )}
-          {api_secret?.delete_value === true && (
-            <Col md={2}>
-              <Button type="button" onClick={() => { this.undoResetSecret('api_secret'); }}>
-                Undo Reset
-              </Button>
-            </Col>
-          )}
+        </Row>
+        <Row>
+          <Col md={12}>
+            {api_secret?.keep_value ? (
+              <>
+                <ControlLabel>API Secret</ControlLabel>
+                <StyledButton bsStyle="danger" type="button" onClick={() => { this.resetSecret('api_secret'); }}>
+                  Reset Secret
+                </StyledButton>
+              </>
+            ) : (
+              <Input id="apiSecret"
+                     label="API Secret"
+                     name="api_secret"
+                     type="password"
+                     onChange={this.handleSecretInputChange}
+                     bsStyle={validation.errors.api_secret ? 'error' : null}
+                     help={lodash.get(validation, 'errors.api_secret[0]', 'The API Secret')}
+                     value={this.state.api_secret || ''}
+                     buttonAfter={reset.api_secret ? (
+                       <Button type="button" onClick={() => { this.undoResetSecret('api_secret'); }}>
+                         Undo Reset
+                       </Button>
+                     ) : undefined} />
+            )}
+          </Col>
         </Row>
       </>
     );
