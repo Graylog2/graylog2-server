@@ -21,8 +21,10 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
 
+import java.util.Collection;
+
 public interface MetricMapping {
-    MapperConfig toMapperConfig();
+    Collection<MapperConfig> toMapperConfigs();
 
     interface Factory<TYPE extends MetricMapping> {
         TYPE create(Config config);
@@ -34,6 +36,7 @@ public interface MetricMapping {
             property = "type")
     @JsonSubTypes({
             @JsonSubTypes.Type(value = MetricMatchMapping.Config.class, name = MetricMatchMapping.TYPE),
+            @JsonSubTypes.Type(value = InputMetricMapping.Config.class, name = InputMetricMapping.TYPE),
     })
     interface Config {
         @JsonProperty("type")

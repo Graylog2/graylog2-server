@@ -19,6 +19,7 @@ package org.graylog.metrics.prometheus.mapping;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
+import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.system.NodeId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,12 +45,18 @@ class PrometheusMappingFilesHandlerTest {
     @Mock
     NodeId nodeId;
 
+    @Mock
+    InputService inputService;
+
     PrometheusMappingConfigLoader configLoader;
 
     @BeforeEach
     void setUp() {
         this.configLoader = new PrometheusMappingConfigLoader(
-                ImmutableMap.of(MetricMatchMapping.TYPE, config -> new MetricMatchMapping(nodeId, config)));
+                ImmutableMap.of(
+                        MetricMatchMapping.TYPE, config -> new MetricMatchMapping(nodeId, config),
+                        InputMetricMapping.TYPE, config -> new InputMetricMapping(inputService, nodeId, config))
+        );
     }
 
     @Nested

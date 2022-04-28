@@ -33,9 +33,9 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PrometheusMappingConfigLoader {
     private static final Logger log = LoggerFactory.getLogger(PrometheusMappingConfigLoader.class);
@@ -82,19 +82,18 @@ public class PrometheusMappingConfigLoader {
 
         return config.metricMappingConfigs()
                 .stream()
-                .map(this::mapMetric)
-                .filter(Objects::nonNull)
+                .flatMap(this::mapMetric)
                 .collect(Collectors.toSet());
     }
 
     @Nullable
-    private MapperConfig mapMetric(MetricMapping.Config config) {
+    private Stream<MapperConfig> mapMetric(MetricMapping.Config config) {
         final MetricMapping.Factory<? extends MetricMapping> factory = metricMappingFactories.get(config.type());
         if (factory == null) {
             log.error("Missing handler to process mapping for metric <{}> of type <{}>. Skipping mapping.",
                     config.metricName(), config.type());
-            return null;
+            return Stream.empty();
         }
-        return factory.create(config).toMapperConfig();
+        return factory.create(config).toMapperConfigs().stream();
     }
 }

@@ -28,9 +28,11 @@ import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
 import org.graylog2.plugin.system.NodeId;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class MetricMatchMapping implements MetricMapping {
     public static final String TYPE = "metric_match";
@@ -50,7 +52,7 @@ public class MetricMatchMapping implements MetricMapping {
     }
 
     @Override
-    public MapperConfig toMapperConfig() {
+    public Set<MapperConfig> toMapperConfigs() {
         final Map<String, String> labels = new HashMap<>();
 
         // Add nodeId to every metric.
@@ -61,7 +63,8 @@ public class MetricMatchMapping implements MetricMapping {
             labels.put(config.wildcardExtractLabels().get(i), "${" + i + "}");
         }
 
-        return new MapperConfig(config.matchPattern(), "gl_" + config.metricName(), labels);
+        return Collections.singleton(
+                new MapperConfig(config.matchPattern(), "gl_" + config.metricName(), labels));
     }
 
     @AutoValue
