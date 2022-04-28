@@ -56,6 +56,10 @@ module.exports = {
     '.fixtures.[jt]s$',
   ],
   testTimeout: applyTimeoutMultiplier(5000),
+  transform: {
+    '^.+\\.[tj]sx?$': 'babel-jest',
+  },
+  transformIgnorePatterns: ['node_modules/(?!(@react-hook|uuid)/)'],
   reporters: [
     'default',
     [
