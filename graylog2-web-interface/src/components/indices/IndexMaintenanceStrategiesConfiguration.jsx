@@ -87,9 +87,25 @@ const _getConfigurationComponent = (selectedStrategy, pluginExports, strategies,
   return (<span key={strategy.type}>{element}</span>);
 };
 
-const IndexMaintenanceStrategiesConfiguration = ({ title, description, selectPlaceholder, pluginExports, strategies, retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod }, activeConfig: { strategy, config }, getState }) => {
+const IndexMaintenanceStrategiesConfiguration = ({
+  title,
+  description,
+  selectPlaceholder,
+  pluginExports,
+  strategies,
+  retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod },
+  activeConfig: { strategy, config },
+  getState,
+}) => {
   const [newStrategy, setNewStrategy] = useState(strategy);
-  const { setValues, values, values: { rotation_strategy_class: rotationStrategyClass, retention_strategy_class: retentionStrategyClass } } = useFormikContext();
+  const {
+    setValues,
+    values,
+    values: {
+      rotation_strategy_class: rotationStrategyClass,
+      retention_strategy_class: retentionStrategyClass,
+    },
+  } = useFormikContext();
 
   const _onSelect = (selectedStrategy) => {
     if (!selectedStrategy || selectedStrategy.length < 1) {
