@@ -22,10 +22,8 @@ import { chunk } from 'lodash';
 
 import ColorPicker from 'components/common/ColorPicker';
 import Value from 'views/components/Value';
-import { useStore } from 'stores/connect';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import ChartColorContext from 'views/components/visualizations/ChartColorContext';
-import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { Popover } from 'components/graylog';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { colors as defaultColors } from 'views/components/visualizations/Colors';
@@ -33,6 +31,7 @@ import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/E
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import Series from 'views/logic/aggregationbuilder/Series';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 
 const ColorHint = styled.div(({ color }) => `
   cursor: pointer;
@@ -125,7 +124,7 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
   const [colorPickerConfig, setColorPickerConfig] = useState<ColorPickerConfig | undefined>();
   const { rowPivots, columnPivots, series } = config;
   const labels: Array<string> = labelMapper(chartData);
-  const { activeQuery } = useStore(CurrentViewStateStore);
+  const activeQuery = useCurrentQueryId();
   const { colors, setColor } = useContext(ChartColorContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
   const defaultFieldMapper = useCallback((isFunction: boolean) => legendField(columnPivots, rowPivots, series, !neverHide, isFunction), [columnPivots, neverHide, rowPivots, series]);
