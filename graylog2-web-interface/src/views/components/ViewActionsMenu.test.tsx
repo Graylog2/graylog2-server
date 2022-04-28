@@ -20,9 +20,11 @@ import { render, fireEvent } from 'wrappedTestingLibrary';
 
 import { alice } from 'fixtures/users';
 import type User from 'logic/users/User';
+import type { SearchConfigState } from 'views/components/contexts/SearchPageConfigContext';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import CurrentUserContext from 'contexts/CurrentUserContext';
+import { ViewActionsLayoutOptions, SearchPageConfigContextProvider } from 'views/components/contexts/SearchPageConfigContext';
 
 import ViewActionsMenu from './ViewActionsMenu';
 
@@ -85,19 +87,22 @@ describe('ViewActionsMenu', () => {
     .permissions(mockImmutable.List(['dashboards:edit:view-id', 'view:edit:view-id']))
     .build();
 
-  const SimpleViewActionMenu = ({ currentUser: user, ...props }: {currentUser?: User}) => (
-    <CurrentUserContext.Provider value={user}>
-      <ViewActionsMenu {...props} />
-    </CurrentUserContext.Provider>
+  const SimpleViewActionMenu = ({ currentUser: user, providerOverrides, ...props }: {currentUser?: User, providerOverrides?: SearchConfigState}) => (
+    <SearchPageConfigContextProvider providerOverrides={providerOverrides}>
+      <CurrentUserContext.Provider value={user}>
+        <ViewActionsMenu {...props} />
+      </CurrentUserContext.Provider>
+    </SearchPageConfigContextProvider>
   );
 
   SimpleViewActionMenu.defaultProps = {
     currentUser,
+    providerOverrides: undefined,
   };
 
   it('should open modal to save new dashboard', () => {
-    const { getByTestId, getByText } = render(<SimpleViewActionMenu />);
-    const saveAsMenuItem = getByTestId('dashboard-save-as-button');
+    const { getByTitle, getByText } = render(<SimpleViewActionMenu />);
+    const saveAsMenuItem = getByTitle(/Save As Button/);
 
     fireEvent.click(saveAsMenuItem);
 
@@ -120,5 +125,42 @@ describe('ViewActionsMenu', () => {
     fireEvent.click(openShareButton);
 
     expect(getByText(/Sharing/i)).not.toBeNull();
+  });
+
+  it('should use FULL_MENU layout option by default and render all buttons', async () => {
+    const { findByRole, findByTitle } = render(<SimpleViewActionMenu />);
+
+    await findByTitle(/Save Button/);
+    await findByTitle(/Save As Button/);
+    await findByTitle(/Share/);
+    await findByRole(/^menu$/);
+  });
+
+  it('should only render "Save As" button in SAVE_COPY layout option', async () => {
+    const { findByTitle, queryByRole, queryByTitle } = render(<SimpleViewActionMenu providerOverrides={{ sidebar: { isShown: false }, viewActionsLayoutOptions: ViewActionsLayoutOptions.SAVE_COPY }} />);
+
+    const saveButton = queryByTitle(/Save Button/);
+    const shareButton = queryByTitle(/Share/);
+    const extrasButton = queryByRole(/^menu$/);
+
+    expect(saveButton).not.toBeInTheDocument();
+    expect(shareButton).not.toBeInTheDocument();
+    expect(extrasButton).not.toBeInTheDocument();
+
+    await findByTitle(/Save As Button/);
+  });
+
+  it('should render no action menu items in BLANK layout option', () => {
+    const { queryByRole, queryByTitle } = render(<SimpleViewActionMenu providerOverrides={{ sidebar: { isShown: false }, viewActionsLayoutOptions: ViewActionsLayoutOptions.BLANK }} />);
+
+    const saveButton = queryByTitle(/Save Button/);
+    const saveAsButton = queryByTitle(/Save As Button/);
+    const shareButton = queryByTitle(/Share/);
+    const extrasButton = queryByRole(/^menu$/);
+
+    expect(saveButton).not.toBeInTheDocument();
+    expect(saveAsButton).not.toBeInTheDocument();
+    expect(shareButton).not.toBeInTheDocument();
+    expect(extrasButton).not.toBeInTheDocument();
   });
 });

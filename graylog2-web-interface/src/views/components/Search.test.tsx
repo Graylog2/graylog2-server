@@ -38,6 +38,7 @@ import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import Query, { filtersForQuery } from 'views/logic/queries/Query';
 import usePluginEntities from 'views/logic/usePluginEntities';
+import { SearchPageConfigContextProvider } from 'views/components/contexts/SearchPageConfigContext';
 
 import Search from './Search';
 
@@ -107,6 +108,12 @@ jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('views/logic/usePluginEntities');
 
 describe('Search', () => {
+  const SUT = (props) => (
+    <SearchPageConfigContextProvider>
+      <Search {...props} />
+    </SearchPageConfigContextProvider>
+  );
+
   beforeEach(() => {
     asMock(usePluginEntities).mockReturnValue([]);
     WidgetStore.listen = jest.fn(() => jest.fn());
@@ -135,25 +142,25 @@ describe('Search', () => {
   });
 
   it('register a WindowLeaveMessage', async () => {
-    render(<Search />);
+    render(<SUT />);
 
     await waitFor(() => expect(WindowLeaveMessage).toHaveBeenCalled());
   });
 
   it('executes search upon mount', async () => {
-    render(<Search />);
+    render(<SUT />);
 
     await waitFor(() => expect(SearchActions.execute).toHaveBeenCalled());
   });
 
   it('refreshes search config upon mount', async () => {
-    render(<Search />);
+    render(<SUT />);
 
     await waitFor(() => expect(SearchConfigActions.refresh).toHaveBeenCalled());
   });
 
   it('does not register to QueryFiltersStore upon mount', async () => {
-    render(<Search />);
+    render(<SUT />);
 
     await waitFor(() => expect(QueryFiltersStore.listen).not.toHaveBeenCalled());
   });
@@ -162,7 +169,7 @@ describe('Search', () => {
     const unsubscribe = jest.fn();
 
     QueryFiltersStore.listen = jest.fn(() => unsubscribe);
-    const { unmount } = render(<Search />);
+    const { unmount } = render(<SUT />);
 
     unmount();
 
@@ -170,13 +177,13 @@ describe('Search', () => {
   });
 
   it('registers to SearchActions.refresh upon mount', async () => {
-    render(<Search />);
+    render(<SUT />);
 
     await waitFor(() => expect(SearchActions.refresh.listen).toHaveBeenCalled());
   });
 
   it('registers to ViewActions.search.completed upon mount', async () => {
-    render(<Search />);
+    render(<SUT />);
 
     await waitFor(() => expect(ViewActions.search.completed.listen).toHaveBeenCalled());
   });
@@ -185,7 +192,7 @@ describe('Search', () => {
     const unsubscribe = jest.fn();
 
     ViewActions.search.completed.listen = jest.fn(() => unsubscribe);
-    const { unmount } = render(<Search />);
+    const { unmount } = render(<SUT />);
 
     await waitFor(() => expect(ViewActions.search.completed.listen).toHaveBeenCalled());
 
@@ -197,19 +204,19 @@ describe('Search', () => {
   });
 
   it('refreshes Streams upon mount', async () => {
-    render(<Search />);
+    render(<SUT />);
 
     await waitFor(() => expect(StreamsActions.refresh).toHaveBeenCalled());
   });
 
   it('synchronizes URL upon mount', async () => {
-    render(<Search />);
+    render(<SUT />);
 
     await waitFor(() => expect(useSyncWithQueryParameters).toHaveBeenCalled());
   });
 
   it('updating search in view triggers search execution', async () => {
-    render(<Search />);
+    render(<SUT />);
 
     asMock(SearchActions.execute).mockClear();
 
@@ -221,7 +228,7 @@ describe('Search', () => {
   });
 
   it('refreshing after query change parses search metadata first', async () => {
-    render(<Search />);
+    render(<SUT />);
 
     const executeQuery = await screen.findByRole('button', { name: 'Execute Query' });
 

@@ -26,10 +26,13 @@ import { useStore } from 'stores/connect';
 import { DocumentTitle } from 'components/common';
 import viewTitle from 'views/logic/views/ViewTitle';
 import { ViewStore } from 'views/stores/ViewStore';
+import type { SearchConfigState } from 'views/components/contexts/SearchPageConfigContext';
+import { SearchPageConfigContextProvider } from 'views/components/contexts/SearchPageConfigContext';
 
 type Props = {
   loadNewView?: () => unknown,
   loadView?: (string) => unknown,
+  providerOverrides?: SearchConfigState,
 };
 
 const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
@@ -42,13 +45,15 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const SearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => (
+const SearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultLoadView, providerOverrides = undefined }: Props) => (
   <SearchPageTitle>
     <DashboardPageContextProvider>
       <NewViewLoaderContext.Provider value={loadNewView}>
         <ViewLoaderContext.Provider value={loadView}>
           <IfUserHasAccessToAnyStream>
-            <Search />
+            <SearchPageConfigContextProvider providerOverrides={providerOverrides}>
+              <Search />
+            </SearchPageConfigContextProvider>
           </IfUserHasAccessToAnyStream>
         </ViewLoaderContext.Provider>
       </NewViewLoaderContext.Provider>
@@ -59,6 +64,7 @@ const SearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultLoadVi
 SearchPage.defaultProps = {
   loadNewView: defaultLoadNewView,
   loadView: defaultLoadView,
+  providerOverrides: undefined,
 };
 
 export default React.memo(SearchPage);

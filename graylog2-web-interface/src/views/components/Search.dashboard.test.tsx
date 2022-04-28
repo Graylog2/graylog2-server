@@ -33,6 +33,7 @@ import View from 'views/logic/views/View';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import Query, { filtersForQuery } from 'views/logic/queries/Query';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import { SearchPageConfigContextProvider } from 'views/components/contexts/SearchPageConfigContext';
 
 import Search from './Search';
 import WidgetFocusProvider from './contexts/WidgetFocusProvider';
@@ -95,6 +96,12 @@ const mockWidgetEditing = () => {
 };
 
 describe('Dashboard Search', () => {
+  const SUT = (props) => (
+    <SearchPageConfigContextProvider>
+      <Search {...props} />
+    </SearchPageConfigContextProvider>
+  );
+
   beforeEach(() => {
     WidgetStore.listen = jest.fn(() => jest.fn());
     QueryFiltersStore.listen = jest.fn(() => jest.fn());
@@ -129,7 +136,7 @@ describe('Dashboard Search', () => {
   });
 
   it('should list tabs for dashboard pages', async () => {
-    render(<Search />);
+    render(<SUT />);
 
     await screen.findByRole('button', { name: 'First dashboard page' });
 
@@ -138,7 +145,7 @@ describe('Dashboard Search', () => {
 
   it('should not list tabs for pages when focusing a widget', async () => {
     mockWidgetEditing();
-    render(<Search />);
+    render(<SUT />);
 
     await screen.findByText('Mocked search results');
 
@@ -147,14 +154,14 @@ describe('Dashboard Search', () => {
   });
 
   it('should display dashboard search bar', async () => {
-    render(<Search />);
+    render(<SUT />);
 
     await screen.findByText('Mocked dashboard search bar');
   });
 
   it('should not display dashboard search bar on widget edit', async () => {
     mockWidgetEditing();
-    render(<Search />);
+    render(<SUT />);
 
     await screen.findByText('Mocked search results');
 
