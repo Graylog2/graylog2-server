@@ -60,12 +60,4 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'babel-jest',
   },
   transformIgnorePatterns: ['node_modules/(?!(@react-hook|uuid)/)'],
-  reporters: [
-    'default',
-    [
-      'jest-junit', {
-        outputDirectory: 'target',
-      },
-    ],
-  ],
 };
