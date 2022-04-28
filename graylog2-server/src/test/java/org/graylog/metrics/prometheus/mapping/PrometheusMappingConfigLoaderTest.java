@@ -48,7 +48,8 @@ class PrometheusMappingConfigLoaderTest {
     void setUp() {
         when(nodeId.toString()).thenReturn("abc-123");
 
-        this.configLoader = new PrometheusMappingConfigLoader(nodeId);
+        this.configLoader = new PrometheusMappingConfigLoader(
+                ImmutableMap.of(MetricMatchMapping.TYPE, config -> new MetricMatchMapping(nodeId, config)));
         this.objectMapper = new ObjectMapper(new YAMLFactory());
     }
 

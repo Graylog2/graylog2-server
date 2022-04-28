@@ -48,7 +48,8 @@ class PrometheusMappingFilesHandlerTest {
 
     @BeforeEach
     void setUp() {
-        this.configLoader = new PrometheusMappingConfigLoader(nodeId);
+        this.configLoader = new PrometheusMappingConfigLoader(
+                ImmutableMap.of(MetricMatchMapping.TYPE, config -> new MetricMatchMapping(nodeId, config)));
     }
 
     @Nested
