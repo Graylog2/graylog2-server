@@ -124,6 +124,9 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
         @JsonCreator
         public static Builder create() {
             return new AutoValue_HTTPEventNotificationConfig.Builder()
+                    .basicAuth(EncryptedValue.createUnset())
+                    .apiSecret(EncryptedValue.createUnset())
+                    .apiKey("")
                     .type(TYPE_NAME);
         }
 
