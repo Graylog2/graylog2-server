@@ -120,4 +120,6 @@ PieVisualization.propTypes = {
   data: AggregationResult.isRequired,
 };
 
+PieVisualization.displayName = 'PieVisualization';
+
 export default PieVisualization;
