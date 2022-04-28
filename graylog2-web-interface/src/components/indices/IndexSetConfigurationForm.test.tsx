@@ -15,8 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import selectEvent from 'react-select-event';
-import { act } from 'react-dom/test-utils';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import IndexSetConfigurationForm from './IndexSetConfigurationForm';
@@ -231,29 +229,5 @@ describe('IndexSetConfigurationForm', () => {
     const indexPrefix = screen.getByText(/index prefix/i);
 
     expect(indexPrefix).toBeInTheDocument();
-  });
-
-  it('should show Max retention period warning', async () => {
-    render(<IndexSetConfigurationForm indexSet={indexSet}
-                                      retentionStrategiesContext={retentionStrategiesContext}
-                                      rotationStrategies={rotationStrategies}
-                                      retentionStrategies={retentionStrategies}
-                                      cancelLink={cancelLink}
-                                      onUpdate={onSave} />);
-
-    const indexRotationHead = screen.getByRole('heading', {
-      name: /index rotation configuration/i,
-    });
-    const rotationSelect = screen.getByText('Index Message Count');
-
-    await act(async () => {
-      await selectEvent.openMenu(rotationSelect);
-      await selectEvent.select(rotationSelect, 'Index Time');
-    });
-
-    const maxRetentionWarningText = screen.getByText(/The effective retention period value calculated/i);
-
-    expect(indexRotationHead).toBeInTheDocument();
-    expect(maxRetentionWarningText).toBeInTheDocument();
   });
 });
