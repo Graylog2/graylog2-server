@@ -161,7 +161,7 @@
     "file-loader": "^6.0.0",
     "fork-ts-checker-webpack-plugin": "^6.5.0",
     "form-data": "^4.0.0",
-    "glob": "^7.0.0",
+    "glob": "^8.0.1",
     "html-webpack-plugin": "^5.3.2",
     "json-loader": "^0.5.3",
     "less": "^4.1.2",
