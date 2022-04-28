@@ -32,9 +32,13 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.core.Response;
@@ -52,6 +56,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith({MockitoExtension.class})
+@MockitoSettings(strictness = Strictness.WARN)
 public class SearchResourceExecutionTest {
     private static final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
 
@@ -80,7 +86,6 @@ public class SearchResourceExecutionTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
         final SearchExecutor searchExecutor = new SearchExecutor(searchDomain,
                 searchJobService,
                 queryEngine,

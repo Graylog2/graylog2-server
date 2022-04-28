@@ -35,9 +35,13 @@ import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.ForbiddenException;
@@ -62,6 +66,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith({MockitoExtension.class})
+@MockitoSettings(strictness = Strictness.WARN)
 public class ViewsResourceTest {
     public static final String VIEW_ID = "test-view";
 
@@ -93,7 +99,6 @@ public class ViewsResourceTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
         this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain);
         when(searchUser.canCreateDashboards()).thenReturn(true);
         final Search search = mock(Search.class, RETURNS_DEEP_STUBS);
@@ -137,8 +142,6 @@ public class ViewsResourceTest {
 
         final UserContext userContext = mock(UserContext.class);
         when(userContext.getUser()).thenReturn(testUser);
-        when(userContext.getUserId()).thenReturn("testuser");
-        when(currentUser.isLocalAdmin()).thenReturn(true);
         when(searchUser.username()).thenReturn("testuser");
 
         this.viewsResource.create(view, userContext, searchUser);

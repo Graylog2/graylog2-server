@@ -27,10 +27,13 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import javax.ws.rs.NotFoundException;
 import java.util.Optional;
@@ -43,6 +46,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith({MockitoExtension.class})
+@MockitoSettings(strictness = Strictness.WARN)
 public class SearchResourceTest {
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -65,7 +70,6 @@ public class SearchResourceTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        MockitoAnnotations.openMocks(this);
         this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
     }
 

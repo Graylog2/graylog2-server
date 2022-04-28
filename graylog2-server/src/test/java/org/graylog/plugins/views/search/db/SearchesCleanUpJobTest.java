@@ -27,9 +27,13 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,6 +53,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith({MockitoExtension.class})
+@MockitoSettings(strictness = Strictness.WARN)
 public class SearchesCleanUpJobTest {
     public static final String IN_USE_SEARCH_ID = "This search is in use";
     public static final String IN_USE_RESOLVER_SEARCH_ID = "in-use-resolver-search-id";
@@ -63,7 +69,6 @@ public class SearchesCleanUpJobTest {
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.openMocks(this);
         this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4), testViewResolvers());
     }
 
