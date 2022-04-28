@@ -23,8 +23,8 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
-import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.inputs.MessageInputFactory;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -34,13 +34,13 @@ import java.util.stream.Collectors;
 public class InputMetricMapping implements MetricMapping {
     public static final String TYPE = "input_metric";
 
-    private final InputService inputService;
+    private final MessageInputFactory messageInputFactory;
     private final NodeId nodeId;
     private final Config config;
 
     @Inject
-    public InputMetricMapping(InputService inputService, NodeId nodeId, @Assisted MetricMapping.Config config) {
-        this.inputService = inputService;
+    public InputMetricMapping(MessageInputFactory messageInputFactory, NodeId nodeId, @Assisted MetricMapping.Config config) {
+        this.messageInputFactory = messageInputFactory;
         this.nodeId = nodeId;
         this.config = (Config) config;
     }
@@ -52,14 +52,13 @@ public class InputMetricMapping implements MetricMapping {
 
     @Override
     public Set<MapperConfig> toMapperConfigs() {
-        return inputService.all()
-                .stream()
-                .map(input -> {
-                    final String match = input.getType() + "." + input.getId() + "." + config.inputMetricName();
+        return messageInputFactory.getAvailableInputs().keySet().stream()
+                .map(type -> {
+                    final String match = type + ".*." + config.inputMetricName();
                     final Map<String, String> labels = ImmutableMap.of(
                             "node", nodeId.toString(),
-                            "input_id", input.getId(),
-                            "input_type", input.getType()
+                            "input_id", "${0}",
+                            "input_type", type
                     );
                     return new MapperConfig(match, "gl_" + config.metricName(), labels);
                 })
