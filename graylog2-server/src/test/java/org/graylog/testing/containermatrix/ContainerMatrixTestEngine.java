@@ -17,6 +17,7 @@
 package org.graylog.testing.containermatrix;
 
 import com.google.common.io.Resources;
+import org.apache.commons.lang.StringUtils;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
@@ -80,10 +81,17 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.pluginJarsProvider()));
     }
 
+    private boolean isJenkinsOnGithub() {
+        String github_workspace = System.getenv("GITHUB_WORKSPACE");
+        return !StringUtils.isBlank(github_workspace);
+    }
+
     private Set<SearchServer> getSearchServerVersions(Set<Class<?>> annotatedClasses) {
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> {
             if (annotation.searchVersions().length == 0) {
                 return Stream.of(SearchServer.DEFAULT_VERSION);
+            } if (isJenkinsOnGithub()) {
+                return Stream.of(annotation.searchVersions()[0]);
             } else {
                 return Stream.of(annotation.searchVersions());
             }
@@ -91,7 +99,15 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
     }
 
     private Set<MongodbServer> getMongoVersions(Set<Class<?>> annotatedClasses) {
-        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.mongoVersions()));
+        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> {
+            if (annotation.mongoVersions().length == 0) {
+                return Stream.of(MongodbServer.DEFAULT_VERSION);
+            } if (isJenkinsOnGithub()) {
+                return Stream.of(annotation.mongoVersions()[0]);
+            } else {
+                return Stream.of(annotation.mongoVersions());
+            }
+        });
     }
 
     private Set<Integer> getExtraPorts(Set<Class<?>> annotatedClasses) {
