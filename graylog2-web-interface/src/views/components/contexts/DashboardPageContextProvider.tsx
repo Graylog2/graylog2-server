@@ -84,7 +84,7 @@ const DashboardPageContextProvider = ({ children }: { children: React.ReactNode 
     history.replace(newUri);
   }, [history, query]);
 
-  const setDashboardPageParam = useCallback((nextPage) => updatePageParams(nextPage), [updatePageParams]);
+  const setDashboardPageParam = useCallback((nextPage: string) => updatePageParams(nextPage), [updatePageParams]);
   const unSetDashboardPageParam = useCallback(() => updatePageParams(undefined), [updatePageParams]);
 
   const dashboardPageContextValue = useMemo(() => ({

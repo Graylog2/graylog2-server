@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 
+import type { Warnings } from './FormWarningsContext';
 import FormWarningsContext from './FormWarningsContext';
 
 type Props = {
@@ -25,9 +26,9 @@ type Props = {
 
 const FormWarningsProvider = ({ children }: Props) => {
   const isMounted = useRef<boolean>();
-  const [warnings, setWarnings] = useState({});
+  const [warnings, setWarnings] = useState<Warnings>({});
 
-  const setFieldWarning = useCallback((fieldName, warning) => {
+  const setFieldWarning = useCallback(<T extends keyof Warnings>(fieldName: T, warning: Warnings[T]) => {
     if (isMounted.current === true) {
       setWarnings({ ...warnings, [fieldName]: warning });
     }

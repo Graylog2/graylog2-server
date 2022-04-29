@@ -38,7 +38,7 @@ const WidgetColorContext = ({ children, colorRules, id }: Props) => {
   const colorRulesForWidget = colorRulesForWidgetBuilder.build();
 
   const contextValue = useMemo(() => {
-    const setColor = (name, color) => {
+    const setColor = (name: string, color: string) => {
       colorRulesForWidget.set(name, color);
 
       return ChartColorRulesActions.set(id, name, color);
