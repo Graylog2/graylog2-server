@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { union } from 'lodash';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
@@ -25,6 +25,8 @@ import PlotLegend from 'views/components/visualizations/PlotLegend';
 import useChartData from 'views/components/visualizations/useChartData';
 import type { Generator } from 'views/components/visualizations/ChartData';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
+import type Pivot from 'views/logic/aggregationbuilder/Pivot';
+import type Series from 'views/logic/aggregationbuilder/Series';
 
 import type { ChartConfig } from '../GenericPlot';
 import GenericPlot from '../GenericPlot';
@@ -85,12 +87,26 @@ const labelMapper = (data: Array<{ labels: Array<string> }>) => data.reduce((acc
   return union(acc, labels);
 }, []);
 
+const legendField = (columnPivots: Array<Pivot>, rowPivots: Array<Pivot>, series: Array<Series>, isFunction: boolean) => {
+  if (rowPivots.length === 1 && series.length === 1 && !isFunction) {
+    return rowPivots[0].field;
+  }
+
+  if (columnPivots.length === 1) {
+    return columnPivots[0].field;
+  }
+
+  return null;
+};
+
 const PieVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
   const rows = useMemo(() => retrieveChartData(data), [data]);
   const transformedData = useChartData(rows, { widgetConfig: config, chartType: 'pie', generator: _generateSeries });
+  const { columnPivots, rowPivots, series } = config;
+  const fieldMapper = useCallback((isFunction: boolean) => legendField(columnPivots, rowPivots, series, isFunction), [columnPivots, rowPivots, series]);
 
   return (
-    <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} neverHide>
+    <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} fieldMapper={fieldMapper} neverHide>
       <GenericPlot chartData={transformedData}
                    layout={{ showlegend: false }}
                    getChartColor={getChartColor}
@@ -103,5 +119,7 @@ PieVisualization.propTypes = {
   config: AggregationType.isRequired,
   data: AggregationResult.isRequired,
 };
+
+PieVisualization.displayName = 'PieVisualization';
 
 export default PieVisualization;
