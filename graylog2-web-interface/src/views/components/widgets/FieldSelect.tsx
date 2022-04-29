@@ -47,7 +47,7 @@ const FieldSelect = ({ fields, onChange, value, allowOptionCreation, inputId }: 
   return (
     <SortableSelect options={fieldsForSelect}
                     onChange={onChange}
-                    valueComponent={({ children: _children }) => <ValueComponent>{_children}</ValueComponent>}
+                    valueComponent={ValueComponent}
                     value={value}
                     inputId={inputId}
                     allowOptionCreation={allowOptionCreation} />
