@@ -184,7 +184,7 @@ class HttpNotificationForm extends React.Component {
                      type="password"
                      onChange={this.handleSecretInputChange}
                      bsStyle={validation.errors.api_secret ? 'error' : null}
-                     help={lodash.get(validation, 'errors.api_secret[0]', 'The API Secret')}
+                     help={lodash.get(validation, 'errors.api_secret[0]', 'The API Secret.')}
                      value={this.state.api_secret || ''}
                      buttonAfter={reset.api_secret ? (
                        <Button type="button" onClick={() => { this.undoResetSecret('api_secret'); }}>
