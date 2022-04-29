@@ -18,13 +18,18 @@ import * as Immutable from 'immutable';
 import { waitFor } from 'wrappedTestingLibrary';
 
 import fetch from 'logic/rest/FetchProvider';
-import { StoreMock as MockStore } from 'helpers/mocking';
+import { StoreMock as MockStore, asMock } from 'helpers/mocking';
+import UserNotification from 'util/UserNotification';
 
 import type { ValidationQuery } from './validateQuery';
 import validateQuery from './validateQuery';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore('get') }));
+
+jest.mock('util/UserNotification', () => ({
+  error: jest.fn(),
+}));
 
 describe('validateQuery', () => {
   afterEach(() => {
@@ -70,5 +75,17 @@ describe('validateQuery', () => {
     };
 
     expect(fetch).toHaveBeenCalledWith('POST', expect.any(String), expectedPayload);
+  });
+
+  it('should display user notification and return status OK on server error', async () => {
+    asMock(fetch).mockImplementation(() => Promise.reject(new Error('Unexpected error')));
+
+    const result = await validateQuery({
+      ...validationInput,
+      timeRange: { type: 'absolute', from: '2021-01-01 16:00:00.000', to: '2021-01-01 17:00:00.000' },
+    });
+
+    expect(UserNotification.error).toHaveBeenCalledWith('Validating search query failed with status: Error: Unexpected error');
+    expect(result).toEqual({ status: 'OK' });
   });
 });

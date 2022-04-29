@@ -27,7 +27,7 @@ const DEFAULT_INTERPOLATION = 'linear';
 
 const validate = hasAtLeastOneMetric('Area chart');
 
-const areaChart: VisualizationType<AreaVisualizationConfig, AreaVisualizationConfigFormValues> = {
+const areaChart: VisualizationType<typeof AreaVisualization.type, AreaVisualizationConfig, AreaVisualizationConfigFormValues> = {
   type: AreaVisualization.type,
   displayName: 'Area Chart',
   component: AreaVisualization,

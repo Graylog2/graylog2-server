@@ -14,45 +14,46 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import moment from 'moment-timezone';
+
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 
 import * as fixtures from './TransformKeys.fixtures';
 
 import transformKeys from '../TransformKeys';
 
-jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: { get: jest.fn() } }));
-jest.mock('util/AppConfig', () => ({ rootTimeZone: jest.fn(() => 'America/Chicago') }));
+const formatTime = (timestamp: string) => timestamp;
+const formatTimeForLocalTz = (timezone: string) => (timestamp: string) => moment.tz(timestamp, timezone).toISOString(true);
 
 // eslint-disable-next-line global-require
 describe('TransformKeys', () => {
   it('returns original result when no aggregations are present', () => {
-    const rows = [{
+    const rows: Rows = [{
       source: 'row-leaf',
       value: 42,
       key: ['foo'],
       rollup: false,
     }];
-    const result = transformKeys([], [])(rows);
+    const result = transformKeys([], [], formatTime)(rows);
 
     expect(result).toEqual(rows);
   });
 
   it('returns original result when no time aggregations are present', () => {
-    const rows = [{
+    const rows: Rows = [{
       source: 'row-leaf',
       value: 42,
       key: ['foo'],
       rollup: false,
     }];
-    const result = transformKeys([Pivot.create('foo', 'value')], [Pivot.create('bar', 'value')])(rows);
+    const result = transformKeys([Pivot.create('foo', 'value')], [Pivot.create('bar', 'value')], formatTime)(rows);
 
     expect(result).toEqual(rows);
   });
 
   it('transforms row keys using current user\'s timezone', () => {
-    CurrentUserStore.get.mockReturnValue({ timezone: 'Europe/Berlin' });
-    const input = [
+    const input: Rows = [
       {
         source: 'leaf',
         key: ['2018-10-01T15:10:55.323Z'],
@@ -65,7 +66,7 @@ describe('TransformKeys', () => {
       },
     ];
 
-    const result = transformKeys([Pivot.create('timestamp', 'time')], [])(input);
+    const result = transformKeys([Pivot.create('timestamp', 'time')], [], formatTimeForLocalTz('Europe/Berlin'))(input);
 
     expect(result).toEqual([
       {
@@ -81,8 +82,7 @@ describe('TransformKeys', () => {
   });
 
   it('transforms column keys using current user\'s timezone', () => {
-    CurrentUserStore.get.mockReturnValueOnce({ timezone: 'America/Los_Angeles' });
-    const input = [
+    const input: Rows = [
       {
         source: 'leaf',
         key: ['2018-10-01T15:10:55.323Z'],
@@ -95,7 +95,7 @@ describe('TransformKeys', () => {
       },
     ];
 
-    const result = transformKeys([Pivot.create('timestamp', 'time')], [])(input);
+    const result = transformKeys([Pivot.create('timestamp', 'time')], [], formatTimeForLocalTz('America/Los_Angeles'))(input);
 
     expect(result).toEqual([
       {
@@ -110,48 +110,16 @@ describe('TransformKeys', () => {
     ]);
   });
 
-  it('transforms column keys using AppConfig rootTimeZone if user\'s timezone is null', () => {
-    CurrentUserStore.get.mockReturnValueOnce({ timezone: null });
-
-    const input = [
-      {
-        source: 'leaf',
-        key: ['2018-10-01T15:10:55.323Z'],
-        values: [],
-      },
-      {
-        source: 'leaf',
-        key: ['2017-03-12T09:32:21.283-08:00'],
-        values: [],
-      },
-    ];
-
-    const result = transformKeys([Pivot.create('timestamp', 'time')], [])(input);
-
-    expect(result).toEqual([
-      {
-        key: ['2018-10-01T10:10:55.323-05:00'],
-        source: 'leaf',
-        values: [],
-      }, {
-        key: ['2017-03-12T12:32:21.283-05:00'],
-        source: 'leaf',
-        values: [],
-      },
-    ]);
-  });
-
   it('transforms complete results using current user\'s timezone', () => {
-    CurrentUserStore.get.mockReturnValueOnce({ timezone: 'America/New_York' });
     const { rowPivots, columnPivots, input, output } = fixtures.singleRowPivot;
-    const result = transformKeys(rowPivots as Pivot[], columnPivots)(input);
+    const result = transformKeys(rowPivots as Pivot[], columnPivots, formatTimeForLocalTz('America/New_York'))(input);
 
     expect(result).toEqual(output);
   });
 
   it('does not transform complete results without time pivots', () => {
     const { rowPivots, columnPivots, input, output } = fixtures.noTimePivots;
-    const result = transformKeys(rowPivots as Pivot[], columnPivots as Pivot[])(input);
+    const result = transformKeys(rowPivots as Pivot[], columnPivots as Pivot[], formatTime)(input);
 
     expect(result).toEqual(output);
   });

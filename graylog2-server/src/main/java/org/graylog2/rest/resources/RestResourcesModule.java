@@ -60,6 +60,7 @@ import org.graylog2.rest.resources.system.MessagesResource;
 import org.graylog2.rest.resources.system.MetricsHistoryResource;
 import org.graylog2.rest.resources.system.NotificationsResource;
 import org.graylog2.rest.resources.system.PermissionsResource;
+import org.graylog2.rest.resources.system.SearchVersionResource;
 import org.graylog2.rest.resources.system.SessionsResource;
 import org.graylog2.rest.resources.system.StatsResource;
 import org.graylog2.rest.resources.system.SystemFieldsResource;
@@ -130,6 +131,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(StatsResource.class);
         addSystemRestResource(SystemShutdownResource.class);
         addSystemRestResource(TrafficResource.class);
+        addSystemRestResource(SearchVersionResource.class);
     }
 
     private void addAuthResources() {

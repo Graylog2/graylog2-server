@@ -43,6 +43,12 @@ class DocsHelper {
     PIPELINES: 'pipelines',
     REPORTING: 'reporting',
     ROLLING_ES_UPGRADE: 'rolling-es-upgrade',
+    SEARCH_QUERY_ERRORS: {
+      UNKNOWN_FIELD: 'query-language#unknown-field',
+      QUERY_PARSING_ERROR: 'query-language#parse-exception',
+      INVALID_OPERATOR: 'query-language#invalid-operator',
+      UNDECLARED_PARAMETER: 'query-language#undeclared-parameter',
+    },
     SEARCH_QUERY_LANGUAGE: 'query-language',
     STREAMS: 'streams',
     STREAM_PROCESSING_RUNTIME_LIMITS: 'streams#stream-processing-runtime-limits',

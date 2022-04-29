@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.validation.ValidationMessage;
 import org.graylog.plugins.views.search.validation.ValidationRequest;
 import org.graylog.plugins.views.search.validation.ValidationResponse;
 import org.graylog.plugins.views.search.validation.ValidationStatus;
+import org.graylog.plugins.views.search.validation.ValidationType;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -45,6 +46,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.nullsLast;
 
 @RequiresAuthentication
 @Api(value = "Search/Validation")
@@ -52,12 +55,10 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 public class QueryValidationResource extends RestResource implements PluginRestResource {
 
     private final QueryValidationService queryValidationService;
-    private final PermittedStreams permittedStreams;
 
     @Inject
-    public QueryValidationResource(QueryValidationService queryValidationService, PermittedStreams permittedStreams) {
+    public QueryValidationResource(QueryValidationService queryValidationService) {
         this.queryValidationService = queryValidationService;
-        this.permittedStreams = permittedStreams;
     }
 
     @POST
@@ -105,14 +106,29 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     private List<ValidationMessageDTO> toExplanations(ValidationResponse response) {
         return response.explanations().stream()
                 .map(this::toExplanation)
-                .sorted(Comparator
-                        .comparing(ValidationMessageDTO::beginLine)
-                        .thenComparing(ValidationMessageDTO::beginColumn))
+                .sorted(Comparator.comparing(ValidationMessageDTO::beginLine, nullsLast(naturalOrder()))
+                        .thenComparing(ValidationMessageDTO::beginColumn, nullsLast(naturalOrder())))
                 .collect(Collectors.toList());
     }
 
     private ValidationMessageDTO toExplanation(ValidationMessage message) {
-        return ValidationMessageDTO.create(message.beginLine(), message.beginColumn(), message.endLine(), message.endColumn(), message.errorType(), message.errorMessage());
+        final ValidationTypeDTO validationType = convert(message.validationType());
+        final ValidationMessageDTO.Builder builder = ValidationMessageDTO.builder(
+                validationType,
+                message.errorMessage());
+
+        message.relatedProperty().ifPresent(builder::relatedProperty);
+        message.position().ifPresent(queryPosition -> {
+            builder.beginLine(queryPosition.beginLine());
+            builder.beginColumn(queryPosition.beginColumn());
+            builder.endLine(queryPosition.endLine());
+            builder.endColumn(queryPosition.endColumn());
+        });
+        return builder.build();
+    }
+
+    private ValidationTypeDTO convert(ValidationType validationType) {
+        return ValidationTypeDTO.from(validationType);
     }
 
     private RelativeRange defaultTimeRange() {

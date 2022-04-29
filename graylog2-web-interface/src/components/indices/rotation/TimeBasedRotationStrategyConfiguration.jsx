@@ -64,7 +64,7 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
 
   _validationLimit = (durationInMilliseconds, rotationLimit) => {
     return durationInMilliseconds <= moment.duration(rotationLimit).asMilliseconds();
-  }
+  };
 
   _isValidPeriod = (duration) => {
     const { rotation_period: rotationPeriod, rotationLimit } = this.state;

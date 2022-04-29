@@ -24,16 +24,18 @@ import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import javax.ws.rs.NotFoundException;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -44,6 +46,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith({MockitoExtension.class})
+@MockitoSettings(strictness = Strictness.WARN)
 public class SearchResourceTest {
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -54,8 +58,7 @@ public class SearchResourceTest {
     @Mock
     private SearchJobService searchJobService;
 
-    @Mock
-    private SearchUser searchUser;
+    private final SearchUser searchUser = TestSearchUser.builder().build();
 
     @Mock
     private EventBus eventBus;
@@ -65,9 +68,8 @@ public class SearchResourceTest {
 
     private SearchResource searchResource;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        GuiceInjectorHolder.createInjector(Collections.emptyList());
         this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
     }
 

@@ -66,14 +66,14 @@ class LUTDataAdaptersPage extends React.Component {
         LookupTablesActions.getErrors(null, null, names || null);
       }
     }, this.errorStatesInterval);
-  }
+  };
 
   _stopErrorStatesTimer = () => {
     if (this.errorStatesTimer) {
       clearInterval(this.errorStatesTimer);
       this.errorStatesTimer = undefined;
     }
-  }
+  };
 
   _loadData = (props) => {
     const { pagination } = props;
@@ -88,20 +88,20 @@ class LUTDataAdaptersPage extends React.Component {
       LookupTableDataAdaptersActions.searchPaginated(pagination.page, pagination.per_page, pagination.query);
       this._startErrorStatesTimer();
     }
-  }
+  };
 
   _saved = () => {
     // reset detail state
     history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
-  }
+  };
 
   _isCreating = ({ action }) => {
     return action === 'create';
-  }
+  };
 
   _validateAdapter = (adapter) => {
     LookupTableDataAdaptersActions.validate(adapter);
-  }
+  };
 
   render() {
     const {

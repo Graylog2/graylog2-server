@@ -28,7 +28,6 @@ import validate from 'views/components/searchbar/validate';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
 import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
-import DateTimeProvider from './searchbar/date-time-picker/DateTimeProvider';
 
 export type DashboardFormValues = {
   timerange: TimeRange | undefined | null | NoTimeRangeOverride,
@@ -71,11 +70,9 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
                                  validate={_validate}
                                  validateOnMount>
       {(...args) => (
-        <DateTimeProvider limitDuration={limitDuration}>
-          <Form>
-            {_isFunction(children) ? children(...args) : children}
-          </Form>
-        </DateTimeProvider>
+        <Form>
+          {_isFunction(children) ? children(...args) : children}
+        </Form>
       )}
     </Formik>
   );

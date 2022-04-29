@@ -39,7 +39,7 @@ const SERVER_PING_TIMEOUT = 20000;
 const AppFacade = () => {
   const currentUser = useStore(CurrentUserStore as Store<CurrentUserStoreState>, (state) => state?.currentUser);
   const server = useStore(ServerAvailabilityStore, (state) => state?.server);
-  const sessionId = useStore(SessionStore as Store<SessionStoreState>, (state) => (state?.sessionId ?? ''));
+  const username = useStore(SessionStore as Store<SessionStoreState>, (state) => (state?.username ?? ''));
 
   useEffect(() => {
     const interval = setInterval(ServerAvailabilityStore.ping, SERVER_PING_TIMEOUT);
@@ -51,7 +51,7 @@ const AppFacade = () => {
     return <ServerUnavailablePage server={server} />;
   }
 
-  if (!sessionId) {
+  if (!username) {
     return (
       <LoginQueryClientProvider>
         <LoginPage />

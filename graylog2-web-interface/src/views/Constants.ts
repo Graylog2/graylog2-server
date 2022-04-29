@@ -16,7 +16,7 @@
  */
 import chroma from 'chroma-js';
 
-import type { TimeRange, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
+import type { TimeRange, RelativeTimeRangeWithEnd, RelativeTimeRange } from 'views/logic/queries/Query';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 export type SearchBarFormValues = {
@@ -33,6 +33,7 @@ export const SOURCE_FIELD = 'source';
 export const DEFAULT_MESSAGE_FIELDS = [TIMESTAMP_FIELD, SOURCE_FIELD];
 
 export const RELATIVE_ALL_TIME = 0; // value for time range `range` property, which represents all time
+export const ALL_MESSAGES_TIMERANGE: RelativeTimeRange = { type: 'relative', range: RELATIVE_ALL_TIME };
 export const Messages = {
   DEFAULT_LIMIT: 150,
 };

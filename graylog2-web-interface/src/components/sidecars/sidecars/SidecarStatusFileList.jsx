@@ -47,17 +47,13 @@ class SidecarStatusFileList extends React.Component {
     return (<span><Icon name="file" type="regular" />&nbsp;&nbsp;{file.path}</span>);
   };
 
-  _fileListFormatter = (file) => {
-    const format = 'YYYY-MM-DD HH:mm:ss';
-
-    return (
-      <tr key={file.path} className={this._activityFormatter(file.mod_time)}>
-        <td className="limited"><Timestamp dateTime={file.mod_time} format={format} /></td>
-        <td className="limited">{file.size}</td>
-        <td>{this._dirFormatter(file)}</td>
-      </tr>
-    );
-  };
+  _fileListFormatter = (file) => (
+    <tr key={file.path} className={this._activityFormatter(file.mod_time)}>
+      <td className="limited"><Timestamp dateTime={file.mod_time} /></td>
+      <td className="limited">{file.size}</td>
+      <td>{this._dirFormatter(file)}</td>
+    </tr>
+  );
 
   render() {
     const filterKeys = [];

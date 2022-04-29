@@ -189,6 +189,19 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     }
 
     private AbsoluteRange extractEffectiveTimeRange(SearchResponse queryResult, Query query, Pivot pivot) {
+        if (queryResult.getHits().getTotalHits().value != 0) {
+            return getAbsoluteRangeFromAggregations(queryResult, query, pivot);
+        } else {
+            return getAbsoluteRangeFromPivot(query, pivot);
+        }
+    }
+
+    private AbsoluteRange getAbsoluteRangeFromPivot(final Query query, final Pivot pivot) {
+        final TimeRange pivotRange = query.effectiveTimeRange(pivot);
+        return AbsoluteRange.create(pivotRange.getFrom(), pivotRange.getTo());
+    }
+
+    private AbsoluteRange getAbsoluteRangeFromAggregations(final SearchResponse queryResult, final Query query, final Pivot pivot) {
         final Min min = queryResult.getAggregations().get("timestamp-min");
         final Double from = min.getValue();
         final Max max = queryResult.getAggregations().get("timestamp-max");
@@ -197,10 +210,10 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         return AbsoluteRange.create(
                 isAllMessagesTimeRange(pivotRange) && from != 0
                         ? new DateTime(from.longValue(), DateTimeZone.UTC)
-                        : query.effectiveTimeRange(pivot).getFrom(),
+                        : pivotRange.getFrom(),
                 isAllMessagesTimeRange(pivotRange) && to != 0
                         ? new DateTime(to.longValue(), DateTimeZone.UTC)
-                        : query.effectiveTimeRange(pivot).getTo()
+                        : pivotRange.getTo()
         );
     }
 

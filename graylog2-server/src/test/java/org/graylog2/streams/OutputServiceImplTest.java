@@ -22,7 +22,8 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.outputs.OutputRegistry;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.outputs.events.OutputChangedEvent;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -37,6 +38,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
 
 public class OutputServiceImplTest {
     @Rule
@@ -48,7 +50,7 @@ public class OutputServiceImplTest {
     @Mock
     private StreamService streamService;
     @Mock
-    private OutputRegistry outputRegistry;
+    private ClusterEventBus clusterEventBus;
 
     private OutputServiceImpl outputService;
 
@@ -60,8 +62,7 @@ public class OutputServiceImplTest {
                 mongodb.mongoConnection(),
                 mapperProvider,
                 streamService,
-                outputRegistry
-        );
+                clusterEventBus);
     }
 
     @Test
@@ -120,5 +121,14 @@ public class OutputServiceImplTest {
         final Output retrievedOutput = outputService.load(outputId);
 
         assertThat(retrievedOutput.getTitle()).isEqualTo("Some other Title");
+    }
+
+    @Test
+    @MongoDBFixtures("single-output.json")
+    public void updatingEmitsEvent() throws Exception {
+        final String outputId = "5b927d32a7c8644ed44576ed";
+        outputService.update(outputId, Collections.singletonMap("title", "Some other Title"));
+
+        verify(clusterEventBus).post(OutputChangedEvent.create(outputId));
     }
 }

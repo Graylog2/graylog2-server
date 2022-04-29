@@ -16,11 +16,9 @@
  */
 package org.graylog.plugins.views.search;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multimap;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -147,12 +145,12 @@ public class SearchTest {
     }
 
     private ExecutionState partialResultsMapWithSearchTypes(String... searchTypeIds) {
-        Multimap<String, Object> searchTypes = HashMultimap.create();
+        final ExecutionStateGlobalOverride.Builder builder = ExecutionStateGlobalOverride.builder();
         for (String id : searchTypeIds) {
-            searchTypes.put("keep_search_types", id);
+            builder.keepSearchTypesBuilder().add(id);
         }
         return ExecutionState.builder()
-                .setGlobalOverride(ImmutableMap.copyOf(searchTypes.asMap()))
+                .setGlobalOverride(builder.build())
                 .build();
     }
 

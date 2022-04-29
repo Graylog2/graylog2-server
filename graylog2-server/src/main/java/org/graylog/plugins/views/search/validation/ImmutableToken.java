@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.validation;
 
 import com.google.auto.value.AutoValue;
+import org.apache.lucene.queryparser.classic.QueryParserConstants;
 
 @AutoValue
 public abstract class ImmutableToken {

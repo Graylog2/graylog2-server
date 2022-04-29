@@ -28,6 +28,10 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import WidgetQueryControls from './WidgetQueryControls';
 import WidgetContext from './contexts/WidgetContext';
 
+jest.mock('hooks/useUserDateTime');
+jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
+jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
+
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
     update: jest.fn(),
@@ -67,7 +71,8 @@ jest.mock('moment', () => {
 });
 
 jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
-jest.mock('views/components/searchbar/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
+jest.mock('views/components/searchbar/queryinput/BasicQueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
+jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {
@@ -128,7 +133,7 @@ describe('WidgetQueryControls', () => {
   describe('displays if global override is set', () => {
     const resetTimeRangeButtonTitle = /reset global override/i;
     const resetQueryButtonTitle = /reset global filter/i;
-    const timeRangeOverrideInfo = '2020-01-01T10:00:00.850Z - 2020-01-02T10:00:00.000Z';
+    const timeRangeOverrideInfo = '2019-10-10 12:26:31 - 2019-10-10 12:26:31';
     const queryOverrideInfo = globalOverrideWithQuery.query.query_string;
 
     it('shows preview of global override time range', async () => {

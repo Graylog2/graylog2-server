@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
@@ -57,6 +58,7 @@ const StyledPaginatedList = styled(PaginatedList)`
 `;
 
 const _headerCellFormatter = (header) => {
+  // eslint-disable-next-line react/destructuring-assignment
   switch (header.toLowerCase()) {
     case 'actions':
       return <th className="actions text-right">{header}</th>;
@@ -76,22 +78,40 @@ const _loadRoles = (pagination, setLoading, setPaginatedRoles) => {
 
 const _updateListOnRoleDelete = (perPage, query, setPagination) => AuthzRolesActions.delete.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
 
+const getUseTeamMembersHook = () => {
+  const defaultHook = () => ({ loading: false, users: [] });
+  const teamsPlugin = PluginStore.exports('teams');
+
+  return teamsPlugin?.[0]?.useTeamMembersByRole || defaultHook;
+};
+
 const RolesOverview = () => {
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined | null>();
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { list: roles } = paginatedRoles || {};
   const { page, perPage, query } = pagination;
+  const useTeamMembersByRole = getUseTeamMembersHook();
+  const teamMembersByRole = useTeamMembersByRole();
 
   useEffect(() => _loadRoles(pagination, setLoading, setPaginatedRoles), [pagination]);
   useEffect(() => _updateListOnRoleDelete(perPage, query, setPagination), [perPage, query]);
+
+  const _rolesOverviewItem = useCallback((role) => {
+    const { id: roleId } = role;
+    const roleUsers = paginatedRoles?.context.users[roleId];
+    const users = teamMembersByRole.users[roleId]
+      ? [...teamMembersByRole.users[roleId], ...roleUsers]
+      : paginatedRoles?.context?.users[roleId];
+
+    return <RolesOverviewItem role={role} users={users} />;
+  }, [teamMembersByRole, paginatedRoles?.context]);
 
   if (!paginatedRoles) {
     return <Spinner />;
   }
 
   const searchFilter = <RolesFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />;
-  const _rolesOverviewItem = (role) => <RolesOverviewItem role={role} users={paginatedRoles?.context?.users[role.id]} />;
 
   return (
     <Container>

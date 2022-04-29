@@ -88,7 +88,7 @@ const _exportOnSearchPage = (format: string, payload: ExportPayload, searchQueri
 
 const SearchExportStrategy: ExportStrategy = {
   title: 'Export all search results',
-  shouldEnableDownload: (showWidgetSelection, selectedWidget, selectedFields, loading) => !loading && !showWidgetSelection && !!selectedFields && selectedFields.length > 0,
+  shouldEnableDownload: (showWidgetSelection, _selectedWidget, selectedFields, loading) => !loading && !showWidgetSelection && !!selectedFields && selectedFields.length > 0,
   shouldAllowWidgetSelection: (singleWidgetDownload, showWidgetSelection, widgets) => !singleWidgetDownload && !showWidgetSelection && widgets.size > 1,
   shouldShowWidgetSelection: (singleWidgetDownload, selectedWidget, widgets) => !singleWidgetDownload && !selectedWidget && widgets.size > 1,
   initialWidget: _initialSearchWidget,
@@ -97,11 +97,11 @@ const SearchExportStrategy: ExportStrategy = {
 
 const DashboardExportStrategy: ExportStrategy = {
   title: 'Export message table search results',
-  shouldEnableDownload: (showWidgetSelection, selectedWidget, selectedFields, loading) => !loading && !!selectedWidget && !!selectedFields && selectedFields.length > 0,
+  shouldEnableDownload: (_showWidgetSelection, selectedWidget, selectedFields, loading) => !loading && !!selectedWidget && !!selectedFields && selectedFields.length > 0,
   shouldAllowWidgetSelection: (singleWidgetDownload, showWidgetSelection) => !singleWidgetDownload && !showWidgetSelection,
   shouldShowWidgetSelection: (singleWidgetDownload, selectedWidget) => !singleWidgetDownload && !selectedWidget,
   initialWidget: (widget, directExportWidgetId) => (directExportWidgetId ? _getWidgetById(widget, directExportWidgetId) : null),
-  downloadFile: (format: string, payload, searchQueries, searchType, searchId, filename) => _exportOnDashboard(format, payload, searchType, searchId, filename),
+  downloadFile: (format: string, payload, _searchQueries, searchType, searchId, filename) => _exportOnDashboard(format, payload, searchType, searchId, filename),
 };
 
 const createExportStrategy = (viewType: ViewType) => {

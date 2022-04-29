@@ -48,7 +48,7 @@ const viewJson: ViewJson = {
   search_id: 'foosearch',
   properties: Immutable.List(),
   state: {},
-  created_at: new Date('2019-05-24T12:34:04.993Z'),
+  created_at: '2019-05-24T12:34:04.993Z',
   owner: 'admin',
   requires: {},
 };

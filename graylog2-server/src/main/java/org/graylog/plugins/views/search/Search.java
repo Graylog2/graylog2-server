@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -30,6 +29,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.graylog.plugins.views.search.rest.ExecutionState;
+import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -103,18 +103,23 @@ public abstract class Search implements ContentPackable<SearchEntity> {
                     .collect(toImmutableSet());
             builder.parameters(parameters);
         }
+
         if (executionState.queries() != null || executionState.globalOverride() != null) {
             final ImmutableSet<Query> queries = queries().stream()
-                    .map(query -> {
-                        final JsonNode queryOverride = executionState.globalOverride() != null
-                                ? objectMapper.convertValue(executionState.globalOverride(), JsonNode.class)
-                                : objectMapper.convertValue(executionState.queries(), JsonNode.class).path(query.id());
-                        return query.applyExecutionState(objectMapper, queryOverride);
-                    })
+                    .map(query -> applyStateToQuery(executionState, query))
                     .collect(toImmutableSet());
             builder.queries(queries);
         }
         return builder.build();
+    }
+
+    private Query applyStateToQuery(ExecutionState executionState, Query query) {
+        if (executionState.globalOverride().hasValues()) {
+            return query.applyExecutionState(executionState.globalOverride());
+        } else {
+            final ExecutionStateGlobalOverride queryOverride = executionState.queries().get(query.id());
+            return query.applyExecutionState(queryOverride);
+        }
     }
 
     public Search addStreamsToQueriesWithoutStreams(Supplier<Set<String>> defaultStreamsSupplier) {

@@ -70,7 +70,7 @@ jest.mock('views/stores/SearchMetadataStore', () => ({
 declare global {
   namespace NodeJS {
     interface Global {
-      api_url: string
+      api_url: string;
     }
   }
 }
@@ -89,11 +89,10 @@ jest.mock('stores/sessions/SessionStore', () => ({
   },
   SessionStore: {
     isLoggedIn: jest.fn(() => true),
-    getSessionId: jest.fn(() => 'foobar'),
   },
 }));
 
-jest.mock('views/components/searchbar/QueryInput', () => () => <span>Query Editor</span>);
+jest.mock('views/components/searchbar/queryinput/QueryInput', () => () => <span>Query Editor</span>);
 
 jest.unmock('logic/rest/FetchProvider');
 

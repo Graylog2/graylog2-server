@@ -162,7 +162,7 @@ public class VersionProbe {
     private Optional<SearchVersion> parseVersion(VersionResponse versionResponse) {
         try {
             final com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.valueOf(versionResponse.number());
-            return Optional.of(SearchVersion.create(versionResponse.distribution(), new Version(version)));
+            return Optional.of(SearchVersion.create(versionResponse.distribution(), version));
         } catch (Exception e) {
             LOG.error("Unable to parse version retrieved from Elasticsearch node: <{}>", versionResponse.number(), e);
             return Optional.empty();

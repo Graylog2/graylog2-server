@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+
 export const singleRowPivot = {
   rowPivots: [{ field: 'timestamp', type: 'time', config: { interval: { type: 'auto' } } }],
   columnPivots: [],
@@ -134,7 +136,7 @@ export const singleRowPivot = {
       key: [],
       values: [{ key: ['count()'], value: 28265, rollup: true, source: 'row-inner' }],
       source: 'non-leaf',
-    }],
+    }] as Rows,
   output: [
     {
       key: ['2018-10-02T07:12:30.000-04:00'],
@@ -467,7 +469,7 @@ export const noTimePivots = {
       values: [{ key: ['count()'], value: 45662, rollup: true, source: 'row-inner' }],
       source: 'non-leaf',
     },
-  ],
+  ] as Rows,
   output: [
     {
       key: ['GET'],

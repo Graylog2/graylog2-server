@@ -42,8 +42,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -75,13 +75,13 @@ public class RotationStrategyResource extends RestResource {
     @ApiOperation(value = "List available rotation strategies",
                   notes = "This resource returns a list of all available rotation strategies on this Graylog node.")
     public RotationStrategies list() {
-        final Set<RotationStrategyDescription> strategies = rotationStrategies.keySet()
+        final List<RotationStrategyDescription> strategies = rotationStrategies.keySet()
                 .stream()
                 .filter(this::isEnabledRotationStrategy)
                 .map(this::getRotationStrategyDescription)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
-        return RotationStrategies.create(strategies.size(), strategies);
+        return RotationStrategies.create(strategies);
     }
 
     @GET

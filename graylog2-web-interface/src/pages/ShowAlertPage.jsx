@@ -103,7 +103,7 @@ const ShowAlertPage = createReactClass({
       if (resolvedAtTime) {
         resolvedState = (
           <span>
-            This alert was resolved at <Timestamp dateTime={resolvedAtTime} format={DateTime.Formats.DATETIME} />.
+            This alert was resolved at <Timestamp dateTime={resolvedAtTime} />.
           </span>
         );
       }
@@ -113,7 +113,7 @@ const ShowAlertPage = createReactClass({
       resolvedState = (
         <span>
           This alert was triggered at{' '}
-          <Timestamp dateTime={alert.triggered_at} format={DateTime.Formats.DATETIME} />{' '}
+          <Timestamp dateTime={alert.triggered_at} />{' '}
           and is still unresolved.
         </span>
       );

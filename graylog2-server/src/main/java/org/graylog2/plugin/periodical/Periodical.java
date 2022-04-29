@@ -17,8 +17,12 @@
 package org.graylog2.plugin.periodical;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
 
 public abstract class Periodical implements Runnable {
+    private static final Logger LOG = LoggerFactory.getLogger(Periodical.class);
 
     /**
      * Defines if this thread should be called periodically or only once
@@ -72,13 +76,11 @@ public abstract class Periodical implements Runnable {
     public abstract boolean isDaemon();
 
     /**
-     *
      * @return Seconds to wait before starting the thread. 0 for runsForever() threads.
      */
     public abstract int getInitialDelaySeconds();
 
     /**
-     *
      * @return How long to wait between each execution of the thread. 0 for runsForever() threads.
      */
     public abstract int getPeriodSeconds();
@@ -91,10 +93,16 @@ public abstract class Periodical implements Runnable {
         try {
             doRun();
         } catch (RuntimeException e) {
-            getLogger().error("Uncaught exception in periodical", e);
+            final Logger logger = getLogger();
+            if (logger != null) {
+                logger.error("Uncaught exception in Periodical", e);
+            } else {
+                LOG.error("Uncaught exception in Periodical", e);
+            }
         }
     }
 
+    @Nonnull
     protected abstract Logger getLogger();
 
     public abstract void doRun();

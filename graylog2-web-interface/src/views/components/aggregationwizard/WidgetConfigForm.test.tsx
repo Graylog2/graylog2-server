@@ -20,36 +20,36 @@ import { render, screen } from 'wrappedTestingLibrary';
 import WidgetConfigForm from 'views/components/aggregationwizard/WidgetConfigForm';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-import ValidationStateProvider from '../contexts/ValidationStateProvider';
-import ValidationStateContext from '../contexts/ValidationStateContext';
+import DisableSubmissionStateProvider from '../contexts/DisableSubmissionStateProvider';
+import DisableSubmissionStateContext from '../contexts/DisableSubmissionStateContext';
 
 describe('WidgetConfigForm', () => {
   const WidgetConfigFormWithValidationState = ({ validate }: { validate: () => ({ [key: string]: string })}) => {
     return (
-      <ValidationStateProvider>
-        <ValidationStateContext.Consumer>
-          {({ hasErrors }) => (
+      <DisableSubmissionStateProvider>
+        <DisableSubmissionStateContext.Consumer>
+          {({ disabled }) => (
             <>
               <WidgetConfigForm initialValues={{}} onSubmit={() => {}} validate={validate} config={AggregationWidgetConfig.builder().build()}>
                 <span>Hello world!</span>
               </WidgetConfigForm>
-              <span>{hasErrors ? 'Form has errors' : 'Form has no errors'}</span>
+              <span>{disabled ? 'Form submission is disabled' : 'Form submission is not disabled'}</span>
             </>
           )}
-        </ValidationStateContext.Consumer>
-      </ValidationStateProvider>
+        </DisableSubmissionStateContext.Consumer>
+      </DisableSubmissionStateProvider>
     );
   };
 
-  it('propagates validation state to context if it has errors', async () => {
+  it('propagates validation state to context if submission is disabled', async () => {
     render(<WidgetConfigFormWithValidationState validate={() => ({ visualization: 'Is missing.' })} />);
 
-    await screen.findByText('Form has errors');
+    await screen.findByText('Form submission is disabled');
   });
 
-  it('propagates validation state to context if it has no errors', async () => {
+  it('propagates validation state to context if submission is not disabled', async () => {
     render(<WidgetConfigFormWithValidationState validate={() => ({})} />);
 
-    await screen.findByText('Form has no errors');
+    await screen.findByText('Form submission is not disabled');
   });
 });

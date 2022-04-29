@@ -44,7 +44,7 @@ public class EventsIndexMappingTest {
             "7.0.0"
     })
     void createsValidMappingTemplates(String versionString) throws Exception {
-        final SearchVersion version = SearchVersion.elasticsearch(Version.valueOf(versionString));
+        final SearchVersion version = SearchVersion.elasticsearch(versionString);
         final IndexMappingTemplate mapping = new EventIndexTemplateProvider().create(version, null);
 
         assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*"), at -> {
@@ -104,7 +104,7 @@ public class EventsIndexMappingTest {
     }
 
     private String dateFormat(SearchVersion version) {
-        if (version.version().getVersion().greaterThanOrEqualTo(Version.valueOf("7.0.0"))) {
+        if (version.version().greaterThanOrEqualTo(Version.valueOf("7.0.0"))) {
             return "uuuu-MM-dd HH:mm:ss.SSS";
         }
 
@@ -112,7 +112,7 @@ public class EventsIndexMappingTest {
     }
 
     private String keyFor(String keySuffix, SearchVersion version) {
-        if (version.version().getVersion().greaterThanOrEqualTo(Version.valueOf("7.0.0"))) {
+        if (version.version().greaterThanOrEqualTo(Version.valueOf("7.0.0"))) {
             return "$.mappings." + keySuffix;
         }
         return "$.mappings.message." + keySuffix;

@@ -31,7 +31,7 @@ class EditOutputButton extends React.Component {
   static defaultProps = {
     disabled: false,
     onUpdate: () => {},
-  }
+  };
 
   constructor(props) {
     super(props);

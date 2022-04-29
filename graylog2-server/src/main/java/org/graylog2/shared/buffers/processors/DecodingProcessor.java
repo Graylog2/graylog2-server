@@ -109,6 +109,9 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
                 for (final Message message : event.getMessages()) {
                     message.recordTiming(serverStatus, "decode", context.stop());
                 }
+            } else {
+                // Acknowledge null messages
+                acknowledger.acknowledge(event.getRaw().getMessageQueueId());
             }
             // aid garbage collection to collect the raw message early (to avoid promoting it to later generations).
             event.clearRaw();

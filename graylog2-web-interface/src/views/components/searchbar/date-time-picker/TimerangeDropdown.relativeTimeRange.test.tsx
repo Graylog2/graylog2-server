@@ -21,7 +21,6 @@ import userEvent from '@testing-library/user-event';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 
-import { DateTimeContext } from './DateTimeProvider';
 import type { TimeRangeDropdownProps } from './TimeRangeDropdown';
 import OriginalTimeRangeDropDown from './TimeRangeDropdown';
 
@@ -36,6 +35,7 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   ),
 }));
 
+jest.mock('hooks/useUserDateTime');
 jest.mock('stores/tools/ToolsStore', () => ({}));
 
 const defaultProps = {
@@ -47,14 +47,11 @@ const defaultProps = {
   setCurrentTimeRange: jest.fn(),
   toggleDropdownShow: jest.fn(),
   position: 'bottom',
+  limitDuration: 259200,
 } as const;
 
 const TimeRangeDropdown = (allProps: TimeRangeDropdownProps) => (
-  <DateTimeContext.Provider value={{
-    limitDuration: 259200,
-  }}>
-    <OriginalTimeRangeDropDown {...allProps} />
-  </DateTimeContext.Provider>
+  <OriginalTimeRangeDropDown {...allProps} />
 );
 
 describe('TimeRangeDropdown relative time range', () => {

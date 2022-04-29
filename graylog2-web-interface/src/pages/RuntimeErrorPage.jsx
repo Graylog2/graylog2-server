@@ -77,7 +77,7 @@ class RuntimeErrorPage extends React.Component {
             </ToggleDetails>
           </dt>
           <dt>
-            <pre className="content">
+            <pre className="content" id="render-error">
               <div className="pull-right">
                 <ClipboardButton title={<Icon name="copy" fixedWidth />}
                                  bsSize="sm"

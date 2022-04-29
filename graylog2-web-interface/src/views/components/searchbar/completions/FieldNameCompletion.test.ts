@@ -14,81 +14,60 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as Immutable from 'immutable';
-
-import { StoreMock as MockStore } from 'helpers/mocking';
-import asMock from 'helpers/mocking/AsMock';
-import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import type { FieldTypeMappingsList, FieldTypesStoreState } from 'views/stores/FieldTypesStore';
-import { FieldTypesStore } from 'views/stores/FieldTypesStore';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import FieldType from 'views/logic/fieldtypes/FieldType';
+import type { CompletionResult } from 'views/components/searchbar/queryinput/ace-types';
 
 import FieldNameCompletion from './FieldNameCompletion';
 
-jest.mock('views/stores/FieldTypesStore', () => ({
-  FieldTypesStore: MockStore(
-    ['getInitialState', jest.fn(() => ({ all: [], queryFields: { get: () => [] } }))],
-  ),
-}));
+const _createField = (name: string) => FieldTypeMapping.create(name, FieldType.create('string', []));
 
-jest.mock('views/stores/ViewMetadataStore', () => ({
-  ViewMetadataStore: MockStore(
-    ['getInitialState', jest.fn(() => ({ activeQuery: 'query1' }))],
-  ),
-}));
+const toIndex = (fields: Array<FieldTypeMapping>) => Object.fromEntries(fields.map((field) => [field.name, field]));
+const createFieldTypes = (fields: Array<FieldTypeMapping>) => ({ all: toIndex(fields), query: toIndex(fields) });
 
-const _createField = (name) => ({ name, type: { type: 'string' } });
-const dummyFields = ['source', 'message', 'timestamp'].map(_createField);
-
-const _createQueryFields = (fields) => ({ get: () => fields }) as unknown as Immutable.Map<string, FieldTypeMappingsList>;
-const _createFieldTypesStoreState = (fields): FieldTypesStoreState => ({ all: fields, queryFields: _createQueryFields(fields) });
+const dummyFieldTypes = createFieldTypes(['source', 'message', 'timestamp'].map(_createField));
 
 describe('FieldNameCompletion', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    asMock(FieldTypesStore.getInitialState).mockReturnValue(_createFieldTypesStoreState(dummyFields));
-  });
-
   it('returns empty list if inputs are empty', () => {
-    asMock(FieldTypesStore.getInitialState).mockReturnValue(_createFieldTypesStoreState([]));
+    const fieldTypes = createFieldTypes([]);
 
     const completer = new FieldNameCompletion([]);
 
-    expect(completer.getCompletions(null, null, '')).toEqual([]);
+    expect(completer.getCompletions({ currentToken: null, lastToken: null, prefix: '', tokens: [], currentTokenIdx: 0, fieldTypes })).toEqual([]);
   });
 
   it('returns matching fields if prefix is present in one field name', () => {
     const completer = new FieldNameCompletion();
 
-    expect(completer.getCompletions(null, null, 'mess').map((result) => result.name))
+    expect(completer.getCompletions({ currentToken: null, lastToken: null, prefix: 'mess', tokens: [], currentTokenIdx: 0, fieldTypes: dummyFieldTypes }).map((result) => result.name))
       .toEqual(['message']);
   });
 
   it('returns matching fields if prefix is present in at least one field name', () => {
     const completer = new FieldNameCompletion([]);
 
-    expect(completer.getCompletions(null, null, 'e').map((result) => result.name))
+    expect(completer.getCompletions({ currentToken: null, lastToken: null, prefix: 'e', tokens: [], currentTokenIdx: 0, fieldTypes: dummyFieldTypes }).map((result) => result.name))
       .toEqual(['source', 'message', 'timestamp']);
   });
 
   it('suffixes matching fields with colon', () => {
     const completer = new FieldNameCompletion([]);
 
-    expect(completer.getCompletions(null, null, 'e').map((result) => result.value))
+    expect(completer.getCompletions({ currentToken: null, lastToken: null, prefix: 'e', tokens: [], currentTokenIdx: 0, fieldTypes: dummyFieldTypes }).map((result) => result.value))
       .toEqual(['source:', 'message:', 'timestamp:']);
   });
 
   it('returns _exist_-operator if matching prefix', () => {
     const completer = new FieldNameCompletion();
 
-    expect(completer.getCompletions(null, null, '_e').map((result) => result.value))
+    expect(completer.getCompletions({ currentToken: null, lastToken: null, prefix: '_e', tokens: [], currentTokenIdx: 0, fieldTypes: dummyFieldTypes }).map((result) => result.value))
       .toEqual(['_exists_:']);
   });
 
   it('returns matching fields after _exists_-operator', () => {
     const completer = new FieldNameCompletion();
 
-    expect(completer.getCompletions(null, { type: 'keyword', value: '_exists_:' }, 'e')
+    expect(completer.getCompletions({ currentToken: null, lastToken: { type: 'keyword', value: '_exists_:' }, prefix: 'e', tokens: [], currentTokenIdx: 0, fieldTypes: dummyFieldTypes })
       .map((result) => result.name))
       .toEqual(['source', 'message', 'timestamp']);
   });
@@ -96,72 +75,42 @@ describe('FieldNameCompletion', () => {
   it('returns exists operator together with matching fields', () => {
     const completer = new FieldNameCompletion();
 
-    expect(completer.getCompletions(null, null, 'e').map((result) => result.name))
+    expect(completer.getCompletions({ currentToken: null, lastToken: null, prefix: 'e', tokens: [], currentTokenIdx: 0, fieldTypes: dummyFieldTypes }).map((result) => result.name))
       .toEqual(['_exists_', 'source', 'message', 'timestamp']);
-  });
-
-  it('updates its types when `FieldTypesStore` updates', () => {
-    const completer = new FieldNameCompletion([]);
-    const newFields = ['nf_version', 'nf_proto_name'];
-    const callback = asMock(FieldTypesStore.listen).mock.calls[0][0];
-
-    callback(_createFieldTypesStoreState(newFields.map(_createField)));
-
-    expect(completer.getCompletions(null, null, '').map((result) => result.name))
-      .toEqual(['nf_version', 'nf_proto_name']);
   });
 
   it('returns empty list when current token is a keyword and the the prefix is empty', () => {
     const completer = new FieldNameCompletion();
     const currentToken = { type: 'keyword', value: 'http_method:', index: 0, start: 0 };
 
-    expect(completer.getCompletions(currentToken, null, '')).toEqual([]);
+    expect(completer.getCompletions({ currentToken, lastToken: null, prefix: '', tokens: [], currentTokenIdx: 0, fieldTypes: dummyFieldTypes })).toEqual([]);
   });
 
   describe('considers current query', () => {
-    const completionByName = (fieldName, completions) => completions.find(({ name }) => (name === fieldName));
+    const completionByName = (fieldName: string, completions: CompletionResult[]) => completions.find(({ name }) => (name === fieldName));
 
-    const queryFields = {
-      get: (queryId, _default) => ({
-        query1: ['foo'].map(_createField),
-        query2: ['bar'].map(_createField),
-      }[queryId] || _default),
+    const fieldTypes = {
+      all: {
+        foo: _createField('foo'),
+        bar: _createField('bar'),
+      },
+      query: {
+        foo: _createField('foo'),
+      },
     };
-
-    const all = Immutable.List(['foo', 'bar'].map(_createField));
-
-    beforeEach(() => {
-      asMock(FieldTypesStore.getInitialState).mockReturnValue({ all, queryFields } as FieldTypesStoreState);
-    });
 
     it('scores fields of current query higher', () => {
       const completer = new FieldNameCompletion([]);
 
-      const completions = completer.getCompletions(null, null, '');
+      const completions = completer.getCompletions({ currentToken: null, lastToken: null, prefix: '', tokens: [], currentTokenIdx: 0, fieldTypes });
 
-      const completion = (fieldName) => completionByName(fieldName, completions);
+      const completion = (fieldName: string) => completionByName(fieldName, completions);
 
       expect(completion('foo')?.score).toEqual(12);
       expect(completion('foo')?.meta).not.toMatch('(not in streams)');
 
       expect(completion('bar')?.score).toEqual(3);
       expect(completion('bar')?.meta).toMatch('(not in streams)');
-    });
-
-    it('scores fields of current query higher after selecting different query', () => {
-      const completer = new FieldNameCompletion([]);
-      const callback = asMock(ViewMetadataStore.listen).mock.calls[0][0];
-
-      callback({ activeQuery: 'query2' } as ViewMetaData);
-
-      const completions = completer.getCompletions(null, null, '');
-      const completion = (fieldName) => completionByName(fieldName, completions);
-
-      expect(completion('foo')?.score).toEqual(3);
-      expect(completion('foo')?.meta).toMatch('(not in streams)');
-
-      expect(completion('bar')?.score).toEqual(12);
-      expect(completion('bar')?.meta).not.toMatch('(not in streams)');
     });
   });
 });

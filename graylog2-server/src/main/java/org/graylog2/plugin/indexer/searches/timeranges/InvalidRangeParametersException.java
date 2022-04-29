@@ -16,7 +16,7 @@
  */
 package org.graylog2.plugin.indexer.searches.timeranges;
 
-public class InvalidRangeParametersException extends Exception {
+public class InvalidRangeParametersException extends RuntimeException {
     public InvalidRangeParametersException() {
         super();
     }

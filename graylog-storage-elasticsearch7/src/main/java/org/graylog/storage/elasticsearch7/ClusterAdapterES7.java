@@ -266,16 +266,15 @@ public class ClusterAdapterES7 implements ClusterAdapter {
 
     private Optional<ClusterHealthResponse> clusterHealth(Collection<String> indices) {
         final String[] indicesAry = indices.toArray(new String[0]);
-        if (!indices.isEmpty() && !indicesExist(indicesAry)) {
-            return Optional.empty();
-        }
-        final ClusterHealthRequest request = new ClusterHealthRequest(indicesAry)
-                .timeout(TimeValue.timeValueSeconds(Ints.saturatedCast(requestTimeout.toSeconds())))
-                .indicesOptions(IndicesOptions.lenientExpand());
-
         try {
+            if (!indices.isEmpty() && !indicesExist(indicesAry)) {
+                return Optional.empty();
+            }
+            final ClusterHealthRequest request = new ClusterHealthRequest(indicesAry)
+                    .timeout(TimeValue.timeValueSeconds(Ints.saturatedCast(requestTimeout.toSeconds())))
+                    .indicesOptions(IndicesOptions.lenientExpand());
             return Optional.of(client.execute((c, requestOptions) -> c.cluster().health(request, requestOptions)));
-        } catch (ElasticsearchException e) {
+        } catch (org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"), e);
             } else {

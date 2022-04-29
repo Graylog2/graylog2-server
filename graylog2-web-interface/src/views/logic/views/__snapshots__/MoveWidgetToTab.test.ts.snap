@@ -2,7 +2,7 @@
 
 exports[`MoveWidgetToTab should copy a Widget to a dashboard 1`] = `
 Object {
-  "created_at": "2020-05-27T12:32:49.786Z",
+  "created_at": 2020-05-27T12:32:49.786Z,
   "description": "move widget to tab",
   "id": "5ece5e1b74ff709b0b0dc69b",
   "owner": "admin",
@@ -118,7 +118,7 @@ Object {
 
 exports[`MoveWidgetToTab should move a Widget to a dashboard 1`] = `
 Object {
-  "created_at": "2020-05-27T12:32:49.786Z",
+  "created_at": 2020-05-27T12:32:49.786Z,
   "description": "move widget to tab",
   "id": "5ece5e1b74ff709b0b0dc69b",
   "owner": "admin",
@@ -142,7 +142,7 @@ Object {
         "highlighting": Array [],
       },
       "positions": Immutable.Map {
-        "dead-beef": Object {
+        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": Object {
           "col": 0,
           "height": 4,
           "row": 1,
@@ -152,11 +152,11 @@ Object {
       "selected_fields": undefined,
       "titles": Immutable.Map {
         "widget": Immutable.Map {
-          "dead-beef": "Widget Title",
+          "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": "Widget Title",
         },
       },
       "widget_mapping": Immutable.Map {
-        "dead-beef": Immutable.Set [
+        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": Immutable.Set [
           "dead-beef",
         ],
       },
@@ -179,7 +179,7 @@ Object {
             "visualization": "numeric",
           },
           "filter": undefined,
-          "id": "dead-beef",
+          "id": "b34c3c6f-c49d-41d3-a65a-f746134f8f3e",
           "query": null,
           "streams": Array [],
           "timerange": null,
@@ -196,7 +196,7 @@ Object {
 
 exports[`MoveWidgetToTab should provide a default position in case the widgets position cannot be found 1`] = `
 Object {
-  "created_at": "2020-05-27T12:32:49.786Z",
+  "created_at": 2020-05-27T12:32:49.786Z,
   "description": "move widget to tab",
   "id": "5ece5e1b74ff709b0b0dc69b",
   "owner": "admin",
@@ -220,7 +220,7 @@ Object {
         "highlighting": Array [],
       },
       "positions": Immutable.Map {
-        "dead-beef": Object {
+        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": Object {
           "col": 1,
           "height": 4,
           "row": 1,
@@ -230,11 +230,11 @@ Object {
       "selected_fields": undefined,
       "titles": Immutable.Map {
         "widget": Immutable.Map {
-          "dead-beef": "Widget Title",
+          "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": "Widget Title",
         },
       },
       "widget_mapping": Immutable.Map {
-        "dead-beef": Immutable.Set [
+        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": Immutable.Set [
           "dead-beef",
         ],
       },
@@ -257,7 +257,7 @@ Object {
             "visualization": "numeric",
           },
           "filter": undefined,
-          "id": "dead-beef",
+          "id": "b34c3c6f-c49d-41d3-a65a-f746134f8f3e",
           "query": null,
           "streams": Array [],
           "timerange": null,
@@ -274,7 +274,7 @@ Object {
 
 exports[`MoveWidgetToTab should work when titles are empty 1`] = `
 Object {
-  "created_at": "2020-05-27T12:32:49.786Z",
+  "created_at": 2020-05-27T12:32:49.786Z,
   "description": "move widget to tab",
   "id": "5ece5e1b74ff709b0b0dc69b",
   "owner": "admin",
@@ -296,7 +296,7 @@ Object {
         "highlighting": Array [],
       },
       "positions": Immutable.Map {
-        "dead-beef": Object {
+        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": Object {
           "col": 0,
           "height": 4,
           "row": 1,
@@ -306,7 +306,7 @@ Object {
       "selected_fields": undefined,
       "titles": Immutable.Map {},
       "widget_mapping": Immutable.Map {
-        "dead-beef": Immutable.Set [
+        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": Immutable.Set [
           "dead-beef",
         ],
       },
@@ -329,7 +329,7 @@ Object {
             "visualization": "numeric",
           },
           "filter": undefined,
-          "id": "dead-beef",
+          "id": "b34c3c6f-c49d-41d3-a65a-f746134f8f3e",
           "query": null,
           "streams": Array [],
           "timerange": null,

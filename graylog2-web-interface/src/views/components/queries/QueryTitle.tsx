@@ -36,7 +36,7 @@ type Props = {
   active: boolean,
   allowsClosing?: boolean,
   id: QueryId,
-  onClose: () => Promise<void> | Promise<ViewState>,
+  onClose: () => Promise<void | ViewState>,
   openEditModal: (string) => void,
   title: string,
 };
@@ -64,7 +64,7 @@ const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, title }
           <MenuItem onSelect={() => _onDuplicate()}>Duplicate</MenuItem>
           <MenuItem onSelect={() => openEditModal(titleValue)}>Edit Title</MenuItem>
           <MenuItem divider />
-          <MenuItem onSelect={onClose} disabled={!allowsClosing}>Close</MenuItem>
+          <MenuItem onSelect={onClose} disabled={!allowsClosing}>Delete</MenuItem>
         </QueryActionDropdown>
       )}
     </>

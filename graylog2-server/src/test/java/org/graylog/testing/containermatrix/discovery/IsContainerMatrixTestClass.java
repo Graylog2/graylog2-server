@@ -21,6 +21,7 @@ import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.storage.SearchVersion;
+import org.junit.jupiter.engine.descriptor.ContainerMatrixTestWithRunningESMongoTestsDescriptor;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestsDescriptor;
 import org.junit.jupiter.engine.discovery.predicates.IsContainerMatrixTest;
 import org.junit.jupiter.engine.discovery.predicates.IsNestedTestClass;
@@ -59,11 +60,15 @@ public class IsContainerMatrixTestClass extends IsTestClassWithTests {
         Optional<ContainerMatrixTestsConfiguration> annotation = AnnotationSupport.findAnnotation(candidate, ContainerMatrixTestsConfiguration.class);
         if (annotation.isPresent()) {
             ContainerMatrixTestsConfiguration config = annotation.get();
-            return config.serverLifecycle().equals(container.getLifecycle())
-                    && config.mavenProjectDirProvider().equals(container.getMavenProjectDirProvider())
-                    && config.pluginJarsProvider().equals(container.getPluginJarsProvider())
-                    && getSearchServers(config).contains(container.getEsVersion())
-                    && getMongodbServers(config).contains(container.getMongoVersion());
+            if (container instanceof ContainerMatrixTestWithRunningESMongoTestsDescriptor) {
+                return true;
+            } else {
+                return config.serverLifecycle().equals(container.getLifecycle())
+                        && config.mavenProjectDirProvider().equals(container.getMavenProjectDirProvider())
+                        && config.pluginJarsProvider().equals(container.getPluginJarsProvider())
+                        && getSearchServers(config).contains(container.getEsVersion())
+                        && getMongodbServers(config).contains(container.getMongoVersion());
+            }
         } else {
             // Annotation should be present!
             return false;

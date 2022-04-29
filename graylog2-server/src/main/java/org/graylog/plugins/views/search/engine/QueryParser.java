@@ -54,8 +54,8 @@ public class QueryParser {
 
         return queryStringStreams
                 .map(queryStringParser::parse)
-                .reduce(QueryMetadata.builder().build(), (meta1, meta2) -> QueryMetadata.builder().usedParameterNames(
-                        Sets.union(meta1.usedParameterNames(), meta2.usedParameterNames())
+                .reduce(QueryMetadata.builder().build(), (meta1, meta2) -> QueryMetadata.builder().usedParameters(
+                        Sets.union(meta1.usedParameters(), meta2.usedParameters())
                 ).build());
     }
 

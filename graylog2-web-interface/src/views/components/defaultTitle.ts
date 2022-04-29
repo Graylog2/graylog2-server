@@ -18,9 +18,13 @@ import { capitalize } from 'lodash';
 
 import { widgetDefinition } from 'views/logic/Widgets';
 
-const defaultTitleGenerator = (w) => `Untitled ${w.type.replace('_', ' ').split(' ').map(capitalize).join(' ')}`;
+interface WidgetLike {
+  type: string;
+}
 
-const defaultTitle = (widget) => {
+const defaultTitleGenerator = ({ type }: WidgetLike) => `Untitled ${type.replace('_', ' ').split(' ').map(capitalize).join(' ')}`;
+
+const defaultTitle = (widget: WidgetLike) => {
   const widgetDef = widgetDefinition(widget.type);
 
   return (widgetDef.titleGenerator || defaultTitleGenerator)(widget);

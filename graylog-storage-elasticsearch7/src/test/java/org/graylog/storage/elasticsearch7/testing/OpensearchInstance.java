@@ -22,9 +22,10 @@ import org.graylog.shaded.elasticsearch7.org.apache.http.impl.client.BasicCreden
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.RestHighLevelClientProvider;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
@@ -40,7 +41,7 @@ import java.util.Locale;
 
 import static java.util.Objects.isNull;
 
-public class OpensearchInstance extends SearchServerInstance {
+public class OpensearchInstance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchInstance.class);
 
     private static final int ES_PORT = 9200;
@@ -57,6 +58,11 @@ public class OpensearchInstance extends SearchServerInstance {
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
         this.client = new ClientES7(this.elasticsearchClient);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
+    }
+
+    @Override
+    public SearchServer searchServer() {
+        return SearchServer.OS1;
     }
 
     private RestHighLevelClient buildRestClient() {
@@ -88,16 +94,16 @@ public class OpensearchInstance extends SearchServerInstance {
     }
 
     private static String imageNameFrom(SearchVersion version) {
-        return String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version.version().getVersion());
+        return String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version.version());
     }
 
     @Override
-    protected Client client() {
+    public Client client() {
         return this.client;
     }
 
     @Override
-    protected FixtureImporter fixtureImporter() {
+    public FixtureImporter fixtureImporter() {
         return this.fixtureImporter;
     }
 
@@ -109,7 +115,8 @@ public class OpensearchInstance extends SearchServerInstance {
         return this.restHighLevelClient;
     }
 
-    protected GenericContainer<?> buildContainer(String image, Network network) {
+    @Override
+    public GenericContainer<?> buildContainer(String image, Network network) {
         return new OpensearchContainer(DockerImageName.parse(image))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
                 .withReuse(isNull(System.getenv("BUILD_ID")))

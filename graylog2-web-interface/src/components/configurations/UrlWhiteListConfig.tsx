@@ -65,19 +65,19 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
         </tr>
       );
     });
-  }
+  };
 
   _openModal = () => {
     if (this.configModal) {
       this.configModal.open();
     }
-  }
+  };
 
   _closeModal = () => {
     if (this.configModal) {
       this.configModal.close();
     }
-  }
+  };
 
   _saveConfig = () => {
     const { config, isValid } = this.state;
@@ -88,20 +88,20 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
         this._closeModal();
       });
     }
-  }
+  };
 
   _update = (config: WhiteListConfig, isValid: boolean) => {
     const updatedState = { config, isValid };
 
     this.setState(updatedState);
-  }
+  };
 
   _resetConfig = () => {
     const { config } = this.props;
     const updatedState = { ...this.state, config };
 
     this.setState(updatedState);
-  }
+  };
 
   render() {
     const { config: { entries, disabled } } = this.props;

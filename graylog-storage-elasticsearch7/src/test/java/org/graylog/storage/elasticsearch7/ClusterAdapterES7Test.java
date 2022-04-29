@@ -19,12 +19,16 @@ package org.graylog.storage.elasticsearch7;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.io.Resources;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
+import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -71,6 +75,13 @@ class ClusterAdapterES7Test {
         mockNodesResponse();
 
         assertThat(this.clusterAdapter.nodeIdToName("foobar")).isEmpty();
+    }
+
+    @Test
+    void returnsEmptyOptionalForHealthWhenElasticsearchExceptionThrown() {
+        when(client.execute(any())).thenThrow(new ElasticsearchException("Exception"));
+        final Optional<HealthStatus> healthStatus = clusterAdapter.health(Collections.singletonList("foo_index"));
+        assertThat(healthStatus).isEmpty();
     }
 
     private void mockNodesResponse() throws IOException {

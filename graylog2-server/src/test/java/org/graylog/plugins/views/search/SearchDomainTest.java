@@ -21,6 +21,7 @@ import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.junit.Before;
 import org.junit.Rule;
@@ -32,9 +33,14 @@ import org.mockito.junit.MockitoRule;
 
 import javax.ws.rs.ForbiddenException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -68,7 +74,7 @@ public class SearchDomainTest {
     public void setUp() throws Exception {
         allSearchesInDb.clear();
         when(dbService.streamAll()).thenReturn(allSearchesInDb.stream());
-        sut = new SearchDomain(dbService, executionGuard, viewService);
+        sut = new SearchDomain(dbService, executionGuard, viewService, new HashMap<>());
     }
 
     @Test
@@ -149,6 +155,23 @@ public class SearchDomainTest {
     }
 
     @Test
+    public void includesSearchesPermittedViaResolvedView() {
+        Search permittedSearch = Search.builder().id(UUID.randomUUID().toString()).owner("someone else").build();
+        allSearchesInDb.add(permittedSearch);
+        when(dbService.get(permittedSearch.id())).thenReturn(Optional.of(permittedSearch));
+        final SearchUser searchUser = mock(SearchUser.class);
+        final ViewDTO viewDTO = mock(ViewDTO.class);
+        when(searchUser.canReadView(viewDTO)).thenReturn(true);
+
+        // Prepare test ViewResolver that returns a view that should be permitted.
+        final SearchDomain searchDomain = new SearchDomain(dbService, executionGuard, viewService,
+                testViewResolvers(viewDTO));
+
+        List<Search> result = searchDomain.getAllForUser(searchUser, searchUser::canReadView);
+        assertThat(result).containsExactly(permittedSearch);
+    }
+
+    @Test
     public void listIsEmptyIfNoSearchesPermitted() {
         mockSearchWithOwner("someone else");
         mockSearchWithOwner("someone else");
@@ -196,5 +219,40 @@ public class SearchDomainTest {
         allSearchesInDb.add(search);
         when(dbService.get(search.id())).thenReturn(Optional.of(search));
         return search;
+    }
+
+    private HashMap<String, ViewResolver> testViewResolvers(ViewDTO viewDTO) {
+        final HashMap<String, ViewResolver> viewResolvers = new HashMap<>();
+        viewResolvers.put("test-resolver", new TestViewResolver(viewDTO));
+        return viewResolvers;
+    }
+
+    private static class TestViewResolver implements ViewResolver {
+
+        private final ViewDTO viewDTO;
+
+        public TestViewResolver(ViewDTO viewDTO) {
+            this.viewDTO = viewDTO;
+        }
+
+        @Override
+        public Optional<ViewDTO> get(String id) {
+            return Optional.empty();
+        }
+
+        @Override
+        public Set<String> getSearchIds() {
+            return Collections.emptySet();
+        }
+
+        @Override
+        public boolean canReadView(String viewId, Predicate<String> permissionTester, BiPredicate<String, String> entityPermissionsTester) {
+            return false;
+        }
+
+        @Override
+        public Set<ViewDTO> getBySearchId(String searchId) {
+            return Collections.singleton(viewDTO);
+        }
     }
 }

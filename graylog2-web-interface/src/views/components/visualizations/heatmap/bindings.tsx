@@ -56,7 +56,7 @@ const validate = (formValues: WidgetConfigFormValues) => {
     : {};
 };
 
-const heatmap: VisualizationType<HeatmapVisualizationConfig, HeatMapVisualizationConfigFormValues> = {
+const heatmap: VisualizationType<typeof HeatmapVisualization.type, HeatmapVisualizationConfig, HeatMapVisualizationConfigFormValues> = {
   type: HeatmapVisualization.type,
   displayName: 'Heatmap',
   component: HeatmapVisualization,

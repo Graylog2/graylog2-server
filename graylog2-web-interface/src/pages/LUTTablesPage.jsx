@@ -68,14 +68,14 @@ class LUTTablesPage extends React.Component {
         LookupTablesActions.getErrors(tableNames, null, adapterNames || null);
       }
     }, this.errorStatesInterval);
-  }
+  };
 
   _stopErrorStatesTimer = () => {
     if (this.errorStatesTimer) {
       clearInterval(this.errorStatesTimer);
       this.errorStatesTimer = undefined;
     }
-  }
+  };
 
   _loadData = (props) => {
     const { pagination } = this.props;
@@ -90,20 +90,20 @@ class LUTTablesPage extends React.Component {
       LookupTablesActions.searchPaginated(pagination.page, pagination.per_page, pagination.query);
       this._startErrorStatesTimer();
     }
-  }
+  };
 
   _saved = () => {
     // reset detail state
     history.push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
-  }
+  };
 
   _isCreating = ({ action }) => {
     return action === 'create';
-  }
+  };
 
   _validateTable = (table) => {
     LookupTablesActions.validate(table);
-  }
+  };
 
   render() {
     const {

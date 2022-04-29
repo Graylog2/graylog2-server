@@ -68,6 +68,7 @@ import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.sort.SortBuilders;
+import org.graylog.storage.elasticsearch6.blocks.JestBlockSettingsParser;
 import org.graylog.storage.elasticsearch6.indices.GetSingleAlias;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.ElasticsearchException;
@@ -78,6 +79,7 @@ import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.jackson.TypeReferences;
@@ -572,6 +574,15 @@ public class IndicesAdapterES6 implements IndicesAdapter {
     }
 
     @Override
+    public IndicesBlockStatus getIndicesBlocksStatus(final List<String> indices) {
+        final GetSettings request = new GetSettings.Builder()
+                .addIndex(indices)
+                .build();
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't check settings of indices " + indices);
+        return JestBlockSettingsParser.parseBlockSettings(jestResult, indices);
+    }
+
+    @Override
     public boolean exists(String indexName) throws IOException {
         final JestResult result = jestClient.execute(new GetSettings.Builder().addIndex(indexName).build());
         return result.isSucceeded() && Iterators.contains(result.getJsonObject().fieldNames(), indexName);
@@ -689,9 +700,15 @@ public class IndicesAdapterES6 implements IndicesAdapter {
 
     private String getIndexState(String index) {
         final State request = new State.Builder().indices(index).withMetadata().build();
-
         final JestResult response = JestUtils.execute(jestClient, request, () -> "Failed to get index metadata");
-
         return response.getJsonObject().path("metadata").path("indices").path(index).path("state").asText();
+    }
+
+    @Override
+    public String getIndexId(String index) {
+        final State request = new State.Builder().indices(index).withMetadata().build();
+        final JestResult response = JestUtils.execute(jestClient, request, () -> "Failed to get index metadata");
+        return response.getJsonObject().path("metadata").path("indices").path(index)
+                .path("settings").path("index").path("uuid").asText();
     }
 }

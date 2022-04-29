@@ -33,6 +33,7 @@ import org.graylog2.bindings.providers.DefaultStreamProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
+import org.graylog2.cluster.leader.FakeLeaderElectionModule;
 import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokModule;
@@ -72,6 +73,7 @@ import org.graylog2.shared.messageq.MessageQueueModule;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.shared.security.RestrictToLeaderFeature;
 import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.storage.SupportedSearchVersionDynamicFeature;
 import org.graylog2.streams.DefaultStreamChangeHandler;
 import org.graylog2.streams.StreamRouter;
 import org.graylog2.streams.StreamRouterEngine;
@@ -125,7 +127,11 @@ public class ServerBindings extends Graylog2Module {
         install(new GrokModule());
         install(new LookupModule(configuration));
         install(new FieldTypesModule());
-        install(new LeaderElectionModule(configuration));
+        if (isMigrationCommand) {
+            install(new FakeLeaderElectionModule());
+        } else {
+            install(new LeaderElectionModule(configuration));
+        }
 
         // Just to create the binders so they are present in the injector. Prevents a server startup error when no
         // outputs are bound that implement MessageOutput.Factory2.
@@ -184,6 +190,7 @@ public class ServerBindings extends Graylog2Module {
         final Multibinder<Class<? extends DynamicFeature>> dynamicFeatures = jerseyDynamicFeatureBinder();
         dynamicFeatures.addBinding().toInstance(MetricsDynamicBinding.class);
         dynamicFeatures.addBinding().toInstance(RestrictToLeaderFeature.class);
+        dynamicFeatures.addBinding().toInstance(SupportedSearchVersionDynamicFeature.class);
     }
 
     private void bindExceptionMappers() {

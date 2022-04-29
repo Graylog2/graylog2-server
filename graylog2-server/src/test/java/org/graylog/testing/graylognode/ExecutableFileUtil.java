@@ -38,13 +38,13 @@ public class ExecutableFileUtil {
         LOG.info("Found executable {} at {}", executableName, executableFile.getAbsolutePath());
     }
 
-    private static RuntimeException executableNotFoundException(String executableName, String path) {
+    private static ExecutableNotFoundException executableNotFoundException(String executableName, String path) {
         String msg = String.format(Locale.US, "Could not find executable %s in PATH [%s]", executableName, path);
         if (path.contains("~")) {
             msg += "\nAt least one ~ character was found in your path. " +
                     "Since tilde-expansion doesn't work in most implementations of /bin/sh, " +
                     "please make sure that the path to your executable doesn't contain one.";
         }
-        return new RuntimeException(msg);
+        return new ExecutableNotFoundException(msg);
     }
 }

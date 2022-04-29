@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import uuid from 'uuid/v4';
-
 import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import generateId from 'logic/generateId';
 
 import SortsConfiguration from './SortsConfiguration';
 
@@ -31,7 +30,7 @@ type SortError = {
   direction?: string,
 }
 
-const hasErrors = <T extends {}>(errors: Array<T>): boolean => {
+const hasErrors = <T extends {}> (errors: Array<T>): boolean => {
   return errors.filter((error) => Object.keys(error).length > 0).length > 0;
 };
 
@@ -68,22 +67,28 @@ const validateSorts = (values: WidgetConfigFormValues) => {
 
 const addRandomId = (baseSort = {}) => ({
   ...baseSort,
-  id: uuid(),
+  id: generateId(),
 });
 
 const configTypeToFormValueType = (type: 'pivot' | 'series') => {
   switch (type) {
-    case 'pivot': return 'groupBy';
-    case 'series': return 'metric';
-    default: throw new Error(`Invalid sort type: ${type}`);
+    case 'pivot':
+      return 'groupBy';
+    case 'series':
+      return 'metric';
+    default:
+      throw new Error(`Invalid sort type: ${type}`);
   }
 };
 
 const formValueTypeToConfigType = (type: 'groupBy' | 'metric') => {
   switch (type) {
-    case 'groupBy': return 'pivot';
-    case 'metric': return 'series';
-    default: throw new Error(`Invalid sort type: ${type}`);
+    case 'groupBy':
+      return 'pivot';
+    case 'metric':
+      return 'series';
+    default:
+      throw new Error(`Invalid sort type: ${type}`);
   }
 };
 
@@ -111,7 +116,7 @@ const SortElement: AggregationElement = {
     .sort(formValues.sort.map((sort) => new SortConfig(formValueTypeToConfigType(sort.type), sort.field, Direction.fromString(sort.direction)))),
   onRemove: ((index, formValues) => ({
     ...formValues,
-    sort: formValues.sort.filter((value, i) => index !== i),
+    sort: formValues.sort.filter((_value, i) => index !== i),
   })),
   validate: validateSorts,
 };

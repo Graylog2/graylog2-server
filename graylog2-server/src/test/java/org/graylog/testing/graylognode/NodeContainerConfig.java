@@ -17,6 +17,8 @@
 package org.graylog.testing.graylognode;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.graylog.testing.completebackend.MavenProjectDirProvider;
+import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog2.storage.SearchVersion;
 import org.testcontainers.containers.Network;
 
@@ -35,12 +37,16 @@ public class NodeContainerConfig {
     public final int[] extraPorts;
     public final boolean enableDebugging;
     public final boolean skipPackaging;
+    public final PluginJarsProvider pluginJarsProvider;
+    public final MavenProjectDirProvider mavenProjectDirProvider;
 
-    public static NodeContainerConfig create(Network network, String mongoDbUri, String elasticsearchUri, SearchVersion elasticsearchVersion, int[] extraPorts) {
-        return new NodeContainerConfig(network, mongoDbUri, elasticsearchUri, elasticsearchVersion, extraPorts);
-    }
-
-    public NodeContainerConfig(Network network, String mongoDbUri, String elasticsearchUri, SearchVersion elasticsearchVersion, int[] extraPorts) {
+    public NodeContainerConfig(Network network,
+                               String mongoDbUri,
+                               String elasticsearchUri,
+                               SearchVersion elasticsearchVersion,
+                               int[] extraPorts,
+                               PluginJarsProvider pluginJarsProvider,
+                               MavenProjectDirProvider mavenProjectDirProvider) {
         this.network = network;
         this.mongoDbUri = mongoDbUri;
         this.elasticsearchUri = elasticsearchUri;
@@ -48,6 +54,8 @@ public class NodeContainerConfig {
         this.extraPorts = extraPorts == null ? new int[0] : extraPorts;
         this.enableDebugging = flagFromEnvVar("GRAYLOG_IT_DEBUG_SERVER");
         this.skipPackaging = flagFromEnvVar("GRAYLOG_IT_SKIP_PACKAGING");
+        this.pluginJarsProvider = pluginJarsProvider;
+        this.mavenProjectDirProvider = mavenProjectDirProvider;
     }
 
     private static boolean flagFromEnvVar(String flagName) {

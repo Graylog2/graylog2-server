@@ -14,41 +14,44 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import * as React from 'react';
+import { useCallback, useState } from 'react';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { LinkContainer } from 'components/common/router';
 import { Col, Row, Button } from 'components/bootstrap';
-import connect from 'stores/connect';
 import { DocumentTitle, PageHeader, IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
-import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
-import ViewList from 'views/components/views/ViewList';
+import DashboardList from 'views/components/views/DashboardList';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+import useDashboards from 'views/logic/dashboards/useDashboards';
+import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 
-type Props = {
-  dashboards: DashboardsStoreState,
+import type View from '../logic/views/View';
+
+// eslint-disable-next-line no-alert
+const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
+
+const handleDashboardDelete = async (view: View) => {
+  const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingDashboard');
+
+  const result = await iterateConfirmationHooks([...pluginDashboardDeletionHooks, defaultDashboardDeletionHook], view);
+
+  return result === true ? ViewManagementActions.delete(view) : Promise.reject();
 };
 
-const handleSearch = (query, page, perPage) => DashboardsActions.search(query, page, perPage);
-
-const handleViewDelete = (view) => {
-  // eslint-disable-next-line no-alert
-  if (window.confirm(`Are you sure you want to delete "${view.title}"?`)) {
-    return ViewManagementActions.delete(view);
-  }
-
-  return null;
+type SearchQuery = {
+  query: string,
+  page: number,
+  perPage: number,
 };
 
-const refreshDashboards = () => {
-  DashboardsActions.search();
-};
-
-const DashboardsPage = ({ dashboards: { list, pagination } }: Props) => {
-  useEffect(refreshDashboards, []);
+const DashboardsPage = () => {
+  const [searchQuery, setSearchQuery] = useState<SearchQuery>({ query: '', page: 1, perPage: 10 });
+  const handleSearch = useCallback((query: string, page: number, perPage: number) => setSearchQuery({ query, page, perPage }), []);
+  const { list, pagination } = useDashboards(searchQuery);
 
   return (
     <DocumentTitle title="Dashboards">
@@ -76,10 +79,10 @@ const DashboardsPage = ({ dashboards: { list, pagination } }: Props) => {
 
         <Row className="content">
           <Col md={12}>
-            <ViewList views={list}
-                      pagination={pagination}
-                      handleSearch={handleSearch}
-                      handleViewDelete={handleViewDelete} />
+            <DashboardList dashboards={list}
+                           pagination={pagination}
+                           handleSearch={handleSearch}
+                           handleDashboardDelete={handleDashboardDelete} />
           </Col>
         </Row>
       </span>
@@ -89,4 +92,4 @@ const DashboardsPage = ({ dashboards: { list, pagination } }: Props) => {
 
 DashboardsPage.propTypes = {};
 
-export default connect(DashboardsPage, { dashboards: DashboardsStore });
+export default DashboardsPage;

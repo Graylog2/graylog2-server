@@ -28,6 +28,11 @@ public class DefaultMavenProjectDirProvider implements MavenProjectDirProvider {
     }
 
     @Override
+    public Path getFileCopyBaseDir() {
+        return getProjectReposDir().resolve("graylog2-server/bin");
+    }
+
+    @Override
     public String getUniqueId() {
         return "default";
     }

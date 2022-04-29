@@ -129,6 +129,6 @@ public class IndexMappingFactoryTest {
     }
 
     private void mockNodeVersion(String version) {
-        when(node.getVersion()).thenReturn(Optional.of(SearchVersion.elasticsearch(Version.valueOf(version))));
+        when(node.getVersion()).thenReturn(Optional.of(SearchVersion.elasticsearch(version)));
     }
 }

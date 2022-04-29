@@ -18,16 +18,20 @@ import styled, { css } from 'styled-components';
 
 import AceEditor from './ace';
 
-const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
+const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme, $height }) => ({
   // NOTE: After setting the prop we need to swap them back so AceEditor uses the proper styles
   theme: aceTheme, /* stylelint-disable-line */
   $scTheme: theme,
-}))(({ $scTheme, $height = 34, disabled }) => css`
+  $height,
+}))(({ $scTheme, $height, disabled, value }) => css`
   &.ace-queryinput {
-    height: ${$height}px !important;
+    ${$height ? `height: ${$height}px !important` : ''};
+    min-height: 34px;
     width: 100% !important;
     background-color: ${$scTheme.colors.input.background};
     color: ${$scTheme.utils.contrastingColor($scTheme.colors.input.background, 'AAA')};
+    border: 1px solid ${$scTheme.colors.variant.light.default};
+    border-radius: 4px;
 
     &.ace_multiselect .ace_selection.ace_start {
       box-shadow: 0 0 3px 0 ${$scTheme.colors.input.background};
@@ -46,6 +50,10 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     .ace_cursor {
       color: ${$scTheme.colors.gray[50]};
       display: ${disabled ? 'none' : 'block'} !important;
+    }
+
+    .ace_hidden-cursors {
+      display: ${value ? 'block' : 'none'};
     }
 
     .ace_marker-layer .ace_selection {
@@ -151,15 +159,21 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
       background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bdu3f/BwAlfgctduB85QAAAABJRU5ErkJggg==) right repeat-y;
     }
 
-    .ace_content,
     .ace_placeholder {
-      top: 6px;
-      padding: 0 !important;
-    }
-
-    .ace_placeholder {
-      font-family: inherit !important;
+      left: 0;
+      right: 0;
+      padding: 0;
+      margin-top: 6px;
+      margin-left: 6px;
+      transform: none;
+      opacity: 1;
       z-index: auto !important;
+      font-family: inherit !important;
+      font-size: ${$scTheme.fonts.size.body};
+      color: ${$scTheme.colors.input.placeholder};
+      text-overflow: ellipsis;
+      max-width: 100%;
+      overflow: hidden;
     }
 
     .ace_marker {

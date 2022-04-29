@@ -150,7 +150,7 @@ class MessageList extends React.Component<Props, State> {
     const newConfig = config.toBuilder().sort(newSort).build();
 
     return onConfigChange(newConfig).then(() => {});
-  }
+  };
 
   render() {
     const {

@@ -17,6 +17,7 @@
 import * as React from 'react';
 
 import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
+import type { IconName } from 'components/common/Icon';
 
 import ViewDescription from './description/ViewDescription';
 import AddWidgetButton from './create/AddWidgetButton';
@@ -24,7 +25,7 @@ import HighlightingRules from './highlighting/HighlightingRules';
 
 /* eslint-disable react/no-unused-prop-types */
 export type SidebarSectionProps = {
-  sidebarChildren: React.ReactNode,
+  sidebarChildren: React.ReactElement,
   sidebarIsPinned: boolean,
   queryId: string,
   results: any,
@@ -36,7 +37,7 @@ export type SidebarSectionProps = {
 export type SidebarSection = {
   key: string,
   title: string,
-  icon: string,
+  icon: IconName,
   content: React.ComponentType<SidebarSectionProps>,
 };
 
@@ -65,7 +66,7 @@ const sidebarSections: Array<SidebarSection> = [
     key: 'fieldList',
     icon: 'subscript',
     title: 'Fields',
-    content: ({ sidebarChildren }: SidebarSectionProps) => <>{sidebarChildren}</>,
+    content: ({ sidebarChildren }: SidebarSectionProps) => sidebarChildren,
   },
 ];
 

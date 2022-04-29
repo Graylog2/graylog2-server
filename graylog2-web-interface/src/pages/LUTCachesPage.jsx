@@ -56,11 +56,11 @@ class LUTCachesPage extends React.Component {
 
   _saved = () => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
-  }
+  };
 
   _isCreating = ({ action }) => {
     return action === 'create';
-  }
+  };
 
   _validateCache = (adapter) => {
     LookupTableCachesActions.validate(adapter);

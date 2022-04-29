@@ -29,7 +29,7 @@ const DEFAULT_BARMODE = 'group';
 
 const validate = hasAtLeastOneMetric('Bar chart');
 
-const barChart: VisualizationType<BarVisualizationConfig, BarVisualizationConfigFormValues> = {
+const barChart: VisualizationType<typeof BarVisualization.type, BarVisualizationConfig, BarVisualizationConfigFormValues> = {
   type: BarVisualization.type,
   displayName: 'Bar Chart',
   component: BarVisualization,

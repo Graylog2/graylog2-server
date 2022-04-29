@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import uuid from 'uuid/v4';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 import { sortBy, isEmpty } from 'lodash';
@@ -23,6 +22,7 @@ import { sortBy, isEmpty } from 'lodash';
 import { Button } from 'components/bootstrap';
 import { ViewStore } from 'views/stores/ViewStore';
 import type View from 'views/logic/views/View';
+import generateId from 'logic/generateId';
 
 import SectionInfo from '../SectionInfo';
 import SectionSubheadline from '../SectionSubheadline';
@@ -102,7 +102,7 @@ class AddWidgetButton extends React.Component<Props, State> {
       const CreatorComponent = creator.component;
 
       return () => {
-        const id = uuid();
+        const id = generateId();
         const onClose = () => this.setState((state) => {
           const { overflowingComponents } = state;
 
@@ -140,7 +140,7 @@ class AddWidgetButton extends React.Component<Props, State> {
     const sortedCreators = sortBy(typeCreators, 'title');
 
     return sortedCreators.map(this._createMenuItem);
-  }
+  };
 
   render() {
     const { overflowingComponents } = this.state;
@@ -151,7 +151,9 @@ class AddWidgetButton extends React.Component<Props, State> {
 
     return (
       <>
-        <SectionInfo>Use the following options to add an aggregation or parameters (enterprise) to your search.</SectionInfo>
+        <SectionInfo>Use the following options to add an aggregation, log view (enterprise feature) or parameters
+          (enterprise feature) to your search.
+        </SectionInfo>
         <Group>
           <SectionSubheadline>Generic</SectionSubheadline>
           {generic}

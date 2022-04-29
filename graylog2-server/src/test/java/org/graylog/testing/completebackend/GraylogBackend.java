@@ -16,159 +16,38 @@
  */
 package org.graylog.testing.completebackend;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.graylog.testing.containermatrix.MongodbServer;
+import io.restassured.RestAssured;
+import io.restassured.config.FailureConfig;
+import io.restassured.config.RestAssuredConfig;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog.testing.graylognode.NodeInstance;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
-import javax.annotation.Nonnull;
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+public interface GraylogBackend {
+    String uri();
 
-public class GraylogBackend implements AutoCloseable {
-    private static final Logger LOG = LoggerFactory.getLogger(GraylogBackend.class);
-    private final Network network;
-    private final SearchServerInstance searchServer;
-    private final MongoDBInstance mongodb;
-    private final NodeInstance node;
+    int apiPort();
 
-    private static GraylogBackend instance;
+    SearchServerInstance searchServerInstance();
 
-    public static GraylogBackend createStarted(int[] extraPorts, MongodbServer mongoVersion,
-                                               SearchServerInstanceFactory searchServerInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
-                                               List<URL> mongoDBFixtures) {
-        // if a cached version exists, shut it down first
-        if (instance != null) {
-            instance.close();
-        }
-        return doCreateStartedBackend(extraPorts, mongoVersion, searchServerInstanceFactory, pluginJars, mavenProjectDir,
-                mongoDBFixtures);
-    }
+    int mappedPortFor(int originalPort);
 
-    /**
-     * TODO: use or remove this method, currently is not used anywhere
-     */
-    public static GraylogBackend createStarted(int[] extraPorts,
-                                               SearchServerInstanceFactory searchServerInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
-                                               List<URL> mongoDBFixtures) {
-        if (instance == null) {
-            instance = doCreateStartedBackend(extraPorts, MongodbServer.DEFAULT_VERSION, searchServerInstanceFactory, pluginJars, mavenProjectDir,
-                    mongoDBFixtures);
-        } else {
-            instance.fullReset(mongoDBFixtures);
-            LOG.info("Reusing running backend");
-        }
-        return instance;
-    }
+    void importMongoDBFixture(String resourcePath, Class<?> testClass);
 
-    // Starting ES instance in parallel thread to save time.
-    // MongoDB and the node have to be started in sequence however, because the node might crash,
-    // if a MongoDb instance isn't already present while it's starting up.
-    private static GraylogBackend doCreateStartedBackend(int[] extraPorts, @Nonnull MongodbServer mongodbVersion,
-                                                         SearchServerInstanceFactory searchServerInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
-                                                         List<URL> mongoDBFixtures) {
-        Network network = Network.newNetwork();
-        ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("build-es-container-for-api-it").build());
-        Future<SearchServerInstance> esFuture = executor.submit(() -> searchServerInstanceFactory.create(network));
-        MongoDBInstance mongoDB = MongoDBInstance.createStartedWithUniqueName(network, Lifecycle.CLASS, mongodbVersion);
-        mongoDB.dropDatabase();
-        mongoDB.importFixtures(mongoDBFixtures);
+    void importElasticsearchFixture(String resourcePath, Class<?> testClass);
 
-        try {
-            // Wait for ES before starting the Graylog node to avoid any race conditions
-            SearchServerInstance esInstance = esFuture.get();
-            NodeInstance node = NodeInstance.createStarted(
-                    network,
-                    MongoDBInstance.internalUri(),
-                    SearchServerInstance.internalUri(),
-                    searchServerInstanceFactory.getVersion(),
-                    extraPorts,
-                    pluginJars, mavenProjectDir);
-            final GraylogBackend backend = new GraylogBackend(network, esInstance, mongoDB, node);
+    Network network();
 
-            // ensure that all containers and networks will be removed after all tests finish
-            // We can't close the resources in an afterAll callback, as the instances are cached and reused
-            // so we need a solution that will be triggered only once after all test classes
-            Runtime.getRuntime().addShutdownHook(new Thread(backend::close));
+    String getLogs();
 
-            return backend;
-        } catch (InterruptedException | ExecutionException e) {
-            LOG.error("Container creation aborted", e);
-            throw new RuntimeException(e);
-        } finally {
-            executor.shutdown();
-        }
-    }
-
-    private GraylogBackend(Network network, SearchServerInstance searchServer, MongoDBInstance mongodb, NodeInstance node) {
-        this.network = network;
-        this.searchServer = searchServer;
-        this.mongodb = mongodb;
-        this.node = node;
-    }
-
-    public void purgeData() {
-        mongodb.dropDatabase();
-        searchServer.cleanUp();
-    }
-
-    public void fullReset(List<URL> mongoDBFixtures) {
-        LOG.debug("Resetting backend.");
-        purgeData();
-        mongodb.importFixtures(mongoDBFixtures);
-        node.restart();
-    }
-
-    public void importElasticsearchFixture(String resourcePath, Class<?> testClass) {
-        searchServer.importFixtureResource(resourcePath, testClass);
-    }
-
-    public void importMongoDBFixture(String resourcePath, Class<?> testClass) {
-        mongodb.importFixture(resourcePath, testClass);
-    }
-
-    public String uri() {
-        return node.uri();
-    }
-
-    public int apiPort() {
-        return node.apiPort();
-    }
-
-    public void printServerLog() {
-        node.printLog();
-    }
-
-    public int mappedPortFor(int originalPort) {
-        return node.mappedPortFor(originalPort);
-    }
-
-    public Network network() {
-        return this.network;
-    }
-
-    public MongoDBInstance mongoDB() {
-        return mongodb;
-    }
-
-    @Override
-    public void close() {
-        node.close();
-        mongodb.close();
-        searchServer.close();
-        network.close();
-    }
-
-    public SearchServerInstance searchServerInstance() {
-        return searchServer;
+    default RestAssuredConfig withGraylogBackendFailureConfig() {
+        return RestAssured.config().failureConfig(FailureConfig.failureConfig().with().failureListeners(
+                (reqSpec, respSpec, resp) -> {
+                    if (resp.statusCode() >= 500) {
+                        System.out.println("------------------------ Output from graylog docker container start ------------------------");
+                        System.out.println(this.getLogs());
+                        System.out.println("------------------------ Output from graylog docker container ends  ------------------------");
+                    }
+                })
+        );
     }
 }

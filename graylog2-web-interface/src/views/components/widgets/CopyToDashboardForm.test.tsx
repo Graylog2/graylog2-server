@@ -21,6 +21,7 @@ import mockAction from 'helpers/mocking/MockAction';
 import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
 import { DashboardsActions } from 'views/stores/DashboardsStore';
 import View from 'views/logic/views/View';
+import Search from 'views/logic/search/Search';
 
 import CopyToDashboardForm from './CopyToDashboardForm';
 
@@ -38,8 +39,10 @@ describe('CopyToDashboardForm', () => {
   });
 
   const view1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1')
+    .search(Search.create())
     .build();
   const view2 = View.builder().type(View.Type.Dashboard).id('view-2').title('view 2')
+    .search(Search.create())
     .build();
   const dashboardList = [view1, view2];
   const dashboardState: DashboardsStoreState = {

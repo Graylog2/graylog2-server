@@ -19,9 +19,9 @@ import { useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
 import type * as Immutable from 'immutable';
 import * as ImmutablePropTypes from 'react-immutable-proptypes';
-import type { OrderedSet } from 'immutable';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import connect from 'stores/connect';
+import connect, { useStore } from 'stores/connect';
 import { TitlesActions } from 'views/stores/TitlesStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
@@ -30,41 +30,56 @@ import { QueryIdsStore } from 'views/stores/QueryIdsStore';
 import { QueryTitlesStore } from 'views/stores/QueryTitlesStore';
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import { ViewStatesActions } from 'views/stores/ViewStatesStore';
+import { ViewStatesActions, ViewStatesStore } from 'views/stores/ViewStatesStore';
 import type { QueryId } from 'views/logic/queries/Query';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
+import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 
 import QueryTabs from './QueryTabs';
 
-const onTitleChange = (queryId, newTitle) => TitlesActions.set('tab', 'title', newTitle);
+const onTitleChange = (_queryId: string, newTitle: string) => TitlesActions.set('tab', 'title', newTitle);
 
-const onCloseTab = (queryId: string, currentQuery: string, queries: Immutable.OrderedSet<string>, setDashboardPage: (page: string) => void) => {
+// eslint-disable-next-line no-alert
+const defaultConfirm = async () => window.confirm('Do you really want to delete this dashboard page?');
+
+const onCloseTab = async (dashboardId: string, queryId: string, currentQuery: string, queries: Immutable.OrderedSet<string>, widgetIds: Immutable.Map<string, Immutable.List<string>>, setDashboardPage: (page: string) => void) => {
   if (queries.size === 1) {
     return Promise.resolve();
   }
 
-  if (queryId === currentQuery) {
-    const indexedQueryIds = queries.toIndexedSeq();
-    const currentQueryIdIndex = indexedQueryIds.indexOf(queryId);
-    const newQueryIdIndex = Math.min(0, currentQueryIdIndex - 1);
-    const newQuery = indexedQueryIds.filter((currentQueryId) => (currentQueryId !== queryId))
-      .get(newQueryIdIndex);
+  const deletingDashboardPageHooks = PluginStore.exports('views.hooks.confirmDeletingDashboardPage');
+  const _widgetIds = widgetIds.map((ids) => ids.toArray()).toObject();
+  const result = await iterateConfirmationHooks([...deletingDashboardPageHooks, defaultConfirm], dashboardId, queryId, _widgetIds);
 
-    setDashboardPage(newQuery);
+  if (result === true) {
+    if (queryId === currentQuery) {
+      const indexedQueryIds = queries.toIndexedSeq();
+      const currentQueryIdIndex = indexedQueryIds.indexOf(queryId);
+      const newQueryIdIndex = Math.min(0, currentQueryIdIndex - 1);
+      const newQuery = indexedQueryIds.filter((currentQueryId) => (currentQueryId !== queryId))
+        .get(newQueryIdIndex);
+
+      setDashboardPage(newQuery);
+    }
+
+    return QueriesActions.remove(queryId).then(() => ViewStatesActions.remove(queryId));
   }
 
-  return QueriesActions.remove(queryId).then(() => ViewStatesActions.remove(queryId));
+  return Promise.resolve();
 };
 
 type Props = {
-  queries: OrderedSet<QueryId>,
+  queries: Immutable.OrderedSet<QueryId>,
   queryTitles: Immutable.Map<string, string>,
   viewMetadata: ViewMetaData,
 };
 
+const useWidgetIds = () => useStore(ViewStatesStore, (states) => states.map((viewState) => viewState.widgets.map((widget) => widget.id).toList()).toMap());
+
 const QueryBar = ({ queries, queryTitles, viewMetadata }: Props) => {
-  const { activeQuery } = viewMetadata;
+  const { activeQuery, id: dashboardId } = viewMetadata;
   const { setDashboardPage } = useContext(DashboardPageContext);
+  const widgetIds = useWidgetIds();
 
   const onSelectPage = useCallback((pageId) => {
     if (pageId === 'new') {
@@ -80,7 +95,8 @@ const QueryBar = ({ queries, queryTitles, viewMetadata }: Props) => {
     return ViewActions.selectQuery(pageId);
   }, [setDashboardPage]);
 
-  const onRemove = useCallback((queryId) => onCloseTab(queryId, activeQuery, queries, setDashboardPage), [activeQuery, queries, setDashboardPage]);
+  const onRemove = useCallback((queryId: string) => onCloseTab(dashboardId, queryId, activeQuery, queries, widgetIds, setDashboardPage),
+    [activeQuery, dashboardId, queries, widgetIds, setDashboardPage]);
 
   return (
     <QueryTabs queries={queries}
@@ -104,4 +120,8 @@ QueryBar.propTypes = {
   }).isRequired,
 };
 
-export default connect(QueryBar, { queries: QueryIdsStore, queryTitles: QueryTitlesStore, viewMetadata: ViewMetadataStore });
+export default connect(QueryBar, {
+  queries: QueryIdsStore,
+  queryTitles: QueryTitlesStore,
+  viewMetadata: ViewMetadataStore,
+});

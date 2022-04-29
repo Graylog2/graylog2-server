@@ -16,8 +16,15 @@
  */
 package org.graylog2.indexer;
 
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
+import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.joda.time.Duration;
+import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,6 +33,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -42,11 +51,14 @@ public class IndexSetValidatorTest {
     @Mock
     private IndexSetRegistry indexSetRegistry;
 
+    @Mock
+    private ElasticsearchConfiguration elasticsearchConfiguration;
+
     private IndexSetValidator validator;
 
     @Before
     public void setUp() throws Exception {
-        this.validator = new IndexSetValidator(indexSetRegistry);
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration);
     }
 
     @Test
@@ -129,5 +141,51 @@ public class IndexSetValidatorTest {
         final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
 
         assertThat(violation).isPresent();
+    }
+
+    @Test
+    public void validateMaxRetentionPeriod() {
+        when(indexSetRegistry.iterator()).thenReturn(Collections.emptyIterator());
+
+        // no max retention period configured
+        assertThat(validator.validate(dummyConfig())).isNotPresent();
+
+        // max retention period >= effective retention period
+        when(elasticsearchConfiguration.getMaxIndexRetentionPeriod()).thenReturn(Period.days(10));
+        assertThat(validator.validate(dummyConfig())).isNotPresent();
+
+        // max retention period < effective retention period
+        when(elasticsearchConfiguration.getMaxIndexRetentionPeriod()).thenReturn(Period.days(9));
+        assertThat(validator.validate(dummyConfig())).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("effective index retention period of P1W3D")
+        );
+
+        // rotation strategy is not time-based
+        final IndexSetConfig modifiedConfig = dummyConfig().toBuilder()
+                .rotationStrategy(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
+                .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
+                .build();
+        assertThat(validator.validate(modifiedConfig)).isNotPresent();
+    }
+
+    private IndexSetConfig dummyConfig() {
+        return IndexSetConfig.builder()
+                .isWritable(true)
+                .title("Test 1")
+                .description("A test index-set.")
+                .indexPrefix("graylog1")
+                .indexWildcard("graylog1_*")
+                .rotationStrategy(TimeBasedRotationStrategyConfig.create(Period.days(1), Period.days(1)))
+                .rotationStrategyClass(TimeBasedRotationStrategyConfig.class.getCanonicalName())
+                .retentionStrategy(NoopRetentionStrategyConfig.create(10))
+                .retentionStrategyClass(NoopRetentionStrategy.class.getCanonicalName())
+                .shards(4)
+                .replicas(0)
+                .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
+                .indexTemplateName("graylog1-template")
+                .indexAnalyzer("standard")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
+                .build();
     }
 }

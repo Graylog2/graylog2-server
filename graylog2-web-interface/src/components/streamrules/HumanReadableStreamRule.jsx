@@ -40,7 +40,7 @@ class HumanReadableStreamRule extends React.Component {
     const { inputs } = this.props;
 
     return inputs.find((input) => input.id === inputId);
-  }
+  };
 
   _formatRuleValue = (streamRule) => {
     if (String(streamRule.type) === String(this.MATCH_INPUT)) {

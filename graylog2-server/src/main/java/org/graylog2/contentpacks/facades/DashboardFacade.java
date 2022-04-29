@@ -27,7 +27,7 @@ import org.graylog2.shared.users.UserService;
 
 import javax.inject.Inject;
 
-public class DashboardFacade extends ViewFacade {
+public class DashboardFacade extends ViewFacade implements DashboardEntityCreator {
     public static final ModelType TYPE_V2 = ModelTypes.DASHBOARD_V2;
 
     @Inject

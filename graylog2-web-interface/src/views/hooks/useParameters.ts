@@ -14,7 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect'; import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore'; import { SearchStore } from 'views/stores/SearchStore';
+import { useStore } from 'stores/connect';
+import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
+import { SearchStore } from 'views/stores/SearchStore';
 
 const useParameters = () => {
   const { parameterBindings } = useStore(SearchExecutionStateStore);

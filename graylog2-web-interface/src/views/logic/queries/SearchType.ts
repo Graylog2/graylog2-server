@@ -17,9 +17,21 @@
 import type MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfig';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
-import type { Interval } from 'views/components/aggregationbuilder/pivottypes/Interval';
 
 import type { ElasticsearchQueryString, TimeRange } from './Query';
+
+type AutoInterval = {
+  type: 'auto',
+  scaling?: number,
+};
+
+type TimeUnitInterval = {
+  type: 'timeunit',
+  value: number,
+  unit: string,
+};
+
+type Interval = AutoInterval | TimeUnitInterval;
 
 type SearchTypePivot = {
   type: string,

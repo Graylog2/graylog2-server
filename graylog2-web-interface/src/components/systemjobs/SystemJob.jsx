@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { ProgressBar, LinkToNode, Timestamp, Icon } from 'components/common';
+import { ProgressBar, LinkToNode, RelativeTime, Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
 import { SystemJobsActions } from 'stores/systemjobs/SystemJobsStore';
 
@@ -43,7 +43,7 @@ class SystemJob extends React.Component {
       node_id: PropTypes.string,
       started_at: PropTypes.string,
     }).isRequired,
-  }
+  };
 
   _onCancel = (job) => {
     return (e) => {
@@ -70,7 +70,7 @@ class SystemJob extends React.Component {
           <Icon name="cog" />{' '}
           <span data-toggle="tooltip" title={job.name}>{job.info}</span>{' '}
           - Started on <LinkToNode nodeId={job.node_id} />{' '}
-          <Timestamp dateTime={job.started_at} relative />{' '}
+          <RelativeTime dateTime={job.started_at} />{' '}
           {cancel}
         </JobWrap>
 

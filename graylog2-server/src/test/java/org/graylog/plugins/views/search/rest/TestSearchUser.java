@@ -22,6 +22,7 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.plugin.database.users.User;
 import org.mockito.Mockito;
 
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -65,8 +66,25 @@ public class TestSearchUser {
         return this;
     }
 
+    public TestSearchUser allowView(String id) {
+        this.permissions.put(ViewsRestPermissions.VIEW_READ + ":" + id, true);
+        return this;
+    }
+
+    public TestSearchUser denyView(String id) {
+        this.permissions.put(ViewsRestPermissions.VIEW_READ + ":" + id, false);
+        return this;
+    }
+
     public TestSearchUser withUser(User user) {
         this.user = user;
+        return this;
+    }
+
+    public TestSearchUser withUser(Consumer<TestUser> user) {
+        final TestUser testUser = TestUser.builder();
+        user.accept(testUser);
+        this.user = testUser.build();
         return this;
     }
 
@@ -78,8 +96,8 @@ public class TestSearchUser {
                 Optional.ofNullable(user).orElseGet(() -> Mockito.mock(User.class)),
                 permission -> verifyPermission(permissions, permission),
                 (permission, entityid) -> verifyPermission(permissions, permission, entityid),
-                new PermittedStreams(knownStreamIDs::stream)
-        );
+                new PermittedStreams(knownStreamIDs::stream),
+                new HashMap<>());
     }
 
     private Boolean verifyPermission(ImmutableMap<String, Boolean> permissions, String permission, String entityId) {

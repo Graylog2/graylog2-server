@@ -19,7 +19,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Row, Col } from 'components/bootstrap';
-import { Timestamp } from 'components/common';
+import { RelativeTime } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import type { PipelineType } from 'stores/pipelines/PipelinesStore';
 
@@ -71,9 +71,9 @@ const PipelineDetails = ({ pipeline, create, onChange, onCancel }: Props) => {
             <dt>Description</dt>
             <dd>{pipeline.description}</dd>
             <dt>Created</dt>
-            <dd><Timestamp dateTime={pipeline.created_at} relative /></dd>
+            <dd><RelativeTime dateTime={pipeline.created_at} /></dd>
             <dt>Last modified</dt>
-            <dd><Timestamp dateTime={pipeline.modified_at} relative /></dd>
+            <dd><RelativeTime dateTime={pipeline.modified_at} /></dd>
             <dt>Current throughput</dt>
             <dd>
               <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.executed`}>

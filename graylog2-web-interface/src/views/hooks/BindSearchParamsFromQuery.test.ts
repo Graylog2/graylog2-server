@@ -32,7 +32,9 @@ jest.mock('views/stores/QueriesStore', () => ({
 }));
 
 describe('BindSearchParamsFromQuery should', () => {
-  const query = Query.builder().id(MOCK_VIEW_QUERY_ID).build();
+  const query = Query.builder()
+    .id(MOCK_VIEW_QUERY_ID)
+    .build();
   const search = Search.create()
     .toBuilder()
     .queries([query])
@@ -59,6 +61,12 @@ describe('BindSearchParamsFromQuery should', () => {
     };
 
     await bindSearchParamsFromQuery(input);
+
+    expect(QueriesActions.update).not.toHaveBeenCalled();
+  });
+
+  it('not update query when query is already up to date', async () => {
+    await bindSearchParamsFromQuery(defaultInput);
 
     expect(QueriesActions.update).not.toHaveBeenCalled();
   });

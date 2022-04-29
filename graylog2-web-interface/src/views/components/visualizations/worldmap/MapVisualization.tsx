@@ -49,11 +49,11 @@ type MapVisualizationProps = {
 };
 
 class MapVisualization extends React.Component<MapVisualizationProps> {
-  _map = undefined
+  _map = undefined;
 
-  _isMapReady = false
+  _isMapReady = false;
 
-  _areTilesReady = false
+  _areTilesReady = false;
 
   static propTypes = {
     id: PropTypes.string.isRequired,
@@ -71,7 +71,7 @@ class MapVisualization extends React.Component<MapVisualizationProps> {
       center: PropTypes.arrayOf(PropTypes.number),
       zoom: PropTypes.number,
     }),
-  }
+  };
 
   static defaultProps = {
     data: {},
@@ -82,7 +82,7 @@ class MapVisualization extends React.Component<MapVisualizationProps> {
     viewport: DEFAULT_VIEWPORT,
     markerRadiusSize: 10,
     markerRadiusIncrementSize: 10,
-  }
+  };
 
   componentDidMount() {
     leafletStyles.use();
@@ -130,7 +130,7 @@ class MapVisualization extends React.Component<MapVisualizationProps> {
         </Popup>
       </CircleMarker>
     );
-  }
+  };
 
   _getBucket = (value, bucketCount, minValue, maxValue, increment) => {
     // Calculate bucket size based on min/max value and the number of buckets.
@@ -139,7 +139,7 @@ class MapVisualization extends React.Component<MapVisualizationProps> {
     const bucket = value < maxValue ? Math.ceil((value - minValue) / bucketSize) : bucketCount;
 
     return bucket + increment;
-  }
+  };
 
   _handleRenderComplete = () => {
     if (this._areTilesReady && this._isMapReady) {
@@ -147,17 +147,17 @@ class MapVisualization extends React.Component<MapVisualizationProps> {
 
       onRenderComplete();
     }
-  }
+  };
 
   _handleMapReady = () => {
     this._isMapReady = true;
     this._handleRenderComplete();
-  }
+  };
 
   _handleTilesReady = () => {
     this._areTilesReady = true;
     this._handleRenderComplete();
-  }
+  };
 
   render() {
     const { data, id, height, width, url, attribution, locked, viewport, onChange, markerRadiusSize, markerRadiusIncrementSize } = this.props;

@@ -16,10 +16,13 @@
  */
 package org.junit.jupiter.engine.descriptor;
 
+import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
+import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog2.storage.SearchVersion;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
@@ -66,7 +69,24 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         this.mongoDBFixtures.addAll(mongoDBFixtures);
     }
 
-    private static String createKey(Lifecycle lifecycle, String mavenProjectDirProvider, String pluginJarsProvider, SearchVersion esVersion, MongodbServer mongoVersion) {
+    public ContainerMatrixTestsDescriptor(TestDescriptor parent,
+                                          String displayName,
+                                          Set<Integer> extraPorts,
+                                          List<URL> mongoDBFixtures) {
+        super(parent.getUniqueId().append(SEGMENT_TYPE,
+                        displayName),
+                displayName);
+        setParent(parent);
+        this.lifecycle = Lifecycle.VM;
+        this.mavenProjectDirProvider = DefaultMavenProjectDirProvider.class;
+        this.pluginJarsProvider = DefaultPluginJarsProvider.class;
+        this.esVersion = SearchServer.DEFAULT_VERSION.getSearchVersion();
+        this.mongoVersion = MongodbServer.DEFAULT_VERSION;
+        this.extraPorts.addAll(extraPorts);
+        this.mongoDBFixtures.addAll(mongoDBFixtures);
+    }
+
+    protected static String createKey(Lifecycle lifecycle, String mavenProjectDirProvider, String pluginJarsProvider, SearchVersion esVersion, MongodbServer mongoVersion) {
         return "Lifecycle: " + lifecycle.name() + ", MavenProjectDirProvider: " + mavenProjectDirProvider + ", PluginJarsProvider: " + pluginJarsProvider + ", Search: " + esVersion + ", MongoDB: " + mongoVersion.getVersion();
     }
 

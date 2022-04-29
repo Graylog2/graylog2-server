@@ -25,6 +25,7 @@ import org.junit.jupiter.engine.config.CachingJupiterConfiguration;
 import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixEngineDescriptor;
+import org.junit.jupiter.engine.descriptor.ContainerMatrixTestWithRunningESMongoTestsDescriptor;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestsDescriptor;
 import org.junit.jupiter.engine.discovery.ContainerMatrixTestsDiscoverySelectorResolver;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
@@ -50,6 +51,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEngine<JupiterEngineExecutionContext> {
     private static final String ENGINE_ID = "graylog-container-matrix-tests";
@@ -133,6 +136,11 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         }
     }
 
+    protected boolean testAgainstRunningESMongoDB() {
+        final String value = System.getenv("GRAYLOG_TEST_WITH_RUNNING_ES_AND_MONGODB");
+        return !isBlank(value) && Boolean.parseBoolean(value);
+    }
+
     @Override
     public TestDescriptor discover(EngineDiscoveryRequest discoveryRequest, UniqueId uniqueId) {
         JupiterConfiguration configuration = new CachingJupiterConfiguration(
@@ -144,53 +152,63 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         final Set<Integer> extraPorts = getExtraPorts(annotated);
         final List<URL> mongoDBFixtures = getMongoDBFixtures(annotated);
 
-        // create all combinations of tests, first differentiate for maven builds
-        getMavenProjectDirProvider(annotated)
-                .forEach(mavenProjectDirProvider -> getPluginJarsProvider(annotated)
-                        .forEach(pluginJarsProvider -> {
-                            MavenProjectDirProvider mpdp = instantiateFactory(mavenProjectDirProvider);
-                            PluginJarsProvider pjp = instantiateFactory(pluginJarsProvider);
-                            // now add all grouped tests for Lifecycle.VM
-                            getSearchServerVersions(annotated)
-                                    .stream().map(SearchServer::getSearchVersion)
-                                    .forEach(searchVersion -> getMongoVersions(annotated)
-                                            .forEach(mongoVersion -> {
-                                                ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
-                                                        Lifecycle.VM,
-                                                        mavenProjectDirProvider,
-                                                        mpdp.getUniqueId(),
-                                                        pluginJarsProvider,
-                                                        pjp.getUniqueId(),
-                                                        searchVersion,
-                                                        mongoVersion,
-                                                        extraPorts,
-                                                        mongoDBFixtures);
-                                                new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
-                                                engineDescriptor.addChild(testsDescriptor);
-                                            })
-                                    );
-                            // add separate test classes (Lifecycle.CLASS)
-                            getSearchServerVersions(annotated)
-                                    .stream().map(SearchServer::getSearchVersion)
-                                    .forEach(esVersion -> getMongoVersions(annotated)
-                                                    .forEach(mongoVersion -> {
-                                                        ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
-                                                                Lifecycle.CLASS,
-                                                                mavenProjectDirProvider,
-                                                                mpdp.getUniqueId(),
-                                                                pluginJarsProvider,
-                                                                pjp.getUniqueId(),
-                                                                esVersion,
-                                                                mongoVersion,
-                                                                extraPorts,
-                                                                new ArrayList<>());
-                                                        new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
-                                                        engineDescriptor.addChild(testsDescriptor);
-                                                    })
-                                            );
-                                }
-                        )
-                );
+        if (testAgainstRunningESMongoDB()) {
+            // if you test from inside an IDE against running containers
+            ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestWithRunningESMongoTestsDescriptor(
+                    engineDescriptor,
+                    extraPorts,
+                    mongoDBFixtures);
+            new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
+            engineDescriptor.addChild(testsDescriptor);
+        } else {
+            // for full tests, create all combinations of tests. First differentiate for maven builds.
+            getMavenProjectDirProvider(annotated)
+                    .forEach(mavenProjectDirProvider -> getPluginJarsProvider(annotated)
+                            .forEach(pluginJarsProvider -> {
+                                        MavenProjectDirProvider mpdp = instantiateFactory(mavenProjectDirProvider);
+                                        PluginJarsProvider pjp = instantiateFactory(pluginJarsProvider);
+                                        // now add all grouped tests for Lifecycle.VM
+                                        getSearchServerVersions(annotated)
+                                                .stream().map(SearchServer::getSearchVersion)
+                                                .forEach(searchVersion -> getMongoVersions(annotated)
+                                                        .forEach(mongoVersion -> {
+                                                            ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
+                                                                    Lifecycle.VM,
+                                                                    mavenProjectDirProvider,
+                                                                    mpdp.getUniqueId(),
+                                                                    pluginJarsProvider,
+                                                                    pjp.getUniqueId(),
+                                                                    searchVersion,
+                                                                    mongoVersion,
+                                                                    extraPorts,
+                                                                    mongoDBFixtures);
+                                                            new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
+                                                            engineDescriptor.addChild(testsDescriptor);
+                                                        })
+                                                );
+                                        // add separate test classes (Lifecycle.CLASS)
+                                        getSearchServerVersions(annotated)
+                                                .stream().map(SearchServer::getSearchVersion)
+                                                .forEach(esVersion -> getMongoVersions(annotated)
+                                                        .forEach(mongoVersion -> {
+                                                            ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
+                                                                    Lifecycle.CLASS,
+                                                                    mavenProjectDirProvider,
+                                                                    mpdp.getUniqueId(),
+                                                                    pluginJarsProvider,
+                                                                    pjp.getUniqueId(),
+                                                                    esVersion,
+                                                                    mongoVersion,
+                                                                    extraPorts,
+                                                                    new ArrayList<>());
+                                                            new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
+                                                            engineDescriptor.addChild(testsDescriptor);
+                                                        })
+                                                );
+                                    }
+                            )
+                    );
+        }
 
         return engineDescriptor;
     }

@@ -23,10 +23,11 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RotationStrategyValidator implements Validator<Set<String>> {
+public class RotationStrategyValidator implements Validator<List<String>> {
     Set<String> VALID_STRATEGIES = Sets.newHashSet(
             MessageCountRotationStrategy.NAME, SizeBasedRotationStrategy.NAME, TimeBasedRotationStrategy.NAME);
 
@@ -34,7 +35,7 @@ public class RotationStrategyValidator implements Validator<Set<String>> {
     // The set of valid rotation strategies must
     // - contain only names of supported strategies
     // - not be empty
-    public void validate(String parameter, Set<String> value) throws ValidationException {
+    public void validate(String parameter, List<String> value) throws ValidationException {
         if (value == null || value.isEmpty()) {
             throw new ValidationException("Parameter " + parameter + " should be non-empty list");
         }
@@ -43,6 +44,10 @@ public class RotationStrategyValidator implements Validator<Set<String>> {
                 .filter(s -> !VALID_STRATEGIES.contains(s))
                 .collect(Collectors.toSet()).isEmpty()) {
             throw new ValidationException("Parameter " + parameter + " contains invalid values: " + value);
+        }
+
+        if (value.stream().distinct().count() != value.size()) {
+            throw new ValidationException("Parameter " + parameter + " contains duplicate values: " + value);
         }
     }
 }

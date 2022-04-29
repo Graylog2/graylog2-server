@@ -29,8 +29,6 @@ import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 
 type QueryId = string;
 
-export type CopyWidgetToDashboardHook = (widgetId: string, search: View, dashboard: View) => View;
-
 const _newPositionsMap = (oldPosition, widgetPositions, widget, widgets) => {
   const widgetPositionsMap = oldPosition ? {
     ...widgetPositions,

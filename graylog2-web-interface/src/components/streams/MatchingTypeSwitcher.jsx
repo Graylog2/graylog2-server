@@ -53,11 +53,11 @@ class MatchingTypeSwitcher extends React.Component {
 
   handleTypeChangeToAnd = () => {
     this.handleTypeChange('AND');
-  }
+  };
 
   handleTypeChangeToOr = () => {
     this.handleTypeChange('OR');
-  }
+  };
 
   handleTypeChange = (newValue) => {
     const { onChange, stream } = this.props;
@@ -73,7 +73,7 @@ class MatchingTypeSwitcher extends React.Component {
         return response;
       });
     }
-  }
+  };
 
   render() {
     const { stream } = this.props;

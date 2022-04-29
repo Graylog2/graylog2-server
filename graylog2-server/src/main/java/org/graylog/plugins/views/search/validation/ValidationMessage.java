@@ -16,114 +16,51 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.search.engine.QueryPosition;
+import org.graylog2.shared.utilities.ExceptionUtils;
 
 import javax.annotation.Nullable;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @AutoValue
 public abstract class ValidationMessage {
 
-    private static final Pattern regexSimple = Pattern.compile("([\\w.]+):\\s+(.*)", Pattern.MULTILINE | Pattern.DOTALL);
-    private static final Pattern regexPosition = Pattern.compile(".*at line (\\d+), column (\\d+).", Pattern.MULTILINE | Pattern.DOTALL);
-    private static final Pattern regexForExplanation = Pattern.compile("(\\w+)\\(\"(.+)\"\\)", Pattern.MULTILINE | Pattern.DOTALL);
+    public abstract Optional<QueryPosition> position();
 
-    @JsonProperty
-    @Nullable
-    public abstract Integer beginLine();
-
-    @JsonProperty
-    @Nullable
-    public abstract Integer beginColumn();
-
-
-    @JsonProperty
-    @Nullable
-    public abstract Integer endLine();
-
-    @JsonProperty
-    @Nullable
-    public abstract Integer endColumn();
-
-    @JsonProperty
-    @Nullable
-    public abstract String errorType();
-
-    @JsonProperty
     public abstract String errorMessage();
 
-    public static ValidationMessage fromException(final String query, final Exception exception) {
+    public abstract Optional<String> relatedProperty();
 
-        final String input = exception.toString();
+    public abstract ValidationStatus validationStatus();
 
-        final ValidationMessage.Builder errorBuilder = builder();
+    public abstract ValidationType validationType();
 
-        final Matcher simpleMatcher = regexSimple.matcher(input);
-        if (simpleMatcher.find()) {
-            final String fullyQualifiedName = simpleMatcher.group(1);
-            final String[] parts = fullyQualifiedName.split("\\.");
-            if (parts.length > 0) {
-                errorBuilder.errorType(parts[parts.length - 1]);
-            } else {
-                errorBuilder.errorType(fullyQualifiedName);
-            }
-            errorBuilder.errorMessage(simpleMatcher.group(2));
-        }
-
-        final Matcher explanationMatcher = regexForExplanation.matcher(input);
-        if (explanationMatcher.find()) {
-            errorBuilder.errorType(explanationMatcher.group(1));
-            errorBuilder.errorMessage(explanationMatcher.group(2));
-        }
-
-
-        final Matcher positionMatcher = regexPosition.matcher(input);
-        if (positionMatcher.find()) {
-            errorBuilder.beginLine(1);
-            errorBuilder.beginColumn(0);
-
-            errorBuilder.endLine(Integer.parseInt(positionMatcher.group(1)));
-            errorBuilder.endColumn(Integer.parseInt(positionMatcher.group(2)));
-        }
-
-        // Fallback, all parsing failed
-        if (!errorBuilder.errorMessage().isPresent()) {
-            errorBuilder.errorMessage(input);
-        }
-
-        return errorBuilder.build();
+    public static Builder builder(ValidationStatus status, ValidationType validationType) {
+        return new AutoValue_ValidationMessage.Builder()
+                .validationStatus(status)
+                .validationType(validationType);
     }
 
-    public static Builder builder() {
-        return new AutoValue_ValidationMessage.Builder();
-    }
+    public abstract Builder toBuilder();
 
 
     @AutoValue.Builder
     public abstract static class Builder {
 
-        public abstract Builder beginLine(int line);
-
-        public abstract Builder beginColumn(int column);
-
-        public abstract Builder endLine(int line);
-
-        public abstract Builder endColumn(int column);
-
-        public abstract Builder errorType(@Nullable String errorType);
+        public abstract Builder position(QueryPosition position);
 
         public abstract Builder errorMessage(String errorMessage);
 
-        public abstract Optional<String> errorMessage();
+        public abstract Builder relatedProperty(String relatedProperty);
+
+        public abstract Builder validationType(ValidationType validationType);
+
+        public abstract Builder validationStatus(ValidationStatus validationStatus);
 
         public abstract ValidationMessage build();
-
     }
-
-
 }

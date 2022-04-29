@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.views.search.elasticsearch;
 
+import org.graylog.plugins.views.search.QueryMetadata;
+import org.graylog.plugins.views.search.validation.SubstringMultilinePosition;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -30,6 +32,11 @@ public class QueryStringParserTest {
         assertThat(parse("foo:bar AND some:value")).isEmpty();
         assertThat(parse("foo:$bar$ AND some:value")).containsExactly("bar");
         assertThat(parse("foo:$bar$ AND some:$value$")).containsExactlyInAnyOrder("value", "bar");
+    }
+
+    @Test
+    void testRepeatedParamUsage() {
+        assertThat(parse("foo:$bar$ AND lorem:$bar")).containsExactly("bar");
     }
 
     @Test
@@ -59,6 +66,31 @@ public class QueryStringParserTest {
         assertThat(parse("foo:$_$")).containsExactly("_");
         assertThat(parse("foo:$s$")).containsExactly("s");
         assertThat(parse("foo:$9$")).isEmpty();
+    }
+
+    @Test
+    void testParamPositions() {
+        final QueryMetadata metadata = queryStringParser.parse("foo:$bar$ AND lorem:$bar$");
+        assertThat(metadata.usedParameters().size()).isEqualTo(1);
+        final QueryParam param = metadata.usedParameters().iterator().next();
+        assertThat(param.name()).isEqualTo("bar");
+        assertThat(param.positions()).containsExactly(
+                SubstringMultilinePosition.create(1, 4, 9),
+                SubstringMultilinePosition.create(1, 20, 25)
+        );
+    }
+
+    @Test
+    void testParamPositionsMultiline() {
+        final QueryMetadata metadata = queryStringParser.parse("foo:$bar$ AND\nlorem:$bar$ OR ipsum:$bar$");
+        assertThat(metadata.usedParameters().size()).isEqualTo(1);
+        final QueryParam param = metadata.usedParameters().iterator().next();
+        assertThat(param.name()).isEqualTo("bar");
+        assertThat(param.positions()).containsExactly(
+                SubstringMultilinePosition.create(1, 4, 9),
+                SubstringMultilinePosition.create(2, 6, 11),
+                SubstringMultilinePosition.create(2, 21, 26)
+        );
     }
 
     private Set<String> parse(String query) {

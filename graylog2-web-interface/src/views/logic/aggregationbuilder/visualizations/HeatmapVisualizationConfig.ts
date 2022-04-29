@@ -155,7 +155,7 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
     };
   }
 
-  static fromJSON(type: string, value: HeatmapVisualizationConfigJSON = {
+  static fromJSON(_type: string, value: HeatmapVisualizationConfigJSON = {
     color_scale: 'Viridis',
     reverse_scale: false,
     auto_scale: true,

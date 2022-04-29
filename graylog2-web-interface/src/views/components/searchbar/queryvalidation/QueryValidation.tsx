@@ -30,11 +30,16 @@ import DocsHelper from 'util/DocsHelper';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 const Container = styled.div`
   margin-right: 5px;
   margin-left: 5px;
   width: 25px;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable }) => `
@@ -43,7 +48,6 @@ const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable
   border: 0;
   display: flex;
   align-items: center;
-  min-height: 35px;
   cursor: ${$clickable ? 'pointer' : 'default'};
 `);
 
@@ -59,6 +63,15 @@ const DocumentationIcon = styled(Icon)`
 const Title = styled.div`
   display: flex;
   justify-content: space-between;
+`;
+
+const Explanation = styled.div`
+  display: flex;
+  justify-content: space-between;
+
+  :not(:last-child) {
+    margin-bottom: 6px;
+  }
 `;
 
 const shakeAnimation = keyframes`
@@ -84,22 +97,14 @@ const shakeAnimation = keyframes`
   }
 `;
 
-const StyledPopover = styled(Popover)(({ $shaking }) => {
-  if ($shaking) {
-    return css`
-      animation: ${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-    `;
-  }
-
-  return '';
-});
+const StyledPopover = styled(Popover)(({ $shaking }) => css`
+  z-index: 2;
+  animation: ${$shaking ? css`${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both` : 'none'};
+`);
 
 const ExplanationTitle = ({ title }: { title: string }) => (
   <Title>
     {title}
-    <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                       title="Search query syntax documentation"
-                       text={<DocumentationIcon name="lightbulb" />} />
   </Title>
 );
 
@@ -137,7 +142,23 @@ const useTriggerIfErrorsPersist = (trigger: () => void) => {
   return [showExplanation, toggleShow] as const;
 };
 
+const getErrorDocumentationLink = (errorType: string) => {
+  switch (errorType) {
+    case 'UNKNOWN_FIELD':
+      return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.UNKNOWN_FIELD;
+    case 'QUERY_PARSING_ERROR':
+      return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.QUERY_PARSING_ERROR;
+    case 'INVALID_OPERATOR':
+      return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.INVALID_OPERATOR;
+    case 'UNDECLARED_PARAMETER':
+      return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.UNDECLARED_PARAMETER;
+    default:
+      return DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE;
+  }
+};
+
 const QueryValidation = () => {
+  const plugableValidationExplanation = usePluginEntities('views.elements.validationErrorExplanation');
   const [shakingPopover, shake] = useShakeTemporarily();
   const [showExplanation, toggleShow] = useTriggerIfErrorsPersist(shake);
 
@@ -153,14 +174,18 @@ const QueryValidation = () => {
   return (
     <>
       <Container ref={explanationTriggerRef}>
-        {hasExplanations && (
-        <ExplanationTrigger title="Toggle validation error explanation"
-                            onClick={toggleShow}
-                            $clickable
-                            tabIndex={0}
-                            type="button">
-          <ErrorIcon $status={status} name="exclamation-circle" />
-        </ExplanationTrigger>
+        {hasExplanations ? (
+          <ExplanationTrigger title="Toggle validation error explanation"
+                              onClick={toggleShow}
+                              $clickable
+                              tabIndex={0}
+                              type="button">
+            <ErrorIcon $status={status} name="exclamation-circle" />
+          </ExplanationTrigger>
+        ) : (
+          <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                             title="Search query syntax documentation"
+                             text={<Icon name="lightbulb" />} />
         )}
       </Container>
 
@@ -175,22 +200,24 @@ const QueryValidation = () => {
                          title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
                          $shaking={shakingPopover}>
             <div role="alert">
-              {explanations.map(({ errorType, errorMessage }) => (
-                <p key={errorMessage}>
-                  <b>{errorType}</b>: {errorMessage}
-                </p>
+              {explanations.map(({ errorType, errorTitle, errorMessage }) => (
+                <Explanation key={errorMessage}>
+                  <span><b>{errorTitle}</b>: {errorMessage}</span>
+                  <DocumentationLink page={getErrorDocumentationLink(errorType)}
+                                     title={`${errorTitle} documentation`}
+                                     text={<DocumentationIcon name="lightbulb" />} />
+                </Explanation>
               ))}
+              {plugableValidationExplanation?.map((PlugableExplanation, index) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <PlugableExplanation validationState={validationState} key={index} />),
+              )}
             </div>
           </StyledPopover>
         </Overlay>
       )}
     </>
   );
-};
-
-QueryValidation.defaultProps = {
-  filter: undefined,
-  streams: undefined,
 };
 
 export default QueryValidation;

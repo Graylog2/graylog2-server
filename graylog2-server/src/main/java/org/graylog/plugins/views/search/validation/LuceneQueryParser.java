@@ -17,80 +17,25 @@
 package org.graylog.plugins.views.search.validation;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParserConstants;
-import org.apache.lucene.queryparser.classic.Token;
-import org.apache.lucene.search.AutomatonQuery;
-import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.QueryVisitor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class LuceneQueryParser {
-    private final TermCollectingQueryParser parser;
 
-    public LuceneQueryParser() {
-        this.parser = new TermCollectingQueryParser(ParsedTerm.DEFAULT_FIELD, new StandardAnalyzer());
-        this.parser.setSplitOnWhitespace(true);
-    }
+    public static final StandardAnalyzer ANALYZER = new StandardAnalyzer();
 
     public ParsedQuery parse(final String query) throws ParseException {
+        final TokenCollectingQueryParser parser = new TokenCollectingQueryParser(ParsedTerm.DEFAULT_FIELD, ANALYZER);
+        parser.setSplitOnWhitespace(true);
+
         final Query parsed = parser.parse(query);
         final ParsedQuery.Builder builder = ParsedQuery.builder().query(query);
 
-        final List<ImmutableToken> availableTokens = new ArrayList<>(this.parser.getTokens());
-        builder.tokensBuilder().addAll(availableTokens);
+        builder.tokensBuilder().addAll(parser.getTokens());
 
-        parsed.visit(new QueryVisitor() {
-            @Override
-            public void consumeTerms(Query query, Term... terms) {
-                super.consumeTerms(query, terms);
-                for (Term t : terms) {
-                    final String field = t.field();
-
-                    final ParsedTerm.Builder termBuilder = ParsedTerm.builder()
-                            .field(field)
-                            .value(t.text());
-
-                    if (field.equals(ParsedTerm.DEFAULT_FIELD)) {
-                        availableTokens.stream()
-                                .filter(token -> token.matches(QueryParserConstants.TERM, t.text()))
-                                .findFirst()
-                                .ifPresent(token -> {
-                                    termBuilder.tokensBuilder().add(token);
-                                    availableTokens.remove(token);
-                                });
-                    } else {
-                        availableTokens.stream()
-                                .filter(token -> token.kind() == QueryParserConstants.TERM)
-                                .filter(token -> token.image().equals(field))
-                                .findFirst()
-                                .ifPresent(token -> {
-                                    termBuilder.tokensBuilder().add(token);
-                                    availableTokens.remove(token);
-                                });
-                    }
-                    builder.termsBuilder().add(termBuilder.build());
-                }
-            }
-
-            @Override
-            public void visitLeaf(Query query) {
-                if (query instanceof AutomatonQuery) {
-                    final String field = ((AutomatonQuery) query).getField();
-                    builder.termsBuilder().add(ParsedTerm.create(ParsedTerm.EXISTS, field));
-                }
-            }
-
-            @Override
-            public QueryVisitor getSubVisitor(BooleanClause.Occur occur, Query parent) {
-                // the default implementation ignores MUST_NOT clauses, we want to collect all, even MUST_NOT
-                return this;
-            }
-        });
+        final TermCollectingQueryVisitor visitor = new TermCollectingQueryVisitor(ANALYZER, parser.getTokenLookup());
+        parsed.visit(visitor);
+        builder.termsBuilder().addAll(visitor.getParsedTerms());
         return builder.build();
     }
 }

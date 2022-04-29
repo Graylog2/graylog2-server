@@ -33,7 +33,7 @@ describe('<MeasureDimensions />', () => {
 
       static defaultProps = {
         containerHeight: undefined,
-      }
+      };
 
       getContainerHeight() {
         const { containerHeight } = this.props;

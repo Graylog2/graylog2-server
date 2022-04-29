@@ -23,6 +23,7 @@ import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.users.ChangeUserRequest;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.shared.users.UserManagementService;
@@ -51,7 +52,7 @@ public class UserManagementServiceImpl extends UserServiceImpl implements UserMa
     }
 
     @Override
-    public String update(User user) throws ValidationException {
+    public String update(User user, ChangeUserRequest cr) throws ValidationException {
         return super.save(user);
     }
 

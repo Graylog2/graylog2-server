@@ -36,7 +36,7 @@ export const ConditionLabelMap = {
   greater: '>',
 };
 
-export type Value = string;
+export type Value = string | number | boolean;
 export type Color = HighlightingColor;
 export type Condition = keyof typeof ConditionLabelMap;
 

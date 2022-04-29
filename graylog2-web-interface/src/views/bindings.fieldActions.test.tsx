@@ -21,10 +21,6 @@ import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 
 import bindings from './bindings';
 
-jest.mock('views/stores/FieldTypesStore', () => ({
-  FieldTypesStore: MockStore(['getInitialState', () => ({ all: {}, queryFields: {} })]),
-}));
-
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(),
   ConfigurationsActions: {

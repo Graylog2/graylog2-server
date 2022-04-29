@@ -29,6 +29,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -107,17 +108,12 @@ public abstract class MessageList implements SearchType {
     public abstract Builder toBuilder();
 
     @Override
-    public SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state) {
-        final boolean hasLimit = state.hasNonNull("limit");
-        final boolean hasOffset = state.hasNonNull("offset");
-        if (hasLimit || hasOffset) {
+    public SearchType applyExecutionContext(SearchTypeExecutionState executionState) {
+
+        if (executionState.limit().isPresent() || executionState.offset().isPresent()) {
             final Builder builder = toBuilder();
-            if (hasLimit) {
-                builder.limit(state.path("limit").asInt());
-            }
-            if (hasOffset) {
-                builder.offset(state.path("offset").asInt());
-            }
+            executionState.limit().ifPresent(builder::limit);
+            executionState.offset().ifPresent(builder::offset);
             return builder.build();
         }
         return this;

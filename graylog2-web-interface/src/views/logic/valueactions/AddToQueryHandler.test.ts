@@ -81,7 +81,7 @@ describe('AddToQueryHandler', () => {
       contexts: { view },
     })
       .then(() => {
-        expect(QueriesActions.query).toHaveBeenCalledWith('queryId', 'timestamp:"2019-01-17 11:00:09.025"');
+        expect(QueriesActions.query).toHaveBeenCalledWith('queryId', 'timestamp:"2019-01-17T11:00:09.025Z"');
       });
   });
 

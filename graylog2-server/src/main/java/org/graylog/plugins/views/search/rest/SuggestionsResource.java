@@ -51,6 +51,7 @@ import java.util.stream.Collectors;
 @Path("/search/suggest")
 public class SuggestionsResource extends RestResource implements PluginRestResource {
 
+    public static final int SUGGESTIONS_COUNT_MAX = 100;
     private final PermittedStreams permittedStreams;
     private final QuerySuggestionsService querySuggestionsService;
 
@@ -71,12 +72,15 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
                 .field(suggestionsRequest.field())
                 .input(suggestionsRequest.input())
                 .streams(adaptStreams(suggestionsRequest.streams(), searchUser))
+                .size(Math.min(suggestionsRequest.size(), SUGGESTIONS_COUNT_MAX))
                 .timerange(Optional.ofNullable(suggestionsRequest.timerange()).orElse(defaultTimeRange()))
                 .build();
 
         SuggestionResponse res = querySuggestionsService.suggest(req);
         final List<SuggestionEntryDTO> suggestions = res.suggestions().stream().map(s -> SuggestionEntryDTO.create(s.getValue(), s.getOccurrence())).collect(Collectors.toList());
-        final SuggestionsDTO.Builder suggestionsBuilder = SuggestionsDTO.builder(res.field(), res.input()).suggestions(suggestions);
+        final SuggestionsDTO.Builder suggestionsBuilder = SuggestionsDTO.builder(res.field(), res.input())
+                .suggestions(suggestions)
+                .sumOtherDocsCount(res.sumOtherDocsCount());
 
         res.suggestionError()
                 .map(e -> SuggestionsErrorDTO.create(e.type(), e.reason()))

@@ -17,42 +17,13 @@
 /* eslint-disable no-console */
 const fs = require('fs');
 const path = require('path');
+
 const puppeteer = require('puppeteer');
 const express = require('express');
 const cors = require('cors');
 
 const VENDORMODULE = 'vendor-module.json';
 const BUILDMODULE = 'module.json';
-
-const HEADLESS_SHELL = 'test/bin/headless_shell';
-
-const isExecutable = (filename) => {
-  try {
-    // eslint-disable-next-line no-bitwise
-    fs.accessSync(filename, fs.constants.R_OK | fs.constants.X_OK);
-  } catch (e) {
-    return false;
-  }
-  return true;
-};
-
-const useHeadlessShell = (filename = HEADLESS_SHELL) => {
-  const isLinux = process.platform === 'linux';
-  if (!isLinux) {
-    return false;
-  }
-  if (!fs.existsSync(filename)) {
-    return false;
-  }
-  if (!isExecutable(filename)) {
-    try {
-      fs.chmodSync(filename, 0o755);
-    } catch (e) {
-      return false;
-    }
-  }
-  return true;
-};
 
 function fatal(throwable) {
   console.error(throwable);
@@ -70,13 +41,16 @@ function generateIndexHtml(assets) {
     <html>
   `;
 }
+
 function bootstrapExpress(buildDir, config, pluginMounts, indexHtml = '<html><body></body></html>') {
   const app = express();
   app.get('/', (req, res) => res.send(indexHtml));
   app.get('/assets/config.js', (req, res) => res.send(config));
   app.use('/assets', express.static(buildDir));
+
   Object.entries(pluginMounts)
     .forEach(([name, pluginPath]) => app.use(`/assets/${name}`, express.static(pluginPath)));
+
   const server = app.listen();
   const { port } = server.address();
 
@@ -87,7 +61,12 @@ function bootstrapApi(prefix = '/api/') {
   const api = express();
   api.use(cors());
 
-  const rootHandler = (req, res) => res.json({ cluster_id: 'deadbeef', node_id: 'deadbeef', version: '3.0.0', tagline: 'Manage your logs in the dark and have lasers going and make it look like you\'re from space!' });
+  const rootHandler = (req, res) => res.json({
+    cluster_id: 'deadbeef',
+    node_id: 'deadbeef',
+    version: '3.0.0',
+    tagline: 'Manage your logs in the dark and have lasers going and make it look like you\'re from space!',
+  });
   api.get(prefix, rootHandler);
 
   const sessionHandler = (req, res) => res.json({ session_id: null, username: null, is_valid: false });
@@ -109,9 +88,6 @@ async function loadPage(url, handleError, handleConsole) {
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     };
-    if (useHeadlessShell()) {
-      options.executablePath = HEADLESS_SHELL;
-    }
     const browser = await puppeteer.launch(options);
     const page = await browser.newPage();
     page.on('console', handleConsole);
@@ -140,6 +116,7 @@ function collectMounts(pluginModuleNames) {
   return pluginModuleNames.map((pluginModuleName) => {
     const pluginModule = JSON.parse(fs.readFileSync(pluginModuleName));
     const name = Object.keys(pluginModule.files.chunks)[0];
+
     return { [name]: path.dirname(pluginModuleName) };
   }).reduce((prev, cur) => ({ ...prev, ...cur }), {});
 }
@@ -173,6 +150,7 @@ const trackEvent = (evt, arr) => {
 };
 
 const pagePromise = loadPage(url, (msg) => trackEvent(msg, pageErrors), (msg) => trackEvent(msg, consoleLogs));
+
 pagePromise
   .catch((err) => {
     console.error('Error: ', err.toString());
@@ -180,6 +158,7 @@ pagePromise
   })
   .finally(() => {
     const isSuccess = pageErrors.length === 0 && consoleLogs.length === 0;
+
     if (pageErrors.length > 0) {
       console.log('Errors:');
       console.log(pageErrors);

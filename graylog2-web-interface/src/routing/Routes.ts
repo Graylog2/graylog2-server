@@ -60,6 +60,7 @@ const Routes = {
       show: (notificationId: string) => `/alerts/notifications/${notificationId}`,
     },
   },
+  SECURITY: '/security',
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
   GETTING_STARTED: '/gettingstarted',
@@ -69,7 +70,7 @@ const Routes = {
       LIST: '/system/contentpacks',
       EXPORT: '/system/contentpacks/export',
       CREATE: '/system/contentpacks/create',
-      edit: (contentPackId: string, contentPackRev: string) => { return `/system/contentpacks/${contentPackId}/${contentPackRev}/edit`; },
+      edit: (contentPackId: string, contentPackRev: string) => `/system/contentpacks/${contentPackId}/${contentPackRev}/edit`,
       show: (contentPackId: string) => `/system/contentpacks/${contentPackId}`,
     },
     GROKPATTERNS: '/system/grokpatterns',
@@ -253,31 +254,41 @@ const Routes = {
   filtered_metrics: (nodeId: string, filter: string) => `${Routes.SYSTEM.METRICS(nodeId)}?filter=${filter}`,
 } as const;
 
-const qualifyUrls = (routes, appPrefix): typeof routes => {
-  const qualifiedRoutes = {};
+const prefixUrlWithoutHostname = (url: string, prefix: string) => {
+  const uri = new URI(url);
 
-  Object.keys(routes).forEach((routeName) => {
-    switch (typeof routes[routeName]) {
-      case 'string':
-        qualifiedRoutes[routeName] = new URI(`${appPrefix}/${routes[routeName]}`).normalizePath().resource();
-        break;
-      case 'function':
-        qualifiedRoutes[routeName] = (...params) => {
-          const result = routes[routeName](...params);
+  return uri.directory(`${prefix}/${uri.directory()}`)
+    .normalizePath()
+    .resource();
+};
 
-          return new URI(`${appPrefix}/${result}`).normalizePath().resource();
-        };
+type RouteFunction<P extends Array<any>> = (...args: P) => string;
+type RouteMapEntry = string | RouteFunction<any> | RouteMap;
+type RouteMap = { [routeName: string]: RouteMapEntry };
 
-        break;
-      case 'object':
-        qualifiedRoutes[routeName] = qualifyUrls(routes[routeName], appPrefix);
-        break;
-      default:
-        break;
+const isLiteralRoute = (entry: RouteMapEntry): entry is string => (typeof entry === 'string');
+const isRouteFunction = (entry: RouteMapEntry): entry is RouteFunction<any> => (typeof entry === 'function');
+
+const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string): R => {
+  if (appPrefix === '/') {
+    return routes;
+  }
+
+  return Object.fromEntries(Object.entries(routes).map(([routeName, routeValue]) => {
+    if (isLiteralRoute(routeValue)) {
+      return [routeName, prefixUrlWithoutHostname(routeValue, appPrefix)];
     }
-  });
 
-  return qualifiedRoutes;
+    if (isRouteFunction(routeValue)) {
+      return [routeName, (...params: Parameters<typeof routeValue>) => {
+        const result = routeValue(...params);
+
+        return prefixUrlWithoutHostname(result, appPrefix);
+      }];
+    }
+
+    return [routeName, qualifyUrls(routeValue, appPrefix)];
+  }));
 };
 
 const qualifiedRoutes: typeof Routes = AppConfig.gl2AppPathPrefix() ? qualifyUrls(Routes, AppConfig.gl2AppPathPrefix()) : Routes;
@@ -300,7 +311,7 @@ const unqualified = Routes;
  * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES_PIPELINEID')(123)}>...</LinkContainer>
  *
  */
-const pluginRoute = (routeKey, throwError = true) => {
+const pluginRoute = (routeKey: string, throwError: boolean = true) => {
   const pluginRoutes = {};
 
   PluginStore.exports('routes').forEach((route) => {
@@ -335,7 +346,14 @@ const pluginRoute = (routeKey, throwError = true) => {
   return route;
 };
 
-const getPluginRoute = (routeKey) => pluginRoute(routeKey, false);
+const getPluginRoute = (routeKey: string) => pluginRoute(routeKey, false);
+
+/**
+ * Exported constants for using strings to check if a plugin is registered by it's description.
+ *
+ */
+export const ENTERPRISE_ROUTE_DESCRIPTION = 'Enterprise';
+export const SECURITY_ROUTE_DESCRIPTION = 'Analyst Tools';
 
 const defaultExport = Object.assign(qualifiedRoutes, { pluginRoute, getPluginRoute, unqualified });
 

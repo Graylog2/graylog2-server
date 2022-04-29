@@ -16,7 +16,7 @@
  */
 import { List, Map, Set } from 'immutable';
 
-import { filtersToStreamSet } from './Query';
+import Query, { filtersToStreamSet } from './Query';
 
 describe('Query', () => {
   describe('filtersToStreamSet', () => {
@@ -67,6 +67,15 @@ describe('Query', () => {
         '5c2e07eeba33a9681ad6070a',
         '5d2d9649e117dc4df84cf83c',
       ]));
+    });
+  });
+
+  describe('equality check', () => {
+    it('does not differentiate between a filter which is `undefined` and a filter which is `null`', () => {
+      const queryWithUndefinedFilter = Query.builder().build();
+      const queryWithNullFilter = Query.builder().filter(null).build();
+
+      expect(queryWithUndefinedFilter.equals(queryWithNullFilter)).toBe(true);
     });
   });
 });

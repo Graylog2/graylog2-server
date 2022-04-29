@@ -29,6 +29,8 @@ import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewResolver;
+import org.graylog.plugins.views.search.views.ViewResolverDecoder;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.security.UserContext;
@@ -44,6 +46,8 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -65,6 +69,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -75,6 +80,7 @@ import static java.util.Locale.ENGLISH;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class ViewsResource extends RestResource implements PluginRestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(ViewsResource.class);
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(ViewDTO.FIELD_ID))
             .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
@@ -85,13 +91,16 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final SearchQueryParser searchQueryParser;
     private final ClusterEventBus clusterEventBus;
     private final SearchDomain searchDomain;
+    private final Map<String, ViewResolver> viewResolvers;
 
     @Inject
     public ViewsResource(ViewService dbService,
-                         ClusterEventBus clusterEventBus, SearchDomain searchDomain) {
+                         ClusterEventBus clusterEventBus, SearchDomain searchDomain,
+                         Map<String, ViewResolver> viewResolvers) {
         this.dbService = dbService;
         this.clusterEventBus = clusterEventBus;
         this.searchDomain = searchDomain;
+        this.viewResolvers = viewResolvers;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
 
@@ -138,7 +147,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                     .orElseThrow(() -> new NotFoundException("Default view doesn't exist"));
         }
 
-        final ViewDTO view = loadView(id);
+        // Attempt to resolve the view from optional view resolvers before using the default database lookup.
+        // The view resolvers must be used first, because the ID may not be a valid hex ID string.
+        ViewDTO view = resolveView(id);
         if (searchUser.canReadView(view)) {
             return view;
         }
@@ -146,10 +157,34 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         throw viewNotFoundException(id);
     }
 
+    /**
+     * Resolve (find) view from either the corresponding view resolver, or from the database.
+     *
+     * @param id The id of a view. If an ID matching the resolver format is provided (e.g. resolver_name:id)
+     *           then a view will be looked up from the corresponding resolver, otherwise, it will be looked
+     *           up in the database.
+     * @return An optional view.
+     */
+    private ViewDTO resolveView(String id) {
+        final ViewResolverDecoder decoder = new ViewResolverDecoder(id);
+        if (decoder.isResolverViewId()) {
+            final ViewResolver viewResolver = viewResolvers.get(decoder.getResolverName());
+            if (viewResolver != null) {
+                return viewResolver.get(decoder.getViewId())
+                        .orElseThrow(() -> new NotFoundException("Failed to resolve view:" + id));
+            } else {
+                throw new NotFoundException("Failed to find view resolver: " + decoder.getResolverName());
+            }
+        } else {
+            return loadView(id);
+        }
+    }
+
+
     @POST
     @ApiOperation("Create a new view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
-    public ViewDTO create(@ApiParam @Valid  @NotNull(message = "View is mandatory") ViewDTO dto,
+    public ViewDTO create(@ApiParam @Valid @NotNull(message = "View is mandatory") ViewDTO dto,
                           @Context UserContext userContext,
                           @Context SearchUser searchUser) throws ValidationException {
         if (dto.type().equals(ViewDTO.Type.DASHBOARD) && !searchUser.canCreateDashboards()) {

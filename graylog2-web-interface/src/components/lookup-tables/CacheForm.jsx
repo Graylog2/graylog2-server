@@ -91,7 +91,7 @@ class CacheForm extends React.Component {
 
   updateState = (cache) => {
     this.setState(this._initialState(cache));
-  }
+  };
 
   _initialState = (c) => {
     const { create } = this.props;

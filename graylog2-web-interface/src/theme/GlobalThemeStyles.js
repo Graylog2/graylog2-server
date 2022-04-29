@@ -345,11 +345,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-left: 180px;
   }
 
-  .search-help {
-    margin: 0 5px;
-    line-height: 34px;
-  }
-
   .no-widgets {
     margin-top: 15px;
   }

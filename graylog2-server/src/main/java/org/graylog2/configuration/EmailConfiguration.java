@@ -20,6 +20,7 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
+import joptsimple.internal.Strings;
 
 import java.net.URI;
 
@@ -96,9 +97,18 @@ public class EmailConfiguration {
 
     @ValidatorMethod
     @SuppressWarnings("unused")
-    public void validateConfig() throws ValidationException {
+    public void validateTlsSsl() throws ValidationException {
         if (isUseTls() && isUseSsl()) {
             throw new ValidationException("SMTP over SSL (SMTPS) and SMTP with STARTTLS cannot be used at the same time.");
         }
     }
+
+    @ValidatorMethod
+    @SuppressWarnings("unused")
+    public void validateHostname() throws ValidationException {
+        if (isEnabled() && Strings.isNullOrEmpty(getHostname())) {
+            throw new ValidationException("No hostname configured for email transport");
+        }
+    }
+
 }

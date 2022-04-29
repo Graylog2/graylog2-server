@@ -61,7 +61,7 @@ export default class LineVisualizationConfig extends VisualizationConfig {
     return { interpolation };
   }
 
-  static fromJSON(type: string, value: LineVisualizationConfigJSON) {
+  static fromJSON(_type: string, value: LineVisualizationConfigJSON) {
     return LineVisualizationConfig.create(value?.interpolation ?? this.DEFAULT_INTERPOLATION);
   }
 }

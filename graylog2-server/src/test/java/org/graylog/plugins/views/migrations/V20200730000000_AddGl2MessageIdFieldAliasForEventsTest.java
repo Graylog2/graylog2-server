@@ -52,7 +52,7 @@ class V20200730000000_AddGl2MessageIdFieldAliasForEventsTest {
     }
 
     private V20200730000000_AddGl2MessageIdFieldAliasForEvents buildSut(int major) {
-        return new V20200730000000_AddGl2MessageIdFieldAliasForEvents(SearchVersion.elasticsearch(Version.from(major, 0, 0)), clusterConfigService, elasticsearchAdapter, elasticsearchConfig);
+        return new V20200730000000_AddGl2MessageIdFieldAliasForEvents(SearchVersion.elasticsearch(major, 0, 0), clusterConfigService, elasticsearchAdapter, elasticsearchConfig);
     }
 
     @Test

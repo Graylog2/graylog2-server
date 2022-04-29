@@ -94,7 +94,6 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
   }, [pipeline, onStagesChange]);
 
   const _formatConnectedStreams = (connectedStreams: Stream[]) => {
-    // eslint-disable-next-line react/destructuring-assignment
     const formattedStreams = connectedStreams.map((s) => `"${s.title}"`);
     const streamList = formattedStreams.length > 1 ? [formattedStreams.slice(0, -1).join(', '), formattedStreams.slice(-1)].join(' and ') : formattedStreams[0];
 

@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
-import uuid from 'uuid/v4';
-import { cloneDeep, debounce } from 'lodash';
+import { cloneDeep, debounce, map } from 'lodash';
 import styled from 'styled-components';
 
 import Input from 'components/bootstrap/Input';
@@ -28,18 +27,53 @@ import { Button, Table } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import type { Url, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
 import ToolsStore from 'stores/tools/ToolsStore';
+import { isValidURL } from 'util/URLUtils';
+import generateId from 'logic/generateId';
 
-type Props = {
-  urls: Array<Url>,
-  disabled: boolean,
-  onUpdate: (config: WhiteListConfig, valid: boolean) => void,
+type ValidationResult = {
+  title: { valid: boolean },
+  value: { valid: boolean },
 };
 
 const StyledTable = styled(Table)`
   margin-top: 10px;
 `;
 
-const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
+const validateUrlEntry = async (idx: number, entry: Url, callback?: (...any) => void): Promise<ValidationResult> => {
+  const validationResult = {
+    title: { valid: false },
+    value: { valid: false },
+  };
+
+  validationResult.title = entry.title.trim().length <= 0 ? { valid: false } : { valid: true };
+
+  let valueValidation = { valid: false };
+
+  if (entry.type === 'literal') {
+    valueValidation = isValidURL(entry.value) ? { valid: true } : { valid: false };
+  } else if (entry.type === 'regex' && entry.value.trim().length > 0) {
+    valueValidation = (await ToolsStore.testRegexValidity(entry.value)).is_valid ? { valid: true } : { valid: false };
+  }
+
+  validationResult.value = valueValidation;
+
+  if (typeof callback === 'function') {
+    callback(idx, entry, validationResult);
+  }
+
+  return validationResult;
+};
+
+const debouncedValidateUrlEntry = debounce(validateUrlEntry, 200);
+
+type Props = {
+  urls: Array<Url>,
+  disabled: boolean,
+  onUpdate: (config: WhiteListConfig, valid: boolean) => void,
+  newEntryId?: string,
+};
+
+const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
   const literal = 'literal';
   const regex = 'regex';
   const options = [{ value: literal, label: 'Exact match' }, { value: regex, label: 'Regex' }];
@@ -47,10 +81,11 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   let inputs = {};
   const [config, setConfig] = useState<WhiteListConfig>({ entries: urls, disabled });
   const [validationState, setValidationState] = useState({ errors: [] });
+  const isMounted = useRef<boolean>(false);
 
   const _onAdd = (event: Event) => {
     event.preventDefault();
-    setConfig({ ...config, entries: [...config.entries, { id: uuid(), title: '', value: '', type: literal }] });
+    setConfig({ ...config, entries: [...config.entries, { id: generateId(), title: '', value: '', type: literal }] });
   };
 
   const _onRemove = (event: MouseEvent, idx: number) => {
@@ -65,96 +100,46 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
     setConfig(stateUpdate);
   };
 
-  const validURL = (str: string) => {
-    let isValid = true;
-
-    try {
-      // @ts-ignore
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const test = new URL(str);
-    } catch (e) {
-      isValid = false;
-    }
-
-    return isValid;
-  };
-
-  const _isFormValid = (): boolean => {
+  const hasValidationErrors = useCallback(() => {
     let isValid = true;
 
     if (validationState.errors.length > 0
       && validationState.errors.find(((el) => (el && el.title && el.title.valid) === false
-      || (el && el.value && el.value.valid === false)))) {
+        || (el && el.value && el.value.valid === false)))) {
       isValid = false;
     }
 
     return isValid;
-  };
+  }, [validationState]);
 
-  const _updateState = (idx: number, type: string, name: string, value: string) => {
+  const _updateState = (idx: number, nextEntry: Url) => {
     const stateUpdate = cloneDeep(config);
-
-    stateUpdate.entries[idx][name] = value;
-    stateUpdate.entries[idx] = { ...stateUpdate.entries[idx], type };
+    stateUpdate.entries[idx] = nextEntry;
     setConfig(stateUpdate);
   };
 
-  const _updateValidationError = (idx: number, type: string, name: string, result: Object, value: string) => {
-    const validationUpdate = cloneDeep(validationState);
+  const _updateValidationError = (idx: number, nextEntry: Url, entryValidation: ValidationResult) => {
+    setValidationState((prevValidationState) => {
+      const nextValidationState = cloneDeep(prevValidationState);
+      nextValidationState.errors[idx] = entryValidation;
 
-    validationUpdate.errors[idx] = { ...validationUpdate.errors[idx], [name]: result };
-    setValidationState(validationUpdate);
-    _updateState(idx, type, name, value);
+      return nextValidationState;
+    });
+
+    _updateState(idx, nextEntry);
   };
 
-  const _validate = (name: string, idx: number, type: string, value: string): void => {
-    switch (name) {
-      case 'title': {
-        const result = value.trim().length <= 0 ? { valid: false } : { valid: true };
-
-        _updateValidationError(idx, type, name, result, value);
-      }
-
-        break;
-      case 'value':
-        if (type === literal) {
-          const result = validURL(value) ? { valid: true } : { valid: false };
-
-          _updateValidationError(idx, type, name, result, value);
-        } else if (type === regex && value.trim().length > 0) {
-          const promise = ToolsStore.testRegexValidity(value);
-
-          promise.then((result) => {
-            const res = result.is_valid ? { valid: true } : { valid: false };
-
-            _updateValidationError(idx, type, name, res, value);
-          });
-        } else {
-          const res = { valid: false };
-
-          _updateValidationError(idx, type, name, res, value);
-        }
-
-        break;
-      default:
-        break;
-    }
+  const _validate = async (name: string, idx: number, value: string): Promise<void> => {
+    const nextEntry = { ...config.entries[idx], [name]: value };
+    await debouncedValidateUrlEntry(idx, nextEntry, _updateValidationError);
   };
 
-  const debouncedValidate = debounce(_validate, 500);
-
-  const _onInputChange = (event: React.ChangeEvent<HTMLInputElement>, idx: number, type: string) => {
-    if (type === regex) {
-      debouncedValidate(event.target.name, idx, type, getValueFromInput(event.target));
-    } else {
-      _validate(event.target.name, idx, type, getValueFromInput(event.target));
-    }
+  const _onInputChange = (event: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    _validate(event.target.name, idx, getValueFromInput(event.target));
   };
 
   const _onUpdateType = (idx: number, type: string) => {
-    const stateUpdate = cloneDeep(config);
-
-    _validate('value', idx, type, stateUpdate.entries[idx].value);
+    _validate('type', idx, type);
   };
 
   const _getErrorMessage = (type: string) => {
@@ -173,7 +158,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
                    help={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'Required field' : null}
                    name="title"
                    bsStyle={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'error' : null}
-                   onChange={(event) => _onInputChange(event, idx, url.type)}
+                   onChange={(event) => _onInputChange(event, idx)}
                    defaultValue={url.title}
                    required />
           </td>
@@ -184,7 +169,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
                    help={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? _getErrorMessage(url.type) : null}
                    name="value"
                    bsStyle={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? 'error' : null}
-                   onChange={(event) => _onInputChange(event, idx, url.type)}
+                   onChange={(event) => _onInputChange(event, idx)}
                    defaultValue={url.value}
                    required />
           </td>
@@ -203,6 +188,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
           <td>
             <Button onClick={(event) => _onRemove(event, idx)}>
               <Icon name="trash-alt" />
+              <span className="sr-only">Delete entry</span>
             </Button>
           </td>
         </tr>
@@ -211,9 +197,29 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   };
 
   useEffect(() => {
-    const valid = _isFormValid();
+    const isNewEntryValid = async () => {
+      const newEntryIdx = config.entries.findIndex((entry) => entry.id === newEntryId);
 
-    onUpdate(config, valid);
+      if (newEntryIdx < 0) {
+        return false;
+      }
+
+      const newEntry = config.entries[newEntryIdx];
+      const entryValidation = await validateUrlEntry(newEntryIdx, newEntry, _updateValidationError);
+
+      return map(entryValidation, 'valid').some((valid) => !!valid);
+    };
+
+    const propagateUpdate = async (firstRender) => {
+      const valid = firstRender && newEntryId ? await isNewEntryValid() : hasValidationErrors();
+      onUpdate(config, valid);
+    };
+
+    propagateUpdate(!isMounted.current);
+
+    if (!isMounted.current) {
+      isMounted.current = true;
+    }
   }, [config]);
 
   return (
@@ -248,12 +254,14 @@ UrlWhiteListForm.propTypes = {
   urls: PropTypes.array,
   disabled: PropTypes.bool,
   onUpdate: PropTypes.func,
+  newEntryId: PropTypes.string,
 };
 
 UrlWhiteListForm.defaultProps = {
   urls: [],
   disabled: false,
   onUpdate: () => {},
+  newEntryId: undefined,
 };
 
 export default UrlWhiteListForm;

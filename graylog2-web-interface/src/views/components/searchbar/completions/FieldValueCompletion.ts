@@ -14,25 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as Immutable from 'immutable';
+import { isEqual } from 'lodash';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import type { FieldTypesStoreState, FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
-import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 
-import type { Completer } from '../SearchBarAutocompletions';
-import type { Token, Line } from '../ace-types';
+import type { Completer, CompleterContext, FieldTypes } from '../SearchBarAutocompletions';
+import type { Token, Line, CompletionResult } from '../queryinput/ace-types';
+
+const SUGGESTIONS_PAGE_SIZE = 50;
 
 type SuggestionsResponse = {
   field: string,
   input: string,
-  suggestions: Array<{ value: string, occurrence: number}> | undefined,
+  suggestions: Array<{ value: string, occurrence: number }> | undefined,
+  sum_other_docs_count: number,
 }
 
 const suggestionsUrl = qualifyUrl('/search/suggest');
@@ -43,6 +43,14 @@ const formatValue = (value: string, type: string) => {
   }
 
   return value;
+};
+
+const completionCaption = (fieldValue: string, input: string | number) => {
+  if (fieldValue.startsWith(String(input))) {
+    return fieldValue;
+  }
+
+  return `${fieldValue} ⭢ ${input}`;
 };
 
 const getFieldNameAndInput = (currentToken: Token | undefined | null, lastToken: Token | undefined | null) => {
@@ -63,60 +71,89 @@ const getFieldNameAndInput = (currentToken: Token | undefined | null, lastToken:
   return {};
 };
 
-const getFieldByName = (fields: FieldTypeMappingsList, fieldName: string) => {
-  return fields.find(({ name }) => name === fieldName);
-};
-
 const isEnumerableField = (field: FieldTypeMapping | undefined) => {
   return field?.type.isEnumerable() ?? false;
 };
 
 class FieldValueCompletion implements Completer {
-  activeQuery: string;
+  private previousSuggestions: undefined | {
+    furtherSuggestionsCount: number,
+    completions: Array<CompletionResult>,
+    fieldName: string,
+    input: string | number,
+    timeRange: TimeRange | NoTimeRangeOverride | undefined,
+    streams: Array<string> | undefined,
+  };
 
-  allFields: FieldTypeMappingsList;
-
-  currentQueryFields: FieldTypeMappingsList;
-
-  fields: FieldTypesStoreState;
-
-  constructor() {
-    this.onViewMetadataStoreUpdate(ViewMetadataStore.getInitialState());
-    ViewMetadataStore.listen(this.onViewMetadataStoreUpdate);
-
-    this._newFields(FieldTypesStore.getInitialState());
-    FieldTypesStore.listen((newState) => this._newFields(newState));
-  }
-
-  shouldFetchCompletions = (fieldName: string) => {
+  // eslint-disable-next-line class-methods-use-this
+  shouldFetchCompletions = (fieldName: string, fieldTypes: FieldTypes) => {
     if (!fieldName) {
       return false;
     }
 
-    const queryField = getFieldByName(this.currentQueryFields, fieldName);
+    const queryField = fieldTypes?.query[fieldName];
 
     if (!queryField || !isEnumerableField(queryField)) {
-      const allFieldType = getFieldByName(this.allFields, fieldName);
+      const allFieldType = fieldTypes?.all[fieldName];
 
       return isEnumerableField(allFieldType);
     }
 
     return true;
+  };
+
+  alreadyFetchedAllSuggestions(
+    input: string | number,
+    fieldName: string,
+    streams: Array<string> | undefined,
+    timeRange: TimeRange | NoTimeRangeOverride | undefined,
+  ) {
+    if (!this.previousSuggestions) {
+      return false;
+    }
+
+    const {
+      fieldName: prevFieldName,
+      streams: prevStreams,
+      timeRange: prevTimeRange,
+      furtherSuggestionsCount,
+      input: prevInput,
+    } = this.previousSuggestions;
+
+    return String(input).startsWith(String(prevInput))
+      && prevFieldName === fieldName
+      && isEqual(prevStreams, streams)
+      && isEqual(prevTimeRange, timeRange)
+      && !furtherSuggestionsCount;
   }
 
-  getCompletions = (
-    currentToken: Token | undefined | null,
-    lastToken: Token | undefined | null,
-    prefix: string,
-    tokens: Array<Token>,
-    currentTokenIdx: number,
-    timeRange: TimeRange | NoTimeRangeOverride | undefined,
-    streams: Array<string> | undefined,
-  ) => {
+  filterExistingSuggestions(input: string | number) {
+    if (this.previousSuggestions) {
+      return this.previousSuggestions.completions.filter((completion) => completion.name.startsWith(String(input)));
+    }
+
+    return [];
+  }
+
+  getCompletions = ({
+    currentToken,
+    lastToken,
+    timeRange,
+    streams,
+    fieldTypes,
+  }: CompleterContext) => {
     const { fieldName, input } = getFieldNameAndInput(currentToken, lastToken);
 
-    if (!this.shouldFetchCompletions(fieldName)) {
+    if (!this.shouldFetchCompletions(fieldName, fieldTypes)) {
       return [];
+    }
+
+    if (this.alreadyFetchedAllSuggestions(input, fieldName, streams, timeRange)) {
+      const existingSuggestions = this.filterExistingSuggestions(input);
+
+      if (existingSuggestions.length) {
+        return existingSuggestions;
+      }
     }
 
     const normalizedTimeRange = (!timeRange || isNoTimeRangeOverride(timeRange)) ? undefined : onSubmittingTimerange(timeRange);
@@ -126,44 +163,52 @@ class FieldValueCompletion implements Completer {
       input,
       timerange: normalizedTimeRange,
       streams,
-    }).then(({ suggestions }: SuggestionsResponse) => {
+      size: SUGGESTIONS_PAGE_SIZE,
+    }).then(({ suggestions, sum_other_docs_count: furtherSuggestionsCount }: SuggestionsResponse) => {
       if (!suggestions) {
         return [];
       }
 
-      return suggestions.map(({ value, occurrence }) => ({
+      const completions = suggestions.map(({ value, occurrence }) => ({
         name: value,
         value: value,
         score: occurrence,
+        caption: completionCaption(value, input),
+        meta: `${occurrence} hits`,
       }));
+
+      this.previousSuggestions = {
+        furtherSuggestionsCount,
+        streams,
+        timeRange,
+        fieldName,
+        input,
+        completions,
+      };
+
+      return completions;
     });
   };
 
-  _newFields = (fields: FieldTypesStoreState) => {
-    this.fields = fields;
-    const { queryFields, all } = this.fields;
-
-    if (this.activeQuery) {
-      this.currentQueryFields = queryFields.get(this.activeQuery, Immutable.List());
-      this.allFields = all;
-    }
-  };
-
-  onViewMetadataStoreUpdate = (newState: { activeQuery: string }) => {
-    const { activeQuery } = newState;
-
-    this.activeQuery = activeQuery;
-
-    if (this.fields) {
-      this._newFields(this.fields);
-    }
-  };
-
+  // eslint-disable-next-line class-methods-use-this
   shouldShowCompletions = (currentLine: number, lines: Array<Array<Line>>) => {
-    const currentToken = lines[currentLine - 1].find((token) => token?.start !== undefined);
+    const currentLineTokens = lines[currentLine - 1];
+    const currentTokenIndex = currentLineTokens.findIndex((token) => token?.start !== undefined);
+    const currentToken = currentLineTokens[currentTokenIndex];
 
-    return currentToken?.type === 'keyword' && currentToken?.value.endsWith(':');
-  }
+    if (!currentToken) {
+      return false;
+    }
+
+    const previousToken = currentLineTokens[currentTokenIndex - 1];
+    const nextToken = currentLineTokens[currentTokenIndex + 1];
+
+    const currentTokenIsFieldName = currentToken?.type === 'keyword' && currentToken?.value.endsWith(':');
+    const currentTokenIsFieldValue = currentToken?.type === 'term' && previousToken?.type === 'keyword';
+    const nextTokenIsTerm = nextToken?.type === 'term';
+
+    return (currentTokenIsFieldName || currentTokenIsFieldValue) && !nextTokenIsTerm;
+  };
 }
 
 export default FieldValueCompletion;

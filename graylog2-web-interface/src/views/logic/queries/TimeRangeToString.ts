@@ -29,8 +29,9 @@ export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' 
     return placeholder;
   }
 
-  const dateAgo = moment().subtract(rangeAsSeconds, 'seconds');
-  const rangeTimespan = moment.preciseDiff(moment(), dateAgo);
+  const reference = moment();
+  const dateAgo = moment(reference).subtract(rangeAsSeconds, 'seconds');
+  const rangeTimespan = moment.preciseDiff(reference, dateAgo);
 
   return `${rangeTimespan} ago`;
 };

@@ -23,6 +23,7 @@ import moment from 'moment';
 import { Icon } from 'components/common';
 import { Button, FormGroup, InputGroup, FormControl } from 'components/bootstrap';
 import DateTime from 'logic/datetimes/DateTime';
+import type { IconName } from 'components/common/Icon';
 
 const TIME_ICON_BOD = 'hourglass-start';
 const TIME_ICON_MID = 'hourglass-half';
@@ -194,7 +195,7 @@ const fieldUpdate = (value) => {
 };
 
 const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
-  const hourIcon = useRef(TIME_ICON_MID);
+  const hourIcon = useRef<IconName>(TIME_ICON_MID);
 
   const {
     initialDateTime,

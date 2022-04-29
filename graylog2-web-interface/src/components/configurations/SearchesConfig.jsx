@@ -53,7 +53,7 @@ class SearchesConfig extends React.Component {
       analysis_disabled_fields: PropTypes.arrayOf(PropTypes.string),
     }).isRequired,
     updateConfig: PropTypes.func.isRequired,
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -84,7 +84,7 @@ class SearchesConfig extends React.Component {
     this.defaultState = { ...this.state };
   }
 
-  _onUpdate=(field) => {
+  _onUpdate = (field) => {
     return (newOptions) => {
       const { config } = this.state;
       const update = ObjectUtils.clone(config);
@@ -93,23 +93,23 @@ class SearchesConfig extends React.Component {
 
       this.setState({ config: update });
     };
-  }
+  };
 
-  _onRelativeTimeRangeOptionsUpdate=(data) => {
+  _onRelativeTimeRangeOptionsUpdate = (data) => {
     this.setState({ relativeTimeRangeOptionsUpdate: data });
-  }
+  };
 
-  _onSurroundingTimeRangeOptionsUpdate=(data) => {
+  _onSurroundingTimeRangeOptionsUpdate = (data) => {
     this.setState({ surroundingTimeRangeOptionsUpdate: data });
-  }
+  };
 
-  _onFilterFieldsUpdate=(e) => {
+  _onFilterFieldsUpdate = (e) => {
     this.setState({ surroundingFilterFields: e.target.value });
-  }
+  };
 
-  _onAnalysisDisabledFieldsUpdate=(e) => {
+  _onAnalysisDisabledFieldsUpdate = (e) => {
     this.setState({ analysisDisabledFields: e.target.value });
-  }
+  };
 
   _onChecked = () => {
     const { config: origConfig, limitEnabled } = this.state;
@@ -124,7 +124,7 @@ class SearchesConfig extends React.Component {
     }
 
     this.setState({ config: config, limitEnabled: !limitEnabled });
-  }
+  };
 
   _saveConfig = () => {
     const { updateConfig } = this.props;
@@ -165,20 +165,20 @@ class SearchesConfig extends React.Component {
     updateConfig(update).then(() => {
       this._closeModal();
     });
-  }
+  };
 
   _resetConfig = () => {
     // Reset to initial state when the modal is closed without saving.
     this.setState(this.defaultState);
-  }
+  };
 
   _openModal = () => {
     this.searchesConfigModal.current.open();
-  }
+  };
 
   _closeModal = () => {
     this.searchesConfigModal.current.close();
-  }
+  };
 
   render() {
     const _buildTimeRangeOptions = (options) => {

@@ -32,6 +32,7 @@ import org.graylog.scheduler.JobTriggerData;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.joda.time.DateTimeZone;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Set;
@@ -77,6 +78,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     private static final String FIELD_HTML_BODY_TEMPLATE = "html_body_template";
     private static final String FIELD_EMAIL_RECIPIENTS = "email_recipients";
     private static final String FIELD_USER_RECIPIENTS = "user_recipients";
+    private static final String FIELD_TIME_ZONE = "time_zone";
 
     @JsonProperty(FIELD_SENDER)
     public abstract String sender();
@@ -97,6 +99,10 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     @JsonProperty(FIELD_USER_RECIPIENTS)
     public abstract Set<String> userRecipients();
 
+    @JsonProperty(FIELD_TIME_ZONE)
+    public abstract DateTimeZone timeZone();
+
+    @Override
     @JsonIgnore
     public JobTriggerData toJobTriggerData(EventDto dto) {
         return EventNotificationExecutionJob.Data.builder().eventDto(dto).build();
@@ -106,6 +112,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         return Builder.create();
     }
 
+    @Override
     @JsonIgnore
     public ValidationResult validate() {
         final ValidationResult validation = new ValidationResult();
@@ -134,6 +141,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                     .emailRecipients(ImmutableSet.of())
                     .userRecipients(ImmutableSet.of())
                     .bodyTemplate(DEFAULT_BODY_TEMPLATE)
+                    .timeZone(DateTimeZone.UTC)
                     .htmlBodyTemplate("");
         }
 
@@ -155,18 +163,22 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         @JsonProperty(FIELD_USER_RECIPIENTS)
         public abstract Builder userRecipients(Set<String> userRecipients);
 
+        @JsonProperty(FIELD_TIME_ZONE)
+        public abstract Builder timeZone(DateTimeZone timeZone);
+
         public abstract EmailEventNotificationConfig build();
     }
 
     @Override
     public EventNotificationConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         return EmailEventNotificationConfigEntity.builder()
-            .sender(ValueReference.of(sender()))
-            .subject(ValueReference.of(subject()))
-            .bodyTemplate(ValueReference.of(bodyTemplate()))
-            .htmlBodyTemplate(ValueReference.of(htmlBodyTemplate()))
-            .emailRecipients(emailRecipients())
-            .userRecipients(userRecipients())
+                .sender(ValueReference.of(sender()))
+                .subject(ValueReference.of(subject()))
+                .bodyTemplate(ValueReference.of(bodyTemplate()))
+                .htmlBodyTemplate(ValueReference.of(htmlBodyTemplate()))
+                .emailRecipients(emailRecipients())
+                .userRecipients(userRecipients())
+                .timeZone(ValueReference.of(timeZone().getID()))
             .build();
     }
 }

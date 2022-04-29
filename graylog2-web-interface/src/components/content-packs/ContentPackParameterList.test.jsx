@@ -22,7 +22,7 @@ import ContentPack from 'logic/content-packs/ContentPack';
 import Entity from 'logic/content-packs/Entity';
 import ContentPackParameterList from 'components/content-packs/ContentPackParameterList';
 
-jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
+jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 
 describe('<ContentPackParameterList />', () => {
   it('should render with empty parameters with readOnly', () => {
@@ -147,15 +147,15 @@ describe('<ContentPackParameterList />', () => {
       .build();
     const wrapper = mount(<ContentPackParameterList contentPack={contentPack} />);
 
-    expect(wrapper.find("td[children='PARAM']").exists()).toBe(true);
+    expect(wrapper.find('td[children=\'PARAM\']').exists()).toBe(true);
 
     wrapper.find('input').simulate('change', { target: { value: 'Bad' } });
     wrapper.find('form').simulate('submit');
 
-    expect(wrapper.find("td[children='PARAM']").exists()).toBe(false);
+    expect(wrapper.find('td[children=\'PARAM\']').exists()).toBe(false);
 
-    wrapper.find("button[children='Reset']").simulate('click');
+    wrapper.find('button[children=\'Reset\']').simulate('click');
 
-    expect(wrapper.find("td[children='PARAM']").exists()).toBe(true);
+    expect(wrapper.find('td[children=\'PARAM\']').exists()).toBe(true);
   });
 });

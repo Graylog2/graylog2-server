@@ -39,6 +39,7 @@ import org.mockito.junit.MockitoRule;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.joda.time.Period.hours;
 import static org.joda.time.Period.minutes;
 import static org.joda.time.Period.seconds;
 import static org.junit.Assert.assertEquals;
@@ -109,7 +110,7 @@ public class TimeBasedRotationStrategyTest {
         Period period;
 
         // should snap to 14:00:00
-        period = Period.hours(1);
+        period = hours(1);
         final DateTime hourAnchor = TimeBasedRotationStrategy.determineRotationPeriodAnchor(null, period);
         assertEquals(14, hourAnchor.getHourOfDay());
         assertEquals(0, hourAnchor.getMinuteOfHour());
@@ -141,7 +142,7 @@ public class TimeBasedRotationStrategyTest {
         assertEquals(0, thirtyDays.getMinuteOfHour());
         assertEquals(0, thirtyDays.getSecondOfMinute());
 
-        period = Period.hours(1);
+        period = hours(1);
         final DateTime diffAnchor = TimeBasedRotationStrategy.determineRotationPeriodAnchor(initialTime.minusMinutes(61), period);
         assertEquals(2014, diffAnchor.getYear());
         assertEquals(3, diffAnchor.getMonthOfYear());
@@ -155,7 +156,7 @@ public class TimeBasedRotationStrategyTest {
     @Test
     public void shouldRotateHourly() throws Exception {
         final DateTime initialTime = new DateTime(2014, 1, 1, 1, 59, 59, 0, DateTimeZone.UTC);
-        final Period period = Period.hours(1);
+        final Period period = hours(1);
 
         final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
         DateTimeUtils.setCurrentMillisProvider(clock);
@@ -329,7 +330,7 @@ public class TimeBasedRotationStrategyTest {
     @Test
     public void shouldRotateConcurrently() throws Exception {
         final DateTime initialTime = new DateTime(2014, 1, 1, 1, 59, 59, 0, DateTimeZone.UTC);
-        final Period period = Period.hours(1);
+        final Period period = hours(1);
 
         final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
         DateTimeUtils.setCurrentMillisProvider(clock);
@@ -394,5 +395,50 @@ public class TimeBasedRotationStrategyTest {
         rotationStrategy.rotate(indexSet2);
         verify(indexSet2, never()).cycle();
         reset(indexSet2);
+    }
+
+    // Without any previous state, rotation for a mixed period (e.g. 1 hour + 30 minutes) behaves differently than it
+    // does with previous state. This is not ideal and this test demonstrates the behaviour by also acting as a test for
+    // the #reset method. The ultimate goal would be to remove state, the #reset method and this test altogether.
+    @Test
+    public void testResetWithMixedPeriod() throws Exception {
+        final DateTime initialTime = new DateTime(2014, 1, 1, 1, 0, 0, 0, DateTimeZone.UTC);
+        final Period period = hours(1).plusMinutes(30);
+
+        final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
+        DateTimeUtils.setCurrentMillisProvider(clock);
+
+        when(indexSet.getNewestIndex()).thenReturn("ignored");
+        when(indexSet.getConfig()).thenReturn(indexSetConfig);
+        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
+        when(indices.indexCreationDate(anyString())).thenReturn(Optional.of(initialTime.minus(minutes(1))));
+
+        clock.tick(minutes(31));
+
+        // current time: 01:31
+        // index creation: 00:59 -> anchor: 00:00
+
+        // ideally we wouldn't rotate, because the index is only 32 minutes old
+        rotationStrategy.rotate(indexSet);
+        verify(indexSet, times(1)).cycle();
+
+        reset(indexSet);
+        reset(indices);
+
+        when(indexSet.getNewestIndex()).thenReturn("ignored");
+        when(indexSet.getConfig()).thenReturn(indexSetConfig);
+        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
+        when(indices.indexCreationDate(anyString())).thenReturn(Optional.of(new DateTime(clock.getMillis(), DateTimeZone.UTC)));
+
+        clock.tick(hours(1));
+
+        rotationStrategy.reset();
+
+        // current time: 02:31
+        // index creation: 01:31 -> anchor 01:00 (without resetting it would be 01:30)
+
+        // ideally we wouldn't rotate here, because the index is only 1 hour old
+        rotationStrategy.rotate(indexSet);
+        verify(indexSet, times(1)).cycle();
     }
 }

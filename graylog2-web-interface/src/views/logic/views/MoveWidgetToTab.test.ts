@@ -26,7 +26,7 @@ import Parameter from '../parameters/Parameter';
 import ValueParameter from '../parameters/ValueParameter';
 import Search from '../search/Search';
 
-jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
+jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 
 jest.mock('bson-objectid', () => jest.fn(() => ({
   toString: jest.fn(() => 'new-search-id'),

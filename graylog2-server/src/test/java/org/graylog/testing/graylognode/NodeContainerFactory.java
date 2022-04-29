@@ -21,17 +21,20 @@ import org.graylog.testing.PropertyLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BindMode;
+import org.testcontainers.containers.Container;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.utility.MountableFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.StreamSupport;
@@ -50,16 +53,18 @@ public class NodeContainerFactory {
     // sha2 for password "admin"
     private static final String ADMIN_PW_SHA2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
 
-    public static GenericContainer<?> buildContainer(NodeContainerConfig config, List<Path> pluginJars,
-            Path mavenProjectDir) {
+    private static final String GRAYLOG_HOME = "/usr/share/graylog";
+
+    public static GenericContainer<?> buildContainer(NodeContainerConfig config) {
+        checkBinaries(config);
         if (!config.skipPackaging) {
-            MavenPackager.packageJarIfNecessary(mavenProjectDir);
+            MavenPackager.packageJarIfNecessary(config);
         } else {
             LOG.info("Skipping packaging");
         }
         ImageFromDockerfile image = createImage(config);
 
-        return createRunningContainer(config, image, pluginJars);
+        return createRunningContainer(config, image);
     }
 
     private static ImageFromDockerfile createImage(NodeContainerConfig config) {
@@ -73,20 +78,50 @@ public class NodeContainerFactory {
                 .withFileFromFile("docker-entrypoint.sh", entrypointScript, EXECUTABLE_MODE)
                 .withFileFromPath("graylog.conf", pathTo("graylog_config"))
                 .withFileFromClasspath("log4j2.xml", "log4j2.xml");
+
         if (config.enableDebugging) {
             image.withBuildArg("DEBUG_OPTS", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:5005");
         }
         return image;
     }
 
-    private static GenericContainer<?> createRunningContainer(NodeContainerConfig config, ImageFromDockerfile image,
-            List<Path> pluginJars) {
-        String graylogHome = "/usr/share/graylog";
+    private static boolean containerFileExists(final GenericContainer container, String path) {
+        try {
+            Container.ExecResult r = container.execInContainer("/bin/sh", "-c",
+                    "if [ -f " + path + " ] ; then echo '0' ; else (>&2 echo '1') ; fi");
+
+            return !r.getStderr().contains("1");
+        } catch (IOException | InterruptedException e) {
+            LOG.error("Could not check for file existence: " + path, e);
+            return false;
+        }
+    }
+
+    private static void checkBinaries(NodeContainerConfig config) {
+        final Path fileCopyBaseDir = config.mavenProjectDirProvider.getFileCopyBaseDir();
+        config.mavenProjectDirProvider.getFilesToAddToBinDir().forEach(filename -> {
+            Path path = fileCopyBaseDir.resolve(filename);
+            if (!Files.exists(path)) {
+                LOG.error("Mandatory file {} does not exist in {}", filename, fileCopyBaseDir);
+            } else if (!Files.isExecutable(path)) {
+                LOG.warn("File {} in {} is not executable, setting executable flag.", filename, fileCopyBaseDir);
+                try {
+                    Files.setPosixFilePermissions(path, PosixFilePermissions.fromString("rwxrwxr-x"));
+                } catch (IOException iox) {
+                    LOG.error("Setting executable flag for file " + filename + " in " + fileCopyBaseDir + " failed.", iox);
+                }
+            }
+        });
+    }
+
+    private static GenericContainer<?> createRunningContainer(NodeContainerConfig config, ImageFromDockerfile image) {
+        Path fileCopyBaseDir = config.mavenProjectDirProvider.getFileCopyBaseDir();
+        List<Path> pluginJars = config.pluginJarsProvider.getJars();
+        boolean includeFrontend = config.mavenProjectDirProvider.includeFrontend();
 
         GenericContainer<?> container = new GenericContainer<>(image)
-                .withFileSystemBind(property("server_jar"), graylogHome + "/graylog.jar", BindMode.READ_ONLY)
+                .withFileSystemBind(property("server_jar"), GRAYLOG_HOME + "/graylog.jar", BindMode.READ_ONLY)
                 .withNetwork(config.network)
-                .withEnv("DEVELOPMENT", "true")
                 .withEnv("GRAYLOG_MONGODB_URI", config.mongoDbUri)
                 .withEnv("GRAYLOG_ELASTICSEARCH_HOSTS", config.elasticsearchUri)
                 // TODO: should we set this override search version or let graylog server to detect it from the search server itself?
@@ -118,9 +153,13 @@ public class NodeContainerFactory {
                 .withExposedPorts(config.portsToExpose())
                 .withStartupTimeout(Duration.of(120, SECONDS));
 
+        if (!includeFrontend) {
+            container.withEnv("DEVELOPMENT", "true");
+        }
+
         pluginJars.forEach(hostPath -> {
             if (Files.exists(hostPath)) {
-                final Path containerPath = Paths.get(graylogHome, "plugin", hostPath.getFileName().toString());
+                final Path containerPath = Paths.get(GRAYLOG_HOME, "plugin", hostPath.getFileName().toString());
                 container.addFileSystemBind(hostPath.toString(), containerPath.toString(), BindMode.READ_ONLY);
             }
         });
@@ -130,6 +169,16 @@ public class NodeContainerFactory {
         if (config.enableDebugging) {
             LOG.info("Container debug port: " + container.getMappedPort(DEBUG_PORT));
         }
+
+        config.mavenProjectDirProvider.getFilesToAddToBinDir().forEach(filename -> {
+            final Path originalPath = fileCopyBaseDir.resolve(filename);
+            final String containerPath = GRAYLOG_HOME + "/bin/" + originalPath.getFileName();
+            container.copyFileToContainer(MountableFile.forHostPath(originalPath), containerPath);
+            if (!containerFileExists(container, containerPath)) {
+                LOG.error("Mandatory file {} does not exist in container at {}", filename, containerPath);
+            }
+        });
+
         return container;
     }
 

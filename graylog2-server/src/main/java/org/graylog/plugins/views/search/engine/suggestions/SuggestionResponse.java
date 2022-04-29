@@ -35,12 +35,15 @@ public abstract class SuggestionResponse {
 
     public abstract Optional<SuggestionError> suggestionError();
 
+    @Nullable
+    public abstract Long sumOtherDocsCount();
 
-    public static SuggestionResponse forSuggestions(final String field, final String input, final List<SuggestionEntry> suggestions) {
-        return new AutoValue_SuggestionResponse(field, input, suggestions, Optional.empty());
+
+    public static SuggestionResponse forSuggestions(final String field, final String input, final List<SuggestionEntry> suggestions, Long sumOtherDocsCount) {
+        return new AutoValue_SuggestionResponse(field, input, suggestions, Optional.empty(), sumOtherDocsCount);
     }
 
     public static SuggestionResponse forError(final String field, final String input, final SuggestionError error) {
-        return new AutoValue_SuggestionResponse(field, input, Collections.emptyList(), Optional.of(error));
+        return new AutoValue_SuggestionResponse(field, input, Collections.emptyList(), Optional.of(error), null);
     }
 }

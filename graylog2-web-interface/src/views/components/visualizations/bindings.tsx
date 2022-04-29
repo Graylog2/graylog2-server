@@ -26,7 +26,7 @@ import pieChart from './pie/bindings';
 import scatterChart from './scatter/bindings';
 import worldMap from './worldmap/bindings';
 
-const visualizationBindings: Array<VisualizationType> = [
+const visualizationBindings: Array<VisualizationType<any>> = [
   areaChart,
   barChart,
   dataTable,

@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { MultiSelect, SourceCodeEditor } from 'components/common';
+import { MultiSelect, SourceCodeEditor, TimezoneSelect } from 'components/common';
 import { ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -96,6 +96,7 @@ class EmailNotificationForm extends React.Component {
     html_body_template: DEFAULT_HTML_BODY_TEMPLATE,
     user_recipients: [],
     email_recipients: [],
+    time_zone: 'UTC',
   };
 
   propagateChange = (key, value) => {
@@ -110,6 +111,10 @@ class EmailNotificationForm extends React.Component {
     const { name } = event.target;
 
     this.propagateChange(name, getValueFromInput(event.target));
+  };
+
+  handleTimeZoneChange = (nextValue) => {
+    this.propagateChange('time_zone', nextValue);
   };
 
   handleBodyTemplateChange = (nextValue) => {
@@ -179,6 +184,14 @@ class EmailNotificationForm extends React.Component {
             {lodash.get(validation, 'errors.recipients[0]', 'Add email addresses that will receive this Notification.')}
           </HelpBlock>
         </FormGroup>
+        <Input id="notification-time-zone"
+               help="Time zone used for timestamps in the email body."
+               label={<>Time zone for date/time values <small className="text-muted">(Optional)</small></>}>
+          <TimezoneSelect className="timezone-select"
+                          name="time_zone"
+                          value={config.time_zone}
+                          onChange={this.handleTimeZoneChange} />
+        </Input>
         <FormGroup controlId="notification-body-template"
                    validationState={validation.errors.body ? 'error' : null}>
           <ControlLabel>Body Template</ControlLabel>

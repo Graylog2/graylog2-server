@@ -31,7 +31,7 @@ const DEFAULT_FORM_VALUES = {
   centerY: 0,
 };
 
-const worldMap: VisualizationType = {
+const worldMap: VisualizationType<typeof WorldMapVisualization.type> = {
   type: WorldMapVisualization.type,
   displayName: 'World Map',
   component: WorldMapVisualization,

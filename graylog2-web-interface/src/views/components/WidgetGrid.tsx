@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useContext, useMemo } from 'react';
 import styled, { css } from 'styled-components';
-import { SizeMe } from 'react-sizeme';
 
 import type { WidgetPositions, BackendWidgetPosition } from 'views/types';
 import ReactGridContainer from 'components/common/ReactGridContainer';
@@ -25,7 +24,7 @@ import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import { useStore } from 'stores/connect';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
@@ -34,6 +33,7 @@ import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import type { StoreState } from 'stores/StoreTypes';
 import { ViewStatesStore } from 'views/stores/ViewStatesStore';
+import ElementDimensions from 'components/common/ElementDimensions';
 
 import WidgetContainer from './WidgetContainer';
 import WidgetComponent from './WidgetComponent';
@@ -47,7 +47,7 @@ const COLUMNS = {
   xs: 12,
 };
 
-const DashboardWrap = styled.div(({ theme }) => css`
+const DashboardWrap = styled(ElementDimensions)(({ theme }) => css`
   color: ${theme.colors.global.textDefault};
   margin: 0;
   width: 100%;
@@ -113,29 +113,24 @@ type GridProps = {
   locked: boolean,
   onPositionsChange: (newPositions: Array<BackendWidgetPosition>) => void,
   positions: WidgetPositions,
+  width: number,
 };
 
-const Grid = ({ children, locked, onPositionsChange, positions }: GridProps) => {
+const Grid = ({ children, locked, onPositionsChange, positions, width }: GridProps) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
-  // The SizeMe component is required to update the widget grid
-  // when its content height results in a scrollbar
   return (
-    <SizeMe monitorWidth refreshRate={100}>
-      {({ size: { width } }) => (
-        <StyledReactGridContainer $hasFocusedWidget={!!focusedWidget?.id}
-                                  columns={COLUMNS}
-                                  isResizable={!focusedWidget?.id}
-                                  locked={locked}
-                                  positions={positions}
-                                  measureBeforeMount
-                                  onPositionsChange={onPositionsChange}
-                                  width={width}
-                                  draggableHandle=".widget-drag-handle">
-          {children}
-        </StyledReactGridContainer>
-      )}
-    </SizeMe>
+    <StyledReactGridContainer $hasFocusedWidget={!!focusedWidget?.id}
+                              columns={COLUMNS}
+                              isResizable={!focusedWidget?.id}
+                              locked={locked}
+                              positions={positions}
+                              measureBeforeMount
+                              onPositionsChange={onPositionsChange}
+                              width={width}
+                              draggableHandle=".widget-drag-handle">
+      {children}
+    </StyledReactGridContainer>
   );
 };
 
@@ -189,13 +184,18 @@ const WidgetGrid = () => {
     );
   }).filter((x) => (x !== null)), [fields, focusedWidget, positions, widgets]);
 
+  // Measuring the width is required to update the widget grid
+  // when its content height results in a scrollbar
   return (
     <DashboardWrap>
-      <Grid locked={!isInteractive}
-            positions={positions}
-            onPositionsChange={onPositionsChange}>
-        {children}
-      </Grid>
+      {({ width }) => (
+        <Grid locked={!isInteractive}
+              positions={positions}
+              onPositionsChange={onPositionsChange}
+              width={width}>
+          {children}
+        </Grid>
+      )}
     </DashboardWrap>
   );
 };

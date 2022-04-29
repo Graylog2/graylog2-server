@@ -16,8 +16,8 @@
  */
 import { trim } from 'lodash';
 
-import type { Completer } from '../SearchBarAutocompletions';
-import type { CompletionResult, Token } from '../ace-types';
+import type { Completer, CompleterContext } from '../SearchBarAutocompletions';
+import type { CompletionResult, Token } from '../queryinput/ace-types';
 
 const combiningOperators: Array<CompletionResult> = [
   {
@@ -52,7 +52,8 @@ const _lastNonEmptyToken = (tokens: Array<Token>, currentTokenIdx: number): Toke
 };
 
 class OperatorCompletion implements Completer {
-  getCompletions = (currentToken: Token | undefined | null, lastToken: Token | undefined | null, prefix: string, tokens: Array<Token>, currentTokenIdx: number): Array<CompletionResult> => {
+  // eslint-disable-next-line class-methods-use-this
+  getCompletions = ({ currentToken, lastToken, prefix, tokens, currentTokenIdx }: CompleterContext): Array<CompletionResult> => {
     if (currentToken?.type === 'keyword') {
       return [];
     }
@@ -72,7 +73,7 @@ class OperatorCompletion implements Completer {
     }
 
     return [];
-  }
+  };
 }
 
 export default OperatorCompletion;

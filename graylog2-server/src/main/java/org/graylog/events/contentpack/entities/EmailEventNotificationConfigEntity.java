@@ -25,6 +25,7 @@ import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.types.EmailEventNotificationConfig;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.joda.time.DateTimeZone;
 
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +42,7 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     private static final String FIELD_HTML_BODY_TEMPLATE = "html_body_template";
     private static final String FIELD_EMAIL_RECIPIENTS = "email_recipients";
     private static final String FIELD_USER_RECIPIENTS = "user_recipients";
+    private static final String FIELD_TIME_ZONE = "time_zone";
 
     @JsonProperty(FIELD_SENDER)
     public abstract ValueReference sender();
@@ -60,6 +62,9 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     @JsonProperty(FIELD_USER_RECIPIENTS)
     public abstract Set<String> userRecipients();
 
+    @JsonProperty(FIELD_TIME_ZONE)
+    public abstract ValueReference timeZone();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -73,7 +78,8 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
         public static Builder create() {
             return new AutoValue_EmailEventNotificationConfigEntity.Builder()
                     .type(TYPE_NAME)
-                    .htmlBodyTemplate(ValueReference.of(""));
+                    .htmlBodyTemplate(ValueReference.of(""))
+                    .timeZone(ValueReference.of("UTC"));
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -94,6 +100,9 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
         @JsonProperty(FIELD_USER_RECIPIENTS)
         public abstract Builder userRecipients(Set<String> userRecipients);
 
+        @JsonProperty(FIELD_TIME_ZONE)
+        public abstract Builder timeZone(ValueReference timeZone);
+
         public abstract EmailEventNotificationConfigEntity build();
     }
 
@@ -106,6 +115,7 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
                 .htmlBodyTemplate(htmlBodyTemplate().asString())
                 .emailRecipients(emailRecipients())
                 .userRecipients(userRecipients())
+                .timeZone(DateTimeZone.forID(timeZone().asString(parameters)))
                 .build();
     }
 }

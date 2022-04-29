@@ -34,6 +34,7 @@ export const EventDefinitionsActions = singletonActions(
     delete: { asyncResult: true },
     enable: { asyncResult: true },
     disable: { asyncResult: true },
+    clearNotificationQueue: { asyncResult: true },
   }),
 );
 
@@ -135,6 +136,9 @@ export const EventDefinitionsStore = singletonStore(
         this.propagateChanges();
 
         return response;
+      }).catch((error) => {
+        UserNotification.error(`Fetching event definitions failed with status: ${error}`,
+          'Could not retrieve event definitions');
       });
 
       EventDefinitionsActions.listPaginated.promise(promise);
@@ -281,6 +285,29 @@ export const EventDefinitionsStore = singletonStore(
       );
 
       EventDefinitionsActions.disable.promise(promise);
+    },
+
+    clearNotificationQueue(eventDefinition) {
+      const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinition.id, 'clear-notification-queue'] }));
+
+      promise.then(
+        (response) => {
+          UserNotification.success('Queued notifications cleared.',
+            'Queued notifications were successfully cleared.');
+
+          this.refresh();
+
+          return response;
+        },
+        (error) => {
+          if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
+            UserNotification.error(`Clearing queued notifications failed with status: ${error}`,
+              'Could not clear queued notifications');
+          }
+        },
+      );
+
+      EventDefinitionsActions.clearNotificationQueue.promise(promise);
     },
   }),
 );

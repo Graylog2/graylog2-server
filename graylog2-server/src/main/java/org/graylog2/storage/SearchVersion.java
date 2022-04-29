@@ -16,13 +16,13 @@
  */
 package org.graylog2.storage;
 
+import com.github.zafarkhaja.semver.Version;
 import com.google.auto.value.AutoValue;
 import org.graylog2.configuration.validators.SearchVersionRange;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.plugin.Version;
-import org.graylog2.storage.AutoValue_SearchVersion;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -39,32 +39,34 @@ public abstract class SearchVersion {
             this.printName = printName;
         }
 
-
         @Override
         public String toString() {
             return this.printName;
         }
-
     }
+
+    public abstract Distribution distribution();
+    public abstract Version version();
+
     public SearchVersion major() {
-        return create(distribution(), Version.from(version().getVersion().getMajorVersion(), 0, 0));
+        return create(distribution(), Version.forIntegers(version().getMajorVersion(), 0, 0));
     }
 
     public boolean satisfies(final Distribution distribution, final String expression) {
-        return this.distribution().equals(distribution) && version().getVersion().satisfies(expression);
+        return this.distribution().equals(distribution) && version().satisfies(expression);
     }
 
     public boolean satisfies(SearchVersionRange range) {
         return satisfies(range.distribution(), range.expression());
     }
 
-    public abstract Distribution distribution();
-
-    public abstract Version version();
-
-
-    public static SearchVersion create(Distribution distribution, com.github.zafarkhaja.semver.Version v) {
-        return create(distribution, new Version(v));
+    public boolean satisfies(Collection<SearchVersionRange> ranges) {
+        for (SearchVersionRange range : ranges) {
+            if (satisfies(range)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static SearchVersion elasticsearch(final String version) {
@@ -75,18 +77,18 @@ public abstract class SearchVersion {
         return create(Distribution.ELASTICSEARCH, version);
     }
 
-    public static SearchVersion elasticsearch(com.github.zafarkhaja.semver.Version version) {
-        return elasticsearch(new Version(version));
+    public static SearchVersion elasticsearch(final int major, final int minor, final int patch) {
+        return create(Distribution.ELASTICSEARCH, Version.forIntegers(major, minor, patch));
     }
 
     public String encode() {
-        return String.format(Locale.ROOT, "%s:%s", this.distribution().name().toUpperCase(Locale.ROOT), this.version().getVersion());
+        return String.format(Locale.ROOT, "%s:%s", this.distribution().name().toUpperCase(Locale.ROOT), this.version());
     }
 
     public static SearchVersion decode(final String searchServerIdentifier) {
         final String[] parts = searchServerIdentifier.split(":");
-        if(parts.length == 2) {
-            return SearchVersion.create(Distribution.valueOf(parts[0].toUpperCase(Locale.ROOT)), com.github.zafarkhaja.semver.Version.valueOf((parts[1])));
+        if (parts.length == 2) {
+            return SearchVersion.create(Distribution.valueOf(parts[0].toUpperCase(Locale.ROOT)), Version.valueOf((parts[1])));
         } else {
             return SearchVersion.elasticsearch(searchServerIdentifier);
         }
@@ -110,7 +112,7 @@ public abstract class SearchVersion {
 
     protected static com.github.zafarkhaja.semver.Version parseVersion(final String version) {
         try {
-            return com.github.zafarkhaja.semver.Version.valueOf(version);
+            return Version.valueOf(version);
         } catch (Exception e) {
             throw new ElasticsearchException("Unable to parse Elasticsearch version: " + version, e);
         }
@@ -119,5 +121,13 @@ public abstract class SearchVersion {
     @Override
     public String toString() {
         return distribution() + ":" + version();
+    }
+
+    public boolean isElasticsearch() {
+        return this.distribution().equals(Distribution.ELASTICSEARCH);
+    }
+
+    public boolean isOpenSearch() {
+        return this.distribution().equals(Distribution.OPENSEARCH);
     }
 }

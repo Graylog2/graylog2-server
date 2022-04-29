@@ -33,10 +33,10 @@ import java.util.ArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class QueryParserTest {
-    private static QueryParser queryParser = new QueryParser(new QueryStringParser());
+    private static final QueryParser queryParser = new QueryParser(new QueryStringParser());
 
     @Test
-    public void parse() throws Exception {
+    public void parse() {
         final QueryMetadata queryMetadata = queryParser.parse(Query.builder()
                 .id("abc123")
                 .query(ElasticsearchQueryString.of("user_name:$username$ http_method:$foo$"))
@@ -48,7 +48,7 @@ public class QueryParserTest {
     }
 
     @Test
-    public void parseAlsoConsidersWidgetFilters() throws Exception {
+    public void parseAlsoConsidersWidgetFilters() {
         final SearchType searchType1 = Pivot.builder()
                 .id("searchType1")
                 .filter(QueryStringFilter.builder().query("source:$bar$").build())

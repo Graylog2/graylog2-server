@@ -98,7 +98,7 @@ class FilterAggregationSummary extends React.Component {
     }
 
     return <dd>{queryParameters.map((p) => p.name).join(', ')}</dd>;
-  }
+  };
 
   render() {
     const { config, currentUser } = this.props;

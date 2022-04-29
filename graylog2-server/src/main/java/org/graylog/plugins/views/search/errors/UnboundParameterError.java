@@ -16,20 +16,30 @@
  */
 package org.graylog.plugins.views.search.errors;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.elasticsearch.QueryParam;
+
+import java.util.Set;
 
 public class UnboundParameterError extends QueryError {
     private final String parameterName;
+    private final Set<QueryParam> allUnknownParameters;
 
-    public UnboundParameterError(Query query, String name) {
+    public UnboundParameterError(Query query, String name, Set<QueryParam> allUnknownParameters) {
         super(query, "Unbound required parameter used: " + name);
         this.parameterName = name;
+        this.allUnknownParameters = allUnknownParameters;
     }
 
     @JsonProperty("parameter")
     public String parameterName() {
         return parameterName;
+    }
+
+    @JsonIgnore
+    public Set<QueryParam> allUnknownParameters() {
+        return allUnknownParameters;
     }
 }

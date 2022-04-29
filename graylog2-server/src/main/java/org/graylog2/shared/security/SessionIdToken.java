@@ -21,14 +21,16 @@ import org.apache.shiro.authc.HostAuthenticationToken;
 
 import java.util.Objects;
 
-public final class SessionIdToken implements HostAuthenticationToken {
+public final class SessionIdToken implements HostAuthenticationToken, RemoteAddressAuthenticationToken {
 
     private final String sessionId;
     private final String host;
+    private final String remoteAddr;
 
-    public SessionIdToken(String sessionId, String host) {
+    public SessionIdToken(String sessionId, String host, String remoteAddr) {
         this.sessionId = sessionId;
         this.host = host;
+        this.remoteAddr = remoteAddr;
     }
 
     @Override
@@ -45,6 +47,10 @@ public final class SessionIdToken implements HostAuthenticationToken {
         return sessionId;
     }
 
+    public String getRemoteAddr() {
+        return remoteAddr;
+    }
+
     @Override
     public String getHost() {
         return host;
@@ -56,18 +62,19 @@ public final class SessionIdToken implements HostAuthenticationToken {
         if (o == null || getClass() != o.getClass()) return false;
         SessionIdToken that = (SessionIdToken) o;
         return Objects.equals(sessionId, that.sessionId) &&
-                Objects.equals(host, that.host);
+                Objects.equals(host, that.host) &&
+                Objects.equals(remoteAddr, that.remoteAddr);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sessionId, host);
+        return Objects.hash(sessionId, host, remoteAddr);
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("sessionId", sessionId)
+                .add("hashcode", hashCode())
                 .add("host", host)
                 .toString();
     }

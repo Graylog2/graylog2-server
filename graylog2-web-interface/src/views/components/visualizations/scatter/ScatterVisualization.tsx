@@ -15,32 +15,38 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
-import EventHandler from 'views/logic/searchtypes/events/EventHandler';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
+import useChartData from 'views/components/visualizations/useChartData';
+import useEvents from 'views/components/visualizations/useEvents';
 
-import { chartData } from '../ChartData';
 import XYPlot from '../XYPlot';
 
 const seriesGenerator = (type, name, labels, values) => ({ type, name, x: labels, y: values, mode: 'markers' });
 
 const setChartColor = (chart, colors) => ({ marker: { color: colors.get(chart.name) } });
 
-const ScatterVisualization = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
-  const rows = retrieveChartData(data);
-  const chartDataResult = chartData(config, rows, 'scatter', seriesGenerator);
-  const layout: { shapes?: Shapes } = {};
+const ScatterVisualization = makeVisualization(({
+  config,
+  data,
+  effectiveTimerange,
+  height,
+}: VisualizationComponentProps) => {
+  const rows = useMemo(() => retrieveChartData(data), [data]);
+  const _chartDataResult = useChartData(rows, {
+    widgetConfig: config,
+    chartType: 'scatter',
+    generator: seriesGenerator,
+  });
+  const { eventChartData, shapes } = useEvents(config, data.events);
 
-  if (config.eventAnnotation && data.events) {
-    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events);
-
-    chartDataResult.push(eventChartData);
-    layout.shapes = shapes;
-  }
+  const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
+  const layout: { shapes?: Shapes } = shapes ? { shapes } : {};
 
   return (
     <XYPlot config={config}

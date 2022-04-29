@@ -17,6 +17,8 @@
 package org.graylog.testing.graylognode;
 
 import com.google.common.base.Stopwatch;
+import org.graylog.testing.completebackend.MavenProjectDirProvider;
+import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +26,6 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
 import java.io.Closeable;
-import java.nio.file.Path;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -38,9 +38,9 @@ public class NodeInstance implements Closeable {
     private final GenericContainer<?> container;
 
     public static NodeInstance createStarted(Network network, String mongoDbUri, String elasticsearchUri, SearchVersion elasticsearchVersion, int[] extraPorts,
-                                             List<Path> pluginJars, Path mavenProjectDir) {
-        NodeContainerConfig config = NodeContainerConfig.create(network, mongoDbUri, elasticsearchUri, elasticsearchVersion, extraPorts);
-        GenericContainer<?> container = NodeContainerFactory.buildContainer(config, pluginJars, mavenProjectDir);
+                                             PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider) {
+        NodeContainerConfig config = new NodeContainerConfig(network, mongoDbUri, elasticsearchUri, elasticsearchVersion, extraPorts, pluginJarsProvider, mavenProjectDirProvider);
+        GenericContainer<?> container = NodeContainerFactory.buildContainer(config);
         return new NodeInstance(container);
     }
 
@@ -68,8 +68,8 @@ public class NodeInstance implements Closeable {
         return container.getMappedPort(originalPort);
     }
 
-    public void printLog() {
-        System.out.println(container.getLogs());
+    public String getLogs() {
+        return container.getLogs();
     }
 
     @Override

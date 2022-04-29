@@ -51,9 +51,17 @@ public class SuggestionResourceIT {
         int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
         GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
         GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"SuggestionResourceIT\", \"host\":\"example.org\", \"facility\":\"test\"}",
+                "{\"short_message\":\"SuggestionResourceIT#1\", \"host\":\"example.org\", \"facility\":\"junit\"}",
                 requestSpec);
-         SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT");
+        GelfInputUtils.postMessage(mappedPort,
+                "{\"short_message\":\"SuggestionResourceIT#2\", \"host\":\"example.org\", \"facility\":\"test\"}",
+                requestSpec);
+        GelfInputUtils.postMessage(mappedPort,
+                "{\"short_message\":\"SuggestionResourceIT#3\", \"host\":\"example.org\", \"facility\":\"test\"}",
+                requestSpec);
+         SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT#1");
+         SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT#2");
+         SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT#3");
     }
 
     @ContainerMatrixTest
@@ -66,7 +74,7 @@ public class SuggestionResourceIT {
                 .then()
                 .statusCode(200);
         validatableResponse.assertThat().body("suggestions.value[0]", equalTo("test"));
-        validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(1));
+        validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(2));
     }
 
     @ContainerMatrixTest
@@ -80,6 +88,33 @@ public class SuggestionResourceIT {
                 .statusCode(200);
         // error types and messages are different for each ES version, so let's just check that there is an error in the response
         validatableResponse.assertThat().body("error", notNullValue());
-
     }
+
+    @ContainerMatrixTest
+    void testSizeOtherDocsCount() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("{\"field\":\"facility\", \"input\":\"\", \"size\":1}")
+                .post("/search/suggest")
+                .then()
+                .statusCode(200);
+        validatableResponse.assertThat().body("suggestions.value[0]", equalTo("test"));
+        validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(2));
+        validatableResponse.assertThat().body("sum_other_docs_count", greaterThanOrEqualTo(1));
+    }
+
+    @ContainerMatrixTest
+    void testTypoCorrection() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("{\"field\":\"facility\", \"input\":\"tets\"}")
+                .post("/search/suggest")
+                .then()
+                .statusCode(200);
+        validatableResponse.assertThat().body("suggestions.value[0]", equalTo("test"));
+        validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(1));
+    }
+
 }

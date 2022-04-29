@@ -28,6 +28,10 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuil
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.SuggestBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.SuggestBuilders;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.term.TermSuggestion;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.term.TermSuggestionBuilder;
 import org.graylog.storage.elasticsearch7.errors.ResponseError;
 
 import javax.inject.Inject;
@@ -50,16 +54,27 @@ public class QuerySuggestionsES7 implements QuerySuggestionsService {
     @Override
     public SuggestionResponse suggest(SuggestionRequest req) {
         final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(req.streams(), req.timerange());
+        final TermSuggestionBuilder suggestionBuilder = SuggestBuilders.termSuggestion(req.field()).text(req.input()).size(req.size());
         final SearchSourceBuilder search = new SearchSourceBuilder()
                 .query(QueryBuilders.prefixQuery(req.field(), req.input()))
                 .size(0)
-                .aggregation(AggregationBuilders.terms("fieldvalues").field(req.field()).size(10));
+                .aggregation(AggregationBuilders.terms("fieldvalues").field(req.field()).size(req.size()))
+                .suggest(new SuggestBuilder().addSuggestion("corrections", suggestionBuilder));
 
         try {
             final SearchResponse result = client.singleSearch(new SearchRequest(affectedIndices.toArray(new String[]{})).source(search), "Failed to execute aggregation");
             final ParsedStringTerms fieldValues = result.getAggregations().get("fieldvalues");
             final List<SuggestionEntry> entries = fieldValues.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getDocCount())).collect(Collectors.toList());
-            return SuggestionResponse.forSuggestions(req.field(), req.input(), entries);
+
+            if(!entries.isEmpty()) {
+                return SuggestionResponse.forSuggestions(req.field(), req.input(), entries, fieldValues.getSumOfOtherDocCounts());
+            } else {
+                TermSuggestion suggestion = result.getSuggest().getSuggestion("corrections");
+                final List<SuggestionEntry> corrections = suggestion.getEntries().stream().flatMap(e -> e.getOptions().stream()).map(o -> new SuggestionEntry(o.getText().string(), o.getFreq())).collect(Collectors.toList());
+                return SuggestionResponse.forSuggestions(req.field(), req.input(), corrections, null);
+            }
+
+
         } catch (org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException exception) {
             final SuggestionError err = tryResponseException(exception)
                     .orElseGet(() -> parseException(exception));

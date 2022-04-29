@@ -18,8 +18,6 @@ package org.graylog.testing.fullbackend;
 
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.SearchUtils;
@@ -43,6 +41,7 @@ class BackendStartupIT {
     @ContainerMatrixTest
     void canReachApi() {
         given()
+                .config(sut.withGraylogBackendFailureConfig())
                 .spec(requestSpec)
                 .when()
                 .get()

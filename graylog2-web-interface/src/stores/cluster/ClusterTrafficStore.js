@@ -23,7 +23,7 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 export const ClusterTrafficActions = singletonActions(
   'core.ClusterTraffic',
   () => Reflux.createActions({
-    traffic: { asyncResult: true },
+    getTraffic: { asyncResult: true },
   }),
 );
 
@@ -31,12 +31,17 @@ export const ClusterTrafficStore = singletonStore(
   'core.ClusterTraffic',
   () => Reflux.createStore({
     listenables: ClusterTrafficActions,
+    traffic: undefined,
 
-    traffic() {
+    getInitialState() {
+      return { traffic: this.traffic };
+    },
+
+    getTraffic() {
       const promise = fetch('GET', URLUtils.qualifyUrl('/system/cluster/traffic'));
 
       promise.then((response) => {
-        this.trigger(response);
+        this.trigger({ traffic: response });
       });
 
       return promise;

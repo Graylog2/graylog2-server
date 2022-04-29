@@ -27,13 +27,15 @@ import javax.annotation.Nullable;
 public abstract class ValidationMessageDTO {
 
     @JsonProperty
+    public abstract ValidationTypeDTO errorType();
+
+    @JsonProperty
     @Nullable
     public abstract Integer beginLine();
 
     @JsonProperty
     @Nullable
     public abstract Integer beginColumn();
-
 
     @JsonProperty
     @Nullable
@@ -43,16 +45,46 @@ public abstract class ValidationMessageDTO {
     @Nullable
     public abstract Integer endColumn();
 
-
     @JsonProperty
     @Nullable
-    public abstract String errorType();
+    public abstract String errorTitle();
 
     @JsonProperty
     public abstract String errorMessage();
 
+    @Nullable
+    @JsonProperty
+    public abstract String relatedProperty();
 
-    public static ValidationMessageDTO create(Integer beginLine, Integer beginColumn, Integer endLine, Integer endColumn, String errorType, String errorMessage) {
-        return new AutoValue_ValidationMessageDTO(beginLine, beginColumn, endLine, endColumn, errorType, errorMessage);
+    public static ValidationMessageDTO.Builder builder(ValidationTypeDTO validationType, String errorMessage) {
+        return new AutoValue_ValidationMessageDTO.Builder()
+                .errorType(validationType)
+                .errorMessage(errorMessage);
+    }
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract Builder errorType(ValidationTypeDTO type);
+
+        public abstract Builder beginLine(int beginLine);
+
+        @Nullable
+        public abstract Builder beginColumn(int beginColumn);
+
+        @Nullable
+        public abstract Builder endLine(int endLine);
+
+        @Nullable
+        public abstract Builder endColumn(int endColumn);
+
+        @Nullable
+        public abstract Builder errorTitle(String errorTitle);
+
+        public abstract Builder errorMessage(String errorMessage);
+
+        @Nullable
+        public abstract Builder relatedProperty(String relatedProperty);
+
+        public abstract ValidationMessageDTO build();
     }
 }

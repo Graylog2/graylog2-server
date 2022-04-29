@@ -28,10 +28,11 @@ import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 import { ViewStore } from 'views/stores/ViewStore';
-import { FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import View from 'views/logic/views/View';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
+import Query, { filtersForQuery } from 'views/logic/queries/Query';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 
 import Search from './Search';
 import WidgetFocusProvider from './contexts/WidgetFocusProvider';
@@ -46,10 +47,7 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
   ),
 }));
 
-jest.mock('react-sizeme', () => ({
-  // eslint-disable-next-line react/prop-types
-  SizeMe: ({ children }) => <div>{children({ size: { width: 1024 } })}</div>,
-}));
+jest.mock('hooks/useElementDimensions', () => () => ({ width: 1024, height: 768 }));
 
 const mockedQueryIds = Immutable.OrderedSet(['query-id-1', 'query-id-2']);
 
@@ -76,13 +74,7 @@ jest.mock('views/components/SearchResult', () => () => <div>Mocked search result
 jest.mock('views/components/DashboardSearchBar', () => () => <div>Mocked dashboard search bar</div>);
 jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 jest.mock('views/components/contexts/WidgetFocusProvider', () => jest.fn());
-
-jest.mock('views/stores/FieldTypesStore', () => ({
-  FieldTypesStore: MockStore(),
-  FieldTypesActions: {
-    refresh: jest.fn(),
-  },
-}));
+jest.mock('views/logic/queries/useCurrentQuery');
 
 const mockWidgetEditing = () => {
   asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(({ children }) => (
@@ -117,7 +109,6 @@ describe('Dashboard Search', () => {
       activeQuery: 'foobar',
     }));
 
-    FieldTypesActions.all = mockAction(jest.fn(async () => {}));
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
     SearchActions.refresh = mockAction();
 
@@ -132,16 +123,13 @@ describe('Dashboard Search', () => {
         {children}
       </WidgetFocusContext.Provider>
     ));
+
+    const query = Query.builder().id('foobar').filter(filtersForQuery([])).build();
+    asMock(useCurrentQuery).mockReturnValue(query);
   });
 
-  const SimpleSearch = (props) => (
-    <Search location={{ query: {}, pathname: '/search', search: '' }}
-            searchRefreshHooks={[]}
-            {...props} />
-  );
-
   it('should list tabs for dashboard pages', async () => {
-    render(<SimpleSearch />);
+    render(<Search />);
 
     await screen.findByRole('button', { name: 'First dashboard page' });
 
@@ -150,7 +138,7 @@ describe('Dashboard Search', () => {
 
   it('should not list tabs for pages when focusing a widget', async () => {
     mockWidgetEditing();
-    render(<SimpleSearch />);
+    render(<Search />);
 
     await screen.findByText('Mocked search results');
 
@@ -159,14 +147,14 @@ describe('Dashboard Search', () => {
   });
 
   it('should display dashboard search bar', async () => {
-    render(<SimpleSearch />);
+    render(<Search />);
 
     await screen.findByText('Mocked dashboard search bar');
   });
 
   it('should not display dashboard search bar on widget edit', async () => {
     mockWidgetEditing();
-    render(<SimpleSearch />);
+    render(<Search />);
 
     await screen.findByText('Mocked search results');
 

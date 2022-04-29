@@ -30,6 +30,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
+import org.mongojack.DBQuery.Query;
 import org.mongojack.DBSort;
 import org.mongojack.DBUpdate;
 import org.mongojack.JacksonDBCollection;
@@ -126,7 +127,7 @@ public class DBJobTriggerService {
             throw new IllegalArgumentException("jobDefinitionId cannot be null or empty");
         }
 
-        final DBQuery.Query query = DBQuery.is(FIELD_JOB_DEFINITION_ID, jobDefinitionId);
+        final Query query = DBQuery.is(FIELD_JOB_DEFINITION_ID, jobDefinitionId);
 
         try (final DBCursor<JobTriggerDto> cursor = db.find(query)) {
             final ImmutableList<JobTriggerDto> triggers = ImmutableList.copyOf(cursor.iterator());
@@ -162,7 +163,7 @@ public class DBJobTriggerService {
                 .filter(id -> !isNullOrEmpty(id))
                 .collect(Collectors.toSet());
 
-        final DBQuery.Query query = DBQuery.in(FIELD_JOB_DEFINITION_ID, queryValues);
+        final Query query = DBQuery.in(FIELD_JOB_DEFINITION_ID, queryValues);
         final Map<String, List<JobTriggerDto>> groupedTriggers = StreamEx.of(db.find(query).toArray())
                 .groupingBy(JobTriggerDto::jobDefinitionId);
 
@@ -279,13 +280,25 @@ public class DBJobTriggerService {
      * @return the number of deleted triggers
      */
     public int deleteCompletedOnceSchedulesOlderThan(long timeValue, TimeUnit unit) {
-        final DBQuery.Query query = DBQuery.and(
+        final Query query = DBQuery.and(
                 DBQuery.is(FIELD_LOCK_OWNER, null),
                 DBQuery.is(FIELD_STATUS, JobTriggerStatus.COMPLETE),
                 DBQuery.is(FIELD_SCHEDULE + "." + JobSchedule.TYPE_FIELD, OnceJobSchedule.TYPE_NAME),
                 DBQuery.lessThan(FIELD_UPDATED_AT, clock.nowUTC().minus(unit.toMillis(timeValue)))
         );
         return db.remove(query).getN();
+    }
+
+    /**
+     * Deletes job triggers using the given query. <em>Use judiciously</em>, as will make assumptions about the
+     * internal data structure of triggers.
+     */
+    public int deleteByQuery(Query query) {
+        return db.remove(query).getN();
+    }
+
+    public long countByQuery(Query query) {
+        return db.getCount(query);
     }
 
     /**
@@ -296,7 +309,7 @@ public class DBJobTriggerService {
     public Optional<JobTriggerDto> nextRunnableTrigger() {
         final DateTime now = clock.nowUTC();
 
-        final DBQuery.Query query = DBQuery.or(DBQuery.and(
+        final Query query = DBQuery.or(DBQuery.and(
                         // We cannot lock a trigger that is already locked by another node
                         DBQuery.is(FIELD_LOCK_OWNER, null),
                         DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNABLE),
@@ -310,10 +323,10 @@ public class DBJobTriggerService {
                         //       The scheduler should not lock any new triggers if it detects that its clock is wrong
                         DBQuery.lessThanEquals(FIELD_NEXT_TIME, now)
                 ), DBQuery.and(
-                DBQuery.notEquals(FIELD_LOCK_OWNER, null),
-                DBQuery.notEquals(FIELD_LOCK_OWNER, nodeId),
-                DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING),
-                DBQuery.lessThan(FIELD_LAST_LOCK_TIME, now.minus(lockExpirationDuration.toMilliseconds())))
+                        DBQuery.notEquals(FIELD_LOCK_OWNER, null),
+                        DBQuery.notEquals(FIELD_LOCK_OWNER, nodeId),
+                        DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING),
+                        DBQuery.lessThan(FIELD_LAST_LOCK_TIME, now.minus(lockExpirationDuration.toMilliseconds())))
         );
         // We want to lock the trigger with the oldest next time
         final DBSort.SortBuilder sort = DBSort.asc(FIELD_NEXT_TIME);
@@ -348,7 +361,7 @@ public class DBJobTriggerService {
         requireNonNull(trigger, "trigger cannot be null");
         requireNonNull(triggerUpdate, "triggerUpdate cannot be null");
 
-        final DBQuery.Query query = DBQuery.and(
+        final Query query = DBQuery.and(
                 // Make sure that the owner still owns the trigger
                 DBQuery.is(FIELD_LOCK_OWNER, nodeId),
                 DBQuery.is(FIELD_ID, getId(trigger)),
@@ -395,7 +408,7 @@ public class DBJobTriggerService {
      * @return number of released triggers
      */
     public int forceReleaseOwnedTriggers() {
-        final DBQuery.Query query = DBQuery.and(
+        final Query query = DBQuery.and(
                 // Only select trigger for force release which are owned by the calling node
                 DBQuery.is(FIELD_LOCK_OWNER, nodeId),
                 DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING)
@@ -415,7 +428,7 @@ public class DBJobTriggerService {
     public boolean setTriggerError(JobTriggerDto trigger) {
         requireNonNull(trigger, "trigger cannot be null");
 
-        final DBQuery.Query query = DBQuery.and(
+        final Query query = DBQuery.and(
                 // Make sure that the owner still owns the trigger
                 DBQuery.is(FIELD_LOCK_OWNER, nodeId),
                 DBQuery.is(FIELD_ID, getId(trigger))
@@ -432,7 +445,7 @@ public class DBJobTriggerService {
 
     public void updateLockedJobTriggers() {
         final DateTime now = clock.nowUTC();
-        DBQuery.Query query = DBQuery.and(
+        Query query = DBQuery.and(
                 DBQuery.is(FIELD_LOCK_OWNER, nodeId),
                 DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING)
         );

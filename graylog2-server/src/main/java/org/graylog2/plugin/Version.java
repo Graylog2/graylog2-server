@@ -260,7 +260,7 @@ public class Version implements Comparable<Version> {
 
             return from(major, minor, patch, qualifier, commitSha);
         } catch (Exception e) {
-            LOG.error("Unable to read " + path + ", this build has no version number.", e);
+            LOG.error("Unable to read " + path + ", this build has no version number. <{}>", e.toString());
         }
         return defaultVersion;
     }

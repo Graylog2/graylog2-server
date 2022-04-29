@@ -30,6 +30,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
+import org.graylog2.grok.GrokPatternService.ImportStrategy;
 import org.graylog2.grok.PaginatedGrokPatternService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -182,9 +183,14 @@ public class GrokResource extends RestResource {
     @Timed
     @ApiOperation("Add a list of new patterns")
     @AuditEvent(type = AuditEventTypes.GROK_PATTERN_IMPORT_CREATE)
-    public Response bulkUpdatePatterns(@ApiParam(name = "patterns", required = true) @NotNull GrokPatternList patternList,
-                                       @ApiParam(name = "replace", value = "Replace all patterns with the new ones.")
-                                       @QueryParam("replace") @DefaultValue("false") boolean replace) throws ValidationException {
+    public Response bulkUpdatePatterns(@ApiParam(name = "patterns", required = true) @NotNull
+                                               GrokPatternList patternList,
+                                       // deprecated. used to drop all existing patterns before import
+                                       @Deprecated @QueryParam("replace") @DefaultValue("false")
+                                               boolean deprecatedDropAllExisting,
+                                       @ApiParam(name = "import-strategy", value = "Strategy to apply when importing.")
+                                       @QueryParam("import-strategy")
+                                               ImportStrategy importStrategy) throws ValidationException {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
         try {
@@ -195,7 +201,10 @@ public class GrokResource extends RestResource {
             throw new ValidationException("Invalid pattern. Did not save any patterns\n" + e.getMessage());
         }
 
-        grokPatternService.saveAll(patternList.patterns(), replace);
+        ImportStrategy resolvedStrategy = importStrategy != null ? importStrategy :
+                deprecatedDropAllExisting ? ImportStrategy.DROP_ALL_EXISTING : ImportStrategy.ABORT_ON_CONFLICT;
+
+        grokPatternService.saveAll(patternList.patterns(), resolvedStrategy);
         return Response.accepted().build();
     }
 
@@ -205,8 +214,12 @@ public class GrokResource extends RestResource {
     @ApiOperation("Add a list of new patterns")
     @AuditEvent(type = AuditEventTypes.GROK_PATTERN_IMPORT_CREATE)
     public Response bulkUpdatePatternsFromTextFile(@ApiParam(name = "patterns", required = true) @NotNull InputStream patternsFile,
-                                                   @ApiParam(name = "replace", value = "Replace all patterns with the new ones.")
-                                                   @QueryParam("replace") @DefaultValue("false") boolean replace) throws ValidationException, IOException {
+                                                   // deprecated. used to drop all existing patterns before import
+                                                   @Deprecated @QueryParam("replace") @DefaultValue("false")
+                                                           boolean deprecatedDropAllExisting,
+                                                   @ApiParam(name = "import-strategy", value = "Strategy to apply when importing.")
+                                                   @QueryParam("import-strategy")
+                                                           ImportStrategy importStrategy) throws ValidationException, IOException {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
         final List<GrokPattern> grokPatterns = readGrokPatterns(patternsFile);
@@ -220,7 +233,10 @@ public class GrokResource extends RestResource {
                 throw new ValidationException("Invalid pattern. Did not save any patterns\n" + e.getMessage());
             }
 
-            grokPatternService.saveAll(grokPatterns, replace);
+            ImportStrategy resolvedStrategy = importStrategy != null ? importStrategy :
+                    deprecatedDropAllExisting ? ImportStrategy.DROP_ALL_EXISTING : ImportStrategy.ABORT_ON_CONFLICT;
+
+            grokPatternService.saveAll(grokPatterns, resolvedStrategy);
         }
 
         return Response.accepted().build();

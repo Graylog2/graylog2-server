@@ -23,10 +23,6 @@ import DataTable from 'views/components/datatable/DataTable';
 
 import bindings from './bindings';
 
-jest.mock('views/stores/FieldTypesStore', () => ({
-  FieldTypesStore: MockStore(['getInitialState', () => ({ all: {}, queryFields: {} })]),
-}));
-
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(),
   ConfigurationsActions: {

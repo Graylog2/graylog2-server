@@ -19,7 +19,7 @@ import styled from 'styled-components';
 import type { $PropertyType } from 'utility-types';
 
 import type UserOverview from 'logic/users/UserOverview';
-import { OverlayTrigger, Timestamp } from 'components/common';
+import { OverlayTrigger, RelativeTime } from 'components/common';
 import { Popover } from 'components/bootstrap';
 
 import LoggedInIcon from '../../LoggedInIcon';
@@ -46,7 +46,7 @@ const LoggedInCell = ({ lastActivity, sessionActive, clientAddress }: Props) => 
                           {sessionActive ? (
                             <>
                               <div>Last activity: {lastActivity
-                                ? <Timestamp dateTime={lastActivity} relative /> : '-'}
+                                ? <RelativeTime dateTime={lastActivity} /> : '-'}
                               </div>
                               <div>Client address: {clientAddress ?? '-'}</div>
                             </>

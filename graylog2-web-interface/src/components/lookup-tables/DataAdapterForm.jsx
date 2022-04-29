@@ -95,7 +95,7 @@ class DataAdapterForm extends React.Component {
 
   updateState = (dataAdapter) => {
     this.setState(this._initialState(dataAdapter));
-  }
+  };
 
   _initialState = (dataAdapter) => {
     const adapter = ObjectUtils.clone(dataAdapter);

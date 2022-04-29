@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import uuid from 'uuid/v4';
 
 import isDeepEqual from 'stores/isDeepEqual';
+import generateId from 'logic/generateId';
 
 import type { SearchType } from './SearchType';
 
@@ -49,7 +49,10 @@ export type ElasticsearchQueryString = {
   query_string: string,
 };
 
-export const createElasticsearchQueryString = (query = ''): ElasticsearchQueryString => ({ type: 'elasticsearch', query_string: query });
+export const createElasticsearchQueryString = (query = ''): ElasticsearchQueryString => ({
+  type: 'elasticsearch',
+  query_string: query,
+});
 
 const _streamFilters = (selectedStreams: Array<string>) => {
   return Immutable.List(selectedStreams.map((stream) => Immutable.Map({ type: 'stream', id: stream })));
@@ -119,6 +122,8 @@ export type TimeRange = RelativeTimeRange | AbsoluteTimeRange | KeywordTimeRange
 
 export type NoTimeRangeOverride = {};
 
+const isNullish = (o: any) => (o === null || o === undefined);
+
 export default class Query {
   private _value: InternalState;
 
@@ -149,11 +154,13 @@ export default class Query {
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const { id, query, timerange, filter, searchTypes } = this._value;
+
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const builder = Query.builder()
       .id(id)
       .query(query)
       .timerange(timerange)
+      .filter(filter)
       .searchTypes(searchTypes);
 
     return filter ? builder.filter(filter) : builder;
@@ -171,7 +178,7 @@ export default class Query {
     if (this.id !== other.id
       || !isDeepEqual(this.query, other.query)
       || !isDeepEqual(this.timerange, other.timerange)
-      || !isDeepEqual(this.filter, other.filter)
+      || !((isNullish(this.filter) && isNullish(other.filter)) || isDeepEqual(this.filter, other.filter))
       || !isDeepEqual(this.searchTypes, other.searchTypes)) {
       return false;
     }
@@ -217,7 +224,7 @@ class Builder {
   }
 
   newId(): Builder {
-    return this.id(uuid());
+    return this.id(generateId());
   }
 
   query(value: QueryString): Builder {

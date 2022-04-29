@@ -16,7 +16,6 @@
  */
 import React, { useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { SizeMe } from 'react-sizeme';
 
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import connect from 'stores/connect';
@@ -29,6 +28,7 @@ import RenderCompletionCallback from 'views/components/widgets/RenderCompletionC
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
+import ElementDimensions from 'components/common/ElementDimensions';
 
 import Trend from './Trend';
 import AutoFontSizer from './AutoFontSizer';
@@ -55,17 +55,13 @@ const SingleItemGrid = styled.div`
   width: 100%;
 `;
 
-const NumberBox = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
+const NumberBox = styled(ElementDimensions)`
   height: 100%;
   width: 100%;
-  text-align: center;
   padding-bottom: 10px;
 `;
 
-const TrendBox = styled.div`
+const TrendBox = styled(ElementDimensions)`
   height: 100%;
   width: 100%;
 `;
@@ -122,33 +118,29 @@ const NumberVisualization = ({ config, currentView, fields, data }: Props) => {
 
   return (
     <Container>
-      <NumberBox>
-        <SizeMe monitorHeight monitorWidth>
-          {({ size }) => (
-            <AutoFontSizer height={size.height} width={size.width}>
-              <CustomHighlighting field={field} value={value}>
-                <Value field={field}
-                       type={fieldTypeFor(field, fields)}
-                       value={value}
-                       queryId={activeQuery}
-                       render={DecoratedValue} />
-              </CustomHighlighting>
-            </AutoFontSizer>
-          )}
-        </SizeMe>
+      <NumberBox resizeDelay={20}>
+        {({ height, width }) => (
+          <AutoFontSizer height={height} width={width} center>
+            <CustomHighlighting field={field} value={value}>
+              <Value field={field}
+                     type={fieldTypeFor(field, fields)}
+                     value={value}
+                     queryId={activeQuery}
+                     render={DecoratedValue} />
+            </CustomHighlighting>
+          </AutoFontSizer>
+        )}
       </NumberBox>
       {visualizationConfig.trend && (
         <TrendBox>
-          <SizeMe monitorHeight monitorWidth>
-            {({ size }) => (
-              <AutoFontSizer height={size.height} width={size.width} target={targetRef}>
-                <Trend ref={targetRef}
-                       current={value}
-                       previous={previousValue}
-                       trendPreference={visualizationConfig.trendPreference} />
-              </AutoFontSizer>
-            )}
-          </SizeMe>
+          {({ height, width }) => (
+            <AutoFontSizer height={height} width={width} target={targetRef}>
+              <Trend ref={targetRef}
+                     current={value}
+                     previous={previousValue}
+                     trendPreference={visualizationConfig.trendPreference} />
+            </AutoFontSizer>
+          )}
         </TrendBox>
       )}
     </Container>

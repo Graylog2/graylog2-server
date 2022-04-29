@@ -216,7 +216,7 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
         {({ colors, setColor }) => {
           plotLayout.shapes = plotLayout.shapes.map((shape) => ({
             ...shape,
-            line: { color: colors.get(eventsDisplayName, EVENT_COLOR) },
+            line: { color: shape?.line?.color || colors.get(eventsDisplayName, EVENT_COLOR) },
           }));
 
           const newChartData = chartData.map((chart) => {

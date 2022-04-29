@@ -30,6 +30,7 @@ public class EmailConfigurationTest {
     @Test
     public void validationSucceedsIfSSLAndTLSAreDisabled() throws ValidationException, RepositoryException {
         final ImmutableMap<String, String> config = ImmutableMap.of(
+                "transport_email_hostname", "localhost",
                 "transport_email_enabled", "true",
                 "transport_email_use_tls", "false",
                 "transport_email_use_ssl", "false"
@@ -45,6 +46,7 @@ public class EmailConfigurationTest {
     @Test
     public void validationSucceedsIfSSLIsEnabledAndTLSIsDisabled() throws ValidationException, RepositoryException {
         final ImmutableMap<String, String> config = ImmutableMap.of(
+                "transport_email_hostname", "localhost",
                 "transport_email_enabled", "true",
                 "transport_email_use_tls", "false",
                 "transport_email_use_ssl", "true"
@@ -60,6 +62,7 @@ public class EmailConfigurationTest {
     @Test
     public void validationSucceedsIfSSLIsDisabledAndTLSIsEnabled() throws ValidationException, RepositoryException {
         final ImmutableMap<String, String> config = ImmutableMap.of(
+                "transport_email_hostname", "localhost",
                 "transport_email_enabled", "true",
                 "transport_email_use_tls", "true",
                 "transport_email_use_ssl", "false"
@@ -75,6 +78,7 @@ public class EmailConfigurationTest {
     @Test
     public void validationFailsIfSSLandTLSAreBothEnabled() {
         final ImmutableMap<String, String> config = ImmutableMap.of(
+                "transport_email_hostname", "localhost",
                 "transport_email_enabled", "true",
                 "transport_email_use_tls", "true",
                 "transport_email_use_ssl", "true"

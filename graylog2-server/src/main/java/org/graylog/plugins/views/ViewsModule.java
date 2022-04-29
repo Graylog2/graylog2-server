@@ -21,6 +21,7 @@ import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.binder.ScopedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.plugins.views.search.QueryMetadataDecorator;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
@@ -29,6 +30,7 @@ import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.rest.SeriesDescription;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.validation.QueryValidator;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.VersionAwareModule;
@@ -92,11 +94,19 @@ public abstract class ViewsModule extends VersionAwareModule {
     }
 
     protected void registerESQueryDecorator(Class<? extends QueryStringDecorator> esQueryDecorator) {
-        esQueryDecoratorBinder().addBinding().to(esQueryDecorator);
+        esQueryDecoratorBinder().setBinding().to(esQueryDecorator);
     }
 
-    protected Multibinder<QueryStringDecorator> esQueryDecoratorBinder() {
-        return Multibinder.newSetBinder(binder(), QueryStringDecorator.class);
+    protected OptionalBinder<QueryStringDecorator> esQueryDecoratorBinder() {
+        return OptionalBinder.newOptionalBinder(binder(), QueryStringDecorator.class);
+    }
+
+    protected void registerQueryValidator(Class<? extends QueryValidator> validator) {
+        queryValidatorMultibinder().addBinding().to(validator);
+    }
+
+    protected Multibinder<QueryValidator> queryValidatorMultibinder() {
+        return Multibinder.newSetBinder(binder(), QueryValidator.class);
     }
 
 }

@@ -42,6 +42,11 @@ public abstract class SuggestionsDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public abstract SuggestionsErrorDTO error();
 
+    @Nullable
+    @JsonProperty
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public abstract Long sumOtherDocsCount();
+
     public static Builder builder(final String field, final String input) {
         return new AutoValue_SuggestionsDTO.Builder().field(field).input(input).suggestions(Collections.emptyList());
     }
@@ -55,6 +60,8 @@ public abstract class SuggestionsDTO {
         public abstract Builder suggestions(final List<SuggestionEntryDTO> entries);
 
         public abstract Builder error(@Nullable final SuggestionsErrorDTO error);
+
+        public abstract Builder sumOtherDocsCount(@Nullable final Long sumOtherDocsCount);
 
         public abstract SuggestionsDTO build();
     }

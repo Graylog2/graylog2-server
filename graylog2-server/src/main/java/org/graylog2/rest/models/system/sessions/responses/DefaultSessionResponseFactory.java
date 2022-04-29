@@ -22,6 +22,7 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Years;
 
 import javax.inject.Inject;
 import java.util.Date;
@@ -39,16 +40,20 @@ public class DefaultSessionResponseFactory implements SessionResponseFactory {
     }
 
     @Override
-    public JsonNode forSession(Session session) {
+    public SessionResponse forSession(Session session) {
         Date validUntil = getValidUntil(session);
         String id = session.getId().toString();
         String userId = getSubjectFromSession(session).getPrincipal().toString();
         String username = String.valueOf(session.getAttribute("username"));
-        return toJsonNode(DefaultSessionResponse.create(validUntil, id, username, userId));
+        return DefaultSessionResponse.create(validUntil, id, username, userId);
     }
 
     protected Date getValidUntil(Session session) {
-        return new DateTime(session.getLastAccessTime(), DateTimeZone.UTC).plus(session.getTimeout()).toDate();
+        if(session.getTimeout() < 0) { // means "session never expires", which is not possible in cookie-based auth
+            return new DateTime(DateTimeZone.UTC ).plus(Years.years(10)).toDate(); // careful, later we convert the date to seconds as int and it may overflow for too big values
+        } else {
+            return new DateTime(session.getLastAccessTime(), DateTimeZone.UTC).plus(session.getTimeout()).toDate();
+        }
     }
 
     protected Subject getSubjectFromSession(Session session) {

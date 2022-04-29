@@ -15,19 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $ReadOnly } from 'utility-types';
 
-import { FieldTypesStore } from 'views/stores/FieldTypesStore';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import type { FieldTypeMappingsList, FieldTypesStoreState } from 'views/stores/FieldTypesStore';
-import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type { CompletionResult, Token } from '../queryinput/ace-types';
+import type { Completer, CompleterContext } from '../SearchBarAutocompletions';
 
-import type { CompletionResult, Token } from '../ace-types';
-import type { Completer } from '../SearchBarAutocompletions';
-
-type Suggestion = $ReadOnly<{
+type Suggestion = Readonly<{
   name: string,
-  type: $ReadOnly<{
+  type: Readonly<{
     type: string,
   }>,
 }>;
@@ -63,52 +57,19 @@ const _matchesFieldName = (prefix) => {
   };
 };
 
+const isFollowingExistsOperator = (lastToken: Token | undefined | null) => ((lastToken && lastToken.value === `${existsOperator.name}:`) === true);
+
+const isFollowingFieldName = (lastToken: Token | undefined | null) => (lastToken && lastToken.type === 'keyword' && lastToken.value.endsWith(':'));
+
 class FieldNameCompletion implements Completer {
-  activeQuery: string;
-
-  fields: FieldTypesStoreState;
-
-  currentQueryFieldNames: { [key: string]: string };
-
-  staticSuggestions: Array<Suggestion>;
+  private readonly staticSuggestions: Array<Suggestion>;
 
   constructor(staticSuggestions: Array<Suggestion> = [existsOperator]) {
     this.staticSuggestions = staticSuggestions;
-    this.onViewMetadataStoreUpdate(ViewMetadataStore.getInitialState());
-    ViewMetadataStore.listen(this.onViewMetadataStoreUpdate);
-
-    this._newFields(FieldTypesStore.getInitialState());
-    FieldTypesStore.listen((newState) => this._newFields(newState));
   }
 
-  _newFields = (fields: FieldTypesStoreState) => {
-    this.fields = fields;
-    const { queryFields } = this.fields;
-
-    if (this.activeQuery) {
-      const currentQueryFields: FieldTypeMappingsList = queryFields.get(this.activeQuery, Immutable.List());
-
-      this.currentQueryFieldNames = currentQueryFields.map((fieldMapping) => fieldMapping.name)
-        .reduce((prev, cur) => ({ ...prev, [cur]: cur }), {});
-    }
-  };
-
-  onViewMetadataStoreUpdate = (newState: { activeQuery: string }) => {
-    const { activeQuery } = newState;
-
-    this.activeQuery = activeQuery;
-
-    if (this.fields) {
-      this._newFields(this.fields);
-    }
-  };
-
-  _isFollowingExistsOperator = (lastToken: Token | undefined | null) => ((lastToken && lastToken.value === `${existsOperator.name}:`) === true);
-
-  _isFollowingFieldName = (lastToken: Token | undefined | null) => (lastToken && lastToken.type === 'keyword' && lastToken.value.endsWith(':'));
-
-  getCompletions = (currentToken: Token | undefined | null, lastToken: Token | undefined | null, prefix: string) => {
-    if (this._isFollowingFieldName(lastToken) && !this._isFollowingExistsOperator(lastToken)) {
+  getCompletions = ({ currentToken, lastToken, prefix, fieldTypes }: CompleterContext) => {
+    if (isFollowingFieldName(lastToken) && !isFollowingExistsOperator(lastToken)) {
       return [];
     }
 
@@ -117,25 +78,23 @@ class FieldNameCompletion implements Completer {
     }
 
     const matchesFieldName = _matchesFieldName(prefix);
-    const { all, queryFields } = this.fields;
-    // @ts-ignore
-    const currentQueryFields: FieldTypeMapping[] = queryFields.get(this.activeQuery, Immutable.List());
+    const { all, query } = fieldTypes;
+    const currentQueryFields = Immutable.List(Object.values(query));
 
-    const valuePosition = this._isFollowingExistsOperator(lastToken);
+    const valuePosition = isFollowingExistsOperator(lastToken);
 
-    const allButInCurrent = all.filter((field) => !this.currentQueryFieldNames[field.name]);
+    const allButInCurrent = Object.values(all).filter((field) => !query[field.name]);
     const fieldsToMatchIn = valuePosition
-      ? [...currentQueryFields]
-      : [...this.staticSuggestions, ...currentQueryFields];
+      ? [...currentQueryFields.toArray()]
+      : [...this.staticSuggestions, ...currentQueryFields.toArray()];
     const currentQuery = fieldsToMatchIn.filter((field) => (matchesFieldName(field) > 0))
       .map((field) => _fieldResult(field, 10 + matchesFieldName(field), valuePosition));
-    // @ts-ignore
-    const allFields: CompletionResult[] = allButInCurrent.filter((field) => (matchesFieldName(field) > 0))
+    const allFields = allButInCurrent.filter((field) => (matchesFieldName(field) > 0))
       .map((field) => _fieldResult(field, 1 + matchesFieldName(field), valuePosition))
       .map((result) => ({ ...result, meta: `${result.meta} (not in streams)` }));
 
     return [...currentQuery, ...allFields];
-  }
+  };
 }
 
 export default FieldNameCompletion;

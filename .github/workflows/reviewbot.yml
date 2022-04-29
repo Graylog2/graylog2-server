@@ -1,0 +1,32 @@
+name: PR Review
+
+on:
+  pull_request:
+    branches:
+      - 'reviewbot/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: graylog2-web-interface
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up Yarn cache
+        uses: actions/cache@v2
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('graylog2-web-interface/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+          path: ~/.cache/yarn
+      - name: Install dependencies
+        run: yarn install
+      - name: Reviewbot
+        uses: Graylog2/reviewbot@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          prefix: graylog2-web-interface

@@ -21,10 +21,9 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -79,7 +78,7 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
     @JsonProperty
     Set<String> streams();
 
-    SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state);
+    SearchType applyExecutionContext(SearchTypeExecutionState executionState);
 
     default Set<String> effectiveStreams() {
         return streams();
@@ -169,7 +168,7 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
         }
 
         @Override
-        public SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state) {
+        public SearchType applyExecutionContext(SearchTypeExecutionState state) {
             return this;
         }
 

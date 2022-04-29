@@ -3,7 +3,7 @@
 exports[`ViewTransformer transform with all attributes should transform a view with search from a json fixture 1`] = `
 Object {
   "_value": Object {
-    "createdAt": "2019-10-14T07:58:06.562Z",
+    "createdAt": 2019-10-14T07:58:06.562Z,
     "description": "",
     "id": Any<String>,
     "owner": "admin",

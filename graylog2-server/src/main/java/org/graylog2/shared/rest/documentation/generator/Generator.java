@@ -18,11 +18,22 @@ package org.graylog2.shared.rest.documentation.generator;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonAnyFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonBooleanFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonIntegerFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonMapFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonNullFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonNumberFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonStringFormatVisitor;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
+import com.fasterxml.jackson.module.jsonSchema.customProperties.TitleSchemaFactoryWrapper;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
+import com.fasterxml.jackson.module.jsonSchema.factories.VisitorContext;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
@@ -64,6 +75,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -240,7 +253,9 @@ public class Generator {
                         operation.put("produces", produces.value());
                     }
                     // skip Response.class because we can't reliably infer any schema information from its payload anyway.
-                    final TypeSchema responseType = extractResponseType(method);
+                    final TypeSchema responseType = apiOperation.response().equals(Void.class)
+                            ? extractResponseType(method)
+                            : typeSchema(TypeToken.of(apiOperation.response()).getType());
                     if (responseType != null) {
                         models.putAll(responseType.models());
                         if (responseType.name() != null && isObjectSchema(responseType.type())) {
@@ -356,7 +371,7 @@ public class Generator {
     private TypeSchema typeSchema(Type genericType) {
         final Class<?> returnType = classForType(genericType);
         if (returnType.isAssignableFrom(Response.class)) {
-            return createPrimitiveSchema("string");
+            return createPrimitiveSchema("any");
         }
 
         if (returnType.isEnum()) {
@@ -534,16 +549,7 @@ public class Generator {
     }
 
     private Map<String, Object> schemaForType(Type valueType) {
-        final SchemaFactoryWrapper schemaFactoryWrapper = new SchemaFactoryWrapper() {
-            @Override
-            public JsonAnyFormatVisitor expectAnyFormat(JavaType convertedType) {
-                /*final ObjectSchema s = schemaProvider.objectSchema();
-                s.putProperty("anyType", schemaProvider.stringSchema());
-                this.schema = s;
-                return visitorFactory.anyFormatVisitor(new AnySchema());*/
-                return super.expectAnyFormat(convertedType);
-            }
-        };
+        final SchemaFactoryWrapper schemaFactoryWrapper = new SchemaFactoryWrapper() {};
         final JsonSchemaGenerator schemaGenerator = new JsonSchemaGenerator(mapper, schemaFactoryWrapper);
         try {
             final JsonSchema schema = schemaGenerator.generateSchema(mapper.getTypeFactory().constructType(valueType));
@@ -593,6 +599,11 @@ public class Generator {
                     if (!isNullOrEmpty(apiParam.defaultValue())) {
                         param.setDefaultValue(apiParam.defaultValue());
                     }
+
+                    if (!isNullOrEmpty(apiParam.allowableValues()) && !apiParam.allowableValues().startsWith("range[")) {
+                        final List<String> allowableValues = Arrays.asList(apiParam.allowableValues().split(","));
+                        param.setAllowableValues(allowableValues);
+                    }
                 }
 
                 if (annotation instanceof DefaultValue) {
@@ -607,6 +618,10 @@ public class Generator {
                 if (annotation instanceof QueryParam) {
                     paramKind = Parameter.Kind.QUERY;
                 } else if (annotation instanceof PathParam) {
+                    final String annotationValue = ((PathParam)annotation).value();
+                    if (!Strings.isNullOrEmpty(annotationValue)) {
+                        param.setName(annotationValue);
+                    }
                     paramKind = Parameter.Kind.PATH;
                 } else if (annotation instanceof HeaderParam) {
                     paramKind = Parameter.Kind.HEADER;
@@ -762,6 +777,7 @@ public class Generator {
         private TypeSchema typeSchema;
         private Kind kind;
         private String defaultValue;
+        private Collection<String> allowableValues;
 
         public void setName(String name) {
             this.name = name;
@@ -807,6 +823,8 @@ public class Generator {
             this.defaultValue = defaultValue;
         }
 
+        public void setAllowableValues(Collection<String> allowableValues) { this.allowableValues = allowableValues; }
+
         @JsonValue
         public Map<String, Object> jsonValue() {
             ImmutableMap.Builder<String, Object> builder = ImmutableMap.<String, Object>builder()
@@ -817,6 +835,10 @@ public class Generator {
 
             if (defaultValue != null) {
                 builder = builder.put("defaultValue", defaultValue);
+            }
+
+            if (allowableValues != null) {
+                builder = builder.put("enum", allowableValues);
             }
 
             if (typeSchema.type() == null || isObjectSchema(typeSchema.type())) {

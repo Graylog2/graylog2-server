@@ -18,24 +18,23 @@ import * as React from 'react';
 import { useRef } from 'react';
 import type * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
-import { SizeMe } from 'react-sizeme';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import type { OrderedSet } from 'immutable';
 
 import { Col, Row } from 'components/bootstrap';
 import type { QueryId } from 'views/logic/queries/Query';
 import type Query from 'views/logic/queries/Query';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import type ViewState from 'views/logic/views/ViewState';
+import ElementDimensions from 'components/common/ElementDimensions';
 
 import QueryTitleEditModal from './queries/QueryTitleEditModal';
 import AdaptableQueryTabs from './AdaptableQueryTabs';
 
 export interface QueryTabsProps {
-  onRemove: (queryId: string) => Promise<void> | Promise<ViewState>,
+  onRemove: (queryId: string) => Promise<void | ViewState>,
   onSelect: (queryId: string) => Promise<Query> | Promise<string>,
   onTitleChange: (queryId: string, newTitle: string) => Promise<TitlesMap>,
-  queries: OrderedSet<QueryId>,
+  queries: Immutable.OrderedSet<QueryId>,
   selectedQueryId: string,
   titles: Immutable.Map<string, string>,
 }
@@ -46,9 +45,9 @@ const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId
   return (
     <Row>
       <Col>
-        <SizeMe>
-          {({ size }) => (size.width ? (
-            <AdaptableQueryTabs maxWidth={size.width}
+        <ElementDimensions>
+          {({ width }) => (width ? (
+            <AdaptableQueryTabs maxWidth={width}
                                 queries={queries}
                                 titles={titles}
                                 selectedQueryId={selectedQueryId}
@@ -57,7 +56,7 @@ const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId
                                 queryTitleEditModal={queryTitleEditModal}
                                 onTitleChange={onTitleChange} />
           ) : <div />)}
-        </SizeMe>
+        </ElementDimensions>
 
         {/*
           The title edit modal can't be part of the QueryTitle component,

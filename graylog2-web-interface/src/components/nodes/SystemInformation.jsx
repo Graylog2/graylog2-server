@@ -85,7 +85,7 @@ class SystemInformation extends React.Component {
         <dt>JVM:</dt>
         <dd>{jvmInformationText}</dd>
         <dt>Time:</dt>
-        <dd><Timestamp dateTime={time} format={DateTime.Formats.DATETIME_TZ} tz={timezone} /></dd>
+        <dd><Timestamp dateTime={time} format="withTz" tz={timezone} /></dd>
       </StyledDl>
     );
   }

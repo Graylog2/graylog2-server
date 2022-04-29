@@ -95,6 +95,8 @@ if (TARGET.startsWith('build')) {
   module.exports = merge(webpackConfig, {
     mode: 'production',
     optimization: {
+      concatenateModules: false,
+      sideEffects: false,
       minimizer: [new TerserPlugin({
         terserOptions: {
           compress: {

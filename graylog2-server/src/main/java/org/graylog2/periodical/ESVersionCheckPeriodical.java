@@ -119,6 +119,6 @@ public class ESVersionCheckPeriodical extends Periodical {
     }
 
     private boolean compatible(SearchVersion initialElasticsearchMajorVersion, SearchVersion version) {
-        return initialElasticsearchMajorVersion.version().getVersion().getMajorVersion() == version.version().getVersion().getMajorVersion();
+        return initialElasticsearchMajorVersion.version().getMajorVersion() == version.version().getMajorVersion();
     }
 }

@@ -14,15 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import uuid from 'uuid/v4';
-
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import type { TimeRange, ElasticsearchQueryString, QueryId } from 'views/logic/queries/Query';
 import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
+import generateId from 'logic/generateId';
 
 export default (
   streamId?: string,
-  id: QueryId | undefined = uuid(),
+  id: QueryId | undefined = generateId(),
   timeRange?: TimeRange,
   queryString?: ElasticsearchQueryString,
 ): Query => {

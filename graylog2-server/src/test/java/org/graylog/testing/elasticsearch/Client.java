@@ -65,4 +65,6 @@ public interface Client {
     void waitForIndexBlock(String index);
 
     void resetIndexBlock(String index);
+
+    void setIndexBlock(String index);
 }
