@@ -117,6 +117,8 @@ import org.graylog2.contentpacks.facades.DashboardEntityCreator;
 import org.graylog2.contentpacks.facades.DashboardFacade;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesServiceImpl;
+import org.graylog2.indexer.fieldtypes.streams.SearchEngineStreamBasedFieldTypeFilter;
+import org.graylog2.indexer.fieldtypes.streams.StreamBasedFieldTypeFilter;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.rest.MoreMediaTypes;
 
@@ -185,6 +187,8 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(AutoIntervalDTO.class);
 
         bind(SearchJobService.class).to(InMemorySearchJobService.class).in(Scopes.SINGLETON);
+
+        bind(StreamBasedFieldTypeFilter.class).to(SearchEngineStreamBasedFieldTypeFilter.class);
         bind(MappedFieldTypesService.class).to(MappedFieldTypesServiceImpl.class).in(Scopes.SINGLETON);
         bind(FieldTypeValidation.class).to(FieldTypeValidationImpl.class).in(Scopes.SINGLETON);
 
