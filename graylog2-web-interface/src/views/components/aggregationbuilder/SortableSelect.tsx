@@ -94,7 +94,7 @@ const SortableSelect = ({ onChange, value, valueComponent, valueTransformer, inp
 SortableSelect.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.any.isRequired,
-  valueComponent: PropTypes.func.isRequired,
+  valueComponent: PropTypes.oneOfType([PropTypes.func, PropTypes.object]).isRequired,
   valueTransformer: PropTypes.func,
 };
 
