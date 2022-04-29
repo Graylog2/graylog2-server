@@ -82,7 +82,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
     }
 
     private boolean isJenkinsOnGithub() {
-        String github_workspace = System.getenv("GITHUB_WORKSPACE");
+        String github_workspace = System.getenv("CI");
         return !StringUtils.isBlank(github_workspace);
     }
 
