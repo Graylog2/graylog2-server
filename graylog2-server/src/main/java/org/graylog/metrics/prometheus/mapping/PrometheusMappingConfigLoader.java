@@ -16,15 +16,10 @@
  */
 package org.graylog.metrics.prometheus.mapping;
 
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
-import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
+import org.graylog2.jackson.DeserializationProblemHandlerModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,33 +43,7 @@ public class PrometheusMappingConfigLoader {
             Map<String, MetricMapping.Factory<? extends MetricMapping>> metricMappingFactories) {
         this.metricMappingFactories = metricMappingFactories;
 
-        // This is a workaround to properly fail for unknown types but still provide a default if the type property
-        // is missing at all.
-        ymlMapper = new ObjectMapper(new YAMLFactory()).registerModule(new Module() {
-            @Override
-            public String getModuleName() {
-                return "Custom Config Handler Module";
-            }
-
-            @Override
-            public Version version() {
-                return Version.unknownVersion();
-            }
-
-            @Override
-            public void setupModule(SetupContext context) {
-                context.addDeserializationProblemHandler(new DeserializationProblemHandler() {
-                    @Override
-                    public JavaType handleMissingTypeId(DeserializationContext ctxt, JavaType baseType, TypeIdResolver idResolver, String failureMsg) throws IOException {
-                        // default to "metric_match" mapping subtype
-                        if (baseType.isTypeOrSubTypeOf(MetricMapping.Config.class)) {
-                            return idResolver.typeFromId(ctxt, MetricMatchMapping.TYPE);
-                        }
-                        return super.handleMissingTypeId(ctxt, baseType, idResolver, failureMsg);
-                    }
-                });
-            }
-        });
+        ymlMapper = new ObjectMapper(new YAMLFactory()).registerModule(new DeserializationProblemHandlerModule());
     }
 
     public Set<MapperConfig> load(InputStream inputStream) throws IOException {

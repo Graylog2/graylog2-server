@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
+import org.graylog2.jackson.JsonSubTypePropertyDefaultValue;
 
 import java.util.Collection;
 
@@ -38,6 +39,7 @@ public interface MetricMapping {
             @JsonSubTypes.Type(value = MetricMatchMapping.Config.class, name = MetricMatchMapping.TYPE),
             @JsonSubTypes.Type(value = InputMetricMapping.Config.class, name = InputMetricMapping.TYPE),
     })
+    @JsonSubTypePropertyDefaultValue(MetricMatchMapping.TYPE)
     interface Config {
         @JsonProperty("type")
         String type();
