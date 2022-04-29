@@ -37,7 +37,7 @@ import java.lang.annotation.Target;
  *   }
  * }</pre>
  * The difference to the {@code defaultImpl} parameter for {@link JsonTypeInfo} is,
- * that the default value is only used when the type attribute it's missing in a document. Using {@code defaultImpl}
+ * that the default value is only used when the type attribute is missing in a document. Using {@code defaultImpl}
  * will use the given default implementation in all cases, even if a document contains a non-existent type name.
  */
 @Target(ElementType.TYPE)
