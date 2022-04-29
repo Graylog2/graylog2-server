@@ -110,10 +110,6 @@ const URLUtils = {
 
     return acceptedProtocols.includes(url.protocol);
   },
-  urlQueryFromObject(object) {
-    return Object.entries(object)
-      .reduce((res, [key, value], i) => `${res}${i === 0 ? '' : '&'}${key}=${value}`, '');
-  },
 };
 
 export default URLUtils;
@@ -127,5 +123,4 @@ export const {
   concatURLPath,
   isValidURL,
   hasAcceptedProtocol,
-  urlQueryFromObject,
 } = URLUtils;

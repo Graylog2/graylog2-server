@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { asMock } from 'helpers/mocking';
-import URLUtils, { qualifyUrl } from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
 
 jest.mock('util/AppConfig');
@@ -49,14 +49,5 @@ describe('qualifyUrl', () => {
     const qualifiedUrl = qualifyUrl('/foo');
 
     expect(qualifyUrl(qualifiedUrl)).toEqual('http://something.graylog.cloud/api/foo');
-  });
-});
-
-describe('URLUtils#urlQueryFromObject()', () => {
-  const obj = { page: 1, order: 'asc', per_page: '10' };
-  const expected = 'page=1&order=asc&per_page=10';
-
-  it('should return correct string', () => {
-    expect(URLUtils.urlQueryFromObject(obj)).toEqual(expected);
   });
 });

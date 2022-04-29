@@ -21,7 +21,6 @@ import styled, { css, keyframes } from 'styled-components';
 import { Overlay, Transition } from 'react-overlays';
 import { delay } from 'lodash';
 import { useFormikContext } from 'formik';
-import PropTypes from 'prop-types';
 
 import { Popover } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
@@ -99,7 +98,6 @@ const shakeAnimation = keyframes`
 `;
 
 const StyledPopover = styled(Popover)(({ $shaking }) => css`
-  z-index: 1061;
   animation: ${$shaking ? css`${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both` : 'none'};
 `);
 
@@ -158,17 +156,16 @@ const getErrorDocumentationLink = (errorType: string) => {
   }
 };
 
-const QueryValidation = ({ queryStringFormKey }) => {
+const QueryValidation = () => {
   const plugableValidationExplanation = usePluginEntities('views.elements.validationErrorExplanation');
   const [shakingPopover, shake] = useShakeTemporarily();
   const [showExplanation, toggleShow] = useTriggerIfErrorsPersist(shake);
 
   const explanationTriggerRef = useRef(undefined);
-  const { errors } = useFormikContext();
-  const queryStringErrors = errors[queryStringFormKey];
+  const { errors: { queryString: queryStringErrors } } = useFormikContext();
   const { warnings } = useContext(FormWarningsContext);
 
-  const validationState = (queryStringErrors ?? warnings?.[queryStringFormKey]) as QueryValidationState;
+  const validationState = (queryStringErrors ?? warnings?.queryString) as QueryValidationState;
 
   const { status, explanations } = validationState ?? {};
   const hasExplanations = validationState && validationState?.status !== 'OK';
@@ -220,14 +217,6 @@ const QueryValidation = ({ queryStringFormKey }) => {
       )}
     </>
   );
-};
-
-QueryValidation.propTypes = {
-  queryStringFormKey: PropTypes.string,
-};
-
-QueryValidation.defaultProps = {
-  queryStringFormKey: 'queryString',
 };
 
 export default QueryValidation;
