@@ -73,12 +73,12 @@ public class HttpTransport extends AbstractTcpTransport {
                          LocalMetricRegistry localRegistry,
                          TLSProtocolsConfiguration tlsConfiguration) {
         super(configuration,
-                throughputCounter,
-                localRegistry,
-                eventLoopGroup,
-                eventLoopGroupFactory,
-                nettyTransportConfiguration,
-                tlsConfiguration);
+              throughputCounter,
+              localRegistry,
+              eventLoopGroup,
+              eventLoopGroupFactory,
+              nettyTransportConfiguration,
+              tlsConfiguration);
 
         this.enableBulkReceiving = configuration.getBoolean(CK_ENABLE_BULK_RECEIVING);
         this.enableCors = configuration.getBoolean(CK_ENABLE_CORS);
@@ -90,7 +90,7 @@ public class HttpTransport extends AbstractTcpTransport {
      * @return If the configured Max Chunk Size is less than zero, return {@link HttpTransport#DEFAULT_MAX_CHUNK_SIZE}.
      */
     protected static int parseMaxChunkSize(Configuration configuration) {
-        int maxChunkSize = configuration.intIsSet(CK_MAX_CHUNK_SIZE) ? configuration.getInt(CK_MAX_CHUNK_SIZE) : DEFAULT_MAX_CHUNK_SIZE;
+        int maxChunkSize = configuration.getInt(CK_MAX_CHUNK_SIZE, DEFAULT_MAX_CHUNK_SIZE);
         return maxChunkSize <= 0 ? DEFAULT_MAX_CHUNK_SIZE : maxChunkSize;
     }
 
@@ -112,7 +112,7 @@ public class HttpTransport extends AbstractTcpTransport {
         if (!enableBulkReceiving) {
             handlers.put("http-handler", () -> new HttpHandler(enableCors));
         } else {
-            handlers.put("http-bulk-handler", () -> new HttpHandler(enableCors) /* TODO: Add chunking support? */);
+            handlers.put("http-bulk-handler", () -> new HttpHandler(enableCors));
             handlers.put("http-bulk-newline-decoder",
                     () -> new LenientDelimiterBasedFrameDecoder(maxChunkSize, Delimiters.lineDelimiter()));
         }
@@ -139,20 +139,20 @@ public class HttpTransport extends AbstractTcpTransport {
                     false,
                     "Enables bulk receiving of messages separated by newlines."));
             r.addField(new BooleanField(CK_ENABLE_CORS,
-                    "Enable CORS",
-                    true,
-                    "Input sends CORS headers to satisfy browser security policies"));
+                                        "Enable CORS",
+                                        true,
+                                        "Input sends CORS headers to satisfy browser security policies"));
             r.addField(new NumberField(CK_MAX_CHUNK_SIZE,
-                    "Max. HTTP chunk size",
-                    DEFAULT_MAX_CHUNK_SIZE,
-                    "The maximum HTTP chunk size in bytes (e. g. length of HTTP request body)",
-                    ConfigurationField.Optional.OPTIONAL));
+                                        "Max. HTTP chunk size",
+                                        DEFAULT_MAX_CHUNK_SIZE,
+                                        "The maximum HTTP chunk size in bytes (e. g. length of HTTP request body)",
+                                        ConfigurationField.Optional.OPTIONAL));
             r.addField(new NumberField(CK_IDLE_WRITER_TIMEOUT,
-                    "Idle writer timeout",
-                    DEFAULT_IDLE_WRITER_TIMEOUT,
-                    "The server closes the connection after the given time in seconds after the last client write request. (use 0 to disable)",
-                    ConfigurationField.Optional.OPTIONAL,
-                    NumberField.Attribute.ONLY_POSITIVE));
+                                        "Idle writer timeout",
+                                        DEFAULT_IDLE_WRITER_TIMEOUT,
+                                        "The server closes the connection after the given time in seconds after the last client write request. (use 0 to disable)",
+                                        ConfigurationField.Optional.OPTIONAL,
+                                        NumberField.Attribute.ONLY_POSITIVE));
             return r;
         }
     }
