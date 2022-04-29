@@ -136,18 +136,19 @@ class HttpNotificationForm extends React.Component {
           <Col md={12}>
             {basic_auth?.keep_value ? (
               <>
-                <ControlLabel>Basic Authentication</ControlLabel>
+                <ControlLabel>Basic authentication</ControlLabel>
                 <StyledButton bsStyle="danger" type="button" onClick={() => { this.resetSecret('basic_auth'); }}>
                   Reset Secret
                 </StyledButton>
               </>
             ) : (
               <Input id="basicAuth"
-                     label="Basic Authentication"
+                     label={<span>Basic authentication <small className="text-muted">(Optional)</small></span>}
                      name="basic_auth"
                      type="password"
                      onChange={this.handleSecretInputChange}
                      value={this.state.basic_auth || ''}
+                     help="The Basic authentication string needs to follow this format: '<username>:<password>'."
                      buttonAfter={reset.basic_auth ? (
                        <Button type="button" onClick={() => { this.undoResetSecret('basic_auth'); }}>
                          Undo Reset
@@ -160,11 +161,11 @@ class HttpNotificationForm extends React.Component {
           <Col md={12}>
             <Input id="api_key"
                    name="api_key"
-                   label="API Key"
+                   label={<span>API Key <small className="text-muted">(Optional)</small></span>}
                    type="text"
                    onChange={this.handleChange}
                    bsStyle={validation.errors.api_key ? 'error' : null}
-                   help={lodash.get(validation, 'errors.api_key[0]', 'The API Key.')}
+                   help={lodash.get(validation, 'errors.api_key[0]', 'If an API secret is set, an API key must also be set.')}
                    value={config.api_key} />
           </Col>
         </Row>
@@ -179,12 +180,12 @@ class HttpNotificationForm extends React.Component {
               </>
             ) : (
               <Input id="apiSecret"
-                     label="API Secret"
+                     label={<span>API Secret <small className="text-muted">(Optional)</small></span>}
                      name="api_secret"
                      type="password"
                      onChange={this.handleSecretInputChange}
                      bsStyle={validation.errors.api_secret ? 'error' : null}
-                     help={lodash.get(validation, 'errors.api_secret[0]', 'The API Secret.')}
+                     help={lodash.get(validation, 'errors.api_secret[0]', 'If an API key is set, an API secret must also be set.')}
                      value={this.state.api_secret || ''}
                      buttonAfter={reset.api_secret ? (
                        <Button type="button" onClick={() => { this.undoResetSecret('api_secret'); }}>
