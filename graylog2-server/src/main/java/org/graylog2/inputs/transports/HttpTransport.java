@@ -137,7 +137,7 @@ public class HttpTransport extends AbstractTcpTransport {
             r.addField(new BooleanField(CK_ENABLE_BULK_RECEIVING,
                     "Enable Bulk Receiving",
                     false,
-                    "Enables bulk receiving of messages separated by newlines."));
+                    "Enables bulk receiving of messages separated by newlines (\\n or \\r\\n)."));
             r.addField(new BooleanField(CK_ENABLE_CORS,
                                         "Enable CORS",
                                         true,
