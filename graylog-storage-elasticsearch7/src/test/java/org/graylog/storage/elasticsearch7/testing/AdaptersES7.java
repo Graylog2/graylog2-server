@@ -32,9 +32,11 @@ import org.graylog.storage.elasticsearch7.SearchesAdapterES7;
 import org.graylog.storage.elasticsearch7.SortOrderMapper;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
+import org.graylog.storage.elasticsearch7.fieldtypes.streams.StreamsWithFieldUsageRetrieverES7;
 import org.graylog.storage.elasticsearch7.mapping.FieldMappingApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
 import org.graylog.testing.elasticsearch.Adapters;
+import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
@@ -101,6 +103,6 @@ public class AdaptersES7 implements Adapters {
 
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter() {
-        return new IndexFieldTypePollerAdapterES7(new FieldMappingApi(objectMapper, client));
+        return new IndexFieldTypePollerAdapterES7(new FieldMappingApi(objectMapper, client), new Configuration(), new StreamsWithFieldUsageRetrieverES7(client));
     }
 }

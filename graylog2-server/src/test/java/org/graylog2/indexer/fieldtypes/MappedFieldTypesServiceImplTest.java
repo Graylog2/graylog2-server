@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog2.Configuration;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -66,7 +67,7 @@ public class MappedFieldTypesServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        this.mappedFieldTypesService = new MappedFieldTypesServiceImpl(streamService, indexFieldTypesService, new FieldTypeMapper(), indexLookup);
+        this.mappedFieldTypesService = new MappedFieldTypesServiceImpl(new Configuration(), streamService, indexFieldTypesService, new FieldTypeMapper(), indexLookup);
         when(streamService.indexSetIdsByIds(Collections.singleton("stream1"))).thenReturn(Collections.singleton("indexSetId"));
     }
 
@@ -76,12 +77,12 @@ public class MappedFieldTypesServiceImplTest {
                 createIndexTypes(
                         "deadbeef",
                         "testIndex",
-                        FieldTypeDTO.create("field1", "keyword")
+                        FieldTypeDTO.builder().fieldName("field1").physicalType("keyword").streams(Set.of("stream1")).build()
                 ),
                 createIndexTypes(
                         "affeaffe",
                         "testIndex2",
-                        FieldTypeDTO.create("field1", "text")
+                        FieldTypeDTO.builder().fieldName("field1").physicalType("text").streams(Set.of("stream1")).build()
                 )
         );
         when(indexFieldTypesService.findForIndexSets(Collections.singleton("indexSetId"))).thenReturn(fieldTypes);
@@ -99,14 +100,14 @@ public class MappedFieldTypesServiceImplTest {
                 createIndexTypes(
                         "deadbeef",
                         "testIndex",
-                        FieldTypeDTO.create("field1", "long"),
-                        FieldTypeDTO.create("field2", "long")
+                        FieldTypeDTO.builder().fieldName("field1").physicalType("long").streams(Set.of("stream1")).build(),
+                        FieldTypeDTO.builder().fieldName("field2").physicalType("long").streams(Set.of("stream1")).build()
                 ),
                 createIndexTypes(
                         "affeaffe",
                         "testIndex2",
-                        FieldTypeDTO.create("field1", "text"),
-                        FieldTypeDTO.create("field2", "long")
+                        FieldTypeDTO.builder().fieldName("field1").physicalType("text").streams(Set.of("stream1")).build(),
+                        FieldTypeDTO.builder().fieldName("field2").physicalType("long").streams(Set.of("stream1")).build()
                 )
         );
         when(indexFieldTypesService.findForIndexSets(Collections.singleton("indexSetId"))).thenReturn(fieldTypes);
