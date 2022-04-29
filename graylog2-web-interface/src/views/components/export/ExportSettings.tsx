@@ -84,7 +84,7 @@ const ExportSettings = ({
               <label htmlFor={name}>Fields to export</label>
               <FieldSelect fields={fields}
                            onChange={(newFields) => {
-                             const newFieldsValue = newFields.map(({ value: field }) => ({ field }));
+                             const newFieldsValue = newFields.map((field) => ({ field }));
 
                              return onChange({ target: { name, value: newFieldsValue } });
                            }}

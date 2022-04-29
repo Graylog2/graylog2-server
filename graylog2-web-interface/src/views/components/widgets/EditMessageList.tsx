@@ -53,9 +53,8 @@ const PreviewOptionCheckbox = styled(Checkbox)`
   }
 `;
 
-const _onFieldSelectionChanged = (fields, config, onChange) => {
-  const newFields = fields.map(({ value }) => value);
-  const newConfig = config.toBuilder().fields(newFields).build();
+const _onFieldSelectionChanged = (fields: Array<string>, config: MessagesWidgetConfig, onChange: (newConfig: MessagesWidgetConfig) => void) => {
+  const newConfig = config.toBuilder().fields(fields).build();
 
   return onChange(newConfig);
 };
