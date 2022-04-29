@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SystemMessageServiceImpl extends PersistedServiceImpl implements SystemMessageService {
-    private static final int MAX_COLLECTION_BYTES = 5 * 1024 * 1024;
+    private static final int MAX_COLLECTION_BYTES = 50 * 1024 * 1024;
     private final int PER_PAGE = 30;
     @Inject
     public SystemMessageServiceImpl(MongoConnection mongoConnection) {

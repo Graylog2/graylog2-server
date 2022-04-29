@@ -22,3 +22,8 @@ The following API endpoints have been removed in 4.4.
 | Endpoint                                    | Description                 |
 | ------------------------------------------- | --------------------------- |
 | `PUT /example/placeholder`                  | TODO placeholder comment    |
+
+## Behaviour Changes
+
+- The system messages collection in MongoDB will be created as a 50MB capped collection going forward.
+  This happens at creation, so existing system messages collections remain unconstrained.
