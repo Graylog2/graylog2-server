@@ -106,11 +106,6 @@ export interface VisualizationConfigProps {
   onChange: (newConfig: WidgetConfig) => void;
 }
 
-export interface VisualizationConfigType {
-  type: string;
-  component: React.ComponentType<VisualizationConfigProps>;
-}
-
 type BaseField = {
   title: string,
   name: string,
@@ -271,7 +266,6 @@ declare module 'graylog-web-plugin/plugin' {
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
     'views.widgets.actions'?: Array<WidgetActionType>;
     'views.requires.provided'?: Array<string>;
-    visualizationConfigTypes?: Array<VisualizationConfigType>;
     visualizationTypes?: Array<VisualizationType<any>>;
   }
 }
