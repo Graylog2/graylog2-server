@@ -137,7 +137,7 @@ class HttpNotificationForm extends React.Component {
             {basic_auth?.keep_value ? (
               <>
                 <ControlLabel>Basic authentication</ControlLabel>
-                <StyledButton bsStyle="danger" type="button" onClick={() => { this.resetSecret('basic_auth'); }}>
+                <StyledButton bsStyle="default" type="button" onClick={() => { this.resetSecret('basic_auth'); }}>
                   Reset Secret
                 </StyledButton>
               </>
@@ -174,7 +174,7 @@ class HttpNotificationForm extends React.Component {
             {api_secret?.keep_value ? (
               <>
                 <ControlLabel>API Secret</ControlLabel>
-                <StyledButton bsStyle="danger" type="button" onClick={() => { this.resetSecret('api_secret'); }}>
+                <StyledButton bsStyle="default" type="button" onClick={() => { this.resetSecret('api_secret'); }}>
                   Reset Secret
                 </StyledButton>
               </>
