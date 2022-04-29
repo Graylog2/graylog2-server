@@ -22,6 +22,7 @@ import org.graylog.scheduler.periodicals.ScheduleTriggerCleanUp;
 import org.graylog2.events.ClusterEventCleanupPeriodical;
 import org.graylog2.events.ClusterEventPeriodical;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerPeriodical;
+import org.graylog2.indexer.fieldtypes.streamfiltered.storage.periodical.PeriodicalStreamFieldsObtainer;
 import org.graylog2.periodical.AlertScannerThread;
 import org.graylog2.periodical.BatchedElasticSearchOutputFlushThread;
 import org.graylog2.periodical.ClusterHealthCheckThread;
@@ -66,5 +67,6 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(ScheduleTriggerCleanUp.class);
         periodicalBinder.addBinding().to(ESVersionCheckPeriodical.class);
         periodicalBinder.addBinding().to(UserSessionTerminationPeriodical.class);
+        periodicalBinder.addBinding().to(PeriodicalStreamFieldsObtainer.class);
     }
 }

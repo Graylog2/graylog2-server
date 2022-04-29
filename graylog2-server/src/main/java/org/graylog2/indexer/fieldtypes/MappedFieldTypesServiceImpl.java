@@ -20,10 +20,12 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog2.indexer.fieldtypes.streamfiltered.filters.StreamBasedFieldTypeFilter;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamService;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -32,38 +34,66 @@ import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableSet.of;
 import static org.graylog2.indexer.fieldtypes.FieldTypes.Type.createType;
+import static org.graylog2.indexer.fieldtypes.streamfiltered.config.Config.MAX_FIELDS_TO_FILTER_AD_HOC;
 
 public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
+    private static final FieldTypes.Type UNKNOWN_TYPE = createType("unknown", of());
+    private static final String PROP_COMPOUND_TYPE = "compound";
+
     private final StreamService streamService;
     private final IndexFieldTypesService indexFieldTypesService;
     private final FieldTypeMapper fieldTypeMapper;
     private final IndexLookup indexLookup;
 
-    private static final FieldTypes.Type UNKNOWN_TYPE = createType("unknown", of());
-    private static final String PROP_COMPOUND_TYPE = "compound";
+    private final StreamBasedFieldTypeFilter adHocSearchEngineStreamBasedFieldTypeFilter;
+    private final StreamBasedFieldTypeFilter allowAllStreamBasedFieldTypeFilter;
+    private final StreamBasedFieldTypeFilter storedSearchEngineStreamBasedFieldTypeFilter;
 
     @Inject
     public MappedFieldTypesServiceImpl(StreamService streamService,
                                        IndexFieldTypesService indexFieldTypesService,
                                        FieldTypeMapper fieldTypeMapper,
-                                       IndexLookup indexLookup) {
+                                       IndexLookup indexLookup,
+                                       @Named("AdHocFilter") StreamBasedFieldTypeFilter adHocSearchEngineStreamBasedFieldTypeFilter,
+                                       @Named("AllowAllFilter") StreamBasedFieldTypeFilter allowAllStreamBasedFieldTypeFilter,
+                                       @Named("StoredFilter") StreamBasedFieldTypeFilter storedSearchEngineStreamBasedFieldTypeFilter) {
         this.streamService = streamService;
         this.indexFieldTypesService = indexFieldTypesService;
         this.fieldTypeMapper = fieldTypeMapper;
         this.indexLookup = indexLookup;
+        this.adHocSearchEngineStreamBasedFieldTypeFilter = adHocSearchEngineStreamBasedFieldTypeFilter;
+        this.allowAllStreamBasedFieldTypeFilter = allowAllStreamBasedFieldTypeFilter;
+        this.storedSearchEngineStreamBasedFieldTypeFilter = storedSearchEngineStreamBasedFieldTypeFilter;
     }
 
+    @Override
     public Set<MappedFieldTypeDTO> fieldTypesByStreamIds(Collection<String> streamIds, TimeRange timeRange) {
         final Set<String> indexSets = streamService.indexSetIdsByIds(streamIds);
-
         final Set<String> indexNames = this.indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.copyOf(streamIds), timeRange);
-
-        final java.util.stream.Stream<MappedFieldTypeDTO> types = this.indexFieldTypesService.findForIndexSets(indexSets)
+        final Set<FieldTypeDTO> fieldTypeDTOs = this.indexFieldTypesService.findForIndexSets(indexSets)
                 .stream()
                 .filter(fieldTypes -> indexNames.contains(fieldTypes.indexName()))
                 .flatMap(fieldTypes -> fieldTypes.fields().stream())
-                .map(this::mapPhysicalFieldType);
-        return mergeCompoundFieldTypes(types);
+                .collect(Collectors.toSet());
+
+        StreamBasedFieldTypeFilter streamBasedFieldTypeFilter;
+        if (fieldTypeDTOs.size() < MAX_FIELDS_TO_FILTER_AD_HOC) {
+            streamBasedFieldTypeFilter = adHocSearchEngineStreamBasedFieldTypeFilter;
+        } else {
+            streamBasedFieldTypeFilter = storedSearchEngineStreamBasedFieldTypeFilter;
+        }
+
+        try {
+            final java.util.stream.Stream<MappedFieldTypeDTO> types = streamBasedFieldTypeFilter.filterFieldTypes(fieldTypeDTOs, indexNames, streamIds)
+                    .stream()
+                    .map(this::mapPhysicalFieldType);
+            return mergeCompoundFieldTypes(types);
+        } catch (Exception ex) {
+            final java.util.stream.Stream<MappedFieldTypeDTO> types = allowAllStreamBasedFieldTypeFilter.filterFieldTypes(fieldTypeDTOs, indexNames, streamIds)
+                    .stream()
+                    .map(this::mapPhysicalFieldType);
+            return mergeCompoundFieldTypes(types);
+        }
     }
 
     private MappedFieldTypeDTO mapPhysicalFieldType(FieldTypeDTO fieldType) {

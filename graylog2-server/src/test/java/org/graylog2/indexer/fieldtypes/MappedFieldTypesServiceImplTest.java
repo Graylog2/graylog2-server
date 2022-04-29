@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog2.indexer.fieldtypes.streamfiltered.filters.AllowAllStreamBasedFieldTypeFilter;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -66,7 +67,8 @@ public class MappedFieldTypesServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        this.mappedFieldTypesService = new MappedFieldTypesServiceImpl(streamService, indexFieldTypesService, new FieldTypeMapper(), indexLookup);
+        this.mappedFieldTypesService = new MappedFieldTypesServiceImpl(streamService, indexFieldTypesService, new FieldTypeMapper(), indexLookup,
+                null, new AllowAllStreamBasedFieldTypeFilter(), null);
         when(streamService.indexSetIdsByIds(Collections.singleton("stream1"))).thenReturn(Collections.singleton("indexSetId"));
     }
 

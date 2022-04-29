@@ -27,11 +27,15 @@ import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
+import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.AggregationBasedFieldTypeFilterAdapter;
+import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.CountExistingBasedFieldTypeFilterAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
+import org.graylog2.storage.providers.AggregationBasedFieldTypeFilterAdapterProvider;
 import org.graylog2.storage.providers.ClusterAdapterProvider;
+import org.graylog2.storage.providers.CountExistingBasedFieldTypeFilterAdapterProvider;
 import org.graylog2.storage.providers.CountsAdapterProvider;
 import org.graylog2.storage.providers.ElasticsearchBackendProvider;
 import org.graylog2.storage.providers.IndexFieldTypePollerAdapterProvider;
@@ -48,6 +52,8 @@ import org.graylog2.storage.providers.V20200730000000_AddGl2MessageIdFieldAliasF
 public class VersionAwareStorageModule extends AbstractModule {
     @Override
     protected void configure() {
+        bind(AggregationBasedFieldTypeFilterAdapter.class).toProvider(AggregationBasedFieldTypeFilterAdapterProvider.class);
+        bind(CountExistingBasedFieldTypeFilterAdapter.class).toProvider(CountExistingBasedFieldTypeFilterAdapterProvider.class);
         bind(CountsAdapter.class).toProvider(CountsAdapterProvider.class);
         bind(IndicesAdapter.class).toProvider(IndicesAdapterProvider.class);
         bind(SearchesAdapter.class).toProvider(SearchesAdapterProvider.class);

@@ -22,6 +22,8 @@ import io.searchbox.client.JestClient;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
+import org.graylog.storage.elasticsearch6.fieldtypes.streams.AggregationBasedFieldTypeFilterES6;
+import org.graylog.storage.elasticsearch6.fieldtypes.streams.CountExistingBasedFieldTypeFilterES6;
 import org.graylog.storage.elasticsearch6.jest.JestClientProvider;
 import org.graylog.storage.elasticsearch6.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES6;
 import org.graylog.storage.elasticsearch6.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEventsES6;
@@ -30,6 +32,8 @@ import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
+import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.AggregationBasedFieldTypeFilterAdapter;
+import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.CountExistingBasedFieldTypeFilterAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.searches.SearchesAdapter;
@@ -41,6 +45,8 @@ import static org.graylog.storage.elasticsearch6.Elasticsearch6Plugin.SUPPORTED_
 public class Elasticsearch6Module extends VersionAwareModule {
     @Override
     protected void configure() {
+        bindForSupportedVersion(AggregationBasedFieldTypeFilterAdapter.class).to(AggregationBasedFieldTypeFilterES6.class);
+        bindForSupportedVersion(CountExistingBasedFieldTypeFilterAdapter.class).to(CountExistingBasedFieldTypeFilterES6.class);
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterES6.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterES6.class);
         bindForSupportedVersion(SearchesAdapter.class).to(SearchesAdapterES6.class);
