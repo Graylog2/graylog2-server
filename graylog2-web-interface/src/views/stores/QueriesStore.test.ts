@@ -63,20 +63,20 @@ describe('QueriesStore', () => {
     expect(ViewStore.listen).toHaveBeenCalled();
   });
 
-  it('retrieves and propagates queries from ViewStore upon updates', (done) => {
+  it('retrieves and propagates queries from ViewStore upon updates', () => new Promise<void>((resolve) => {
     const query1 = Query.builder().id('query1').build();
     const queries = [query1];
     const callback = asMock(ViewStore.listen).mock.calls[0][0];
     const unsubscribe = QueriesStore.listen((newQueries) => {
       expect(newQueries).toEqual(Immutable.OrderedMap<QueryId, Query>({ query1 }));
 
-      done();
+      resolve();
     });
 
     callback(newViewStoreStateForQueries(queries));
 
     unsubscribe();
-  });
+  }));
 
   describe('rangeType', () => {
     const query1 = Query.builder()
@@ -91,15 +91,19 @@ describe('QueriesStore', () => {
       callback(newViewStoreStateForQueries(queries));
     });
 
-    it('throws error if no type is given', () => {
-      return QueriesActions.rangeType('query1', undefined)
-        .catch((error) => expect(error).toEqual(new Error('Invalid time range type: undefined')));
+    it('throws error if no type is given', async () => {
+      const result = await QueriesActions.rangeType('query1', undefined)
+        .catch((error) => error);
+
+      expect(result).toEqual(new Error('Invalid time range type: undefined'));
     });
 
-    it('throws error if invalid type is given', () => {
-      // @ts-ignore
-      return QueriesActions.rangeType('query1', 'invalid')
-        .catch((error) => expect(error).toEqual(new Error('Invalid time range type: invalid')));
+    it('throws error if invalid type is given', async () => {
+      // @ts-expect-error
+      const result = await QueriesActions.rangeType('query1', 'invalid')
+        .catch((error) => error);
+
+      expect(result).toEqual(new Error('Invalid time range type: invalid'));
     });
 
     it('does not do anything if type stays the same', () => QueriesActions.rangeType('query1', 'relative')
