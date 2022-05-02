@@ -23,7 +23,7 @@ import usePluginEntities from 'views/logic/usePluginEntities';
 import PluggableSearchBarControls from './PluggableSearchBarControls';
 
 jest.mock('views/logic/usePluginEntities');
-jest.mock('hooks/useFeature', () => () => true);
+jest.mock('hooks/useFeature', () => (key) => key === 'search_filter');
 
 describe('PluggableSearchBarControls', () => {
   const createPluggableSearchBarControl = (overrides = {}) => {
@@ -60,7 +60,7 @@ describe('PluggableSearchBarControls', () => {
   });
 
   it('should not render fallback when search bar filters are defined', () => {
-    const example = createPluggableSearchBarControl({ id: 'search-filters' });
+    const example = createPluggableSearchBarControl({ id: 'search-filters', placement: 'left' });
     asMock(usePluginEntities).mockImplementation((entityKey) => ({ 'views.components.searchBar': [example] }[entityKey]));
     render(<PluggableSearchBarControls />);
 

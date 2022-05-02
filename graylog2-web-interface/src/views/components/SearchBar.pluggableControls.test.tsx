@@ -1,0 +1,170 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import * as React from 'react';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
+import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
+
+import { StoreMock as MockStore, asMock } from 'helpers/mocking';
+import mockAction from 'helpers/mocking/MockAction';
+import { SearchActions } from 'views/stores/SearchStore';
+import MockQuery from 'views/logic/queries/Query';
+import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
+import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
+import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import usePluginEntities from 'views/logic/usePluginEntities';
+
+import SearchBar from './SearchBar';
+
+import FormikInput from '../../components/common/FormikInput';
+
+const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
+
+const testTimeout = applyTimeoutMultiplier(30000);
+
+jest.mock('views/logic/usePluginEntities');
+jest.mock('hooks/useFeature', () => (key: string) => key === 'search_filter');
+
+jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(
+    ['getInitialState', () => ({ search: { parameters: [] } })],
+  ),
+  SearchActions: {
+    refresh: jest.fn(),
+  },
+}));
+
+jest.mock('stores/users/CurrentUserStore', () => ({
+  CurrentUserStore: MockStore(
+    ['get', () => mockCurrentUser],
+    ['getInitialState', () => mockCurrentUser],
+  ),
+}));
+
+jest.mock('stores/streams/StreamsStore', () => MockStore(
+  ['listStreams', () => ({ then: jest.fn() })],
+  'availableStreams',
+));
+
+jest.mock('views/stores/SearchConfigStore', () => ({
+  SearchConfigStore: MockStore(),
+  SearchConfigActions: {
+    refresh: jest.fn(() => Promise.resolve()),
+  },
+}));
+
+jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => jest.fn(() => (
+  <div>Saved Search Controls</div>
+)));
+
+jest.mock('views/stores/CurrentQueryStore', () => ({
+  CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder()
+    .timerange({ type: 'relative', from: 300 })
+    .query({ type: 'elasticsearch', query_string: '*' })
+    .id('34efae1e-e78e-48ab-ab3f-e83c8611a683')
+    .build()]),
+}));
+
+jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest.fn(() => Promise.resolve({
+  status: 'OK',
+  explanations: [],
+})));
+
+jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
+
+describe('SearchBar pluggable controls', () => {
+  const PluggableSearchBarControl = () => {
+    return (
+      <FormikInput label="Pluggable Control"
+                   name="pluggableControl"
+                   id="pluggable-control" />
+    );
+  };
+
+  const mockOnSubmit = jest.fn(() => Promise.resolve());
+  const mockOnValidate = jest.fn(() => Promise.resolve({}));
+  const pluggableSearchBarControls = [
+    () => ({
+      id: 'pluggable-search-bar-control',
+      component: PluggableSearchBarControl,
+      useInitialValues: () => {
+        return ({
+          pluggableControl: 'Initial Value',
+        });
+      },
+      onSubmit: mockOnSubmit,
+      validationPayload: (values) => {
+        return ({ customKey: values.pluggableControl });
+      },
+      onValidate: mockOnValidate,
+      placement: 'right',
+    }),
+  ];
+
+  beforeEach(() => {
+    SearchActions.refresh = mockAction();
+    SearchConfigStore.getInitialState = jest.fn(() => ({ searchesClusterConfig: mockSearchesClusterConfig }));
+    asMock(usePluginEntities).mockImplementation((entityKey) => ({ 'views.components.searchBar': pluggableSearchBarControls }[entityKey]));
+  });
+
+  it('should render and have initial values', async () => {
+    render(<SearchBar />);
+
+    const pluggableFormField = await screen.findByLabelText('Pluggable Control');
+
+    expect(pluggableFormField).toHaveValue('Initial Value');
+  });
+
+  it('should be able to register submit handler which receives current form state', async () => {
+    render(<SearchBar />);
+
+    const pluggableFormField = await screen.findByLabelText('Pluggable Control');
+    userEvent.type(pluggableFormField, '2');
+
+    const searchButton = await screen.findByRole('button', { name: /Perform search/ });
+    userEvent.click(searchButton);
+
+    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith({
+      pluggableControl: 'Initial Value2',
+      queryString: '*',
+      streams: [],
+      timerange: { from: 300, type: 'relative' },
+    }));
+  }, testTimeout);
+
+  it('should be able to register validation handler', async () => {
+    render(<SearchBar />);
+
+    await waitFor(() => expect(mockOnValidate).toHaveBeenCalledWith({
+      pluggableControl: 'Initial Value',
+      queryString: '*',
+      streams: [],
+      timerange: { from: 300, type: 'relative' },
+    }));
+  });
+
+  it('should be able to extend query validation payload', async () => {
+    render(<SearchBar />);
+
+    await waitFor(() => expect(validateQuery).toHaveBeenCalledWith({
+      customKey: 'Initial Value',
+      queryString: '*',
+      streams: [],
+      timeRange: { from: 300, type: 'relative' },
+    }));
+  });
+});
