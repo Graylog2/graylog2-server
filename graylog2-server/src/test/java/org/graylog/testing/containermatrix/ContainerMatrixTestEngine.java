@@ -81,7 +81,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.pluginJarsProvider()));
     }
 
-    private boolean isRunningInCI() {
+    private boolean isRunningOnCI() {
         String ci = System.getenv("CI");
         return !StringUtils.isBlank(ci);
     }
@@ -95,7 +95,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> {
             if (annotation.searchVersions().length == 0) {
                 return Stream.of(SearchServer.DEFAULT_VERSION);
-            } if (isRunningInCI() && !enableContainerMatrixOnCI()) {
+            } if (isRunningOnCI() && !enableContainerMatrixOnCI()) {
                 return Stream.of(annotation.searchVersions()[0]);
             } else {
                 return Stream.of(annotation.searchVersions());
@@ -107,7 +107,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> {
             if (annotation.mongoVersions().length == 0) {
                 return Stream.of(MongodbServer.DEFAULT_VERSION);
-            } if (isRunningInCI() && !enableContainerMatrixOnCI()) {
+            } if (isRunningOnCI() && !enableContainerMatrixOnCI()) {
                 return Stream.of(annotation.mongoVersions()[0]);
             } else {
                 return Stream.of(annotation.mongoVersions());
