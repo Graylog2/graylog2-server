@@ -15,42 +15,47 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { createContext, useState, useMemo, useCallback } from 'react';
+import { createContext, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import Store from 'logic/local-storage/Store';
 
-export const ScratchpadContext = createContext();
+export const ScratchpadContext = createContext(undefined);
 
-export const ScratchpadProvider = ({ children, loginName }) => {
+type Props = {
+  children: React.ReactNode,
+  loginName: string,
+}
+
+export const ScratchpadProvider = ({ children, loginName }: Props) => {
   const localStorageItem = `gl-scratchpad-${loginName}`;
   const scratchpadStore = Store.get(localStorageItem) || {};
   const [isScratchpadVisible, setVisibility] = useState(scratchpadStore.opened || false);
 
-  const toggleScratchpadVisibility = useCallback(() => {
-    const currentStorage = Store.get(localStorageItem);
+  const scratchpadContextValue = useMemo(() => {
+    const toggleScratchpadVisibility = () => {
+      const currentStorage = Store.get(localStorageItem);
 
-    Store.set(localStorageItem, { ...currentStorage, opened: !isScratchpadVisible });
-    setVisibility(!isScratchpadVisible);
-  }, [isScratchpadVisible, localStorageItem]);
+      Store.set(localStorageItem, { ...currentStorage, opened: !isScratchpadVisible });
+      setVisibility(!isScratchpadVisible);
+    };
 
-  const setScratchpadVisibility = useCallback((opened) => {
-    const currentStorage = Store.get(localStorageItem);
+    const setScratchpadVisibility = (opened: boolean) => {
+      const currentStorage = Store.get(localStorageItem);
 
-    Store.set(localStorageItem, { ...currentStorage, opened });
-    setVisibility(opened);
-  }, [localStorageItem]);
+      Store.set(localStorageItem, { ...currentStorage, opened });
+      setVisibility(opened);
+    };
 
-  const scratchpadContextValue = useMemo(() => ({
+    return {
+      isScratchpadVisible,
+      localStorageItem,
+      setScratchpadVisibility,
+      toggleScratchpadVisibility,
+    };
+  }, [
     isScratchpadVisible,
     localStorageItem,
-    setScratchpadVisibility,
-    toggleScratchpadVisibility,
-  }), [
-    isScratchpadVisible,
-    localStorageItem,
-    setScratchpadVisibility,
-    toggleScratchpadVisibility,
   ]);
 
   return (
