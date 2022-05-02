@@ -25,5 +25,7 @@ The following API endpoints have been removed in 4.4.
 
 ## Behaviour Changes
 
-- The system messages collection in MongoDB will be created as a 50MB capped collection going forward.
-  This happens at creation, so existing system messages collections remain unconstrained.
+- The `system_messages` collection in MongoDB will be created as a 50MB capped collection going forward.
+  This happens at creation, so existing `system_messages` collections remain unconstrained.
+<br>You can manually convert your existing collection to a capped collection by following 
+these [instructions](https://www.mongodb.com/docs/manual/core/capped-collections/#convert-a-collection-to-capped).
