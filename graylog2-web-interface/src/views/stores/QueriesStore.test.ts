@@ -109,29 +109,33 @@ describe('QueriesStore', () => {
     it('does not do anything if type stays the same', () => QueriesActions.rangeType('query1', 'relative')
       .then((newQueries) => expect(newQueries).toEqual(Immutable.OrderedMap<QueryId, Query>({ query1 }))));
 
-    it('translates current relative time range parameters to absolute ones when switching to absolute',
-      () => QueriesActions.rangeType('query1', 'absolute')
-        .then((newQueries) => expect(newQueries)
-          .toEqual(Immutable.OrderedMap<QueryId, Query>({
-            query1: query1.toBuilder()
-              .timerange({
-                type: 'absolute',
-                from: moment(fixedDate).subtract(300, 'seconds').toISOString(),
-                to: moment(fixedDate).toISOString(),
-              })
-              .build(),
-          }))));
+    it('translates current relative time range parameters to absolute ones when switching to absolute', async () => {
+      const newQueries = await QueriesActions.rangeType('query1', 'absolute');
 
-    it('translates current relative time range parameters to keyword when switching to keyword',
-      () => QueriesActions.rangeType('query1', 'keyword')
-        .then((newQueries) => expect(newQueries)
-          .toEqual(Immutable.OrderedMap<QueryId, Query>({
-            query1: query1.toBuilder()
-              .timerange({
-                type: 'keyword',
-                keyword: 'Last five Minutes',
-              })
-              .build(),
-          }))));
+      expect(newQueries.toJS())
+        .toEqual({
+          query1: query1.toBuilder()
+            .timerange({
+              type: 'absolute',
+              from: moment(fixedDate).subtract(300, 'seconds').toISOString(),
+              to: moment(fixedDate).toISOString(),
+            })
+            .build(),
+        });
+    });
+
+    it('translates current relative time range parameters to keyword when switching to keyword', async () => {
+      const newQueries = await QueriesActions.rangeType('query1', 'keyword');
+
+      expect(newQueries.toJS())
+        .toEqual({
+          query1: query1.toBuilder()
+            .timerange({
+              type: 'keyword',
+              keyword: 'Last five Minutes',
+            })
+            .build(),
+        });
+    });
   });
 });
