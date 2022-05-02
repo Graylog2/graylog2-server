@@ -81,16 +81,21 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.pluginJarsProvider()));
     }
 
-    private boolean isJenkinsOnGithub() {
-        String github_workspace = System.getenv("CI");
-        return !StringUtils.isBlank(github_workspace);
+    private boolean isRunningInCI() {
+        String ci = System.getenv("CI");
+        return !StringUtils.isBlank(ci);
+    }
+
+    private boolean enableContainerMatrixOnCI() {
+        String force_matrix = System.getenv("ENABLE_CONTAINER_MATRIX_ON_CI");
+        return "true".equalsIgnoreCase(force_matrix);
     }
 
     private Set<SearchServer> getSearchServerVersions(Set<Class<?>> annotatedClasses) {
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> {
             if (annotation.searchVersions().length == 0) {
                 return Stream.of(SearchServer.DEFAULT_VERSION);
-            } if (isJenkinsOnGithub()) {
+            } if (isRunningInCI() && !enableContainerMatrixOnCI()) {
                 return Stream.of(annotation.searchVersions()[0]);
             } else {
                 return Stream.of(annotation.searchVersions());
@@ -102,7 +107,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> {
             if (annotation.mongoVersions().length == 0) {
                 return Stream.of(MongodbServer.DEFAULT_VERSION);
-            } if (isJenkinsOnGithub()) {
+            } if (isRunningInCI() && !enableContainerMatrixOnCI()) {
                 return Stream.of(annotation.mongoVersions()[0]);
             } else {
                 return Stream.of(annotation.mongoVersions());
