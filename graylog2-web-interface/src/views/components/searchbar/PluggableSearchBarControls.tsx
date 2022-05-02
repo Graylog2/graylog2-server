@@ -16,15 +16,15 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 import usePluginEntities from 'views/logic/usePluginEntities';
 import SearchFilterBanner from 'views/components/searchbar/SearchFilterBanner';
-import useFeature from 'hooks/useFeature';
 import type { SearchBarControl } from 'views/types';
 import Store from 'logic/local-storage/Store';
+import useFeature from 'hooks/useFeature';
 
-const LOCAL_STORAGE_ITEM = 'search_filter_preview_viewed';
+export const PLUGGABLE_CONTROLS_HIDDEN_KEY = 'pluggableSearchBarControlsAreHidden';
 
 const Container = styled.div`
   display: flex;
@@ -32,26 +32,41 @@ const Container = styled.div`
   justify-content: space-between;
 `;
 
-const PluggableSearchBarControls = () => {
-  const [isBannerHidden, setIsBannerHidden] = useState(Store.get(LOCAL_STORAGE_ITEM));
-  const searchBarControls = usePluginEntities('views.components.searchBar');
-  const hasSearchFilterFeature = useFeature('search_filter');
+const usePluggableControls = () => {
+  const searchBarControls = usePluginEntities('views.components.searchBar') ?? [];
   const existingControls = searchBarControls.map((controlFn) => controlFn()).filter((control) => !!control);
   const leftControls = existingControls.filter(({ placement }) => placement === 'left');
   const rightControls = existingControls.filter(({ placement }) => placement === 'right');
-  const renderControls = (controls: Array<SearchBarControl>) => controls?.map(({ component: ControlComponent, id }) => <ControlComponent key={id} />);
-  const hasEnterpriseSearchFilters = existingControls.find((control) => control.id === 'search-filters');
-  const shouldRenderContainer = (hasEnterpriseSearchFilters || !isBannerHidden) && hasSearchFilterFeature;
+
+  return ({
+    leftControls,
+    rightControls,
+  });
+};
+
+const renderControls = (controls: Array<SearchBarControl>) => controls?.map(({ component: ControlComponent, id }) => <ControlComponent key={id} />);
+
+const PluggableSearchBarControls = () => {
+  const [hidePluggableControlsPreview, setHidePluggableControlsPreview] = useState(!!Store.get(PLUGGABLE_CONTROLS_HIDDEN_KEY));
+  const { leftControls, rightControls } = usePluggableControls();
+  const hasSearchFilterFeatureFlag = useFeature('search_filter');
+  const hasPluggableControls = !!(leftControls?.length || rightControls?.length);
+  const shouldRenderContainer = (hasPluggableControls || (!hidePluggableControlsPreview && hasSearchFilterFeatureFlag));
+
+  const onHidePluggableControlsPreview = useCallback(() => {
+    setHidePluggableControlsPreview(true);
+    Store.set(PLUGGABLE_CONTROLS_HIDDEN_KEY, true);
+  }, []);
 
   if (!shouldRenderContainer) return null;
 
   return (
     <Container>
       <div>
-        {hasSearchFilterFeature && (
+        {hasSearchFilterFeatureFlag && (
           <>
             {renderControls(leftControls)}
-            {!hasEnterpriseSearchFilters && <SearchFilterBanner setHidden={setIsBannerHidden} />}
+            <SearchFilterBanner onHide={onHidePluggableControlsPreview} pluggableControls={leftControls} />
           </>
         )}
       </div>
