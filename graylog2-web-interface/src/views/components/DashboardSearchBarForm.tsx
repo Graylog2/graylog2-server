@@ -57,7 +57,6 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
   const initialTimeRange = timerange && !isNoTimeRangeOverride(timerange) ? onInitializingTimerange(timerange) : {} as TimeRange;
   const _initialValues = {
     timerange: initialTimeRange,
-    nextTimeRange: initialTimeRange,
     ...rest,
   };
 
