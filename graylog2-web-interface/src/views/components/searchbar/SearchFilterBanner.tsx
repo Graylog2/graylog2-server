@@ -17,19 +17,17 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Col, Button, ControlLabel, ButtonGroup, Popover } from 'components/bootstrap';
+import { Button, ButtonGroup, Popover } from 'components/bootstrap';
 import { Icon, OverlayTrigger } from 'components/common';
 import type { SearchBarControl } from 'views/types';
 
-const Container = styled.div(({ theme }) => css`
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+const Container = styled.div`
+  display: flex;
   align-items: center;
-  gap: ${theme.spacings.md};
-`);
+`;
 
-const StyledControlLabel = styled(ControlLabel)`
-  margin-right: 10px;
+const StyledButtonGroup = styled(ButtonGroup)`
+  margin-left: 5px;
 `;
 
 const StyledButtonBar = styled.div`
@@ -72,22 +70,16 @@ const SearchFilterBanner = ({ onHide, pluggableControls }: Props) => {
 
   return (
     <Container>
-      <Col>
-        <StyledControlLabel>
-          Filters
-        </StyledControlLabel>
-        <ButtonGroup>
-          <Button disabled bsSize="small">
-            <Icon name="plus" />
-          </Button>
-          <Button disabled bsSize="small">
-            <Icon name="folder" />
-          </Button>
-        </ButtonGroup>
-      </Col>
-      <Col>
-        <PopoverHelp onHide={onHide} />
-      </Col>
+      Filters
+      <StyledButtonGroup>
+        <Button disabled bsSize="small">
+          <Icon name="plus" />
+        </Button>
+        <Button disabled bsSize="small">
+          <Icon name="folder" />
+        </Button>
+      </StyledButtonGroup>
+      <PopoverHelp onHide={onHide} />
     </Container>
   );
 };
