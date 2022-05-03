@@ -18,6 +18,7 @@ package org.graylog.events.notifications.types;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -29,10 +30,12 @@ import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationModelData;
 import org.graylog.events.notifications.EventNotificationService;
+import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.notifications.NotificationTestData;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog2.plugin.MessageSummary;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.slf4j.Logger;
@@ -40,6 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -58,16 +62,19 @@ public class HTTPEventNotification implements EventNotification {
     private final OkHttpClient httpClient;
     private final UrlWhitelistService whitelistService;
     private final UrlWhitelistNotificationService urlWhitelistNotificationService;
+    private final EncryptedValueService encryptedValueService;
 
     @Inject
     public HTTPEventNotification(EventNotificationService notificationCallbackService, ObjectMapper objectMapper,
-            final OkHttpClient httpClient, UrlWhitelistService whitelistService,
-            UrlWhitelistNotificationService urlWhitelistNotificationService) {
+                                 final OkHttpClient httpClient, UrlWhitelistService whitelistService,
+                                 UrlWhitelistNotificationService urlWhitelistNotificationService,
+                                 EncryptedValueService encryptedValueService) {
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapper = objectMapper;
         this.httpClient = httpClient;
         this.whitelistService = whitelistService;
         this.urlWhitelistNotificationService = urlWhitelistNotificationService;
+        this.encryptedValueService = encryptedValueService;
     }
 
     @Override
@@ -96,8 +103,23 @@ public class HTTPEventNotification implements EventNotification {
         } catch (JsonProcessingException e) {
             throw new PermanentEventNotificationException("Unable to serialize notification", e);
         }
-        final Request request = new Request.Builder()
-                .url(httpUrl)
+
+        final Request.Builder builder = new Request.Builder();
+        final String basicAuthHeaderValue = getBasicAuthHeaderValue(config);
+        if (!Strings.isNullOrEmpty(basicAuthHeaderValue)) {
+            builder.addHeader("Authorization", basicAuthHeaderValue);
+        }
+
+        if (!Strings.isNullOrEmpty(config.apiKey())) {
+            final String apiKeyValue = getApiKeyValue(config);
+            HttpUrl urlWithApiKey = httpUrl.newBuilder().addQueryParameter(config.apiKey(), apiKeyValue).build();
+            builder.url(urlWithApiKey);
+        }
+        else {
+            builder.url(httpUrl);
+        }
+
+        final Request request = builder
                 .post(RequestBody.create(CONTENT_TYPE, body))
                 .build();
 
@@ -120,5 +142,20 @@ public class HTTPEventNotification implements EventNotification {
                 "\" is trying to access a URL which is not whitelisted. Please check your configuration. [url: \"" +
                 url + "\"]";
         urlWhitelistNotificationService.publishWhitelistFailure(description);
+    }
+
+    private String getBasicAuthHeaderValue(HTTPEventNotificationConfig config) {
+        if (config.basicAuth() == null || !config.basicAuth().isSet()) {
+            return null;
+        }
+        String credentials = encryptedValueService.decrypt(config.basicAuth());
+        return "Basic " + com.unboundid.util.Base64.encode(credentials.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private  String getApiKeyValue(HTTPEventNotificationConfig config) {
+        if (config.apiSecret() == null || !config.apiSecret().isSet()) {
+            return null;
+        }
+        return encryptedValueService.decrypt(config.apiSecret());
     }
 }
