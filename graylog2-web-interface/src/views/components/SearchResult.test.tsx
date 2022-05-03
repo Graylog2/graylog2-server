@@ -84,12 +84,10 @@ describe('SearchResult', () => {
 
   SimpleSearchResult.propTypes = {
     fieldTypes: PropTypes.object,
-    hasErrors: PropTypes.bool,
   };
 
   SimpleSearchResult.defaultProps = {
     fieldTypes: initialFieldTypes,
-    hasErrors: false,
   };
 
   it('should show spinner with undefined fields', () => {
