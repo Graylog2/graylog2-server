@@ -15,29 +15,35 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import DecoratorContext from 'views/components/messagelist/decoration/DecoratorContext';
 import HighlightingRulesContext from 'views/components/contexts/HighlightingRulesContext';
+import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import useUserDateTime from 'hooks/useUserDateTime';
+import type { DateTime } from 'util/DateTime';
+import type HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
 import PossiblyHighlight from './PossiblyHighlight';
 import Highlight from './Highlight';
 
-type Props = {
-  children?: React.ReactElement,
-  field: string,
-  value?: any,
-};
-
-const CustomHighlighting = ({ children, field: fieldName, value: fieldValue }: Props) => {
-  const { formatTime } = useUserDateTime();
+const extractDecorators = ({
+  fieldName,
+  fieldValue,
+  formatTime,
+  fieldTypes,
+  highlightingRules = [],
+}: {
+  fieldName: string,
+  fieldValue: any,
+  formatTime: (fieldValue: DateTime) => string,
+  fieldTypes: FieldTypes,
+  highlightingRules: Array<HighlightingRule>
+}) => {
   const decorators = [];
-  const highlightingRules = useContext(HighlightingRulesContext) ?? [];
-  const fieldTypes = useContext(FieldTypesContext);
   let type;
 
   if (fieldTypes) {
@@ -72,6 +78,34 @@ const CustomHighlighting = ({ children, field: fieldName, value: fieldValue }: P
   if (decorators.length === 0) {
     decorators.push(Highlight);
   }
+
+  return decorators;
+};
+
+type Props = {
+  children?: React.ReactElement,
+  field: string,
+  value?: any,
+};
+
+const CustomHighlighting = ({ children, field: fieldName, value: fieldValue }: Props) => {
+  const { formatTime } = useUserDateTime();
+  const highlightingRules = useContext(HighlightingRulesContext);
+  const fieldTypes = useContext(FieldTypesContext);
+
+  const decorators = useMemo(() => extractDecorators(({
+    fieldName,
+    fieldValue,
+    formatTime,
+    fieldTypes,
+    highlightingRules,
+  })), [
+    fieldName,
+    fieldValue,
+    formatTime,
+    fieldTypes,
+    highlightingRules,
+  ]);
 
   return (
     <DecoratorContext.Provider value={decorators}>

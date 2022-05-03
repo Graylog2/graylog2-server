@@ -14,39 +14,52 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { createContext, useState } from 'react';
+import * as React from 'react';
+import { createContext, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import Store from 'logic/local-storage/Store';
 
-export const ScratchpadContext = createContext();
+export const ScratchpadContext = createContext(undefined);
 
-export const ScratchpadProvider = ({ children, loginName }) => {
+type Props = {
+  children: React.ReactNode,
+  loginName: string,
+}
+
+export const ScratchpadProvider = ({ children, loginName }: Props) => {
   const localStorageItem = `gl-scratchpad-${loginName}`;
   const scratchpadStore = Store.get(localStorageItem) || {};
   const [isScratchpadVisible, setVisibility] = useState(scratchpadStore.opened || false);
 
-  const toggleScratchpadVisibility = () => {
-    const currentStorage = Store.get(localStorageItem);
+  const scratchpadContextValue = useMemo(() => {
+    const toggleScratchpadVisibility = () => {
+      const currentStorage = Store.get(localStorageItem);
 
-    Store.set(localStorageItem, { ...currentStorage, opened: !isScratchpadVisible });
-    setVisibility(!isScratchpadVisible);
-  };
+      Store.set(localStorageItem, { ...currentStorage, opened: !isScratchpadVisible });
+      setVisibility(!isScratchpadVisible);
+    };
 
-  const setScratchpadVisibility = (opened) => {
-    const currentStorage = Store.get(localStorageItem);
+    const setScratchpadVisibility = (opened: boolean) => {
+      const currentStorage = Store.get(localStorageItem);
 
-    Store.set(localStorageItem, { ...currentStorage, opened });
-    setVisibility(opened);
-  };
+      Store.set(localStorageItem, { ...currentStorage, opened });
+      setVisibility(opened);
+    };
 
-  return (
-    <ScratchpadContext.Provider value={{
+    return {
       isScratchpadVisible,
       localStorageItem,
       setScratchpadVisibility,
       toggleScratchpadVisibility,
-    }}>
+    };
+  }, [
+    isScratchpadVisible,
+    localStorageItem,
+  ]);
+
+  return (
+    <ScratchpadContext.Provider value={scratchpadContextValue}>
       {children}
     </ScratchpadContext.Provider>
   );

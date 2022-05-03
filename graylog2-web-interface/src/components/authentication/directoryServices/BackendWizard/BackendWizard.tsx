@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { compact, camelCase, mapKeys, mapValues } from 'lodash';
 import type { $PropertyType } from 'utility-types';
 import PropTypes from 'prop-types';
@@ -62,9 +62,8 @@ const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: st
 
 const _formatBackendValidationErrors = (backendErrors: { [inputNameJSON: string]: string[] }) => {
   const backendErrorStrings = mapValues(backendErrors, (errorArray) => `Server validation error: ${errorArray.join(' ')}`);
-  const formattedBackendErrors = mapKeys(backendErrorStrings, (_value, key) => camelCase(key));
 
-  return formattedBackendErrors;
+  return mapKeys(backendErrorStrings, (_value, key) => camelCase(key));
 };
 
 export const _passwordPayload = (backendId: string | null | undefined, systemUserPassword: string | null | undefined) => {
@@ -252,6 +251,8 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     [GROUP_SYNC_KEY]: useRef<FormikProps<WizardFormValues>>(null),
   };
 
+  const wizardContextValue = useMemo(() => ({ ...stepsState, setStepsState }), [stepsState, setStepsState]);
+
   useEffect(() => _loadRoles(setPaginatedRoles), []);
 
   useEffect(() => {
@@ -345,7 +346,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
   );
 
   return (
-    <BackendWizardContext.Provider value={{ ...stepsState, setStepsState }}>
+    <BackendWizardContext.Provider value={wizardContextValue}>
       {MatchingGroupsProvider
         ? (
           <MatchingGroupsProvider prepareSubmitPayload={_getSubmitPayload}>

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import type { DefaultTheme } from 'styled-components';
 import { ThemeProvider } from 'styled-components';
@@ -94,12 +94,16 @@ const GraylogThemeProvider = ({ children, initialThemeModeOverride }) => {
     _generateTheme({ changeMode, mode, generateCustomThemeColors, initialLoad: true }).then(setTheme);
   }, [changeMode, generateCustomThemeColors, mode, setTheme]);
 
-  const regenerateTheme = () => {
-    _generateTheme({ changeMode, mode, generateCustomThemeColors, initialLoad: false }).then(setTheme);
-  };
+  const regeneratableThemeContextValue = useMemo(() => {
+    const regenerateTheme = () => {
+      _generateTheme({ changeMode, mode, generateCustomThemeColors, initialLoad: false }).then(setTheme);
+    };
+
+    return ({ regenerateTheme });
+  }, [changeMode, generateCustomThemeColors, mode]);
 
   return theme ? (
-    <RegeneratableThemeContext.Provider value={{ regenerateTheme }}>
+    <RegeneratableThemeContext.Provider value={regeneratableThemeContextValue}>
       <ThemeProvider theme={theme}>
         {children}
       </ThemeProvider>

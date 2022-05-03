@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
 import { flatten, get } from 'lodash';
 import type { DefaultTheme } from 'styled-components';
@@ -55,15 +56,26 @@ type Props = {
 
 const _c = (field, value, path, source) => ({ field, value, path, source });
 
-const _column = (field: string, value: any, selectedQuery: string, idx: number, type: FieldType, valuePath: ValuePath, source: string | undefined | null) => (
-  <StyledTd isNumeric={type.isNumeric()} key={`${selectedQuery}-${field}=${value}-${idx}`}>
-    <AdditionalContext.Provider value={{ valuePath }}>
-      <CustomHighlighting field={source ?? field} value={value}>
-        {value !== null && value !== undefined ? <Value field={source ?? field} type={type} value={value} queryId={selectedQuery} render={DecoratedValue} /> : null}
-      </CustomHighlighting>
-    </AdditionalContext.Provider>
-  </StyledTd>
-);
+const _column = (field: string, value: any, selectedQuery: string, idx: number, type: FieldType, valuePath: ValuePath, source: string | undefined | null) => {
+  const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
+
+  return (
+    <StyledTd isNumeric={type.isNumeric()} key={`${selectedQuery}-${field}=${value}-${idx}`}>
+      <AdditionalContext.Provider value={additionalContextValue}>
+        <CustomHighlighting field={source ?? field} value={value}>
+          {value !== null && value !== undefined
+            ? (
+              <Value field={source ?? field}
+                     type={type}
+                     value={value}
+                     queryId={selectedQuery}
+                     render={DecoratedValue} />
+            ) : null}
+        </CustomHighlighting>
+      </AdditionalContext.Provider>
+    </StyledTd>
+  );
+};
 
 const fullValuePathForField = (fieldName, valuePath) => {
   const currentSeries = parseSeries(fieldName);
