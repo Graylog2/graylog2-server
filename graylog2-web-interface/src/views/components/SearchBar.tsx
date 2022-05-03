@@ -120,7 +120,7 @@ const defaultProps = {
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
-const useInitialFormValues = ({ currentQuery, queryFilters }: { currentQuery: Query | undefined, queryFilters: Immutable.Map<QueryId, FilterType> }) => { // todo check undefined
+const useInitialFormValues = ({ currentQuery, queryFilters }: { currentQuery: Query | undefined, queryFilters: Immutable.Map<QueryId, FilterType> }) => {
   const { id, query, timerange } = currentQuery ?? {};
   const { query_string: queryString } = query ?? {};
   const initialValuesFromPlugins = usePluggableInitialValues();
@@ -130,7 +130,7 @@ const useInitialFormValues = ({ currentQuery, queryFilters }: { currentQuery: Qu
 
     return ({ timerange, streams, queryString, ...initialValuesFromPlugins });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timerange, queryString, id, queryFilters]);
+  }, [timerange, queryString, id, queryFilters, initialValuesFromPlugins]);
 };
 
 const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>) => {

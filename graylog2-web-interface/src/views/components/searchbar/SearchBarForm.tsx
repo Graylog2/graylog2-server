@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useMemo } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import type { FormikProps } from 'formik';
@@ -48,10 +48,13 @@ const _isFunction = (children: Props['children']): children is (props: FormikPro
 export const normalizeSearchBarFormValues = ({ timerange, ...rest }: SearchBarFormValues) => ({ timerange: onSubmittingTimerange(timerange), ...rest });
 
 const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef, validateQueryString }: Props) => {
+  const [enableReinitialize, setEnableReinitialize] = useState(true);
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const { setFieldWarning } = useContext(FormWarningsContext);
   const _onSubmit = useCallback((values: SearchBarFormValues) => {
-    return onSubmit(normalizeSearchBarFormValues(values));
+    setEnableReinitialize(false);
+
+    return onSubmit(normalizeSearchBarFormValues(values)).finally(() => setEnableReinitialize(true));
   }, [onSubmit]);
   const _initialValues = useMemo(() => {
     const { timerange, ...rest } = initialValues;
@@ -67,7 +70,7 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
 
   return (
     <Formik<SearchBarFormValues> initialValues={_initialValues}
-                                 enableReinitialize
+                                 enableReinitialize={enableReinitialize}
                                  onSubmit={_onSubmit}
                                  innerRef={formRef}
                                  validate={_validate}
