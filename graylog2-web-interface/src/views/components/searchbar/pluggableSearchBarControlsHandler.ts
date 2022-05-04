@@ -17,15 +17,8 @@
 import { merge } from 'lodash';
 
 import UserNotification from 'util/UserNotification';
-import type { SearchBarControl } from 'views/types';
+import type { SearchBarControl, CombinedSearchBarFormValues } from 'views/types';
 import usePluginEntities from 'views/logic/usePluginEntities';
-import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
-
-type FormValues = {
-  timerange: TimeRange | NoTimeRangeOverride,
-  streams?: Array<string>,
-  queryString: string,
-}
 
 const executeSafely = <T extends () => ReturnType<T>>(fn: T, errorMessage: string, fallbackResult?: ReturnType<T>): ReturnType<T> => {
   try {
@@ -53,7 +46,7 @@ export const usePluggableInitialValues = () => {
   return merge({}, ...initialValues);
 };
 
-export const executePluggableSubmitHandler = (values: FormValues, pluggableSearchBarControls: Array<() => SearchBarControl>) => {
+export const executePluggableSubmitHandler = (values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>) => {
   const pluginSubmitHandler = pluggableSearchBarControls?.map((pluginFn) => pluginFn()?.onSubmit).filter((pluginData) => !!pluginData);
 
   const executableSubmitHandler = pluginSubmitHandler.map((onSubmit) => new Promise((resolve) => {
@@ -67,7 +60,7 @@ export const executePluggableSubmitHandler = (values: FormValues, pluggableSearc
   return Promise.all(executableSubmitHandler);
 };
 
-export const pluggableValidationPayload = (values: FormValues, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
+export const pluggableValidationPayload = (values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
   const validationPayloadHandler = pluggableSearchBarControls.map((pluginFn) => pluginFn()?.validationPayload).filter((validationPayloadFn) => !!validationPayloadFn);
   const validationPayload: Array<{ [key: string ]: any }> = validationPayloadHandler.map((validationPayloadFn) => executeSafely(
     () => validationPayloadFn(values),
@@ -78,7 +71,7 @@ export const pluggableValidationPayload = (values: FormValues, pluggableSearchBa
   return merge({}, ...validationPayload);
 };
 
-export const validatePluggableValues = async (values: FormValues, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
+export const validatePluggableValues = async (values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
   const validationHandler = pluggableSearchBarControls.map((pluginFn) => pluginFn()?.onValidate).filter((onValidate) => !!onValidate);
 
   const errors = validationHandler.map((onValidate) => executeSafely(
