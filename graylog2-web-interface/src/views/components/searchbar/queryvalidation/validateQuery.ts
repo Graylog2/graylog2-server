@@ -24,6 +24,7 @@ import type Parameter from 'views/logic/parameters/Parameter';
 import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
+import generateId from 'logic/generateId';
 
 export type ValidationQuery = {
   queryString: ElasticsearchQueryString | string,
@@ -71,6 +72,7 @@ export const validateQuery = ({
         end_column: endColumn,
         related_property: relatedProperty,
       }) => ({
+        id: generateId(),
         errorMessage,
         errorType,
         errorTitle,
