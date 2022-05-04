@@ -59,7 +59,8 @@ public abstract class ValidationMessageDTO {
     public static ValidationMessageDTO.Builder builder(ValidationTypeDTO validationType, String errorMessage) {
         return new AutoValue_ValidationMessageDTO.Builder()
                 .errorType(validationType)
-                .errorMessage(errorMessage);
+                .errorMessage(errorMessage)
+                .errorTitle(validationType.errorTitle());
     }
 
     @AutoValue.Builder
