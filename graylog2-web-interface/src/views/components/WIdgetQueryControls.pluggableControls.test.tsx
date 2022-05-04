@@ -19,13 +19,12 @@ import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import WrappingContainer from 'WrappingContainer';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
+import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import Widget from 'views/logic/widgets/Widget';
 import mockComponent from 'helpers/mocking/MockComponent';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
-import { asMock } from 'helpers/mocking';
-import usePluginEntities from 'views/logic/usePluginEntities';
 
 import WidgetContext from './contexts/WidgetContext';
 import WidgetQueryControls from './WidgetQueryControls';
@@ -38,7 +37,6 @@ jest.mock('hooks/useUserDateTime');
 jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
 jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 jest.mock('hooks/useFeature', () => (key: string) => key === 'search_filter');
-jest.mock('views/logic/usePluginEntities');
 jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
 jest.mock('views/components/searchbar/queryinput/BasicQueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
@@ -129,23 +127,30 @@ describe('WidgetQueryControls pluggable controls', () => {
   const mockOnSubmit = jest.fn(() => Promise.resolve());
   const mockOnValidate = jest.fn(() => Promise.resolve({}));
 
-  const pluggableSearchBarControls = [
-    () => ({
-      id: 'pluggable-search-bar-control',
-      component: PluggableSearchBarControl,
-      useInitialValues: () => {
-        return ({
-          pluggableControl: 'Initial Value',
-        });
-      },
-      onSubmit: mockOnSubmit,
-      validationPayload: (values) => {
-        return ({ customKey: values.pluggableControl });
-      },
-      onValidate: mockOnValidate,
-      placement: 'right',
-    }),
-  ];
+  beforeAll(() => {
+    PluginStore.register(new PluginManifest({}, {
+      'views.components.searchBar': [
+        () => ({
+          id: 'pluggable-search-bar-control',
+          component: PluggableSearchBarControl,
+          useInitialValues: () => {
+            return ({
+              pluggableControl: 'Initial Value',
+            });
+          },
+          onSubmit: mockOnSubmit,
+          validationPayload: (values) => {
+            // @ts-ignore
+            const { pluggableControl } = values;
+
+            return ({ customKey: pluggableControl });
+          },
+          onValidate: mockOnValidate,
+          placement: 'right',
+        }),
+      ],
+    }));
+  });
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <WrappingContainer>
@@ -161,10 +166,6 @@ describe('WidgetQueryControls pluggable controls', () => {
                            {...props} />
     </Wrapper>,
   );
-
-  beforeEach(() => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ 'views.components.searchBar': pluggableSearchBarControls }[entityKey]));
-  });
 
   it('should render and have initial values', async () => {
     renderSUT();

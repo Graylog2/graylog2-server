@@ -18,25 +18,23 @@ import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
+import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import MockStore from 'helpers/mocking/StoreMock';
 import { SearchActions } from 'views/stores/SearchStore';
 import mockAction from 'helpers/mocking/MockAction';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
-import { asMock } from 'helpers/mocking';
-import usePluginEntities from 'views/logic/usePluginEntities';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
+import FormikInput from 'components/common/FormikInput';
 
 import DashboardSearchBar from './DashboardSearchBar';
-
-import FormikInput from '../../components/common/FormikInput';
 
 const testTimeout = applyTimeoutMultiplier(30000);
 
 jest.mock('views/components/ViewActionsMenu', () => () => <span>View Actions</span>);
 jest.mock('hooks/useUserDateTime');
-jest.mock('views/logic/usePluginEntities');
+jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
 jest.mock('views/stores/GlobalOverrideStore', () => ({
   GlobalOverrideStore: MockStore(),
@@ -64,8 +62,6 @@ jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest
   explanations: [],
 })));
 
-jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
-
 describe('DashboardSearchBar pluggable controls', () => {
   const PluggableSearchBarControl = () => {
     return (
@@ -77,28 +73,35 @@ describe('DashboardSearchBar pluggable controls', () => {
 
   const mockOnSubmit = jest.fn(() => Promise.resolve());
   const mockOnValidate = jest.fn(() => Promise.resolve({}));
-  const pluggableSearchBarControls = [
-    () => ({
-      id: 'pluggable-search-bar-control',
-      component: PluggableSearchBarControl,
-      useInitialValues: () => {
-        return ({
-          pluggableControl: 'Initial Value',
-        });
-      },
-      onSubmit: mockOnSubmit,
-      validationPayload: (values) => {
-        return ({ customKey: values.pluggableControl });
-      },
-      onValidate: mockOnValidate,
-      placement: 'right',
-    }),
-  ];
+
+  beforeAll(() => {
+    PluginStore.register(new PluginManifest({}, {
+      'views.components.searchBar': [
+        () => ({
+          id: 'pluggable-search-bar-control',
+          component: PluggableSearchBarControl,
+          useInitialValues: () => {
+            return ({
+              pluggableControl: 'Initial Value',
+            });
+          },
+          onSubmit: mockOnSubmit,
+          validationPayload: (values) => {
+            // @ts-ignore
+            const { pluggableControl } = values;
+
+            return ({ customKey: pluggableControl });
+          },
+          onValidate: mockOnValidate,
+          placement: 'right',
+        }),
+      ],
+    }));
+  });
 
   beforeEach(() => {
     SearchActions.refresh = mockAction();
     SearchConfigStore.getInitialState = jest.fn(() => ({ searchesClusterConfig: mockSearchesClusterConfig }));
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ 'views.components.searchBar': pluggableSearchBarControls }[entityKey]));
   });
 
   it('should render and have initial values', async () => {
