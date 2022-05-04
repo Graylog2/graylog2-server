@@ -56,10 +56,6 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
 const extendedTimeout = applyTimeoutMultiplier(15000);
 
 describe('<UserCreate />', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('should create user', async () => {
     const { findByLabelText, findByPlaceholderText, findByText } = render(<UserCreate />);
 
@@ -140,6 +136,7 @@ describe('<UserCreate />', () => {
     const usernameInput = await findByLabelText('Username');
 
     await userEvent.type(usernameInput, existingUser.username);
+    fireEvent.blur(usernameInput);
 
     await findByText(/Username is already taken/);
   }, extendedTimeout);
