@@ -18,6 +18,7 @@
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
 export const validationErrorExplanation = {
+  id: 'validation-explanation-id',
   errorType: 'QUERY_PARSING_ERROR',
   errorTitle: 'Parse Exception',
   errorMessage: "Cannot parse 'source: '",
