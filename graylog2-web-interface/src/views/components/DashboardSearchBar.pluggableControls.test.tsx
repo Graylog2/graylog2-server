@@ -112,7 +112,8 @@ describe('DashboardSearchBar pluggable controls', () => {
   it('should register submit handler', async () => {
     render(<DashboardSearchBar />);
 
-    const searchButton = await screen.findByRole('button', { name: 'Perform search' });
+    const searchButton = await screen.findByRole('button', { name: /perform search/i });
+    await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
     userEvent.click(searchButton);
 
     await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith({

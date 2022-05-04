@@ -135,7 +135,10 @@ describe('SearchBar pluggable controls', () => {
     const pluggableFormField = await screen.findByLabelText('Pluggable Control');
     userEvent.type(pluggableFormField, '2');
 
-    const searchButton = await screen.findByRole('button', { name: /Perform search/ });
+    const searchButton = screen.getByRole('button', {
+      name: /perform search \(changes were made after last search execution\)/i,
+    });
+    await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
     userEvent.click(searchButton);
 
     await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith({
