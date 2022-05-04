@@ -26,13 +26,13 @@ import { useStore } from 'stores/connect';
 import { DocumentTitle } from 'components/common';
 import viewTitle from 'views/logic/views/ViewTitle';
 import { ViewStore } from 'views/stores/ViewStore';
-import type { SearchConfigState } from 'views/components/contexts/SearchPageConfigContext';
-import { SearchPageConfigContextProvider } from 'views/components/contexts/SearchPageConfigContext';
+import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
+import { SearchPageLayoutProvider } from 'views/components/contexts/SearchPageLayoutContext';
 
 type Props = {
   loadNewView?: () => unknown,
   loadView?: (string) => unknown,
-  providerOverrides?: SearchConfigState,
+  providerOverrides?: LayoutState,
 };
 
 const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
@@ -51,9 +51,9 @@ const SearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultLoadVi
       <NewViewLoaderContext.Provider value={loadNewView}>
         <ViewLoaderContext.Provider value={loadView}>
           <IfUserHasAccessToAnyStream>
-            <SearchPageConfigContextProvider providerOverrides={providerOverrides}>
+            <SearchPageLayoutProvider providerOverrides={providerOverrides}>
               <Search />
-            </SearchPageConfigContextProvider>
+            </SearchPageLayoutProvider>
           </IfUserHasAccessToAnyStream>
         </ViewLoaderContext.Provider>
       </NewViewLoaderContext.Provider>

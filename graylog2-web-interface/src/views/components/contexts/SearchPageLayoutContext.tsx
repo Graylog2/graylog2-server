@@ -14,19 +14,56 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
 
-type SearchPageLayoutConfig = {
-  sidebar: {
-    isPinned: boolean,
-  },
+enum ViewActionsLayoutOptions {
+  FULL_MENU = 'FULL_MENU',
+  SAVE_COPY = 'SAVE_COPY',
+  BLANK = 'BLANK'
+}
+
+export type LayoutState = {
+  sidebar: { isShown: boolean }
+  viewActionsLayoutOptions: ViewActionsLayoutOptions
+}
+
+type SeacrchPageLayoutProviderProps = {
+  children: React.ReactNode
+  providerOverrides?: LayoutState
+}
+
+const defaultState = {
+  sidebar: { isShown: true },
+  viewActionsLayoutOptions: ViewActionsLayoutOptions.FULL_MENU,
+} as LayoutState;
+
+const SearchPageLayoutContext = React.createContext<LayoutState | undefined>(undefined);
+
+function SearchPageLayoutProvider({ children, providerOverrides = defaultState }: SeacrchPageLayoutProviderProps) {
+  const [state] = React.useState<LayoutState>(providerOverrides);
+
+  const value = React.useMemo(() => ({ ...state }), [state]);
+
+  return (
+    <SearchPageLayoutContext.Provider value={value}>
+      {children}
+    </SearchPageLayoutContext.Provider>
+  );
+}
+
+SearchPageLayoutProvider.defaultProps = {
+  providerOverrides: defaultState,
 };
 
-export type SearchPageLayout = {
-  config: SearchPageLayoutConfig,
-  actions: { toggleSidebarPinning: () => void },
-};
+function useSearchPageLayout() {
+  const context = React.useContext(SearchPageLayoutContext);
 
-const SearchPageLayoutContext = React.createContext<SearchPageLayout | undefined>(undefined);
+  if (context === undefined) {
+    throw new Error('useSearchPageConfig must be used within a SearchPageConfigContextProvider');
+  }
 
-export default SearchPageLayoutContext;
+  return context;
+}
+
+export { SearchPageLayoutContext, SearchPageLayoutProvider, useSearchPageLayout, ViewActionsLayoutOptions };

@@ -31,7 +31,7 @@ import { ViewStore } from 'views/stores/ViewStore';
 import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import type SearchMetadata from 'views/logic/search/SearchMetadata';
 import * as ViewPermissions from 'views/Permissions';
-import { ViewActionsLayoutOptions, useSearchPageConfig } from 'views/components/contexts/SearchPageConfigContext';
+import { ViewActionsLayoutOptions, useSearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
 import View from 'views/logic/views/View';
 import type User from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -49,7 +49,7 @@ const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetad
 
 const ViewActionsMenu = ({ view, isNewView, metadata }) => {
   const currentUser = useContext(CurrentUserContext);
-  const { viewActionsLayoutOptions } = useSearchPageConfig();
+  const { viewActionsLayoutOptions } = useSearchPageLayout();
   const [shareViewOpen, setShareViewOpen] = useState(false);
   const [debugOpen, setDebugOpen] = useState(false);
   const [saveAsViewOpen, setSaveAsViewOpen] = useState(false);

@@ -28,8 +28,8 @@ import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import type { UserJSON } from 'logic/users/User';
 import { PreferencesActions } from 'stores/users/PreferencesStore';
 
-import SearchPageLayoutContext from './SearchPageLayoutContext';
-import SearchPageLayoutProvider from './SearchPageLayoutProvider';
+import SearchPagePreferencesContext from './SearchPagePreferencesContext';
+import SearchPagePreferencesProvider from './SearchPagePreferencesProvider';
 
 jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(),
@@ -48,16 +48,16 @@ jest.mock('logic/local-storage/Store', () => ({
   set: jest.fn(),
 }));
 
-describe('SearchPageLayoutProvider', () => {
+describe('SearchPagePreferencesProvider', () => {
   const SimpleProvider = ({ children }: { children: any }) => (
     <CurrentUserProvider>
       <CurrentUserPreferencesProvider>
         <CurrentViewTypeProvider type={View.Type.Search}>
-          <SearchPageLayoutProvider>
-            <SearchPageLayoutContext.Consumer>
+          <SearchPagePreferencesProvider>
+            <SearchPagePreferencesContext.Consumer>
               {children}
-            </SearchPageLayoutContext.Consumer>
-          </SearchPageLayoutProvider>
+            </SearchPagePreferencesContext.Consumer>
+          </SearchPagePreferencesProvider>
         </CurrentViewTypeProvider>
       </CurrentUserPreferencesProvider>
     </CurrentUserProvider>
@@ -65,9 +65,9 @@ describe('SearchPageLayoutProvider', () => {
 
   const ProviderWithToggleButton = () => (
     <SimpleProvider>
-      {(searchPageLayout) => {
-        if (!searchPageLayout) return '';
-        const { actions: { toggleSidebarPinning } } = searchPageLayout;
+      {(searchPagePreferences) => {
+        if (!searchPagePreferences) return '';
+        const { actions: { toggleSidebarPinning } } = searchPagePreferences;
 
         return (<button type="button" onClick={() => toggleSidebarPinning()}>Toggle sidebar pinning</button>);
       }}
@@ -86,13 +86,13 @@ describe('SearchPageLayoutProvider', () => {
     return consume;
   };
 
-  it('provides default search page layout with empty preference store', () => {
+  it('provides default search page preference state with empty preference store', () => {
     const consume = renderSUT();
 
     expect(consume.mock.calls[0][0]?.config.sidebar.isPinned).toEqual(false);
   });
 
-  it('provides default search page layout if user does not exists', () => {
+  it('provides default search page preference state if user does not exists', () => {
     asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: {} as UserJSON });
 
     const consume = renderSUT();
@@ -100,7 +100,7 @@ describe('SearchPageLayoutProvider', () => {
     expect(consume.mock.calls[0][0]?.config.sidebar.isPinned).toEqual(false);
   });
 
-  it('provides default search page layout if user has no preferences', () => {
+  it('provides default search page preference state if user has no preferences', () => {
     asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: { preferences: {} } as UserJSON });
 
     const consume = renderSUT();
@@ -108,7 +108,7 @@ describe('SearchPageLayoutProvider', () => {
     expect(consume.mock.calls[0][0]?.config.sidebar.isPinned).toEqual(false);
   });
 
-  it('provides search page layout based on user preferences', () => {
+  it('provides search page preferences based on user preferences', () => {
     asMock(CurrentUserStore.getInitialState).mockReturnValue({
       currentUser: {
         preferences: {
@@ -122,7 +122,7 @@ describe('SearchPageLayoutProvider', () => {
     expect(consume.mock.calls[0][0]?.config.sidebar.isPinned).toEqual(true);
   });
 
-  it('provides search page layout based on local storage for system admin', () => {
+  it('provides search page preference state based on local storage for system admin', () => {
     asMock(Store.get).mockImplementationOnce((key) => {
       if (key === 'searchSidebarIsPinned') return true;
 
@@ -142,7 +142,7 @@ describe('SearchPageLayoutProvider', () => {
     expect(consume.mock.calls[0][0]?.config.sidebar.isPinned).toEqual(true);
   });
 
-  it('should update user preferences on layout change', () => {
+  it('should update user preferences on state change', () => {
     asMock(CurrentUserStore.getInitialState).mockReturnValue({
       currentUser: {
         username: 'alice',
@@ -169,7 +169,7 @@ describe('SearchPageLayoutProvider', () => {
     );
   });
 
-  it('should update local storage on layout change for system admin', () => {
+  it('should update local storage on preference state change for system admin', () => {
     asMock(CurrentUserStore.getInitialState).mockReturnValue({
       currentUser: {
         id: 'local:admin',

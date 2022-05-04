@@ -17,32 +17,31 @@
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 
-import type { SearchConfigState } from 'views/components/contexts/SearchPageConfigContext';
-
-import { SearchPageConfigContext, SearchPageConfigContextProvider, ViewActionsLayoutOptions } from './SearchPageConfigContext';
+import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
+import { SearchPageLayoutContext, SearchPageLayoutProvider, ViewActionsLayoutOptions } from 'views/components/contexts/SearchPageLayoutContext';
 
 describe('SearchPageConfigProvider', () => {
-  const SUT = (suppliedProviderOverrides : SearchConfigState = undefined) => {
+  const SUT = (suppliedProviderOverrides : LayoutState = undefined) => {
     let contextValue;
 
     render(
-      <SearchPageConfigContextProvider providerOverrides={suppliedProviderOverrides}>
-        <SearchPageConfigContext.Consumer>
+      <SearchPageLayoutProvider providerOverrides={suppliedProviderOverrides}>
+        <SearchPageLayoutContext.Consumer>
           {(value) => {
             contextValue = value;
 
             return <div />;
           }}
-        </SearchPageConfigContext.Consumer>
+        </SearchPageLayoutContext.Consumer>
 
-      </SearchPageConfigContextProvider>,
+      </SearchPageLayoutProvider>,
     );
 
     return contextValue;
   };
 
   it('provides logical defaults when no provider overrides are supplied', () => {
-    const providerOverrides: SearchConfigState = {
+    const providerOverrides: LayoutState = {
       sidebar: { isShown: true }, viewActionsLayoutOptions: ViewActionsLayoutOptions.FULL_MENU,
     };
     const contextValue = SUT();
@@ -51,7 +50,7 @@ describe('SearchPageConfigProvider', () => {
   });
 
   it('provides the overridden provider state when supplied', () => {
-    const providerOverrides: SearchConfigState = {
+    const providerOverrides: LayoutState = {
       sidebar: { isShown: false }, viewActionsLayoutOptions: ViewActionsLayoutOptions.SAVE_COPY,
     };
     const contextValue = SUT(providerOverrides);

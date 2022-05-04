@@ -20,11 +20,11 @@ import { render, fireEvent } from 'wrappedTestingLibrary';
 
 import { alice } from 'fixtures/users';
 import type User from 'logic/users/User';
-import type { SearchConfigState } from 'views/components/contexts/SearchPageConfigContext';
+import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import { ViewActionsLayoutOptions, SearchPageConfigContextProvider } from 'views/components/contexts/SearchPageConfigContext';
+import { ViewActionsLayoutOptions, SearchPageLayoutProvider } from 'views/components/contexts/SearchPageLayoutContext';
 
 import ViewActionsMenu from './ViewActionsMenu';
 
@@ -87,12 +87,12 @@ describe('ViewActionsMenu', () => {
     .permissions(mockImmutable.List(['dashboards:edit:view-id', 'view:edit:view-id']))
     .build();
 
-  const SimpleViewActionMenu = ({ currentUser: user, providerOverrides, ...props }: {currentUser?: User, providerOverrides?: SearchConfigState}) => (
-    <SearchPageConfigContextProvider providerOverrides={providerOverrides}>
+  const SimpleViewActionMenu = ({ currentUser: user, providerOverrides, ...props }: {currentUser?: User, providerOverrides?: LayoutState}) => (
+    <SearchPageLayoutProvider providerOverrides={providerOverrides}>
       <CurrentUserContext.Provider value={user}>
         <ViewActionsMenu {...props} />
       </CurrentUserContext.Provider>
-    </SearchPageConfigContextProvider>
+    </SearchPageLayoutProvider>
   );
 
   SimpleViewActionMenu.defaultProps = {

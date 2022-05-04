@@ -45,9 +45,9 @@ import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import DefaultFieldTypesProvider from 'views/components/contexts/DefaultFieldTypesProvider';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
-import { useSearchPageConfig } from 'views/components/contexts/SearchPageConfigContext';
+import { useSearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
 import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
-import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
+import SearchPagePreferencesProvider from 'views/components/contexts/SearchPagePreferencesProvider';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
@@ -141,7 +141,7 @@ const useRefreshSearchOn = (_actions: Array<RefluxActions<any>>, refresh: () => 
 
 const Search = () => {
   const refreshSearch = useCallback(() => _refreshSearch(SearchExecutionStateStore.getInitialState()), []);
-  const { sidebar: { isShown: showSidebar } } = useSearchPageConfig();
+  const { sidebar: { isShown: showSidebar } } = useSearchPageLayout();
 
   useRefreshSearchOn([SearchActions.refresh, ViewActions.search], refreshSearch);
 
@@ -170,7 +170,7 @@ const Search = () => {
               </IfInteractive>
               <InteractiveContext.Consumer>
                 {(interactive) => (
-                  <SearchPageLayoutProvider>
+                  <SearchPagePreferencesProvider>
                     <DefaultFieldTypesProvider>
                       <ViewAdditionalContextProvider>
                         <HighlightingRulesProvider>
@@ -206,7 +206,7 @@ const Search = () => {
                         </HighlightingRulesProvider>
                       </ViewAdditionalContextProvider>
                     </DefaultFieldTypesProvider>
-                  </SearchPageLayoutProvider>
+                  </SearchPagePreferencesProvider>
                 )}
               </InteractiveContext.Consumer>
             </CurrentViewTypeProvider>

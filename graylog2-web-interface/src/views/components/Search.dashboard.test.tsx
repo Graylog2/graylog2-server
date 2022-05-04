@@ -33,7 +33,7 @@ import View from 'views/logic/views/View';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import Query, { filtersForQuery } from 'views/logic/queries/Query';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
-import { SearchPageConfigContextProvider } from 'views/components/contexts/SearchPageConfigContext';
+import { SearchPageLayoutProvider } from 'views/components/contexts/SearchPageLayoutContext';
 
 import Search from './Search';
 import WidgetFocusProvider from './contexts/WidgetFocusProvider';
@@ -97,9 +97,9 @@ const mockWidgetEditing = () => {
 
 describe('Dashboard Search', () => {
   const SUT = (props) => (
-    <SearchPageConfigContextProvider>
+    <SearchPageLayoutProvider>
       <Search {...props} />
-    </SearchPageConfigContextProvider>
+    </SearchPageLayoutProvider>
   );
 
   beforeEach(() => {

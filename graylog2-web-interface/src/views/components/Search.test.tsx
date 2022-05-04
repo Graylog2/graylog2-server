@@ -38,7 +38,7 @@ import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import Query, { filtersForQuery } from 'views/logic/queries/Query';
 import usePluginEntities from 'views/logic/usePluginEntities';
-import { SearchPageConfigContextProvider } from 'views/components/contexts/SearchPageConfigContext';
+import { SearchPageLayoutProvider } from 'views/components/contexts/SearchPageLayoutContext';
 
 import Search from './Search';
 
@@ -109,9 +109,9 @@ jest.mock('views/logic/usePluginEntities');
 
 describe('Search', () => {
   const SUT = (props) => (
-    <SearchPageConfigContextProvider>
+    <SearchPageLayoutProvider>
       <Search {...props} />
-    </SearchPageConfigContextProvider>
+    </SearchPageLayoutProvider>
   );
 
   beforeEach(() => {
