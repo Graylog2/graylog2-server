@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -40,8 +41,8 @@ const ValueActionTitle = styled.span`
 const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
 const Value = ({ children, field, value, queryId, render = defaultRenderer, type = FieldType.Unknown }: Props) => {
-  const RenderComponent: ValueRenderer = render || ((props: ValueRendererProps) => props.value);
-  const Component = ({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />;
+  const RenderComponent: ValueRenderer = useMemo(() => render ?? ((props: ValueRendererProps) => props.value), [render]);
+  const Component = useCallback(({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />, [RenderComponent, field]);
   const element = <TypeSpecificValue field={field} value={value} type={type} render={Component} />;
 
   return (
