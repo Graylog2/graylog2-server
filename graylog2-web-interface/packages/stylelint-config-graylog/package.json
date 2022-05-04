@@ -13,7 +13,7 @@
   "author": "Graylog, Inc. <hello@graylog.com>",
   "license": "SSPL-1.0",
   "dependencies": {
-    "@stylelint/postcss-css-in-js": "0.37.3",
+    "@stylelint/postcss-css-in-js": "0.38.0",
     "postcss-syntax": "0.36.2",
     "stylelint": "14.8.1",
     "stylelint-config-recommended": "7.0.0",
