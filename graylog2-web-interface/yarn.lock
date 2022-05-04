@@ -1941,10 +1941,10 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@stylelint/postcss-css-in-js@0.37.3":
-  version "0.37.3"
-  resolved "https://registry.yarnpkg.com/@stylelint/postcss-css-in-js/-/postcss-css-in-js-0.37.3.tgz#d149a385e07ae365b0107314c084cb6c11adbf49"
-  integrity sha512-scLk3cSH1H9KggSniseb2KNAU5D9FWc3H7BxCSAIdtU9OWIyw0zkEZ9qEKHryRM+SExYXRKNb7tOOVNAsQ3iwg==
+"@stylelint/postcss-css-in-js@0.38.0":
+  version "0.38.0"
+  resolved "https://registry.yarnpkg.com/@stylelint/postcss-css-in-js/-/postcss-css-in-js-0.38.0.tgz#eabb061df932744db766f11a153ae1c465b6263c"
+  integrity sha512-XOz5CAe49kS95p5yRd+DAIWDojTjfmyAQ4bbDlXMdbZTQ5t0ThjSLvWI6JI2uiS7MFurVBkZ6zUqcimzcLTBoQ==
   dependencies:
     "@babel/core" "^7.17.9"
 
@@ -7574,11 +7574,11 @@ graceful-fs@^4.2.9:
     "@babel/preset-env" "7.16.11"
     "@babel/preset-typescript" "7.16.7"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-dff0925e-720e-4eb0-b757-eb0d8eb0b093-1651623393270/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-dff0925e-720e-4eb0-b757-eb0d8eb0b093-1651623393270/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.5.1"
     moment "2.29.3"
     moment-timezone "0.5.34"
@@ -12507,9 +12507,9 @@ react-transition-group@^4.3.0:
     prop-types "^15.6.2"
 
 react-ultimate-pagination@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/react-ultimate-pagination/-/react-ultimate-pagination-1.2.0.tgz#c440305c9bc32ead0e21e9047b2d16435cffb4e4"
-  integrity sha512-tBLzzskuBqsziQDUI98hA7FTBy2/Q5olRsvu3GdLYykfGUgDvYQOI7hLi9o5pD5zJeuAsVn3OoAUw0CaJi0WoQ==
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/react-ultimate-pagination/-/react-ultimate-pagination-1.3.0.tgz#feb4d9518e52b3915c863d4305a1190b66befdbd"
+  integrity sha512-Nvf+PjncTqBW/wHgO4FM3EX7VzrUf13CnpElREUgZloG2BiEQkGseDS2r5p3h/TIvLfLb602IeaihQFJbUSt0A==
   dependencies:
     prop-types "^15.0.0"
     ultimate-pagination "1.0.0"
@@ -14034,7 +14034,7 @@ styled-components@5.3.5:
 "stylelint-config-graylog@file:packages/stylelint-config-graylog":
   version "1.0.0"
   dependencies:
-    "@stylelint/postcss-css-in-js" "0.37.3"
+    "@stylelint/postcss-css-in-js" "0.38.0"
     postcss-syntax "0.36.2"
     stylelint "14.8.1"
     stylelint-config-recommended "7.0.0"
