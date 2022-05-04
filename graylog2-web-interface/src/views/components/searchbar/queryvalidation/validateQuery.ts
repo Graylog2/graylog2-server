@@ -14,14 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type * as Immutable from 'immutable';
-
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
-import type Parameter from 'views/logic/parameters/Parameter';
-import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
 
@@ -29,8 +25,6 @@ export type ValidationQuery = {
   queryString: ElasticsearchQueryString | string,
   timeRange: TimeRange | undefined,
   streams?: Array<string>,
-  parameters: Immutable.Set<Parameter>,
-  parameterBindings: ParameterBindings,
   filter?: ElasticsearchQueryString | string,
 }
 
