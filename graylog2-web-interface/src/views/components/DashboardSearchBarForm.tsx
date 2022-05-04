@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Formik } from 'formik';
 import { isFunction } from 'lodash';
@@ -38,7 +38,7 @@ export type DashboardFormValues = {
 type Props = {
   initialValues: DashboardFormValues,
   limitDuration: number,
-  onSubmit: (values: DashboardFormValues) => void | Promise<any>,
+  onSubmit: (values: DashboardFormValues) => Promise<any>,
   children: ((props: FormikProps<DashboardFormValues>) => React.ReactElement) | React.ReactElement,
   validateQueryString: (values: DashboardFormValues) => Promise<QueryValidationState>,
 };
@@ -46,12 +46,15 @@ type Props = {
 const _isFunction = (children: Props['children']): children is (props: FormikProps<DashboardFormValues>) => React.ReactElement => isFunction(children);
 
 const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQueryString, children }: Props) => {
+  const [enableReinitialize, setEnableReinitialize] = useState(true);
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const _onSubmit = useCallback(({ timerange, ...rest }: DashboardFormValues) => {
+    setEnableReinitialize(false);
+
     return onSubmit({
       timerange: isNoTimeRangeOverride(timerange) ? undefined : onSubmittingTimerange(timerange),
       ...rest,
-    });
+    }).then(() => setEnableReinitialize(true));
   }, [onSubmit]);
   const { timerange, ...rest } = initialValues;
   const initialTimeRange = timerange && !isNoTimeRangeOverride(timerange) ? onInitializingTimerange(timerange) : {} as TimeRange;
@@ -66,7 +69,7 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
 
   return (
     <Formik<DashboardFormValues> initialValues={_initialValues}
-                                 enableReinitialize
+                                 enableReinitialize={enableReinitialize}
                                  onSubmit={_onSubmit}
                                  validate={_validate}
                                  validateOnMount>
