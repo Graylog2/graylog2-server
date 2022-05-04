@@ -45,7 +45,7 @@ import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import DefaultFieldTypesProvider from 'views/components/contexts/DefaultFieldTypesProvider';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
-import { useSearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
+import useSearchPageLayout from 'hooks/useSearchPageLayout';
 import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
 import SearchPagePreferencesProvider from 'views/components/contexts/SearchPagePreferencesProvider';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';

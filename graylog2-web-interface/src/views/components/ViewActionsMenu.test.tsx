@@ -24,7 +24,8 @@ import type { LayoutState } from 'views/components/contexts/SearchPageLayoutCont
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import { ViewActionsLayoutOptions, SearchPageLayoutProvider } from 'views/components/contexts/SearchPageLayoutContext';
+import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
+import { ViewActionsLayoutOptions } from 'views/components/contexts/SearchPageLayoutContext';
 
 import ViewActionsMenu from './ViewActionsMenu';
 

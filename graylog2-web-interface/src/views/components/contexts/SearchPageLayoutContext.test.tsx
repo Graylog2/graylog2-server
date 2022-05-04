@@ -18,7 +18,8 @@ import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
-import { SearchPageLayoutContext, SearchPageLayoutProvider, ViewActionsLayoutOptions } from 'views/components/contexts/SearchPageLayoutContext';
+import SearchPageLayoutContext, { ViewActionsLayoutOptions } from 'views/components/contexts/SearchPageLayoutContext';
+import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 
 describe('SearchPageConfigProvider', () => {
   const SUT = (suppliedProviderOverrides : LayoutState = undefined) => {

@@ -33,7 +33,7 @@ import View from 'views/logic/views/View';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import Query, { filtersForQuery } from 'views/logic/queries/Query';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
-import { SearchPageLayoutProvider } from 'views/components/contexts/SearchPageLayoutContext';
+import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 
 import Search from './Search';
 import WidgetFocusProvider from './contexts/WidgetFocusProvider';

@@ -38,7 +38,7 @@ import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import Query, { filtersForQuery } from 'views/logic/queries/Query';
 import usePluginEntities from 'views/logic/usePluginEntities';
-import { SearchPageLayoutProvider } from 'views/components/contexts/SearchPageLayoutContext';
+import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 
 import Search from './Search';
 

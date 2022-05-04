@@ -15,20 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import * as React from 'react';
+import { useContext } from 'react';
 
-enum ViewActionsLayoutOptions {
-  FULL_MENU = 'FULL_MENU',
-  SAVE_COPY = 'SAVE_COPY',
-  BLANK = 'BLANK'
+import SearchPageLayoutContext from 'views/components/contexts/SearchPageLayoutContext';
+
+export default function useSearchPageLayout() {
+  const context = useContext(SearchPageLayoutContext);
+
+  if (context === undefined) {
+    throw new Error('useSearchPageConfig must be used within a SearchPageConfigContextProvider');
+  }
+
+  return context;
 }
-
-export type LayoutState = {
-  sidebar: { isShown: boolean }
-  viewActionsLayoutOptions: ViewActionsLayoutOptions
-}
-
-const SearchPageLayoutContext = React.createContext<LayoutState | undefined>(undefined);
-
-export default SearchPageLayoutContext;
-export { ViewActionsLayoutOptions };

@@ -27,7 +27,7 @@ import { DocumentTitle } from 'components/common';
 import viewTitle from 'views/logic/views/ViewTitle';
 import { ViewStore } from 'views/stores/ViewStore';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
-import { SearchPageLayoutProvider } from 'views/components/contexts/SearchPageLayoutContext';
+import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 
 type Props = {
   loadNewView?: () => unknown,
