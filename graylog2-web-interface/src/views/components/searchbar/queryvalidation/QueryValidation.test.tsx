@@ -129,7 +129,7 @@ describe('QueryValidation', () => {
   it('only displays current validation explanation', async () => {
     const multipleValidationErrors: QueryValidationState = {
       status: 'ERROR',
-      explanations: [validationErrorExplanation, validationErrorExplanation],
+      explanations: [validationErrorExplanation, { ...validationErrorExplanation, endColumn: 6 }],
     };
     const singleValidationError: QueryValidationState = {
       status: 'ERROR',
