@@ -43,7 +43,7 @@ const validate = async <T extends FormValues>(
     errors = { ...errors, timerange: timeRangeErrors };
   }
 
-  const pluggableSearchBarControlsErrors = await validatePluggableValues(values, pluggableSearchBarControls);
+  const pluggableSearchBarControlsErrors = validatePluggableValues(values, pluggableSearchBarControls);
 
   if (!isEmpty(pluggableSearchBarControlsErrors)) {
     errors = { ...errors, ...pluggableSearchBarControlsErrors };

@@ -25,7 +25,7 @@ const executeSafely = <T extends () => ReturnType<T>>(fn: T, errorMessage: strin
     return fn();
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.error(e);
+    console.error(`${errorMessage}: ${e}`);
     UserNotification.error(`${errorMessage}: ${e}`);
   }
 
@@ -52,9 +52,10 @@ export const executePluggableSubmitHandler = (values: CombinedSearchBarFormValue
   const executableSubmitHandler = pluginSubmitHandler.map((onSubmit) => new Promise((resolve) => {
     resolve(onSubmit(values));
   }).catch((e) => {
+    const errorMessage = `An error occurred when executing a submit handler from a plugin: ${e}`;
     // eslint-disable-next-line no-console
-    console.error(e);
-    UserNotification.error(`An error occurred when executing a submit handler from a plugin: ${e}`);
+    console.error(errorMessage);
+    UserNotification.error(errorMessage);
   }));
 
   return Promise.all(executableSubmitHandler);
@@ -71,7 +72,7 @@ export const pluggableValidationPayload = (values: CombinedSearchBarFormValues, 
   return merge({}, ...validationPayload);
 };
 
-export const validatePluggableValues = async (values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
+export const validatePluggableValues = (values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
   const validationHandler = pluggableSearchBarControls.map((pluginFn) => pluginFn()?.onValidate).filter((onValidate) => !!onValidate);
 
   const errors = validationHandler.map((onValidate) => executeSafely(
