@@ -20,7 +20,7 @@ import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import { Icon, Spinner } from 'components/common';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { IconName } from 'components/common/Icon';
 
@@ -47,6 +47,7 @@ type Props = {
   disabled: boolean,
   glyph: IconName,
   dirty: boolean,
+  displaySpinner?: boolean,
 };
 
 const onButtonClick = (e: MouseEvent, disabled: Boolean) => {
@@ -56,7 +57,7 @@ const onButtonClick = (e: MouseEvent, disabled: Boolean) => {
   }
 };
 
-const SearchButton = ({ dirty, disabled, glyph }: Props) => {
+const SearchButton = ({ dirty, disabled, glyph, displaySpinner }: Props) => {
   const className = disabled ? 'disabled' : '';
   const title = dirty ? 'Perform search (changes were made after last search execution)' : 'Perform Search';
 
@@ -67,19 +68,21 @@ const SearchButton = ({ dirty, disabled, glyph }: Props) => {
                   type="submit"
                   bsStyle="success"
                   $dirty={dirty}>
-      <Icon name={glyph} />
+      {displaySpinner ? <Spinner delay={0} text="" /> : <Icon name={glyph} />}
     </StyledButton>
   );
 };
 
 SearchButton.defaultProps = {
   disabled: false,
+  displaySpinner: false,
   dirty: false,
   glyph: 'search',
 };
 
 SearchButton.propTypes = {
   disabled: PropTypes.bool,
+  displaySpinner: PropTypes.bool,
   dirty: PropTypes.bool,
   glyph: PropTypes.string,
 };

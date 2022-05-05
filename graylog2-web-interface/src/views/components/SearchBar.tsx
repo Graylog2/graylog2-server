@@ -214,7 +214,8 @@ const SearchBar = ({
                       <BottomRow>
                         <SearchButtonAndQuery>
                           <SearchButton disabled={disableSearchSubmit}
-                                        dirty={dirty} />
+                                        dirty={dirty}
+                                          displaySpinner={isSubmitting} />
 
                           <Field name="queryString">
                             {({ field: { name, value, onChange }, meta: { error } }) => (

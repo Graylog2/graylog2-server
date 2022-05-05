@@ -213,7 +213,8 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
 
               <SecondRow>
                 <SearchButton disabled={disableSearchSubmit}
-                              dirty={dirty} />
+                              dirty={dirty}
+                              displaySpinner={isSubmitting} />
 
                 <Field name="queryString">
                   {({ field: { name, value, onChange }, meta: { error } }) => (
