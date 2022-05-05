@@ -28,6 +28,7 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import DashboardSearchBar from './DashboardSearchBar';
 
+jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 jest.mock('views/components/ViewActionsMenu', () => () => <span>View Actions</span>);
 jest.mock('hooks/useUserDateTime');
 
@@ -70,7 +71,7 @@ describe('DashboardSearchBar', () => {
     await screen.findByLabelText('Open Time Range Selector');
     await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
     await screen.findByLabelText('Refresh Search Controls');
-    await screen.findByTitle('Perform search');
+    await screen.findByRole('button', { name: /perform search/i });
   });
 
   it('defaults to no override being selected', async () => {
@@ -82,7 +83,7 @@ describe('DashboardSearchBar', () => {
   it('should call SearchActions.refresh on submit when there are no changes', async () => {
     render(<DashboardSearchBar />);
 
-    const searchButton = await screen.findByTitle('Perform search');
+    const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
     await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
 
@@ -100,7 +101,9 @@ describe('DashboardSearchBar', () => {
     userEvent.click(await screen.findByRole('tab', { name: 'Relative' }));
     userEvent.click(await screen.findByRole('button', { name: 'Apply' }));
 
-    const searchButton = await screen.findByTitle('Perform search (changes were made after last search execution)');
+    const searchButton = await screen.findByRole('button', {
+      name: /perform search \(changes were made after last search execution\)/i,
+    });
 
     await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
 

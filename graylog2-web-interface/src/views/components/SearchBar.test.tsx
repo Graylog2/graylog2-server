@@ -88,11 +88,11 @@ describe('SearchBar', () => {
     render(<SearchBar />);
 
     const timeRangeButton = await screen.findByLabelText('Open Time Range Selector');
-    const timeRangeDisplay = screen.getByLabelText('Search Time Range, Opens Time Range Selector On Click');
-    const streamsFilter = screen.getByTestId('streams-filter');
-    const liveUpdate = screen.getByLabelText('Refresh Search Controls');
-    const searchButton = screen.getByTitle('Perform search');
-    const metaButtons = screen.getByText('Saved Search Controls');
+    const timeRangeDisplay = await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
+    const streamsFilter = await screen.findByTestId('streams-filter');
+    const liveUpdate = await screen.findByLabelText('Refresh Search Controls');
+    const searchButton = await screen.findByRole('button', { name: /perform search/i });
+    const metaButtons = await screen.findByText('Saved Search Controls');
 
     expect(timeRangeButton).not.toBeNull();
     expect(timeRangeDisplay).not.toBeNull();
@@ -105,7 +105,7 @@ describe('SearchBar', () => {
   it('should refresh search, when search is performed and there are no changes.', async () => {
     render(<SearchBar />);
 
-    const searchButton = await screen.findByTitle('Perform search');
+    const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
     await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
 
@@ -118,8 +118,8 @@ describe('SearchBar', () => {
     asMock(SearchConfigStore.getInitialState).mockReturnValue({ searchesClusterConfig: { ...mockSearchesClusterConfig, query_time_range_limit: 'PT1M' } });
     render(<SearchBar />);
 
-    const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
-    const searchButton = screen.getByTitle('Perform search');
+    const timeRangeButton = await screen.findByLabelText('Open Time Range Selector');
+    const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
     await waitFor(() => expect(searchButton.classList).toContain('disabled'));
     await waitFor(() => expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle'));
@@ -141,7 +141,7 @@ describe('SearchBar', () => {
       </WidgetFocusContext.Provider>,
     );
 
-    await screen.findByTitle('Perform search');
+    await screen.findByRole('button', { name: /perform search/i });
     const saveBtn = screen.queryByText('Saved Search Controls');
 
     expect(saveBtn).toBeNull();
