@@ -43,6 +43,7 @@ describe('pluggableSearchBarControlsHandler', () => {
     placement: 'right',
   };
 
+  // eslint-disable-next-line no-console
   const original = console.error;
   const mockConsoleError = jest.fn();
 
