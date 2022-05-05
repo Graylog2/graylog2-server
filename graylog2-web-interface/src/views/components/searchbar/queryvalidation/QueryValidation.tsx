@@ -200,8 +200,8 @@ const QueryValidation = () => {
                          title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
                          $shaking={shakingPopover}>
             <div role="alert">
-              {explanations.map(({ errorType, errorTitle, errorMessage }) => (
-                <Explanation key={errorMessage}>
+              {explanations.map(({ errorType, errorTitle, errorMessage, id }) => (
+                <Explanation key={id}>
                   <span><b>{errorTitle}</b>: {errorMessage}</span>
                   <DocumentationLink page={getErrorDocumentationLink(errorType)}
                                      title={`${errorTitle} documentation`}
