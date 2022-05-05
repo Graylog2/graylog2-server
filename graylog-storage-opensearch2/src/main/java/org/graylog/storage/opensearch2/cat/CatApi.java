@@ -20,9 +20,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
 import org.graylog.storage.opensearch2.ElasticsearchClient;
+import org.opensearch.client.Request;
+import org.opensearch.client.Response;
 
 import javax.inject.Inject;
 import java.io.IOException;

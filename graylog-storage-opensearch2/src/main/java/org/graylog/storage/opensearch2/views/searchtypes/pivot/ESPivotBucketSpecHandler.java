@@ -22,12 +22,12 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.HasAggregations;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.search.aggregations.Aggregation;
+import org.opensearch.search.aggregations.AggregationBuilder;
+import org.opensearch.search.aggregations.HasAggregations;
+import org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 
 import java.util.stream.Stream;
 

@@ -19,8 +19,8 @@ package org.graylog.storage.opensearch2.stats;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
+import org.opensearch.client.Request;
+import org.opensearch.client.Response;
 import org.graylog.storage.opensearch2.ElasticsearchClient;
 
 import javax.inject.Inject;

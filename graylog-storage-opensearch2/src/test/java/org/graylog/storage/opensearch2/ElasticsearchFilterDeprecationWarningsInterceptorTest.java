@@ -16,11 +16,11 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.graylog.shaded.elasticsearch7.org.apache.http.HttpException;
-import org.graylog.shaded.elasticsearch7.org.apache.http.HttpResponse;
-import org.graylog.shaded.elasticsearch7.org.apache.http.ProtocolVersion;
-import org.graylog.shaded.elasticsearch7.org.apache.http.message.BasicHttpResponse;
-import org.graylog.shaded.elasticsearch7.org.apache.http.message.BasicStatusLine;
+import org.apache.http.HttpException;
+import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolVersion;
+import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.message.BasicStatusLine;
 import org.junit.Test;
 
 import java.io.IOException;

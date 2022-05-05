@@ -22,16 +22,16 @@ import org.graylog.plugins.views.search.engine.suggestions.SuggestionEntry;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionError;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.SuggestBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.SuggestBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.term.TermSuggestion;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.term.TermSuggestionBuilder;
+import org.opensearch.action.search.SearchRequest;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.index.query.QueryBuilders;
+import org.opensearch.search.aggregations.AggregationBuilders;
+import org.opensearch.search.aggregations.bucket.terms.ParsedStringTerms;
+import org.opensearch.search.builder.SearchSourceBuilder;
+import org.opensearch.search.suggest.SuggestBuilder;
+import org.opensearch.search.suggest.SuggestBuilders;
+import org.opensearch.search.suggest.term.TermSuggestion;
+import org.opensearch.search.suggest.term.TermSuggestionBuilder;
 import org.graylog.storage.opensearch2.errors.ResponseError;
 
 import javax.inject.Inject;
@@ -75,21 +75,21 @@ public class QuerySuggestionsES7 implements QuerySuggestionsService {
             }
 
 
-        } catch (org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException exception) {
+        } catch (org.opensearch.OpenSearchException exception) {
             final SuggestionError err = tryResponseException(exception)
                     .orElseGet(() -> parseException(exception));
             return SuggestionResponse.forError(req.field(), req.input(), err);
         }
     }
 
-    private Optional<SuggestionError> tryResponseException(org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException exception) {
+    private Optional<SuggestionError> tryResponseException(org.opensearch.OpenSearchException exception) {
         return client.parseResponseException(exception)
                 .map(ResponseError::error)
                 .flatMap(e -> e.rootCause().stream().findFirst())
                 .map(e -> SuggestionError.create(e.type(), e.reason()));
     }
 
-    private SuggestionError parseException(org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException exception) {
+    private SuggestionError parseException(org.opensearch.OpenSearchException exception) {
         final Throwable cause = getCause(exception);
         try {
             final ParsedElasticsearchException parsed = ParsedElasticsearchException.from(cause.toString());

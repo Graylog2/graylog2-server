@@ -18,24 +18,24 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.MaxAggregationBuilder;
 import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.search.aggregations.AggregationBuilder;
+import org.opensearch.search.aggregations.AggregationBuilders;
+import org.opensearch.search.aggregations.metrics.MaxAggregationBuilder;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ESMaxHandler extends ESPivotSeriesSpecHandler<Max, org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max> {
+public class ESMaxHandler extends ESPivotSeriesSpecHandler<Max, org.opensearch.search.aggregations.metrics.Max> {
     @Nonnull
     @Override
     public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Max maxSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
         final MaxAggregationBuilder max = AggregationBuilders.max(name).field(maxSpec.field());
-        record(queryContext, pivot, maxSpec, name, org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max.class);
+        record(queryContext, pivot, maxSpec, name, org.opensearch.search.aggregations.metrics.Max.class);
         return Optional.of(max);
     }
 
@@ -43,7 +43,7 @@ public class ESMaxHandler extends ESPivotSeriesSpecHandler<Max, org.graylog.shad
     public Stream<Value> doHandleResult(Pivot pivot,
                                         Max pivotSpec,
                                         SearchResponse searchResult,
-                                        org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max maxAggregation,
+                                        org.opensearch.search.aggregations.metrics.Max maxAggregation,
                                         ESPivot searchTypeHandler,
                                         ESGeneratedQueryContext esGeneratedQueryContext) {
         return Stream.of(ESPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Max.NAME, maxAggregation.getValue()));

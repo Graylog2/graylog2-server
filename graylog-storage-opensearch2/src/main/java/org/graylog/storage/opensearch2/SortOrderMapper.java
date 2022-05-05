@@ -16,7 +16,7 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
+import org.opensearch.search.sort.SortOrder;
 import org.graylog2.indexer.searches.Sorting;
 
 import java.util.Locale;

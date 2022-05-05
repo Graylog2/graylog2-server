@@ -18,12 +18,12 @@ package org.graylog.storage.opensearch2;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.index.IndexRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.index.IndexResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.CountRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.CountResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.rest.RestStatus;
+import org.opensearch.action.admin.indices.refresh.RefreshRequest;
+import org.opensearch.action.index.IndexRequest;
+import org.opensearch.action.index.IndexResponse;
+import org.opensearch.client.core.CountRequest;
+import org.opensearch.client.core.CountResponse;
+import org.opensearch.rest.RestStatus;
 import org.graylog.storage.opensearch2.testing.ElasticsearchInstanceES7;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;

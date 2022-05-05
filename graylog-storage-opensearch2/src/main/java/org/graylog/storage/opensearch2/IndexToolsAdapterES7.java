@@ -18,25 +18,25 @@ package org.graylog.storage.opensearch2;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.CountRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.CountResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.Filter;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.opensearch.action.search.SearchRequest;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.action.support.IndicesOptions;
+import org.opensearch.client.core.CountRequest;
+import org.opensearch.client.core.CountResponse;
+import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.index.query.QueryBuilders;
+import org.opensearch.search.aggregations.AggregationBuilders;
+import org.opensearch.search.aggregations.bucket.filter.Filter;
+import org.opensearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
+import org.opensearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.opensearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
+import org.opensearch.search.aggregations.bucket.terms.Terms;
+import org.opensearch.search.builder.SearchSourceBuilder;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
@@ -46,10 +46,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.existsQuery;
-import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.termsQuery;
+import static org.opensearch.index.query.QueryBuilders.boolQuery;
+import static org.opensearch.index.query.QueryBuilders.existsQuery;
+import static org.opensearch.index.query.QueryBuilders.matchAllQuery;
+import static org.opensearch.index.query.QueryBuilders.termsQuery;
 
 public class IndexToolsAdapterES7 implements IndexToolsAdapter {
     private static final String AGG_DATE_HISTOGRAM = "source_date_histogram";

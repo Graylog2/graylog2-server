@@ -46,7 +46,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.ElasticsearchBackend;
 import org.graylog.storage.opensearch2.views.export.ElasticsearchExportBackend;
@@ -73,6 +72,7 @@ import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.ESSumOfSqu
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.ESVarianceHandler;
 import org.graylog.storage.opensearch2.views.export.SearchAfter;
 import org.graylog2.storage.SearchVersion;
+import org.opensearch.search.aggregations.Aggregation;
 
 public class ViewsESBackendModule extends ViewsModule {
     private final SearchVersion supportedSearchVersion;

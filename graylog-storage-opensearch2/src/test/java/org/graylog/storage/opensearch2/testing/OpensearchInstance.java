@@ -18,8 +18,8 @@ package org.graylog.storage.opensearch2.testing;
 
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
-import org.graylog.shaded.elasticsearch7.org.apache.http.impl.client.BasicCredentialsProvider;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.opensearch.client.RestHighLevelClient;
 import org.graylog.storage.opensearch2.ElasticsearchClient;
 import org.graylog.storage.opensearch2.RestHighLevelClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;

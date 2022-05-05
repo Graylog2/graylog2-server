@@ -31,10 +31,10 @@ import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.util.UniqueNamer;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.index.query.QueryBuilder;
+import org.opensearch.search.aggregations.AggregationBuilder;
+import org.opensearch.search.builder.SearchSourceBuilder;
 
 import java.util.Collection;
 import java.util.Map;

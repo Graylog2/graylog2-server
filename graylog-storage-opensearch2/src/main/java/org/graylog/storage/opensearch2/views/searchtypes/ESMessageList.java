@@ -25,17 +25,6 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.text.Text;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryStringQueryBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.FieldSortBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
 import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
@@ -43,6 +32,17 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.joda.time.DateTime;
+import org.opensearch.common.text.Text;
+import org.opensearch.index.query.QueryBuilders;
+import org.opensearch.index.query.QueryStringQueryBuilder;
+import org.opensearch.search.SearchHit;
+import org.opensearch.search.aggregations.Aggregations;
+import org.opensearch.search.builder.SearchSourceBuilder;
+import org.opensearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.opensearch.search.fetch.subphase.highlight.HighlightField;
+import org.opensearch.search.sort.FieldSortBuilder;
+import org.opensearch.search.sort.SortBuilders;
+import org.opensearch.search.sort.SortOrder;
 
 import javax.inject.Inject;
 import java.util.Arrays;
@@ -144,7 +144,7 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     }
 
     @Override
-    public SearchType.Result doExtractResult(SearchJob job, Query query, MessageList searchType, org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse result, Aggregations aggregations, ESGeneratedQueryContext queryContext) {
+    public SearchType.Result doExtractResult(SearchJob job, Query query, MessageList searchType, org.opensearch.action.search.SearchResponse result, Aggregations aggregations, ESGeneratedQueryContext queryContext) {
         final List<ResultMessageSummary> messages = StreamSupport.stream(result.getHits().spliterator(), false)
                 .map(ESMessageList::resultMessageFromSearchHit)
                 .map((resultMessage) -> ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex()))

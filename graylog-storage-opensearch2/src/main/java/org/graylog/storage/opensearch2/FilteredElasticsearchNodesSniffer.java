@@ -18,10 +18,10 @@ package org.graylog.storage.opensearch2;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Node;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestClient;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.ElasticsearchNodesSniffer;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.NodesSniffer;
+import org.opensearch.client.Node;
+import org.opensearch.client.RestClient;
+import org.opensearch.client.sniff.NodesSniffer;
+import org.opensearch.client.sniff.OpenSearchNodesSniffer;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -33,7 +33,7 @@ class FilteredElasticsearchNodesSniffer implements NodesSniffer {
     private final String attribute;
     private final String value;
 
-    static FilteredElasticsearchNodesSniffer create(RestClient restClient, long sniffRequestTimeoutMillis, ElasticsearchNodesSniffer.Scheme scheme, String filter) {
+    static FilteredElasticsearchNodesSniffer create(RestClient restClient, long sniffRequestTimeoutMillis, OpenSearchNodesSniffer.Scheme scheme, String filter) {
         final String attribute;
         final String value;
         if (!Strings.isNullOrEmpty(filter)) {
@@ -47,7 +47,7 @@ class FilteredElasticsearchNodesSniffer implements NodesSniffer {
             attribute = null;
             value = null;
         }
-        final NodesSniffer nodesSniffer = new ElasticsearchNodesSniffer(restClient, sniffRequestTimeoutMillis, scheme);
+        final NodesSniffer nodesSniffer = new OpenSearchNodesSniffer(restClient, sniffRequestTimeoutMillis, scheme);
 
         return new FilteredElasticsearchNodesSniffer(nodesSniffer, attribute, value);
     }
