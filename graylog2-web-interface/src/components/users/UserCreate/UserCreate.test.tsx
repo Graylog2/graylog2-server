@@ -19,14 +19,15 @@ import * as Immutable from 'immutable';
 import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import { act } from 'react-dom/test-utils';
+import userEvent from '@testing-library/user-event';
+import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
-import { alice } from 'fixtures/userOverviews';
+import { alice as existingUser } from 'fixtures/userOverviews';
 import { rolesList } from 'fixtures/roles';
 import { UsersActions } from 'stores/users/UsersStore';
 
 import UserCreate from './UserCreate';
 
-const existingUser = alice;
 const mockLoadUsersPromise = Promise.resolve(Immutable.List([existingUser]));
 const mockLoadRolesPromise = Promise.resolve({
   list: rolesList,
@@ -52,13 +53,9 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
   },
 }));
 
-jest.setTimeout(10000);
+const extendedTimeout = applyTimeoutMultiplier(15000);
 
 describe('<UserCreate />', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('should create user', async () => {
     const { findByLabelText, findByPlaceholderText, findByText } = render(<UserCreate />);
 
@@ -98,7 +95,7 @@ describe('<UserCreate />', () => {
       session_timeout_ms: 144000000,
       password: 'thepassword',
     }));
-  });
+  }, extendedTimeout);
 
   it('should trim the username', async () => {
     const { findByLabelText, findByPlaceholderText, findByText } = render(<UserCreate />);
@@ -130,28 +127,30 @@ describe('<UserCreate />', () => {
       session_timeout_ms: 3600000,
       password: 'thepassword',
     }));
-  });
+  }, extendedTimeout);
 
   // The following tests will work when we use @testing-library/user-event instead of fireEvent
-  // it('should display warning if username is already taken', async () => {
-  //   const { findByLabelText, findByText } = render(<UserCreate />);
+  it('should display warning if username is already taken', async () => {
+    const { findByLabelText, findByText } = render(<UserCreate />);
 
-  //   const usernameInput = await findByLabelText('Username');
+    const usernameInput = await findByLabelText('Username');
 
-  //   fireEvent.change(usernameInput, { target: { value: existingUser.username } });
+    await userEvent.type(usernameInput, existingUser.username);
+    fireEvent.blur(usernameInput);
 
-  //   await findByText('Username is already taken');
-  // });
+    await findByText(/Username is already taken/);
+  }, extendedTimeout);
 
-  // it('should display warning, if password repeat does not match password', async () => {
-  //   const { findByPlaceholderText, findByText } = render(<UserCreate />);
+  it('should display warning, if password repeat does not match password', async () => {
+    const { findByPlaceholderText, findByText } = render(<UserCreate />);
 
-  //   const passwordInput = await findByPlaceholderText('Password');
-  //   const passwordRepeatInput = await findByPlaceholderText('Repeat password');
+    const passwordInput = await findByPlaceholderText('Password');
+    const passwordRepeatInput = await findByPlaceholderText('Repeat password');
 
-  //   fireEvent.change(passwordInput, { target: { value: 'thepassword' } });
-  //   fireEvent.change(passwordRepeatInput, { target: { value: 'notthepassword' } });
+    await userEvent.type(passwordInput, 'thepassword');
+    await userEvent.type(passwordRepeatInput, 'notthepassword');
+    fireEvent.blur(passwordRepeatInput);
 
-  //   await findByText('Passwords do not match');
-  // });
+    await findByText(/Passwords do not match/);
+  }, extendedTimeout);
 });
