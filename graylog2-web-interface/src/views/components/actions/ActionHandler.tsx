@@ -55,8 +55,9 @@ export type ActionConditions<Contexts> = {
 type ActionDefinitionBase<Contexts> = {
   type: string,
   title: string,
-  resetFocus: boolean,
+  resetFocus?: boolean,
   help?: (args: ActionHandlerArguments<Contexts>) => { title: string, description: React.ReactNode } | undefined,
+  condition?: () => boolean,
 };
 
 type FunctionHandlerAction<Contexts> = {
