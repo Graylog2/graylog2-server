@@ -17,23 +17,10 @@
 package org.graylog2.shared.rest.documentation.generator;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonAnyFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonBooleanFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonIntegerFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonMapFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonNullFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonNumberFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonStringFormatVisitor;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
-import com.fasterxml.jackson.module.jsonSchema.customProperties.TitleSchemaFactoryWrapper;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
-import com.fasterxml.jackson.module.jsonSchema.factories.VisitorContext;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
@@ -827,27 +814,28 @@ public class Generator {
 
         @JsonValue
         public Map<String, Object> jsonValue() {
-            ImmutableMap.Builder<String, Object> builder = ImmutableMap.<String, Object>builder()
-                    .put("name", name)
-                    .put("description", description)
-                    .put("required", isRequired)
-                    .put("paramType", getKind());
+            final HashMap<String, Object> result = new HashMap<String, Object>() {{
+                put("name", name);
+                put("description", description);
+                put("required", isRequired);
+                put("paramType", getKind());
 
-            if (defaultValue != null) {
-                builder = builder.put("defaultValue", defaultValue);
-            }
+                if (defaultValue != null) {
+                    put("defaultValue", defaultValue);
+                }
 
-            if (allowableValues != null) {
-                builder = builder.put("enum", allowableValues);
-            }
+                if (allowableValues != null) {
+                    put("enum", allowableValues);
+                }
 
-            if (typeSchema.type() == null || isObjectSchema(typeSchema.type())) {
-                builder = builder.put("type", typeSchema.name());
-            } else {
-                builder = builder.putAll(typeSchema.type());
-            }
+                if (typeSchema.type() == null || isObjectSchema(typeSchema.type())) {
+                    put("type", typeSchema.name());
+                } else {
+                    putAll(typeSchema.type());
+                }
+            }};
 
-            return builder.build();
+            return ImmutableMap.copyOf(result);
         }
 
         public enum Kind {
