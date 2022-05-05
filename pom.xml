@@ -25,6 +25,7 @@
         <module>graylog-plugin-archetype</module>
         <module>graylog-storage-elasticsearch6</module>
         <module>graylog-storage-elasticsearch7</module>
+        <module>graylog-storage-opensearch2</module>
         <module>distribution</module>
     </modules>
 
