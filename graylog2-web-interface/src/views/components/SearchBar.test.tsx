@@ -17,13 +17,15 @@
 import * as React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
+import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 import { SearchActions } from 'views/stores/SearchStore';
 import MockQuery from 'views/logic/queries/Query';
 import type { WidgetEditingState, WidgetFocusingState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
+import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
+import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 
 import SearchBar from './SearchBar';
 
@@ -51,7 +53,7 @@ jest.mock('stores/streams/StreamsStore', () => MockStore(
 ));
 
 jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigStore: MockStore(['getInitialState', () => ({})]),
+  SearchConfigStore: MockStore(),
   SearchConfigActions: {
     refresh: jest.fn(() => Promise.resolve()),
   },
@@ -77,20 +79,13 @@ jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
 describe('SearchBar', () => {
-  const config = {
-    analysis_disabled_fields: ['full_message', 'message'],
-    query_time_range_limit: 'PT0S',
-    relative_timerange_options: { PT0S: 'Search in all messages', P1D: 'Search in last day' },
-    surrounding_filter_fields: ['file', 'source', 'gl2_source_input', 'source_file'],
-    surrounding_timerange_options: { PT1S: 'One second', PT2S: 'Two seconds' },
-  };
-
   beforeEach(() => {
     SearchActions.refresh = mockAction();
+    SearchConfigStore.getInitialState = jest.fn(() => ({ searchesClusterConfig: mockSearchesClusterConfig }));
   });
 
   it('should render the SearchBar', async () => {
-    render(<SearchBar config={config} />);
+    render(<SearchBar />);
 
     const timeRangeButton = await screen.findByLabelText('Open Time Range Selector');
     const timeRangeDisplay = screen.getByLabelText('Search Time Range, Opens Time Range Selector On Click');
@@ -108,7 +103,7 @@ describe('SearchBar', () => {
   });
 
   it('should refresh search, when search is performed and there are no changes.', async () => {
-    render(<SearchBar config={config} />);
+    render(<SearchBar />);
 
     const searchButton = await screen.findByTitle('Perform search');
 
@@ -120,7 +115,8 @@ describe('SearchBar', () => {
   });
 
   it('date exceeding limitDuration should render with error Icon & search button disabled', async () => {
-    render(<SearchBar config={{ ...config, query_time_range_limit: 'PT1M' }} />);
+    asMock(SearchConfigStore.getInitialState).mockReturnValue({ searchesClusterConfig: { ...mockSearchesClusterConfig, query_time_range_limit: 'PT1M' } });
+    render(<SearchBar />);
 
     const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
     const searchButton = screen.getByTitle('Perform search');
@@ -141,7 +137,7 @@ describe('SearchBar', () => {
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <SearchBar config={config} />
+        <SearchBar />
       </WidgetFocusContext.Provider>,
     );
 
@@ -163,7 +159,7 @@ describe('SearchBar', () => {
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <SearchBar config={config} />
+        <SearchBar />
       </WidgetFocusContext.Provider>,
     );
 
@@ -173,7 +169,7 @@ describe('SearchBar', () => {
   });
 
   it('should validate query on mount', async () => {
-    render(<SearchBar config={config} />);
+    render(<SearchBar />);
 
     await waitFor(() => expect(validateQuery).toHaveBeenCalled());
   });
