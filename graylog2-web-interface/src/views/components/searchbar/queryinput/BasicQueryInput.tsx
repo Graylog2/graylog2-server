@@ -97,7 +97,7 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
   }, [onLoad]);
   const editorProps = useMemo(() => ({ $blockScrolling: Infinity, selectionStyle: 'line' }), []);
   const setOptions = useMemo(() => ({ indentedSoftWrap: false }), []);
-  console.log('test');
+
   const commonProps = {
     $height: height,
     aceTheme: 'ace-queryinput', // NOTE: is usually just `theme` but we need that prop for styled-components
