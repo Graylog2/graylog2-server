@@ -56,11 +56,13 @@ type Props = {
 
 const _c = (field, value, path, source) => ({ field, value, path, source });
 
-const _column = (field: string, value: any, selectedQuery: string, idx: number, type: FieldType, valuePath: ValuePath, source: string | undefined | null) => {
+type ColumnProps = { field: string, value: any, selectedQuery: string, type: FieldType, valuePath: ValuePath, source: string | undefined | null };
+
+const Column = ({ field, value, selectedQuery, type, valuePath, source }: ColumnProps) => {
   const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
 
   return (
-    <StyledTd isNumeric={type.isNumeric()} key={`${selectedQuery}-${field}=${value}-${idx}`}>
+    <StyledTd isNumeric={type.isNumeric()}>
       <AdditionalContext.Provider value={additionalContextValue}>
         <CustomHighlighting field={source ?? field} value={value}>
           {value !== null && value !== undefined
@@ -117,7 +119,16 @@ const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivot
   return (
     <tbody className={classes}>
       <tr className="fields-row">
-        {columns.map(({ field, value, path, source }, idx) => _column(field, value, activeQuery, idx, fieldTypeFor(columnNameToField(field, series), types), path.slice(), source))}
+        {columns.map(({ field, value, path, source }, idx) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <Column key={`${activeQuery}-${field}=${value}-${idx}`}
+                  field={field}
+                  value={value}
+                  selectedQuery={activeQuery}
+                  type={fieldTypeFor(columnNameToField(field, series), types)}
+                  valuePath={path.slice()}
+                  source={source} />
+        ))}
       </tr>
     </tbody>
   );
