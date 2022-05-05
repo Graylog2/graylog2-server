@@ -18,19 +18,18 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.document.DocumentField;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHits;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.TopHits;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.TopHitsAggregationBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
 import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.search.SearchHit;
+import org.opensearch.search.SearchHits;
+import org.opensearch.search.aggregations.AggregationBuilder;
+import org.opensearch.search.aggregations.AggregationBuilders;
+import org.opensearch.search.aggregations.metrics.TopHits;
+import org.opensearch.search.aggregations.metrics.TopHitsAggregationBuilder;
+import org.opensearch.search.sort.SortBuilders;
+import org.opensearch.search.sort.SortOrder;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;

@@ -16,11 +16,12 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.graylog.shaded.elasticsearch7.org.apache.http.Header;
-import org.graylog.shaded.elasticsearch7.org.apache.http.HttpException;
-import org.graylog.shaded.elasticsearch7.org.apache.http.HttpResponse;
-import org.graylog.shaded.elasticsearch7.org.apache.http.HttpResponseInterceptor;
-import org.graylog.shaded.elasticsearch7.org.apache.http.protocol.HttpContext;
+import org.apache.http.Header;
+import org.apache.http.HttpException;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.protocol.HttpContext;
+import org.opensearch.common.joda.JodaDeprecationPatterns;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -33,7 +34,7 @@ public class ElasticsearchFilterDeprecationWarningsInterceptor implements HttpRe
             "but in a future major version, direct access to system indices and their aliases will not be allowed",
             "but in a future major version, direct access to system indices will be prevented by default",
             "in epoch time formats is deprecated and will not be supported in the next major version of Elasticsearch",
-            org.graylog.shaded.elasticsearch7.org.elasticsearch.common.joda.JodaDeprecationPatterns.USE_NEW_FORMAT_SPECIFIERS
+            JodaDeprecationPatterns.USE_NEW_FORMAT_SPECIFIERS
     };
 
     private boolean isDeprecationMessage(final String message) {

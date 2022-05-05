@@ -17,22 +17,16 @@
 package org.graylog.storage.opensearch2.views.export;
 
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.opensearch.action.search.SearchRequest;
+import org.opensearch.search.SearchHit;
+import org.opensearch.search.builder.SearchSourceBuilder;
 
 import java.util.List;
 
 public interface RequestStrategy {
     List<SearchHit> nextChunk(SearchRequest search, ExportMessagesCommand command);
 
-    /**
-     * Allows implementers to specify options on SearchSourceBuilder that cannot be specified on Search.Builder.
-     *
-     * @see #nextChunk(SearchRequest, ExportMessagesCommand)
-     * @see org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder#searchAfter(Object[])
-     */
-    default SearchSourceBuilder configure(SearchSourceBuilder ssb) {
+     default SearchSourceBuilder configure(SearchSourceBuilder ssb) {
         return ssb;
     }
 }

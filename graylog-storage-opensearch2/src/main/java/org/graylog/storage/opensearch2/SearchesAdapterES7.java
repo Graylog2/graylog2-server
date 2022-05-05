@@ -17,13 +17,13 @@
 package org.graylog.storage.opensearch2;
 
 import com.google.common.collect.Streams;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Cardinality;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ExtendedStats;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ValueCount;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.opensearch.action.search.SearchRequest;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.search.aggregations.AggregationBuilders;
+import org.opensearch.search.aggregations.metrics.Cardinality;
+import org.opensearch.search.aggregations.metrics.ExtendedStats;
+import org.opensearch.search.aggregations.metrics.ValueCount;
+import org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;

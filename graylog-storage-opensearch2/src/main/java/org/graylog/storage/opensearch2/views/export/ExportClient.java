@@ -17,13 +17,13 @@
 package org.graylog.storage.opensearch2.views.export;
 
 import org.graylog.plugins.views.search.export.ExportException;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RequestOptions;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.opensearch2.ElasticsearchClient;
 import org.graylog.storage.opensearch2.ThrowingBiFunction;
 import org.graylog2.indexer.ElasticsearchException;
+import org.opensearch.action.search.SearchRequest;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.client.RequestOptions;
+import org.opensearch.client.RestHighLevelClient;
 
 import javax.inject.Inject;
 import java.io.IOException;

@@ -19,7 +19,7 @@ package org.graylog.storage.opensearch2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.io.Resources;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
+import org.opensearch.OpenSearchException;
 import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -79,7 +79,7 @@ class ClusterAdapterES7Test {
 
     @Test
     void returnsEmptyOptionalForHealthWhenElasticsearchExceptionThrown() {
-        when(client.execute(any())).thenThrow(new ElasticsearchException("Exception"));
+        when(client.execute(any())).thenThrow(new OpenSearchException("Exception"));
         final Optional<HealthStatus> healthStatus = clusterAdapter.health(Collections.singletonList("foo_index"));
         assertThat(healthStatus).isEmpty();
     }

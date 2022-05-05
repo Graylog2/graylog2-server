@@ -21,10 +21,10 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
 import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.search.SearchHit;
+import org.opensearch.search.aggregations.Aggregations;
 
 import java.util.List;
 import java.util.Map;

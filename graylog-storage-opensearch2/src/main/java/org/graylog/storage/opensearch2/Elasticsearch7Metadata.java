@@ -32,7 +32,7 @@ public class Elasticsearch7Metadata implements PluginMetaData {
 
     @Override
     public String getName() {
-        return "Elasticsearch 7 Support";
+        return "Opensearch 2 Support";
     }
 
     @Override
@@ -52,7 +52,7 @@ public class Elasticsearch7Metadata implements PluginMetaData {
 
     @Override
     public String getDescription() {
-        return "Support for Elasticsearch 7";
+        return "Support for Opensearch 2";
     }
 
     @Override

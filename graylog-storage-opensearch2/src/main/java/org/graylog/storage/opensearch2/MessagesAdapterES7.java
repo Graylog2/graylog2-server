@@ -21,17 +21,17 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.bulk.BulkItemResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.bulk.BulkRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.bulk.BulkResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.get.GetRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.get.GetResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.index.IndexRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.AnalyzeRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.AnalyzeResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentType;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.rest.RestStatus;
+import org.opensearch.OpenSearchException;
+import org.opensearch.action.bulk.BulkItemResponse;
+import org.opensearch.action.bulk.BulkRequest;
+import org.opensearch.action.bulk.BulkResponse;
+import org.opensearch.action.get.GetRequest;
+import org.opensearch.action.get.GetResponse;
+import org.opensearch.action.index.IndexRequest;
+import org.opensearch.client.indices.AnalyzeRequest;
+import org.opensearch.client.indices.AnalyzeResponse;
+import org.opensearch.common.xcontent.XContentType;
+import org.opensearch.rest.RestStatus;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Indexable;
@@ -172,8 +172,8 @@ public class MessagesAdapterES7 implements MessagesAdapter {
         final BulkResponse result;
         try {
             result = this.client.execute((c, requestOptions) -> c.bulk(bulkRequest, requestOptions));
-        } catch (ElasticsearchException e) {
-            for (ElasticsearchException cause : e.guessRootCauses()) {
+        } catch (OpenSearchException e) {
+            for (OpenSearchException cause : e.guessRootCauses()) {
                 if (cause.status().equals(RestStatus.REQUEST_ENTITY_TOO_LARGE)) {
                     throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully, indexingErrorsFrom(chunk));
                 }

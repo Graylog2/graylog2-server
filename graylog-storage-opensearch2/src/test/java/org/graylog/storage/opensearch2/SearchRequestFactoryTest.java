@@ -16,7 +16,7 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.searches.ScrollCommand;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTime;

@@ -18,7 +18,7 @@ package org.graylog.storage.opensearch2;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
+import org.opensearch.client.Request;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.storage.SearchVersion;
 

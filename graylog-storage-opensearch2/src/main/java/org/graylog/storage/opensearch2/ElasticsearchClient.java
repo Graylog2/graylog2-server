@@ -19,19 +19,19 @@ package org.graylog.storage.opensearch2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.Streams;
-import org.graylog.shaded.elasticsearch7.org.apache.http.client.config.RequestConfig;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RequestOptions;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.ResponseException;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
+import org.apache.http.client.config.RequestConfig;
 import org.graylog.storage.opensearch2.errors.ResponseError;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
+import org.opensearch.OpenSearchException;
+import org.opensearch.action.search.MultiSearchRequest;
+import org.opensearch.action.search.MultiSearchResponse;
+import org.opensearch.action.search.SearchRequest;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.client.RequestOptions;
+import org.opensearch.client.ResponseException;
+import org.opensearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,9 +131,9 @@ public class ElasticsearchClient {
                 : RequestOptions.DEFAULT;
     }
 
-    private ElasticsearchException exceptionFrom(Exception e, String errorMessage) {
-        if (e instanceof ElasticsearchException) {
-            final ElasticsearchException elasticsearchException = (ElasticsearchException) e;
+    private OpenSearchException exceptionFrom(Exception e, String errorMessage) {
+        if (e instanceof OpenSearchException) {
+            final OpenSearchException elasticsearchException = (OpenSearchException) e;
             if (isIndexNotFoundException(elasticsearchException)) {
                 throw IndexNotFoundException.create(errorMessage + elasticsearchException.getResourceId(), elasticsearchException.getIndex().getName());
             }
@@ -148,10 +148,10 @@ public class ElasticsearchClient {
                 }
             }
         }
-        return new ElasticsearchException(errorMessage, e);
+        return new OpenSearchException(errorMessage, e);
     }
 
-    private boolean isInvalidWriteTargetException(ElasticsearchException elasticsearchException) {
+    private boolean isInvalidWriteTargetException(OpenSearchException elasticsearchException) {
         try {
             final ParsedElasticsearchException parsedException = ParsedElasticsearchException.from(elasticsearchException.getMessage());
             return parsedException.reason().startsWith("no write index is defined for alias");
@@ -160,7 +160,7 @@ public class ElasticsearchClient {
         }
     }
 
-    private boolean isMasterNotDiscoveredException(ElasticsearchException elasticsearchException) {
+    private boolean isMasterNotDiscoveredException(OpenSearchException elasticsearchException) {
         try {
             final ParsedElasticsearchException parsedException = ParsedElasticsearchException.from(elasticsearchException.getMessage());
             return parsedException.type().equals("master_not_discovered_exception")
@@ -170,7 +170,7 @@ public class ElasticsearchClient {
         }
     }
 
-    private boolean isIndexNotFoundException(ElasticsearchException e) {
+    private boolean isIndexNotFoundException(OpenSearchException e) {
         return e.getMessage().contains("index_not_found_exception");
     }
 
@@ -190,7 +190,7 @@ public class ElasticsearchClient {
 
     }
 
-    public Optional<ResponseError> parseResponseException(ElasticsearchException ex) {
+    public Optional<ResponseError> parseResponseException(OpenSearchException ex) {
         if (ex.getCause() != null) {
             final Throwable[] suppressed = ex.getCause().getSuppressed();
             if (suppressed.length > 0) {

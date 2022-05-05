@@ -16,10 +16,10 @@
  */
 package org.graylog.storage.opensearch2.blocks;
 
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.settings.get.GetSettingsResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.collect.ImmutableOpenMap;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Settings;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
+import org.opensearch.action.admin.indices.settings.get.GetSettingsResponse;
+import org.opensearch.common.collect.ImmutableOpenMap;
+import org.opensearch.common.settings.Settings;
 
 import java.util.Set;
 import java.util.stream.Collectors;

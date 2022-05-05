@@ -23,15 +23,6 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.health.ClusterHealthStatus;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
 import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog.storage.opensearch2.cat.NodeResponse;
 import org.graylog2.indexer.ElasticsearchException;
@@ -47,6 +38,16 @@ import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
 import org.graylog2.system.stats.elasticsearch.NodesStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
+import org.opensearch.OpenSearchException;
+import org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
+import org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
+import org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
+import org.opensearch.action.support.IndicesOptions;
+import org.opensearch.client.Request;
+import org.opensearch.client.indices.GetIndexRequest;
+import org.opensearch.cluster.health.ClusterHealthStatus;
+import org.opensearch.common.unit.TimeValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -274,7 +275,7 @@ public class ClusterAdapterES7 implements ClusterAdapter {
                     .timeout(TimeValue.timeValueSeconds(Ints.saturatedCast(requestTimeout.toSeconds())))
                     .indicesOptions(IndicesOptions.lenientExpand());
             return Optional.of(client.execute((c, requestOptions) -> c.cluster().health(request, requestOptions)));
-        } catch (org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException e) {
+        } catch (OpenSearchException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"), e);
             } else {

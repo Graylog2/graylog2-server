@@ -16,7 +16,7 @@
  */
 package org.graylog.storage.opensearch2.views;
 
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
+import org.opensearch.action.search.SearchRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;

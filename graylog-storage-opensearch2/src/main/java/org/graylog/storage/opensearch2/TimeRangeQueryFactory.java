@@ -16,8 +16,8 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.RangeQueryBuilder;
+import org.opensearch.index.query.QueryBuilders;
+import org.opensearch.index.query.RangeQueryBuilder;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;

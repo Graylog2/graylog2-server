@@ -30,8 +30,8 @@ import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHits;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.opensearch.search.SearchHits;
+import org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -52,8 +52,8 @@ public class ESMessageListTest {
         final ESMessageList esMessageList = new ESMessageList(new QueryStringDecorators(Optional.empty()));
         final MessageList messageList = someMessageList().toBuilder().name("customResult").build();
 
-        final org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse result =
-                mock(org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse.class);
+        final org.opensearch.action.search.SearchResponse result =
+                mock(org.opensearch.action.search.SearchResponse.class);
 
         when(result.getHits()).thenReturn(SearchHits.empty());
 

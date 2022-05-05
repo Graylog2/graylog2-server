@@ -18,15 +18,15 @@ package org.graylog.storage.opensearch2;
 
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Suppliers;
-import org.graylog.shaded.elasticsearch7.org.apache.http.HttpHost;
-import org.graylog.shaded.elasticsearch7.org.apache.http.client.CredentialsProvider;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestClient;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestClientBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.ElasticsearchNodesSniffer;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.NodesSniffer;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.Sniffer;
+import org.apache.http.HttpHost;
+import org.apache.http.client.CredentialsProvider;
+import org.opensearch.client.RestClient;
+import org.opensearch.client.RestClientBuilder;
+import org.opensearch.client.RestHighLevelClient;
 import org.graylog2.system.shutdown.GracefulShutdownService;
+import org.opensearch.client.sniff.NodesSniffer;
+import org.opensearch.client.sniff.OpenSearchNodesSniffer;
+import org.opensearch.client.sniff.Sniffer;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -93,10 +93,10 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                 .build();
     }
 
-    private ElasticsearchNodesSniffer.Scheme mapDefaultScheme(String defaultSchemeForDiscoveredNodes) {
+    private OpenSearchNodesSniffer.Scheme mapDefaultScheme(String defaultSchemeForDiscoveredNodes) {
         switch (defaultSchemeForDiscoveredNodes.toUpperCase(Locale.ENGLISH)) {
-            case "HTTP": return ElasticsearchNodesSniffer.Scheme.HTTP;
-            case "HTTPS": return ElasticsearchNodesSniffer.Scheme.HTTPS;
+            case "HTTP": return OpenSearchNodesSniffer.Scheme.HTTP;
+            case "HTTPS": return OpenSearchNodesSniffer.Scheme.HTTPS;
             default: throw new IllegalArgumentException("Invalid default scheme for discovered ES nodes: " + defaultSchemeForDiscoveredNodes);
         }
     }
