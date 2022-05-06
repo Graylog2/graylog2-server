@@ -29,7 +29,7 @@ const StyledButton = styled(Button)(({ theme, $dirty }: { theme: DefaultTheme, $
   margin-right: 12px;
   min-width: 61px;
 
-  ${$dirty ? css` 
+  ${$dirty ? css`
     &::after {
       position: absolute;
       content: '';
