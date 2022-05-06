@@ -224,15 +224,12 @@ const SearchBar = ({
                                   <QueryInput value={value}
                                               timeRange={values.timerange}
                                               streams={values.streams}
+                                              name={name}
+                                              onChange={onChange}
                                               placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
                                               error={error}
                                               isValidating={isValidating}
                                               warning={warnings.queryString}
-                                              onChange={(newQuery) => {
-                                                onChange({ target: { value: newQuery, name } });
-
-                                                return Promise.resolve(newQuery);
-                                              }}
                                               disableExecution={disableSearchSubmit}
                                               validate={validateForm}
                                               onExecute={handleSubmit as () => void} />

@@ -177,11 +177,8 @@ const DashboardSearchBar = () => {
                                   <QueryInput value={value}
                                               timeRange={values?.timerange}
                                               placeholder="Apply filter to all widgets"
-                                              onChange={(newQuery) => {
-                                                onChange({ target: { value: newQuery, name } });
-
-                                                return Promise.resolve(newQuery);
-                                              }}
+                                              name={name}
+                                              onChange={onChange}
                                               disableExecution={disableSearchSubmit}
                                               error={error}
                                               isValidating={isValidating}

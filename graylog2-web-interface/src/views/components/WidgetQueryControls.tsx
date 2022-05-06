@@ -229,11 +229,8 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                                     isValidating={isValidatingQuery}
                                     warning={warnings.queryString}
                                     validate={validateForm}
-                                    onChange={(newQuery) => {
-                                      onChange({ target: { value: newQuery, name } });
-
-                                      return Promise.resolve(newQuery);
-                                    }}
+                                    name={name}
+                                    onChange={onChange}
                                     onExecute={handleSubmit as () => void} />
                       )}
                     </FormWarningsContext.Consumer>
