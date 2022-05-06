@@ -72,6 +72,7 @@ class BootstrapModalForm extends React.Component {
     this.close();
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => this.modal.open();
 
   close = () => this.modal.close();
