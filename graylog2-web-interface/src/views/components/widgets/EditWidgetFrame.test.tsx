@@ -91,7 +91,7 @@ describe('EditWidgetFrame', () => {
 
     it('refreshes search after clicking on search button, when there are no changes', async () => {
       renderSUT();
-      const searchButton = screen.getByRole('button', { name: /perform search/i });
+      const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
       await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
       fireEvent.click(searchButton);
