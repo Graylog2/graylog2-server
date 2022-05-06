@@ -78,14 +78,14 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
       {showSaveButton && (
       <Button onClick={() => onSaveView(view)}
               disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}
-              title="Save Button">
+              title="Save dashboard">
         <Icon name="save" /> Save
       </Button>
       )}
       {showSaveAsButton && (
       <Button onClick={() => setSaveAsViewOpen(true)}
               disabled={hasUndeclaredParameters}
-              title="Save As Button">
+              title="Save as new dashboard">
         <Icon name="copy" /> Save as
       </Button>
       )}

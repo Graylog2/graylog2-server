@@ -29,8 +29,8 @@ import type User from 'logic/users/User';
 
 type Props = {
   children: (preferencesConsumer: {
-    setPreferencesState: (stateKey: string, value: boolean) => void,
-    getPreferencesState: (stateKey: string, defaultValue: boolean) => boolean,
+    setPreferences: (stateKey: string, value: boolean) => void,
+    getPreferences: (stateKey: string, defaultValue: boolean) => boolean,
   }) => React.ReactElement;
 };
 
@@ -84,11 +84,11 @@ const SearchPagePreferencesState = ({ children }: Props) => {
 
   const _onSidebarPinningChange = useCallback((newIsPinned: boolean) => _updateUserSidebarPinningPref(currentUser, userPreferences, viewType, newIsPinned), [currentUser, userPreferences, viewType]);
 
-  const getPreferencesState = useCallback((stateKey: string, defaultValue: boolean) => {
+  const getPreferences = useCallback((stateKey: string, defaultValue: boolean) => {
     return state[stateKey] ?? defaultValue;
   }, [state]);
 
-  const setPreferencesState = useCallback((stateKey: string, value: boolean) => {
+  const setPreferences = useCallback((stateKey: string, value: boolean) => {
     if (stateKey === 'sidebarIsPinned') {
       _onSidebarPinningChange(value);
     }
@@ -96,7 +96,7 @@ const SearchPagePreferencesState = ({ children }: Props) => {
     setState({ ...state, [stateKey]: value });
   }, [_onSidebarPinningChange, state]);
 
-  return children({ getPreferencesState: getPreferencesState, setPreferencesState: setPreferencesState });
+  return children({ getPreferences: getPreferences, setPreferences: setPreferences });
 };
 
 export default SearchPagePreferencesState;

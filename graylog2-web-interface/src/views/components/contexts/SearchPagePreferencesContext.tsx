@@ -16,6 +16,8 @@
  */
 import * as React from 'react';
 
+import { singleton } from 'logic/singleton';
+
 type SearchPagePreferencesConfig = {
   sidebar: {
     isPinned: boolean,
@@ -29,4 +31,4 @@ export type SearchPreferencesLayout = {
 
 const SearchPagePreferencesContext = React.createContext<SearchPreferencesLayout | undefined>(undefined);
 
-export default SearchPagePreferencesContext;
+export default singleton('contexts.SearchPagePreferences', () => SearchPagePreferencesContext);

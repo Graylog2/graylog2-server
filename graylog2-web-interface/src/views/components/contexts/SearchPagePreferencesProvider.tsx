@@ -22,22 +22,22 @@ import SearchPagePreferencesState from './SearchPagePreferencesState';
 
 type Props = {
   children: React.ReactNode
-  setPreferencesState: (stateKey: string, value: boolean) => void,
-  getPreferencesState: (stateKey: string, defaultValue: boolean) => boolean,
+  setPreferences: (stateKey: string, value: boolean) => void,
+  getPreferences: (stateKey: string, defaultValue: boolean) => boolean,
 };
 
-const SearchPagePreferencesProvider = ({ getPreferencesState, setPreferencesState, children }: Props) => {
+const SearchPagePreferencesStateProvider = ({ getPreferences, setPreferences, children }: Props) => {
   const searchPagePreferencesContextValue = useMemo(() => {
     const config = {
-      sidebar: { isPinned: getPreferencesState('sidebarIsPinned', false) },
+      sidebar: { isPinned: getPreferences('sidebarIsPinned', false) },
     };
-    const actions = { toggleSidebarPinning: () => setPreferencesState('sidebarIsPinned', !config.sidebar.isPinned) };
+    const actions = { toggleSidebarPinning: () => setPreferences('sidebarIsPinned', !config.sidebar.isPinned) };
 
     return ({
       config,
       actions,
     });
-  }, [getPreferencesState, setPreferencesState]);
+  }, [getPreferences, setPreferences]);
 
   return (
     <SearchPagePreferencesContext.Provider value={searchPagePreferencesContextValue}>
@@ -46,14 +46,14 @@ const SearchPagePreferencesProvider = ({ getPreferencesState, setPreferencesStat
   );
 };
 
-const SearchPagePreferencesStateProvider = ({ children }: { children: React.ReactNode }) => (
+const SearchPagePreferencesProvider = ({ children }: { children: React.ReactNode }) => (
   <SearchPagePreferencesState>
-    {({ getPreferencesState, setPreferencesState }) => (
-      <SearchPagePreferencesProvider getPreferencesState={getPreferencesState} setPreferencesState={setPreferencesState}>
+    {({ getPreferences, setPreferences }) => (
+      <SearchPagePreferencesStateProvider getPreferences={getPreferences} setPreferences={setPreferences}>
         {children}
-      </SearchPagePreferencesProvider>
+      </SearchPagePreferencesStateProvider>
     )}
   </SearchPagePreferencesState>
 );
 
-export default SearchPagePreferencesStateProvider;
+export default SearchPagePreferencesProvider;

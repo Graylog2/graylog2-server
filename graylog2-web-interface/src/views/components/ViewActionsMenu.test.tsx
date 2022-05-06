@@ -103,7 +103,7 @@ describe('ViewActionsMenu', () => {
 
   it('should open modal to save new dashboard', () => {
     const { getByTitle, getByText } = render(<SimpleViewActionMenu />);
-    const saveAsMenuItem = getByTitle(/Save As Button/);
+    const saveAsMenuItem = getByTitle(/Save as new dashboard/);
 
     fireEvent.click(saveAsMenuItem);
 
@@ -131,8 +131,8 @@ describe('ViewActionsMenu', () => {
   it('should use FULL_MENU layout option by default and render all buttons', async () => {
     const { findByRole, findByTitle } = render(<SimpleViewActionMenu />);
 
-    await findByTitle(/Save Button/);
-    await findByTitle(/Save As Button/);
+    await findByTitle(/Save dashboard/);
+    await findByTitle(/Save as new dashboard/);
     await findByTitle(/Share/);
     await findByRole(/^menu$/);
   });
@@ -140,7 +140,7 @@ describe('ViewActionsMenu', () => {
   it('should only render "Save As" button in SAVE_COPY layout option', async () => {
     const { findByTitle, queryByRole, queryByTitle } = render(<SimpleViewActionMenu providerOverrides={{ sidebar: { isShown: false }, viewActionsLayoutOptions: ViewActionsLayoutOptions.SAVE_COPY }} />);
 
-    const saveButton = queryByTitle(/Save Button/);
+    const saveButton = queryByTitle(/Save dashboard/);
     const shareButton = queryByTitle(/Share/);
     const extrasButton = queryByRole(/^menu$/);
 
@@ -148,14 +148,14 @@ describe('ViewActionsMenu', () => {
     expect(shareButton).not.toBeInTheDocument();
     expect(extrasButton).not.toBeInTheDocument();
 
-    await findByTitle(/Save As Button/);
+    await findByTitle(/Save as new dashboard/);
   });
 
   it('should render no action menu items in BLANK layout option', () => {
     const { queryByRole, queryByTitle } = render(<SimpleViewActionMenu providerOverrides={{ sidebar: { isShown: false }, viewActionsLayoutOptions: ViewActionsLayoutOptions.BLANK }} />);
 
-    const saveButton = queryByTitle(/Save Button/);
-    const saveAsButton = queryByTitle(/Save As Button/);
+    const saveButton = queryByTitle(/Save dashboard/);
+    const saveAsButton = queryByTitle(/Save as new dashboard/);
     const shareButton = queryByTitle(/Share/);
     const extrasButton = queryByRole(/^menu$/);
 

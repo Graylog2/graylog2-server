@@ -17,6 +17,8 @@
 
 import * as React from 'react';
 
+import { singleton } from 'logic/singleton';
+
 enum ViewActionsLayoutOptions {
   FULL_MENU = 'FULL_MENU',
   SAVE_COPY = 'SAVE_COPY',
@@ -30,5 +32,6 @@ export type LayoutState = {
 
 const SearchPageLayoutContext = React.createContext<LayoutState | undefined>(undefined);
 
-export default SearchPageLayoutContext;
+export default singleton('contexts.SearchPageLayout', () => SearchPageLayoutContext);
+
 export { ViewActionsLayoutOptions };
