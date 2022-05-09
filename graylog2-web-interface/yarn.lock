@@ -2461,17 +2461,10 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/plotly.js@*":
-  version "1.54.2"
-  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-1.54.2.tgz#8e5916c83bd07b01fed7f404c3e460ee8197968a"
-  integrity sha512-p05hxJSlPLYEPsPW1NuQs1v+oM7pit3xMyo/L/iAr+xAH7bc035rTGFheCiYhx/d+kfCp1jrdJe52XPwei1m6g==
-  dependencies:
-    "@types/d3" "^3"
-
-"@types/plotly.js@1.54.16":
-  version "1.54.16"
-  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-1.54.16.tgz#7e76e2828ff06f46f8ff9ffd4eb56bf0c4703931"
-  integrity sha512-Kli9UqZwO12cvJ4dT2kGaBtpgq96y8TPsvsB87XTCO+jEMMVy0OZ4WMW+8plS/lBKCtMNtwRNYNlD3+8Stgn2Q==
+"@types/plotly.js@*", "@types/plotly.js@1.54.20":
+  version "1.54.20"
+  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-1.54.20.tgz#88fd8500f4860eb7590cb38366fa098618cc68df"
+  integrity sha512-vqiqq5chr72QoApD+6Hu52iuBvT5/po/sdVF74IBnacQV6J1MjH9OeFZ3GFDwKLF24xT++FMkEGAWcgVMwg2YQ==
   dependencies:
     "@types/d3" "^3"
 
@@ -7564,11 +7557,11 @@ graceful-fs@^4.2.9:
     "@babel/preset-env" "7.16.11"
     "@babel/preset-typescript" "7.16.7"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-ed6f2c46-214b-4b80-a54c-c0ba7ec139bd-1651796226234/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-ed6f2c46-214b-4b80-a54c-c0ba7ec139bd-1651796226234/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.5.1"
     moment "2.29.3"
     moment-timezone "0.5.34"
