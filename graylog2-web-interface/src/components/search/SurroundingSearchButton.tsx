@@ -35,7 +35,7 @@ const buildFilterFields = (messageFields, searchConfig) => {
   return surroundingFilterFields.reduce((prev, cur) => ({ ...prev, [cur]: messageFields[cur] }), {});
 };
 
-const buildSearchLink = (id, from, to, fields, filterFields, streams) => SearchLink.builder()
+const buildSearchLink = (id, from, to, filterFields, streams) => SearchLink.builder()
   .timerange({ type: 'absolute', from, to })
   .streams(streams)
   .filterFields(filterFields)
@@ -48,7 +48,7 @@ const searchLink = (range, timestamp, id, messageFields, searchConfig, streams) 
   const toTime = moment(timestamp).add(Number(range), 'seconds').toISOString();
   const filterFields = buildFilterFields(messageFields, searchConfig);
 
-  return buildSearchLink(id, fromTime, toTime, [], filterFields, streams);
+  return buildSearchLink(id, fromTime, toTime, filterFields, streams);
 };
 
 type Props = {
@@ -64,7 +64,10 @@ const SurroundingSearchButton = ({ searchConfig, timestamp, id, messageFields }:
   const menuItems = Object.keys(timeRangeOptions)
     .sort((a, b) => naturalSort(a, b))
     .map((range) => (
-      <MenuItem key={range} href={searchLink(range, timestamp, id, messageFields, searchConfig, streams)} target="_blank" rel="noopener noreferrer">
+      <MenuItem key={range}
+                href={searchLink(range, timestamp, id, messageFields, searchConfig, streams)}
+                target="_blank"
+                rel="noopener noreferrer">
         {timeRangeOptions[range]}
       </MenuItem>
     ));

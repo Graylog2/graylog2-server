@@ -34,15 +34,19 @@ public class NodeAdapterES7 implements NodeAdapter {
         this.jsonApi = new PlainJsonApi(objectMapper, client);
     }
 
+    NodeAdapterES7(final PlainJsonApi jsonApi) {
+        this.jsonApi = jsonApi;
+    }
+
     @Override
     public Optional<SearchVersion> version() {
 
-        final Request request = new Request("GET", "/");
+        final Request request = new Request("GET", "/?filter_path=version.number,version.distribution");
         final Optional<JsonNode> resp = Optional.of(jsonApi.perform(request, "Unable to retrieve cluster information"));
 
         final Optional<String> version = resp.map(r -> r.path("version")).map(r -> r.path("number")).map(JsonNode::textValue);
 
-        final SearchVersion.Distribution distribution  = resp.map(r -> r.path("version")).map(r -> r.path("distribution")).map(JsonNode::textValue)
+        final SearchVersion.Distribution distribution = resp.map(r -> r.path("version")).map(r -> r.path("distribution")).map(JsonNode::textValue)
                 .map(d -> d.toUpperCase(Locale.ROOT))
                 .map(SearchVersion.Distribution::valueOf)
                 .orElse(SearchVersion.Distribution.ELASTICSEARCH);

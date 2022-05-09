@@ -65,7 +65,7 @@ jest.mock('views/stores/ViewManagementStore', () => ({
 }));
 
 jest.mock('views/logic/views/ViewLoader', () => ({
-  processHooks: jest.fn((promise, loadHooks, executeHooks, query, onSuccess) => Promise.resolve().then(onSuccess)),
+  processHooks: jest.fn((_promise, _loadHooks, _executeHooks, _query, onSuccess) => Promise.resolve().then(onSuccess)),
 }));
 
 jest.mock('views/hooks/SyncWithQueryParameters');
@@ -131,7 +131,11 @@ describe('StreamSearchPage', () => {
     it('should be possible with specific view id', async () => {
       asMock(SearchComponent as React.FunctionComponent).mockImplementationOnce(() => (
         <ViewLoaderContext.Consumer>
-          {(_loadView) => <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>Load view</button>}
+          {(_loadView) => (
+            <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>Load
+              view
+            </button>
+          )}
         </ViewLoaderContext.Consumer>
       ));
 

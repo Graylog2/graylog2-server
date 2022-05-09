@@ -15,19 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect, useContext, useState, useMemo } from 'react';
+import { useCallback, useEffect, useContext, useMemo } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
 import PageContentLayout from 'components/layout/PageContentLayout';
 import connect, { useStore } from 'stores/connect';
 import Sidebar from 'views/components/sidebar/Sidebar';
-import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
-import type {
-  SearchRefreshCondition,
-  SearchRefreshConditionArguments,
-} from 'views/logic/hooks/SearchRefreshCondition';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchConfigActions, SearchConfigStore } from 'views/stores/SearchConfigStore';
@@ -52,7 +47,6 @@ import DefaultFieldTypesProvider from 'views/components/contexts/DefaultFieldTyp
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
-import usePluginEntities from 'views/logic/usePluginEntities';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
@@ -102,32 +96,13 @@ const ConnectedSidebar = connect(
   }),
 );
 
-const _searchRefreshConditionChain = (searchRefreshHooks: Array<SearchRefreshCondition>, state: SearchRefreshConditionArguments) => {
-  if (!searchRefreshHooks || searchRefreshHooks.length === 0) {
-    return true;
-  }
-
-  return searchRefreshHooks.every((condition: SearchRefreshCondition) => condition(state));
-};
-
-const _refreshIfNotUndeclared = (searchRefreshHooks: Array<SearchRefreshCondition>, executionState: SearchExecutionState, setHasErrors: (hasErrors: boolean) => void) => {
+const _refreshSearch = (executionState: SearchExecutionState) => {
   const { view } = ViewStore.getInitialState();
 
-  return SearchMetadataActions.parseSearch(view.search).then((searchMetadata) => {
-    if (_searchRefreshConditionChain(searchRefreshHooks, { view, searchMetadata, executionState })) {
-      setHasErrors(false);
-
-      return SearchActions.execute(executionState).then(() => {});
-    }
-
-    setHasErrors(true);
-
-    return Promise.resolve();
+  return SearchMetadataActions.parseSearch(view.search).then(() => {
+    return SearchActions.execute(executionState).then(() => {});
   });
 };
-
-const SearchBarWithStatus = WithSearchStatus(SearchBar);
-const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
 
 const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode }) => {
   const { view } = useStore(ViewStore);
@@ -148,7 +123,7 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
-const useRefreshSearchOn = (actions: Array<RefluxActions<any>>, refresh: () => Promise<any>) => {
+const useRefreshSearchOn = (_actions: Array<RefluxActions<any>>, refresh: () => Promise<any>) => {
   useEffect(() => {
     let storeListenersUnsubscribes = Immutable.List<() => void>();
 
@@ -164,14 +139,9 @@ const useRefreshSearchOn = (actions: Array<RefluxActions<any>>, refresh: () => P
 };
 
 const Search = () => {
-  const searchRefreshHooks = usePluginEntities('views.hooks.searchRefresh');
-  const [hasErrors, setHasErrors] = useState(false);
-  const refreshIfNotUndeclared = useCallback(
-    () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState(), setHasErrors),
-    [searchRefreshHooks],
-  );
+  const refreshSearch = useCallback(() => _refreshSearch(SearchExecutionStateStore.getInitialState()), []);
 
-  useRefreshSearchOn([SearchActions.refresh, ViewActions.search], refreshIfNotUndeclared);
+  useRefreshSearchOn([SearchActions.refresh, ViewActions.search], refreshSearch);
 
   useEffect(() => {
     SearchConfigActions.refresh();
@@ -212,11 +182,10 @@ const Search = () => {
                               <IfInteractive>
                                 <HeaderElements />
                                 <IfDashboard>
-                                  {!editingWidget
-                                  && <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />}
+                                  {!editingWidget && <DashboardSearchBar />}
                                 </IfDashboard>
                                 <IfSearch>
-                                  <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                                  <SearchBar />
                                 </IfSearch>
 
                                 <QueryBarElements />
@@ -226,7 +195,7 @@ const Search = () => {
                                 </IfDashboard>
                               </IfInteractive>
                               <HighlightMessageInQuery>
-                                <SearchResult hasErrors={hasErrors} />
+                                <SearchResult />
                               </HighlightMessageInQuery>
                             </SearchArea>
                           </GridContainer>

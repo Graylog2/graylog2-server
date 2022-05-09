@@ -35,7 +35,7 @@ const ConfirmDialog = ({
   btnConfirmText,
 }) => {
   return (
-    <Modal show={show}>
+    <Modal show={show} onHide={onCancel}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>

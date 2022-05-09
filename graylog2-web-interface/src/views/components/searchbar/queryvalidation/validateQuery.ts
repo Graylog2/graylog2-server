@@ -14,23 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type * as Immutable from 'immutable';
-
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
-import type Parameter from 'views/logic/parameters/Parameter';
-import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
+import generateId from 'logic/generateId';
 
 export type ValidationQuery = {
   queryString: ElasticsearchQueryString | string,
   timeRange: TimeRange | undefined,
   streams?: Array<string>,
-  parameters: Immutable.Set<Parameter>,
-  parameterBindings: ParameterBindings,
   filter?: ElasticsearchQueryString | string,
 }
 
@@ -42,9 +37,8 @@ export const validateQuery = ({
   queryString,
   timeRange,
   streams,
-  parameters,
-  parameterBindings,
   filter,
+  ...rest
 }: ValidationQuery): Promise<QueryValidationState> => {
   if (!queryExists(queryString) && !queryExists(filter)) {
     return Promise.resolve({ status: 'OK', explanations: [] });
@@ -55,8 +49,7 @@ export const validateQuery = ({
     timerange: timeRange ? onSubmittingTimerange(timeRange) : undefined,
     streams,
     filter,
-    parameters,
-    parameter_bindings: parameterBindings,
+    ...rest,
   };
 
   return fetch('POST', qualifyUrl('/search/validate'), payload).then((result) => {
@@ -71,6 +64,7 @@ export const validateQuery = ({
         end_column: endColumn,
         related_property: relatedProperty,
       }) => ({
+        id: generateId(),
         errorMessage,
         errorType,
         errorTitle,

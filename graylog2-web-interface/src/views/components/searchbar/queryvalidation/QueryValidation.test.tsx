@@ -23,7 +23,7 @@ import QueryValidation from 'views/components/searchbar/queryvalidation/QueryVal
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
-import { validationError } from 'fixtures/queryValidationState';
+import { validationError, validationErrorExplanation } from 'fixtures/queryValidationState';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
 import asMock from '../../../../../test/helpers/mocking/AsMock';
@@ -70,7 +70,7 @@ describe('QueryValidation', () => {
   };
 
   const SUT = ({ error, warning }: SUTProps) => (
-    <Formik onSubmit={() => {}} initialValues={{}} initialErrors={error ? { queryString: error } : {}}>
+    <Formik onSubmit={() => {}} initialValues={{}} initialErrors={error ? { queryString: error } : {}} enableReinitialize>
       <Form>
         <FormWarningsContext.Provider value={{ warnings: warning ? { queryString: warning } : {}, setFieldWarning: () => {} }}>
           <QueryValidation />
@@ -114,7 +114,7 @@ describe('QueryValidation', () => {
     await screen.findByTitle('Parse Exception documentation');
   });
 
-  it('renders plugable validation explanation', async () => {
+  it('renders pluggable validation explanation', async () => {
     const ExampleComponent = ({ validationState }: { validationState: QueryValidationState }) => (
       <>Plugable validation explanation for {validationState.explanations.map(({ errorTitle }) => errorTitle).join()}</>
     );
@@ -124,5 +124,25 @@ describe('QueryValidation', () => {
     await openExplanation();
 
     await screen.findByText('Plugable validation explanation for Parse Exception');
+  });
+
+  it('only displays current validation explanation', async () => {
+    const multipleValidationErrors: QueryValidationState = {
+      status: 'ERROR',
+      explanations: [validationErrorExplanation, { ...validationErrorExplanation, id: 'validation-explanation-id-2' }],
+    };
+    const singleValidationError: QueryValidationState = {
+      status: 'ERROR',
+      explanations: [validationErrorExplanation],
+    };
+
+    const { rerender } = render(<SUT error={multipleValidationErrors} />);
+    await openExplanation();
+
+    await waitFor(() => expect(screen.getAllByText('Parse Exception')).toHaveLength(2));
+
+    rerender(<SUT error={singleValidationError} />);
+
+    await waitFor(() => expect(screen.getAllByText('Parse Exception')).toHaveLength(1));
   });
 });

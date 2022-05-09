@@ -17,6 +17,7 @@
 export type QueryValidationState = {
   status: 'OK' | 'ERROR' | 'WARNING',
   explanations: Array<{
+    id: string,
     errorType: string,
     errorTitle: string,
     errorMessage: string,

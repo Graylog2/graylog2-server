@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import connect from 'stores/connect';
@@ -36,13 +37,18 @@ const WidgetColorContext = ({ children, colorRules, id }: Props) => {
     .reduce((prev, { name, color }) => (prev.set(name, color)), colorMapperBuilder);
   const colorRulesForWidget = colorRulesForWidgetBuilder.build();
 
-  const setColor = (name, color) => {
-    colorRulesForWidget.set(name, color);
+  const contextValue = useMemo(() => {
+    const setColor = (name: string, color: string) => {
+      colorRulesForWidget.set(name, color);
 
-    return ChartColorRulesActions.set(id, name, color);
-  };
+      return ChartColorRulesActions.set(id, name, color);
+    };
 
-  const contextValue = { colors: colorRulesForWidget, setColor };
+    return ({
+      colors: colorRulesForWidget,
+      setColor,
+    });
+  }, [colorRulesForWidget, id]);
 
   return (
     <ChartColorContext.Provider value={contextValue}>

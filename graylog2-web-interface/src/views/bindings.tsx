@@ -21,7 +21,6 @@ import type { PluginExports } from 'graylog-web-plugin/plugin';
 import type { WidgetComponentProps } from 'views/types';
 import Routes from 'routing/Routes';
 import App from 'routing/App';
-import AppConfig from 'util/AppConfig';
 import { MessageListHandler } from 'views/logic/searchtypes/messages';
 import { MessageList } from 'views/components/widgets';
 import AddToTableActionHandler from 'views/logic/fieldactions/AddToTableActionHandler';
@@ -48,7 +47,6 @@ import DataTable from 'views/components/datatable/DataTable';
 import FieldStatisticsHandler from 'views/logic/fieldactions/FieldStatisticsHandler';
 import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHandler';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
-import AggregationControls from 'views/components/aggregationbuilder/AggregationControls';
 import EditMessageList from 'views/components/widgets/EditMessageList';
 import { DashboardsPage, ShowViewPage, NewSearchPage, NewDashboardPage, StreamSearchPage } from 'views/pages';
 import AddMessageCountActionHandler from 'views/logic/fieldactions/AddMessageCountActionHandler';
@@ -79,7 +77,6 @@ import {
 } from 'views/Constants';
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
-import HeatmapVisualizationConfiguration from 'views/components/aggregationbuilder/HeatmapVisualizationConfiguration';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import visualizationBindings from 'views/components/visualizations/bindings';
 import { AggregationWizard } from 'views/components/aggregationwizard';
@@ -87,13 +84,9 @@ import { filterCloudValueActions } from 'util/conditional/filterValueActions';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
-import BarVisualizationConfiguration from './components/aggregationbuilder/BarVisualizationConfiguration';
-import NumberVisualizationConfiguration from './components/aggregationbuilder/NumberVisualizationConfiguration';
 import AreaVisualization from './components/visualizations/area/AreaVisualization';
 import LineVisualizationConfig from './logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import AreaVisualizationConfig from './logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
-import LineVisualizationConfiguration from './components/aggregationbuilder/LineVisualizationConfiguration';
-import AreaVisualizationConfiguration from './components/aggregationbuilder/AreaVisualizationConfiguration';
 import Parameter from './logic/parameters/Parameter';
 import ValueParameter from './logic/parameters/ValueParameter';
 import MessageConfigGenerator from './logic/searchtypes/messages/MessageConfigGenerator';
@@ -157,9 +150,7 @@ const exports: PluginExports = {
       defaultWidth: 4,
       reportStyle: () => ({ width: 600 }),
       visualizationComponent: AggregationBuilder,
-      editComponent: AppConfig.isFeatureEnabled('legacy-aggregation-wizard')
-        ? AggregationControls
-        : AggregationWizard,
+      editComponent: AggregationWizard,
       needsControlledHeight: (widget: Widget) => {
         const widgetVisualization = get(widget, 'config.visualization');
         const flexibleHeightWidgets = [
@@ -309,28 +300,6 @@ const exports: PluginExports = {
     },
   ], ['create-extractor']),
   visualizationTypes: visualizationBindings,
-  visualizationConfigTypes: [
-    {
-      type: AreaVisualization.type,
-      component: AreaVisualizationConfiguration,
-    },
-    {
-      type: BarVisualization.type,
-      component: BarVisualizationConfiguration,
-    },
-    {
-      type: LineVisualization.type,
-      component: LineVisualizationConfiguration,
-    },
-    {
-      type: NumberVisualization.type,
-      component: NumberVisualizationConfiguration,
-    },
-    {
-      type: HeatmapVisualization.type,
-      component: HeatmapVisualizationConfiguration,
-    },
-  ],
   creators: [
     {
       type: 'preset',

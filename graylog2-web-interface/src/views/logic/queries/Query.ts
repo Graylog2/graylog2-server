@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import uuid from 'uuid/v4';
 
 import isDeepEqual from 'stores/isDeepEqual';
+import generateId from 'logic/generateId';
 
 import type { SearchType } from './SearchType';
 
@@ -49,7 +49,10 @@ export type ElasticsearchQueryString = {
   query_string: string,
 };
 
-export const createElasticsearchQueryString = (query = ''): ElasticsearchQueryString => ({ type: 'elasticsearch', query_string: query });
+export const createElasticsearchQueryString = (query = ''): ElasticsearchQueryString => ({
+  type: 'elasticsearch',
+  query_string: query,
+});
 
 const _streamFilters = (selectedStreams: Array<string>) => {
   return Immutable.List(selectedStreams.map((stream) => Immutable.Map({ type: 'stream', id: stream })));
@@ -221,7 +224,7 @@ class Builder {
   }
 
   newId(): Builder {
-    return this.id(uuid());
+    return this.id(generateId());
   }
 
   query(value: QueryString): Builder {

@@ -30,18 +30,18 @@ import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.PasswordAlgorithmFactory;
-import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserImpl;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.ForbiddenException;
@@ -66,19 +66,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith({MockitoExtension.class})
+@MockitoSettings(strictness = Strictness.WARN)
 public class ViewsResourceTest {
     public static final String VIEW_ID = "test-view";
-
-    @Before
-    public void setUpInjector() {
-        GuiceInjectorHolder.createInjector(Collections.emptyList());
-    }
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
-
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private Subject subject;
@@ -106,6 +97,15 @@ public class ViewsResourceTest {
 
     private ViewsResource viewsResource;
 
+    @BeforeEach
+    public void setUp() {
+        this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain);
+        when(searchUser.canCreateDashboards()).thenReturn(true);
+        final Search search = mock(Search.class, RETURNS_DEEP_STUBS);
+        when(search.queries()).thenReturn(ImmutableSet.of());
+        when(searchDomain.getForUser(eq("6141d457d3a6b9d73c8ac55a"), eq(searchUser))).thenReturn(Optional.of(search));
+    }
+
     class ViewsTestResource extends ViewsResource {
         ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain) {
             this(viewService, clusterEventBus, userService, searchDomain, new HashMap<>());
@@ -128,15 +128,6 @@ public class ViewsResourceTest {
         }
     }
 
-    @Before
-    public void setUp() throws Exception {
-        this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain);
-        when(searchUser.canCreateDashboards()).thenReturn(true);
-        final Search search = mock(Search.class, RETURNS_DEEP_STUBS);
-        when(search.queries()).thenReturn(ImmutableSet.of());
-        when(searchDomain.getForUser(eq("6141d457d3a6b9d73c8ac55a"), eq(searchUser))).thenReturn(Optional.of(search));
-    }
-
     @Test
     public void creatingViewAddsCurrentUserAsOwner() throws Exception {
         final ViewDTO.Builder builder = mock(ViewDTO.Builder.class);
@@ -151,8 +142,6 @@ public class ViewsResourceTest {
 
         final UserContext userContext = mock(UserContext.class);
         when(userContext.getUser()).thenReturn(testUser);
-        when(userContext.getUserId()).thenReturn("testuser");
-        when(currentUser.isLocalAdmin()).thenReturn(true);
         when(searchUser.username()).thenReturn("testuser");
 
         this.viewsResource.create(view, userContext, searchUser);
@@ -174,8 +163,8 @@ public class ViewsResourceTest {
 
     @Test
     public void invalidObjectIdReturnsViewNotFoundException() {
-        expectedException.expect(NotFoundException.class);
-        this.viewsResource.get("invalid", searchUser);
+        assertThatThrownBy(() -> this.viewsResource.get("invalid", searchUser))
+                .isInstanceOf(NotFoundException.class);
     }
 
     @Test

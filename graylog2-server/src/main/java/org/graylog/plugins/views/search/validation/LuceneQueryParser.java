@@ -21,19 +21,19 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
 
 public class LuceneQueryParser {
-    private final TermCollectingQueryParser parser;
 
-    public LuceneQueryParser() {
-        this.parser = new TermCollectingQueryParser(ParsedTerm.DEFAULT_FIELD, new StandardAnalyzer());
-        this.parser.setSplitOnWhitespace(true);
-    }
+    public static final StandardAnalyzer ANALYZER = new StandardAnalyzer();
 
     public ParsedQuery parse(final String query) throws ParseException {
+        final TokenCollectingQueryParser parser = new TokenCollectingQueryParser(ParsedTerm.DEFAULT_FIELD, ANALYZER);
+        parser.setSplitOnWhitespace(true);
+
         final Query parsed = parser.parse(query);
         final ParsedQuery.Builder builder = ParsedQuery.builder().query(query);
 
-        builder.tokensBuilder().addAll(this.parser.getTokens());
-        final TermCollectingQueryVisitor visitor = new TermCollectingQueryVisitor(this.parser.getTokens());
+        builder.tokensBuilder().addAll(parser.getTokens());
+
+        final TermCollectingQueryVisitor visitor = new TermCollectingQueryVisitor(ANALYZER, parser.getTokenLookup());
         parsed.visit(visitor);
         builder.termsBuilder().addAll(visitor.getParsedTerms());
         return builder.build();

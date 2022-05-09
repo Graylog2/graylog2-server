@@ -17,7 +17,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import Select from 'views/components/Select';
+import Select from 'components/common/Select';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 
 type Props = {
@@ -27,16 +27,15 @@ type Props = {
 };
 
 const SortDirectionSelect = ({ direction, disabled, onChange }: Props) => (
-  <Select isDisabled={disabled}
-          isClearable={false}
-          isSearchable={false}
+  <Select disabled={disabled}
+          clearable={false}
           options={[
             { label: 'Ascending', value: 'Ascending' },
             { label: 'Descending', value: 'Descending' },
           ]}
-          onChange={({ value }) => onChange(Direction.fromString(value))}
+          onChange={(value: string) => onChange(Direction.fromString(value))}
           placeholder={disabled ? 'No sorting selected' : 'Click to select direction'}
-          value={(direction && { label: direction, value: direction }) ?? null} />
+          value={direction ?? null} />
 );
 
 SortDirectionSelect.propTypes = {

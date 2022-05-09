@@ -17,7 +17,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import uuid from 'uuid/v4';
 import moment from 'moment';
 
 import { MultiSelect, TimeUnitInput } from 'components/common';
@@ -32,6 +31,7 @@ import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { isPermitted } from 'util/PermissionsMixin';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
+import generateId from 'logic/generateId';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -41,6 +41,17 @@ export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 const LOOKUP_PERMISSIONS = [
   'lookuptables:read',
 ];
+
+const _buildNewParameter = (name) => {
+  return ({
+    name: name,
+    embryonic: true,
+    type: 'lut-parameter-v1',
+    data_type: 'any',
+    title: 'new title',
+    // has no binding, no need to set binding property
+  });
+};
 
 class FilterForm extends React.Component {
   formatStreamIds = lodash.memoize(
@@ -112,8 +123,8 @@ class FilterForm extends React.Component {
       searchWithinMsUnit: searchWithin.unit,
       executeEveryMsDuration: executeEvery.duration,
       executeEveryMsUnit: executeEvery.unit,
-      queryId: uuid(),
-      searchTypeId: uuid(),
+      queryId: generateId(),
+      searchTypeId: generateId(),
       queryParameterStash: {}, // keep already defined parameters around to ease editing
     };
   }
@@ -155,7 +166,7 @@ class FilterForm extends React.Component {
         if (queryParameterStash[np]) {
           newParameters.push(queryParameterStash[np]);
         } else {
-          newParameters.push(this._buildNewParameter(np));
+          newParameters.push(_buildNewParameter(np));
         }
       }
     });
@@ -170,17 +181,6 @@ class FilterForm extends React.Component {
     const { currentUser } = this.props;
 
     return isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS);
-  };
-
-  _buildNewParameter = (name) => {
-    return ({
-      name: name,
-      embryonic: true,
-      type: 'lut-parameter-v1',
-      data_type: 'any',
-      title: 'new title',
-      // has no binding, no need to set binding property
-    });
   };
 
   handleQueryChange = (event) => {

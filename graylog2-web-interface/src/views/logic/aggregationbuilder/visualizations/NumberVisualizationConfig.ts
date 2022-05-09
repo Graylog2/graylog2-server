@@ -79,7 +79,7 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
     return other && 'trend' in other && other.trend === this.trend;
   }
 
-  static fromJSON(type: string, value: NumberVisualizationConfigJSON) {
+  static fromJSON(_type: string, value: NumberVisualizationConfigJSON) {
     const { trend, trend_preference: trendPreference } = value;
 
     return NumberVisualizationConfig.create(trend, trendPreference);

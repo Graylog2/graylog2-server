@@ -29,14 +29,14 @@ const ValueComponent = styled.span`
 `;
 
 type Props = {
-  onChange: (newFields: { label: string, value: string }[]) => void,
+  onChange: (newFields: Array<string>) => void,
   fields: Immutable.List<FieldTypeMapping>,
-  value: { field: string }[] | undefined | null,
+  value: Array<{ field: string }> | undefined | null,
   allowOptionCreation?: boolean,
   inputId?: string,
 };
 
-const FieldSelect = ({ fields, onChange, value, ...rest }: Props) => {
+const FieldSelect = ({ fields, onChange, value, allowOptionCreation, inputId }: Props) => {
   const fieldsForSelect = fields
     .map((fieldType) => fieldType.name)
     .map((fieldName) => ({ label: fieldName, value: fieldName }))
@@ -45,11 +45,12 @@ const FieldSelect = ({ fields, onChange, value, ...rest }: Props) => {
     .sort((v1, v2) => defaultCompare(v1.label, v2.label));
 
   return (
-    <SortableSelect {...rest}
-                    options={fieldsForSelect}
+    <SortableSelect options={fieldsForSelect}
                     onChange={onChange}
-                    valueComponent={({ children: _children }) => <ValueComponent>{_children}</ValueComponent>}
-                    value={value} />
+                    valueComponent={ValueComponent}
+                    value={value}
+                    inputId={inputId}
+                    allowOptionCreation={allowOptionCreation} />
   );
 };
 

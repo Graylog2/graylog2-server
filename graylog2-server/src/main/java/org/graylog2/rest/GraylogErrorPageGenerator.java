@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
@@ -56,6 +57,7 @@ public class GraylogErrorPageGenerator implements ErrorPageGenerator {
 
         if (exception != null) {
             String stacktrace = "";
+            String exceptionString = Objects.nonNull(exception.getMessage()) ? exception.getMessage() : "Null";
             try (final StringWriter stringWriter = new StringWriter();
                  final PrintWriter printWriter = new PrintWriter(stringWriter)) {
                 exception.printStackTrace(printWriter);
@@ -66,7 +68,7 @@ public class GraylogErrorPageGenerator implements ErrorPageGenerator {
                 // Ignore
             }
             modelBuilder
-                    .put("exception", StringEscapeUtils.escapeHtml4(exception.getMessage()))
+                    .put("exception", StringEscapeUtils.escapeHtml4(exceptionString))
                     .put("stacktrace", StringEscapeUtils.escapeHtml4(stacktrace));
         }
 

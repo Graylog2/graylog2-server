@@ -17,10 +17,7 @@
 package org.graylog.plugins.views.search.validation;
 
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-import org.apache.lucene.queryparser.classic.Token;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
@@ -35,6 +32,8 @@ public abstract class ParsedTerm {
     public abstract String value();
 
     public abstract Optional<ImmutableToken> keyToken();
+
+    public abstract Optional<ImmutableToken> valueToken();
 
     public static ParsedTerm create(final String field, final String value) {
         return builder().field(field).value(value).build();
@@ -51,10 +50,6 @@ public abstract class ParsedTerm {
 
     public boolean isDefaultField() {
         return field().equals(DEFAULT_FIELD);
-    }
-
-    public boolean isInvalidOperator() {
-        return isDefaultField() && ("and".equals(value()) || "or".equals(value()) || "not".equals(value()));
     }
 
     public String getRealFieldName() {
@@ -74,6 +69,7 @@ public abstract class ParsedTerm {
         public abstract Builder field(@NotNull String field);
         public abstract Builder value(@NotNull String value);
         public abstract Builder keyToken(@NotNull ImmutableToken keyToken);
+        public abstract Builder valueToken(@NotNull ImmutableToken valueToken);
         public abstract ParsedTerm build();
     }
 }

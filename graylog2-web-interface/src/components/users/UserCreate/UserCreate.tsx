@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { useEffect, useState } from 'react';
+import * as Immutable from 'immutable';
 import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -38,6 +38,7 @@ import LastNameFormGroup from './LastNameFormGroup';
 import EmailFormGroup from './EmailFormGroup';
 import PasswordFormGroup, { validatePasswords } from './PasswordFormGroup';
 import UsernameFormGroup from './UsernameFormGroup';
+import ServiceAccountFormGroup from './ServiceAccountFormGroup';
 
 import { Headline } from '../../common/Section/SectionComponent';
 
@@ -81,6 +82,40 @@ const _validate = (values) => {
 
 type RequestError = { additional: { res: { text: string }}};
 
+const PasswordGroup = () => {
+  if (isCloud && oktaUserForm) {
+    const { fields: { password: CloudPasswordFormGroup } } = oktaUserForm;
+
+    return <CloudPasswordFormGroup />;
+  }
+
+  return <PasswordFormGroup />;
+};
+
+const UserNameGroup = ({ users }: { users: Immutable.List<User> }) => {
+  if (isCloud && oktaUserForm) {
+    const { fields: { username: CloudUserNameFormGroup } } = oktaUserForm;
+
+    return CloudUserNameFormGroup && <CloudUserNameFormGroup />;
+  }
+
+  return (
+    <UsernameFormGroup users={users} />
+  );
+};
+
+const EmailGroup = () => {
+  if (isCloud && oktaUserForm) {
+    const { fields: { email: CloudEmailFormGroup } } = oktaUserForm;
+
+    return CloudEmailFormGroup && <CloudEmailFormGroup />;
+  }
+
+  return (
+    <EmailFormGroup />
+  );
+};
+
 const UserCreate = () => {
   const initialRole = { name: 'Reader', description: 'Grants basic permissions for every Graylog user (built-in)', id: '' };
   const [users, setUsers] = useState<Immutable.List<User> | undefined>();
@@ -109,48 +144,6 @@ const UserCreate = () => {
   const _handleCancel = () => history.push(Routes.SYSTEM.USERS.OVERVIEW);
   const hasValidRole = selectedRoles.size > 0 && selectedRoles.filter((role) => role.name === 'Reader' || role.name === 'Admin');
 
-  const getUserNameGroup = () => {
-    if (isCloud && oktaUserForm) {
-      const { fields: { username: CloudUserNameFormGroup } } = oktaUserForm;
-
-      return (
-        <>
-          {CloudUserNameFormGroup && <CloudUserNameFormGroup />}
-        </>
-      );
-    }
-
-    return (
-      <UsernameFormGroup users={users} />
-    );
-  };
-
-  const getEmailGroup = () => {
-    if (isCloud && oktaUserForm) {
-      const { fields: { email: CloudEmailFormGroup } } = oktaUserForm;
-
-      return (
-        <>
-          {CloudEmailFormGroup && <CloudEmailFormGroup />}
-        </>
-      );
-    }
-
-    return (
-      <EmailFormGroup />
-    );
-  };
-
-  const getPasswordGroup = () => {
-    if (isCloud && oktaUserForm) {
-      const { fields: { password: CloudPasswordFormGroup } } = oktaUserForm;
-
-      return <CloudPasswordFormGroup />;
-    }
-
-    return <PasswordFormGroup />;
-  };
-
   if (!users) {
     return <Spinner />;
   }
@@ -177,13 +170,14 @@ const UserCreate = () => {
                 <Headline>Profile</Headline>
                 <FirstNameFormGroup />
                 <LastNameFormGroup />
-                {getUserNameGroup()}
-                {getEmailGroup()}
+                <UserNameGroup users={users} />
+                <EmailGroup />
               </div>
               <div>
                 <Headline>Settings</Headline>
                 <TimeoutFormGroup />
                 <TimezoneFormGroup />
+                <ServiceAccountFormGroup />
               </div>
               <div>
                 <Headline>Roles</Headline>
@@ -210,7 +204,7 @@ const UserCreate = () => {
               </div>
               <div>
                 <Headline>Password</Headline>
-                {getPasswordGroup()}
+                <PasswordGroup />
               </div>
               {submitError && (
                 <Row>

@@ -17,37 +17,43 @@
 import * as React from 'react';
 import { render, screen, fireEvent } from 'wrappedTestingLibrary';
 
-import { SearchActions } from 'views/stores/SearchStore';
 import SearchButton from 'views/components/searchbar/SearchButton';
 
-jest.mock('views/stores/SearchStore', () => ({
-  SearchActions: {
-    refresh: jest.fn(),
-  },
-}));
-
 describe('SearchButton', () => {
+  const onFormSubmit = jest.fn().mockImplementation((e) => e.preventDefault());
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should perform refresh when not dirty', () => {
-    render(<SearchButton />);
+  const SUT = ({ disabled, dirty }: { dirty?: boolean, disabled?: boolean}) => (
+    <form onSubmit={onFormSubmit}>
+      <SearchButton disabled={disabled} dirty={dirty} />
+    </form>
+  );
 
-    const button = screen.getByTitle('Perform search');
+  SUT.defaultProps = {
+    dirty: false,
+    disabled: false,
+  };
+
+  it('should trigger form submit refresh when dirty', () => {
+    render(<SUT dirty />);
+
+    const button = screen.getByRole('button', { name: /perform search \(changes were made after last search execution\)/i });
 
     fireEvent.click(button);
 
-    expect(SearchActions.refresh).toHaveBeenCalledTimes(1);
+    expect(onFormSubmit).toHaveBeenCalledTimes(1);
   });
 
-  it('should not perform refresh when not dirty and disabled', () => {
-    render(<SearchButton disabled />);
+  it('should trigger form submit refresh when not dirty', () => {
+    render(<SUT />);
 
-    const button = screen.getByTitle('Perform search');
+    const button = screen.getByRole('button', { name: /perform search/i });
 
     fireEvent.click(button);
 
-    expect(SearchActions.refresh).not.toHaveBeenCalled();
+    expect(onFormSubmit).toHaveBeenCalledTimes(1);
   });
 });

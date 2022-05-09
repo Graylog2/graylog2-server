@@ -29,7 +29,7 @@ jest.mock('views/actions/QueryValidationActions', () => ({
 
 class Completer {
   // eslint-disable-next-line class-methods-use-this
-  getCompletions = (editor, session, pos, prefix, callback) => {
+  getCompletions = (_editor, _session, _pos, _prefix, callback) => {
     callback(null, []);
   };
 
@@ -41,6 +41,7 @@ describe('QueryInput', () => {
 
   const SimpleQueryInput = (props: Partial<React.ComponentProps<typeof QueryInput>>) => (
     <QueryInput value=""
+                name="search-query"
                 onChange={() => Promise.resolve('')}
                 validate={() => Promise.resolve({})}
                 isValidating={false}
@@ -66,7 +67,7 @@ describe('QueryInput', () => {
     userEvent.paste(getQueryInput(), 'the query');
 
     expect(onChange).toHaveBeenCalledTimes(1);
-    expect(onChange).toHaveBeenCalledWith('the query', expect.any(Object));
+    expect(onChange).toHaveBeenCalledWith({ target: { value: 'the query', name: 'search-query' } });
   });
 
   it('triggers onBlur when input is blurred', () => {

@@ -46,7 +46,7 @@ class BootstrapModalForm extends React.Component {
     /* Text to use in the cancel button. "Cancel" is the default */
     cancelButtonText: PropTypes.string,
     /* Text to use in the submit button. "Submit" is the default */
-    submitButtonText: PropTypes.string,
+    submitButtonText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     submitButtonDisabled: PropTypes.bool,
     show: PropTypes.bool,
   };
@@ -72,6 +72,7 @@ class BootstrapModalForm extends React.Component {
     this.close();
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => this.modal.open();
 
   close = () => this.modal.close();
@@ -91,6 +92,7 @@ class BootstrapModalForm extends React.Component {
     const { onSubmitForm } = this.props;
 
     if (typeof onSubmitForm === 'function') {
+      event.preventDefault();
       onSubmitForm(event);
     }
   };
@@ -135,9 +137,7 @@ class BootstrapModalForm extends React.Component {
           </Modal.Body>
           <Modal.Footer>
             <Button type="button" onClick={this.onModalCancel}>{cancelButtonText}</Button>
-            {/* We are not using type=submit here, because when this form is being rendered inside another form */}
-            {/* the submit button can influence the parent form, even though this form is in a portal */}
-            <Button type="button" onClick={this.submit} disabled={submitButtonDisabled} bsStyle="primary">{submitButtonText}</Button>
+            <Button type="submit" disabled={submitButtonDisabled} bsStyle="primary">{submitButtonText}</Button>
           </Modal.Footer>
         </form>
       </BootstrapModalWrapper>

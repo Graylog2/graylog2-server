@@ -21,6 +21,7 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.specification.RequestSpecification;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog.plugins.views.search.rest.QueryDTO;
 import org.graylog.plugins.views.search.rest.SearchDTO;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
@@ -31,6 +32,7 @@ import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -99,5 +101,13 @@ public class SearchDriver {
     @SuppressWarnings("SameParameterValue")
     private static String allMessagesJsonPath(String queryId, String messageListId) {
         return "results." + queryId + ".search_types." + messageListId + ".messages";
+    }
+
+    public static List<MappedFieldTypeDTO> getFieldTypes(RequestSpecification requestSpecification) {
+        final MappedFieldTypeDTO[] as = given()
+                .spec(requestSpecification)
+                .get("/views/fields")
+                .as(MappedFieldTypeDTO[].class);
+        return Arrays.asList(as);
     }
 }

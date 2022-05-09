@@ -16,16 +16,13 @@
  */
 import * as React from 'react';
 import { useEffect } from 'react';
-import PropTypes from 'prop-types';
-import loadable from 'loadable-components';
+import { ErrorBoundary } from 'react-error-boundary';
 
 type Props = {
-  error: {
-    message: string;
-  };
+  error: Error;
 };
 
-const ErrorComponent: React.FC<Props> = ({ error }: Props) => {
+const ErrorComponent = ({ error }: Props) => {
   useEffect(() => {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -34,10 +31,21 @@ const ErrorComponent: React.FC<Props> = ({ error }: Props) => {
   return <div>Loading component failed: {error.message}</div>;
 };
 
-ErrorComponent.propTypes = {
-  error: PropTypes.exact({
-    message: PropTypes.string,
-  }).isRequired,
+type ComponentSupplier<TProps> = () => Promise<{ default: React.ComponentType<TProps> }>;
+
+// eslint-disable-next-line react/jsx-no-useless-fragment
+const emptyPlaceholder = <></>;
+
+const loadAsync = <TProps, >(factory: ComponentSupplier<TProps>): React.ComponentType<TProps> => {
+  const Component = React.lazy(factory);
+
+  return (props: TProps) => (
+    <ErrorBoundary FallbackComponent={ErrorComponent}>
+      <React.Suspense fallback={emptyPlaceholder}>
+        <Component {...props} />
+      </React.Suspense>
+    </ErrorBoundary>
+  );
 };
 
-export default <T, >(f: () => Promise<{ default: loadable.DefaultComponent<T> }>) => loadable<T>(() => f().then((c) => c.default), { ErrorComponent });
+export default loadAsync;

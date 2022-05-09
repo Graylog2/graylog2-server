@@ -37,7 +37,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.inject.Provider;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -48,13 +50,13 @@ public class ElasticsearchBackendTest {
     @BeforeClass
     public static void setup() {
         Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
-        handlers.put(MessageList.NAME, () -> new ESMessageList(new QueryStringDecorators.Fake()));
+        handlers.put(MessageList.NAME, () -> new ESMessageList(new QueryStringDecorators(Optional.empty())));
 
         final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
         backend = new ElasticsearchBackend(handlers,
                 null,
                 mock(IndexLookup.class),
-                new QueryStringDecorators.Fake(),
+                new QueryStringDecorators(Optional.empty()),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 false);
     }

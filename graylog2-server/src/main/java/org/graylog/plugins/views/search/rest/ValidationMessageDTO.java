@@ -37,7 +37,6 @@ public abstract class ValidationMessageDTO {
     @Nullable
     public abstract Integer beginColumn();
 
-
     @JsonProperty
     @Nullable
     public abstract Integer endLine();
@@ -57,8 +56,36 @@ public abstract class ValidationMessageDTO {
     @JsonProperty
     public abstract String relatedProperty();
 
+    public static ValidationMessageDTO.Builder builder(ValidationTypeDTO validationType, String errorMessage) {
+        return new AutoValue_ValidationMessageDTO.Builder()
+                .errorType(validationType)
+                .errorMessage(errorMessage)
+                .errorTitle(validationType.errorTitle());
+    }
 
-    public static ValidationMessageDTO create(ValidationTypeDTO validationType, Integer beginLine, Integer beginColumn, Integer endLine, Integer endColumn, String errorMessage, String relatedProperty) {
-        return new AutoValue_ValidationMessageDTO(validationType, beginLine, beginColumn, endLine, endColumn, validationType.errorTitle(), errorMessage, relatedProperty);
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract Builder errorType(ValidationTypeDTO type);
+
+        public abstract Builder beginLine(int beginLine);
+
+        @Nullable
+        public abstract Builder beginColumn(int beginColumn);
+
+        @Nullable
+        public abstract Builder endLine(int endLine);
+
+        @Nullable
+        public abstract Builder endColumn(int endColumn);
+
+        @Nullable
+        public abstract Builder errorTitle(String errorTitle);
+
+        public abstract Builder errorMessage(String errorMessage);
+
+        @Nullable
+        public abstract Builder relatedProperty(String relatedProperty);
+
+        public abstract ValidationMessageDTO build();
     }
 }

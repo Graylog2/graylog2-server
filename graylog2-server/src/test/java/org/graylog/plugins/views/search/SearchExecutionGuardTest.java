@@ -57,8 +57,6 @@ public class SearchExecutionGuardTest {
 
     @Before
     public void setUp() throws Exception {
-        GuiceInjectorHolder.createInjector(Collections.emptyList());
-
         providedCapabilities = new HashMap<>();
         providedCapabilities.put("my only capability", mock(PluginMetaData.class));
         sut = new SearchExecutionGuard(providedCapabilities);
@@ -66,7 +64,7 @@ public class SearchExecutionGuardTest {
 
     @Test
     public void failsForNonPermittedStreams() {
-        final Search search = searchWithStreamIds(createRelativeTimeRange(300), "ok", "not-ok");
+        final Search search = searchWithStreamIds(RelativeRange.create(300), "ok", "not-ok");
 
         assertThatExceptionOfType(MissingStreamPermissionException.class)
                 .isThrownBy(() -> sut.check(search, id -> id.equals("ok")))
@@ -75,14 +73,14 @@ public class SearchExecutionGuardTest {
 
     @Test
     public void succeedsIfAllStreamsArePermitted() {
-        final Search search = searchWithStreamIds(createRelativeTimeRange(300), "ok", "ok-too", "this is fine...");
+        final Search search = searchWithStreamIds(RelativeRange.create(300), "ok", "ok-too", "this is fine...");
 
         assertSucceeds(search, id -> true);
     }
 
     @Test
     public void allowsSearchesWithNoStreams() {
-        final Search search = searchWithStreamIds(createRelativeTimeRange(300));
+        final Search search = searchWithStreamIds(RelativeRange.create(300));
 
         assertSucceeds(search, id -> true);
     }
@@ -109,7 +107,7 @@ public class SearchExecutionGuardTest {
     }
 
     private Search searchWithCapabilityRequirements(String... requirementNames) {
-        final Search search = searchWithStreamIds(createRelativeTimeRange(300), "streamId");
+        final Search search = searchWithStreamIds(RelativeRange.create(300), "streamId");
 
         final Map<String, PluginMetadataSummary> requirements = requirementsMap(requirementNames);
 
@@ -133,13 +131,5 @@ public class SearchExecutionGuardTest {
                 .filter(OrFilter.or(filters))
                 .build();
         return Search.Builder.create().id("searchId").queries(ImmutableSet.of(query)).build();
-    }
-
-    private RelativeRange createRelativeTimeRange(int relativeTimeRange) {
-        try {
-            return RelativeRange.create(relativeTimeRange);
-        } catch (InvalidRangeParametersException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

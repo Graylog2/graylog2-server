@@ -15,15 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type * as React from 'react';
-import { useContext, useState } from 'react';
+import { useContext, useState, useCallback } from 'react';
 
 import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import type { UserPreferences } from 'contexts/UserPreferencesContext';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import Store from 'logic/local-storage/Store';
 import { PreferencesActions } from 'stores/users/PreferencesStore';
+import type User from 'logic/users/User';
 
 type Props = {
   children: (layoutConsumer: {
@@ -48,7 +50,7 @@ const _getPinningPreferenceKey = (viewType: ViewType | undefined): PinningPrefer
   return preferenceKey;
 };
 
-const _userSidebarPinningPref = (currentUser, userPreferences, viewType) => {
+const _userSidebarPinningPref = (currentUser: User, userPreferences: UserPreferences, viewType: ViewType | undefined) => {
   const sidebarPinningPrefKey = _getPinningPreferenceKey(viewType);
 
   if (currentUser?.readOnly) {
@@ -58,7 +60,7 @@ const _userSidebarPinningPref = (currentUser, userPreferences, viewType) => {
   return userPreferences[sidebarPinningPrefKey];
 };
 
-const _updateUserSidebarPinningPref = (currentUser, userPreferences, viewType, newIsPinned) => {
+const _updateUserSidebarPinningPref = (currentUser: User, userPreferences: UserPreferences, viewType: ViewType | undefined, newIsPinned: boolean) => {
   const sidebarPinningPrefKey: string = _getPinningPreferenceKey(viewType);
 
   if (currentUser?.readOnly) {
@@ -80,19 +82,19 @@ const SearchPageLayoutState = ({ children }: Props) => {
     sidebarIsPinned: _userSidebarPinningPref(currentUser, userPreferences, viewType),
   });
 
-  const _onSidebarPinningChange = (newIsPinned) => _updateUserSidebarPinningPref(currentUser, userPreferences, viewType, newIsPinned);
+  const _onSidebarPinningChange = useCallback((newIsPinned: boolean) => _updateUserSidebarPinningPref(currentUser, userPreferences, viewType, newIsPinned), [currentUser, userPreferences, viewType]);
 
-  const getLayoutState = (stateKey: string, defaultValue: boolean) => {
+  const getLayoutState = useCallback((stateKey: string, defaultValue: boolean) => {
     return state[stateKey] ?? defaultValue;
-  };
+  }, [state]);
 
-  const setLayoutState = (stateKey: string, value: boolean) => {
+  const setLayoutState = useCallback((stateKey: string, value: boolean) => {
     if (stateKey === 'sidebarIsPinned') {
       _onSidebarPinningChange(value);
     }
 
     setState({ ...state, [stateKey]: value });
-  };
+  }, [_onSidebarPinningChange, state]);
 
   return children({ getLayoutState, setLayoutState });
 };

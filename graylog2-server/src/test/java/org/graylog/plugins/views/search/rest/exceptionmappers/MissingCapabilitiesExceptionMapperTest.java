@@ -17,12 +17,10 @@
 package org.graylog.plugins.views.search.rest.exceptionmappers;
 
 import org.graylog.plugins.views.search.errors.MissingCapabilitiesException;
-import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.ws.rs.core.Response;
-import java.util.Collections;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,10 +30,8 @@ import static org.graylog.plugins.views.search.TestData.requirementsMap;
 public class MissingCapabilitiesExceptionMapperTest {
     private MissingCapabilitiesExceptionMapper sut;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        GuiceInjectorHolder.createInjector(Collections.emptyList());
-
         sut = new MissingCapabilitiesExceptionMapper();
     }
 

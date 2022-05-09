@@ -31,7 +31,7 @@ import usePluginEntities from 'views/logic/usePluginEntities';
 
 import type { AutoCompleter, Editor } from './ace-types';
 import type { BaseProps } from './BasicQueryInput';
-import BaseQueryInput from './BasicQueryInput';
+import BasicQueryInput from './BasicQueryInput';
 
 import SearchBarAutoCompletions from '../SearchBarAutocompletions';
 import type { Completer, FieldTypes } from '../SearchBarAutocompletions';
@@ -96,7 +96,7 @@ const _onLoadEditor = (editor, isInitialTokenizerUpdate: React.MutableRefObject<
   if (editor) {
     editor.commands.removeCommands(['find', 'indent', 'outdent']);
 
-    editor.session.on('tokenizerUpdate', (input, { bgTokenizer: { currentLine, lines } }) => {
+    editor.session.on('tokenizerUpdate', (_input, { bgTokenizer: { currentLine, lines } }) => {
       if (!isInitialTokenizerUpdate.current) {
         editor.completers.forEach((completer) => {
           if (completer?.shouldShowCompletions(currentLine, lines)) {
@@ -158,8 +158,9 @@ type Props = BaseProps & {
   ) => AutoCompleter,
   disableExecution?: boolean,
   isValidating?: boolean,
+  name: string,
   onBlur?: (query: string) => void,
-  onChange: (query: string) => Promise<string>,
+  onChange: (changeEvent: { target: { value: string, name: string } }) => Promise<string>,
   onExecute: (query: string) => void,
   streams?: Array<string> | undefined,
   timeRange?: TimeRange | NoTimeRangeOverride | undefined,
@@ -184,6 +185,7 @@ const QueryInput = ({
   validate,
   warning,
   wrapEnabled,
+  name,
 }: Props) => {
   const isInitialTokenizerUpdate = useRef(true);
   const { enableSmartSearch } = useContext(UserPreferencesContext);
@@ -199,23 +201,28 @@ const QueryInput = ({
     validate,
   }), [onExecuteProp, value, error, disableExecution, isValidating, validate]);
   const updateEditorConfiguration = useCallback((node) => _updateEditorConfiguration(node, completer, onExecute), [onExecute, completer]);
+  const _onChange = useCallback((newQuery) => {
+    onChange({ target: { value: newQuery, name } });
+
+    return Promise.resolve(newQuery);
+  }, [name, onChange]);
 
   return (
-    <BaseQueryInput height={height}
-                    className={className}
-                    disabled={false}
-                    enableAutocompletion={enableSmartSearch}
-                    error={error}
-                    warning={warning}
-                    maxLines={maxLines}
-                    onBlur={onBlur}
-                    onExecute={onExecute}
-                    onChange={onChange}
-                    onLoad={onLoadEditor}
-                    placeholder={placeholder}
-                    ref={updateEditorConfiguration}
-                    value={value}
-                    wrapEnabled={wrapEnabled} />
+    <BasicQueryInput height={height}
+                     className={className}
+                     disabled={false}
+                     enableAutocompletion={enableSmartSearch}
+                     error={error}
+                     warning={warning}
+                     maxLines={maxLines}
+                     onBlur={onBlur}
+                     onExecute={onExecute}
+                     onChange={_onChange}
+                     onLoad={onLoadEditor}
+                     placeholder={placeholder}
+                     ref={updateEditorConfiguration}
+                     value={value}
+                     wrapEnabled={wrapEnabled} />
   );
 };
 

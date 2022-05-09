@@ -95,13 +95,15 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
       onLoad?.(editor);
     }
   }, [onLoad]);
+  const editorProps = useMemo(() => ({ $blockScrolling: Infinity, selectionStyle: 'line' }), []);
+  const setOptions = useMemo(() => ({ indentedSoftWrap: false }), []);
 
   const commonProps = {
     $height: height,
     aceTheme: 'ace-queryinput', // NOTE: is usually just `theme` but we need that prop for styled-components
     className,
     disabled,
-    editorProps: { $blockScrolling: Infinity, selectionStyle: 'line' },
+    editorProps,
     fontSize: theme.fonts.size.large,
     highlightActiveLine: false,
     markers,
@@ -112,7 +114,7 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
     placeholder,
     readOnly: disabled,
     ref,
-    setOptions: { indentedSoftWrap: false },
+    setOptions,
     showGutter: false,
     showPrintMargin: false,
     value,
@@ -180,4 +182,4 @@ BasicQueryInput.defaultProps = {
   wrapEnabled: true,
 };
 
-export default BasicQueryInput;
+export default React.memo(BasicQueryInput);

@@ -86,11 +86,12 @@ jest.mock('views/components/QueryBar', () => mockComponent('QueryBar'));
 jest.mock('views/components/SearchResult', () => mockComponent('SearchResult'));
 jest.mock('views/stores/StreamsStore');
 jest.mock('views/components/common/WindowLeaveMessage', () => jest.fn(mockComponent('WindowLeaveMessage')));
-jest.mock('views/components/WithSearchStatus', () => (x) => x);
 jest.mock('views/components/SearchBar', () => mockComponent('SearchBar'));
 
-jest.mock('views/components/DashboardSearchBar', () => ({ onExecute }: { onExecute: (view: View) => Promise<void> }) => (
-  <button type="button" onClick={() => onExecute({ search: {} } as View)}>Execute Query</button>
+const mockRefreshSearch = () => SearchActions.refresh();
+
+jest.mock('views/components/DashboardSearchBar', () => () => (
+  <button type="button" onClick={mockRefreshSearch}>Execute Query</button>
 ));
 
 jest.mock('views/stores/SearchMetadataStore');
@@ -178,18 +179,6 @@ describe('Search', () => {
     render(<Search />);
 
     await waitFor(() => expect(ViewActions.search.completed.listen).toHaveBeenCalled());
-  });
-
-  it('registers to ViewActions.search.completed even if search refresh condition fails', async () => {
-    const failingSearchRefreshHook = jest.fn(() => false);
-
-    asMock(usePluginEntities).mockImplementation((type) => (type === 'views.hooks.searchRefresh' ? [failingSearchRefreshHook] : []));
-
-    render(<Search />);
-
-    await waitFor(() => expect(failingSearchRefreshHook).toHaveBeenCalled());
-
-    expect(ViewActions.search.completed.listen).toHaveBeenCalled();
   });
 
   it('unregisters from ViewActions.search.completed upon unmount', async () => {

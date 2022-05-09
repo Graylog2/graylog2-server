@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import asMock from 'helpers/mocking/AsMock';
@@ -76,25 +76,23 @@ describe('SearchResult', () => {
   });
 
   const initialFieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('aQueryId') };
-  const SimpleSearchResult = ({ fieldTypes, hasErrors }) => (
+  const SimpleSearchResult = ({ fieldTypes }) => (
     <FieldTypesContext.Provider value={fieldTypes}>
-      <SearchResult hasErrors={hasErrors} />
+      <SearchResult />
     </FieldTypesContext.Provider>
   );
 
   SimpleSearchResult.propTypes = {
     fieldTypes: PropTypes.object,
-    hasErrors: PropTypes.bool,
   };
 
   SimpleSearchResult.defaultProps = {
     fieldTypes: initialFieldTypes,
-    hasErrors: false,
   };
 
   it('should show spinner with undefined fields', () => {
     const { getByText } = render(
-      <SearchResult hasErrors={false} />,
+      <SearchResult />,
     );
 
     act(() => { jest.advanceTimersByTime(200); });
@@ -122,17 +120,5 @@ describe('SearchResult', () => {
     const { getByText } = render(<SimpleSearchResult />);
 
     expect(getByText('Create a new widget by selecting a widget type in the left sidebar section "Create".')).not.toBeNull();
-  });
-
-  it('should display overlay when hasErrors prop is true', () => {
-    render(<SimpleSearchResult hasErrors />);
-
-    expect(screen.getByTestId('disable-results-overlay')).toBeInTheDocument();
-  });
-
-  it('should not display overlay when hasErrors prop is false', () => {
-    render(<SimpleSearchResult />);
-
-    expect(screen.queryByTestId('disable-results-overlay')).not.toBeInTheDocument();
   });
 });

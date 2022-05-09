@@ -212,5 +212,10 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
         public String type() {
             return StubRetentionStrategy.class.getCanonicalName();
         }
+
+        @Override
+        public int maxNumberOfIndices() {
+            return 0;
+        }
     }
 }

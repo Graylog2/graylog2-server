@@ -16,86 +16,73 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
-import { Icon } from 'components/common';
-import { SearchActions } from 'views/stores/SearchStore';
+import { Icon, Spinner } from 'components/common';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { IconName } from 'components/common/Icon';
 
-const StyledButton = styled(Button)`
+const StyledButton = styled(Button)(({ theme, $dirty }: { theme: DefaultTheme, $dirty: boolean }) => css`
+  position: relative;
   margin-right: 12px;
   min-width: 61px;
-`;
 
-const DirtyButton = styled(StyledButton)(({ theme }) => css`
-  position: relative;
-
-  &::after {
-    position: absolute;
-    content: '';
-    height: 16px;
-    width: 16px;
-    top: -5px;
-    right: -6px;
-    border-radius: 50%;
-    background-color: ${theme.colors.variant.warning};
-  }
+  ${$dirty ? css`
+    &::after {
+      position: absolute;
+      content: '';
+      height: 16px;
+      width: 16px;
+      top: -5px;
+      right: -6px;
+      border-radius: 50%;
+      background-color: ${theme.colors.variant.warning};
+    }
+  ` : ''}
 `);
 
 type Props = {
   disabled: boolean,
   glyph: IconName,
   dirty: boolean,
+  displaySpinner?: boolean,
 };
 
-const onButtonClick = (e: MouseEvent, disabled: Boolean, onClick?: () => void) => {
+const onButtonClick = (e: MouseEvent, disabled: Boolean) => {
   if (disabled) {
     e.preventDefault();
     QueryValidationActions.displayValidationErrors();
-
-    return;
-  }
-
-  if (typeof onClick === 'function') {
-    onClick();
   }
 };
 
-const DirtySearchButton = ({ glyph, className, disabled }: { disabled: boolean, glyph: IconName, className: string }) => (
-  <DirtyButton type="submit"
-               bsStyle="success"
-               onClick={(e) => onButtonClick(e, disabled)}
-               title="Perform search (changes were made after last search execution)"
-               className={className}>
-    <Icon name={glyph} />
-  </DirtyButton>
-);
-
-const CleanSearchButton = ({ disabled, glyph, className }: { disabled: boolean, glyph: IconName, className: string }) => (
-  <StyledButton bsStyle="success"
-                onClick={(e) => onButtonClick(e, disabled, SearchActions.refresh)}
-                title="Perform search"
-                className={className}>
-    <Icon name={glyph} />
-  </StyledButton>
-);
-
-const SearchButton = ({ dirty, disabled, ...rest }: Props) => {
+const SearchButton = ({ dirty, disabled, glyph, displaySpinner }: Props) => {
   const className = disabled ? 'disabled' : '';
+  const title = dirty ? 'Perform search (changes were made after last search execution)' : 'Perform Search';
 
-  return dirty ? <DirtySearchButton className={className} disabled={disabled} {...rest} /> : <CleanSearchButton className={className} disabled={disabled} {...rest} />;
+  return (
+    <StyledButton onClick={(e) => onButtonClick(e, disabled)}
+                  title={title}
+                  className={className}
+                  type="submit"
+                  bsStyle="success"
+                  $dirty={dirty}>
+      {displaySpinner ? <Spinner delay={0} text="" /> : <Icon name={glyph} />}
+    </StyledButton>
+  );
 };
 
 SearchButton.defaultProps = {
   disabled: false,
+  displaySpinner: false,
   dirty: false,
   glyph: 'search',
 };
 
 SearchButton.propTypes = {
   disabled: PropTypes.bool,
+  displaySpinner: PropTypes.bool,
   dirty: PropTypes.bool,
   glyph: PropTypes.string,
 };

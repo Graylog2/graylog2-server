@@ -41,6 +41,7 @@ import org.graylog.grn.GRNKeyDeserializer;
 import org.graylog.grn.GRNRegistry;
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.jackson.AutoValueSubtypeResolver;
+import org.graylog2.jackson.DeserializationProblemHandlerModule;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
 import org.graylog2.jackson.SemverDeserializer;
 import org.graylog2.jackson.SemverRequirementDeserializer;
@@ -118,6 +119,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                 .registerModule(new Jdk8Module())
                 .registerModule(new JavaTimeModule())
                 .registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.SECONDS, false))
+                .registerModule(new DeserializationProblemHandlerModule())
                 .registerModule(new SimpleModule("Graylog")
                         .addKeyDeserializer(Period.class, new JodaTimePeriodKeyDeserializer())
                         .addKeyDeserializer(GRN.class, new GRNKeyDeserializer(grnRegistry))

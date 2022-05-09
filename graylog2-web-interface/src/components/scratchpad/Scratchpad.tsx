@@ -89,7 +89,7 @@ const StatusMessage = styled.span(({ theme, $visible }: { theme: DefaultTheme, $
 `);
 
 const Scratchpad = () => {
-  const clipboard = useRef<typeof ClipboardJS>();
+  const clipboard = useRef<ClipboardJS>();
   const textareaRef = useRef<HTMLTextAreaElement>();
   const confirmationModalRef = useRef<typeof BootstrapModalConfirm>();
   const statusTimeout = useRef<ReturnType<typeof setTimeout>>();
