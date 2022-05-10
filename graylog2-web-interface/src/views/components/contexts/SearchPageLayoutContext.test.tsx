@@ -43,7 +43,7 @@ describe('SearchPageConfigProvider', () => {
 
   it('provides logical defaults when no provider overrides are supplied', () => {
     const providerOverrides: LayoutState = {
-      sidebar: { isShown: true }, viewActionsLayoutOptions: FULL_MENU,
+      sidebar: { isShown: true }, viewActions: FULL_MENU,
     };
     const contextValue = SUT();
 
@@ -52,7 +52,7 @@ describe('SearchPageConfigProvider', () => {
 
   it('provides the overridden provider state when supplied', () => {
     const providerOverrides: LayoutState = {
-      sidebar: { isShown: false }, viewActionsLayoutOptions: SAVE_COPY,
+      sidebar: { isShown: false }, viewActions: SAVE_COPY,
     };
     const contextValue = SUT(providerOverrides);
 

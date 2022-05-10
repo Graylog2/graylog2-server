@@ -22,18 +22,16 @@ import SearchPageLayoutContext, { FULL_MENU } from 'views/components/contexts/Se
 
 type SearchPageLayoutProviderProps = {
   children: React.ReactNode
-  providerOverrides?: LayoutState
+  readonly providerOverrides?: LayoutState
 }
 
-const defaultState = {
+export const defaultState = {
   sidebar: { isShown: true },
-  viewActionsLayoutOptions: FULL_MENU,
+  viewActions: FULL_MENU,
 } as LayoutState;
 
 function SearchPageLayoutProvider({ children, providerOverrides = defaultState }: SearchPageLayoutProviderProps) {
-  const [state] = React.useState<LayoutState>(providerOverrides);
-
-  const value = React.useMemo(() => ({ ...state }), [state]);
+  const value = providerOverrides;
 
   return (
     <SearchPageLayoutContext.Provider value={value}>

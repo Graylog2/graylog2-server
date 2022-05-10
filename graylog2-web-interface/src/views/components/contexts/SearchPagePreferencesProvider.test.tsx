@@ -89,7 +89,7 @@ describe('SearchPagePreferencesProvider', () => {
   it('provides default search page preference state with empty preference store', () => {
     const consume = renderSUT();
 
-    expect(consume.mock.calls[0][0]?.config.sidebar.isPinned).toEqual(false);
+    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: false }) }) }));
   });
 
   it('provides default search page preference state if user does not exists', () => {
@@ -97,7 +97,7 @@ describe('SearchPagePreferencesProvider', () => {
 
     const consume = renderSUT();
 
-    expect(consume.mock.calls[0][0]?.config.sidebar.isPinned).toEqual(false);
+    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: false }) }) }));
   });
 
   it('provides default search page preference state if user has no preferences', () => {
@@ -105,7 +105,7 @@ describe('SearchPagePreferencesProvider', () => {
 
     const consume = renderSUT();
 
-    expect(consume.mock.calls[0][0]?.config.sidebar.isPinned).toEqual(false);
+    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: false }) }) }));
   });
 
   it('provides search page preferences based on user preferences', () => {
@@ -119,7 +119,7 @@ describe('SearchPagePreferencesProvider', () => {
 
     const consume = renderSUT();
 
-    expect(consume.mock.calls[0][0]?.config.sidebar.isPinned).toEqual(true);
+    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: true }) }) }));
   });
 
   it('provides search page preference state based on local storage for system admin', () => {
@@ -139,7 +139,7 @@ describe('SearchPagePreferencesProvider', () => {
 
     const consume = renderSUT();
 
-    expect(consume.mock.calls[0][0]?.config.sidebar.isPinned).toEqual(true);
+    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: true }) }) }));
   });
 
   it('should update user preferences on state change', () => {

@@ -19,7 +19,7 @@ import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
 
-export interface ViewActionsLayoutOptions {
+export interface ViewActions {
   save: {
     isShown: boolean,
   };
@@ -34,21 +34,21 @@ export interface ViewActionsLayoutOptions {
   }
 }
 
-export const FULL_MENU: ViewActionsLayoutOptions = {
+export const FULL_MENU: ViewActions = {
   save: { isShown: true },
   saveAs: { isShown: true },
   share: { isShown: true },
   actionsDropdown: { isShown: true },
 };
 
-export const SAVE_COPY: ViewActionsLayoutOptions = {
+export const SAVE_COPY: ViewActions = {
   save: { isShown: false },
   saveAs: { isShown: true },
   share: { isShown: false },
   actionsDropdown: { isShown: false },
 };
 
-export const BLANK: ViewActionsLayoutOptions = {
+export const BLANK: ViewActions = {
   save: { isShown: false },
   saveAs: { isShown: false },
   share: { isShown: false },
@@ -57,7 +57,7 @@ export const BLANK: ViewActionsLayoutOptions = {
 
 export type LayoutState = {
   sidebar: { isShown: boolean }
-  viewActionsLayoutOptions: ViewActionsLayoutOptions
+  viewActions: ViewActions
 }
 
 const SearchPageLayoutContext = React.createContext<LayoutState | undefined>(undefined);

@@ -18,12 +18,13 @@
 import { useContext } from 'react';
 
 import SearchPageLayoutContext from 'views/components/contexts/SearchPageLayoutContext';
+import { defaultState } from 'views/components/contexts/SearchPageLayoutProvider';
 
 export default function useSearchPageLayout() {
-  const context = useContext(SearchPageLayoutContext);
+  let context = useContext(SearchPageLayoutContext);
 
   if (context === undefined) {
-    throw new Error('useSearchPageConfig must be used within a SearchPageConfigContextProvider');
+    context = defaultState;
   }
 
   return context;

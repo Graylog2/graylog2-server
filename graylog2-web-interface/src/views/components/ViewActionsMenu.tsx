@@ -50,7 +50,7 @@ const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetad
 const ViewActionsMenu = ({ view, isNewView, metadata }) => {
   const currentUser = useContext(CurrentUserContext);
   const {
-    viewActionsLayoutOptions: {
+    viewActions: {
       save: {
         isShown: showSaveButton,
       }, saveAs: {

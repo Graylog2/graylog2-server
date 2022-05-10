@@ -138,7 +138,7 @@ describe('ViewActionsMenu', () => {
   });
 
   it('should only render "Save As" button in SAVE_COPY layout option', async () => {
-    const { findByTitle, queryByRole, queryByTitle } = render(<SimpleViewActionMenu providerOverrides={{ sidebar: { isShown: false }, viewActionsLayoutOptions: SAVE_COPY }} />);
+    const { findByTitle, queryByRole, queryByTitle } = render(<SimpleViewActionMenu providerOverrides={{ sidebar: { isShown: false }, viewActions: SAVE_COPY }} />);
 
     const saveButton = queryByTitle(/Save dashboard/);
     const shareButton = queryByTitle(/Share/);
@@ -152,7 +152,7 @@ describe('ViewActionsMenu', () => {
   });
 
   it('should render no action menu items in BLANK layout option', () => {
-    const { queryByRole, queryByTitle } = render(<SimpleViewActionMenu providerOverrides={{ sidebar: { isShown: false }, viewActionsLayoutOptions: BLANK }} />);
+    const { queryByRole, queryByTitle } = render(<SimpleViewActionMenu providerOverrides={{ sidebar: { isShown: false }, viewActions: BLANK }} />);
 
     const saveButton = queryByTitle(/Save dashboard/);
     const saveAsButton = queryByTitle(/Save as new dashboard/);
