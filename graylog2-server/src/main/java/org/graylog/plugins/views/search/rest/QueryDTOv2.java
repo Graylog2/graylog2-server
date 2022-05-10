@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nonnull;
@@ -51,6 +52,9 @@ public abstract class QueryDTOv2 {
     public abstract Optional<List<String>> streams();
 
     @JsonProperty
+    public abstract Optional<List<UsedSearchFilter>> filters();
+
+    @JsonProperty
     public abstract Optional<BackendQuery> query();
 
     @Nonnull
@@ -64,6 +68,7 @@ public abstract class QueryDTOv2 {
                 .streams(ImmutableList.copyOf(query.usedStreamIds()))
                 .searchTypes(query.searchTypes())
                 .timerange(query.timerange())
+                .filters(query.filters())
                 .build();
     }
 
@@ -81,6 +86,9 @@ public abstract class QueryDTOv2 {
 
         @JsonProperty
         public abstract Builder streams(@Nullable List<String> streams);
+
+        @JsonProperty
+        public abstract Builder filters(@Nullable List<UsedSearchFilter> searchFilters);
 
         @JsonProperty
         public abstract Builder query(@Nullable BackendQuery query);
@@ -103,6 +111,7 @@ public abstract class QueryDTOv2 {
         final Query.Builder finalQueryBuilder = queryBuilder;
         queryBuilder = streams().map(streams -> finalQueryBuilder.filter(StreamFilter.anyIdOf(streams.toArray(new String[0])))).orElse(queryBuilder);
         queryBuilder = query().map(queryBuilder::query).orElse(queryBuilder);
+        queryBuilder = filters().map(queryBuilder::filters).orElse(queryBuilder);
 
         return queryBuilder
                 .searchTypes(ImmutableSet.copyOf(searchTypes()))

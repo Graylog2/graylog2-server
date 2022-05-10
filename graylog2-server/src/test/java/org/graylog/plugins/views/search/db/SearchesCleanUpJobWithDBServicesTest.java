@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.db;
 
 import org.graylog.plugins.views.search.SearchRequirements;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.testing.inject.TestPasswordSecretModule;
 import org.graylog.testing.mongodb.MongoDBFixtures;
@@ -75,7 +76,8 @@ public class SearchesCleanUpJobWithDBServicesTest {
                 new SearchDbService(
                         mongodb.mongoConnection(),
                         mapperProvider,
-                        dto -> new SearchRequirements(Collections.emptySet(), dto)
+                        dto -> new SearchRequirements(Collections.emptySet(), dto),
+                        new IgnoreSearchFilters()
                 )
         );
         this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4),

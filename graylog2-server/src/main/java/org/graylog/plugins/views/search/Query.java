@@ -33,6 +33,7 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -46,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -74,6 +76,10 @@ public abstract class Query implements ContentPackable<QueryEntity> {
     @Nullable
     @JsonProperty
     public abstract Filter filter();
+
+    @Nullable
+    @JsonProperty
+    public abstract List<UsedSearchFilter> filters();
 
     @Nonnull
     @JsonProperty
@@ -212,6 +218,9 @@ public abstract class Query implements ContentPackable<QueryEntity> {
 
         @JsonProperty
         public abstract Builder filter(Filter filter);
+
+        @JsonProperty
+        public abstract Builder filters(List<UsedSearchFilter> filters);
 
         @JsonProperty
         public abstract Builder query(BackendQuery query);

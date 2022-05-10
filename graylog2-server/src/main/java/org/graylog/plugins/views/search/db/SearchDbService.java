@@ -16,12 +16,15 @@
  */
 package org.graylog.plugins.views.search.db;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.SearchSummary;
+import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
+import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
@@ -51,11 +54,13 @@ public class SearchDbService {
     protected final JacksonDBCollection<Search, ObjectId> db;
     protected final JacksonDBCollection<SearchSummary, ObjectId> summarydb;
     private final SearchRequirements.Factory searchRequirementsFactory;
+    private final SearchFiltersReFetcher searchFiltersRefetcher;
 
     @Inject
     protected SearchDbService(MongoConnection mongoConnection,
                               MongoJackObjectMapperProvider mapper,
-                              SearchRequirements.Factory searchRequirementsFactory) {
+                              SearchRequirements.Factory searchRequirementsFactory,
+                              SearchFiltersReFetcher searchFiltersRefetcher) {
         this.searchRequirementsFactory = searchRequirementsFactory;
         db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("searches"),
                 Search.class,
@@ -66,11 +71,35 @@ public class SearchDbService {
                 SearchSummary.class,
                 ObjectId.class,
                 mapper.get());
+        this.searchFiltersRefetcher = searchFiltersRefetcher;
     }
 
     public Optional<Search> get(String id) {
         return Optional.ofNullable(db.findOneById(new ObjectId(id)))
+                .map(this::getSearchWithRefetchedFilters)
                 .map(this::requirementsForSearch);
+    }
+
+    private Search getSearchWithRefetchedFilters(final Search search) {
+        if (searchFiltersRefetchNeeded(search)) {
+            return search.toBuilder()
+                    .queries(search.queries()
+                            .stream()
+                            .map(query -> query.toBuilder()
+                                    .filters(searchFiltersRefetcher.reFetch(query.filters()))
+                                    .build())
+                            .collect(ImmutableSet.toImmutableSet())
+                    )
+                    .build();
+        } else {
+            return search;
+        }
+    }
+
+    private boolean searchFiltersRefetchNeeded(Search search) {
+        return searchFiltersRefetcher.turnedOn() && search.queries()
+                .stream()
+                .anyMatch(q -> q.filters() != null && q.filters().stream().anyMatch(f -> f instanceof ReferencedSearchFilter));
     }
 
     public Search save(Search search) {
@@ -99,7 +128,10 @@ public class SearchDbService {
                 .skip(perPage * Math.max(0, page - 1));
 
         return new PaginatedList<>(
-                Streams.stream((Iterable<Search>) cursor).map(this::requirementsForSearch).collect(Collectors.toList()),
+                Streams.stream((Iterable<Search>) cursor)
+                        .map(this::getSearchWithRefetchedFilters)
+                        .map(this::requirementsForSearch)
+                        .collect(Collectors.toList()),
                 cursor.count(),
                 page,
                 perPage
@@ -112,12 +144,15 @@ public class SearchDbService {
 
     public Collection<Search> findByIds(Set<String> idSet) {
         return Streams.stream((Iterable<Search>) db.find(DBQuery.in("_id", idSet.stream().map(ObjectId::new).collect(Collectors.toList()))))
+                .map(this::getSearchWithRefetchedFilters)
                 .map(this::requirementsForSearch)
                 .collect(Collectors.toList());
     }
 
     public Stream<Search> streamAll() {
-        return Streams.stream((Iterable<Search>) db.find()).map(this::requirementsForSearch);
+        return Streams.stream((Iterable<Search>) db.find())
+                .map(this::getSearchWithRefetchedFilters)
+                .map(this::requirementsForSearch);
     }
 
     private Search requirementsForSearch(Search search) {
