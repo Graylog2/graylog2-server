@@ -16,7 +16,8 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import org.apache.lucene.queryparser.classic.CharStream;
+
+import org.apache.lucene.queryparser.charstream.CharStream;
 
 public class TokenLineCounter {
 
