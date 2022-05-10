@@ -24,18 +24,18 @@ import org.graylog2.storage.SearchVersion;
 
 import java.util.Collection;
 
-public class Elasticsearch7Plugin implements Plugin {
+public class Opensearch2Plugin implements Plugin {
     public static final SearchVersion SUPPORTED_OPENSEARCH_VERSION = SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, com.github.zafarkhaja.semver.Version.forIntegers(2, 0, 0));
 
     @Override
     public PluginMetaData metadata() {
-        return new Elasticsearch7Metadata();
+        return new Opensearch2Metadata();
     }
 
     @Override
     public Collection<PluginModule> modules() {
         return ImmutableSet.of(
-                new Elasticsearch7Module(SUPPORTED_OPENSEARCH_VERSION),
+                new Opensearch2Module(SUPPORTED_OPENSEARCH_VERSION),
                 new ViewsESBackendModule(SUPPORTED_OPENSEARCH_VERSION)
         );
     }

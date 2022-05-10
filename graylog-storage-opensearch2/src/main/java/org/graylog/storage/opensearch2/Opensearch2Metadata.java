@@ -24,10 +24,10 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
 
-public class Elasticsearch7Metadata implements PluginMetaData {
+public class Opensearch2Metadata implements PluginMetaData {
     @Override
     public String getUniqueId() {
-        return Elasticsearch7Plugin.class.getCanonicalName();
+        return Opensearch2Plugin.class.getCanonicalName();
     }
 
     @Override
