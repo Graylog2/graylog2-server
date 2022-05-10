@@ -25,7 +25,7 @@ import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
-import { ViewActionsLayoutOptions } from 'views/components/contexts/SearchPageLayoutContext';
+import { SAVE_COPY, BLANK } from 'views/components/contexts/SearchPageLayoutContext';
 
 import ViewActionsMenu from './ViewActionsMenu';
 
@@ -138,7 +138,7 @@ describe('ViewActionsMenu', () => {
   });
 
   it('should only render "Save As" button in SAVE_COPY layout option', async () => {
-    const { findByTitle, queryByRole, queryByTitle } = render(<SimpleViewActionMenu providerOverrides={{ sidebar: { isShown: false }, viewActionsLayoutOptions: ViewActionsLayoutOptions.SAVE_COPY }} />);
+    const { findByTitle, queryByRole, queryByTitle } = render(<SimpleViewActionMenu providerOverrides={{ sidebar: { isShown: false }, viewActionsLayoutOptions: SAVE_COPY }} />);
 
     const saveButton = queryByTitle(/Save dashboard/);
     const shareButton = queryByTitle(/Share/);
@@ -152,7 +152,7 @@ describe('ViewActionsMenu', () => {
   });
 
   it('should render no action menu items in BLANK layout option', () => {
-    const { queryByRole, queryByTitle } = render(<SimpleViewActionMenu providerOverrides={{ sidebar: { isShown: false }, viewActionsLayoutOptions: ViewActionsLayoutOptions.BLANK }} />);
+    const { queryByRole, queryByTitle } = render(<SimpleViewActionMenu providerOverrides={{ sidebar: { isShown: false }, viewActionsLayoutOptions: BLANK }} />);
 
     const saveButton = queryByTitle(/Save dashboard/);
     const saveAsButton = queryByTitle(/Save as new dashboard/);

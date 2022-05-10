@@ -32,7 +32,6 @@ import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import type SearchMetadata from 'views/logic/search/SearchMetadata';
 import * as ViewPermissions from 'views/Permissions';
 import useSearchPageLayout from 'hooks/useSearchPageLayout';
-import { ViewActionsLayoutOptions } from 'views/components/contexts/SearchPageLayoutContext';
 import View from 'views/logic/views/View';
 import type User from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -50,7 +49,19 @@ const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetad
 
 const ViewActionsMenu = ({ view, isNewView, metadata }) => {
   const currentUser = useContext(CurrentUserContext);
-  const { viewActionsLayoutOptions } = useSearchPageLayout();
+  const {
+    viewActionsLayoutOptions: {
+      save: {
+        isShown: showSaveButton,
+      }, saveAs: {
+        isShown: showSaveAsButton,
+      }, share: {
+        isShown: showShareButton,
+      }, actionsDropdown: {
+        isShown: showDropDownButton,
+      },
+    },
+  } = useSearchPageLayout();
   const [shareViewOpen, setShareViewOpen] = useState(false);
   const [debugOpen, setDebugOpen] = useState(false);
   const [saveAsViewOpen, setSaveAsViewOpen] = useState(false);
@@ -67,11 +78,6 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
       </MenuItem>
     </>
   );
-
-  const showSaveButton = viewActionsLayoutOptions === ViewActionsLayoutOptions.FULL_MENU;
-  const showSaveAsButton = viewActionsLayoutOptions === ViewActionsLayoutOptions.FULL_MENU || viewActionsLayoutOptions === ViewActionsLayoutOptions.SAVE_COPY;
-  const showShareButton = viewActionsLayoutOptions === ViewActionsLayoutOptions.FULL_MENU;
-  const showDropDownButton = viewActionsLayoutOptions === ViewActionsLayoutOptions.FULL_MENU;
 
   return (
     <ButtonGroup>

@@ -18,7 +18,7 @@ import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
-import SearchPageLayoutContext, { ViewActionsLayoutOptions } from 'views/components/contexts/SearchPageLayoutContext';
+import SearchPageLayoutContext, { FULL_MENU, SAVE_COPY } from 'views/components/contexts/SearchPageLayoutContext';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 
 describe('SearchPageConfigProvider', () => {
@@ -43,7 +43,7 @@ describe('SearchPageConfigProvider', () => {
 
   it('provides logical defaults when no provider overrides are supplied', () => {
     const providerOverrides: LayoutState = {
-      sidebar: { isShown: true }, viewActionsLayoutOptions: ViewActionsLayoutOptions.FULL_MENU,
+      sidebar: { isShown: true }, viewActionsLayoutOptions: FULL_MENU,
     };
     const contextValue = SUT();
 
@@ -52,7 +52,7 @@ describe('SearchPageConfigProvider', () => {
 
   it('provides the overridden provider state when supplied', () => {
     const providerOverrides: LayoutState = {
-      sidebar: { isShown: false }, viewActionsLayoutOptions: ViewActionsLayoutOptions.SAVE_COPY,
+      sidebar: { isShown: false }, viewActionsLayoutOptions: SAVE_COPY,
     };
     const contextValue = SUT(providerOverrides);
 
