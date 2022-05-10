@@ -27,13 +27,18 @@ public class V20220414150000_MigrateStreamsInSearchesToSeparateField extends Mig
     private static final Logger LOG = LoggerFactory.getLogger(V20220414150000_MigrateStreamsInSearchesToSeparateField.class);
 
     private final ClusterConfigService clusterConfigService;
-    private final JacksonDBCollection<Search, ObjectId> db;
+    private final JacksonDBCollection<SearchOutdated, ObjectId> dbOldSchema;
+    private final JacksonDBCollection<Search, ObjectId> dbNewSchema;
 
     @Inject
     public V20220414150000_MigrateStreamsInSearchesToSeparateField(final MongoConnection mongoConnection,
                                                                    final ClusterConfigService clusterConfigService,
                                                                    final MongoJackObjectMapperProvider mapper) {
-        this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("searches"),
+        this.dbOldSchema = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("searches"),
+                SearchOutdated.class,
+                ObjectId.class,
+                mapper.get());
+        this.dbNewSchema = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("searches"),
                 Search.class,
                 ObjectId.class,
                 mapper.get());
@@ -55,8 +60,8 @@ public class V20220414150000_MigrateStreamsInSearchesToSeparateField extends Mig
         final StreamsInSearchMigration migration = new StreamsInSearchMigration();
         final MigrationStatistics topLevelMigrationStatistics = new MigrationStatistics();
         final Collection<String> failedToMigrate = new ArrayList<>();
-        final DBCursor<Search> allSearches = db.find();
-        for (final Search searchObject : allSearches) {
+        final DBCursor<SearchOutdated> allSearches = dbOldSchema.find();
+        for (final SearchOutdated searchObject : allSearches) {
 
             final StreamsInSearchMigration.MigrationResponse migrationResponse = migration.migrateQueries(searchObject);
 
@@ -68,8 +73,8 @@ public class V20220414150000_MigrateStreamsInSearchesToSeparateField extends Mig
                 failedToMigrate.add(searchObject.id());
             } else if (migrationResponse.migrationStatistics.canBeMigrated()) {
                 topLevelMigrationStatistics.newMigrated();
-                final Search updatedSearchObject = searchObject.toBuilder().queries(migrationResponse.updatedQuerySet).build();
-                //db.update(DBQuery.is("_id", new ObjectId(searchObject.id())), updatedSearchObject); //TODO: won't change Mongo till the migration is fully finished
+                final Search updatedSearchObject = searchObject.migrateToNewSearchFormat(migrationResponse.updatedQuerySet);
+                //dbNewSchema.update(DBQuery.is("_id", new ObjectId(searchObject.id())), updatedSearchObject); //TODO: won't change Mongo till the migration is fully finished
             }
 
 

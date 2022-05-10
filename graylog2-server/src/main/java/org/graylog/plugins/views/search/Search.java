@@ -137,7 +137,8 @@ public abstract class Search implements ContentPackable<SearchEntity> {
         }
 
         final Set<Query> withDefaultStreams = withoutStreams.stream()
-                .map(q -> q.addStreamsToFilter(defaultStreams))
+                .map(q -> q.toBuilder().streams(defaultStreams).build())
+                //.map(q -> q.addStreamsToFilter(defaultStreams))
                 .collect(toSet());
 
         final ImmutableSet<Query> newQueries = Sets.union(withStreams, withDefaultStreams).immutableCopy();

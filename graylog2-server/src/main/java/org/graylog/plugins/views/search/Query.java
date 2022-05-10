@@ -25,11 +25,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.graph.Traverser;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.EmptyTimeRange;
-import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
@@ -40,20 +38,15 @@ import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableSortedSet.of;
 import static java.util.stream.Collectors.toSet;
 
@@ -62,7 +55,6 @@ import static java.util.stream.Collectors.toSet;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = Query.Builder.class)
 public abstract class Query implements ContentPackable<QueryEntity> {
-    private static final Logger LOG = LoggerFactory.getLogger(Query.class);
 
     @Nullable
     @JsonProperty
@@ -169,34 +161,35 @@ public abstract class Query implements ContentPackable<QueryEntity> {
 
     @SuppressWarnings("UnstableApiUsage")
     public Set<String> usedStreamIds() {
-        return Optional.ofNullable(filter())
-                .map(optFilter -> {
-                    final Traverser<Filter> filterTraverser = Traverser.forTree(filter -> firstNonNull(filter.filters(), Collections.emptySet()));
-                    return StreamSupport.stream(filterTraverser.breadthFirst(optFilter).spliterator(), false)
-                            .filter(filter -> filter instanceof StreamFilter)
-                            .map(streamFilter -> ((StreamFilter) streamFilter).streamId())
-                            .filter(Objects::nonNull)
-                            .collect(toSet());
-                })
-                .orElse(Collections.emptySet());
+        return streams();
+//        return Optional.ofNullable(filter())
+//                .map(optFilter -> {
+//                    final Traverser<Filter> filterTraverser = Traverser.forTree(filter -> firstNonNull(filter.filters(), Collections.emptySet()));
+//                    return StreamSupport.stream(filterTraverser.breadthFirst(optFilter).spliterator(), false)
+//                            .filter(filter -> filter instanceof StreamFilter)
+//                            .map(streamFilter -> ((StreamFilter) streamFilter).streamId())
+//                            .filter(Objects::nonNull)
+//                            .collect(toSet());
+//                })
+//                .orElse(Collections.emptySet());
     }
 
     public boolean hasStreams() {
         return !usedStreamIds().isEmpty();
     }
 
-    Query addStreamsToFilter(Set<String> streamIds) {
-        final Filter newFilter = addStreamsTo(filter(), streamIds);
-        return toBuilder().filter(newFilter).build();
-    }
-
-    private Filter addStreamsTo(Filter filter, Set<String> streamIds) {
-        final Filter streamIdFilter = StreamFilter.anyIdOf(streamIds.toArray(new String[]{}));
-        if (filter == null) {
-            return streamIdFilter;
-        }
-        return AndFilter.and(streamIdFilter, filter);
-    }
+//    Query addStreamsToFilter(Set<String> streamIds) {
+//        final Filter newFilter = addStreamsTo(filter(), streamIds);
+//        return toBuilder().filter(newFilter).build();
+//    }
+//
+//    private Filter addStreamsTo(Filter filter, Set<String> streamIds) {
+//        final Filter streamIdFilter = StreamFilter.anyIdOf(streamIds.toArray(new String[]{}));
+//        if (filter == null) {
+//            return streamIdFilter;
+//        }
+//        return AndFilter.and(streamIdFilter, filter);
+//    }
 
     public boolean hasSearchType(String searchTypeId) {
         return searchTypes().stream()

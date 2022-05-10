@@ -2,11 +2,10 @@ package org.graylog.plugins.views.migrations.V20220414150000_MigrateStreamsInSea
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.Search;
 
 public class StreamsInSearchMigration {
 
-    MigrationResponse migrateQueries(final Search search) {
+    MigrationResponse migrateQueries(final SearchOutdated search) {
 
         final StreamsInQueryMigration queryMigration = new StreamsInQueryMigration();
         final ImmutableSet<Query> updatedQuerySet = search.queries()

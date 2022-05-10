@@ -13,11 +13,11 @@ public class StreamsInQueryMigration {
 
     private MigrationStatistics migrationStatistics = new MigrationStatistics();
 
-    Query migrate(final Query original) {
+    Query migrate(final QueryOutdated original) {
 
         if (!needsMigration(original)) {
             migrationStatistics.newUnchanged();
-            return original;
+            return original.migrateWithNoChange();
         } else {
             //TODO: we may try to consider Query#usedStreamIds(), but it seems to get to deep with filter analysys
             final Filter filter = original.filter();
@@ -26,14 +26,11 @@ public class StreamsInQueryMigration {
                 if (subFilters.stream().allMatch(sf -> sf instanceof StreamFilter)) {
                     final Set<String> streamIds = fetchStreamIdsFromFilters(subFilters);
                     migrationStatistics.newMigrated();
-                    return original.toBuilder()
-                            .filter(null)
-                            .streams(streamIds)
-                            .build();
+                    return original.migrateToNewQueryFormat(streamIds);
                 }
             }
             migrationStatistics.newWrongFilter();
-            return original;
+            return original.migrateWithNoChange();
         }
     }
 
@@ -44,7 +41,7 @@ public class StreamsInQueryMigration {
                 .collect(Collectors.toSet());
     }
 
-    private boolean needsMigration(final Query searchQuery) {
+    private boolean needsMigration(final QueryOutdated searchQuery) {
         final Filter filter = searchQuery.filter();
         return filter != null && filter.filters() != null && !filter.filters().isEmpty();
     }
