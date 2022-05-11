@@ -22,22 +22,22 @@ import SearchPagePreferencesState from './SearchPagePreferencesState';
 
 type Props = {
   children: React.ReactNode
-  setPreferences: (stateKey: string, value: boolean) => void,
-  getPreferences: (stateKey: string, defaultValue: boolean) => boolean,
+  setPreference: (stateKey: string, value: boolean) => void,
+  getPreference: (stateKey: string, defaultValue: boolean) => boolean,
 };
 
-const SearchPagePreferencesStateProvider = ({ getPreferences, setPreferences, children }: Props) => {
+const SearchPagePreferencesStateProvider = ({ getPreference, setPreference, children }: Props) => {
   const searchPagePreferencesContextValue = useMemo(() => {
     const config = {
-      sidebar: { isPinned: getPreferences('sidebarIsPinned', false) },
+      sidebar: { isPinned: getPreference('sidebarIsPinned', false) },
     };
-    const actions = { toggleSidebarPinning: () => setPreferences('sidebarIsPinned', !config.sidebar.isPinned) };
+    const actions = { toggleSidebarPinning: () => setPreference('sidebarIsPinned', !config.sidebar.isPinned) };
 
     return ({
       config,
       actions,
     });
-  }, [getPreferences, setPreferences]);
+  }, [getPreference, setPreference]);
 
   return (
     <SearchPagePreferencesContext.Provider value={searchPagePreferencesContextValue}>
@@ -48,8 +48,8 @@ const SearchPagePreferencesStateProvider = ({ getPreferences, setPreferences, ch
 
 const SearchPagePreferencesProvider = ({ children }: { children: React.ReactNode }) => (
   <SearchPagePreferencesState>
-    {({ getPreferences, setPreferences }) => (
-      <SearchPagePreferencesStateProvider getPreferences={getPreferences} setPreferences={setPreferences}>
+    {({ getPreference, setPreference }) => (
+      <SearchPagePreferencesStateProvider getPreference={getPreference} setPreference={setPreference}>
         {children}
       </SearchPagePreferencesStateProvider>
     )}

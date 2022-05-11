@@ -18,15 +18,14 @@ import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
-import SearchPageLayoutContext, { FULL_MENU, SAVE_COPY } from 'views/components/contexts/SearchPageLayoutContext';
-import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
+import SearchPageLayoutContext, { SAVE_COPY } from 'views/components/contexts/SearchPageLayoutContext';
 
 describe('SearchPageConfigProvider', () => {
   const SUT = (suppliedProviderOverrides : LayoutState = undefined) => {
     let contextValue;
 
     render(
-      <SearchPageLayoutProvider providerOverrides={suppliedProviderOverrides}>
+      <SearchPageLayoutContext.Provider value={suppliedProviderOverrides}>
         <SearchPageLayoutContext.Consumer>
           {(value) => {
             contextValue = value;
@@ -35,20 +34,11 @@ describe('SearchPageConfigProvider', () => {
           }}
         </SearchPageLayoutContext.Consumer>
 
-      </SearchPageLayoutProvider>,
+      </SearchPageLayoutContext.Provider>,
     );
 
     return contextValue;
   };
-
-  it('provides logical defaults when no provider overrides are supplied', () => {
-    const providerOverrides: LayoutState = {
-      sidebar: { isShown: true }, viewActions: FULL_MENU,
-    };
-    const contextValue = SUT();
-
-    expect(contextValue).toEqual(providerOverrides);
-  });
 
   it('provides the overridden provider state when supplied', () => {
     const providerOverrides: LayoutState = {

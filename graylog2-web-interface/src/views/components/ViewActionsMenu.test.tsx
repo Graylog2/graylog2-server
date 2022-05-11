@@ -24,8 +24,7 @@ import type { LayoutState } from 'views/components/contexts/SearchPageLayoutCont
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
-import { SAVE_COPY, BLANK } from 'views/components/contexts/SearchPageLayoutContext';
+import SearchPageLayoutContext, { SAVE_COPY, BLANK } from 'views/components/contexts/SearchPageLayoutContext';
 
 import ViewActionsMenu from './ViewActionsMenu';
 
@@ -89,11 +88,11 @@ describe('ViewActionsMenu', () => {
     .build();
 
   const SimpleViewActionMenu = ({ currentUser: user, providerOverrides, ...props }: {currentUser?: User, providerOverrides?: LayoutState}) => (
-    <SearchPageLayoutProvider providerOverrides={providerOverrides}>
+    <SearchPageLayoutContext.Provider value={providerOverrides}>
       <CurrentUserContext.Provider value={user}>
         <ViewActionsMenu {...props} />
       </CurrentUserContext.Provider>
-    </SearchPageLayoutProvider>
+    </SearchPageLayoutContext.Provider>
   );
 
   SimpleViewActionMenu.defaultProps = {

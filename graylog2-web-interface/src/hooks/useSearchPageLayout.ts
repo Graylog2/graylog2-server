@@ -17,14 +17,13 @@
 
 import { useContext } from 'react';
 
-import SearchPageLayoutContext from 'views/components/contexts/SearchPageLayoutContext';
-import { defaultState } from 'views/components/contexts/SearchPageLayoutProvider';
+import SearchPageLayoutContext, { DEFAULT_STATE } from 'views/components/contexts/SearchPageLayoutContext';
 
 export default function useSearchPageLayout() {
   let context = useContext(SearchPageLayoutContext);
 
   if (context === undefined) {
-    context = defaultState;
+    context = DEFAULT_STATE;
   }
 
   return context;

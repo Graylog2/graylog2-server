@@ -60,6 +60,11 @@ export type LayoutState = {
   viewActions: ViewActions
 }
 
-const SearchPageLayoutContext = React.createContext<LayoutState | undefined>(undefined);
+export const DEFAULT_STATE: LayoutState = {
+  sidebar: { isShown: true },
+  viewActions: FULL_MENU,
+};
+
+const SearchPageLayoutContext = React.createContext<LayoutState>(DEFAULT_STATE);
 
 export default singleton('contexts.SearchPageLayout', () => SearchPageLayoutContext);
