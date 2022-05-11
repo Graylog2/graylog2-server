@@ -54,3 +54,5 @@ the current stage; following stages are skipped. Other pipelines operating on th
 complete stage numbers less than or equal to the aborting stage; higher numbered stages are skipped.  
 - Restarting the server would restart all inputs, even those that were manually stopped.
 We now persist the desired input state: manually stopped inputs remain stopped, even after a server restart.
+<br>Users can choose the legacy behaviour by setting a flag in the `graylog.conf`:  
+  `auto_restart_inputs = true`
