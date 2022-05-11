@@ -1,0 +1,4 @@
+type = "a"
+message = "Introduce a simplified version of the search API."
+
+pulls = ["11666"]

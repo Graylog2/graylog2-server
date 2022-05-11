@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix validation of saved searches and dashboards."
+
+issues = ["8257"]
+pulls = ["11292"]

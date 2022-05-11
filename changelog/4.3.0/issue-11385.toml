@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix problem with keyword time range parsing in search."
+
+issues = ["11385"]
+pulls = ["11386"]

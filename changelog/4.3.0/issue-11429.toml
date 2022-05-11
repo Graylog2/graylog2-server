@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix timestamp values when adding them to the search query."
+
+issues = ["11429"]
+pulls = ["12244"]

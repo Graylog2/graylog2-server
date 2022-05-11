@@ -1,0 +1,5 @@
+type = "a"
+message = "Add time zone setting for email event notifications."
+
+issues = ["11418"]
+pulls = ["11982"]

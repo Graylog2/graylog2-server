@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix user time zone issue when selecting time range from histogram widget."
+
+issues = ["12257"]
+pulls = ["12277"]

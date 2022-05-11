@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix index field type poller handling on multiple nodes."
+
+issues = ["11504"]
+pulls = ["11510"]

@@ -1,0 +1,5 @@
+type = "f"
+message = "Ensure stable order for index rotation strategies in the drop-down UI."
+
+issues = ["12246"]
+pulls = ["12247"]

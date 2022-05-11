@@ -1,0 +1,4 @@
+type = "r"
+message = "Remove database migrations that allow updates from pre-2.2 versions of Graylog."
+
+pulls = ["11683"]

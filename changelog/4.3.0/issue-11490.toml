@@ -1,0 +1,5 @@
+type = "a"
+message = "Add search query validation in the UI."
+
+issues = ["11490", "11502", "11503"]
+pulls = ["11534"]

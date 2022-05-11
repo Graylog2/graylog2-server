@@ -1,0 +1,21 @@
+type = "a"
+message = "Run pre-flight checks for MongoDB and Elasticsearch on server startup."
+
+issues = ["5248"]
+pulls = ["11889"]
+
+details.user = """
+When Graylog is starting up, it now performs connectivity and version
+checks for MongoDB and ElasticSearch/OpenSearch.
+
+By default Graylog will wait indefinitely until it can reach
+MongoDB and ElasticSearch/OpenSearch.
+Once the connections are established the versions are asserted
+for compatibility. If those fail, the startup is aborted without
+running any further actions. (e.g., migrations, periodicals)
+
+This change introduces two new configuration flags:
+
+- `skip_preflight_checks` - Set to `true` to skip the checks (`false` by default)
+- `mongodb_version_probe_attempts` - `0` (retry indefinitely) by default
+"""

@@ -1,0 +1,7 @@
+type = "f"
+message = "Switch GitHub Action builds to the Eclipse Temurin JDK."
+
+contributors = ["carldea"]
+
+issues = ["11467"]
+pulls = ["11468"]

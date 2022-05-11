@@ -1,0 +1,10 @@
+type = "c"
+message = "Improve server shutdown behavior in load balancer setups."
+
+pulls = ["12221"]
+
+details.user = """
+During shutdown, at first, set the load balancer status to "DEAD" and then
+pause for the configured load balancer recognition period. Only after that
+trigger the lifecycle change to "HALTING".
+"""

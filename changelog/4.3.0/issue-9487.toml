@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix search to adhere to the query time range limit again."
+
+issues = ["9487"]
+pulls = ["11297"]

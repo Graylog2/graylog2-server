@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix focus behavior of cloned widgets."
+
+issues = ["11918"]
+pulls = ["12175"]

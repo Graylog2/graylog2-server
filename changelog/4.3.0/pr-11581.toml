@@ -1,0 +1,4 @@
+type = "a"
+message = "Allow the usage of `this year/month/week` in keyword time ranges."
+
+pulls = ["11581"]

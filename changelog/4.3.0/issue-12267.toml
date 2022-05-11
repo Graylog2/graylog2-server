@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix validation of URL whitelist in HTTP event notification form."
+
+issues = ["12267"]
+pulls = ["12344"]

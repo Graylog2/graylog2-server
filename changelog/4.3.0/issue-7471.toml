@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix name of button to delete a dashboard page."
+
+issues = ["7471", "10403"]
+pulls = ["12138"]

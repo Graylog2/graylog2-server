@@ -1,0 +1,5 @@
+type = "c"
+message = "Improve the `key_value` pipeline function to handle quoted values."
+
+issues = ["11731", "4751"]
+pulls = ["11738"]

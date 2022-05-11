@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix disappearing field selection in aggregation builder."
+
+issues = ["11433"]
+pulls = ["11432"]

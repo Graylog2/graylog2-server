@@ -1,0 +1,5 @@
+type = "a"
+message = "Add options to disable entity sharing with \"everyone\" and individual users."
+
+issues = ["11112"]
+pulls = ["11620"]

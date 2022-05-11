@@ -1,0 +1,5 @@
+type = "a"
+message = "Add button to remove queued event notifications."
+
+issues = ["7096"]
+pulls = ["12084"]

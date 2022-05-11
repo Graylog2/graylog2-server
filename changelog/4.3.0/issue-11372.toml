@@ -1,0 +1,4 @@
+type = "f"
+message = "Avoid the creation of unnecessary search objects on the default search page."
+
+pulls = ["11372"]

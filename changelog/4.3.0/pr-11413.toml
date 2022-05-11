@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix race condition when installing content packs."
+
+pulls = ["11413"]

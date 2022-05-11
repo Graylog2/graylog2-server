@@ -1,0 +1,5 @@
+type = "a"
+message = "Extend search API to allow a query string in addition to a search object."
+
+issues = ["11257"]
+pulls = ["11266"]

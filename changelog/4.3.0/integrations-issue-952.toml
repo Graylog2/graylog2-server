@@ -1,0 +1,5 @@
+type = "c"
+message = "Several improvements to the built-in geoip lookup message processor."
+
+issues = ["graylog-plugin-integrations#952"]
+pulls = ["11854"]

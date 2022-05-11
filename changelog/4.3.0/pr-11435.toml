@@ -1,0 +1,4 @@
+type = "a"
+message = "Add support for OpenSearch as a storage backend."
+
+pulls = ["11435"]

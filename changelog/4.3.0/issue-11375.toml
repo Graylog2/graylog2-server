@@ -1,0 +1,7 @@
+type = "f"
+message = "Fix index count on index set overview page to show the correct number of indices under management."
+
+contributors = ["supahgreg"]
+
+issues = ["11375"]
+pulls = ["11395"]

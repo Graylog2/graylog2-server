@@ -1,0 +1,11 @@
+type = "c"
+message = "Stop processing further pipeline stages after `drop_message` got called."
+
+issues = ["4855"]
+pulls = ["11754"]
+
+details.user = """
+When `drop_message` is called, we complete processing of that stage; as well
+as all stages up to that stage number in other pipelines (for that message).
+Any subsequent stages are skipped, across all pipelines.
+"""

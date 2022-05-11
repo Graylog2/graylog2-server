@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix reliability of scroll queries by disabling search highlighting for those."
+
+pulls = ["12225"]

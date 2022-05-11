@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix several issues related to changing or deleting stream outputs."
+
+issues = ["8714", "11531", "10199"]
+pulls = ["12195"]

@@ -1,0 +1,5 @@
+type = "f"
+message = "Redirect to pipeline rules list when a rule doesn't exist anymore."
+
+issues = ["11044"]
+pulls = ["11455"]
