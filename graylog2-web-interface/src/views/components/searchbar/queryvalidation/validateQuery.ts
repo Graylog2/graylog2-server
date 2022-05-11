@@ -24,7 +24,7 @@ import generateId from 'logic/generateId';
 
 export type ValidationQuery = {
   queryString: ElasticsearchQueryString | string,
-  timeRange: TimeRange | undefined,
+  timeRange?: TimeRange | undefined,
   streams?: Array<string>,
   filter?: ElasticsearchQueryString | string,
 }
