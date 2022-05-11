@@ -52,3 +52,5 @@ pre 2.2 Graylog installations.
 predictable results: When `drop_message` is called in a rule, we complete processing of
 the current stage; following stages are skipped. Other pipelines operating on the same message will
 complete stage numbers less than or equal to the aborting stage; higher numbered stages are skipped.  
+- Restarting the server would restart all inputs, even those that were manually stopped.
+We now persist the desired input state: manually stopped inputs remain stopped, even after a server restart.
