@@ -33,9 +33,7 @@ class QueryValidationServiceImplTest {
 
     @Test
     void validateNoMessages() {
-        final MappedFieldTypesService fields = (streamIds, timeRange) -> Collections.emptySet();
-
-        // validator doesn't return any warnings or errors
+         // validator doesn't return any warnings or errors
         final QueryValidator queryValidator = context -> Collections.emptyList();
 
         final QueryValidationServiceImpl service = new QueryValidationServiceImpl(
@@ -51,8 +49,6 @@ class QueryValidationServiceImplTest {
 
     @Test
     void validateWithWarning() {
-        final MappedFieldTypesService fields = (streamIds, timeRange) -> Collections.emptySet();
-
         // validator returns one warning
         final QueryValidator queryValidator = context -> Collections.singletonList(
                 ValidationMessage.builder(ValidationStatus.WARNING, ValidationType.INVALID_OPERATOR)
@@ -76,8 +72,6 @@ class QueryValidationServiceImplTest {
 
     @Test
     void validateWithError() {
-        final MappedFieldTypesService fields = (streamIds, timeRange) -> Collections.emptySet();
-
         // validator returns one warning
         final QueryValidator queryValidator = context -> Collections.singletonList(
                 ValidationMessage.builder(ValidationStatus.ERROR, ValidationType.QUERY_PARSING_ERROR)
