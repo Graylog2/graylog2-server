@@ -30,7 +30,8 @@ import onSaveAsView from 'views/logic/views/OnSaveAsViewAction';
 import { ViewStore } from 'views/stores/ViewStore';
 import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import type SearchMetadata from 'views/logic/search/SearchMetadata';
-import * as Permissions from 'views/Permissions';
+import * as ViewPermissions from 'views/Permissions';
+import useSearchPageLayout from 'hooks/useSearchPageLayout';
 import View from 'views/logic/views/View';
 import type User from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -41,13 +42,26 @@ import ViewPropertiesModal from './views/ViewPropertiesModal';
 import IfDashboard from './dashboard/IfDashboard';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
 
-const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) => isPermitted(currentUser?.permissions, [Permissions.View.Edit(view.id)])
+const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) => isPermitted(currentUser?.permissions, [ViewPermissions.View.Edit(view.id)])
   || (view.type === View.Type.Dashboard && isPermitted(currentUser?.permissions, [`dashboards:edit:${view.id}`]));
 
 const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetadata.undeclared.size > 0;
 
 const ViewActionsMenu = ({ view, isNewView, metadata }) => {
   const currentUser = useContext(CurrentUserContext);
+  const {
+    viewActions: {
+      save: {
+        isShown: showSaveButton,
+      }, saveAs: {
+        isShown: showSaveAsButton,
+      }, share: {
+        isShown: showShareButton,
+      }, actionsDropdown: {
+        isShown: showDropDownButton,
+      },
+    },
+  } = useSearchPageLayout();
   const [shareViewOpen, setShareViewOpen] = useState(false);
   const [debugOpen, setDebugOpen] = useState(false);
   const [saveAsViewOpen, setSaveAsViewOpen] = useState(false);
@@ -67,21 +81,28 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
 
   return (
     <ButtonGroup>
+      {showSaveButton && (
       <Button onClick={() => onSaveView(view)}
               disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}
-              data-testid="dashboard-save-button">
+              title="Save dashboard">
         <Icon name="save" /> Save
       </Button>
+      )}
+      {showSaveAsButton && (
       <Button onClick={() => setSaveAsViewOpen(true)}
               disabled={hasUndeclaredParameters}
-              data-testid="dashboard-save-as-button">
+              title="Save as new dashboard">
         <Icon name="copy" /> Save as
       </Button>
+      )}
+      {showShareButton && (
       <ShareButton entityType="dashboard"
                    entityId={view.id}
                    onClick={() => setShareViewOpen(true)}
                    bsStyle="default"
                    disabledInfo={isNewView && 'Only saved dashboards can be shared.'} />
+      )}
+      {showDropDownButton && (
       <DropdownButton title={<Icon name="ellipsis-h" />} id="query-tab-actions-dropdown" pullRight noCaret>
         <MenuItem onSelect={() => setEditViewOpen(true)} disabled={isNewView || !allowedToEdit}>
           <Icon name="edit" /> Edit metadata
@@ -93,6 +114,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
           <BigDisplayModeConfiguration view={view} disabled={isNewView} />
         </IfDashboard>
       </DropdownButton>
+      )}
       {debugOpen && <DebugOverlay show onClose={() => setDebugOpen(false)} />}
       {saveAsViewOpen && (
         <ViewPropertiesModal show

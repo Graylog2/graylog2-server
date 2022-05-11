@@ -50,9 +50,10 @@ import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import DefaultFieldTypesProvider from 'views/components/contexts/DefaultFieldTypesProvider';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import useSearchPageLayout from 'hooks/useSearchPageLayout';
 import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
-import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import usePluginEntities from 'views/logic/usePluginEntities';
+import SearchPagePreferencesProvider from 'views/components/contexts/SearchPagePreferencesProvider';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
@@ -170,6 +171,7 @@ const Search = () => {
     () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState(), setHasErrors),
     [searchRefreshHooks],
   );
+  const { sidebar: { isShown: showSidebar } } = useSearchPageLayout();
 
   useRefreshSearchOn([SearchActions.refresh, ViewActions.search], refreshIfNotUndeclared);
 
@@ -198,15 +200,17 @@ const Search = () => {
               </IfInteractive>
               <InteractiveContext.Consumer>
                 {(interactive) => (
-                  <SearchPageLayoutProvider>
+                  <SearchPagePreferencesProvider>
                     <DefaultFieldTypesProvider>
                       <ViewAdditionalContextProvider>
                         <HighlightingRulesProvider>
                           <GridContainer id="main-row" interactive={interactive}>
                             <IfInteractive>
+                              {showSidebar && (
                               <ConnectedSidebar>
                                 <FieldsOverview />
                               </ConnectedSidebar>
+                              )}
                             </IfInteractive>
                             <SearchArea>
                               <IfInteractive>
@@ -233,7 +237,7 @@ const Search = () => {
                         </HighlightingRulesProvider>
                       </ViewAdditionalContextProvider>
                     </DefaultFieldTypesProvider>
-                  </SearchPageLayoutProvider>
+                  </SearchPagePreferencesProvider>
                 )}
               </InteractiveContext.Consumer>
             </CurrentViewTypeProvider>
