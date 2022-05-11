@@ -28,9 +28,9 @@ import { PreferencesActions } from 'stores/users/PreferencesStore';
 import type User from 'logic/users/User';
 
 type Props = {
-  children: (layoutConsumer: {
-    setLayoutState: (stateKey: string, value: boolean) => void,
-    getLayoutState: (stateKey: string, defaultValue: boolean) => boolean,
+  children: (preferencesConsumer: {
+    setPreference: (stateKey: string, value: boolean) => void,
+    getPreference: (stateKey: string, defaultValue: boolean) => boolean,
   }) => React.ReactElement;
 };
 
@@ -74,7 +74,7 @@ const _updateUserSidebarPinningPref = (currentUser: User, userPreferences: UserP
   }
 };
 
-const SearchPageLayoutState = ({ children }: Props) => {
+const SearchPagePreferencesState = ({ children }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   const userPreferences = useContext(UserPreferencesContext);
   const viewType = useContext(ViewTypeContext);
@@ -84,11 +84,11 @@ const SearchPageLayoutState = ({ children }: Props) => {
 
   const _onSidebarPinningChange = useCallback((newIsPinned: boolean) => _updateUserSidebarPinningPref(currentUser, userPreferences, viewType, newIsPinned), [currentUser, userPreferences, viewType]);
 
-  const getLayoutState = useCallback((stateKey: string, defaultValue: boolean) => {
+  const getPreference = useCallback((stateKey: string, defaultValue: boolean) => {
     return state[stateKey] ?? defaultValue;
   }, [state]);
 
-  const setLayoutState = useCallback((stateKey: string, value: boolean) => {
+  const setPreference = useCallback((stateKey: string, value: boolean) => {
     if (stateKey === 'sidebarIsPinned') {
       _onSidebarPinningChange(value);
     }
@@ -96,7 +96,7 @@ const SearchPageLayoutState = ({ children }: Props) => {
     setState({ ...state, [stateKey]: value });
   }, [_onSidebarPinningChange, state]);
 
-  return children({ getLayoutState, setLayoutState });
+  return children({ getPreference: getPreference, setPreference: setPreference });
 };
 
-export default SearchPageLayoutState;
+export default SearchPagePreferencesState;

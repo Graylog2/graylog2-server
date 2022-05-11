@@ -22,8 +22,8 @@ import styled, { css } from 'styled-components';
 
 import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import type QueryResult from 'views/logic/QueryResult';
-import type { SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
-import SearchPageLayoutContext from 'views/components/contexts/SearchPageLayoutContext';
+import type { SearchPreferencesLayout } from 'views/components/contexts/SearchPagePreferencesContext';
+import SearchPagePreferencesContext from 'views/components/contexts/SearchPagePreferencesContext';
 
 import SidebarNavigation from './SidebarNavigation';
 import ContentColumn from './ContentColumn';
@@ -36,7 +36,7 @@ type Props = {
   children: React.ReactElement,
   queryId: string,
   results: QueryResult,
-  searchPageLayout?: SearchPageLayout,
+  searchPageLayout?: SearchPreferencesLayout,
   sections?: Array<SidebarSection>,
   viewMetadata: ViewMetadata,
 };
@@ -134,9 +134,9 @@ Sidebar.defaultProps = {
 };
 
 const SidebarWithContext = ({ children, ...props }: React.ComponentProps<typeof Sidebar>) => (
-  <SearchPageLayoutContext.Consumer>
+  <SearchPagePreferencesContext.Consumer>
     {(searchPageLayout) => <Sidebar {...props} searchPageLayout={searchPageLayout}>{children}</Sidebar>}
-  </SearchPageLayoutContext.Consumer>
+  </SearchPagePreferencesContext.Consumer>
 );
 
 export default SidebarWithContext;
