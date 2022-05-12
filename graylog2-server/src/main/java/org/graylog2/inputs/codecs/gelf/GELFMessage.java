@@ -21,6 +21,7 @@ import org.graylog2.plugin.Tools;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class GELFMessage {
@@ -67,7 +68,11 @@ public class GELFMessage {
      * @see Tools#decompressGzip(byte[], long)
      * @see Tools#decompressZlib(byte[], long)
      */
+
     public String getJSON(long maxBytes) {
+        return getJSON(maxBytes, StandardCharsets.UTF_8);
+    }
+    public String getJSON(long maxBytes, Charset charset) {
         try {
             switch (getGELFType()) {
                 case ZLIB:
@@ -75,7 +80,7 @@ public class GELFMessage {
                 case GZIP:
                     return Tools.decompressGzip(payload, maxBytes);
                 case UNCOMPRESSED:
-                    return new String(payload, StandardCharsets.UTF_8);
+                    return new String(payload, charset);
                 case CHUNKED:
                 case UNSUPPORTED:
                     throw new IllegalStateException("Unknown GELF type. Not supported.");

@@ -45,7 +45,7 @@ public class RawCodec extends AbstractCodec {
     @Nullable
     @Override
     public Message decode(@Nonnull RawMessage raw) {
-        return new Message(new String(raw.getPayload(), StandardCharsets.UTF_8), null, raw.getTimestamp());
+        return new Message(new String(raw.getPayload(), charset), null, raw.getTimestamp());
     }
 
     @Nullable
