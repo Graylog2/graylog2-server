@@ -55,7 +55,7 @@
     "ace-builds": "1.4.14",
     "bluebird": "^3.4.0",
     "bootstrap": "3.4.1",
-    "bson-objectid": "^1.2.5",
+    "bson-objectid": "^2.0.3",
     "buffer": "^6.0.3",
     "chroma-js": "^2.0.3",
     "classnames": "^2.2.0",
