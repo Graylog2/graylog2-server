@@ -19,6 +19,7 @@ class DocsHelper {
   PAGES = {
     ALERTS: 'alerts',
     AUTHENTICATORS: 'permission-management#authentication',
+    CHANGELOG: 'changelog',
     CLUSTER_STATUS_EXPLAINED: 'elasticsearch#cluster-status-explained',
     COLLECTOR: 'sidecar',
     COLLECTOR_SIDECAR: 'sidecar',
@@ -26,6 +27,7 @@ class DocsHelper {
     CONFIGURING_ES: 'elasticsearch',
     DASHBOARDS: 'dashboards',
     DECORATORS: 'decorators',
+    ENTERPRISE_CHANGELOG: 'changelog-graylog',
     ENTERPRISE_SETUP: 'setup',
     ES_CLUSTER_STATUS_RED: 'elasticsearch#cluster-status-explained',
     ES_CLUSTER_UNAVAILABLE: 'elasticsearch#configuration',
