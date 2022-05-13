@@ -14,18 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest;
+package org.graylog.plugins.views.search.engine;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
-import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchJobService;
-import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.plugins.views.search.permissions.StreamPermissions;
+import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,28 +33,26 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
-
 public class SearchExecutor {
     private static final Logger LOG = LoggerFactory.getLogger(SearchExecutor.class);
 
     private final SearchDomain searchDomain;
     private final SearchJobService searchJobService;
     private final QueryEngine queryEngine;
-    private final SearchExecutionGuard executionGuard;
-    private final ObjectMapper objectMapper;
+    private final SearchValidator searchValidator;
+    private final SearchNormalizer searchNormalizer;
 
     @Inject
     public SearchExecutor(SearchDomain searchDomain,
                           SearchJobService searchJobService,
                           QueryEngine queryEngine,
-                          SearchExecutionGuard executionGuard,
-                          ObjectMapper objectMapper) {
+                          SearchValidator searchValidator,
+                          SearchNormalizer searchNormalizer) {
         this.searchDomain = searchDomain;
         this.searchJobService = searchJobService;
         this.queryEngine = queryEngine;
-        this.executionGuard = executionGuard;
-        this.objectMapper = objectMapper;
+        this.searchValidator = searchValidator;
+        this.searchNormalizer = searchNormalizer;
     }
 
     public SearchJob execute(String searchId, SearchUser searchUser, ExecutionState executionState) {
@@ -67,13 +62,11 @@ public class SearchExecutor {
     }
 
     public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState) {
-        final Search searchWithStreams = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadAll());
+        final Search normalizedSearch = searchNormalizer.normalize(search, searchUser, executionState);
 
-        final Search searchWithExecutionState = searchWithStreams.applyExecutionState(objectMapper, firstNonNull(executionState, ExecutionState.empty()));
+        searchValidator.validate(normalizedSearch, searchUser);
 
-        authorize(searchWithExecutionState, searchUser);
-
-        final SearchJob searchJob = queryEngine.execute(searchJobService.create(searchWithExecutionState, searchUser.username()));
+        final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username()));
 
         try {
             Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 60000, TimeUnit.MILLISECONDS);
@@ -88,9 +81,5 @@ public class SearchExecutor {
         }
 
         return searchJob;
-    }
-
-    private void authorize(Search search, StreamPermissions streamPermissions) {
-        this.executionGuard.check(search, streamPermissions::canReadStream);
     }
 }

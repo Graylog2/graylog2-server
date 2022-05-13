@@ -16,7 +16,7 @@
  */
 package org.graylog2.rest.resources.search;
 
-import org.graylog.plugins.views.search.rest.SearchExecutor;
+import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesClusterConfig;

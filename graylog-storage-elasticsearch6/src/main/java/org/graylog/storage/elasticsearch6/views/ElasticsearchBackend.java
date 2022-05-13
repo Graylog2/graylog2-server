@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.elasticsearch6.views;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.google.inject.name.Named;
 import io.searchbox.client.JestClient;
@@ -34,6 +33,7 @@ import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.SearchConfig;
+import org.graylog.plugins.views.search.engine.SearchValidator;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -78,6 +78,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final QueryStringDecorators queryStringDecorators;
     private final ESGeneratedQueryContext.Factory queryContextFactory;
     private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
+    private final SearchValidator searchValidator;
     private final boolean allowLeadingWildcard;
 
     @Inject
@@ -87,8 +88,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                 QueryStringDecorators queryStringDecorators,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
                                 UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
-                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard,
-                                ObjectMapper objectMapper) {
+                                SearchValidator searchValidator,
+                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.jestClient = jestClient;
         this.indexLookup = indexLookup;
@@ -96,6 +97,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         this.queryStringDecorators = queryStringDecorators;
         this.queryContextFactory = queryContextFactory;
         this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
+        this.searchValidator = searchValidator;
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
@@ -109,7 +111,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     public ESGeneratedQueryContext generate(SearchJob job, Query query, SearchConfig searchConfig) {
         final BackendQuery backendQuery = query.query();
 
-        validateQueryTimeRange(query, searchConfig);
+        searchValidator.validateQueryTimeRange(query, searchConfig);
 
         final Set<SearchType> searchTypes = query.searchTypes();
 
@@ -136,14 +138,12 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, job, query);
         for (SearchType searchType : searchTypes) {
-
-            final Optional<SearchTypeError> searchTypeError = validateSearchType(query, searchType, searchConfig);
+            final Optional<SearchTypeError> searchTypeError = searchValidator.validateSearchType(query, searchType, searchConfig);
             if(searchTypeError.isPresent()) {
                 LOG.error("Invalid search type {} for elasticsearch backend, cannot generate query part. Skipping this search type.", searchType.type());
                 queryContext.addError(searchTypeError.get());
                 continue;
             }
-
 
             final SearchSourceBuilder searchTypeSourceBuilder = queryContext.searchSourceBuilder(searchType);
 
@@ -164,8 +164,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
 
             searchType.query().ifPresent(searchTypeBackendQuery -> {
-                final String searchTypeQueryString = this.queryStringDecorators.decorate(searchTypeBackendQuery.queryString(), job, query);
-                final QueryBuilder normalizedSearchTypeQuery = normalizeQueryString(searchTypeQueryString);
+                final QueryBuilder normalizedSearchTypeQuery = normalizeQueryString(searchTypeBackendQuery.queryString());
                 searchTypeOverrides.must(normalizedSearchTypeQuery);
             });
 
