@@ -20,11 +20,11 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.SearchSummary;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
-import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
@@ -97,9 +97,10 @@ public class SearchDbService {
     }
 
     private boolean searchFiltersRefetchNeeded(Search search) {
-        return searchFiltersRefetcher.turnedOn() && search.queries()
-                .stream()
-                .anyMatch(q -> q.filters() != null && q.filters().stream().anyMatch(f -> f instanceof ReferencedSearchFilter));
+        return searchFiltersRefetcher.turnedOn() &&
+                search.queries()
+                        .stream()
+                        .anyMatch(Query::hasReferencedStreamFilters);
     }
 
     public Search save(Search search) {

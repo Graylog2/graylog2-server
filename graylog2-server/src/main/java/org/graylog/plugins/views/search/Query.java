@@ -33,6 +33,7 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
+import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -184,6 +185,10 @@ public abstract class Query implements ContentPackable<QueryEntity> {
 
     public boolean hasStreams() {
         return !usedStreamIds().isEmpty();
+    }
+
+    public boolean hasReferencedStreamFilters() {
+        return filters() != null && filters().stream().anyMatch(f -> f instanceof ReferencedSearchFilter);
     }
 
     Query addStreamsToFilter(Set<String> streamIds) {
