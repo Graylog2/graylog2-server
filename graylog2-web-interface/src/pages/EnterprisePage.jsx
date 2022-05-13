@@ -36,6 +36,26 @@ const EnterpriseProductLink = ({ children }) => {
   );
 };
 
+const ProductLink = ({ href, clusterId, children }) => {
+  let hrefWithParam = href;
+
+  if (clusterId) {
+    hrefWithParam = `${hrefWithParam}?cluster_id=${clusterId}`;
+  }
+
+  return (
+    <ButtonToolbar>
+      <Button type="link"
+              target="_blank"
+              rel="noopener noreferrer"
+              href={hrefWithParam}
+              bsStyle="primary">
+        {children}
+      </Button>
+    </ButtonToolbar>
+  );
+};
+
 EnterpriseProductLink.propTypes = {
   children: PropTypes.node,
 };
@@ -56,6 +76,10 @@ const EnterprisePage = createReactClass({
   displayName: 'EnterprisePage',
 
   render() {
+    // TODO: Actually request and set clusterId in state
+    // const { clusterId } = this.state;
+    const clusterId = 'abc-123';
+
     return (
       <DocumentTitle title="Try Graylog Enterprise">
         <div>
@@ -82,15 +106,9 @@ const EnterprisePage = createReactClass({
                     hours per year in collecting and analyzing log data to uncover the root cause of performance,
                     outage, and error issues.
                   </p>
-                  <ButtonToolbar>
-                    <Button type="link"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href="https://go2.graylog.org/request-graylog-operations"
-                            bsStyle="primary">
-                      Request now
-                    </Button>
-                  </ButtonToolbar>
+                  <ProductLink href="https://go2.graylog.org/request-graylog-operations" clusterId={clusterId}>
+                    Request now
+                  </ProductLink>
                 </BiggerFontSize>
               </Col>
               <Col md={6}>
@@ -102,15 +120,9 @@ const EnterprisePage = createReactClass({
                     integrations with other security tools, SOAR capabilities, and numerous compliance reporting
                     features.
                   </p>
-                  <ButtonToolbar>
-                    <Button type="link"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href="https://go2.graylog.org/request-graylog-security"
-                            bsStyle="primary">
-                      Request now
-                    </Button>
-                  </ButtonToolbar>
+                  <ProductLink href="https://go2.graylog.org/request-graylog-security" clusterId={clusterId}>
+                    Request now
+                  </ProductLink>
                 </BiggerFontSize>
               </Col>
             </Row>
