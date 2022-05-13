@@ -115,7 +115,8 @@ describe('FetchProvider', () => {
 
   beforeAll(() => {
     server = setUpServer();
-    // eslint-disable-next-line global-require
+
+    // @ts-expect-error Node.js implementation has slightly differing types
     window.fetch = nodeFetch;
 
     // @ts-ignore Types do not match actual result for some reason
