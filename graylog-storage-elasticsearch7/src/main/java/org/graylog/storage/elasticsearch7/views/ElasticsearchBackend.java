@@ -35,6 +35,7 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.ShardOperationFailedException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
@@ -94,6 +95,23 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         this.queryStringDecorators = queryStringDecorators;
         this.queryContextFactory = queryContextFactory;
         this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
+        this.allowLeadingWildcard = allowLeadingWildcard;
+    }
+
+    @Deprecated
+    public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
+                                ElasticsearchClient client,
+                                IndexLookup indexLookup,
+                                QueryStringDecorators queryStringDecorators,
+                                ESGeneratedQueryContext.Factory queryContextFactory,
+                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
+        this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
+        this.client = client;
+        this.indexLookup = indexLookup;
+
+        this.queryStringDecorators = queryStringDecorators;
+        this.queryContextFactory = queryContextFactory;
+        this.usedSearchFiltersToQueryStringsMapper = new IgnoreSearchFilters();
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
