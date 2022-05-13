@@ -25,8 +25,6 @@ public abstract class EnterpriseLicenseInfo {
     public enum Status {
         @JsonProperty("absent")
         ABSENT,
-        @JsonProperty("staged")
-        STAGED,
         @JsonProperty("installed")
         INSTALLED
     }
