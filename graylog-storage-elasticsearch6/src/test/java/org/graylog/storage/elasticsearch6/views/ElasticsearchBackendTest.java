@@ -138,20 +138,16 @@ public class ElasticsearchBackendTest {
         final List<QueryBuilder> filters = ((BoolQueryBuilder) esQuery).filter();
 
         //filter for empty ES query
-        assertThat(filters.stream()
-                .anyMatch(queryBuilder -> queryBuilder instanceof MatchAllQueryBuilder))
-                .isTrue();
+        assertThat(filters)
+                .anyMatch(queryBuilder -> queryBuilder instanceof MatchAllQueryBuilder);
 
         //2 filters from search filters
-        assertThat(filters.stream()
-                .filter(queryBuilder -> queryBuilder instanceof QueryStringQueryBuilder)
-                .anyMatch(queryBuilder -> "method:GET".equals(((QueryStringQueryBuilder) queryBuilder).queryString())))
-                .isTrue();
-
-        assertThat(filters.stream()
-                .filter(queryBuilder -> queryBuilder instanceof QueryStringQueryBuilder)
-                .anyMatch(queryBuilder -> "method:POST".equals(((QueryStringQueryBuilder) queryBuilder).queryString())))
-                .isTrue();
+        assertThat(filters)
+                .filteredOn(queryBuilder -> queryBuilder instanceof QueryStringQueryBuilder)
+                .extracting(queryBuilder -> (QueryStringQueryBuilder) queryBuilder)
+                .extracting(QueryStringQueryBuilder::queryString)
+                .contains("method:POST")
+                .contains("method:GET");
 
 
     }
