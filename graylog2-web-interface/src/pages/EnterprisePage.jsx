@@ -18,17 +18,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 import styled, { css } from 'styled-components';
 
-import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
-import { Alert, Col, Row } from 'components/bootstrap';
+import { DocumentTitle, PageHeader } from 'components/common';
+import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import { GraylogClusterOverview } from 'components/cluster';
-import DocumentationLink from 'components/support/DocumentationLink';
-import EnterpriseFreeLicenseForm from 'components/enterprise/EnterpriseFreeLicenseForm';
 import PluginList from 'components/enterprise/PluginList';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { EnterpriseActions, EnterpriseStore } from 'stores/enterprise/EnterpriseStore';
 
 const EnterpriseProductLink = ({ children }) => {
   return (
@@ -48,11 +44,6 @@ EnterpriseProductLink.defaultProps = {
   children: null,
 };
 
-const EnterpriseFeatureList = styled.ul`
-  list-style-type: disc;
-  padding-left: 20px;
-`;
-
 const BiggerFontSize = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.large};
 `);
@@ -63,52 +54,8 @@ const GraylogEnterpriseHeader = styled.h2`
 
 const EnterprisePage = createReactClass({
   displayName: 'EnterprisePage',
-  mixins: [Reflux.connect(EnterpriseStore)],
-
-  componentDidMount() {
-    EnterpriseActions.getLicenseInfo();
-  },
-
-  onFreeLicenseFormSubmit(formFields, callback) {
-    EnterpriseActions.requestFreeEnterpriseLicense(formFields)
-      .then(() => callback(true))
-      .catch(() => callback(false));
-  },
-
-  _isLoading() {
-    const { licenseStatus } = this.state;
-
-    return !licenseStatus;
-  },
-
-  renderLicenseFormContent(licenseStatus) {
-    let licenseFormContent;
-
-    if (this._isLoading()) {
-      licenseFormContent = <Spinner text="Loading license status" />;
-    } else if (licenseStatus === 'installed') {
-      licenseFormContent = (
-        <Alert bsStyle="success">
-          You have a Graylog Enterprise license installed.
-        </Alert>
-      );
-    } else if (licenseStatus === 'staged') {
-      licenseFormContent = (
-        <Alert bsStyle="warning">
-          You requested a free Graylog Enterprise license. It will be activated once you restart the Graylog
-          server with the Graylog Enterprise plugins installed.
-        </Alert>
-      );
-    } else {
-      licenseFormContent = <EnterpriseFreeLicenseForm onSubmit={this.onFreeLicenseFormSubmit} />;
-    }
-
-    return licenseFormContent;
-  },
 
   render() {
-    const { licenseStatus } = this.state;
-
     return (
       <DocumentTitle title="Try Graylog Enterprise">
         <div>
@@ -125,47 +72,48 @@ const EnterprisePage = createReactClass({
             <PluginList />
           </GraylogClusterOverview>
           <HideOnCloud>
-            <IfPermitted permissions="freelicenses:create">
-              <Row className="content">
-                <Col md={6}>
-                  <GraylogEnterpriseHeader>Graylog Enterprise</GraylogEnterpriseHeader>
-                  <BiggerFontSize>
-                    <p><strong>Extend Graylog’s Open Source capabilities with a free trial of Graylog Enterprise for 30 days.</strong></p>
-                    <p>
-                      Graylog Enterprise introduces productivity and compliance features designed to help organizations
-                      reduce risk while encouraging collaboration across a large number of users.
-                    </p>
-
-                    <p>Graylog Enterprise includes:</p>
-
-                    <EnterpriseFeatureList>
-                      <li>Automated <DocumentationLink page="archiving" text={<strong>archiving</strong>} /> and retention</li>
-                      <li><DocumentationLink page="auditlog" text={<strong>Audit logs</strong>} /> of Graylog user activity</li>
-                      <li>
-                        Alerts with <DocumentationLink page="alerts#filter-with-dynamic-lists-enterprise-feature" text={<strong>dynamic lists</strong>} />
-                        {' '}and <DocumentationLink page="alerts" text={<strong>correlation engine</strong>} /> for events
-                        to minimize the number of alerts that you need to create and maintain
-                      </li>
-                      <li>
-                        Customizable <DocumentationLink page="reporting" text={<strong>scheduled reporting</strong>} /> using dashboard widgets for sharing analysis outside Graylog
-                      </li>
-                      <li><DocumentationLink page="parameters"
-                                             text={<strong>Parameterized search templates</strong>} /> enable you to
-                        combine and reuse queries
-                      </li>
-                      <li><DocumentationLink page="cluster-to-cluster-forwarder"
-                                             text={<strong>Data forwarder</strong>} /> to easily combine data from
-                        multiple Graylog instances
-                      </li>
-                      <li>And more...</li>
-                    </EnterpriseFeatureList>
-                  </BiggerFontSize>
-                </Col>
-                <Col md={6}>
-                  {this.renderLicenseFormContent(licenseStatus)}
-                </Col>
-              </Row>
-            </IfPermitted>
+            <Row className="content">
+              <Col md={6}>
+                <GraylogEnterpriseHeader>Graylog Operations</GraylogEnterpriseHeader>
+                <BiggerFontSize>
+                  <p>
+                    Designed to meet the needs of resource-constrained IT Operations and Software Engineering teams,
+                    Graylog Operations provides numerous productivity enhancements that will save you thousands of
+                    hours per year in collecting and analyzing log data to uncover the root cause of performance,
+                    outage, and error issues.
+                  </p>
+                  <ButtonToolbar>
+                    <Button type="link"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href="https://go2.graylog.org/request-graylog-operations"
+                            bsStyle="primary">
+                      Request now
+                    </Button>
+                  </ButtonToolbar>
+                </BiggerFontSize>
+              </Col>
+              <Col md={6}>
+                <GraylogEnterpriseHeader>Graylog Security</GraylogEnterpriseHeader>
+                <BiggerFontSize>
+                  <p>
+                    Extend Graylog Open’s capabilities for detecting, investigating, and responding to cybersecurity
+                    threats with security-specific dashboards and alerts, anomaly detection AI/ML engine,
+                    integrations with other security tools, SOAR capabilities, and numerous compliance reporting
+                    features.
+                  </p>
+                  <ButtonToolbar>
+                    <Button type="link"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href="https://go2.graylog.org/request-graylog-security"
+                            bsStyle="primary">
+                      Request now
+                    </Button>
+                  </ButtonToolbar>
+                </BiggerFontSize>
+              </Col>
+            </Row>
           </HideOnCloud>
         </div>
       </DocumentTitle>

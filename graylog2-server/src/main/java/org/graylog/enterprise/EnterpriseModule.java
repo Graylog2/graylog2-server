@@ -14,23 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.freeenterprise;
+package org.graylog.enterprise;
 
-import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
-import org.graylog2.plugin.PluginConfigBean;
+import org.graylog2.plugin.PluginModule;
 
-import java.net.URI;
-
-public class FreeEnterpriseConfiguration implements PluginConfigBean {
-    private static final String PREFIX = "free_enterprise_";
-
-    public static final String SERVICE_URL = PREFIX + "service_url";
-
-    @Parameter(value = SERVICE_URL, validators = URIAbsoluteValidator.class)
-    private URI serviceUrl = URI.create("https://api.graylog.com/");
-
-    public URI getServiceUrl() {
-        return serviceUrl;
+public class EnterpriseModule extends PluginModule {
+    @Override
+    protected void configure() {
+        addSystemRestResource(EnterpriseResource.class);
     }
 }

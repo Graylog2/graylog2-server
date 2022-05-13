@@ -14,22 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.freeenterprise;
+package org.graylog.enterprise;
 
-public class FreeLicenseRequestException extends RuntimeException {
-    private final FreeLicenseRequest request;
+import org.graylog2.database.MongoConnection;
 
-    public FreeLicenseRequestException(String message, FreeLicenseRequest request, Throwable e) {
-        super(message, e);
-        this.request = request;
+import javax.inject.Inject;
+
+public class EnterpriseService {
+    private final MongoConnection mongoConnection;
+
+    @Inject
+    public EnterpriseService(MongoConnection mongoConnection) {
+        this.mongoConnection = mongoConnection;
     }
 
-    public FreeLicenseRequestException(String message, FreeLicenseRequest request) {
-        super(message);
-        this.request = request;
+
+    private boolean hasLicenseInstalled() {
+        return mongoConnection.getMongoDatabase().getCollection("licenses").countDocuments() > 0;
     }
 
-    public FreeLicenseRequest getRequest() {
-        return request;
+    public EnterpriseLicenseInfo licenseInfo() {
+        if (hasLicenseInstalled()) {
+            return EnterpriseLicenseInfo.installed();
+        }
+        return EnterpriseLicenseInfo.absent();
     }
 }

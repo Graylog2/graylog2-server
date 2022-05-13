@@ -25,9 +25,8 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
+import org.graylog.enterprise.EnterpriseModule;
 import org.graylog.events.EventsModule;
-import org.graylog.freeenterprise.FreeEnterpriseConfiguration;
-import org.graylog.freeenterprise.FreeEnterpriseModule;
 import org.graylog.grn.GRNTypesModule;
 import org.graylog.metrics.prometheus.PrometheusExporterConfiguration;
 import org.graylog.metrics.prometheus.PrometheusMetricsModule;
@@ -124,7 +123,6 @@ public class Server extends ServerBootstrap {
     private final ViewsConfig viewsConfiguration = new ViewsConfig();
     private final ProcessingStatusConfig processingStatusConfig = new ProcessingStatusConfig();
     private final JobSchedulerConfiguration jobSchedulerConfiguration = new JobSchedulerConfiguration();
-    private final FreeEnterpriseConfiguration freeEnterpriseConfiguration = new FreeEnterpriseConfiguration();
     private final PrometheusExporterConfiguration prometheusExporterConfiguration = new PrometheusExporterConfiguration();
     private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
 
@@ -177,7 +175,7 @@ public class Server extends ServerBootstrap {
                 new ViewsBindings(),
                 new JobSchedulerModule(),
                 new EventsModule(),
-                new FreeEnterpriseModule(),
+                new EnterpriseModule(),
                 new GRNTypesModule(),
                 new SecurityModule(),
                 new PrometheusMetricsModule(),
@@ -202,7 +200,6 @@ public class Server extends ServerBootstrap {
                 viewsConfiguration,
                 processingStatusConfig,
                 jobSchedulerConfiguration,
-                freeEnterpriseConfiguration,
                 prometheusExporterConfiguration,
                 tlsConfiguration);
     }

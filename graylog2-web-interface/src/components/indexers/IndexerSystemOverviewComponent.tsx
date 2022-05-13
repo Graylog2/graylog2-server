@@ -32,7 +32,7 @@ const IndexerSystemOverviewComponent = () => {
   useEffect(() => {
     if (EnterpriseIndexerFailures) {
       EnterpriseActions.getLicenseInfo().then((response) => {
-        setLoadIndexerFailuresComponent(response.free_license_info.license_status === 'installed' ? <EnterpriseIndexerFailures /> : <IndexerFailuresComponent />);
+        setLoadIndexerFailuresComponent(response.license_info.license_status === 'installed' ? <EnterpriseIndexerFailures /> : <IndexerFailuresComponent />);
       });
     } else {
       setLoadIndexerFailuresComponent(<IndexerFailuresComponent />);
