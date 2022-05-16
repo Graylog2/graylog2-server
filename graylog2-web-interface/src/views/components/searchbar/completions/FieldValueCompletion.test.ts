@@ -17,23 +17,26 @@
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import FieldType from 'views/logic/fieldtypes/FieldType';
+import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
 import fetch from 'logic/rest/FetchProvider';
 import type { FieldTypes } from 'views/components/searchbar/SearchBarAutocompletions';
 
 import FieldValueCompletion from './FieldValueCompletion';
 
-const httpMethodField = new FieldTypeMapping('http_method', new FieldType('string', ['enumerable'], []));
-const actionField = new FieldTypeMapping('action', new FieldType('string', ['enumerable'], []));
-const messageField = new FieldTypeMapping('message', new FieldType('string', [], []));
+const httpMethodField = FieldTypeMapping.create('http_method', FieldType.create('string', [Properties.Enumerable], []));
+const actionField = FieldTypeMapping.create('action', FieldType.create('string', [Properties.Enumerable], []));
+const messageField = FieldTypeMapping.create('message', FieldType.create('string', [], []));
+const processField = FieldTypeMapping.create('process', FieldType.create('string', [Properties.Enumerable]));
 
 const fieldTypes: FieldTypes = {
   all: {
     http_method: httpMethodField,
+    process: processField,
   },
   query: {
     http_method: httpMethodField,
     action: actionField,
+    process: processField,
   },
 };
 
@@ -67,7 +70,7 @@ describe('FieldValueCompletion', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    asMock(fetch).mockReturnValue(Promise.resolve(suggestionsResponse));
+    asMock(fetch).mockResolvedValue(suggestionsResponse);
   });
 
   describe('getCompletions', () => {
@@ -217,7 +220,7 @@ describe('FieldValueCompletion', () => {
         type: 'keyword',
         value: 'http_method:',
       };
-      asMock(fetch).mockReturnValue(Promise.resolve(response));
+      asMock(fetch).mockResolvedValue(response);
 
       const completer = new FieldValueCompletion();
 
@@ -237,6 +240,46 @@ describe('FieldValueCompletion', () => {
       ];
 
       expect(suggestions).toEqual(expectedCorrections);
+    });
+
+    it('escapes value for suggestions correctly', async () => {
+      const response = {
+        field: 'process',
+        input: '',
+        sum_other_docs_count: 0,
+        suggestions: [
+          { value: 'C:\\Windows\\System32\\lsass.exe', occurrence: 300 },
+        ],
+      };
+      const currentToken = createCurrentToken('term', '', 1, 12);
+      const lastToken = {
+        type: 'keyword',
+        value: 'process:',
+      };
+      asMock(fetch).mockResolvedValue(response);
+
+      const completer = new FieldValueCompletion();
+
+      const suggestions = await completer.getCompletions({
+        currentToken,
+        lastToken,
+        prefix: '',
+        tokens: [lastToken, currentToken],
+        currentTokenIdx: 1,
+        timeRange: undefined,
+        streams: undefined,
+        fieldTypes,
+      });
+
+      expect(suggestions).toEqual([
+        {
+          name: 'C:\\Windows\\System32\\lsass.exe',
+          value: 'C\\:\\\\Windows\\\\System32\\\\lsass.exe',
+          caption: 'C:\\Windows\\System32\\lsass.exe',
+          score: 300,
+          meta: '300 hits',
+        },
+      ]);
     });
 
     describe('refetching suggestions', () => {
@@ -262,7 +305,7 @@ describe('FieldValueCompletion', () => {
       ];
 
       it('is fetching further suggestions when there are some', async () => {
-        asMock(fetch).mockReturnValue(Promise.resolve(firstResponse));
+        asMock(fetch).mockResolvedValue(firstResponse);
 
         const completer = new FieldValueCompletion();
 
@@ -288,7 +331,7 @@ describe('FieldValueCompletion', () => {
             { value: 'action4', occurrence: 100 },
           ],
         };
-        asMock(fetch).mockReturnValue(Promise.resolve(secondResponse));
+        asMock(fetch).mockResolvedValue(secondResponse);
 
         const secondSuggestions = await completer.getCompletions({
           currentToken,
@@ -308,7 +351,7 @@ describe('FieldValueCompletion', () => {
       });
 
       it('is not fetching further suggestions when there are none', async () => {
-        asMock(fetch).mockReturnValue(Promise.resolve({ ...firstResponse, sum_other_docs_count: 0 }));
+        asMock(fetch).mockResolvedValue({ ...firstResponse, sum_other_docs_count: 0 });
 
         const completer = new FieldValueCompletion();
 
