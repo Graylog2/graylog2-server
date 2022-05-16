@@ -19,7 +19,7 @@ import * as React from 'react';
 import { singleton } from 'logic/singleton';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
-type Warnings = {
+export type Warnings = {
   queryString?: QueryValidationState,
 };
 

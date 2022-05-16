@@ -24,7 +24,6 @@ import org.graylog.plugins.views.search.views.ViewLike;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog2.plugin.database.users.User;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,6 +31,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -47,7 +47,7 @@ class SearchUserTest {
     }
 
     private SearchUser searchUser() {
-        return new SearchUser(mockUser(), (perm) -> true, (perm, id) -> true, Mockito.mock(PermittedStreams.class),
+        return new SearchUser(mockUser(), (perm) -> true, (perm, id) -> true, new PermittedStreams(Stream::of),
                 new HashMap<>());
     }
 
@@ -110,7 +110,7 @@ class SearchUserTest {
         return new SearchUser(mockUser(),
                 (perm) -> perm.equals(permission),
                 (perm, pId) -> perm.equals(permission) && id.equals(pId),
-                Mockito.mock(PermittedStreams.class),
+                new PermittedStreams(Stream::of),
                 viewResolvers);
     }
 
@@ -139,7 +139,7 @@ class SearchUserTest {
         return new SearchUser(mockUser(),
                 (perm) -> perm.equals("allowed-permission"),
                 (perm, pId) -> perm.equals("allowed-permission") && "resolved-id".equals(pId),
-                Mockito.mock(PermittedStreams.class),
+                new PermittedStreams(Stream::of),
                 viewResolvers);
     }
 
@@ -181,7 +181,7 @@ class SearchUserTest {
         return new SearchUser(mockUser(),
                 (perm) -> perm.equals("allowed-permission"),
                 (perm, pId) -> perm.equals("allowed-permission") && "resolved-id".equals(pId),
-                Mockito.mock(PermittedStreams.class),
+                new PermittedStreams(Stream::of),
                 viewResolvers);
     }
 

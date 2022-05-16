@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ValidationRequestTest {
 
     @Test
-    void combineQueryFilterQueryOnly() throws InvalidRangeParametersException {
+    void combineQueryFilterQueryOnly() {
         final String q = builder()
                 .query(ElasticsearchQueryString.of("foo:bar"))
                 .build()
@@ -41,7 +41,7 @@ class ValidationRequestTest {
     }
 
     @Test
-    void combineQueryFilterBoth() throws InvalidRangeParametersException {
+    void combineQueryFilterBoth() {
         final String q = builder()
                 .query(ElasticsearchQueryString.of("foo:bar"))
                 .filter(ElasticsearchQueryString.of("lorem:ipsum"))
@@ -51,7 +51,7 @@ class ValidationRequestTest {
         assertThat(q).isEqualTo("foo:bar AND lorem:ipsum");
     }
 
-    private ValidationRequest.Builder builder() throws InvalidRangeParametersException {
+    private ValidationRequest.Builder builder() {
         return ValidationRequest.builder()
                 .timerange(RelativeRange.create(300))
                 .streams(Collections.emptySet())

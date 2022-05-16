@@ -95,7 +95,9 @@ public class QueryValidationResourceIT {
                 .body("{\"query\":\"unknown_field:(x OR y)\"}")
                 .post("/search/validate")
                 .then()
+                .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
+
         validatableResponse.assertThat().body("status", equalTo("WARNING"));
         validatableResponse.assertThat().body("explanations.error_message[0]", containsString("Query contains unknown field: unknown_field"));
     }
@@ -108,6 +110,7 @@ public class QueryValidationResourceIT {
                 .body("{\"query\":\"/ethernet[0-9]+/\"}")
                 .post("/search/validate")
                 .then()
+                .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
         validatableResponse.assertThat().body("status", equalTo("OK"));
     }
@@ -120,6 +123,7 @@ public class QueryValidationResourceIT {
                 .body("{\"query\":\"not(http_response_code:200)\"}")
                 .post("/search/validate")
                 .then()
+                .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
         validatableResponse.assertThat().body("status", equalTo("WARNING"));
         validatableResponse.assertThat().body("explanations.error_message[0]", containsString("Query contains invalid operator \"not\". All AND / OR / NOT operators have to be written uppercase"));
@@ -133,6 +137,7 @@ public class QueryValidationResourceIT {
                 .body("{\"query\":\"timestamp:AAA\"}")
                 .post("/search/validate")
                 .then()
+                .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
         validatableResponse.assertThat().body("status", equalTo("WARNING"));
         validatableResponse.assertThat().body("explanations.error_type[0]", equalTo("INVALID_VALUE_TYPE"));

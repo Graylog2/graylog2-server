@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 
+import type { Warnings } from './FormWarningsContext';
 import FormWarningsContext from './FormWarningsContext';
 
 type Props = {
@@ -25,6 +26,13 @@ type Props = {
 
 const FormWarningsProvider = ({ children }: Props) => {
   const isMounted = useRef<boolean>();
+  const [warnings, setWarnings] = useState<Warnings>({});
+
+  const setFieldWarning = useCallback(<T extends keyof Warnings>(fieldName: T, warning: Warnings[T]) => {
+    if (isMounted.current === true) {
+      setWarnings({ ...warnings, [fieldName]: warning });
+    }
+  }, [warnings]);
 
   useEffect(() => {
     isMounted.current = true;
@@ -32,15 +40,10 @@ const FormWarningsProvider = ({ children }: Props) => {
     return () => { isMounted.current = false; };
   });
 
-  const [warnings, setWarnings] = useState({});
-  const setFieldWarning = useCallback((fieldName, warning) => {
-    if (isMounted.current === true) {
-      setWarnings({ ...warnings, [fieldName]: warning });
-    }
-  }, [warnings]);
+  const formWarningsContextValue = useMemo(() => ({ warnings, setFieldWarning }), [setFieldWarning, warnings]);
 
   return (
-    <FormWarningsContext.Provider value={{ warnings, setFieldWarning }}>
+    <FormWarningsContext.Provider value={formWarningsContextValue}>
       {children}
     </FormWarningsContext.Provider>
   );

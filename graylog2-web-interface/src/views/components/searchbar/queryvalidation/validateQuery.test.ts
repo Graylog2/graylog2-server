@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as Immutable from 'immutable';
 import { waitFor } from 'wrappedTestingLibrary';
 
 import fetch from 'logic/rest/FetchProvider';
@@ -40,8 +39,6 @@ describe('validateQuery', () => {
     queryString: 'source:',
     timeRange: { type: 'relative', from: 300 } as const,
     streams: ['stream-id'],
-    parameters: Immutable.Set(),
-    parameterBindings: Immutable.Map(),
   };
 
   const requestPayload = {
@@ -49,8 +46,6 @@ describe('validateQuery', () => {
     filter: undefined,
     timerange: { type: 'relative', from: 300 },
     streams: ['stream-id'],
-    parameters: Immutable.Set(),
-    parameter_bindings: Immutable.Map(),
   };
 
   it('calls validate API', async () => {

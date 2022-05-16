@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import URI from 'urijs';
 
@@ -78,21 +78,25 @@ const DashboardPageContextProvider = ({ children }: { children: React.ReactNode 
   useSyncStateWithQueryParams({ dashboardPage, uriParams, setDashboardPage, states });
   useCleanupQueryParams({ uriParams, query, history });
 
-  const updatePageParams = useCallback((newPage: string | undefined) => {
-    const newUri = _updateQueryParams(newPage, query);
+  const dashboardPageContextValue = useMemo(() => {
+    const updatePageParams = (newPage: string | undefined) => {
+      const newUri = _updateQueryParams(newPage, query);
 
-    history.replace(newUri);
-  }, [history, query]);
+      history.replace(newUri);
+    };
 
-  const setDashboardPageParam = (nextPage) => updatePageParams(nextPage);
-  const unSetDashboardPageParam = () => updatePageParams(undefined);
+    const setDashboardPageParam = (nextPage: string) => updatePageParams(nextPage);
+    const unSetDashboardPageParam = () => updatePageParams(undefined);
 
-  return (
-    <DashboardPageContext.Provider value={{
+    return ({
       setDashboardPage: setDashboardPageParam,
       unsetDashboardPage: unSetDashboardPageParam,
       dashboardPage: dashboardPage,
-    }}>
+    });
+  }, [dashboardPage, history, query]);
+
+  return (
+    <DashboardPageContext.Provider value={dashboardPageContextValue}>
       {children}
     </DashboardPageContext.Provider>
   );

@@ -20,7 +20,6 @@ import type { FormikErrors } from 'formik';
 
 import type Widget from 'views/logic/widgets/Widget';
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
-import type { SearchRefreshCondition } from 'views/logic/hooks/SearchRefreshCondition';
 import type { VisualizationComponent } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { WidgetActionType } from 'views/components/widgets/Types';
 import type { Creator } from 'views/components/sidebar/create/AddWidgetButton';
@@ -38,7 +37,7 @@ import type {
   WidgetConfigFormValues,
 } from 'views/components/aggregationwizard';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
-import type { TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import type View from 'views/logic/views/View';
 import type User from 'logic/users/User';
 import type { Message } from 'views/components/messagelist/Types';
@@ -104,11 +103,6 @@ export interface WidgetExport {
 export interface VisualizationConfigProps {
   config: WidgetConfig;
   onChange: (newConfig: WidgetConfig) => void;
-}
-
-export interface VisualizationConfigType {
-  type: string;
-  component: React.ComponentType<VisualizationConfigProps>;
 }
 
 type BaseField = {
@@ -235,10 +229,20 @@ interface MessageRowOverrideProps {
   renderMessageRow: () => React.ReactNode,
 }
 
+export interface CombinedSearchBarFormValues {
+  timerange?: TimeRange | NoTimeRangeOverride,
+  streams?: Array<string>,
+  queryString?: string,
+}
+
 export interface SearchBarControl {
   component: React.ComponentType;
   id: string;
+  onSubmit?: (values: CombinedSearchBarFormValues) => Promise<void>,
+  onValidate?: (values: CombinedSearchBarFormValues) => FormikErrors<{}>,
   placement: 'left' | 'right';
+  useInitialValues?: () => ({ [key: string]: any }),
+  validationPayload: (values: CombinedSearchBarFormValues) => ({ [key: string]: any }),
 }
 
 declare module 'graylog-web-plugin/plugin' {
@@ -265,13 +269,25 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.confirmDeletingWidget'?: Array<(widget: Widget, view: View, title: string) => Promise<boolean | null>>,
     'views.hooks.executingView'?: Array<ViewHook>;
     'views.hooks.loadingView'?: Array<ViewHook>;
-    'views.hooks.searchRefresh'?: Array<SearchRefreshCondition>;
     'views.hooks.copyWidgetToDashboard'?: Array<CopyWidgetToDashboardHook>;
     'views.hooks.removingWidget'?: Array<RemovingWidgetHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
     'views.widgets.actions'?: Array<WidgetActionType>;
     'views.requires.provided'?: Array<string>;
-    visualizationConfigTypes?: Array<VisualizationConfigType>;
     visualizationTypes?: Array<VisualizationType<any>>;
+  }
+}
+export interface ViewActions {
+  save: {
+    isShown: boolean,
+  };
+  saveAs: {
+    isShown: boolean,
+  };
+  share: {
+    isShown: boolean,
+  }
+  actionsDropdown: {
+    isShown: boolean,
   }
 }

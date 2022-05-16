@@ -133,7 +133,8 @@ class EventNotificationForm extends React.Component {
                    help={lodash.get(validation, 'errors.title[0]', 'Title to identify this Notification.')}
                    value={notification.title}
                    onChange={this.handleChange}
-                   required />
+                   required
+                   autoFocus />
 
             <Input id="notification-description"
                    name="description"

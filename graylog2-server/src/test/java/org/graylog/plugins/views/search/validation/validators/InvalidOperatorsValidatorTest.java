@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.views.search.validation.validators;
 
+import org.assertj.core.api.Assertions;
+import org.graylog.plugins.views.search.engine.QueryPosition;
 import org.graylog.plugins.views.search.validation.QueryValidator;
 import org.graylog.plugins.views.search.validation.TestValidationContext;
 import org.graylog.plugins.views.search.validation.ValidationContext;
@@ -27,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Objects;
 
+import static org.assertj.core.api.Assertions.allOf;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class InvalidOperatorsValidatorTest {
@@ -51,13 +54,14 @@ class InvalidOperatorsValidatorTest {
 
         final ValidationMessage message = validation.iterator().next();
         assertThat(message.validationType()).isEqualTo(ValidationType.INVALID_OPERATOR);
-        assertThat(message.relatedProperty()).isEqualTo("and");
+        assertThat(message.relatedProperty()).hasValue("and");
 
-
-        assertThat(message.position().beginColumn()).isEqualTo(8);
-        assertThat(message.position().beginLine()).isEqualTo(1);
-        assertThat(message.position().endColumn()).isEqualTo(11);
-        assertThat(message.position().endLine()).isEqualTo(1);
+        assertThat(message.position()).hasValue(QueryPosition.builder()
+                .beginLine(1)
+                .beginColumn(8)
+                .endLine(1)
+                .endColumn(11)
+                .build());
     }
 
 
@@ -76,7 +80,7 @@ class InvalidOperatorsValidatorTest {
         assertThat(messages.size()).isEqualTo(1);
         final ValidationMessage message = messages.iterator().next();
         assertThat(message.validationType()).isEqualTo(ValidationType.INVALID_OPERATOR);
-        assertThat(message.relatedProperty()).isEqualTo("and");
+        assertThat(message.relatedProperty()).hasValue("and");
     }
 
 
@@ -88,7 +92,7 @@ class InvalidOperatorsValidatorTest {
         assertThat(messages.size()).isEqualTo(1);
         final ValidationMessage message = messages.iterator().next();
         assertThat(message.validationType()).isEqualTo(ValidationType.INVALID_OPERATOR);
-        assertThat(message.relatedProperty()).isEqualTo("or");
+        assertThat(message.relatedProperty()).hasValue("or");
     }
 
     @Test
@@ -99,7 +103,7 @@ class InvalidOperatorsValidatorTest {
         assertThat(messages.size()).isEqualTo(1);
         final ValidationMessage message = messages.iterator().next();
         assertThat(message.validationType()).isEqualTo(ValidationType.INVALID_OPERATOR);
-        assertThat(message.relatedProperty()).isEqualTo("not");
+        assertThat(message.relatedProperty()).hasValue("not");
     }
 
     @Test
@@ -119,7 +123,9 @@ class InvalidOperatorsValidatorTest {
         final List<ValidationMessage> messages = sut.validate(context);
         assertThat(messages.size()).isEqualTo(6);
         assertThat(messages.stream().allMatch(v -> v.validationType() == ValidationType.INVALID_OPERATOR)).isTrue();
-        assertThat(messages.stream().allMatch(v -> (Objects.equals(v.relatedProperty(), "or") || Objects.equals(v.relatedProperty(), "and")))).isTrue();
 
+        Assertions.assertThat(messages)
+                .extracting(v -> v.relatedProperty().orElse("invalid-property"))
+                .containsOnly("and", "or");
     }
 }

@@ -14,19 +14,57 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
 
-type SearchPageLayoutConfig = {
-  sidebar: {
-    isPinned: boolean,
-  },
+import { singleton } from 'logic/singleton';
+
+export interface ViewActions {
+  save: {
+    isShown: boolean,
+  };
+  saveAs: {
+    isShown: boolean,
+  };
+  share: {
+    isShown: boolean,
+  }
+  actionsDropdown: {
+    isShown: boolean,
+  }
+}
+
+export const FULL_MENU: ViewActions = {
+  save: { isShown: true },
+  saveAs: { isShown: true },
+  share: { isShown: true },
+  actionsDropdown: { isShown: true },
 };
 
-export type SearchPageLayout = {
-  config: SearchPageLayoutConfig,
-  actions: { toggleSidebarPinning: () => void },
+export const SAVE_COPY: ViewActions = {
+  save: { isShown: false },
+  saveAs: { isShown: true },
+  share: { isShown: false },
+  actionsDropdown: { isShown: false },
 };
 
-const SearchPageLayoutContext = React.createContext<SearchPageLayout | undefined>(undefined);
+export const BLANK: ViewActions = {
+  save: { isShown: false },
+  saveAs: { isShown: false },
+  share: { isShown: false },
+  actionsDropdown: { isShown: false },
+};
 
-export default SearchPageLayoutContext;
+export type LayoutState = {
+  sidebar: { isShown: boolean }
+  viewActions: ViewActions
+}
+
+export const DEFAULT_STATE: LayoutState = {
+  sidebar: { isShown: true },
+  viewActions: FULL_MENU,
+};
+
+const SearchPageLayoutContext = React.createContext<LayoutState>(DEFAULT_STATE);
+
+export default singleton('contexts.SearchPageLayout', () => SearchPageLayoutContext);

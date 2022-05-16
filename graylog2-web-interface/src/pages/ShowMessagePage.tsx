@@ -91,8 +91,11 @@ type FieldTypesProviderProps = {
 
 const FieldTypesProvider = ({ streams, timestamp, children }: FieldTypesProviderProps) => {
   const { data: fieldTypes } = useFieldTypes(streams, { type: 'absolute', from: timestamp, to: timestamp });
-  const fieldTypesList = Immutable.List(fieldTypes);
-  const types = { all: fieldTypesList, queryFields: Immutable.Map({ query: fieldTypesList }) };
+  const types = useMemo(() => {
+    const fieldTypesList = Immutable.List(fieldTypes);
+
+    return ({ all: fieldTypesList, queryFields: Immutable.Map({ query: fieldTypesList }) });
+  }, [fieldTypes]);
 
   return (
     <FieldTypesContext.Provider value={types}>

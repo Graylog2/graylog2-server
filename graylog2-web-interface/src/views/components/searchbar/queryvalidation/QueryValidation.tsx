@@ -98,7 +98,6 @@ const shakeAnimation = keyframes`
 `;
 
 const StyledPopover = styled(Popover)(({ $shaking }) => css`
-  z-index: 2;
   animation: ${$shaking ? css`${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both` : 'none'};
 `);
 
@@ -200,8 +199,8 @@ const QueryValidation = () => {
                          title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
                          $shaking={shakingPopover}>
             <div role="alert">
-              {explanations.map(({ errorType, errorTitle, errorMessage }) => (
-                <Explanation key={errorMessage}>
+              {explanations.map(({ errorType, errorTitle, errorMessage, id }) => (
+                <Explanation key={id}>
                   <span><b>{errorTitle}</b>: {errorMessage}</span>
                   <DocumentationLink page={getErrorDocumentationLink(errorType)}
                                      title={`${errorTitle} documentation`}

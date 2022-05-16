@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect, useContext, useRef } from 'react';
+import { useCallback, useEffect, useContext, useRef, useMemo } from 'react';
 import { Field } from 'formik';
 import moment from 'moment';
 import styled from 'styled-components';
@@ -44,6 +44,12 @@ import useParameters from 'views/hooks/useParameters';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
+import {
+  usePluggableInitialValues,
+  pluggableValidationPayload, executePluggableSubmitHandler,
+} from 'views/components/searchbar/pluggableSearchBarControlsHandler';
+import type { SearchBarControl } from 'views/types';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
@@ -86,9 +92,11 @@ export const updateWidgetSearchControls = (widget, { timerange, streams, querySt
     .build();
 };
 
-const _onSubmit = (values, widget: Widget) => {
+const onSubmit = async (values, pluggableSearchBarControls: Array<() => SearchBarControl>, widget: Widget) => {
   const { timerange, streams, queryString } = values;
   const newWidget = updateWidgetSearchControls(widget, { timerange, streams, queryString });
+
+  await executePluggableSubmitHandler(values, pluggableSearchBarControls);
 
   if (!widget.equals(newWidget)) {
     return WidgetActions.update(widget.id, newWidget);
@@ -120,50 +128,63 @@ const useBindApplySearchControlsChanges = (formRef) => {
   }, [formRef, bindApplySearchControlsChanges]);
 };
 
+const useInitialFormValues = (widget: Widget) => {
+  const { streams } = widget;
+  const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
+  const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
+  const initialValuesFromPlugins = usePluggableInitialValues();
+
+  return useMemo(() => {
+    return ({ timerange, streams, queryString, ...initialValuesFromPlugins });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timerange, queryString]);
+};
+
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
+
+const _validateQueryString = (values: SearchBarFormValues, globalOverride: GlobalOverride, pluggableSearchBarControls: Array<() => SearchBarControl>) => {
+  const request = {
+    queryString: values?.queryString,
+    timeRange: !isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange,
+    filter: globalOverride?.query ? globalOverride.query : undefined,
+    streams: values?.streams,
+    ...pluggableValidationPayload(values, pluggableSearchBarControls),
+  };
+
+  return debouncedValidateQuery(request);
+};
 
 const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
   const widget = useContext(WidgetContext);
   const config = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
   const isValidatingQuery = !!useIsFetching('validateSearchQuery');
+  const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const limitDuration = moment.duration(config?.query_time_range_limit).asSeconds() ?? 0;
-  const { streams } = widget;
-  const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
-  const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
   const hasTimeRangeOverride = globalOverride?.timerange !== undefined;
   const hasQueryOverride = globalOverride?.query !== undefined;
   const formRef = useRef(null);
-  const { parameters, parameterBindings } = useParameters();
-  const _validateQueryString = useCallback((values: SearchBarFormValues) => {
-    const request = {
-      queryString: values?.queryString,
-      timeRange: !isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange,
-      filter: globalOverride?.query ? globalOverride.query : undefined,
-      streams: values?.streams,
-      parameters,
-      parameterBindings,
-    };
-
-    return debouncedValidateQuery(request);
-  }, [globalOverride?.query, globalOverride?.timerange, parameterBindings, parameters]);
+  const { parameters } = useParameters();
+  const validate = (values) => _validateQueryString(values, globalOverride, pluggableSearchBarControls);
+  const initialValues = useInitialFormValues(widget);
+  const _onSubmit = useCallback((values) => onSubmit(values, pluggableSearchBarControls, widget), [pluggableSearchBarControls, widget]);
 
   useBindApplySearchControlsChanges(formRef);
 
   return (
     <FormWarningsProvider>
-      <SearchBarForm initialValues={{ timerange, streams, queryString }}
+      <SearchBarForm initialValues={initialValues}
                      limitDuration={limitDuration}
                      formRef={formRef}
-                     onSubmit={(values) => _onSubmit(values, widget)}
+                     onSubmit={_onSubmit}
                      validateOnMount={false}
-                     validateQueryString={_validateQueryString}>
+                     validateQueryString={validate}>
         {({ dirty, errors, isValid, isSubmitting, handleSubmit, values, setFieldValue, validateForm }) => {
           const disableSearchSubmit = isSubmitting || isValidatingQuery || !isValid;
 
           return (
             <Container>
               <PropagateDisableSubmissionState formKey="widget-query-controls" disableSubmission={disableSearchSubmit} />
-              <ValidateOnParameterChange parameters={parameters} parameterBindings={parameterBindings} />
+              <ValidateOnParameterChange parameters={parameters} />
               <WidgetTopRow>
                 <Col md={6}>
                   {!hasTimeRangeOverride && (
@@ -192,7 +213,8 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
 
               <SecondRow>
                 <SearchButton disabled={disableSearchSubmit}
-                              dirty={dirty} />
+                              dirty={dirty}
+                              displaySpinner={isSubmitting} />
 
                 <Field name="queryString">
                   {({ field: { name, value, onChange }, meta: { error } }) => (
@@ -207,11 +229,8 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                                     isValidating={isValidatingQuery}
                                     warning={warnings.queryString}
                                     validate={validateForm}
-                                    onChange={(newQuery) => {
-                                      onChange({ target: { value: newQuery, name } });
-
-                                      return Promise.resolve(newQuery);
-                                    }}
+                                    name={name}
+                                    onChange={onChange}
                                     onExecute={handleSubmit as () => void} />
                       )}
                     </FormWarningsContext.Consumer>

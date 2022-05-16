@@ -123,26 +123,26 @@ const ExportModal = ({ closeModal, view, directExportWidgetId, executionState }:
               <Modal.Body>
                 <Content>
                   {showWidgetSelection && (
-                  <Field name="selectedWidget">
-                    {({ field: { name, onChange } }) => {
-                      const onChangeSelectWidget = ({ value }) => {
-                        setSelectedFields(_getInitialFields(value));
+                    <Field name="selectedWidget">
+                      {({ field: { name, onChange } }) => {
+                        const onChangeSelectWidget = (widget) => {
+                          setSelectedFields(_getInitialFields(widget));
 
-                        return onChange({ target: { name, value } });
-                      };
+                          return onChange({ target: { name, value: widget } });
+                        };
 
-                      return (
-                        <ExportWidgetSelection selectWidget={onChangeSelectWidget}
-                                               view={view}
-                                               widgets={exportableWidgets.toList()} />
-                      );
-                    }}
-                  </Field>
+                        return (
+                          <ExportWidgetSelection selectWidget={onChangeSelectWidget}
+                                                 view={view}
+                                                 widgets={exportableWidgets.toList()} />
+                        );
+                      }}
+                    </Field>
                   )}
                   {!showWidgetSelection && (
-                  <ExportSettings fields={fields}
-                                  selectedWidget={initialSelectedWidget}
-                                  view={view} />
+                    <ExportSettings fields={fields}
+                                    selectedWidget={initialSelectedWidget}
+                                    view={view} />
                   )}
                 </Content>
               </Modal.Body>

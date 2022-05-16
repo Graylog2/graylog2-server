@@ -26,10 +26,10 @@ import ValidateOnParameterChange from './ValidateOnParameterChange';
 
 describe('ValidateOnParameterChange', () => {
   type SUTProps = React.ComponentProps<typeof ValidateOnParameterChange> & { onValidate: () => void };
-  const SUT = ({ onValidate, parameters, parameterBindings }: SUTProps) => (
+  const SUT = ({ onValidate, parameters }: SUTProps) => (
     <Formik validate={onValidate} onSubmit={() => {}} initialValues={{}} validateOnMount={false}>
       <Form>
-        <ValidateOnParameterChange parameterBindings={parameterBindings} parameters={parameters} />
+        <ValidateOnParameterChange parameters={parameters} />
       </Form>
     </Formik>
   );
@@ -40,31 +40,19 @@ describe('ValidateOnParameterChange', () => {
 
   it('should not trigger form validation on mount', async () => {
     const onValidateMock = jest.fn();
-    render(<SUT parameterBindings={undefined} parameters={undefined} onValidate={onValidateMock} />);
+    render(<SUT parameters={undefined} onValidate={onValidateMock} />);
 
     expect(onValidateMock).not.toHaveBeenCalled();
   });
 
   it('should trigger validation when parameters change', async () => {
-    const parameterBindings = Immutable.Map({ source: new ParameterBinding('value', 'example.org') });
-
     const onValidateMock = jest.fn();
-    const { rerender } = render(<SUT parameterBindings={parameterBindings} parameters={simpleParameters} onValidate={onValidateMock} />);
+    const { rerender } = render(<SUT parameters={simpleParameters} onValidate={onValidateMock} />);
 
     const updatedParameters = Immutable.fromJS({
       foo: ValueParameter.create('source', 'Source parameter', 'The value that source should have', 'string', 'default value', false, ParameterBinding.empty()),
     });
-    rerender(<SUT parameterBindings={parameterBindings} parameters={updatedParameters} onValidate={onValidateMock} />);
-
-    await waitFor(() => expect(onValidateMock).toHaveBeenCalledTimes(1));
-  });
-
-  it('should trigger validation when parameter bindings change', async () => {
-    const onValidateMock = jest.fn();
-    const { rerender } = render(<SUT parameterBindings={undefined} parameters={simpleParameters} onValidate={onValidateMock} />);
-
-    const parameterBindings = Immutable.Map({ source: new ParameterBinding('value', 'example.org') });
-    rerender(<SUT parameterBindings={parameterBindings} parameters={simpleParameters} onValidate={onValidateMock} />);
+    rerender(<SUT parameters={updatedParameters} onValidate={onValidateMock} />);
 
     await waitFor(() => expect(onValidateMock).toHaveBeenCalledTimes(1));
   });

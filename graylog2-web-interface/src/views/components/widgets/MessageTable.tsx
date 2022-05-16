@@ -20,7 +20,6 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
-import { AdditionalContext } from 'views/logic/ActionContext';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -34,7 +33,6 @@ import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
 import { SOURCE_FIELD } from 'views/Constants';
 
-import HighlightMessageContext from '../contexts/HighlightMessageContext';
 import InteractiveContext from '../contexts/InteractiveContext';
 
 const Table = styled.table(({ theme }) => css`
@@ -173,22 +171,15 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
           const messageKey = `${message.index}-${message.id}`;
 
           return (
-            <AdditionalContext.Provider key={messageKey}
-                                        value={{ message }}>
-              <HighlightMessageContext.Consumer>
-                {(highlightMessageId) => (
-                  <MessageTableEntry fields={fields}
-                                     message={message}
-                                     config={config}
-                                     showMessageRow={config?.showMessageRow}
-                                     selectedFields={selectedFields}
-                                     expanded={expandedMessages.contains(messageKey)}
-                                     toggleDetail={toggleDetail}
-                                     highlightMessage={highlightMessageId}
-                                     expandAllRenderAsync={false} />
-                )}
-              </HighlightMessageContext.Consumer>
-            </AdditionalContext.Provider>
+            <MessageTableEntry fields={fields}
+                               key={messageKey}
+                               message={message}
+                               config={config}
+                               showMessageRow={config?.showMessageRow}
+                               selectedFields={selectedFields}
+                               expanded={expandedMessages.contains(messageKey)}
+                               toggleDetail={toggleDetail}
+                               expandAllRenderAsync={false} />
           );
         })}
       </Table>

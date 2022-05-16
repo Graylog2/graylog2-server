@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import type { FormikProps } from 'formik';
@@ -27,12 +27,13 @@ import type { SearchBarFormValues } from 'views/Constants';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validate from 'views/components/searchbar/validate';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 type Props = {
   children: ((props: FormikProps<SearchBarFormValues>) => React.ReactNode) | React.ReactNode,
   initialValues: SearchBarFormValues,
   limitDuration: number,
-  onSubmit: (values: SearchBarFormValues) => void | Promise<any>,
+  onSubmit: (values: SearchBarFormValues) => Promise<any>,
   validateOnMount?: boolean,
   formRef?: React.Ref<FormikProps<SearchBarFormValues>>,
   validateQueryString: (values: SearchBarFormValues) => Promise<QueryValidationState>,
@@ -44,38 +45,36 @@ const StyledForm = styled(Form)`
 
 const _isFunction = (children: Props['children']): children is (props: FormikProps<SearchBarFormValues>) => React.ReactElement => isFunction(children);
 
-export const normalizeSearchBarFormValues = ({ timerange, streams, queryString }) => {
-  const newTimeRange = onSubmittingTimerange(timerange);
-
-  return {
-    timerange: newTimeRange,
-    streams,
-    queryString,
-  };
-};
+export const normalizeSearchBarFormValues = ({ timerange, ...rest }: SearchBarFormValues) => ({ timerange: onSubmittingTimerange(timerange), ...rest });
 
 const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef, validateQueryString }: Props) => {
-  const _onSubmit = useCallback(({ timerange, streams, queryString }: SearchBarFormValues) => {
-    return onSubmit(normalizeSearchBarFormValues({ timerange, streams, queryString }));
-  }, [onSubmit]);
-  const { timerange, streams, queryString } = initialValues;
-  const initialTimeRange = onInitializingTimerange(timerange);
-  const _initialValues = {
-    queryString,
-    streams,
-    timerange: initialTimeRange,
-  };
-
+  const [enableReinitialize, setEnableReinitialize] = useState(true);
+  const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const { setFieldWarning } = useContext(FormWarningsContext);
-  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString),
-    [limitDuration, setFieldWarning, validateQueryString]);
+  const _onSubmit = useCallback((values: SearchBarFormValues) => {
+    setEnableReinitialize(false);
+
+    return onSubmit(normalizeSearchBarFormValues(values)).finally(() => setEnableReinitialize(true));
+  }, [onSubmit]);
+  const _initialValues = useMemo(() => {
+    const { timerange, ...rest } = initialValues;
+
+    return ({
+      ...rest,
+      timerange: onInitializingTimerange(timerange),
+    });
+  }, [initialValues]);
+
+  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls),
+    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls]);
 
   return (
     <Formik<SearchBarFormValues> initialValues={_initialValues}
-                                 enableReinitialize
+                                 enableReinitialize={enableReinitialize}
                                  onSubmit={_onSubmit}
                                  innerRef={formRef}
                                  validate={_validate}
+                                 validateOnBlur={false}
                                  validateOnMount={validateOnMount}>
       {(...args) => (
         <StyledForm>
@@ -87,11 +86,6 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
 };
 
 SearchBarForm.propTypes = {
-  initialValues: PropTypes.exact({
-    timerange: PropTypes.object.isRequired,
-    queryString: PropTypes.string.isRequired,
-    streams: PropTypes.arrayOf(PropTypes.string).isRequired,
-  }).isRequired,
   onSubmit: PropTypes.func.isRequired,
   limitDuration: PropTypes.number.isRequired,
   validateOnMount: PropTypes.bool,
