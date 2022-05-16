@@ -22,6 +22,7 @@ import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
+import { escape } from 'views/logic/queries/QueryHelper';
 
 import type { Completer, CompleterContext, FieldTypes } from '../SearchBarAutocompletions';
 import type { Token, Line, CompletionResult } from '../queryinput/ace-types';
@@ -86,7 +87,7 @@ class FieldValueCompletion implements Completer {
   };
 
   // eslint-disable-next-line class-methods-use-this
-  shouldFetchCompletions = (fieldName: string, fieldTypes: FieldTypes) => {
+  private readonly shouldFetchCompletions = (fieldName: string, fieldTypes: FieldTypes) => {
     if (!fieldName) {
       return false;
     }
@@ -102,7 +103,7 @@ class FieldValueCompletion implements Completer {
     return true;
   };
 
-  alreadyFetchedAllSuggestions(
+  private alreadyFetchedAllSuggestions(
     input: string | number,
     fieldName: string,
     streams: Array<string> | undefined,
@@ -127,7 +128,7 @@ class FieldValueCompletion implements Completer {
       && !furtherSuggestionsCount;
   }
 
-  filterExistingSuggestions(input: string | number) {
+  private filterExistingSuggestions(input: string | number) {
     if (this.previousSuggestions) {
       return this.previousSuggestions.completions.filter((completion) => completion.name.startsWith(String(input)));
     }
@@ -171,7 +172,7 @@ class FieldValueCompletion implements Completer {
 
       const completions = suggestions.map(({ value, occurrence }) => ({
         name: value,
-        value: value,
+        value: escape(value),
         score: occurrence,
         caption: completionCaption(value, input),
         meta: `${occurrence} hits`,
