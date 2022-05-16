@@ -23,30 +23,26 @@ import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
 
-import static org.graylog.plugins.views.search.searchfilters.model.ModelConstants.Fields.DESCRIPTION;
-import static org.graylog.plugins.views.search.searchfilters.model.ModelConstants.Fields.QUERY_STRING;
-import static org.graylog.plugins.views.search.searchfilters.model.ModelConstants.Fields.TITLE;
-
 @AutoValue
 @JsonTypeName(UsedSearchFilter.INLINE_QUERY_STRING_SEARCH_FILTER)
 public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter {
 
-    @JsonProperty(TITLE)
+    @JsonProperty(TITLE_FIELD)
     @Nullable
     public abstract String title();
 
-    @JsonProperty(DESCRIPTION)
+    @JsonProperty(DESCRIPTION_FIELD)
     @Nullable
     public abstract String description();
 
-    @JsonProperty(QUERY_STRING)
+    @JsonProperty(QUERY_STRING_FIELD)
     public abstract String queryString();
 
     @JsonCreator
     @SuppressWarnings("unused")
-    public static InlineQueryStringSearchFilter create(@JsonProperty(TITLE) final String title,
-                                                       @JsonProperty(DESCRIPTION) final String description,
-                                                       @JsonProperty(QUERY_STRING) final String queryString) {
+    public static InlineQueryStringSearchFilter create(@JsonProperty(TITLE_FIELD) final String title,
+                                                       @JsonProperty(DESCRIPTION_FIELD) final String description,
+                                                       @JsonProperty(QUERY_STRING_FIELD) final String queryString) {
         return new AutoValue_InlineQueryStringSearchFilter(title, description, queryString);
     }
 }

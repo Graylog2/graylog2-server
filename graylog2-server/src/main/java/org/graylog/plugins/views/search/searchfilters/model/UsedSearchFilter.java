@@ -23,12 +23,18 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
-        property = ModelConstants.Fields.TYPE)
+        property = UsedSearchFilter.TYPE)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = InlineQueryStringSearchFilter.class, name = UsedSearchFilter.INLINE_QUERY_STRING_SEARCH_FILTER),
         @JsonSubTypes.Type(value = ReferencedQueryStringSearchFilter.class, name = UsedSearchFilter.REFERENCED_SEARCH_FILTER),
 })
 public interface UsedSearchFilter {
+
+    String TYPE = "type";
+
+    String TITLE_FIELD = "title";
+    String DESCRIPTION_FIELD = "description";
+    String QUERY_STRING_FIELD = "queryString";
 
     String INLINE_QUERY_STRING_SEARCH_FILTER = "inlineQueryString";
     String REFERENCED_SEARCH_FILTER = "referenced";

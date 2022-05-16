@@ -23,10 +23,6 @@ import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
 
-import static org.graylog.plugins.views.search.searchfilters.model.ModelConstants.Fields.DESCRIPTION;
-import static org.graylog.plugins.views.search.searchfilters.model.ModelConstants.Fields.QUERY_STRING;
-import static org.graylog.plugins.views.search.searchfilters.model.ModelConstants.Fields.TITLE;
-
 @AutoValue
 @JsonTypeName(UsedSearchFilter.REFERENCED_SEARCH_FILTER)
 public abstract class ReferencedQueryStringSearchFilter implements ReferencedSearchFilter {
@@ -35,24 +31,24 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
     @Override
     public abstract String id();
 
-    @JsonProperty(TITLE)
+    @JsonProperty(TITLE_FIELD)
     @Nullable
     public abstract String title();
 
-    @JsonProperty(DESCRIPTION)
+    @JsonProperty(DESCRIPTION_FIELD)
     @Nullable
     public abstract String description();
 
-    @JsonProperty(QUERY_STRING)
+    @JsonProperty(QUERY_STRING_FIELD)
     @Nullable
     public abstract String queryString();
 
     @JsonCreator
     @SuppressWarnings("unused")
     public static ReferencedQueryStringSearchFilter create(@JsonProperty("id") final String id,
-                                                           @JsonProperty(TITLE) final String title,
-                                                           @JsonProperty(DESCRIPTION) final String description,
-                                                           @JsonProperty(QUERY_STRING) final String queryString) {
+                                                           @JsonProperty(TITLE_FIELD) final String title,
+                                                           @JsonProperty(DESCRIPTION_FIELD) final String description,
+                                                           @JsonProperty(QUERY_STRING_FIELD) final String queryString) {
         return new AutoValue_ReferencedQueryStringSearchFilter(id, title, description, queryString);
     }
 
