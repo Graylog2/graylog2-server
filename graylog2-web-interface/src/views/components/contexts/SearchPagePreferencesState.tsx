@@ -26,9 +26,9 @@ import Store from 'logic/local-storage/Store';
 import { PreferencesActions } from 'stores/users/PreferencesStore';
 
 type Props = {
-  children: (layoutConsumer: {
-    setLayoutState: (stateKey: string, value: boolean) => void,
-    getLayoutState: (stateKey: string, defaultValue: boolean) => boolean,
+  children: (preferenceConsumer: {
+    setPreferenceState: (stateKey: string, value: boolean) => void,
+    getPreferenceState: (stateKey: string, defaultValue: boolean) => boolean,
   }) => React.ReactElement;
 };
 
@@ -72,7 +72,7 @@ const _updateUserSidebarPinningPref = (currentUser, userPreferences, viewType, n
   }
 };
 
-const SearchPageLayoutState = ({ children }: Props) => {
+const SearchPagePreferenceState = ({ children }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   const userPreferences = useContext(UserPreferencesContext);
   const viewType = useContext(ViewTypeContext);
@@ -82,11 +82,11 @@ const SearchPageLayoutState = ({ children }: Props) => {
 
   const _onSidebarPinningChange = (newIsPinned) => _updateUserSidebarPinningPref(currentUser, userPreferences, viewType, newIsPinned);
 
-  const getLayoutState = (stateKey: string, defaultValue: boolean) => {
+  const getPreferenceState = (stateKey: string, defaultValue: boolean) => {
     return state[stateKey] ?? defaultValue;
   };
 
-  const setLayoutState = (stateKey: string, value: boolean) => {
+  const setPreferenceState = (stateKey: string, value: boolean) => {
     if (stateKey === 'sidebarIsPinned') {
       _onSidebarPinningChange(value);
     }
@@ -94,7 +94,7 @@ const SearchPageLayoutState = ({ children }: Props) => {
     setState({ ...state, [stateKey]: value });
   };
 
-  return children({ getLayoutState, setLayoutState });
+  return children({ getPreferenceState, setPreferenceState });
 };
 
-export default SearchPageLayoutState;
+export default SearchPagePreferenceState;

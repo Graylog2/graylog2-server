@@ -17,35 +17,35 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import SearchPageLayoutContext from './SearchPageLayoutContext';
-import SearchPageLayoutState from './SearchPageLayoutState';
+import SearchPagePreferencesContext from './SearchPagePreferencesContext';
+import SearchPagePreferencesState from './SearchPagePreferencesState';
 
 type Props = {
   children: React.ReactElement,
 };
 
-const SearchPageLayoutProvider = ({ children }: Props) => {
+const SearchPagePreferencesProvider = ({ children }: Props) => {
   return (
-    <SearchPageLayoutState>
-      {({ getLayoutState, setLayoutState }) => {
+    <SearchPagePreferencesState>
+      {({ getPreferenceState, setPreferenceState }) => {
         const config = {
-          sidebar: { isPinned: getLayoutState('sidebarIsPinned', false) },
+          sidebar: { isPinned: getPreferenceState('sidebarIsPinned', false) },
         };
-        const actions = { toggleSidebarPinning: () => setLayoutState('sidebarIsPinned', !config.sidebar.isPinned) };
+        const actions = { toggleSidebarPinning: () => setPreferenceState('sidebarIsPinned', !config.sidebar.isPinned) };
 
         return (
-          <SearchPageLayoutContext.Provider value={{ config, actions }}>
+          <SearchPagePreferencesContext.Provider value={{ config, actions }}>
             {children}
-          </SearchPageLayoutContext.Provider>
+          </SearchPagePreferencesContext.Provider>
         );
       }}
 
-    </SearchPageLayoutState>
+    </SearchPagePreferencesState>
   );
 };
 
-SearchPageLayoutProvider.propTypes = {
+SearchPagePreferencesProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export default SearchPageLayoutProvider;
+export default SearchPagePreferencesProvider;
