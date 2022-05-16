@@ -28,6 +28,10 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.engine.SearchConfig;
+import org.graylog.plugins.views.search.engine.SearchValidator;
+import org.graylog.plugins.views.search.errors.SearchTypeError;
+import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -97,7 +101,23 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
                 new QueryStringDecorators(Optional.empty()),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
-                false, objectMapper);
+                new SearchValidator() {
+                    @Override
+                    public Optional<SearchTypeError> validateSearchType(Query query, SearchType searchType, SearchConfig searchConfig) {
+                        return Optional.empty();
+                    }
+
+                    @Override
+                    public void validateQueryTimeRange(Query query, SearchConfig config) {
+
+                    }
+
+                    @Override
+                    public void validate(Search search, StreamPermissions streamPermissions) {
+
+                    }
+                },
+        false);
     }
 
     SearchJob searchJobForQuery(Query query) {

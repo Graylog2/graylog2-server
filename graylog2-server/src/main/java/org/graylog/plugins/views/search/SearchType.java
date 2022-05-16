@@ -189,6 +189,11 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
             return this;
         }
 
+        @Override
+        public SearchType withQuery(BackendQuery query) {
+            return this;
+        }
+
         @JsonAnySetter
         public void setProperties(String key, Object value) {
             props.put(key, value);

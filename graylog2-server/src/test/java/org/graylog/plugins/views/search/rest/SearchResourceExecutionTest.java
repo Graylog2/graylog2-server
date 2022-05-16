@@ -24,11 +24,16 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
+import org.graylog.plugins.views.search.engine.SearchValidator;
+import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -89,8 +94,23 @@ public class SearchResourceExecutionTest {
         final SearchExecutor searchExecutor = new SearchExecutor(searchDomain,
                 searchJobService,
                 queryEngine,
-                executionGuard,
-                objectMapperProvider.get());
+                new SearchValidator() {
+                    @Override
+                    public Optional<SearchTypeError> validateSearchType(Query query, SearchType searchType, SearchConfig searchConfig) {
+                        return Optional.empty();
+                    }
+
+                    @Override
+                    public void validateQueryTimeRange(Query query, SearchConfig config) {
+
+                    }
+
+                    @Override
+                    public void validate(Search search, StreamPermissions streamPermissions) {
+
+                    }
+                },
+                (search, user, executionState) -> search);
 
         this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus) {
             @Override

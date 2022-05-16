@@ -33,6 +33,9 @@ import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQuer
 import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.ReferencedQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.engine.SearchValidator;
+import org.graylog.plugins.views.search.errors.SearchTypeError;
+import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.MatchAllQueryBuilder;
@@ -41,7 +44,6 @@ import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryStri
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,7 +78,23 @@ public class ElasticsearchBackendTest {
                 new QueryStringDecorators(Optional.empty()),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 usedSearchFiltersToQueryStringsMapper,
-                false, new ObjectMapperProvider().get());
+                new SearchValidator() {
+                    @Override
+                    public Optional<SearchTypeError> validateSearchType(Query query, SearchType searchType, SearchConfig searchConfig) {
+                        return Optional.empty();
+                    }
+
+                    @Override
+                    public void validateQueryTimeRange(Query query, SearchConfig config) {
+
+                    }
+
+                    @Override
+                    public void validate(Search search, StreamPermissions streamPermissions) {
+
+                    }
+                },
+        false);
     }
 
     @Test

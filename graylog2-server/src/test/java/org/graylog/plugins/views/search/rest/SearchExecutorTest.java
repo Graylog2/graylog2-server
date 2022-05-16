@@ -17,14 +17,20 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
+import org.graylog.plugins.views.search.engine.SearchValidator;
+import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog2.rest.resources.RestResourceBaseTest;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -76,7 +82,26 @@ public class SearchExecutorTest extends RestResourceBaseTest {
     @BeforeEach
     void setUp() {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        this.searchExecutor = new SearchExecutor(searchDomain, searchJobService, queryEngine, searchExecutionGuard, objectMapper);
+        this.searchExecutor = new SearchExecutor(searchDomain,
+                searchJobService,
+                queryEngine,
+                new SearchValidator() {
+                    @Override
+                    public Optional<SearchTypeError> validateSearchType(Query query, SearchType searchType, SearchConfig searchConfig) {
+                        return Optional.empty();
+                    }
+
+                    @Override
+                    public void validateQueryTimeRange(Query query, SearchConfig config) {
+
+                    }
+
+                    @Override
+                    public void validate(Search search, StreamPermissions streamPermissions) {
+
+                    }
+                },
+                (search, user, executionState) -> search);
     }
 
     @Test

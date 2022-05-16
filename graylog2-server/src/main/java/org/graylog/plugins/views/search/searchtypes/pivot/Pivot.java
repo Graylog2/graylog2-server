@@ -95,6 +95,11 @@ public abstract class Pivot implements SearchType {
         return this;
     }
 
+    @Override
+    public SearchType withQuery(BackendQuery query) {
+        return toBuilder().query(query).build();
+    }
+
     public static Builder builder() {
         return new AutoValue_Pivot.Builder()
                 .type(NAME)

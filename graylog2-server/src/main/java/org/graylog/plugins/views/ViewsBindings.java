@@ -39,9 +39,13 @@ import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.engine.DefaultSearchValidator;
+import org.graylog.plugins.views.search.engine.PluggableSearchNormalizer;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.engine.SearchConfigProvider;
+import org.graylog.plugins.views.search.engine.SearchNormalizer;
+import org.graylog.plugins.views.search.engine.SearchValidator;
 import org.graylog.plugins.views.search.export.ChunkDecorator;
 import org.graylog.plugins.views.search.export.DecoratingMessagesExporter;
 import org.graylog.plugins.views.search.export.ExportBackend;
@@ -245,6 +249,9 @@ public class ViewsBindings extends ViewsModule {
         // The ViewResolver binder must be explicitly initialized to avoid an initialization error when
         // no values are bound.
         viewResolverBinder();
+
+        bind(SearchNormalizer.class).to(PluggableSearchNormalizer.class);
+        bind(SearchValidator.class).to(DefaultSearchValidator.class);
     }
 
     private void registerExportBackendProvider() {
