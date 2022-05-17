@@ -16,17 +16,12 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
-import { Button, Input } from 'components/bootstrap';
+import { Button, Input, Table } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 
 // eslint-disable-next-line no-unused-vars
 import style from './KeyValueTable.css';
-
-const Tr = styled.tr(({ theme }) => css`
-  background-color: ${theme.colors.input.background} !important;
-`);
 
 /**
  * KeyValueTable displays a table for all key-value pairs in a JS object. If the editable prop is set to true, it also
@@ -104,7 +99,7 @@ class KeyValueTable extends React.Component {
 
   _formattedHeaders = (headers) => {
     return (
-      <Tr>
+      <tr>
         {headers.map((header, idx) => {
           const customStyle = {};
 
@@ -119,7 +114,7 @@ class KeyValueTable extends React.Component {
 
           return <th key={header} style={customStyle}>{header}</th>;
         })}
-      </Tr>
+      </tr>
     );
   };
 
@@ -140,11 +135,11 @@ class KeyValueTable extends React.Component {
       }
 
       return (
-        <Tr key={key}>
+        <tr key={key}>
           <td>{key}</td>
           <td>{pairs[key]}</td>
           {actionsColumn}
-        </Tr>
+        </tr>
       );
     });
   };
@@ -157,7 +152,7 @@ class KeyValueTable extends React.Component {
     const addRowDisabled = !this.state.newKey || !this.state.newValue;
 
     return (
-      <Tr>
+      <tr>
         <td>
           <Input type="text"
                  name="newKey"
@@ -181,7 +176,7 @@ class KeyValueTable extends React.Component {
         <td>
           <Button bsStyle="success" bsSize="small" onClick={this._addRow} disabled={addRowDisabled}>Add</Button>
         </td>
-      </Tr>
+      </tr>
     );
   };
 
@@ -189,13 +184,13 @@ class KeyValueTable extends React.Component {
     return (
       <div className="key-value-table-component">
         <div className={`table-responsive ${this.props.containerClassName}`}>
-          <table className={`table table-striped ${this.props.className}`}>
+          <Table className={`table table-striped ${this.props.className}`}>
             <thead>{this._formattedHeaders(this.props.headers)}</thead>
             <tbody>
               {this._formattedRows(this.props.pairs)}
               {this._newRow()}
             </tbody>
-          </table>
+          </Table>
         </div>
       </div>
     );
