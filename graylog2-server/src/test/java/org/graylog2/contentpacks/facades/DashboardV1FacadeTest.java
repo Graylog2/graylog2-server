@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewRequirements;
@@ -94,7 +95,7 @@ public class DashboardV1FacadeTest {
     public static class TestSearchDBService extends SearchDbService {
         protected TestSearchDBService(MongoConnection mongoConnection,
                                       MongoJackObjectMapperProvider mapper) {
-            super(mongoConnection, mapper, dto -> new SearchRequirements(Collections.emptySet(), dto));;
+            super(mongoConnection, mapper, dto -> new SearchRequirements(Collections.emptySet(), dto), new IgnoreSearchFilters());
         }
     }
 

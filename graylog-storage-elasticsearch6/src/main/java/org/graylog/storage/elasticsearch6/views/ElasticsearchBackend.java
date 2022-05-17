@@ -40,6 +40,8 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
+import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders;
@@ -76,9 +78,29 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final IndexLookup indexLookup;
     private final QueryStringDecorators queryStringDecorators;
     private final ESGeneratedQueryContext.Factory queryContextFactory;
+    private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
     private final boolean allowLeadingWildcard;
 
     @Inject
+    public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
+                                JestClient jestClient,
+                                IndexLookup indexLookup,
+                                QueryStringDecorators queryStringDecorators,
+                                ESGeneratedQueryContext.Factory queryContextFactory,
+                                UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
+                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard,
+                                ObjectMapper objectMapper) {
+        this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
+        this.jestClient = jestClient;
+        this.indexLookup = indexLookup;
+
+        this.queryStringDecorators = queryStringDecorators;
+        this.queryContextFactory = queryContextFactory;
+        this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
+        this.allowLeadingWildcard = allowLeadingWildcard;
+    }
+
+    @Deprecated
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
                                 JestClient jestClient,
                                 IndexLookup indexLookup,
@@ -92,6 +114,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         this.queryStringDecorators = queryStringDecorators;
         this.queryContextFactory = queryContextFactory;
+        this.usedSearchFiltersToQueryStringsMapper = new IgnoreSearchFilters();
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
@@ -114,6 +137,13 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         final BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
                 .filter(normalizedRootQuery);
+
+        usedSearchFiltersToQueryStringsMapper.map(query.filters())
+                .forEach(searchFilterQueryString -> {
+                    final String decorated = this.queryStringDecorators.decorate(searchFilterQueryString, job, query);
+                    final QueryBuilder normalized = normalizeQueryString(decorated);
+                    boolQuery.filter(normalized);
+                });
 
         // add the optional root query filters
         generateFilterClause(query.filter(), job, query)

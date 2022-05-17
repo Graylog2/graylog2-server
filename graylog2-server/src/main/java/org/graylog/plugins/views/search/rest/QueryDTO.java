@@ -27,10 +27,13 @@ import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -49,6 +52,9 @@ public abstract class QueryDTO {
     public abstract Optional<Filter> filter();
 
     @JsonProperty
+    public abstract List<UsedSearchFilter> filters();
+
+    @JsonProperty
     public abstract Optional<BackendQuery> query();
 
     @Nonnull
@@ -60,6 +66,7 @@ public abstract class QueryDTO {
                 .id(query.id())
                 .query(query.query())
                 .filter(query.filter())
+                .filters(query.filters())
                 .searchTypes(query.searchTypes())
                 .timerange(query.timerange())
                 .build();
@@ -81,6 +88,9 @@ public abstract class QueryDTO {
         public abstract Builder filter(@Nullable Filter filter);
 
         @JsonProperty
+        public abstract Builder filters(List<UsedSearchFilter> usedSearchFilters);
+
+        @JsonProperty
         public abstract Builder query(@Nullable BackendQuery query);
 
         @JsonProperty("search_types")
@@ -90,7 +100,8 @@ public abstract class QueryDTO {
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_QueryDTO.Builder();
+            return new AutoValue_QueryDTO.Builder()
+                    .filters(Collections.emptyList());
         }
     }
 
@@ -103,6 +114,7 @@ public abstract class QueryDTO {
 
         return queryBuilder
                 .searchTypes(ImmutableSet.copyOf(searchTypes()))
+                .filters(filters())
                 .build();
     }
 }
