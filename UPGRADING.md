@@ -42,3 +42,5 @@ The following API endpoints have been removed in 4.4.
   This happens at creation, so existing `system_messages` collections remain unconstrained.
 <br>You can manually convert your existing collection to a capped collection by following 
 these [instructions](https://www.mongodb.com/docs/manual/core/capped-collections/#convert-a-collection-to-capped).
+- Introducing new archive config parameter retentionTime in days, which automatically deletes archives meeting the criteria.
+  Default value is set to 0 which will disable this feature.
