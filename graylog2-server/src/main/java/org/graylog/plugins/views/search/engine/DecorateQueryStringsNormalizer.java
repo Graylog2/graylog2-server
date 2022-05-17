@@ -1,6 +1,5 @@
 package org.graylog.plugins.views.search.engine;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
@@ -14,15 +13,11 @@ import javax.inject.Inject;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
-
-public class PluggableSearchNormalizer implements SearchNormalizer {
-    private final ObjectMapper objectMapper;
+public class DecorateQueryStringsNormalizer implements SearchNormalizer{
     private final QueryStringDecorators queryStringDecorators;
 
     @Inject
-    public PluggableSearchNormalizer(ObjectMapper objectMapper, QueryStringDecorators queryStringDecorators) {
-        this.objectMapper = objectMapper;
+    public DecorateQueryStringsNormalizer(QueryStringDecorators queryStringDecorators) {
         this.queryStringDecorators = queryStringDecorators;
     }
 
@@ -40,12 +35,10 @@ public class PluggableSearchNormalizer implements SearchNormalizer {
     }
 
     public Search normalize(Search search, SearchUser searchUser, ExecutionState executionState) {
-        final Search searchWithStreams = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadAll());
-
-        final Search searchWithExecutionState = searchWithStreams.applyExecutionState(objectMapper, firstNonNull(executionState, ExecutionState.empty()));
-        final Set<Query> newQueries = searchWithExecutionState.queries().stream()
+        final Set<Query> newQueries = search.queries().stream()
                 .map(query -> normalizeQuery(query, search))
                 .collect(Collectors.toSet());
-        return searchWithExecutionState.toBuilder().queries(ImmutableSet.copyOf(newQueries)).build();
+        return search.toBuilder().queries(ImmutableSet.copyOf(newQueries)).build();
     }
+
 }

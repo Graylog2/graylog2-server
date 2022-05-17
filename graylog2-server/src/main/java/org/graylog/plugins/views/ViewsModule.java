@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.QueryStringDecorator;
+import org.graylog.plugins.views.search.engine.SearchNormalizer;
 import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.rest.SeriesDescription;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -109,4 +110,11 @@ public abstract class ViewsModule extends VersionAwareModule {
         return Multibinder.newSetBinder(binder(), QueryValidator.class);
     }
 
+    protected void registerSearchNormalizer(Class<? extends SearchNormalizer> normalizer) {
+        searchNormalizerBinder().addBinding().to(normalizer);
+    }
+    
+    protected Multibinder<SearchNormalizer> searchNormalizerBinder() {
+        return Multibinder.newSetBinder(binder(), SearchNormalizer.class);
+    }
 }

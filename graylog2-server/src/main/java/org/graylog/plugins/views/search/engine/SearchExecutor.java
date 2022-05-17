@@ -40,19 +40,19 @@ public class SearchExecutor {
     private final SearchJobService searchJobService;
     private final QueryEngine queryEngine;
     private final SearchValidator searchValidator;
-    private final SearchNormalizer searchNormalizer;
+    private final SearchNormalization searchNormalization;
 
     @Inject
     public SearchExecutor(SearchDomain searchDomain,
                           SearchJobService searchJobService,
                           QueryEngine queryEngine,
                           SearchValidator searchValidator,
-                          SearchNormalizer searchNormalizer) {
+                          SearchNormalization searchNormalization) {
         this.searchDomain = searchDomain;
         this.searchJobService = searchJobService;
         this.queryEngine = queryEngine;
         this.searchValidator = searchValidator;
-        this.searchNormalizer = searchNormalizer;
+        this.searchNormalization = searchNormalization;
     }
 
     public SearchJob execute(String searchId, SearchUser searchUser, ExecutionState executionState) {
@@ -62,7 +62,7 @@ public class SearchExecutor {
     }
 
     public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState) {
-        final Search normalizedSearch = searchNormalizer.normalize(search, searchUser, executionState);
+        final Search normalizedSearch = searchNormalization.normalize(search, searchUser, executionState);
 
         searchValidator.validate(normalizedSearch, searchUser);
 
