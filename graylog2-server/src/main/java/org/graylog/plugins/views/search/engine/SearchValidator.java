@@ -11,7 +11,5 @@ import java.util.Optional;
 public interface SearchValidator {
     Optional<SearchTypeError> validateSearchType(Query query, SearchType searchType, SearchConfig searchConfig);
 
-    void validateQueryTimeRange(Query query, SearchConfig config);
-
     void validate(Search search, StreamPermissions streamPermissions);
 }

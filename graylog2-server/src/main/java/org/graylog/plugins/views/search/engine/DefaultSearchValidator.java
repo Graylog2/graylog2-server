@@ -16,10 +16,13 @@ import java.util.Optional;
 
 public class DefaultSearchValidator implements SearchValidator {
     private final SearchExecutionGuard executionGuard;
+    private final SearchConfigProvider searchConfigProvider;
 
     @Inject
-    public DefaultSearchValidator(SearchExecutionGuard executionGuard) {
+    public DefaultSearchValidator(SearchExecutionGuard executionGuard,
+                                  SearchConfigProvider searchConfigProvider) {
         this.executionGuard = executionGuard;
+        this.searchConfigProvider = searchConfigProvider;
     }
 
     public Optional<SearchTypeError> validateSearchType(Query query, SearchType searchType, SearchConfig searchConfig) {
@@ -30,14 +33,14 @@ public class DefaultSearchValidator implements SearchValidator {
                         .map(tr -> new SearchTypeError(query, searchType.id(), "Search type '" + searchType.type() + "' out of allowed time range limit")));
     }
 
-    boolean isOutOfLimit(TimeRange timeRange, Period limit) {
+    private boolean isOutOfLimit(TimeRange timeRange, Period limit) {
         final DateTime start = timeRange.getFrom();
         final DateTime end = timeRange.getTo();
         final DateTime allowedStart = end.minus(limit);
         return start.isBefore(allowedStart);
     }
 
-    public void validateQueryTimeRange(Query query, SearchConfig config) {
+    private void validateQueryTimeRange(Query query, SearchConfig config) {
         config.getQueryTimeRangeLimit()
                 .flatMap(timeRangeLimit -> Optional.ofNullable(query.timerange())
                         .filter(tr -> tr.getFrom() != null && tr.getTo() != null) // TODO: is this check necessary?
@@ -49,5 +52,8 @@ public class DefaultSearchValidator implements SearchValidator {
 
     public void validate(Search search, StreamPermissions streamPermissions) {
         this.executionGuard.check(search, streamPermissions::canReadStream);
+
+        final SearchConfig searchConfig = searchConfigProvider.get();
+        search.queries().forEach(query -> validateQueryTimeRange(query, searchConfig));
     }
 }
