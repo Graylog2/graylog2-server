@@ -41,6 +41,7 @@ class EventDefinitions extends React.Component {
     onPageChange: PropTypes.func.isRequired,
     onQueryChange: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
+    onCopy: PropTypes.func.isRequired,
     onEnable: PropTypes.func.isRequired,
     onDisable: PropTypes.func.isRequired,
   };
@@ -70,7 +71,7 @@ class EventDefinitions extends React.Component {
   };
 
   render() {
-    const { eventDefinitions, context, pagination, query, onPageChange, onQueryChange, onDelete, onEnable, onDisable } = this.props;
+    const { eventDefinitions, context, pagination, query, onPageChange, onQueryChange, onDelete, onCopy, onEnable, onDisable } = this.props;
 
     if (pagination.grandTotal === 0) {
       return this.renderEmptyContent();
@@ -81,7 +82,8 @@ class EventDefinitions extends React.Component {
                             eventDefinition={definition}
                             onDisable={onDisable}
                             onEnable={onEnable}
-                            onDelete={onDelete} />
+                            onDelete={onDelete}
+                            onCopy={onCopy} />
     ));
 
     return (

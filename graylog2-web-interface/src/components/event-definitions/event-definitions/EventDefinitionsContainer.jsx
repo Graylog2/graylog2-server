@@ -63,6 +63,14 @@ class EventDefinitionsContainer extends React.Component {
     };
   };
 
+  handleCopy = (definition) => {
+    return () => {
+      if (window.confirm(`Are you sure you want to create a copy of "${definition.title}"?`)) {
+        EventDefinitionsActions.copy(definition);
+      }
+    };
+  };
+
   handleEnable = (definition) => {
     return () => {
       if (window.confirm(`Are you sure you want to enable "${definition.title}"?`)) {
@@ -94,6 +102,7 @@ class EventDefinitionsContainer extends React.Component {
                         onPageChange={this.handlePageChange}
                         onQueryChange={this.handleQueryChange}
                         onDelete={this.handleDelete}
+                        onCopy={this.handleCopy}
                         onEnable={this.handleEnable}
                         onDisable={this.handleDisable} />
     );

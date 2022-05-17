@@ -41,6 +41,7 @@ describe('EventDefinitionEntry', () => {
     return (
       <CurrentUserContext.Provider value={currentUser}>
         <EventDefinitionEntry onDelete={() => {}}
+                              onCopy={() => {}}
                               onDisable={() => {}}
                               onEnable={() => {}}
                               context={{ scheduler: {} }}
