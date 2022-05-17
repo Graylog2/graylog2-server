@@ -17,23 +17,21 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EncodingTest {
-    GelfChunkAggregator aggregator = Mockito.mock(GelfChunkAggregator.class);
-
     final String MSG_FIELD = "short_message";
     final String MESSAGE = "äöüß";
-    final String rawJSON = "{"
+    final String jsonString = "{"
             + "\"version\": \"1.1\","
             + "\"" + MSG_FIELD + "\": \"" + MESSAGE + "\","
             + "\"host\": \"example.org\","
             + "}";
-    RawMessage rawUTF8 = new RawMessage(rawJSON.getBytes(StandardCharsets.UTF_8));
-    RawMessage rawUTF16 = new RawMessage(rawJSON.getBytes(StandardCharsets.UTF_16));
+    RawMessage rawUTF8 = new RawMessage(jsonString.getBytes(StandardCharsets.UTF_8));
+    RawMessage rawUTF16 = new RawMessage(jsonString.getBytes(StandardCharsets.UTF_16));
     Configuration configUTF8 = new Configuration(Collections.singletonMap(Codec.Config.CK_CHARSET_NAME, StandardCharsets.UTF_8.name()));
     Configuration configUTF16 = new Configuration(Collections.singletonMap(Codec.Config.CK_CHARSET_NAME, StandardCharsets.UTF_16.name()));
 
     @Test
     void GelfCodecTestUTF8() {
-        GelfCodec gelfCodecUTF8 = new GelfCodec(configUTF8, aggregator);
+        GelfCodec gelfCodecUTF8 = new GelfCodec(configUTF8, Mockito.mock(GelfChunkAggregator.class));
 
         final Message message = gelfCodecUTF8.decode(rawUTF8);
         assertThat(message.getMessage()).isEqualTo(MESSAGE);
@@ -43,7 +41,7 @@ class EncodingTest {
 
     @Test
     void GelfCodecTestUTF16() {
-        GelfCodec gelfCodecUTF16 = new GelfCodec(configUTF16, aggregator);
+        GelfCodec gelfCodecUTF16 = new GelfCodec(configUTF16, Mockito.mock(GelfChunkAggregator.class));
 
         final Message message = gelfCodecUTF16.decode(rawUTF16);
         assertThat(message.getMessage()).isEqualTo(MESSAGE);
