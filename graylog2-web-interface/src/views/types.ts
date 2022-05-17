@@ -268,3 +268,17 @@ declare module 'graylog-web-plugin/plugin' {
     visualizationTypes?: Array<VisualizationType<any>>;
   }
 }
+export interface ViewActions {
+  save: {
+    isShown: boolean,
+  };
+  saveAs: {
+    isShown: boolean,
+  };
+  share: {
+    isShown: boolean,
+  }
+  actionsDropdown: {
+    isShown: boolean,
+  }
+}

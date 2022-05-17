@@ -343,7 +343,7 @@ const getPluginRoute = (routeKey) => pluginRoute(routeKey, false);
  *
  */
 export const ENTERPRISE_ROUTE_DESCRIPTION = 'Enterprise';
-export const SECURITY_ROUTE_DESCRIPTION = 'Analyst Tools';
+export const SECURITY_ROUTE_DESCRIPTION = 'Security';
 
 const defaultExport = Object.assign(qualifiedRoutes, { pluginRoute, getPluginRoute, unqualified });
 
