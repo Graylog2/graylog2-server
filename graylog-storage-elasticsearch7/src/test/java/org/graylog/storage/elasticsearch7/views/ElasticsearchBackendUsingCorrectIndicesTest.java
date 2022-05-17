@@ -102,7 +102,6 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
         this.backend = new ElasticsearchBackend(handlers,
                 client,
                 indexLookup,
-                new QueryStringDecorators(Optional.empty()),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
                 new SearchValidator() {

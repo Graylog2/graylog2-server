@@ -29,7 +29,6 @@ import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.SearchConfig;
@@ -75,7 +74,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers;
     private final JestClient jestClient;
     private final IndexLookup indexLookup;
-    private final QueryStringDecorators queryStringDecorators;
     private final ESGeneratedQueryContext.Factory queryContextFactory;
     private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
     private final SearchValidator searchValidator;
@@ -85,7 +83,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
                                 JestClient jestClient,
                                 IndexLookup indexLookup,
-                                QueryStringDecorators queryStringDecorators,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
                                 UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
                                 SearchValidator searchValidator,
@@ -94,7 +91,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         this.jestClient = jestClient;
         this.indexLookup = indexLookup;
 
-        this.queryStringDecorators = queryStringDecorators;
         this.queryContextFactory = queryContextFactory;
         this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
         this.searchValidator = searchValidator;
@@ -111,12 +107,9 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     public ESGeneratedQueryContext generate(SearchJob job, Query query, SearchConfig searchConfig) {
         final BackendQuery backendQuery = query.query();
 
-        searchValidator.validateQueryTimeRange(query, searchConfig);
-
         final Set<SearchType> searchTypes = query.searchTypes();
 
-        final String queryString = this.queryStringDecorators.decorate(backendQuery.queryString(), job, query);
-        final QueryBuilder normalizedRootQuery = normalizeQueryString(queryString);
+        final QueryBuilder normalizedRootQuery = normalizeQueryString(backendQuery.queryString());
 
         final BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
                 .filter(normalizedRootQuery);
@@ -215,7 +208,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 // Skipping stream filter, will be extracted elsewhere
                 return Optional.empty();
             case QueryStringFilter.NAME:
-                return Optional.of(QueryBuilders.queryStringQuery(this.queryStringDecorators.decorate(((QueryStringFilter) filter).query(), job, query)));
+                return Optional.of(QueryBuilders.queryStringQuery(((QueryStringFilter) filter).query()));
         }
         return Optional.empty();
     }

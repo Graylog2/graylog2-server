@@ -93,7 +93,6 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         this.backend = new ElasticsearchBackend(handlers,
                 jestClient,
                 indexLookup,
-                new QueryStringDecorators(Optional.empty()),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
                 new SearchValidator() {

@@ -27,7 +27,6 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.engine.SearchValidator;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
@@ -98,7 +97,6 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
         this.elasticsearchBackend = new ElasticsearchBackend(elasticSearchTypeHandlers,
                 jestClient,
                 indexLookup,
-                new QueryStringDecorators(Optional.empty()),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
                 new SearchValidator() {

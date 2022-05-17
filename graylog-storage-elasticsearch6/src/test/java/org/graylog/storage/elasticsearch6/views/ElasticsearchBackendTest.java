@@ -75,7 +75,6 @@ public class ElasticsearchBackendTest {
         backend = new ElasticsearchBackend(handlers,
                 null,
                 mock(IndexLookup.class),
-                new QueryStringDecorators(Optional.empty()),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 usedSearchFiltersToQueryStringsMapper,
                 new SearchValidator() {
