@@ -229,16 +229,6 @@ public class QueryTest {
     }
 
     @Test
-    public void testHasReferencedSearchFiltersReturnsFalseOnNullSearchFilters() {
-        Query query = Query.builder()
-                .filters(null)
-                .build();
-
-        assertThat(query.hasReferencedStreamFilters())
-                .isFalse();
-    }
-
-    @Test
     public void testHasReferencedSearchFiltersReturnsFalseOnEmptySearchFilters() {
         Query query = Query.builder()
                 .filters(Collections.emptyList())
