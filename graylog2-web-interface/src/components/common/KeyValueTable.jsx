@@ -16,12 +16,17 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import { Button, Input, Table } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 
-// eslint-disable-next-line no-unused-vars
-import style from './KeyValueTable.css';
+const StyledDiv = styled.div`
+  .form-group {
+    margin-left: 0;
+    margin-right: 0;
+  }
+`;
 
 /**
  * KeyValueTable displays a table for all key-value pairs in a JS object. If the editable prop is set to true, it also
@@ -154,24 +159,28 @@ class KeyValueTable extends React.Component {
     return (
       <tr>
         <td>
-          <Input type="text"
-                 name="newKey"
-                 id="newKey"
-                 data-testid="newKey"
-                 bsSize="small"
-                 placeholder={this.props.headers[0]}
-                 value={this.state.newKey}
-                 onChange={this._bindValue} />
+          <StyledDiv>
+            <Input type="text"
+                   name="newKey"
+                   id="newKey"
+                   data-testid="newKey"
+                   bsSize="small"
+                   placeholder={this.props.headers[0]}
+                   value={this.state.newKey}
+                   onChange={this._bindValue} />
+          </StyledDiv>
         </td>
         <td>
-          <Input type="text"
-                 name="newValue"
-                 id="newValue"
-                 data-testid="newValue"
-                 bsSize="small"
-                 placeholder={this.props.headers[1]}
-                 value={this.state.newValue}
-                 onChange={this._bindValue} />
+          <StyledDiv>
+            <Input type="text"
+                   name="newValue"
+                   id="newValue"
+                   data-testid="newValue"
+                   bsSize="small"
+                   placeholder={this.props.headers[1]}
+                   value={this.state.newValue}
+                   onChange={this._bindValue} />
+          </StyledDiv>
         </td>
         <td>
           <Button bsStyle="success" bsSize="small" onClick={this._addRow} disabled={addRowDisabled}>Add</Button>
