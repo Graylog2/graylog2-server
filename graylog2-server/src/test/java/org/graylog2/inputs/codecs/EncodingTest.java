@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog2.inputs.codecs;
 
 import com.jayway.jsonpath.PathNotFoundException;
@@ -57,7 +73,7 @@ class EncodingTest {
         JsonPathCodec jsonPathCodecUTF8 = new JsonPathCodec(new Configuration(jsonPathCollectionUTF8));
 
         final Message message = jsonPathCodecUTF8.decode(rawUTF8);
-        assertThat(message.getMessage().contains(MESSAGE)).isTrue();
+        assertThat(message.getMessage()).contains(MESSAGE);
 
         Assertions.assertThrows(PathNotFoundException.class, () -> {jsonPathCodecUTF8.decode(rawUTF16);});
     }
@@ -70,7 +86,7 @@ class EncodingTest {
         JsonPathCodec jsonPathCodecUTF16 = new JsonPathCodec(new Configuration(jsonPathCollectionUTF16));
 
         final Message message = jsonPathCodecUTF16.decode(rawUTF16);
-        assertThat(message.getMessage().contains(MESSAGE)).isTrue();
+        assertThat(message.getMessage()).contains(MESSAGE);
 
         Assertions.assertThrows(PathNotFoundException.class, () -> {jsonPathCodecUTF16.decode(rawUTF8);});
     }
