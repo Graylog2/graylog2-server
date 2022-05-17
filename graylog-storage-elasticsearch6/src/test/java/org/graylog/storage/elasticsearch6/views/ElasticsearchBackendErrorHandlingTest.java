@@ -95,11 +95,6 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
                     }
 
                     @Override
-                    public void validateQueryTimeRange(Query query, SearchConfig config) {
-
-                    }
-
-                    @Override
                     public void validate(Search search, StreamPermissions streamPermissions) {
 
                     }

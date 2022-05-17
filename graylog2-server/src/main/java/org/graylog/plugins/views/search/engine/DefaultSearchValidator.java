@@ -12,15 +12,16 @@ import org.joda.time.DateTime;
 import org.joda.time.Period;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.Optional;
 
 public class DefaultSearchValidator implements SearchValidator {
     private final SearchExecutionGuard executionGuard;
-    private final SearchConfigProvider searchConfigProvider;
+    private final Provider<SearchConfig> searchConfigProvider;
 
     @Inject
     public DefaultSearchValidator(SearchExecutionGuard executionGuard,
-                                  SearchConfigProvider searchConfigProvider) {
+                                  Provider<SearchConfig> searchConfigProvider) {
         this.executionGuard = executionGuard;
         this.searchConfigProvider = searchConfigProvider;
     }

@@ -32,8 +32,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -61,14 +59,6 @@ public class QueryEngine {
         this.queryMetadataDecorators = queryMetadataDecorators;
         this.queryParser = queryParser;
         this.searchConfig = searchConfig;
-    }
-
-    // TODO: Backwards-compatible constructor to avoid breakage. Remove at some point.
-    @Deprecated
-    public QueryEngine(Map<String, QueryBackend<? extends GeneratedQueryContext>> backends,
-                       Set<QueryMetadataDecorator> queryMetadataDecorators,
-                       QueryParser queryParser, Provider<SearchConfig> searchConfig) {
-        this(backends.get("elasticsearch"), queryMetadataDecorators, queryParser, searchConfig);
     }
 
     public QueryMetadata parse(Search search, Query query) {
@@ -118,7 +108,6 @@ public class QueryEngine {
     }
 
     private QueryResult prepareAndRun(SearchJob searchJob, Query query) {
-
         final QueryBackend<? extends GeneratedQueryContext> backend = getQueryBackend(query);
         LOG.debug("[{}] Using {} to generate query", query.id(), backend);
         // with all the results done, we can execute the current query and eventually complete our own result

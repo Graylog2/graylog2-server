@@ -102,11 +102,6 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
                     }
 
                     @Override
-                    public void validateQueryTimeRange(Query query, SearchConfig config) {
-
-                    }
-
-                    @Override
                     public void validate(Search search, StreamPermissions streamPermissions) {
 
                     }
