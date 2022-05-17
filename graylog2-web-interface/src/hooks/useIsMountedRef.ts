@@ -17,10 +17,14 @@
 import { useEffect, useRef } from 'react';
 
 const useIsMountedRef = () => {
-  const isMounted = useRef(true);
+  const isMounted = useRef(false);
 
-  useEffect(() => () => {
-    isMounted.current = false;
+  useEffect(() => {
+    isMounted.current = true;
+
+    return () => {
+      isMounted.current = false;
+    };
   }, []);
 
   return isMounted;
