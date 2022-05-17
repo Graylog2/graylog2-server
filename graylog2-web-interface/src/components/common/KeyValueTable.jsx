@@ -50,15 +50,6 @@ class KeyValueTable extends React.Component {
     actionsSize: PropTypes.oneOf(['large', 'medium', 'small', 'xsmall']),
   };
 
-  static defaultProps = {
-    headers: ['Name', 'Value', 'Actions'],
-    editable: false,
-    actionsSize: 'xsmall',
-    className: '',
-    containerClassName: '',
-    onChange: () => {},
-  };
-
   constructor(props) {
     super(props);
 
@@ -205,5 +196,14 @@ class KeyValueTable extends React.Component {
     );
   }
 }
+
+KeyValueTable.defaultProps = {
+  headers: ['Name', 'Value', 'Actions'],
+  editable: false,
+  actionsSize: 'xsmall',
+  className: '',
+  containerClassName: '',
+  onChange: () => {},
+};
 
 export default KeyValueTable;
