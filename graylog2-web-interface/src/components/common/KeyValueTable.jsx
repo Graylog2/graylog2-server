@@ -56,12 +56,17 @@ class KeyValueTable extends React.Component {
     actionsSize: 'xsmall',
     className: '',
     containerClassName: '',
+    onChange: () => {},
   };
 
-  state = {
-    newKey: '',
-    newValue: '',
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      newKey: '',
+      newValue: '',
+    };
+  }
 
   _onPairsChange = (newPairs) => {
     if (this.props.onChange) {
@@ -87,6 +92,7 @@ class KeyValueTable extends React.Component {
 
   _deleteRow = (key) => {
     return () => {
+      // eslint-disable-next-line no-alert
       if (window.confirm(`Are you sure you want to delete property '${key}'?`)) {
         const newPairs = ObjectUtils.clone(this.props.pairs);
 
@@ -100,7 +106,7 @@ class KeyValueTable extends React.Component {
     return (
       <Tr>
         {headers.map((header, idx) => {
-          const style = {};
+          const customStyle = {};
 
           // Hide last column or apply width so it sticks to the right
           if (idx === headers.length - 1) {
@@ -108,10 +114,10 @@ class KeyValueTable extends React.Component {
               return null;
             }
 
-            style.width = 75;
+            customStyle.width = 75;
           }
 
-          return <th key={header} style={style}>{header}</th>;
+          return <th key={header} style={customStyle}>{header}</th>;
         })}
       </Tr>
     );
