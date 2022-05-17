@@ -16,12 +16,17 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import { Button, Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 
 // eslint-disable-next-line no-unused-vars
 import style from './KeyValueTable.css';
+
+const Tr = styled.tr(({ theme }) => css`
+  background-color: ${theme.colors.input.background} !important;
+`);
 
 /**
  * KeyValueTable displays a table for all key-value pairs in a JS object. If the editable prop is set to true, it also
@@ -93,7 +98,7 @@ class KeyValueTable extends React.Component {
 
   _formattedHeaders = (headers) => {
     return (
-      <tr>
+      <Tr>
         {headers.map((header, idx) => {
           const style = {};
 
@@ -108,7 +113,7 @@ class KeyValueTable extends React.Component {
 
           return <th key={header} style={style}>{header}</th>;
         })}
-      </tr>
+      </Tr>
     );
   };
 
@@ -129,11 +134,11 @@ class KeyValueTable extends React.Component {
       }
 
       return (
-        <tr key={key}>
+        <Tr key={key}>
           <td>{key}</td>
           <td>{pairs[key]}</td>
           {actionsColumn}
-        </tr>
+        </Tr>
       );
     });
   };
@@ -146,7 +151,7 @@ class KeyValueTable extends React.Component {
     const addRowDisabled = !this.state.newKey || !this.state.newValue;
 
     return (
-      <tr>
+      <Tr>
         <td>
           <Input type="text"
                  name="newKey"
@@ -170,7 +175,7 @@ class KeyValueTable extends React.Component {
         <td>
           <Button bsStyle="success" bsSize="small" onClick={this._addRow} disabled={addRowDisabled}>Add</Button>
         </td>
-      </tr>
+      </Tr>
     );
   };
 
