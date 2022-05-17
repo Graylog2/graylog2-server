@@ -88,6 +88,8 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
 
     SearchType withQuery(BackendQuery query);
 
+    SearchType withFilter(Filter filter);
+
     default Set<String> effectiveStreams() {
         return streams();
     }
@@ -191,6 +193,11 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
 
         @Override
         public SearchType withQuery(BackendQuery query) {
+            return this;
+        }
+
+        @Override
+        public SearchType withFilter(Filter filter) {
             return this;
         }
 

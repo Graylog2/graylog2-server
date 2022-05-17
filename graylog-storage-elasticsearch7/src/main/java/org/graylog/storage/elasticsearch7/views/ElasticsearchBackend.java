@@ -115,8 +115,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         final Set<SearchType> searchTypes = query.searchTypes();
 
-        final String queryString = this.queryStringDecorators.decorate(backendQuery.queryString(), job, query);
-        final QueryBuilder normalizedRootQuery = normalizeQueryString(queryString);
+        final QueryBuilder normalizedRootQuery = normalizeQueryString(backendQuery.queryString());
 
         final BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
                 .filter(normalizedRootQuery);
@@ -166,8 +165,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
 
             searchType.query().ifPresent(searchTypeQuery -> {
-                final String searchTypeQueryString = this.queryStringDecorators.decorate(searchTypeQuery.queryString(), job, query);
-                final QueryBuilder normalizedSearchTypeQuery = normalizeQueryString(searchTypeQueryString);
+                final QueryBuilder normalizedSearchTypeQuery = normalizeQueryString(searchTypeQuery.queryString());
                 searchTypeOverrides.must(normalizedSearchTypeQuery);
             });
 

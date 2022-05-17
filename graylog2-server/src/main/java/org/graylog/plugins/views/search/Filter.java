@@ -41,12 +41,14 @@ public interface Filter {
     @JsonProperty("filters")
     Set<Filter> filters();
 
+    Filter withFilters(Set<Filter> filters);
+
     Builder toGenericBuilder();
 
     interface Builder {
-        public abstract Builder filters(Set<Filter> filters);
+        Builder filters(Set<Filter> filters);
 
-        public abstract Filter build();
+        Filter build();
     }
 
     @JsonAutoDetect
@@ -89,6 +91,11 @@ public interface Filter {
         @Override
         public Builder toGenericBuilder() {
             return null;
+        }
+
+        @Override
+        public Filter withFilters(Set<Filter> filters) {
+            return this;
         }
     }
 }

@@ -84,6 +84,11 @@ public abstract class EventList implements SearchType {
     }
 
     @Override
+    public SearchType withFilter(Filter filter) {
+        return toBuilder().filter(filter).build();
+    }
+
+    @Override
     public Set<String> effectiveStreams() {
         return ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
     }

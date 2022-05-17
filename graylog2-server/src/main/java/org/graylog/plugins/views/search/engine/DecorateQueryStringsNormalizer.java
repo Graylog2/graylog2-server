@@ -1,11 +1,13 @@
 package org.graylog.plugins.views.search.engine;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 
@@ -28,10 +30,32 @@ public class DecorateQueryStringsNormalizer implements SearchNormalizer{
                 .build();
     }
 
+    private Filter normalizeFilter(Filter filter, Query query, Search search) {
+        if (filter == null) {
+            return filter;
+        }
+        Filter normalizedFilter = filter;
+        if (filter instanceof QueryStringFilter) {
+            final QueryStringFilter queryStringFilter = (QueryStringFilter) filter;
+            normalizedFilter = queryStringFilter.withQuery(this.queryStringDecorators.decorate(queryStringFilter.query(), search::getParameter, query));
+        }
+
+        if (normalizedFilter.filters() == null) {
+            return normalizedFilter;
+        }
+
+        return normalizedFilter.withFilters(normalizedFilter.filters()
+                .stream()
+                .map(f -> normalizeFilter(f, query, search))
+                .collect(Collectors.toSet()));
+    }
+
     private SearchType normalizeSearchType(SearchType searchType, Query query, Search search) {
-        return searchType.query()
+        final SearchType searchTypeWithNormalizedQuery = searchType.query()
                 .map(backendQuery -> searchType.withQuery(ElasticsearchQueryString.of(this.queryStringDecorators.decorate(backendQuery.queryString(), search::getParameter, query))))
                 .orElse(searchType);
+
+        return searchTypeWithNormalizedQuery.withFilter(normalizeFilter(searchType.filter(), query, search));
     }
 
     public Search normalize(Search search, SearchUser searchUser, ExecutionState executionState) {
@@ -40,5 +64,4 @@ public class DecorateQueryStringsNormalizer implements SearchNormalizer{
                 .collect(Collectors.toSet());
         return search.toBuilder().queries(ImmutableSet.copyOf(newQueries)).build();
     }
-
 }
