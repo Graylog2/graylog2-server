@@ -1,5 +1,4 @@
 type = "fixed"
-message = "Fix rounding issues in date time picker."
 message = "Improve user experience when changing relative time ranges in the date picker."
 
 issues = ["11075"]
