@@ -42,8 +42,6 @@ import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -65,7 +63,6 @@ import static java.util.stream.Collectors.toSet;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = Query.Builder.class)
 public abstract class Query implements ContentPackable<QueryEntity> {
-    private static final Logger LOG = LoggerFactory.getLogger(Query.class);
 
     @Nullable
     @JsonProperty
@@ -78,7 +75,6 @@ public abstract class Query implements ContentPackable<QueryEntity> {
     @JsonProperty
     public abstract Filter filter();
 
-    @Nullable
     @JsonProperty
     public abstract List<UsedSearchFilter> filters();
 
@@ -242,6 +238,7 @@ public abstract class Query implements ContentPackable<QueryEntity> {
             try {
                 return new AutoValue_Query.Builder()
                         .searchTypes(of())
+                        .filters(Collections.emptyList())
                         .query(ElasticsearchQueryString.empty())
                         .timerange(RelativeRange.create(300));
             } catch (InvalidRangeParametersException e) {

@@ -32,6 +32,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -50,7 +51,6 @@ public abstract class QueryDTO {
     @JsonProperty
     public abstract Optional<Filter> filter();
 
-    @Nullable
     @JsonProperty
     public abstract List<UsedSearchFilter> filters();
 
@@ -88,7 +88,7 @@ public abstract class QueryDTO {
         public abstract Builder filter(@Nullable Filter filter);
 
         @JsonProperty
-        public abstract Builder filters(@Nullable List<UsedSearchFilter> usedSearchFilters);
+        public abstract Builder filters(List<UsedSearchFilter> usedSearchFilters);
 
         @JsonProperty
         public abstract Builder query(@Nullable BackendQuery query);
@@ -100,7 +100,8 @@ public abstract class QueryDTO {
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_QueryDTO.Builder();
+            return new AutoValue_QueryDTO.Builder()
+                    .filters(Collections.emptyList());
         }
     }
 
