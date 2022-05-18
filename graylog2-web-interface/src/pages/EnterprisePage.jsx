@@ -16,9 +16,10 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-// eslint-disable-next-line no-restricted-imports
 import styled, { css } from 'styled-components';
 
+import LicenseCheck from 'license/LicenseCheck';
+import useLicenseCheck from 'license/useLicenseCheck';
 import { useStore } from 'stores/connect';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -87,6 +88,7 @@ const GraylogEnterpriseHeader = styled.h2`
 
 const EnterprisePage = () => {
   const nodes = useStore(NodesStore);
+  const { security: { isValid: isValidSecurityLicense, isLoading: isLoadingSecurityLicense } } = useLicenseCheck();
 
   if (!nodes) {
     return <Spinner />;
@@ -120,9 +122,19 @@ const EnterprisePage = () => {
                   hours per year in collecting and analyzing log data to uncover the root cause of performance,
                   outage, and error issues.
                 </p>
-                <ProductLink href="https://go2.graylog.org/request-graylog-operations" clusterId={clusterId}>
-                  Request now
-                </ProductLink>
+                <LicenseCheck licenseSubject="/license/enterprise" displayLicenseWarning={false}>
+                  {({ licenseIsValid }) => {
+                    if (licenseIsValid) {
+                      return null;
+                    }
+
+                    return (
+                      <ProductLink href="https://go2.graylog.org/request-graylog-operations" clusterId={clusterId}>
+                        Request now
+                      </ProductLink>
+                    );
+                  }}
+                </LicenseCheck>
               </BiggerFontSize>
             </Col>
             <Col md={6}>
@@ -134,9 +146,11 @@ const EnterprisePage = () => {
                   integrations with other security tools, SOAR capabilities, and numerous compliance reporting
                   features.
                 </p>
-                <ProductLink href="https://go2.graylog.org/request-graylog-security" clusterId={clusterId}>
-                  Request now
-                </ProductLink>
+                {!isLoadingSecurityLicense && !isValidSecurityLicense && (
+                  <ProductLink href="https://go2.graylog.org/request-graylog-security" clusterId={clusterId}>
+                    Request now
+                  </ProductLink>
+                )}
               </BiggerFontSize>
             </Col>
           </Row>
