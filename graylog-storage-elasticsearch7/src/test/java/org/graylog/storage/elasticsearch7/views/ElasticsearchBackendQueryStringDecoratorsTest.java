@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -54,9 +55,10 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
                 Collections.emptyMap(),
                 mock(ElasticsearchClient.class),
                 mock(IndexLookup.class),
+                new QueryStringDecorators(Optional.empty()),
                 (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
-        true);
+                true);
     }
 
     @Test
