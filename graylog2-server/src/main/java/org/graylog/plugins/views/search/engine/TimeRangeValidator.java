@@ -7,6 +7,9 @@ import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.permissions.StreamPermissions;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.joda.time.DateTime;
+import org.joda.time.Period;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -14,8 +17,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static org.graylog.plugins.views.search.engine.TimeRangeValidation.isOutOfLimit;
 
 public class TimeRangeValidator implements SearchValidator{
     private final Provider<SearchConfig> searchConfigProvider;
@@ -46,6 +47,12 @@ public class TimeRangeValidator implements SearchValidator{
                         .map(tr -> new SearchTypeError(query, searchType.id(), "Search type '" + searchType.type() + "' out of allowed time range limit")));
     }
 
+    boolean isOutOfLimit(TimeRange timeRange, Period limit) {
+        final DateTime start = timeRange.getFrom();
+        final DateTime end = timeRange.getTo();
+        final DateTime allowedStart = end.minus(limit);
+        return start.isBefore(allowedStart);
+    }
 
     public Set<SearchError> validate(Search search, StreamPermissions streamPermissions) {
         final SearchConfig searchConfig = searchConfigProvider.get();
