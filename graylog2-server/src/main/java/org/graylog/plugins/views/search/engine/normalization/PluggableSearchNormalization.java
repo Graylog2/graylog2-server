@@ -1,4 +1,4 @@
-package org.graylog.plugins.views.search.engine;
+package org.graylog.plugins.views.search.engine.normalization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.plugins.views.search.Search;

@@ -1,4 +1,4 @@
-package org.graylog.plugins.views.search.engine;
+package org.graylog.plugins.views.search.engine.normalization;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Filter;

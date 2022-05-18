@@ -21,6 +21,8 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchJobService;
+import org.graylog.plugins.views.search.engine.normalization.SearchNormalization;
+import org.graylog.plugins.views.search.engine.validation.SearchValidation;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;

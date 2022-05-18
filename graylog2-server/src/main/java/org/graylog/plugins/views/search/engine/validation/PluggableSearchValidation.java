@@ -1,4 +1,4 @@
-package org.graylog.plugins.views.search.engine;
+package org.graylog.plugins.views.search.engine.validation;
 
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchExecutionGuard;

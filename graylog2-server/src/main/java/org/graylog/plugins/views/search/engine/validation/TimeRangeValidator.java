@@ -1,8 +1,9 @@
-package org.graylog.plugins.views.search.engine;
+package org.graylog.plugins.views.search.engine.validation;
 
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
