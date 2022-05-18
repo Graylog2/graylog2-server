@@ -77,7 +77,6 @@ public class ElasticsearchBackendTest {
                 mock(IndexLookup.class),
                 (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
                 usedSearchFiltersToQueryStringsMapper,
-                (search, streamPermissions) -> Collections.emptySet(),
                 false);
     }
 

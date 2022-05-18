@@ -75,14 +75,8 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
                 SearchSourceBuilder ssb,
                 SearchJob job,
                 Query query,
-                Set<SearchError> validationErrors
+                Collection<SearchError> validationErrors
         );
-        default ESGeneratedQueryContext create(
-                ElasticsearchBackend elasticsearchBackend,
-                SearchSourceBuilder ssb,
-                SearchJob job,
-                Query query
-        ) { return create(elasticsearchBackend, ssb, job, query, new HashSet<>()); }
     }
 
     public SearchSourceBuilder searchSourceBuilder(SearchType searchType) {

@@ -32,7 +32,6 @@ import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.SearchConfig;
-import org.graylog.plugins.views.search.engine.SearchValidator;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
@@ -77,7 +76,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final IndexLookup indexLookup;
     private final ESGeneratedQueryContext.Factory queryContextFactory;
     private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
-    private final SearchValidator searchValidator;
     private final boolean allowLeadingWildcard;
 
     @Inject
@@ -86,7 +84,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                 IndexLookup indexLookup,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
                                 UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
-                                SearchValidator searchValidator,
                                 @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.jestClient = jestClient;
@@ -94,7 +91,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         this.queryContextFactory = queryContextFactory;
         this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
-        this.searchValidator = searchValidator;
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 

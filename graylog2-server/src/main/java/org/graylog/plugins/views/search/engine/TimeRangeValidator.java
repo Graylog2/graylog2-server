@@ -2,7 +2,6 @@ package org.graylog.plugins.views.search.engine;
 
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
@@ -18,14 +17,11 @@ import java.util.stream.Stream;
 
 import static org.graylog.plugins.views.search.engine.TimeRangeValidation.isOutOfLimit;
 
-public class DefaultSearchValidator implements SearchValidator {
-    private final SearchExecutionGuard executionGuard;
+public class TimeRangeValidator implements SearchValidator{
     private final Provider<SearchConfig> searchConfigProvider;
 
     @Inject
-    public DefaultSearchValidator(SearchExecutionGuard executionGuard,
-                                  Provider<SearchConfig> searchConfigProvider) {
-        this.executionGuard = executionGuard;
+    public TimeRangeValidator(Provider<SearchConfig> searchConfigProvider) {
         this.searchConfigProvider = searchConfigProvider;
     }
 
@@ -52,8 +48,6 @@ public class DefaultSearchValidator implements SearchValidator {
 
 
     public Set<SearchError> validate(Search search, StreamPermissions streamPermissions) {
-        this.executionGuard.check(search, streamPermissions::canReadStream);
-
         final SearchConfig searchConfig = searchConfigProvider.get();
         return search.queries()
                 .stream()

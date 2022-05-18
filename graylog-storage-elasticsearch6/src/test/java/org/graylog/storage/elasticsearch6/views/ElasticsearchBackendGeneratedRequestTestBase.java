@@ -94,7 +94,6 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
                 indexLookup,
                 (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
-                (search, streamPermissions) -> Collections.emptySet(),
         false);
     }
 
