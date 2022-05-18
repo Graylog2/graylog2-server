@@ -32,6 +32,7 @@ import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.SearchConfig;
+import org.graylog.plugins.views.search.engine.SearchTypeValidator;
 import org.graylog.plugins.views.search.engine.SearchValidator;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
@@ -131,7 +132,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, job, query);
         for (SearchType searchType : searchTypes) {
-            final Optional<SearchTypeError> searchTypeError = searchValidator.validateSearchType(query, searchType, searchConfig);
+            final Optional<SearchTypeError> searchTypeError = SearchTypeValidator.validate(query, searchType, searchConfig);
             if(searchTypeError.isPresent()) {
                 LOG.error("Invalid search type {} for elasticsearch backend, cannot generate query part. Skipping this search type.", searchType.type());
                 queryContext.addError(searchTypeError.get());

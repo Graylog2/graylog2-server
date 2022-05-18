@@ -77,17 +77,6 @@ public class ElasticsearchBackendTest {
                 mock(IndexLookup.class),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 usedSearchFiltersToQueryStringsMapper,
-                new SearchValidator() {
-                    @Override
-                    public Optional<SearchTypeError> validateSearchType(Query query, SearchType searchType, SearchConfig searchConfig) {
-                        return Optional.empty();
-                    }
-
-                    @Override
-                    public void validate(Search search, StreamPermissions streamPermissions) {
-
-                    }
-                },
         false);
     }
 

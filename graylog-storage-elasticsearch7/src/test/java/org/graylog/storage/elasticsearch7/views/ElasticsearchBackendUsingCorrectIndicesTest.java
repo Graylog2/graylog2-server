@@ -27,11 +27,8 @@ import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.SearchConfig;
-import org.graylog.plugins.views.search.engine.SearchValidator;
-import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
@@ -104,17 +101,6 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
                 indexLookup,
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
-                new SearchValidator() {
-                    @Override
-                    public Optional<SearchTypeError> validateSearchType(Query query, SearchType searchType, SearchConfig searchConfig) {
-                        return Optional.empty();
-                    }
-
-                    @Override
-                    public void validate(Search search, StreamPermissions streamPermissions) {
-
-                    }
-                },
         false);
     }
 

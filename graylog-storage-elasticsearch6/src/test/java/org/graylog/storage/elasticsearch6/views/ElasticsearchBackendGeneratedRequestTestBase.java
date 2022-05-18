@@ -27,10 +27,6 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.engine.SearchConfig;
-import org.graylog.plugins.views.search.engine.SearchValidator;
-import org.graylog.plugins.views.search.errors.SearchTypeError;
-import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -58,7 +54,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -99,17 +94,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
                 indexLookup,
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
-                new SearchValidator() {
-                    @Override
-                    public Optional<SearchTypeError> validateSearchType(Query query, SearchType searchType, SearchConfig searchConfig) {
-                        return Optional.empty();
-                    }
-
-                    @Override
-                    public void validate(Search search, StreamPermissions streamPermissions) {
-
-                    }
-                },
+                (search, streamPermissions) -> {},
         false);
     }
 
