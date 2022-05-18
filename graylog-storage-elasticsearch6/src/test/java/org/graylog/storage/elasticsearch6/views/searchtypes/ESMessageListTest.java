@@ -20,19 +20,15 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.revinate.assertj.json.JsonPathAssert;
 import io.searchbox.core.SearchResult;
-import org.graylog.plugins.views.search.ParameterProvider;
-import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
-import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
-import org.graylog.plugins.views.search.engine.QueryStringDecorator;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Test;
@@ -40,7 +36,6 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -50,7 +45,7 @@ public class ESMessageListTest {
 
     @Test
     public void includesCustomNameInResultIfPresent() {
-        final ESMessageList esMessageList = new ESMessageList(new QueryStringDecorators(Optional.empty()));
+        final ESMessageList esMessageList = new ESMessageList();
         final MessageList messageList = someMessageList().toBuilder().name("customResult").build();
 
         final SearchResult result = new MockSearchResult(Collections.emptyList(), (long)0);
@@ -81,24 +76,12 @@ public class ESMessageListTest {
     }
 
     @Test
-    public void appliesDecoratorsToQueryStringIfHighlightingActivated() {
-        final QueryStringDecorator queryStringDecorator = (String queryString, ParameterProvider job, Query query) -> PositionTrackingQuery.of("Foobar!");
-
-        final MessageList messageList = someMessageList();
-
-        ESGeneratedQueryContext queryContext = generateQueryPartWithHighlighting(messageList, Optional.of(queryStringDecorator));
-
-        final DocumentContext doc = JsonPath.parse(queryContext.searchSourceBuilder(messageList).toString());
-        JsonPathAssert.assertThat(doc).jsonPathAsString("$.highlight.highlight_query.query_string.query").isEqualTo("Foobar!");
-    }
-
-    @Test
     public void passesTypeOfSortingFieldAsUnmappedType() {
         final MessageList messageList = someMessageListWithSorting("stream1", "somefield");
         final ESGeneratedQueryContext context = mockQueryContext(messageList);
         when(context.fieldType(Collections.singleton("stream1"), "somefield")).thenReturn(Optional.of("long"));
 
-        final ESGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, Optional.empty(), context);
+        final ESGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, context);
 
         final DocumentContext doc = JsonPath.parse(queryContext.searchSourceBuilder(messageList).toString());
         JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[0].somefield.unmapped_type").isEqualTo("long");
@@ -110,7 +93,7 @@ public class ESMessageListTest {
         final ESGeneratedQueryContext context = mockQueryContext(messageList);
         when(context.fieldType(Collections.singleton("stream1"), "somefield")).thenReturn(Optional.empty());
 
-        final ESGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, Optional.empty(), context);
+        final ESGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, context);
 
         final DocumentContext doc = JsonPath.parse(queryContext.searchSourceBuilder(messageList).toString());
         assertThat(doc.read("$.sort[0].somefield", Map.class)).doesNotContainKey("unmapped_type");
@@ -152,21 +135,17 @@ public class ESMessageListTest {
     }
 
     private ESGeneratedQueryContext generateQueryPartWithHighlighting(MessageList messageList) {
-        return generateQueryPartFor(messageList, true, Optional.empty());
-    }
-
-    private ESGeneratedQueryContext generateQueryPartWithHighlighting(MessageList messageList, Optional<QueryStringDecorator> decorator) {
-        return generateQueryPartFor(messageList, true, decorator);
+        return generateQueryPartFor(messageList, true);
     }
 
     private ESGeneratedQueryContext generateQueryPartWithoutHighlighting(MessageList messageList) {
-        return generateQueryPartFor(messageList, false, Optional.empty());
+        return generateQueryPartFor(messageList, false);
     }
 
-    private ESGeneratedQueryContext generateQueryPartFor(MessageList messageList, boolean allowHighlighting, Optional<QueryStringDecorator> decorator) {
+    private ESGeneratedQueryContext generateQueryPartFor(MessageList messageList, boolean allowHighlighting) {
         final ESGeneratedQueryContext context = mockQueryContext(messageList);
 
-        return generateQueryPartWithContextFor(messageList, allowHighlighting, decorator, context);
+        return generateQueryPartWithContextFor(messageList, allowHighlighting, context);
     }
 
     private ESGeneratedQueryContext mockQueryContext(MessageList messageList) {
@@ -179,10 +158,8 @@ public class ESMessageListTest {
 
     private ESGeneratedQueryContext generateQueryPartWithContextFor(MessageList messageList,
                                                                     boolean allowHighlighting,
-                                                                    Optional<QueryStringDecorator> decorator,
                                                                     ESGeneratedQueryContext context) {
         ESMessageList sut = new ESMessageList(
-                new QueryStringDecorators(decorator),
                 new LegacyDecoratorProcessor.Fake(),
                 allowHighlighting);
 
