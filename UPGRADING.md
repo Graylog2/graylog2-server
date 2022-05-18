@@ -80,3 +80,7 @@ complete stage numbers less than or equal to the aborting stage; higher numbered
 We now persist the desired input state: manually stopped inputs remain stopped, even after a server restart.
 <br>Users can choose the legacy behaviour by setting a flag in the `graylog.conf`:  
   `auto_restart_inputs = true`
+
+- Introducing new archive config parameter retentionTime in days. 
+  Archives exceeding the specified retentionTime are automatically deleted. 
+  By default the behavior is unchanged: archives are retained indefinitely. 
