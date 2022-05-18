@@ -99,7 +99,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
         this.backend = new ElasticsearchBackend(handlers,
                 client,
                 indexLookup,
-                (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
         false);
     }
@@ -127,7 +127,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
 
     @Test
     public void queryDoesNotFallBackToUsingAllIndicesWhenNoIndexRangesAreReturned() throws Exception {
-        final ESGeneratedQueryContext context = backend.generate(job, query, new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext context = backend.generate(job, query, new SearchConfig(Period.ZERO), Collections.emptySet());
         backend.doRun(job, query, context);
 
         verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
@@ -142,7 +142,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
         final long datetimeFixture = 1530194810;
         DateTimeUtils.setCurrentMillisFixed(datetimeFixture);
 
-        final ESGeneratedQueryContext context = backend.generate(job, query, new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext context = backend.generate(job, query, new SearchConfig(Period.ZERO), Collections.emptySet());
         backend.doRun(job, query, context);
 
         ArgumentCaptor<TimeRange> captor = ArgumentCaptor.forClass(TimeRange.class);
@@ -178,7 +178,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
                 .build();
         final Search search = dummySearch(query);
         final SearchJob job = new SearchJob("job1", search, "admin");
-        final ESGeneratedQueryContext context = backend.generate(job, query, new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext context = backend.generate(job, query, new SearchConfig(Period.ZERO), Collections.emptySet());
 
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("streamId"), RelativeRange.create(600)))
                 .thenReturn(ImmutableSet.of("index1", "index2"));
@@ -199,7 +199,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
                 .build();
         final Search search = dummySearch(query);
         final SearchJob job = new SearchJob("job1", search, "admin");
-        final ESGeneratedQueryContext context = backend.generate(job, query, new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext context = backend.generate(job, query, new SearchConfig(Period.ZERO), Collections.emptySet());
 
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1", "stream2"), RelativeRange.create(600)))
                 .thenReturn(ImmutableSet.of("index1", "index2"));

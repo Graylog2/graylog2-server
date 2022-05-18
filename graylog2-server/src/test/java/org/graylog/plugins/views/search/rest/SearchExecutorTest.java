@@ -37,12 +37,14 @@ import org.mockito.quality.Strictness;
 
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -76,7 +78,7 @@ public class SearchExecutorTest extends RestResourceBaseTest {
         this.searchExecutor = new SearchExecutor(searchDomain,
                 searchJobService,
                 queryEngine,
-                (search, streamPermissions) -> {},
+                (search, streamPermissions) -> Collections.emptySet(),
                 (search, user, executionState) -> search);
     }
 
@@ -103,7 +105,7 @@ public class SearchExecutorTest extends RestResourceBaseTest {
         final SearchJob searchJob = mock(SearchJob.class);
         when(searchJobService.create(search, "frank-drebin")).thenReturn(searchJob);
         when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));
-        when(queryEngine.execute(searchJob)).thenReturn(searchJob);
+        when(queryEngine.execute(searchJob, anySet())).thenReturn(searchJob);
 
         when(searchDomain.getForUser(eq("search1"), eq(searchUser))).thenReturn(Optional.of(search));
 
@@ -123,7 +125,7 @@ public class SearchExecutorTest extends RestResourceBaseTest {
         final SearchJob searchJob = mock(SearchJob.class);
         when(searchJobService.create(search, "frank-drebin")).thenReturn(searchJob);
         when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));
-        when(queryEngine.execute(searchJob)).thenReturn(searchJob);
+        when(queryEngine.execute(searchJob, anySet())).thenReturn(searchJob);
         when(searchDomain.getForUser(eq("search1"), eq(searchUser))).thenReturn(Optional.of(search));
         final ExecutionState executionState = ExecutionState.builder().addAdditionalParameter("foo", 42).build();
 

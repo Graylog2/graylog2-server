@@ -22,6 +22,7 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.errors.QueryError;
+import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -31,6 +32,7 @@ import org.joda.time.DateTime;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -48,7 +50,7 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      * @param searchConfig       additional cluster-wide search configuration like query time-range limit
      * @return a backend specific generated query
      */
-    T generate(SearchJob job, Query query, SearchConfig searchConfig);
+    T generate(SearchJob job, Query query, SearchConfig searchConfig, Set<SearchError> validationErrors);
 
     default boolean isAllMessages(TimeRange timeRange) {
         return timeRange instanceof RelativeRange && ((RelativeRange)timeRange).isAllMessages();

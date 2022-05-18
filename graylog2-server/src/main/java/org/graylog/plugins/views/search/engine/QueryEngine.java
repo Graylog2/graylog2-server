@@ -70,11 +70,11 @@ public class QueryEngine {
                 .orElse(parsedMetadata);
     }
 
-    public SearchJob execute(SearchJob searchJob) {
+    public SearchJob execute(SearchJob searchJob, Set<SearchError> validationErrors) {
         searchJob.getSearch().queries().forEach(query -> searchJob.addQueryResultFuture(query.id(),
                 // generate and run each query, making sure we never let an exception escape
                 // if need be we default to an empty result with a failed state and the wrapped exception
-                CompletableFuture.supplyAsync(() -> prepareAndRun(searchJob, query), queryPool)
+                CompletableFuture.supplyAsync(() -> prepareAndRun(searchJob, query, validationErrors), queryPool)
                         .handle((queryResult, throwable) -> {
                             if (throwable != null) {
                                 final Throwable cause = throwable.getCause();
@@ -107,13 +107,13 @@ public class QueryEngine {
         return searchJob.seal();
     }
 
-    private QueryResult prepareAndRun(SearchJob searchJob, Query query) {
+    private QueryResult prepareAndRun(SearchJob searchJob, Query query, Set<SearchError> validationErrors) {
         final QueryBackend<? extends GeneratedQueryContext> backend = getQueryBackend(query);
         LOG.debug("[{}] Using {} to generate query", query.id(), backend);
         // with all the results done, we can execute the current query and eventually complete our own result
         // if any of this throws an exception, the handle in #execute will convert it to an error and return a "failed" result instead
         // if the backend already returns a "failed result" then nothing special happens here
-        final GeneratedQueryContext generatedQueryContext = backend.generate(searchJob, query, searchConfig.get());
+        final GeneratedQueryContext generatedQueryContext = backend.generate(searchJob, query, searchConfig.get(), validationErrors);
         LOG.trace("[{}] Generated query {}, running it on backend {}", query.id(), generatedQueryContext, backend);
         final QueryResult result = backend.run(searchJob, query, generatedQueryContext);
         LOG.debug("[{}] Query returned {}", query.id(), result);

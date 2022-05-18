@@ -54,7 +54,7 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
                 Collections.emptyMap(),
                 mock(ElasticsearchClient.class),
                 mock(IndexLookup.class),
-                (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
         true);
     }
@@ -70,7 +70,7 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
     }
 
     private DocumentContext generateJsonRequest(Query query, SearchJob searchJob) {
-        final ESGeneratedQueryContext context = this.backend.generate(searchJob, query, new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext context = this.backend.generate(searchJob, query, new SearchConfig(Period.ZERO), Collections.emptySet());
 
         final String request = context.searchTypeQueries().get("testSearchtype").toString();
         return JsonPath.parse(request);

@@ -42,6 +42,7 @@ import org.mockito.quality.Strictness;
 
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.core.Response;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -89,7 +90,7 @@ public class SearchResourceExecutionTest {
         final SearchExecutor searchExecutor = new SearchExecutor(searchDomain,
                 searchJobService,
                 queryEngine,
-                (search, streamPermissions) -> {},
+                (search, streamPermissions) -> Collections.emptySet(),
                 (search, user, executionState) -> search);
 
         this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus) {
@@ -155,7 +156,7 @@ public class SearchResourceExecutionTest {
         searchJob.addQueryResultFuture("query", CompletableFuture.completedFuture(QueryResult.emptyResult()));
         searchJob.seal();
 
-        when(queryEngine.execute(any())).thenReturn(searchJob);
+        when(queryEngine.execute(any(), any())).thenReturn(searchJob);
 
         final Response response = this.searchResource.executeSyncJob(search, 100, searchUser);
 
@@ -190,7 +191,7 @@ public class SearchResourceExecutionTest {
 
         final SearchJob searchJob = mocKSearchJob(search.toSearch());
 
-        when(queryEngine.execute(any())).thenReturn(searchJob);
+        when(queryEngine.execute(any(), any())).thenReturn(searchJob);
 
         this.searchResource.executeSyncJob(search, 100, searchUser);
 
@@ -298,7 +299,7 @@ public class SearchResourceExecutionTest {
         final SearchJob searchJob = mocKSearchJob(search);
         when(searchJobService.create(any(), any())).thenReturn(searchJob);
 
-        when(queryEngine.execute(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(queryEngine.execute(any(), any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         return search;
     }

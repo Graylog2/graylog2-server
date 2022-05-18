@@ -42,7 +42,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGeneratedRequestTestBase {
@@ -82,7 +81,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
 
     @Test
     public void everySearchTypeGeneratesASearchSourceBuilder() {
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO), Collections.emptySet());
 
         assertThat(queryContext.searchTypeQueries())
                 .hasSize(2)
@@ -91,7 +90,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
 
     @Test
     public void everySearchTypeGeneratesOneESQuery() throws Exception {
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO), Collections.emptySet());
         when(jestClient.execute(any(), any())).thenReturn(resultFor(resourceFile("successfulMultiSearchResponse.json")));
 
         final String generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
@@ -101,7 +100,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
 
     @Test
     public void multiSearchResultsAreAssignedToSearchTypes() throws Exception {
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO), Collections.emptySet());
 
         when(jestClient.execute(any(), any())).thenReturn(resultFor(resourceFile("successfulMultiSearchResponse.json")));
 
@@ -126,7 +125,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
 
     @Test
     public void oneFailingSearchTypeReturnsPartialResults() throws Exception {
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO), Collections.emptySet());
 
         when(jestClient.execute(any(), any())).thenReturn(resultFor(resourceFile("partiallySuccessfulMultiSearchResponse.json")));
 

@@ -75,9 +75,9 @@ public class ElasticsearchBackendTest {
         backend = new ElasticsearchBackend(handlers,
                 null,
                 mock(IndexLookup.class),
-                (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
                 usedSearchFiltersToQueryStringsMapper,
-                (search, streamPermissions) -> {},
+                (search, streamPermissions) -> Collections.emptySet(),
                 false);
     }
 
@@ -91,7 +91,7 @@ public class ElasticsearchBackendTest {
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
         final SearchJob job = new SearchJob("deadbeef", search, "admin");
 
-        backend.generate(job, query, new SearchConfig(Period.ZERO));
+        backend.generate(job, query, new SearchConfig(Period.ZERO), Collections.emptySet());
     }
 
     @Test

@@ -48,7 +48,6 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGeneratedRequestTestBase {
@@ -88,7 +87,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
 
     @Test
     public void everySearchTypeGeneratesASearchSourceBuilder() {
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO), Collections.emptySet());
 
         assertThat(queryContext.searchTypeQueries())
                 .hasSize(2)
@@ -102,7 +101,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
                 .collect(Collectors.toList());
         when(client.msearch(any(), any())).thenReturn(items);
 
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO), Collections.emptySet());
         final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
 
         assertThat(generatedRequest).hasSize(2);
@@ -115,7 +114,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
                 .collect(Collectors.toList());
         when(client.msearch(any(), any())).thenReturn(items);
 
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO), Collections.emptySet());
         final QueryResult queryResult = this.elasticsearchBackend.doRun(searchJob, query, queryContext);
 
         assertThat(queryResult.searchTypes()).containsOnlyKeys("pivot1", "pivot2");
@@ -137,7 +136,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
 
     @Test
     public void oneFailingSearchTypeReturnsPartialResults() throws Exception {
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO), Collections.emptySet());
 
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("partiallySuccessfulMultiSearchResponse.json");
         final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())

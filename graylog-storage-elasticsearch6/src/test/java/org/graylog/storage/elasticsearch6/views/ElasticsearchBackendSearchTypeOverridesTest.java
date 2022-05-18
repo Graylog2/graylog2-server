@@ -44,7 +44,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBackendGeneratedRequestTestBase {
@@ -87,7 +86,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
 
     @Test
     public void overridesInSearchTypeAreIncorporatedIntoGeneratedQueries() throws IOException {
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO), Collections.emptySet());
         when(jestClient.execute(any(), any())).thenReturn(resultFor(resourceFile("successfulMultiSearchResponse.json")));
 
         final String generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
@@ -104,7 +103,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1"), tr))
                 .thenReturn(ImmutableSet.of("searchTypeIndex"));
 
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, new SearchConfig(Period.ZERO), Collections.emptySet());
         when(jestClient.execute(any(), any())).thenReturn(resultFor(resourceFile("successfulMultiSearchResponse.json")));
 
         final String generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());

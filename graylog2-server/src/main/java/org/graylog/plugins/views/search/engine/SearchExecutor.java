@@ -21,6 +21,7 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchJobService;
+import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -64,9 +66,9 @@ public class SearchExecutor {
     public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState) {
         final Search normalizedSearch = searchNormalization.normalize(search, searchUser, executionState);
 
-        searchValidator.validate(normalizedSearch, searchUser);
+        final Set<SearchError> validationErrors = searchValidator.validate(normalizedSearch, searchUser);
 
-        final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username()));
+        final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors);
 
         try {
             Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 60000, TimeUnit.MILLISECONDS);
