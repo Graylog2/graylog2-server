@@ -32,6 +32,7 @@ export interface OktaBackendConfig extends SharedBackendConfig {
 }
 export interface OidcBackendConfig extends SharedBackendConfig {
   baseUrl?: string;
+  claims?: { [key: string]: string },
 }
 
 export type BackendConfig = OktaBackendConfig | OidcBackendConfig;
@@ -48,6 +49,7 @@ export interface OktaBackendConfigJson extends SharedBackendConfigJson {
 
 export interface OidcBackendConfigJson extends SharedBackendConfigJson {
   base_url: string;
+  claims: { [key: string]: string };
 }
 
 export type BackendConfigJson = OktaBackendConfigJson | OidcBackendConfigJson

@@ -16,13 +16,17 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
-import { Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Button, Input, Table } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 
-// eslint-disable-next-line no-unused-vars
-import style from './KeyValueTable.css';
+const StyledDiv = styled.div`
+  .form-group {
+    margin-left: 0;
+    margin-right: 0;
+  }
+`;
 
 /**
  * KeyValueTable displays a table for all key-value pairs in a JS object. If the editable prop is set to true, it also
@@ -46,18 +50,14 @@ class KeyValueTable extends React.Component {
     actionsSize: PropTypes.oneOf(['large', 'medium', 'small', 'xsmall']),
   };
 
-  static defaultProps = {
-    headers: ['Name', 'Value', 'Actions'],
-    editable: false,
-    actionsSize: 'xsmall',
-    className: '',
-    containerClassName: '',
-  };
+  constructor(props) {
+    super(props);
 
-  state = {
-    newKey: '',
-    newValue: '',
-  };
+    this.state = {
+      newKey: '',
+      newValue: '',
+    };
+  }
 
   _onPairsChange = (newPairs) => {
     if (this.props.onChange) {
@@ -83,6 +83,7 @@ class KeyValueTable extends React.Component {
 
   _deleteRow = (key) => {
     return () => {
+      // eslint-disable-next-line no-alert
       if (window.confirm(`Are you sure you want to delete property '${key}'?`)) {
         const newPairs = ObjectUtils.clone(this.props.pairs);
 
@@ -96,7 +97,7 @@ class KeyValueTable extends React.Component {
     return (
       <tr>
         {headers.map((header, idx) => {
-          const style = {};
+          const customStyle = {};
 
           // Hide last column or apply width so it sticks to the right
           if (idx === headers.length - 1) {
@@ -104,10 +105,10 @@ class KeyValueTable extends React.Component {
               return null;
             }
 
-            style.width = 75;
+            customStyle.width = 75;
           }
 
-          return <th key={header} style={style}>{header}</th>;
+          return <th key={header} style={customStyle}>{header}</th>;
         })}
       </tr>
     );
@@ -149,24 +150,28 @@ class KeyValueTable extends React.Component {
     return (
       <tr>
         <td>
-          <Input type="text"
-                 name="newKey"
-                 id="newKey"
-                 data-testid="newKey"
-                 bsSize="small"
-                 placeholder={this.props.headers[0]}
-                 value={this.state.newKey}
-                 onChange={this._bindValue} />
+          <StyledDiv>
+            <Input type="text"
+                   name="newKey"
+                   id="newKey"
+                   data-testid="newKey"
+                   bsSize="small"
+                   placeholder={this.props.headers[0]}
+                   value={this.state.newKey}
+                   onChange={this._bindValue} />
+          </StyledDiv>
         </td>
         <td>
-          <Input type="text"
-                 name="newValue"
-                 id="newValue"
-                 data-testid="newValue"
-                 bsSize="small"
-                 placeholder={this.props.headers[1]}
-                 value={this.state.newValue}
-                 onChange={this._bindValue} />
+          <StyledDiv>
+            <Input type="text"
+                   name="newValue"
+                   id="newValue"
+                   data-testid="newValue"
+                   bsSize="small"
+                   placeholder={this.props.headers[1]}
+                   value={this.state.newValue}
+                   onChange={this._bindValue} />
+          </StyledDiv>
         </td>
         <td>
           <Button bsStyle="success" bsSize="small" onClick={this._addRow} disabled={addRowDisabled}>Add</Button>
@@ -179,17 +184,26 @@ class KeyValueTable extends React.Component {
     return (
       <div className="key-value-table-component">
         <div className={`table-responsive ${this.props.containerClassName}`}>
-          <table className={`table table-striped ${this.props.className}`}>
+          <Table className={`table table-striped ${this.props.className}`}>
             <thead>{this._formattedHeaders(this.props.headers)}</thead>
             <tbody>
               {this._formattedRows(this.props.pairs)}
               {this._newRow()}
             </tbody>
-          </table>
+          </Table>
         </div>
       </div>
     );
   }
 }
+
+KeyValueTable.defaultProps = {
+  headers: ['Name', 'Value', 'Actions'],
+  editable: false,
+  actionsSize: 'xsmall',
+  className: '',
+  containerClassName: '',
+  onChange: () => {},
+};
 
 export default KeyValueTable;
