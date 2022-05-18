@@ -84,7 +84,7 @@ public class SyslogCodec extends AbstractCodec {
     @Nullable
     @Override
     public Message decode(@Nonnull RawMessage rawMessage) {
-        final String msg = new String(rawMessage.getPayload(), StandardCharsets.UTF_8);
+        final String msg = new String(rawMessage.getPayload(), charset);
         try (Timer.Context ignored = this.decodeTime.time()) {
             final ResolvableInetSocketAddress address = rawMessage.getRemoteAddress();
             final InetSocketAddress remoteAddress;
@@ -160,7 +160,7 @@ public class SyslogCodec extends AbstractCodec {
 
         // Store full message if configured.
         if (configuration.getBoolean(CK_STORE_FULL_MESSAGE)) {
-            m.addField("full_message", new String(e.getRaw(), StandardCharsets.UTF_8));
+            m.addField("full_message", new String(e.getRaw(), charset));
         }
 
 
@@ -213,7 +213,7 @@ public class SyslogCodec extends AbstractCodec {
             } else {
                 LOG.warn("Syslog message is missing date or date could not be parsed. (Possibly set {} to true) "
                                 + "Not further handling. Message was: {}",
-                        CK_ALLOW_OVERRIDE_DATE, new String(msg.getRaw(), StandardCharsets.UTF_8));
+                        CK_ALLOW_OVERRIDE_DATE, new String(msg.getRaw(), charset));
                 throw new IllegalStateException("Syslog message is missing date or date could not be parsed.");
             }
         }

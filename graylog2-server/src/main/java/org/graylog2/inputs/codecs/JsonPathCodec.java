@@ -61,7 +61,7 @@ public class JsonPathCodec extends AbstractCodec {
         if (jsonPath == null) {
             return null;
         }
-        final String json = new String(rawMessage.getPayload(), StandardCharsets.UTF_8);
+        final String json = new String(rawMessage.getPayload(), charset);
         final Map<String, Object> fields = read(json);
 
         final Message message = new Message(buildShortMessage(fields),

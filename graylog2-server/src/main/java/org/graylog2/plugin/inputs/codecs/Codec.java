@@ -45,6 +45,7 @@ public interface Codec {
 
     interface Config {
         String CK_OVERRIDE_SOURCE = "override_source";
+        String CK_CHARSET_NAME = "charset_name";
 
         ConfigurationRequest getRequestedConfiguration();
         void overrideDefaultValues(@Nonnull ConfigurationRequest cr);
