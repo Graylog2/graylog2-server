@@ -47,10 +47,9 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      *
      * @param job                currently executing job
      * @param query              the graylog query structure
-     * @param searchConfig       additional cluster-wide search configuration like query time-range limit
      * @return a backend specific generated query
      */
-    T generate(SearchJob job, Query query, SearchConfig searchConfig, Set<SearchError> validationErrors);
+    T generate(SearchJob job, Query query, Set<SearchError> validationErrors);
 
     default boolean isAllMessages(TimeRange timeRange) {
         return timeRange instanceof RelativeRange && ((RelativeRange)timeRange).isAllMessages();
@@ -107,7 +106,7 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      *
      * @param job                currently executing job
      * @param query              the individual query to run from the current job
-     * @param queryContext       the generated query by {@link #generate(SearchJob, Query, SearchConfig, Set<SearchError>)}
+     * @param queryContext       the generated query by {@link #generate(SearchJob, Query, Set) <SearchError>)}
      * @return the result for the query
      * @throws RuntimeException if the query could not be executed for some reason
      */

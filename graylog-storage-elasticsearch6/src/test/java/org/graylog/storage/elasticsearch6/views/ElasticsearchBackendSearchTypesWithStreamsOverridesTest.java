@@ -22,12 +22,10 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
-import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -126,7 +124,7 @@ public class ElasticsearchBackendSearchTypesWithStreamsOverridesTest extends Ela
 
     private MultiSearch run(Query query) throws IOException {
         final SearchJob job = searchJobForQuery(query);
-        final ESGeneratedQueryContext context = this.elasticsearchBackend.generate(job, query, new SearchConfig(Period.ZERO), Collections.emptySet());
+        final ESGeneratedQueryContext context = this.elasticsearchBackend.generate(job, query, Collections.emptySet());
 
         this.elasticsearchBackend.doRun(job, query, context);
 

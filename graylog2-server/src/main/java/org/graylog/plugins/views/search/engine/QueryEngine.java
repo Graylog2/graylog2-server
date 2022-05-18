@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Objects;
@@ -52,16 +51,14 @@ public class QueryEngine {
     // TODO proper thread pool with tunable settings
     private final Executor queryPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("query-engine-%d").build());
     private final QueryBackend<? extends GeneratedQueryContext> backend;
-    private final Provider<SearchConfig> searchConfig;
 
     @Inject
     public QueryEngine(QueryBackend<? extends GeneratedQueryContext> backend,
                        Set<QueryMetadataDecorator> queryMetadataDecorators,
-                       QueryParser queryParser, Provider<SearchConfig> searchConfig) {
+                       QueryParser queryParser) {
         this.backend = backend;
         this.queryMetadataDecorators = queryMetadataDecorators;
         this.queryParser = queryParser;
-        this.searchConfig = searchConfig;
     }
 
     public QueryMetadata parse(Search search, Query query) {
@@ -120,7 +117,7 @@ public class QueryEngine {
         // with all the results done, we can execute the current query and eventually complete our own result
         // if any of this throws an exception, the handle in #execute will convert it to an error and return a "failed" result instead
         // if the backend already returns a "failed result" then nothing special happens here
-        final GeneratedQueryContext generatedQueryContext = backend.generate(searchJob, query, searchConfig.get(), validationErrors);
+        final GeneratedQueryContext generatedQueryContext = backend.generate(searchJob, query, validationErrors);
         LOG.trace("[{}] Generated query {}, running it on backend {}", query.id(), generatedQueryContext, backend);
         final QueryResult result = backend.run(searchJob, query, generatedQueryContext);
         LOG.debug("[{}] Query returned {}", query.id(), result);

@@ -28,7 +28,6 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
 import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.ReferencedQueryStringSearchFilter;
@@ -41,7 +40,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryStri
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -88,7 +86,7 @@ public class ElasticsearchBackendTest {
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
         final SearchJob job = new SearchJob("deadbeef", search, "admin");
 
-        backend.generate(job, query, new SearchConfig(Period.ZERO), Collections.emptySet());
+        backend.generate(job, query, Collections.emptySet());
     }
 
     @Test
@@ -128,7 +126,7 @@ public class ElasticsearchBackendTest {
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
         final SearchJob job = new SearchJob("deadbeef", search, "admin");
 
-        final ESGeneratedQueryContext queryContext = backend.generate(job, query, new SearchConfig(Period.ZERO), Collections.emptySet());
+        final ESGeneratedQueryContext queryContext = backend.generate(job, query, Collections.emptySet());
         final QueryBuilder esQuery = queryContext.searchSourceBuilder(new SearchType.Fallback()).query();
         assertThat(esQuery)
                 .isNotNull()

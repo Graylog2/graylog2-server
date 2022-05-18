@@ -27,11 +27,9 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.joda.time.Period;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -72,7 +70,7 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
     }
 
     private DocumentContext generateJsonRequest(Query query, SearchJob searchJob) {
-        final ESGeneratedQueryContext context = this.backend.generate(searchJob, query, new SearchConfig(Period.ZERO), Collections.emptySet());
+        final ESGeneratedQueryContext context = this.backend.generate(searchJob, query, Collections.emptySet());
 
         final String request = context.searchTypeQueries().get("testSearchtype").toString();
         return JsonPath.parse(request);
