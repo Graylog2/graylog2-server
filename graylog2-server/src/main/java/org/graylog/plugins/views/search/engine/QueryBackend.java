@@ -120,12 +120,4 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
                 .map(SearchTypeError::searchTypeId)
                 .anyMatch(id -> Objects.equals(id, searchTypeId));
     }
-
-    default boolean isQueryWithError(T queryContext, String queryId) {
-        return queryContext.errors().stream()
-                .filter(q -> q instanceof SearchTypeError)
-                .map(q -> (QueryError) q)
-                .map(QueryError::queryId)
-                .anyMatch(id -> Objects.equals(id, queryId));
-    }
 }

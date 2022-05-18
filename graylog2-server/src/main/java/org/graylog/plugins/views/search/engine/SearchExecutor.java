@@ -70,6 +70,8 @@ public class SearchExecutor {
 
         final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors);
 
+        validationErrors.forEach(searchJob::addError);
+
         try {
             Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 60000, TimeUnit.MILLISECONDS);
         } catch (ExecutionException e) {

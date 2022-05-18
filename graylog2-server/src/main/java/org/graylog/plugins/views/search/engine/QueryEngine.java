@@ -32,10 +32,13 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 
@@ -71,7 +74,12 @@ public class QueryEngine {
     }
 
     public SearchJob execute(SearchJob searchJob, Set<SearchError> validationErrors) {
-        searchJob.getSearch().queries().forEach(query -> searchJob.addQueryResultFuture(query.id(),
+        final Set<Query> validQueries = searchJob.getSearch().queries()
+                .stream()
+                .filter(query -> !isQueryWithError(validationErrors, query))
+                .collect(Collectors.toSet());
+
+        validQueries.forEach(query -> searchJob.addQueryResultFuture(query.id(),
                 // generate and run each query, making sure we never let an exception escape
                 // if need be we default to an empty result with a failed state and the wrapped exception
                 CompletableFuture.supplyAsync(() -> prepareAndRun(searchJob, query, validationErrors), queryPool)
@@ -92,7 +100,7 @@ public class QueryEngine {
                         })
         ));
 
-        searchJob.getSearch().queries().forEach(query -> {
+        validQueries.forEach(query -> {
             final CompletableFuture<QueryResult> queryResultFuture = searchJob.getQueryResultFuture(query.id());
             if (!queryResultFuture.isDone()) {
                 // this is not going to throw an exception, because we will always replace it with a placeholder "FAILED" result above
@@ -118,7 +126,16 @@ public class QueryEngine {
         LOG.debug("[{}] Query returned {}", query.id(), result);
         if (!generatedQueryContext.errors().isEmpty()) {
             generatedQueryContext.errors().forEach(searchJob::addError);
+
         }
         return result;
+    }
+
+    private boolean isQueryWithError(Collection<SearchError> validationErrors, Query query) {
+        return validationErrors.stream()
+                .filter(q -> q instanceof QueryError)
+                .map(q -> (QueryError) q)
+                .map(QueryError::queryId)
+                .anyMatch(id -> Objects.equals(id, query.id()));
     }
 }
