@@ -48,14 +48,14 @@ public class QueryEngine {
 
     // TODO proper thread pool with tunable settings
     private final Executor queryPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("query-engine-%d").build());
-    private final QueryBackend<? extends GeneratedQueryContext> elasticsearchBackend;
+    private final QueryBackend<? extends GeneratedQueryContext> backend;
     private final Provider<SearchConfig> searchConfig;
 
     @Inject
-    public QueryEngine(QueryBackend<? extends GeneratedQueryContext> elasticsearchBackend,
+    public QueryEngine(QueryBackend<? extends GeneratedQueryContext> backend,
                        Set<QueryMetadataDecorator> queryMetadataDecorators,
                        QueryParser queryParser, Provider<SearchConfig> searchConfig) {
-        this.elasticsearchBackend = elasticsearchBackend;
+        this.backend = backend;
         this.queryMetadataDecorators = queryMetadataDecorators;
         this.queryParser = queryParser;
         this.searchConfig = searchConfig;
@@ -108,7 +108,6 @@ public class QueryEngine {
     }
 
     private QueryResult prepareAndRun(SearchJob searchJob, Query query, Set<SearchError> validationErrors) {
-        final QueryBackend<? extends GeneratedQueryContext> backend = getQueryBackend(query);
         LOG.debug("[{}] Using {} to generate query", query.id(), backend);
         // with all the results done, we can execute the current query and eventually complete our own result
         // if any of this throws an exception, the handle in #execute will convert it to an error and return a "failed" result instead
@@ -122,9 +121,4 @@ public class QueryEngine {
         }
         return result;
     }
-
-    private QueryBackend<? extends GeneratedQueryContext> getQueryBackend(Query query) {
-        return elasticsearchBackend;
-    }
-
 }

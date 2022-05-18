@@ -107,13 +107,11 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      *
      * @param job                currently executing job
      * @param query              the individual query to run from the current job
-     * @param queryContext       the generated query by {@link #generate(SearchJob, Query, SearchConfig)}
+     * @param queryContext       the generated query by {@link #generate(SearchJob, Query, SearchConfig, Set<SearchError>)}
      * @return the result for the query
      * @throws RuntimeException if the query could not be executed for some reason
      */
     QueryResult doRun(SearchJob job, Query query, T queryContext);
-
-
 
     default boolean isSearchTypeWithError(T queryContext, String searchTypeId) {
         return queryContext.errors().stream()
