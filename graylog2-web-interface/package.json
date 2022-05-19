@@ -113,7 +113,7 @@
     "@babel/plugin-proposal-class-properties": "7.16.7",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/plugin-transform-runtime": "7.17.12",
-    "@babel/preset-env": "7.16.11",
+    "@babel/preset-env": "7.17.12",
     "@babel/preset-react": "7.16.7",
     "@testing-library/user-event": "^13.5.0",
     "@types/chroma-js": "^2.1.3",
