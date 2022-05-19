@@ -67,6 +67,7 @@ const ContentPacksPage = createReactClass({
   _installContentPack(contentPackId, contentPackRev, parameters) {
     ContentPacksActions.install(contentPackId, contentPackRev, parameters).then(() => {
       UserNotification.success('Content Pack installed successfully.', 'Success');
+      ContentPacksActions.list();
     }, (error) => {
       UserNotification.error(`Installing content pack failed with status: ${error}.
          Could not install Content Pack with ID: ${contentPackId}`);
