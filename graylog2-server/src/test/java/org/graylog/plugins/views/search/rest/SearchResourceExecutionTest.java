@@ -30,7 +30,6 @@ import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,8 +59,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith({MockitoExtension.class})
 @MockitoSettings(strictness = Strictness.WARN)
 public class SearchResourceExecutionTest {
-    private static final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
-
     @Mock
     private SearchJobService searchJobService;
 
