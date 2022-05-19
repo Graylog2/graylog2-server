@@ -43,6 +43,7 @@ class Input extends React.Component {
       PropTypes.string,
     ]),
     labelClassName: PropTypes.string,
+    bsClass: PropTypes.string,
     bsStyle: PropTypes.oneOf(['success', 'warning', 'error']),
     formGroupClassName: PropTypes.string,
     value: PropTypes.oneOfType([
@@ -79,6 +80,7 @@ class Input extends React.Component {
     labelClassName: undefined,
     name: undefined,
     formGroupClassName: undefined,
+    bsClass: undefined,
     bsStyle: null,
     value: undefined,
     placeholder: '',
