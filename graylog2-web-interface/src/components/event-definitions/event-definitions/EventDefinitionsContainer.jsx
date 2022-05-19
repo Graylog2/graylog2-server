@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Spinner } from 'components/common';
+import { ConfirmDialog, Spinner } from 'components/common';
 import connect from 'stores/connect';
 import { EventDefinitionsActions, EventDefinitionsStore } from 'stores/event-definitions/EventDefinitionsStore';
 
@@ -30,17 +30,30 @@ class EventDefinitionsContainer extends React.Component {
     eventDefinitions: PropTypes.object.isRequired,
   };
 
-  componentDidMount() {
-    this.fetchData({});
-  }
-
-  fetchData = ({ page, pageSize, query }) => {
+  static fetchData = ({ page, pageSize, query }) => {
     return EventDefinitionsActions.listPaginated({
       query: query,
       page: page,
       pageSize: pageSize,
     });
   };
+
+  constructor(props) {
+    super(props);
+    this.props = props;
+
+    this.state = {
+      currentDefinition: null,
+      showCopyDialog: false,
+      showDeleteDialog: false,
+      showDisableDialog: false,
+      showEnableDialog: false,
+    };
+  }
+
+  componentDidMount() {
+    EventDefinitionsContainer.fetchData({});
+  }
 
   handlePageChange = (nextPage, nextPageSize) => {
     const { eventDefinitions } = this.props;
@@ -56,55 +69,109 @@ class EventDefinitionsContainer extends React.Component {
   };
 
   handleDelete = (definition) => {
-    return () => {
-      if (window.confirm(`Are you sure you want to delete "${definition.title}"?`)) {
-        EventDefinitionsActions.delete(definition);
-      }
-    };
+    this.setState({ showDeleteDialog: true, currentDefinition: definition });
   };
 
   handleCopy = (definition) => {
-    return () => {
-      if (window.confirm(`Are you sure you want to create a copy of "${definition.title}"?`)) {
-        EventDefinitionsActions.copy(definition);
-      }
-    };
+    this.setState({ showCopyDialog: true, currentDefinition: definition });
   };
 
   handleEnable = (definition) => {
-    return () => {
-      if (window.confirm(`Are you sure you want to enable "${definition.title}"?`)) {
-        EventDefinitionsActions.enable(definition);
-      }
-    };
+    this.setState({ showEnableDialog: true, currentDefinition: definition });
   };
 
   handleDisable = (definition) => {
-    return () => {
-      if (window.confirm(`Are you sure you want to disable "${definition.title}"?`)) {
-        EventDefinitionsActions.disable(definition);
-      }
-    };
+    this.setState({ showDisableDialog: true, currentDefinition: definition });
+  };
+
+  handleClearState = () => {
+    this.setState({
+      showCopyDialog: false,
+      showDeleteDialog: false,
+      showDisableDialog: false,
+      showEnableDialog: false,
+      currentDefinition: null,
+    });
   };
 
   render() {
     const { eventDefinitions } = this.props;
+
+    const {
+      currentDefinition,
+      showCopyDialog,
+      showDeleteDialog,
+      showDisableDialog,
+      showEnableDialog,
+    } = this.state;
 
     if (!eventDefinitions.eventDefinitions) {
       return <Spinner text="Loading Event Definitions information..." />;
     }
 
     return (
-      <EventDefinitions eventDefinitions={eventDefinitions.eventDefinitions}
-                        context={eventDefinitions.context}
-                        pagination={eventDefinitions.pagination}
-                        query={eventDefinitions.query}
-                        onPageChange={this.handlePageChange}
-                        onQueryChange={this.handleQueryChange}
-                        onDelete={this.handleDelete}
-                        onCopy={this.handleCopy}
-                        onEnable={this.handleEnable}
-                        onDisable={this.handleDisable} />
+      <>
+        <EventDefinitions eventDefinitions={eventDefinitions.eventDefinitions}
+                          context={eventDefinitions.context}
+                          pagination={eventDefinitions.pagination}
+                          query={eventDefinitions.query}
+                          onPageChange={this.handlePageChange}
+                          onQueryChange={this.handleQueryChange}
+                          onDelete={this.handleDelete}
+                          onCopy={this.handleCopy}
+                          onEnable={this.handleEnable}
+                          onDisable={this.handleDisable} />
+        {showCopyDialog && (
+        <ConfirmDialog id="copy-event-definition-dialog"
+                       title="Copy Event Definition"
+                       show
+                       onConfirm={() => {
+                         EventDefinitionsActions.copy(currentDefinition);
+                         this.handleClearState();
+                       }}
+                       onCancel={this.handleClearState}>
+          {`Are you sure you want to create a copy of "${currentDefinition?.title || ''}"?`}
+        </ConfirmDialog>
+        )}
+        {showDeleteDialog && (
+        <ConfirmDialog id="delete-event-definition-dialog"
+                       title="Delete Event Definition"
+                       show
+                       onConfirm={() => {
+                         EventDefinitionsActions.delete(currentDefinition);
+                         this.handleClearState();
+                       }}
+                       onCancel={this.handleClearState}>
+          {`Are you sure you want to delete "${currentDefinition?.title || ''}"?`}
+        </ConfirmDialog>
+        )}
+        {showDisableDialog && (
+        <ConfirmDialog id="disable-event-definition-dialog"
+                       title="Disable Event Definition"
+                       show
+                       onConfirm={() => {
+                         EventDefinitionsActions.disable(currentDefinition);
+                         this.handleClearState();
+                       }}
+                       onCancel={this.handleClearState}>
+          {`Are you sure you want to disable "${currentDefinition?.title || ''}"?`}
+        </ConfirmDialog>
+        )}
+        {showEnableDialog && (
+        <ConfirmDialog id="enable-event-definition-dialog"
+                       title="Enable Event Definition"
+                       show
+                       onConfirm={() => {
+                         EventDefinitionsActions.enable(currentDefinition);
+                         this.handleClearState();
+                       }}
+                       onCancel={this.handleClearState}>
+          {`Are you sure you want to enable "${currentDefinition?.title || ''}"?`}
+        </ConfirmDialog>
+        )}
+
+      </>
+
     );
   }
 }

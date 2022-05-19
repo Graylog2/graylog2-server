@@ -77,10 +77,26 @@ const EventDefinitionEntry = ({
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const isScheduled = lodash.get(context, `scheduler.${eventDefinition.id}.is_scheduled`, true);
 
-  let toggle = <MenuItem onClick={onDisable(eventDefinition)}>Disable</MenuItem>;
+  const handleCopy = () => {
+    onCopy(eventDefinition);
+  };
+
+  const handleDelete = () => {
+    onDelete(eventDefinition);
+  };
+
+  const handleDisable = () => {
+    onDisable(eventDefinition);
+  };
+
+  const handleEnable = () => {
+    onEnable(eventDefinition);
+  };
+
+  let toggle = <MenuItem onClick={handleDisable}>Disable</MenuItem>;
 
   if (!isScheduled) {
-    toggle = <MenuItem onClick={onEnable(eventDefinition)}>Enable</MenuItem>;
+    toggle = <MenuItem onClick={handleEnable}>Enable</MenuItem>;
   }
 
   const actions = (
@@ -95,11 +111,11 @@ const EventDefinitionEntry = ({
       <ShareButton entityId={eventDefinition.id} entityType="event_definition" onClick={() => setShowEntityShareModal(true)} />
       <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
         <DropdownButton id="more-dropdown" title="More" pullRight>
-          <MenuItem onClick={onCopy(eventDefinition)}>Duplicate</MenuItem>
+          <MenuItem onClick={handleCopy}>Duplicate</MenuItem>
           <MenuItem divider />
           {toggle}
           <MenuItem divider />
-          <MenuItem onClick={onDelete(eventDefinition)}>Delete</MenuItem>
+          <MenuItem onClick={handleDelete}>Delete</MenuItem>
         </DropdownButton>
       </IfPermitted>
     </React.Fragment>

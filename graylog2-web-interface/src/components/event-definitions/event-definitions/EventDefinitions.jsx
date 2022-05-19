@@ -50,7 +50,7 @@ class EventDefinitions extends React.Component {
     context: {},
   };
 
-  renderEmptyContent = () => {
+  static renderEmptyContent = () => {
     return (
       <Row>
         <Col md={6} mdOffset={3} lg={4} lgOffset={4}>
