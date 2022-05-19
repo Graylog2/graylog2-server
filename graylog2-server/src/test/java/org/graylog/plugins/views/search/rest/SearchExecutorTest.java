@@ -16,15 +16,26 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.google.common.collect.ImmutableSet;
+import org.assertj.core.api.Condition;
+import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
+import org.graylog.plugins.views.search.engine.normalization.PluggableSearchNormalization;
+import org.graylog.plugins.views.search.engine.validation.PluggableSearchValidation;
+import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.resources.RestResourceBaseTest;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +46,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
 import java.util.Collections;
 import java.util.Optional;
@@ -46,8 +56,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -55,31 +63,31 @@ import static org.mockito.Mockito.when;
 @ExtendWith({MockitoExtension.class})
 @MockitoSettings(strictness = Strictness.WARN)
 public class SearchExecutorTest extends RestResourceBaseTest {
-
     @Mock
     private SearchDomain searchDomain;
 
     @Mock
-    private SearchJobService searchJobService;
-
-    @Mock
     private QueryEngine queryEngine;
 
-    @Mock
-    private SearchExecutionGuard searchExecutionGuard;
-
     @Captor
-    private ArgumentCaptor<ExecutionState> executionStateCaptor;
+    private ArgumentCaptor<SearchJob> searchJobCaptor;
 
     private SearchExecutor searchExecutor;
 
     @BeforeEach
     void setUp() {
+        final SearchJobService searchJobService = new InMemorySearchJobService();
         this.searchExecutor = new SearchExecutor(searchDomain,
                 searchJobService,
                 queryEngine,
-                (search, streamPermissions) -> Collections.emptySet(),
-                (search, user, executionState) -> search);
+                new PluggableSearchValidation(new SearchExecutionGuard(Collections.emptyMap()), Collections.emptySet()),
+                new PluggableSearchNormalization(new ObjectMapperProvider().get(), Collections.emptySet()));
+        when(queryEngine.execute(any(), any())).thenAnswer(invocation -> {
+            final SearchJob searchJob = invocation.getArgument(0);
+            searchJob.addQueryResultFuture("query", CompletableFuture.completedFuture(QueryResult.emptyResult()));
+            searchJob.seal();
+            return searchJob;
+        });
     }
 
     @Test
@@ -96,62 +104,66 @@ public class SearchExecutorTest extends RestResourceBaseTest {
 
     @Test
     public void addsStreamsToSearchWithoutStreams() {
-        final Search search = mockSearch();
+        final Search search = Search.builder()
+                .queries(ImmutableSet.of(Query.builder().build()))
+                .build();
 
         final SearchUser searchUser = TestSearchUser.builder()
                 .withUser(testUser -> testUser.withUsername("frank-drebin"))
+                .allowStream("somestream")
                 .build();
-
-        final SearchJob searchJob = mock(SearchJob.class);
-        when(searchJobService.create(search, "frank-drebin")).thenReturn(searchJob);
-        when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));
-        when(queryEngine.execute(searchJob, anySet())).thenReturn(searchJob);
 
         when(searchDomain.getForUser(eq("search1"), eq(searchUser))).thenReturn(Optional.of(search));
 
-        this.searchExecutor.execute("search1", searchUser, ExecutionState.empty());
-
-        verify(search, times(1)).addStreamsToQueriesWithoutStreams(any());
+        final SearchJob searchJob = this.searchExecutor.execute("search1", searchUser, ExecutionState.empty());
+        assertThat(searchJob.getSearch().queries())
+                .are(new Condition<>(query -> query.usedStreamIds().equals(Collections.singleton("somestream")), "All accessible streams have been added"));
     }
 
     @Test
     public void appliesSearchExecutionState() {
-        final Search search = mockSearch();
+        final Search search = makeSearch();
 
         final SearchUser searchUser = TestSearchUser.builder()
                 .withUser(testUser -> testUser.withUsername("frank-drebin"))
                 .build();
 
-        final SearchJob searchJob = mock(SearchJob.class);
-        when(searchJobService.create(search, "frank-drebin")).thenReturn(searchJob);
-        when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));
-        when(queryEngine.execute(searchJob, anySet())).thenReturn(searchJob);
         when(searchDomain.getForUser(eq("search1"), eq(searchUser))).thenReturn(Optional.of(search));
-        final ExecutionState executionState = ExecutionState.builder().addAdditionalParameter("foo", 42).build();
 
+        final AbsoluteRange absoluteRange = AbsoluteRange.create("2022-05-18T10:00:00.000Z", "2022-05-19T10:00:00.000Z");
+        final ExecutionState executionState = ExecutionState.builder()
+                .setGlobalOverride(ExecutionStateGlobalOverride.builder().timerange(absoluteRange).build())
+                .build();
         this.searchExecutor.execute("search1", searchUser, executionState);
 
-        verify(search, times(1)).applyExecutionState(any(), executionStateCaptor.capture());
+        verify(queryEngine, times(1)).execute(searchJobCaptor.capture(), anySet());
 
-        assertThat(executionStateCaptor.getValue()).isEqualTo(executionState);
+        final SearchJob executedJob = searchJobCaptor.getValue();
+
+        assertThat(executedJob.getSearch().queries())
+                .are(new Condition<>(query -> query.timerange().equals(absoluteRange), "timeranges are applied through execution state"));
     }
 
     @Test
     public void checksUserPermissionsForSearch() {
-        final Search search = mockSearch();
-        final SearchUser searchUser = TestSearchUser.builder().build();
+        final Search search = Search.builder()
+                .queries(ImmutableSet.of(
+                        Query.builder()
+                                .filter(StreamFilter.ofId("forbidden_stream"))
+                                .build()
+                ))
+                .build();
+        final SearchUser searchUser = TestSearchUser.builder()
+                .denyStream("forbidden_stream")
+                .build();
 
-        doThrow(ForbiddenException.class).when(searchExecutionGuard).check(eq(search), any());
         when(searchDomain.getForUser(eq("search1"), eq(searchUser))).thenReturn(Optional.of(search));
 
-        assertThatExceptionOfType(ForbiddenException.class)
+        assertThatExceptionOfType(MissingStreamPermissionException.class)
                 .isThrownBy(() -> this.searchExecutor.execute("search1", searchUser, ExecutionState.empty()));
     }
 
-    private Search mockSearch() {
-        final Search search = mock(Search.class);
-        when(search.addStreamsToQueriesWithoutStreams(any())).thenReturn(search);
-        when(search.applyExecutionState(any(), any())).thenReturn(search);
-        return search;
+    private Search makeSearch() {
+        return Search.builder().build();
     }
 }
