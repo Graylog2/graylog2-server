@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.events.notifications.NotificationDto;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
@@ -167,6 +168,11 @@ public class OutputFacade implements EntityFacade<Output> {
     }
 
     @Override
+    public String id(Output nativeEntity) {
+        return nativeEntity.getId();
+    }
+
+    @Override
     public EntityExcerpt createExcerpt(Output output) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(output.getId()))
@@ -178,7 +184,9 @@ public class OutputFacade implements EntityFacade<Output> {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return outputService.loadAll().stream()
-                .map(this::createExcerpt)
+                .map(this::maybeCreateExcerpt)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 

@@ -25,6 +25,7 @@ import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import org.bson.types.ObjectId;
 import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
+import org.graylog.events.notifications.NotificationDto;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
@@ -317,6 +318,11 @@ public class StreamFacade implements EntityFacade<Stream> {
     }
 
     @Override
+    public String id(Stream nativeEntity) {
+        return nativeEntity.getId();
+    }
+
+    @Override
     public EntityExcerpt createExcerpt(Stream stream) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(stream.getId()))
@@ -328,7 +334,9 @@ public class StreamFacade implements EntityFacade<Stream> {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return streamService.loadAll().stream()
-                .map(this::createExcerpt)
+                .map(this::maybeCreateExcerpt)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 

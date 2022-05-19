@@ -24,6 +24,7 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import org.graylog.events.notifications.NotificationDto;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
@@ -237,6 +238,11 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
     }
 
     @Override
+    public String id(PipelineDao nativeEntity) {
+        return nativeEntity.id();
+    }
+
+    @Override
     public EntityExcerpt createExcerpt(PipelineDao pipeline) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(pipeline.id()))
@@ -248,7 +254,9 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return pipelineService.loadAll().stream()
-                .map(this::createExcerpt)
+                .map(this::maybeCreateExcerpt)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 

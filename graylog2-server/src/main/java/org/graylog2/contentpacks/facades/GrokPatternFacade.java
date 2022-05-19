@@ -23,6 +23,7 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
 import org.graylog2.contentpacks.model.ModelId;
@@ -114,6 +115,11 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
     }
 
     @Override
+    public String id(GrokPattern nativeEntity) {
+        return nativeEntity.id();
+    }
+
+    @Override
     public Optional<NativeEntity<GrokPattern>> findExisting(Entity entity, Map<String, ValueReference> parameters) {
         if (entity instanceof EntityV1) {
             return findExisting((EntityV1) entity);
@@ -151,7 +157,9 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return grokPatternService.loadAll().stream()
-                .map(this::createExcerpt)
+                .map(this::maybeCreateExcerpt)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 

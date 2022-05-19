@@ -48,6 +48,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
@@ -441,6 +442,11 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
     }
 
     @Override
+    public String id(InputWithExtractors nativeEntity) {
+        return nativeEntity.input().getId();
+    }
+
+    @Override
     public EntityExcerpt createExcerpt(InputWithExtractors inputWithExtractors) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(inputWithExtractors.input().getId()))
@@ -448,12 +454,13 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                 .title(inputWithExtractors.input().getTitle())
                 .build();
     }
-
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return inputService.all().stream()
                 .map(InputWithExtractors::create)
-                .map(this::createExcerpt)
+                .map(this::maybeCreateExcerpt)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 

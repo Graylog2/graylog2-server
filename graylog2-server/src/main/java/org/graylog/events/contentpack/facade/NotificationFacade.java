@@ -33,6 +33,7 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.lookup.dto.LookupTableDto;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
@@ -114,6 +115,11 @@ public class NotificationFacade implements EntityFacade<NotificationDto> {
     }
 
     @Override
+    public String id(NotificationDto nativeEntity) {
+        return nativeEntity.id();
+    }
+
+    @Override
     public EntityExcerpt createExcerpt(NotificationDto nativeEntity) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(nativeEntity.id()))
@@ -125,7 +131,9 @@ public class NotificationFacade implements EntityFacade<NotificationDto> {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return notificationService.streamAll()
-                .map(this::createExcerpt)
+                .map(this::maybeCreateExcerpt)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 }

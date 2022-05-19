@@ -189,6 +189,11 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
     }
 
     @Override
+    public String id(LookupTableDto nativeEntity) {
+        return nativeEntity.id();
+    }
+
+    @Override
     public EntityExcerpt createExcerpt(LookupTableDto lookupTableDto) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(lookupTableDto.id()))
@@ -200,7 +205,9 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return lookupTableService.findAll().stream()
-                .map(this::createExcerpt)
+                .map(this::maybeCreateExcerpt)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 

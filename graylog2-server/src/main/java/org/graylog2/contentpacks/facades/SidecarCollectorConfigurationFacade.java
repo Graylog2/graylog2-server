@@ -23,6 +23,7 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import org.graylog.events.notifications.NotificationDto;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -119,6 +120,11 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
     }
 
     @Override
+    public String id(Configuration nativeEntity) {
+        return nativeEntity.id();
+    }
+
+    @Override
     public EntityExcerpt createExcerpt(Configuration configuration) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(configuration.id()))
@@ -130,7 +136,9 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return configurationService.all().stream()
-                .map(this::createExcerpt)
+                .map(this::maybeCreateExcerpt)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 

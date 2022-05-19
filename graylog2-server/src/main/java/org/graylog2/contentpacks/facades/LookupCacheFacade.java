@@ -150,6 +150,11 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
     }
 
     @Override
+    public String id(CacheDto nativeEntity) {
+        return nativeEntity.id();
+    }
+
+    @Override
     public EntityExcerpt createExcerpt(CacheDto cacheDto) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(cacheDto.id()))
@@ -161,7 +166,9 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return cacheService.findAll().stream()
-                .map(this::createExcerpt)
+                .map(this::maybeCreateExcerpt)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 

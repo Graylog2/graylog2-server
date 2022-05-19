@@ -161,6 +161,11 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     }
 
     @Override
+    public String id(EventDefinitionDto nativeEntity) {
+        return nativeEntity.id();
+    }
+
+    @Override
     public EntityExcerpt createExcerpt(EventDefinitionDto nativeEntity) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(nativeEntity.id()))
@@ -172,7 +177,9 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return eventDefinitionService.streamAll()
-                .map(this::createExcerpt)
+                .map(this::maybeCreateExcerpt)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 

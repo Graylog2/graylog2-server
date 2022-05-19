@@ -17,6 +17,7 @@
 package org.graylog2.contentpacks.facades;
 
 import com.google.common.graph.Graph;
+import org.graylog.events.notifications.NotificationDto;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -51,6 +52,11 @@ public class RootEntityFacade implements EntityFacade<Void> {
 
     @Override
     public void delete(Void nativeEntity) {
+    }
+
+    @Override
+    public String id(Void nativeEntity) {
+        throw new UnsupportedOperationException("Unsupported operation for root entity");
     }
 
     @Override

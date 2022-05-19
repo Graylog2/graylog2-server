@@ -68,7 +68,7 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
     protected final UserService userService;
 
     @Inject
-    public ViewFacade(ObjectMapper objectMapper,
+    protected ViewFacade(ObjectMapper objectMapper,
                       SearchDbService searchDbService,
                       ViewService viewService,
                       ViewSummaryService viewSummaryService,
@@ -158,8 +158,17 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
     }
 
     @Override
+    public String id(ViewSummaryDTO nativeEntity) {
+        return nativeEntity.id();
+    }
+
+    @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        return getNativeViews().map(this::createExcerpt).collect(Collectors.toSet());
+        return getNativeViews()
+                .map(this::maybeCreateExcerpt)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
     }
 
     protected Stream<ViewSummaryDTO> getNativeViews() {

@@ -36,6 +36,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.lookup.db.DBDataAdapterService;
+import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
@@ -150,6 +151,11 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
     }
 
     @Override
+    public String id(DataAdapterDto nativeEntity) {
+        return nativeEntity.id();
+    }
+
+    @Override
     public EntityExcerpt createExcerpt(DataAdapterDto dataAdapterDto) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(dataAdapterDto.id()))
@@ -161,7 +167,9 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return dataAdapterService.findAll().stream()
-                .map(this::createExcerpt)
+                .map(this::maybeCreateExcerpt)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 

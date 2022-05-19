@@ -97,6 +97,11 @@ public class UrlWhitelistFacade implements EntityFacade<WhitelistEntry> {
     }
 
     @Override
+    public String id(WhitelistEntry nativeEntity) {
+        return nativeEntity.id();
+    }
+
+    @Override
     public EntityExcerpt createExcerpt(WhitelistEntry whitelistEntry) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(whitelistEntry.id()))
@@ -110,7 +115,9 @@ public class UrlWhitelistFacade implements EntityFacade<WhitelistEntry> {
         return urlWhitelistService.getWhitelist()
                 .entries()
                 .stream()
-                .map(this::createExcerpt)
+                .map(this::maybeCreateExcerpt)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 

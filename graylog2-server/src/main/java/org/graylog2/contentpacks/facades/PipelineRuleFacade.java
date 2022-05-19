@@ -19,6 +19,7 @@ package org.graylog2.contentpacks.facades;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
+import org.graylog.events.notifications.NotificationDto;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -121,6 +122,11 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
     }
 
     @Override
+    public String id(RuleDao nativeEntity) {
+        return nativeEntity.id();
+    }
+
+    @Override
     public Optional<NativeEntity<RuleDao>> findExisting(Entity entity, Map<String, ValueReference> parameters) {
         if (entity instanceof EntityV1) {
             return findExisting((EntityV1) entity, parameters);
@@ -164,7 +170,9 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return ruleService.loadAll().stream()
-                .map(this::createExcerpt)
+                .map(this::maybeCreateExcerpt)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 

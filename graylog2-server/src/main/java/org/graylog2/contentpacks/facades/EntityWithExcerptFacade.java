@@ -28,12 +28,16 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 public interface EntityWithExcerptFacade<EntityClass, ExcerptClass> {
+    Logger LOG = LoggerFactory.getLogger(EntityWithExcerptFacade.class);
+
     /**
      * Create an exportable model of a native entity referenced by an {@link EntityDescriptor}
      * including optional constraints.
@@ -92,6 +96,13 @@ public interface EntityWithExcerptFacade<EntityClass, ExcerptClass> {
     void delete(EntityClass nativeEntity);
 
     /**
+     * Return a unique ID - primarily for troubleshooting
+     * @param nativeEntity The native entity
+     * @return unique ID of the entity
+     */
+    String id(ExcerptClass nativeEntity);
+
+    /**
      * Create an excerpt (id, type, title) of a native entity for display purposes.
      *
      * @param nativeEntity The native entity to create an excerpt of
@@ -99,6 +110,23 @@ public interface EntityWithExcerptFacade<EntityClass, ExcerptClass> {
      * @see EntityExcerpt
      */
     EntityExcerpt createExcerpt(ExcerptClass nativeEntity);
+
+    /**
+     * Create an excerpt (id, type, title) of a native entity for display purposes, but catch
+     * and log any exceptions that arise.
+     *
+     * @param nativeEntity The native entity to create an excerpt of
+     * @return The entity excerpt of the native entity
+     * @see EntityExcerpt
+     */
+    default Optional<EntityExcerpt> maybeCreateExcerpt(ExcerptClass nativeEntity) {
+        try {
+            return Optional.of(createExcerpt(nativeEntity));
+        } catch (Exception e) {
+            LOG.error("Unable to extract {} {}: {}", nativeEntity.getClass().getSimpleName(), id(nativeEntity), e.getMessage());
+        }
+        return Optional.empty();
+    }
 
     /**
      * Create entity excerpts of all native entities of type {@code T}.

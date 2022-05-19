@@ -19,6 +19,7 @@ package org.graylog2.contentpacks.facades;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
+import org.graylog.events.notifications.NotificationDto;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -138,6 +139,11 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
     }
 
     @Override
+    public String id(Collector nativeEntity) {
+        return nativeEntity.id();
+    }
+
+    @Override
     public EntityExcerpt createExcerpt(Collector collector) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(collector.id()))
@@ -149,7 +155,9 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return collectorService.all().stream()
-                .map(this::createExcerpt)
+                .map(this::maybeCreateExcerpt)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 

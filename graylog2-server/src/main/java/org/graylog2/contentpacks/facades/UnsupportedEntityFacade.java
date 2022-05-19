@@ -17,6 +17,7 @@
 package org.graylog2.contentpacks.facades;
 
 import com.google.common.graph.Graph;
+import org.graylog.events.notifications.NotificationDto;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -53,6 +54,11 @@ public class UnsupportedEntityFacade implements EntityFacade<Void> {
 
     @Override
     public void delete(Void nativeEntity) {
+        throw new UnsupportedOperationException("Unsupported entity");
+    }
+
+    @Override
+    public String id(Void nativeEntity) {
         throw new UnsupportedOperationException("Unsupported entity");
     }
 
