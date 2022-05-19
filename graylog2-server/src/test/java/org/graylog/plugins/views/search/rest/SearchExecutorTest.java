@@ -34,7 +34,6 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.resources.RestResourceBaseTest;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,7 +80,7 @@ public class SearchExecutorTest extends RestResourceBaseTest {
                 searchJobService,
                 queryEngine,
                 new PluggableSearchValidation(new SearchExecutionGuard(Collections.emptyMap()), Collections.emptySet()),
-                new PluggableSearchNormalization(new ObjectMapperProvider().get(), Collections.emptySet()));
+                new PluggableSearchNormalization(Collections.emptySet()));
         when(queryEngine.execute(any(), any())).thenAnswer(invocation -> {
             final SearchJob searchJob = invocation.getArgument(0);
             searchJob.addQueryResultFuture("query", CompletableFuture.completedFuture(QueryResult.emptyResult()));

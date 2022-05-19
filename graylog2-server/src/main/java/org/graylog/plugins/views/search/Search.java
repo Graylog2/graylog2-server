@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
@@ -94,7 +93,7 @@ public abstract class Search implements ContentPackable<SearchEntity> {
         return Optional.ofNullable(parameterIndex.get(parameterName));
     }
 
-    public Search applyExecutionState(ObjectMapper objectMapper, ExecutionState executionState) {
+    public Search applyExecutionState(ExecutionState executionState) {
         final Builder builder = toBuilder();
 
         if (!executionState.parameterBindings().isEmpty()) {

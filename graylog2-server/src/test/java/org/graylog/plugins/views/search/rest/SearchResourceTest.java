@@ -131,7 +131,7 @@ public class SearchResourceTest {
         when(search.id()).thenReturn(searchId);
         when(search.parameters()).thenReturn(ImmutableSet.of());
 
-        when(search.applyExecutionState(any(), any())).thenReturn(search);
+        when(search.applyExecutionState(any())).thenReturn(search);
         when(searchDomain.getForUser(eq(search.id()), any())).thenReturn(Optional.of(search));
 
         final SearchJob searchJob = mock(SearchJob.class);

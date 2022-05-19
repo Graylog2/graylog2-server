@@ -34,7 +34,6 @@ import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -94,7 +93,7 @@ public class SearchResourceExecutionTest {
                 searchJobService,
                 queryEngine,
                 new PluggableSearchValidation(executionGuard, Collections.emptySet()),
-                new PluggableSearchNormalization(new ObjectMapperProvider().get(), Collections.emptySet()));
+                new PluggableSearchNormalization(Collections.emptySet()));
 
         this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus) {
             @Override
