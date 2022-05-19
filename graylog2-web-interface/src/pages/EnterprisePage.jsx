@@ -105,7 +105,7 @@ const EnterprisePage = () => {
                   integrations with other security tools, SOAR capabilities, and numerous compliance reporting
                   features.
                 </p>
-                <ProductLinkComponent href="https://go2.graylog.org/request-graylog-security" clusterId={clusterId}>
+                <ProductLinkComponent href="https://go2.graylog.org/request-graylog-security" licenseSubject="/license/security" clusterId={clusterId}>
                   Request now
                 </ProductLinkComponent>
               </BiggerFontSize>
