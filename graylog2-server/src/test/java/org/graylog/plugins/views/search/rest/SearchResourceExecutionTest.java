@@ -24,15 +24,22 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
+import org.graylog.plugins.views.search.engine.normalization.PluggableSearchNormalization;
+import org.graylog.plugins.views.search.engine.validation.PluggableSearchValidation;
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
+import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -50,7 +57,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -59,9 +65,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith({MockitoExtension.class})
 @MockitoSettings(strictness = Strictness.WARN)
 public class SearchResourceExecutionTest {
-    @Mock
-    private SearchJobService searchJobService;
-
     @Mock
     private EventBus eventBus;
 
@@ -77,18 +80,21 @@ public class SearchResourceExecutionTest {
     @Mock
     private User currentUser;
 
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private SearchUser searchUser;
 
     private SearchResource searchResource;
 
+    private SearchJobService searchJobService;
+
     @BeforeEach
     public void setUp() {
+        this.searchJobService = new InMemorySearchJobService();
         final SearchExecutor searchExecutor = new SearchExecutor(searchDomain,
                 searchJobService,
                 queryEngine,
-                (search, streamPermissions) -> Collections.emptySet(),
-                (search, user, executionState) -> search);
+                new PluggableSearchValidation(executionGuard, Collections.emptySet()),
+                new PluggableSearchNormalization(new ObjectMapperProvider().get(), Collections.emptySet()));
 
         this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus) {
             @Override
@@ -100,23 +106,24 @@ public class SearchResourceExecutionTest {
 
     @Test
     public void executeQueryAddsCurrentUserAsOwner() {
-        mockCurrentUserName("basti");
+        final String username = "basti";
+        mockCurrentUserName(username);
 
-        final Search search = mockExistingSearch();
+        final Search search = makeExistingSearch(username);
 
-        this.searchResource.executeQuery(search.id(), ExecutionState.empty(), searchUser);
+        final Response response = this.searchResource.executeQuery(search.id(), ExecutionState.empty(), searchUser);
 
-        final ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
-        verify(searchJobService, times(1)).create(eq(search), usernameCaptor.capture());
+        final SearchJob searchJob = (SearchJob)response.getEntity();
 
-        assertThat(usernameCaptor.getValue()).isEqualTo("basti");
+        assertThat(searchJob.getOwner()).isEqualTo(username);
     }
 
     @Test
     public void executeQueryTriggersEvent() {
-        mockCurrentUserName("basti");
+        final String username = "basti";
+        mockCurrentUserName(username);
 
-        final Search search = mockExistingSearch();
+        final Search search = makeExistingSearch(username);
 
         final Response response = this.searchResource.executeQuery(search.id(), ExecutionState.empty(), searchUser);
 
@@ -130,10 +137,11 @@ public class SearchResourceExecutionTest {
 
     @Test
     public void guardExceptionPreventsTriggeringEvent() {
-        mockCurrentUserName("basti");
+        final String username = "basti";
+        mockCurrentUserName(username);
 
-        final Search search = mockExistingSearch();
-        throwGuardExceptionFor(search);
+        final Search search = makeExistingSearch(username);
+        throwGuardExceptionFor();
 
         try {
             this.searchResource.executeQuery(search.id(), ExecutionState.empty(), searchUser);
@@ -147,7 +155,7 @@ public class SearchResourceExecutionTest {
     public void executeSyncJobTriggersEvent() {
         mockCurrentUserName("peterchen");
 
-        final SearchDTO search = mockSearchDTO();
+        final SearchDTO search = makeSearchDTO();
 
         final SearchJob searchJob = new SearchJob("deadbeef", search.toSearch(), "peterchen");
         searchJob.addQueryResultFuture("query", CompletableFuture.completedFuture(QueryResult.emptyResult()));
@@ -161,15 +169,19 @@ public class SearchResourceExecutionTest {
         verify(this.eventBus, times(1)).post(eventCaptor.capture());
 
         final SearchJobExecutionEvent searchJobExecutionEvent = eventCaptor.getValue();
-        assertThat(searchJobExecutionEvent.user()).isEqualTo(currentUser);
-        assertThat(searchJobExecutionEvent.searchJob().getId()).isEqualTo("deadbeef");
+        assertThat(searchJobExecutionEvent)
+                .extracting(SearchJobExecutionEvent::user)
+                .containsExactly(currentUser);
+        assertThat(searchJobExecutionEvent)
+                .extracting(event -> event.searchJob().getId())
+                .containsExactly("deadbeef");
     }
 
     @Test
     public void guardExceptionDuringSyncExecutionPreventsTriggeringEvent() {
         mockCurrentUserName("basti");
 
-        final SearchDTO search = mockSearchDTO();
+        final SearchDTO search = makeSearchDTO();
         doThrow(new ForbiddenException()).when(executionGuard).check(any(), any());
 
         try {
@@ -184,41 +196,23 @@ public class SearchResourceExecutionTest {
     public void executeSyncJobAddsCurrentUserAsOwner() {
         mockCurrentUserName("peterchen");
 
-        final SearchDTO search = mockSearchDTO();
+        final SearchDTO search = makeSearchDTO();
 
-        final SearchJob searchJob = mocKSearchJob(search.toSearch());
+        final SearchJob searchJob = makeSearchJob(search.toSearch());
 
         when(queryEngine.execute(any(), any())).thenReturn(searchJob);
 
-        this.searchResource.executeSyncJob(search, 100, searchUser);
+        final Response response = this.searchResource.executeSyncJob(search, 100, searchUser);
 
-        final ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
-        verify(searchJobService, times(1)).create(any(), usernameCaptor.capture());
-
-        assertThat(usernameCaptor.getValue()).isEqualTo("peterchen");
-    }
-
-    @Test
-    public void executeQueryAppliesExecutionState() {
-        final Search search = mockExistingSearch();
-
-        final ExecutionState.Builder builder = ExecutionState.builder();
-        builder.addAdditionalParameter("foo", 42);
-
-        final ExecutionState executionState = builder.build();
-        this.searchResource.executeQuery(search.id(), executionState, searchUser);
-
-        final ArgumentCaptor<ExecutionState> executionStateCaptor = ArgumentCaptor.forClass(ExecutionState.class);
-        verify(search, times(1)).applyExecutionState(any(), executionStateCaptor.capture());
-
-        assertThat(executionStateCaptor.getValue()).isEqualTo(executionState);
+        final SearchJobDTO responseSearchJob = (SearchJobDTO)response.getEntity();
+        assertThat(responseSearchJob.owner()).isEqualTo("peterchen");
     }
 
     @Test
     public void guardExceptionInAsyncExecutionLeadsTo403() {
-        final Search search = mockExistingSearch();
+        final Search search = makeExistingSearch("basti");
 
-        throwGuardExceptionFor(search);
+        throwGuardExceptionFor();
 
         assertThatExceptionOfType(ForbiddenException.class)
                 .isThrownBy(() -> this.searchResource.executeQuery(search.id(), null, searchUser));
@@ -226,7 +220,7 @@ public class SearchResourceExecutionTest {
 
     @Test
     public void guardExceptionInSynchronousExecutionLeadsTo403() {
-        final SearchDTO search = mockSearchDTO();
+        final SearchDTO search = makeSearchDTO();
 
         throwGuardException();
 
@@ -236,28 +230,28 @@ public class SearchResourceExecutionTest {
 
     @Test
     public void failureToAddDefaultStreamsInAsyncSearchLeadsTo403() {
-        final Search search = mockExistingSearch();
+        final Search search = makeNewSearch("search1");
+        persistSearch(search);
 
-        doThrow(new ForbiddenException()).when(search).addStreamsToQueriesWithoutStreams(any());
+        when(searchUser.streams().loadAll()).thenReturn(ImmutableSet.of());
 
-        assertThatExceptionOfType(ForbiddenException.class)
+        assertThatExceptionOfType(MissingStreamPermissionException.class)
                 .isThrownBy(() -> this.searchResource.executeQuery(search.id(), null, searchUser));
     }
 
     @Test
     public void failureToAddDefaultStreamsInSynchronousSearchLeadsTo403() {
-        final SearchDTO searchDTO = mock(SearchDTO.class);
-        final Search search = mockExistingSearch();
-        when(searchDTO.toSearch()).thenReturn(search);
+        final Search search = makeNewSearch("search1");
+        final SearchDTO searchDTO = SearchDTO.fromSearch(search);
 
-        doThrow(new ForbiddenException()).when(search).addStreamsToQueriesWithoutStreams(any());
+        when(searchUser.streams().loadAll()).thenReturn(ImmutableSet.of());
 
-        assertThatExceptionOfType(ForbiddenException.class)
+        assertThatExceptionOfType(MissingStreamPermissionException.class)
                 .isThrownBy(() -> this.searchResource.executeSyncJob(searchDTO, 0, searchUser));
     }
 
-    private void throwGuardExceptionFor(Search search) {
-        doThrow(new ForbiddenException()).when(executionGuard).check(eq(search), any());
+    private void throwGuardExceptionFor() {
+        doThrow(new ForbiddenException()).when(executionGuard).check(any(), any());
     }
 
     private void throwGuardException() {
@@ -269,45 +263,50 @@ public class SearchResourceExecutionTest {
         when(searchUser.username()).thenReturn(name);
     }
 
-    private Search mockNewSearch() {
-        final Search search = mock(Search.class);
-
-        when(search.addStreamsToQueriesWithoutStreams(any())).thenReturn(search);
-
+    private Search makeNewSearch(String searchId) {
         final String streamId = "streamId";
+        final Query query1 = Query.builder()
+                .id("query1")
+                .filter(StreamFilter.ofId(streamId))
+                .build();
+        final Query query2 = Query.builder()
+                .id("query2")
+                .build();
+        return Search.builder()
+                .id(searchId)
+                .queries(ImmutableSet.of(query1, query2))
+                .build();
+    }
 
-        final Query query = mock(Query.class);
-        when(query.usedStreamIds()).thenReturn(ImmutableSet.of(streamId));
-        when(search.queries()).thenReturn(ImmutableSet.of(query));
+    private Search makeExistingSearch(String owner) {
+        final Search search = makeNewSearch("deadbeef")
+                .toBuilder()
+                .owner(owner)
+                .build();
+
+        persistSearch(search);
+
+        when(queryEngine.execute(any(), any())).thenAnswer(invocation -> {
+            final SearchJob searchJob = invocation.getArgument(0);
+            searchJob.addQueryResultFuture("query", CompletableFuture.completedFuture(QueryResult.emptyResult()));
+            searchJob.seal();
+            return searchJob;
+        });
 
         return search;
     }
 
-    private Search mockExistingSearch() {
-
-        final Search search = mockNewSearch();
-
-        final String searchId = "deadbeef";
-        when(search.id()).thenReturn(searchId);
-
-        when(search.applyExecutionState(any(), any())).thenReturn(search);
+    private void persistSearch(Search search) {
         when(searchDomain.getForUser(eq(search.id()), any())).thenReturn(Optional.of(search));
-
-        final SearchJob searchJob = mocKSearchJob(search);
-        when(searchJobService.create(any(), any())).thenReturn(searchJob);
-
-        when(queryEngine.execute(any(), any())).thenAnswer(invocation -> invocation.getArgument(0));
-
-        return search;
     }
 
-    private SearchDTO mockSearchDTO() {
+    private SearchDTO makeSearchDTO() {
         return SearchDTO.Builder
                 .create()
                 .build();
     }
 
-    private SearchJob mocKSearchJob(Search search) {
+    private SearchJob makeSearchJob(Search search) {
         final SearchJob searchJob = new SearchJob("deadbeef", search, "peterchen");
         searchJob.addQueryResultFuture("query1", CompletableFuture.completedFuture(QueryResult.emptyResult()));
         searchJob.seal();
