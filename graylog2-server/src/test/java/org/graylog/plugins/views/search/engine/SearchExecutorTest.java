@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest;
+package org.graylog.plugins.views.search.engine;
 
 import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.Condition;
@@ -24,16 +24,21 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
-import org.graylog.plugins.views.search.engine.QueryEngine;
-import org.graylog.plugins.views.search.engine.SearchExecutor;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.engine.normalization.DecorateQueryStringsNormalizer;
 import org.graylog.plugins.views.search.engine.normalization.PluggableSearchNormalization;
 import org.graylog.plugins.views.search.engine.validation.PluggableSearchValidation;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.ExecutionState;
+import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
+import org.graylog.plugins.views.search.rest.TestSearchUser;
+import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.rest.resources.RestResourceBaseTest;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,7 +66,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class})
 @MockitoSettings(strictness = Strictness.WARN)
-public class SearchExecutorTest extends RestResourceBaseTest {
+public class SearchExecutorTest {
     @Mock
     private SearchDomain searchDomain;
 
@@ -80,7 +85,13 @@ public class SearchExecutorTest extends RestResourceBaseTest {
                 searchJobService,
                 queryEngine,
                 new PluggableSearchValidation(new SearchExecutionGuard(Collections.emptyMap()), Collections.emptySet()),
-                new PluggableSearchNormalization(Collections.emptySet()));
+                new PluggableSearchNormalization(Collections.singleton(
+                        new DecorateQueryStringsNormalizer(
+                                new QueryStringDecorators(
+                                        Optional.of((queryString, job, query) -> PositionTrackingQuery.of("decorated"))
+                                )
+                        )
+                )));
         when(queryEngine.execute(any(), any())).thenAnswer(invocation -> {
             final SearchJob searchJob = invocation.getArgument(0);
             searchJob.addQueryResultFuture("query", CompletableFuture.completedFuture(QueryResult.emptyResult()));
@@ -91,8 +102,7 @@ public class SearchExecutorTest extends RestResourceBaseTest {
 
     @Test
     public void throwsExceptionIfSearchIsNotFound() {
-        final SearchUser searchUser = TestSearchUser.builder()
-                .build();
+        final SearchUser searchUser = TestSearchUser.builder().build();
 
         when(searchDomain.getForUser(eq("search1"), eq(searchUser))).thenReturn(Optional.empty());
 
@@ -160,6 +170,52 @@ public class SearchExecutorTest extends RestResourceBaseTest {
 
         assertThatExceptionOfType(MissingStreamPermissionException.class)
                 .isThrownBy(() -> this.searchExecutor.execute("search1", searchUser, ExecutionState.empty()));
+    }
+
+    @Test
+    void appliesQueryStringDecorators() {
+        final SearchUser searchUser = TestSearchUser.builder()
+                .allowStream("foo")
+                .build();
+        final Search search = Search.builder()
+                .queries(ImmutableSet.of(
+                        Query.builder()
+                                .query(ElasticsearchQueryString.of("*"))
+                                .build()
+                ))
+                .build();
+
+        final SearchJob searchJob = this.searchExecutor.execute(search, searchUser, ExecutionState.empty());
+
+        assertThat(searchJob.getSearch().queries())
+                .are(new Condition<>(query -> query.query().queryString().equals("decorated"), "Query string is decorated"));
+    }
+
+    @Test
+    void appliesQueryStringDecoratorsOnSearchTypes() {
+        final SearchUser searchUser = TestSearchUser.builder()
+                .allowStream("foo")
+                .build();
+        final SearchType searchType = MessageList.builder()
+                .id("searchType1")
+                .query(ElasticsearchQueryString.of("*"))
+                .build();
+        final Search search = Search.builder()
+                .queries(ImmutableSet.of(
+                        Query.builder()
+                                .query(ElasticsearchQueryString.of("*"))
+                                .searchTypes(Collections.singleton(searchType))
+                                .build()
+                ))
+                .build();
+
+        final SearchJob searchJob = this.searchExecutor.execute(search, searchUser, ExecutionState.empty());
+
+        final Query query = searchJob.getSearch().queries().stream().findFirst().orElseThrow(IllegalStateException::new);
+        final SearchType resultingSearchType = query.searchTypes().stream().findFirst().orElseThrow(IllegalStateException::new);
+        assertThat(resultingSearchType.query())
+                .isPresent()
+                .contains(ElasticsearchQueryString.of("decorated"));
     }
 
     private Search makeSearch() {

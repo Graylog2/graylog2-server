@@ -26,7 +26,7 @@ import java.util.Optional;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class QueryStringDecorators {
-    private  Optional<QueryStringDecorator> decorator;
+    private final Optional<QueryStringDecorator> decorator;
 
     @Inject
     public QueryStringDecorators(Optional<QueryStringDecorator> queryDecorators) {
