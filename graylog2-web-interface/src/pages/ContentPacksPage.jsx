@@ -38,7 +38,6 @@ const ConfigurationBundles = styled.div(({ theme }) => css`
 `);
 
 const ContentPacksPage = createReactClass({
-  displayName: 'ContentPacksPage',
   mixins: [Reflux.connect(ContentPacksStore)],
 
   componentDidMount() {
