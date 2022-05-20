@@ -10,8 +10,6 @@
   },
   "readme": "../README.md",
   "scripts": {
-    "docs:build": "styleguidist build",
-    "docs:server": "styleguidist server",
     "start": "node devServer.js",
     "build": "cross-env disable_plugins=true webpack --config webpack.bundled.js",
     "build:stats": "cross-env disable_plugins=true webpack --profile --json > ./webpack/stats-$(git rev-parse --abbrev-ref HEAD).json",
@@ -166,7 +164,6 @@
     "less-loader": "^10.2.0",
     "node-fetch": "^2.6.1",
     "puppeteer": "^14.0.0",
-    "react-styleguidist": "^11.1.7",
     "style-loader": "3.3.1",
     "stylelint-config-graylog": "file:packages/stylelint-config-graylog",
     "trace-unhandled": "^2.0.1",
