@@ -25,6 +25,13 @@ import {} from 'components/event-definitions/event-definition-types';
 
 import EventDefinitions from './EventDefinitions';
 
+const DIALOG_TYPES = {
+  COPY: 'copy',
+  DELETE: 'delete',
+  DISABLE: 'disable',
+  ENABLE: 'enable',
+};
+
 class EventDefinitionsContainer extends React.Component {
   static propTypes = {
     eventDefinitions: PropTypes.object.isRequired,
@@ -44,10 +51,10 @@ class EventDefinitionsContainer extends React.Component {
 
     this.state = {
       currentDefinition: null,
-      showCopyDialog: false,
-      showDeleteDialog: false,
-      showDisableDialog: false,
-      showEnableDialog: false,
+      dialogBody: '',
+      dialogTitle: '',
+      showDialog: false,
+      dialogType: null,
     };
   }
 
@@ -69,28 +76,76 @@ class EventDefinitionsContainer extends React.Component {
   };
 
   handleDelete = (definition) => {
-    this.setState({ showDeleteDialog: true, currentDefinition: definition });
+    this.setState({
+      showDialog: true,
+      dialogType: DIALOG_TYPES.DELETE,
+      dialogBody: `Are you sure you want to delete "${definition.title}"?`,
+      dialogTitle: 'Delete Event Definition',
+      currentDefinition: definition,
+    });
   };
 
   handleCopy = (definition) => {
-    this.setState({ showCopyDialog: true, currentDefinition: definition });
+    this.setState({
+      showDialog: true,
+      dialogType: DIALOG_TYPES.COPY,
+      dialogBody: `Are you sure you want to create a copy of "${definition.title}"?`,
+      dialogTitle: 'Copy Event Definition',
+      currentDefinition: definition,
+    });
   };
 
   handleEnable = (definition) => {
-    this.setState({ showEnableDialog: true, currentDefinition: definition });
+    this.setState({
+      showDialog: true,
+      dialogType: DIALOG_TYPES.ENABLE,
+      dialogBody: `Are you sure you want to enable "${definition.title}"?`,
+      dialogTitle: 'Enable Event Definition',
+      currentDefinition: definition,
+    });
   };
 
   handleDisable = (definition) => {
-    this.setState({ showDisableDialog: true, currentDefinition: definition });
+    this.setState({
+      showDialog: true,
+      dialogType: DIALOG_TYPES.DISABLE,
+      dialogBody: 'Disable Event Definition',
+      dialogTitle: `Are you sure you want to disable "${definition.title}"?`,
+      currentDefinition: definition,
+    });
+  };
+
+  handleConfirm = () => {
+    const { dialogType, currentDefinition } = this.state;
+
+    switch (dialogType) {
+      case 'copy':
+        EventDefinitionsActions.copy(currentDefinition);
+        this.handleClearState();
+        break;
+      case 'delete':
+        EventDefinitionsActions.delete(currentDefinition);
+        this.handleClearState();
+        break;
+      case 'enable':
+        EventDefinitionsActions.enable(currentDefinition);
+        this.handleClearState();
+        break;
+      case 'disable':
+        EventDefinitionsActions.disable(currentDefinition);
+        this.handleClearState();
+        break;
+      default:
+        break;
+    }
   };
 
   handleClearState = () => {
     this.setState({
-      showCopyDialog: false,
-      showDeleteDialog: false,
-      showDisableDialog: false,
-      showEnableDialog: false,
+      showDialog: false,
       currentDefinition: null,
+      dialogBody: '',
+      dialogTitle: '',
     });
   };
 
@@ -98,11 +153,9 @@ class EventDefinitionsContainer extends React.Component {
     const { eventDefinitions } = this.props;
 
     const {
-      currentDefinition,
-      showCopyDialog,
-      showDeleteDialog,
-      showDisableDialog,
-      showEnableDialog,
+      showDialog,
+      dialogBody,
+      dialogTitle,
     } = this.state;
 
     if (!eventDefinitions.eventDefinitions) {
@@ -121,55 +174,15 @@ class EventDefinitionsContainer extends React.Component {
                           onCopy={this.handleCopy}
                           onEnable={this.handleEnable}
                           onDisable={this.handleDisable} />
-        {showCopyDialog && (
+        {showDialog && (
         <ConfirmDialog id="copy-event-definition-dialog"
-                       title="Copy Event Definition"
+                       title={dialogTitle}
                        show
-                       onConfirm={() => {
-                         EventDefinitionsActions.copy(currentDefinition);
-                         this.handleClearState();
-                       }}
+                       onConfirm={this.handleConfirm}
                        onCancel={this.handleClearState}>
-          {`Are you sure you want to create a copy of "${currentDefinition?.title || ''}"?`}
+          {dialogBody}
         </ConfirmDialog>
         )}
-        {showDeleteDialog && (
-        <ConfirmDialog id="delete-event-definition-dialog"
-                       title="Delete Event Definition"
-                       show
-                       onConfirm={() => {
-                         EventDefinitionsActions.delete(currentDefinition);
-                         this.handleClearState();
-                       }}
-                       onCancel={this.handleClearState}>
-          {`Are you sure you want to delete "${currentDefinition?.title || ''}"?`}
-        </ConfirmDialog>
-        )}
-        {showDisableDialog && (
-        <ConfirmDialog id="disable-event-definition-dialog"
-                       title="Disable Event Definition"
-                       show
-                       onConfirm={() => {
-                         EventDefinitionsActions.disable(currentDefinition);
-                         this.handleClearState();
-                       }}
-                       onCancel={this.handleClearState}>
-          {`Are you sure you want to disable "${currentDefinition?.title || ''}"?`}
-        </ConfirmDialog>
-        )}
-        {showEnableDialog && (
-        <ConfirmDialog id="enable-event-definition-dialog"
-                       title="Enable Event Definition"
-                       show
-                       onConfirm={() => {
-                         EventDefinitionsActions.enable(currentDefinition);
-                         this.handleClearState();
-                       }}
-                       onCancel={this.handleClearState}>
-          {`Are you sure you want to enable "${currentDefinition?.title || ''}"?`}
-        </ConfirmDialog>
-        )}
-
       </>
 
     );
