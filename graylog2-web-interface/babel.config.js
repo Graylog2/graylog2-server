@@ -16,10 +16,11 @@
  */
 module.exports = {
   presets: [
-    ['@babel/env', {
+    [require('@babel/preset-env'), {
       modules: false,
       useBuiltIns: 'entry',
       corejs: '3.9',
+      shippedProposals: true,
     }],
     '@babel/react',
     '@babel/typescript',
