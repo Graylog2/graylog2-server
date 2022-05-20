@@ -7,6 +7,12 @@ Please make sure to create a MongoDB database backup before starting the upgrade
 
 ## Breaking Changes
 
+The following public interfaces have changed in 4.4:
+
+| Interface                 | Breaking Change            |
+|---------------------------|----------------------------|
+| `EntityWithExcerptFacade` | New abstract method <br/>`String id(ExcerptClass nativeEntity)` |
+
 ## API Endpoint Deprecations
 
 The following API endpoints are deprecated beginning with 4.4.
