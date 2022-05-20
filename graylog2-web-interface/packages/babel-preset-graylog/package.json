@@ -1,0 +1,18 @@
+{
+  "name": "babel-preset-graylog",
+  "version": "1.0.0",
+  "description": "Babel preset for the Graylog project",
+  "main": "index.js",
+  "repository": "https://github.com/Graylog2/graylog2-server",
+  "author": "Graylog, Inc. <hello@graylog.com>",
+  "license": "SSPL-1.0",
+  "dependencies": {
+    "@babel/core": "^7.18.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.18.0",
+    "@babel/preset-env": "^7.18.0",
+    "@babel/preset-react": "^7.17.12",
+    "@babel/preset-typescript": "^7.17.12",
+    "babel-plugin-styled-components": "^2.0.7"
+  }
+}
