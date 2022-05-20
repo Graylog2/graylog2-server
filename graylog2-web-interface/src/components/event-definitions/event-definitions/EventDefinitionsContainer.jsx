@@ -32,6 +32,25 @@ const DIALOG_TYPES = {
   ENABLE: 'enable',
 };
 
+const DIALOG_TEXT = {
+  [DIALOG_TYPES.COPY]: {
+    dialogTitle: 'Copy Event Definition',
+    dialogBody: (definitionTitle) => `Are you sure you want to create a copy of "${definitionTitle}"?`,
+  },
+  [DIALOG_TYPES.DELETE]: {
+    dialogTitle: 'Delete Event Definition',
+    dialogBody: (definitionTitle) => `Are you sure you want to delete "${definitionTitle}"?`,
+  },
+  [DIALOG_TYPES.DISABLE]: {
+    dialogTitle: 'Disable Event Definition',
+    dialogBody: (definitionTitle) => `Are you sure you want to disable "${definitionTitle}"?`,
+  },
+  [DIALOG_TYPES.ENABLE]: {
+    dialogTitle: 'Enable Event Definition',
+    dialogBody: (definitionTitle) => `Are you sure you want to enable "${definitionTitle}"?`,
+  },
+};
+
 class EventDefinitionsContainer extends React.Component {
   static propTypes = {
     eventDefinitions: PropTypes.object.isRequired,
@@ -51,8 +70,6 @@ class EventDefinitionsContainer extends React.Component {
 
     this.state = {
       currentDefinition: null,
-      dialogBody: '',
-      dialogTitle: '',
       showDialog: false,
       dialogType: null,
     };
@@ -75,44 +92,43 @@ class EventDefinitionsContainer extends React.Component {
     promise.finally(callback);
   };
 
-  handleDelete = (definition) => {
-    this.setState({
-      showDialog: true,
-      dialogType: DIALOG_TYPES.DELETE,
-      dialogBody: `Are you sure you want to delete "${definition.title}"?`,
-      dialogTitle: 'Delete Event Definition',
-      currentDefinition: definition,
-    });
-  };
+  handleAction = (action) => (definition) => {
+    switch (action) {
+      case DIALOG_TYPES.COPY:
+        this.setState({
+          showDialog: true,
+          dialogType: DIALOG_TYPES.COPY,
+          currentDefinition: definition,
+        });
 
-  handleCopy = (definition) => {
-    this.setState({
-      showDialog: true,
-      dialogType: DIALOG_TYPES.COPY,
-      dialogBody: `Are you sure you want to create a copy of "${definition.title}"?`,
-      dialogTitle: 'Copy Event Definition',
-      currentDefinition: definition,
-    });
-  };
+        break;
+      case DIALOG_TYPES.DELETE:
+        this.setState({
+          showDialog: true,
+          dialogType: DIALOG_TYPES.DELETE,
+          currentDefinition: definition,
+        });
 
-  handleEnable = (definition) => {
-    this.setState({
-      showDialog: true,
-      dialogType: DIALOG_TYPES.ENABLE,
-      dialogBody: `Are you sure you want to enable "${definition.title}"?`,
-      dialogTitle: 'Enable Event Definition',
-      currentDefinition: definition,
-    });
-  };
+        break;
+      case DIALOG_TYPES.ENABLE:
+        this.setState({
+          showDialog: true,
+          dialogType: DIALOG_TYPES.ENABLE,
+          currentDefinition: definition,
+        });
 
-  handleDisable = (definition) => {
-    this.setState({
-      showDialog: true,
-      dialogType: DIALOG_TYPES.DISABLE,
-      dialogBody: 'Disable Event Definition',
-      dialogTitle: `Are you sure you want to disable "${definition.title}"?`,
-      currentDefinition: definition,
-    });
+        break;
+      case DIALOG_TYPES.DISABLE:
+        this.setState({
+          showDialog: true,
+          dialogType: DIALOG_TYPES.DISABLE,
+          currentDefinition: definition,
+        });
+
+        break;
+      default:
+        break;
+    }
   };
 
   handleConfirm = () => {
@@ -144,8 +160,7 @@ class EventDefinitionsContainer extends React.Component {
     this.setState({
       showDialog: false,
       currentDefinition: null,
-      dialogBody: '',
-      dialogTitle: '',
+      dialogType: null,
     });
   };
 
@@ -153,9 +168,9 @@ class EventDefinitionsContainer extends React.Component {
     const { eventDefinitions } = this.props;
 
     const {
+      currentDefinition,
+      dialogType,
       showDialog,
-      dialogBody,
-      dialogTitle,
     } = this.state;
 
     if (!eventDefinitions.eventDefinitions) {
@@ -170,17 +185,17 @@ class EventDefinitionsContainer extends React.Component {
                           query={eventDefinitions.query}
                           onPageChange={this.handlePageChange}
                           onQueryChange={this.handleQueryChange}
-                          onDelete={this.handleDelete}
-                          onCopy={this.handleCopy}
-                          onEnable={this.handleEnable}
-                          onDisable={this.handleDisable} />
+                          onDelete={this.handleAction(DIALOG_TYPES.DELETE)}
+                          onCopy={this.handleAction(DIALOG_TYPES.COPY)}
+                          onEnable={this.handleAction(DIALOG_TYPES.ENABLE)}
+                          onDisable={this.handleAction(DIALOG_TYPES.DISABLE)} />
         {showDialog && (
         <ConfirmDialog id="copy-event-definition-dialog"
-                       title={dialogTitle}
+                       title={DIALOG_TEXT[dialogType].dialogTitle}
                        show
                        onConfirm={this.handleConfirm}
                        onCancel={this.handleClearState}>
-          {dialogBody}
+          {DIALOG_TEXT[dialogType].dialogBody(currentDefinition.title)}
         </ConfirmDialog>
         )}
       </>
