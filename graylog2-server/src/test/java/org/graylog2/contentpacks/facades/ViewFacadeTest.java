@@ -31,6 +31,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -102,7 +103,7 @@ public class ViewFacadeTest {
     public static class TestSearchDBService extends SearchDbService {
         protected TestSearchDBService(MongoConnection mongoConnection,
                                       MongoJackObjectMapperProvider mapper) {
-            super(mongoConnection, mapper, dto -> new SearchRequirements(Collections.emptySet(), dto));
+            super(mongoConnection, mapper, dto -> new SearchRequirements(Collections.emptySet(), dto), new IgnoreSearchFilters());
         }
     }
 

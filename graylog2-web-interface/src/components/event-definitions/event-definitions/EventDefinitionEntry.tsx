@@ -56,6 +56,7 @@ type Props = {
   onDisable: (EventDefinition) => void,
   onEnable: (EventDefinition) => void,
   onDelete: (EventDefinition) => void,
+  onCopy: (EventDefinition) => void,
 };
 
 const getConditionPlugin = (type: string) => PluginStore.exports('eventDefinitionTypes')
@@ -71,14 +72,31 @@ const EventDefinitionEntry = ({
   onDisable,
   onEnable,
   onDelete,
+  onCopy,
 }: Props) => {
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const isScheduled = lodash.get(context, `scheduler.${eventDefinition.id}.is_scheduled`, true);
 
-  let toggle = <MenuItem onClick={onDisable(eventDefinition)}>Disable</MenuItem>;
+  const handleCopy = () => {
+    onCopy(eventDefinition);
+  };
+
+  const handleDelete = () => {
+    onDelete(eventDefinition);
+  };
+
+  const handleDisable = () => {
+    onDisable(eventDefinition);
+  };
+
+  const handleEnable = () => {
+    onEnable(eventDefinition);
+  };
+
+  let toggle = <MenuItem onClick={handleDisable}>Disable</MenuItem>;
 
   if (!isScheduled) {
-    toggle = <MenuItem onClick={onEnable(eventDefinition)}>Enable</MenuItem>;
+    toggle = <MenuItem onClick={handleEnable}>Enable</MenuItem>;
   }
 
   const actions = (
@@ -93,16 +111,18 @@ const EventDefinitionEntry = ({
       <ShareButton entityId={eventDefinition.id} entityType="event_definition" onClick={() => setShowEntityShareModal(true)} />
       <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
         <DropdownButton id="more-dropdown" title="More" pullRight>
+          <MenuItem onClick={handleCopy}>Duplicate</MenuItem>
+          <MenuItem divider />
           {toggle}
           <MenuItem divider />
-          <MenuItem onClick={onDelete(eventDefinition)}>Delete</MenuItem>
+          <MenuItem onClick={handleDelete}>Delete</MenuItem>
         </DropdownButton>
       </IfPermitted>
     </React.Fragment>
   );
 
   const plugin = getConditionPlugin(eventDefinition.config.type);
-  let titleSuffix = <>{plugin?.displayName ?? eventDefinition.config.type}</>;
+  let titleSuffix = <div>{plugin?.displayName ?? eventDefinition.config.type}</div>;
 
   if (!isScheduled) {
     titleSuffix = (<span>{titleSuffix} <Label bsStyle="warning">disabled</Label></span>);

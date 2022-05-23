@@ -37,6 +37,7 @@ import org.graylog.plugins.pipelineprocessor.PipelineConfig;
 import org.graylog.plugins.sidecar.SidecarModule;
 import org.graylog.plugins.views.ViewsBindings;
 import org.graylog.plugins.views.ViewsConfig;
+import org.graylog.plugins.views.search.searchfilters.module.SearchFiltersModule;
 import org.graylog.scheduler.JobSchedulerConfiguration;
 import org.graylog.scheduler.JobSchedulerModule;
 import org.graylog.security.SecurityModule;
@@ -180,7 +181,8 @@ public class Server extends ServerBootstrap {
                 new SecurityModule(),
                 new PrometheusMetricsModule(),
                 new ClusterConfigValidatorModule(),
-                new MapWidgetModule()
+                new MapWidgetModule(),
+                new SearchFiltersModule()
         );
         return modules.build();
     }
