@@ -16,13 +16,14 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-// eslint-disable-next-line no-restricted-imports
 import styled, { css } from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { useStore } from 'stores/connect';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
+import { Col, Row } from 'components/bootstrap';
+import ProductLink from 'components/enterprise/ProductLink';
 import { GraylogClusterOverview } from 'components/cluster';
 import PluginList from 'components/enterprise/PluginList';
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -35,38 +36,6 @@ const EnterpriseProductLink = ({ children }) => {
       {children}
     </a>
   );
-};
-
-const ProductLink = ({ href, clusterId, children }) => {
-  let hrefWithParam = href;
-
-  if (clusterId) {
-    hrefWithParam = `${hrefWithParam}?cluster_id=${clusterId}`;
-  }
-
-  return (
-    <ButtonToolbar>
-      <Button type="link"
-              target="_blank"
-              rel="noopener noreferrer"
-              href={hrefWithParam}
-              bsStyle="primary">
-        {children}
-      </Button>
-    </ButtonToolbar>
-  );
-};
-
-ProductLink.propTypes = {
-  children: PropTypes.node,
-  href: PropTypes.string,
-  clusterId: PropTypes.string,
-};
-
-ProductLink.defaultProps = {
-  children: null,
-  href: '',
-  clusterId: null,
 };
 
 EnterpriseProductLink.propTypes = {
@@ -87,6 +56,8 @@ const GraylogEnterpriseHeader = styled.h2`
 
 const EnterprisePage = () => {
   const nodes = useStore(NodesStore);
+  const licensePlugin = PluginStore.exports('license');
+  const ProductLinkComponent = licensePlugin[0]?.EnterpriseProductLink || ProductLink;
 
   if (!nodes) {
     return <Spinner />;
@@ -120,9 +91,9 @@ const EnterprisePage = () => {
                   hours per year in collecting and analyzing log data to uncover the root cause of performance,
                   outage, and error issues.
                 </p>
-                <ProductLink href="https://go2.graylog.org/request-graylog-operations" clusterId={clusterId}>
+                <ProductLinkComponent href="https://go2.graylog.org/request-graylog-operations" clusterId={clusterId}>
                   Request now
-                </ProductLink>
+                </ProductLinkComponent>
               </BiggerFontSize>
             </Col>
             <Col md={6}>
@@ -134,9 +105,9 @@ const EnterprisePage = () => {
                   integrations with other security tools, SOAR capabilities, and numerous compliance reporting
                   features.
                 </p>
-                <ProductLink href="https://go2.graylog.org/request-graylog-security" clusterId={clusterId}>
+                <ProductLinkComponent href="https://go2.graylog.org/request-graylog-security" licenseSubject="/license/security" clusterId={clusterId}>
                   Request now
-                </ProductLink>
+                </ProductLinkComponent>
               </BiggerFontSize>
             </Col>
           </Row>
