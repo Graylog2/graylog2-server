@@ -1,5 +1,5 @@
 type = "c"
-message = "Stop processing further pipeline stages after `drop_message` got called."
+message = "Stop processing further pipeline stages after `drop_message` getting called."
 
 issues = ["4855"]
 pulls = ["11754"]

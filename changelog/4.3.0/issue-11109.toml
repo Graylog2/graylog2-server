@@ -1,5 +1,5 @@
 type = "a"
-message = "Add option to update existing Grok patters on bulk import."
+message = "Add option to update existing Grok patterns on bulk import."
 
 issues = ["11109"]
 pulls = ["12174"]
