@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { useStore } from 'stores/connect';
 import { NodesStore } from 'stores/nodes/NodesStore';
@@ -37,6 +38,8 @@ const GraylogEnterpriseHeader = styled.h2`
 
 const EnterprisePage = () => {
   const nodes = useStore(NodesStore);
+  const licensePlugin = PluginStore.exports('license');
+  const ProductLinkComponent = licensePlugin[0]?.EnterpriseProductLink || ProductLink;
 
   if (!nodes) {
     return <Spinner />;
@@ -70,9 +73,9 @@ const EnterprisePage = () => {
                   hours per year in collecting and analyzing log data to uncover the root cause of performance,
                   outage, and error issues.
                 </p>
-                <ProductLink href="https://go2.graylog.org/request-graylog-operations" clusterId={clusterId}>
+                <ProductLinkComponent href="https://go2.graylog.org/request-graylog-operations" clusterId={clusterId}>
                   Request now
-                </ProductLink>
+                </ProductLinkComponent>
               </BiggerFontSize>
             </Col>
             <Col md={6}>
@@ -84,9 +87,9 @@ const EnterprisePage = () => {
                   integrations with other security tools, SOAR capabilities, and numerous compliance reporting
                   features.
                 </p>
-                <ProductLink href="https://go2.graylog.org/request-graylog-security" clusterId={clusterId}>
+                <ProductLinkComponent href="https://go2.graylog.org/request-graylog-security" licenseSubject="/license/security" clusterId={clusterId}>
                   Request now
-                </ProductLink>
+                </ProductLinkComponent>
               </BiggerFontSize>
             </Col>
           </Row>
