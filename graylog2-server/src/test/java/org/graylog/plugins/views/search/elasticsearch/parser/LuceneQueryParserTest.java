@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class LuceneQueryParserTest {
 
-    private final LuceneQueryParser parser = new LuceneQueryParser();
+    private final LuceneQueryParser parser = new LuceneQueryParser(false);
 
     @Test
     void getFieldNamesSimple() throws ParseException {
@@ -189,5 +189,20 @@ class LuceneQueryParserTest {
         final ParsedTerm term = query.terms().iterator().next();
         assertThat(term.field()).isEqualTo("_default_");
         assertThat(term.value()).isEqualTo("fuzzy");
+    }
+
+    @Test
+    void testLeadingWildcardsParsingDependsOnParserSettings() throws ParseException {
+        assertThatThrownBy(() -> parser.parse("foo:*bar"))
+                .isInstanceOf(ParseException.class);
+
+        assertThatThrownBy(() -> parser.parse("foo:?bar"))
+                .isInstanceOf(ParseException.class);
+
+        final LuceneQueryParser leadingWildcardsTolerantParser = new LuceneQueryParser(true);
+        assertThat(leadingWildcardsTolerantParser.parse("foo:*bar"))
+                .isNotNull();
+        assertThat(leadingWildcardsTolerantParser.parse("foo:?bar"))
+                .isNotNull();
     }
 }
