@@ -20,12 +20,17 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 public class LuceneQueryParser {
     private final TermCollectingQueryParser parser;
 
-    public LuceneQueryParser() {
+    @Inject
+    public LuceneQueryParser(@Named("allow_leading_wildcard_searches") final boolean allowLeadingWildcard) {
         this.parser = new TermCollectingQueryParser(ParsedTerm.DEFAULT_FIELD, new StandardAnalyzer());
         this.parser.setSplitOnWhitespace(true);
+        this.parser.setAllowLeadingWildcard(allowLeadingWildcard);
     }
 
     public ParsedQuery parse(final String query) throws ParseException {

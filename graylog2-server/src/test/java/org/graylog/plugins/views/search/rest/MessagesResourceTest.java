@@ -22,7 +22,6 @@ import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.export.AuditContext;
 import org.graylog.plugins.views.search.export.CommandFactory;
@@ -79,7 +78,7 @@ public class MessagesResourceTest {
         SearchDomain searchDomain = mock(SearchDomain.class);
 
         final QueryValidationServiceImpl validationService = new QueryValidationServiceImpl(
-                new LuceneQueryParser(),
+                new LuceneQueryParser(false),
                 (streamIds, timeRange) -> Collections.emptySet(),
                 new QueryStringDecorators(Collections.emptySet()));
 
