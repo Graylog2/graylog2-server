@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+
+import useIsMountedRef from 'hooks/useIsMountedRef';
 
 import type { Warnings } from './FormWarningsContext';
 import FormWarningsContext from './FormWarningsContext';
@@ -25,20 +27,14 @@ type Props = {
 };
 
 const FormWarningsProvider = ({ children }: Props) => {
-  const isMounted = useRef<boolean>();
+  const isMountedRef = useIsMountedRef();
   const [warnings, setWarnings] = useState<Warnings>({});
 
   const setFieldWarning = useCallback(<T extends keyof Warnings>(fieldName: T, warning: Warnings[T]) => {
-    if (isMounted.current === true) {
-      setWarnings({ ...warnings, [fieldName]: warning });
+    if (isMountedRef.current === true) {
+      setWarnings((curWarnings) => ({ ...curWarnings, [fieldName]: warning }));
     }
-  }, [warnings]);
-
-  useEffect(() => {
-    isMounted.current = true;
-
-    return () => { isMounted.current = false; };
-  });
+  }, [isMountedRef]);
 
   const formWarningsContextValue = useMemo(() => ({ warnings, setFieldWarning }), [setFieldWarning, warnings]);
 
