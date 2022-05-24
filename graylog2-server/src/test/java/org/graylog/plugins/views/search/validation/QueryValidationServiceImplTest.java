@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class QueryValidationServiceImplTest {
 
     public static final MappedFieldTypesService FIELD_TYPES_SERVICE = (streamIds, timeRange) -> Collections.emptySet();
-    public static final LuceneQueryParser LUCENE_QUERY_PARSER = new LuceneQueryParser();
+    public static final LuceneQueryParser LUCENE_QUERY_PARSER = new LuceneQueryParser(false);
 
     @Test
     void validateNoMessages() {
@@ -111,7 +111,7 @@ class QueryValidationServiceImplTest {
                         .build());
 
         final QueryValidationServiceImpl service = new QueryValidationServiceImpl(
-                new LuceneQueryParser(),
+                new LuceneQueryParser(false),
                 FIELD_TYPES_SERVICE,
                 ImmutableSet.of(warningValidator, errorValidator));
 
