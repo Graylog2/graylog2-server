@@ -107,10 +107,9 @@ const _initialCapabilityId = (capabilities: CapabilitiesList) => {
 const _isRequired = (field) => (value) => (!value ? `The ${field} is required` : undefined);
 
 const _renderGranteesSelectOption = ({ label, granteeType }: {label: string, granteeType: $PropertyType<Grantee, 'type'> }) => (
-  <GranteesSelectOption>
-    <StyledGranteeIcon type={granteeType} />
+  <div>
     {label}
-  </GranteesSelectOption>
+  </div>
 );
 
 const GranteesSelector = ({ availableGrantees, availableCapabilities, className, onSubmit, formRef }: Props) => {
@@ -134,7 +133,6 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className,
                   {({ field: { name, value, onChange } }) => (
                     <GranteesSelect inputProps={{ 'aria-label': 'Search for users and teams' }}
                                     onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
-                                    optionRenderer={_renderGranteesSelectOption}
                                     options={granteesOptions}
                                     placeholder="Search for users and teams"
                                     value={value} />
