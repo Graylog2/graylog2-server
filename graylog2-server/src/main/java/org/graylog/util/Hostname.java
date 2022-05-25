@@ -40,6 +40,13 @@ public abstract class Hostname {
      */
     public abstract String canonicalHostname();
 
+    /**
+     * Creates the hostname object.
+     *
+     * @param hostname          the short hostname, see: {@link InetAddress#getHostName()}
+     * @param canonicalHostname the full hostname, see: {@link InetAddress#getCanonicalHostName()}
+     * @return the newly created hostname object
+     */
     public static Hostname create(String hostname, String canonicalHostname) {
         return new AutoValue_Hostname(requireNonNull(hostname), requireNonNull(canonicalHostname));
     }
