@@ -82,7 +82,7 @@ const ContentPacksPage = createReactClass({
 
     return (
       <DocumentTitle title="Content Packs">
-        <span>
+        <span data-capture-group="system-content-packs-page">
           <PageHeader title="Content Packs">
             <span>
               Content Packs accelerate the set up process for a specific data source. A Content Pack can include inputs/extractors, streams, and dashboards.

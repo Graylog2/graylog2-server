@@ -111,7 +111,7 @@ const EnterprisePage = createReactClass({
 
     return (
       <DocumentTitle title="Try Graylog Enterprise">
-        <div>
+        <div data-capture-group="enterprise-page">
           <PageHeader title="Try Graylog Enterprise">
             {null}
 

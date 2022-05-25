@@ -165,7 +165,7 @@ class LUTTablesPage extends React.Component {
 
     return (
       <DocumentTitle title="Lookup Tables">
-        <span>
+        <span data-capture-group="system-lookup-tables-page">
           <PageHeader title="Lookup Tables">
             <span>Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages.</span>
             {null}

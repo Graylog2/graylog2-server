@@ -77,7 +77,7 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
                                  validateOnBlur={false}
                                  validateOnMount={validateOnMount}>
       {(...args) => (
-        <StyledForm>
+        <StyledForm data-capture-group="search-bar-form">
           {_isFunction(children) ? children(...args) : children}
         </StyledForm>
       )}

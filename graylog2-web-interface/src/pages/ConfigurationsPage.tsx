@@ -147,7 +147,7 @@ const ConfigurationsPage = () => {
 
   return (
     <DocumentTitle title="Configurations">
-      <span>
+      <span data-capture-group="system-configurations-page">
         <PageHeader title="Configurations">
           <span>
             You can configure system settings for different sub systems on this page.

@@ -31,7 +31,7 @@ const EventsPage = ({ location }) => {
 
   return (
     <DocumentTitle title="Alerts &amp; Events">
-      <span>
+      <span data-capture-group="events-page">
         <PageHeader title="Alerts &amp; Events">
           <span>
             Define Events through different conditions. Add Notifications to Events that require your attention

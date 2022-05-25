@@ -125,7 +125,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
   const pluginItems = PluginStore.exports('navigationItems');
 
   return (
-    <StyledNavbar fluid fixedTop>
+    <StyledNavbar fluid fixedTop data-capture-group="nav-bar">
       <Navbar.Header>
         <Navbar.Brand>
           <LinkContainer to={Routes.STARTPAGE}>

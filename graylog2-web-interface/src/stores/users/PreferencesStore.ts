@@ -46,6 +46,7 @@ export type PreferencesUpdateMap = {
   updateUnfocussed: boolean | BooleanString,
   dashboardSidebarIsPinned?: boolean | BooleanString,
   searchSidebarIsPinned?: boolean | BooleanString,
+  diagnosticsIsAnonymized?: boolean | BooleanString,
   [PREFERENCES_THEME_MODE]: ThemeMode,
 };
 
@@ -54,6 +55,7 @@ export type PreferencesMap = {
   updateUnfocussed: boolean,
   dashboardSidebarIsPinned?: boolean,
   searchSidebarIsPinned?: boolean,
+  diagnosticsIsAnonymized?: boolean,
   [PREFERENCES_THEME_MODE]: ThemeMode,
 };
 
