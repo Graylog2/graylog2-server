@@ -14,13 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.freeenterprise;
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import org.graylog2.plugin.PluginModule;
-
-public class FreeEnterpriseModule extends PluginModule {
-    @Override
-    protected void configure() {
-        addSystemRestResource(FreeEnterpriseResource.class);
-    }
+type Props = {
+  children: React.ReactNode,
 }
+
+const EnterpriseProductLink = ({ children }: Props) => {
+  return (
+    <a href="https://www.graylog.org/products/enterprise"
+       rel="noopener noreferrer"
+       target="_blank">
+      {children}
+    </a>
+  );
+};
+
+EnterpriseProductLink.propTypes = {
+  children: PropTypes.node,
+};
+
+EnterpriseProductLink.defaultProps = {
+  children: null,
+};
+
+export default EnterpriseProductLink;

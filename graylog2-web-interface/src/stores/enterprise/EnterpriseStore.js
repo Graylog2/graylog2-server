@@ -25,7 +25,6 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 export const EnterpriseActions = singletonActions(
   'core.Enterprise',
   () => Reflux.createActions({
-    requestFreeEnterpriseLicense: { asyncResult: true },
     getLicenseInfo: { asyncResult: true },
   }),
 );
@@ -34,7 +33,7 @@ export const EnterpriseStore = singletonStore(
   'core.Enterprise',
   () => Reflux.createStore({
     listenables: [EnterpriseActions],
-    sourceUrl: '/free-enterprise',
+    sourceUrl: '/enterprise/license',
     licenseStatus: undefined,
 
     getInitialState() {
@@ -60,11 +59,11 @@ export const EnterpriseStore = singletonStore(
     },
 
     getLicenseInfo() {
-      const promise = fetch('GET', this.enterpriseUrl('license/info'));
+      const promise = fetch('GET', this.enterpriseUrl('info'));
 
       promise.then(
         (response) => {
-          this.licenseStatus = response.free_license_info.license_status;
+          this.licenseStatus = response.license_info.license_status;
           this.propagateChanges();
 
           return response;
@@ -77,34 +76,6 @@ export const EnterpriseStore = singletonStore(
       );
 
       EnterpriseActions.getLicenseInfo.promise(promise);
-    },
-
-    requestFreeEnterpriseLicense(formValues) {
-      const requestBody = {
-        first_name: formValues.firstName,
-        last_name: formValues.lastName,
-        company: formValues.company,
-        email: formValues.email,
-        phone: formValues.phone,
-      };
-
-      const promise = fetch('POST', this.enterpriseUrl('license'), requestBody);
-
-      promise.then(
-        (response) => {
-          UserNotification.success('Your free Graylog Enterprise license should be on the way.', 'Success!');
-          this.refresh();
-
-          return response;
-        },
-        (error) => {
-          const errorMessage = lodash.get(error, 'additional.body.message', error.message);
-
-          UserNotification.error(`Requesting a free Graylog Enterprise license failed: ${errorMessage}`, 'Error');
-        },
-      );
-
-      EnterpriseActions.requestFreeEnterpriseLicense.promise(promise);
     },
   }),
 );

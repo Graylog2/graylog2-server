@@ -14,19 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.freeenterprise;
+package org.graylog.enterprise;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-public abstract class FreeLicenseInfo {
+public abstract class EnterpriseLicenseInfo {
     public enum Status {
         @JsonProperty("absent")
         ABSENT,
-        @JsonProperty("staged")
-        STAGED,
         @JsonProperty("installed")
         INSTALLED
     }
@@ -36,20 +34,16 @@ public abstract class FreeLicenseInfo {
     @JsonProperty(FIELD_LICENSE_STATUS)
     public abstract Status licenseStatus();
 
-    public static FreeLicenseInfo absent() {
+    public static EnterpriseLicenseInfo absent() {
         return create(Status.ABSENT);
     }
 
-    public static FreeLicenseInfo staged() {
-        return create(Status.STAGED);
-    }
-
-    public static FreeLicenseInfo installed() {
+    public static EnterpriseLicenseInfo installed() {
         return create(Status.INSTALLED);
     }
 
     @JsonCreator
-    public static FreeLicenseInfo create(@JsonProperty(FIELD_LICENSE_STATUS) Status licenseStatus) {
-        return new AutoValue_FreeLicenseInfo(licenseStatus);
+    public static EnterpriseLicenseInfo create(@JsonProperty(FIELD_LICENSE_STATUS) Status licenseStatus) {
+        return new AutoValue_EnterpriseLicenseInfo(licenseStatus);
     }
 }
