@@ -49,12 +49,14 @@ public class MongoDBContainer extends GenericContainer<MongoDBContainer> {
     }
 
     public static MongoDBContainer create(MongodbServer version, Network network) {
-        return new MongoDBContainer(DEFAULT_IMAGE + ":" + version.getVersion(), network);
+        final MongoDBContainer mongoDBContainer = new MongoDBContainer(DEFAULT_IMAGE + ":" + version.getVersion(), network);
+        return mongoDBContainer;
     }
 
     private MongoDBContainer(String dockerImageName, Network network) {
         super(requireNonNull(dockerImageName, "dockerImageName cannot be null"));
         withExposedPorts(MONGODB_PORT);
+        withCommand("--replSet repl0");
         withNetwork(requireNonNull(network, "network cannot be null"));
         withNetworkAliases(NETWORK_ALIAS);
         waitingFor(Wait.forListeningPort());

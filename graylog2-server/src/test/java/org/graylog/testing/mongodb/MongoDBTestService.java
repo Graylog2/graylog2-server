@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
+import java.io.IOException;
 import java.util.Locale;
 
 import static java.util.Objects.requireNonNull;
@@ -97,6 +98,13 @@ public class MongoDBTestService implements AutoCloseable {
 
         final MongoDbConfiguration mongoConfiguration = new MongoDbConfiguration();
         mongoConfiguration.setUri(uri());
+
+        try {
+            container.execInContainer("/bin/bash", "-c", "mongo --eval 'rs.initiate()' --quiet");
+            container.execInContainer("/bin/bash", "-c", "mongo -- eval 'while (rs.isMaster().ismaster != true) sleep(100)'");
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         this.mongoConnection = new MongoConnectionImpl(mongoConfiguration);
         this.mongoConnection.connect();

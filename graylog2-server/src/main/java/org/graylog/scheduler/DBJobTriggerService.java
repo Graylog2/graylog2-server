@@ -16,17 +16,38 @@
  */
 package org.graylog.scheduler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.ReadConcern;
+import com.mongodb.ReadPreference;
+import com.mongodb.TransactionOptions;
+import com.mongodb.WriteConcern;
+import com.mongodb.client.AggregateIterable;
+import com.mongodb.client.ClientSession;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.TransactionBody;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
+import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.ReturnDocument;
+import com.mongodb.client.model.Sorts;
+import com.mongodb.client.model.Updates;
 import one.util.streamex.StreamEx;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
@@ -34,26 +55,40 @@ import org.mongojack.DBQuery.Query;
 import org.mongojack.DBSort;
 import org.mongojack.DBUpdate;
 import org.mongojack.JacksonDBCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.gt;
+import static com.mongodb.client.model.Filters.lt;
+import static com.mongodb.client.model.Filters.lte;
+import static com.mongodb.client.model.Filters.ne;
+import static com.mongodb.client.model.Filters.not;
+import static com.mongodb.client.model.Filters.or;
 import static java.util.Objects.requireNonNull;
 import static org.graylog.scheduler.JobSchedulerConfiguration.LOCK_EXPIRATION_DURATION;
 
 // This class does NOT use PaginatedDbService because we use the triggers collection for locking and need to handle
 // updates very carefully.
 public class DBJobTriggerService {
+    private final static Logger LOG = LoggerFactory.getLogger(DBJobTriggerService.class);
     static final String COLLECTION_NAME = "scheduler_triggers";
     private static final String FIELD_ID = "_id";
     static final String FIELD_JOB_DEFINITION_ID = JobTriggerDto.FIELD_JOB_DEFINITION_ID;
@@ -70,18 +105,27 @@ public class DBJobTriggerService {
 
     private final String nodeId;
     private final JacksonDBCollection<JobTriggerDto, ObjectId> db;
+
+    private final MongoClient mongoClient;
     private final JobSchedulerClock clock;
     private final Duration lockExpirationDuration;
+    private final MongoCollection<Document> collection;
+    private final ObjectMapper objectMapper;
 
     @Inject
     public DBJobTriggerService(MongoConnection mongoConnection,
                                MongoJackObjectMapperProvider mapper,
                                NodeId nodeId,
                                JobSchedulerClock clock,
+                               ObjectMapperProvider objectMapperProvider,
                                @Named(LOCK_EXPIRATION_DURATION) Duration lockExpirationDuration) {
         this.nodeId = nodeId.toString();
         this.clock = clock;
+        this.objectMapper = objectMapperProvider.get();
         this.lockExpirationDuration = lockExpirationDuration;
+        this.mongoClient = (MongoClient) mongoConnection.connect();
+        collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
+        // TODO
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 JobTriggerDto.class,
                 ObjectId.class,
@@ -307,47 +351,105 @@ public class DBJobTriggerService {
      * @return next runnable trigger if any exists, an empty {@link Optional} otherwise
      */
     public Optional<JobTriggerDto> nextRunnableTrigger() {
-        final DateTime now = clock.nowUTC();
+        // use java.util.Date because BSON cannot handle jodatime by default
+        final Date now = new Date(clock.nowUTC().getMillis());
+        final Date expirationTime = new Date(new DateTime(now).minus(lockExpirationDuration.toMilliseconds()).getMillis());
 
-        final Query query = DBQuery.or(DBQuery.and(
-                        // We cannot lock a trigger that is already locked by another node
-                        DBQuery.is(FIELD_LOCK_OWNER, null),
-                        DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNABLE),
-                        DBQuery.lessThanEquals(FIELD_START_TIME, now),
-                        DBQuery.or( // Skip triggers that have an endTime which is due
-                                DBQuery.notExists(FIELD_END_TIME),
-                                DBQuery.is(FIELD_END_TIME, null),
-                                DBQuery.greaterThan(FIELD_END_TIME, Optional.of(now))
-                        ),
-                        // TODO: Using the wall clock time here can be problematic if the node time is off
-                        //       The scheduler should not lock any new triggers if it detects that its clock is wrong
-                        DBQuery.lessThanEquals(FIELD_NEXT_TIME, now)
-                ), DBQuery.and(
-                        DBQuery.notEquals(FIELD_LOCK_OWNER, null),
-                        DBQuery.notEquals(FIELD_LOCK_OWNER, nodeId),
-                        DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING),
-                        DBQuery.lessThan(FIELD_LAST_LOCK_TIME, now.minus(lockExpirationDuration.toMilliseconds())))
+
+        final Bson expiredTriggers = and(
+                ne(FIELD_LOCK_OWNER, null),
+                ne(FIELD_LOCK_OWNER, nodeId),
+                eq(FIELD_STATUS, JobTriggerStatus.RUNNING.toString().toLowerCase(Locale.US)), // TODO
+                lt(FIELD_LAST_LOCK_TIME, expirationTime)
         );
+        final Bson query = or(
+                and(
+                // We cannot lock a trigger that is already locked by another node
+                eq(FIELD_LOCK_OWNER, null),
+                eq(FIELD_STATUS, JobTriggerStatus.RUNNABLE.toString().toLowerCase(Locale.US)), // TODO
+                lte(FIELD_START_TIME, now),
+                or(
+                        Filters.exists(FIELD_END_TIME, false),
+                        eq(FIELD_END_TIME, null),
+                        gt(FIELD_END_TIME, now) //TODO what's the optional doing?
+                ),
+                // TODO: Using the wall clock time here can be problematic if the node time is off
+                //       The scheduler should not lock any new triggers if it detects that its clock is wrong
+                lte(FIELD_NEXT_TIME, now)),
+
+                expiredTriggers
+        );
+
         // We want to lock the trigger with the oldest next time
-        final DBSort.SortBuilder sort = DBSort.asc(FIELD_NEXT_TIME);
+        final Bson sort = Sorts.ascending(FIELD_NEXT_TIME);
 
-        final DBUpdate.Builder lockUpdate = DBUpdate.set(FIELD_LOCK_OWNER, nodeId)
-                .set(FIELD_STATUS, JobTriggerStatus.RUNNING)
-                .set(FIELD_TRIGGERED_AT, Optional.of(now))
-                .set(FIELD_LAST_LOCK_TIME, now);
-
-        // Atomically update, lock and return the next runnable trigger
-        final JobTriggerDto trigger = db.findAndModify(
-                query,
-                null,
-                sort,
-                false,
-                lockUpdate,
-                true, // We need the modified object so we have access to the lock information
-                false
+        final Bson lockUpdateB = Updates.combine(
+                Updates.set(FIELD_LOCK_OWNER, nodeId),
+                Updates.set(FIELD_STATUS, JobTriggerStatus.RUNNING.toString().toLowerCase(Locale.US)), // TODO
+                Updates.set(FIELD_TRIGGERED_AT, now), // TODO optional.of?
+                Updates.set(FIELD_LAST_LOCK_TIME, now)
         );
 
-        return Optional.ofNullable(trigger);
+        final ClientSession clientSession = mongoClient.startSession();
+
+        final TransactionBody<Document> transactionBody = () -> {
+
+            // TODO this might need some more thinking
+            Bson runningButNotExpired = and(
+                    eq(FIELD_STATUS, JobTriggerStatus.RUNNING.toString().toLowerCase(Locale.US)),
+                    not(expiredTriggers));
+
+            final AggregateIterable<Document> count = collection.aggregate(clientSession,
+                    ImmutableList.of(
+                            //runningButNotExpired,
+                            //Aggregates.lookup(DBJobDefinitionService.COLLECTION_NAME, FIELD_JOB_DEFINITION_ID, "_id", "job_definition"),
+                            Aggregates.group("$" + FIELD_JOB_DEFINITION_ID, Accumulators.sum("count", 1)),
+                            Aggregates.project(Projections.computed("job_definition_id", "$toString: $_id")),
+                            Aggregates.lookup(DBJobDefinitionService.COLLECTION_NAME, "job_definition_id", "id", "job_definition"),
+
+                            // TODO
+                            // TODO This does not work yet. I can't get the pipeline to fill in a default value for max_concurrency
+                            // TODO The next pipeline step would be to extract all job_definition_ids that have reached their concurrency limit.
+                            // TODO Those job_definition_ids could then be used as a filter in the findOneAndUpdate() query, so we won't pick up
+                            // TODO triggers that are beyond their limit.
+                            Aggregates.project(Projections.fields(
+                                    Projections.include("count", "max_concurrency"),
+                                    Projections.computed("max_concurrency", "$ifNull: [ $job_definition.max_concurrency, 1 ]")
+                                    ))
+
+                    )
+            );
+            count.forEach((Consumer<? super Document>) doc -> LOG.info("doc {}", doc.toJson()));
+
+            // Atomically update, lock and return the next runnable trigger
+            final Document trigger = collection.findOneAndUpdate(clientSession,
+                    query,
+                    lockUpdateB,
+                    new FindOneAndUpdateOptions()
+                            .sort(sort)
+                            .returnDocument(ReturnDocument.AFTER) // We need the modified object, so we have access to the lock information
+                            .upsert(false));
+
+            return trigger;
+        };
+
+        final TransactionOptions txnOptions = TransactionOptions.builder()
+                .readPreference(ReadPreference.primary())
+                .readConcern(ReadConcern.MAJORITY)
+                .writeConcern(WriteConcern.MAJORITY)
+                .build();
+
+        try {
+            //return Optional.ofNullable(transactionBody.execute());
+            final Document triggerDoc = clientSession.withTransaction(transactionBody, txnOptions);
+            final JobTriggerDto jobTriggerDto = objectMapper.convertValue(triggerDoc, JobTriggerDto.class);
+            return Optional.ofNullable(jobTriggerDto);
+        } catch (RuntimeException e) {
+            return Optional.empty();
+        } finally {
+            clientSession.close();
+        }
+
     }
 
     /**

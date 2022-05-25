@@ -82,6 +82,7 @@ public class MongoDBPreflightCheck implements PreflightCheck {
                     });
 
             MongoDBVersionCheck.assertCompatibleVersion(mongoVersion);
+            // TODO check if a replica set exists
             LOG.info("Connected to MongoDB version {}", mongoVersion);
         } catch (ExecutionException | RetryException e) {
             throw new PreflightCheckException("Failed to retrieve MongoDB version.", e);
