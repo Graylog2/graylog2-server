@@ -124,7 +124,7 @@ describe('WidgetQueryControls pluggable controls', () => {
     );
   };
 
-  const mockOnSubmit = jest.fn(() => Promise.resolve());
+  const mockOnSubmit = jest.fn((_values, entity) => Promise.resolve(entity));
   const mockOnValidate = jest.fn(() => Promise.resolve({}));
 
   beforeAll(() => {
@@ -138,7 +138,8 @@ describe('WidgetQueryControls pluggable controls', () => {
               pluggableControl: 'Initial Value',
             });
           },
-          onSubmit: mockOnSubmit,
+          onSearchSubmit: mockOnSubmit,
+          onDashboardWidgetSubmit: mockOnSubmit,
           validationPayload: (values) => {
             // @ts-ignore
             const { pluggableControl } = values;

@@ -21,8 +21,8 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import type { SearchBarControl } from 'views/types';
 
 import {
-  usePluggableInitialValues,
-  executePluggableSubmitHandler,
+  useInitialSearchValues,
+  executeSearchSubmitHandler,
   pluggableValidationPayload,
   validatePluggableValues,
 } from './pluggableSearchBarControlsHandler';
@@ -31,8 +31,10 @@ describe('pluggableSearchBarControlsHandler', () => {
   const pluggableSearchBarControl: SearchBarControl = {
     id: 'pluggable-search-bar-control',
     component: () => <div />,
-    useInitialValues: () => ({ pluggableControl: 'Initial Value' }),
-    onSubmit: () => Promise.resolve(),
+    useInitialSearchValues: () => ({ pluggableControl: 'Initial Value' }),
+    useInitialDashboardWidgetValues: () => ({ pluggableControl: 'Initial Value' }),
+    onSearchSubmit: (_values, entity) => Promise.resolve(entity),
+    onDashboardWidgetSubmit: (_values, entity) => Promise.resolve(entity),
     validationPayload: (values) => {
       // @ts-ignore
       const { pluggableControl } = values;
@@ -65,7 +67,7 @@ describe('pluggableSearchBarControlsHandler', () => {
     }));
 
     const ExampleComponent = () => {
-      const initialValuesFromPlugin = usePluggableInitialValues();
+      const initialValuesFromPlugin = useInitialSearchValues();
 
       return <div>Plugin initial values: {JSON.stringify(initialValuesFromPlugin)}</div>;
     };
@@ -80,7 +82,7 @@ describe('pluggableSearchBarControlsHandler', () => {
   });
 
   it('executePluggableSubmitHandler should catch errors', async () => {
-    const result = await executePluggableSubmitHandler(
+    const result = await executeSearchSubmitHandler(
       {},
       [() => ({
         ...pluggableSearchBarControl,

@@ -45,8 +45,9 @@ import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
 import {
-  usePluggableInitialValues,
-  pluggableValidationPayload, executePluggableSubmitHandler,
+  executeDashboardWidgetSubmitHandler as executePluggableSubmitHandler,
+  useInitialDashboardWidgetValues as usePluggableInitialValues,
+  pluggableValidationPayload,
 } from 'views/components/searchbar/pluggableSearchBarControlsHandler';
 import type { SearchBarControl } from 'views/types';
 import usePluginEntities from 'views/logic/usePluginEntities';
@@ -132,12 +133,11 @@ const useInitialFormValues = (widget: Widget) => {
   const { streams } = widget;
   const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
   const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
-  const initialValuesFromPlugins = usePluggableInitialValues();
+  const initialValuesFromPlugins = usePluggableInitialValues(widget);
 
   return useMemo(() => {
     return ({ timerange, streams, queryString, ...initialValuesFromPlugins });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timerange, queryString]);
+  }, [timerange, queryString, initialValuesFromPlugins]);
 };
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);

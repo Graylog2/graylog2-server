@@ -93,7 +93,7 @@ describe('SearchBar pluggable controls', () => {
     );
   };
 
-  const mockOnSubmit = jest.fn(() => Promise.resolve());
+  const mockOnSubmit = jest.fn((_values, entity) => Promise.resolve(entity));
   const mockOnValidate = jest.fn(() => Promise.resolve({}));
 
   beforeAll(() => {
@@ -102,12 +102,18 @@ describe('SearchBar pluggable controls', () => {
         () => ({
           id: 'pluggable-search-bar-control',
           component: PluggableSearchBarControl,
-          useInitialValues: () => {
+          useInitialSearchValues: () => {
             return ({
               pluggableControl: 'Initial Value',
             });
           },
-          onSubmit: mockOnSubmit,
+          useInitialDashboardWidgetValues: () => {
+            return ({
+              pluggableControl: 'Initial Value',
+            });
+          },
+          onSearchSubmit: mockOnSubmit,
+          onDashboardWidgetSubmit: mockOnSubmit,
           validationPayload: (values) => {
             // @ts-ignore
             const { pluggableControl } = values;

@@ -26,7 +26,7 @@ export type QueryId = string;
 export type FilterType = Immutable.Map<string, any>;
 
 export type FiltersType = Array<{
-  type:string,
+  type: string,
   id?: string,
   title?: string,
   description?: string
@@ -223,9 +223,9 @@ export default class Query {
   }
 
   static fromJSON(value: QueryJson): Query {
-    const { id, query, timerange, filter, search_types } = value;
+    const { id, query, timerange, filter, filters, search_types } = value;
 
-    return new Query(id, query, timerange, Immutable.fromJS(filter), search_types);
+    return new Query(id, query, timerange, Immutable.fromJS(filter), search_types, filters);
   }
 }
 
