@@ -25,13 +25,15 @@ export type QueryId = string;
 
 export type FilterType = Immutable.Map<string, any>;
 
-export type FiltersType = Array<{
+export type SearchFilter = {
   type: string,
   id?: string,
   title?: string,
   description?: string
   queryString: string
-}>
+}
+
+export type FiltersType = Immutable.List<SearchFilter>
 
 export type SearchTypeList = Array<SearchType>;
 type InternalBuilderState = Immutable.Map<string, any>;
@@ -225,7 +227,7 @@ export default class Query {
   static fromJSON(value: QueryJson): Query {
     const { id, query, timerange, filter, filters, search_types } = value;
 
-    return new Query(id, query, timerange, Immutable.fromJS(filter), search_types, filters);
+    return new Query(id, query, timerange, Immutable.fromJS(filter), search_types, Immutable.List(filters));
   }
 }
 
@@ -257,7 +259,7 @@ class Builder {
   }
 
   filters(value: FiltersType | null | undefined): Builder {
-    return new Builder(this.value.set('filters', value));
+    return new Builder(this.value.set('filters', Immutable.List(value)));
   }
 
   searchTypes(value: SearchTypeList): Builder {

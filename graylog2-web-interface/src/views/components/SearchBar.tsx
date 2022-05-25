@@ -171,6 +171,7 @@ const SearchBar = ({
                              onSubmit={_onSubmit}
                              validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls)}>
                 {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
+                  console.log({ values })
                   const disableSearchSubmit = isSubmitting || isValidating || !isValid;
 
                   return (
