@@ -18,12 +18,26 @@ package org.graylog.util;
 
 import com.google.auto.value.AutoValue;
 
+import java.net.InetAddress;
+
 import static java.util.Objects.requireNonNull;
 
 @AutoValue
 public abstract class Hostname {
+    /**
+     * Returns the short hostname.
+     *
+     * @return the hostname
+     * @see InetAddress#getHostName()
+     */
     public abstract String hostname();
 
+    /**
+     * Returns the full hostname.
+     *
+     * @return the hostname
+     * @see InetAddress#getCanonicalHostName()
+     */
     public abstract String canonicalHostname();
 
     public static Hostname create(String hostname, String canonicalHostname) {
