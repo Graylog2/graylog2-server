@@ -260,7 +260,7 @@ class NotificationsFactory {
             <span>
               The most recent stable Graylog version is <em>{notification.details.current_version}</em>.
               See what&apos;s new in the <DocumentationLink page={DocsHelper.PAGES.CHANGELOG} text="Open" />{' '}
-              and <DocumentationLink page={DocsHelper.PAGES.ENTERPRISE_CHANGELOG} text="Enterprise" /> changelogs!
+              and <DocumentationLink page={DocsHelper.PAGES.OPERATIONS_CHANGELOG} text="Operations" /> changelogs!
             </span>
           ),
         };
