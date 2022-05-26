@@ -18,6 +18,7 @@ package org.graylog.events.event;
 
 import de.huxhorn.sulky.ulid.ULID;
 import org.graylog.events.processor.EventDefinition;
+import org.graylog.util.HostnameProvider;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.system.NodeId;
@@ -31,6 +32,17 @@ public class EventProcessorEventFactory implements EventFactory {
     private final ULID ulid;
 
     @Inject
+    public EventProcessorEventFactory(ULID ulid, HostnameProvider hostnameProvider) {
+        this.ulid = ulid;
+        try {
+            this.source = hostnameProvider.get().canonicalHostname();
+        } catch (Exception e) {
+            throw new RuntimeException("Couldn't get local hostname", e);
+        }
+    }
+
+    // Used in some tests in another repository.
+    @Deprecated
     public EventProcessorEventFactory(ULID ulid, NodeService nodeService, NodeId nodeId) {
         this.ulid = ulid;
         try {
