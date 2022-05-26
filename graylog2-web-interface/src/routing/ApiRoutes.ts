@@ -200,6 +200,7 @@ const ApiRoutes = {
   },
   MessageFieldsApiController: {
     list: () => { return { url: '/system/fields' }; },
+    types: () => ({ url: 'views/fields' }),
   },
   MetricsApiController: {
     multiple: () => { return { url: '/system/metrics/multiple' }; },
