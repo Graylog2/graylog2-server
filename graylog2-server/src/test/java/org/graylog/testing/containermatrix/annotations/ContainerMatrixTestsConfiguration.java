@@ -73,4 +73,11 @@ public @interface ContainerMatrixTestsConfiguration {
 
     // are run after the initialization of mongoDb, gets concatenated for all tests below the above rules
     String[] mongoDBFixtures() default {};
+
+    /**
+     * A list of Graylog Feature Flags that should be enabled for this test.
+     *
+     * @return enabled feature flags
+     */
+    String[] enabledFeatureFlags() default {};
 }
