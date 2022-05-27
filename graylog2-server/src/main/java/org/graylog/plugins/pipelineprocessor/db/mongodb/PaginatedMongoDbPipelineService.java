@@ -22,7 +22,6 @@ public class PaginatedMongoDbPipelineService extends PaginatedDbService<Pipeline
         super(mongoConnection, mapper, PipelineDao.class, COLLECTION_NAME);
     }
 
-    @Override
     public long count() {
         return db.count();
     }

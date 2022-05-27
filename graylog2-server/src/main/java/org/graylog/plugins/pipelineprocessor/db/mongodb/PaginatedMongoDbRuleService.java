@@ -21,7 +21,6 @@ public class PaginatedMongoDbRuleService extends PaginatedDbService<RuleDao> imp
         super(mongoConnection, mapper, RuleDao.class, COLLECTION_NAME);
     }
 
-    @Override
     public long count() {
         return db.count();
     }
