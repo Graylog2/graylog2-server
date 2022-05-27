@@ -17,6 +17,7 @@
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import type { $PropertyType, $Shape } from 'utility-types';
+import URI from 'urijs';
 
 import type { UserOverviewJSON, AccountStatus } from 'logic/users/UserOverview';
 import UserOverview from 'logic/users/UserOverview';
@@ -28,7 +29,6 @@ import PaginationURL from 'util/PaginationURL';
 import type { UserJSON } from 'logic/users/User';
 import User from 'logic/users/User';
 import type { PaginatedListJSON, Pagination, PaginatedList } from 'stores/PaginationTypes';
-import URI from 'urijs';
 
 export type PaginatedUsersResponse = PaginatedListJSON & {
   users: Array<UserOverviewJSON>;
