@@ -76,6 +76,11 @@ export type PaginatedUsers = PaginatedList<UserOverview> & {
   adminUser: UserOverview | null | undefined,
 };
 
+export type Query = {
+  include_permissions?: boolean;
+  include_sessions?: boolean;
+};
+
 export type ActionsType = {
   create: (user: UserCreate) => Promise<void>;
   load: (userId: string) => Promise<User>;
@@ -86,7 +91,7 @@ export type ActionsType = {
   createToken: (userId: string, tokenName: string) => Promise<Token>;
   loadTokens: (userId: string) => Promise<TokenSummary[]>;
   deleteToken: (userId: string, tokenId: string, tokenName: string) => Promise<void>;
-  loadUsers: () => Promise<Immutable.List<User>>;
+  loadUsers: (query?: Query) => Promise<Immutable.List<User>>;
   loadUsersPaginated: (pagination: Pagination) => Promise<PaginatedUsers>;
   setStatus: (userId: string, newStatus: AccountStatus) => Promise<void>;
 };
@@ -195,7 +200,7 @@ export const UsersStore = singletonStore('core.Users', () => Reflux.createStore(
     return promise;
   },
 
-  loadUsers(query = {}): Promise<Immutable.List<User>> {
+  loadUsers(query: Query = {}): Promise<Immutable.List<User>> {
     const url = usersUrl({ url: ApiRoutes.UsersApiController.list().url, query });
     const promise = fetch('GET', url).then(({
       users,
