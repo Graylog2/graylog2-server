@@ -28,6 +28,7 @@ import PaginationURL from 'util/PaginationURL';
 import type { UserJSON } from 'logic/users/User';
 import User from 'logic/users/User';
 import type { PaginatedListJSON, Pagination, PaginatedList } from 'stores/PaginationTypes';
+import URI from 'urijs';
 
 export type PaginatedUsersResponse = PaginatedListJSON & {
   users: Array<UserOverviewJSON>;
@@ -88,6 +89,14 @@ export type ActionsType = {
   loadUsers: () => Promise<Immutable.List<User>>;
   loadUsersPaginated: (pagination: Pagination) => Promise<PaginatedUsers>;
   setStatus: (userId: string, newStatus: AccountStatus) => Promise<void>;
+};
+
+const usersUrl = ({ url = '', query = {} }) => {
+  const uri = new URI(url);
+
+  uri.query(query);
+
+  return qualifyUrl(uri.resource());
 };
 
 export const UsersActions = singletonActions(
@@ -186,8 +195,8 @@ export const UsersStore = singletonStore('core.Users', () => Reflux.createStore(
     return promise;
   },
 
-  loadUsers(): Promise<Immutable.List<User>> {
-    const url = qualifyUrl(ApiRoutes.UsersApiController.list().url);
+  loadUsers(query = {}): Promise<Immutable.List<User>> {
+    const url = usersUrl({ url: ApiRoutes.UsersApiController.list().url, query });
     const promise = fetch('GET', url).then(({
       users,
     }) => Immutable.List(users.map((user) => UserOverview.fromJSON(user))));
