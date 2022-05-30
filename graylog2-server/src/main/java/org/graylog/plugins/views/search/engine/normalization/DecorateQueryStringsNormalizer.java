@@ -31,7 +31,7 @@ import javax.inject.Inject;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DecorateQueryStringsNormalizer implements SearchNormalizer{
+public class DecorateQueryStringsNormalizer implements SearchNormalizer {
     private final QueryStringDecorators queryStringDecorators;
 
     @Inject
@@ -41,7 +41,8 @@ public class DecorateQueryStringsNormalizer implements SearchNormalizer{
 
     private Query normalizeQuery(Query query, Search search) {
         return query.toBuilder()
-                .query(ElasticsearchQueryString.of(this.queryStringDecorators.decorate(query.query().queryString(), search::getParameter, query)))
+                .query(ElasticsearchQueryString.of(this.queryStringDecorators.decorate(query.query().queryString(), search, query)))
+                .filter(normalizeFilter(query.filter(), query, search))
                 .searchTypes(query.searchTypes().stream().map(searchType -> normalizeSearchType(searchType, query, search)).collect(Collectors.toSet()))
                 .build();
     }
@@ -53,7 +54,7 @@ public class DecorateQueryStringsNormalizer implements SearchNormalizer{
         Filter normalizedFilter = filter;
         if (filter instanceof QueryStringFilter) {
             final QueryStringFilter queryStringFilter = (QueryStringFilter) filter;
-            normalizedFilter = queryStringFilter.withQuery(this.queryStringDecorators.decorate(queryStringFilter.query(), search::getParameter, query));
+            normalizedFilter = queryStringFilter.withQuery(this.queryStringDecorators.decorate(queryStringFilter.query(), search, query));
         }
 
         if (normalizedFilter.filters() == null) {
@@ -68,7 +69,7 @@ public class DecorateQueryStringsNormalizer implements SearchNormalizer{
 
     private SearchType normalizeSearchType(SearchType searchType, Query query, Search search) {
         final SearchType searchTypeWithNormalizedQuery = searchType.query()
-                .map(backendQuery -> searchType.withQuery(ElasticsearchQueryString.of(this.queryStringDecorators.decorate(backendQuery.queryString(), search::getParameter, query))))
+                .map(backendQuery -> searchType.withQuery(ElasticsearchQueryString.of(this.queryStringDecorators.decorate(backendQuery.queryString(), search, query))))
                 .orElse(searchType);
 
         return searchTypeWithNormalizedQuery.withFilter(normalizeFilter(searchType.filter(), query, search));
