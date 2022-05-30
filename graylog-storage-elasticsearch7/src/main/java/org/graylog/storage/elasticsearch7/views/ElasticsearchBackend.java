@@ -139,9 +139,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
                     final SearchSourceBuilder searchTypeSourceBuilder = queryContext.searchSourceBuilder(searchType);
 
-                    final Set<String> effectiveStreamIds = searchType.effectiveStreams().isEmpty()
-                            ? query.usedStreamIds()
-                            : searchType.effectiveStreams();
+                    final Set<String> effectiveStreamIds = query.effectiveStreams(searchType);
 
                     final BoolQueryBuilder searchTypeOverrides = QueryBuilders.boolQuery()
                             .must(searchTypeSourceBuilder.query())
@@ -220,6 +218,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         final Map<String, SearchSourceBuilder> searchTypeQueries = queryContext.searchTypeQueries();
         final List<String> searchTypeIds = new ArrayList<>(searchTypeQueries.keySet());
+
         final List<SearchRequest> searches = searchTypeIds
                 .stream()
                 .map(searchTypeId -> {
@@ -231,11 +230,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                         && !searchType.timerange().isPresent()) {
                                     return Optional.empty();
                                 }
-                                final Set<String> usedStreamIds = searchType.effectiveStreams().isEmpty()
-                                        ? query.usedStreamIds()
-                                        : searchType.effectiveStreams();
-
-                                return Optional.of(indexLookup.indexNamesForStreamsInTimeRange(usedStreamIds, query.effectiveTimeRange(searchType)));
+                                return Optional.of(indexLookup.indexNamesForStreamsInTimeRange(query.effectiveStreams(searchType), query.effectiveTimeRange(searchType)));
                             })
                             .orElse(affectedIndices);
 

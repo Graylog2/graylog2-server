@@ -29,7 +29,6 @@ import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.errors.SearchError;
@@ -74,7 +73,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers;
     private final JestClient jestClient;
     private final IndexLookup indexLookup;
-    private final QueryStringDecorators queryStringDecorators;
     private final ESGeneratedQueryContext.Factory queryContextFactory;
     private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
     private final boolean allowLeadingWildcard;
@@ -83,14 +81,12 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
                                 JestClient jestClient,
                                 IndexLookup indexLookup,
-                                QueryStringDecorators queryStringDecorators,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
                                 UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
                                 @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.jestClient = jestClient;
         this.indexLookup = indexLookup;
-        this.queryStringDecorators = queryStringDecorators;
 
         this.queryContextFactory = queryContextFactory;
         this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
@@ -143,9 +139,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
                     final SearchSourceBuilder searchTypeSourceBuilder = queryContext.searchSourceBuilder(searchType);
 
-                    final Set<String> effectiveStreamIds = searchType.effectiveStreams().isEmpty()
-                            ? query.usedStreamIds()
-                            : searchType.effectiveStreams();
+                    final Set<String> effectiveStreamIds = query.effectiveStreams(searchType);
 
                     final BoolQueryBuilder searchTypeOverrides = QueryBuilders.boolQuery()
                             .must(searchTypeSourceBuilder.query())
@@ -235,11 +229,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                         && !searchType.timerange().isPresent()) {
                                     return Optional.empty();
                                 }
-                                final Set<String> usedStreamIds = searchType.effectiveStreams().isEmpty()
-                                        ? query.usedStreamIds()
-                                        : searchType.effectiveStreams();
-
-                                return Optional.of(indexLookup.indexNamesForStreamsInTimeRange(usedStreamIds, query.effectiveTimeRange(searchType)));
+                                return Optional.of(indexLookup.indexNamesForStreamsInTimeRange(query.effectiveStreams(searchType), query.effectiveTimeRange(searchType)));
                             })
                             .orElse(affectedIndices);
 

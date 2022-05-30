@@ -93,9 +93,7 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
 
         applyHighlightingIfActivated(searchSourceBuilder, job, query);
 
-        final Set<String> effectiveStreamIds = messageList.effectiveStreams().isEmpty()
-                ? query.usedStreamIds()
-                : messageList.effectiveStreams();
+        final Set<String> effectiveStreamIds = query.effectiveStreams(messageList);
 
         if (!messageList.fields().isEmpty()) {
             searchSourceBuilder.fetchSource(messageList.fields().toArray(new String[0]), new String[0]);
