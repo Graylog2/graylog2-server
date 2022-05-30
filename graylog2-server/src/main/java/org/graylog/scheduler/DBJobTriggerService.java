@@ -23,10 +23,12 @@ import com.mongodb.BasicDBObject;
 import one.util.streamex.StreamEx;
 import org.bson.types.ObjectId;
 import org.graylog.scheduler.clock.JobSchedulerClock;
+import org.graylog.scheduler.constraints.JobConstraintsService;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.utilities.MongoQueryUtils;
 import org.joda.time.DateTime;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
@@ -67,10 +69,12 @@ public class DBJobTriggerService {
     private static final String FIELD_DATA = JobTriggerDto.FIELD_DATA;
     private static final String FIELD_UPDATED_AT = JobTriggerDto.FIELD_UPDATED_AT;
     private static final String FIELD_TRIGGERED_AT = JobTriggerDto.FIELD_TRIGGERED_AT;
+    private static final String FIELD_CONSTRAINTS = JobTriggerDto.FIELD_CONSTRAINTS;
 
     private final String nodeId;
     private final JacksonDBCollection<JobTriggerDto, ObjectId> db;
     private final JobSchedulerClock clock;
+    private final JobConstraintsService jobConstraintsService;
     private final Duration lockExpirationDuration;
 
     @Inject
@@ -78,9 +82,11 @@ public class DBJobTriggerService {
                                MongoJackObjectMapperProvider mapper,
                                NodeId nodeId,
                                JobSchedulerClock clock,
+                               JobConstraintsService jobConstraintsService,
                                @Named(LOCK_EXPIRATION_DURATION) Duration lockExpirationDuration) {
         this.nodeId = nodeId.toString();
         this.clock = clock;
+        this.jobConstraintsService = jobConstraintsService;
         this.lockExpirationDuration = lockExpirationDuration;
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 JobTriggerDto.class,
@@ -93,6 +99,7 @@ public class DBJobTriggerService {
         db.createIndex(new BasicDBObject(FIELD_START_TIME, 1));
         db.createIndex(new BasicDBObject(FIELD_END_TIME, 1));
         db.createIndex(new BasicDBObject(FIELD_NEXT_TIME, 1));
+        db.createIndex(new BasicDBObject(FIELD_CONSTRAINTS, 1));
     }
 
     /**
@@ -309,11 +316,16 @@ public class DBJobTriggerService {
     public Optional<JobTriggerDto> nextRunnableTrigger() {
         final DateTime now = clock.nowUTC();
 
+        // TODO add cache?
+        final Query constraintsQuery = MongoQueryUtils.getArrayIsContainedQuery(FIELD_CONSTRAINTS, jobConstraintsService.getJobCapabilities());
+
         final Query query = DBQuery.or(DBQuery.and(
                         // We cannot lock a trigger that is already locked by another node
                         DBQuery.is(FIELD_LOCK_OWNER, null),
                         DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNABLE),
                         DBQuery.lessThanEquals(FIELD_START_TIME, now),
+                        constraintsQuery,
+
                         DBQuery.or( // Skip triggers that have an endTime which is due
                                 DBQuery.notExists(FIELD_END_TIME),
                                 DBQuery.is(FIELD_END_TIME, null),
@@ -326,6 +338,7 @@ public class DBJobTriggerService {
                         DBQuery.notEquals(FIELD_LOCK_OWNER, null),
                         DBQuery.notEquals(FIELD_LOCK_OWNER, nodeId),
                         DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING),
+                        constraintsQuery,
                         DBQuery.lessThan(FIELD_LAST_LOCK_TIME, now.minus(lockExpirationDuration.toMilliseconds())))
         );
         // We want to lock the trigger with the oldest next time

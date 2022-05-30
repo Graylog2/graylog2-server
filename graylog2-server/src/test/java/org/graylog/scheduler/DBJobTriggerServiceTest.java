@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestJobTriggerData;
+import org.graylog.scheduler.constraints.JobConstraintsService;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog.testing.mongodb.MongoDBFixtures;
@@ -38,6 +39,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.mongojack.DBQuery;
 
 import java.util.Collections;
 import java.util.List;
@@ -66,6 +68,9 @@ public class DBJobTriggerServiceTest {
     @Mock
     private NodeId nodeId;
 
+    @Mock
+    private JobConstraintsService jobConstraintsService;
+
     private DBJobTriggerService dbJobTriggerService;
     private JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
     private ObjectMapper objectMapper;
@@ -74,6 +79,7 @@ public class DBJobTriggerServiceTest {
     @Before
     public void setUp() throws Exception {
         when(nodeId.toString()).thenReturn(NODE_ID);
+        when(jobConstraintsService.getJobCapabilities()).thenReturn(ImmutableSet.of());
 
         objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(new NamedType(IntervalJobSchedule.class, IntervalJobSchedule.TYPE_NAME));
@@ -81,7 +87,7 @@ public class DBJobTriggerServiceTest {
         objectMapper.registerSubtypes(new NamedType(TestJobTriggerData.class, TestJobTriggerData.TYPE_NAME));
 
         mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        this.dbJobTriggerService = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, EXPIRATION_DURATION);
+        this.dbJobTriggerService = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, jobConstraintsService, EXPIRATION_DURATION);
     }
 
     @Test
@@ -505,7 +511,7 @@ public class DBJobTriggerServiceTest {
     public void nextRunnableTriggerWithEndTime() {
         // Set clock to base date used in the fixture file
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.parse("2019-01-01T00:00:00.000Z"));
-        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, EXPIRATION_DURATION);
+        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, jobConstraintsService, EXPIRATION_DURATION);
 
         // No triggers yet because 54e3deadbeefdeadbeef0002 is already locked and RUNNING
         assertThat(service.nextRunnableTrigger()).isEmpty();
@@ -746,7 +752,7 @@ public class DBJobTriggerServiceTest {
     @MongoDBFixtures("stale-job-triggers-with-expired-lock.json")
     public void nextStaleTrigger() {
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.parse("2019-01-01T02:00:00.000Z"));
-        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, EXPIRATION_DURATION);
+        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, jobConstraintsService, EXPIRATION_DURATION);
 
         assertThat(service.nextRunnableTrigger())
                 .isNotEmpty()
@@ -759,7 +765,7 @@ public class DBJobTriggerServiceTest {
     public void updateLockedJobTriggers() {
         DateTime newLockTime = DateTime.parse("2019-01-01T02:00:00.000Z");
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(newLockTime);
-        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, EXPIRATION_DURATION);
+        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, jobConstraintsService, EXPIRATION_DURATION);
 
         service.updateLockedJobTriggers();
 
@@ -768,5 +774,53 @@ public class DBJobTriggerServiceTest {
                 .map(JobTriggerDto::id)
                 .collect(Collectors.toList());
         assertThat(updatedJobTriggerIds).containsOnly("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0002");
+    }
+
+    @Test
+    public void triggerWithConstraints() {
+        final JobTriggerDto.Builder triggerBuilder = JobTriggerDto.Builder.create(clock)
+                .jobDefinitionId("abc-123")
+                .nextTime(clock.nowUTC().minusSeconds(10))
+                .schedule(IntervalJobSchedule.builder()
+                        .interval(1)
+                        .unit(TimeUnit.SECONDS)
+                        .build());
+
+        // no constraints
+        dbJobTriggerService.create(triggerBuilder
+                .build());
+        assertThat(dbJobTriggerService.nextRunnableTrigger()).isNotEmpty();
+        dbJobTriggerService.deleteByQuery(DBQuery.empty());
+
+        // two unfulfilled constraints
+        dbJobTriggerService.create(triggerBuilder
+                .constraints(ImmutableSet.of("IS_LEADER", "HAS_ARCHIVE"))
+                .build());
+        assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
+        dbJobTriggerService.deleteByQuery(DBQuery.empty());
+
+        // two fulfilled constraints
+        when(jobConstraintsService.getJobCapabilities()).thenReturn(ImmutableSet.of("HAS_ARCHIVE", "IS_LEADER"));
+        dbJobTriggerService.create(triggerBuilder
+                .constraints(ImmutableSet.of("IS_LEADER", "HAS_ARCHIVE"))
+                .build());
+        assertThat(dbJobTriggerService.nextRunnableTrigger()).isNotEmpty();
+        dbJobTriggerService.deleteByQuery(DBQuery.empty());
+
+        // more capabilities than constraints
+        when(jobConstraintsService.getJobCapabilities()).thenReturn(ImmutableSet.of("HAS_ARCHIVE", "IS_LEADER", "ANOTHER_CAPABITILITY"));
+        dbJobTriggerService.create(triggerBuilder
+                .constraints(ImmutableSet.of("IS_LEADER", "HAS_ARCHIVE"))
+                .build());
+        assertThat(dbJobTriggerService.nextRunnableTrigger()).isNotEmpty();
+        dbJobTriggerService.deleteByQuery(DBQuery.empty());
+
+        // more constraints than capabilities
+        when(jobConstraintsService.getJobCapabilities()).thenReturn(ImmutableSet.of("HAS_ARCHIVE", "IS_LEADER"));
+        dbJobTriggerService.create(triggerBuilder
+                .constraints(ImmutableSet.of("IS_LEADER", "HAS_ARCHIVE", "ANOTHER_CONSTRAINT"))
+                .build());
+        assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
+        dbJobTriggerService.deleteByQuery(DBQuery.empty());
     }
 }
