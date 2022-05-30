@@ -19,9 +19,11 @@ package org.graylog2.web;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
+@Singleton
 public class IndexHtmlGeneratorProvider implements Provider<IndexHtmlGenerator> {
-    private final Provider<? extends IndexHtmlGenerator> indexHtmlGeneratorProvider;
+    private final IndexHtmlGenerator indexHtmlGenerator;
 
     @Inject
     public IndexHtmlGeneratorProvider(Provider<DevelopmentIndexHtmlGenerator> developmentIndexHtmlGeneratorProvider,
@@ -30,13 +32,15 @@ public class IndexHtmlGeneratorProvider implements Provider<IndexHtmlGenerator> 
         // In development mode we use an external process to provide the web interface.
         // To avoid errors because of missing production web assets, we use a different implementation for
         // generating the "index.html" page.
-        this.indexHtmlGeneratorProvider = isDevelopmentServer
+        final Provider<? extends IndexHtmlGenerator> indexHtmlGeneratorProvider = isDevelopmentServer
                 ? developmentIndexHtmlGeneratorProvider
                 : productionIndexHtmlGeneratorProvider;
+
+        this.indexHtmlGenerator = indexHtmlGeneratorProvider.get();
     }
 
     @Override
     public IndexHtmlGenerator get() {
-        return indexHtmlGeneratorProvider.get();
+        return indexHtmlGenerator;
     }
 }

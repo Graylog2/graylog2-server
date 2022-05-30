@@ -23,7 +23,6 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.RestTools;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.ws.rs.core.MultivaluedMap;
 import java.io.IOException;
 import java.net.URI;
@@ -39,7 +38,6 @@ import static java.util.Objects.requireNonNull;
  *
  * This implementation throws an error when the web interface assets cannot be found in the classpath.
  */
-@Singleton
 public class ProductionIndexHtmlGenerator implements IndexHtmlGenerator {
     private final String template;
     private final List<String> cssFiles;
