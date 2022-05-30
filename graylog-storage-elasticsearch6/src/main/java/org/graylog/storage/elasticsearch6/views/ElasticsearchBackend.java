@@ -93,7 +93,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
-    private QueryBuilder normalizeQueryString(String queryString) {
+    private QueryBuilder translateQueryString(String queryString) {
         return (queryString.isEmpty() || queryString.trim().equals("*"))
                 ? QueryBuilders.matchAllQuery()
                 : QueryBuilders.queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
@@ -105,14 +105,14 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         final Set<SearchType> searchTypes = query.searchTypes();
 
-        final QueryBuilder normalizedRootQuery = normalizeQueryString(backendQuery.queryString());
+        final QueryBuilder normalizedRootQuery = translateQueryString(backendQuery.queryString());
 
         final BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
                 .filter(normalizedRootQuery);
 
         usedSearchFiltersToQueryStringsMapper.map(query.filters())
                 .forEach(searchFilterQueryString -> {
-                    final QueryBuilder normalized = normalizeQueryString(searchFilterQueryString);
+                    final QueryBuilder normalized = translateQueryString(searchFilterQueryString);
                     boolQuery.filter(normalized);
                 });
 
@@ -154,7 +154,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                             .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
 
                     searchType.query().ifPresent(searchTypeBackendQuery -> {
-                        final QueryBuilder normalizedSearchTypeQuery = normalizeQueryString(searchTypeBackendQuery.queryString());
+                        final QueryBuilder normalizedSearchTypeQuery = translateQueryString(searchTypeBackendQuery.queryString());
                         searchTypeOverrides.must(normalizedSearchTypeQuery);
                     });
 
