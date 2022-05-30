@@ -66,9 +66,11 @@ public class SearchExecutor {
     }
 
     public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState) {
-        final Search normalizedSearch = searchNormalization.normalize(search, searchUser, executionState);
+        final Search preValidationSearch = searchNormalization.preValidation(search, searchUser, executionState);
 
-        final Set<SearchError> validationErrors = searchValidation.validate(normalizedSearch, searchUser);
+        final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
+
+        final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
 
         final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors);
 

@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.QueryStringDecorator;
+import org.graylog.plugins.views.search.engine.normalization.PostValidation;
 import org.graylog.plugins.views.search.engine.normalization.SearchNormalizer;
 import org.graylog.plugins.views.search.engine.validation.SearchValidator;
 import org.graylog.plugins.views.search.export.ExportBackend;
@@ -112,11 +113,19 @@ public abstract class ViewsModule extends VersionAwareModule {
     }
 
     protected void registerSearchNormalizer(Class<? extends SearchNormalizer> normalizer) {
-        searchNormalizerBinder().addBinding().to(normalizer);
+        if (normalizer.getAnnotation(PostValidation.class) != null) {
+            searchPostValidationNormalizerBinder().addBinding().to(normalizer);
+        } else {
+            searchNormalizerBinder().addBinding().to(normalizer);
+        }
     }
 
     protected Multibinder<SearchNormalizer> searchNormalizerBinder() {
         return Multibinder.newSetBinder(binder(), SearchNormalizer.class);
+    }
+
+    protected Multibinder<SearchNormalizer> searchPostValidationNormalizerBinder() {
+        return Multibinder.newSetBinder(binder(), SearchNormalizer.class, PostValidation.class);
     }
 
     protected void registerSearchValidator(Class<? extends SearchValidator> validator) {

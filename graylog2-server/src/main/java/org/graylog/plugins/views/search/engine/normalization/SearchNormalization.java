@@ -21,5 +21,6 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 
 public interface SearchNormalization {
-    Search normalize(Search search, SearchUser searchUser, ExecutionState executionState);
+    Search preValidation(Search search, SearchUser searchUser, ExecutionState executionState);
+    Search postValidation(Search search, SearchUser searchUser, ExecutionState executionState);
 }

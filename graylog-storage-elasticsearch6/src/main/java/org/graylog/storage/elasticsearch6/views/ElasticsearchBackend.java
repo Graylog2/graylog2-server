@@ -115,10 +115,10 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .filter(normalizedRootQuery);
 
         usedSearchFiltersToQueryStringsMapper.map(query.filters())
-                .stream()
-                .map(searchFilterQueryString -> this.queryStringDecorators.decorate(searchFilterQueryString, job, query))
-                .map(this::normalizeQueryString)
-                .forEach(boolQuery::filter);
+                .forEach(searchFilterQueryString -> {
+                    final QueryBuilder normalized = normalizeQueryString(searchFilterQueryString);
+                    boolQuery.filter(normalized);
+                });
 
         // add the optional root query filters
         generateFilterClause(query.filter(), job, query)

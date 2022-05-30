@@ -25,7 +25,6 @@ import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.errors.SearchError;
@@ -74,7 +73,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers;
     private final ElasticsearchClient client;
     private final IndexLookup indexLookup;
-    private final QueryStringDecorators queryStringDecorators;
     private final ESGeneratedQueryContext.Factory queryContextFactory;
     private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
     private final boolean allowLeadingWildcard;
@@ -83,7 +81,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
                                 ElasticsearchClient client,
                                 IndexLookup indexLookup,
-                                QueryStringDecorators queryStringDecorators,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
                                 UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
                                 @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
@@ -93,7 +90,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         this.queryContextFactory = queryContextFactory;
         this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
-        this.queryStringDecorators = queryStringDecorators;
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
@@ -115,11 +111,10 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .filter(normalizedRootQuery);
 
         usedSearchFiltersToQueryStringsMapper.map(query.filters())
-                .stream()
-                .map(searchFilterQueryString -> this.queryStringDecorators.decorate(searchFilterQueryString, job, query))
-                .map(this::normalizeQueryString)
-                .forEach(boolQuery::filter);
-
+                .forEach(searchFilterQueryString -> {
+                    final QueryBuilder normalized = normalizeQueryString(searchFilterQueryString);
+                    boolQuery.filter(normalized);
+                });
 
         // add the optional root query filters
         generateFilterClause(query.filter(), job, query).map(boolQuery::filter);

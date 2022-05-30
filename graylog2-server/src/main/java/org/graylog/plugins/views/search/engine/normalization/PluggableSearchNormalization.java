@@ -21,27 +21,44 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class PluggableSearchNormalization implements SearchNormalization {
     private final Set<SearchNormalizer> pluggableNormalizers;
+    private final Set<SearchNormalizer> postValidationNormalizers;
 
     @Inject
-    public PluggableSearchNormalization(Set<SearchNormalizer> pluggableNormalizers) {
+    public PluggableSearchNormalization(Set<SearchNormalizer> pluggableNormalizers,
+                                        @PostValidation Set<SearchNormalizer> postValidationNormalizers) {
         this.pluggableNormalizers = pluggableNormalizers;
-   }
+        this.postValidationNormalizers = postValidationNormalizers;
+    }
 
-    public Search normalize(Search search, SearchUser searchUser, ExecutionState executionState) {
-        final Search searchWithStreams = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadAll());
+    public PluggableSearchNormalization(Set<SearchNormalizer> pluggableNormalizers) {
+        this(pluggableNormalizers, Collections.emptySet());
+    }
 
-        Search normalizedSearch = searchWithStreams.applyExecutionState(firstNonNull(executionState, ExecutionState.empty()));
-
-        for (SearchNormalizer searchNormalizer : pluggableNormalizers) {
+    private Search normalize(Search search, Set<SearchNormalizer> normalizers, SearchUser searchUser, ExecutionState executionState) {
+        Search normalizedSearch = search;
+        for (SearchNormalizer searchNormalizer : normalizers) {
             normalizedSearch = searchNormalizer.normalize(normalizedSearch, searchUser, executionState);
         }
 
         return normalizedSearch;
+    }
+
+    public Search preValidation(Search search, SearchUser searchUser, ExecutionState executionState) {
+        final Search searchWithStreams = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadAll());
+
+        Search normalizedSearch = searchWithStreams.applyExecutionState(firstNonNull(executionState, ExecutionState.empty()));
+
+        return normalize(normalizedSearch, pluggableNormalizers, searchUser, executionState);
+    }
+
+    public Search postValidation(Search search, SearchUser searchUser, ExecutionState executionState) {
+        return normalize(search, postValidationNormalizers, searchUser, executionState);
     }
 }

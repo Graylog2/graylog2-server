@@ -55,7 +55,7 @@ import static java.util.stream.Collectors.toSet;
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = Search.Builder.class)
-public abstract class Search implements ContentPackable<SearchEntity> {
+public abstract class Search implements ContentPackable<SearchEntity>, ParameterProvider {
     public static final String FIELD_REQUIRES = "requires";
     static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_OWNER = "owner";
