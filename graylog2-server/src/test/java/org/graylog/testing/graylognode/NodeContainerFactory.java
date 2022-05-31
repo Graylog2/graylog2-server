@@ -37,6 +37,8 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -46,6 +48,7 @@ import static org.graylog.testing.graylognode.NodeContainerConfig.DEBUG_PORT;
 
 public class NodeContainerFactory {
     private static final Logger LOG = LoggerFactory.getLogger(NodeContainerFactory.class);
+    private static final String FEATURE_PREFIX = "GRAYLOG_FEATURE";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @SuppressWarnings("OctalInteger")
@@ -164,6 +167,8 @@ public class NodeContainerFactory {
             }
         });
 
+        addEnabledFeatureFlagsToContainerEnv(config, container);
+
         container.start();
 
         if (config.enableDebugging) {
@@ -180,6 +185,18 @@ public class NodeContainerFactory {
         });
 
         return container;
+    }
+
+    private static void addEnabledFeatureFlagsToContainerEnv(NodeContainerConfig config, GenericContainer<?> container) {
+        List<String> prefixed = config.getEnabledFeatureFlags()
+                .stream()
+                .map(e -> e.startsWith(FEATURE_PREFIX) ? e : String.join("_", FEATURE_PREFIX, e))
+                .map(e -> e.toUpperCase(Locale.ENGLISH))
+                .collect(Collectors.toList());
+
+        for (String name : prefixed) {
+            container.withEnv(name, "on");
+        }
     }
 
     private static Path pathTo(String propertyName) {

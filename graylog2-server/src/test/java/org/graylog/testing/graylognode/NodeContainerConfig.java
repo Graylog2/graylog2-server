@@ -23,6 +23,8 @@ import org.graylog2.storage.SearchVersion;
 import org.testcontainers.containers.Network;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class NodeContainerConfig {
 
@@ -39,6 +41,7 @@ public class NodeContainerConfig {
     public final boolean skipPackaging;
     public final PluginJarsProvider pluginJarsProvider;
     public final MavenProjectDirProvider mavenProjectDirProvider;
+    private final List<String> enabledFeatureFlags;
 
     public NodeContainerConfig(Network network,
                                String mongoDbUri,
@@ -46,7 +49,8 @@ public class NodeContainerConfig {
                                SearchVersion elasticsearchVersion,
                                int[] extraPorts,
                                PluginJarsProvider pluginJarsProvider,
-                               MavenProjectDirProvider mavenProjectDirProvider) {
+                               MavenProjectDirProvider mavenProjectDirProvider,
+                               List<String> enabledFeatureFlags) {
         this.network = network;
         this.mongoDbUri = mongoDbUri;
         this.elasticsearchUri = elasticsearchUri;
@@ -56,6 +60,7 @@ public class NodeContainerConfig {
         this.skipPackaging = flagFromEnvVar("GRAYLOG_IT_SKIP_PACKAGING");
         this.pluginJarsProvider = pluginJarsProvider;
         this.mavenProjectDirProvider = mavenProjectDirProvider;
+        this.enabledFeatureFlags = enabledFeatureFlags == null ? Collections.emptyList() : enabledFeatureFlags;
     }
 
     private static boolean flagFromEnvVar(String flagName) {
@@ -72,5 +77,9 @@ public class NodeContainerConfig {
         }
 
         return Arrays.stream(allPorts).boxed().toArray(Integer[]::new);
+    }
+
+    public List<String> getEnabledFeatureFlags() {
+        return enabledFeatureFlags;
     }
 }

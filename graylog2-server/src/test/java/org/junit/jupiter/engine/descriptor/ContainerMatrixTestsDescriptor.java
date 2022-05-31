@@ -45,6 +45,7 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
     private final MongodbServer mongoVersion;
     private final Set<Integer> extraPorts = Collections.synchronizedSet(new HashSet<>());
     private final Set<URL> mongoDBFixtures = Collections.synchronizedSet(new HashSet<>());
+    private final Set<String> enabledFeatureFlags = Collections.synchronizedSet(new HashSet<>());
 
     public ContainerMatrixTestsDescriptor(TestDescriptor parent,
                                           Lifecycle lifecycle,
@@ -55,7 +56,8 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
                                           SearchVersion esVersion,
                                           MongodbServer mongoVersion,
                                           Set<Integer> extraPorts,
-                                          List<URL> mongoDBFixtures) {
+                                          List<URL> mongoDBFixtures,
+                                          List<String> enabledFeatureFlags) {
         super(parent.getUniqueId().append(SEGMENT_TYPE,
                         createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion)),
                 createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion));
@@ -67,6 +69,7 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         this.mongoVersion = mongoVersion;
         this.extraPorts.addAll(extraPorts);
         this.mongoDBFixtures.addAll(mongoDBFixtures);
+        this.enabledFeatureFlags.addAll(enabledFeatureFlags);
     }
 
     public ContainerMatrixTestsDescriptor(TestDescriptor parent,
@@ -125,5 +128,9 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
 
     public List<URL> getMongoDBFixtures() {
         return new ArrayList<>(mongoDBFixtures);
+    }
+
+    public List<String> getEnabledFeatureFlags() {
+        return new ArrayList<>(enabledFeatureFlags);
     }
 }
