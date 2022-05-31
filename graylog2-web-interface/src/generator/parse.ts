@@ -252,7 +252,7 @@ type RawOperation = {
   nickname: string;
   type: string | RawType;
   parameters: Array<RawParameter>;
-  path: string;
+  path?: string;
   produces: Array<RawContentType>;
 }
 

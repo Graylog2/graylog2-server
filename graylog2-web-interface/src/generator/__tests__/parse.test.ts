@@ -28,6 +28,48 @@ describe('parse', () => {
     expect(result).toMatchSnapshot();
   });
 
+  it('parses operation with query parameter', () => {
+    const api = {
+      models: [] as Record<string, any>,
+      apis: [
+        {
+          path: '/system/grok',
+          operations: [
+            {
+              summary: 'Add a list of new patterns',
+              notes: '',
+              method: 'POST' as const,
+              nickname: 'bulkUpdatePatternsFromTextFile',
+              produces: [
+                'application/json' as const,
+              ],
+              type: 'any',
+              parameters: [
+                {
+                  paramType: 'query' as const,
+                  name: 'import-strategy',
+                  description: 'Strategy to apply when importing.',
+                  type: 'string',
+                  required: false,
+                  enum: [
+                    'ABORT_ON_CONFLICT',
+                    'REPLACE_ON_CONFLICT',
+                    'DROP_ALL_EXISTING',
+                  ],
+                },
+              ],
+              responseMessages: [],
+            },
+          ],
+        },
+      ],
+    };
+
+    const result = parseApi('grok', api);
+
+    expect(result).toMatchSnapshot();
+  });
+
   it('parses arrays of referenced types', () => {
     const api = {
       models: {
