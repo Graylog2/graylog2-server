@@ -67,7 +67,7 @@ class PrometheusExporterTest {
         when(prometheusMappingFilesHandler.getMapperConfigs()).thenReturn(Collections.singletonList(new MapperConfig(
                 "org.graylog2.plugin.streams.Stream.*.StreamRule.*.executionTime",
                 "stream_rules_execution_time",
-                Collections.EMPTY_MAP
+                Collections.emptyMap()
         )));
 
         metricRegistry.timer(MetricRegistry.name(Stream.class, "stream-id", "StreamRule", "stream-rule-id",
@@ -76,6 +76,6 @@ class PrometheusExporterTest {
 
         Collector collector = classUnderTest.createCollector();
 
-        assertThat(collector.collect().size()).isEqualTo(1);
+        assertThat(collector.collect()).hasSize(1);
     }
 }
