@@ -66,4 +66,39 @@ export function bulkUpdatePatternsFromTextFile(importStrategy?: 'ABORT_ON_CONFLI
 ]
 `);
   });
+
+  it('emits proper indexer signatures for collection-types', () => {
+    const api = {
+      name: 'sample',
+      routes: [],
+      models: {
+        AvailableOutputSummaryMapMap: {
+          type: 'type_literal' as const,
+          properties: {},
+          additionalProperties: {
+            type: 'type_reference' as const,
+            name: 'AvailableOutputSummaryMap',
+            optional: false,
+          },
+          id: 'AvailableOutputSummaryMapMap',
+        },
+      },
+    };
+
+    const result = emit([api]);
+
+    expect(result).toMatchInlineSnapshot(`
+Array [
+  Object {
+    "sample": "import __request__ from 'routing/request';
+interface AvailableOutputSummaryMapMap {
+    readonly [_key: string]: AvailableOutputSummaryMap;
+}
+",
+  },
+  "export * as sample from './sample';
+",
+]
+`);
+  });
 });
