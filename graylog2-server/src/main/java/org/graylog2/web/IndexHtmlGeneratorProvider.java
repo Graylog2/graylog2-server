@@ -16,14 +16,17 @@
  */
 package org.graylog2.web;
 
+import com.google.common.base.Suppliers;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import java.util.function.Supplier;
 
 @Singleton
 public class IndexHtmlGeneratorProvider implements Provider<IndexHtmlGenerator> {
-    private final IndexHtmlGenerator indexHtmlGenerator;
+    private final Supplier<IndexHtmlGenerator> indexHtmlGeneratorSupplier;
 
     @Inject
     public IndexHtmlGeneratorProvider(Provider<DevelopmentIndexHtmlGenerator> developmentIndexHtmlGeneratorProvider,
@@ -36,11 +39,11 @@ public class IndexHtmlGeneratorProvider implements Provider<IndexHtmlGenerator> 
                 ? developmentIndexHtmlGeneratorProvider
                 : productionIndexHtmlGeneratorProvider;
 
-        this.indexHtmlGenerator = indexHtmlGeneratorProvider.get();
+        this.indexHtmlGeneratorSupplier = Suppliers.memoize(indexHtmlGeneratorProvider::get);
     }
 
     @Override
     public IndexHtmlGenerator get() {
-        return indexHtmlGenerator;
+        return this.indexHtmlGeneratorSupplier.get();
     }
 }
