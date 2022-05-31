@@ -25,7 +25,6 @@ import MockStore from 'helpers/mocking/StoreMock';
 import Widget from 'views/logic/widgets/Widget';
 import mockComponent from 'helpers/mocking/MockComponent';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
-import { SearchBarControl } from 'views/types';
 
 import WidgetContext from './contexts/WidgetContext';
 import WidgetQueryControls from './WidgetQueryControls';
