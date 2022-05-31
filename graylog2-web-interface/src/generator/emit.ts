@@ -33,7 +33,7 @@ const typeMappings = {
   ZonedDateTime: 'string',
 };
 
-const emitNumberOrString = (type) => {
+const emitNumberOrString = (type: string) => {
   switch (type) {
     case 'number':
       return (number: unknown) => ts.factory.createNumericLiteral(number as number);
@@ -94,11 +94,11 @@ const emitModel = ([name, definition]: [string, Model]) => (definition.type === 
 
 // ==== APIs/Operations ==== //
 // === Types === //
-const emitPromiseResultType = (typeNode) => ts.factory.createTypeReferenceNode('Promise', [typeNode]);
+const emitPromiseResultType = (typeNode: ts.TypeNode) => ts.factory.createTypeReferenceNode('Promise', [typeNode]);
 
 // === Functions === //
 
-const extractVariable = (segment) => segment.replace(/[{}]/g, '').split(':')[0];
+const extractVariable = (segment: string) => segment.replace(/[{}]/g, '').split(':')[0];
 
 const emitTemplateString = (path: string) => {
   const segments = path.split(/({.+?})/);
@@ -250,7 +250,7 @@ const emitFunctionParameter = ({
   defaultValue ? emitInitializer(type, defaultValue as string) : undefined,
 );
 
-const firstNonEmpty = (...strings) => strings.find((s) => (s !== undefined && s.trim() !== ''));
+const firstNonEmpty = (...strings: string[]) => strings.find((s) => (s !== undefined && s.trim() !== ''));
 
 const deriveNameFromParameters = (functionName: string, parameters: Parameter[]) => {
   const joinedParameters = parameters.map(({ name }) => cleanParameterName(name)).join('And');
