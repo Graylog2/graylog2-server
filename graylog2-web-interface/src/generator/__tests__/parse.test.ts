@@ -106,4 +106,42 @@ Object {
 }
 `);
   });
+
+  it('parses additional properties', () => {
+    const api = {
+      apis: [],
+      models: {
+        AvailableOutputSummaryMapMap: {
+          type: 'object',
+          id: 'AvailableOutputSummaryMapMap',
+          properties: {},
+          additional_properties: {
+            $ref: 'AvailableOutputSummaryMap',
+          },
+        },
+      },
+    };
+
+    const result = parseApi('sample', api);
+
+    expect(result).toMatchInlineSnapshot(`
+Object {
+  "description": undefined,
+  "models": Object {
+    "AvailableOutputSummaryMapMap": Object {
+      "additionalProperties": Object {
+        "name": "AvailableOutputSummaryMap",
+        "optional": false,
+        "type": "type_reference",
+      },
+      "id": "AvailableOutputSummaryMapMap",
+      "properties": Object {},
+      "type": "type_literal",
+    },
+  },
+  "name": "sample",
+  "routes": Array [],
+}
+`);
+  });
 });

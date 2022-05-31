@@ -77,7 +77,7 @@ type ObjectType = {
   id: string;
   type: 'object';
   properties: Record<string, RawType>;
-  additionalProperties?: RawType;
+  additional_properties?: string | RawType;
 }
 
 type RawType = PrimitiveType | EnumType | ArrayType | RefType | ObjectType;
@@ -175,8 +175,10 @@ function createType(rawTypeDefinition: RawType): Type {
       )
       : {};
 
-    const additionalProperties = typeDefinition.additionalProperties
-      ? createType(typeDefinition.additionalProperties)
+    const additionalProperties = typeDefinition.additional_properties
+      ? createType(typeof typeDefinition.additional_properties === 'string'
+        ? { type: typeDefinition.additional_properties }
+        : typeDefinition.additional_properties)
       : undefined;
 
     return createTypeLiteralNode(properties, additionalProperties);
