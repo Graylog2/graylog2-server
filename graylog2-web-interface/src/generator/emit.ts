@@ -129,13 +129,23 @@ const emitTemplateString = (path: string) => {
   );
 };
 
+const cleanVariableName = (name: string) => name.replace(/-(\w?)/g, (substr) => (substr[1] ? substr[1].toUpperCase() : ''));
+
 const emitBlock = (method: string, path: any, bodyParameter: Parameter, queryParameter: Parameter[], rawProduces: string[]) => {
   const produces = rawProduces || [];
   const queryParameters = ts.factory.createObjectLiteralExpression(
     queryParameter.map((q) => ts.factory.createPropertyAssignment(
-      q.name,
-      ts.factory.createIdentifier(q.name),
+      emitString(q.name),
+      ts.factory.createIdentifier(cleanVariableName(q.name)),
     )),
+  );
+
+  const headers = ts.factory.createObjectLiteralExpression(
+    [ts.factory.createPropertyAssignment(
+      emitString('Accept'),
+      ts.factory.createArrayLiteralExpression(produces.map((contentType) => emitString(contentType)), produces.length > 1),
+    )],
+    true,
   );
 
   return ts.factory.createBlock(
@@ -149,13 +159,7 @@ const emitBlock = (method: string, path: any, bodyParameter: Parameter, queryPar
             emitTemplateString(path),
             bodyParameter ? ts.factory.createIdentifier(bodyParameter.name) : ts.factory.createNull(),
             queryParameters,
-            ts.factory.createObjectLiteralExpression(
-              [ts.factory.createPropertyAssignment(
-                'Accept',
-                ts.factory.createArrayLiteralExpression(produces.map((contentType) => emitString(contentType)), produces.length > 1),
-              )],
-              true,
-            ),
+            headers,
           ],
         ),
       ),
@@ -190,7 +194,11 @@ const emitInitializer = (type: Type, defaultValue: string) => {
 
 const sortByOptionality = (parameter1: Parameter, parameter2: Parameter) => Number(parameter2.required) - Number(parameter1.required);
 
-const cleanParameterName = (name: string) => name.replace(/\s/g, '');
+const cleanParameterName = (name: string) => {
+  console.log(`Cleaning '${name}'`);
+
+  return name.replace(/\s/g, '');
+};
 
 function emitEnumType({ options, name }: EnumType) {
   const creator = emitNumberOrString(name);
@@ -244,10 +252,10 @@ const emitFunctionParameter = ({
   undefined,
   undefined,
   undefined,
-  cleanParameterName(name),
+  cleanVariableName(cleanParameterName(name)),
   (required || defaultValue) ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
   emitType(type),
-  defaultValue ? emitInitializer(type, defaultValue as string) : undefined,
+  defaultValue ? emitInitializer(type, defaultValue) : undefined,
 );
 
 const firstNonEmpty = (...strings: string[]) => strings.find((s) => (s !== undefined && s.trim() !== ''));
