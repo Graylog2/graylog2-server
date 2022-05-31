@@ -25,6 +25,7 @@ import MockStore from 'helpers/mocking/StoreMock';
 import Widget from 'views/logic/widgets/Widget';
 import mockComponent from 'helpers/mocking/MockComponent';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
+import { SearchBarControl } from 'views/types';
 
 import WidgetContext from './contexts/WidgetContext';
 import WidgetQueryControls from './WidgetQueryControls';
@@ -133,7 +134,7 @@ describe('WidgetQueryControls pluggable controls', () => {
         () => ({
           id: 'pluggable-search-bar-control',
           component: PluggableSearchBarControl,
-          useInitialValues: () => {
+          useInitialDashboardWidgetValues: () => {
             return ({
               pluggableControl: 'Initial Value',
             });
@@ -176,7 +177,7 @@ describe('WidgetQueryControls pluggable controls', () => {
     expect(pluggableFormField).toHaveValue('Initial Value');
   });
 
-  it('should register submit handler which receives current form state', async () => {
+  it('should register submit handler which receives current form state and widget', async () => {
     renderSUT();
 
     const pluggableFormField = await screen.findByLabelText('Pluggable Control');
@@ -188,12 +189,15 @@ describe('WidgetQueryControls pluggable controls', () => {
     await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
     userEvent.click(searchButton);
 
-    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith({
-      pluggableControl: 'Initial Value2',
-      queryString: '',
-      streams: [],
-      timerange: { from: 300, type: 'relative' },
-    }));
+    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith(
+      {
+        pluggableControl: 'Initial Value2',
+        queryString: '',
+        streams: [],
+        timerange: { from: 300, type: 'relative' },
+      },
+      widget,
+    ));
   }, testTimeout);
 
   it('should register validation handler', async () => {

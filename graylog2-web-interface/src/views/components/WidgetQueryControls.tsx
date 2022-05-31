@@ -95,9 +95,8 @@ export const updateWidgetSearchControls = (widget, { timerange, streams, querySt
 
 const onSubmit = async (values, pluggableSearchBarControls: Array<() => SearchBarControl>, widget: Widget) => {
   const { timerange, streams, queryString } = values;
-  const newWidget = updateWidgetSearchControls(widget, { timerange, streams, queryString });
-
-  await executePluggableSubmitHandler(values, pluggableSearchBarControls);
+  const widgetWithPluginData = await executePluggableSubmitHandler(values, pluggableSearchBarControls, widget);
+  const newWidget = updateWidgetSearchControls(widgetWithPluginData, { timerange, streams, queryString });
 
   if (!widget.equals(newWidget)) {
     return WidgetActions.update(widget.id, newWidget);
@@ -137,7 +136,7 @@ const useInitialFormValues = (widget: Widget) => {
 
   return useMemo(() => {
     return ({ timerange, streams, queryString, ...initialValuesFromPlugins });
-  }, [timerange, queryString, initialValuesFromPlugins]);
+  }, [timerange, streams, queryString, initialValuesFromPlugins]);
 };
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);

@@ -49,7 +49,7 @@ const renderControls = (controls: Array<SearchBarControl>) => controls?.map(({ c
 const PluggableSearchBarControls = () => {
   const [hidePluggableControlsPreview, setHidePluggableControlsPreview] = useState(!!Store.get(PLUGGABLE_CONTROLS_HIDDEN_KEY));
   const { leftControls, rightControls } = usePluggableControls();
-  const hasSearchFilterFeatureFlag = !useFeature('search_filter');
+  const hasSearchFilterFeatureFlag = useFeature('search_filter');
   const hasPluggableControls = !!(leftControls?.length || rightControls?.length);
   const shouldRenderContainer = (hasPluggableControls || (!hidePluggableControlsPreview && hasSearchFilterFeatureFlag));
 

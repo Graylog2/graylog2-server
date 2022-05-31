@@ -23,11 +23,11 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 import { SearchActions } from 'views/stores/SearchStore';
-import MockQuery from 'views/logic/queries/Query';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import FormikInput from 'components/common/FormikInput';
+import Query from 'views/logic/queries/Query';
 
 import SearchBar from './SearchBar';
 
@@ -69,12 +69,14 @@ jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => j
   <div>Saved Search Controls</div>
 )));
 
+const mockCurrentQuery = Query.builder()
+  .timerange({ type: 'relative', from: 300 })
+  .query({ type: 'elasticsearch', query_string: '*' })
+  .id('34efae1e-e78e-48ab-ab3f-e83c8611a683')
+  .build();
+
 jest.mock('views/stores/CurrentQueryStore', () => ({
-  CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder()
-    .timerange({ type: 'relative', from: 300 })
-    .query({ type: 'elasticsearch', query_string: '*' })
-    .id('34efae1e-e78e-48ab-ab3f-e83c8611a683')
-    .build()]),
+  CurrentQueryStore: MockStore(['getInitialState', () => mockCurrentQuery]),
 }));
 
 jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest.fn(() => Promise.resolve({
@@ -93,7 +95,7 @@ describe('SearchBar pluggable controls', () => {
     );
   };
 
-  const mockOnSubmit = jest.fn((_values, entity) => Promise.resolve(entity));
+  const mockOnSubmitFromPlugin = jest.fn((_values, _entity) => Promise.resolve(_entity));
   const mockOnValidate = jest.fn(() => Promise.resolve({}));
 
   beforeAll(() => {
@@ -112,8 +114,8 @@ describe('SearchBar pluggable controls', () => {
               pluggableControl: 'Initial Value',
             });
           },
-          onSearchSubmit: mockOnSubmit,
-          onDashboardWidgetSubmit: mockOnSubmit,
+          onSearchSubmit: mockOnSubmitFromPlugin,
+          onDashboardWidgetSubmit: mockOnSubmitFromPlugin,
           validationPayload: (values) => {
             // @ts-ignore
             const { pluggableControl } = values;
@@ -140,7 +142,7 @@ describe('SearchBar pluggable controls', () => {
     expect(pluggableFormField).toHaveValue('Initial Value');
   });
 
-  it('should register submit handler which receives current form state', async () => {
+  it('should register submit handler which receive current form state and query', async () => {
     render(<SearchBar />);
 
     const pluggableFormField = await screen.findByLabelText('Pluggable Control');
@@ -152,23 +154,28 @@ describe('SearchBar pluggable controls', () => {
     await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
     userEvent.click(searchButton);
 
-    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith({
-      pluggableControl: 'Initial Value2',
-      queryString: '*',
-      streams: [],
-      timerange: { from: 300, type: 'relative' },
-    }));
+    await waitFor(() => expect(mockOnSubmitFromPlugin).toHaveBeenCalledWith(
+      {
+        pluggableControl: 'Initial Value2',
+        queryString: '*',
+        streams: [],
+        timerange: { from: 300, type: 'relative' },
+      },
+      mockCurrentQuery,
+    ));
   }, testTimeout);
 
   it('should register validation handler', async () => {
     render(<SearchBar />);
 
-    await waitFor(() => expect(mockOnValidate).toHaveBeenCalledWith({
-      pluggableControl: 'Initial Value',
-      queryString: '*',
-      streams: [],
-      timerange: { from: 300, type: 'relative' },
-    }));
+    await waitFor(() => expect(mockOnValidate).toHaveBeenCalledWith(
+      {
+        pluggableControl: 'Initial Value',
+        queryString: '*',
+        streams: [],
+        timerange: { from: 300, type: 'relative' },
+      },
+    ));
   });
 
   it('should extend query validation payload', async () => {

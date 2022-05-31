@@ -26,7 +26,7 @@ export type QueryId = string;
 export type FilterType = Immutable.Map<string, any>;
 
 export type SearchFilter = {
-  type: string,
+  type: 'referenced' | 'inlineQueryString',
   id?: string,
   title?: string,
   description?: string
@@ -227,7 +227,7 @@ export default class Query {
   static fromJSON(value: QueryJson): Query {
     const { id, query, timerange, filter, filters, search_types } = value;
 
-    return new Query(id, query, timerange, Immutable.fromJS(filter), search_types, Immutable.List(filters));
+    return new Query(id, query, timerange, Immutable.fromJS(filter), search_types, filters ? Immutable.List(filters) : filters);
   }
 }
 
@@ -259,7 +259,7 @@ class Builder {
   }
 
   filters(value: FiltersType | null | undefined): Builder {
-    return new Builder(this.value.set('filters', Immutable.List(value)));
+    return new Builder(this.value.set('filters', value ? Immutable.List(value) : value));
   }
 
   searchTypes(value: SearchTypeList): Builder {

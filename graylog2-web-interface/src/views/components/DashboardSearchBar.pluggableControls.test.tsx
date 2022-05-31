@@ -125,11 +125,14 @@ describe('DashboardSearchBar pluggable controls', () => {
     await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
     userEvent.click(searchButton);
 
-    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith({
-      pluggableControl: 'Initial Value',
-      queryString: '',
-      timerange: undefined,
-    }));
+    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith(
+      {
+        pluggableControl: 'Initial Value',
+        queryString: '',
+        timerange: undefined,
+      },
+      undefined,
+    ));
   }, testTimeout);
 
   it('should register validation handler', async () => {
