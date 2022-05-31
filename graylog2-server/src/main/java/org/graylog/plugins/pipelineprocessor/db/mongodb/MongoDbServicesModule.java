@@ -31,7 +31,6 @@ public class MongoDbServicesModule extends PluginModule {
                 .setDefault().to(MongoDbPipelineService.class);
         OptionalBinder.newOptionalBinder(binder(), RuleService.class)
                 .setDefault().to(MongoDbRuleService.class);
-        //bind(RuleService.class).to(MongoDbRuleService.class);
         OptionalBinder.newOptionalBinder(binder(), PaginatedPipelineService.class)
                 .setDefault().to(PaginatedMongoDbPipelineService.class);
         OptionalBinder.newOptionalBinder(binder(), PaginatedRuleService.class)

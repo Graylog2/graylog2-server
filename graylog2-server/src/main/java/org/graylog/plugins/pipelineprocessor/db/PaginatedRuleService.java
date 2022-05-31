@@ -20,5 +20,5 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.search.SearchQuery;
 
 public interface PaginatedRuleService {
-    public PaginatedList<RuleDao> findPaginated(SearchQuery searchQuery, int page, int perPage, String sortField, String order);
+    PaginatedList<RuleDao> findPaginated(SearchQuery searchQuery, int page, int perPage, String sortField, String order);
 }

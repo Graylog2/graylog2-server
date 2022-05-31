@@ -22,5 +22,5 @@ import org.graylog2.search.SearchQuery;
 import java.util.function.Predicate;
 
 public interface PaginatedPipelineService {
-    public PaginatedList<PipelineDao> findPaginated(SearchQuery searchQuery, Predicate<PipelineDao> filter, int page, int perPage, String sortField, String order);
+    PaginatedList<PipelineDao> findPaginated(SearchQuery searchQuery, Predicate<PipelineDao> filter, int page, int perPage, String sortField, String order);
 }
