@@ -19,6 +19,7 @@ package org.junit.jupiter.engine.discovery;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.ContainerMatrixTestEngine;
 import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.containermatrix.discovery.IsContainerMatrixTestClass;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
@@ -28,6 +29,7 @@ import org.junit.jupiter.engine.descriptor.ContainerMatrixTestsDescriptor;
 import org.junit.jupiter.engine.descriptor.NestedClassTestDescriptor;
 import org.junit.jupiter.engine.discovery.predicates.IsNestedTestClass;
 import org.junit.jupiter.engine.discovery.predicates.IsTestClassWithTests;
+import org.junit.platform.commons.support.AnnotationSupport;
 import org.junit.platform.commons.util.ReflectionUtils;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.TestDescriptor;
@@ -135,6 +137,11 @@ public class ContainerMatrixClassSelectorResolver implements SelectorResolver {
         return Optional.empty();
     }
 
+    private boolean preImportLicense(Class<?> aClass) {
+        Optional<ContainerMatrixTestsConfiguration> annotation = AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class);
+        return annotation.isPresent() ? annotation.get().preImportLicense() : true;
+    }
+
     private ClassBasedTestDescriptor newClassTestDescriptor(TestDescriptor parent, Class<?> testClass) {
         Optional<ContainerMatrixTestsDescriptor> containerMatrixTestsDescriptor = findContainerMatrixTestsDescriptor(parent);
 
@@ -145,12 +152,20 @@ public class ContainerMatrixClassSelectorResolver implements SelectorResolver {
             return new ContainerMatrixTestClassDescriptor(
                     parent,
                     testClass,
-                    configuration, esVersion, mongoVersion, ContainerMatrixTestEngine.getMongoDBFixtures(Lifecycle.CLASS, testClass));
+                    configuration,
+                    esVersion,
+                    mongoVersion,
+                    ContainerMatrixTestEngine.getMongoDBFixtures(Lifecycle.CLASS, testClass),
+                    preImportLicense(testClass)
+            );
         } else {
             return new ContainerMatrixTestClassDescriptor(
                     parent,
                     testClass,
-                    configuration, ContainerMatrixTestEngine.getMongoDBFixtures(Lifecycle.CLASS, testClass));
+                    configuration,
+                    ContainerMatrixTestEngine.getMongoDBFixtures(Lifecycle.CLASS, testClass),
+                    preImportLicense(testClass)
+            );
 
         }
     }

@@ -138,6 +138,16 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                 .collect(Collectors.toList());
     }
 
+    private boolean preImportLicense(Set<Class<?>> annotatedClasses) {
+        return annotatedClasses
+                .stream()
+                .map(aClass -> AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .anyMatch(ContainerMatrixTestsConfiguration::preImportLicense);
+    }
+
+
     private List<URL> getMongoDBFixtures(Set<Class<?>> annotatedClasses) {
         final List<URL> urls = new LinkedList<>();
         for (Class<?> aClass : annotatedClasses) {
