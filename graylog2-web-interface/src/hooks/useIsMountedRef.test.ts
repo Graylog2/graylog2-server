@@ -14,23 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.freeenterprise;
 
-import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
-import org.graylog2.plugin.PluginConfigBean;
+import { renderHook } from '@testing-library/react-hooks';
 
-import java.net.URI;
+import useIsMountedRef from './useIsMountedRef';
 
-public class FreeEnterpriseConfiguration implements PluginConfigBean {
-    private static final String PREFIX = "free_enterprise_";
+describe('useIsMountedRef', () => {
+  it('should be true after mount', () => {
+    const { result: { current: isMountedRef } } = renderHook(useIsMountedRef);
 
-    public static final String SERVICE_URL = PREFIX + "service_url";
+    expect(isMountedRef.current).toEqual(true);
+  });
 
-    @Parameter(value = SERVICE_URL, validators = URIAbsoluteValidator.class)
-    private URI serviceUrl = URI.create("https://api.graylog.com/");
+  it('should be false after unmount', () => {
+    const { unmount, result: { current: isMountedRef } } = renderHook(useIsMountedRef);
 
-    public URI getServiceUrl() {
-        return serviceUrl;
-    }
-}
+    expect(isMountedRef.current).toEqual(true);
+
+    unmount();
+
+    expect(isMountedRef.current).toEqual(false);
+  });
+});

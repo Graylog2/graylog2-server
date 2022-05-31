@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.freeenterprise;
+package org.graylog.enterprise;
 
-import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.POST;
+import org.graylog2.plugin.PluginModule;
 
-public interface FreeLicenseAPIClient {
-    @POST("enterprise/license/v2/freetrial")
-    Call<FreeLicenseAPIResponse> requestFreeLicense(@Body FreeLicenseAPIRequest request);
+public class EnterpriseModule extends PluginModule {
+    @Override
+    protected void configure() {
+        addSystemRestResource(EnterpriseResource.class);
+    }
 }

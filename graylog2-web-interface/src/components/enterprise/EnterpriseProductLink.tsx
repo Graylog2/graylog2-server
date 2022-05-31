@@ -14,22 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { capitalize } from 'lodash';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import { widgetDefinition } from 'views/logic/Widgets';
-import type Widget from 'views/logic/widgets/Widget';
-
-interface WidgetLike {
-  type: string;
-  config: Widget['config'];
+type Props = {
+  children: React.ReactNode,
 }
 
-const defaultTitleGenerator = ({ type }: WidgetLike) => `Untitled ${type.replace('_', ' ').split(' ').map(capitalize).join(' ')}`;
-
-const defaultTitle = (widget: WidgetLike) => {
-  const widgetDef = widgetDefinition(widget.type);
-
-  return (widgetDef.titleGenerator || defaultTitleGenerator)(widget);
+const EnterpriseProductLink = ({ children }: Props) => {
+  return (
+    <a href="https://www.graylog.org/products/enterprise"
+       rel="noopener noreferrer"
+       target="_blank">
+      {children}
+    </a>
+  );
 };
 
-export default defaultTitle;
+EnterpriseProductLink.propTypes = {
+  children: PropTypes.node,
+};
+
+EnterpriseProductLink.defaultProps = {
+  children: null,
+};
+
+export default EnterpriseProductLink;

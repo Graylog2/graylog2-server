@@ -14,21 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.freeenterprise;
+import { useEffect, useRef } from 'react';
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+const useIsMountedRef = () => {
+  const isMounted = useRef(false);
 
-@AutoValue
-@JsonIgnoreProperties("version")
-public abstract class FreeLicenseAPIResponse {
-    @JsonProperty("license")
-    public abstract String licenseString();
+  useEffect(() => {
+    isMounted.current = true;
 
-    @JsonCreator
-    public static FreeLicenseAPIResponse create(@JsonProperty("license") String licenseString) {
-        return new AutoValue_FreeLicenseAPIResponse(licenseString);
-    }
-}
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  return isMounted;
+};
+
+export default useIsMountedRef;

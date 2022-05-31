@@ -39,7 +39,9 @@ import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.ReferencedQueryStringSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -258,5 +260,25 @@ public class QueryTest {
 
         assertThat(query.hasReferencedStreamFilters())
                 .isTrue();
+    }
+
+    @Test
+    public void testSavesEmptySearchFiltersCollectionInContentPack() {
+        Query noFiltersQuery = Query.builder().build();
+        assertThat(noFiltersQuery.toContentPackEntity(EntityDescriptorIds.empty()).filters())
+                .isNotNull()
+                .isEmpty();
+    }
+
+    @Test
+    public void testSavesSearchFiltersCollectionInContentPack() {
+        final ImmutableList<UsedSearchFilter> originalSearchFilters = ImmutableList.of(
+                InlineQueryStringSearchFilter.create("title", "descr", "*"),
+                ReferencedQueryStringSearchFilter.create("007")
+        );
+        Query queryWithFilters = Query.builder().filters(originalSearchFilters).build();
+        assertThat(queryWithFilters.toContentPackEntity(EntityDescriptorIds.empty()).filters())
+                .isNotNull()
+                .isEqualTo(originalSearchFilters);
     }
 }

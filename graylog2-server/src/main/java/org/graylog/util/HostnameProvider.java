@@ -14,13 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.freeenterprise;
+package org.graylog.util;
 
-import org.graylog2.plugin.PluginModule;
+import org.graylog2.plugin.Tools;
 
-public class FreeEnterpriseModule extends PluginModule {
+import javax.inject.Provider;
+
+public class HostnameProvider implements Provider<Hostname> {
+    /**
+     * Returns the {@link Hostname} object for the local node.
+     *
+     * @return the hostname
+     * @throws RuntimeException when local hostname cannot be retrieved
+     */
     @Override
-    protected void configure() {
-        addSystemRestResource(FreeEnterpriseResource.class);
+    public Hostname get() {
+        try {
+            return Hostname.create(Tools.getLocalHostname(), Tools.getLocalCanonicalHostname());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
