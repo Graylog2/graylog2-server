@@ -82,5 +82,6 @@ public @interface ContainerMatrixTestsConfiguration {
     String[] enabledFeatureFlags() default {};
 
     // pre-import an existing GL license to avoid possible race conditions during tests, only works reliable with Lifecycle.CLASS
-    boolean preImportLicense() default true;
+    boolean defaultPreImportLicense = true;
+    boolean preImportLicense() default defaultPreImportLicense;
 }

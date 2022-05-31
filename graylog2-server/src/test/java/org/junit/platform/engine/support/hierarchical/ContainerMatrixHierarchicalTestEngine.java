@@ -26,6 +26,7 @@ import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.completebackend.RunningGraylogBackend;
 import org.graylog.testing.containermatrix.ContainerMatrixTestEngine;
 import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestClassDescriptor;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestWithRunningESMongoTestsDescriptor;
@@ -75,7 +76,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                 MavenProjectDirProvider mavenProjectDirProvider = instantiateFactory(containerMatrixTestsDescriptor.getMavenProjectDirProvider());
 
                 if (Lifecycle.VM.equals(containerMatrixTestsDescriptor.getLifecycle())) {
-                    try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(esVersion, mongoVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, true)) {
+                    try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(esVersion, mongoVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, ContainerMatrixTestsConfiguration.defaultPreImportLicense)) {
                         RequestSpecification specification = requestSpec(backend);
                         this.execute(request, ((ContainerMatrixTestsDescriptor) descriptor).getChildren(), backend, specification);
                     } catch (Exception exception) {
@@ -84,7 +85,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                 } else if (Lifecycle.CLASS.equals(containerMatrixTestsDescriptor.getLifecycle())) {
                     for (TestDescriptor td : containerMatrixTestsDescriptor.getChildren()) {
                         List<URL> fixtures = mongoDBFixtures;
-                        boolean preImportLicense = false;
+                        boolean preImportLicense = ContainerMatrixTestsConfiguration.defaultPreImportLicense;
                         if (td instanceof ContainerMatrixTestClassDescriptor) {
                             fixtures = ((ContainerMatrixTestClassDescriptor) td).getMongoFixtures();
                             preImportLicense = ((ContainerMatrixTestClassDescriptor) td).isPreImportLicense();
