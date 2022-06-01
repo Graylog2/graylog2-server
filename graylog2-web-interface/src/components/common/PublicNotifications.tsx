@@ -89,7 +89,11 @@ const PublicNotifications = ({ readFromConfig }: Props) => {
     };
 
     const notification = allNotification[notificationId];
-    const { variant, hiddenTitle, isDismissible, title, shortMessage, longMessage } = notification;
+    const { variant, hiddenTitle, isActive, isDismissible, title, shortMessage, longMessage } = notification;
+
+    if (!isActive) {
+      return null;
+    }
 
     const _dismiss = () => {
       return onDismissPublicNotification(notificationId);
