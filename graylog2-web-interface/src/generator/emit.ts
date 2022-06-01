@@ -194,11 +194,7 @@ const emitInitializer = (type: Type, defaultValue: string) => {
 
 const sortByOptionality = (parameter1: Parameter, parameter2: Parameter) => Number(parameter2.required) - Number(parameter1.required);
 
-const cleanParameterName = (name: string) => {
-  console.log(`Cleaning '${name}'`);
-
-  return name.replace(/\s/g, '');
-};
+const cleanParameterName = (name: string) => name.replace(/\s/g, '');
 
 function emitEnumType({ options, name }: EnumType) {
   const creator = emitNumberOrString(name);
@@ -207,7 +203,7 @@ function emitEnumType({ options, name }: EnumType) {
   return ts.factory.createUnionTypeNode(types);
 }
 
-function emitTypeLiteral(type: TypeLiteral) {
+function emitTypeLiteral(type: TypeLiteral): ReturnType<typeof ts.factory.createTypeLiteralNode> {
   const properties = Object.entries(type.properties ?? [])
     .map(([propName, propType]) => ts.factory.createPropertySignature(
       [readonlyModifier],
@@ -226,7 +222,13 @@ const assertUnreachable = (ignored: never, message: string): never => {
   throw new Error(`${message}: ${ignored}`);
 };
 
-function emitType(type: Type) {
+type TypeResult = ReturnType<typeof ts.factory.createArrayTypeNode>
+  | ReturnType<typeof emitEnumType>
+  | ReturnType<typeof emitTypeLiteral>
+  | ReturnType<typeof ts.factory.createTypeReferenceNode>
+  | undefined;
+
+function emitType(type: Type): TypeResult {
   switch (type.type) {
     case 'array':
       return ts.factory.createArrayTypeNode(emitType(type.items));
