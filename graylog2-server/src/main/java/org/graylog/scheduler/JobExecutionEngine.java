@@ -169,7 +169,7 @@ public class JobExecutionEngine {
                 LOG.debug("Execute job: {}/{}/{} (job-class={} trigger={} config={})", jobDefinition.title(), jobDefinition.id(),
                         jobDefinition.config().type(), job.getClass().getSimpleName(), trigger.id(), jobDefinition.config());
             }
-            final JobTriggerUpdate triggerUpdate = job.execute(JobExecutionContext.create(trigger, jobDefinition, jobTriggerUpdatesFactory.create(trigger), isRunning));
+            final JobTriggerUpdate triggerUpdate = job.execute(JobExecutionContext.create(trigger, jobDefinition, jobTriggerUpdatesFactory.create(trigger), isRunning, jobTriggerService));
 
             if (triggerUpdate == null) {
                 executionFailed.inc();

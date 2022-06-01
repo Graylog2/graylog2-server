@@ -36,6 +36,8 @@ import org.mongojack.DBQuery.Query;
 import org.mongojack.DBSort;
 import org.mongojack.DBUpdate;
 import org.mongojack.JacksonDBCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -56,10 +58,13 @@ import static org.graylog.scheduler.JobSchedulerConfiguration.LOCK_EXPIRATION_DU
 // This class does NOT use PaginatedDbService because we use the triggers collection for locking and need to handle
 // updates very carefully.
 public class DBJobTriggerService {
+    private final static Logger LOG = LoggerFactory.getLogger(DBJobTriggerService.class);
     static final String COLLECTION_NAME = "scheduler_triggers";
     private static final String FIELD_ID = "_id";
     static final String FIELD_JOB_DEFINITION_ID = JobTriggerDto.FIELD_JOB_DEFINITION_ID;
     private static final String FIELD_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_OWNER;
+
+    private static final String FIELD_PROGRESS = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_PROGRESS;
     private static final String FIELD_LAST_LOCK_TIME = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_LAST_LOCK_TIME;
     private static final String FIELD_NEXT_TIME = JobTriggerDto.FIELD_NEXT_TIME;
     private static final String FIELD_START_TIME = JobTriggerDto.FIELD_START_TIME;
@@ -463,5 +468,14 @@ public class DBJobTriggerService {
         );
         DBUpdate.Builder update = DBUpdate.set(FIELD_LAST_LOCK_TIME, now);
         db.updateMulti(query, update);
+    }
+
+    public void updateProgress(JobTriggerDto trigger, int progress) {
+        final Query query = DBQuery.is(FIELD_ID, trigger.id());
+        final DBUpdate.Builder update = DBUpdate.set(FIELD_PROGRESS, progress);
+        final int n = db.update(query, update).getN();
+        if (n != 1) {
+            LOG.warn("Progress update for trigger <{}> returned unexpected write result count <{}>", trigger, n);
+        }
     }
 }

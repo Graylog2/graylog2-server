@@ -46,8 +46,8 @@ public abstract class JobTriggerDto {
     static final String FIELD_LOCK = "lock";
     static final String FIELD_SCHEDULE = "schedule";
     static final String FIELD_DATA = "data";
-
     static final String FIELD_CONSTRAINTS = "constraints";
+    private static final String FIELD_IS_CANCELLED = "is_cancelled";
 
     @Id
     @ObjectId
@@ -91,6 +91,8 @@ public abstract class JobTriggerDto {
     @JsonProperty(FIELD_CONSTRAINTS)
     public abstract Set<String> constraints();
 
+    @JsonProperty(FIELD_IS_CANCELLED)
+    public abstract boolean isCancelled();
     public static Builder builder() {
         return Builder.create();
     }
@@ -100,6 +102,7 @@ public abstract class JobTriggerDto {
     }
 
     public abstract Builder toBuilder();
+
 
     @AutoValue.Builder
     public static abstract class Builder {
@@ -117,6 +120,7 @@ public abstract class JobTriggerDto {
                     .updatedAt(now)
                     .nextTime(now)
                     .status(JobTriggerStatus.RUNNABLE)
+                    .isCancelled(false)
                     .constraints(ImmutableSet.of())
                     .lock(JobTriggerLock.empty());
         }
@@ -161,6 +165,9 @@ public abstract class JobTriggerDto {
 
         @JsonProperty(FIELD_CONSTRAINTS)
         public abstract Builder constraints(Set<String> constraints);
+
+        @JsonProperty(FIELD_IS_CANCELLED)
+        public abstract Builder isCancelled(boolean isCancelled);
 
         public abstract JobTriggerDto build();
     }

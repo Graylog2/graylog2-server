@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @AutoValue
@@ -33,12 +34,26 @@ public abstract class JobExecutionContext {
 
     public abstract AtomicBoolean isRunning();
 
-    public static JobExecutionContext create(JobTriggerDto trigger, JobDefinitionDto definition, JobTriggerUpdates jobTriggerUpdates, AtomicBoolean isRunning) {
+    public boolean isCancelled() {
+        if (!isRunning().get()) {
+            return true;
+        }
+        final Optional<JobTriggerDto> triggerDto = jobTriggerService().get(trigger().id());
+        return triggerDto.map(JobTriggerDto::isCancelled).orElse(false);
+    }
+
+    public void updateProgress(int progress) {
+        jobTriggerService().updateProgress(trigger(), progress);
+    }
+    public abstract DBJobTriggerService jobTriggerService();
+
+    public static JobExecutionContext create(JobTriggerDto trigger, JobDefinitionDto definition, JobTriggerUpdates jobTriggerUpdates, AtomicBoolean isRunning, DBJobTriggerService jobTriggerService) {
         return builder()
                 .trigger(trigger)
                 .definition(definition)
                 .jobTriggerUpdates(jobTriggerUpdates)
                 .isRunning(isRunning)
+                .jobTriggerService(jobTriggerService)
                 .build();
     }
 
@@ -62,6 +77,8 @@ public abstract class JobExecutionContext {
         public abstract Builder jobTriggerUpdates(JobTriggerUpdates jobTriggerUpdates);
 
         public abstract Builder isRunning(AtomicBoolean isRunning);
+
+        public abstract Builder jobTriggerService(DBJobTriggerService jobTriggerService);
 
         public abstract JobExecutionContext build();
     }
