@@ -89,7 +89,7 @@
     "react-isolated-scroll": "^0.1.1",
     "react-leaflet": "^2.3.0",
     "react-mops": "v2.0.0-beta.0",
-    "react-overlays": "^0.7.0",
+    "react-overlays": "^5.1.2",
     "react-plotly.js": "2.5.1",
     "react-resizable": "^3.0.4",
     "react-rnd": "^10.1.1",
