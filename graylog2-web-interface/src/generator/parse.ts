@@ -37,6 +37,7 @@ const typeMappings = {
   DateTime: 'string',
   ChunkedOutput: 'unknown',
   ZonedDateTime: 'string',
+  Void: 'void',
 };
 const isPrimitiveType = (type: RawType): type is PrimitiveType => ('type' in type && Object.keys(primitiveTypeMappings).includes(type.type));
 const mapPrimitiveType = (type: keyof typeof primitiveTypeMappings) => primitiveTypeMappings[type];
