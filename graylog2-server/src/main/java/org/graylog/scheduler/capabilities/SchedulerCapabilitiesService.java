@@ -25,15 +25,15 @@ import java.util.stream.Collectors;
  * These will be matched against the constraints of JobTriggers
  */
 public class SchedulerCapabilitiesService {
-    private final Set<SchedulerCapabilities> jobConstraints;
+    private final Set<SchedulerCapabilities> schedulerCapabilities;
 
     @Inject
-    public SchedulerCapabilitiesService(Set<SchedulerCapabilities> jobConstraints) {
-        this.jobConstraints = jobConstraints;
+    public SchedulerCapabilitiesService(Set<SchedulerCapabilities> schedulerCapabilities) {
+        this.schedulerCapabilities = schedulerCapabilities;
     }
 
     public Set<String> getJobCapabilities() {
         // TODO cache results? Currently the operations are rather cheap
-        return jobConstraints.stream().flatMap(s -> s.getNodeCapabilities().stream()).collect(Collectors.toSet());
+        return schedulerCapabilities.stream().flatMap(s -> s.getNodeCapabilities().stream()).collect(Collectors.toSet());
     }
 }
