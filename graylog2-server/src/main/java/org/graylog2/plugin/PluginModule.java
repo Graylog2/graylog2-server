@@ -36,7 +36,7 @@ import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
 import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.JobTriggerData;
-import org.graylog.scheduler.constraints.JobConstraints;
+import org.graylog.scheduler.capabilities.SchedulerCapabilities;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendConfig;
 import org.graylog2.audit.AuditEventType;
@@ -391,10 +391,10 @@ public abstract class PluginModule extends Graylog2Module {
         clusterConfigMapBinder().addBinding(configClass).to(configValidatorClass);
     }
 
-    protected Multibinder<JobConstraints> jobConstraintsBinder() {
-        return Multibinder.newSetBinder(binder(), JobConstraints.class);
+    protected Multibinder<SchedulerCapabilities> jobConstraintsBinder() {
+        return Multibinder.newSetBinder(binder(), SchedulerCapabilities.class);
     }
-    protected void addJobConstraints(Class<? extends JobConstraints> jobConstraintsClass) {
+    protected void addJobConstraints(Class<? extends SchedulerCapabilities> jobConstraintsClass) {
         jobConstraintsBinder().addBinding().to(jobConstraintsClass);
     }
 }

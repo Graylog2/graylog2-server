@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.scheduler.constraints;
+package org.graylog.scheduler.capabilities;
 
 import org.graylog2.plugin.PluginModule;
 
-public class ServerJobConstraintsModule extends PluginModule {
+public class ServerNodeCapabilitiesModule extends PluginModule {
     @Override
     protected void configure() {
-        addJobConstraints(ServerNodeJobConstraints.class);
+        addJobConstraints(ServerNodeSchedulerCapabilities.class);
     }
 }

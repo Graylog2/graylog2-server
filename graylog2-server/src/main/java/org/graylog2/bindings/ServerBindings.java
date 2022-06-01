@@ -23,7 +23,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
-import org.graylog.scheduler.constraints.ServerJobConstraintsModule;
+import org.graylog.scheduler.capabilities.ServerNodeCapabilitiesModule;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.EmailRecipients;
@@ -133,7 +133,7 @@ public class ServerBindings extends Graylog2Module {
         } else {
             install(new LeaderElectionModule(configuration));
         }
-        install(new ServerJobConstraintsModule());
+        install(new ServerNodeCapabilitiesModule());
 
         // Just to create the binders so they are present in the injector. Prevents a server startup error when no
         // outputs are bound that implement MessageOutput.Factory2.

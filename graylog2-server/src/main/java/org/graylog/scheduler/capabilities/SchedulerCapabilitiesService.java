@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.scheduler.constraints;
+package org.graylog.scheduler.capabilities;
 
 import javax.inject.Inject;
 import java.util.Set;
@@ -24,15 +24,16 @@ import java.util.stream.Collectors;
  * Builds the current Set of capabilities this node provides.
  * These will be matched against the constraints of JobTriggers
  */
-public class JobConstraintsService {
-    private final Set<JobConstraints> jobConstraints;
+public class SchedulerCapabilitiesService {
+    private final Set<SchedulerCapabilities> jobConstraints;
 
     @Inject
-    public JobConstraintsService(Set<JobConstraints> jobConstraints) {
+    public SchedulerCapabilitiesService(Set<SchedulerCapabilities> jobConstraints) {
         this.jobConstraints = jobConstraints;
     }
 
     public Set<String> getJobCapabilities() {
+        // TODO cache results? Currently the operations are rather cheap
         return jobConstraints.stream().flatMap(s -> s.getNodeCapabilities().stream()).collect(Collectors.toSet());
     }
 }

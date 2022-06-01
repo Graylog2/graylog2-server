@@ -37,8 +37,8 @@ public class MongoQueryUtils {
     // With e.g. PostgreSQL this would have been a simple '[ A,B,C ] @> [ A,B ]' query.
     // Instead we have to expand this query manually, into each possible combination. ¯\_(ツ)_/¯
     // Furthermore, MongoDB does not provide an exact "$all" query that ignores the order,
-    // but only matches exactly (╯°□°）╯︵ ┻━┻ This needs to be checked with an additional "$size"
-    // query.
+    // but matches exactly (╯°□°）╯︵ ┻━┻
+    // This needs to be checked with an additional "$size" query.
     // And finally, "$all" does not work with an empty array. This needs to be compared with "$eq"
     //
     // So checking whether [A,B,C] is contained will need the following query:
@@ -53,6 +53,8 @@ public class MongoQueryUtils {
     //   { "$and" : [ { "constraints" : { "$all" : [ C ] } }, { "constraints" : { "$size" : 1 } } ] }
     //   ] }
     //
+    // TODO Once we can assume to run on a non-EOL MongoDB version (>=4.2) this can probably
+    // TODO be replaced with an update inside an aggregation which uses the "$setIsSubset" operator.
     public static DBQuery.Query getArrayIsContainedQuery(String fieldName, Set<String> queryInput) {
         final DBQuery.Query[] expressions = getQueryCombinations(queryInput).stream().map(subset -> {
             if (subset.size() == 0) {

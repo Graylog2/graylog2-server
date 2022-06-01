@@ -14,18 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.scheduler.constraints;
+package org.graylog.scheduler.capabilities;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.cluster.leader.LeaderElectionService;
 
+import javax.inject.Inject;
 import java.util.Set;
 
-public interface JobConstraints {
-    /**
-     * Returns the current capabilities of this node
-     * @return the Set of provided capabilities
-     */
-    default Set<String> getNodeCapabilities() {
+public class ServerNodeSchedulerCapabilities implements SchedulerCapabilities {
+
+    public static final String IS_LEADER = "IS_LEADER";
+    private LeaderElectionService leaderElectionService;
+
+    @Inject
+    public ServerNodeSchedulerCapabilities(LeaderElectionService leaderElectionService) {
+        this.leaderElectionService = leaderElectionService;
+    }
+
+    @Override
+    public Set<String> getNodeCapabilities() {
+        if (leaderElectionService.isLeader()) {
+            return ImmutableSet.of(IS_LEADER);
+        }
         return ImmutableSet.of();
     }
 }

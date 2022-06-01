@@ -23,7 +23,7 @@ import com.mongodb.BasicDBObject;
 import one.util.streamex.StreamEx;
 import org.bson.types.ObjectId;
 import org.graylog.scheduler.clock.JobSchedulerClock;
-import org.graylog.scheduler.constraints.JobConstraintsService;
+import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -74,7 +74,7 @@ public class DBJobTriggerService {
     private final String nodeId;
     private final JacksonDBCollection<JobTriggerDto, ObjectId> db;
     private final JobSchedulerClock clock;
-    private final JobConstraintsService jobConstraintsService;
+    private final SchedulerCapabilitiesService schedulerCapabilitiesService;
     private final Duration lockExpirationDuration;
 
     @Inject
@@ -82,11 +82,11 @@ public class DBJobTriggerService {
                                MongoJackObjectMapperProvider mapper,
                                NodeId nodeId,
                                JobSchedulerClock clock,
-                               JobConstraintsService jobConstraintsService,
+                               SchedulerCapabilitiesService schedulerCapabilitiesService,
                                @Named(LOCK_EXPIRATION_DURATION) Duration lockExpirationDuration) {
         this.nodeId = nodeId.toString();
         this.clock = clock;
-        this.jobConstraintsService = jobConstraintsService;
+        this.schedulerCapabilitiesService = schedulerCapabilitiesService;
         this.lockExpirationDuration = lockExpirationDuration;
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 JobTriggerDto.class,
@@ -316,8 +316,7 @@ public class DBJobTriggerService {
     public Optional<JobTriggerDto> nextRunnableTrigger() {
         final DateTime now = clock.nowUTC();
 
-        // TODO add cache?
-        final Query constraintsQuery = MongoQueryUtils.getArrayIsContainedQuery(FIELD_CONSTRAINTS, jobConstraintsService.getJobCapabilities());
+        final Query constraintsQuery = MongoQueryUtils.getArrayIsContainedQuery(FIELD_CONSTRAINTS, schedulerCapabilitiesService.getJobCapabilities());
 
         final Query query = DBQuery.or(DBQuery.and(
                         // We cannot lock a trigger that is already locked by another node
