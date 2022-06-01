@@ -139,7 +139,7 @@ public class ContainerMatrixClassSelectorResolver implements SelectorResolver {
 
     private boolean preImportLicense(Class<?> aClass) {
         Optional<ContainerMatrixTestsConfiguration> annotation = AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class);
-        return annotation.isPresent() ? annotation.get().preImportLicense() : ContainerMatrixTestsConfiguration.defaultPreImportLicense;
+        return annotation.isPresent() ? annotation.get().importLicenses() : ContainerMatrixTestsConfiguration.defaultImportLicenses;
     }
 
     private ClassBasedTestDescriptor newClassTestDescriptor(TestDescriptor parent, Class<?> testClass) {

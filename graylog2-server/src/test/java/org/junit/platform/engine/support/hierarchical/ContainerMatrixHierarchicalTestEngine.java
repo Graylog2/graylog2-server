@@ -76,7 +76,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                 MavenProjectDirProvider mavenProjectDirProvider = instantiateFactory(containerMatrixTestsDescriptor.getMavenProjectDirProvider());
 
                 if (Lifecycle.VM.equals(containerMatrixTestsDescriptor.getLifecycle())) {
-                    try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(esVersion, mongoVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, ContainerMatrixTestsConfiguration.defaultPreImportLicense)) {
+                    try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(esVersion, mongoVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, ContainerMatrixTestsConfiguration.defaultImportLicenses)) {
                         RequestSpecification specification = requestSpec(backend);
                         this.execute(request, ((ContainerMatrixTestsDescriptor) descriptor).getChildren(), backend, specification);
                     } catch (Exception exception) {
@@ -85,7 +85,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                 } else if (Lifecycle.CLASS.equals(containerMatrixTestsDescriptor.getLifecycle())) {
                     for (TestDescriptor td : containerMatrixTestsDescriptor.getChildren()) {
                         List<URL> fixtures = mongoDBFixtures;
-                        boolean preImportLicense = ContainerMatrixTestsConfiguration.defaultPreImportLicense;
+                        boolean preImportLicense = ContainerMatrixTestsConfiguration.defaultImportLicenses;
                         if (td instanceof ContainerMatrixTestClassDescriptor) {
                             fixtures = ((ContainerMatrixTestClassDescriptor) td).getMongoFixtures();
                             preImportLicense = ((ContainerMatrixTestClassDescriptor) td).isPreImportLicense();
