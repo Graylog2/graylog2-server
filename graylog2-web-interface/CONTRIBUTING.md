@@ -3,7 +3,6 @@
 Please follow [the instructions on graylog.org](https://www.graylog.org/get-involved/).
 
 ## Code of Conduct
-
 In the interest of fostering an open and welcoming environment, we as
 contributors and maintainers pledge to making participation in our project and
 our community a harassment-free experience for everyone, regardless of age, body
@@ -17,32 +16,29 @@ Please read and understand the [Code of Conduct](https://github.com/Graylog2/gra
 
 ### Code Style
 We use ESLint to detect some issues in our code. We mostly follow the [Airbnb Javascript style guide](https://github.com/airbnb/javascript) to write frontend code,
-with a few exceptions that we list here: You can take a look at the ESLint rules we use in [our repository](https://raw.githubusercontent.com/Graylog2/graylog2-server/master/graylog2-web-interface/packages/eslint-config-graylog/index.js).
+with a few exceptions. We maintain those custom rules in a package, which is part of [our graylog2-server repository](https://raw.githubusercontent.com/Graylog2/graylog2-server/master/graylog2-web-interface/packages/eslint-config-graylog/index.js).
 
 #### Naming
-_Function Naming_ 
-
-- When a function is only getting used inside a JavaScript class, start its name with an underscore, like `_myPrivateFunction`.
-It has no technical effect, but is good way to describe a functions intention.
+_Function Naming_
 - Generally use a verb as a function name.
 
 _Class Naming_
 
-Generally use a noun as a class name
+- Generally use a noun as a class name
 
 #### Class vs functional components
 Small components should be functional components. When a component is more complex, you can decide which type of component
-you want to use (class or a functional component with react hooks). When you don’t have a preference, use react hooks.
+you want to use (class or a functional component with react hooks). When you don’t have a preference, use a functional component.
 
 #### Type definitions
 We use TypeScript for new components, and we also define `PropType` definitions. Static types add better type support for the development,
 integrating with your IDE, while `PropType` definitions are present at runtime.
 
-#### Testing
-
+### Testing
 - When adding new functionality, try to write unit tests for every possible use case. If you are not sure where to start, try to test what is important for the user.
-- Currently, we have nearly only unit tests, but want to add more integration tests in the future. You can find examples for an integration test in src/views/spec 
-- When writing a new component test you can decide between the test utilities from @testing-library/react and enzyme. We do favor testing-library for new tests, as it has been proven that it results in more reliable tests. You should not use both libraries in one file.
+- Currently, we have nearly only unit tests, but want to add more integration tests in the future. You can find examples for an integration test in `src/views/spec` 
+- There are still some tests, which implement enzyme, but we are only using @testing-library/react for new tests. 
+  We do favor testing-library for new tests, as it has been proven that it results in more reliable tests. You should not use both libraries in one file. 
 - Test files should be on the same level 
   - ComponentA.jsx 
   - ComponentA.test.jsx 
@@ -53,10 +49,9 @@ integrating with your IDE, while `PropType` definitions are present at runtime.
   - __tests__/ComponentA.text.case1.result.json
 
 #### Imports
-
 _ES6 modules_
 
-Prefer ES6 modules (import and export) over a non-standard module system and CommonJS’s require.
+- Prefer ES6 modules (import and export) over a non-standard module system and CommonJS’s require.
 
 _Modules_
 
@@ -66,8 +61,8 @@ _Modules_
   - The downside of this is that it might introduce cyclic dependencies (which can be resolved by babel/webpack by proxying, but should be avoided)
 
 #### Injecting stores
-
-When writing new code, you should prefer injecting stores into your components with CombinedProvider instead of using StoreProvider and ActionsProvider. The *Providers use a registration system using a key in the window object to ensure that stores are loaded and initialized only once (making them effectively singletons) across core & plugins.
+When writing new code, you should prefer injecting stores into your components with CombinedProvider instead of using StoreProvider
+and ActionsProvider. The *Providers use a registration system using a key in the window object to ensure that stores are loaded and initialized only once (making them effectively singletons) across core & plugins.
 Newer code (views) is testing a different approach: Instead of importing stores differently, it uses a `singleton()` wrapper that exports stores while tracking them centrally. The benefit is that:
 - Tracking usages of stores across the code base & refactoring support of your favorite IDE still works
 - (Re-)Moving a store that is still in use will fail at compile time, not at runtime
@@ -80,7 +75,7 @@ Newer code (views) is testing a different approach: Instead of importing stores 
 #### Good to know / gotchas
 _Default Values_
 - Using if and an assignment or the logical or assignment, you may end up assigning a default value when you didn’t want to do it, e.g.
-```
+```js
 const a = undefined || 'default';
 const b = null || 'default';
 const c = false || 'default';
@@ -89,7 +84,7 @@ const e = '' || 'default';
 // They will all contain the 'default' value.
 ```
 - Using default values on functions and destructuring only assigns default values when initial value was `undefined`, e.g.
-```
+```js
 const testDefaultValues = ({ value1 = 12, value2 = 34 }) => {
   console.log(value1, value2);
 }
@@ -97,6 +92,15 @@ testDefaultValues({ value1: undefined, value2: null })
 // Output: 12, null
 ```
 - With the introduction of support for nullish coalescing, we should use ?? for default values:
+```js
+// These will contain 'default
+const a = undefined ?? 'default'
+const b = null ?? 'default'
+// These will contain the original value
+const c = false ?? 'default'
+const d = 0 ?? 'default'
+const e = '' ?? 'default'
+```
 
 ### UI Styling
 
@@ -121,7 +125,7 @@ testDefaultValues({ value1: undefined, value2: null })
 - Avoid using `link` buttons, since that is considered misleading. Buttons and anchors have different purposes and usability, so we should try to use anchors only to navigate.
 
 #### Page loading indicator
-- Use an Spinner whenever a page is loading data from the backend.
+- Use a `Spinner` whenever a page is loading data from the backend.
 - We are working on different levels of loading indicators.
 
 ## Reusing components
@@ -138,10 +142,10 @@ testDefaultValues({ value1: undefined, value2: null })
 - When making changes closer to a release or working on changes that will be backported, please consider the risk of doing the refactoring of fixing linter errors now. If it feels too risky or there are too many changes, it may be a sign that the refactoring should wait.
 
 ## Internal packages
-We currently have three internal packages, used for the core application and all plug-ins:
+We currently have a few internal packages, used for the core application and all plug-ins:
 - graylog-web-plugin contains common packages for both the core and plug-ins, webpack configuration for building plug-ins, as well as some interfaces to register and consume plugins.
 - eslint-config-graylog contains our custom linter configuration, based on eslint-config-airbnb.
-- jest-preset-graylog contains common packages and a shared config for jest, the test runner
-  
+- stylelint-config-graylog contains our custom stylelint configuration, based on the default stylelint config.
+
 ## Browser compatibility
 We currently do not have a pre release process to test different or old browser. Nevertheless you should test layout changes in at least all modern browsers (Chrome, Firefox, Safari). Bigger layout changes should also be tested in older browsers. Have a look at our public browser compatibility list.
