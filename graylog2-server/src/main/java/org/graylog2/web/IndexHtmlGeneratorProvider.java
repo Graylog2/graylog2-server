@@ -16,12 +16,17 @@
  */
 package org.graylog2.web;
 
+import com.google.common.base.Suppliers;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
+import java.util.function.Supplier;
 
+@Singleton
 public class IndexHtmlGeneratorProvider implements Provider<IndexHtmlGenerator> {
-    private final Provider<? extends IndexHtmlGenerator> indexHtmlGeneratorProvider;
+    private final Supplier<IndexHtmlGenerator> indexHtmlGeneratorSupplier;
 
     @Inject
     public IndexHtmlGeneratorProvider(Provider<DevelopmentIndexHtmlGenerator> developmentIndexHtmlGeneratorProvider,
@@ -30,13 +35,15 @@ public class IndexHtmlGeneratorProvider implements Provider<IndexHtmlGenerator> 
         // In development mode we use an external process to provide the web interface.
         // To avoid errors because of missing production web assets, we use a different implementation for
         // generating the "index.html" page.
-        this.indexHtmlGeneratorProvider = isDevelopmentServer
+        final Provider<? extends IndexHtmlGenerator> indexHtmlGeneratorProvider = isDevelopmentServer
                 ? developmentIndexHtmlGeneratorProvider
                 : productionIndexHtmlGeneratorProvider;
+
+        this.indexHtmlGeneratorSupplier = Suppliers.memoize(indexHtmlGeneratorProvider::get);
     }
 
     @Override
     public IndexHtmlGenerator get() {
-        return indexHtmlGeneratorProvider.get();
+        return this.indexHtmlGeneratorSupplier.get();
     }
 }

@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.constraints;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.contentpacks.model.constraints.Constraint;
+import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
 import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
 import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
 import org.graylog2.plugin.PluginMetaData;
@@ -64,7 +65,39 @@ public class PluginVersionConstraintCheckerTest {
         assertThat(constraintChecker.checkConstraints(requiredConstraints).stream().allMatch(c -> !c.fulfilled())).isTrue();
     }
 
+    @Test
+    public void checkSnapshotVersionOfPlugin() {
+        // create a plugin metadata with -SNAPSHOT version
+        final TestPluginMetaData pluginMetaData = new TestPluginMetaData(Version.from(4, 4, 0, "SNAPSHOT"));
+
+        // require a version the same number, but ignore the -SNAPSHOT suffix
+        final PluginVersionConstraint pluginVersionConstraint = PluginVersionConstraint.builder()
+                .pluginId("unique-id")
+                .version(">=4.4.0")
+                .build();
+
+        final PluginVersionConstraintChecker constraintChecker = new PluginVersionConstraintChecker(Collections.singleton(pluginMetaData));
+        final ImmutableSet<Constraint> requiredConstraints = ImmutableSet.of(pluginVersionConstraint);
+
+        // let the checker compute results
+        final Set<ConstraintCheckResult> results = constraintChecker.checkConstraints(requiredConstraints);
+
+        // there should be one element that's fulfilled => -SNAPSHOT version is accepted
+        assertThat(results).hasOnlyOneElementSatisfying(r -> assertThat(r.fulfilled()).isTrue());
+    }
+
     private static final class TestPluginMetaData implements PluginMetaData {
+
+        private final Version version;
+
+        public TestPluginMetaData() {
+            this.version = Version.from(1, 2, 3);
+        }
+
+        public TestPluginMetaData(Version version) {
+            this.version = version;
+        }
+
         @Override
         public String getUniqueId() {
             return "unique-id";
@@ -87,7 +120,7 @@ public class PluginVersionConstraintCheckerTest {
 
         @Override
         public Version getVersion() {
-            return Version.from(1, 2, 3);
+            return version;
         }
 
         @Override

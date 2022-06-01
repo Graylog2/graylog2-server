@@ -17,9 +17,11 @@
 import { capitalize } from 'lodash';
 
 import { widgetDefinition } from 'views/logic/Widgets';
+import type Widget from 'views/logic/widgets/Widget';
 
 interface WidgetLike {
   type: string;
+  config: Widget['config'];
 }
 
 const defaultTitleGenerator = ({ type }: WidgetLike) => `Untitled ${type.replace('_', ' ').split(' ').map(capitalize).join(' ')}`;

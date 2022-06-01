@@ -17,10 +17,6 @@
 package org.graylog.testing.completebackend;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import io.restassured.RestAssured;
-import io.restassured.config.FailureConfig;
-import io.restassured.config.RestAssuredConfig;
-import io.restassured.listener.ResponseValidationFailureListener;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog.testing.graylognode.ExecutableNotFoundException;
@@ -50,16 +46,18 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
 
     public static ContainerizedGraylogBackend createStarted(SearchVersion esVersion, MongodbServer mongodbVersion,
                                                             int[] extraPorts, List<URL> mongoDBFixtures,
-                                                            PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider) {
+                                                            PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider,
+                                                            List<String> enabledFeatureFlags) {
 
         final ContainerizedGraylogBackend backend = new ContainerizedGraylogBackend();
-        backend.create(esVersion, mongodbVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider);
+        backend.create(esVersion, mongodbVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags);
         return backend;
     }
 
     private void create(SearchVersion esVersion, MongodbServer mongodbVersion,
                         int[] extraPorts, List<URL> mongoDBFixtures,
-                        PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider) {
+                        PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider,
+                        List<String> enabledFeatureFlags) {
 
         final SearchServerInstanceFactory searchServerInstanceFactory = new SearchServerInstanceFactoryByVersion(esVersion);
         Network network = Network.newNetwork();
@@ -78,7 +76,8 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                     esInstance.internalUri(),
                     esInstance.version(),
                     extraPorts,
-                    pluginJarsProvider, mavenProjectDirProvider);
+                    pluginJarsProvider, mavenProjectDirProvider,
+                    enabledFeatureFlags);
             this.network = network;
             this.searchServer = esInstance;
             this.mongodb = mongoDB;
@@ -128,6 +127,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         return node.apiPort();
     }
 
+    @Override
     public String getLogs() {
         return node.getLogs();
     }
