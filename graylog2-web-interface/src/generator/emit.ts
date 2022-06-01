@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as ts from 'typescript';
-import { chunk } from 'lodash';
+import { chunk, uniq } from 'lodash';
 
 import type { Api, Route, Operation, Parameter, Type, EnumType, TypeLiteral, Model } from 'generator/Api';
 
@@ -366,9 +366,45 @@ function emitSummary(apis: Array<Api>) {
   return printer.printList(ts.ListFormat.MultiLine, reexports, packageIndexFile);
 }
 
+const referencedTypes = (type: Type): Array<string> => {
+  if (!type) {
+    return [];
+  }
+  switch (type.type) {
+    case 'type_reference': return [type.name];
+    case 'type_literal': return type.properties
+      ? [ ...Object.values(type.properties).flatMap(referencedTypes),
+        ...referencedTypes(type.additionalProperties)]
+      : [];
+    case 'enum': return [];
+    case 'array': return referencedTypes(type.items);
+    default: assertUnreachable(type, 'Missing type.');
+  }
+
+  return [];
+};
+
+const isPrimitiveType = (typeName: string) => ['string', 'unknown', 'boolean', 'void', 'number', 'any'].includes(typeName);
+
+const usedModels = ({ models, routes }: Api) => {
+  const typesFromModels = Object.values(models)
+    .flatMap(referencedTypes);
+
+  const routeModels = routes.flatMap((route) => route.operations)
+    .flatMap((operation) => [
+      ...operation.parameters.flatMap(parameter => referencedTypes(parameter.type)),
+      ...referencedTypes(operation.type)
+    ]);
+
+  return uniq([...typesFromModels, ...routeModels]).filter((typeName) => !isPrimitiveType(typeName));
+}
+
 function emitApi({ name, models, routes }: Api) {
+  const modelsInUse = usedModels({ name, models, routes });
+
   const emittedModels = Object.entries(models)
     .filter(isNotBannedModel)
+    .filter(([modelName]) => modelsInUse.includes(modelName))
     .map(emitModel);
 
   const apiObject = emitApiObject(routes);
