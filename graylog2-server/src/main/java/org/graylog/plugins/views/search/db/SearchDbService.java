@@ -106,7 +106,13 @@ public class SearchDbService {
         );
     }
 
-    public void delete(String id) {
+    /**
+     * Searches should only be deleted directly by {@link SearchesCleanUpJob} if they are no longer referenced
+     * by any views. Do not directly delete searches when deleting views. The searches might still be referenced by
+     * other view copies (until those copies are modified, at which time a new search would be created).
+     * @param id A Search ID.
+     */
+    void delete(String id) {
         db.removeById(new ObjectId(id));
     }
 
