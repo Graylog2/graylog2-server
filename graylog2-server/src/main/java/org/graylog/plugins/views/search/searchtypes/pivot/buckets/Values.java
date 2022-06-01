@@ -35,6 +35,7 @@ public abstract class Values implements BucketSpec {
     @Override
     public abstract String type();
 
+    @Override
     @JsonProperty
     public abstract String field();
 

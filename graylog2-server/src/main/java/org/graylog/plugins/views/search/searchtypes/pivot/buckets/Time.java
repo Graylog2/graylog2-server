@@ -34,6 +34,7 @@ public abstract class Time implements BucketSpec {
     @Override
     public abstract String type();
 
+    @Override
     @JsonProperty
     public abstract String field();
 
