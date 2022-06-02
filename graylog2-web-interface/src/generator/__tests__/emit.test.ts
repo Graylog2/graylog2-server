@@ -86,7 +86,27 @@ export function bulkUpdatePatternsFromTextFile(importStrategy?: 'ABORT_ON_CONFLI
   it('emits proper indexer signatures for collection-types', () => {
     const api = {
       name: 'sample',
-      routes: [],
+      routes: [
+        {
+          path: '/sample',
+          operations: [
+            {
+              method: 'POST' as const,
+              summary: 'A sample operation',
+              nickname: 'sample',
+              type: {
+                type: 'type_reference' as const,
+                name: 'AvailableOutputSummaryMapMap',
+                optional: false,
+              },
+              parameters: [],
+              produces: [
+                'application/json' as const,
+              ],
+            },
+          ],
+        },
+      ],
       models: {
         AvailableOutputSummaryMapMap: {
           type: 'type_literal' as const,
@@ -109,6 +129,14 @@ Array [
     "sample": "import __request__ from 'routing/request';
 interface AvailableOutputSummaryMapMap {
     readonly [_key: string]: AvailableOutputSummaryMap;
+}
+/**
+ * A sample operation
+ */
+export function sample(): Promise<AvailableOutputSummaryMapMap> {
+    return __request__('POST', '/sample', null, {}, {
+        'Accept': ['application/json']
+    });
 }
 ",
   },
