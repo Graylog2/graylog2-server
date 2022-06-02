@@ -42,15 +42,25 @@ public interface BucketSpec extends PivotSpec {
     @JsonProperty
     String type();
 
+    @JsonProperty
+    String field();
+
     @JsonAutoDetect
     class Fallback implements BucketSpec {
         @JsonProperty
         private String type;
+        @JsonProperty
+        private String field;
         private Map<String, Object> props = Maps.newHashMap();
 
         @Override
         public String type() {
             return type;
+        }
+
+        @Override
+        public String field() {
+            return field;
         }
 
         @JsonAnySetter
@@ -73,13 +83,14 @@ public interface BucketSpec extends PivotSpec {
             }
             Fallback fallback = (Fallback) o;
             return Objects.equals(type, fallback.type) &&
+                    Objects.equals(field, fallback.field) &&
                     Objects.equals(props, fallback.props);
         }
 
         @Override
         public int hashCode() {
 
-            return Objects.hash(type, props);
+            return Objects.hash(type, field, props);
         }
     }
 }
