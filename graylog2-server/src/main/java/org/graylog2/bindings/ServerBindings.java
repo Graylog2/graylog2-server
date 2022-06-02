@@ -17,6 +17,7 @@
 package org.graylog2.bindings;
 
 import com.floreysoft.jmte.Engine;
+import com.floreysoft.jmte.NamedRenderer;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
@@ -33,6 +34,7 @@ import org.graylog2.bindings.providers.DefaultStreamProvider;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
+import org.graylog2.bindings.providers.JmteEngineProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
@@ -168,7 +170,8 @@ public class ServerBindings extends Graylog2Module {
         bind(ClusterStatsModule.class).asEagerSingleton();
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
         bind(GrokPatternRegistry.class).in(Scopes.SINGLETON);
-        bind(Engine.class).toInstance(Engine.createEngine());
+        Multibinder.newSetBinder(binder(), NamedRenderer.class);
+        bind(Engine.class).toProvider(JmteEngineProvider.class).asEagerSingleton();
         bind(ErrorPageGenerator.class).to(GraylogErrorPageGenerator.class).asEagerSingleton();
     }
 
