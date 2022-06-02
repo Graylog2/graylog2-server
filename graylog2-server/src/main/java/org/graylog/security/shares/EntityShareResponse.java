@@ -44,6 +44,9 @@ public abstract class EntityShareResponse {
     @JsonProperty("available_grantees")
     public abstract ImmutableSet<Grantee> availableGrantees();
 
+    @JsonProperty("selectable_grantees")
+    public abstract ImmutableSet<Grantee> selectableGrantees();
+
     @JsonProperty("available_capabilities")
     public abstract ImmutableSet<AvailableCapability> availableCapabilities();
 
@@ -82,6 +85,9 @@ public abstract class EntityShareResponse {
 
         @JsonProperty("available_grantees")
         public abstract Builder availableGrantees(Set<Grantee> availableGrantees);
+
+        @JsonProperty("selectable_grantees")
+        public abstract Builder selectableGrantees(Set<Grantee> selectableGrantees);
 
         @JsonProperty("available_capabilities")
         public abstract Builder availableCapabilities(Set<AvailableCapability> availableCapabilities);

@@ -59,6 +59,18 @@ public class DefaultGranteeService implements GranteeService {
     }
 
     @Override
+    public ImmutableSet<Grantee> getSelectableGrantees(Set<Grantee> availableGrantees) {
+        final UserAndTeamsConfig config = clusterConfigService.getOrDefault(UserAndTeamsConfig.class, UserAndTeamsConfig.DEFAULT_VALUES);
+        return availableGrantees.stream().filter(grantee -> isAllowedType(config, grantee)).collect(ImmutableSet.toImmutableSet());
+    }
+
+    private boolean isAllowedType(UserAndTeamsConfig config, Grantee grantee) {
+        final boolean notPermittedGlobal = !config.sharingWithEveryone() && Grantee.GRANTEE_TYPE_GLOBAL.equals(grantee.type());
+        final boolean notPermittedUser = !config.sharingWithUsers() && Grantee.GRANTEE_TYPE_USER.equals(grantee.type());
+        return !notPermittedGlobal && !notPermittedUser;
+    }
+
+    @Override
     public Set<GRN> getGranteeAliases(GRN grantee) {
         return Collections.singleton(grantee);
     }

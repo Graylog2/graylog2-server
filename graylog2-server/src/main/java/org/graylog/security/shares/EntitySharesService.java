@@ -96,12 +96,14 @@ public class EntitySharesService {
 
         final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
         final Set<Grantee> availableGrantees = granteeService.getAvailableGrantees(sharingUser);
+        final Set<Grantee> selectableGrantees = granteeService.getSelectableGrantees(availableGrantees);
         final Set<GRN> availableGranteeGRNs = availableGrantees.stream().map(Grantee::grn).collect(Collectors.toSet());
         final ImmutableSet<ActiveShare> activeShares = getActiveShares(ownedEntity, sharingUser, availableGranteeGRNs);
         return EntityShareResponse.builder()
                 .entity(ownedEntity.toString())
                 .sharingUser(sharingUserGRN)
                 .availableGrantees(availableGrantees)
+                .selectableGrantees(selectableGrantees)
                 .availableCapabilities(getAvailableCapabilities())
                 .activeShares(activeShares)
                 .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))

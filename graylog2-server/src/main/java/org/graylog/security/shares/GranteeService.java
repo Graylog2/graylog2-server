@@ -24,6 +24,8 @@ import java.util.Set;
 public interface GranteeService {
     Set<Grantee> getAvailableGrantees(User sharingUser);
 
+    Set<Grantee> getSelectableGrantees(Set<Grantee> availableGrantees);
+
     Set<User> getVisibleUsers(User requestingUser);
 
     Set<GRN> getGranteeAliases(GRN grantee);

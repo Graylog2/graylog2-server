@@ -23,6 +23,10 @@ import org.graylog.grn.GRNRegistry;
 
 @AutoValue
 public abstract class Grantee {
+
+    public static final String GRANTEE_TYPE_GLOBAL = "global";
+    public static final String GRANTEE_TYPE_USER = "user";
+
     @JsonProperty("id")
     public abstract GRN grn();
 
@@ -37,11 +41,11 @@ public abstract class Grantee {
     }
 
     public static Grantee createGlobal() {
-        return create(GRNRegistry.GLOBAL_USER_GRN, "global", "Everyone");
+        return create(GRNRegistry.GLOBAL_USER_GRN, GRANTEE_TYPE_GLOBAL, "Everyone");
     }
 
     public static Grantee createUser(GRN grn, String title) {
-        return create(grn, "user", title);
+        return create(grn, GRANTEE_TYPE_USER, title);
     }
 
 }
