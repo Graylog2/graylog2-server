@@ -98,7 +98,7 @@
     "react-sticky-el": "^2.0.9",
     "react-ultimate-pagination": "^1.2.0",
     "react-window": "^1.8.2",
-    "terser-webpack-plugin": "5.3.1",
+    "terser-webpack-plugin": "5.3.3",
     "toastr": "^2.1.2",
     "twix": "^1.1.4",
     "typeahead.js": "^0.11.1",
