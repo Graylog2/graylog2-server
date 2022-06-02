@@ -33,6 +33,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ServiceLoader;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -104,16 +105,11 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         }
     }
 
-    private void createLicenses(MongoDBInstance mongoDBInstance, String... licenseStrs) {
-        try {
-            final List<String> licenses = Arrays.stream(licenseStrs).map(System::getenv).filter(p -> StringUtils.isNotBlank(p)).collect(Collectors.toList());
-            if(!licenses.isEmpty()) {
-                Class myClass = Class.forName("testing.completebackend.EnterpriseITUtils");
-                Method method = myClass.getDeclaredMethod("importLicenses", MongoDBInstance.class, List.class);
-                method.invoke(null, mongoDBInstance, licenses);
-            }
-        } catch (NoSuchMethodException | ClassNotFoundException | InvocationTargetException | IllegalAccessException ex) {
-            LOG.error("Could not import license to Mongo: ", ex);
+    private void createLicenses(final MongoDBInstance mongoDBInstance, final String... licenseStrs) {
+        final List<String> licenses = Arrays.stream(licenseStrs).map(System::getenv).filter(p -> StringUtils.isNotBlank(p)).collect(Collectors.toList());
+        if(!licenses.isEmpty()) {
+            ServiceLoader<TestLicenseImporter> loader = ServiceLoader.load(TestLicenseImporter.class);
+            loader.forEach(importer -> importer.importLicenses(mongoDBInstance, licenses));
         }
     }
 
