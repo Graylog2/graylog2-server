@@ -46,28 +46,23 @@ public class MaxMindIpLocationResolver extends MaxMindIpResolver<GeoLocationInfo
     @Override
     public Optional<GeoLocationInformation> doGetGeoIpData(InetAddress address) {
 
-        GeoLocationInformation info;
+        Optional<GeoLocationInformation> info;
         try (Timer.Context ignored = resolveTime.time()) {
             final CityResponse response = databaseReader.city(address);
             final Location location = response.getLocation();
             final Country country = response.getCountry();
             final City city = response.getCity();
 
-            info = GeoLocationInformation.create(
-                    location.getLatitude(), location.getLongitude(),
-                    country.getGeoNameId() == null ? "N/A" : country.getIsoCode(),
-                    country.getGeoNameId() == null ? "N/A" : country.getName(),
-                    city.getGeoNameId() == null ? "N/A" : city.getName(),// calling to .getName() may throw a NPE
-                    "N/A",
-                    "N/A");
-        } catch (IOException | GeoIp2Exception | UnsupportedOperationException e) {
-            info = null;
+            GeoLocationInformation gli = GeoLocationInformation.create(location, country, city, "N/A");
+            info = Optional.of(gli);
+        } catch (IOException | GeoIp2Exception | NullPointerException | UnsupportedOperationException e) {
+            info = Optional.empty();
             if (!(e instanceof AddressNotFoundException)) {
                 LOG.debug("Could not get location from IP {}", address.getHostAddress(), e);
                 lastError = e.getMessage();
             }
         }
 
-        return Optional.ofNullable(info);
+        return info;
     }
 }
