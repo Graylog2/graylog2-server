@@ -38,11 +38,23 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter 
     @JsonProperty(QUERY_STRING_FIELD)
     public abstract String queryString();
 
+    @Override
+    @JsonProperty(NEGATION_FIELD)
+    @Nullable
+    public abstract Boolean negation();
+
     @JsonCreator
     @SuppressWarnings("unused")
     public static InlineQueryStringSearchFilter create(@JsonProperty(TITLE_FIELD) final String title,
                                                        @JsonProperty(DESCRIPTION_FIELD) final String description,
+                                                       @JsonProperty(QUERY_STRING_FIELD) final String queryString,
+                                                       @JsonProperty(NEGATION_FIELD) final Boolean negation) {
+        return new AutoValue_InlineQueryStringSearchFilter(title, description, queryString, negation);
+    }
+
+    public static InlineQueryStringSearchFilter create(@JsonProperty(TITLE_FIELD) final String title,
+                                                       @JsonProperty(DESCRIPTION_FIELD) final String description,
                                                        @JsonProperty(QUERY_STRING_FIELD) final String queryString) {
-        return new AutoValue_InlineQueryStringSearchFilter(title, description, queryString);
+        return new AutoValue_InlineQueryStringSearchFilter(title, description, queryString, null);
     }
 }
