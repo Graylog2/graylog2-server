@@ -29,8 +29,7 @@ const OPTIONS = [
 describe('Autocomplete component', () => {
   it('should render the field with a label', async () => {
     const { getByText, baseElement } = render(
-      <Formik initialValues={{ value: 'Verde', label: 'Green' }}
-              onSubmit={(e) => console.log(e)}>
+      <Formik initialValues={{ value: 'Verde', label: 'Green' }} onSubmit={() => null}>
         <Autocomplete fieldName="spaColor"
                       label="Color translator"
                       helpText="Choose a color"
@@ -51,8 +50,7 @@ describe('Autocomplete component', () => {
 
   it('should let the user type', async () => {
     const { baseElement } = render(
-      <Formik initialValues={{ value: 'Verde', label: 'Green' }}
-              onSubmit={(e) => console.log(e)}>
+      <Formik initialValues={{ value: 'Verde', label: 'Green' }} onSubmit={() => null}>
         <Autocomplete fieldName="spaColor"
                       label="Color translator"
                       helpText="Choose a color"
@@ -66,8 +64,7 @@ describe('Autocomplete component', () => {
 
   it('should show a list with options', async () => {
     const { baseElement } = render(
-      <Formik initialValues={{ value: 'Verde', label: 'Green' }}
-              onSubmit={(e) => console.log(e)}>
+      <Formik initialValues={{ value: 'Verde', label: 'Green' }} onSubmit={() => null}>
         <Autocomplete fieldName="spaColor"
                       label="Color translator"
                       helpText="Choose a color"
