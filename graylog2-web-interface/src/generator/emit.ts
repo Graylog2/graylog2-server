@@ -370,11 +370,14 @@ const referencedTypes = (type: Type): Array<string> => {
   if (!type) {
     return [];
   }
+
   switch (type.type) {
     case 'type_reference': return [type.name];
     case 'type_literal': return type.properties
-      ? [ ...Object.values(type.properties).flatMap(referencedTypes),
-        ...referencedTypes(type.additionalProperties)]
+      ? [
+        ...Object.values(type.properties).flatMap(referencedTypes),
+        ...referencedTypes(type.additionalProperties),
+      ]
       : [];
     case 'enum': return [];
     case 'array': return referencedTypes(type.items);
@@ -392,12 +395,12 @@ const usedModels = ({ models, routes }: Api) => {
 
   const routeModels = routes.flatMap((route) => route.operations)
     .flatMap((operation) => [
-      ...operation.parameters.flatMap(parameter => referencedTypes(parameter.type)),
-      ...referencedTypes(operation.type)
+      ...operation.parameters.flatMap((parameter) => referencedTypes(parameter.type)),
+      ...referencedTypes(operation.type),
     ]);
 
   return uniq([...typesFromModels, ...routeModels]).filter((typeName) => !isPrimitiveType(typeName));
-}
+};
 
 function emitApi({ name, models, routes }: Api) {
   const modelsInUse = usedModels({ name, models, routes });
