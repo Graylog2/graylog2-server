@@ -39,6 +39,7 @@ public class PluginVersionConstraintChecker implements ConstraintChecker {
                 .map(PluginMetaData::getVersion)
                 .map(Version::toString)
                 .map(Semver::new)
+                .map(Semver::withClearedSuffixAndBuild)
                 .collect(Collectors.toSet());
     }
 
