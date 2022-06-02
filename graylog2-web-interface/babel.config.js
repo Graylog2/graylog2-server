@@ -16,17 +16,18 @@
  */
 module.exports = {
   presets: [
-    ['@babel/env', {
+    // eslint-disable-next-line global-require
+    [require('@babel/preset-env'), {
       modules: false,
       useBuiltIns: 'entry',
       corejs: '3.9',
+      shippedProposals: true,
     }],
     '@babel/react',
     '@babel/typescript',
   ],
   plugins: [
     '@babel/plugin-syntax-dynamic-import',
-    '@babel/plugin-proposal-class-properties',
     'babel-plugin-styled-components',
   ],
   env: {
