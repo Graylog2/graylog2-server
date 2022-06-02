@@ -18,6 +18,7 @@
 package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.Timer;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.assistedinject.Assisted;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
@@ -46,23 +47,29 @@ public class MaxMindIpLocationResolver extends MaxMindIpResolver<GeoLocationInfo
     @Override
     public Optional<GeoLocationInformation> doGetGeoIpData(InetAddress address) {
 
-        Optional<GeoLocationInformation> info;
-        try (Timer.Context ignored = resolveTime.time()) {
-            final CityResponse response = databaseReader.city(address);
+        try (Timer.Context ignored = getTimer()) {
+            final CityResponse response = getCityResponse(address);
             final Location location = response.getLocation();
             final Country country = response.getCountry();
             final City city = response.getCity();
 
-            GeoLocationInformation gli = GeoLocationInformation.create(location, country, city, "N/A");
-            info = Optional.of(gli);
+            return Optional.of(GeoLocationInformation.create(location, country, city, "N/A"));
         } catch (IOException | GeoIp2Exception | NullPointerException | UnsupportedOperationException e) {
-            info = Optional.empty();
             if (!(e instanceof AddressNotFoundException)) {
                 LOG.debug("Could not get location from IP {}", address.getHostAddress(), e);
                 lastError = e.getMessage();
             }
+            return Optional.empty();
         }
+    }
 
-        return info;
+    @VisibleForTesting
+    Timer.Context getTimer() {
+        return resolveTime.time();
+    }
+
+    @VisibleForTesting
+    CityResponse getCityResponse(InetAddress address) throws IOException, GeoIp2Exception {
+        return databaseReader.city(address);
     }
 }
