@@ -73,10 +73,10 @@ const _extractValueAndField = (rows: Rows) => {
 
   const results = rows[0];
 
-  if (results.source === 'leaf') {
+  if (results.source == 'leaf') {
     const leaf = results.values.find((f) => f.source === 'row-leaf');
 
-    if (leaf && leaf.source == 'row-leaf') {
+    if (leaf && leaf.source === 'row-leaf') {
       return { value: leaf.value, field: leaf.key[0] };
     }
   }
