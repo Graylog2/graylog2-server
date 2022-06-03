@@ -43,16 +43,28 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
     @Nullable
     public abstract String queryString();
 
+    @Override
+    @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
+    public abstract boolean negation();
+
     @JsonCreator
     @SuppressWarnings("unused")
     public static ReferencedQueryStringSearchFilter create(@JsonProperty("id") final String id,
                                                            @JsonProperty(TITLE_FIELD) final String title,
                                                            @JsonProperty(DESCRIPTION_FIELD) final String description,
+                                                           @JsonProperty(QUERY_STRING_FIELD) final String queryString,
+                                                           @JsonProperty(value = NEGATION_FIELD, defaultValue = "false") final boolean negation) {
+        return new AutoValue_ReferencedQueryStringSearchFilter(id, title, description, queryString, negation);
+    }
+
+    public static ReferencedQueryStringSearchFilter create(@JsonProperty("id") final String id,
+                                                           @JsonProperty(TITLE_FIELD) final String title,
+                                                           @JsonProperty(DESCRIPTION_FIELD) final String description,
                                                            @JsonProperty(QUERY_STRING_FIELD) final String queryString) {
-        return new AutoValue_ReferencedQueryStringSearchFilter(id, title, description, queryString);
+        return new AutoValue_ReferencedQueryStringSearchFilter(id, title, description, queryString, false);
     }
 
     public static ReferencedQueryStringSearchFilter create(final String id) {
-        return new AutoValue_ReferencedQueryStringSearchFilter(id, null, null, null);
+        return new AutoValue_ReferencedQueryStringSearchFilter(id, null, null, null, false);
     }
 }
