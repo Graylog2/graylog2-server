@@ -73,7 +73,7 @@ const _extractValueAndField = (rows: Rows) => {
 
   const results = rows[0];
 
-  if (results.source == 'leaf') {
+  if (results.source === 'leaf') {
     const leaf = results.values.find((f) => f.source === 'row-leaf');
 
     if (leaf && leaf.source == 'row-leaf') {
@@ -91,7 +91,7 @@ type Props = {
 const _extractFirstSeriesName = (config) => {
   const { series = [] } = config;
 
-  return series.length === 0
+  return series.length == 0
     ? undefined
     : series[0].function;
 };
