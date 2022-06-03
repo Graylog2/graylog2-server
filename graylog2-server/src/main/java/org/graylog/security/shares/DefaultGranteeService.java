@@ -89,11 +89,6 @@ public class DefaultGranteeService implements GranteeService {
     }
 
     private ImmutableSet<Grantee> getAvailableUserGrantees(User sharingUser) {
-        final UserAndTeamsConfig config = clusterConfigService.getOrDefault(UserAndTeamsConfig.class, UserAndTeamsConfig.DEFAULT_VALUES);
-        if (!config.sharingWithUsers()) {
-            return ImmutableSet.of();
-        }
-
         return getVisibleUsers(sharingUser).stream()
                 // Don't return the sharing user in available grantees until we want to support that sharing users
                 // can remove themselves from an entity.
@@ -106,10 +101,6 @@ public class DefaultGranteeService implements GranteeService {
     }
 
     private Optional<Grantee> getGlobalGrantee() {
-        final UserAndTeamsConfig config = clusterConfigService.getOrDefault(UserAndTeamsConfig.class, UserAndTeamsConfig.DEFAULT_VALUES);
-        if (config.sharingWithEveryone()) {
-            return Optional.of(Grantee.createGlobal());
-        }
-        return Optional.empty();
+        return Optional.of(Grantee.createGlobal());
     }
 }
