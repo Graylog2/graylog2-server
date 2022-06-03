@@ -45,8 +45,9 @@ import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
 import {
-  usePluggableInitialValues,
-  pluggableValidationPayload, executePluggableSubmitHandler,
+  executeDashboardWidgetSubmitHandler as executePluggableSubmitHandler,
+  useInitialDashboardWidgetValues as usePluggableInitialValues,
+  pluggableValidationPayload,
 } from 'views/components/searchbar/pluggableSearchBarControlsHandler';
 import type { SearchBarControl } from 'views/types';
 import usePluginEntities from 'views/logic/usePluginEntities';
@@ -94,9 +95,8 @@ export const updateWidgetSearchControls = (widget, { timerange, streams, querySt
 
 const onSubmit = async (values, pluggableSearchBarControls: Array<() => SearchBarControl>, widget: Widget) => {
   const { timerange, streams, queryString } = values;
-  const newWidget = updateWidgetSearchControls(widget, { timerange, streams, queryString });
-
-  await executePluggableSubmitHandler(values, pluggableSearchBarControls);
+  const widgetWithPluginData = await executePluggableSubmitHandler(values, pluggableSearchBarControls, widget);
+  const newWidget = updateWidgetSearchControls(widgetWithPluginData, { timerange, streams, queryString });
 
   if (!widget.equals(newWidget)) {
     return WidgetActions.update(widget.id, newWidget);
@@ -132,12 +132,11 @@ const useInitialFormValues = (widget: Widget) => {
   const { streams } = widget;
   const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
   const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
-  const initialValuesFromPlugins = usePluggableInitialValues();
+  const initialValuesFromPlugins = usePluggableInitialValues(widget);
 
   return useMemo(() => {
     return ({ timerange, streams, queryString, ...initialValuesFromPlugins });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timerange, queryString]);
+  }, [timerange, streams, queryString, initialValuesFromPlugins]);
 };
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);

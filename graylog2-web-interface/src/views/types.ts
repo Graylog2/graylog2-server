@@ -45,6 +45,7 @@ import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import type Query from 'views/logic/queries/Query';
 
 export type BackendWidgetPosition = {
   id: string,
@@ -238,10 +239,12 @@ export interface CombinedSearchBarFormValues {
 export interface SearchBarControl {
   component: React.ComponentType;
   id: string;
-  onSubmit?: (values: CombinedSearchBarFormValues) => Promise<void>,
+  onSearchSubmit?: <T extends Query | undefined>(values: CombinedSearchBarFormValues, currentQuery?: T) => Promise<T>,
+  onDashboardWidgetSubmit: (values: CombinedSearchBarFormValues, currentWidget: Widget) => Promise<Widget | void>,
   onValidate?: (values: CombinedSearchBarFormValues) => FormikErrors<{}>,
   placement: 'left' | 'right';
-  useInitialValues?: () => ({ [key: string]: any }),
+  useInitialSearchValues?: (currentQuery?: Query) => ({ [key: string]: any }),
+  useInitialDashboardWidgetValues?: (currentWidget: Widget) => ({ [key: string]: any }),
   validationPayload: (values: CombinedSearchBarFormValues) => ({ [key: string]: any }),
 }
 
