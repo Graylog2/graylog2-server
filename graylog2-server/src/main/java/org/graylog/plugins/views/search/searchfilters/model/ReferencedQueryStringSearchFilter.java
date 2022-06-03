@@ -44,9 +44,8 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
     public abstract String queryString();
 
     @Override
-    @JsonProperty(NEGATION_FIELD)
-    @Nullable
-    public abstract Boolean negation();
+    @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
+    public abstract boolean negation();
 
     @JsonCreator
     @SuppressWarnings("unused")
@@ -54,7 +53,7 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
                                                            @JsonProperty(TITLE_FIELD) final String title,
                                                            @JsonProperty(DESCRIPTION_FIELD) final String description,
                                                            @JsonProperty(QUERY_STRING_FIELD) final String queryString,
-                                                           @JsonProperty(NEGATION_FIELD) final Boolean negation) {
+                                                           @JsonProperty(value = NEGATION_FIELD, defaultValue = "false") final boolean negation) {
         return new AutoValue_ReferencedQueryStringSearchFilter(id, title, description, queryString, negation);
     }
 
@@ -62,10 +61,10 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
                                                            @JsonProperty(TITLE_FIELD) final String title,
                                                            @JsonProperty(DESCRIPTION_FIELD) final String description,
                                                            @JsonProperty(QUERY_STRING_FIELD) final String queryString) {
-        return new AutoValue_ReferencedQueryStringSearchFilter(id, title, description, queryString, null);
+        return new AutoValue_ReferencedQueryStringSearchFilter(id, title, description, queryString, false);
     }
 
     public static ReferencedQueryStringSearchFilter create(final String id) {
-        return new AutoValue_ReferencedQueryStringSearchFilter(id, null, null, null, null);
+        return new AutoValue_ReferencedQueryStringSearchFilter(id, null, null, null, false);
     }
 }

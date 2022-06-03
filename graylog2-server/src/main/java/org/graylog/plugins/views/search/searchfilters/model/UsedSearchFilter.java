@@ -40,5 +40,5 @@ public interface UsedSearchFilter {
     String INLINE_QUERY_STRING_SEARCH_FILTER = "inlineQueryString";
     String REFERENCED_SEARCH_FILTER = "referenced";
 
-    Boolean negation();
+    boolean negation();
 }
