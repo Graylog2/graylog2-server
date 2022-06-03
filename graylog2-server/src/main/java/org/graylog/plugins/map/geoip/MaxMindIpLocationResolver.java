@@ -18,6 +18,7 @@
 package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.Timer;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.assistedinject.Assisted;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
@@ -46,28 +47,29 @@ public class MaxMindIpLocationResolver extends MaxMindIpResolver<GeoLocationInfo
     @Override
     public Optional<GeoLocationInformation> doGetGeoIpData(InetAddress address) {
 
-        GeoLocationInformation info;
-        try (Timer.Context ignored = resolveTime.time()) {
-            final CityResponse response = databaseReader.city(address);
+        try (Timer.Context ignored = getTimer()) {
+            final CityResponse response = getCityResponse(address);
             final Location location = response.getLocation();
             final Country country = response.getCountry();
             final City city = response.getCity();
 
-            info = GeoLocationInformation.create(
-                    location.getLatitude(), location.getLongitude(),
-                    country.getGeoNameId() == null ? "N/A" : country.getIsoCode(),
-                    country.getGeoNameId() == null ? "N/A" : country.getName(),
-                    city.getGeoNameId() == null ? "N/A" : city.getName(),// calling to .getName() may throw a NPE
-                    "N/A",
-                    "N/A");
-        } catch (IOException | GeoIp2Exception | UnsupportedOperationException e) {
-            info = null;
+            return Optional.of(GeoLocationInformation.create(location, country, city, "N/A"));
+        } catch (IOException | GeoIp2Exception | NullPointerException | UnsupportedOperationException e) {
             if (!(e instanceof AddressNotFoundException)) {
                 LOG.debug("Could not get location from IP {}", address.getHostAddress(), e);
                 lastError = e.getMessage();
             }
+            return Optional.empty();
         }
+    }
 
-        return Optional.ofNullable(info);
+    @VisibleForTesting
+    Timer.Context getTimer() {
+        return resolveTime.time();
+    }
+
+    @VisibleForTesting
+    CityResponse getCityResponse(InetAddress address) throws IOException, GeoIp2Exception {
+        return databaseReader.city(address);
     }
 }
