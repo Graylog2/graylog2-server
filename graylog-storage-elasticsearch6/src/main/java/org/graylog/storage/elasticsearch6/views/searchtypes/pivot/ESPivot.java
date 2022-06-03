@@ -88,8 +88,6 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final AggTypes aggTypes = new AggTypes();
         contextMap.put(pivot.id(), aggTypes);
 
-        // holds the initial level aggregation to be added to the query
-        AggregationBuilder topLevelAggregation = null;
         // holds the last complete bucket aggregation into which subsequent buckets get added
         AggregationBuilder previousAggregation = null;
 
@@ -112,9 +110,6 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             final Optional<AggregationBuilder> generatedAggregation = handler.createAggregation(name, pivot, bucketSpec, this, queryContext, query);
             if (generatedAggregation.isPresent()) {
                 final AggregationBuilder aggregationBuilder = generatedAggregation.get();
-                if (topLevelAggregation == null) {
-                    topLevelAggregation = aggregationBuilder;
-                }
                 // always insert the series for the final row group, or for each one if explicit rollup was requested
                 if (!rowBuckets.hasNext() || pivot.rollup()) {
                     seriesStream(pivot, queryContext, !rowBuckets.hasNext() ? "leaf row" : "row rollup")
@@ -161,7 +156,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         searchSourceBuilder.aggregation(startTimestamp);
         searchSourceBuilder.aggregation(endTimestamp);
 
-        if (topLevelAggregation == null) {
+        if (previousAggregation == null) {
             LOG.debug("No aggregations generated for {}", pivot);
         }
     }
