@@ -276,7 +276,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             // if it is missing for some weird reason, it's ok to fail hard here
             final ESPivotBucketSpecHandler<? extends PivotSpec, ? extends Aggregation> handler = bucketHandlers.get(currentBucket.type());
             final Aggregation aggregationResult = handler.extractAggregationFromResult(pivot, currentBucket, aggregation, queryContext);
-            final Stream<ESPivotBucketSpecHandler.Bucket> bucketStream = handler.handleResult(pivot, currentBucket, searchResult, aggregationResult, this, queryContext);
+            final Stream<ESPivotBucketSpecHandler.Bucket> bucketStream = handler.handleResult(currentBucket, aggregationResult);
             // for each bucket, recurse and eventually collect all the row keys. once we reach a leaf, we'll end up in the other if branch above
             bucketStream.forEach(bucket -> {
                 // push the bucket's key and use its aggregation as the new source for sub-aggregations
@@ -320,7 +320,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             // if it is missing for some weird reason, it's ok to fail hard here
             final ESPivotBucketSpecHandler<? extends PivotSpec, ? extends Aggregation> handler = bucketHandlers.get(currentBucket.type());
             final Aggregation aggregationResult = handler.extractAggregationFromResult(pivot, currentBucket, aggregation, queryContext);
-            final Stream<ESPivotBucketSpecHandler.Bucket> bucketStream = handler.handleResult(pivot, currentBucket, searchResult, aggregationResult, this, queryContext);
+            final Stream<ESPivotBucketSpecHandler.Bucket> bucketStream = handler.handleResult(currentBucket, aggregationResult);
 
             // for each bucket, recurse and eventually collect all the column keys. once we reach a leaf, we'll end up in the other if branch above
             bucketStream.forEach(bucket -> {
