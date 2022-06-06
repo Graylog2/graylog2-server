@@ -46,9 +46,9 @@ public class OshiOsProbe implements OsProbe {
         final Memory mem = Memory.create(
                 globalMemory.getTotal(),
                 globalMemory.getAvailable(),
-                (short) (globalMemory.getAvailable() * 100 / globalMemory.getTotal()),
+                safePercentage(globalMemory.getAvailable(), globalMemory.getTotal(), 0),
                 globalMemory.getTotal() - globalMemory.getAvailable(),
-                (short) ((globalMemory.getTotal() - globalMemory.getAvailable()) * 100 / globalMemory.getTotal()),
+                safePercentage(globalMemory.getTotal() - globalMemory.getAvailable(), globalMemory.getTotal(), 0),
                 globalMemory.getAvailable(),
                 globalMemory.getTotal() - globalMemory.getAvailable());
 
@@ -87,5 +87,9 @@ public class OshiOsProbe implements OsProbe {
                 proc,
                 mem,
                 swap);
+    }
+
+    private short safePercentage(long nominator, long denominator, int override) {
+        return (denominator == 0) ? (short) override : (short) (nominator * 100 / denominator);
     }
 }
