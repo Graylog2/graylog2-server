@@ -14,21 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.freeenterprise;
+package org.graylog.util;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.Tools;
 
-@AutoValue
-@JsonIgnoreProperties("version")
-public abstract class FreeLicenseAPIResponse {
-    @JsonProperty("license")
-    public abstract String licenseString();
+import javax.inject.Provider;
 
-    @JsonCreator
-    public static FreeLicenseAPIResponse create(@JsonProperty("license") String licenseString) {
-        return new AutoValue_FreeLicenseAPIResponse(licenseString);
+public class HostnameProvider implements Provider<Hostname> {
+    /**
+     * Returns the {@link Hostname} object for the local node.
+     *
+     * @return the hostname
+     * @throws RuntimeException when local hostname cannot be retrieved
+     */
+    @Override
+    public Hostname get() {
+        try {
+            return Hostname.create(Tools.getLocalHostname(), Tools.getLocalCanonicalHostname());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

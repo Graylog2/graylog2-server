@@ -23,7 +23,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.BucketOrder;
@@ -84,11 +83,8 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, Terms> {
     }
 
     @Override
-    public Stream<Bucket> doHandleResult(Pivot pivot, Values bucketSpec,
-                                         SearchResponse searchResult,
-                                         Terms termsAggregation,
-                                         ESPivot searchTypeHandler,
-                                         ESGeneratedQueryContext esGeneratedQueryContext) {
+    public Stream<Bucket> doHandleResult(Values bucketSpec,
+                                         Terms termsAggregation) {
         return termsAggregation.getBuckets().stream()
                 .map(entry -> Bucket.create(entry.getKeyAsString(), entry));
     }

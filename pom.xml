@@ -142,7 +142,7 @@
         <netty.version>4.1.60.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.36.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>3.14.6</okhttp.version>
-        <okta-sdk.version>3.0.1</okta-sdk.version>
+        <okta-sdk.version>8.2.1</okta-sdk.version>
         <opencsv.version>2.3</opencsv.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.5</pkts.version>
@@ -330,7 +330,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.7</version>
+                    <version>2.11.0</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>

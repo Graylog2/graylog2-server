@@ -65,7 +65,7 @@ public abstract class ProxiedResource extends RestResource {
         this.authenticationToken = authenticationToken(httpHeaders);
     }
 
-    static String authenticationToken(HttpHeaders httpHeaders) {
+    public static String authenticationToken(HttpHeaders httpHeaders) {
         final List<String> authorizationHeader = httpHeaders.getRequestHeader("Authorization");
         if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
             return authorizationHeader.get(0);

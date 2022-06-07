@@ -23,7 +23,9 @@ import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 @AutoValue
@@ -208,14 +210,30 @@ public abstract class ValueReference implements Reference {
                 .build();
     }
 
-    public static ValueReference of(String value) {
+    public static ValueReference ofNullable(@Nullable String value) {
+        if (value == null) {
+            return null;
+        } else {
+            return of(value);
+        }
+    }
+
+    public static ValueReference of(@NotNull String value) {
         return ValueReference.builder()
                 .valueType(ValueType.STRING)
                 .value(value)
                 .build();
     }
 
-    public static ValueReference of(Enum value) {
+    public static ValueReference ofNullable(@Nullable Enum value) {
+        if (value == null) {
+            return null;
+        } else {
+            return of(value);
+        }
+    }
+
+    public static ValueReference of(@Nonnull Enum value) {
         return ValueReference.builder()
                 .valueType(ValueType.STRING)
                 .value(value.name())

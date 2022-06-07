@@ -53,7 +53,7 @@ describe('RefreshControls', () => {
     ${true}      | ${300000}
     ${false}     | ${300000}
     ${false}     | ${1000}
-  `('it renders refresh controlls with enabled: $enabled and interval: $interval', verifyRendering);
+  `('renders refresh controlls with enabled: $enabled and interval: $interval', verifyRendering);
   });
 
   it('should start the interval', () => {

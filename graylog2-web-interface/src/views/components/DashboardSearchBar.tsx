@@ -41,8 +41,9 @@ import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
 import { SearchActions } from 'views/stores/SearchStore';
 import {
-  usePluggableInitialValues,
-  pluggableValidationPayload, executePluggableSubmitHandler,
+  executeSearchSubmitHandler as executePluggableSubmitHandler,
+  useInitialSearchValues as usePluggableInitialValues,
+  pluggableValidationPayload,
 } from 'views/components/searchbar/pluggableSearchBarControlsHandler';
 import type { SearchBarControl } from 'views/types';
 import usePluginEntities from 'views/logic/usePluginEntities';
@@ -111,8 +112,7 @@ const useInitialFormValues = (timerange, queryString) => {
 
   return useMemo(() => {
     return { timerange, queryString, ...initialValuesFromPlugins };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queryString, timerange]);
+  }, [queryString, timerange, initialValuesFromPlugins]);
 };
 
 const DashboardSearchBar = () => {

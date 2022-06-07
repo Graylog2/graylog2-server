@@ -34,7 +34,6 @@ import org.graylog.plugins.views.search.validation.QueryValidationService;
 import org.graylog.plugins.views.search.validation.QueryValidationServiceImpl;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -77,7 +76,7 @@ public class MessagesResourceTest {
 
         final MappedFieldTypesService mappedFieldTypesService = (streamIds, timeRange) -> Collections.emptySet();
         final QueryValidationServiceImpl validationService = new QueryValidationServiceImpl(
-                new LuceneQueryParser(),
+                new LuceneQueryParser(false),
                 mappedFieldTypesService,
                 Collections.emptySet());
 

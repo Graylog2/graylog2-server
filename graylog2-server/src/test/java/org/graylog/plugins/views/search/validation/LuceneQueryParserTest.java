@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class LuceneQueryParserTest {
 
-    private final LuceneQueryParser parser = new LuceneQueryParser();
+    private final LuceneQueryParser parser = new LuceneQueryParser(false);
 
 
     @Test
@@ -203,5 +203,20 @@ class LuceneQueryParserTest {
         assertThat(query.terms())
                 .extracting(ParsedTerm::field)
                 .containsOnly("unknown_field");
+    }
+
+    @Test
+    void testLeadingWildcardsParsingDependsOnParserSettings() throws ParseException {
+        assertThatThrownBy(() -> parser.parse("foo:*bar"))
+                .isInstanceOf(ParseException.class);
+
+        assertThatThrownBy(() -> parser.parse("foo:?bar"))
+                .isInstanceOf(ParseException.class);
+
+        final LuceneQueryParser leadingWildcardsTolerantParser = new LuceneQueryParser(true);
+        assertThat(leadingWildcardsTolerantParser.parse("foo:*bar"))
+                .isNotNull();
+        assertThat(leadingWildcardsTolerantParser.parse("foo:?bar"))
+                .isNotNull();
     }
 }

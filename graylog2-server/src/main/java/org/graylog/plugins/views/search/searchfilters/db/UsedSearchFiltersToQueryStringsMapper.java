@@ -14,23 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.freeenterprise;
+package org.graylog.plugins.views.search.searchfilters.db;
 
-import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
-import org.graylog2.plugin.PluginConfigBean;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 
-import java.net.URI;
+import java.util.Collection;
+import java.util.Set;
 
-public class FreeEnterpriseConfiguration implements PluginConfigBean {
-    private static final String PREFIX = "free_enterprise_";
+@FunctionalInterface
+public interface UsedSearchFiltersToQueryStringsMapper {
 
-    public static final String SERVICE_URL = PREFIX + "service_url";
-
-    @Parameter(value = SERVICE_URL, validators = URIAbsoluteValidator.class)
-    private URI serviceUrl = URI.create("https://api.graylog.com/");
-
-    public URI getServiceUrl() {
-        return serviceUrl;
-    }
+    Set<String> map(final Collection<UsedSearchFilter> usedSearchFilters);
 }

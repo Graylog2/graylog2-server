@@ -42,3 +42,10 @@ The following API endpoints have been removed in 4.4.
   This happens at creation, so existing `system_messages` collections remain unconstrained.
 <br>You can manually convert your existing collection to a capped collection by following 
 these [instructions](https://www.mongodb.com/docs/manual/core/capped-collections/#convert-a-collection-to-capped).
+- Introducing new archive config parameter `retentionTime` in days. 
+  Archives exceeding the specified retention time are automatically deleted. 
+  By default the behavior is unchanged: archives are retained indefinitely. 
+- Introducing new input config option `encoding`, enabling users to override the default
+UTF-8 encoding. 
+<br>Note that this encoding is applied to all messages received by the input. A single input
+cannot handle multiple log sources with different encodings.

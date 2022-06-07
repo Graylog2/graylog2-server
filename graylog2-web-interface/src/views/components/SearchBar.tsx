@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
@@ -59,8 +59,8 @@ import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 import {
-  executePluggableSubmitHandler,
-  usePluggableInitialValues,
+  executeSearchSubmitHandler as executePluggableSubmitHandler,
+  useInitialSearchValues as usePluggableInitialValues,
   pluggableValidationPayload,
 } from './searchbar/pluggableSearchBarControlsHandler';
 
@@ -99,9 +99,9 @@ const SearchButtonAndQuery = styled.div`
 const defaultOnSubmit = async (values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentQuery: Query) => {
   const { timerange, streams, queryString } = values;
 
-  await executePluggableSubmitHandler(values, pluggableSearchBarControls);
+  const queryWithPluginData = await executePluggableSubmitHandler(values, pluggableSearchBarControls, currentQuery);
 
-  const newQuery = currentQuery.toBuilder()
+  const newQuery = queryWithPluginData.toBuilder()
     .timerange(timerange)
     .filter(filtersForQuery(streams))
     .query(createElasticsearchQueryString(queryString))
@@ -123,14 +123,10 @@ const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 const useInitialFormValues = ({ currentQuery, queryFilters }: { currentQuery: Query | undefined, queryFilters: Immutable.Map<QueryId, FilterType> }) => {
   const { id, query, timerange } = currentQuery ?? {};
   const { query_string: queryString } = query ?? {};
-  const initialValuesFromPlugins = usePluggableInitialValues();
+  const initialValuesFromPlugins = usePluggableInitialValues(currentQuery);
+  const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
 
-  return useMemo(() => {
-    const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
-
-    return ({ timerange, streams, queryString, ...initialValuesFromPlugins });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timerange, queryString, id, queryFilters, initialValuesFromPlugins]);
+  return ({ timerange, streams, queryString, ...initialValuesFromPlugins });
 };
 
 const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>) => {

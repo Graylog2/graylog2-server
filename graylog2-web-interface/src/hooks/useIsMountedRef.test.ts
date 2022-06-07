@@ -14,13 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.freeenterprise;
 
-import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.POST;
+import { renderHook } from '@testing-library/react-hooks';
 
-public interface FreeLicenseAPIClient {
-    @POST("enterprise/license/v2/freetrial")
-    Call<FreeLicenseAPIResponse> requestFreeLicense(@Body FreeLicenseAPIRequest request);
-}
+import useIsMountedRef from './useIsMountedRef';
+
+describe('useIsMountedRef', () => {
+  it('should be true after mount', () => {
+    const { result: { current: isMountedRef } } = renderHook(useIsMountedRef);
+
+    expect(isMountedRef.current).toEqual(true);
+  });
+
+  it('should be false after unmount', () => {
+    const { unmount, result: { current: isMountedRef } } = renderHook(useIsMountedRef);
+
+    expect(isMountedRef.current).toEqual(true);
+
+    unmount();
+
+    expect(isMountedRef.current).toEqual(false);
+  });
+});

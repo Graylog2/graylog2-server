@@ -259,7 +259,8 @@ class NotificationsFactory {
           description: (
             <span>
               The most recent stable Graylog version is <em>{notification.details.current_version}</em>.
-              Get it from <a href="https://www.graylog.org/" target="_blank" rel="noreferrer">https://www.graylog.org/</a>.
+              See what&apos;s new in the <DocumentationLink page={DocsHelper.PAGES.CHANGELOG} text="Open" />{' '}
+              and <DocumentationLink page={DocsHelper.PAGES.OPERATIONS_CHANGELOG} text="Operations" /> changelogs!
             </span>
           ),
         };

@@ -29,6 +29,7 @@ import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
@@ -36,7 +37,11 @@ import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
+import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.ReferencedQueryStringSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -49,11 +54,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import static com.google.common.collect.ImmutableMap.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -223,5 +228,57 @@ public class QueryTest {
     public void testSerializeQuery() throws JsonProcessingException {
         final String value = objectMapper.writeValueAsString(ElasticsearchQueryString.of("foo:bar"));
         assertThat(value).isEqualTo("{\"type\":\"elasticsearch\",\"query_string\":\"foo:bar\"}");
+    }
+
+    @Test
+    public void testHasReferencedSearchFiltersReturnsFalseOnEmptySearchFilters() {
+        Query query = Query.builder()
+                .filters(Collections.emptyList())
+                .build();
+
+        assertThat(query.hasReferencedStreamFilters())
+                .isFalse();
+    }
+
+    @Test
+    public void testHasReferencedSearchFiltersReturnsFalseWhenNoReferencedSearchFilters() {
+        Query query = Query.builder()
+                .filters(Collections.singletonList(InlineQueryStringSearchFilter.create("title", "descr", "*")))
+                .build();
+
+        assertThat(query.hasReferencedStreamFilters())
+                .isFalse();
+    }
+
+    @Test
+    public void testHasReferencedSearchFiltersReturnsTrueWhenReferencedSearchFilterPresent() {
+        Query query = Query.builder()
+                .filters(ImmutableList.of(
+                        InlineQueryStringSearchFilter.create("title", "descr", "*"),
+                        ReferencedQueryStringSearchFilter.create("007")))
+                .build();
+
+        assertThat(query.hasReferencedStreamFilters())
+                .isTrue();
+    }
+
+    @Test
+    public void testSavesEmptySearchFiltersCollectionInContentPack() {
+        Query noFiltersQuery = Query.builder().build();
+        assertThat(noFiltersQuery.toContentPackEntity(EntityDescriptorIds.empty()).filters())
+                .isNotNull()
+                .isEmpty();
+    }
+
+    @Test
+    public void testSavesSearchFiltersCollectionInContentPack() {
+        final ImmutableList<UsedSearchFilter> originalSearchFilters = ImmutableList.of(
+                InlineQueryStringSearchFilter.create("title", "descr", "*"),
+                ReferencedQueryStringSearchFilter.create("007")
+        );
+        Query queryWithFilters = Query.builder().filters(originalSearchFilters).build();
+        assertThat(queryWithFilters.toContentPackEntity(EntityDescriptorIds.empty()).filters())
+                .isNotNull()
+                .isEqualTo(originalSearchFilters);
     }
 }

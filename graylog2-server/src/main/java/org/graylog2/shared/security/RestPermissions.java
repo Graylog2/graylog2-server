@@ -60,7 +60,6 @@ public class RestPermissions implements PluginPermissions {
     public static final String DECORATORS_READ = "decorators:read";
     public static final String DEFLECTOR_CYCLE = "deflector:cycle";
     public static final String DEFLECTOR_READ = "deflector:read";
-    public static final String FREELICENSES_CREATE = "freelicenses:create";
     public static final String LICENSEINFOS_READ = "licenseinfos:read";
     public static final String EVENT_DEFINITIONS_CREATE = "eventdefinitions:create";
     public static final String EVENT_DEFINITIONS_DELETE = "eventdefinitions:delete";
@@ -188,7 +187,6 @@ public class RestPermissions implements PluginPermissions {
             .add(create(DECORATORS_READ, ""))
             .add(create(DEFLECTOR_CYCLE, ""))
             .add(create(DEFLECTOR_READ, ""))
-            .add(create(FREELICENSES_CREATE, ""))
             .add(create(LICENSEINFOS_READ, ""))
             .add(create(EVENT_DEFINITIONS_CREATE, ""))
             .add(create(EVENT_DEFINITIONS_DELETE, ""))

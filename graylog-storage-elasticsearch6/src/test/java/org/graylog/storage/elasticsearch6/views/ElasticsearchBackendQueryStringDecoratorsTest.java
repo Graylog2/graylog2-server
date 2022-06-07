@@ -41,7 +41,6 @@ import org.junit.jupiter.api.Test;
 import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.Set;
 
 import static com.revinate.assertj.json.JsonPathAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -62,6 +61,7 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
                 mock(IndexLookup.class),
                 new QueryStringDecorators(Optional.of(decorator)),
                 (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
+                usedSearchFilters -> Collections.emptySet(),
                 true,
                 new ObjectMapperProvider().get());
     }

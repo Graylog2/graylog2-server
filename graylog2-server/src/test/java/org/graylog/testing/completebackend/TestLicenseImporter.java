@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.freeenterprise;
+package org.graylog.testing.completebackend;
 
-import org.graylog2.plugin.PluginModule;
+import org.graylog.testing.mongodb.MongoDBInstance;
 
-public class FreeEnterpriseModule extends PluginModule {
-    @Override
-    protected void configure() {
-        addSystemRestResource(FreeEnterpriseResource.class);
-    }
+import java.util.List;
+
+public interface TestLicenseImporter {
+    default void importLicenses(final MongoDBInstance mongoDBInstance, final List<String> licenses) {}
 }

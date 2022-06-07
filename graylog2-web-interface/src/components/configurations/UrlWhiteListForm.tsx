@@ -81,7 +81,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
   let inputs = {};
   const [config, setConfig] = useState<WhiteListConfig>({ entries: urls, disabled });
   const [validationState, setValidationState] = useState({ errors: [] });
-  const isMounted = useRef<boolean>(false);
+  const isInitialRender = useRef<boolean>(false);
 
   const _onAdd = (event: Event) => {
     event.preventDefault();
@@ -215,11 +215,12 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
       onUpdate(config, valid);
     };
 
-    propagateUpdate(!isMounted.current);
+    propagateUpdate(!isInitialRender.current);
 
-    if (!isMounted.current) {
-      isMounted.current = true;
+    if (!isInitialRender.current) {
+      isInitialRender.current = true;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config]);
 
   return (
