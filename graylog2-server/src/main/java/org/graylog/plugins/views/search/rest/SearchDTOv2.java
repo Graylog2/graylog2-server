@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableSet.of;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 @AutoValue
 @JsonAutoDetect
@@ -41,7 +42,7 @@ public abstract class SearchDTOv2 {
     public abstract String id();
 
     @JsonProperty
-    public abstract Set<QueryDTOv2> queries();
+    public abstract ImmutableSet<QueryDTOv2> queries();
 
     @JsonProperty
     public abstract Set<Parameter> parameters();
@@ -53,7 +54,7 @@ public abstract class SearchDTOv2 {
                 .queries(search.queries()
                         .stream()
                         .map(QueryDTOv2::fromQuery)
-                        .collect(Collectors.toSet()))
+                        .collect(toImmutableSet()))
                 .build();
     }
 
@@ -69,7 +70,7 @@ public abstract class SearchDTOv2 {
         public abstract String id();
 
         @JsonProperty
-        public abstract Builder queries(Set<QueryDTOv2> queries);
+        public abstract Builder queries(ImmutableSet<QueryDTOv2> queries);
 
         @JsonProperty
         public abstract Builder parameters(Set<Parameter> parameters);
