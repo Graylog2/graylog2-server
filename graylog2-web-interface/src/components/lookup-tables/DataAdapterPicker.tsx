@@ -30,7 +30,9 @@ const DataAdapterPicker: React.FC<DataAdapterPickerProps> = ({
   name = 'data_adapter_id',
   dataAdapters = [],
 }) => {
-  const [_, meta, helpers] = useField(name);
+  const field = useField(name);
+  const meta = field[1];
+  const helpers = field[2];
   const sortedAdapters = dataAdapters.map((adapter) => {
     return { value: adapter.id, label: `${adapter.title} (${adapter.name})` };
   }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));

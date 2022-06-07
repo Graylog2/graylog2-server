@@ -30,7 +30,9 @@ const CachePicker: React.FC<CachePickerProps> = ({
   name = 'cache_id',
   caches = [],
 }) => {
-  const [_, meta, helpers] = useField(name);
+  const field = useField(name);
+  const meta = field[1];
+  const helpers = field[2];
   const sortedCaches = caches.map((cache) => {
     return { value: cache.id, label: `${cache.title} (${cache.name})` };
   }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
