@@ -25,6 +25,7 @@ import org.graylog.grn.GRNRegistry;
 public abstract class Grantee {
 
     public static final String GRANTEE_TYPE_GLOBAL = "global";
+    public static final String GRANTEE_TYPE_TEAM = "team";
     public static final String GRANTEE_TYPE_USER = "user";
 
     @JsonProperty("id")

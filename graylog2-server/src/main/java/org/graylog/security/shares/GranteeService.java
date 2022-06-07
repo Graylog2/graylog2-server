@@ -16,6 +16,7 @@
  */
 package org.graylog.security.shares;
 
+import com.google.common.collect.ImmutableSet;
 import org.graylog.grn.GRN;
 import org.graylog2.plugin.database.users.User;
 
@@ -24,7 +25,7 @@ import java.util.Set;
 public interface GranteeService {
     Set<Grantee> getAvailableGrantees(User sharingUser);
 
-    Set<Grantee> getSelectableGrantees(Set<Grantee> availableGrantees);
+    Set<Grantee> getModifiableGrantees(Set<Grantee> availableGrantees, ImmutableSet<EntityShareResponse.ActiveShare> activeShares);
 
     Set<User> getVisibleUsers(User requestingUser);
 
