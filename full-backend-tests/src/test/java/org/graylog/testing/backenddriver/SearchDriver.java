@@ -30,6 +30,8 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -89,7 +91,7 @@ public class SearchDriver {
                 .build();
         SearchDTO s = SearchDTO.builder()
                 .id(new ObjectId().toHexString())
-                .queries(ImmutableSet.of(q))
+                .queries(new LinkedHashSet<>(Collections.singleton(q)))
                 .build();
 
         return JsonUtils.toJsonString(s);
