@@ -27,11 +27,11 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 
 import javax.annotation.Nullable;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableSet.of;
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 @AutoValue
 @JsonAutoDetect
@@ -42,7 +42,7 @@ public abstract class SearchDTO {
     public abstract String id();
 
     @JsonProperty
-    public abstract ImmutableSet<QueryDTO> queries();
+    public abstract LinkedHashSet<QueryDTO> queries();
 
     @JsonProperty
     public abstract Set<Parameter> parameters();
@@ -54,7 +54,7 @@ public abstract class SearchDTO {
                 .queries(search.queries()
                         .stream()
                         .map(QueryDTO::fromQuery)
-                        .collect(toImmutableSet()))
+                        .collect(Collectors.toCollection(LinkedHashSet::new)))
                 .build();
     }
 
@@ -70,7 +70,7 @@ public abstract class SearchDTO {
         public abstract String id();
 
         @JsonProperty
-        public abstract Builder queries(ImmutableSet<QueryDTO> queries);
+        public abstract Builder queries(LinkedHashSet<QueryDTO> queries);
 
         @JsonProperty
         public abstract Builder parameters(Set<Parameter> parameters);
@@ -80,7 +80,7 @@ public abstract class SearchDTO {
         @JsonCreator
         static Builder create() {
             return new AutoValue_SearchDTO.Builder()
-                    .queries(ImmutableSet.of())
+                    .queries(new LinkedHashSet<>())
                     .parameters(of());
         }
     }

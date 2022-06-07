@@ -306,7 +306,6 @@ public class SearchResourceExecutionTest {
     private SearchDTO mockSearchDTO() {
         return SearchDTO.Builder
                 .create()
-                .queries(ImmutableSet.of())
                 .build();
     }
 
