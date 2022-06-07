@@ -17,6 +17,7 @@
 import React from 'react';
 import { Formik, Field, Form } from 'formik';
 import type { FieldProps } from 'formik';
+import _omit from 'lodash/omit';
 
 import { Col, Row, Button, Input } from 'components/bootstrap';
 import { JSONValueInput } from 'components/common';
@@ -80,7 +81,8 @@ const LookupTableForm: React.FC<LookupTableFormProps> = ({
 
   const handleSubmit = (values: ITable) => {
     let promise;
-    const { enable_single_value, enable_multi_value, ...valuesToSave } = values;
+
+    const valuesToSave = _omit(values, ['enable_single_value', 'enable_multi_value']);
 
     if (create) {
       promise = LookupTablesActions.create(valuesToSave as LookupTable);
