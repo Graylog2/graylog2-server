@@ -33,6 +33,8 @@ public abstract class JobDefinitionDto {
     private static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_CONFIG = "config";
 
+    public static final String FIELD_MAX_CONCURRENCY = "max_concurrency";
+
     @Id
     @ObjectId
     @Nullable
@@ -45,6 +47,8 @@ public abstract class JobDefinitionDto {
     @JsonProperty(FIELD_DESCRIPTION)
     public abstract String description();
 
+    @JsonProperty(FIELD_MAX_CONCURRENCY)
+    public abstract int maxConcurrency();
     @JsonProperty(FIELD_CONFIG)
     public abstract JobDefinitionConfig config();
 
@@ -58,7 +62,8 @@ public abstract class JobDefinitionDto {
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_JobDefinitionDto.Builder();
+            return new AutoValue_JobDefinitionDto.Builder()
+                    .maxConcurrency(1);
         }
 
         @Id
@@ -72,6 +77,8 @@ public abstract class JobDefinitionDto {
         @JsonProperty(FIELD_DESCRIPTION)
         public abstract Builder description(String description);
 
+        @JsonProperty(FIELD_MAX_CONCURRENCY)
+        public abstract Builder maxConcurrency(int maxConcurrency);
         @JsonProperty(FIELD_CONFIG)
         public abstract Builder config(JobDefinitionConfig config);
 

@@ -35,7 +35,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class DBJobDefinitionService extends PaginatedDbService<JobDefinitionDto> {
-    private static final String COLLECTION_NAME = "scheduler_job_definitions";
+    public static final String COLLECTION_NAME = "scheduler_job_definitions";
 
     private final ObjectMapper objectMapper;
 
