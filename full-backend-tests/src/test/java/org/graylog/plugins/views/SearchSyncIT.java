@@ -39,6 +39,7 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -147,6 +148,40 @@ public class SearchSyncIT {
                 .body("execution.completed_exceptionally", equalTo(false))
                 .body("results.f1446410-a082-4871-b3bf-d69aa42d0c96.search_types", not(hasKey("f1446410-a082-4871-b3bf-d69aa42d0c97")))
                 .body("results.f1446410-a082-4871-b3bf-d69aa42d0c97.search_types", hasKey("01c76680-377b-4930-86e2-a55fdb867b58"));
+    }
+
+    @ContainerMatrixTest
+    void testThatQueryOrderStaysConsistentInV1() {
+        given()
+                .spec(requestSpec)
+                .accept("application/json")
+                .contentType("application/json")
+                .when()
+                .body(fixture("org/graylog/plugins/views/search-with-three-empty-queries.json"))
+                .post("/views/search")
+                .then()
+                .statusCode(201)
+                .assertThat()
+                .body("queries*.id", contains("4966dd79-2c7d-4ba9-8f90-c84aea7b5c49",
+                        "0d5b45b8-1f55-4b60-ad34-d086ddd5d8fa",
+                        "3eec6f5c-0f1b-41dc-bb95-3ebc6bb905f3"));
+    }
+
+    @ContainerMatrixTest
+    void testThatQueryOrderStaysConsistentInV2() {
+        given()
+                .spec(requestSpec)
+                .accept("application/vnd.graylog.search.v2+json")
+                .contentType("application/vnd.graylog.search.v2+json")
+                .when()
+                .body(fixture("org/graylog/plugins/views/search-with-three-empty-queries.json"))
+                .post("/views/search")
+                .then()
+                .statusCode(201)
+                .assertThat()
+                .body("queries*.id", contains("4966dd79-2c7d-4ba9-8f90-c84aea7b5c49",
+                        "0d5b45b8-1f55-4b60-ad34-d086ddd5d8fa",
+                        "3eec6f5c-0f1b-41dc-bb95-3ebc6bb905f3"));
     }
 
     private String executeStoredSearch(String searchId) {
