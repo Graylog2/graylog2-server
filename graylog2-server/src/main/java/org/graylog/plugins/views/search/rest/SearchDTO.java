@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -71,6 +72,10 @@ public abstract class SearchDTO {
 
         @JsonProperty
         public abstract Builder queries(LinkedHashSet<QueryDTO> queries);
+
+        public Builder queries(QueryDTO... queries) {
+            return this.queries(new LinkedHashSet<>(Arrays.asList(queries)));
+        }
 
         @JsonProperty
         public abstract Builder parameters(Set<Parameter> parameters);

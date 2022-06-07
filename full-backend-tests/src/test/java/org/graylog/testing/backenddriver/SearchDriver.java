@@ -91,7 +91,7 @@ public class SearchDriver {
                 .build();
         SearchDTO s = SearchDTO.builder()
                 .id(new ObjectId().toHexString())
-                .queries(new LinkedHashSet<>(Collections.singleton(q)))
+                .queries(q)
                 .build();
 
         return JsonUtils.toJsonString(s);
