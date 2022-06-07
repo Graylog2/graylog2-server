@@ -104,7 +104,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     }
 
     @POST
-    @ApiOperation(value = "Create a search query", response = SearchDTO.class, code = 201)
+    @ApiOperation(value = "Create a search query", response = SearchDTOv2.class, code = 201)
     @AuditEvent(type = ViewsAuditEventTypes.SEARCH_CREATE)
     @Consumes({SEARCH_FORMAT_V2})
     @Produces({SEARCH_FORMAT_V2})
@@ -112,7 +112,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
         final Search search = searchRequest.toSearch();
 
         final Search saved = searchDomain.saveForUser(search, searchUser);
-        final SearchDTO result = SearchDTO.fromSearch(saved);
+        final SearchDTOv2 result = SearchDTOv2.fromSearch(saved);
         if (result == null || result.id() == null) {
             return Response.serverError().build();
         }
