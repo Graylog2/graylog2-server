@@ -79,7 +79,7 @@ public class DBJobTriggerServiceTest {
     @Before
     public void setUp() throws Exception {
         when(nodeId.toString()).thenReturn(NODE_ID);
-        when(schedulerCapabilitiesService.getJobCapabilities()).thenReturn(ImmutableSet.of());
+        when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of());
 
         objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(new NamedType(IntervalJobSchedule.class, IntervalJobSchedule.TYPE_NAME));
@@ -800,7 +800,7 @@ public class DBJobTriggerServiceTest {
         dbJobTriggerService.deleteByQuery(DBQuery.empty());
 
         // two fulfilled constraints
-        when(schedulerCapabilitiesService.getJobCapabilities()).thenReturn(ImmutableSet.of("HAS_ARCHIVE", "IS_LEADER"));
+        when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of("HAS_ARCHIVE", "IS_LEADER"));
         dbJobTriggerService.create(triggerBuilder
                 .constraints(ImmutableSet.of("IS_LEADER", "HAS_ARCHIVE"))
                 .build());
@@ -808,7 +808,7 @@ public class DBJobTriggerServiceTest {
         dbJobTriggerService.deleteByQuery(DBQuery.empty());
 
         // more capabilities than constraints
-        when(schedulerCapabilitiesService.getJobCapabilities()).thenReturn(ImmutableSet.of("HAS_ARCHIVE", "IS_LEADER", "ANOTHER_CAPABITILITY"));
+        when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of("HAS_ARCHIVE", "IS_LEADER", "ANOTHER_CAPABITILITY"));
         dbJobTriggerService.create(triggerBuilder
                 .constraints(ImmutableSet.of("IS_LEADER", "HAS_ARCHIVE"))
                 .build());
@@ -816,7 +816,7 @@ public class DBJobTriggerServiceTest {
         dbJobTriggerService.deleteByQuery(DBQuery.empty());
 
         // more constraints than capabilities
-        when(schedulerCapabilitiesService.getJobCapabilities()).thenReturn(ImmutableSet.of("HAS_ARCHIVE", "IS_LEADER"));
+        when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of("HAS_ARCHIVE", "IS_LEADER"));
         dbJobTriggerService.create(triggerBuilder
                 .constraints(ImmutableSet.of("IS_LEADER", "HAS_ARCHIVE", "ANOTHER_CONSTRAINT"))
                 .build());

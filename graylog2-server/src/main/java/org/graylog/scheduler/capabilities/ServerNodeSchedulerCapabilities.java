@@ -24,8 +24,8 @@ import java.util.Set;
 
 public class ServerNodeSchedulerCapabilities implements SchedulerCapabilities {
 
-    public static final String IS_LEADER = "IS_LEADER";
-    private LeaderElectionService leaderElectionService;
+    public static final String IS_LEADER = "org.graylog.cluster.is-leader";
+    private final LeaderElectionService leaderElectionService;
 
     @Inject
     public ServerNodeSchedulerCapabilities(LeaderElectionService leaderElectionService) {

@@ -391,10 +391,10 @@ public abstract class PluginModule extends Graylog2Module {
         clusterConfigMapBinder().addBinding(configClass).to(configValidatorClass);
     }
 
-    protected Multibinder<SchedulerCapabilities> jobConstraintsBinder() {
+    protected Multibinder<SchedulerCapabilities> schdulerCapabilitiesBinder() {
         return Multibinder.newSetBinder(binder(), SchedulerCapabilities.class);
     }
-    protected void addJobConstraints(Class<? extends SchedulerCapabilities> jobConstraintsClass) {
-        jobConstraintsBinder().addBinding().to(jobConstraintsClass);
+    protected void addSchedulerCapabilities(Class<? extends SchedulerCapabilities> schedulerCapabilitiesClass) {
+        schdulerCapabilitiesBinder().addBinding().to(schedulerCapabilitiesClass);
     }
 }

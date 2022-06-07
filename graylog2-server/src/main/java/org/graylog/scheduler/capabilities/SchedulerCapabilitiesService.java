@@ -32,7 +32,7 @@ public class SchedulerCapabilitiesService {
         this.schedulerCapabilities = schedulerCapabilities;
     }
 
-    public Set<String> getJobCapabilities() {
+    public Set<String> getNodeCapabilities() {
         // TODO cache results? Currently the operations are rather cheap
         return schedulerCapabilities.stream().flatMap(s -> s.getNodeCapabilities().stream()).collect(Collectors.toSet());
     }

@@ -21,6 +21,6 @@ import org.graylog2.plugin.PluginModule;
 public class ServerNodeCapabilitiesModule extends PluginModule {
     @Override
     protected void configure() {
-        addJobConstraints(ServerNodeSchedulerCapabilities.class);
+        addSchedulerCapabilities(ServerNodeSchedulerCapabilities.class);
     }
 }
