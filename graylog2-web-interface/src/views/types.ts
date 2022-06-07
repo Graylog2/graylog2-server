@@ -17,6 +17,7 @@
 import type React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikErrors } from 'formik';
+import type { List } from 'immutable';
 
 import type Widget from 'views/logic/widgets/Widget';
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
@@ -247,6 +248,16 @@ export interface SearchBarControl {
   useInitialDashboardWidgetValues?: (currentWidget: Widget) => ({ [key: string]: any }),
   validationPayload: (values: CombinedSearchBarFormValues) => ({ [key: string]: any }),
 }
+
+export type SearchFilter = {
+  type: 'referenced' | 'inlineQueryString',
+  id?: string,
+  title?: string,
+  description?: string
+  queryString: string
+}
+
+export type FiltersType = List<SearchFilter>
 
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {

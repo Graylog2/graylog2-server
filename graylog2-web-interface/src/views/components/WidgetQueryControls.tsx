@@ -21,6 +21,7 @@ import moment from 'moment';
 import styled from 'styled-components';
 import { isEmpty } from 'lodash';
 import { useIsFetching } from 'react-query';
+import Immutable from 'immutable';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import { StreamsStore } from 'views/stores/StreamsStore';
@@ -132,6 +133,7 @@ const useInitialFormValues = (widget: Widget) => {
   const { streams } = widget;
   const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
   const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
+  console.log('!!!!!!!', { widget });
   const initialValuesFromPlugins = usePluggableInitialValues(widget);
 
   return useMemo(() => {
@@ -164,7 +166,16 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
   const formRef = useRef(null);
   const { parameters } = useParameters();
   const validate = (values) => _validateQueryString(values, globalOverride, pluggableSearchBarControls);
-  const initialValues = useInitialFormValues(widget);
+  const w = widget.toBuilder().filters(Immutable.List([{
+    description: '',
+    id: '6283b08c52a46a0b7c6568db',
+    negation: false,
+    queryString: 'http_method:GET',
+    title: '',
+    type: 'referenced',
+  }])).build();
+  console.log({ w });
+  const initialValues = useInitialFormValues(w);
   const _onSubmit = useCallback((values) => onSubmit(values, pluggableSearchBarControls, widget), [pluggableSearchBarControls, widget]);
 
   useBindApplySearchControlsChanges(formRef);
