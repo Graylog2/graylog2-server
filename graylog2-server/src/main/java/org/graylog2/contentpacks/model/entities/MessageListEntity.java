@@ -26,6 +26,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
@@ -60,12 +61,17 @@ public abstract class MessageListEntity implements SearchTypeEntity {
     @JsonProperty
     public abstract String id();
 
+    @Override
     @JsonProperty
     public abstract Optional<String> name();
 
     @Nullable
     @Override
     public abstract Filter filter();
+
+    @Override
+    @JsonProperty(FIELD_SEARCH_FILTERS)
+    public abstract List<UsedSearchFilter> filters();
 
     @JsonProperty
     public abstract int limit();
@@ -86,6 +92,7 @@ public abstract class MessageListEntity implements SearchTypeEntity {
                 .limit(150)
                 .offset(0)
                 .streams(Collections.emptySet())
+                .filters(Collections.emptyList())
                 .decorators(Collections.emptyList());
     }
 
@@ -101,6 +108,7 @@ public abstract class MessageListEntity implements SearchTypeEntity {
         @JsonCreator
         public static Builder createDefault() {
             return builder()
+                    .filters(Collections.emptyList())
                     .streams(Collections.emptySet());
         }
 
@@ -115,6 +123,9 @@ public abstract class MessageListEntity implements SearchTypeEntity {
 
         @JsonProperty
         public abstract Builder filter(@Nullable Filter filter);
+
+        @JsonProperty
+        public abstract Builder filters(List<UsedSearchFilter> filters);
 
         @JsonProperty
         @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
@@ -132,6 +143,7 @@ public abstract class MessageListEntity implements SearchTypeEntity {
         @JsonProperty
         public abstract Builder query(@Nullable BackendQuery query);
 
+        @Override
         @JsonProperty
         public abstract Builder streams(Set<String> streams);
 
@@ -151,23 +163,25 @@ public abstract class MessageListEntity implements SearchTypeEntity {
 
         public abstract Builder decorators(List<Decorator> decorators);
 
+        @Override
         public abstract MessageListEntity build();
     }
 
     @Override
     public SearchType toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
-       return MessageList.builder()
-       .limit(limit())
-       .streams(mappedStreams(nativeEntities))
-       .id(id())
-       .offset(offset())
-       .decorators(decorators())
-       .timerange(timerange().orElse(null))
-       .filter(filter())
-       .name(name().orElse(null))
-       .type(type())
-       .query(query().orElse(null))
-       .sort(sort())
-       .build();
+        return MessageList.builder()
+                .limit(limit())
+                .streams(mappedStreams(nativeEntities))
+                .id(id())
+                .offset(offset())
+                .decorators(decorators())
+                .timerange(timerange().orElse(null))
+                .filter(filter())
+                .filters(filters())
+                .name(name().orElse(null))
+                .type(type())
+                .query(query().orElse(null))
+                .sort(sort())
+                .build();
     }
 }

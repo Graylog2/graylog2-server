@@ -22,14 +22,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -66,12 +65,17 @@ public abstract class MessageList implements SearchType {
     @JsonProperty
     public abstract String id();
 
+    @Override
     @JsonProperty
     public abstract Optional<String> name();
 
     @Nullable
     @Override
     public abstract Filter filter();
+
+    @Override
+    @JsonProperty(FIELD_SEARCH_FILTERS)
+    public abstract List<UsedSearchFilter> filters();
 
     @JsonProperty
     public abstract int limit();
@@ -100,6 +104,7 @@ public abstract class MessageList implements SearchType {
                 .type(NAME)
                 .limit(150)
                 .offset(0)
+                .filters(Collections.emptyList())
                 .streams(Collections.emptySet())
                 .decorators(Collections.emptyList())
                 .fields(Collections.emptyList());
@@ -124,6 +129,7 @@ public abstract class MessageList implements SearchType {
         @JsonCreator
         public static Builder createDefault() {
             return builder()
+                    .filters(Collections.emptyList())
                     .streams(Collections.emptySet());
         }
 
@@ -140,6 +146,9 @@ public abstract class MessageList implements SearchType {
 
         @JsonProperty
         public abstract Builder filter(@Nullable Filter filter);
+
+        @JsonProperty(FIELD_SEARCH_FILTERS)
+        public abstract Builder filters(List<UsedSearchFilter> filters);
 
         @JsonProperty
         public abstract Builder fields(List<String> fields);
@@ -250,6 +259,7 @@ public abstract class MessageList implements SearchType {
                 .limit(limit())
                 .offset(offset())
                 .filter(filter())
+                .filters(filters())
                 .id(id())
                 .name(name().orElse(null))
                 .query(query().orElse(null))

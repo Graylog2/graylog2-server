@@ -167,6 +167,13 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 searchTypeOverrides.must(normalizedSearchTypeQuery);
             });
 
+            usedSearchFiltersToQueryStringsMapper.map(searchType.filters())
+                    .forEach(searchFilterQueryString -> {
+                        final String decorated = this.queryStringDecorators.decorate(searchFilterQueryString, job, query);
+                        final QueryBuilder normalized = normalizeQueryString(decorated);
+                        searchTypeOverrides.must(normalized);
+                    });
+
             searchTypeSourceBuilder.query(searchTypeOverrides);
 
             final String type = searchType.type();
