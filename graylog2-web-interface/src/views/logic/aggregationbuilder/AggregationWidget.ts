@@ -19,14 +19,16 @@ import { Map } from 'immutable';
 import isDeepEqual from 'stores/isDeepEqual';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+import type { FiltersType } from 'views/types';
 
 import AggregationWidgetConfig from './AggregationWidgetConfig';
 
 import Widget from '../widgets/Widget';
 
 export default class AggregationWidget extends Widget {
-  constructor(id: string, config: AggregationWidgetConfig, filter?: string, timerange?: TimeRange, query?: QueryString, streams: Array<string> = []) {
-    super(id, AggregationWidget.type, config, filter, timerange, query, streams);
+  // eslint-disable-next-line default-param-last
+  constructor(id: string, config: AggregationWidgetConfig, filter?: string, timerange?: TimeRange, query?: QueryString, streams: Array<string> = [], filters?: FiltersType) {
+    super(id, AggregationWidget.type, config, filter, timerange, query, streams, filters);
   }
 
   static type = 'AGGREGATION';
@@ -34,26 +36,26 @@ export default class AggregationWidget extends Widget {
   static defaultTitle = 'Untitled Aggregation';
 
   static fromJSON(value) {
-    const { id, config, filter, timerange, query, streams } = value;
+    const { id, config, filter, timerange, query, streams, filters } = value;
 
-    return new AggregationWidget(id, AggregationWidgetConfig.fromJSON(config), filter, timerange, query, streams);
+    return new AggregationWidget(id, AggregationWidgetConfig.fromJSON(config), filter, timerange, query, streams, filters);
   }
 
   toBuilder() {
-    const { id, config, filter, timerange, query, streams } = this._value;
+    const { id, config, filter, timerange, query, streams, filters } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
-    return new Builder(Map({ id, config, filter, timerange, query, streams }));
+    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
+    return new Builder(Map({ id, config, filter, timerange, query, streams, filters }));
   }
 
   static builder() {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
     return new Builder();
   }
 
   equals(other: any) {
     if (other instanceof AggregationWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams'].every((key) => isDeepEqual(this[key], other[key]));
+      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'filters'].every((key) => isDeepEqual(this[key], other[key]));
     }
 
     return false;
@@ -61,7 +63,7 @@ export default class AggregationWidget extends Widget {
 
   equalsForSearch(other: any) {
     if (other instanceof AggregationWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams'].every((key) => isEqualForSearch(this[key], other[key]));
+      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'filters'].every((key) => isEqualForSearch(this[key], other[key]));
     }
 
     return false;
@@ -70,8 +72,8 @@ export default class AggregationWidget extends Widget {
 
 class Builder extends Widget.Builder {
   build() {
-    const { id, config, filter, timerange, query, streams } = this.value.toObject();
+    const { id, config, filter, timerange, query, streams, filters } = this.value.toObject();
 
-    return new AggregationWidget(id, config, filter, timerange, query, streams);
+    return new AggregationWidget(id, config, filter, timerange, query, streams, filters);
   }
 }

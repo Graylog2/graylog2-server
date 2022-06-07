@@ -44,6 +44,7 @@ class Widget {
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static Builder: typeof Builder;
 
+  // eslint-disable-next-line default-param-last
   constructor(id: string, type: string, config: any, filter?: string, timerange?: TimeRange, query?: QueryString, streams: Array<string> = [], filters?: FiltersType) {
     this._value = { id, type, config, filter: filter === null ? undefined : filter, filters, timerange, query, streams };
   }
@@ -156,7 +157,7 @@ class Widget {
       return implementingClass.fromJSON(value);
     }
 
-    return new Widget(id, type, config, filter, filters, timerange, query, streams);
+    return new Widget(id, type, config, filter, timerange, query, streams, filters);
   }
 
   static empty() {
@@ -213,9 +214,7 @@ class Builder {
   }
 
   filters(value: FiltersType | null | undefined) {
-    console.log({ value });
     this.value = this.value.set('filters', value ? Immutable.List(value) : value);
-    console.log(this.value);
 
     return this;
   }
@@ -249,7 +248,6 @@ class Builder {
       query,
       streams,
     } = this.value.toObject();
-    console.log('!!!!!qqqqq!!', { filters });
 
     return new Widget(id, type, config, filter, timerange, query, streams, filters);
   }
