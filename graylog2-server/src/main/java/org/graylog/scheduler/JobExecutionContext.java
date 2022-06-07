@@ -32,10 +32,10 @@ public abstract class JobExecutionContext {
 
     public abstract JobTriggerUpdates jobTriggerUpdates();
 
-    public abstract AtomicBoolean isRunning();
+    public abstract AtomicBoolean schedulerIsRunning();
 
     public boolean isCancelled() {
-        if (!isRunning().get()) {
+        if (!schedulerIsRunning().get()) {
             return true;
         }
         final Optional<JobTriggerDto> triggerDto = jobTriggerService().get(trigger().id());
@@ -47,12 +47,12 @@ public abstract class JobExecutionContext {
     }
     public abstract DBJobTriggerService jobTriggerService();
 
-    public static JobExecutionContext create(JobTriggerDto trigger, JobDefinitionDto definition, JobTriggerUpdates jobTriggerUpdates, AtomicBoolean isRunning, DBJobTriggerService jobTriggerService) {
+    public static JobExecutionContext create(JobTriggerDto trigger, JobDefinitionDto definition, JobTriggerUpdates jobTriggerUpdates, AtomicBoolean schedulerIsRunning, DBJobTriggerService jobTriggerService) {
         return builder()
                 .trigger(trigger)
                 .definition(definition)
                 .jobTriggerUpdates(jobTriggerUpdates)
-                .isRunning(isRunning)
+                .schedulerIsRunning(schedulerIsRunning)
                 .jobTriggerService(jobTriggerService)
                 .build();
     }
@@ -76,7 +76,7 @@ public abstract class JobExecutionContext {
 
         public abstract Builder jobTriggerUpdates(JobTriggerUpdates jobTriggerUpdates);
 
-        public abstract Builder isRunning(AtomicBoolean isRunning);
+        public abstract Builder schedulerIsRunning(AtomicBoolean isRunning);
 
         public abstract Builder jobTriggerService(DBJobTriggerService jobTriggerService);
 

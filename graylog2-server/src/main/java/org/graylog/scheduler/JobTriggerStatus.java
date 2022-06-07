@@ -51,5 +51,12 @@ public enum JobTriggerStatus {
      * intervention to fix the underlying issue. (e.g. too many unsuccessful retries, missing Job class)
      */
     @JsonProperty("error")
-    ERROR
+    ERROR,
+
+    /**
+     * The trigger was manually cancelled and has aborted its execution.
+     */
+    // TODO not sure how / where to set this
+    @JsonProperty("cancelled")
+    CANCELLED
 }

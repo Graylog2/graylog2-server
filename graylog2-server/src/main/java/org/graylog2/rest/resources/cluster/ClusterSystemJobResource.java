@@ -17,10 +17,13 @@
 package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.scheduler.JobTriggerStatus;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.cluster.Node;
@@ -30,6 +33,7 @@ import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.SystemJobSummary;
 import org.graylog2.rest.resources.system.jobs.RemoteSystemJobResource;
 import org.graylog2.shared.rest.resources.ProxiedResource;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Response;
@@ -71,7 +75,16 @@ public class ClusterSystemJobResource extends ProxiedResource {
     @ApiOperation(value = "List currently running jobs")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Optional<Map<String, List<SystemJobSummary>>>> list() throws IOException {
-        return getForAllNodes(RemoteSystemJobResource::list, createRemoteInterfaceProvider(RemoteSystemJobResource.class));
+        final Map<String, Optional<Map<String, List<SystemJobSummary>>>> forAllNodes = getForAllNodes(RemoteSystemJobResource::list, createRemoteInterfaceProvider(RemoteSystemJobResource.class));
+
+        final Node someNode = nodeService.allActive().values().stream().findFirst().get();
+        forAllNodes.put(someNode.getNodeId(), Optional.of(ImmutableMap.of("jobs", ImmutableList.of(
+                SystemJobSummary.create("23948098", "Restores an index from the archive", "org.graylog.plugins.archive.job.ArchiveRestoreSystemJob", "Restoring 234985 documents into index: graylog_123",someNode.getNodeId(), DateTime.now(), 24, true, true, JobTriggerStatus.RUNNING),
+                SystemJobSummary.create("92948014", "Restores an index from the archive", "org.graylog.plugins.archive.job.ArchiveRestoreSystemJob", "Restoring 9285 documents into index: graylog_432", someNode.getNodeId(), DateTime.now().minus(100000), 100, true, true, JobTriggerStatus.COMPLETE),
+                SystemJobSummary.create("82948013", "Restores an index from the archive", "org.graylog.plugins.archive.job.ArchiveRestoreSystemJob", "Restoring 29189 documents into index: graylog_b0rk", "dummy-node", DateTime.now().minus(2000000), 0, true, true, JobTriggerStatus.CANCELLED),
+                SystemJobSummary.create("42948012", "Restores an index from the archive", "org.graylog.plugins.archive.job.ArchiveRestoreSystemJob", "Restoring 3595 documents into index: graylog_b0rk", "dummy-node", DateTime.now().minus(3000000), 80, true, true, JobTriggerStatus.ERROR)
+        ))));
+        return forAllNodes;
     }
 
     @GET

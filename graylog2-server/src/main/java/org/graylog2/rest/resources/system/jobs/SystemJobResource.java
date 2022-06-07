@@ -58,7 +58,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @RequiresAuthentication
 @Api(value = "System/Jobs", description = "System Jobs")
@@ -92,7 +91,7 @@ public class SystemJobResource extends RestResource {
             if (isPermitted(RestPermissions.SYSTEMJOBS_READ, entry.getKey())) {
                 final SystemJob systemJob = entry.getValue();
                 jobs.add(SystemJobSummary.create(
-                        UUID.fromString(systemJob.getId()),
+                        systemJob.getId(),
                         systemJob.getDescription(),
                         systemJob.getClassName(),
                         systemJob.getInfo(),
@@ -127,7 +126,7 @@ public class SystemJobResource extends RestResource {
         }
 
         return SystemJobSummary.create(
-                UUID.fromString(systemJob.getId()),
+                systemJob.getId(),
                 systemJob.getDescription(),
                 systemJob.getClassName(),
                 systemJob.getInfo(),
@@ -181,6 +180,7 @@ public class SystemJobResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.SYSTEM_JOB_STOP)
     public SystemJobSummary cancel(@ApiParam(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) {
         SystemJob systemJob = systemJobManager.getRunningJobs().get(jobId);
+        // TODO
         if (systemJob == null) {
             throw new NotFoundException("No system job with ID <" + jobId + "> found");
         }
@@ -194,7 +194,7 @@ public class SystemJobResource extends RestResource {
         }
 
         return SystemJobSummary.create(
-                UUID.fromString(systemJob.getId()),
+                systemJob.getId(),
                 systemJob.getDescription(),
                 systemJob.getClassName(),
                 systemJob.getInfo(),

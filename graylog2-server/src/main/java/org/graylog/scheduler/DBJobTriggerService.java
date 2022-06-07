@@ -22,8 +22,8 @@ import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
 import one.util.streamex.StreamEx;
 import org.bson.types.ObjectId;
-import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
+import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -43,6 +43,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -476,6 +477,18 @@ public class DBJobTriggerService {
         final int n = db.update(query, update).getN();
         if (n != 1) {
             LOG.warn("Progress update for trigger <{}> returned unexpected write result count <{}>", trigger, n);
+        }
+    }
+
+    public int cancelTriggerWithQuery(Query query) {
+        final DBUpdate.Builder update = DBUpdate.set(JobTriggerDto.FIELD_IS_CANCELLED, true);
+
+        return db.update(query, update).getN();
+    }
+
+    public List<JobTriggerDto> findWithQuery(Query query) {
+        try (final DBCursor<JobTriggerDto> cursor = db.find(query).sort(DBSort.desc(FIELD_UPDATED_AT))) {
+            return ImmutableList.copyOf((Iterator<? extends JobTriggerDto>) cursor);
         }
     }
 }

@@ -83,6 +83,7 @@ public class JobExecutionEngine {
      * Signal shutdown to the engine.
      */
     public void shutdown() {
+        // TODO this should indicate that running jobs have been aborted
         isRunning.set(false);
     }
 

@@ -115,7 +115,7 @@ public class EventProcessorExecutionJobTest {
         final JobExecutionContext jobExecutionContext = JobExecutionContext.builder()
                 .definition(jobDefinition)
                 .trigger(trigger)
-                .isRunning(new AtomicBoolean(true))
+                .schedulerIsRunning(new AtomicBoolean(true))
                 .jobTriggerUpdates(new JobTriggerUpdates(clock, jobScheduleStrategies, trigger))
                 .build();
 
@@ -174,7 +174,7 @@ public class EventProcessorExecutionJobTest {
         final JobExecutionContext jobExecutionContext = JobExecutionContext.builder()
                 .definition(jobDefinition)
                 .trigger(trigger)
-                .isRunning(new AtomicBoolean(true))
+                .schedulerIsRunning(new AtomicBoolean(true))
                 .jobTriggerUpdates(new JobTriggerUpdates(clock, jobScheduleStrategies, trigger))
                 .build();
 
@@ -244,7 +244,7 @@ public class EventProcessorExecutionJobTest {
         final JobExecutionContext jobExecutionContext = JobExecutionContext.builder()
                 .definition(jobDefinition)
                 .trigger(trigger)
-                .isRunning(new AtomicBoolean(true))
+                .schedulerIsRunning(new AtomicBoolean(true))
                 .jobTriggerUpdates(new JobTriggerUpdates(clock, jobScheduleStrategies, trigger))
                 .build();
 
@@ -313,7 +313,7 @@ public class EventProcessorExecutionJobTest {
         final JobExecutionContext jobExecutionContext = JobExecutionContext.builder()
                 .definition(jobDefinition)
                 .trigger(trigger)
-                .isRunning(new AtomicBoolean(true))
+                .schedulerIsRunning(new AtomicBoolean(true))
                 .jobTriggerUpdates(new JobTriggerUpdates(clock, jobScheduleStrategies, trigger))
                 .build();
 
@@ -378,7 +378,7 @@ public class EventProcessorExecutionJobTest {
         final JobExecutionContext jobExecutionContext = JobExecutionContext.builder()
                 .definition(jobDefinition)
                 .trigger(trigger)
-                .isRunning(new AtomicBoolean(true))
+                .schedulerIsRunning(new AtomicBoolean(true))
                 .jobTriggerUpdates(new JobTriggerUpdates(clock, jobScheduleStrategies, trigger))
                 .build();
 
@@ -433,7 +433,7 @@ public class EventProcessorExecutionJobTest {
         final JobExecutionContext jobExecutionContext = JobExecutionContext.builder()
                 .definition(jobDefinition)
                 .trigger(trigger)
-                .isRunning(new AtomicBoolean(true))
+                .schedulerIsRunning(new AtomicBoolean(true))
                 .jobTriggerUpdates(new JobTriggerUpdates(clock, jobScheduleStrategies, trigger))
                 .build();
 
@@ -512,7 +512,7 @@ public class EventProcessorExecutionJobTest {
         final JobExecutionContext jobExecutionContext = JobExecutionContext.builder()
                 .definition(jobDefinition)
                 .trigger(trigger)
-                .isRunning(new AtomicBoolean(true))
+                .schedulerIsRunning(new AtomicBoolean(true))
                 .jobTriggerUpdates(new JobTriggerUpdates(clock, jobScheduleStrategies, trigger))
                 .build();
 
@@ -597,7 +597,7 @@ public class EventProcessorExecutionJobTest {
         final JobExecutionContext jobExecutionContext = JobExecutionContext.builder()
                 .definition(jobDefinition)
                 .trigger(trigger)
-                .isRunning(new AtomicBoolean(true))
+                .schedulerIsRunning(new AtomicBoolean(true))
                 .jobTriggerUpdates(new JobTriggerUpdates(clock, jobScheduleStrategies, trigger))
                 .build();
 

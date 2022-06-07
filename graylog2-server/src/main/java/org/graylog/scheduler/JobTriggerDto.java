@@ -34,7 +34,7 @@ import java.util.Set;
 @AutoValue
 @JsonDeserialize(builder = JobTriggerDto.Builder.class)
 public abstract class JobTriggerDto {
-    private static final String FIELD_ID = "id";
+    public static final String FIELD_ID = "_id";
     public static final String FIELD_JOB_DEFINITION_ID = "job_definition_id";
     static final String FIELD_START_TIME = "start_time";
     static final String FIELD_END_TIME = "end_time";
@@ -45,9 +45,9 @@ public abstract class JobTriggerDto {
     static final String FIELD_STATUS = "status";
     static final String FIELD_LOCK = "lock";
     static final String FIELD_SCHEDULE = "schedule";
-    static final String FIELD_DATA = "data";
+    public static final String FIELD_DATA = "data";
     static final String FIELD_CONSTRAINTS = "constraints";
-    private static final String FIELD_IS_CANCELLED = "is_cancelled";
+    public static final String FIELD_IS_CANCELLED = "is_cancelled";
 
     @Id
     @ObjectId
