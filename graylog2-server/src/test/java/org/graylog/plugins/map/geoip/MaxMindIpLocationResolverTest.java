@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -63,7 +64,6 @@ class MaxMindIpLocationResolverTest {
     void cleanUp() throws Exception {
         mocks.close();
     }
-
 
     @Test
     void testDoGetGeoIpData() throws IOException, GeoIp2Exception {
@@ -130,7 +130,7 @@ class MaxMindIpLocationResolverTest {
 
         InetAddress address = InetAddress.getByName("localhost");
         Optional<GeoLocationInformation> optInfo = resolver.doGetGeoIpData(address);
-        assertNonNullLocation(optInfo);
+        assertFalse(optInfo.isPresent());
 
     }
 
@@ -144,16 +144,8 @@ class MaxMindIpLocationResolverTest {
 
         InetAddress address = InetAddress.getByName("localhost");
         Optional<GeoLocationInformation> optInfo = resolver.doGetGeoIpData(address);
-        assertNonNullLocation(optInfo);
+        assertFalse(optInfo.isPresent());
 
-    }
-
-    private void assertNonNullLocation(Optional<GeoLocationInformation> optInfo) {
-        assertTrue(optInfo.isPresent());
-        GeoLocationInformation info = optInfo.get();
-
-        assertEquals(0.0, info.latitude());
-        assertEquals(0.0, info.longitude());
     }
 
     private CityResponse createCityResponse(Country country, City city, Location location) {
@@ -176,6 +168,6 @@ class MaxMindIpLocationResolverTest {
     }
 
     private static Location createLocation() {
-        return new Location(10, 10_000_000, 16.766945605833932, -3.003387490676568, 1, 1, "GMT");
+        return new Location(10, 10_000_000, 16.766945605833932, -3.003387490676568, 1, 1, "N/A");
     }
 }
