@@ -174,7 +174,7 @@ public class SearchSyncIT {
                 .accept("application/vnd.graylog.search.v2+json")
                 .contentType("application/vnd.graylog.search.v2+json")
                 .when()
-                .body(fixture("org/graylog/plugins/views/search-with-three-empty-queries.json"))
+                .body(fixture("org/graylog/plugins/views/search-with-three-empty-queries-v2.json"))
                 .post("/views/search")
                 .then()
                 .statusCode(201)
