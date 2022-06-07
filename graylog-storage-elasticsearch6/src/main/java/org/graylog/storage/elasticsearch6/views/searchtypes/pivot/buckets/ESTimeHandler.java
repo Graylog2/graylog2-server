@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.elasticsearch6.views.searchtypes.pivot.buckets;
 
-import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.DateHistogramAggregation;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -85,12 +84,8 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, DateHistogramA
     }
 
     @Override
-    public Stream<Bucket> doHandleResult(Pivot pivot,
-                                         Time bucketSpec,
-                                         SearchResult searchResult,
-                                         DateHistogramAggregation dateHistogramAggregation,
-                                         ESPivot searchTypeHandler,
-                                         ESGeneratedQueryContext esGeneratedQueryContext) {
+    public Stream<Bucket> doHandleResult(Time bucketSpec,
+                                         DateHistogramAggregation dateHistogramAggregation) {
         return dateHistogramAggregation.getBuckets().stream()
                 .map(dateHistogram -> Bucket.create(dateHistogram.getTimeAsString(), dateHistogram));
     }

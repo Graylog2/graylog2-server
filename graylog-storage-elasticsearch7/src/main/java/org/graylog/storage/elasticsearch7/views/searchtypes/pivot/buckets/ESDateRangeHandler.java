@@ -19,7 +19,6 @@ package org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.range.DateRangeAggregationBuilder;
@@ -57,12 +56,9 @@ public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket
     }
 
     @Override
-    public Stream<Bucket> doHandleResult(Pivot pivot,
-                                         DateRangeBucket dateRangeBucket,
-                                         SearchResponse searchResult,
-                                         ParsedDateRange rangeAggregation,
-                                         ESPivot searchTypeHandler,
-                                         ESGeneratedQueryContext esGeneratedQueryContext) {
+    public Stream<Bucket> doHandleResult(
+            DateRangeBucket dateRangeBucket,
+            ParsedDateRange rangeAggregation) {
         if (dateRangeBucket.bucketKey().equals(DateRangeBucket.BucketKey.TO)) {
             return rangeAggregation.getBuckets().stream()
                     .map(range -> Bucket.create(range.getToAsString(), range));
