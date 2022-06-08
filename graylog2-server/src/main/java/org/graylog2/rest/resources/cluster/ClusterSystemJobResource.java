@@ -82,7 +82,8 @@ public class ClusterSystemJobResource extends ProxiedResource {
                 SystemJobSummary.create("23948098", "Restores an index from the archive", "org.graylog.plugins.archive.job.ArchiveRestoreSystemJob", "Restoring 234985 documents into index: graylog_123",someNode.getNodeId(), Tools.nowUTC(), 24, true, true, JobTriggerStatus.RUNNING),
                 SystemJobSummary.create("92948014", "Restores an index from the archive", "org.graylog.plugins.archive.job.ArchiveRestoreSystemJob", "Restoring 9285 documents into index: graylog_432", someNode.getNodeId(), Tools.nowUTC().minus(100000), 100, true, true, JobTriggerStatus.COMPLETE),
                 SystemJobSummary.create("82948013", "Restores an index from the archive", "org.graylog.plugins.archive.job.ArchiveRestoreSystemJob", "Restoring 29189 documents into index: graylog_b0rk", "dummy-node", Tools.nowUTC().minus(2000000), 0, true, true, JobTriggerStatus.CANCELLED),
-                SystemJobSummary.create("42948012", "Restores an index from the archive", "org.graylog.plugins.archive.job.ArchiveRestoreSystemJob", "Restoring 3595 documents into index: graylog_b0rk", "dummy-node", Tools.nowUTC().minus(3000000), 80, true, true, JobTriggerStatus.ERROR)
+                SystemJobSummary.create("42948012", "Restores an index from the archive", "org.graylog.plugins.archive.job.ArchiveRestoreSystemJob", "Restoring 3595 documents into index: graylog_b0rk", "dummy-node", Tools.nowUTC().minus(3000000), 80, true, true, JobTriggerStatus.ERROR),
+                SystemJobSummary.create("62948014", "Restores an index from the archive", "org.graylog.plugins.archive.job.ArchiveRestoreSystemJob", "Restoring 3595 documents into index: graylog_b0rk", someNode.getNodeId(), Tools.nowUTC().minus(3000), 0, true, true, JobTriggerStatus.RUNNABLE)
         ))));
         return forAllNodes;
     }
