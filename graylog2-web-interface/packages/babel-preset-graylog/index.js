@@ -37,6 +37,7 @@ module.exports = (api) => {
           modules: false,
           useBuiltIns: 'entry',
           corejs: '3.9',
+          shippedProposals: true,
         }],
         require('@babel/preset-react'),
         require('@babel/preset-typescript'),
