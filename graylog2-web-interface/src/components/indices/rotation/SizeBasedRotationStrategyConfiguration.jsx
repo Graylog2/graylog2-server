@@ -15,53 +15,51 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 
+import { getValueFromInput } from 'util/FormsUtils';
 import { Input } from 'components/bootstrap';
 import NumberUtils from 'util/NumberUtils';
 
-class SizeBasedRotationStrategyConfiguration extends React.Component {
-  static propTypes = {
-    config: PropTypes.object.isRequired,
-    jsonSchema: PropTypes.object.isRequired,
-    updateConfig: PropTypes.func.isRequired,
-  };
+const SizeBasedRotationStrategyConfiguration = ({ config, updateConfig }) => {
+  const { max_size } = config;
+  const [maxSize, setMaxSize] = useState(max_size);
 
-  state = {
-    max_size: this.props.config.max_size,
-  };
-
-  _onInputUpdate = (field) => {
+  const _onInputUpdate = (field) => {
     return (e) => {
       const update = {};
+      const value = getValueFromInput(e.target);
+      update[field] = value;
 
-      update[field] = e.target.value;
-
-      this.setState(update);
-      this.props.updateConfig(update);
+      setMaxSize(value);
+      updateConfig(update);
     };
   };
 
-  _formatSize = () => {
-    return NumberUtils.formatBytes(this.state.max_size);
+  const _formatSize = () => {
+    return NumberUtils.formatBytes(maxSize);
   };
 
-  render() {
-    return (
-      <div>
-        <fieldset>
-          <Input type="number"
-                 id="max-size"
-                 label="Max size per index (in bytes)"
-                 onChange={this._onInputUpdate('max_size')}
-                 value={this.state.max_size}
-                 help="Maximum size of an index before it gets rotated"
-                 addonAfter={this._formatSize()}
-                 required />
-        </fieldset>
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <Input type="number"
+             id="max-size"
+             label="Max size per index (in bytes)"
+             onChange={_onInputUpdate('max_size')}
+             labelClassName="col-sm-3"
+             wrapperClassName="col-sm-9"
+             value={maxSize}
+             help="Maximum size of an index before it gets rotated"
+             addonAfter={_formatSize()}
+             required />
+    </div>
+  );
+};
+
+SizeBasedRotationStrategyConfiguration.propTypes = {
+  config: PropTypes.object.isRequired,
+  updateConfig: PropTypes.func.isRequired,
+};
 
 export default SizeBasedRotationStrategyConfiguration;

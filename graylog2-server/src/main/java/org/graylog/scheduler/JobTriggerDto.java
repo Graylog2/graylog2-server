@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.clock.JobSchedulerSystemClock;
 import org.joda.time.DateTime;
@@ -28,6 +29,7 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = JobTriggerDto.Builder.class)
@@ -44,6 +46,8 @@ public abstract class JobTriggerDto {
     static final String FIELD_LOCK = "lock";
     static final String FIELD_SCHEDULE = "schedule";
     static final String FIELD_DATA = "data";
+
+    static final String FIELD_CONSTRAINTS = "constraints";
 
     @Id
     @ObjectId
@@ -84,6 +88,9 @@ public abstract class JobTriggerDto {
     @JsonProperty(FIELD_DATA)
     public abstract Optional<JobTriggerData> data();
 
+    @JsonProperty(FIELD_CONSTRAINTS)
+    public abstract Set<String> constraints();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -110,6 +117,7 @@ public abstract class JobTriggerDto {
                     .updatedAt(now)
                     .nextTime(now)
                     .status(JobTriggerStatus.RUNNABLE)
+                    .constraints(ImmutableSet.of())
                     .lock(JobTriggerLock.empty());
         }
 
@@ -150,6 +158,9 @@ public abstract class JobTriggerDto {
 
         @JsonProperty(FIELD_DATA)
         public abstract Builder data(@Nullable JobTriggerData data);
+
+        @JsonProperty(FIELD_CONSTRAINTS)
+        public abstract Builder constraints(Set<String> constraints);
 
         public abstract JobTriggerDto build();
     }

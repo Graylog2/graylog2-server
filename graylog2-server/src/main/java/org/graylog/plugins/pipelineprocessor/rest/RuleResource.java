@@ -84,6 +84,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     private static final Logger log = LoggerFactory.getLogger(RuleResource.class);
 
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put(RuleDao.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put(RuleDao.FIELD_TITLE, SearchQueryField.create(RuleDao.FIELD_TITLE))
             .put(RuleDao.FIELD_DESCRIPTION, SearchQueryField.create(RuleDao.FIELD_DESCRIPTION))
             .build();

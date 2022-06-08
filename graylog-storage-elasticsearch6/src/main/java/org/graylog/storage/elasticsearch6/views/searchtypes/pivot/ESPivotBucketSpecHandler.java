@@ -19,14 +19,12 @@ package org.graylog.storage.elasticsearch6.views.searchtypes.pivot;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.Aggregation;
 import io.searchbox.core.search.aggregation.MetricAggregation;
-import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
-import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
-import org.graylog.plugins.views.search.engine.SearchTypeHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
 
 import java.util.stream.Stream;
 
@@ -47,12 +45,12 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec, AGG
 
     @SuppressWarnings("unchecked")
     @Override
-    public Stream<Bucket> handleResult(Pivot pivot, BucketSpec bucketSpec, Object queryResult, Object aggregationResult, SearchTypeHandler searchTypeHandler, GeneratedQueryContext queryContext) {
-        return doHandleResult(pivot, (SPEC_TYPE) bucketSpec, (SearchResult) queryResult, (AGGREGATION_RESULT) aggregationResult, (ESPivot) searchTypeHandler, (ESGeneratedQueryContext) queryContext);
+    public Stream<Bucket> handleResult(BucketSpec bucketSpec, Object aggregationResult) {
+        return doHandleResult((SPEC_TYPE) bucketSpec, (AGGREGATION_RESULT) aggregationResult);
     }
 
     @Override
-    public abstract Stream<Bucket> doHandleResult(Pivot pivot, SPEC_TYPE bucketSpec, SearchResult searchResult, AGGREGATION_RESULT aggregation_result, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext);
+    public abstract Stream<Bucket> doHandleResult(SPEC_TYPE bucketSpec, AGGREGATION_RESULT aggregationResult);
 
     public static class Bucket {
 
