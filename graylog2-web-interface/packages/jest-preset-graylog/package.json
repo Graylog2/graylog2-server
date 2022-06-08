@@ -22,7 +22,7 @@
     "@testing-library/react": "12.1.5",
     "@testing-library/react-hooks": "^8.0.0",
     "@types/enzyme": "3.10.12",
-    "@jest/types": "27.5.1",
+    "@jest/types": "28.1.1",
     "babel-jest": "^27.4.6",
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
