@@ -21,6 +21,8 @@ import { Alert } from 'components/bootstrap';
 
 const StyledAlert = styled(Alert)`
   overflow: auto;
+  margin-right: 15px;
+  margin-left: 15px;
 `;
 
 const NoopRetentionStrategyConfiguration = () => {
