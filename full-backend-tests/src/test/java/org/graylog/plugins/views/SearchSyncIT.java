@@ -153,6 +153,7 @@ public class SearchSyncIT {
     @ContainerMatrixTest
     void testThatQueryOrderStaysConsistentInV1() {
         given()
+                .config(sut.withGraylogBackendFailureConfig())
                 .spec(requestSpec)
                 .accept("application/json")
                 .contentType("application/json")
@@ -160,6 +161,7 @@ public class SearchSyncIT {
                 .body(fixture("org/graylog/plugins/views/search-with-three-empty-queries.json"))
                 .post("/views/search")
                 .then()
+                .log().ifStatusCodeMatches(not(201))
                 .statusCode(201)
                 .assertThat()
                 .body("queries*.id", contains("4966dd79-2c7d-4ba9-8f90-c84aea7b5c49",
@@ -170,6 +172,7 @@ public class SearchSyncIT {
     @ContainerMatrixTest
     void testThatQueryOrderStaysConsistentInV2() {
         given()
+                .config(sut.withGraylogBackendFailureConfig())
                 .spec(requestSpec)
                 .accept("application/vnd.graylog.search.v2+json")
                 .contentType("application/vnd.graylog.search.v2+json")
@@ -177,6 +180,7 @@ public class SearchSyncIT {
                 .body(fixture("org/graylog/plugins/views/search-with-three-empty-queries-v2.json"))
                 .post("/views/search")
                 .then()
+                .log().ifStatusCodeMatches(not(201))
                 .statusCode(201)
                 .assertThat()
                 .body("queries*.id", contains("4966dd79-2c7d-4ba9-8f90-c84aea7b5c49",
