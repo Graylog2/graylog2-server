@@ -17,7 +17,6 @@
 import type React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikErrors } from 'formik';
-import type { List } from 'immutable';
 
 import type Widget from 'views/logic/widgets/Widget';
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
@@ -257,7 +256,7 @@ export type SearchFilter = {
   queryString: string
 }
 
-export type FiltersType = List<SearchFilter>
+export type FiltersType = Immutable.List<SearchFilter>
 
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
