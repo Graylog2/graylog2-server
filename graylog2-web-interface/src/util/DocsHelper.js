@@ -32,6 +32,9 @@ class DocsHelper {
     ES_CLUSTER_UNAVAILABLE: 'elasticsearch#configuration',
     ES_OPEN_FILE_LIMITS: 'elasticsearch#configuration',
     EXTRACTORS: 'extractors',
+    ILLUMINATE: {
+      INSTALL: 'illuminate-installer',
+    },
     INDEXER_FAILURES: 'indexer-failures',
     INDEX_MODEL: 'index-model',
     LOAD_BALANCERS: 'load-balancers',
