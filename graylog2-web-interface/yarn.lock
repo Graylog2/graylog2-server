@@ -21,7 +21,7 @@
   resolved "https://registry.yarnpkg.com/@babel/compat-data/-/compat-data-7.17.10.tgz#711dc726a492dfc8be8220028b1b92482362baab"
   integrity sha512-GZt/TCsG70Ms19gfZO1tM4CVnXsPgEPBCpJu+Qz3L0LUDsY5nZqFZglIoPC1kIYOtNBZlrnFT+klg12vFGZXrw==
 
-"@babel/core@^7.1.0", "@babel/core@^7.12.3", "@babel/core@^7.17.9", "@babel/core@^7.18.0", "@babel/core@^7.7.2", "@babel/core@^7.7.5":
+"@babel/core@^7.1.0", "@babel/core@^7.12.3", "@babel/core@^7.17.9", "@babel/core@^7.18.2", "@babel/core@^7.7.2", "@babel/core@^7.7.5":
   version "7.18.2"
   resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.18.2.tgz#87b2fcd7cce9becaa7f5acebdc4f09f3dd19d876"
   integrity sha512-A8pri1YJiC5UnkdrWcmfZTJTV85b4UXTAfImGmCfYmax4TR9Cw8sDS0MOk++Gp2mE/BefVJ5nwy5yzqNJbP/DQ==
@@ -501,7 +501,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.14.5"
 
-"@babel/plugin-syntax-dynamic-import@^7.8.3":
+"@babel/plugin-syntax-dynamic-import@7.8.3", "@babel/plugin-syntax-dynamic-import@^7.8.3":
   version "7.8.3"
   resolved "https://registry.yarnpkg.com/@babel/plugin-syntax-dynamic-import/-/plugin-syntax-dynamic-import-7.8.3.tgz#62bf98b2da3cd21d626154fc96ee5b3cb68eacb3"
   integrity sha512-5gdGbFon+PszYzqs83S3E5mpi7/y/8M9eC90MRTZfduQOYW76ig6SOSPNe41IG5LoP3FGBn2N0RjVDSQiS94kQ==
@@ -847,7 +847,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.17.12"
 
-"@babel/plugin-transform-runtime@^7.18.0":
+"@babel/plugin-transform-runtime@7.18.2":
   version "7.18.2"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-runtime/-/plugin-transform-runtime-7.18.2.tgz#04637de1e45ae8847ff14b9beead09c33d34374d"
   integrity sha512-mr1ufuRMfS52ttq+1G1PD8OJNqgcTFjq3hwn8SZ5n1x1pBhi0E36rYMdTK0TsKtApJ4lDEdfXJwtGobQMHSMPg==
@@ -919,7 +919,7 @@
     "@babel/helper-create-regexp-features-plugin" "^7.16.7"
     "@babel/helper-plugin-utils" "^7.16.7"
 
-"@babel/preset-env@^7.18.0":
+"@babel/preset-env@7.18.2":
   version "7.18.2"
   resolved "https://registry.yarnpkg.com/@babel/preset-env/-/preset-env-7.18.2.tgz#f47d3000a098617926e674c945d95a28cb90977a"
   integrity sha512-PfpdxotV6afmXMU47S08F9ZKIm2bJIQ0YbAAtDfIENX7G1NUAXigLREh69CWDjtgUy7dYn7bsMzkgdtAlmS68Q==
@@ -1011,7 +1011,7 @@
     "@babel/types" "^7.4.4"
     esutils "^2.0.2"
 
-"@babel/preset-react@^7.17.12":
+"@babel/preset-react@7.17.12":
   version "7.17.12"
   resolved "https://registry.yarnpkg.com/@babel/preset-react/-/preset-react-7.17.12.tgz#62adbd2d1870c0de3893095757ed5b00b492ab3d"
   integrity sha512-h5U+rwreXtZaRBEQhW1hOJLMq8XNJBQ/9oymXiCXTuT/0uOwpbT0gUt+sXeOqoXBgNuUKI7TaObVwoEyWkpFgA==
@@ -1023,7 +1023,7 @@
     "@babel/plugin-transform-react-jsx-development" "^7.16.7"
     "@babel/plugin-transform-react-pure-annotations" "^7.16.7"
 
-"@babel/preset-typescript@^7.17.12":
+"@babel/preset-typescript@7.17.12":
   version "7.17.12"
   resolved "https://registry.yarnpkg.com/@babel/preset-typescript/-/preset-typescript-7.17.12.tgz#40269e0a0084d56fc5731b6c40febe1c9a4a3e8c"
   integrity sha512-S1ViF8W2QwAKUGJXxP9NAfNaqGDdEBJKpYkxHf5Yy2C4NPPzXGeR3Lhk7G8xJaaLcFTRfNjVbtbVtm8Gb0mqvg==
@@ -3558,13 +3558,12 @@ babel-preset-current-node-syntax@^1.0.0:
 "babel-preset-graylog@file:packages/babel-preset-graylog":
   version "1.0.0"
   dependencies:
-    "@babel/core" "^7.18.0"
-    "@babel/plugin-proposal-class-properties" "^7.17.12"
-    "@babel/plugin-syntax-dynamic-import" "^7.8.3"
-    "@babel/plugin-transform-runtime" "^7.18.0"
-    "@babel/preset-env" "^7.18.0"
-    "@babel/preset-react" "^7.17.12"
-    "@babel/preset-typescript" "^7.17.12"
+    "@babel/core" "^7.18.2"
+    "@babel/plugin-syntax-dynamic-import" "7.8.3"
+    "@babel/plugin-transform-runtime" "7.18.2"
+    "@babel/preset-env" "7.18.2"
+    "@babel/preset-react" "7.17.12"
+    "@babel/preset-typescript" "7.17.12"
     babel-plugin-styled-components "^2.0.7"
 
 babel-preset-jest@^27.0.1:
@@ -6897,13 +6896,13 @@ graceful-fs@^4.2.9:
 "graylog-web-plugin@file:packages/graylog-web-plugin":
   version "4.4.0-SNAPSHOT"
   dependencies:
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-79bceb92-0113-432a-b494-f59ee94c1e69-1654088554181/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-f77109e6-8b0e-4e22-b7e3-7af13f4001ae-1654733912898/node_modules/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:packages/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-f77109e6-8b0e-4e22-b7e3-7af13f4001ae-1654733912898/node_modules/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:packages/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-f77109e6-8b0e-4e22-b7e3-7af13f4001ae-1654733912898/node_modules/jest-preset-graylog"
     jquery "3.6.0"
     moment "2.29.3"
     moment-timezone "0.5.34"
