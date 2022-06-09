@@ -67,7 +67,7 @@ public class DefaultGranteeService implements GranteeService {
                 .collect(ImmutableSet.toImmutableSet());
     }
 
-    public boolean isAllowedType(UserAndTeamsConfig config, Grantee grantee) {
+    protected boolean isAllowedType(UserAndTeamsConfig config, Grantee grantee) {
         final boolean permittedGlobal = config.sharingWithEveryone() && Grantee.GRANTEE_TYPE_GLOBAL.equals(grantee.type());
         final boolean permittedUser = config.sharingWithUsers() && Grantee.GRANTEE_TYPE_USER.equals(grantee.type());
         return permittedGlobal || permittedUser;
