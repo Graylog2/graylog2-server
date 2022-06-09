@@ -59,6 +59,21 @@ public class DefaultGranteeService implements GranteeService {
     }
 
     @Override
+    public ImmutableSet<Grantee> getModifiableGrantees(Set<Grantee> availableGrantees, ImmutableSet<EntityShareResponse.ActiveShare> activeShares) {
+        final UserAndTeamsConfig config = clusterConfigService.getOrDefault(UserAndTeamsConfig.class, UserAndTeamsConfig.DEFAULT_VALUES);
+        return availableGrantees.stream()
+                .filter(grantee -> isAllowedType(config, grantee) || activeShares.stream().
+                        anyMatch(activeShare -> activeShare.grantee().equals(grantee.grn())))
+                .collect(ImmutableSet.toImmutableSet());
+    }
+
+    protected boolean isAllowedType(UserAndTeamsConfig config, Grantee grantee) {
+        final boolean permittedGlobal = config.sharingWithEveryone() && Grantee.GRANTEE_TYPE_GLOBAL.equals(grantee.type());
+        final boolean permittedUser = config.sharingWithUsers() && Grantee.GRANTEE_TYPE_USER.equals(grantee.type());
+        return permittedGlobal || permittedUser;
+    }
+
+    @Override
     public Set<GRN> getGranteeAliases(GRN grantee) {
         return Collections.singleton(grantee);
     }
@@ -77,11 +92,6 @@ public class DefaultGranteeService implements GranteeService {
     }
 
     private ImmutableSet<Grantee> getAvailableUserGrantees(User sharingUser) {
-        final UserAndTeamsConfig config = clusterConfigService.getOrDefault(UserAndTeamsConfig.class, UserAndTeamsConfig.DEFAULT_VALUES);
-        if (!config.sharingWithUsers()) {
-            return ImmutableSet.of();
-        }
-
         return getVisibleUsers(sharingUser).stream()
                 // Don't return the sharing user in available grantees until we want to support that sharing users
                 // can remove themselves from an entity.
@@ -94,10 +104,6 @@ public class DefaultGranteeService implements GranteeService {
     }
 
     private Optional<Grantee> getGlobalGrantee() {
-        final UserAndTeamsConfig config = clusterConfigService.getOrDefault(UserAndTeamsConfig.class, UserAndTeamsConfig.DEFAULT_VALUES);
-        if (config.sharingWithEveryone()) {
-            return Optional.of(Grantee.createGlobal());
-        }
-        return Optional.empty();
+        return Optional.of(Grantee.createGlobal());
     }
 }
