@@ -45,7 +45,7 @@ const LookupTableForm = ({
 }) => {
   const validate = (values) => {
     const errors = {};
-    const requiredFields = ['title', 'description', 'name', 'cache_id', 'data_adapter_id'];
+    const requiredFields = ['title', 'name', 'cache_id', 'data_adapter_id'];
 
     requiredFields.forEach((requiredField) => {
       if (!values[requiredField]) {
