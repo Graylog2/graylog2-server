@@ -21,7 +21,7 @@ import naturalSort from 'javascript-natural-sort';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
-interface DataAdapterPickerProps {
+type Props = {
   name: string,
   dataAdapters: any[],
 }
@@ -29,7 +29,7 @@ interface DataAdapterPickerProps {
 const DataAdapterPicker = ({
   name = 'data_adapter_id',
   dataAdapters = [],
-}: DataAdapterPickerProps) => {
+}: Props) => {
   const [, { value, touched, error }, { setTouched, setValue }] = useField(name);
   const sortedAdapters = dataAdapters.map((adapter) => {
     return { value: adapter.id, label: `${adapter.title} (${adapter.name})` };
