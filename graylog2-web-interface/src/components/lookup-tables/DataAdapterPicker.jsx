@@ -14,58 +14,45 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
+import { useField } from 'formik';
 import naturalSort from 'javascript-natural-sort';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
-class DataAdapterPicker extends React.Component {
-  static propTypes = {
-    onSelect: PropTypes.func.isRequired,
-    selectedId: PropTypes.string,
-    dataAdapters: PropTypes.array,
-    pagination: PropTypes.object,
-  };
+const DataAdapterPicker = ({
+  name = 'data_adapter_id',
+  dataAdapters = [],
+}) => {
+  const [, { value, touched, error }, { setTouched, setValue }] = useField(name);
+  
+  const sortedAdapters = dataAdapters.map((adapter) => {
+    return { value: adapter.id, label: `${adapter.title} (${adapter.name})` };
+  }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
 
-  static defaultProps = {
-    selectedId: null,
-    dataAdapters: [],
-    pagination: {},
-  };
+  const errorMsg = touched ? error : '';
 
-  render() {
-    const adapterPlugins = {};
-
-    PluginStore.exports('lookupTableAdapters').forEach((p) => {
-      adapterPlugins[p.type] = p;
-    });
-
-    const sortedAdapters = this.props.dataAdapters.map((adapter) => {
-      return { value: adapter.id, label: `${adapter.title} (${adapter.name})` };
-    }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
-
-    return (
-      <fieldset>
-        <Input id="data-adapter-select"
-               label="Data Adapter"
-               required
-               autoFocus
-               help="Select an existing data adapter"
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9">
-          <Select placeholder="Select a data adapter"
-                  clearable={false}
-                  options={sortedAdapters}
-                  matchProp="label"
-                  onChange={this.props.onSelect}
-                  value={this.props.selectedId} />
-        </Input>
-      </fieldset>
-    );
-  }
-}
+  return (
+    <fieldset>
+      <Input id="data-adapter-select"
+             label="Data Adapter"
+             required
+             autoFocus
+             bsStyle={errorMsg ? 'error' : undefined}
+             help={errorMsg || 'Select an existing data adapter'}
+             labelClassName="col-sm-3"
+             wrapperClassName="col-sm-9">
+        <Select placeholder="Select a data adapter"
+                clearable={false}
+                options={sortedAdapters}
+                matchProp="label"
+                onBlur={() => setTouched(true)}
+                onChange={setValue}
+                value={value} />
+      </Input>
+    </fieldset>
+  );
+};
 
 export default DataAdapterPicker;
