@@ -96,6 +96,7 @@ class Input extends React.Component {
     return this.input;
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   getValue = () => {
     const { type } = this.props;
 
@@ -112,6 +113,7 @@ class Input extends React.Component {
     }
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   getChecked = () => {
     return this.getInputDOMNode().checked;
   };
