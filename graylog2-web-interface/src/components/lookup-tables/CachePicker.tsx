@@ -21,12 +21,16 @@ import naturalSort from 'javascript-natural-sort';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
+type Props = {
+  name: string,
+  caches: any[],
+}
+
 const CachePicker = ({
   name = 'cache_id',
   caches = [],
-}) => {
+}: Props) => {
   const [, { value, touched, error }, { setTouched, setValue }] = useField(name);
-  
   const sortedCaches = caches.map((cache) => {
     return { value: cache.id, label: `${cache.title} (${cache.name})` };
   }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
