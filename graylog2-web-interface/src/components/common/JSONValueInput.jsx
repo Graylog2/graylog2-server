@@ -40,6 +40,7 @@ const OPTIONS = [
 class JSONValueInput extends React.Component {
   static propTypes = {
     update: PropTypes.func.isRequired,
+    onBlur: PropTypes.func,
     label: PropTypes.string,
     help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     required: PropTypes.bool,
@@ -120,7 +121,7 @@ class JSONValueInput extends React.Component {
         {this.props.label && <ControlLabel className={this.props.labelClassName}>{this.props.label}</ControlLabel>}
         <InputWrapper className={this.props.wrapperClassName}>
           <InputGroup>
-            <FormControl type="text" onChange={this._onUpdate} value={this.state.value} required={this.props.required} />
+            <FormControl type="text" onChange={this._onUpdate} onBlur={this.props.onBlur} value={this.state.value} required={this.props.required} />
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
                             bsStyle={this.props.validationState === 'error' ? 'danger' : null}
