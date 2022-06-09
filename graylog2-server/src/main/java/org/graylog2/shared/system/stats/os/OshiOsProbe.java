@@ -66,6 +66,7 @@ public class OshiOsProbe implements OsProbe {
         short steal = (short) (ticks[TickType.STEAL.getIndex()] - prevTicks[TickType.STEAL.getIndex()]);
 
         final CentralProcessor.ProcessorIdentifier processorIdentifier = centralProcessor.getProcessorIdentifier();
+        final int totalSockets = centralProcessor.getPhysicalPackageCount() > 0 ? centralProcessor.getPhysicalPackageCount() : 1;
 
         final Processor proc = Processor.create(
                 processorIdentifier.getName(),
@@ -73,7 +74,7 @@ public class OshiOsProbe implements OsProbe {
                 ((int) processorIdentifier.getVendorFreq() / 1000000),
                 centralProcessor.getLogicalProcessorCount(),
                 centralProcessor.getPhysicalPackageCount(),
-                centralProcessor.getLogicalProcessorCount() / centralProcessor.getPhysicalPackageCount(),
+                centralProcessor.getLogicalProcessorCount() / totalSockets,
                 -1,
                 sys,
                 user,
