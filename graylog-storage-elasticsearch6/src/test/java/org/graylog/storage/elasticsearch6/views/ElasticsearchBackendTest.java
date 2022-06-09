@@ -115,7 +115,7 @@ public class ElasticsearchBackendTest {
     @Test
     public void generatedContextHasQueryThatIncludesSearchFilters() {
         final ImmutableList<UsedSearchFilter> usedSearchFilters = ImmutableList.of(
-                InlineQueryStringSearchFilter.create("", "", "method:GET"),
+                InlineQueryStringSearchFilter.builder().title("").description("").queryString("method:GET").build(),
                 ReferencedQueryStringSearchFilter.create("12345")
         );
         doReturn(ImmutableSet.of("method:GET", "method:POST")).when(usedSearchFiltersToQueryStringsMapper).map(usedSearchFilters);

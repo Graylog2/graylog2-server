@@ -243,7 +243,7 @@ public class QueryTest {
     @Test
     public void testHasReferencedSearchFiltersReturnsFalseWhenNoReferencedSearchFilters() {
         Query query = Query.builder()
-                .filters(Collections.singletonList(InlineQueryStringSearchFilter.create("title", "descr", "*")))
+                .filters(Collections.singletonList(InlineQueryStringSearchFilter.builder().title("title").description("descr").queryString("*").build()))
                 .build();
 
         assertThat(query.hasReferencedStreamFilters())
@@ -254,7 +254,7 @@ public class QueryTest {
     public void testHasReferencedSearchFiltersReturnsTrueWhenReferencedSearchFilterPresent() {
         Query query = Query.builder()
                 .filters(ImmutableList.of(
-                        InlineQueryStringSearchFilter.create("title", "descr", "*"),
+                        InlineQueryStringSearchFilter.builder().title("title").description("descr").queryString("*").build(),
                         ReferencedQueryStringSearchFilter.create("007")))
                 .build();
 
@@ -273,7 +273,7 @@ public class QueryTest {
     @Test
     public void testSavesSearchFiltersCollectionInContentPack() {
         final ImmutableList<UsedSearchFilter> originalSearchFilters = ImmutableList.of(
-                InlineQueryStringSearchFilter.create("title", "descr", "*"),
+                InlineQueryStringSearchFilter.builder().title("title").description("descr").queryString("*").build(),
                 ReferencedQueryStringSearchFilter.create("007")
         );
         Query queryWithFilters = Query.builder().filters(originalSearchFilters).build();
