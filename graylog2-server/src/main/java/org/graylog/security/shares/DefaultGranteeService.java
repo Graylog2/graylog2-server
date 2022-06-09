@@ -61,10 +61,13 @@ public class DefaultGranteeService implements GranteeService {
     @Override
     public ImmutableSet<Grantee> getModifiableGrantees(Set<Grantee> availableGrantees, ImmutableSet<EntityShareResponse.ActiveShare> activeShares) {
         final UserAndTeamsConfig config = clusterConfigService.getOrDefault(UserAndTeamsConfig.class, UserAndTeamsConfig.DEFAULT_VALUES);
-        return availableGrantees.stream().filter(grantee -> isAllowedType(config, grantee) || activeShares.stream().anyMatch(activeShare -> activeShare.grantee().equals(grantee.grn()))).collect(ImmutableSet.toImmutableSet());
+        return availableGrantees.stream()
+                .filter(grantee -> isAllowedType(config, grantee) || activeShares.stream().
+                        anyMatch(activeShare -> activeShare.grantee().equals(grantee.grn())))
+                .collect(ImmutableSet.toImmutableSet());
     }
 
-    private boolean isAllowedType(UserAndTeamsConfig config, Grantee grantee) {
+    public boolean isAllowedType(UserAndTeamsConfig config, Grantee grantee) {
         final boolean permittedGlobal = config.sharingWithEveryone() && Grantee.GRANTEE_TYPE_GLOBAL.equals(grantee.type());
         final boolean permittedUser = config.sharingWithUsers() && Grantee.GRANTEE_TYPE_USER.equals(grantee.type());
         return permittedGlobal || permittedUser;
