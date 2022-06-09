@@ -32,6 +32,24 @@ import QueryHelper from 'components/common/QueryHelper';
 import styles from './EventDefinitions.css';
 import EventDefinitionEntry from './EventDefinitionEntry';
 
+const EmptyContent = () => (
+  <Row>
+    <Col md={6} mdOffset={3} lg={4} lgOffset={4}>
+      <EmptyEntity>
+        <p>
+          Create Event Definitions that are able to search, aggregate or correlate Messages and other
+          Events, allowing you to record significant Events in Graylog and alert on them.
+        </p>
+        <IfPermitted permissions="eventdefinitions:create">
+          <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
+            <Button bsStyle="success">Get Started!</Button>
+          </LinkContainer>
+        </IfPermitted>
+      </EmptyEntity>
+    </Col>
+  </Row>
+);
+
 class EventDefinitions extends React.Component {
   static propTypes = {
     eventDefinitions: PropTypes.array.isRequired,
@@ -50,31 +68,11 @@ class EventDefinitions extends React.Component {
     context: {},
   };
 
-  static renderEmptyContent = () => {
-    return (
-      <Row>
-        <Col md={6} mdOffset={3} lg={4} lgOffset={4}>
-          <EmptyEntity>
-            <p>
-              Create Event Definitions that are able to search, aggregate or correlate Messages and other
-              Events, allowing you to record significant Events in Graylog and alert on them.
-            </p>
-            <IfPermitted permissions="eventdefinitions:create">
-              <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
-                <Button bsStyle="success">Get Started!</Button>
-              </LinkContainer>
-            </IfPermitted>
-          </EmptyEntity>
-        </Col>
-      </Row>
-    );
-  };
-
   render() {
     const { eventDefinitions, context, pagination, query, onPageChange, onQueryChange, onDelete, onCopy, onEnable, onDisable } = this.props;
 
     if (pagination.grandTotal === 0) {
-      return this.renderEmptyContent();
+      return <EmptyContent />;
     }
 
     const items = eventDefinitions.map((definition) => (
