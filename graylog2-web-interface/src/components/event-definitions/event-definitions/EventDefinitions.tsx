@@ -30,6 +30,7 @@ import Routes from 'routing/Routes';
 import QueryHelper from 'components/common/QueryHelper';
 
 import styles from './EventDefinitions.css';
+import type { EventDefinition } from './EventDefinitionEntry';
 import EventDefinitionEntry from './EventDefinitionEntry';
 
 const EmptyContent = () => (
@@ -50,7 +51,25 @@ const EmptyContent = () => (
   </Row>
 );
 
-const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPageChange, onQueryChange, onDelete, onCopy, onEnable, onDisable }) => {
+type Props = {
+  eventDefinitions: Array<EventDefinition>,
+  context?: React.ComponentProps<typeof EventDefinitionEntry>['context'],
+  pagination: {
+    grandTotal: number,
+    page: number,
+    pageSize: number,
+    total: number,
+  },
+  query: string,
+  onPageChange: (page: number, size: number) => void,
+  onQueryChange: (newQuery: string) => void,
+  onDelete: (eventDefinition: EventDefinition) => void,
+  onCopy: (eventDefinition: EventDefinition) => void,
+  onEnable: (eventDefinition: EventDefinition) => void,
+  onDisable: (eventDefinition: EventDefinition) => void,
+};
+
+const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPageChange, onQueryChange, onDelete, onCopy, onEnable, onDisable }: Props) => {
   if (pagination.grandTotal === 0) {
     return <EmptyContent />;
   }
