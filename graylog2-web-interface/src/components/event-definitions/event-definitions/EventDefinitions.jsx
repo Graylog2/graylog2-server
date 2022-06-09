@@ -50,73 +50,69 @@ const EmptyContent = () => (
   </Row>
 );
 
-class EventDefinitions extends React.Component {
-  static propTypes = {
-    eventDefinitions: PropTypes.array.isRequired,
-    context: PropTypes.object,
-    pagination: PropTypes.object.isRequired,
-    query: PropTypes.string.isRequired,
-    onPageChange: PropTypes.func.isRequired,
-    onQueryChange: PropTypes.func.isRequired,
-    onDelete: PropTypes.func.isRequired,
-    onCopy: PropTypes.func.isRequired,
-    onEnable: PropTypes.func.isRequired,
-    onDisable: PropTypes.func.isRequired,
-  };
-
-  static defaultProps = {
-    context: {},
-  };
-
-  render() {
-    const { eventDefinitions, context, pagination, query, onPageChange, onQueryChange, onDelete, onCopy, onEnable, onDisable } = this.props;
-
-    if (pagination.grandTotal === 0) {
-      return <EmptyContent />;
-    }
-
-    const items = eventDefinitions.map((definition) => (
-      <EventDefinitionEntry context={context}
-                            eventDefinition={definition}
-                            onDisable={onDisable}
-                            onEnable={onEnable}
-                            onDelete={onDelete}
-                            onCopy={onCopy} />
-    ));
-
-    return (
-      <Row>
-        <Col md={12}>
-          <SearchForm query={query}
-                      onSearch={onQueryChange}
-                      onReset={onQueryChange}
-                      searchButtonLabel="Find"
-                      placeholder="Find Event Definitions"
-                      wrapperClass={styles.inline}
-                      queryHelpComponent={<QueryHelper entityName="event definition" />}
-                      queryWidth={200}
-                      topMargin={0}
-                      useLoadingState>
-            <IfPermitted permissions="eventdefinitions:create">
-              <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
-                <Button bsStyle="success" className={styles.createButton}>Create Event Definition</Button>
-              </LinkContainer>
-            </IfPermitted>
-          </SearchForm>
-
-          <PaginatedList activePage={pagination.page}
-                         pageSize={pagination.pageSize}
-                         pageSizes={[10, 25, 50]}
-                         totalItems={pagination.total}
-                         onChange={onPageChange}>
-            <div className={styles.definitionList}>
-              <EntityList items={items} />
-            </div>
-          </PaginatedList>
-        </Col>
-      </Row>
-    );
+const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPageChange, onQueryChange, onDelete, onCopy, onEnable, onDisable }) => {
+  if (pagination.grandTotal === 0) {
+    return <EmptyContent />;
   }
-}
+
+  const items = eventDefinitions.map((definition) => (
+    <EventDefinitionEntry context={context}
+                          eventDefinition={definition}
+                          onDisable={onDisable}
+                          onEnable={onEnable}
+                          onDelete={onDelete}
+                          onCopy={onCopy} />
+  ));
+
+  return (
+    <Row>
+      <Col md={12}>
+        <SearchForm query={query}
+                    onSearch={onQueryChange}
+                    onReset={onQueryChange}
+                    searchButtonLabel="Find"
+                    placeholder="Find Event Definitions"
+                    wrapperClass={styles.inline}
+                    queryHelpComponent={<QueryHelper entityName="event definition" />}
+                    queryWidth={200}
+                    topMargin={0}
+                    useLoadingState>
+          <IfPermitted permissions="eventdefinitions:create">
+            <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
+              <Button bsStyle="success" className={styles.createButton}>Create Event Definition</Button>
+            </LinkContainer>
+          </IfPermitted>
+        </SearchForm>
+
+        <PaginatedList activePage={pagination.page}
+                       pageSize={pagination.pageSize}
+                       pageSizes={[10, 25, 50]}
+                       totalItems={pagination.total}
+                       onChange={onPageChange}>
+          <div className={styles.definitionList}>
+            <EntityList items={items} />
+          </div>
+        </PaginatedList>
+      </Col>
+    </Row>
+  );
+};
+
+EventDefinitions.propTypes = {
+  eventDefinitions: PropTypes.array.isRequired,
+  context: PropTypes.object,
+  pagination: PropTypes.object.isRequired,
+  query: PropTypes.string.isRequired,
+  onPageChange: PropTypes.func.isRequired,
+  onQueryChange: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onCopy: PropTypes.func.isRequired,
+  onEnable: PropTypes.func.isRequired,
+  onDisable: PropTypes.func.isRequired,
+};
+
+EventDefinitions.defaultProps = {
+  context: undefined,
+};
 
 export default EventDefinitions;
