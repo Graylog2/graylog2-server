@@ -46,9 +46,9 @@ public class OshiOsProbe implements OsProbe {
         final Memory mem = Memory.create(
                 globalMemory.getTotal(),
                 globalMemory.getAvailable(),
-                (short) (globalMemory.getAvailable() * 100 / globalMemory.getTotal()),
+                safePercentage(globalMemory.getAvailable(), globalMemory.getTotal(), 0),
                 globalMemory.getTotal() - globalMemory.getAvailable(),
-                (short) ((globalMemory.getTotal() - globalMemory.getAvailable()) * 100 / globalMemory.getTotal()),
+                safePercentage(globalMemory.getTotal() - globalMemory.getAvailable(), globalMemory.getTotal(), 0),
                 globalMemory.getAvailable(),
                 globalMemory.getTotal() - globalMemory.getAvailable());
 
@@ -66,6 +66,7 @@ public class OshiOsProbe implements OsProbe {
         short steal = (short) (ticks[TickType.STEAL.getIndex()] - prevTicks[TickType.STEAL.getIndex()]);
 
         final CentralProcessor.ProcessorIdentifier processorIdentifier = centralProcessor.getProcessorIdentifier();
+        final int totalSockets = centralProcessor.getPhysicalPackageCount() > 0 ? centralProcessor.getPhysicalPackageCount() : 1;
 
         final Processor proc = Processor.create(
                 processorIdentifier.getName(),
@@ -73,7 +74,7 @@ public class OshiOsProbe implements OsProbe {
                 ((int) processorIdentifier.getVendorFreq() / 1000000),
                 centralProcessor.getLogicalProcessorCount(),
                 centralProcessor.getPhysicalPackageCount(),
-                centralProcessor.getLogicalProcessorCount() / centralProcessor.getPhysicalPackageCount(),
+                centralProcessor.getLogicalProcessorCount() / totalSockets,
                 -1,
                 sys,
                 user,
@@ -87,5 +88,9 @@ public class OshiOsProbe implements OsProbe {
                 proc,
                 mem,
                 swap);
+    }
+
+    private short safePercentage(long nominator, long denominator, int override) {
+        return (denominator == 0) ? (short) override : (short) (nominator * 100 / denominator);
     }
 }
