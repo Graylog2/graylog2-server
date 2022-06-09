@@ -34,6 +34,7 @@ public class ElasticsearchFilterDeprecationWarningsInterceptor implements HttpRe
             "but in a future major version, directaccess to system indices and their aliases will not be allowed",
             "but in a future major version, direct access to system indices will be prevented by default",
             "in epoch time formats is deprecated and will not be supported in the next major version of Elasticsearch",
+            "parameter is deprecated because frozen indices have been deprecated.",
             org.graylog.shaded.elasticsearch7.org.elasticsearch.common.joda.JodaDeprecationPatterns.USE_NEW_FORMAT_SPECIFIERS
     };
 
