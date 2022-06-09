@@ -17,13 +17,31 @@
 import React from 'react';
 import { Formik, Field, Form } from 'formik';
 import _omit from 'lodash/omit';
+import type { FieldProps } from 'formik';
+import type { LookupTable } from 'src/logic/lookup-tables/types';
 
+import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import { Col, Row, Button, Input } from 'components/bootstrap';
 import { JSONValueInput } from 'components/common';
 import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker } from 'components/lookup-tables';
-import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
-const defaultTableValues = {
+type LookupTableType = {
+  id: string|undefined,
+  title: string,
+  description: string,
+  name: string,
+  cache_id: string|undefined,
+  data_adapter_id: string|undefined,
+  enable_single_value: boolean,
+  default_single_value: string,
+  default_single_value_type: 'STRING'|'NUMBER'|'BOOLEAN'|'NULL',
+  enable_multi_value: boolean,
+  default_multi_value: string,
+  default_multi_value_type: 'OBJECT'|'NULL',
+  content_pack: string | null,
+}
+
+const defaultTableValues: LookupTableType = {
   id: undefined,
   title: '',
   description: '',
@@ -36,21 +54,28 @@ const defaultTableValues = {
   enable_multi_value: false,
   default_multi_value: '',
   default_multi_value_type: 'NULL',
+  content_pack: null,
 };
+
+type Props = {
+    saved: () => void,
+    create: boolean,
+    table: LookupTableType,
+}
 
 const LookupTableForm = ({
   saved,
   create = true,
   table = defaultTableValues,
-}) => {
-  const validate = (values) => {
+}: Props) => {
+  const validate = (values: LookupTableType) => {
     const errors = {};
-    const requiredFields = ['title', 'name', 'cache_id', 'data_adapter_id', 'cache_id', 'default_single_value', 'default_multi_value'];
+    const requiredFields: (keyof LookupTableType)[] = ['title', 'name', 'cache_id', 'data_adapter_id', 'cache_id', 'default_single_value', 'default_multi_value'];
 
     requiredFields.forEach((requiredField) => {
-      if (requiredField === 'default_single_value' && !values.enable_single_value) return;
-      if (requiredField === 'default_multi_value' && !values.enable_multi_value) return;
       if (!values[requiredField]) {
+        if (requiredField === 'default_single_value' && !values.enable_single_value) return;
+        if (requiredField === 'default_multi_value' && !values.enable_multi_value) return;
         errors[requiredField] = 'Required';
       }
     });
@@ -58,10 +83,10 @@ const LookupTableForm = ({
     return errors;
   };
 
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: LookupTableType) => {
     let promise;
 
-    const valuesToSave = _omit(values, ['enable_single_value', 'enable_multi_value']);
+    const valuesToSave: LookupTable = _omit(values, ['enable_single_value', 'enable_multi_value']);
 
     if (create) {
       promise = LookupTablesActions.create(valuesToSave);
@@ -74,7 +99,7 @@ const LookupTableForm = ({
     });
   };
 
-  const initialValues = {
+  const initialValues: LookupTableType = {
     ...defaultTableValues,
     ...table,
     enable_single_value: table.default_single_value !== '',
@@ -94,10 +119,9 @@ const LookupTableForm = ({
             }}>
       {({ values, errors, touched, setFieldValue, setFieldTouched, setValues }) => (
         <Form className="form form-horizontal">
-          {(Object.keys(errors).length > 0) && console.log(errors)}
           <fieldset>
             <Field name="title">
-              {({ field }) => (
+              {({ field } :FieldProps) => (
                 <Input type="text"
                        id="title"
                        label="Title"
@@ -111,7 +135,7 @@ const LookupTableForm = ({
             </Field>
 
             <Field name="description">
-              {({ field }) => (
+              {({ field } :FieldProps) => (
                 <Input type="text"
                        id="description"
                        label="Description"
@@ -124,7 +148,7 @@ const LookupTableForm = ({
             </Field>
 
             <Field name="name">
-              {({ field }) => (
+              {({ field } :FieldProps) => (
                 <Input type="text"
                        id="name"
                        label="Name"
@@ -162,8 +186,8 @@ const LookupTableForm = ({
                               setValues({
                                 ...values,
                                 default_single_value: value,
-                                default_single_value_type: valueType
-                              })
+                                default_single_value_type: valueType,
+                              });
                             }}
                             value={values.default_single_value}
                             valueType={values.default_single_value_type || 'NULL'}
@@ -197,8 +221,8 @@ const LookupTableForm = ({
                               setValues({
                                 ...values,
                                 default_multi_value: value,
-                                default_multi_value_type: valueType
-                              })
+                                default_multi_value_type: valueType,
+                              });
                             }}
                             value={values.default_multi_value}
                             valueType={values.default_multi_value_type || 'NULL'}
