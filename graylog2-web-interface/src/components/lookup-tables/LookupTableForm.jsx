@@ -45,9 +45,11 @@ const LookupTableForm = ({
 }) => {
   const validate = (values) => {
     const errors = {};
-    const requiredFields = ['title', 'name', 'cache_id', 'data_adapter_id'];
+    const requiredFields = ['title', 'name', 'cache_id', 'data_adapter_id', 'cache_id', 'default_single_value', 'default_multi_value'];
 
     requiredFields.forEach((requiredField) => {
+      if (requiredField === 'default_single_value' && !values.enable_single_value) return;
+      if (requiredField === 'default_multi_value' && !values.enable_multi_value) return;
       if (!values[requiredField]) {
         errors[requiredField] = 'Required';
       }
@@ -75,8 +77,8 @@ const LookupTableForm = ({
   const initialValues = {
     ...defaultTableValues,
     ...table,
-    enable_single_value: (table.default_single_value !== '') && (table.default_single_value_type !== 'NULL'),
-    enable_multi_value: (table.default_multi_value !== '') && (table.default_multi_value_type !== 'NULL'),
+    enable_single_value: table.default_single_value !== '',
+    enable_multi_value: table.default_multi_value !== '',
   };
 
   return (
@@ -90,8 +92,9 @@ const LookupTableForm = ({
                 handleSubmit(values);
               }
             }}>
-      {({ values, errors, touched, setFieldValue }) => (
+      {({ values, errors, touched, setFieldValue, setFieldTouched, setValues }) => (
         <Form className="form form-horizontal">
+          {(Object.keys(errors).length > 0) && console.log(errors)}
           <fieldset>
             <Field name="title">
               {({ field }) => (
@@ -152,10 +155,15 @@ const LookupTableForm = ({
             {values.enable_single_value
             && (
             <JSONValueInput label="Default single value"
-                            help="The single value that is being used as lookup result if the data adapter or cache does not find a value."
+                            help={(touched.default_single_value && errors.default_single_value) || 'The single value that is being used as lookup result if the data adapter or cache does not find a value.'}
+                            validationState={(touched.default_single_value && errors.default_single_value) ? 'error' : undefined}
+                            onBlur={() => setFieldTouched('default_single_value', true)}
                             update={(value, valueType) => {
-                              setFieldValue('default_single_value', value);
-                              setFieldValue('default_single_value_type', valueType);
+                              setValues({
+                                ...values,
+                                default_single_value: value,
+                                default_single_value_type: valueType
+                              })
                             }}
                             value={values.default_single_value}
                             valueType={values.default_single_value_type || 'NULL'}
@@ -182,10 +190,15 @@ const LookupTableForm = ({
             {values.enable_multi_value
             && (
             <JSONValueInput label="Default multi value"
-                            help="The multi value that is being used as lookup result if the data adapter or cache does not find a value."
+                            help={(touched.default_multi_value && errors.default_multi_value) || 'The multi value that is being used as lookup result if the data adapter or cache does not find a value.'}
+                            validationState={(touched.default_multi_value && errors.default_multi_value) ? 'error' : undefined}
+                            onBlur={() => setFieldTouched('default_multi_value', true)}
                             update={(value, valueType) => {
-                              setFieldValue('default_multi_value', value);
-                              setFieldValue('default_multi_value_type', valueType);
+                              setValues({
+                                ...values,
+                                default_multi_value: value,
+                                default_multi_value_type: valueType
+                              })
                             }}
                             value={values.default_multi_value}
                             valueType={values.default_multi_value_type || 'NULL'}
