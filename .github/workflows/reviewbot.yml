@@ -2,29 +2,23 @@ name: PR Review
 
 on:
   pull_request:
-    branches:
-      - 'reviewbot/**'
 
 jobs:
-  build:
+  linter:
+    name: Reviewbot
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: graylog2-web-interface
-
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Set up Yarn cache
-        uses: actions/cache@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v2
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('graylog2-web-interface/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-          path: ~/.cache/yarn
-      - name: Install dependencies
-        run: yarn install
+          java-version: 8
+          distribution: temurin
+          cache: maven
+      - name: Compile with Maven / Install dependencies
+        run: mvn --fail-fast -Dmaven.wagon.http.retryHandler.class=standard -Dmaven.wagon.http.retryHandler.count=3 -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 compile
       - name: Reviewbot
         uses: Graylog2/reviewbot@v1
         with:
