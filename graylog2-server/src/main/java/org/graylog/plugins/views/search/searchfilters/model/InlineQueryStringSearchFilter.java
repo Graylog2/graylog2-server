@@ -52,15 +52,11 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter,
         return Builder.create();
     }
 
+    public abstract Builder toBuilder();
+
     @Override
     public UsedSearchFilter withQueryString(String queryString) {
-        return builder()
-                .title(title())
-                .description(description())
-                .queryString(queryString)
-                .negation(negation())
-                .disabled(disabled())
-                .build();
+        return toBuilder().queryString(queryString).build();
     }
 
     @AutoValue.Builder

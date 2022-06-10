@@ -61,16 +61,11 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
         return Builder.create();
     }
 
+    public abstract Builder toBuilder();
+
     @Override
     public UsedSearchFilter withQueryString(String queryString) {
-        return builder()
-                .id(id())
-                .title(title())
-                .description(description())
-                .queryString(queryString)
-                .negation(negation())
-                .disabled(disabled())
-                .build();
+        return toBuilder().queryString(queryString).build();
     }
 
     @AutoValue.Builder
