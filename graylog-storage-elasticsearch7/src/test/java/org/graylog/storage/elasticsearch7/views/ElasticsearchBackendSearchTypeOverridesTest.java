@@ -75,7 +75,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
                             .series(Collections.singletonList(Average.builder().field("field1").build()))
                             .rollup(true)
                             .timerange(DerivedTimeRange.of(AbsoluteRange.create("2019-09-11T10:31:52.819Z", "2019-09-11T10:36:52.823Z")))
-                            .filters(Collections.singletonList(InlineQueryStringSearchFilter.create("Pivot1 local filter", "Pivot1 local filter", "local:filter")))
+                            .filters(Collections.singletonList(InlineQueryStringSearchFilter.builder().title("Pivot1 local filter").description("Pivot1 local filter").queryString("local:filter").build()))
                             .build()
             );
             add(
@@ -92,7 +92,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
                 .searchTypes(searchTypes)
                 .query(ElasticsearchQueryString.of("production:true"))
                 .filter(StreamFilter.ofId("stream1"))
-                .filters(Collections.singletonList(InlineQueryStringSearchFilter.create("Global filter", "Global filter", "global:filter")))
+                .filters(Collections.singletonList(InlineQueryStringSearchFilter.builder().title("Global filter").description("Global filter").queryString("global:filter").build()))
                 .timerange(timeRangeForTest())
                 .build();
 
