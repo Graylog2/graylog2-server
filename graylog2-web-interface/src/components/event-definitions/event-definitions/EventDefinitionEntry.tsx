@@ -36,7 +36,7 @@ import {
 
 import EventDefinitionDescription from './EventDefinitionDescription';
 
-type EventDefinition = {
+export type EventDefinition = {
   id: string,
   config: {
     type: string,
@@ -53,10 +53,10 @@ type Props = {
     },
   },
   eventDefinition: EventDefinition,
-  onDisable: (EventDefinition) => void,
-  onEnable: (EventDefinition) => void,
-  onDelete: (EventDefinition) => void,
-  onCopy: (EventDefinition) => void,
+  onDisable: (eventDefinition: EventDefinition) => void,
+  onEnable: (eventDefinition: EventDefinition) => void,
+  onDelete: (eventDefinition: EventDefinition) => void,
+  onCopy: (eventDefinition: EventDefinition) => void,
 };
 
 const getConditionPlugin = (type: string) => PluginStore.exports('eventDefinitionTypes')
