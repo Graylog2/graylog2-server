@@ -35,7 +35,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class TimeRangeValidator implements SearchValidator{
+public class TimeRangeValidator implements SearchValidator {
     private final Provider<SearchConfig> searchConfigProvider;
 
     @Inject
@@ -48,7 +48,7 @@ public class TimeRangeValidator implements SearchValidator{
                 .flatMap(timeRangeLimit -> Optional.ofNullable(query.timerange())
                         .filter(tr -> tr.getFrom() != null && tr.getTo() != null) // TODO: is this check necessary?
                         .filter(tr -> isOutOfLimit(tr, timeRangeLimit)))
-                .map(tr -> new QueryError(query, "Search out of allowed time range limit"));
+                .map(tr -> new QueryError(query, "Search out of allowed time range limit", true));
 
         final Stream<SearchError> searchTypeErrors = query.searchTypes()
                 .stream()
@@ -61,7 +61,7 @@ public class TimeRangeValidator implements SearchValidator{
                 .flatMap(configuredTimeLimit -> searchType.timerange() // TODO: what if there is no timerange for the type but there is a global limit?
                         .map(tr -> tr.effectiveTimeRange(query, searchType))
                         .filter(tr -> isOutOfLimit(tr, configuredTimeLimit))
-                        .map(tr -> new SearchTypeError(query, searchType.id(), "Search type '" + searchType.type() + "' out of allowed time range limit")));
+                        .map(tr -> new SearchTypeError(query, searchType.id(), "Search type '" + searchType.type() + "' out of allowed time range limit", true)));
     }
 
     boolean isOutOfLimit(TimeRange timeRange, Period limit) {

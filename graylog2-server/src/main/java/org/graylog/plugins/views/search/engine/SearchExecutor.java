@@ -70,6 +70,10 @@ public class SearchExecutor {
 
         final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
 
+        if (hasFatalError(validationErrors)) {
+            return searchJobWithFatalError(searchJobService.create(preValidationSearch, searchUser.username()), validationErrors);
+        }
+
         final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
 
         final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors);
@@ -89,5 +93,15 @@ public class SearchExecutor {
         }
 
         return searchJob;
+    }
+
+    private SearchJob searchJobWithFatalError(SearchJob searchJob, Set<SearchError> validationErrors) {
+        validationErrors.forEach(searchJob::addError);
+
+        return searchJob;
+    }
+
+    private boolean hasFatalError(Set<SearchError> validationErrors) {
+        return validationErrors.stream().anyMatch(SearchError::fatal);
     }
 }
