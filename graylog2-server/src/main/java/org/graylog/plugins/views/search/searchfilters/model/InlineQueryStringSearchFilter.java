@@ -19,12 +19,14 @@ package org.graylog.plugins.views.search.searchfilters.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
 
 @AutoValue
 @JsonTypeName(UsedSearchFilter.INLINE_QUERY_STRING_SEARCH_FILTER)
+@JsonDeserialize(builder = InlineQueryStringSearchFilter.Builder.class)
 public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter {
 
     @JsonProperty(TITLE_FIELD)
@@ -42,18 +44,40 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter 
     @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
     public abstract boolean negation();
 
-    @JsonCreator
-    @SuppressWarnings("unused")
-    public static InlineQueryStringSearchFilter create(@JsonProperty(TITLE_FIELD) final String title,
-                                                       @JsonProperty(DESCRIPTION_FIELD) final String description,
-                                                       @JsonProperty(QUERY_STRING_FIELD) final String queryString,
-                                                       @JsonProperty(value = NEGATION_FIELD, defaultValue = "false") final boolean negation) {
-        return new AutoValue_InlineQueryStringSearchFilter(title, description, queryString, negation);
+    @Override
+    @JsonProperty(value = DISABLED_FIELD, defaultValue = "false")
+    public abstract boolean disabled();
+
+    public static Builder builder() {
+        return Builder.create();
     }
 
-    public static InlineQueryStringSearchFilter create(@JsonProperty(TITLE_FIELD) final String title,
-                                                       @JsonProperty(DESCRIPTION_FIELD) final String description,
-                                                       @JsonProperty(QUERY_STRING_FIELD) final String queryString) {
-        return new AutoValue_InlineQueryStringSearchFilter(title, description, queryString, false);
+    @AutoValue.Builder
+    public abstract static class Builder {
+
+        @JsonProperty(TITLE_FIELD)
+        public abstract Builder title(String title);
+
+        @JsonProperty(DESCRIPTION_FIELD)
+        public abstract Builder description(String description);
+
+        @JsonProperty(QUERY_STRING_FIELD)
+        public abstract Builder queryString(String queryString);
+
+        @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
+        public abstract Builder negation(boolean negation);
+
+        @JsonProperty(value = DISABLED_FIELD, defaultValue = "false")
+        public abstract Builder disabled(boolean disabled);
+
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_InlineQueryStringSearchFilter.Builder()
+                    .disabled(false)
+                    .negation(false);
+        }
+
+        public abstract InlineQueryStringSearchFilter build();
     }
+
 }
