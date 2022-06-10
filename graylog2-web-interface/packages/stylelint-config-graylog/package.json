@@ -17,7 +17,7 @@
     "postcss-syntax": "0.36.2",
     "stylelint": "14.9.0",
     "stylelint-config-recommended": "8.0.0",
-    "stylelint-config-standard": "25.0.0",
+    "stylelint-config-standard": "26.0.0",
     "stylelint-config-styled-components": "0.1.1"
   }
 }
