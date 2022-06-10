@@ -57,11 +57,6 @@ public abstract class AndFilter implements Filter {
         return toBuilder();
     }
 
-    @Override
-    public Filter withFilters(Set<Filter> filters) {
-        return toBuilder().filters(filters).build();
-    }
-
     @AutoValue.Builder
     public abstract static class Builder implements Filter.Builder {
         @JsonProperty
