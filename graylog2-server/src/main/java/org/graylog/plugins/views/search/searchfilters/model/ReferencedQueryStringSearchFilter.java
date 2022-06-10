@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
 @AutoValue
 @JsonTypeName(UsedSearchFilter.REFERENCED_SEARCH_FILTER)
 @JsonDeserialize(builder = ReferencedQueryStringSearchFilter.Builder.class)
-public abstract class ReferencedQueryStringSearchFilter implements ReferencedSearchFilter {
+public abstract class ReferencedQueryStringSearchFilter implements ReferencedSearchFilter, QueryStringSearchFilter {
 
     @JsonProperty
     @Override
@@ -59,6 +59,18 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
 
     public static Builder builder() {
         return Builder.create();
+    }
+
+    @Override
+    public UsedSearchFilter withQueryString(String queryString) {
+        return builder()
+                .id(id())
+                .title(title())
+                .description(description())
+                .queryString(queryString)
+                .negation(negation())
+                .disabled(disabled())
+                .build();
     }
 
     @AutoValue.Builder
