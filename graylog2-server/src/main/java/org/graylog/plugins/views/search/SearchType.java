@@ -94,6 +94,8 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
         return streams();
     }
 
+    SearchType withFilters(List<UsedSearchFilter> filters);
+
     /**
      * Each search type should declare an implementation of its result conforming to this interface.
      * <p>
@@ -200,6 +202,9 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
         public SearchType withFilter(Filter filter) {
             return this;
         }
+
+        @Override
+        public SearchType withFilters(List<UsedSearchFilter> filters) { return this; }
 
         @JsonAnySetter
         public void setProperties(String key, Object value) {

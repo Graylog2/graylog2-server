@@ -111,10 +111,9 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .filter(normalizedRootQuery);
 
         usedSearchFiltersToQueryStringsMapper.map(query.filters())
-                .forEach(searchFilterQueryString -> {
-                    final QueryBuilder normalized = translateQueryString(searchFilterQueryString);
-                    boolQuery.filter(normalized);
-                });
+                .stream()
+                .map(this::translateQueryString)
+                .forEach(boolQuery::filter);
 
         // add the optional root query filters
         generateFilterClause(query.filter(), job, query).map(boolQuery::filter);
@@ -159,10 +158,9 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     });
 
                     usedSearchFiltersToQueryStringsMapper.map(searchType.filters())
-                    .stream()
-                    .map(searchFilterQueryString -> this.queryStringDecorators.decorate(searchFilterQueryString, job, query))
-                    .map(this::normalizeQueryString)
-                    .forEach(searchTypeOverrides::must);
+                            .stream()
+                            .map(this::translateQueryString)
+                            .forEach(searchTypeOverrides::must);
 
             searchTypeSourceBuilder.query(searchTypeOverrides);
 
