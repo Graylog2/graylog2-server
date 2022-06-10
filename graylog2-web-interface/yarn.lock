@@ -6901,13 +6901,13 @@ graceful-fs@^4.2.9:
 "graylog-web-plugin@file:packages/graylog-web-plugin":
   version "4.4.0-SNAPSHOT"
   dependencies:
-    babel-preset-graylog "file:packages/babel-preset-graylog"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-270e32f1-ee2a-4bd0-831d-c8a4b43ba51f-1654862742941/node_modules/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:packages/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-270e32f1-ee2a-4bd0-831d-c8a4b43ba51f-1654862742941/node_modules/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:packages/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-270e32f1-ee2a-4bd0-831d-c8a4b43ba51f-1654862742941/node_modules/jest-preset-graylog"
     jquery "3.6.0"
     moment "2.29.3"
     moment-timezone "0.5.34"
