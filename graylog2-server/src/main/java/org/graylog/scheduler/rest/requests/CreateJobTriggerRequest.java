@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.JobTriggerData;
 import org.graylog.scheduler.JobTriggerDto;
@@ -75,6 +76,7 @@ public abstract class CreateJobTriggerRequest {
 
     public JobTriggerDto toDto(JobSchedulerClock clock) {
         return JobTriggerDto.builderWithClock(clock)
+                .type(EventProcessorExecutionJob.TYPE_NAME)
                 .jobDefinitionId(jobDefinitionId())
                 .startTime(startTime())
                 .endTime(endTime().orElse(null))

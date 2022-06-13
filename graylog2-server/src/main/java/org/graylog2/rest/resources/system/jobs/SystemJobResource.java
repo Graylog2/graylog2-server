@@ -180,7 +180,6 @@ public class SystemJobResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.SYSTEM_JOB_STOP)
     public SystemJobSummary cancel(@ApiParam(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) {
         SystemJob systemJob = systemJobManager.getRunningJobs().get(jobId);
-        // TODO
         if (systemJob == null) {
             throw new NotFoundException("No system job with ID <" + jobId + "> found");
         }

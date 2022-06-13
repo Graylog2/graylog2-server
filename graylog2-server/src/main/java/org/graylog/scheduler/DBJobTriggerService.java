@@ -65,6 +65,8 @@ public class DBJobTriggerService {
     static final String FIELD_JOB_DEFINITION_ID = JobTriggerDto.FIELD_JOB_DEFINITION_ID;
     private static final String FIELD_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_OWNER;
 
+    private static final String FIELD_LAST_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_LAST_OWNER;
+
     private static final String FIELD_PROGRESS = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_PROGRESS;
     private static final String FIELD_LAST_LOCK_TIME = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_LAST_LOCK_TIME;
     private static final String FIELD_NEXT_TIME = JobTriggerDto.FIELD_NEXT_TIME;
@@ -350,6 +352,7 @@ public class DBJobTriggerService {
         final DBSort.SortBuilder sort = DBSort.asc(FIELD_NEXT_TIME);
 
         final DBUpdate.Builder lockUpdate = DBUpdate.set(FIELD_LOCK_OWNER, nodeId)
+                .set(FIELD_LAST_LOCK_OWNER, nodeId)
                 .set(FIELD_STATUS, JobTriggerStatus.RUNNING)
                 .set(FIELD_TRIGGERED_AT, Optional.of(now))
                 .set(FIELD_LAST_LOCK_TIME, now);
@@ -480,10 +483,10 @@ public class DBJobTriggerService {
         }
     }
 
-    public int cancelTriggerWithQuery(Query query) {
+    public Optional<JobTriggerDto> cancelTriggerWithQuery(Query query) {
         final DBUpdate.Builder update = DBUpdate.set(JobTriggerDto.FIELD_IS_CANCELLED, true);
 
-        return db.update(query, update).getN();
+        return Optional.ofNullable(db.findAndModify(query, update));
     }
 
     public List<JobTriggerDto> findWithQuery(Query query) {
