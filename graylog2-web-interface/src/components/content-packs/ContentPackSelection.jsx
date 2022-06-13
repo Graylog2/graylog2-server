@@ -24,6 +24,7 @@ import { Col, HelpBlock, Panel, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import Entity from 'logic/content-packs/Entity';
 import { hasAcceptedProtocol } from 'util/URLUtils';
+import InputDescription from 'components/common/InputDescription';
 
 import style from './ContentPackSelection.css';
 
@@ -376,7 +377,7 @@ class ContentPackSelection extends React.Component {
         </Row>
         <Row>
           <Col smOffset={1} sm={8} lg={8}>
-            {touched.selection && errors.selection && <Panel bsStyle="danger">{errors.selection}</Panel>}
+            {touched.selection && errors.selection && <InputDescription error={errors.selection} />}
             <ExpandableList>
               {entitiesComponent}
             </ExpandableList>
