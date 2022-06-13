@@ -60,6 +60,7 @@ class ContentPackSelection extends React.Component {
       filter: '',
       isFiltered: false,
       errors: {},
+      touched: {}
     };
   }
 
@@ -121,6 +122,18 @@ class ContentPackSelection extends React.Component {
     this._updateField(event.target.name, getValueFromInput(event.target));
   };
 
+  _handleTouched = (name) => {
+    const touched = {
+      ...this.state.touched,
+      [name]: true,
+    }
+    this.setState({ touched }, this._validate);
+  };
+
+  _error = (name) => {
+    return this.state.touched[name] ? this.state.errors[name] : undefined;
+  };
+
   _updateSelectionEntity = (entity) => {
     const { selectedEntities, onStateChange } = this.props;
     const typeName = entity.type.name;
@@ -135,6 +148,7 @@ class ContentPackSelection extends React.Component {
       newSelection[typeName].splice(index, 1);
     }
 
+    this._handleTouched('selection');
     this._validate(newSelection);
     onStateChange({ selectedEntities: newSelection });
   };
@@ -157,6 +171,7 @@ class ContentPackSelection extends React.Component {
       newSelection[type] = entities[type];
     }
 
+    this._handleTouched('selection');
     this._validate(newSelection);
     onStateChange({ selectedEntities: newSelection });
   };
@@ -235,7 +250,7 @@ class ContentPackSelection extends React.Component {
   };
 
   render() {
-    const { filteredEntities = {}, errors, isFiltered, contentPack } = this.state;
+    const { filteredEntities = {}, errors, touched, isFiltered, contentPack } = this.state;
     const { edit } = this.props;
 
     const entitiesComponent = Object.keys(filteredEntities)
@@ -290,9 +305,10 @@ class ContentPackSelection extends React.Component {
                        maxLength={250}
                        value={contentPack.name}
                        onChange={this._bindValue}
+                       onBlur={() => this._handleTouched('name')}
                        label="Name"
                        help="Required. Give a descriptive name for this content pack."
-                       error={errors.name}
+                       error={this._error('name')}
                        required />
                 <Input name="summary"
                        id="summary"
@@ -300,15 +316,17 @@ class ContentPackSelection extends React.Component {
                        maxLength={250}
                        value={contentPack.summary}
                        onChange={this._bindValue}
+                       onBlur={() => this._handleTouched('summary')}
                        label="Summary"
                        help="Required. Give a short summary of the content pack."
-                       error={errors.summary}
+                       error={this._error('summary')}
                        required />
                 <Input name="description"
                        id="description"
                        type="textarea"
                        value={contentPack.description}
                        onChange={this._bindValue}
+                       onBlur={() => this._handleTouched('description')}
                        rows={6}
                        label="Description"
                        help="Give a long description of the content pack in markdown." />
@@ -318,9 +336,10 @@ class ContentPackSelection extends React.Component {
                        maxLength={250}
                        value={contentPack.vendor}
                        onChange={this._bindValue}
+                       onBlur={() => this._handleTouched('vendor')}
                        label="Vendor"
                        help="Required. Who did this content pack and how can they be reached, e.g. Name and email."
-                       error={errors.vendor}
+                       error={this._error('vendor')}
                        required />
                 <Input name="url"
                        id="url"
@@ -328,9 +347,10 @@ class ContentPackSelection extends React.Component {
                        maxLength={250}
                        value={contentPack.url}
                        onChange={this._bindValue}
+                       onBlur={() => this._handleTouched('url')}
                        label="URL"
                        help="Where can I find the content pack. e.g. github url"
-                       error={errors.url} />
+                       error={this._error('url')} />
               </fieldset>
             </form>
           </Col>
@@ -350,12 +370,13 @@ class ContentPackSelection extends React.Component {
             <SearchForm id="filter-input"
                         onSearch={this._onSetFilter}
                         onReset={this._onClearFilter}
+                        onBlur={() => this._handleTouched('selection')}
                         searchButtonLabel="Filter" />
           </Col>
         </Row>
         <Row>
           <Col smOffset={1} sm={8} lg={8}>
-            {errors.selection && <Panel bsStyle="danger">{errors.selection}</Panel>}
+            {touched.selection && errors.selection && <Panel bsStyle="danger">{errors.selection}</Panel>}
             <ExpandableList>
               {entitiesComponent}
             </ExpandableList>

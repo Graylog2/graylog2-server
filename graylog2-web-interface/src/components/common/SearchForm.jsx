@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (C) 2020 Graylog, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -114,6 +114,7 @@ class SearchForm extends React.Component {
       PropTypes.element,
     ]),
     focusAfterMount: PropTypes.bool,
+    onBlur: PropTypes.func,
   };
 
   static defaultProps = {
@@ -135,6 +136,7 @@ class SearchForm extends React.Component {
     queryHelpComponent: null,
     children: null,
     focusAfterMount: false,
+    onBlur: () => {},
   };
 
   constructor(props) {
@@ -249,6 +251,7 @@ class SearchForm extends React.Component {
                    /* eslint-disable-next-line jsx-a11y/no-autofocus */
                      autoFocus={focusAfterMount}
                      onChange={this.handleQueryChange}
+                     onBlur={this.props.onBlur}
                      value={query}
                      placeholder={placeholder}
                      type="text"
