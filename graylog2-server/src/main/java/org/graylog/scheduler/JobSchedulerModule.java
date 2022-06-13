@@ -22,7 +22,6 @@ import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.clock.JobSchedulerSystemClock;
 import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
 import org.graylog.scheduler.eventbus.JobSchedulerEventBusProvider;
-import org.graylog.scheduler.rest.JobSchedulerResource;
 import org.graylog2.plugin.PluginModule;
 
 /**
@@ -37,8 +36,6 @@ public class JobSchedulerModule extends PluginModule {
 
         OptionalBinder.newOptionalBinder(binder(), JobSchedulerConfig.class)
                 .setDefault().to(DefaultJobSchedulerConfig.class);
-
-        addSystemRestResource(JobSchedulerResource.class);
 
         addInitializer(JobSchedulerService.class);
         addAuditEventTypes(JobSchedulerAuditEventTypes.class);
