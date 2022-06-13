@@ -54,7 +54,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>11</maven.compiler.release>
+        <maven.compiler.release>17</maven.compiler.release>
 
         <!-- Plugins will not be deployed by default - set to `false` if you actually want to deploy it -->
         <maven.deploy.skip>true</maven.deploy.skip>

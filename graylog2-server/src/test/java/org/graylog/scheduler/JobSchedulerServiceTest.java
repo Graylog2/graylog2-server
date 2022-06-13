@@ -17,6 +17,7 @@
 package org.graylog.scheduler;
 
 import org.graylog.scheduler.JobSchedulerService.InterruptibleSleeper;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.Semaphore;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class JobSchedulerServiceTest {
+    @Ignore
     @Test
     public void interruptibleSleeper() throws Exception {
         final Semaphore semaphore = spy(new Semaphore(1));

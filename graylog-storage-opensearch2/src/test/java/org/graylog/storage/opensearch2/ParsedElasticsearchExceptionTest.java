@@ -23,9 +23,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ParsedElasticsearchExceptionTest {
     @Test
     void parsingMapperParsingException() {
-        final String exception = "ElasticsearchException[Elasticsearch exception [type=mapper_parsing_exception, " +
+        final String exception = "OpenSearchException[OpenSearch exception [type=mapper_parsing_exception, " +
                 "reason=failed to parse field [_ourcustomfield] of type [long] in document with id '2f1b81f1-c050-11ea-ad64-d2850321fca4'. " +
-                "Preview of field's value: 'fourty-two']]; nested: ElasticsearchException[Elasticsearch exception " +
+                "Preview of field's value: 'fourty-two']]; nested: OpenSearchException[OpenSearch exception " +
                 "[type=illegal_argument_exception, reason=For input string: \"fourty-two\"]];";
 
         final ParsedElasticsearchException parsed = ParsedElasticsearchException.from(exception);
@@ -39,7 +39,7 @@ class ParsedElasticsearchExceptionTest {
 
     @Test
     void parsingIndexReadonlyException() {
-        final String exception = "Elasticsearch exception: ElasticsearchException[Elasticsearch exception " +
+        final String exception = "OpenSearch exception: OpenSearchException[OpenSearch exception " +
                 "[type=cluster_block_exception, reason=index [messages_it_deflector] blocked by: [TOO_MANY_REQUESTS/12/index " +
                 "read-only / allow delete (api)];]]";
 
@@ -53,7 +53,7 @@ class ParsedElasticsearchExceptionTest {
 
     @Test
     void parsingPrimaryShardIsNotAvailable() {
-        final String exception = "Elasticsearch exception: ElasticsearchException[Elasticsearch exception [type=unavailable_shards_exception, " +
+        final String exception = "OpenSearch exception: OpenSearchException[OpenSearch exception [type=unavailable_shards_exception, " +
                 "reason=[graylog_0][2] primary shard is not active Timeout: [1m], request: [BulkShardRequest [[graylog_0][2]] containing [125] " +
                 "requests]]]";
 
@@ -68,7 +68,7 @@ class ParsedElasticsearchExceptionTest {
 
     @Test
     void parsingInvalidWriteTargetMessage() {
-        final String exception = "Elasticsearch exception [type=illegal_argument_exception, reason=no write index is defined for alias [messages_it_deflector]. The write index may be explicitly disabled using is_write_index=false or the alias points to multiple indices without one being designated as a write index]";
+        final String exception = "OpenSearch exception [type=illegal_argument_exception, reason=no write index is defined for alias [messages_it_deflector]. The write index may be explicitly disabled using is_write_index=false or the alias points to multiple indices without one being designated as a write index]";
 
         final ParsedElasticsearchException parsed = ParsedElasticsearchException.from(exception);
 

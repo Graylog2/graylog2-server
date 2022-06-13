@@ -84,11 +84,8 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, Terms> {
     }
 
     @Override
-    public Stream<Bucket> doHandleResult(Pivot pivot, Values bucketSpec,
-                                         SearchResponse searchResult,
-                                         Terms termsAggregation,
-                                         ESPivot searchTypeHandler,
-                                         ESGeneratedQueryContext esGeneratedQueryContext) {
+    public Stream<Bucket> doHandleResult(Values bucketSpec,
+                                         Terms termsAggregation) {
         return termsAggregation.getBuckets().stream()
                 .map(entry -> Bucket.create(entry.getKeyAsString(), entry));
     }

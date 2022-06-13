@@ -20,6 +20,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.TestInstances;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.platform.engine.EngineExecutionListener;
+import org.junit.platform.engine.support.hierarchical.Node;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
@@ -44,6 +45,11 @@ public class ContainerMatrixExtensionContext extends AbstractExtensionContext<Co
     }
 
     @Override
+    public Class<?> getRequiredTestClass() {
+        return super.getRequiredTestClass();
+    }
+
+    @Override
     public Optional<TestInstance.Lifecycle> getTestInstanceLifecycle() {
         return Optional.empty();
     }
@@ -54,8 +60,18 @@ public class ContainerMatrixExtensionContext extends AbstractExtensionContext<Co
     }
 
     @Override
+    public Object getRequiredTestInstance() {
+        return super.getRequiredTestInstance();
+    }
+
+    @Override
     public Optional<TestInstances> getTestInstances() {
         return Optional.empty();
+    }
+
+    @Override
+    public TestInstances getRequiredTestInstances() {
+        return super.getRequiredTestInstances();
     }
 
     @Override
@@ -64,7 +80,27 @@ public class ContainerMatrixExtensionContext extends AbstractExtensionContext<Co
     }
 
     @Override
+    public Method getRequiredTestMethod() {
+        return super.getRequiredTestMethod();
+    }
+
+    @Override
     public Optional<Throwable> getExecutionException() {
         return Optional.empty();
+    }
+
+    @Override
+    public void publishReportEntry(String key, String value) {
+        super.publishReportEntry(key, value);
+    }
+
+    @Override
+    public void publishReportEntry(String value) {
+        super.publishReportEntry(value);
+    }
+
+    @Override
+    protected Node.ExecutionMode getPlatformExecutionMode() {
+        return Node.ExecutionMode.SAME_THREAD;
     }
 }

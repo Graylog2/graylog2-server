@@ -57,12 +57,9 @@ public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket
     }
 
     @Override
-    public Stream<Bucket> doHandleResult(Pivot pivot,
-                                         DateRangeBucket dateRangeBucket,
-                                         SearchResponse searchResult,
-                                         ParsedDateRange rangeAggregation,
-                                         ESPivot searchTypeHandler,
-                                         ESGeneratedQueryContext esGeneratedQueryContext) {
+    public Stream<Bucket> doHandleResult(
+            DateRangeBucket dateRangeBucket,
+            ParsedDateRange rangeAggregation) {
         if (dateRangeBucket.bucketKey().equals(DateRangeBucket.BucketKey.TO)) {
             return rangeAggregation.getBuckets().stream()
                     .map(range -> Bucket.create(range.getToAsString(), range));

@@ -151,7 +151,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
         assertThat(searchTypeError.description()).isEqualTo(
                 "Unable to perform search query: \n" +
                         "\n" +
-                        "Elasticsearch exception [type=illegal_argument_exception, reason=Expected numeric type on field [field1], but got [keyword]]."
+                        "OpenSearch exception [type=illegal_argument_exception, reason=Expected numeric type on field [field1], but got [keyword]]."
         );
         assertThat(searchTypeError.searchTypeId()).isEqualTo("pivot1");
 

@@ -72,7 +72,7 @@ public class GrokTesterResourceTest {
         assertThat(response.matched()).isFalse();
         assertThat(response.pattern()).isEqualTo("%{NUMBER");
         assertThat(response.string()).isEqualTo("abc 1234");
-        assertThat(response.errorMessage()).startsWith("Illegal repetition near index 0");
+        assertThat(response.errorMessage()).startsWith("Illegal repetition near index ");
     }
 
     @Test

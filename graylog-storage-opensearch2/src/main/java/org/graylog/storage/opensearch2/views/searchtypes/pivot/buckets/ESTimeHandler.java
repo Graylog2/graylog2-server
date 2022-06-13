@@ -94,12 +94,8 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, ParsedDateHist
     }
 
     @Override
-    public Stream<Bucket> doHandleResult(Pivot pivot,
-                                         Time bucketSpec,
-                                         SearchResponse searchResult,
-                                         ParsedDateHistogram dateHistogramAggregation,
-                                         ESPivot searchTypeHandler,
-                                         ESGeneratedQueryContext esGeneratedQueryContext) {
+    public Stream<Bucket> doHandleResult(Time bucketSpec,
+                                         ParsedDateHistogram dateHistogramAggregation) {
         return dateHistogramAggregation.getBuckets().stream()
                 .map(dateHistogram -> Bucket.create(dateHistogram.getKeyAsString(), dateHistogram));
     }
