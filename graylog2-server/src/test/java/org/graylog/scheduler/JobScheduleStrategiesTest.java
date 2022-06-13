@@ -80,34 +80,43 @@ public class JobScheduleStrategiesTest {
 
     @Test
     public void nextTimeCron() {
-        final Cron cron = CronBuilder.cron(CronDefinitionBuilder.instanceDefinitionFor(QUARTZ))
-                .withSecond(on(0))
-                .withMinute(on(0))
-                .withHour(on(1))
-                .withDoM(always())
-                .withMonth(always())
-                .withDoW(questionMark())
-                .withYear(always())
-                .instance();
-
-        final String expression = cron.asString();
-
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .jobDefinitionId("abc-123")
                 .schedule(CronJobSchedule.builder()
-                        .cronExpression(expression)
+                        .cronExpression("0 0 1 * * ? *")
                         .timezone("Europe/Vienna")
                         .build())
                 .build();
 
-        final DateTime nextFutureTime1 = strategies.nextTime(trigger).orElse(null);
+        final DateTime nextTime = strategies.nextTime(trigger).orElse(null);
 
-        assertThat(nextFutureTime1)
+        assertThat(nextTime)
                 .isNotNull()
                 .satisfies(dateTime ->  {
                     assertThat(dateTime.getZone()).isEqualTo(DateTimeZone.forID("Europe/Vienna"));
                     assertThat(dateTime.toString(DATE_FORMAT)).isEqualTo("14/06/2022 01:00:00");
                 });
+    }
+
+    @Test
+    public void nextTimeCronWithEndTime() {
+        final DateTime endTime = DateTime.parse("13/06/2022 00:00:00", DATE_FORMAT);
+
+        // TODO: do I have to manually assign the end time in the lock?
+        final JobTriggerLock lock = JobTriggerLock.builder().lastLockTime(endTime).build();
+
+        final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
+                .jobDefinitionId("abc-123")
+                .endTime(endTime)
+                .schedule(CronJobSchedule.builder()
+                        .cronExpression("0 0 1 * * ? *")
+                        .timezone("Europe/Vienna")
+                        .build())
+                .lock(lock)
+                .build();
+
+        // it should not be running anymore
+        assertThat(strategies.nextTime(trigger)).isNotPresent();
     }
 
     @Test
