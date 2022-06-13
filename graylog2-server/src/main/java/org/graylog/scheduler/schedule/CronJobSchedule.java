@@ -31,6 +31,7 @@ import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nullable;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -48,17 +49,21 @@ public abstract class CronJobSchedule implements JobSchedule {
 
     public static final String FIELD_CRON_EXPRESSION = "cron_expression";
     public static final String FIELD_TIMEZONE = "timezone";
+    public static final String DEFAULT_TIMEZONE = "UTC";
 
     @JsonProperty(FIELD_CRON_EXPRESSION)
     public abstract String cronExpression();
 
-    @JsonProperty(value = FIELD_TIMEZONE, defaultValue = "UTC")
+    @JsonProperty(value = FIELD_TIMEZONE)
     public abstract String timezone();
+
+    private static CronParser getCronParser() {
+        return new CronParser(CronDefinitionBuilder.instanceDefinitionFor(QUARTZ));
+    }
 
     @Override
     public Optional<DateTime> calculateNextTime(DateTime lastExecutionTime, DateTime lastNextTime, JobSchedulerClock clock) {
-        CronParser parser = new CronParser(CronDefinitionBuilder.instanceDefinitionFor(QUARTZ));
-        final Cron cron = parser.parse(cronExpression());
+        final Cron cron = getCronParser().parse(cronExpression());
         final ExecutionTime executionTime = ExecutionTime.forCron(cron);
 
         ZonedDateTime zdt = getZonedDateTime(clock);
@@ -95,7 +100,7 @@ public abstract class CronJobSchedule implements JobSchedule {
         ));
     }
     public static CronJobSchedule.Builder builder() {
-        return CronJobSchedule.Builder.create();
+        return CronJobSchedule.Builder.create().timezone(DEFAULT_TIMEZONE);
     }
 
     public abstract CronJobSchedule.Builder toBuilder();
@@ -119,8 +124,16 @@ public abstract class CronJobSchedule implements JobSchedule {
         public CronJobSchedule build() {
             // Make sure the type name is correct!
             type(TYPE_NAME);
+            final CronJobSchedule schedule = autoBuild();
 
-            return autoBuild();
+            validateCronExpression(schedule);
+
+            return schedule;
+        }
+
+        private void validateCronExpression(CronJobSchedule schedule) {
+            final Cron cron = getCronParser().parse(schedule.cronExpression());
+            cron.validate();
         }
     }
 }
