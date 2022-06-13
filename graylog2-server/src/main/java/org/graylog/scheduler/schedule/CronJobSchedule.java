@@ -61,18 +61,29 @@ public abstract class CronJobSchedule implements JobSchedule {
         final Cron cron = parser.parse(cronExpression());
         final ExecutionTime executionTime = ExecutionTime.forCron(cron);
 
-        final DateTime now = clock.nowUTC();
-
-        Instant instant = Instant.ofEpochMilli(now.getMillis());
-        ZoneId zoneId = ZoneId.of(timezone(), ZoneId.SHORT_IDS);
-        ZonedDateTime zdt = ZonedDateTime.ofInstant(instant, zoneId);
+        ZonedDateTime zdt = getZonedDateTime(clock);
 
         final Optional<ZonedDateTime> nextExecution = executionTime.nextExecution(zdt);
 
-        return nextExecution.map(t -> {
-            final DateTimeZone tz = DateTimeZone.forTimeZone(TimeZone.getTimeZone(t.getZone()));
-            return new DateTime(t.toInstant().toEpochMilli(), tz);
-        });
+        return nextExecution
+                .map(this::toDateTime)
+                .filter(t -> isBeforeLastExecution(t, lastExecutionTime));
+    }
+
+    private boolean isBeforeLastExecution(DateTime nextExecution, DateTime lastExecutionTime) {
+        return lastExecutionTime == null || nextExecution.isBefore(lastExecutionTime);
+    }
+
+    private ZonedDateTime getZonedDateTime(JobSchedulerClock clock) {
+        final DateTime now = clock.nowUTC();
+        Instant instant = Instant.ofEpochMilli(now.getMillis());
+        ZoneId zoneId = ZoneId.of(timezone());
+        return ZonedDateTime.ofInstant(instant, zoneId);
+    }
+
+    private DateTime toDateTime(ZonedDateTime t) {
+        final DateTimeZone tz = DateTimeZone.forTimeZone(TimeZone.getTimeZone(t.getZone()));
+        return new DateTime(t.toInstant().toEpochMilli(), tz);
     }
 
     @Override

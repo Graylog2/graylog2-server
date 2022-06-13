@@ -19,12 +19,13 @@ package org.graylog.scheduler;
 import com.cronutils.builder.CronBuilder;
 import com.cronutils.model.Cron;
 import com.cronutils.model.definition.CronDefinitionBuilder;
-import org.apache.logging.log4j.core.util.CronExpression;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.scheduler.schedule.CronJobSchedule;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,12 +38,17 @@ import static com.cronutils.model.field.expression.FieldExpressionFactory.questi
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class JobScheduleStrategiesTest {
+
+    public static final DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss");
+
     private JobSchedulerTestClock clock;
     private JobScheduleStrategies strategies;
 
     @Before
     public void setUp() throws Exception {
-        this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
+        DateTime dateTime = DateTime.parse("13/06/2022 15:13:59", DATE_FORMAT);
+        DateTime dateTimeWithZone = dateTime.withZone(DateTimeZone.forID("UTC"));
+        this.clock = new JobSchedulerTestClock(dateTimeWithZone);
         this.strategies = new JobScheduleStrategies(clock);
     }
 
@@ -98,10 +104,9 @@ public class JobScheduleStrategiesTest {
 
         assertThat(nextFutureTime1)
                 .isNotNull()
-                .isGreaterThanOrEqualTo(clock.nowUTC())
-                .satisfies(dateTime -> {
-                    assertThat(dateTime.secondOfMinute().get()).isEqualTo(0);
-                    assertThat(dateTime.minuteOfHour().get()).isEqualTo(0);
+                .satisfies(dateTime ->  {
+                    assertThat(dateTime.getZone()).isEqualTo(DateTimeZone.forID("Europe/Vienna"));
+                    assertThat(dateTime.toString(DATE_FORMAT)).isEqualTo("14/06/2022 01:00:00");
                 });
     }
 
