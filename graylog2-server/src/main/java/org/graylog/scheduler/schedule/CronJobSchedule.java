@@ -27,10 +27,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.scheduler.JobSchedule;
+import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import java.time.Clock;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -54,18 +55,19 @@ public abstract class CronJobSchedule implements JobSchedule {
     @JsonProperty(value = FIELD_TIMEZONE, defaultValue = "UTC")
     public abstract String timezone();
 
-    // TODO: do we need this clock?
-    private final Clock clock = Clock.systemDefaultZone();
-
     @Override
-    public Optional<DateTime> calculateNextTime(DateTime lastExecutionTime, DateTime lastNextTime) {
+    public Optional<DateTime> calculateNextTime(DateTime lastExecutionTime, DateTime lastNextTime, JobSchedulerClock clock) {
         CronParser parser = new CronParser(CronDefinitionBuilder.instanceDefinitionFor(QUARTZ));
         final Cron cron = parser.parse(cronExpression());
         final ExecutionTime executionTime = ExecutionTime.forCron(cron);
-        final ZonedDateTime now = ZonedDateTime.now(clock);
 
-        final ZoneId zoneId = ZoneId.of(timezone());
-        final Optional<ZonedDateTime> nextExecution = executionTime.nextExecution(now.withZoneSameInstant(zoneId));
+        final DateTime now = clock.nowUTC();
+
+        Instant instant = Instant.ofEpochMilli(now.getMillis());
+        ZoneId zoneId = ZoneId.of(timezone(), ZoneId.SHORT_IDS);
+        ZonedDateTime zdt = ZonedDateTime.ofInstant(instant, zoneId);
+
+        final Optional<ZonedDateTime> nextExecution = executionTime.nextExecution(zdt);
 
         return nextExecution.map(t -> {
             final DateTimeZone tz = DateTimeZone.forTimeZone(TimeZone.getTimeZone(t.getZone()));
