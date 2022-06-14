@@ -23,7 +23,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.BucketOrder;
@@ -94,12 +93,8 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, ParsedDateHist
     }
 
     @Override
-    public Stream<Bucket> doHandleResult(Pivot pivot,
-                                         Time bucketSpec,
-                                         SearchResponse searchResult,
-                                         ParsedDateHistogram dateHistogramAggregation,
-                                         ESPivot searchTypeHandler,
-                                         ESGeneratedQueryContext esGeneratedQueryContext) {
+    public Stream<Bucket> doHandleResult(Time bucketSpec,
+                                         ParsedDateHistogram dateHistogramAggregation) {
         return dateHistogramAggregation.getBuckets().stream()
                 .map(dateHistogram -> Bucket.create(dateHistogram.getKeyAsString(), dateHistogram));
     }

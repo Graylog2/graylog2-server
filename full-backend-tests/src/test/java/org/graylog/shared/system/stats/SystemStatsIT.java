@@ -23,6 +23,8 @@ import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +44,7 @@ public class SystemStatsIT {
     }
 
     @ContainerMatrixTest
+    @DisabledOnOs(OS.MAC)
     void filesystemStats() {
         final Map<Object, Object> filesystems = given()
                 .spec(requestSpec)

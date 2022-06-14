@@ -19,12 +19,14 @@ package org.graylog.plugins.views.search.searchfilters.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
 
 @AutoValue
 @JsonTypeName(UsedSearchFilter.REFERENCED_SEARCH_FILTER)
+@JsonDeserialize(builder = ReferencedQueryStringSearchFilter.Builder.class)
 public abstract class ReferencedQueryStringSearchFilter implements ReferencedSearchFilter {
 
     @JsonProperty
@@ -43,16 +45,50 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
     @Nullable
     public abstract String queryString();
 
-    @JsonCreator
-    @SuppressWarnings("unused")
-    public static ReferencedQueryStringSearchFilter create(@JsonProperty("id") final String id,
-                                                           @JsonProperty(TITLE_FIELD) final String title,
-                                                           @JsonProperty(DESCRIPTION_FIELD) final String description,
-                                                           @JsonProperty(QUERY_STRING_FIELD) final String queryString) {
-        return new AutoValue_ReferencedQueryStringSearchFilter(id, title, description, queryString);
-    }
+    @Override
+    @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
+    public abstract boolean negation();
+
+    @Override
+    @JsonProperty(value = DISABLED_FIELD, defaultValue = "false")
+    public abstract boolean disabled();
 
     public static ReferencedQueryStringSearchFilter create(final String id) {
-        return new AutoValue_ReferencedQueryStringSearchFilter(id, null, null, null);
+        return builder().id(id).build();
+    }
+
+    public static Builder builder() {
+        return Builder.create();
+    }
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+
+        @JsonProperty
+        public abstract Builder id(String id);
+
+        @JsonProperty(TITLE_FIELD)
+        public abstract Builder title(String title);
+
+        @JsonProperty(DESCRIPTION_FIELD)
+        public abstract Builder description(String description);
+
+        @JsonProperty(QUERY_STRING_FIELD)
+        public abstract Builder queryString(String queryString);
+
+        @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
+        public abstract Builder negation(boolean negation);
+
+        @JsonProperty(value = DISABLED_FIELD, defaultValue = "false")
+        public abstract Builder disabled(boolean disabled);
+
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_ReferencedQueryStringSearchFilter.Builder()
+                    .disabled(false)
+                    .negation(false);
+        }
+
+        public abstract ReferencedQueryStringSearchFilter build();
     }
 }

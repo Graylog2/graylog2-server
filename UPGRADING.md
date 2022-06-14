@@ -23,6 +23,15 @@ The following API endpoints have been removed in 4.4.
 | ------------------------------------------- | --------------------------- |
 | `PUT /example/placeholder`                  | TODO placeholder comment    |
 
+## Java Code API Changes
+
+The following Java Code API changes have been made in 4.4.
+
+| File                                                                                                   | Description                                              |
+|--------------------------------------------------------------------------------------------------------|----------------------------------------------------------|
+| `PaginatedPipelineService.java` | Concrete implementation has been changed to an interface |
+| `PaginatedRuleService.java`     | Concrete implementation has been changed to an interface |
+
 ## Behaviour Changes
 
 - The Prometheus metrics for Graylog inputs were previously only exposed for

@@ -38,6 +38,7 @@ import org.graylog.events.processor.aggregation.AggregationFunction;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
+import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
@@ -89,6 +90,9 @@ public class LegacyAlertConditionMigratorTest {
     @Mock
     private Map<String, EventNotification.Factory> eventNotificationFactories;
 
+    @Mock
+    private SchedulerCapabilitiesService schedulerCapabilitiesService;
+
     @Before
     public void setUp() throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
@@ -107,7 +111,7 @@ public class LegacyAlertConditionMigratorTest {
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
         final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(mongoConnection, mongoJackObjectMapperProvider);
-        final DBJobTriggerService jobTriggerService = new DBJobTriggerService(mongoConnection, mongoJackObjectMapperProvider, mock(NodeId.class), clock, Duration.minutes(5));
+        final DBJobTriggerService jobTriggerService = new DBJobTriggerService(mongoConnection, mongoJackObjectMapperProvider, mock(NodeId.class), clock, schedulerCapabilitiesService, Duration.minutes(5));
         notificationService = new DBNotificationService(mongoConnection, mongoJackObjectMapperProvider, mock(EntityOwnershipService.class));
 
         this.eventDefinitionService = new DBEventDefinitionService(mongoConnection, mongoJackObjectMapperProvider, mock(DBEventProcessorStateService.class), mock(EntityOwnershipService.class));

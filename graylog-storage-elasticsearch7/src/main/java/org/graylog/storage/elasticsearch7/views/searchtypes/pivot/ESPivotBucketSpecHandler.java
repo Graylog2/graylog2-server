@@ -16,8 +16,6 @@
  */
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivot;
 
-import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
-import org.graylog.plugins.views.search.engine.SearchTypeHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -48,12 +46,12 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec, AGG
 
     @SuppressWarnings("unchecked")
     @Override
-    public Stream<Bucket> handleResult(Pivot pivot, BucketSpec bucketSpec, Object queryResult, Object aggregationResult, SearchTypeHandler searchTypeHandler, GeneratedQueryContext queryContext) {
-        return doHandleResult(pivot, (SPEC_TYPE) bucketSpec, (SearchResponse) queryResult, (AGGREGATION_RESULT) aggregationResult, (ESPivot) searchTypeHandler, (ESGeneratedQueryContext) queryContext);
+    public Stream<Bucket> handleResult(BucketSpec bucketSpec, Object aggregationResult) {
+        return doHandleResult((SPEC_TYPE) bucketSpec, (AGGREGATION_RESULT) aggregationResult);
     }
 
     @Override
-    public abstract Stream<Bucket> doHandleResult(Pivot pivot, SPEC_TYPE bucketSpec, SearchResponse searchResult, AGGREGATION_RESULT aggregation_result, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext);
+    public abstract Stream<Bucket> doHandleResult(SPEC_TYPE bucketSpec, AGGREGATION_RESULT aggregationResult);
 
     public static class Bucket {
 

@@ -35,7 +35,13 @@ public interface UsedSearchFilter {
     String TITLE_FIELD = "title";
     String DESCRIPTION_FIELD = "description";
     String QUERY_STRING_FIELD = "queryString";
+    String NEGATION_FIELD = "negation";
+    String DISABLED_FIELD = "disabled";
 
     String INLINE_QUERY_STRING_SEARCH_FILTER = "inlineQueryString";
     String REFERENCED_SEARCH_FILTER = "referenced";
+
+    boolean negation();
+
+    boolean disabled();
 }

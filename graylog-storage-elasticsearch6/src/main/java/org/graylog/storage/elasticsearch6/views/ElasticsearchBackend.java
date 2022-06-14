@@ -120,11 +120,10 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .filter(normalizedRootQuery);
 
         usedSearchFiltersToQueryStringsMapper.map(query.filters())
-                .forEach(searchFilterQueryString -> {
-                    final String decorated = this.queryStringDecorators.decorate(searchFilterQueryString, job, query);
-                    final QueryBuilder normalized = normalizeQueryString(decorated);
-                    boolQuery.filter(normalized);
-                });
+                .stream()
+                .map(searchFilterQueryString -> this.queryStringDecorators.decorate(searchFilterQueryString, job, query))
+                .map(this::normalizeQueryString)
+                .forEach(boolQuery::filter);
 
         // add the optional root query filters
         generateFilterClause(query.filter(), job, query)
@@ -169,6 +168,12 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 final QueryBuilder normalizedSearchTypeQuery = normalizeQueryString(searchTypeQueryString);
                 searchTypeOverrides.must(normalizedSearchTypeQuery);
             });
+
+            usedSearchFiltersToQueryStringsMapper.map(searchType.filters())
+                    .stream()
+                    .map(searchFilterQueryString -> this.queryStringDecorators.decorate(searchFilterQueryString, job, query))
+                    .map(this::normalizeQueryString)
+                    .forEach(searchTypeOverrides::must);
 
             searchTypeSourceBuilder.query(searchTypeOverrides);
 

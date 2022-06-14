@@ -48,7 +48,7 @@ class QueryEntityTest {
     public void testLoadsSearchFiltersCollectionFromContentPack() {
 
         final ImmutableList<UsedSearchFilter> originalSearchFilters = ImmutableList.of(
-                InlineQueryStringSearchFilter.create("title", "descr", "*"),
+                InlineQueryStringSearchFilter.builder().title("title").description("descr").queryString("*").disabled(true).build(),
                 ReferencedQueryStringSearchFilter.create("42")
         );
         QueryEntity queryWithFilters = QueryEntity.Builder

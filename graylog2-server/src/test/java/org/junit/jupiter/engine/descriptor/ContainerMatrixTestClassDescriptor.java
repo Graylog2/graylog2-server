@@ -44,8 +44,14 @@ public class ContainerMatrixTestClassDescriptor extends ClassBasedTestDescriptor
     private final SearchVersion esVersion;
     private final MongodbServer mongoVersion;
     private final List<URL> mongoFixtures;
+    private final boolean preImportLicense;
 
-    public ContainerMatrixTestClassDescriptor(TestDescriptor parent, Class<?> testClass, JupiterConfiguration configuration, @Nullable SearchVersion esVersion, @Nullable MongodbServer mongoVersion, List<URL> mongoFixtures) {
+    public ContainerMatrixTestClassDescriptor(TestDescriptor parent, Class<?> testClass,
+                                              JupiterConfiguration configuration,
+                                              @Nullable SearchVersion esVersion,
+                                              @Nullable MongodbServer mongoVersion,
+                                              List<URL> mongoFixtures,
+                                              boolean preImportLicense) {
         super(
                 parent.getUniqueId().append(SEGMENT_TYPE, testClass.getName() + "_" + esVersion + "_" + mongoVersion),
                 testClass,
@@ -55,11 +61,16 @@ public class ContainerMatrixTestClassDescriptor extends ClassBasedTestDescriptor
         this.esVersion = esVersion;
         this.mongoVersion = mongoVersion;
         this.mongoFixtures = mongoFixtures;
+        this.preImportLicense = preImportLicense;
         setParent(parent);
     }
 
-    public ContainerMatrixTestClassDescriptor(TestDescriptor parent, Class<?> testClass, JupiterConfiguration configuration, List<URL> mongoFixtures) {
-        this(parent, testClass, configuration, null, null, mongoFixtures);
+    public ContainerMatrixTestClassDescriptor(TestDescriptor parent,
+                                              Class<?> testClass,
+                                              JupiterConfiguration configuration,
+                                              List<URL> mongoFixtures,
+                                              boolean preImportLicense) {
+        this(parent, testClass, configuration, null, null, mongoFixtures, preImportLicense);
     }
 
     private static Supplier<String> determineDisplayName(Class<?> testClass, @Nullable SearchVersion esVersion, @Nullable MongodbServer mongodbServer) {
@@ -105,5 +116,9 @@ public class ContainerMatrixTestClassDescriptor extends ClassBasedTestDescriptor
 
     public List<URL> getMongoFixtures() {
         return mongoFixtures;
+    }
+
+    public boolean isPreImportLicense() {
+        return preImportLicense;
     }
 }

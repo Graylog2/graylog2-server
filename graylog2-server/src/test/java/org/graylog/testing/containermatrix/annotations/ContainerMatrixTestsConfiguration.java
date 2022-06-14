@@ -80,4 +80,12 @@ public @interface ContainerMatrixTestsConfiguration {
      * @return enabled feature flags
      */
     String[] enabledFeatureFlags() default {};
+
+    /**
+     * Import existing GL licenses directly into Mongo to avoid possible race conditions during tests,
+     * that occured if the licenses where imported via REST
+     * Disabling only works with Lifecycle.CLASS because a new container is spun up.
+     */
+    boolean defaultImportLicenses = true;
+    boolean importLicenses() default defaultImportLicenses;
 }

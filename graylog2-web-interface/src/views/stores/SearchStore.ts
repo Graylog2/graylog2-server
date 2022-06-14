@@ -105,6 +105,7 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
         this._trigger();
       }
     },
+
     onSearchExecutionStateUpdate(executionState: SearchExecutionState) {
       this.executionState = executionState;
     },

@@ -103,6 +103,23 @@ public class SearchResource extends RestResource implements PluginRestResource {
         return Response.created(URI.create(result.id())).entity(result).build();
     }
 
+    @POST
+    @ApiOperation(value = "Create a search query", response = SearchDTOv2.class, code = 201)
+    @AuditEvent(type = ViewsAuditEventTypes.SEARCH_CREATE)
+    @Consumes({SEARCH_FORMAT_V2})
+    @Produces({SEARCH_FORMAT_V2})
+    public Response createSearchV2(@ApiParam SearchDTOv2 searchRequest, @Context SearchUser searchUser) {
+        final Search search = searchRequest.toSearch();
+
+        final Search saved = searchDomain.saveForUser(search, searchUser);
+        final SearchDTOv2 result = SearchDTOv2.fromSearch(saved);
+        if (result == null || result.id() == null) {
+            return Response.serverError().build();
+        }
+        LOG.debug("Created new search object {}", result.id());
+        return Response.created(URI.create(result.id())).entity(result).build();
+    }
+
     @GET
     @ApiOperation(value = "Retrieve a search query")
     @Path("{id}")

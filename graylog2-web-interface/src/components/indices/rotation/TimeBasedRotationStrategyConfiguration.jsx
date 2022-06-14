@@ -20,6 +20,10 @@ import moment from 'moment';
 
 import { Input } from 'components/bootstrap';
 
+const _validationLimit = (durationInMilliseconds, rotationLimit) => {
+  return durationInMilliseconds <= moment.duration(rotationLimit).asMilliseconds();
+};
+
 class TimeBasedRotationStrategyConfiguration extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
@@ -62,17 +66,13 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
     };
   };
 
-  _validationLimit = (durationInMilliseconds, rotationLimit) => {
-    return durationInMilliseconds <= moment.duration(rotationLimit).asMilliseconds();
-  };
-
   _isValidPeriod = (duration) => {
     const { rotation_period: rotationPeriod, rotationLimit } = this.state;
     const check = duration || rotationPeriod;
     const checkInMilliseconds = moment.duration(check).asMilliseconds();
 
     return checkInMilliseconds >= 3600000 && (
-      rotationLimit ? this._validationLimit(checkInMilliseconds, rotationLimit) : true
+      rotationLimit ? _validationLimit(checkInMilliseconds, rotationLimit) : true
     );
   };
 
@@ -99,6 +99,8 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
       <div>
         <Input id="rotation-period"
                type="text"
+               labelClassName="col-sm-3"
+               wrapperClassName="col-sm-9"
                ref={(rotationPeriodRef) => { this.inputs.rotation_period = rotationPeriodRef; }}
                label="Rotation period (ISO8601 Duration)"
                onChange={this._onPeriodUpdate('rotation_period')}

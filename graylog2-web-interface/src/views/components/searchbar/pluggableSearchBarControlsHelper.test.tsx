@@ -21,8 +21,8 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import type { SearchBarControl } from 'views/types';
 
 import {
-  usePluggableInitialValues,
-  executePluggableSubmitHandler,
+  useInitialSearchValues,
+  executeSearchSubmitHandler,
   pluggableValidationPayload,
   validatePluggableValues,
 } from './pluggableSearchBarControlsHandler';
@@ -31,8 +31,10 @@ describe('pluggableSearchBarControlsHandler', () => {
   const pluggableSearchBarControl: SearchBarControl = {
     id: 'pluggable-search-bar-control',
     component: () => <div />,
-    useInitialValues: () => ({ pluggableControl: 'Initial Value' }),
-    onSubmit: () => Promise.resolve(),
+    useInitialSearchValues: () => ({ pluggableControl: 'Initial Value' }),
+    useInitialDashboardWidgetValues: () => ({ pluggableControl: 'Initial Value' }),
+    onSearchSubmit: (_values, entity) => Promise.resolve(entity),
+    onDashboardWidgetSubmit: (_values, entity) => Promise.resolve(entity),
     validationPayload: (values) => {
       // @ts-ignore
       const { pluggableControl } = values;
@@ -57,15 +59,15 @@ describe('pluggableSearchBarControlsHandler', () => {
     console.error = original;
   });
 
-  it('usePluggableInitialValues should catch errors', async () => {
+  it('useInitialSearchValues should catch errors', async () => {
     PluginStore.register(new PluginManifest({}, {
       'views.components.searchBar': [
-        () => ({ ...pluggableSearchBarControl, useInitialValues: () => { throw Error('something went wrong!'); } }),
+        () => ({ ...pluggableSearchBarControl, useInitialSearchValues: () => { throw Error('something went wrong!'); } }),
       ],
     }));
 
     const ExampleComponent = () => {
-      const initialValuesFromPlugin = usePluggableInitialValues();
+      const initialValuesFromPlugin = useInitialSearchValues();
 
       return <div>Plugin initial values: {JSON.stringify(initialValuesFromPlugin)}</div>;
     };
@@ -79,12 +81,12 @@ describe('pluggableSearchBarControlsHandler', () => {
     await screen.findByText('Plugin initial values: {}');
   });
 
-  it('executePluggableSubmitHandler should catch errors', async () => {
-    const result = await executePluggableSubmitHandler(
+  it('executeSearchSubmitHandler should catch errors', async () => {
+    const result = await executeSearchSubmitHandler(
       {},
       [() => ({
         ...pluggableSearchBarControl,
-        onSubmit: () => { throw Error('something went wrong!'); },
+        onSearchSubmit: () => Promise.reject(new Error('something went wrong!')),
       })],
     );
 
@@ -92,7 +94,7 @@ describe('pluggableSearchBarControlsHandler', () => {
       'An error occurred when executing a submit handler from a plugin: Error: something went wrong!',
     ));
 
-    expect(result).toStrictEqual([undefined]);
+    expect(result).toStrictEqual(undefined);
   });
 
   it('pluggableValidationPayload should catch errors', async () => {
