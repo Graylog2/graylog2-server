@@ -16,7 +16,6 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled from 'styled-components';
 
 import {
   ControlLabel,
@@ -37,10 +36,6 @@ const OPTIONS = [
   { value: 'BOOLEAN', label: 'boolean' },
   { value: 'NULL', label: 'null' },
 ];
-
-const StyledDropdownButton = styled(DropdownButton)(({ theme }) => `
-  color: ${theme.colors.variant.dark.default};
-`);
 
 class JSONValueInput extends React.Component {
   static propTypes = {
@@ -130,7 +125,7 @@ class JSONValueInput extends React.Component {
             <DropdownButton componentClass={InputGroup.Button}
                  id="input-dropdown-addon"
                  bsStyle={this.props.validationState === 'error' ? 'danger' : 'default'}
-                title={OPTIONS.filter((o) => o.value === this.props.valueType)[0].label}>
+                 title={OPTIONS.filter((o) => o.value === this.props.valueType)[0].label}>
               {options}
             </DropdownButton>
           </InputGroup>
