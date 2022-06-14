@@ -72,7 +72,7 @@ public class JobResourceHandlerService {
 
         return SystemJobSummary.create(trigger.id(),
                 details.description(),
-                trigger.type(),
+                details.systemJobName(),
                 details.info(),
                 Objects.toString(trigger.lock().lastOwner(), ""),
                 trigger.triggeredAt().orElse(null),

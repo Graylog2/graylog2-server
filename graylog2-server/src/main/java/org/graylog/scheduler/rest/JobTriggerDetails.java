@@ -20,16 +20,19 @@ import com.google.auto.value.AutoValue;
 
 @AutoValue
 public abstract class JobTriggerDetails {
-    public static JobTriggerDetails EMPTY_DETAILS = create("", "", false);
+    public static JobTriggerDetails EMPTY_DETAILS = create("", "", "unknown", false);
 
     public abstract String info();
 
     public abstract String description();
 
+    // Used to identify a SystemJob
+    public abstract String systemJobName();
+
     public abstract boolean isCancallable();
 
-    public static JobTriggerDetails create(String info, String description, boolean isCancallable) {
-        return new AutoValue_JobTriggerDetails(info, description, isCancallable);
+    public static JobTriggerDetails create(String info, String description, String systemJobName, boolean isCancallable) {
+        return new AutoValue_JobTriggerDetails(info, description, systemJobName, isCancallable);
     }
 
 }
