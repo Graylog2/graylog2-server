@@ -28,8 +28,8 @@ type Props = {
 }
 
 const CachePicker = ({
-  name = 'cache_id',
-  caches = [],
+  name,
+  caches,
 }: Props) => {
   const [, { value, touched, error }, { setTouched, setValue }] = useField(name);
   const sortedCaches = caches.map((cache) => {
