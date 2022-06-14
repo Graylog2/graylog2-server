@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { Formik, Field, Form } from 'formik';
+import PropTypes from 'prop-types';
 import _omit from 'lodash/omit';
 import type { FieldProps } from 'formik';
 import type { LookupTable } from 'src/logic/lookup-tables/types';
@@ -65,8 +66,8 @@ type Props = {
 
 const LookupTableForm = ({
   saved,
-  create = true,
-  table = defaultTableValues,
+  create,
+  table,
 }: Props) => {
   const validate = (values: LookupTableType) => {
     const errors = {};
@@ -251,6 +252,17 @@ const LookupTableForm = ({
       )}
     </Formik>
   );
+};
+
+LookupTableForm.propTypes = {
+  saved: PropTypes.func.isRequired,
+  create: PropTypes.bool,
+  table: PropTypes.object,
+};
+
+LookupTableForm.defaultProps = {
+  create: true,
+  table: defaultTableValues,
 };
 
 export default LookupTableForm;

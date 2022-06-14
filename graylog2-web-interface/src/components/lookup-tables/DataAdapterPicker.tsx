@@ -17,6 +17,7 @@
 import React from 'react';
 import { useField } from 'formik';
 import naturalSort from 'javascript-natural-sort';
+import PropTypes from 'prop-types';
 
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
@@ -27,8 +28,8 @@ type Props = {
 }
 
 const DataAdapterPicker = ({
-  name = 'data_adapter_id',
-  dataAdapters = [],
+  name,
+  dataAdapters,
 }: Props) => {
   const [, { value, touched, error }, { setTouched, setValue }] = useField(name);
   const sortedAdapters = dataAdapters.map((adapter) => {
@@ -57,6 +58,16 @@ const DataAdapterPicker = ({
       </Input>
     </fieldset>
   );
+};
+
+DataAdapterPicker.propTypes = {
+  name: PropTypes.string,
+  dataAdapters: PropTypes.array,
+};
+
+DataAdapterPicker.defaultProps = {
+  name: 'data_adapter_id',
+  dataAdapters: [],
 };
 
 export default DataAdapterPicker;
