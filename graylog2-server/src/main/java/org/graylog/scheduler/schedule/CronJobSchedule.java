@@ -48,6 +48,7 @@ public abstract class CronJobSchedule implements JobSchedule {
 
     public static final String FIELD_CRON_EXPRESSION = "cron_expression";
     public static final String FIELD_TIMEZONE = "timezone";
+
     public static final String DEFAULT_TIMEZONE = "UTC";
 
     @JsonProperty(FIELD_CRON_EXPRESSION)
@@ -56,13 +57,13 @@ public abstract class CronJobSchedule implements JobSchedule {
     @JsonProperty(value = FIELD_TIMEZONE)
     public abstract String timezone();
 
-    private static CronParser getCronParser() {
+    private static CronParser newCronParser() {
         return new CronParser(CronDefinitionBuilder.instanceDefinitionFor(QUARTZ));
     }
 
     @Override
     public Optional<DateTime> calculateNextTime(DateTime lastExecutionTime, DateTime lastNextTime, JobSchedulerClock clock) {
-        final Cron cron = getCronParser().parse(cronExpression());
+        final Cron cron = newCronParser().parse(cronExpression());
         final ExecutionTime executionTime = ExecutionTime.forCron(cron);
 
         ZonedDateTime zdt = getZonedDateTime(clock);
@@ -99,7 +100,7 @@ public abstract class CronJobSchedule implements JobSchedule {
         ));
     }
     public static CronJobSchedule.Builder builder() {
-        return CronJobSchedule.Builder.create().timezone(DEFAULT_TIMEZONE);
+        return CronJobSchedule.Builder.create();
     }
 
     public abstract CronJobSchedule.Builder toBuilder();
@@ -109,7 +110,9 @@ public abstract class CronJobSchedule implements JobSchedule {
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_CronJobSchedule.Builder().type(TYPE_NAME);
+            return new AutoValue_CronJobSchedule.Builder()
+                    .type(TYPE_NAME)
+                    .timezone(DEFAULT_TIMEZONE);
         }
 
         @JsonProperty(FIELD_CRON_EXPRESSION)
@@ -130,8 +133,12 @@ public abstract class CronJobSchedule implements JobSchedule {
             return schedule;
         }
 
+        /**
+         * make sure that we don't allow any invalid cron expression, as we are accepting plain string
+         * that could contain anything
+         */
         private void validateCronExpression(CronJobSchedule schedule) {
-            final Cron cron = getCronParser().parse(schedule.cronExpression());
+            final Cron cron = newCronParser().parse(schedule.cronExpression());
             cron.validate();
         }
     }
