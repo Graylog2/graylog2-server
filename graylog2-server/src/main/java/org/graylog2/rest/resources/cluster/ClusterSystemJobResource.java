@@ -72,7 +72,9 @@ public class ClusterSystemJobResource extends ProxiedResource {
     public ClusterSystemJobResource(NodeService nodeService,
                                     RemoteInterfaceProvider remoteInterfaceProvider,
                                     @Context HttpHeaders httpHeaders,
-                                    @Named("proxiedRequestsExecutorService") ExecutorService executorService, JobResourceHandlerService jobResourceHandlerService, ServerStatus serverStatus) throws NodeNotFoundException {
+                                    @Named("proxiedRequestsExecutorService") ExecutorService executorService,
+                                    JobResourceHandlerService jobResourceHandlerService,
+                                    ServerStatus serverStatus) throws NodeNotFoundException {
         super(httpHeaders, nodeService, remoteInterfaceProvider, executorService);
         this.jobResourceHandlerService = jobResourceHandlerService;
         this.serverStatus = serverStatus;

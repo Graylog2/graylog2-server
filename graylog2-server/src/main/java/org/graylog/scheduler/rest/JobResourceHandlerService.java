@@ -61,8 +61,8 @@ public class JobResourceHandlerService {
     }
 
     public SystemJobSummary jobSummaryFromTrigger(JobTriggerDto trigger) {
-
         final JobResourceHandler handler = resourceHandlers.get(trigger.type());
+
         JobTriggerDetails details;
         if (handler == null) {
             details = JobTriggerDetails.EMPTY_DETAILS;

@@ -64,9 +64,7 @@ public class DBJobTriggerService {
     private static final String FIELD_ID = "_id";
     static final String FIELD_JOB_DEFINITION_ID = JobTriggerDto.FIELD_JOB_DEFINITION_ID;
     private static final String FIELD_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_OWNER;
-
     private static final String FIELD_LAST_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_LAST_OWNER;
-
     private static final String FIELD_PROGRESS = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_PROGRESS;
     private static final String FIELD_LAST_LOCK_TIME = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_LAST_LOCK_TIME;
     private static final String FIELD_NEXT_TIME = JobTriggerDto.FIELD_NEXT_TIME;
