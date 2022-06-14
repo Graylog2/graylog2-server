@@ -213,11 +213,11 @@ const LookupTableForm = ({
           </fieldset>
 
           <DataAdaptersContainer>
-            <DataAdapterPicker name="data_adapter_id" />
+            <DataAdapterPicker />
           </DataAdaptersContainer>
 
           <CachesContainer>
-            <CachePicker name="cache_id" />
+            <CachePicker />
           </CachesContainer>
 
           <fieldset>

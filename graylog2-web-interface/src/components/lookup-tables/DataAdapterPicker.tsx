@@ -23,15 +23,13 @@ import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
 type Props = {
-  name: string,
   dataAdapters: any[],
 }
 
 const DataAdapterPicker = ({
-  name,
   dataAdapters,
 }: Props) => {
-  const [, { value, touched, error }, { setTouched, setValue }] = useField(name);
+  const [, { value, touched, error }, { setTouched, setValue }] = useField('data_adapter_id');
   const sortedAdapters = dataAdapters.map((adapter) => {
     return { value: adapter.id, label: `${adapter.title} (${adapter.name})` };
   }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
@@ -61,12 +59,10 @@ const DataAdapterPicker = ({
 };
 
 DataAdapterPicker.propTypes = {
-  name: PropTypes.string,
   dataAdapters: PropTypes.array,
 };
 
 DataAdapterPicker.defaultProps = {
-  name: 'data_adapter_id',
   dataAdapters: [],
 };
 
