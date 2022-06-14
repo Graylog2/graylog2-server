@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useField } from 'formik';
 import naturalSort from 'javascript-natural-sort';
 
@@ -58,8 +59,15 @@ const CachePicker = ({
     </fieldset>
   );
 };
+
+CachePicker.propTypes = {
+  name: PropTypes.string,
+  caches: PropTypes.array,
+};
+
 CachePicker.defaultProps = {
-   name = 'cache_id',
-  caches = [],
-}
+  name: 'cache_id',
+  caches: [],
+};
+
 export default CachePicker;
