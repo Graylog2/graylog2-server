@@ -123,7 +123,7 @@ const LookupTableForm = ({
             <FormikFormGroup type="text"
                              name="title"
                              label="Title"
-                             help="A short title for this lookup table."
+                             help={(touched.title && errors.title) ? undefined : 'A short title for this lookup table.'}
                              labelClassName="col-sm-3"
                              wrapperClassName="col-sm-9" />
 
@@ -137,7 +137,7 @@ const LookupTableForm = ({
             <FormikFormGroup type="text"
                              name="name"
                              label="Name"
-                             help="The name that is being used to refer to this lookup table. Must be unique."
+                             help={(touched.name && errors.name) ? undefined : 'The name that is being used to refer to this lookup table. Must be unique.'}
                              labelClassName="col-sm-3"
                              wrapperClassName="col-sm-9" />
 
