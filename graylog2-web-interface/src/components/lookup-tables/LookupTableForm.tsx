@@ -15,15 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { Formik, Field, Form } from 'formik';
+import { Formik, Form } from 'formik';
 import PropTypes from 'prop-types';
 import _omit from 'lodash/omit';
-import type { FieldProps } from 'formik';
 import type { LookupTable } from 'src/logic/lookup-tables/types';
 
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import { Col, Row, Button, Input } from 'components/bootstrap';
-import { JSONValueInput } from 'components/common';
+import { FormikFormGroup, JSONValueInput } from 'components/common';
 import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker } from 'components/lookup-tables';
 
 type LookupTableType = {
@@ -121,45 +120,26 @@ const LookupTableForm = ({
       {({ values, errors, touched, setFieldValue, setFieldTouched, setValues }) => (
         <Form className="form form-horizontal">
           <fieldset>
-            <Field name="title">
-              {({ field } :FieldProps) => (
-                <Input type="text"
-                       id="title"
-                       label="Title"
-                       autoFocus
-                       bsStyle={(touched.title && errors.title) ? 'error' : undefined}
-                       help={(touched.title && errors.title) || 'A short title for this lookup table.'}
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9"
-                       {...field} />
-              )}
-            </Field>
+            <FormikFormGroup type="text"
+                             name="title"
+                             label="Title"
+                             help="A short title for this lookup table."
+                             labelClassName="col-sm-3"
+                             wrapperClassName="col-sm-9" />
 
-            <Field name="description">
-              {({ field } :FieldProps) => (
-                <Input type="text"
-                       id="description"
-                       label="Description"
-                       bsStyle={(touched.description && errors.description) ? 'error' : undefined}
-                       help={(touched.description && errors.description) || 'Description of the lookup table.'}
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9"
-                       {...field} />
-              )}
-            </Field>
+            <FormikFormGroup type="text"
+                             name="description"
+                             label="Description"
+                             help="Description of the lookup table."
+                             labelClassName="col-sm-3"
+                             wrapperClassName="col-sm-9" />
 
-            <Field name="name">
-              {({ field } :FieldProps) => (
-                <Input type="text"
-                       id="name"
-                       label="Name"
-                       bsStyle={(touched.name && errors.name) ? 'error' : undefined}
-                       help={(touched.name && errors.name) || 'The name that is being used to refer to this lookup table. Must be unique.'}
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9"
-                       {...field} />
-              )}
-            </Field>
+            <FormikFormGroup type="text"
+                             name="name"
+                             label="Name"
+                             help="The name that is being used to refer to this lookup table. Must be unique."
+                             labelClassName="col-sm-3"
+                             wrapperClassName="col-sm-9" />
 
             <Input id="enable_single_value"
                    name="enable_single_value"
@@ -176,7 +156,6 @@ const LookupTableForm = ({
                        setFieldValue('default_single_value_type', 'NULL');
                      }
                    }} />
-
             {values.enable_single_value
             && (
             <JSONValueInput label="Default single value"
