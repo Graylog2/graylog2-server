@@ -58,5 +58,8 @@ const CachePicker = ({
     </fieldset>
   );
 };
-
+CachePicker.defaultProps = {
+   name = 'cache_id',
+  caches = [],
+}
 export default CachePicker;
