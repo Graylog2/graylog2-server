@@ -23,15 +23,13 @@ import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
 type Props = {
-  name: string,
   caches: any[],
 }
 
 const CachePicker = ({
-  name,
   caches,
 }: Props) => {
-  const [, { value, touched, error }, { setTouched, setValue }] = useField(name);
+  const [, { value, touched, error }, { setTouched, setValue }] = useField('cache_id');
   const sortedCaches = caches.map((cache) => {
     return { value: cache.id, label: `${cache.title} (${cache.name})` };
   }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
@@ -61,12 +59,10 @@ const CachePicker = ({
 };
 
 CachePicker.propTypes = {
-  name: PropTypes.string,
   caches: PropTypes.array,
 };
 
 CachePicker.defaultProps = {
-  name: 'cache_id',
   caches: [],
 };
 
