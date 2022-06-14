@@ -29,13 +29,16 @@ import PagerDutyNotificationSummary from './pager-duty/PagerDutyNotificationSumm
 import SlackNotificationDetails from './event-notifications/event-notification-details/SlackNotificationDetails';
 import SlackNotificationForm from './event-notifications/event-notification-types/SlackNotificationForm';
 import SlackNotificationSummary from './event-notifications/event-notification-types/SlackNotificationSummary';
-
-import packageJson from '../../package.json';
-import GreyNoiseAdapterFieldSet from "./dataadapters/GreyNoiseAdapterFieldSet";
-import GreyNoiseAdapterSummary from "./dataadapters/GreyNoiseAdapterSummary";
-import GreyNoiseAdapterDocumentation from "./dataadapters/GreyNoiseAdapterDocumentation";
+import TeamsNotificationDetails from './event-notifications/event-notification-details/TeamsNotificationDetails';
+import TeamsNotificationForm from './event-notifications/event-notification-types/TeamsNotificationForm';
+import TeamsNotificationSummary from './event-notifications/event-notification-types/TeamsNotificationSummary';
+import GreyNoiseAdapterFieldSet from './dataadapters/GreyNoiseAdapterFieldSet';
+import GreyNoiseAdapterSummary from './dataadapters/GreyNoiseAdapterSummary';
+import GreyNoiseAdapterDocumentation from './dataadapters/GreyNoiseAdapterDocumentation';
 import GreyNoiseCommunityIpLookupAdapterDocumentation
   from './dataadapters/GreyNoiseCommunityIpLookupAdapterDocumentation';
+
+import packageJson from '../../package.json';
 
 const manifest = new PluginManifest(packageJson, {
   routes: [
@@ -64,6 +67,14 @@ const manifest = new PluginManifest(packageJson, {
       summaryComponent: SlackNotificationSummary,
       detailsComponent: SlackNotificationDetails,
       defaultConfig: SlackNotificationForm.defaultConfig,
+    },
+    {
+      type: 'teams-notification-v1',
+      displayName: 'Microsoft Teams Notification',
+      formComponent: TeamsNotificationForm,
+      summaryComponent: TeamsNotificationSummary,
+      detailsComponent: TeamsNotificationDetails,
+      defaultConfig: TeamsNotificationForm.defaultConfig,
     },
   ],
   lookupTableAdapters: [
