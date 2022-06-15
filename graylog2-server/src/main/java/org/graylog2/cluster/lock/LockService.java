@@ -17,10 +17,30 @@
 package org.graylog2.cluster.lock;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 public interface LockService {
-    Optional<Lock> lock(@Nonnull String resource);
+    /**
+     * Request a lock. If a lock already exists, the lock expiry time will be extended.
+     *
+     * @param resource Unique identifier for the resource that should be guarded by this lock.
+     * @param lockContext  an identifier that will be appended to the node id. This will create the lock owner string.
+     *                       A context can be used for resources that should only allow a single lock to be acquired, even from the same node.
+     *                      If the lockContext is null, only the nodeId will be used.
+     * @return A {@link Lock} object, if a lock was obtained. An empty {@link Optional}, if no lock could be acquired.
+     */
+    Optional<Lock> lock(@Nonnull String resource, @Nullable String lockContext);
 
-    Optional<Lock> unlock(@Nonnull String resource);
+    /**
+     * Extend the expiry time of an existing lock.
+     *
+     * @param existingLock the lock that should be extended.
+     * @return A {@link Lock} object, if the lock could be extended. An empty {@link Optional}, if no lock extension could be acquired.
+     */
+    Optional<Lock> extendLock(@Nonnull Lock existingLock);
+
+
+    Optional<Lock> unlock(@Nonnull String resource, @Nullable String lockContext);
+    Optional<Lock> unlock(Lock lock);
 }

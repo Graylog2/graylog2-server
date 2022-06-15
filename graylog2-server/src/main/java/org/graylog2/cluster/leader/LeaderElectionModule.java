@@ -33,6 +33,10 @@ public class LeaderElectionModule extends PluginModule {
 
     @Override
     protected void configure() {
+
+        // TODO move to another module?
+        bind(LockService.class).to(MongoLockService.class).in(Scopes.SINGLETON);
+
         final LeaderElectionMode mode = configuration.getLeaderElectionMode();
 
         switch (mode) {
@@ -43,7 +47,6 @@ public class LeaderElectionModule extends PluginModule {
             case AUTOMATIC:
                 bind(LeaderElectionService.class).to(AutomaticLeaderElectionService.class).in(Scopes.SINGLETON);
                 bind(Service.class).annotatedWith(Names.named("LeaderElectionService")).to(AutomaticLeaderElectionService.class);
-                bind(LockService.class).to(MongoLockService.class).in(Scopes.SINGLETON);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown leader election mode \"" + mode + "\".");

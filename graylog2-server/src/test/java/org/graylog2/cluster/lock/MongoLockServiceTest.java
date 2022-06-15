@@ -50,7 +50,7 @@ public abstract class MongoLockServiceTest {
     void newLock() {
         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 
-        final Optional<Lock> lock = lockService.lock("test-resource");
+        final Optional<Lock> lock = lockService.lock("test-resource", null);
 
         assertThat(lock).hasValueSatisfying(l -> {
             assertThat(l.resource()).isEqualTo("test-resource");
@@ -62,10 +62,10 @@ public abstract class MongoLockServiceTest {
 
     @Test
     void reentrantLock() {
-        final Lock orig = lockService.lock("test-resource")
+        final Lock orig = lockService.lock("test-resource", null)
                 .orElseThrow(() -> new IllegalStateException("Unable to create original lock."));
 
-        final Optional<Lock> lock = lockService.lock("test-resource");
+        final Optional<Lock> lock = lockService.lock("test-resource", null);
 
         assertThat(lock).hasValueSatisfying(l -> {
             assertThat(l.resource()).isEqualTo(orig.resource());
@@ -77,10 +77,10 @@ public abstract class MongoLockServiceTest {
 
     @Test
     void alreadyTaken(MongoDBTestService mongodb) {
-        new MongoLockService(mockNodeId("other-node-id"), mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL).lock("test-resource")
+        new MongoLockService(mockNodeId("other-node-id"), mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL).lock("test-resource", null)
                 .orElseThrow(() -> new IllegalStateException("Unable to create original lock."));
 
-        final Optional<Lock> lock = lockService.lock("test-resource");
+        final Optional<Lock> lock = lockService.lock("test-resource", null);
 
         assertThat(lock).isEmpty();
     }
@@ -90,22 +90,40 @@ public abstract class MongoLockServiceTest {
         final MongoLockService otherNodesLockService =
                 new MongoLockService(mockNodeId("other-node-id"), mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL);
 
-        final Lock orig = otherNodesLockService.lock("test-resource")
+        final Lock orig = otherNodesLockService.lock("test-resource", null)
                 .orElseThrow(() -> new IllegalStateException("Unable to create original lock."));
-        assertThat(lockService.lock("test-resource")).isEmpty();
+        assertThat(lockService.lock("test-resource", null)).isEmpty();
 
-        final Optional<Lock> deletedLock = otherNodesLockService.unlock("test-resource");
+        final Optional<Lock> deletedLock = otherNodesLockService.unlock("test-resource", null);
         assertThat(deletedLock).hasValueSatisfying(l -> {
             assertThat(l.resource()).isEqualTo(orig.resource());
             assertThat(l.lockedBy()).isEqualTo(orig.lockedBy());
         });
 
-        assertThat(lockService.lock("test-resource")).isNotEmpty();
+        assertThat(lockService.lock("test-resource", null)).isNotEmpty();
+    }
+
+    @Test
+    void unlockWithLock(MongoDBTestService mongodb) {
+        final MongoLockService otherNodesLockService =
+                new MongoLockService(mockNodeId("other-node-id"), mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL);
+
+        final Lock orig = otherNodesLockService.lock("test-resource", null)
+                .orElseThrow(() -> new IllegalStateException("Unable to create original lock."));
+        assertThat(lockService.lock("test-resource", null)).isEmpty();
+
+        final Optional<Lock> deletedLock = otherNodesLockService.unlock(orig);
+        assertThat(deletedLock).hasValueSatisfying(l -> {
+            assertThat(l.resource()).isEqualTo(orig.resource());
+            assertThat(l.lockedBy()).isEqualTo(orig.lockedBy());
+        });
+
+        assertThat(lockService.lock("test-resource", null)).isNotEmpty();
     }
 
     @Test
     void unlockNonExistentLock() {
-        assertThat(lockService.unlock("test-resource")).isEmpty();
+        assertThat(lockService.unlock("test-resource", null)).isEmpty();
     }
 
     @Test

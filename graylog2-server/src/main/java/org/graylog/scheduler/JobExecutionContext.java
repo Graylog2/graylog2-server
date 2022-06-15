@@ -42,10 +42,10 @@ public abstract class JobExecutionContext {
         return triggerDto.map(JobTriggerDto::isCancelled).orElse(false);
     }
 
+    abstract DBJobTriggerService jobTriggerService();
     public void updateProgress(int progress) {
         jobTriggerService().updateProgress(trigger(), progress);
     }
-    public abstract DBJobTriggerService jobTriggerService();
 
     public static JobExecutionContext create(JobTriggerDto trigger, JobDefinitionDto definition, JobTriggerUpdates jobTriggerUpdates, AtomicBoolean schedulerIsRunning, DBJobTriggerService jobTriggerService) {
         return builder()
