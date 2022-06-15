@@ -45,6 +45,7 @@ export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType =
       .map((searchType) => ({
 
         id: generateId(),
+        filters: widget.filters.toJS(),
         timerange: widget.timerange,
         query: widget.query,
         streams: widget.streams,
