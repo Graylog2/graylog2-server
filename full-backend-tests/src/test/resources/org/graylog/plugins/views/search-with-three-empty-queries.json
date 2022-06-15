@@ -1,0 +1,42 @@
+{
+  "queries": [
+    {
+      "id": "4966dd79-2c7d-4ba9-8f90-c84aea7b5c49",
+      "query": {
+        "type": "elasticsearch",
+        "query_string": ""
+      },
+      "timerange": {
+        "type": "relative",
+        "from": 300
+      },
+      "filter": null,
+      "search_types": []
+    },
+    {
+      "id": "0d5b45b8-1f55-4b60-ad34-d086ddd5d8fa",
+      "query": {
+        "type": "elasticsearch",
+        "query_string": ""
+      },
+      "timerange": {
+        "type": "relative",
+        "from": 300
+      },
+      "filter": null,
+      "search_types": []
+    },
+    {
+      "id": "3eec6f5c-0f1b-41dc-bb95-3ebc6bb905f3",
+      "query": {
+        "type": "elasticsearch",
+        "query_string": ""
+      },
+      "timerange": {
+        "type": "relative",
+        "from": 300
+      },
+      "search_types": []
+    }
+  ]
+}
