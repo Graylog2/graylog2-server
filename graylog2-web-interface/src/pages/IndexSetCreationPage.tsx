@@ -31,15 +31,16 @@ import { IndexSetPropType, IndexSetsActions, IndexSetsStore } from 'stores/indic
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 import { RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
-import type { RetentionStrategy, RotationStrategy } from 'components/indices/Types';
+import type { RetentionStrategy, RotationStrategy, RetentionStrategyContext } from 'components/indices/Types';
 
 type Props = {
   indexSet: Partial<IndexSet> | null | undefined,
   retentionStrategies?: Array<RetentionStrategy> | null | undefined,
   rotationStrategies?: Array<RotationStrategy> | null | undefined,
+  retentionStrategiesContext?: RetentionStrategyContext | null | undefined,
 }
 
-const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, indexSet }: Props) => {
+const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retentionStrategiesContext, indexSet }: Props) => {
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies();
     IndicesConfigurationActions.loadRetentionStrategies();
@@ -91,6 +92,7 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, indexSe
         <Row className="content">
           <Col md={12}>
             <IndexSetConfigurationForm indexSet={defaultIndexSet}
+                                       retentionStrategiesContext={retentionStrategiesContext}
                                        rotationStrategies={rotationStrategies}
                                        retentionStrategies={retentionStrategies}
                                        create
@@ -107,6 +109,9 @@ IndexSetCreationPage.propTypes = {
   retentionStrategies: PropTypes.arrayOf(RetentionStrategyPropType),
   rotationStrategies: PropTypes.arrayOf(RotationStrategyPropType),
   indexSet: IndexSetPropType,
+  retentionStrategiesContext: PropTypes.shape({
+    max_index_retention_period: PropTypes.string,
+  }),
 };
 
 IndexSetCreationPage.defaultProps = {
@@ -130,6 +135,9 @@ IndexSetCreationPage.defaultProps = {
     index_optimization_disabled: false,
     field_type_refresh_interval: 5 * 1000, // 5 seconds
   },
+  retentionStrategiesContext: {
+    max_index_retention_period: undefined,
+  },
 };
 
 export default connect(
@@ -142,5 +150,6 @@ export default connect(
     indexSet: indexSets.indexSet,
     rotationStrategies: indicesConfigurations.rotationStrategies,
     retentionStrategies: indicesConfigurations.retentionStrategies,
+    retentionStrategiesContext: indicesConfigurations.retentionStrategiesContext,
   }),
 );

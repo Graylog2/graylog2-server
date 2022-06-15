@@ -15,48 +15,45 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 
+import { getValueFromInput } from 'util/FormsUtils';
 import { Input } from 'components/bootstrap';
 
-class MessageCountRotationStrategyConfiguration extends React.Component {
-  static propTypes = {
-    config: PropTypes.object.isRequired,
-    jsonSchema: PropTypes.object.isRequired,
-    updateConfig: PropTypes.func.isRequired,
-  };
+const MessageCountRotationStrategyConfiguration = ({ config, updateConfig }) => {
+  const { max_docs_per_index } = config;
+  const [maxDocsPerIndex, setMaxDocsPerIndex] = useState(max_docs_per_index);
 
-  state = {
-    max_docs_per_index: this.props.config.max_docs_per_index,
-  };
-
-  _onInputUpdate = (field) => {
+  const _onInputUpdate = (field) => {
     return (e) => {
       const update = {};
+      const value = getValueFromInput(e.target);
+      update[field] = value;
 
-      update[field] = e.target.value;
-
-      this.setState(update);
-      this.props.updateConfig(update);
+      setMaxDocsPerIndex(value);
+      updateConfig(update);
     };
   };
 
-  render() {
-    return (
-      <div>
-        <fieldset>
+  return (
+    <div>
+      <Input type="number"
+             id="max-docs-per-index"
+             label="Max documents per index"
+             labelClassName="col-sm-3"
+             wrapperClassName="col-sm-9"
+             onChange={_onInputUpdate('max_docs_per_index')}
+             value={maxDocsPerIndex}
+             help="Maximum number of documents in an index before it gets rotated"
+             required />
+    </div>
+  );
+};
 
-          <Input type="number"
-                 id="max-docs-per-index"
-                 label="Max documents per index"
-                 onChange={this._onInputUpdate('max_docs_per_index')}
-                 value={this.state.max_docs_per_index}
-                 help="Maximum number of documents in an index before it gets rotated"
-                 required />
-        </fieldset>
-      </div>
-    );
-  }
-}
+MessageCountRotationStrategyConfiguration.propTypes = {
+  config: PropTypes.object.isRequired,
+  updateConfig: PropTypes.func.isRequired,
+};
 
 export default MessageCountRotationStrategyConfiguration;

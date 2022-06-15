@@ -52,7 +52,7 @@ public abstract class ESPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
     }
 
     @Override
-    public abstract Stream<Value> doHandleResult(Pivot pivot, SPEC_TYPE seriesSpec, SearchResponse searchResult, AGGREGATION_RESULT aggregation_result, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext);
+    public abstract Stream<Value> doHandleResult(Pivot pivot, SPEC_TYPE seriesSpec, SearchResponse searchResult, AGGREGATION_RESULT aggregationResult, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext);
 
     public static class Value {
 

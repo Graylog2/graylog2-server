@@ -124,7 +124,7 @@ describe('WidgetQueryControls pluggable controls', () => {
     );
   };
 
-  const mockOnSubmit = jest.fn(() => Promise.resolve());
+  const mockOnSubmit = jest.fn((_values, entity) => Promise.resolve(entity));
   const mockOnValidate = jest.fn(() => Promise.resolve({}));
 
   beforeAll(() => {
@@ -133,12 +133,13 @@ describe('WidgetQueryControls pluggable controls', () => {
         () => ({
           id: 'pluggable-search-bar-control',
           component: PluggableSearchBarControl,
-          useInitialValues: () => {
+          useInitialDashboardWidgetValues: () => {
             return ({
               pluggableControl: 'Initial Value',
             });
           },
-          onSubmit: mockOnSubmit,
+          onSearchSubmit: mockOnSubmit,
+          onDashboardWidgetSubmit: mockOnSubmit,
           validationPayload: (values) => {
             // @ts-ignore
             const { pluggableControl } = values;
@@ -175,7 +176,7 @@ describe('WidgetQueryControls pluggable controls', () => {
     expect(pluggableFormField).toHaveValue('Initial Value');
   });
 
-  it('should register submit handler which receives current form state', async () => {
+  it('should register submit handler which receives current form state and widget', async () => {
     renderSUT();
 
     const pluggableFormField = await screen.findByLabelText('Pluggable Control');
@@ -187,12 +188,15 @@ describe('WidgetQueryControls pluggable controls', () => {
     await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
     userEvent.click(searchButton);
 
-    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith({
-      pluggableControl: 'Initial Value2',
-      queryString: '',
-      streams: [],
-      timerange: { from: 300, type: 'relative' },
-    }));
+    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith(
+      {
+        pluggableControl: 'Initial Value2',
+        queryString: '',
+        streams: [],
+        timerange: { from: 300, type: 'relative' },
+      },
+      widget,
+    ));
   }, testTimeout);
 
   it('should register validation handler', async () => {
