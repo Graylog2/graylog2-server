@@ -82,16 +82,22 @@ class JSONValueInput extends React.Component {
     validationState: null,
     labelClassName: undefined,
     wrapperClassName: undefined,
+    onBlur: undefined,
   };
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.setState(this._computeInitialState(nextProps));
+  constructor(props) {
+    super(props);
+    this.state = this._computeInitialState();
   }
 
-  _computeInitialState = (props) => {
+  UNSAFE_componentWillReceiveProps() {
+    this.setState(this._computeInitialState());
+  }
+
+  _computeInitialState = () => {
     return {
-      value: props.value,
-      valueType: props.valueType,
+      value: this.props.value,
+      valueType: this.props.valueType,
     };
   };
 
@@ -109,8 +115,6 @@ class JSONValueInput extends React.Component {
     this.setState({ valueType: valueType }, this._propagateState);
   };
 
-  state = this._computeInitialState(this.props);
-
   render() {
     const options = OPTIONS.filter((o) => this.props.allowedTypes.indexOf(o.value) > -1).map((o) => {
       return <MenuItem key={o.value} onSelect={() => this._onValueTypeSelect(o.value)}>{o.label}</MenuItem>;
@@ -123,9 +127,9 @@ class JSONValueInput extends React.Component {
           <InputGroup>
             <FormControl type="text" onChange={this._onUpdate} onBlur={this.props.onBlur} value={this.state.value} required={this.props.required} />
             <DropdownButton componentClass={InputGroup.Button}
-                 id="input-dropdown-addon"
-                 bsStyle={this.props.validationState === 'error' ? 'danger' : 'default'}
-                 title={OPTIONS.filter((o) => o.value === this.props.valueType)[0].label}>
+                            id="input-dropdown-addon"
+                            bsStyle={this.props.validationState === 'error' ? 'danger' : 'default'}
+                            title={OPTIONS.filter((o) => o.value === this.props.valueType)[0].label}>
               {options}
             </DropdownButton>
           </InputGroup>
