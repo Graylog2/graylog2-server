@@ -1,0 +1,5 @@
+type = "f"
+message = "Improve ES warning filter to avoid repetitive warnings in the server log."
+
+issues = ["12786"]
+pulls = ["12866"]

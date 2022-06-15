@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix NullPointerException for GeoIP message processor."
+
+issues = ["12788"]
+pulls = ["12839"]
