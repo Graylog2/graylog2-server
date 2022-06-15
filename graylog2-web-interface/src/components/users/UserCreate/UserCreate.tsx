@@ -124,7 +124,8 @@ const UserCreate = () => {
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
 
   useEffect(() => {
-    UsersDomain.loadUsers().then(setUsers);
+    const query = { include_permissions: false, include_sessions: false };
+    UsersDomain.loadUsers(query).then(setUsers);
   }, []);
 
   const _onAssignRole = (roles: Immutable.Set<DescriptiveItem>) => {

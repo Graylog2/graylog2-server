@@ -152,6 +152,9 @@ public class UsersResource extends RestResource {
         this.searchQueryParser = new SearchQueryParser(UserOverviewDTO.FIELD_FULL_NAME, SEARCH_FIELD_MAPPING);
     }
 
+    /**
+     * @deprecated
+     */
     @GET
     @Deprecated
     @Path("{username}")
@@ -202,24 +205,33 @@ public class UsersResource extends RestResource {
         final boolean isSelf = requestingUser.equals(user.getId());
         final boolean canEditUserPermissions = isPermitted(USERS_PERMISSIONSEDIT, user.getName());
 
-        return toUserResponse(user, isSelf || canEditUserPermissions, AllUserSessions.create(sessionService));
+        return toUserResponse(user, isSelf || canEditUserPermissions, Optional.of(AllUserSessions.create(sessionService)));
     }
 
+    /**
+     * @deprecated Use the paginated call instead
+     */
     @GET
     @Deprecated
     @RequiresPermissions(RestPermissions.USERS_LIST)
-    @ApiOperation(value = "List all users", notes = "The permissions assigned to the users are always included.")
-    public UserList listUsers() {
+    @ApiOperation(value = "List all users", notes = "Permissions and session data included by default")
+    public UserList listUsers(
+            @ApiParam(name = "include_permissions") @QueryParam("include_permissions") @DefaultValue("true") boolean includePermissions,
+            @ApiParam(name = "include_sessions") @QueryParam("include_sessions") @DefaultValue("true") boolean includeSessions) {
+        return listUsersSelective(includePermissions, includeSessions);
+     }
+
+    private UserList listUsersSelective(boolean includePermissions, boolean includeSessions) {
         final List<User> users = userManagementService.loadAll();
-        final AllUserSessions sessions = AllUserSessions.create(sessionService);
+        final Optional<AllUserSessions> optSessions = includeSessions ? Optional.of(AllUserSessions.create(sessionService)) : Optional.empty();
 
         final List<UserSummary> resultUsers = Lists.newArrayListWithCapacity(users.size() + 1);
         userManagementService.getRootUser().ifPresent(adminUser ->
-                resultUsers.add(toUserResponse(adminUser, sessions))
+                resultUsers.add(toUserResponse(adminUser, includePermissions, optSessions))
         );
 
         for (User user : users) {
-            resultUsers.add(toUserResponse(user, sessions));
+            resultUsers.add(toUserResponse(user, includePermissions, optSessions));
         }
 
         return UserList.create(resultUsers);
@@ -698,10 +710,10 @@ public class UsersResource extends RestResource {
     }
 
     private UserSummary toUserResponse(User user, AllUserSessions sessions) {
-        return toUserResponse(user, true, sessions);
+        return toUserResponse(user, true, Optional.of(sessions));
     }
 
-    private UserSummary toUserResponse(User user, boolean includePermissions, AllUserSessions sessions) {
+    private UserSummary toUserResponse(User user, boolean includePermissions, Optional<AllUserSessions> optSessions) {
         final Set<String> roleIds = user.getRoleIds();
         Set<String> roleNames = Collections.emptySet();
 
@@ -716,12 +728,15 @@ public class UsersResource extends RestResource {
         boolean sessionActive = false;
         Date lastActivity = null;
         String clientAddress = null;
-        final Optional<MongoDbSession> mongoDbSession = sessions.forUser(user);
-        if (mongoDbSession.isPresent()) {
-            final MongoDbSession session = mongoDbSession.get();
-            sessionActive = true;
-            lastActivity = session.getLastAccessTime();
-            clientAddress = session.getHost();
+        if (optSessions.isPresent()) {
+            final AllUserSessions sessions = optSessions.get();
+            final Optional<MongoDbSession> mongoDbSession = sessions.forUser(user);
+            if (mongoDbSession.isPresent()) {
+                final MongoDbSession session = mongoDbSession.get();
+                sessionActive = true;
+                lastActivity = session.getLastAccessTime();
+                clientAddress = session.getHost();
+            }
         }
         List<WildcardPermission> wildcardPermissions;
         List<GRNPermission> grnPermissions;

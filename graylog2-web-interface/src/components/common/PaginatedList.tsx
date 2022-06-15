@@ -27,14 +27,16 @@ const DEFAULT_PAGE_SIZES = [10, 50, 100];
 export const INITIAL_PAGE = 1;
 
 type Props = {
+  activePage?: number,
   children: React.ReactNode,
   className?: string,
+  hideFirstAndLastPageLinks?: boolean
+  hidePreviousAndNextPageLinks?: boolean
   onChange: (currentPage: number, pageSize: number) => void,
-  activePage?: number,
   pageSize?: number,
   pageSizes?: Array<number>,
-  totalItems: number,
   showPageSizeSelect?: boolean,
+  totalItems: number,
 };
 
 /**
@@ -47,6 +49,8 @@ const PaginatedList = ({
   activePage,
   children,
   className,
+  hideFirstAndLastPageLinks,
+  hidePreviousAndNextPageLinks,
   onChange,
   pageSize: propsPageSize,
   pageSizes,
@@ -94,6 +98,8 @@ const PaginatedList = ({
         <div className={`text-center pagination-wrapper ${className ?? ''}`}>
           <Pagination totalPages={numberPages}
                       currentPage={currentPage}
+                      hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
+                      hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
                       onChange={_onChangePage} />
         </div>
       </IfInteractive>
@@ -102,6 +108,8 @@ const PaginatedList = ({
 };
 
 PaginatedList.propTypes = {
+  /** The active page number. If not specified the active page number will be tracked internally. */
+  activePage: PropTypes.number,
   /** React element containing items of the current selected page. */
   children: PropTypes.node.isRequired,
   /**
@@ -109,23 +117,27 @@ PaginatedList.propTypes = {
    * It receives the current page and the page size as arguments.
    */
   onChange: PropTypes.func.isRequired,
-  /** The active page number. If not specified the active page number will be tracked internally. */
-  activePage: PropTypes.number,
+  /** boolean flag to hide first and last page links */
+  hideFirstAndLastPageLinks: PropTypes.bool,
+  /**  boolean flag to hide previous and next page links */
+  hidePreviousAndNextPageLinks: PropTypes.bool,
   /** Number of items per page. */
   pageSize: PropTypes.number,
   /** Array of different items per page that are allowed. */
   pageSizes: PropTypes.arrayOf(PropTypes.number),
-  /** Total amount of items in all pages. */
-  totalItems: PropTypes.number.isRequired,
   /** Whether to show the page size selector or not. */
   showPageSizeSelect: PropTypes.bool,
+  /** Total amount of items in all pages. */
+  totalItems: PropTypes.number.isRequired,
 };
 
 PaginatedList.defaultProps = {
   activePage: 0,
   className: undefined,
-  pageSizes: DEFAULT_PAGE_SIZES,
+  hideFirstAndLastPageLinks: false,
+  hidePreviousAndNextPageLinks: false,
   pageSize: DEFAULT_PAGE_SIZES[0],
+  pageSizes: DEFAULT_PAGE_SIZES,
   showPageSizeSelect: true,
 };
 
