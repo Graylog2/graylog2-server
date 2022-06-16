@@ -26,6 +26,7 @@ import org.graylog.plugins.map.config.DatabaseVendorType;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog2.plugin.Message;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
@@ -35,6 +36,7 @@ import org.mockito.MockitoAnnotations;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -107,6 +109,76 @@ public class GeoIpResolverEngineTest {
     public void tearDown() {
         metricRegistry.removeMatching(MetricFilter.ALL);
         metricRegistry = null;
+    }
+
+    @Test
+    public void testPrivateIpSchemaEnforceOn() {
+
+        testPrivateSourceIpWithSchemaEnforceFlag(true, "source_reserved_ip");
+    }
+
+    @Test
+    public void testPrivateIpSchemaEnforceOff() {
+
+        testPrivateSourceIpWithSchemaEnforceFlag(false, "source_ip_reserved_ip");
+    }
+
+    private void testPrivateSourceIpWithSchemaEnforceFlag(boolean enforceSchema, String expectedFieldName) {
+        GeoIpResolverConfig conf = config.toBuilder().enforceGraylogSchema(enforceSchema).build();
+        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, conf, metricRegistry);
+
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("_id", java.util.UUID.randomUUID().toString());
+        fields.put("source_ip", reservedIp);
+
+        Message message = new Message(fields);
+        engine.filter(message);
+
+        String fieldNotFoundError = String.format(Locale.ENGLISH, "Field '%s' expected", expectedFieldName);
+        Assert.assertTrue(fieldNotFoundError, message.hasField(expectedFieldName));
+
+        Boolean expectedValue = true;
+        String fieldValueError = String.format("Expected value for '%s' is '%s'", expectedFieldName, expectedValue);
+        Assert.assertEquals(fieldValueError, expectedValue, message.getField(expectedFieldName));
+    }
+
+    @Test
+    public void testPublicIpSchemaEnforceOn() {
+
+        // With schema enforcement on, we expect the '_ip' to be dropped from 'source_ip' Geo fields.
+        String[] expectedFields = {"source_geo_name", "source_geo_region", "source_geo_city", "source_geo_timezone",
+                "source_geo_country", "source_geo_country_iso", "source_as_organization", "source_geo_coordinates",
+                "source_as_number"};
+
+        testSourceIpGeoDataFieldsWithSchemaEnforcementFlag(true, expectedFields);
+    }
+
+    @Test
+    public void testPublicIpSchemaEnforceOff() {
+
+        // With schema enforcement off, we expect 'source_ip' to be the prefix for ALL Geo data fields.
+        String[] expectedFields = {"source_ip_geo_name", "source_ip_geo_region", "source_ip_geo_city", "source_ip_geo_timezone",
+                "source_ip_geo_country", "source_ip_geo_country_iso", "source_ip_as_organization", "source_ip_geo_coordinates",
+                "source_ip_as_number"};
+
+        testSourceIpGeoDataFieldsWithSchemaEnforcementFlag(false, expectedFields);
+    }
+
+    private void testSourceIpGeoDataFieldsWithSchemaEnforcementFlag(boolean enforceSchema, String[] expectedFields) {
+        GeoIpResolverConfig conf = config.toBuilder().enforceGraylogSchema(enforceSchema).build();
+        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, conf, metricRegistry);
+
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("_id", java.util.UUID.randomUUID().toString());
+        fields.put("source_ip", publicIp);
+
+        Message message = new Message(fields);
+        engine.filter(message);
+
+        for (String field : expectedFields) {
+            String error = String.format(Locale.ENGLISH, "Field '%s' was not found", field);
+            Assert.assertTrue(error, message.hasField(field));
+        }
     }
 
     @Test
