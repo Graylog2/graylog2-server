@@ -34,7 +34,7 @@ const DataAdapterPicker = ({
     return { value: adapter.id, label: `${adapter.title} (${adapter.name})` };
   }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
 
-  const errorMsg = touched ? error : '';
+  const errorMessage = touched ? error : '';
 
   return (
     <fieldset>
@@ -42,8 +42,8 @@ const DataAdapterPicker = ({
              label="Data Adapter"
              required
              autoFocus
-             bsStyle={errorMsg ? 'error' : undefined}
-             help={errorMsg || 'Select an existing data adapter'}
+             bsStyle={errorMessage ? 'error' : undefined}
+             help={errorMessage || 'Select an existing data adapter'}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9">
         <Select placeholder="Select a data adapter"

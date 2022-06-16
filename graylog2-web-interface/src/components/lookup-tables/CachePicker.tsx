@@ -34,7 +34,7 @@ const CachePicker = ({
     return { value: cache.id, label: `${cache.title} (${cache.name})` };
   }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
 
-  const errorMsg = touched ? error : '';
+  const errorMessage = touched ? error : '';
 
   return (
     <fieldset>
@@ -42,8 +42,8 @@ const CachePicker = ({
              label="Cache"
              required
              autoFocus
-             bsStyle={errorMsg ? 'error' : undefined}
-             help={errorMsg || 'Select an existing cache'}
+             bsStyle={errorMessage ? 'error' : undefined}
+             help={errorMessage || 'Select an existing cache'}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9">
         <Select placeholder="Select a cache"
