@@ -26,7 +26,6 @@ import searchTypeDefinition from '../SearchType';
 import type { SearchTypeIds, WidgetMapping, WidgetId } from '../views/types';
 
 const filterForWidget = (widget) => (widget.filter ? { filter: { type: 'query_string', query: widget.filter } } : {});
-const filtersForWidget = ({ filters }) => (filters ? { filters: filters.toJS() } : {});
 
 export type ResultType = {
   searchTypes: SearchTypeList,
@@ -52,7 +51,7 @@ export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType =
         ...searchType,
         widgetId: widget.id,
         ...filterForWidget(widget),
-        ...filtersForWidget(widget),
+        filters: widget.filters,
       })))
     .reduce((acc, cur) => acc.merge(cur), Immutable.Set<SearchTypeWithWidgetId>())
     .map((searchType) => {

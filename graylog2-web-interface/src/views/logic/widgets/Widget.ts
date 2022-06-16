@@ -38,6 +38,8 @@ type DeserializesWidgets = {
   fromJSON: (value) => Widget;
 };
 
+const isNullish = (o: any) => (o === null || o === undefined);
+
 class Widget {
   _value: WidgetState;
 
@@ -96,8 +98,8 @@ class Widget {
     }
 
     return this.id === other.id
-      && this.filter === other.filter
-      && isDeepEqual(this.filters, other.filters)
+      && ((isNullish(this.filter) && isNullish(other.filter)) || isDeepEqual(this.filter, other.filter))
+      && ((isNullish(this.filters) && isNullish(other.filters)) || isDeepEqual(this.filters, other.filters))
       && isDeepEqual(this.config, other.config)
       && isDeepEqual(this.timerange, other.timerange)
       && isDeepEqual(this.query, other.query)
