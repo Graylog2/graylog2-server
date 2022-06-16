@@ -38,53 +38,6 @@ const OPTIONS = [
 ];
 
 class JSONValueInput extends React.Component {
-  static propTypes = {
-    update: PropTypes.func.isRequired,
-    onBlur: PropTypes.func,
-    label: PropTypes.string,
-    help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    required: PropTypes.bool,
-    validationState: PropTypes.string,
-    value: PropTypes.string,
-    valueType: PropTypes.oneOf(OPTIONS.map((option) => option.value)),
-    allowedTypes: (props, propName, componentName) => {
-      // Check that allowedTypes is an array of type values
-      const values = OPTIONS.map((option) => option.value);
-      const errors = [];
-
-      if (!(props[propName] instanceof Array)) {
-        return new Error(`Invalid prop ${propName} supplied to ${componentName}. Expected an array but got ${props[propName]}`);
-      }
-
-      props[propName].forEach((p) => {
-        if (values.indexOf(p) < 0) {
-          errors.push(p);
-        }
-      });
-
-      if (errors.length > 0) {
-        return new Error(`Invalid prop ${propName} supplied to ${componentName}. Expected array of ${values} but got invalid ${errors}`);
-      }
-
-      return null;
-    },
-    labelClassName: PropTypes.string,
-    wrapperClassName: PropTypes.string,
-  };
-
-  static defaultProps = {
-    value: '',
-    valueType: 'STRING',
-    allowedTypes: OPTIONS.map((option) => option.value),
-    label: '',
-    help: '',
-    required: false,
-    validationState: null,
-    labelClassName: undefined,
-    wrapperClassName: undefined,
-    onBlur: undefined,
-  };
-
   constructor(props) {
     super(props);
     this.state = this._computeInitialState();
@@ -139,5 +92,52 @@ class JSONValueInput extends React.Component {
     );
   }
 }
+
+JSONValueInput.propTypes = {
+  update: PropTypes.func.isRequired,
+  onBlur: PropTypes.func,
+  label: PropTypes.string,
+  help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  required: PropTypes.bool,
+  validationState: PropTypes.string,
+  value: PropTypes.string,
+  valueType: PropTypes.oneOf(OPTIONS.map((option) => option.value)),
+  allowedTypes: (props, propName, componentName) => {
+    // Check that allowedTypes is an array of type values
+    const values = OPTIONS.map((option) => option.value);
+    const errors = [];
+
+    if (!(props[propName] instanceof Array)) {
+      return new Error(`Invalid prop ${propName} supplied to ${componentName}. Expected an array but got ${props[propName]}`);
+    }
+
+    props[propName].forEach((p) => {
+      if (values.indexOf(p) < 0) {
+        errors.push(p);
+      }
+    });
+
+    if (errors.length > 0) {
+      return new Error(`Invalid prop ${propName} supplied to ${componentName}. Expected array of ${values} but got invalid ${errors}`);
+    }
+
+    return null;
+  },
+  labelClassName: PropTypes.string,
+  wrapperClassName: PropTypes.string,
+};
+
+JSONValueInput.defaultProps = {
+  value: '',
+  valueType: 'STRING',
+  allowedTypes: OPTIONS.map((option) => option.value),
+  label: '',
+  help: '',
+  required: false,
+  validationState: null,
+  labelClassName: undefined,
+  wrapperClassName: undefined,
+  onBlur: undefined,
+};
 
 export default JSONValueInput;
