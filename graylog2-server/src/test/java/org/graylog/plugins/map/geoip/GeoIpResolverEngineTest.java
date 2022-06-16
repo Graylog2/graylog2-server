@@ -138,7 +138,7 @@ public class GeoIpResolverEngineTest {
         Assert.assertTrue(fieldNotFoundError, message.hasField(expectedFieldName));
 
         Boolean expectedValue = true;
-        String fieldValueError = String.format("Expected value for '%s' is '%s'", expectedFieldName, expectedValue);
+        String fieldValueError = String.format(Locale.ENGLISH, "Expected value for '%s' is '%s'", expectedFieldName, expectedValue);
         Assert.assertEquals(fieldValueError, expectedValue, message.getField(expectedFieldName));
     }
 
