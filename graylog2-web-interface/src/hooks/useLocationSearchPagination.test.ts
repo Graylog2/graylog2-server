@@ -23,13 +23,11 @@ import { asMock } from 'helpers/mocking';
 
 import useLocationSearchPagination from './useLocationSearchPagination';
 
-const mockHistoryPush = jest.fn();
+const mockNavigate = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useHistory: () => ({
-    push: mockHistoryPush,
-  }),
+  useNavigate: () => mockNavigate,
   useLocation: jest.fn(() => ({
     pathname: '',
     search: '',
@@ -66,7 +64,7 @@ describe('useLocationSearchPagination custom hook', () => {
 
     act(() => setPagination(nextPage));
 
-    expect(mockHistoryPush).toHaveBeenCalledWith({ search: stringify(nextPage) });
+    expect(mockNavigate).toHaveBeenCalledWith({ search: stringify(nextPage) });
   });
 
   it.each`
