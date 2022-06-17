@@ -22,6 +22,7 @@ import type { PlotParams } from 'react-plotly.js';
 import ColorMapper from 'views/components/visualizations/ColorMapper';
 
 import ChartColorContext from '../ChartColorContext';
+import type { ChartConfig } from '../GenericPlot';
 import GenericPlot from '../GenericPlot';
 import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 
@@ -124,14 +125,14 @@ describe('GenericPlot', () => {
       </ChartColorContext.Provider>
     ));
 
-    const { data: newChartData } = wrapper.find('PlotlyComponent').props() as HTMLAttributes & PlotParams;
+    const { data: newChartData } = wrapper.find('PlotlyComponent').props() as HTMLAttributes & { data: ChartConfig[] };
 
     expect(newChartData.find((chart) => chart.name === 'count()').marker.color).toEqual('#783a8e');
     expect(newChartData.find((chart) => chart.name === 'sum(bytes)').marker.color).toEqual('#fd9e48');
   });
 
   describe('has color picker', () => {
-    const getChartColor = (fullData, name) => {
+    const getChartColor = (fullData: ChartConfig[], name: string) => {
       const data = fullData.find((d) => (d.name === name));
 
       if (data && data.marker && data.marker.color) {
