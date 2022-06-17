@@ -56,7 +56,6 @@ public enum JobTriggerStatus {
     /**
      * The trigger was manually cancelled and has aborted its execution.
      */
-    // TODO not sure how / where to set this
     @JsonProperty("cancelled")
     CANCELLED
 }
