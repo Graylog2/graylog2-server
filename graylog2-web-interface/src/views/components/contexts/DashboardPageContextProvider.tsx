@@ -58,14 +58,14 @@ const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPag
   }, [uriParams.page, dashboardPage, setDashboardPage, states, dispatch]);
 };
 
-const useCleanupQueryParams = ({ uriParams, query, history }) => {
+const useCleanupQueryParams = ({ uriParams, query, navigate }) => {
   useEffect(() => {
     if (uriParams?.page === undefined) {
       const baseURI = _clearURI(query);
 
-      history.replace(baseURI.toString());
+      navigate(baseURI.toString(), { replace: true });
     }
-  }, [query, history, uriParams?.page]);
+  }, [query, navigate, uriParams?.page]);
 };
 
 const DashboardPageContextProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
@@ -79,7 +79,7 @@ const DashboardPageContextProvider = ({ children }: { children: React.ReactNode 
   }), [params]);
 
   useSyncStateWithQueryParams({ dashboardPage, uriParams, setDashboardPage });
-  useCleanupQueryParams({ uriParams, query, history });
+  useCleanupQueryParams({ uriParams, query, navigate });
 
   const dashboardPageContextValue = useMemo(() => {
     const updatePageParams = (newPage: string | undefined) => {
