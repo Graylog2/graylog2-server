@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { renderUnwrapped as render, screen } from 'wrappedTestingLibrary';
+import DefaultProviders from 'DefaultProviders';
+import { MemoryRouter } from 'react-router-dom';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import asMock from 'helpers/mocking/AsMock';
 import usePluginEntities from 'hooks/usePluginEntities';
-import history from 'util/History';
 import AppConfig from 'util/AppConfig';
 
 import AppRouter from './AppRouter';
@@ -42,6 +43,25 @@ jest.mock('util/AppConfig', () => ({
   isCloud: jest.fn(() => false),
 }));
 
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  BrowserRouter: ({ children }) => children,
+}));
+
+const AppRouterWithContext = ({ path }: { path?: string }) => (
+  <DefaultProviders>
+    <CurrentUserContext.Provider value={currentUser}>
+      <MemoryRouter initialEntries={[path]}>
+        <AppRouter />
+      </MemoryRouter>
+    </CurrentUserContext.Provider>
+  </DefaultProviders>
+);
+
+AppRouterWithContext.defaultProps = {
+  path: '/',
+};
+
 describe('AppRouter', () => {
   beforeEach(() => {
     asMock(usePluginEntities).mockReturnValue([]);
@@ -49,25 +69,21 @@ describe('AppRouter', () => {
   });
 
   it('routes to Getting Started Page for `/` or empty location', async () => {
-    const { findByText } = render(<AppRouter />);
+    render(<AppRouter />);
 
-    await findByText('This is the start page');
+    await screen.findByText('This is the start page');
   });
 
   it('renders a not found page for unknown URLs', async () => {
-    const { findByText } = render(<AppRouter />);
+    render(<AppRouterWithContext path="/this-url-is-not-registered-and-should-never-be" />);
 
-    history.push('/this-url-is-not-registered-and-should-never-be');
-
-    await findByText('Page not found');
+    await screen.findByText('Page not found');
   });
 
   describe('plugin routes', () => {
     it('renders simple plugin routes', async () => {
       asMock(usePluginEntities).mockReturnValue([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route' }]);
-      const { findByText } = render(<AppRouter />);
-
-      history.push('/a-plugin-route');
+      const { findByText } = render(<AppRouterWithContext path="/a-plugin-route" />);
 
       await findByText('Hey there!');
     });
@@ -75,9 +91,7 @@ describe('AppRouter', () => {
     it('renders null-parent component plugin routes without application chrome', async () => {
       asMock(usePluginEntities).mockReturnValue([{ parentComponent: null, component: () => <span>Hey there!</span>, path: '/' }]);
 
-      const { findByText, queryByTitle } = render(<AppRouter />);
-
-      history.push('/');
+      const { findByText, queryByTitle } = render(<AppRouterWithContext path="/" />);
 
       await findByText('Hey there!');
 
@@ -86,9 +100,7 @@ describe('AppRouter', () => {
 
     it('does not render plugin route when required feature flag is not enabled', async () => {
       asMock(usePluginEntities).mockReturnValue([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }]);
-      render(<AppRouter />);
-
-      history.push('/a-plugin-route');
+      render(<AppRouterWithContext path="/a-plugin-route" />);
 
       await screen.findByText('Page not found');
 
@@ -98,9 +110,7 @@ describe('AppRouter', () => {
     it('render plugin route when required feature flag is enabled', async () => {
       asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
       asMock(usePluginEntities).mockReturnValue([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }]);
-      const { findByText } = render(<AppRouter />);
-
-      history.push('/a-plugin-route');
+      const { findByText } = render(<AppRouterWithContext path="/a-plugin-route" />);
 
       await findByText('Hey there!');
     });

@@ -41,4 +41,5 @@ export function asElement<T extends new(...args: any) => any> (elem: any, elemen
 export * from '@testing-library/react';
 export {
   renderWithWrapper as render,
+  render as renderUnwrapped,
 };
