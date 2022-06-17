@@ -286,7 +286,7 @@ public class DBJobTriggerService {
     }
 
     /**
-     * Deletes completed {@link OnceJobSchedule} triggers that are older than the provided time
+     * Deletes completed / cancelled {@link OnceJobSchedule} triggers that are older than the provided time
      *
      * @param timeValue the time range of triggers to be removed
      * @param unit      the unit of the provided timeValue
@@ -295,7 +295,10 @@ public class DBJobTriggerService {
     public int deleteCompletedOnceSchedulesOlderThan(long timeValue, TimeUnit unit) {
         final Query query = DBQuery.and(
                 DBQuery.is(FIELD_LOCK_OWNER, null),
-                DBQuery.is(FIELD_STATUS, JobTriggerStatus.COMPLETE),
+                DBQuery.or(
+                        DBQuery.is(FIELD_STATUS, JobTriggerStatus.COMPLETE),
+                        DBQuery.is(FIELD_STATUS, JobTriggerStatus.CANCELLED)
+                ),
                 DBQuery.is(FIELD_SCHEDULE + "." + JobSchedule.TYPE_FIELD, OnceJobSchedule.TYPE_NAME),
                 DBQuery.lessThan(FIELD_UPDATED_AT, clock.nowUTC().minus(unit.toMillis(timeValue)))
         );
@@ -380,6 +383,8 @@ public class DBJobTriggerService {
         requireNonNull(trigger, "trigger cannot be null");
         requireNonNull(triggerUpdate, "triggerUpdate cannot be null");
 
+        final boolean wasCancelled = triggerWasCancelled(trigger);
+
         final Query query = DBQuery.and(
                 // Make sure that the owner still owns the trigger
                 DBQuery.is(FIELD_LOCK_OWNER, nodeId),
@@ -398,11 +403,12 @@ public class DBJobTriggerService {
             if (triggerUpdate.status().isPresent()) {
                 update.set(FIELD_STATUS, triggerUpdate.status().get());
             } else {
+                // nextTime has precedence over wasCancelled
                 update.set(FIELD_STATUS, JobTriggerStatus.RUNNABLE);
             }
             update.set(FIELD_NEXT_TIME, triggerUpdate.nextTime().get());
         } else {
-            update.set(FIELD_STATUS, JobTriggerStatus.COMPLETE);
+            update.set(FIELD_STATUS, wasCancelled ? JobTriggerStatus.CANCELLED : JobTriggerStatus.COMPLETE);
         }
 
         if (triggerUpdate.data().isPresent()) {
@@ -432,6 +438,8 @@ public class DBJobTriggerService {
                 DBQuery.is(FIELD_LOCK_OWNER, nodeId),
                 DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING)
         );
+        // TODO should this also set Once scheduled triggers to RUNNABLE?
+        // TODO should we set triggers to CANCELLED here?
         final DBUpdate.Builder update = DBUpdate.set(FIELD_LOCK_OWNER, null)
                 .set(FIELD_STATUS, JobTriggerStatus.RUNNABLE);
 
@@ -485,6 +493,14 @@ public class DBJobTriggerService {
         final DBUpdate.Builder update = DBUpdate.set(JobTriggerDto.FIELD_IS_CANCELLED, true);
 
         return Optional.ofNullable(db.findAndModify(query, update));
+    }
+
+    public boolean triggerWasCancelled(JobTriggerDto trigger) {
+        final JobTriggerDto reloadedTrigger = db.findOneById(getId(trigger));
+        if (reloadedTrigger == null) {
+            return false;
+        }
+        return reloadedTrigger.isCancelled();
     }
 
     public List<JobTriggerDto> findWithQuery(Query query) {
