@@ -17,153 +17,130 @@
 package org.graylog.integrations.notifications.types;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.auto.value.AutoValue;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
+@AutoValue
+@JsonDeserialize(builder = SlackMessage.Builder.class)
+public abstract class SlackMessage {
 
-public class SlackMessage {
+    private static final String FIELD_ICON_EMOJI = "icon_emoji";
+    private static final String FIELD_ICON_URL = "icon_url";
+    private static final String FIELD_USERNAME = "username";
+    private static final String FIELD_CHANNEL = "channel";
+    private static final String FIELD_TEXT = "text";
+    private static final String FIELD_LINK_NAMES = "link_names";
+    private static final String FIELD_ATTACHMENTS = "attachments";
+    private static final String FIELD_COLOR = "color";
+    private static final String FIELD_ATTACHMENT_TEXT = "text";
+    private static final String FIELD_FALLBACK = "fallback";
+    private static final String FIELD_PRETEXT = "pretext";
+    static final String VALUE_FALLBACK = "Custom Message";
+    static final String VALUE_PRETEXT = "Custom Message:";
 
-    private String color;
-    private String iconEmoji;
-    private String iconUrl;
-    private String userName;
-    private String channel;
-    private boolean linkNames;
-    private String message;
-    private String customMessage;
+    @JsonProperty(FIELD_ICON_EMOJI)
+    public abstract String iconEmoji();
 
+    @JsonProperty(FIELD_ICON_URL)
+    public abstract String iconUrl();
 
-    public SlackMessage(
-            String color,
-            String iconEmoji,
-            String iconUrl,
-            String userName,
-            String channel,
-            boolean linkNames,
-            String message,
-            String customMessage
+    @JsonProperty(FIELD_USERNAME)
+    public abstract String username();
 
-    ) {
-        this.color = color;
-        this.iconEmoji = iconEmoji;
-        this.iconUrl = iconUrl;
-        this.userName = userName;
-        this.channel = channel;
-        this.linkNames = linkNames;
-        this.message = message;
-        this.customMessage = customMessage;
+    @JsonProperty(FIELD_CHANNEL)
+    public abstract String channel();
 
+    @JsonProperty(FIELD_LINK_NAMES)
+    public abstract boolean linkNames();
+
+    @JsonProperty(FIELD_TEXT)
+    public abstract String text();
+
+    @JsonProperty(FIELD_ATTACHMENTS)
+    public abstract Set<Attachment> attachments();
+
+    public static Builder builder() {
+        return Builder.create();
     }
 
-    public SlackMessage(String message) {
-        this.message = message;
-    }
+    @AutoValue.Builder
+    public static abstract class Builder {
+        @JsonProperty(FIELD_ICON_EMOJI)
+        public abstract Builder iconEmoji(String iconEmoji);
 
-    public String getJsonString() {
-        // See https://api.slack.com/methods/chat.postMessage for valid parameters
-        final Map<String, Object> params = new HashMap<>();
-        params.put("channel", channel);
-        params.put("text", message);
-        params.put("link_names", linkNames);
+        @JsonProperty(FIELD_ICON_URL)
+        public abstract Builder iconUrl(String iconUrl);
 
-        if (!isNullOrEmpty(userName)) {
-            params.put("username", userName);
-        }
+        @JsonProperty(FIELD_USERNAME)
+        public abstract Builder username(String username);
 
-        if (!isNullOrEmpty(iconUrl)) {
-            params.put("icon_url", iconUrl);
-        }
+        @JsonProperty(FIELD_CHANNEL)
+        public abstract Builder channel(String channel);
 
-        if (!isNullOrEmpty(iconEmoji)) {
-            params.put("icon_emoji", ensureEmojiSyntax(iconEmoji));
-        }
+        @JsonProperty(FIELD_LINK_NAMES)
+        public abstract Builder linkNames(boolean linkNames);
 
-        final List<Attachment> attachments = new ArrayList<>();
-        if (!isNullOrEmpty(customMessage)) {
-            final Attachment attachment = new Attachment(
-                    color,
-                    customMessage,
-                    "Custom Message",
-                    "Custom Message:",
-                    null
-            );
-            attachments.add(attachment);
-        }
+        @JsonProperty(FIELD_TEXT)
+        public abstract Builder text(String text);
 
-        if (!attachments.isEmpty()) {
-            params.put("attachments", attachments);
-        }
+        @JsonProperty(FIELD_ATTACHMENTS)
+        public abstract Builder attachments(Set<Attachment> attachments);
 
-        try {
-            return new ObjectMapper().writeValueAsString(params);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Could not build payload JSON.", e);
-        }
-    }
-
-    private String ensureEmojiSyntax(final String x) {
-        String emoji = x.trim();
-
-        if (!emoji.isEmpty() && !emoji.startsWith(":")) {
-            emoji = ":" + emoji;
-        }
-
-        if (!emoji.isEmpty() && !emoji.endsWith(":")) {
-            emoji = emoji + ":";
-        }
-
-        return emoji;
-    }
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class Attachment {
-        @JsonProperty
-        public String fallback;
-        @JsonProperty
-        public String text;
-        @JsonProperty
-        public String pretext;
-        @JsonProperty
-        public String color;
-        @JsonProperty
-        public List<AttachmentField> fields;
+        public abstract SlackMessage build();
 
         @JsonCreator
-        public Attachment(String color, String text, String fallback, String pretext, List<AttachmentField> fields) {
-            this.fallback = fallback;
-            this.text = text;
-            this.pretext = pretext;
-            this.color = color;
-            this.fields = fields;
+        public static Builder create() {
+            return new AutoValue_SlackMessage.Builder();
         }
     }
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class AttachmentField {
-        @JsonProperty
-        public String title;
-        @JsonProperty
-        public String value;
-        @JsonProperty("short")
-        public boolean isShort;
+    @AutoValue
+    @JsonDeserialize(builder = AutoValue_SlackMessage_Attachment.Builder.class)
+    public static abstract class Attachment {
+        @JsonProperty(FIELD_FALLBACK)
+        public abstract String fallback();
 
-        @JsonCreator
-        public AttachmentField(String title, String value, boolean isShort) {
-            this.title = title;
-            this.value = value;
-            this.isShort = isShort;
+        @JsonProperty(FIELD_ATTACHMENT_TEXT)
+        public abstract String text();
+
+        @JsonProperty(FIELD_PRETEXT)
+        public abstract String pretext();
+
+        @JsonProperty(FIELD_COLOR)
+        public abstract String color();
+
+        public abstract Builder toBuilder();
+
+        public static Builder builder() {
+            return Builder.create();
+        }
+
+        @AutoValue.Builder
+        public static abstract class Builder {
+            @JsonProperty(FIELD_FALLBACK)
+            public abstract Builder fallback(String fallback);
+
+            @JsonProperty(FIELD_ATTACHMENT_TEXT)
+            public abstract Builder text(String fallback);
+
+            @JsonProperty(FIELD_PRETEXT)
+            public abstract Builder pretext(String pretext);
+
+            @JsonProperty(FIELD_COLOR)
+            public abstract Builder color(String color);
+
+            public abstract Attachment build();
+
+            @JsonCreator
+            public static Builder create() {
+                // Set the pretext and fallback values
+                return new AutoValue_SlackMessage_Attachment.Builder()
+                        .pretext(VALUE_PRETEXT)
+                        .fallback(VALUE_FALLBACK);
+            }
         }
     }
-
 }

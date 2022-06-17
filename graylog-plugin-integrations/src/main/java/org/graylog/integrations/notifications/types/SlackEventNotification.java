@@ -16,6 +16,7 @@
  */
 package org.graylog.integrations.notifications.types;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.floreysoft.jmte.Engine;
 import com.google.common.annotations.VisibleForTesting;
@@ -36,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -80,11 +82,23 @@ public class SlackEventNotification implements EventNotification {
         try {
             SlackMessage slackMessage = createSlackMessage(ctx, config);
             slackClient.send(slackMessage, config.webhookUrl());
+        } catch (JsonProcessingException ex) {
+            String errorMessage = String.format(Locale.ENGLISH, "Error serializing Slack message object while sending the SlackEventNotification :: %s", ex.getMessage());
+            LOG.error(errorMessage, ex);
+            final Notification systemNotification = notificationService.buildNow()
+                    .addNode(nodeId.toString())
+                    .addType(Notification.Type.GENERIC)
+                    .addSeverity(Notification.Severity.URGENT)
+                    .addDetail("title", "SlackEventNotification Failed")
+                    .addDetail("description", errorMessage);
+
+            notificationService.publishIfFirst(systemNotification);
+            throw new EventNotificationException("There was an error serializing the Slack message object when sending the SlackEventNotification", ex);
         } catch (TemporaryEventNotificationException exp) {
             //scheduler needs to retry a TemporaryEventNotificationException
             throw exp;
         } catch (PermanentEventNotificationException exp) {
-            String errorMessage = String.format("Error sending the SlackEventNotification :: %s", exp.getMessage());
+            String errorMessage = String.format(Locale.ENGLISH, "Error sending the SlackEventNotification :: %s", exp.getMessage());
             final Notification systemNotification = notificationService.buildNow()
                     .addNode(nodeId.toString())
                     .addType(Notification.Type.GENERIC)
@@ -117,18 +131,36 @@ public class SlackEventNotification implements EventNotification {
             customMessage = buildCustomMessage(ctx, config, template);
         }
 
-        String templatedChannel = buildTemplatedChannel(ctx, config, config.channel());
+        SlackMessage.Attachment attachment = SlackMessage.Attachment.builder()
+                .color(config.color())
+                .text(customMessage)
+                .build();
 
-        return new SlackMessage(
-                config.color(),
-                config.iconEmoji(),
-                config.iconUrl(),
-                config.userName(),
-                templatedChannel,
-                linkNames,
-                message,
-                customMessage
-        );
+        String templatedChannel = buildTemplatedChannel(ctx, config, config.channel());
+        String emoji = config.iconEmoji() != null ? ensureEmojiSyntax(config.iconEmoji()) : "";
+        return SlackMessage.builder()
+                .iconEmoji(emoji)
+                .iconUrl(config.iconUrl())
+                .username(config.userName())
+                .text(message)
+                .channel(templatedChannel)
+                .linkNames(linkNames)
+                .attachments(Collections.singleton(attachment))
+                .build();
+    }
+
+    private String ensureEmojiSyntax(final String x) {
+        String emoji = x.trim();
+
+        if (!emoji.isEmpty() && !emoji.startsWith(":")) {
+            emoji = ":" + emoji;
+        }
+
+        if (!emoji.isEmpty() && !emoji.endsWith(":")) {
+            emoji = emoji + ":";
+        }
+
+        return emoji;
     }
 
     String buildDefaultMessage(EventNotificationContext ctx, SlackEventNotificationConfig config) {

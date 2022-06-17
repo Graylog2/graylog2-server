@@ -17,6 +17,8 @@
 package org.graylog.integrations.notifications.types;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -38,11 +40,13 @@ public class SlackClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(SlackClient.class);
     private final OkHttpClient httpClient;
+    private final ObjectMapper objectMapper;
 
 
     @Inject
-    public SlackClient(OkHttpClient httpClient) {
+    public SlackClient(OkHttpClient httpClient, ObjectMapper objectMapper) {
         this.httpClient = httpClient.newBuilder().followRedirects(false).build();
+        this.objectMapper = objectMapper;
     }
 
 
@@ -52,16 +56,17 @@ public class SlackClient {
      * @throws TemporaryEventNotificationException - thrown for network or timeout type issues
      * @throws PermanentEventNotificationException - thrown with bad webhook url, authentication error type issues
      */
-    public void send(SlackMessage message, String webhookUrl) throws TemporaryEventNotificationException, PermanentEventNotificationException {
+    public void send(SlackMessage message, String webhookUrl) throws TemporaryEventNotificationException,
+            PermanentEventNotificationException, JsonProcessingException {
 
         final Request request = new Request.Builder()
                 .url(webhookUrl)
-                .post(RequestBody.create(MediaType.parse(APPLICATION_JSON), message.getJsonString()))
+                .post(RequestBody.create(MediaType.parse(APPLICATION_JSON), objectMapper.writeValueAsString(message)))
                 .build();
 
-        LOG.debug("Posting to webhook url <{}> the paylod is <{}>",
+        LOG.debug("Posting to webhook url <{}> the payload is <{}>",
                 webhookUrl,
-                message.getJsonString());
+                "");
 
         try (final Response r = httpClient.newCall(request).execute()) {
             if (!r.isSuccessful()) {

@@ -34,7 +34,6 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
-
 public class SlackEventNotificationConfigTest {
 
     @Test
@@ -43,7 +42,7 @@ public class SlackEventNotificationConfigTest {
                 .webhookUrl("http://graylog.org")
                 .build();
         ValidationResult result = slackEventNotificationConfig.validate();
-        Map errors = result.getErrors();
+        Map<String, Collection<String>> errors = result.getErrors();
         assertThat(errors).size().isEqualTo(0);
     }
 
@@ -53,7 +52,7 @@ public class SlackEventNotificationConfigTest {
                 .webhookUrl("https://hooks.slack.com/services/xxxx/xxxx/xxxxxxx")
                 .build();
         ValidationResult result = slackEventNotificationConfig.validate();
-        Map errors = result.getErrors();
+        Map<String, Collection<String>> errors = result.getErrors();
         assertThat(errors).size().isEqualTo(0);
     }
 
@@ -63,7 +62,7 @@ public class SlackEventNotificationConfigTest {
                 .webhookUrl("https://discord.com/api/webhooks/xxxx/xxXXXxxxxxxxxx/slack")
                 .build();
         ValidationResult result = slackEventNotificationConfig.validate();
-        Map errors = result.getErrors();
+        Map<String, Collection<String>> errors = result.getErrors();
         assertThat(errors).size().isEqualTo(0);
     }
 
@@ -73,7 +72,7 @@ public class SlackEventNotificationConfigTest {
                 .webhookUrl("https://discordapp.com/api/webhooks/xxxx/xxXXXxxxxxxxxx/slack")
                 .build();
         ValidationResult result = slackEventNotificationConfig.validate();
-        Map errors = result.getErrors();
+        Map<String, Collection<String>> errors = result.getErrors();
         assertThat(errors).size().isEqualTo(0);
     }
 
@@ -84,9 +83,9 @@ public class SlackEventNotificationConfigTest {
                 .build();
         ValidationResult result = slackEventNotificationConfig.validate();
         assertThat(result.failed()).isTrue();
-        Map errors = result.getErrors();
+        Map<String, Collection<String>> errors = result.getErrors();
         assertThat(errors).size().isEqualTo(1);
-        assertEquals(((List)errors.get(SlackEventNotificationConfig.FIELD_WEBHOOK_URL)).get(0),
+        assertEquals(((List<String>) errors.get(SlackEventNotificationConfig.FIELD_WEBHOOK_URL)).get(0),
                 SlackEventNotificationConfig.INVALID_WEBHOOK_ERROR_MESSAGE);
     }
 
@@ -97,9 +96,9 @@ public class SlackEventNotificationConfigTest {
                 .build();
         ValidationResult result = slackEventNotificationConfig.validate();
         assertThat(result.failed()).isTrue();
-        Map errors = result.getErrors();
+        Map<String, Collection<String>> errors = result.getErrors();
         assertThat(errors).size().isEqualTo(1);
-        assertEquals(((List)errors.get(SlackEventNotificationConfig.FIELD_WEBHOOK_URL)).get(0),
+        assertEquals(((List<String>) errors.get(SlackEventNotificationConfig.FIELD_WEBHOOK_URL)).get(0),
                 SlackEventNotificationConfig.INVALID_SLACK_URL_ERROR_MESSAGE);
     }
 
@@ -110,9 +109,9 @@ public class SlackEventNotificationConfigTest {
                 .build();
         ValidationResult result = slackEventNotificationConfig.validate();
         assertThat(result.failed()).isTrue();
-        Map errors = result.getErrors();
+        Map<String, Collection<String>> errors = result.getErrors();
         assertThat(errors).size().isEqualTo(1);
-        assertEquals(((List)errors.get(SlackEventNotificationConfig.FIELD_WEBHOOK_URL)).get(0),
+        assertEquals(((List<String>) errors.get(SlackEventNotificationConfig.FIELD_WEBHOOK_URL)).get(0),
                 SlackEventNotificationConfig.INVALID_DISCORD_URL_ERROR_MESSAGE);
     }
 
@@ -126,7 +125,7 @@ public class SlackEventNotificationConfigTest {
         assertThat(negativeBacklogSize.channel()).isEqualTo(SlackEventNotificationConfig.CHANNEL);
         assertThat(negativeBacklogSize.webhookUrl()).isEqualTo(SlackEventNotificationConfig.WEB_HOOK_URL);
 
-        Collection<String> expected = new ArrayList();
+        Collection<String> expected = new ArrayList<>();
         expected.add(SlackEventNotificationConfig.INVALID_BACKLOG_ERROR_MESSAGE);
 
         assertThat(negativeBacklogSize.validate().failed()).isTrue();

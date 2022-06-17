@@ -16,6 +16,7 @@
  */
 package org.graylog.integrations.notifications.types;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -29,21 +30,19 @@ import org.junit.Test;
 import org.junit.rules.Timeout;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-
 public class SlackClientTest {
-    private static final String TEST_MESSAGE = "Henry Hühnchen(little chicken)";
-    private static final String TEST_MESSAGE_1 = "{\"link_names\":false,\"channel\":null,\"text\":\"Henry Hühnchen(little chicken)\"}";
-
     @Rule
     public Timeout timout = Timeout.seconds(10);
 
     private final MockWebServer server = new MockWebServer();
     private final OkHttpClient httpClient = new OkHttpClient();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Before
     public void setUp() throws IOException {
@@ -56,36 +55,34 @@ public class SlackClientTest {
     }
 
     @Test
-    public void send_sendsHttpRequestAsExpected_whenInputIsGood() throws Exception {
-        server.enqueue(new MockResponse().setResponseCode(200).setBody(TEST_MESSAGE_1));
+    public void sendsHttpRequestAsExpected_whenInputIsGood() throws Exception {
+        server.enqueue(new MockResponse().setResponseCode(200));
 
-        SlackClient slackClient = new SlackClient(httpClient);
-        SlackMessage message = new SlackMessage(TEST_MESSAGE);
-        slackClient.send(message, server.url("/").toString());
+        SlackClient slackClient = new SlackClient(httpClient, objectMapper);
+        slackClient.send(getMessage(), server.url("/").toString());
 
         final RecordedRequest recordedRequest = server.takeRequest();
 
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
         assertThat(recordedRequest.getBody()).isNotNull();
-        assertThat(recordedRequest.getBody().readUtf8()).isEqualTo(TEST_MESSAGE_1);
+        assertThat(recordedRequest.getBody().readUtf8()).isEqualTo(objectMapper.writeValueAsString(getMessage()));
     }
 
     @Test(expected = TemporaryEventNotificationException.class)
-    public void send_throwsTempNotifException_whenHttpClientThrowsIOException() throws Exception {
+    public void sendThrowsTempNotifException_whenHttpClientThrowsIOException() throws Exception {
         final OkHttpClient httpClient =
                 this.httpClient.newBuilder().readTimeout(1, TimeUnit.MILLISECONDS).build();
 
-        SlackClient slackClient = new SlackClient(httpClient);
-        SlackMessage message = new SlackMessage(TEST_MESSAGE);
-        slackClient.send(message, server.url("/").toString());
+        SlackClient slackClient = new SlackClient(httpClient, objectMapper);
+        slackClient.send(getMessage(), server.url("/").toString());
     }
 
     @Test(expected = PermanentEventNotificationException.class)
-    public void send_throwsPermNotifException_whenPostReturnsHttp402() throws Exception {
-        server.enqueue(new MockResponse().setResponseCode(402).setBody(TEST_MESSAGE_1));
+    public void sendThrowsPermNotifException_whenPostReturnsHttp402() throws Exception {
+        server.enqueue(new MockResponse().setResponseCode(402));
 
-        SlackClient slackClient = new SlackClient(httpClient);
-        slackClient.send(new SlackMessage(TEST_MESSAGE), server.url("/").toString());
+        SlackClient slackClient = new SlackClient(httpClient, objectMapper);
+        slackClient.send(getMessage(), server.url("/").toString());
     }
 
     @Test
@@ -94,10 +91,27 @@ public class SlackClientTest {
                 .setHeader("Location", server.url("/redirected")));
         server.enqueue(new MockResponse().setResponseCode(200));
 
-        SlackClient slackClient = new SlackClient(httpClient);
-        assertThatThrownBy(() -> slackClient.send(new SlackMessage(TEST_MESSAGE), server.url("/").toString()))
+        SlackClient slackClient = new SlackClient(httpClient, objectMapper);
+        assertThatThrownBy(() -> slackClient.send(getMessage(), server.url("/").toString()))
                 .isInstanceOf(PermanentEventNotificationException.class)
                 .hasMessageContaining("[2xx] but got [302]");
+    }
+
+    private SlackMessage getMessage() {
+        SlackMessage.Attachment attachment = SlackMessage.Attachment.builder()
+                .color("#FF000000")
+                .text("text")
+                .build();
+
+        return SlackMessage.builder()
+                .iconEmoji(":smile:")
+                .iconUrl("iconUrl")
+                .username("username")
+                .text("text")
+                .channel("#general")
+                .linkNames(true)
+                .attachments(Collections.singleton(attachment))
+                .build();
     }
 
 }

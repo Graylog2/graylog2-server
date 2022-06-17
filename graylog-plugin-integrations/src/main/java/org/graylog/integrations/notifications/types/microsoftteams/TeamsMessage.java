@@ -17,93 +17,112 @@
 package org.graylog.integrations.notifications.types.microsoftteams;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.auto.value.AutoValue;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
-public class TeamsMessage {
-    private String color;
-    private String iconUrl;
-    private String messageTitle;
-    private JsonNode customMessage;
-    private String description;
+@AutoValue
+@JsonDeserialize(builder = TeamsMessage.Builder.class)
+public abstract class TeamsMessage {
+    // constant fields and values in TeamsMessage JSON object
+    static final String FIELD_TYPE = "@type";
+    static final String FIELD_CONTEXT = "@context";
+    static final String VALUE_TYPE = "MessageCard";
+    static final String VALUE_CONTEXT = "http://schema.org/extensions";
 
+    // configurable fields
+    static final String FIELD_THEME_COLOR = "themeColor";
+    static final String FIELD_TEXT = "text";
+    static final String FIELD_SECTIONS = "sections";
+    static final String FIELD_ACTIVITY_SUBTITLE = "activitySubtitle";
+    static final String FIELD_ACTIVITY_IMAGE = "activityImage";
+    static final String FIELD_FACTS = "facts";
 
-    public TeamsMessage(
-            String color,
-            String iconUrl,
-            String messageTitle,
-            JsonNode customMessage,
-            String description
-    ) {
-        this.color = color;
-        this.iconUrl = iconUrl;
-        this.messageTitle = messageTitle;
-        this.customMessage = customMessage;
-        this.description = description;
+    @JsonProperty(FIELD_TYPE)
+    public abstract String type();
+
+    @JsonProperty(FIELD_CONTEXT)
+    public abstract String context();
+
+    @JsonProperty(FIELD_THEME_COLOR)
+    public abstract String color();
+
+    @JsonProperty(FIELD_TEXT)
+    public abstract String text();
+
+    @JsonProperty(FIELD_SECTIONS)
+    public abstract Set<Sections> sections();
+
+    public abstract Builder toBuilder();
+
+    public static Builder builder() {
+        return Builder.create();
     }
 
-    public TeamsMessage(String messageTitle) {
-        this.messageTitle = messageTitle;
-    }
+    @AutoValue.Builder
+    public static abstract class Builder {
+        @JsonProperty(FIELD_TYPE)
+        public abstract Builder type(String type);
 
-    public String getJsonString() {
+        @JsonProperty(FIELD_CONTEXT)
+        public abstract Builder context(String context);
 
-        final Map<String, Object> params = new HashMap<>();
-        params.put("@type", "MessageCard");
-        params.put("@context", "http://schema.org/extensions");
-        params.put("themeColor", color);
-        params.put("text", messageTitle);
+        @JsonProperty(FIELD_THEME_COLOR)
+        public abstract Builder color(String color);
 
-        final List<Sections> Sections = new ArrayList<>();
-        if (!customMessage.isNull()) {
-            final Sections section = new Sections(
-                    description,
-                    iconUrl,
-                    customMessage
-            );
+        @JsonProperty(FIELD_TEXT)
+        public abstract Builder text(String text);
 
-            Sections.add(section);
-        }
+        @JsonProperty(FIELD_SECTIONS)
+        public abstract Builder sections(Set<Sections> sections);
 
-        if (!Sections.isEmpty()) {
-            params.put("sections", Sections);
-        }
-
-        try {
-            return new ObjectMapper().writeValueAsString(params);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Could not build payload JSON.", e);
-        }
-    }
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class Sections {
-
-        @JsonProperty
-        public String activitySubtitle;
-
-        @JsonProperty
-        public String activityImage;
-
-        @JsonProperty
-        public JsonNode facts;
+        public abstract TeamsMessage build();
 
         @JsonCreator
-        public Sections(String activitySubtitle, String activityImage, JsonNode facts) {
-            this.activitySubtitle = activitySubtitle;
-            this.activityImage = activityImage;
-            this.facts = facts;
+        public static Builder create() {
+            // Set the default @type and @context values on the message
+            // They should never be set elsewhere
+            return new AutoValue_TeamsMessage.Builder()
+                    .context(VALUE_CONTEXT)
+                    .type(VALUE_TYPE);
+        }
+    }
 
+    @AutoValue
+    @JsonDeserialize(builder = AutoValue_TeamsMessage_Sections.Builder.class)
+    public static abstract class Sections {
+
+        @JsonProperty(FIELD_ACTIVITY_SUBTITLE)
+        public abstract String activitySubtitle();
+
+        @JsonProperty(FIELD_ACTIVITY_IMAGE)
+        public abstract String activityImage();
+
+        @JsonProperty(FIELD_FACTS)
+        public abstract JsonNode facts();
+
+        public abstract Builder toBuilder();
+
+        public static Builder builder() {
+            return new AutoValue_TeamsMessage_Sections.Builder();
+        }
+
+        @AutoValue.Builder
+        public static abstract class Builder {
+
+            @JsonProperty(FIELD_ACTIVITY_SUBTITLE)
+            public abstract Builder activitySubtitle(String activitySubtitle);
+
+            @JsonProperty(FIELD_ACTIVITY_IMAGE)
+            public abstract Builder activityImage(String activityImage);
+
+            @JsonProperty(FIELD_FACTS)
+            public abstract Builder facts(JsonNode facts);
+
+            public abstract Sections build();
         }
     }
 
