@@ -2338,17 +2338,10 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/plotly.js@*":
-  version "1.54.2"
-  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-1.54.2.tgz#8e5916c83bd07b01fed7f404c3e460ee8197968a"
-  integrity sha512-p05hxJSlPLYEPsPW1NuQs1v+oM7pit3xMyo/L/iAr+xAH7bc035rTGFheCiYhx/d+kfCp1jrdJe52XPwei1m6g==
-  dependencies:
-    "@types/d3" "^3"
-
-"@types/plotly.js@1.54.21":
-  version "1.54.21"
-  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-1.54.21.tgz#4001df3a077064bcba9b0a36971c84eaebdfde25"
-  integrity sha512-dK915olBqFiM1Jaz8k4GzjbNOodjIajRo1HbGm3kAbB2wJ7Tqo0JFqFbQexC7SowEb+Th1CtoX8V+yB7hW6zGA==
+"@types/plotly.js@*", "@types/plotly.js@1.54.22":
+  version "1.54.22"
+  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-1.54.22.tgz#001b9cfafc5e0bdf133bc6ab6e30ff0af39e584d"
+  integrity sha512-/xL9++eA7VnIIZqNQOw6sZ7DtEmfoHj5rAD2CjU2LCOqem/BxTA1KlpdUWEHOiou6za4HKnM+Nvho3jTBPYJ/w==
   dependencies:
     "@types/d3" "^3"
 
@@ -6918,13 +6911,13 @@ graceful-fs@^4.2.9:
 "graylog-web-plugin@file:packages/graylog-web-plugin":
   version "4.4.0-SNAPSHOT"
   dependencies:
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-ccebc3d4-e0e1-41d2-9172-5a3b14db06d4-1655279798482/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-ccebc3d4-e0e1-41d2-9172-5a3b14db06d4-1655279798482/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-ccebc3d4-e0e1-41d2-9172-5a3b14db06d4-1655279798482/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.6.0"
     moment "2.29.3"
     moment-timezone "0.5.34"
