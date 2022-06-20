@@ -261,7 +261,14 @@ public class IndexSetsResource extends RestResource {
             throw new ClientErrorException("Default index set must be writable.", Response.Status.CONFLICT);
         }
 
-        final IndexSetConfig savedObject = indexSetService.save(updateRequest.toIndexSetConfig(id, oldConfig));
+        final IndexSetConfig indexSetConfig = updateRequest.toIndexSetConfig(id, oldConfig);
+
+        final Optional<IndexSetValidator.Violation> violation = indexSetValidator.validate(indexSetConfig);
+        if (violation.isPresent()) {
+            throw new BadRequestException(violation.get().message());
+        }
+
+        final IndexSetConfig savedObject = indexSetService.save(indexSetConfig);
 
         return IndexSetSummary.fromIndexSetConfig(savedObject, isDefaultSet);
     }

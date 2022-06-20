@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.apache.logging.log4j.util.Strings;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
@@ -57,6 +58,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Min;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.elasticsearch7.blocks.BlockSettingsParser;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
@@ -66,6 +68,7 @@ import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.Message;
@@ -347,6 +350,19 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     @Override
     public JsonNode getIndexStats(Collection<String> indices) {
         return statsApi.indexStatsWithDocsAndStore(indices);
+    }
+
+    @Override
+    public IndicesBlockStatus getIndicesBlocksStatus(final List<String> indices) {
+        final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
+                .indices(indices.toArray(new String[]{}))
+                .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
+                .names(Strings.EMPTY_ARRAY);
+
+        return client.execute((c, requestOptions) -> {
+            final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
+            return BlockSettingsParser.parseBlockSettings(settingsResponse);
+        });
     }
 
     @Override

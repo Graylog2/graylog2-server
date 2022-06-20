@@ -68,6 +68,7 @@ import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.sort.SortBuilders;
+import org.graylog.storage.elasticsearch6.blocks.JestBlockSettingsParser;
 import org.graylog.storage.elasticsearch6.indices.GetSingleAlias;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.ElasticsearchException;
@@ -78,6 +79,7 @@ import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.jackson.TypeReferences;
@@ -569,6 +571,15 @@ public class IndicesAdapterES6 implements IndicesAdapter {
         final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't check stats of indices " + indices);
 
         return jestResult.getJsonObject().path("indices");
+    }
+
+    @Override
+    public IndicesBlockStatus getIndicesBlocksStatus(final List<String> indices) {
+        final GetSettings request = new GetSettings.Builder()
+                .addIndex(indices)
+                .build();
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't check settings of indices " + indices);
+        return JestBlockSettingsParser.parseBlockSettings(jestResult, indices);
     }
 
     @Override
