@@ -22,6 +22,7 @@ import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.client.http.JestHttpClient;
 import org.apache.http.client.config.RequestConfig;
+import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.IndexNotFoundException;
@@ -92,8 +93,10 @@ public class JestUtils {
 
         for (JsonNode rootCause : rootCauses) {
             final JsonNode reason = rootCause.path("reason");
+            String reasonText = "";
             if (reason.isTextual()) {
-                reasons.add(reason.asText());
+                reasonText = reason.asText();
+                reasons.add(reasonText);
             }
 
             final JsonNode type = rootCause.path("type");
@@ -104,16 +107,21 @@ public class JestUtils {
                 case "master_not_discovered_exception":
                     return new MasterNotDiscoveredException();
                 case "cluster_block_exception":
-                    if (reason.asText().contains("no master")) {
+                    if (reasonText.contains("no master")) {
                         return new MasterNotDiscoveredException();
                     }
+                    break;
+                case "query_phase_execution_exception":
+                    if (reasonText.contains("Batch size is too large")) {
+                        throw new BatchSizeTooLargeException(reasonText);
+                    }
+                    break;
                 case "query_parsing_exception":
                     return buildQueryParsingException(errorMessage, rootCause, reasons);
                 case "index_not_found_exception":
                     final String indexName = rootCause.path("resource.id").asText();
                     return IndexNotFoundException.create(errorMessage.get(), indexName);
                 case "illegal_argument_exception":
-                    final String reasonText = reason.asText();
                     if (reasonText.startsWith("Expected numeric type on field")) {
                         return buildFieldTypeException(errorMessage, reasonText);
                     }
