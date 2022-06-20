@@ -25,9 +25,9 @@ public interface LockService {
      * Request a lock. If a lock already exists, the lock expiry time will be extended.
      *
      * @param resource Unique identifier for the resource that should be guarded by this lock.
-     * @param lockContext  an identifier that will be appended to the node id. This will create the lock owner string.
+     * @param lockContext  an identifier that will be appended to the callers' node id. This will create the lock owner string.
      *                       A context can be used for resources that should only allow a single lock to be acquired, even from the same node.
-     *                      If the lockContext is null, only the nodeId will be used.
+     *                       If the lockContext is null, only the nodeId will be used.
      * @return A {@link Lock} object, if a lock was obtained. An empty {@link Optional}, if no lock could be acquired.
      */
     Optional<Lock> lock(@Nonnull String resource, @Nullable String lockContext);

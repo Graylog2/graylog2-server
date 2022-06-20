@@ -70,7 +70,7 @@ public class MongoLockService implements LockService {
     @Inject
     public MongoLockService(NodeId nodeId,
                             MongoConnection mongoConnection,
-                            @Named("lock_service_lock_ttl") Duration leaderElectionLockTTL) {
+                            @Named("lock_service_lock_ttl") Duration lockTTL) {
         this.nodeId = nodeId;
 
         collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
@@ -78,7 +78,7 @@ public class MongoLockService implements LockService {
         collection.createIndex(Indexes.ascending(FIELD_RESOURCE), new IndexOptions().unique(true));
 
         final Bson updatedAtKey = Indexes.ascending(FIELD_UPDATED_AT);
-        final IndexOptions indexOptions = new IndexOptions().expireAfter(leaderElectionLockTTL.getSeconds(), TimeUnit.SECONDS);
+        final IndexOptions indexOptions = new IndexOptions().expireAfter(lockTTL.getSeconds(), TimeUnit.SECONDS);
         ensureTTLIndex(collection, updatedAtKey, indexOptions);
     }
 

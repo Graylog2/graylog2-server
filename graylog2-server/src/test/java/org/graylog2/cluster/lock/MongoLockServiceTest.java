@@ -145,6 +145,19 @@ public abstract class MongoLockServiceTest {
         assertThat(found).isTrue();
     }
 
+    @Test
+    void lockWithContext() {
+        Optional<Lock> lock = lockService.lock("test-resource", "1234");
+        assertThat(lock).isPresent();
+
+        // other context. lock should be non-reentrant
+        Optional<Lock> lockOther = lockService.lock("test-resource", "9876");
+        assertThat(lockOther).isNotPresent();
+
+        Optional<Lock> lockAgain = lockService.lock("test-resource", "1234");
+        assertThat(lockAgain).isPresent();
+    }
+
     private NodeId mockNodeId(String id) {
         NodeId nodeId = mock(NodeId.class);
         when(nodeId.toString()).thenReturn(id);
