@@ -27,8 +27,7 @@ import type { WidgetState } from './Widget';
 import type { QueryString, TimeRange } from '../queries/Query';
 
 export default class MessagesWidget extends Widget {
-  // eslint-disable-next-line default-param-last
-  constructor(id: string, config: any, filter: string | undefined | null, timerange: TimeRange | undefined | null, query: QueryString | undefined | null, streams: Array<string> = [], filters?: FiltersType) {
+  constructor(id: string, config: any, filter: string | undefined | null, timerange: TimeRange | undefined | null, query: QueryString | undefined | null, streams: Array<string>, filters?: FiltersType) {
     super(id, MessagesWidget.type, config, filter, timerange, query, streams, filters);
   }
 

@@ -26,8 +26,7 @@ import AggregationWidgetConfig from './AggregationWidgetConfig';
 import Widget from '../widgets/Widget';
 
 export default class AggregationWidget extends Widget {
-  // eslint-disable-next-line default-param-last
-  constructor(id: string, config: AggregationWidgetConfig, filter?: string, timerange?: TimeRange, query?: QueryString, streams: Array<string> = [], filters?: FiltersType) {
+  constructor(id: string, config: AggregationWidgetConfig, filter?: string, timerange?: TimeRange, query?: QueryString, streams?: Array<string>, filters?: FiltersType) {
     super(id, AggregationWidget.type, config, filter, timerange, query, streams, filters);
   }
 
@@ -44,12 +43,12 @@ export default class AggregationWidget extends Widget {
   toBuilder() {
     const { id, config, filter, timerange, query, streams, filters } = this._value;
 
-    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Map({ id, config, filter, timerange, query, streams, filters }));
   }
 
   static builder() {
-    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();
   }
 

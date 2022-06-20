@@ -46,8 +46,7 @@ class Widget {
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static Builder: typeof Builder;
 
-  // eslint-disable-next-line default-param-last
-  constructor(id: string, type: string, config: any, filter?: string, timerange?: TimeRange, query?: QueryString, streams: Array<string> = [], filters?: FiltersType) {
+  constructor(id: string, type: string, config: any, filter?: string, timerange?: TimeRange, query?: QueryString, streams?: Array<string>, filters?: FiltersType) {
     this._value = { id, type, config, filter: filter === null ? undefined : filter, filters, timerange, query, streams };
   }
 
