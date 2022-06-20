@@ -16,7 +16,8 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
 
@@ -25,7 +26,7 @@ import javax.inject.Named;
 
 public class LuceneQueryParser {
 
-    public static final StandardAnalyzer ANALYZER = new StandardAnalyzer();
+    public static final Analyzer ANALYZER = new WhitespaceAnalyzer();
 
     private final boolean allowLeadingWildcard;
 
