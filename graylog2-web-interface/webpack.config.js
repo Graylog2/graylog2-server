@@ -33,14 +33,6 @@ const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json'
 const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
 
-const BABELRC = path.resolve(ROOT_PATH, 'babel.config.js');
-const BABELOPTIONS = {
-  cacheDirectory: 'target/web/cache',
-  extends: BABELRC,
-};
-
-const BABELLOADER = { loader: 'babel-loader', options: BABELOPTIONS };
-
 // eslint-disable-next-line import/no-dynamic-require
 const BOOTSTRAPVARS = require(path.resolve(ROOT_PATH, 'public', 'stylesheets', 'bootstrap-config.json')).vars;
 
@@ -96,7 +88,17 @@ const webpackConfig = {
   },
   module: {
     rules: [
-      { test: /\.[jt]s(x)?$/, use: BABELLOADER, exclude: /node_modules|\.node_cache/ },
+      {
+        test: /\.[jt]s(x)?$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: 'target/web/cache',
+            presets: ['graylog'],
+          },
+        },
+        exclude: /node_modules|\.node_cache/,
+      },
       {
         test: /\.(svg)(\?.+)?$/,
         type: 'asset/resource',

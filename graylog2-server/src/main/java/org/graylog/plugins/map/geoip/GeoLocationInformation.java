@@ -18,9 +18,6 @@
 package org.graylog.plugins.map.geoip;
 
 import com.google.auto.value.AutoValue;
-import com.maxmind.geoip2.record.City;
-import com.maxmind.geoip2.record.Country;
-import com.maxmind.geoip2.record.Location;
 
 @AutoValue
 public abstract class GeoLocationInformation {
@@ -43,48 +40,4 @@ public abstract class GeoLocationInformation {
         return new AutoValue_GeoLocationInformation(latitude, longitude, countryIsoCode, countryName, cityName,
                 region, timeZone);
     }
-
-    /**
-     * A helper method that performs additional null checks when getting individual fields from location, country, and city objects.
-     *
-     * @param location geo-location information
-     * @param country  country information
-     * @param city     city information
-     * @param region   region name
-     * @return combined geo location information
-     */
-    @SuppressWarnings("complextity")
-    public static GeoLocationInformation create(Location location, Country country, City city, String region) {
-        final double longitude;
-        final double latitude;
-        final String timeZone;
-        final String countryIsoCode;
-        final String countryName;
-        final String cityName = city == null || city.getGeoNameId() == null ? "N/A" : city.getName();
-
-        if (location == null) {
-            longitude = 0;
-            latitude = 0;
-            timeZone = "N/A";
-        } else {
-            // Auto unboxing of null boxed-primitives will produce a NullPointerException--check for nulls.
-            longitude = location.getLongitude() == null ? 0 : location.getLongitude();
-            latitude = location.getLatitude() == null ? 0 : location.getLatitude();
-
-            timeZone = location.getTimeZone() == null ? "N/A" : location.getTimeZone();
-        }
-
-        if (country == null || country.getGeoNameId() == null) {
-            countryName = "N/A";
-            countryIsoCode = "N/A";
-
-        } else {
-            countryIsoCode = country.getIsoCode() == null ? "N/A" : country.getIsoCode();
-            countryName = country.getName() == null ? "N/A" : country.getName();
-        }
-
-        return create(latitude, longitude, countryIsoCode, countryName, cityName, region, timeZone);
-
-    }
-
 }

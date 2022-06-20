@@ -33,6 +33,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -74,7 +75,7 @@ public class PrometheusExporter extends AbstractIdleService {
             return;
         }
 
-        this.mappingFilesHandler = mappingFilesHandlerProvider.get();
+        createMappingFilesHandler();
 
         httpServer.replaceCollector(createCollector(mappingFilesHandler.getMapperConfigs()));
         httpServer.start();
@@ -112,5 +113,16 @@ public class PrometheusExporter extends AbstractIdleService {
                 new PrometheusMetricFilter(mapperConfigs),
                 new CustomMappingSampleBuilder(mapperConfigs)
         );
+    }
+
+    public Collector createCollector() {
+        createMappingFilesHandler();
+        return createCollector(this.mappingFilesHandler.getMapperConfigs());
+    }
+
+    private void createMappingFilesHandler() {
+        if (Objects.isNull(mappingFilesHandler)) {
+            this.mappingFilesHandler = mappingFilesHandlerProvider.get();
+        }
     }
 }
