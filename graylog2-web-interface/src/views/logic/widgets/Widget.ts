@@ -14,14 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 import * as Immutable from 'immutable';
 
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import { singleton } from 'logic/singleton';
 import generateId from 'logic/generateId';
 import isDeepEqual from 'stores/isDeepEqual';
-import type { FiltersType } from 'views/types';
+import type { FiltersType, SearchFilter } from 'views/types';
 
 export type WidgetState = {
   id: string;
@@ -46,8 +46,8 @@ class Widget {
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static Builder: typeof Builder;
 
-  constructor(id: string, type: string, config: any, filter?: string, timerange?: TimeRange, query?: QueryString, streams?: Array<string>, filters?: FiltersType) {
-    this._value = { id, type, config, filter: filter === null ? undefined : filter, filters, timerange, query, streams };
+  constructor(id: string, type: string, config: any, filter?: string, timerange?: TimeRange, query?: QueryString, streams?: Array<string>, filters?: FiltersType | Array<SearchFilter>) {
+    this._value = { id, type, config, filter: filter === null ? undefined : filter, filters: List(filters), timerange, query, streams };
   }
 
   get id(): string {

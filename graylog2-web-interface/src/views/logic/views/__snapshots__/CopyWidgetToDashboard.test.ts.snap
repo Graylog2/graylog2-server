@@ -79,7 +79,7 @@ Object {
             "visualization_config": null,
           },
           "filter": undefined,
-          "filters": undefined,
+          "filters": Immutable.List [],
           "id": "a8058a41-34ea-4846-83d0-1acc2fbc1d7f",
           "query": Object {
             "query_string": "",
@@ -106,7 +106,7 @@ Object {
             "visualization": "numeric",
           },
           "filter": undefined,
-          "filters": undefined,
+          "filters": Immutable.List [],
           "id": "dead-beef",
           "query": Object {
             "query_string": "",
