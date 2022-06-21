@@ -17,8 +17,10 @@
 package org.graylog.events.processor.storage;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog.events.event.EventWithContext;
+import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 
 import java.util.List;
 
@@ -37,6 +39,9 @@ public interface EventStorageHandler {
             property = Config.TYPE_FIELD,
             visible = true,
             defaultImpl = Config.FallbackEventStorageHandlerConfig.class)
+    @JsonSubTypes({
+            @JsonSubTypes.Type(value = PersistToStreamsStorageHandler.Config.class, name = PersistToStreamsStorageHandler.Config.TYPE_NAME)
+    })
     interface Config {
         String TYPE_FIELD = "type";
 

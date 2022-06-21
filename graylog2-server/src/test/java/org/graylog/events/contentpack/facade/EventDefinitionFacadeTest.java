@@ -16,8 +16,13 @@
  */
 package org.graylog.events.contentpack.facade;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -38,6 +43,7 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
+import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationFunction;
@@ -95,14 +101,14 @@ public class EventDefinitionFacadeTest {
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
-    private ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    private ObjectMapper objectMapper;
 
     private EventDefinitionFacade facade;
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+    private MongoJackObjectMapperProvider mapperProvider;
 
     @Mock
     private DBEventProcessorStateService stateService;
@@ -124,11 +130,14 @@ public class EventDefinitionFacadeTest {
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
+        objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(
                 AggregationEventProcessorConfig.class,
                 PersistToStreamsStorageHandler.Config.class,
                 TemplateFieldValueProvider.Config.class,
                 AggregationEventProcessorConfigEntity.class);
+        mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+
         stateService = mock(DBEventProcessorStateService.class);
         jobDefinitionService = mock(DBJobDefinitionService.class);
         jobTriggerService = mock(DBJobTriggerService.class);

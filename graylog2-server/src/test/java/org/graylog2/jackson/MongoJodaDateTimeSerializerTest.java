@@ -34,7 +34,7 @@ public class MongoJodaDateTimeSerializerTest {
         final String valueAsString = objectMapper.writeValueAsString(testBean);
         assertThat(valueAsString)
                 .isNotNull()
-                .isEqualTo("{\"date_time\":\"2016-12-13T14:00:00.000+0000\"}");
+                .isEqualTo("{\"date_time\":\"2016-12-13T14:00:00.000+00:00\"}");
     }
 
     @Test

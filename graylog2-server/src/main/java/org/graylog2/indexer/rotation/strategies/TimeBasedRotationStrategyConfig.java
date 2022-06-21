@@ -47,7 +47,6 @@ public abstract class TimeBasedRotationStrategyConfig implements RotationStrateg
         return new AutoValue_TimeBasedRotationStrategyConfig(type, maxTimePerIndex, maxRotationPeriod);
     }
 
-    @JsonCreator
     public static TimeBasedRotationStrategyConfig create(@JsonProperty("rotation_period") @NotNull Period maxTimePerIndex,
                                                          @JsonProperty("max_rotation_period") Period maxRotationPeriod) {
         return create(TimeBasedRotationStrategyConfig.class.getCanonicalName(), maxTimePerIndex, maxRotationPeriod);
