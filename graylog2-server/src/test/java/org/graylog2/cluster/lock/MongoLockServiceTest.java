@@ -71,7 +71,7 @@ public abstract class MongoLockServiceTest {
             assertThat(l.resource()).isEqualTo(orig.resource());
             assertThat(l.lockedBy()).isEqualTo(orig.lockedBy());
             assertThat(l.createdAt()).isEqualTo(orig.createdAt());
-            assertThat(l.updatedAt()).isAfter(orig.updatedAt());
+            assertThat(l.updatedAt()).isAfterOrEqualTo(orig.updatedAt());
         });
     }
 
