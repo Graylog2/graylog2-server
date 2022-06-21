@@ -30,11 +30,15 @@ class LookupTable extends React.Component {
     dataAdapter: PropTypes.object.isRequired,
   };
 
-  state = {
-    lookupKey: null,
-    lookupResult: null,
-    purgeKey: null,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      lookupKey: null,
+      lookupResult: null,
+      purgeKey: null,
+    };
+  }
 
   _onChange = (event) => {
     this.setState({ lookupKey: FormsUtils.getValueFromInput(event.target) });
