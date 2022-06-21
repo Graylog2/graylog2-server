@@ -109,30 +109,41 @@ class GrokPatternFilter extends React.Component {
   render() {
     const { activeListItem, patternFilter } = this.state;
     const { addToPattern, patterns } = this.props;
-    const regExp = RegExp(patternFilter, 'i');
+    let regExp;
+    let regExpError;
+
+    try {
+      regExp = RegExp(patternFilter, 'i');
+    } catch (error) {
+      regExpError = error?.message;
+    }
 
     this.shownListItems = [];
-    const patternsToDisplay = patterns.filter((displayedPattern) => regExp.test(displayedPattern.name))
-      .map((displayedPattern, index) => {
-        const active = index === activeListItem;
+    let patternsToDisplay = [];
 
-        this.shownListItems.push(displayedPattern.name);
+    if (!regExpError) {
+      patternsToDisplay = patterns.filter((displayedPattern) => regExp.test(displayedPattern.name))
+        .map((displayedPattern, index) => {
+          const active = index === activeListItem;
 
-        return (
-          <ListGroupItem id={`list-item-${index}`}
-                         header={displayedPattern.name}
-                         bsStyle={active ? 'info' : undefined}
-                         onKeyDown={this._onPatternFilterKeyDown}
-                         key={displayedPattern.name}>
-            <span className={GrokPatternFilterStyle.patternDisplay}>{displayedPattern.pattern}</span>
-            <span className={GrokPatternFilterStyle.addButton}>
-              <Button bsSize="xsmall" bsStyle="primary" onClick={() => { addToPattern(displayedPattern.name); }}>
-                Add
-              </Button>
-            </span>
-          </ListGroupItem>
-        );
-      });
+          this.shownListItems.push(displayedPattern.name);
+
+          return (
+            <ListGroupItem id={`list-item-${index}`}
+                           header={displayedPattern.name}
+                           bsStyle={active ? 'info' : undefined}
+                           onKeyDown={this._onPatternFilterKeyDown}
+                           key={displayedPattern.name}>
+              <span className={GrokPatternFilterStyle.patternDisplay}>{displayedPattern.pattern}</span>
+              <span className={GrokPatternFilterStyle.addButton}>
+                <Button bsSize="xsmall" bsStyle="primary" onClick={() => { addToPattern(displayedPattern.name); }}>
+                  Add
+                </Button>
+              </span>
+            </ListGroupItem>
+          );
+        });
+    }
 
     return (
       <>
@@ -143,8 +154,9 @@ class GrokPatternFilter extends React.Component {
                autoComplete="off"
                formGroupClassName={GrokPatternFilterStyle.filterFormGroup}
                onKeyDown={this._onPatternFilterKeyDown}
-               value={patternFilter} />
-        <ListGroup bsClass={GrokPatternFilterStyle.resultList}>{patternsToDisplay}</ListGroup>
+               value={patternFilter}
+               error={regExpError} />
+        {!regExpError && <ListGroup bsClass={GrokPatternFilterStyle.resultList}>{patternsToDisplay}</ListGroup>}
       </>
     );
   }
