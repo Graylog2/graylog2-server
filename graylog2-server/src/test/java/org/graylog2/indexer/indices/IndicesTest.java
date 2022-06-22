@@ -23,6 +23,7 @@ import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexTemplateNotFoundException;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
@@ -35,8 +36,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.ZonedDateTime;
+import java.util.Collections;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -107,6 +111,20 @@ class IndicesTest {
         assertThatCode(() -> underTest.ensureIndexTemplate(indexSetConfig("test",
                 "test-template", "custom")))
                 .doesNotThrowAnyException();
+    }
+
+    @Test
+    public void testGetIndicesBlocksStatusReturnsNoBlocksOnNullIndicesList() {
+        final IndicesBlockStatus indicesBlocksStatus = underTest.getIndicesBlocksStatus(null);
+        assertNotNull(indicesBlocksStatus);
+        assertEquals(0, indicesBlocksStatus.countBlockedIndices());
+    }
+
+    @Test
+    public void testGetIndicesBlocksStatusReturnsNoBlocksOnEmptyIndicesList() {
+        final IndicesBlockStatus indicesBlocksStatus = underTest.getIndicesBlocksStatus(Collections.emptyList());
+        assertNotNull(indicesBlocksStatus);
+        assertEquals(0, indicesBlocksStatus.countBlockedIndices());
     }
 
     private TestIndexSet indexSetConfig(String indexPrefix, String indexTemplaNameName, String indexTemplateType) {
