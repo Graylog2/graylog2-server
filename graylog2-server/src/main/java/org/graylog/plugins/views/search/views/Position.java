@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.views;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public class Position {
@@ -24,22 +25,29 @@ public class Position {
         return new Infinity();
     }
 
+    @JsonCreator
     public static Position fromInt(int value) {
         return new NumberPosition(value);
     }
 
     @JsonCreator
-    public static Position fromJson(Object value) {
-        if (value instanceof Number && !value.equals(Infinity.value)) {
-            return fromInt(((Number) value).intValue());
-        }
-        if (value instanceof Double && value.equals(Infinity.value)) {
+    public static Position fromDouble(Double value) {
+        if (value.equals(Infinity.value)) {
             return infinity();
         }
-        if (value instanceof String && value.equals("Infinity")) {
+        else {
+            return new NumberPosition(value.intValue());
+        }
+    }
+
+    @JsonCreator
+    public static Position fromString(String value) {
+        if (value.equals("Infinity")) {
             return infinity();
         }
-        throw new IllegalArgumentException("Unable to deserialize " + value + " to Position.");
+        else {
+            throw new IllegalArgumentException("Unable to deserialize " + value + " to Position.");
+        }
     }
 }
 
