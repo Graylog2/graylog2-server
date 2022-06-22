@@ -575,6 +575,9 @@ public class IndicesAdapterES6 implements IndicesAdapter {
 
     @Override
     public IndicesBlockStatus getIndicesBlocksStatus(final List<String> indices) {
+        if (indices == null || indices.isEmpty()) {
+            throw new IllegalArgumentException("Expecting list of indices with at least one index present.");
+        }
         final GetSettings request = new GetSettings.Builder()
                 .addIndex(indices)
                 .build();
