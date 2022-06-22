@@ -2866,9 +2866,9 @@
     "@types/react" "*"
 
 "@types/react-plotly.js@^2.5.0":
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/@types/react-plotly.js/-/react-plotly.js-2.5.0.tgz#bf7793ed16db13a2bd775ff8fa8f9595e82e8597"
-  integrity sha512-bda7N/Y65d1x0FfwhgUXAugGeG9CRIxmkW/yBL8PVFUMvZGpfEnw4bXKjDozBYlOskVfxj6UQ9IKmZI6CZ7/QQ==
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/@types/react-plotly.js/-/react-plotly.js-2.5.1.tgz#0d204789b3169755c1216fdd2f5f96a5bba0216f"
+  integrity sha512-e9sjVl6qEkpMx4l1YRiQZJqTUh1YuyppqgMmZ9S/oT4QYb5MKBWsQLBdFH6OxxRWIyoNO0ypzkAaarrwWJK2eA==
   dependencies:
     "@types/plotly.js" "*"
     "@types/react" "*"
@@ -2935,10 +2935,10 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*":
-  version "17.0.3"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.3.tgz#ba6e215368501ac3826951eef2904574c262cc79"
-  integrity sha512-wYOUxIgs2HZZ0ACNiIayItyluADNbONl7kt8lkLjVK8IitMH5QMyAh75Fwhmo37r1m7L2JaFj03sIfxBVDvRAg==
+"@types/react@*", "@types/react@^17":
+  version "17.0.44"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.44.tgz#c3714bd34dd551ab20b8015d9d0dbec812a51ec7"
+  integrity sha512-Ye0nlw09GeMp2Suh8qoOv0odfgCoowfM/9MG6WeRD60Gq9wS90bdkdRtYbRkNhXOpG4H+YXGvj4wOWhAC0LJ1g==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
@@ -2960,15 +2960,6 @@
   dependencies:
     "@types/prop-types" "*"
     csstype "^2.2.0"
-
-"@types/react@^17":
-  version "17.0.44"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.44.tgz#c3714bd34dd551ab20b8015d9d0dbec812a51ec7"
-  integrity sha512-Ye0nlw09GeMp2Suh8qoOv0odfgCoowfM/9MG6WeRD60Gq9wS90bdkdRtYbRkNhXOpG4H+YXGvj4wOWhAC0LJ1g==
-  dependencies:
-    "@types/prop-types" "*"
-    "@types/scheduler" "*"
-    csstype "^3.0.2"
 
 "@types/reactcss@*":
   version "1.2.4"
@@ -7378,12 +7369,13 @@ grapheme-splitter@^1.0.4:
     "@types/create-react-class" "15.6.3"
     "@types/jquery" "3.5.14"
     "@types/react" "18.0.18"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-274f056e-8f18-4385-b859-9a7deba5161c-1662630721960/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-274f056e-8f18-4385-b859-9a7deba5161c-1662630721960/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-274f056e-8f18-4385-b859-9a7deba5161c-1662630721960/node_modules/jest-preset-graylog"
+    javascript-natural-sort "0.7.1"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.6.1"
     moment "2.29.4"
     moment-timezone "0.5.37"
