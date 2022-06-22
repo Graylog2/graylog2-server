@@ -92,9 +92,9 @@ public class GeoIpResolverEngine {
                 continue;
             }
 
-            //IF the user has opted NOT to enforce the Graylog Schema, the key will likely not
-            //be in the field map--in such cases use the key (full field name) as the prefix
-            final String prefix = ipAddressFields.getOrDefault(key, key);
+            // IF the user has opted NOT to enforce the Graylog Schema, the key will likely not
+            // be in the field map--in such cases use the key (full field name) as the prefix.
+            final String prefix = enforceGraylogSchema ? ipAddressFields.getOrDefault(key, key) : key;
 
             if (ReservedIpChecker.getInstance().isReservedIpAddress(address.getHostAddress())) {
                 message.addField(prefix + "_reserved_ip", true);
