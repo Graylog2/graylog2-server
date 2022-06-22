@@ -76,7 +76,7 @@ public abstract class CreateJobTriggerRequest {
 
     public JobTriggerDto toDto(JobSchedulerClock clock) {
         return JobTriggerDto.builderWithClock(clock)
-                .type(EventProcessorExecutionJob.TYPE_NAME)
+                .jobDefinitionType(EventProcessorExecutionJob.TYPE_NAME)
                 .jobDefinitionId(jobDefinitionId())
                 .startTime(startTime())
                 .endTime(endTime().orElse(null))

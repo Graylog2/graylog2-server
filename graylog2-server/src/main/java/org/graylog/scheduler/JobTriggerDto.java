@@ -36,7 +36,7 @@ import java.util.Set;
 public abstract class JobTriggerDto {
     public static final String FIELD_ID = "_id";
 
-    public static final String FIELD_TYPE = "type";
+    public static final String FIELD_JOB_DEFINITION_TYPE = "job_definition_type";
     public static final String FIELD_JOB_DEFINITION_ID = "job_definition_id";
     static final String FIELD_START_TIME = "start_time";
     static final String FIELD_END_TIME = "end_time";
@@ -57,9 +57,9 @@ public abstract class JobTriggerDto {
     @JsonProperty(FIELD_ID)
     public abstract String id();
 
-    @JsonProperty(FIELD_TYPE)
+    @JsonProperty(FIELD_JOB_DEFINITION_TYPE)
     @Nullable
-    public abstract String type();
+    public abstract String jobDefinitionType();
     @JsonProperty(FIELD_JOB_DEFINITION_ID)
     public abstract String jobDefinitionId();
 
@@ -134,8 +134,8 @@ public abstract class JobTriggerDto {
         @JsonProperty(FIELD_ID)
         public abstract Builder id(String id);
 
-        @JsonProperty(FIELD_TYPE)
-        public abstract Builder type(@Nullable String type);
+        @JsonProperty(FIELD_JOB_DEFINITION_TYPE)
+        public abstract Builder jobDefinitionType(@Nullable String type);
 
         @JsonProperty(FIELD_JOB_DEFINITION_ID)
         public abstract Builder jobDefinitionId(String jobDefinitionId);

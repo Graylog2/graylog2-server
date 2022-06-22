@@ -85,7 +85,7 @@ public class EventNotificationHandler {
                 }
                 try {
                     final JobTriggerDto trigger = jobTriggerService.create(JobTriggerDto.builder()
-                            .type(EventNotificationExecutionJob.TYPE_NAME)
+                            .jobDefinitionType(EventNotificationExecutionJob.TYPE_NAME)
                             .jobDefinitionId(jobDefinition.get().id())
                             .schedule(OnceJobSchedule.create())
                             .data(notificationConfig.toJobTriggerData(event.toDto()))
