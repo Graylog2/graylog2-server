@@ -18,12 +18,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 type Props = {
+  href: string,
   children: React.ReactNode,
 }
 
-const EnterpriseProductLink = ({ children }: Props) => {
+const EnterpriseProductLink = ({ href, children }: Props) => {
   return (
-    <a href="https://www.graylog.org/products/enterprise"
+    <a href={href}
        rel="noopener noreferrer"
        target="_blank">
       {children}

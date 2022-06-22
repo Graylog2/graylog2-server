@@ -55,7 +55,8 @@ const EnterprisePage = () => {
 
           <span>
             Graylog Enterprise adds commercial functionality to the Open Source Graylog core. You can learn more
-            about Graylog Enterprise on the <EnterpriseProductLink>product page</EnterpriseProductLink>.
+            about Graylog Enterprise on the&nbsp;
+            <EnterpriseProductLink href="https://www.graylog.org/products/enterprise">product page</EnterpriseProductLink>.
           </span>
         </PageHeader>
 

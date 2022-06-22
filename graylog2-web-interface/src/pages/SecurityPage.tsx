@@ -16,60 +16,74 @@
  */
 
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import { IfPermitted } from 'components/common';
-import { Alert } from 'components/bootstrap';
-import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
-import AppConfig from 'util/AppConfig';
+import { Col, Row } from 'components/bootstrap';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { NodesStore } from 'stores/nodes/NodesStore';
+import PluginList from 'components/enterprise/PluginList';
+import ProductLink from 'components/enterprise/ProductLink';
+import { GraylogClusterOverview } from 'components/cluster';
+import HideOnCloud from 'util/conditional/HideOnCloud';
+import { useStore } from 'stores/connect';
+import EnterpriseProductLink from 'components/enterprise/EnterpriseProductLink';
 
-const StyledH2 = styled.h2`
-  font-weight: bold;
-  margin-bottom: 15px;
-`;
-
-const StyledH4 = styled.h4`
-  font-weight: bold;
+const StyledHeader = styled.h2`
   margin-bottom: 10px;
 `;
 
-const StyledAlert = styled(Alert)`
-  margin-top: 15px;
-`;
-
-const isCloud = AppConfig.isCloud();
-
-const LinkTo = () => {
-  if (Routes.pluginRoute('SYSTEM_LICENSES', false)) {
-    return (
-      <IfPermitted permissions="licenses:create">
-        <p>
-          See <Link to={Routes.pluginRoute('SYSTEM_LICENSES')}>Licenses page</Link> for details.
-        </p>
-      </IfPermitted>
-    );
-  }
-
-  return (
-    <p>
-      Please see <a href="https://www.graylog.org/products/enterprise" rel="noopener noreferrer" target="_blank">our product page</a> for details.
-    </p>
-  );
-};
+const BiggerFontSize = styled.div(({ theme }) => css`
+  font-size: ${theme.fonts.size.large};
+`);
 
 const SecurityPage = () => {
+  const nodes = useStore(NodesStore);
+
+  if (!nodes) {
+    return <Spinner />;
+  }
+
+  const { clusterId } = nodes;
+
   return (
-    <StyledAlert bsStyle="danger" className="tm">
-      <StyledH2>Invalid License for the Security plugin</StyledH2>
-      <StyledH4>Security plugin is disabled</StyledH4>
-      <p>
-        The security plugin is disabled because a valid Graylog for Security license was not found{Routes.pluginRoute('SYSTEM_LICENSES', false) ? '' : ' and the enterprise plugin is not installed'}.
-      </p>
-      {isCloud
-        ? (<>Contact your Graylog account manager.</>)
-        : (<LinkTo />)}
-    </StyledAlert>
+    <DocumentTitle title="Try Graylog Security">
+      <div>
+        <PageHeader title="Try Graylog Security">
+          {null}
+          <span>
+            Extend Graylog's capabilities for detecting, investigating, and responding to cybersecurity
+            threats with security-specific dashboards and alerts, anomaly detection AI/ML engine, integrations with
+            other security tools, SOAR capabilities, and numerous compliance reporting features. You can learn more
+            about Graylog Security on the&nbsp;
+            <EnterpriseProductLink href="https://www.graylog.org/products/security">
+              product page
+            </EnterpriseProductLink>.
+          </span>
+        </PageHeader>
+        <GraylogClusterOverview layout="compact">
+          <PluginList />
+        </GraylogClusterOverview>
+        <HideOnCloud>
+          <Row className="content">
+            <Col md={12}>
+              <StyledHeader>Graylog Security</StyledHeader>
+              <BiggerFontSize>
+                <p>
+                  Graylog Security is built on the Graylog platform. It combines the key features and functionality that set
+                  us apart from the competition with SIEM, Security Analytics, & Anomaly Detection capabilities. IT security
+                  teams get a superior cybersecurity platform designed to overcome legacy SIEM challenges. Your job becomes
+                  easier. You can tackle critical activities faster. And you have the confidence and expertise to mitigate
+                  risks caused by insider threats and credential-based attacks.
+                </p>
+                <ProductLink href="https://go2.graylog.org/request-graylog-security" clusterId={clusterId}>
+                  Request now
+                </ProductLink>
+              </BiggerFontSize>
+            </Col>
+          </Row>
+        </HideOnCloud>
+      </div>
+    </DocumentTitle>
   );
 };
 
