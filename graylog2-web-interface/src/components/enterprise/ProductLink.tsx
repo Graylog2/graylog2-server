@@ -34,7 +34,7 @@ const ProductLink = ({ href, clusterId, children } : Props) => {
 
   return (
     <ButtonToolbar>
-      <Button type="link"
+      <Button type="button"
               target="_blank"
               rel="noopener noreferrer"
               href={hrefWithParam}

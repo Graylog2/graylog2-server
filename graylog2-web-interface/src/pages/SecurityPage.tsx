@@ -51,7 +51,7 @@ const SecurityPage = () => {
         <PageHeader title="Try Graylog Security">
           {null}
           <span>
-            Extend Graylog's capabilities for detecting, investigating, and responding to cybersecurity
+            Extend Graylog&apos;s capabilities for detecting, investigating, and responding to cybersecurity
             threats with security-specific dashboards and alerts, anomaly detection AI/ML engine, integrations with
             other security tools, SOAR capabilities, and numerous compliance reporting features. You can learn more
             about Graylog Security on the&nbsp;
