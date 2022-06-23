@@ -210,9 +210,9 @@ class ExpandableListItem extends React.Component<Props, State> {
     }
   };
 
-  _filterInputProps = (props) => {
+  _filterInputProps = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { expanded, indetermined, stayExpanded, padded, ...inputProps } = props;
+    const { expanded, indetermined, stayExpanded, padded, checked, expandable, selectable, header, subheader, children, ...inputProps } = this.props;
 
     return inputProps;
   };
@@ -225,10 +225,9 @@ class ExpandableListItem extends React.Component<Props, State> {
 
   render() {
     const { expanded } = this.state;
-    const { padded } = this.props;
-    const { checked, expandable, selectable, header, subheader, children, ...otherProps } = this.props;
+    const { padded, checked, expandable, selectable, header, subheader, children } = this.props;
     const headerToRender = selectable ? (<Header type="button" tabIndex={0} onClick={this._clickOnHeader}>{header}</Header>) : header;
-    const inputProps = this._filterInputProps(otherProps);
+    const inputProps = this._filterInputProps();
 
     return (
       <ItemWrap padded={padded}>
