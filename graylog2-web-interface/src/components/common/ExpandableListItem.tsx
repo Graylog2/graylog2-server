@@ -27,6 +27,7 @@ const ItemWrap = styled.li(({ padded }: { padded: boolean }) => css`
 `);
 
 const Container = styled.div(({ theme }) => css`
+  display: flex;
   font-size: ${theme.fonts.size.body};
   line-height: 20px;
 
@@ -76,6 +77,7 @@ const HeaderWrap = styled.span(({ theme }) => css`
 `);
 
 const Header = styled.button`
+  display: flex;
   border: 0;
   padding: 0;
   text-align: left;
