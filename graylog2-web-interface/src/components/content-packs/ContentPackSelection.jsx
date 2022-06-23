@@ -18,6 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
 import { cloneDeep } from 'lodash';
+import styled from 'styled-components';
 
 import { ExpandableList, ExpandableListItem, Icon, SearchForm } from 'components/common';
 import { Col, HelpBlock, Panel, Row, Input } from 'components/bootstrap';
@@ -26,6 +27,15 @@ import Entity from 'logic/content-packs/Entity';
 import { hasAcceptedProtocol } from 'util/URLUtils';
 
 import style from './ContentPackSelection.css';
+
+const HeaderText = styled.span`
+  overflow-wrap: anywhere;
+`;
+
+const HeaderIcon = styled(Icon)`
+  padding-top: 3px;
+  padding-right: 3px;
+`;
 
 class ContentPackSelection extends React.Component {
   static propTypes = {
@@ -228,11 +238,11 @@ class ContentPackSelection extends React.Component {
 
   _entityItemHeader = (entity) => {
     if (entity instanceof Entity) {
-      return <span><Icon name="archive" className={style.contentPackEntity} />{' '}<span>{entity.title}</span></span>;
+      return <><HeaderIcon name="archive" className={style.contentPackEntity} />{' '}<span>{entity.title}</span></>;
     }
 
-    return <span><Icon name="server" />{' '}<span>{entity.title}</span></span>;
-  };
+    return <><HeaderIcon name="server" />{' '}<HeaderText>{entity.title}</HeaderText></>;
+    };
 
   render() {
     const { filteredEntities = {}, errors, isFiltered, contentPack } = this.state;
