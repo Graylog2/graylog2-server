@@ -34,7 +34,7 @@ import java.util.Set;
 @AutoValue
 @JsonDeserialize(builder = JobTriggerDto.Builder.class)
 public abstract class JobTriggerDto {
-    public static final String FIELD_ID = "_id";
+    public static final String FIELD_ID = "id";
 
     public static final String FIELD_JOB_DEFINITION_TYPE = "job_definition_type";
     public static final String FIELD_JOB_DEFINITION_ID = "job_definition_id";
