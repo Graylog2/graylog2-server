@@ -16,9 +16,6 @@
  */
 package org.graylog.scheduler;
 
-import com.cronutils.builder.CronBuilder;
-import com.cronutils.model.Cron;
-import com.cronutils.model.definition.CronDefinitionBuilder;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.scheduler.schedule.CronJobSchedule;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
@@ -31,10 +28,6 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.cronutils.model.CronType.QUARTZ;
-import static com.cronutils.model.field.expression.FieldExpressionFactory.always;
-import static com.cronutils.model.field.expression.FieldExpressionFactory.on;
-import static com.cronutils.model.field.expression.FieldExpressionFactory.questionMark;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class JobScheduleStrategiesTest {
@@ -96,27 +89,6 @@ public class JobScheduleStrategiesTest {
                     assertThat(dateTime.getZone()).isEqualTo(DateTimeZone.forID("Europe/Vienna"));
                     assertThat(dateTime.toString(DATE_FORMAT)).isEqualTo("14/06/2022 01:00:00");
                 });
-    }
-
-    @Test
-    public void nextTimeCronWithEndTime() {
-        final DateTime endTime = DateTime.parse("13/06/2022 00:00:00", DATE_FORMAT);
-
-        // TODO: do I have to manually assign the end time in the lock?
-        final JobTriggerLock lock = JobTriggerLock.builder().lastLockTime(endTime).build();
-
-        final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
-                .jobDefinitionId("abc-123")
-                .endTime(endTime)
-                .schedule(CronJobSchedule.builder()
-                        .cronExpression("0 0 1 * * ? *")
-                        .timezone("Europe/Vienna")
-                        .build())
-                .lock(lock)
-                .build();
-
-        // it should not be running anymore
-        assertThat(strategies.nextTime(trigger)).isNotPresent();
     }
 
     @Test

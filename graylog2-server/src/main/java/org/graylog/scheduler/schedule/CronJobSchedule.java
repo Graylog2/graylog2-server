@@ -62,21 +62,15 @@ public abstract class CronJobSchedule implements JobSchedule {
     }
 
     @Override
-    public Optional<DateTime> calculateNextTime(DateTime lastExecutionTime, DateTime lastNextTime, JobSchedulerClock clock) {
+    public Optional<DateTime> calculateNextTime(DateTime previousExecutionTime, DateTime lastNextTime, JobSchedulerClock clock) {
         final Cron cron = newCronParser().parse(cronExpression());
         final ExecutionTime executionTime = ExecutionTime.forCron(cron);
 
         ZonedDateTime zdt = getZonedDateTime(clock);
 
-        final Optional<ZonedDateTime> nextExecution = executionTime.nextExecution(zdt);
-
-        return nextExecution
-                .map(this::toDateTime)
-                .filter(t -> isBeforeLastExecution(t, lastExecutionTime));
-    }
-
-    private boolean isBeforeLastExecution(DateTime nextExecution, DateTime lastExecutionTime) {
-        return lastExecutionTime == null || nextExecution.isBefore(lastExecutionTime);
+        return executionTime
+                .nextExecution(zdt)
+                .map(this::toDateTime);
     }
 
     private ZonedDateTime getZonedDateTime(JobSchedulerClock clock) {
