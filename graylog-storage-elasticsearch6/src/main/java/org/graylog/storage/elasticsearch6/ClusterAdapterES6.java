@@ -92,8 +92,21 @@ public class ClusterAdapterES6 implements ClusterAdapter {
                 final String host = jsonElement.path("host").asText(null);
                 final String ip = jsonElement.path("ip").asText();
                 final JsonNode fileDescriptorMax = jsonElement.path("fileDescriptorMax");
-                final Long maxFileDescriptors = fileDescriptorMax.isLong() ? fileDescriptorMax.asLong() : null;
-                setBuilder.add(NodeFileDescriptorStats.create(name, ip, host, maxFileDescriptors));
+                if (!fileDescriptorMax.isLong()) {
+                    try {
+                        //try parsing the String, it may represent a Long value
+                        setBuilder.add(NodeFileDescriptorStats.create(name, ip, host, Long.parseLong(fileDescriptorMax.asText())));
+                    } catch (Exception e) {
+                        StringBuilder sb = new StringBuilder("{");
+                        sb.append("name = ").append(name);
+                        sb.append(", host = ").append(host);
+                        sb.append(", ip = ").append(ip);
+                        sb.append("}");
+                        LOG.info("_cat/nodes API has returned a node without disk statistics: " + sb);
+                    }
+                } else {
+                    setBuilder.add(NodeFileDescriptorStats.create(name, ip, host, fileDescriptorMax.asLong()));
+                }
             }
         }
 
@@ -106,17 +119,29 @@ public class ClusterAdapterES6 implements ClusterAdapter {
         final ImmutableSet.Builder<NodeDiskUsageStats> setBuilder = ImmutableSet.builder();
         for (JsonNode jsonElement : nodes) {
             if (jsonElement.isObject()) {
-                setBuilder.add(
-                        NodeDiskUsageStats.create(
-                                jsonElement.path("name").asText(),
-                                jsonElement.path("role").asText(),
-                                jsonElement.path("ip").asText(),
-                                jsonElement.path("host").asText(null),
-                                jsonElement.path("diskUsed").asText(),
-                                jsonElement.path("diskTotal").asText(),
-                                jsonElement.path("diskUsedPercent").asDouble(NodeDiskUsageStats.DEFAULT_DISK_USED_PERCENT)
-                        )
-                );
+                final JsonNode diskUsed = jsonElement.path("diskUsed");
+                final JsonNode diskTotal = jsonElement.path("diskTotal");
+                if (!diskTotal.isMissingNode() && !diskUsed.isMissingNode()) {
+                    setBuilder.add(
+                            NodeDiskUsageStats.create(
+                                    jsonElement.path("name").asText(),
+                                    jsonElement.path("role").asText(),
+                                    jsonElement.path("ip").asText(),
+                                    jsonElement.path("host").asText(null),
+                                    diskUsed.asText(),
+                                    diskTotal.asText(),
+                                    jsonElement.path("diskUsedPercent").asDouble(NodeDiskUsageStats.DEFAULT_DISK_USED_PERCENT)
+                            )
+                    );
+                } else {
+                    StringBuilder sb = new StringBuilder("{");
+                    sb.append("name = ").append(jsonElement.path("name").asText());
+                    sb.append(", host = ").append(jsonElement.path("host").asText(null));
+                    sb.append(", ip = ").append(jsonElement.path("ip").asText());
+                    sb.append(", role = ").append(jsonElement.path("role").asText());
+                    sb.append("}");
+                    LOG.info("_cat/nodes API has returned a node without disk statistics: " + sb);
+                }
             }
         }
         return setBuilder.build();
