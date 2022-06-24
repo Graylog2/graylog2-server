@@ -37,6 +37,8 @@
     "extends": "graylog"
   },
   "dependencies": {
+    "@types/create-react-class": "15.6.3",
+    "@types/jquery": "3.5.14",
     "babel-preset-graylog": "file:../babel-preset-graylog",
     "create-react-class": "15.7.0",
     "eslint-config-graylog": "file:../eslint-config-graylog",
