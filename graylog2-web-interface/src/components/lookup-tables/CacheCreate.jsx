@@ -16,9 +16,9 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import naturalSort from 'javascript-natural-sort';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Select } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
 import { CacheForm } from 'components/lookup-tables';

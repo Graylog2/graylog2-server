@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import { useLocation } from 'react-router-dom';
-import naturalSort from 'javascript-natural-sort';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { LinkContainer } from 'components/common/router';
 import { appPrefixed } from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';

@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import moment from 'moment';
-import naturalSort from 'javascript-natural-sort';
+
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 
 // sortOrder: "asc"|"desc"
 export function sortByDate(d1, d2, sortOrder) {

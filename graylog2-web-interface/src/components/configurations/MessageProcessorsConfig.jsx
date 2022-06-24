@@ -18,8 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
-import naturalSort from 'javascript-natural-sort';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Button, Alert, Table } from 'components/bootstrap';
 import { IfPermitted, SortableList } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
