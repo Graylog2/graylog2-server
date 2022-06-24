@@ -199,7 +199,7 @@ const DashboardSearchBar = () => {
                           </ViewActionsWrapper>
                         )}
                       </BottomRow>
-                      <PluggableSearchBarControls />
+                      <PluggableSearchBarControls showLeftControls={false} />
                     </Container>
                   );
                 }}

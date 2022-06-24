@@ -248,6 +248,16 @@ export interface SearchBarControl {
   validationPayload: (values: CombinedSearchBarFormValues) => ({ [key: string]: any }),
 }
 
+export type SearchFilter = {
+  type: 'referenced' | 'inlineQueryString',
+  id?: string,
+  title?: string,
+  description?: string
+  queryString: string
+}
+
+export type FiltersType = Immutable.List<SearchFilter>
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;

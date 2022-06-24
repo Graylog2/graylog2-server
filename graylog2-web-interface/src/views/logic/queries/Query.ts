@@ -18,22 +18,13 @@ import * as Immutable from 'immutable';
 
 import isDeepEqual from 'stores/isDeepEqual';
 import generateId from 'logic/generateId';
+import type { FiltersType } from 'views/types';
 
 import type { SearchType } from './SearchType';
 
 export type QueryId = string;
 
 export type FilterType = Immutable.Map<string, any>;
-
-export type SearchFilter = {
-  type: 'referenced' | 'inlineQueryString',
-  id?: string,
-  title?: string,
-  description?: string
-  queryString: string
-}
-
-export type FiltersType = Immutable.List<SearchFilter>
 
 export type SearchTypeList = Array<SearchType>;
 type InternalBuilderState = Immutable.Map<string, any>;
