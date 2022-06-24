@@ -22,7 +22,7 @@ import lodash from 'lodash';
 import { MultiSelect } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 // TODO: This should be moved to a general place outside of `views`
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
 

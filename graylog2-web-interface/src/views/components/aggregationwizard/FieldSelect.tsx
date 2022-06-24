@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useContext, useMemo } from 'react';
 import * as Immutable from 'immutable';
 
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';

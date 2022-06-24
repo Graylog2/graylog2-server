@@ -19,7 +19,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import type * as Immutable from 'immutable';
 
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import SortableSelect from 'views/components/aggregationbuilder/SortableSelect';
