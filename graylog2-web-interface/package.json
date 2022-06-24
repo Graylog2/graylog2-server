@@ -64,7 +64,6 @@
     "immutable": "^3.8.1",
     "interactjs": "^1.4.0-rc.13",
     "intersection-observer": "^0.12.0",
-    "javascript-natural-sort": "^0.7.1",
     "leaflet": "^1.5.1",
     "lodash": "^4.17.4",
     "marked": "^4.0.10",
