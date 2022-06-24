@@ -29,7 +29,7 @@ type Props = {
   metricsUpdatedAt: number,
   name: string,
   zeroOnMissing: boolean,
-  children: React.ReactElement[],
+  children: React.ReactElement,
 };
 
 class MetricContainer extends React.Component<Props> {

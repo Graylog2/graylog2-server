@@ -36,10 +36,10 @@ type ComponentSupplier<TProps> = () => Promise<{ default: React.ComponentType<TP
 // eslint-disable-next-line react/jsx-no-useless-fragment
 const emptyPlaceholder = <></>;
 
-const loadAsync = <TProps, >(factory: ComponentSupplier<TProps>): React.ComponentType<TProps> => {
+const loadAsync = <TProps, >(factory: ComponentSupplier<TProps>): React.ComponentType<JSX.IntrinsicAttributes & React.PropsWithoutRef<TProps>> => {
   const Component = React.lazy(factory);
 
-  return (props: TProps) => (
+  return (props: JSX.IntrinsicAttributes & React.PropsWithoutRef<TProps>) => (
     <ErrorBoundary FallbackComponent={ErrorComponent}>
       <React.Suspense fallback={emptyPlaceholder}>
         <Component {...props} />
