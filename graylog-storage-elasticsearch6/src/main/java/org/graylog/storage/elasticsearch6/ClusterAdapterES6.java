@@ -96,7 +96,7 @@ public class ClusterAdapterES6 implements ClusterAdapter {
                     try {
                         //try parsing the String, it may represent a Long value
                         setBuilder.add(NodeFileDescriptorStats.create(name, ip, host, Long.parseLong(fileDescriptorMax.asText())));
-                    } catch (Exception e) {
+                    } catch (NumberFormatException e) {
                         StringBuilder sb = new StringBuilder("{");
                         sb.append("name = ").append(name);
                         sb.append(", host = ").append(host);
