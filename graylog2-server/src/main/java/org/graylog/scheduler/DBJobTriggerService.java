@@ -60,7 +60,7 @@ import static org.graylog.scheduler.JobSchedulerConfiguration.LOCK_EXPIRATION_DU
 // updates very carefully.
 public class DBJobTriggerService {
     private final static Logger LOG = LoggerFactory.getLogger(DBJobTriggerService.class);
-    static final String COLLECTION_NAME = "scheduler_triggers";
+    public static final String COLLECTION_NAME = "scheduler_triggers";
     private static final String FIELD_ID = "_id";
     static final String FIELD_JOB_DEFINITION_ID = JobTriggerDto.FIELD_JOB_DEFINITION_ID;
     private static final String FIELD_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_OWNER;

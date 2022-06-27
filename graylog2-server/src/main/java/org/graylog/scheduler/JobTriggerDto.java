@@ -58,7 +58,6 @@ public abstract class JobTriggerDto {
     public abstract String id();
 
     @JsonProperty(FIELD_JOB_DEFINITION_TYPE)
-    @Nullable
     public abstract String jobDefinitionType();
     @JsonProperty(FIELD_JOB_DEFINITION_ID)
     public abstract String jobDefinitionId();
@@ -135,7 +134,7 @@ public abstract class JobTriggerDto {
         public abstract Builder id(String id);
 
         @JsonProperty(FIELD_JOB_DEFINITION_TYPE)
-        public abstract Builder jobDefinitionType(@Nullable String type);
+        public abstract Builder jobDefinitionType(String type);
 
         @JsonProperty(FIELD_JOB_DEFINITION_ID)
         public abstract Builder jobDefinitionId(String jobDefinitionId);
