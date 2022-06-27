@@ -37,6 +37,14 @@ const HeaderIcon = styled(Icon)`
   padding-right: 3px;
 `;
 
+const _entityItemHeader = (entity) => {
+  if (entity instanceof Entity) {
+    return <><HeaderIcon name="archive" className={style.contentPackEntity} />{' '}<span>{entity.title}</span></>;
+  }
+
+  return <><HeaderIcon name="server" />{' '}<HeaderText>{entity.title}</HeaderText></>;
+};
+
 class ContentPackSelection extends React.Component {
   static propTypes = {
     contentPack: PropTypes.object.isRequired,
@@ -236,14 +244,6 @@ class ContentPackSelection extends React.Component {
     this.setState({ filteredEntities: filtered, isFiltered: true, filter: filter });
   };
 
-  _entityItemHeader = (entity) => {
-    if (entity instanceof Entity) {
-      return <><HeaderIcon name="archive" className={style.contentPackEntity} />{' '}<span>{entity.title}</span></>;
-    }
-
-    return <><HeaderIcon name="server" />{' '}<HeaderText>{entity.title}</HeaderText></>;
-    };
-
   render() {
     const { filteredEntities = {}, errors, isFiltered, contentPack } = this.state;
     const { edit } = this.props;
@@ -254,7 +254,7 @@ class ContentPackSelection extends React.Component {
         const group = filteredEntities[entityType];
         const entities = group.sort((a, b) => naturalSort(a.title, b.title)).map((entity) => {
           const checked = this._isSelected(entity);
-          const header = this._entityItemHeader(entity);
+          const header = _entityItemHeader(entity);
 
           return (
             <ExpandableListItem onChange={() => this._updateSelectionEntity(entity)}

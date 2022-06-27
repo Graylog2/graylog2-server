@@ -97,6 +97,13 @@ const ExpandableContent = styled.div(({ theme }) => css`
   padding-left: 5px;
 `);
 
+const _filterInputProps = (props) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { expanded, indetermined, stayExpanded, padded, ...inputProps } = props;
+
+  return inputProps;
+};
+
 type Props = React.ComponentProps<typeof Checkbox> & {
   header: React.ReactNode,
   checked?: boolean,
@@ -210,13 +217,6 @@ class ExpandableListItem extends React.Component<Props, State> {
     }
   };
 
-  _filterInputProps = (props) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { expanded, indetermined, stayExpanded, padded, ...inputProps } = props;
-
-    return inputProps;
-  };
-
   _clickOnHeader = () => {
     if (this._checkbox) {
       this._checkbox.click();
@@ -228,7 +228,7 @@ class ExpandableListItem extends React.Component<Props, State> {
     const { padded } = this.props;
     const { checked, expandable, selectable, header, subheader, children, ...otherProps } = this.props;
     const headerToRender = selectable ? (<Header type="button" tabIndex={0} onClick={this._clickOnHeader}>{header}</Header>) : header;
-    const inputProps = this._filterInputProps(otherProps);
+    const inputProps = _filterInputProps(otherProps);
 
     return (
       <ItemWrap padded={padded}>
