@@ -49,6 +49,7 @@ public class JobScheduleStrategiesTest {
     public void nextTime() {
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .schedule(IntervalJobSchedule.builder()
                         .interval(1)
                         .unit(TimeUnit.SECONDS)
@@ -95,6 +96,7 @@ public class JobScheduleStrategiesTest {
     public void nextFutureTime() {
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .schedule(IntervalJobSchedule.builder()
                         .interval(1)
                         .unit(TimeUnit.SECONDS)
