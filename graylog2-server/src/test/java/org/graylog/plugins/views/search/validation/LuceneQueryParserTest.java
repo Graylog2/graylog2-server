@@ -84,7 +84,7 @@ class LuceneQueryParserTest {
     @Test
     void testGtQuery() throws ParseException {
         final ParsedQuery query = parser.parse("http_response_code:>400");
-        assertThat(query.terms()).extracting(ParsedTerm::value).contains("400");
+        assertThat(query.terms()).extracting(ParsedTerm::value).contains(">400");
     }
 
     @Test
@@ -218,5 +218,13 @@ class LuceneQueryParserTest {
                 .isNotNull();
         assertThat(leadingWildcardsTolerantParser.parse("foo:?bar"))
                 .isNotNull();
+    }
+
+    @Test
+    void testFieldWithSpecialChars() throws ParseException {
+        final ParsedQuery query = parser.parse("_exists_:\"filebeat_@metadata_beat\"");
+        assertThat(query.allFieldNames())
+                .hasSize(1)
+                .allSatisfy(field -> assertThat(field).isEqualTo("filebeat_@metadata_beat"));
     }
 }

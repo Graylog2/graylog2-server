@@ -29,6 +29,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RequestOptions
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.ResponseException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.elasticsearch7.errors.ResponseError;
+import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
@@ -147,6 +148,9 @@ public class ElasticsearchClient {
                     throw InvalidWriteTargetException.create(target);
                 }
             }
+            if (isBatchSizeTooLargeException(elasticsearchException)) {
+                throw new BatchSizeTooLargeException(elasticsearchException.getMessage());
+            }
         }
         return new ElasticsearchException(errorMessage, e);
     }
@@ -170,8 +174,21 @@ public class ElasticsearchClient {
         }
     }
 
-    private boolean isIndexNotFoundException(ElasticsearchException e) {
-        return e.getMessage().contains("index_not_found_exception");
+    private boolean isIndexNotFoundException(ElasticsearchException elasticsearchException) {
+        return elasticsearchException.getMessage().contains("index_not_found_exception");
+    }
+
+    private boolean isBatchSizeTooLargeException(ElasticsearchException elasticsearchException) {
+        try {
+            final ParsedElasticsearchException parsedException = ParsedElasticsearchException.from(elasticsearchException.getMessage());
+            if (parsedException.type().equals("search_phase_execution_exception")) {
+                ParsedElasticsearchException parsedCause = ParsedElasticsearchException.from(elasticsearchException.getRootCause().getMessage());
+                return parsedCause.reason().contains("Batch size is too large");
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
     }
 
     public static RequestOptions withTimeout(RequestOptions requestOptions, Duration timeout) {

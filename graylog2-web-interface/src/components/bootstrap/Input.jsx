@@ -45,6 +45,7 @@ class Input extends React.Component {
     labelClassName: PropTypes.string,
     bsStyle: PropTypes.oneOf(['success', 'warning', 'error']),
     formGroupClassName: PropTypes.string,
+    inputDescClassName: PropTypes.string,
     value: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -79,6 +80,7 @@ class Input extends React.Component {
     labelClassName: undefined,
     name: undefined,
     formGroupClassName: undefined,
+    inputDescClassName: undefined,
     bsStyle: null,
     value: undefined,
     placeholder: '',
@@ -94,6 +96,7 @@ class Input extends React.Component {
     return this.input;
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   getValue = () => {
     const { type } = this.props;
 
@@ -110,39 +113,42 @@ class Input extends React.Component {
     }
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   getChecked = () => {
     return this.getInputDOMNode().checked;
   };
 
-  _renderFormControl = (componentClass, props, children) => {
+  _renderFormControl = (componentClass, controlProps, children) => {
     return (
-      <FormControl inputRef={(ref) => { this.input = ref; }} componentClass={componentClass} {...props}>
+      <FormControl inputRef={(ref) => { this.input = ref; }} componentClass={componentClass} {...controlProps}>
         {children}
       </FormControl>
     );
   };
 
-  _renderFormGroup = (
-    id,
-    validationState,
-    formGroupClassName,
-    wrapperClassName,
-    label,
-    labelClassName,
-    error,
-    help,
-    children,
-    addon,
-    button,
-  ) => {
+  _renderFormGroup = (children) => {
+    const {
+      id,
+      bsStyle,
+      formGroupClassName,
+      wrapperClassName,
+      inputDescClassName,
+      label,
+      labelClassName,
+      error,
+      help,
+      buttonAfter,
+      addonAfter,
+    } = this.props;
+
     let input;
 
-    if (addon || button) {
+    if (addonAfter || buttonAfter) {
       input = (
         <InputGroup>
           {children}
-          {button && <InputGroup.Button>{button}</InputGroup.Button>}
-          {addon && <InputGroup.Addon>{addon}</InputGroup.Addon>}
+          {buttonAfter && <InputGroup.Button>{buttonAfter}</InputGroup.Button>}
+          {addonAfter && <InputGroup.Addon>{addonAfter}</InputGroup.Addon>}
         </InputGroup>
       );
     } else {
@@ -150,47 +156,66 @@ class Input extends React.Component {
     }
 
     return (
-      <FormGroup controlId={id} validationState={error ? 'error' : validationState} bsClass={formGroupClassName}>
+      <FormGroup controlId={id} validationState={error ? 'error' : bsStyle} bsClass={formGroupClassName}>
         {label && <ControlLabel className={labelClassName}>{label}</ControlLabel>}
         <InputWrapper className={wrapperClassName}>
           {input}
-          <InputDescription error={error} help={help} />
+          <InputDescription error={error} help={help} className={inputDescClassName} />
         </InputWrapper>
       </FormGroup>
     );
   };
 
-  _renderCheckboxGroup = (id, validationState, formGroupClassName, wrapperClassName, label, error, help, props) => {
+  _renderCheckboxGroup = (controlProps) => {
+    const { id, bsStyle, formGroupClassName, inputDescClassName, wrapperClassName, label, error, help } = this.props;
+
     return (
-      <FormGroup controlId={id} validationState={error ? 'error' : validationState} bsClass={formGroupClassName}>
+      <FormGroup controlId={id} validationState={error ? 'error' : bsStyle} bsClass={formGroupClassName}>
         <InputWrapper className={wrapperClassName}>
-          <Checkbox inputRef={(ref) => { this.input = ref; }} {...props}>{label}</Checkbox>
-          <InputDescription error={error} help={help} />
+          <Checkbox inputRef={(ref) => { this.input = ref; }} {...controlProps}>{label}</Checkbox>
+          <InputDescription error={error} help={help} className={inputDescClassName} />
         </InputWrapper>
       </FormGroup>
     );
   };
 
-  _renderRadioGroup = (id, validationState, formGroupClassName, wrapperClassName, label, error, help, props) => {
+  _renderRadioGroup = (controlProps) => {
+    const { id, bsStyle, formGroupClassName, inputDescClassName, wrapperClassName, label, error, help } = this.props;
+
     return (
-      <FormGroup controlId={id} validationState={error ? 'error' : validationState} bsClass={formGroupClassName}>
+      <FormGroup controlId={id} validationState={error ? 'error' : bsStyle} bsClass={formGroupClassName}>
         <InputWrapper className={wrapperClassName}>
-          <Radio inputRef={(ref) => { this.input = ref; }} {...props}>{label}</Radio>
-          <InputDescription error={error} help={help} />
+          <Radio inputRef={(ref) => { this.input = ref; }} {...controlProps}>{label}</Radio>
+          <InputDescription error={error} help={help} className={inputDescClassName} />
         </InputWrapper>
       </FormGroup>
     );
   };
 
   render() {
-    const { id, type, bsStyle, formGroupClassName, wrapperClassName, label, labelClassName, name, error, help, children, addonAfter, buttonAfter, ...controlProps } = this.props;
+    const {
+      id,
+      type,
+      bsStyle,
+      formGroupClassName,
+      wrapperClassName,
+      label,
+      labelClassName, inputDescClassName,
+      name,
+      error,
+      help,
+      children,
+      addonAfter,
+      buttonAfter,
+      ...controlProps
+    } = this.props;
 
     controlProps.type = type;
     controlProps.label = label;
     controlProps.name = name || id;
 
     if (!type) {
-      return this._renderFormGroup(id, bsStyle, formGroupClassName, wrapperClassName, label, labelClassName, error, help, children);
+      return this._renderFormGroup(children);
     }
 
     switch (type) {
@@ -200,15 +225,15 @@ class Input extends React.Component {
       case 'number':
       case 'file':
       case 'tel':
-        return this._renderFormGroup(id, bsStyle, formGroupClassName, wrapperClassName, label, labelClassName, error, help, this._renderFormControl('input', controlProps), addonAfter, buttonAfter);
+        return this._renderFormGroup(this._renderFormControl('input', controlProps));
       case 'textarea':
-        return this._renderFormGroup(id, bsStyle, formGroupClassName, wrapperClassName, label, labelClassName, error, help, this._renderFormControl('textarea', controlProps));
+        return this._renderFormGroup(this._renderFormControl('textarea', controlProps));
       case 'select':
-        return this._renderFormGroup(id, bsStyle, formGroupClassName, wrapperClassName, label, labelClassName, error, help, this._renderFormControl('select', controlProps, children));
+        return this._renderFormGroup(this._renderFormControl('select', controlProps, children));
       case 'checkbox':
-        return this._renderCheckboxGroup(id, bsStyle, formGroupClassName, wrapperClassName, label, error, help, controlProps);
+        return this._renderCheckboxGroup(controlProps);
       case 'radio':
-        return this._renderRadioGroup(id, bsStyle, formGroupClassName, wrapperClassName, label, error, help, controlProps);
+        return this._renderRadioGroup(controlProps);
       default:
         // eslint-disable-next-line no-console
         console.warn(`Unsupported input type ${type}`);

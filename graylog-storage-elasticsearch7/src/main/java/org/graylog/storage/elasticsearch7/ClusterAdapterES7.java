@@ -104,7 +104,14 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     }
 
     private List<NodeResponse> nodes() {
-        return catApi.nodes();
+        final List<NodeResponse> allNodes = catApi.nodes();
+        final List<NodeResponse> nodesWithDiskStatistics = allNodes.stream().filter(NodeResponse::hasDiskStatistics).collect(Collectors.toList());
+        if (allNodes.size() != nodesWithDiskStatistics.size()) {
+            final List<NodeResponse> nodesWithMissingDiskStatistics = allNodes.stream().filter(nr -> !nr.hasDiskStatistics()).collect(Collectors.toList());
+            LOG.info("_cat/nodes API has returned " + nodesWithMissingDiskStatistics.size() + " nodes without disk statistics:");
+            nodesWithMissingDiskStatistics.forEach(node -> LOG.info(node.toString()));
+        }
+        return nodesWithDiskStatistics;
     }
 
     @Override
