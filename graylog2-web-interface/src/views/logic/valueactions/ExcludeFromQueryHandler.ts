@@ -21,7 +21,9 @@ import QueryManipulationHandler from './QueryManipulationHandler';
 
 export default class ExcludeFromQueryHandler extends QueryManipulationHandler {
   formatNewQuery = (oldQuery: string, field: string, value: any) => {
-    const fieldPredicate = `NOT ${field}:${escape(value)}`;
+    const fieldPredicate = value === '(Empty Value)'
+      ? `_exists_:${field}`
+      : `NOT ${field}:${escape(value)}`;
 
     return addToQuery(oldQuery, fieldPredicate);
   };

@@ -33,7 +33,9 @@ const formatNewQuery = (oldQuery: string, field: string, value: string, type: Fi
   const predicateValue = type.type === 'date'
     ? formatTimestampForES(value)
     : escape(value);
-  const fieldPredicate = `${field}:${predicateValue}`;
+  const fieldPredicate = value === '(Empty Value)'
+    ? `NOT _exists_:${field}`
+    : `${field}:${predicateValue}`;
 
   return addToQuery(oldQuery, fieldPredicate);
 };
