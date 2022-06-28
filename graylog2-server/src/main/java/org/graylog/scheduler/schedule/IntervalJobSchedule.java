@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.scheduler.JobSchedule;
+import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.joda.time.DateTime;
 
 import javax.validation.constraints.Min;
@@ -49,7 +50,7 @@ public abstract class IntervalJobSchedule implements JobSchedule {
 
     @JsonIgnore
     @Override
-    public Optional<DateTime> calculateNextTime(DateTime lastExecutionTime, DateTime lastNextTime) {
+    public Optional<DateTime> calculateNextTime(DateTime lastExecutionTime, DateTime lastNextTime, JobSchedulerClock clock) {
         return Optional.of(lastNextTime.plus(unit().toMillis(interval())));
     }
 
