@@ -165,6 +165,7 @@
         <validation-api.version>2.0.1.Final</validation-api.version>
         <zkclient.version>0.11</zkclient.version>
         <zookeeper.version>3.5.7</zookeeper.version>
+        <cron-utils.version>9.1.6</cron-utils.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
