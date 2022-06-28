@@ -20,13 +20,21 @@ import naturalSort from 'javascript-natural-sort';
 import { cloneDeep } from 'lodash';
 
 import { ExpandableList, ExpandableListItem, Icon, SearchForm } from 'components/common';
-import { Col, HelpBlock, Panel, Row, Input } from 'components/bootstrap';
+import { Col, HelpBlock, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import Entity from 'logic/content-packs/Entity';
 import { hasAcceptedProtocol } from 'util/URLUtils';
 import InputDescription from 'components/common/InputDescription';
 
 import style from './ContentPackSelection.css';
+
+const _entityItemHeader = (entity) => {
+  if (entity instanceof Entity) {
+    return <span><Icon name="archive" className={style.contentPackEntity} />{' '}<span>{entity.title}</span></span>;
+  }
+
+  return <span><Icon name="server" />{' '}<span>{entity.title}</span></span>;
+};
 
 class ContentPackSelection extends React.Component {
   static propTypes = {
@@ -61,7 +69,7 @@ class ContentPackSelection extends React.Component {
       filter: '',
       isFiltered: false,
       errors: {},
-      touched: {}
+      touched: {},
     };
   }
 
@@ -124,12 +132,13 @@ class ContentPackSelection extends React.Component {
   };
 
   _handleTouched = (name) => {
-    const touched = {
-      ...this.state.touched,
-      [name]: true,
-      selection: true,
-    }
-    this.setState({ touched }, this._validate);
+    this.setState((prevState) => ({
+      touched: {
+        ...prevState.touched,
+        [name]: true,
+        selection: true,
+      },
+    }), this._validate);
   };
 
   _error = (name) => {
@@ -243,14 +252,6 @@ class ContentPackSelection extends React.Component {
     this.setState({ filteredEntities: filtered, isFiltered: true, filter: filter });
   };
 
-  _entityItemHeader = (entity) => {
-    if (entity instanceof Entity) {
-      return <span><Icon name="archive" className={style.contentPackEntity} />{' '}<span>{entity.title}</span></span>;
-    }
-
-    return <span><Icon name="server" />{' '}<span>{entity.title}</span></span>;
-  };
-
   render() {
     const { filteredEntities = {}, errors, touched, isFiltered, contentPack } = this.state;
     const { edit } = this.props;
@@ -261,7 +262,7 @@ class ContentPackSelection extends React.Component {
         const group = filteredEntities[entityType];
         const entities = group.sort((a, b) => naturalSort(a.title, b.title)).map((entity) => {
           const checked = this._isSelected(entity);
-          const header = this._entityItemHeader(entity);
+          const header = _entityItemHeader(entity);
 
           return (
             <ExpandableListItem onChange={() => this._updateSelectionEntity(entity)}
