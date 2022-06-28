@@ -127,6 +127,7 @@ class ContentPackSelection extends React.Component {
     const touched = {
       ...this.state.touched,
       [name]: true,
+      selection: true,
     }
     this.setState({ touched }, this._validate);
   };
@@ -371,7 +372,6 @@ class ContentPackSelection extends React.Component {
             <SearchForm id="filter-input"
                         onSearch={this._onSetFilter}
                         onReset={this._onClearFilter}
-                        onBlur={() => this._handleTouched('selection')}
                         searchButtonLabel="Filter" />
           </Col>
         </Row>
