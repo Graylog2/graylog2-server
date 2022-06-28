@@ -128,8 +128,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation("Get an event definition")
     public EventDefinitionDto get(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, definitionId);
-        return dbService.get(definitionId)
+        EventDefinitionDto dto = dbService.get(definitionId)
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
+        assertIsViewable(dto);
+        return dto;
     }
 
     @GET
@@ -138,6 +140,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public Map<String, Object> getWithContext(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, definitionId);
         return dbService.get(definitionId)
+                .filter(this::isViewable)
                 .map(evenDefinition -> ImmutableMap.of(
                         "event_definition", evenDefinition,
                         "context", contextService.contextFor(evenDefinition)
@@ -171,8 +174,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                            @ApiParam(name = "JSON Body") EventDefinitionDto dto) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         checkEventDefinitionPermissions(dto, "update");
-        dbService.get(definitionId)
+        EventDefinitionDto current = dbService.get(definitionId)
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
+
+        assertCanEdit(current);
 
         final ValidationResult result = dto.validate();
         if (!definitionId.equals(dto.id())) {
@@ -191,7 +196,13 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_DELETE)
     public void delete(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_DELETE, definitionId);
-        eventDefinitionHandler.delete(definitionId);
+        Optional<EventDefinitionDto> optCurrent = dbService.get(definitionId);
+
+        if (optCurrent.isPresent()) {
+            EventDefinitionDto current = optCurrent.get();
+            assertCanDelete(current);
+            eventDefinitionHandler.delete(current);
+        }
     }
 
     @PUT

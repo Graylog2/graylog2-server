@@ -25,7 +25,7 @@ import org.graylog.events.processor.storage.EventStorageHandler;
 
 import java.util.Set;
 
-public interface EventDefinition {
+public interface EventDefinition extends SystemEntity {
     String id();
 
     String title();

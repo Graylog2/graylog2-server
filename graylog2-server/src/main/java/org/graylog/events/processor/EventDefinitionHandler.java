@@ -64,7 +64,7 @@ public class EventDefinitionHandler {
      * Creates a new event definition and a corresponding scheduler job definition and trigger.
      *
      * @param unsavedEventDefinition the event definition to save
-     * @param user the user who created this eventDefinition. If empty, no ownership will be registered.
+     * @param user                   the user who created this eventDefinition. If empty, no ownership will be registered.
      * @return the created event definition
      */
     public EventDefinitionDto create(EventDefinitionDto unsavedEventDefinition, Optional<User> user) {
@@ -142,11 +142,15 @@ public class EventDefinitionHandler {
 
         final EventDefinitionDto eventDefinition = optionalEventDefinition.get();
 
+        return delete(eventDefinition);
+    }
+
+    public boolean delete(EventDefinitionDto eventDefinition) {
         getJobDefinition(eventDefinition)
                 .ifPresent(jobDefinition -> deleteJobDefinitionAndTrigger(jobDefinition, eventDefinition));
 
         LOG.debug("Deleting event definition <{}/{}>", eventDefinition.id(), eventDefinition.title());
-        return eventDefinitionService.delete(eventDefinitionId) > 0;
+        return eventDefinitionService.delete(eventDefinition.id()) > 0;
     }
 
     /**

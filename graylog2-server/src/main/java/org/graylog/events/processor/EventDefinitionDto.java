@@ -46,6 +46,7 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -66,6 +67,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     private static final String FIELD_KEY_SPEC = "key_spec";
     private static final String FIELD_NOTIFICATION_SETTINGS = "notification_settings";
     private static final String FIELD_STORAGE = "storage";
+    private static final String FIELD_ACTIONS = "denied_actions";
 
     @Override
     @Id
@@ -114,6 +116,10 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     @JsonProperty(FIELD_STORAGE)
     public abstract ImmutableList<EventStorageHandler.Config> storage();
 
+    @Override
+    @JsonProperty(FIELD_ACTIONS)
+    public abstract List<SystemEntityAction> deniedActions();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -138,7 +144,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
             final String fieldName = fieldSpecEntry.getKey();
             if (!Message.validKey(fieldName)) {
                 validation.addError(FIELD_FIELD_SPEC,
-                    "Event Definition field_spec contains invalid message field \"" + fieldName + "\"");
+                        "Event Definition field_spec contains invalid message field \"" + fieldName + "\"");
             }
         }
 
@@ -150,13 +156,15 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     }
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public abstract static class Builder {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_EventDefinitionDto.Builder()
                     .fieldSpec(ImmutableMap.of())
                     .notifications(ImmutableList.of())
-                    .storage(ImmutableList.of());
+                    .storage(ImmutableList.of())
+                    .deniedActions(Collections.emptyList())
+                    ;
         }
 
         @Id
@@ -194,6 +202,9 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
         @JsonProperty(FIELD_STORAGE)
         public abstract Builder storage(ImmutableList<EventStorageHandler.Config> storageHandlers);
 
+        @JsonProperty(FIELD_ACTIONS)
+        public abstract Builder deniedActions(List<SystemEntityAction> actions);
+
         abstract EventDefinitionDto autoBuild();
 
         public EventDefinitionDto build() {
@@ -219,36 +230,42 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
         }
     }
 
+    @Override
     public EventDefinitionEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         final EventProcessorConfig config = config();
         final EventProcessorConfigEntity eventProcessorConfigEntity = config.toContentPackEntity(entityDescriptorIds);
         final ImmutableList<EventNotificationHandlerConfigEntity> notificationList = ImmutableList.copyOf(
-            notifications().stream()
-                .map(notification -> notification.toContentPackEntity(entityDescriptorIds))
-                .collect(Collectors.toList()));
+                notifications().stream()
+                        .map(notification -> notification.toContentPackEntity(entityDescriptorIds))
+                        .collect(Collectors.toList()));
+
+        List<ValueReference> actions = deniedActions().stream()
+                .map(e -> ValueReference.of(e.name()))
+                .collect(Collectors.toList());
 
         return EventDefinitionEntity.builder()
-            .title(ValueReference.of(title()))
-            .description(ValueReference.of(description()))
-            .priority(ValueReference.of(priority()))
-            .alert(ValueReference.of(alert()))
-            .config(eventProcessorConfigEntity)
-            .notifications(notificationList)
-            .notificationSettings(notificationSettings())
-            .fieldSpec(fieldSpec())
-            .keySpec(keySpec())
-            .storage(storage())
-            .build();
+                .title(ValueReference.of(title()))
+                .description(ValueReference.of(description()))
+                .priority(ValueReference.of(priority()))
+                .alert(ValueReference.of(alert()))
+                .config(eventProcessorConfigEntity)
+                .notifications(notificationList)
+                .notificationSettings(notificationSettings())
+                .fieldSpec(fieldSpec())
+                .keySpec(keySpec())
+                .storage(storage())
+                .deniedActions(actions)
+                .build();
     }
 
     @Override
     public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
         notifications().stream().map(EventNotificationHandler.Config::notificationId)
-            .forEach(id -> {
+                .forEach(id -> {
                     final EntityDescriptor depNotification = EntityDescriptor.builder()
-                        .id(ModelId.of(id))
-                        .type(ModelTypes.NOTIFICATION_V1)
-                        .build();
+                            .id(ModelId.of(id))
+                            .type(ModelTypes.NOTIFICATION_V1)
+                            .build();
                     mutableGraph.putEdge(entityDescriptor, depNotification);
                 });
         config().resolveNativeEntity(entityDescriptor, mutableGraph);

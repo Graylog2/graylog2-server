@@ -27,6 +27,7 @@ import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.EventDefinitionDto;
+import org.graylog.events.processor.SystemEntityAction;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.model.ModelId;
@@ -36,6 +37,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -54,6 +56,7 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
     private static final String FIELD_NOTIFICATIONS = "notifications";
     private static final String FIELD_STORAGE = "storage";
     private static final String FIELD_IS_SCHEDULED = "is_scheduled";
+    private static final String FIELD_ACTIONS = "denied_actions";
 
     @JsonProperty(FIELD_TITLE)
     public abstract ValueReference title();
@@ -88,6 +91,9 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
     @JsonProperty(FIELD_IS_SCHEDULED)
     public abstract ValueReference isScheduled();
 
+    @JsonProperty(FIELD_ACTIONS)
+    public abstract List<ValueReference> deniedActions();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -95,7 +101,7 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public abstract static class Builder {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_EventDefinitionEntity.Builder().isScheduled(ValueReference.of(true));
@@ -134,6 +140,9 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
         @JsonProperty(FIELD_IS_SCHEDULED)
         public abstract Builder isScheduled(ValueReference isScheduled);
 
+        @JsonProperty(FIELD_ACTIONS)
+        public abstract Builder deniedActions(List<ValueReference> actions);
+
         public abstract EventDefinitionEntity build();
     }
 
@@ -144,6 +153,10 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
                         .map(notification -> notification.toNativeEntity(parameters, natvieEntities))
                         .collect(Collectors.toList())
         );
+        List<SystemEntityAction> actions = deniedActions().stream()
+                .map(e -> SystemEntityAction.valueOf(e.asString()))
+                .collect(Collectors.toList());
+
         return EventDefinitionDto.builder()
                 .title(title().asString(parameters))
                 .description(description().asString(parameters))
@@ -155,6 +168,7 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
                 .notificationSettings(notificationSettings())
                 .notifications(notificationList)
                 .storage(storage())
+                .deniedActions(actions)
                 .build();
     }
 

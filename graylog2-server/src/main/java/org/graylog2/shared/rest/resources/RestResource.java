@@ -22,6 +22,9 @@ import com.fasterxml.jackson.jaxrs.cfg.EndpointConfigBase;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterInjector;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterModifier;
 import org.apache.shiro.subject.Subject;
+import org.graylog.events.processor.SystemEntity;
+import org.graylog.events.processor.SystemEntityAction;
+import org.graylog.events.processor.SystemEntityActionService;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
@@ -33,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.QueryParam;
@@ -45,7 +49,6 @@ import java.net.URI;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public abstract class RestResource {
@@ -62,6 +65,9 @@ public abstract class RestResource {
 
     @Context
     UriInfo uriInfo;
+
+    @Inject
+    private SystemEntityActionService systemEntityActionService;
 
     @QueryParam("pretty")
     public void setPrettyPrint(boolean prettyPrint) {
@@ -133,7 +139,7 @@ public abstract class RestResource {
         return false;
     }
 
-    protected void checkAnyPermission(String permissions[], String instanceId) {
+    protected void checkAnyPermission(String[] permissions, String instanceId) {
         if (!isAnyPermitted(permissions, instanceId)) {
             LOG.info("Not authorized to access resource id <{}>. User <{}> is missing permissions {} on instance <{}>",
                     instanceId, getSubject().getPrincipal(), Arrays.toString(permissions), instanceId);
@@ -165,5 +171,28 @@ public abstract class RestResource {
     protected IndexSet getIndexSet(final IndexSetRegistry indexSetRegistry, final String indexSetId) {
         return indexSetRegistry.get(indexSetId)
                 .orElseThrow(() -> new NotFoundException("Index set <" + indexSetId + "> not found."));
+    }
+
+    protected boolean isViewable(SystemEntity entity) {
+        return systemEntityActionService.isViewable(entity);
+    }
+
+    protected void assertCanEdit(SystemEntity entity) {
+        assertActionAllowed(entity, SystemEntityAction.EDIT);
+    }
+
+    protected void assertCanDelete(SystemEntity entity) {
+        assertActionAllowed(entity, SystemEntityAction.DELETE);
+    }
+
+    protected void assertIsViewable(SystemEntity entity) {
+        assertActionAllowed(entity, SystemEntityAction.VIEW);
+    }
+
+    protected void assertActionAllowed(SystemEntity entity, SystemEntityAction action) {
+
+        systemEntityActionService.findActionDeniedError(entity, action).ifPresent(error -> {
+            throw new BadRequestException(error);
+        });
     }
 }
