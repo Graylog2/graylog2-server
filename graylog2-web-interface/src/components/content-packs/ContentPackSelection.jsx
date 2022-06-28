@@ -32,10 +32,10 @@ const HeaderText = styled.span`
   overflow-wrap: anywhere;
 `;
 
-const HeaderIcon = styled(Icon)`
-  padding-top: 3px;
-  padding-right: 3px;
-`;
+const HeaderIcon = styled(Icon)(({ theme }) => `
+  padding-top: ${theme.spacings.xxs};
+  padding-right: ${theme.spacings.xxs};
+`);
 
 const _entityItemHeader = (entity) => {
   if (entity instanceof Entity) {
