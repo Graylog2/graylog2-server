@@ -190,10 +190,10 @@ describe('<ContentPackSelection />', () => {
         _wrapper.instance()._handleTouched('name');
         _wrapper.instance()._handleTouched('summary');
         _wrapper.instance()._handleTouched('vendor');
-      }
+      };
 
       const wrapper = mount(<ContentPackSelection contentPack={{}} entities={entities} />);
-      
+
       touchAllFields(wrapper);
       wrapper.instance()._validate();
       wrapper.update();
