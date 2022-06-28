@@ -20,7 +20,7 @@ import type { ActionHandler } from 'views/components/actions/ActionHandler';
 import QueryManipulationHandler from './QueryManipulationHandler';
 
 export default class ExcludeFromQueryHandler extends QueryManipulationHandler {
-  formatNewQuery = (oldQuery: string, field: string, value: any) => {
+  static formatNewQuery = (oldQuery: string, field: string, value: any) => {
     const fieldPredicate = value === '(Empty Value)'
       ? `_exists_:${field}`
       : `NOT ${field}:${escape(value)}`;
@@ -30,7 +30,7 @@ export default class ExcludeFromQueryHandler extends QueryManipulationHandler {
 
   handle: ActionHandler<{}> = ({ queryId, field, value }) => {
     const oldQuery = this.currentQueryString(queryId);
-    const newQuery = this.formatNewQuery(oldQuery, field, value);
+    const newQuery = ExcludeFromQueryHandler.formatNewQuery(oldQuery, field, value);
 
     return this.updateQueryString(queryId, newQuery);
   };
