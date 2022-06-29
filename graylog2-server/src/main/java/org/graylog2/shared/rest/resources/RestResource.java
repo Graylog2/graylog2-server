@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.QueryParam;
@@ -177,22 +176,26 @@ public abstract class RestResource {
         return systemEntityActionService.isViewable(entity);
     }
 
-    protected void assertCanEdit(SystemEntity entity) {
-        assertActionAllowed(entity, SystemEntityAction.EDIT);
+    protected boolean isListable(SystemEntity entity) {
+        return systemEntityActionService.isListable(entity);
     }
 
-    protected void assertCanDelete(SystemEntity entity) {
-        assertActionAllowed(entity, SystemEntityAction.DELETE);
+    protected void assertCanEdit(SystemEntity entity, String entityName) {
+        assertActionAllowed(entity, SystemEntityAction.EDIT, entityName);
     }
 
-    protected void assertIsViewable(SystemEntity entity) {
-        assertActionAllowed(entity, SystemEntityAction.VIEW);
+    protected void assertCanDelete(SystemEntity entity, String entityName) {
+        assertActionAllowed(entity, SystemEntityAction.DELETE, entityName);
     }
 
-    protected void assertActionAllowed(SystemEntity entity, SystemEntityAction action) {
+    protected void assertIsViewable(SystemEntity entity, String entityName) {
+        assertActionAllowed(entity, SystemEntityAction.VIEW, entityName);
+    }
 
-        systemEntityActionService.findActionDeniedError(entity, action).ifPresent(error -> {
-            throw new BadRequestException(error);
+    protected void assertActionAllowed(SystemEntity entity, SystemEntityAction action, String entityName) {
+
+        systemEntityActionService.findActionDeniedError(entity, action, entityName).ifPresent(error -> {
+            throw new ForbiddenException(error);
         });
     }
 }

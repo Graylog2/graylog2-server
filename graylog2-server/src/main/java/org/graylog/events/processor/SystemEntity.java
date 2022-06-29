@@ -18,9 +18,26 @@ package org.graylog.events.processor;
 
 import java.util.List;
 
+/**
+ * Specification for a Graylog entity.
+ *
+ * <p>
+ * The objective for such entity is to identify entities that must be managed in a common way--such as controlling whether an entity can be edited or deleted.
+ * </p>
+ */
 public interface SystemEntity {
 
+    /**
+     * The entity's unique ID.
+     *
+     * @return entity's ID
+     */
     String id();
 
+    /**
+     * A list of actions which have been forbidden/denied on this entity.
+     *
+     * @return forbidden/denied actions
+     */
     List<SystemEntityAction> deniedActions();
 }

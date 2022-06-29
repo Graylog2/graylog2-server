@@ -86,6 +86,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             .put("title", SearchQueryField.create(EventDefinitionDto.FIELD_TITLE))
             .put("description", SearchQueryField.create(EventDefinitionDto.FIELD_DESCRIPTION))
             .build();
+    private static final String ENTITY_NAME = "Event Definition";
 
     private final DBEventDefinitionService dbService;
     private final EventDefinitionHandler eventDefinitionHandler;
@@ -116,11 +117,14 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
-        final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(searchQuery, event -> {
-            return isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
-        }, "title", page, perPage);
+        final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(searchQuery, this::isListableAndUserHasPermission, "title", page, perPage);
         final ImmutableMap<String, Object> context = contextService.contextFor(result.delegate());
         return PaginatedResponse.create("event_definitions", result, query, context);
+    }
+
+    private boolean isListableAndUserHasPermission(EventDefinitionDto event) {
+        return isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id())
+                && isListable(event);
     }
 
     @GET
@@ -130,7 +134,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, definitionId);
         EventDefinitionDto dto = dbService.get(definitionId)
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
-        assertIsViewable(dto);
+        assertIsViewable(dto, ENTITY_NAME);
         return dto;
     }
 
@@ -177,7 +181,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         EventDefinitionDto current = dbService.get(definitionId)
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
 
-        assertCanEdit(current);
+        assertCanEdit(current, ENTITY_NAME);
 
         final ValidationResult result = dto.validate();
         if (!definitionId.equals(dto.id())) {
@@ -200,7 +204,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
         if (optCurrent.isPresent()) {
             EventDefinitionDto current = optCurrent.get();
-            assertCanDelete(current);
+            assertCanDelete(current, ENTITY_NAME);
             eventDefinitionHandler.delete(current);
         }
     }
