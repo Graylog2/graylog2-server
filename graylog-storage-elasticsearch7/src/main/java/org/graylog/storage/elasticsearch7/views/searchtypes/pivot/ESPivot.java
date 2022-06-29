@@ -22,6 +22,7 @@ import one.util.streamex.EntryStream;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
@@ -68,9 +69,6 @@ import java.util.stream.Stream;
 
 public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private static final Logger LOG = LoggerFactory.getLogger(ESPivot.class);
-
-    static final String MISSING_AGGREGATION_NAME = "__missing__";
-    static final String MISSING_BUCKET_NAME = "(Empty Value)";
 
     private final Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers;
     private final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
@@ -160,7 +158,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
     private Optional<MissingAggregationBuilder> createMissingAggregation(final AggregationBuilder aggregation) {
         if (aggregation instanceof ValuesSourceAggregationBuilder) {
-            final MissingAggregationBuilder missingAggregationBuilder = new MissingAggregationBuilder(MISSING_AGGREGATION_NAME)
+            final MissingAggregationBuilder missingAggregationBuilder = new MissingAggregationBuilder(MissingBucketConstants.MISSING_AGGREGATION_NAME)
                     .field(((ValuesSourceAggregationBuilder<?>) aggregation).field());
             aggregation.getSubAggregations().forEach(missingAggregationBuilder::subAggregation);
             return Optional.of(missingAggregationBuilder);
@@ -317,9 +315,9 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 processRows(resultBuilder, searchResult, queryContext, pivot, tail(remainingRows), rowKeys, bucket.aggregation());
                 rowKeys.removeLast();
             });
-            final Missing missingAggregation = aggregation.getAggregations().get(MISSING_AGGREGATION_NAME);
+            final Missing missingAggregation = aggregation.getAggregations().get(MissingBucketConstants.MISSING_AGGREGATION_NAME);
             if (missingAggregation != null && missingAggregation.getDocCount() > 0) {
-                rowKeys.addLast(MISSING_BUCKET_NAME);
+                rowKeys.addLast(MissingBucketConstants.MISSING_BUCKET_NAME);
                 processRows(resultBuilder, searchResult, queryContext, pivot, tail(remainingRows), rowKeys, missingAggregation);
                 rowKeys.removeLast();
             }
