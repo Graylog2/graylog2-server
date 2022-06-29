@@ -37,6 +37,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -104,7 +105,9 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
     public abstract static class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EventDefinitionEntity.Builder().isScheduled(ValueReference.of(true));
+            return new AutoValue_EventDefinitionEntity.Builder()
+                    .isScheduled(ValueReference.of(true))
+                    .deniedActions(Collections.emptyList());
         }
 
         @JsonProperty(FIELD_TITLE)
