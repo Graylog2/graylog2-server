@@ -22,10 +22,12 @@ import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.EventStorageHandler;
+import org.graylog2.system.entities.SystemEntity;
 
 import java.util.Set;
 
 public interface EventDefinition extends SystemEntity {
+    @Override
     String id();
 
     String title();

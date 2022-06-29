@@ -22,11 +22,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.CollectionName;
+import org.graylog2.system.entities.SystemEntityAction;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -40,11 +43,12 @@ public abstract class DecoratorImpl implements Decorator, Comparable {
     static final String FIELD_CONFIG = "config";
     static final String FIELD_STREAM = "stream";
     static final String FIELD_ORDER = "order";
+    private static final String FIELD_ACTIONS = "denied_actions";
 
     @Override
     public int compareTo(Object o) {
         if (o instanceof Decorator) {
-            Decorator decorator = (Decorator)o;
+            Decorator decorator = (Decorator) o;
             return order() - decorator.order();
         }
         return 0;
@@ -74,6 +78,10 @@ public abstract class DecoratorImpl implements Decorator, Comparable {
     @Override
     public abstract int order();
 
+    @Override
+    @JsonProperty(FIELD_ACTIONS)
+    public abstract List<SystemEntityAction> deniedActions();
+
     public abstract Builder toBuilder();
 
     @JsonCreator
@@ -83,12 +91,13 @@ public abstract class DecoratorImpl implements Decorator, Comparable {
                                        @JsonProperty(FIELD_STREAM) Optional<String> stream,
                                        @JsonProperty(FIELD_ORDER) int order) {
         return new AutoValue_DecoratorImpl.Builder()
-            .id(id)
-            .type(type)
-            .config(config)
-            .stream(stream)
-            .order(order)
-            .build();
+                .id(id)
+                .type(type)
+                .config(config)
+                .stream(stream)
+                .order(order)
+                .deniedActions(Collections.emptyList())
+                .build();
     }
 
     public static Decorator create(@JsonProperty(FIELD_TYPE) String type,
@@ -107,10 +116,17 @@ public abstract class DecoratorImpl implements Decorator, Comparable {
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder id(String id);
+
         abstract Builder type(String type);
+
         abstract Builder config(Map<String, Object> config);
+
         abstract Builder stream(Optional<String> stream);
+
         abstract Builder order(int order);
+
+        abstract Builder deniedActions(List<SystemEntityAction> actions);
+
         public abstract DecoratorImpl build();
     }
 }

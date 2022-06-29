@@ -54,6 +54,7 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class DecoratorResource extends RestResource {
+    public static final String ENTITY_NAME = "Decorator";
     private final DecoratorService decoratorService;
     private final Map<String, SearchResponseDecorator.Factory> searchResponseDecorators;
 
@@ -76,16 +77,16 @@ public class DecoratorResource extends RestResource {
     @Timed
     @Path("/available")
     @ApiOperation(value = "Returns all available message decorations",
-        notes = "")
+                  notes = "")
     public Map<String, ConfigurableTypeInfo> getAvailable() {
         return this.searchResponseDecorators.entrySet().stream()
-            .collect(Collectors.toMap(
-                Map.Entry::getKey, entry -> ConfigurableTypeInfo.create(
-                    entry.getKey(),
-                    entry.getValue().getDescriptor(),
-                    entry.getValue().getConfig().getRequestedConfiguration()
-                )
-            ));
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey, entry -> ConfigurableTypeInfo.create(
+                                entry.getKey(),
+                                entry.getValue().getDescriptor(),
+                                entry.getValue().getConfig().getRequestedConfiguration()
+                        )
+                ));
     }
 
     @POST
@@ -112,6 +113,7 @@ public class DecoratorResource extends RestResource {
         if (decorator.stream().isPresent()) {
             checkPermission(RestPermissions.STREAMS_EDIT, decorator.stream().get());
         }
+        assertCanDelete(decorator, ENTITY_NAME);
         this.decoratorService.delete(decoratorId);
     }
 
@@ -129,6 +131,7 @@ public class DecoratorResource extends RestResource {
         if (originalDecorator.stream().isPresent()) {
             checkPermission(RestPermissions.STREAMS_EDIT, originalDecorator.stream().get());
         }
+        assertCanEdit(originalDecorator, ENTITY_NAME);
         return this.decoratorService.save(decorator.toBuilder().id(originalDecorator.id()).build());
     }
 }

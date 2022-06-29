@@ -27,7 +27,6 @@ import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.EventDefinitionDto;
-import org.graylog.events.processor.SystemEntityAction;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.model.ModelId;
@@ -36,6 +35,7 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.system.entities.SystemEntityAction;
 
 import java.util.Collections;
 import java.util.List;

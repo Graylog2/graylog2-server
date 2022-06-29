@@ -42,6 +42,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.graylog2.system.entities.SystemEntityAction;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 

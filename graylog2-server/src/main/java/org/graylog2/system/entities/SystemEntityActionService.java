@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.events.processor;
+package org.graylog2.system.entities;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -39,7 +39,7 @@ public class SystemEntityActionService {
     public boolean isListable(SystemEntity entity) {
         return !hasDeniedAction(entity, SystemEntityAction.LIST);
     }
-    
+
     public boolean isExportable(SystemEntity entity) {
         return !hasDeniedAction(entity, SystemEntityAction.EXPORT);
     }

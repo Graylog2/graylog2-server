@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.events.processor;
+package org.graylog2.system.entities;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ public interface SystemEntity {
     String id();
 
     /**
-     * A list of actions which have been forbidden/denied on this entity.
+     * A list of actions which have been forbidden/denied on this entity. The lack of denied actions suggests that all actions are allowed for an entity.
      *
      * @return forbidden/denied actions
      */

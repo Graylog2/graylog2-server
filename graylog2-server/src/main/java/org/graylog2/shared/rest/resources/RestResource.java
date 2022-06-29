@@ -22,15 +22,15 @@ import com.fasterxml.jackson.jaxrs.cfg.EndpointConfigBase;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterInjector;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterModifier;
 import org.apache.shiro.subject.Subject;
-import org.graylog.events.processor.SystemEntity;
-import org.graylog.events.processor.SystemEntityAction;
-import org.graylog.events.processor.SystemEntityActionService;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.ShiroPrincipal;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.system.entities.SystemEntity;
+import org.graylog2.system.entities.SystemEntityAction;
+import org.graylog2.system.entities.SystemEntityActionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

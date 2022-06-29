@@ -18,26 +18,32 @@ package org.graylog2.decorators;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.system.entities.SystemEntity;
 
 import java.util.Map;
 import java.util.Optional;
 
 @JsonAutoDetect
-public interface Decorator {
+public interface Decorator extends SystemEntity {
     String FIELD_ID = "id";
     String FIELD_TYPE = "type";
     String FIELD_CONFIG = "config";
     String FIELD_STREAM = "stream";
     String FIELD_ORDER = "order";
 
+    @Override
     @JsonProperty(FIELD_ID)
     String id();
+
     @JsonProperty(FIELD_TYPE)
     String type();
+
     @JsonProperty(FIELD_STREAM)
     Optional<String> stream();
+
     @JsonProperty(FIELD_CONFIG)
     Map<String, Object> config();
+
     @JsonProperty(FIELD_ORDER)
     int order();
 }
