@@ -15,8 +15,12 @@ Please read and understand the [Code of Conduct](https://github.com/Graylog2/gra
 ## Conventions
 
 ### Consistent Code Style
-We use ESLint to detect some issues in our code. We mostly follow the [Airbnb Javascript style guide](https://github.com/airbnb/javascript) to write frontend code,
-with a few exceptions. We maintain those custom rules in a package, which is part of [our graylog2-server repository](https://raw.githubusercontent.com/Graylog2/graylog2-server/master/graylog2-web-interface/packages/eslint-config-graylog/index.js).
+- We use ESLint to detect some issues in our code. We mostly follow the [Airbnb Javascript style guide](https://github.com/airbnb/javascript) to write frontend code, with a few exceptions.
+- We maintain those custom rules in a package, which is part of [our graylog2-server repository](https://raw.githubusercontent.com/Graylog2/graylog2-server/master/graylog2-web-interface/packages/eslint-config-graylog/index.js).
+- Ensure you are seeing linter hints in you IDE and consider enabling the setting "fix linter hints on save" ([IntelliJ Docs](https://www.jetbrains.com/help/idea/eslint.html#ws_eslint_configure_run_eslint_on_save)).
+- There is a CI job, which checks if there are linter hints in changes files.
+- If you want to see all linter hints for changed (and committed) files locally, you can run `yarn lint:changes`. You will need to commit your changes first.
+- If you want to see linter hints for a specific file, you can run `lint:path /path/to/file`.
 
 ### Naming
 #### Function Naming
@@ -30,12 +34,14 @@ Small components should be functional components. When a component is more compl
 you want to use (class or a functional component with react hooks). When you don’t have a preference, use a functional component.
 
 ### Type definitions
-We use TypeScript for new components, and we also define `PropType` definitions. Static types add better type support for the development,
-integrating with your IDE, while `PropType` definitions are present at runtime.
+- We use TypeScript for new components, and we also define `PropType` definitions. Static types add better type support for the development, integrating with your IDE, while `PropType` definitions are present at runtime.
+- Names of unused parameters
+  - Sometimes you need to define a parameter which is not being used, for example when you just want to use the second parameter. To satisfy TypeScript the parameter name needs to be prefixed with underscore.
+  - Instead of defining just `_`, use a more meaningful name, like `_theParameterName`. (Related to this discussion){.
+- types.d.ts can have hidden errors, like missing imports. Rename it temporary to `types.d.ts` to detect the most obvious ones.
 
 ### Imports
 #### ES6 modules_
-
 - Prefer ES6 modules (import and export) over a non-standard module system and CommonJS’s require.
 
 #### Modules
@@ -43,6 +49,10 @@ integrating with your IDE, while `PropType` definitions are present at runtime.
 - When a module has several exports, you should use the default export only if one of the exports serves the main purpose of the module.
 - Sometimes, specially when working on a folder containing common components, it may be useful to add an index.js file with all exports of that folder, allowing consumers of those exports to combine several imports in the same line.
 - The downside of this is that it might introduce cyclic dependencies (which can be resolved by babel/webpack by proxying, but should be avoided)
+
+### React components
+- Keep components small < 300 lines
+- Keep components simple, so they do not contain real logic. You need to transform the structure of an object when a user clicks on a button? Create a helper function for the logic which can be reused. Place the helper function in a place where it can be found easily.
 
 ### Testing
 - When adding new functionality, try to write unit tests for every possible use case. If you are not sure where to start, try to test what is important for the user.
@@ -57,7 +67,16 @@ integrating with your IDE, while `PropType` definitions are present at runtime.
   - __tests__/ComponentA.test.jsx
   - __tests__/ComponentA.test.case1.json
   - __tests__/ComponentA.text.case1.result.json
-
+- Do not use snapshot tests to test the state of a component.
+  - Imagine the following case: User clicks on a button and we display an alert. You can test this behavior with a snapshot, but it has many disadvantages. You can also just use the react-testing-library method `getByText()` to check if the alert is being displayed
+  - When you create a snapshot you will need to update the snapshot often, for example when the button style changes.
+  - Good use case for snapshot tests: check if a complex result of a function call is correct.
+- Test timeouts
+  - We have some flaky tests which fail, when jest has less resources to run the tests and the execution of a test just takes more time. In this case you will see failing tests with the error message “Exceeded timeout of 5000 ms for a test”.
+  - You can avoid this by increasing the timeout for jest tests. `yarn test --maxWorkers=150%`.
+  - You can reduce also the timeout: `yarn test --maxWorkers=25%`. This can be helpful if you want to get an idea how the result looks on computers with less power.
+- Chrome extension “Testing Playground”
+  - Helps you find the best queries to select elements
 
 ### Injecting stores
 When writing new code, you should prefer injecting stores into your components with CombinedProvider instead of using StoreProvider
@@ -97,9 +116,28 @@ const d = 0 ?? 'default'
 const e = '' ?? 'default'
 ```
 
+#### Avoid `Array.reduce`
+- When working with many items (like hundred or thousands). Have a look at this PR for more information.
+
 ### Reusing components
 - We use react-bootstrap for many UI common components. To help us deal with breaking changes in their APIs, and to style the components as we want, we use our own wrappers around react bootstrap components. You can import these components from components/graylog.
 - Please ensure to check the [frontend documentation](https://graylog2.github.io/frontend-documentation) to see which common components we use. Whenever possible try using a common component, since that help us have a more consistent UI and make components used in different parts of the product behave the same way.
+
+### Internal packages
+We currently have a few internal packages, used for the core application and all plug-ins:
+- graylog-web-plugin contains common packages for both the core and plug-ins, webpack configuration for building plug-ins, as well as some interfaces to register and consume plugins.
+- eslint-config-graylog contains our custom linter configuration, based on eslint-config-airbnb.
+- stylelint-config-graylog contains our custom stylelint configuration, based on the default stylelint config.
+
+### Browser compatibility
+We currently do not have a pre release process to test different or old browser. Nevertheless you should test layout changes in at least all modern browsers (Chrome, Firefox, Safari). Bigger layout changes should also be tested in older browsers. Have a look at our public browser compatibility list.
+
+### Plugin System
+- Graylogs plugin system allows users to extend the graylog core product without changing its source code. There are multiple points in the application which can be extended, like the navigation.
+- In the frontend you can register anything to the plugin store with `PluginStore.register(new PluginManifest({}, { thePluginStoreKey: [thePluginData] }));` in a plugin and use it with `usePluginEntities('thePluginStoreKey');`.
+- Currently, there is no documentation about the available plugin store keys, you need to look up the usage in the code. 
+- If you want to test the UI without plugins you can run `disable_plugins=true yarn start`.
+- If you want to create a new plugin please have a look at [this example](https://github.com/Graylog2/graylog-plugin-sample) for more information. 
 
 ### Refactoring existing code
 - When you are working on a feature, you will sometimes need to do some small changes on related files.
@@ -110,14 +148,19 @@ const e = '' ?? 'default'
 - When the refactoring gets too big, create a separate PR.
 - When making changes closer to a release or working on changes that will be backported, please consider the risk of doing the refactoring of fixing linter errors now. If it feels too risky or there are too many changes, it may be a sign that the refactoring should wait.
 
-### Internal packages
-We currently have a few internal packages, used for the core application and all plug-ins:
-- graylog-web-plugin contains common packages for both the core and plug-ins, webpack configuration for building plug-ins, as well as some interfaces to register and consume plugins.
-- eslint-config-graylog contains our custom linter configuration, based on eslint-config-airbnb.
-- stylelint-config-graylog contains our custom stylelint configuration, based on the default stylelint config.
+### Working on a feature
+- Especially for more complex changes it is helpful to test different scenarios
+  - Test with different roles. For example not only with an admin user, but also with a user who has only the reader role and as little permissions as possible.
+  - Test with different resolutions.
+  - Test with different browsers (especially Safari).
+  - Most important, test with homogeneous data and with a high volume of data.
+- Execute checks locally before creating a PR
+  - Running all checks in CI can take an hour, make sure you execute the most important ones locally first.
+  - Run `yarn tsc && yarn lint:changes && yarn test` in at least the core and enterprise project.
 
-### Browser compatibility
-We currently do not have a pre release process to test different or old browser. Nevertheless you should test layout changes in at least all modern browsers (Chrome, Firefox, Safari). Bigger layout changes should also be tested in older browsers. Have a look at our public browser compatibility list.
+### Common problems
+- yarn cache
+  - the yarn cache can get very big, like 200GB. Make sure to run `yarn cache clean` from time to time.
 
 ### UI Styling
 
