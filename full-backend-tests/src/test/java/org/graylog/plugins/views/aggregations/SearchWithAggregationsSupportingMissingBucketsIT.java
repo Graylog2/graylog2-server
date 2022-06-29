@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.plugins.views.aggregations;
 
 import io.restassured.response.ValidatableResponse;
@@ -64,7 +80,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
                 .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == 'Joe' }", notNullValue())
                 .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == 'Jane' }", notNullValue())
                 .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == 'Bob' }", notNullValue())
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == " + MISSING_BUCKET_NAME + " }", notNullValue())
+                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", notNullValue())
                 .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == [] }", notNullValue());
 
         //Empty bucket verification (should precede the last/total one - index 3)
@@ -102,16 +118,16 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
                 .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == 'Joe' }", hasSize(3)) //Joe, Joe-Biden, Joe-Smith
                 .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == 'Bob' }", hasSize(2)) //Bob, Bob-empty
                 .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == 'Jane' }", hasSize(2)) //Jane, Jane-Smith
-                .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == " + MISSING_BUCKET_NAME + " }", hasSize(2)) //empty, empty-Cooper
+                .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", hasSize(2)) //empty, empty-Cooper
                 .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == [] }", notNullValue()) //totals
                 .body(pivotSearchTypePathInResponse + ".total", equalTo(5));
 
         //Empty buckets verification
         //We have only one entry with missing first name {(...)"lastName": "Cooper","age": 60(...)}, so both empty buckets will have the same values
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == " + MISSING_BUCKET_NAME + " && it.key[1] == 'Cooper'}.values[0].value", equalTo(1))
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == " + MISSING_BUCKET_NAME + " && it.key[1] == 'Cooper'}.values[1].value", equalTo(60.0f))
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == [" + MISSING_BUCKET_NAME + "]}.values[0].value", equalTo(1))
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == [" + MISSING_BUCKET_NAME + "]}.values[1].value", equalTo(60.0f));
+        validatableResponse.body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '" + MISSING_BUCKET_NAME + "' && it.key[1] == 'Cooper'}.values[0].value", equalTo(1))
+                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '" + MISSING_BUCKET_NAME + "' && it.key[1] == 'Cooper'}.values[1].value", equalTo(60.0f))
+                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "']}.values[0].value", equalTo(1))
+                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "']}.values[1].value", equalTo(60.0f));
 
 
     }
@@ -139,7 +155,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
                 .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == [] }", notNullValue());
 
         //Empty bucket is not there - in a fixture all the documents have "age" field
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == " + MISSING_BUCKET_NAME + " }", nullValue());
+        validatableResponse.body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", nullValue());
 
 
         //Top bucket verification

@@ -1,5 +1,3 @@
-package org.graylog.plugins.views.search.aggregations;
-
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -16,6 +14,9 @@ package org.graylog.plugins.views.search.aggregations;
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.plugins.views.search.aggregations;
+
+
 public interface MissingBucketConstants {
 
     String MISSING_AGGREGATION_NAME = "__missing__";
