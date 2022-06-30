@@ -14,14 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
 import { Popover } from 'components/bootstrap';
 import { OverlayTrigger, Icon } from 'components/common';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
-import DateTime from 'logic/datetimes/DateTime';
+import UserDateTimeContext from 'contexts/UserDateTimeContext';
+import { relativeDifference } from 'util/DateTime';
 
 import style from './StatusIndicator.css';
 
@@ -33,9 +34,10 @@ type Props = {
 }
 
 const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) => {
+  const { toUserTimezone } = useContext(UserDateTimeContext);
   let message = messageProp;
   const text = lodash.upperFirst(SidecarStatusEnum.toString(status));
-  const lastSeenDateTime = new DateTime(lastSeen);
+  const lastSeenDateTime = toUserTimezone(lastSeen);
 
   let icon;
   let className;
@@ -56,7 +58,7 @@ const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) 
     default:
       className = 'text-info';
       icon = 'question-circle';
-      message += ` (${lastSeenDateTime.toRelativeString()})`;
+      message += ` (${relativeDifference(lastSeenDateTime)})`;
   }
 
   if (message && id) {
