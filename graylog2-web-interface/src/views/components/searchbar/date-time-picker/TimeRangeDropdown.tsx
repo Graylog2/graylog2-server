@@ -165,10 +165,10 @@ const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword, tab
     );
   });
 
-const dateTimeValidate = (nextTimeRange, limitDuration) => {
+const dateTimeValidate = (nextTimeRange, limitDuration, formatTime: (dateTime: DateTime, format: string) => string) => {
   let errors = {};
   const timeRange = normalizeIfClassifiedRelativeTimeRange(nextTimeRange);
-  const timeRangeErrors = validateTimeRange(timeRange, limitDuration);
+  const timeRangeErrors = validateTimeRange(timeRange, limitDuration, formatTime);
 
   if (Object.keys(timeRangeErrors).length !== 0) {
     errors = { ...errors, nextTimeRange: timeRangeErrors };
@@ -238,7 +238,7 @@ const TimeRangeDropdown = ({
                    arrowOffsetLeft={positionIsBottom ? 34 : -11}
                    title={title}>
       <Formik<TimeRangeDropDownFormValues> initialValues={{ nextTimeRange: onInitializingNextTimeRange(currentTimeRange) }}
-                                           validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
+                                           validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration, formatTime)}
                                            onSubmit={handleSubmit}
                                            validateOnMount>
         {(({ values: { nextTimeRange }, isValid, setFieldValue, submitForm }) => {

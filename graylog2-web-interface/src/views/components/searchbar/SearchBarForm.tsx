@@ -57,7 +57,7 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
     setEnableReinitialize(false);
 
     return onSubmit(normalizeSearchBarFormValues(values, userTimezone)).finally(() => setEnableReinitialize(true));
-  }, [onSubmit]);
+  }, [onSubmit, userTimezone]);
   const _initialValues = useMemo(() => {
     const { timerange, ...rest } = initialValues;
 
@@ -67,8 +67,8 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
     });
   }, [formatTime, initialValues]);
 
-  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls),
-    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls]);
+  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime),
+    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime]);
 
   return (
     <Formik<SearchBarFormValues> initialValues={_initialValues}

@@ -59,7 +59,7 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
       timerange: isNoTimeRangeOverride(timerange) ? undefined : onSubmittingTimerange(timerange, userTimezone),
       ...rest,
     }).then(() => setEnableReinitialize(true));
-  }, [onSubmit]);
+  }, [onSubmit, userTimezone]);
   const { timerange, ...rest } = initialValues;
   const initialTimeRange = timerange && !isNoTimeRangeOverride(timerange) ? onInitializingTimerange(timerange, formatTime) : {} as TimeRange;
   const _initialValues = {
@@ -67,8 +67,8 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
     ...rest,
   };
 
-  const _validate = useCallback((values: DashboardFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls),
-    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls]);
+  const _validate = useCallback((values: DashboardFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime),
+    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime]);
 
   return (
     <Formik<DashboardFormValues> initialValues={_initialValues}
