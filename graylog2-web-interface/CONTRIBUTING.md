@@ -19,8 +19,8 @@ Please read and understand the [Code of Conduct](https://github.com/Graylog2/gra
 - We maintain those custom rules in a package, which is part of [our graylog2-server repository](https://raw.githubusercontent.com/Graylog2/graylog2-server/master/graylog2-web-interface/packages/eslint-config-graylog/index.js).
 - Ensure you are seeing linter hints in you IDE and consider enabling the setting "fix linter hints on save" ([IntelliJ Docs](https://www.jetbrains.com/help/idea/eslint.html#ws_eslint_configure_run_eslint_on_save)).
 - There is a CI job, which checks if there are linter hints in changes files.
-- If you want to see all linter hints for changed (and committed) files locally, you can run `yarn lint:changes`. You will need to commit your changes first.
-- If you want to see linter hints for a specific file, you can run `lint:path /path/to/file`.
+- If you want to see all linter hints for changed files locally, you can run `yarn lint:changes`. You will need to commit your changes first.
+- If you want to see linter hints for a specific file, you can run `yarn lint:path /path/to/file`.
 
 ### Naming
 #### Function Naming
@@ -38,7 +38,7 @@ you want to use (class or a functional component with react hooks). When you don
 - Names of unused parameters
   - Sometimes you need to define a parameter which is not being used, for example when you just want to use the second parameter. To satisfy TypeScript the parameter name needs to be prefixed with underscore.
   - Instead of defining just `_`, use a more meaningful name, like `_theParameterName`. (Related to this discussion){.
-- types.d.ts can have hidden errors, like missing imports. Rename it temporary to `types.d.ts` to detect the most obvious ones.
+- `types.d.ts` can have hidden errors, like missing imports. Rename it temporary to `types.ts` to detect the most obvious ones.
 
 ### Imports
 #### ES6 modules_
