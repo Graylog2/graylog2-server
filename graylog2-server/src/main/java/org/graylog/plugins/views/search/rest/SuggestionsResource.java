@@ -74,6 +74,7 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
                 .streams(adaptStreams(suggestionsRequest.streams(), searchUser))
                 .size(Math.min(suggestionsRequest.size(), SUGGESTIONS_COUNT_MAX))
                 .timerange(Optional.ofNullable(suggestionsRequest.timerange()).orElse(defaultTimeRange()))
+                .filteringQuery(suggestionsRequest.filteringQuery())
                 .build();
 
         SuggestionResponse res = querySuggestionsService.suggest(req);

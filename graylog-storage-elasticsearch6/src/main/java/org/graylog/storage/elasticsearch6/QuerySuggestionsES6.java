@@ -26,6 +26,8 @@ import org.graylog.plugins.views.search.engine.suggestions.SuggestionEntry;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionError;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.PrefixQueryBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -58,8 +60,11 @@ public class QuerySuggestionsES6 implements QuerySuggestionsService {
     @Override
     public SuggestionResponse suggest(SuggestionRequest req) {
         final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(req.streams(), req.timerange());
+        final PrefixQueryBuilder prefixQuery = QueryBuilders.prefixQuery(req.field(), req.input());
+        final BoolQueryBuilder mainQuery = QueryBuilders.boolQuery().must(prefixQuery);
+        req.filteringQuery().map(QueryBuilders::queryStringQuery).ifPresent(mainQuery::filter);
         final SearchSourceBuilder search = new SearchSourceBuilder()
-                .query(QueryBuilders.prefixQuery(req.field(), req.input()))
+                .query(mainQuery)
                 .size(0)
                 .aggregation(AggregationBuilders.terms("fieldvalues").field(req.field()).size(req.size()))
                 .suggest(new SuggestBuilder()

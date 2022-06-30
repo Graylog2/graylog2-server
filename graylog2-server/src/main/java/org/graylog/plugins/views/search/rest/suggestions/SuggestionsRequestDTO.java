@@ -33,6 +33,7 @@ public abstract class SuggestionsRequestDTO {
 
     private static final String FIELD_STREAMS = "streams";
     private static final String FIELD_TIMERANGE = "timerange";
+    private static final String FIELD_FILTERING_QUERY = "filtering_query";
     public static final int DEFAULT_SUGGESTIONS_COUNT = 10;
 
     @JsonProperty
@@ -52,6 +53,11 @@ public abstract class SuggestionsRequestDTO {
     @JsonProperty(FIELD_STREAMS)
     public abstract Set<String> streams();
 
+    @Nullable
+    @JsonProperty(FIELD_FILTERING_QUERY)
+    public abstract String filteringQuery();
+
+
     @AutoValue.Builder
     public abstract static class Builder {
 
@@ -69,6 +75,9 @@ public abstract class SuggestionsRequestDTO {
 
         @JsonProperty
         public abstract SuggestionsRequestDTO.Builder size(int size);
+
+        @JsonProperty
+        public abstract SuggestionsRequestDTO.Builder filteringQuery(@Nullable String filteringQuery);
 
         public abstract SuggestionsRequestDTO build();
 
