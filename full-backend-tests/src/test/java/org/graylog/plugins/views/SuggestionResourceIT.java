@@ -51,13 +51,13 @@ public class SuggestionResourceIT {
         int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
         GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
         GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"SuggestionResourceIT#1\", \"host\":\"example.org\", \"facility\":\"junit\"}",
+                "{\"short_message\":\"SuggestionResourceIT#1\", \"host\":\"example.org\", \"facility\":\"junit\", \"level\":5}",
                 requestSpec);
         GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"SuggestionResourceIT#2\", \"host\":\"example.org\", \"facility\":\"test\"}",
+                "{\"short_message\":\"SuggestionResourceIT#2\", \"host\":\"example.org\", \"facility\":\"test\", \"level\":4}",
                 requestSpec);
         GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"SuggestionResourceIT#3\", \"host\":\"example.org\", \"facility\":\"test\"}",
+                "{\"short_message\":\"SuggestionResourceIT#3\", \"host\":\"example.org\", \"facility\":\"test\", \"level\":3}",
                 requestSpec);
          SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT#1");
          SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT#2");
@@ -116,5 +116,19 @@ public class SuggestionResourceIT {
         validatableResponse.assertThat().body("suggestions.value[0]", equalTo("test"));
         validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(1));
     }
+
+    @ContainerMatrixTest
+    void testFilteringQuery() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("{\"field\":\"facility\", \"input\":\"\", \"filtering_query\":\"level:5\"}")
+                .post("/search/suggest")
+                .then()
+                .statusCode(200);
+        validatableResponse.assertThat().body("suggestions.value[0]", equalTo("junit"));
+        validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(1));
+    }
+
 
 }
