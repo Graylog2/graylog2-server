@@ -25,7 +25,14 @@ import DateTime from 'logic/datetimes/DateTime';
 
 import style from './StatusIndicator.css';
 
-const StatusIndicator = ({ message: messageProp, status, lastSeen, id }) => {
+type Props = {
+  message: string,
+  status: number,
+  lastSeen: string,
+  id: string,
+}
+
+const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) => {
   let message = messageProp;
   const text = lodash.upperFirst(SidecarStatusEnum.toString(status));
   const lastSeenDateTime = new DateTime(lastSeen);
