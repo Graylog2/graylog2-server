@@ -43,7 +43,6 @@ const exceedsDuration = (timeRange: TimeRange, limitDuration, formatTime: (dateT
       const durationFrom = timeRange.from;
 
       const durationLimit = formatTime(toDateObject(new Date()).subtract(Number(limitDuration), 'seconds'), 'complete');
-      console.log(durationLimit, durationFrom);
 
       return moment(durationFrom).isBefore(durationLimit);
     }
