@@ -25,70 +25,68 @@ import DateTime from 'logic/datetimes/DateTime';
 
 import style from './StatusIndicator.css';
 
-class StatusIndicator extends React.Component {
-  static propTypes = {
-    id: PropTypes.string,
-    lastSeen: PropTypes.string,
-    message: PropTypes.string,
-    status: PropTypes.number,
-  };
+const StatusIndicator = ({ message: messageProp, status, lastSeen, id }) => {
+  let message = messageProp;
+  const text = lodash.upperFirst(SidecarStatusEnum.toString(status));
+  const lastSeenDateTime = new DateTime(lastSeen);
 
-  static defaultProps = {
-    id: '',
-    lastSeen: undefined,
-    message: '',
-    status: -1,
-  };
+  let icon;
+  let className;
 
-  render() {
-    const text = lodash.upperFirst(SidecarStatusEnum.toString(this.props.status));
-    const lastSeenDateTime = new DateTime(this.props.lastSeen);
+  switch (status) {
+    case SidecarStatusEnum.RUNNING:
+      className = 'text-success';
+      icon = 'play';
+      break;
+    case SidecarStatusEnum.FAILING:
+      className = 'text-danger';
+      icon = 'exclamation-triangle';
+      break;
+    case SidecarStatusEnum.STOPPED:
+      className = 'text-danger';
+      icon = 'stop';
+      break;
+    default:
+      className = 'text-info';
+      icon = 'question-circle';
+      message += ` (${lastSeenDateTime.toRelativeString()})`;
+  }
 
-    let icon;
-    let className;
-    let { message } = this.props;
-
-    switch (this.props.status) {
-      case SidecarStatusEnum.RUNNING:
-        className = 'text-success';
-        icon = 'play';
-        break;
-      case SidecarStatusEnum.FAILING:
-        className = 'text-danger';
-        icon = 'exclamation-triangle';
-        break;
-      case SidecarStatusEnum.STOPPED:
-        className = 'text-danger';
-        icon = 'stop';
-        break;
-      default:
-        className = 'text-info';
-        icon = 'question-circle';
-        message += ` (${lastSeenDateTime.toRelativeString()})`;
-    }
-
-    if (this.props.message && this.props.id) {
-      const popover = (
-        <Popover id={`${this.props.id}-status-tooltip`}>
-          {message}
-        </Popover>
-      );
-
-      return (
-        <OverlayTrigger placement="top" overlay={popover} rootClose trigger="hover">
-          <span className={`${className} ${style.indicator}`}>
-            <Icon name={icon} fixedWidth /> {text}
-          </span>
-        </OverlayTrigger>
-      );
-    }
+  if (message && id) {
+    const popover = (
+      <Popover id={`${id}-status-tooltip`}>
+        {message}
+      </Popover>
+    );
 
     return (
-      <span className={`${className} ${style.indicator}`}>
-        <Icon name={icon} fixedWidth /> {text}
-      </span>
+      <OverlayTrigger placement="top" overlay={popover} rootClose trigger="hover">
+        <span className={`${className} ${style.indicator}`}>
+          <Icon name={icon} fixedWidth /> {text}
+        </span>
+      </OverlayTrigger>
     );
   }
-}
+
+  return (
+    <span className={`${className} ${style.indicator}`}>
+      <Icon name={icon} fixedWidth /> {text}
+    </span>
+  );
+};
+
+StatusIndicator.propTypes = {
+  id: PropTypes.string,
+  lastSeen: PropTypes.string,
+  message: PropTypes.string,
+  status: PropTypes.number,
+};
+
+StatusIndicator.defaultProps = {
+  id: '',
+  lastSeen: undefined,
+  message: '',
+  status: -1,
+};
 
 export default StatusIndicator;
