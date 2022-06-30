@@ -24,6 +24,10 @@ You can start the development server in any other host and port that you like:
 
 E.g. `yarn start --host=0.0.0.0 --port=8000` will start the development server in all available network interfaces using the port 8000.
 
+## Contributing
+
+Please have a look at the [CONTRIBUTING.md](CONTRIBUTING.md) for an overview of our conventions, best practices and tips.
+
 ## Frontend documentation and component gallery
 There's an online version of the frontend documentation and component gallery at:
 
