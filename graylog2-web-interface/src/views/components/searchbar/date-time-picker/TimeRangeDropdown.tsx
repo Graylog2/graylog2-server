@@ -23,7 +23,13 @@ import moment from 'moment';
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/bootstrap';
 import { Icon, KeyCapture } from 'components/common';
 import { availableTimeRangeTypes } from 'views/Constants';
-import type { AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
+import type {
+  AbsoluteTimeRange,
+  KeywordTimeRange,
+  NoTimeRangeOverride,
+  TimeRange,
+  RelativeTimeRange,
+} from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelative } from 'views/typeGuards/timeRange';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
@@ -236,9 +242,9 @@ const TimeRangeDropdown = ({
                                            onSubmit={handleSubmit}
                                            validateOnMount>
         {(({ values: { nextTimeRange }, isValid, setFieldValue, submitForm }) => {
-          const handleActiveTab = (nextTab) => {
+          const handleActiveTab = (nextTab: AbsoluteTimeRange['type'] | RelativeTimeRange['type'] | KeywordTimeRange['type']) => {
             if ('type' in nextTimeRange) {
-              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab));
+              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab, formatTime));
             } else {
               setFieldValue('nextTimeRange', defaultRanges[nextTab]);
             }
