@@ -29,8 +29,8 @@ import javax.annotation.Nullable;
  * AutoValue classes cannot extend classes, so an interface is used instead. Not as good, but it's something.
  */
 public interface Entity {
-    String ID = "id";
-    String METADATA = "metadata";
+    String ID = "_id";
+    String METADATA = "_metadata";
 
     // Entity annotations included in interface only as an example.
     @Id

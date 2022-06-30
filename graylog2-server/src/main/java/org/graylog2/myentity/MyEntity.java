@@ -69,6 +69,7 @@ public abstract class MyEntity implements Entity {
 
         @JsonCreator
         public static Builder create() {
+            // TODO (optional): Supply empty metadata default for existing objects.
             return new AutoValue_MyEntity.Builder();
         }
 
