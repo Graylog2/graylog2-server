@@ -130,7 +130,7 @@ We currently have a few internal packages, used for the core application and all
 - stylelint-config-graylog contains our custom stylelint configuration, based on the default stylelint config.
 
 ### Browser compatibility
-We currently do not have a pre release process to test different or old browser. Nevertheless you should test layout changes in at least all modern browsers (Chrome, Firefox, Safari). Bigger layout changes should also be tested in older browsers. Have a look at our public browser compatibility list.
+We currently do not have a pre release process to test different or old browser. Nevertheless you should test layout changes in at least all modern browsers (Chrome, Firefox, Safari). Bigger layout changes should also be tested in older browsers. Have a look at our [public browser compatibility list](https://docs.graylog.org/docs/web-interface#browser-compatibility).
 
 ### Plugin System
 - Graylogs plugin system allows users to extend the graylog core product without changing its source code. There are multiple points in the application which can be extended, like the navigation.
@@ -171,7 +171,7 @@ We currently do not have a pre release process to test different or old browser.
 - Prefer our own Select component over the default one.
 - Avoid adding long forms into a modal.
 - Mark optional fields as optional by adding “(Optional)” to the label text.
-- We are working in using standard components and libraries to make our forms more consistent.
+- We are working on using standard components and libraries to make our forms more consistent.
 
 #### Responsive styles
 - Using Graylog in large and medium size screens should be possible for all features in our product.
