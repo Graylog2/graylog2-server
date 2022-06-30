@@ -19,7 +19,6 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useContext } from 'react';
 
-import DateTime from 'logic/datetimes/DateTime';
 import { Icon } from 'components/common';
 import { Button, Input } from 'components/bootstrap';
 import UserDateTimeContext from 'contexts/UserDateTimeContext';
