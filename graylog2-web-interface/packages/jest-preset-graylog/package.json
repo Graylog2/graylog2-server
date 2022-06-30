@@ -30,7 +30,7 @@
     "jest": "28.1.1",
     "jest-canvas-mock": "^2.3.1",
     "jest-environment-enzyme": "^7.1.2",
-    "jest-environment-jsdom": "28.1.1",
+    "jest-environment-jsdom": "28.1.2",
     "jest-enzyme": "^7.1.2",
     "jest-styled-components": "7.0.7",
     "react-select-event": "^5.0.0"
