@@ -22,7 +22,6 @@ import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
 import { DocumentationLink } from 'components/support';
-import DateTime from 'logic/datetimes/DateTime';
 import history from 'util/History';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
@@ -32,6 +31,7 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 import { RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
 import type { RetentionStrategy, RotationStrategy, RetentionStrategyContext } from 'components/indices/Types';
+import { adjustFormat } from 'util/DateTime';
 
 type Props = {
   indexSet: Partial<IndexSet> | null | undefined,
@@ -49,7 +49,7 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
   const _saveConfiguration = (indexSetItem: IndexSet) => {
     const copy = indexSetItem;
 
-    copy.creation_date = DateTime.now().toISOString();
+    copy.creation_date = adjustFormat(new Date(), 'internal');
 
     IndexSetsActions.create(copy).then(() => {
       history.push(Routes.SYSTEM.INDICES.LIST);
