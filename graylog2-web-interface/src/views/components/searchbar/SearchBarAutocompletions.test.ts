@@ -60,7 +60,7 @@ const EMPTY_FIELDTYPES = { all: {}, query: {} };
 describe('SearchAutoCompletions', () => {
   describe('getCompletions', () => {
     it('should return completions based on provided Completers', async () => {
-      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES);
+      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES, 'Europe/Berlin');
 
       const callback = jest.fn();
 
@@ -77,7 +77,7 @@ describe('SearchAutoCompletions', () => {
     });
 
     it('should support Completers which provide the completions asynchronously', async () => {
-      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter(), new AsyncCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES);
+      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter(), new AsyncCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES, 'Europe/Berlin');
 
       const callback = jest.fn();
 
@@ -96,7 +96,7 @@ describe('SearchAutoCompletions', () => {
 
   describe('shouldShowCompletions', () => {
     it('should not show completions manually when no Completer provides `shouldShowCompletions`', async () => {
-      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES);
+      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES, 'Europe/Berlin');
 
       const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{
         type: 'keyword',
@@ -117,7 +117,7 @@ describe('SearchAutoCompletions', () => {
         shouldShowCompletions = () => false;
       }
 
-      const searchBarAutoCompletions = new SearchBarAutoCompletions([new ExampleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES);
+      const searchBarAutoCompletions = new SearchBarAutoCompletions([new ExampleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES, 'Europe/Berlin');
       const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{
         type: 'keyword',
         value: 'http_method:',
@@ -138,7 +138,7 @@ describe('SearchAutoCompletions', () => {
         shouldShowCompletions = mockShouldShowCompletions;
       }
 
-      const searchBarAutoCompletions = new SearchBarAutoCompletions([new ExampleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES);
+      const searchBarAutoCompletions = new SearchBarAutoCompletions([new ExampleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES, 'Europe/Berlin');
       const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{
         type: 'keyword',
         value: 'http_method:',

@@ -28,6 +28,7 @@ import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validate from 'views/components/searchbar/validate';
 import usePluginEntities from 'views/logic/usePluginEntities';
+import UserDateTimeContext from 'contexts/UserDateTimeContext';
 
 type Props = {
   children: ((props: FormikProps<SearchBarFormValues>) => React.ReactNode) | React.ReactNode,
@@ -45,25 +46,26 @@ const StyledForm = styled(Form)`
 
 const _isFunction = (children: Props['children']): children is (props: FormikProps<SearchBarFormValues>) => React.ReactElement => isFunction(children);
 
-export const normalizeSearchBarFormValues = ({ timerange, ...rest }: SearchBarFormValues) => ({ timerange: onSubmittingTimerange(timerange), ...rest });
+export const normalizeSearchBarFormValues = ({ timerange, ...rest }: SearchBarFormValues, userTimezone: string) => ({ timerange: onSubmittingTimerange(timerange, userTimezone), ...rest });
 
 const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef, validateQueryString }: Props) => {
   const [enableReinitialize, setEnableReinitialize] = useState(true);
+  const { formatTime, userTimezone } = useContext(UserDateTimeContext);
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const { setFieldWarning } = useContext(FormWarningsContext);
   const _onSubmit = useCallback((values: SearchBarFormValues) => {
     setEnableReinitialize(false);
 
-    return onSubmit(normalizeSearchBarFormValues(values)).finally(() => setEnableReinitialize(true));
+    return onSubmit(normalizeSearchBarFormValues(values, userTimezone)).finally(() => setEnableReinitialize(true));
   }, [onSubmit]);
   const _initialValues = useMemo(() => {
     const { timerange, ...rest } = initialValues;
 
     return ({
       ...rest,
-      timerange: onInitializingTimerange(timerange),
+      timerange: onInitializingTimerange(timerange, formatTime),
     });
-  }, [initialValues]);
+  }, [formatTime, initialValues]);
 
   const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls),
     [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls]);

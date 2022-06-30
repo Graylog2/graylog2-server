@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useContext } from 'react';
 import { Field } from 'formik';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
 
+import UserDateTimeContext from 'contexts/UserDateTimeContext';
 import { useStore } from 'stores/connect';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
 import { FlatContentRow, Spinner } from 'components/common';
@@ -97,14 +98,14 @@ const SearchButtonAndQuery = styled.div`
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
-const _validateQueryString = (values: DashboardFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>) => {
+const _validateQueryString = (values: DashboardFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, userTimezone: string) => {
   const request = {
     timeRange: isNoTimeRangeOverride(values?.timerange) ? undefined : values?.timerange,
     queryString: values?.queryString,
     ...pluggableValidationPayload(values, pluggableSearchBarControls),
   };
 
-  return debouncedValidateQuery(request);
+  return debouncedValidateQuery(request, userTimezone);
 };
 
 const useInitialFormValues = (timerange, queryString) => {
@@ -116,6 +117,7 @@ const useInitialFormValues = (timerange, queryString) => {
 };
 
 const DashboardSearchBar = () => {
+  const { userTimezone } = useContext(UserDateTimeContext);
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
   const { timerange, query: { query_string: queryString = '' } = {} } = useStore(GlobalOverrideStore) ?? {};
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
@@ -145,7 +147,7 @@ const DashboardSearchBar = () => {
               <DashboardSearchForm initialValues={initialValues}
                                    limitDuration={limitDuration}
                                    onSubmit={submitForm}
-                                   validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls)}>
+                                   validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls, userTimezone)}>
                 {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
                   const disableSearchSubmit = isSubmitting || isValidating || !isValid;
 
