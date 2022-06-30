@@ -19,6 +19,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 
 import IfInteractive from 'views/components/dashboard/IfInteractive';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 import Pagination from './Pagination';
 import PageSizeSelect from './PageSizeSelect';
@@ -57,16 +58,10 @@ const PaginatedList = ({
   showPageSizeSelect,
   totalItems,
 }: Props) => {
-  const initialPage = activePage > 0 ? activePage : INITIAL_PAGE;
+  const { setPage } = usePaginationQueryParameter();
+  const currentPage = activePage > 0 ? activePage : INITIAL_PAGE;
   const [pageSize, setPageSize] = useState(propsPageSize);
-  const [currentPage, setCurrentPage] = useState(initialPage);
   const numberPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 0;
-
-  useEffect(() => {
-    if (activePage > 0) {
-      setCurrentPage(activePage);
-    }
-  }, [activePage]);
 
   useEffect(() => {
     setPageSize(propsPageSize);
@@ -76,13 +71,13 @@ const PaginatedList = ({
     event.preventDefault();
     const newPageSize = Number(event.target.value);
 
-    setCurrentPage(INITIAL_PAGE);
+    setPage(INITIAL_PAGE);
     setPageSize(newPageSize);
     onChange(INITIAL_PAGE, newPageSize);
   };
 
   const _onChangePage = (pageNum: number) => {
-    setCurrentPage(pageNum);
+    setPage(pageNum);
     onChange(pageNum, pageSize);
   };
 
