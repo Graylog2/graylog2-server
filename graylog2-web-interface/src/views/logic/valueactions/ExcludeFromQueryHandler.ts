@@ -16,12 +16,13 @@
  */
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
 import type { ActionHandler } from 'views/components/actions/ActionHandler';
+import { MISSING_BUCKET_NAME } from 'views/Constants';
 
 import QueryManipulationHandler from './QueryManipulationHandler';
 
 export default class ExcludeFromQueryHandler extends QueryManipulationHandler {
   static formatNewQuery = (oldQuery: string, field: string, value: any) => {
-    const fieldPredicate = value === '(Empty Value)'
+    const fieldPredicate = value === MISSING_BUCKET_NAME
       ? `_exists_:${field}`
       : `NOT ${field}:${escape(value)}`;
 

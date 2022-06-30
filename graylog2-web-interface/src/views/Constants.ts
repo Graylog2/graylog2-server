@@ -29,6 +29,7 @@ export const FULL_MESSAGE_FIELD = 'full_message';
 export const TIMESTAMP_FIELD = 'timestamp';
 export const MESSAGE_FIELD = 'message';
 export const SOURCE_FIELD = 'source';
+export const MISSING_BUCKET_NAME = '(Empty Value)';
 
 export const DEFAULT_MESSAGE_FIELDS = [TIMESTAMP_FIELD, SOURCE_FIELD];
 
