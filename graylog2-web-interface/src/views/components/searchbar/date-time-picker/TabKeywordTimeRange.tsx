@@ -92,7 +92,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
 
       return trim(keyword) === ''
         ? Promise.resolve('Keyword must not be empty!')
-        : ToolsStore.testNaturalDate(keyword)
+        : ToolsStore.testNaturalDate(keyword, userTimezone)
           .then((response) => {
             if (mounted.current) _setSuccessfullPreview(response);
           })
@@ -100,7 +100,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
     }
 
     return undefined;
-  }, [_setFailedPreview, _setSuccessfullPreview, setValidatingKeyword]);
+  }, [_setFailedPreview, _setSuccessfullPreview, setValidatingKeyword, userTimezone]);
 
   useEffect(() => {
     return () => {
