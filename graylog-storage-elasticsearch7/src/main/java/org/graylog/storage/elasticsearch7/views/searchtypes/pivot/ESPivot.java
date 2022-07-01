@@ -366,6 +366,12 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 processColumns(rowBuilder, searchResult, queryContext, pivot, tail(remainingColumns), columnKeys, bucket.aggregation());
                 columnKeys.removeLast();
             });
+            final Missing missingAggregation = aggregation.getAggregations().get(MissingBucketConstants.MISSING_AGGREGATION_NAME);
+            if (missingAggregation != null && missingAggregation.getDocCount() > 0) {
+                columnKeys.addLast(MissingBucketConstants.MISSING_BUCKET_NAME);
+                processColumns(rowBuilder, searchResult, queryContext, pivot, tail(remainingColumns), columnKeys, missingAggregation);
+                columnKeys.removeLast();
+            }
             // also add the series for the base column key if the client wants rollups, the complete column key is processed in the leaf branch
             // don't add the empty column key rollup, because that's not the correct bucket here, it's being done in the row-leaf code
             if (pivot.rollup() && !columnKeys.isEmpty()) {
