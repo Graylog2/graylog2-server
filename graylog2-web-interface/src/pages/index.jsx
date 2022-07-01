@@ -82,7 +82,6 @@ const SidecarsPage = loadAsync(() => import('pages/SidecarsPage'));
 const SidecarStatusPage = loadAsync(() => import('pages/SidecarStatusPage'));
 const SimulatorPage = loadAsync(() => import('./SimulatorPage'));
 const StartPage = loadAsync(() => import('./StartPage'));
-const StreamAlertsOverviewPage = loadAsync(() => import('pages/StreamAlertsOverviewPage'));
 const StreamEditPage = loadAsync(() => import('./StreamEditPage'));
 const StreamOutputsPage = loadAsync(() => import('./StreamOutputsPage'));
 const StreamsPage = loadAsync(() => import('./StreamsPage'));
@@ -165,7 +164,6 @@ export {
   SidecarStatusPage,
   SimulatorPage,
   StartPage,
-  StreamAlertsOverviewPage,
   StreamEditPage,
   StreamOutputsPage,
   StreamsPage,
