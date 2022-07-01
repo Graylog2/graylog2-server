@@ -31,7 +31,7 @@ const usePaginationQueryParameter = () => {
     history.replace(uri.toString());
   };
 
-  return { page: Number(page) || 0, setPage };
+  return { page: Number(page) || 1, setPage };
 };
 
 export default usePaginationQueryParameter;
