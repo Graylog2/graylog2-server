@@ -34,7 +34,6 @@ import org.graylog.plugins.views.search.validation.QueryValidationService;
 import org.graylog.plugins.views.search.validation.QueryValidationServiceImpl;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -42,6 +41,7 @@ import org.mockito.ArgumentCaptor;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -56,7 +56,6 @@ public class MessagesResourceTest {
 
     private MessagesResource sut;
     private User currentUser;
-    private PermittedStreams permittedStreams;
     private SearchExecutionGuard executionGuard;
     private CommandFactory commandFactory;
     @SuppressWarnings("UnstableApiUsage")
@@ -64,7 +63,6 @@ public class MessagesResourceTest {
 
     @BeforeEach
     void setUp() {
-        GuiceInjectorHolder.createInjector(Collections.emptyList());
         currentUser = mock(User.class);
         when(currentUser.getName()).thenReturn("peterchen");
         MessagesExporter exporter = mock(MessagesExporter.class);
@@ -72,14 +70,13 @@ public class MessagesResourceTest {
         when(commandFactory.buildFromRequest(any())).thenReturn(ExportMessagesCommand.withDefaults());
         when(commandFactory.buildWithSearchOnly(any(), any())).thenReturn(ExportMessagesCommand.withDefaults());
         when(commandFactory.buildWithMessageList(any(), any(), any())).thenReturn(ExportMessagesCommand.withDefaults());
-        permittedStreams = mock(PermittedStreams.class);
-        when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("a-default-stream"));
+        final PermittedStreams permittedStreams = new PermittedStreams(() -> Stream.of("a-default-stream"));
         executionGuard = mock(SearchExecutionGuard.class);
         SearchDomain searchDomain = mock(SearchDomain.class);
 
         final MappedFieldTypesService mappedFieldTypesService = (streamIds, timeRange) -> Collections.emptySet();
         final QueryValidationServiceImpl validationService = new QueryValidationServiceImpl(
-                new LuceneQueryParser(),
+                new LuceneQueryParser(false),
                 mappedFieldTypesService,
                 Collections.emptySet());
 

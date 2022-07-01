@@ -91,16 +91,17 @@ describe('EditWidgetFrame', () => {
 
     it('refreshes search after clicking on search button, when there are no changes', async () => {
       renderSUT();
-      const searchButton = screen.getByTitle(/Perform search/);
+      const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
+      await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
       fireEvent.click(searchButton);
 
       await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
     });
 
     it('changes the widget\'s streams when using stream filter', async () => {
-      const { getByTitle, getByTestId } = renderSUT();
-      const streamFilter = getByTestId('streams-filter');
+      renderSUT();
+      const streamFilter = await screen.findByTestId('streams-filter');
       const reactSelect = streamFilter.querySelector('div');
 
       expect(reactSelect).not.toBeNull();
@@ -109,7 +110,10 @@ describe('EditWidgetFrame', () => {
         await selectEvent.select(reactSelect, 'PFLog');
       }
 
-      const searchButton = getByTitle(/Perform search/);
+      const searchButton = screen.getByRole('button', {
+        name: /perform search \(changes were made after last search execution\)/i,
+      });
+      await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
 
       fireEvent.click(searchButton);
 

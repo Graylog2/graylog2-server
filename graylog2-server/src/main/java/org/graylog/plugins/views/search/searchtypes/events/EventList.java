@@ -19,8 +19,6 @@ package org.graylog.plugins.views.search.searchtypes.events;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
@@ -28,6 +26,7 @@ import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.EventListEntity;
@@ -60,10 +59,15 @@ public abstract class EventList implements SearchType {
     @Override
     public abstract Filter filter();
 
+    @Override
+    @JsonProperty(FIELD_SEARCH_FILTERS)
+    public abstract List<UsedSearchFilter> filters();
+
     @JsonCreator
     public static Builder builder() {
         return new AutoValue_EventList.Builder()
                 .type(NAME)
+                .filters(Collections.emptyList())
                 .streams(Collections.emptySet());
     }
 
@@ -84,6 +88,7 @@ public abstract class EventList implements SearchType {
         @JsonCreator
         public static Builder createDefault() {
             return builder()
+                    .filters(Collections.emptyList())
                     .streams(Collections.emptySet());
         }
 
@@ -100,6 +105,9 @@ public abstract class EventList implements SearchType {
 
         @JsonProperty
         public abstract Builder filter(@Nullable Filter filter);
+
+        @JsonProperty(FIELD_SEARCH_FILTERS)
+        public abstract Builder filters(List<UsedSearchFilter> filters);
 
         @JsonProperty
         public abstract Builder query(@Nullable BackendQuery query);
@@ -160,6 +168,7 @@ public abstract class EventList implements SearchType {
         return EventListEntity.builder()
                 .streams(mappedStreams(entityDescriptorIds))
                 .filter(filter())
+                .filters(filters())
                 .id(id())
                 .name(name().orElse(null))
                 .query(query().orElse(null))

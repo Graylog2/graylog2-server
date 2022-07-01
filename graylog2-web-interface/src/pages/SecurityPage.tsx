@@ -61,10 +61,10 @@ const LinkTo = () => {
 const SecurityPage = () => {
   return (
     <StyledAlert bsStyle="danger" className="tm">
-      <StyledH2>Invalid License for Analyst Tools</StyledH2>
-      <StyledH4>Analyst Tools are disabled</StyledH4>
+      <StyledH2>Invalid License for the Security plugin</StyledH2>
+      <StyledH4>Security plugin is disabled</StyledH4>
       <p>
-        Analyst Tools are disabled because a valid Graylog for Security license was not found{Routes.pluginRoute('SYSTEM_LICENSES', false) ? '' : ' and the enterprise plugin is not installed'}.
+        The security plugin is disabled because a valid Graylog for Security license was not found{Routes.pluginRoute('SYSTEM_LICENSES', false) ? '' : ' and the enterprise plugin is not installed'}.
       </p>
       {isCloud
         ? (<>Contact your Graylog account manager.</>)

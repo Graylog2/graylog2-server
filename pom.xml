@@ -98,6 +98,7 @@
         <bouncycastle.version>1.69</bouncycastle.version>
         <caffeine.version>2.8.1</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
+        <classgraph.version>4.8.102</classgraph.version>
         <commons-codec.version>1.14</commons-codec.version>
         <commons-email.version>1.5</commons-email.version>
         <commons-validator.version>1.6</commons-validator.version>
@@ -133,7 +134,7 @@
         <kafka.version>2.7.0</kafka.version>
         <kafka09.version>0.9.0.1-6</kafka09.version>
         <log4j.version>2.17.1</log4j.version>
-        <lucene.version>8.10.1</lucene.version>
+        <lucene.version>8.11.2</lucene.version>
         <metrics.version>4.1.9</metrics.version>
         <mongodb-driver.version>3.12.1</mongodb-driver.version>
         <mongojack.version>2.10.1</mongojack.version>
@@ -141,7 +142,7 @@
         <netty.version>4.1.60.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.36.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>3.14.6</okhttp.version>
-        <okta-sdk.version>3.0.1</okta-sdk.version>
+        <okta-sdk.version>8.2.1</okta-sdk.version>
         <opencsv.version>2.3</opencsv.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.5</pkts.version>
@@ -164,6 +165,7 @@
         <validation-api.version>2.0.1.Final</validation-api.version>
         <zkclient.version>0.11</zkclient.version>
         <zookeeper.version>3.5.7</zookeeper.version>
+        <cron-utils.version>9.1.6</cron-utils.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
@@ -329,7 +331,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.7</version>
+                    <version>2.11.0</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>

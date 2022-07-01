@@ -25,9 +25,8 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
+import org.graylog.enterprise.EnterpriseModule;
 import org.graylog.events.EventsModule;
-import org.graylog.freeenterprise.FreeEnterpriseConfiguration;
-import org.graylog.freeenterprise.FreeEnterpriseModule;
 import org.graylog.grn.GRNTypesModule;
 import org.graylog.metrics.prometheus.PrometheusExporterConfiguration;
 import org.graylog.metrics.prometheus.PrometheusMetricsModule;
@@ -38,6 +37,7 @@ import org.graylog.plugins.pipelineprocessor.PipelineConfig;
 import org.graylog.plugins.sidecar.SidecarModule;
 import org.graylog.plugins.views.ViewsBindings;
 import org.graylog.plugins.views.ViewsConfig;
+import org.graylog.plugins.views.search.searchfilters.module.SearchFiltersModule;
 import org.graylog.scheduler.JobSchedulerConfiguration;
 import org.graylog.scheduler.JobSchedulerModule;
 import org.graylog.security.SecurityModule;
@@ -124,7 +124,6 @@ public class Server extends ServerBootstrap {
     private final ViewsConfig viewsConfiguration = new ViewsConfig();
     private final ProcessingStatusConfig processingStatusConfig = new ProcessingStatusConfig();
     private final JobSchedulerConfiguration jobSchedulerConfiguration = new JobSchedulerConfiguration();
-    private final FreeEnterpriseConfiguration freeEnterpriseConfiguration = new FreeEnterpriseConfiguration();
     private final PrometheusExporterConfiguration prometheusExporterConfiguration = new PrometheusExporterConfiguration();
     private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
 
@@ -177,12 +176,13 @@ public class Server extends ServerBootstrap {
                 new ViewsBindings(),
                 new JobSchedulerModule(),
                 new EventsModule(),
-                new FreeEnterpriseModule(),
+                new EnterpriseModule(),
                 new GRNTypesModule(),
                 new SecurityModule(),
                 new PrometheusMetricsModule(),
                 new ClusterConfigValidatorModule(),
-                new MapWidgetModule()
+                new MapWidgetModule(),
+                new SearchFiltersModule()
         );
         return modules.build();
     }
@@ -202,7 +202,6 @@ public class Server extends ServerBootstrap {
                 viewsConfiguration,
                 processingStatusConfig,
                 jobSchedulerConfiguration,
-                freeEnterpriseConfiguration,
                 prometheusExporterConfiguration,
                 tlsConfiguration);
     }

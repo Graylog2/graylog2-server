@@ -40,7 +40,7 @@ describe('SearchButton', () => {
   it('should trigger form submit refresh when dirty', () => {
     render(<SUT dirty />);
 
-    const button = screen.getByTitle('Perform search (changes were made after last search execution)');
+    const button = screen.getByRole('button', { name: /perform search \(changes were made after last search execution\)/i });
 
     fireEvent.click(button);
 
@@ -50,7 +50,7 @@ describe('SearchButton', () => {
   it('should trigger form submit refresh when not dirty', () => {
     render(<SUT />);
 
-    const button = screen.getByTitle('Perform search');
+    const button = screen.getByRole('button', { name: /perform search/i });
 
     fireEvent.click(button);
 

@@ -33,6 +33,7 @@ import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
+import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.journal.RawMessage;
@@ -55,7 +56,7 @@ import java.util.regex.Pattern;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 @SuppressForbidden("Intentionally use system default timezone")
-public class CEFCodec implements Codec {
+public class CEFCodec extends AbstractCodec {
     public static final String NAME = "CEF";
 
     private static final Logger LOG = LoggerFactory.getLogger(CEFCodec.class);
@@ -68,7 +69,6 @@ public class CEFCodec implements Codec {
 
     private static final DateTimeZone DEFAULT_TIMEZONE = DateTimeZone.getDefault();
 
-    private final Configuration configuration;
     private final DateTimeZone timezone;
     private final Locale locale;
     private final boolean useFullNames;
@@ -76,7 +76,7 @@ public class CEFCodec implements Codec {
 
     @AssistedInject
     public CEFCodec(@Assisted Configuration configuration) {
-        this.configuration = configuration;
+        super(configuration);
         this.parser = CEFParserFactory.create();
 
         DateTimeZone timezone;
@@ -95,7 +95,7 @@ public class CEFCodec implements Codec {
     @Nullable
     @Override
     public Message decode(@Nonnull RawMessage rawMessage) {
-        final String s = new String(rawMessage.getPayload(), StandardCharsets.UTF_8);
+        final String s = new String(rawMessage.getPayload(), charset);
         final Matcher matcher = SYSLOG_PREFIX.matcher(s);
 
         if (matcher.find()) {

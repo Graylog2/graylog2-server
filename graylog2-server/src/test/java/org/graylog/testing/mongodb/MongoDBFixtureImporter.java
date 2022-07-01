@@ -72,7 +72,7 @@ import java.util.stream.Collectors;
  * }
  * }</pre>
  */
-class MongoDBFixtureImporter {
+public class MongoDBFixtureImporter {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBFixtureImporter.class);
     private static final String FIELD_DATA = "data";
     private static final String FIELD_INDEX = "index";
@@ -91,7 +91,7 @@ class MongoDBFixtureImporter {
         this.resources = buildFixtureResources(fixtureResources, contextClass);
     }
 
-    MongoDBFixtureImporter(List<URL> fixtureResources) {
+    public MongoDBFixtureImporter(List<URL> fixtureResources) {
         this.resources = fixtureResources;
     }
 
@@ -125,7 +125,7 @@ class MongoDBFixtureImporter {
     }
 
     @SuppressWarnings("unchecked")
-    private void importData(MongoDatabase database, String jsonData) {
+    public void importData(MongoDatabase database, String jsonData) {
         final Document data = Document.parse(jsonData);
 
         for (final String collectionName : data.keySet()) {

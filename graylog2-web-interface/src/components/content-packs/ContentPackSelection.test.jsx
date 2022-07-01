@@ -186,8 +186,15 @@ describe('<ContentPackSelection />', () => {
     });
 
     it('should validate that all fields are filled out', () => {
+      const touchAllFields = (_wrapper) => {
+        _wrapper.instance()._handleTouched('name');
+        _wrapper.instance()._handleTouched('summary');
+        _wrapper.instance()._handleTouched('vendor');
+      };
+
       const wrapper = mount(<ContentPackSelection contentPack={{}} entities={entities} />);
 
+      touchAllFields(wrapper);
       wrapper.instance()._validate();
       wrapper.update();
 
@@ -195,6 +202,7 @@ describe('<ContentPackSelection />', () => {
 
       const wrapper2 = mount(<ContentPackSelection contentPack={{ name: 'name' }} entities={entities} />);
 
+      touchAllFields(wrapper2);
       wrapper2.instance()._validate();
       wrapper2.update();
 
@@ -202,7 +210,7 @@ describe('<ContentPackSelection />', () => {
 
       const wrapper1 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary' }}
                                                    entities={entities} />);
-
+      touchAllFields(wrapper1);
       wrapper1.instance()._validate();
       wrapper1.update();
 
@@ -210,7 +218,7 @@ describe('<ContentPackSelection />', () => {
 
       const wrapper0 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary', vendor: 'vendor' }}
                                                    entities={entities} />);
-
+      touchAllFields(wrapper0);
       wrapper0.instance()._validate();
       wrapper0.update();
 
@@ -231,6 +239,7 @@ describe('<ContentPackSelection />', () => {
         contentPack.url = `${protocol}//example.org`;
         const invalidWrapper = mount(<ContentPackSelection contentPack={contentPack} entities={entities} />);
 
+        invalidWrapper.instance()._handleTouched('url');
         invalidWrapper.instance()._validate();
         invalidWrapper.update();
 

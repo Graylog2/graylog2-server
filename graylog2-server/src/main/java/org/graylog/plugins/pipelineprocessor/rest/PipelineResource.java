@@ -115,7 +115,14 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 .createdAt(now)
                 .modifiedAt(now)
                 .build();
-        final PipelineDao save = pipelineService.save(pipelineDao);
+
+        final PipelineDao save;
+        try {
+            save = pipelineService.save(pipelineDao);
+        } catch (IllegalArgumentException e) {
+            log.error(e.getMessage(), e);
+            throw new BadRequestException(e.getMessage());
+        }
 
         log.debug("Created new pipeline {}", save);
         return PipelineSource.fromDao(pipelineRuleParser, save);
@@ -226,7 +233,14 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 .source(update.source())
                 .modifiedAt(DateTime.now(DateTimeZone.UTC))
                 .build();
-        final PipelineDao savedPipeline = pipelineService.save(toSave);
+
+        final PipelineDao savedPipeline;
+        try {
+            savedPipeline = pipelineService.save(toSave);
+        } catch (IllegalArgumentException e) {
+            log.error(e.getMessage(), e);
+            throw new BadRequestException(e.getMessage());
+        }
 
         return PipelineSource.fromDao(pipelineRuleParser, savedPipeline);
     }

@@ -38,6 +38,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -53,8 +54,8 @@ public class PivotAggregationSearchTest {
     private EventDefinition eventDefinition;
     @Mock
     private MoreSearch moreSearch;
-    @Mock
-    private PermittedStreams permittedStreams;
+
+    private final PermittedStreams permittedStreams = new PermittedStreams(Stream::of);
 
     @Test
     public void testExtractValuesWithGroupBy() throws Exception {

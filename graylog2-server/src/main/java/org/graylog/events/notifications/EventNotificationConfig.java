@@ -50,6 +50,9 @@ public interface EventNotificationConfig extends ContentPackable<EventNotificati
     @JsonIgnore
     ValidationResult validate();
 
+    @JsonIgnore
+    default EventNotificationConfig prepareConfigUpdate(EventNotificationConfig newConfig) {return newConfig;}
+
     class FallbackNotificationConfig implements EventNotificationConfig {
         @Override
         public String type() {

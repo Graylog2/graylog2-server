@@ -19,46 +19,50 @@ package org.graylog.metrics.prometheus.mapping;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
-import org.graylog2.plugin.system.NodeId;
+import org.graylog2.jackson.DeserializationProblemHandlerModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PrometheusMappingConfigLoader {
-    private static final ObjectMapper YAML_MAPPER = new ObjectMapper(new YAMLFactory());
+    private static final Logger log = LoggerFactory.getLogger(PrometheusMappingConfigLoader.class);
 
-    private final NodeId nodeId;
+    private final ObjectMapper ymlMapper;
+    private final Map<String, MetricMapping.Factory<? extends MetricMapping>> metricMappingFactories;
 
     @Inject
-    public PrometheusMappingConfigLoader(NodeId nodeId) {
-        this.nodeId = nodeId;
+    public PrometheusMappingConfigLoader(
+            Map<String, MetricMapping.Factory<? extends MetricMapping>> metricMappingFactories) {
+        this.metricMappingFactories = metricMappingFactories;
+
+        ymlMapper = new ObjectMapper(new YAMLFactory()).registerModule(new DeserializationProblemHandlerModule());
     }
 
-
     public Set<MapperConfig> load(InputStream inputStream) throws IOException {
-        final PrometheusMappingConfig config = YAML_MAPPER.readValue(inputStream, PrometheusMappingConfig.class);
+        final PrometheusMappingConfig config = ymlMapper.readValue(inputStream, PrometheusMappingConfig.class);
 
-        return config.metricMappings().stream()
-                .map(this::mapMetric)
+        return config.metricMappingConfigs()
+                .stream()
+                .flatMap(this::mapMetric)
                 .collect(Collectors.toSet());
     }
 
-    private MapperConfig mapMetric(PrometheusMappingConfig.MetricMapping mapping) {
-        final Map<String, String> labels = new HashMap<>();
-
-        // Add nodeId to every metric.
-        labels.put("node", nodeId.toString());
-        labels.putAll(mapping.additionalLabels());
-
-        for (int i = 0; i < mapping.wildcardExtractLabels().size(); i++) {
-            labels.put(mapping.wildcardExtractLabels().get(i), "${" + i + "}");
+    @Nullable
+    private Stream<MapperConfig> mapMetric(MetricMapping.Config config) {
+        final MetricMapping.Factory<? extends MetricMapping> factory = metricMappingFactories.get(config.type());
+        if (factory == null) {
+            log.error("Missing handler to process mapping for metric <{}> of type <{}>. Skipping mapping.",
+                    config.metricName(), config.type());
+            return Stream.empty();
         }
-
-        return new MapperConfig(mapping.matchPattern(), "gl_" + mapping.metricName(), labels);
+        return factory.create(config).toMapperConfigs().stream();
     }
 }

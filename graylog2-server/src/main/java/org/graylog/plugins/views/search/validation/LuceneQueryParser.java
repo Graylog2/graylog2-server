@@ -16,26 +16,36 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
 
-public class LuceneQueryParser {
-    private final TokenCollectingQueryParser parser;
-    private final StandardAnalyzer analyzer;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-    public LuceneQueryParser() {
-        analyzer = new StandardAnalyzer();
-        this.parser = new TokenCollectingQueryParser(ParsedTerm.DEFAULT_FIELD, analyzer);
-        this.parser.setSplitOnWhitespace(true);
+public class LuceneQueryParser {
+
+    public static final Analyzer ANALYZER = new WhitespaceAnalyzer();
+
+    private final boolean allowLeadingWildcard;
+
+    @Inject
+    public LuceneQueryParser(@Named("allow_leading_wildcard_searches") final boolean allowLeadingWildcard) {
+        this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
     public ParsedQuery parse(final String query) throws ParseException {
+        final TokenCollectingQueryParser parser = new TokenCollectingQueryParser(ParsedTerm.DEFAULT_FIELD, ANALYZER);
+        parser.setSplitOnWhitespace(true);
+        parser.setAllowLeadingWildcard(allowLeadingWildcard);
+
         final Query parsed = parser.parse(query);
         final ParsedQuery.Builder builder = ParsedQuery.builder().query(query);
 
-        builder.tokensBuilder().addAll(this.parser.getTokens());
-        final TermCollectingQueryVisitor visitor = new TermCollectingQueryVisitor(this.parser.getTokens(), analyzer);
+        builder.tokensBuilder().addAll(parser.getTokens());
+
+        final TermCollectingQueryVisitor visitor = new TermCollectingQueryVisitor(ANALYZER, parser.getTokenLookup());
         parsed.visit(visitor);
         builder.termsBuilder().addAll(visitor.getParsedTerms());
         return builder.build();

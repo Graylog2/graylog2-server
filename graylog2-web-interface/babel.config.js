@@ -15,27 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 module.exports = {
-  presets: [
-    ['@babel/env', {
-      modules: false,
-      useBuiltIns: 'entry',
-      corejs: '3.9',
-    }],
-    '@babel/react',
-    '@babel/typescript',
-  ],
-  plugins: [
-    '@babel/plugin-syntax-dynamic-import',
-    '@babel/plugin-proposal-class-properties',
-    'babel-plugin-styled-components',
-  ],
-  env: {
-    test: {
-      presets: ['@babel/env', '@babel/typescript'],
-      plugins: [
-        'babel-plugin-dynamic-import-node',
-        '@babel/plugin-transform-runtime',
-      ],
-    },
-  },
+  // eslint-disable-next-line global-require
+  presets: [require('babel-preset-graylog')],
 };

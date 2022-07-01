@@ -84,6 +84,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     private static final Logger log = LoggerFactory.getLogger(RuleResource.class);
 
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put(RuleDao.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put(RuleDao.FIELD_TITLE, SearchQueryField.create(RuleDao.FIELD_TITLE))
             .put(RuleDao.FIELD_DESCRIPTION, SearchQueryField.create(RuleDao.FIELD_DESCRIPTION))
             .build();
@@ -136,7 +137,14 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .createdAt(now)
                 .modifiedAt(now)
                 .build();
-        final RuleDao save = ruleService.save(newRuleSource);
+
+        final RuleDao save;
+        try {
+            save = ruleService.save(newRuleSource);
+        } catch (IllegalArgumentException e) {
+            log.error(e.getMessage(), e);
+            throw new BadRequestException(e.getMessage());
+        }
 
         log.debug("Created new rule {}", save);
         return RuleSource.fromDao(pipelineRuleParser, save);
@@ -278,7 +286,14 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .source(update.source())
                 .modifiedAt(DateTime.now(DateTimeZone.UTC))
                 .build();
-        final RuleDao savedRule = ruleService.save(toSave);
+
+        final RuleDao savedRule;
+        try {
+            savedRule = ruleService.save(toSave);
+        } catch (IllegalArgumentException e) {
+            log.error(e.getMessage(), e);
+            throw new BadRequestException(e.getMessage());
+        }
 
         return RuleSource.fromDao(pipelineRuleParser, savedRule);
     }

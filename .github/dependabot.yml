@@ -44,6 +44,17 @@ updates:
     rebase-strategy: "disabled"
 
   - package-ecosystem: npm
+    directory: "/graylog2-web-interface/packages/babel-preset-graylog"
+    schedule:
+      interval: daily
+      time: "02:00"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+    rebase-strategy: "disabled"
+
+  - package-ecosystem: npm
     directory: "/graylog2-web-interface/packages/eslint-config-graylog"
     schedule:
       interval: daily
@@ -75,3 +86,15 @@ updates:
     labels:
       - dependencies
     rebase-strategy: "disabled"
+
+  - package-ecosystem: npm
+    directory: "/graylog2-web-interface/docs"
+    schedule:
+      interval: daily
+      time: "02:00"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+    rebase-strategy: "disabled"
+

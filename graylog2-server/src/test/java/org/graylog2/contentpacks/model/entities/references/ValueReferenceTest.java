@@ -191,6 +191,7 @@ public class ValueReferenceTest {
         assertJsonEqualsNonStrict(objectMapper.writeValueAsString(ValueReference.createParameter("Test")), "{\"@type\":\"parameter\",\"@value\":\"Test\"}");
     }
 
+
     @Test
     public void deserializeParameter() throws IOException {
         assertThat(objectMapper.readValue("{\"@type\":\"parameter\",\"@value\":\"Test\"}", ValueReference.class)).isEqualTo(ValueReference.createParameter("Test"));
@@ -204,5 +205,13 @@ public class ValueReferenceTest {
 
     enum TestEnum {
         A, B, C
+    }
+
+    @Test
+    public void testOfNullable() {
+        assertThat(ValueReference.ofNullable("test")).isNotNull();
+        assertThat(ValueReference.ofNullable((String) null)).isNull();
+        assertThat(ValueReference.ofNullable(TestEnum.A)).isNotNull();
+        assertThat(ValueReference.ofNullable((TestEnum) null)).isNull();
     }
 }

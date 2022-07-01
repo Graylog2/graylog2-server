@@ -14,28 +14,31 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { memoize } from 'lodash';
+
 import FetchError from 'logic/errors/FetchError';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import CancellablePromise from 'logic/rest/CancellablePromise';
+import { ServerAvailabilityActions } from 'stores/sessions/ServerAvailabilityStore';
+
+// eslint-disable-next-line global-require
+const importSessionStore = memoize(() => require('stores/sessions/SessionStore'));
 
 const reportServerSuccess = () => {
-  // eslint-disable-next-line global-require
-  const { ServerAvailabilityActions } = require('stores/sessions/ServerAvailabilityStore');
   ServerAvailabilityActions.reportSuccess();
 };
 
-const defaultOnUnauthorizedError = (error) => ErrorsActions.report(createFromFetchError(error));
+const defaultOnUnauthorizedError = (error: FetchError) => ErrorsActions.report(createFromFetchError(error));
 
 const emptyToUndefined = (s: any) => (s && s !== '' ? s : undefined);
 
 const onServerError = async (error: Response | undefined, onUnauthorized = defaultOnUnauthorizedError) => {
   const contentType = error.headers?.get('Content-Type');
   const response = await (contentType?.startsWith('application/json') ? error.json().then((body) => body) : error?.text?.());
-  // eslint-disable-next-line global-require
-  const { SessionStore, SessionActions } = require('stores/sessions/SessionStore');
+  const { SessionStore, SessionActions } = importSessionStore();
   const fetchError = new FetchError(error.statusText, error.status, emptyToUndefined(response));
 
   if (SessionStore.isLoggedIn() && error.status === 401) {
@@ -48,8 +51,6 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
   }
 
   if (error && !error.status) {
-    // eslint-disable-next-line global-require
-    const { ServerAvailabilityActions } = require('stores/sessions/ServerAvailabilityStore');
     ServerAvailabilityActions.reportError(fetchError);
   }
 
@@ -120,7 +121,7 @@ export class Builder {
 
     this.responseHandler = defaultResponseHandler;
 
-    this.errorHandler = (error) => onServerError(error);
+    this.errorHandler = (error: Response) => onServerError(error);
 
     return this;
   }
@@ -131,7 +132,7 @@ export class Builder {
     this.accept = acceptedMimeType;
 
     this.responseHandler = defaultResponseHandler;
-    this.errorHandler = (error) => onServerError(error);
+    this.errorHandler = (error: Response) => onServerError(error);
 
     return this;
   }
@@ -150,7 +151,7 @@ export class Builder {
       throw resp;
     };
 
-    this.errorHandler = (error) => onServerError(error);
+    this.errorHandler = (error: Response) => onServerError(error);
 
     return this;
   }
@@ -163,13 +164,13 @@ export class Builder {
 
     this.responseHandler = defaultResponseHandler;
 
-    this.errorHandler = (error) => onServerError(error, onUnauthorized);
+    this.errorHandler = (error: Response) => onServerError(error, onUnauthorized);
 
     return this;
   }
 
   ignoreUnauthorized() {
-    this.errorHandler = (error) => onServerError(error, () => {});
+    this.errorHandler = (error: Response) => onServerError(error, () => {});
 
     return this;
   }
@@ -202,8 +203,7 @@ export class Builder {
 }
 
 function queuePromiseIfNotLoggedin(promise) {
-  // eslint-disable-next-line global-require
-  const { SessionStore, SessionActions } = require('stores/sessions/SessionStore');
+  const { SessionStore, SessionActions } = importSessionStore();
 
   if (!SessionStore.isLoggedIn()) {
     return () => CancellablePromise.of(new Promise((resolve, reject) => {

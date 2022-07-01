@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.validation;
 
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.graylog.plugins.views.search.engine.QueryPosition;
 import org.graylog.plugins.views.search.validation.validators.ValidationErrors;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 class ValidationMessageTest {
 
-    private final LuceneQueryParser luceneQueryParser = new LuceneQueryParser();
+    private final LuceneQueryParser luceneQueryParser = new LuceneQueryParser(false);
 
     @Test
     void fromException() {
@@ -42,10 +43,12 @@ class ValidationMessageTest {
 
             final ValidationMessage validationMessage = errors.iterator().next();
 
-            assertThat(validationMessage.position().beginLine()).isEqualTo(1);
-            assertThat(validationMessage.position().endLine()).isEqualTo(1);
-            assertThat(validationMessage.position().beginColumn()).isEqualTo(0);
-            assertThat(validationMessage.position().endColumn()).isEqualTo(4);
+            assertThat(validationMessage.position()).hasValue(QueryPosition.builder()
+                    .beginLine(1)
+                    .beginColumn(0)
+                    .endLine(1)
+                    .endColumn(4)
+                    .build());
             assertThat(validationMessage.validationType()).isEqualTo(ValidationType.QUERY_PARSING_ERROR);
             assertThat(validationMessage.errorMessage()).startsWith("Cannot parse query, cause: incomplete query, query ended unexpectedly");
         }

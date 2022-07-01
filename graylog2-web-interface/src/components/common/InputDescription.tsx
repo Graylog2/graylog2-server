@@ -29,21 +29,22 @@ const HelpMessage = styled.span<{ hasError: boolean }>(({ theme, hasError }) => 
 `);
 
 type Props = {
-  help?: React.ReactNode,
+  className?: string,
   error?: React.ReactElement,
+  help?: React.ReactNode,
 };
 
 /**
  * Component that renders a help and error message for an input.
  * It always displays both messages.
  */
-const InputDescription = ({ help, error }: Props) => {
+const InputDescription = ({ className, error, help }: Props) => {
   if (!help && !error) {
     return null;
   }
 
   return (
-    <HelpBlock>
+    <HelpBlock className={className}>
       {error && (
         <ErrorMessage>
           {error}
@@ -60,19 +61,21 @@ const InputDescription = ({ help, error }: Props) => {
 };
 
 InputDescription.propTypes = {
-  help: PropTypes.oneOfType([
+  className: PropTypes.string,
+  error: PropTypes.oneOfType([
     PropTypes.element,
     PropTypes.string,
   ]),
-  error: PropTypes.oneOfType([
+  help: PropTypes.oneOfType([
     PropTypes.element,
     PropTypes.string,
   ]),
 };
 
 InputDescription.defaultProps = {
-  help: undefined,
+  className: undefined,
   error: undefined,
+  help: undefined,
 };
 
 export default InputDescription;

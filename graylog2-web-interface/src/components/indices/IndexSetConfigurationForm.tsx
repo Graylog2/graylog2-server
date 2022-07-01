@@ -17,22 +17,26 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import moment from 'moment';
-import lodash from 'lodash';
+import { Formik, Form, Field } from 'formik';
+import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { FormikFormGroup, FormikInput, Spinner, TimeUnitInput } from 'components/common';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { LinkContainer } from 'components/common/router';
-import { Spinner, TimeUnitInput } from 'components/common';
 import { Col, Row, Button, Input } from 'components/bootstrap';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import 'components/indices/rotation';
 import 'components/indices/retention';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
+import type { RetentionStrategyContext } from './Types';
+
 type Props = {
   indexSet: IndexSet,
   rotationStrategies: Array<any>,
   retentionStrategies: Array<any>,
+  retentionStrategiesContext: RetentionStrategyContext,
   create: boolean,
   onUpdate: (indexSet: IndexSet) => void,
   cancelLink: string,
@@ -43,9 +47,33 @@ type Unit = 'seconds' | 'minutes';
 type State = {
   indexSet: IndexSet,
   fieldTypeRefreshIntervalUnit: Unit,
-  validationErrors: {
-    [key: string]: string,
-  },
+};
+const StyledButton = styled(Button)`
+  margin-right:10px;
+`;
+
+const _validateIndexPrefix = (value) => {
+  let error;
+
+  if (value.length === 0) {
+    error = 'Invalid index prefix: cannot be empty';
+  } else if (value.indexOf('_') === 0 || value.indexOf('-') === 0 || value.indexOf('+') === 0) {
+    error = 'Invalid index prefix: must start with a letter or number';
+  } else if (value.toLocaleLowerCase() !== value) {
+    error = 'Invalid index prefix: must be lower case';
+  } else if (!value.match(/^[a-z0-9][a-z0-9_\-+]*$/)) {
+    error = 'Invalid index prefix: must only contain letters, numbers, \'_\', \'-\' and \'+\'';
+  }
+
+  return error;
+};
+
+const _getRotationConfigState = (strategy: string, data: string) => {
+  return { rotation_strategy_class: strategy, rotation_strategy: data };
+};
+
+const _getRetentionConfigState = (strategy: string, data: string) => {
+  return { retention_strategy_class: strategy, retention_strategy: data };
 };
 
 class IndexSetConfigurationForm extends React.Component<Props, State> {
@@ -53,6 +81,9 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
     indexSet: PropTypes.object.isRequired,
     rotationStrategies: PropTypes.array.isRequired,
     retentionStrategies: PropTypes.array.isRequired,
+    retentionStrategiesContext: PropTypes.shape({
+      max_index_retention_period: PropTypes.string,
+    }).isRequired,
     create: PropTypes.bool,
     onUpdate: PropTypes.func.isRequired,
     cancelLink: PropTypes.string.isRequired,
@@ -69,93 +100,17 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
     this.state = {
       indexSet: indexSet,
       fieldTypeRefreshIntervalUnit: 'seconds',
-      validationErrors: {},
     };
   }
 
-  _updateConfig = (fieldName: string, value: (string | boolean | number)) => {
-    // Use `setState()` with updater function so consecutive calls to `_updateConfig()` always refer to the state
-    // at the time the change is applied, resulting in all different keys of the object being updated.
-    this.setState((state) => {
-      const config = lodash.cloneDeep(state.indexSet);
-
-      config[fieldName] = value;
-
-      return { indexSet: config };
-    });
-  };
-
-  _validateIndexPrefix = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
-    const { validationErrors } = this.state;
-
-    if (value.match(/^[a-z0-9][a-z0-9_\-+]*$/)) {
-      if (validationErrors[event.target.name]) {
-        const nextValidationErrors = { ...validationErrors };
-
-        delete nextValidationErrors[event.target.name];
-        this.setState({ validationErrors: nextValidationErrors });
-      }
-    } else {
-      const nextValidationErrors = { ...validationErrors };
-
-      if (value.length === 0) {
-        nextValidationErrors[event.target.name] = 'Invalid index prefix: cannot be empty';
-      } else if (value.indexOf('_') === 0 || value.indexOf('-') === 0 || value.indexOf('+') === 0) {
-        nextValidationErrors[event.target.name] = 'Invalid index prefix: must start with a letter or number';
-      } else if (value.toLocaleLowerCase() !== value) {
-        nextValidationErrors[event.target.name] = 'Invalid index prefix: must be lower case';
-      } else {
-        nextValidationErrors[event.target.name] = 'Invalid index prefix: must only contain letters, numbers, \'_\', \'-\' and \'+\'';
-      }
-
-      this.setState({ validationErrors: nextValidationErrors });
-    }
-
-    this._onInputChange(event);
-  };
-
-  _onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this._updateConfig(event.target.name, event.target.value);
-  };
-
-  _onDisableOptimizationClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this._updateConfig(event.target.name, event.target.checked);
-  };
-
-  _saveConfiguration = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const { indexSet, validationErrors } = this.state;
+  _saveConfiguration = (values) => {
     const { onUpdate } = this.props;
-    const invalidFields = Object.keys(validationErrors);
 
-    if (invalidFields.length !== 0) {
-      document.getElementsByName(invalidFields[0])[0].focus();
-
-      return;
-    }
-
-    onUpdate(indexSet);
-  };
-
-  _updateRotationConfigState = (strategy: string, data: string) => {
-    this._updateConfig('rotation_strategy_class', strategy);
-    this._updateConfig('rotation_strategy', data);
-  };
-
-  _updateRetentionConfigState = (strategy: string, data: string) => {
-    this._updateConfig('retention_strategy_class', strategy);
-    this._updateConfig('retention_strategy', data);
-  };
-
-  _onFieldTypeRefreshIntervalChange = (value: number, unit: Unit) => {
-    this._updateConfig('field_type_refresh_interval', moment.duration(value, unit).asMilliseconds());
-    this.setState({ fieldTypeRefreshIntervalUnit: unit });
+    onUpdate(values);
   };
 
   render() {
     const { indexSet, fieldTypeRefreshIntervalUnit } = this.state;
-    const { validationErrors } = this.state;
     const {
       rotationStrategies,
       retentionStrategies,
@@ -167,6 +122,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
         retention_strategy: indexSetRetentionStrategy,
         retention_strategy_class: IndexSetRetentionStrategyClass,
       },
+      retentionStrategiesContext,
     } = this.props;
     let rotationConfig;
 
@@ -179,12 +135,13 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
 
       rotationConfig = (
         <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
+                                                 key="rotation"
                                                  description="Graylog uses multiple indices to store documents in. You can configure the strategy it uses to determine when to rotate the currently active write index."
                                                  selectPlaceholder="Select rotation strategy"
                                                  pluginExports={PluginStore.exports('indexRotationConfig')}
                                                  strategies={rotationStrategies}
                                                  activeConfig={activeConfig}
-                                                 updateState={this._updateRotationConfigState} />
+                                                 getState={_getRotationConfigState} />
       );
     } else {
       rotationConfig = (<Spinner />);
@@ -201,12 +158,14 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
 
       retentionConfig = (
         <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
+                                                 key="retention"
                                                  description="Graylog uses a retention strategy to clean up old indices."
                                                  selectPlaceholder="Select retention strategy"
                                                  pluginExports={PluginStore.exports('indexRetentionConfig')}
                                                  strategies={retentionStrategies}
+                                                 retentionStrategiesContext={retentionStrategiesContext}
                                                  activeConfig={activeConfig}
-                                                 updateState={this._updateRetentionConfigState} />
+                                                 getState={_getRetentionConfigState} />
       );
     } else {
       retentionConfig = (<Spinner />);
@@ -224,23 +183,17 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
 
       readOnlyconfig = (
         <span>
-          <Input type="text"
-                 id="index-set-index-prefix"
-                 label="Index prefix"
-                 name="index_prefix"
-                 onChange={this._validateIndexPrefix}
-                 value={indexSet.index_prefix}
-                 help={validationErrors.index_prefix ? validationErrors.index_prefix : indexPrefixHelp}
-                 bsStyle={validationErrors.index_prefix ? 'error' : null}
-                 required />
-          <Input type="text"
-                 id="index-set-index-analyzer"
-                 label="Analyzer"
-                 name="index_analyzer"
-                 onChange={this._onInputChange}
-                 value={indexSet.index_analyzer}
-                 help="Elasticsearch analyzer for this index set."
-                 required />
+          <FormikFormGroup type="text"
+                           label="Index prefix"
+                           name="index_prefix"
+                           help={indexPrefixHelp}
+                           validate={_validateIndexPrefix}
+                           required />
+          <FormikFormGroup type="text"
+                           label="Analyzer"
+                           name="index_analyzer"
+                           help="Elasticsearch analyzer for this index set."
+                           required />
         </span>
       );
     }
@@ -248,91 +201,101 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
     return (
       <Row>
         <Col md={8}>
-          <form className="form" onSubmit={this._saveConfiguration}>
-            <Row>
-              <Col md={12}>
-                <Input type="text"
-                       id="index-set-title"
-                       label="Title"
-                       name="title"
-                       onChange={this._onInputChange}
-                       value={indexSet.title}
-                       help="Descriptive name of the index set."
-                       autoFocus
-                       required />
-                <Input type="text"
-                       id="index-set-description"
-                       label="Description"
-                       name="description"
-                       onChange={this._onInputChange}
-                       value={indexSet.description}
-                       help="Add a description of this index set."
-                       required />
-                {readOnlyconfig}
-                <HideOnCloud>
-                  <Input type="number"
-                         id="index-set-shards"
-                         label="Index shards"
-                         name="shards"
-                         onChange={this._onInputChange}
-                         value={indexSet.shards}
-                         help="Number of Elasticsearch shards used per index in this index set."
-                         required />
-                  <Input type="number"
-                         id="index-set-replicas"
-                         label="Index replicas"
-                         name="replicas"
-                         onChange={this._onInputChange}
-                         value={indexSet.replicas}
-                         help="Number of Elasticsearch replicas used per index in this index set."
-                         required />
-                  <Input type="number"
-                         id="index-set-max-num-segments"
-                         label="Max. number of segments"
-                         name="index_optimization_max_num_segments"
-                         min="1"
-                         onChange={this._onInputChange}
-                         value={indexSet.index_optimization_max_num_segments}
-                         help="Maximum number of segments per Elasticsearch index after optimization (force merge)."
-                         required />
-                  <Input type="checkbox"
-                         id="index-set-disable-optimization"
-                         label="Disable index optimization after rotation"
-                         name="index_optimization_disabled"
-                         onChange={this._onDisableOptimizationClick}
-                         checked={indexSet.index_optimization_disabled}
-                         help="Disable Elasticsearch index optimization (force merge) after rotation." />
-                </HideOnCloud>
-                <TimeUnitInput id="field-type-refresh-interval"
-                               label="Field type refresh interval"
-                               help="How often the field type information for the active write index will be updated."
-                               value={moment.duration(indexSet.field_type_refresh_interval, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
-                               unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
-                               units={['SECONDS', 'MINUTES']}
-                               required
-                               update={this._onFieldTypeRefreshIntervalChange} />
-              </Col>
-            </Row>
-            <Row>
-              <Col md={12}>
-                {indexSet.writable && rotationConfig}
-              </Col>
-            </Row>
-            <Row>
-              <Col md={12}>
-                {indexSet.writable && retentionConfig}
-              </Col>
-            </Row>
+          <Formik onSubmit={this._saveConfiguration}
+                  initialValues={indexSet}>
+            {({ isValid, setFieldValue }) => (
+              <Form>
+                <Row>
+                  <Col md={12}>
+                    <FormikFormGroup type="text"
+                                     label="Title"
+                                     name="title"
+                                     help="Descriptive name of the index set."
+                                     required />
+                    <FormikFormGroup type="text"
+                                     label="Description"
+                                     name="description"
+                                     help="Add a description of this index set."
+                                     required />
+                    {readOnlyconfig}
+                    <HideOnCloud>
+                      <FormikFormGroup type="number"
+                                       label="Index shards"
+                                       name="shards"
+                                       help="Number of Elasticsearch shards used per index in this index set."
+                                       required />
+                      <FormikFormGroup type="number"
+                                       label="Index replicas"
+                                       name="replicas"
+                                       help="Number of Elasticsearch replicas used per index in this index set."
+                                       required />
+                      <FormikFormGroup type="number"
+                                       label="Max. number of segments"
+                                       name="index_optimization_max_num_segments"
+                                       minLength={1}
+                                       help="Maximum number of segments per Elasticsearch index after optimization (force merge)."
+                                       required />
+                      <Input id="roles-selector-input"
+                             labelClassName="col-sm-3"
+                             wrapperClassName="col-sm-9"
+                             label="Index optimization after rotation">
+                        <FormikInput type="checkbox"
+                                     id="index_optimization_disabled"
+                                     label="Disable index optimization after rotation"
+                                     name="index_optimization_disabled"
+                                     help="Disable Elasticsearch index optimization (force merge) after rotation." />
+                      </Input>
+                    </HideOnCloud>
+                    <Field name="field_type_refresh_interval">
+                      {({ field: { name, value, onChange } }) => {
+                        const _onFieldTypeRefreshIntervalChange = (intervalValue: number, unit: Unit) => {
+                          onChange(name, moment.duration(intervalValue, unit).asMilliseconds());
+                          setFieldValue(name, moment.duration(intervalValue, unit).asMilliseconds());
+                          this.setState({ fieldTypeRefreshIntervalUnit: unit });
+                        };
 
-            <Row>
-              <Col md={12}>
-                <Button type="submit" bsStyle="primary" style={{ marginRight: 10 }}>Save</Button>
-                <LinkContainer to={cancelLink}>
-                  <Button bsStyle="default">Cancel</Button>
-                </LinkContainer>
-              </Col>
-            </Row>
-          </form>
+                        return (
+                          <Input id="roles-selector-input"
+                                 labelClassName="col-sm-3"
+                                 wrapperClassName="col-sm-9"
+                                 label="Field type refresh interval">
+                            <TimeUnitInput id="field-type-refresh-interval"
+                                           type="number"
+                                           help="How often the field type information for the active write index will be updated."
+                                           value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
+                                           unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
+                                           units={['SECONDS', 'MINUTES']}
+                                           required
+                                           update={_onFieldTypeRefreshIntervalChange} />
+                          </Input>
+                        );
+                      }}
+                    </Field>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={12}>
+                    {indexSet.writable && rotationConfig}
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={12}>
+                    {indexSet.writable && retentionConfig}
+                  </Col>
+                </Row>
+
+                <Row>
+                  <Col md={12}>
+                    <StyledButton type="submit" bsStyle="primary" disabled={!isValid} style={{ marginRight: 10 }}>Save</StyledButton>
+                    <LinkContainer to={cancelLink}>
+                      <Button bsStyle="default">Cancel</Button>
+                    </LinkContainer>
+                  </Col>
+                </Row>
+
+              </Form>
+            )}
+          </Formik>
         </Col>
       </Row>
     );

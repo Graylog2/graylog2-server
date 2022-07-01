@@ -31,6 +31,7 @@ import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -41,6 +42,7 @@ import org.graylog2.plugin.streams.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -67,6 +69,9 @@ public abstract class QueryEntity implements NativeEntityConverter<Query> {
     @Nullable
     @JsonProperty
     public abstract Filter filter();
+
+    @JsonProperty
+    public abstract List<UsedSearchFilter> filters();
 
     @Nonnull
     @JsonProperty
@@ -111,6 +116,9 @@ public abstract class QueryEntity implements NativeEntityConverter<Query> {
         public abstract Builder filter(Filter filter);
 
         @JsonProperty
+        public abstract Builder filters(List<UsedSearchFilter> filters);
+
+        @JsonProperty
         public abstract Builder query(BackendQuery query);
 
         public abstract Builder globalOverride(@Nullable GlobalOverride globalOverride);
@@ -122,7 +130,9 @@ public abstract class QueryEntity implements NativeEntityConverter<Query> {
 
         @JsonCreator
         static Builder createWithDefaults() {
-            return new AutoValue_QueryEntity.Builder().searchTypes(of());
+            return new AutoValue_QueryEntity.Builder()
+                    .filters(Collections.emptyList())
+                    .searchTypes(of());
         }
 
         public QueryEntity build() {
@@ -162,6 +172,7 @@ public abstract class QueryEntity implements NativeEntityConverter<Query> {
                         .collect(Collectors.toSet()))
                 .query(query())
                 .filter(shallowMappedFilter(nativeEntities))
+                .filters(filters())
                 .timerange(timerange())
                 .globalOverride(globalOverride().orElse(null))
                 .build();

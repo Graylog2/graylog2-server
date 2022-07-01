@@ -171,21 +171,6 @@ describe('MessageList', () => {
     expect(wrapper2.find('span[role="presentation"]').length).toBe(0);
   });
 
-  it('provides a message context for each individual entry', () => {
-    const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
-    const config = MessagesWidgetConfig.builder().fields(['file_name']).build();
-    const wrapper = mount(
-      <SimpleMessageList data={data}
-                         fields={Immutable.List(fields)}
-                         config={config}
-                         setLoadingState={() => {}} />,
-    );
-    const messageTableEntry = wrapper.find('MessageTableEntry');
-    const td = messageTableEntry.find('td').at(0);
-
-    expect(td.props().children).toMatchSnapshot();
-  });
-
   // eslint-disable-next-line jest/expect-expect
   it('renders also when `inputs` is undefined', () => {
     InputsStore.getInitialState = jest.fn(() => ({ inputs: undefined }));

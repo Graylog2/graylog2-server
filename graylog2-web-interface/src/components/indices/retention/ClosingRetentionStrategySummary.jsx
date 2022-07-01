@@ -17,23 +17,21 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-class ClosingRetentionStrategySummary extends React.Component {
-  static propTypes = {
-    config: PropTypes.object.isRequired,
-  };
+const ClosingRetentionStrategySummary = ({ config }) => {
+  return (
+    <div>
+      <dl>
+        <dt>Index retention strategy:</dt>
+        <dd>Close</dd>
+        <dt>Max number of indices:</dt>
+        <dd>{config.max_number_of_indices}</dd>
+      </dl>
+    </div>
+  );
+};
 
-  render() {
-    return (
-      <div>
-        <dl>
-          <dt>Index retention strategy:</dt>
-          <dd>Close</dd>
-          <dt>Max number of indices:</dt>
-          <dd>{this.props.config.max_number_of_indices}</dd>
-        </dl>
-      </div>
-    );
-  }
-}
+ClosingRetentionStrategySummary.propTypes = {
+  config: PropTypes.object.isRequired,
+};
 
 export default ClosingRetentionStrategySummary;

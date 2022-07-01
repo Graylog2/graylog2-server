@@ -60,17 +60,32 @@ public @interface ContainerMatrixTestsConfiguration {
      * matrix rule
      * If no version is explicitly specified, then {@link SearchServer#DEFAULT_VERSION will be used by the tests}
      */
-    SearchServer[] searchVersions() default {SearchServer.OS1, SearchServer.ES6, SearchServer.ES7};
+    SearchServer[] searchVersions() default {SearchServer.OS1};
 
     /**
      * matrix rule
      * If no version is explicitly specified, then {@link MongodbServer#DEFAULT_VERSION will be used by the tests}
      */
-    MongodbServer[] mongoVersions() default {MongodbServer.MONGO3, MongodbServer.MONGO4};
+    MongodbServer[] mongoVersions() default {MongodbServer.MONGO4};
 
     // additional Parameter, gets concatenated for all tests below the above rules
     int[] extraPorts() default {};
 
     // are run after the initialization of mongoDb, gets concatenated for all tests below the above rules
     String[] mongoDBFixtures() default {};
+
+    /**
+     * A list of Graylog Feature Flags that should be enabled for this test.
+     *
+     * @return enabled feature flags
+     */
+    String[] enabledFeatureFlags() default {};
+
+    /**
+     * Import existing GL licenses directly into Mongo to avoid possible race conditions during tests,
+     * that occured if the licenses where imported via REST
+     * Disabling only works with Lifecycle.CLASS because a new container is spun up.
+     */
+    boolean defaultImportLicenses = true;
+    boolean importLicenses() default defaultImportLicenses;
 }

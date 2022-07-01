@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.elasticsearch6.views.searchtypes.pivot.buckets;
 
-import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.DateRangeAggregation;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -57,12 +56,8 @@ public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket
     }
 
     @Override
-    public Stream<Bucket> doHandleResult(Pivot pivot,
-                                         DateRangeBucket dateRangeBucket,
-                                         SearchResult searchResult,
-                                         DateRangeAggregation rangeAggregation,
-                                         ESPivot searchTypeHandler,
-                                         ESGeneratedQueryContext esGeneratedQueryContext) {
+    public Stream<Bucket> doHandleResult(DateRangeBucket dateRangeBucket,
+                                         DateRangeAggregation rangeAggregation) {
         if (dateRangeBucket.bucketKey().equals(DateRangeBucket.BucketKey.TO)) {
             return rangeAggregation.getBuckets().stream()
                     .map(range -> Bucket.create(range.getToAsString(), range));

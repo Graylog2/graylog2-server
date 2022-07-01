@@ -18,11 +18,14 @@ package org.graylog2.system.activities;
 
 import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import org.graylog2.database.CollectionName;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.indexer.IndexFailureImpl;
 import org.mongojack.DBSort;
 
 import javax.inject.Inject;
@@ -30,13 +33,22 @@ import java.util.List;
 import java.util.Map;
 
 public class SystemMessageServiceImpl extends PersistedServiceImpl implements SystemMessageService {
+    private static final int MAX_COLLECTION_BYTES = 50 * 1024 * 1024;
     private final int PER_PAGE = 30;
-
     @Inject
     public SystemMessageServiceImpl(MongoConnection mongoConnection) {
         super(mongoConnection);
-        final DBCollection collection = this.collection(SystemMessageImpl.class);
-        collection.createIndex(DBSort.desc("timestamp"));
+
+        // Make sure that the system messages collection is always created capped.
+        final String collectionName = SystemMessageImpl.class.getAnnotation(CollectionName.class).value();
+        if (!mongoConnection.getDatabase().collectionExists(collectionName)) {
+            final DBObject options = BasicDBObjectBuilder.start()
+                    .add("capped", true)
+                    .add("size", MAX_COLLECTION_BYTES)
+                    .get();
+            final DBCollection collection = mongoConnection.getDatabase().createCollection(collectionName, options);
+            collection.createIndex(DBSort.desc("timestamp"));
+        }
     }
 
     @Override

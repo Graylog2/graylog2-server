@@ -33,6 +33,8 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
+import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -40,12 +42,11 @@ import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -62,7 +63,6 @@ import static java.util.stream.Collectors.toSet;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = Query.Builder.class)
 public abstract class Query implements ContentPackable<QueryEntity> {
-    private static final Logger LOG = LoggerFactory.getLogger(Query.class);
 
     @Nullable
     @JsonProperty
@@ -74,6 +74,9 @@ public abstract class Query implements ContentPackable<QueryEntity> {
     @Nullable
     @JsonProperty
     public abstract Filter filter();
+
+    @JsonProperty
+    public abstract List<UsedSearchFilter> filters();
 
     @Nonnull
     @JsonProperty
@@ -180,6 +183,10 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         return !usedStreamIds().isEmpty();
     }
 
+    public boolean hasReferencedStreamFilters() {
+        return filters() != null && filters().stream().anyMatch(f -> f instanceof ReferencedSearchFilter);
+    }
+
     Query addStreamsToFilter(Set<String> streamIds) {
         final Filter newFilter = addStreamsTo(filter(), streamIds);
         return toBuilder().filter(newFilter).build();
@@ -214,6 +221,9 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         public abstract Builder filter(Filter filter);
 
         @JsonProperty
+        public abstract Builder filters(List<UsedSearchFilter> filters);
+
+        @JsonProperty
         public abstract Builder query(BackendQuery query);
 
         public abstract Builder globalOverride(@Nullable GlobalOverride globalOverride);
@@ -228,6 +238,7 @@ public abstract class Query implements ContentPackable<QueryEntity> {
             try {
                 return new AutoValue_Query.Builder()
                         .searchTypes(of())
+                        .filters(Collections.emptyList())
                         .query(ElasticsearchQueryString.empty())
                         .timerange(RelativeRange.create(300));
             } catch (InvalidRangeParametersException e) {
@@ -269,6 +280,7 @@ public abstract class Query implements ContentPackable<QueryEntity> {
                 .searchTypes(searchTypes().stream().map(s -> s.toContentPackEntity(entityDescriptorIds))
                         .collect(Collectors.toSet()))
                 .filter(shallowMappedFilter(entityDescriptorIds))
+                .filters(filters())
                 .query(query())
                 .id(id())
                 .globalOverride(globalOverride().orElse(null))

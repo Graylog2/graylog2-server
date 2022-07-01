@@ -19,18 +19,18 @@ import type { List } from 'immutable';
 
 import type Widget from 'views/logic/widgets/Widget';
 import type View from 'views/logic/views/View';
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 import { Row, Alert } from 'components/bootstrap';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
-import Select from 'views/components/Select';
+import Select from 'components/common/Select';
 
 const sortOptions = (options) => options.sort(
   (option1, option2) => defaultCompare(option1.label, option2.label),
 );
 
 type Props = {
-  selectWidget: (widget: { label: string, value: Widget }) => void,
+  selectWidget: (widget: Widget) => void,
   widgets: List<Widget>,
   view: View,
 };

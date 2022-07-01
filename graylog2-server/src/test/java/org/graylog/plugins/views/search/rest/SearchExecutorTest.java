@@ -24,24 +24,23 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.resources.RestResourceBaseTest;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -53,9 +52,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith({MockitoExtension.class})
+@MockitoSettings(strictness = Strictness.WARN)
 public class SearchExecutorTest extends RestResourceBaseTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private SearchDomain searchDomain;
@@ -74,17 +73,16 @@ public class SearchExecutorTest extends RestResourceBaseTest {
 
     private SearchExecutor searchExecutor;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         this.searchExecutor = new SearchExecutor(searchDomain, searchJobService, queryEngine, searchExecutionGuard, objectMapper);
     }
 
     @Test
     public void throwsExceptionIfSearchIsNotFound() {
-        final SearchUser searchUser = mock(SearchUser.class);
-        when(searchUser.canReadView(any())).thenReturn(true);
-        when(searchUser.canReadStream(any())).thenReturn(true);
+        final SearchUser searchUser = TestSearchUser.builder()
+                .build();
 
         when(searchDomain.getForUser(eq("search1"), eq(searchUser))).thenReturn(Optional.empty());
 
@@ -96,10 +94,10 @@ public class SearchExecutorTest extends RestResourceBaseTest {
     @Test
     public void addsStreamsToSearchWithoutStreams() {
         final Search search = mockSearch();
-        final SearchUser searchUser = mock(SearchUser.class);
-        when(searchUser.canReadView(any())).thenReturn(true);
-        when(searchUser.canReadStream(any())).thenReturn(true);
-        when(searchUser.username()).thenReturn("frank-drebin");
+
+        final SearchUser searchUser = TestSearchUser.builder()
+                .withUser(testUser -> testUser.withUsername("frank-drebin"))
+                .build();
 
         final SearchJob searchJob = mock(SearchJob.class);
         when(searchJobService.create(search, "frank-drebin")).thenReturn(searchJob);
@@ -116,10 +114,10 @@ public class SearchExecutorTest extends RestResourceBaseTest {
     @Test
     public void appliesSearchExecutionState() {
         final Search search = mockSearch();
-        final SearchUser searchUser = mock(SearchUser.class);
-        when(searchUser.canReadView(any())).thenReturn(true);
-        when(searchUser.canReadStream(any())).thenReturn(true);
-        when(searchUser.username()).thenReturn("frank-drebin");
+
+        final SearchUser searchUser = TestSearchUser.builder()
+                .withUser(testUser -> testUser.withUsername("frank-drebin"))
+                .build();
 
         final SearchJob searchJob = mock(SearchJob.class);
         when(searchJobService.create(search, "frank-drebin")).thenReturn(searchJob);
@@ -138,9 +136,7 @@ public class SearchExecutorTest extends RestResourceBaseTest {
     @Test
     public void checksUserPermissionsForSearch() {
         final Search search = mockSearch();
-        final SearchUser searchUser = mock(SearchUser.class);
-        when(searchUser.canReadView(any())).thenReturn(true);
-        when(searchUser.canReadStream(any())).thenReturn(false);
+        final SearchUser searchUser = TestSearchUser.builder().build();
 
         doThrow(ForbiddenException.class).when(searchExecutionGuard).check(eq(search), any());
         when(searchDomain.getForUser(eq("search1"), eq(searchUser))).thenReturn(Optional.of(search));

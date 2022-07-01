@@ -46,7 +46,7 @@ class BootstrapModalForm extends React.Component {
     /* Text to use in the cancel button. "Cancel" is the default */
     cancelButtonText: PropTypes.string,
     /* Text to use in the submit button. "Submit" is the default */
-    submitButtonText: PropTypes.string,
+    submitButtonText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     submitButtonDisabled: PropTypes.bool,
     show: PropTypes.bool,
   };
@@ -72,6 +72,7 @@ class BootstrapModalForm extends React.Component {
     this.close();
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => this.modal.open();
 
   close = () => this.modal.close();

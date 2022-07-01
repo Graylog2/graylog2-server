@@ -30,6 +30,7 @@ export const EventDefinitionsActions = singletonActions(
     listPaginated: { asyncResult: true },
     get: { asyncResult: true },
     create: { asyncResult: true },
+    copy: { asyncResult: true },
     update: { asyncResult: true },
     delete: { asyncResult: true },
     enable: { asyncResult: true },
@@ -196,6 +197,35 @@ export const EventDefinitionsStore = singletonStore(
       );
 
       EventDefinitionsActions.create.promise(promise);
+    },
+
+    copy(eventDefinitionToCopy) {
+      const { eventDefinition } = this.extractSchedulerInfo(eventDefinitionToCopy);
+      // Remove the id from the event definition to create a new copy
+      delete eventDefinition.id;
+      // Modify the title to indicate a copy
+      eventDefinition.title = `COPY-${eventDefinition.title}`;
+
+      const promise = fetch('POST', this.eventDefinitionsUrl({ query: { schedule: false } }), this.setAlertFlag(eventDefinition));
+
+      promise.then(
+        (response) => {
+          UserNotification.success('Event Definition copied successfully',
+            `Event Definition "${eventDefinition.title}" was created successfully.`);
+
+          this.refresh();
+
+          return response;
+        },
+        (error) => {
+          if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
+            UserNotification.error(`Creating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
+              'Could not save Event Definition');
+          }
+        },
+      );
+
+      EventDefinitionsActions.copy.promise(promise);
     },
 
     update(eventDefinitionId, updatedEventDefinition) {

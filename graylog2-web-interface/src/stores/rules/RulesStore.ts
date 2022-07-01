@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import naturalSort from 'javascript-natural-sort';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
@@ -68,9 +68,9 @@ type RulesActionsType = {
   delete: (rule: RuleType) => Promise<unknown>,
   list: () => Promise<unknown>,
   get: () => Promise<unknown>,
-  save: () => Promise<unknown>,
-  update: () => Promise<unknown>,
-  parse: () => Promise<unknown>,
+  save: (rule: RuleType) => Promise<unknown>,
+  update: (rule: RuleType) => Promise<unknown>,
+  parse: (rule: RuleType, callback: () => void) => Promise<unknown>,
   multiple: () => Promise<unknown>,
   loadFunctions: () => Promise<unknown>,
   loadMetricsConfig: () => Promise<unknown>,

@@ -19,6 +19,7 @@ class DocsHelper {
   PAGES = {
     ALERTS: 'alerts',
     AUTHENTICATORS: 'permission-management#authentication',
+    CHANGELOG: 'changelog',
     CLUSTER_STATUS_EXPLAINED: 'elasticsearch#cluster-status-explained',
     COLLECTOR: 'sidecar',
     COLLECTOR_SIDECAR: 'sidecar',
@@ -35,6 +36,7 @@ class DocsHelper {
     INDEX_MODEL: 'index-model',
     LOAD_BALANCERS: 'load-balancers',
     LOOKUPTABLES: 'lookuptables',
+    OPERATIONS_CHANGELOG: 'changelog-graylog',
     PAGE_FLEXIBLE_DATE_CONVERTER: 'extractors#normalization',
     PAGE_STANDARD_DATE_CONVERTER: 'extractors#normalization',
     PERMISSIONS: 'permission-management',

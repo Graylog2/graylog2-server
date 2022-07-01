@@ -1,0 +1,15 @@
+{
+  "name": "@graylog/frontend-documentation",
+  "version": "1.0.0",
+  "description": "Graylog Frontend Documentation",
+  "main": "index.js",
+  "author": "Graylog <hello@graylog.com>",
+  "license": "MIT",
+  "scripts": {
+    "docs:build": "styleguidist build",
+    "docs:server": "styleguidist server"
+  },
+  "devDependencies": {
+    "react-styleguidist": "^11.2.0"
+  }
+}
