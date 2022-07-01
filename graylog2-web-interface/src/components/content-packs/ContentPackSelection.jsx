@@ -16,9 +16,9 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import naturalSort from 'javascript-natural-sort';
 import { cloneDeep } from 'lodash';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { ExpandableList, ExpandableListItem, Icon, SearchForm } from 'components/common';
 import { Col, HelpBlock, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';

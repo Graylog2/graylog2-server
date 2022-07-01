@@ -24,7 +24,7 @@ import type {
   ActiveShareType,
   GRN,
 } from 'logic/permissions/types';
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 
 import Capability from './Capability';
 import Grantee from './Grantee';

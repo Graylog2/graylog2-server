@@ -16,8 +16,8 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import naturalSort from 'javascript-natural-sort';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Alert, Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import Output from 'components/outputs/Output';

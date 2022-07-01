@@ -17,8 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useField } from 'formik';
-import naturalSort from 'javascript-natural-sort';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
