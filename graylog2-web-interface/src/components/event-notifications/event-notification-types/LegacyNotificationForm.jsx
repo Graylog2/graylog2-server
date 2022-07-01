@@ -139,7 +139,7 @@ class LegacyNotificationForm extends React.Component {
         </fieldset>
 
         <Alert bsStyle="danger" className={commonStyles.legacyNotificationAlert}>
-          Legacy alarm callbacks are deprecated and will be removed in Graylog 4.1. Please switch to the new notification types as soon as possible!
+          Legacy alarm callbacks are deprecated and will be removed with the next major release. Please switch to the new notification types as soon as possible!
         </Alert>
 
         {content}
