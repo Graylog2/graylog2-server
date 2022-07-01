@@ -78,7 +78,7 @@ class GrokPatterns extends React.Component {
           callback();
         }
 
-        if (!this.loadPromise.isCancelled()) {
+        if (!this.loadPromise?.isCancelled()) {
           this.loadPromise = undefined;
 
           this.setState({ patterns, pagination });
