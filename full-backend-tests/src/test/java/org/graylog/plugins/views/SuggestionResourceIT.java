@@ -31,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.VM;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = VM)
@@ -128,6 +129,8 @@ public class SuggestionResourceIT {
                 .statusCode(200);
         validatableResponse.assertThat().body("suggestions.value[0]", equalTo("junit"));
         validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(1));
+        validatableResponse.assertThat().body("suggestions", hasSize(1));
+
     }
 
 
