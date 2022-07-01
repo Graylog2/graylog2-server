@@ -218,6 +218,6 @@ describe('WidgetQueryControls pluggable controls', () => {
       queryString: '',
       streams: undefined,
       timeRange: { from: 300, type: 'relative' },
-    }));
+    }, 'Europe/Berlin'));
   });
 });

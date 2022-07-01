@@ -68,7 +68,11 @@ describe('validateQuery', () => {
 
     const expectedPayload = {
       ...requestPayload,
-      timerange: { type: 'absolute', from: '2021-01-01T22:00:00.000Z', to: '2021-01-01T23:00:00.000Z' },
+      timerange: {
+        type: 'absolute',
+        from: '2021-01-01T15:00:00.000+00:00',
+        to: '2021-01-01T16:00:00.000+00:00',
+      },
     };
 
     expect(fetch).toHaveBeenCalledWith('POST', expect.any(String), expectedPayload);
