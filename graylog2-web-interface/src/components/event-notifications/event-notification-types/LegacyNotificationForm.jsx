@@ -24,6 +24,11 @@ import { ConfigurationFormField } from 'components/configurationforms';
 
 import commonStyles from './LegacyNotificationCommonStyles.css';
 
+const formatLegacyTypes = (legacyTypes) => {
+  return Object.keys(legacyTypes)
+    .map((typeName) => ({ label: `Legacy ${legacyTypes[typeName].name}`, value: typeName }));
+};
+
 class LegacyNotificationForm extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
@@ -49,11 +54,6 @@ class LegacyNotificationForm extends React.Component {
     const nextConfiguration = { ...config.configuration, [key]: value };
 
     this.propagateMultiChange({ configuration: nextConfiguration });
-  };
-
-  formatLegacyTypes = (legacyTypes) => {
-    return Object.keys(legacyTypes)
-      .map((typeName) => ({ label: `Legacy ${legacyTypes[typeName].name}`, value: typeName }));
   };
 
   getDefaultConfiguration = (legacyNotificationType) => {
@@ -130,7 +130,7 @@ class LegacyNotificationForm extends React.Component {
                     matchProp="label"
                     placeholder="Select Legacy Notification"
                     onChange={this.handleSelectNotificationChange}
-                    options={this.formatLegacyTypes(legacyTypes)}
+                    options={formatLegacyTypes(legacyTypes)}
                     value={callbackType} />
             <HelpBlock>
               {lodash.get(validation, 'errors.callback_type[0]', 'Select a Legacy Notification to use on this Event Definition.')}
