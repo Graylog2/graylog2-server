@@ -58,6 +58,7 @@ import org.graylog.plugins.pipelineprocessor.functions.dates.periods.PeriodParse
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Seconds;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Weeks;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Years;
+import org.graylog.plugins.pipelineprocessor.functions.debug.Debug;
 import org.graylog.plugins.pipelineprocessor.functions.debug.MetricCounterIncrement;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Decode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Encode;
@@ -82,6 +83,7 @@ import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddress;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IsIp;
 import org.graylog.plugins.pipelineprocessor.functions.json.IsJson;
+import org.graylog.plugins.pipelineprocessor.functions.json.JsonFlatten;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
@@ -267,6 +269,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         functions.put(JsonParse.NAME, new JsonParse(objectMapper));
+        functions.put(JsonFlatten.NAME, new JsonFlatten(objectMapper));
         functions.put(SelectJsonPath.NAME, new SelectJsonPath(objectMapper));
 
         functions.put(DateConversion.NAME, new DateConversion());
@@ -334,6 +337,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(IsIp.NAME, new IsIp());
         functions.put(IsJson.NAME, new IsJson());
         functions.put(IsUrl.NAME, new IsUrl());
+        functions.put(Debug.NAME, new Debug());
 
         final GrokPatternService grokPatternService = mock(GrokPatternService.class);
         final GrokPattern greedyPattern = GrokPattern.create("GREEDY", ".*");
@@ -458,6 +462,39 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(evaluatedMessage.getField("array")).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(evaluatedMessage.getField("store")).isInstanceOf(Map.class);
         assertThat(evaluatedMessage.getField("expensive")).isEqualTo(10);
+    }
+
+    @Test
+    public void flattenJson() {
+        final String nestedJson = "{\n" +
+                "    \"store\": {\n" +
+                "        \"book\": {\n" +
+                "            \"category\": \"reference\",\n" +
+                "            \"author\": \"Nigel Rees\",\n" +
+                "            \"title\": \"Sayings of the Century\",\n" +
+                "            \"price\": 8.95\n" +
+                "        },\n" +
+                "        \"bicycle\": {\n" +
+                "            \"color\": \"red\",\n" +
+                "            \"price\": 19.95\n" +
+                "        }\n" +
+                "    },\n" +
+                "    \"some_array\": [ \"a\", \"b\", \"c\" ],\n" +
+                "    \"app.kubernetes.io_name\": \"hal\"\n" +
+                "}";
+
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = new Message("JSON", "test", Tools.nowUTC());
+        message.addField("nested_json", nestedJson);
+        final Message evaluatedMessage = evaluateRule(rule, message);
+
+        assertThat(evaluatedMessage.getField("message")).isEqualTo("JSON");
+        assertThat(evaluatedMessage.getField("nested_json")).isEqualTo(nestedJson);
+        assertThat(evaluatedMessage.getField("store_book_author")).isEqualTo("Nigel Rees");
+        assertThat(evaluatedMessage.getField("store_bicycle_color")).isEqualTo("red");
+        assertThat(evaluatedMessage.getField("some_array_0")).isEqualTo("a");
+        assertThat(evaluatedMessage.getField("some_array_1")).isEqualTo("b");
+        assertThat(evaluatedMessage.getField("app.kubernetes.io_name")).isEqualTo("hal");
     }
 
     @Test

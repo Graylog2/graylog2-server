@@ -1,0 +1,8 @@
+rule "json"
+when
+  true
+then
+  let json = flatten_json(to_string($message.nested_json), "flatten");
+
+  set_fields(to_map(json));
+end
