@@ -19,7 +19,7 @@ import { Field } from 'formik';
 
 import usePluginEntities from 'views/logic/usePluginEntities';
 import Select from 'components/common/Select';
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 
 const ExportFormatSelection = () => {
   const exportFormats = usePluginEntities('views.export.formats');

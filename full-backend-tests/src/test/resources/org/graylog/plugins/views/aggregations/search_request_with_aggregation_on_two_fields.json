@@ -1,0 +1,66 @@
+{
+  "id": "s1",
+  "queries": [
+    {
+      "id": "q1",
+      "timerange": {
+        "type": "relative",
+        "range": 0
+      },
+      "filter": null,
+      "filters": [],
+      "query": {
+        "type": "elasticsearch",
+        "query_string": ""
+      },
+      "search_types": [
+        {
+          "timerange": {
+            "type": "relative",
+            "range": 0
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "fixtureType:474877"
+          },
+          "streams": [
+            "000000000000000000000001"
+          ],
+          "id": "st1",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            },
+            {
+              "type": "avg",
+              "id": "avg(age)",
+              "field": "age"
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "field": "firstName",
+              "limit": 8
+            },
+            {
+              "type": "values",
+              "field": "lastName",
+              "limit": 8
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        }
+      ]
+    }
+  ],
+  "parameters": []
+}

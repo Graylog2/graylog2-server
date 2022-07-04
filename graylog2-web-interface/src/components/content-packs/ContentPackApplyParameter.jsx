@@ -17,8 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { findIndex } from 'lodash';
-import naturalSort from 'javascript-natural-sort';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Row, Col, Button, Input } from 'components/bootstrap';
 import DataTable from 'components/common/DataTable';
 import ValueReferenceData from 'util/ValueReferenceData';

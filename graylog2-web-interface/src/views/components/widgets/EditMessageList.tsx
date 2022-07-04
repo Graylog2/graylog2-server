@@ -32,7 +32,7 @@ import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig'
 import DescriptionBox from 'views/components/aggregationbuilder/DescriptionBox';
 import DecoratorSidebar from 'views/components/messagelist/decorators/DecoratorSidebar';
 import { HoverForHelp } from 'components/common';
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 
 const FullHeightRow = styled(Row)`
   height: 100%;
