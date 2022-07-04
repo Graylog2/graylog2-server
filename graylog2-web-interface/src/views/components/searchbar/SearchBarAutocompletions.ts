@@ -30,8 +30,6 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
   }
 
   getCompletions = (editor: Editor, session: Session, pos: Position, prefix: string, callback: ResultsCallback) => {
-    // eslint-disable-next-line no-param-reassign
-    editor.completer.autoSelect = false;
     const tokens = editor.session.getTokens(pos.row);
     const currentToken = editor.session.getTokenAt(pos.row, pos.column);
     const currentTokenIdx = tokens.findIndex((t) => (t === currentToken));
