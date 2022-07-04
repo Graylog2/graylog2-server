@@ -108,9 +108,9 @@ const DashboardList = ({ pagination, handleSearch, handleDashboardDelete, dashbo
                           onClose={() => setDashboardToShare(undefined)} />
       )}
       <PaginatedList onChange={(newPage, newPerPage) => dispatch({ type: 'pageChange', payload: { newPage, newPerPage } })}
-                     activePage={pagination.page}
+                     activePage={page}
                      totalItems={pagination.total}
-                     pageSize={pagination.perPage}
+                     pageSize={perPage}
                      pageSizes={[10, 50, 100]}>
         <div style={{ marginBottom: 15 }}>
           <SearchForm onSearch={(newQuery) => dispatch({ type: 'search', payload: { newQuery } })}
