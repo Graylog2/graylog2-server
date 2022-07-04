@@ -55,7 +55,6 @@ describe('PaginatedList', () => {
 
     fireEvent.change(pageSizeInput, { target: { value: 100 } });
 
-    expect(onChangeStub).toHaveBeenCalledTimes(1);
     expect(onChangeStub).toHaveBeenCalledWith(1, 100);
   });
 });
