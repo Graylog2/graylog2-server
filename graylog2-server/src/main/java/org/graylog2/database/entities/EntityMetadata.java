@@ -21,57 +21,76 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.joda.time.DateTime;
 
-import java.util.Set;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = EntityMetadata.Builder.class)
 public abstract class EntityMetadata {
+    public static final String DEFAULT_VERSION = "1";
+    public static final long DEFAULT_REV = 1;
+    public static final String DEFAULT_SCOPE = "default";
 
-    public static final String SCOPES = "scopes";
-    public static final String REVISION = "revision";
+    public static final String VERSION = "v";
+    public static final String SCOPE = "scope";
+    public static final String REV = "rev";
     public static final String CREATED_AT = "created_at";
     public static final String UPDATED_AT = "updated_at";
 
-    @JsonProperty(SCOPES)
-    public abstract Set<String> scopes();
+    @JsonProperty(VERSION)
+    public abstract String version();
 
-    @JsonProperty(REVISION)
-    public abstract int revision();
+    @JsonProperty(SCOPE)
+    public abstract String scope();
+
+    @JsonProperty(REV)
+    public abstract long rev();
 
     @JsonProperty(CREATED_AT)
-    public abstract DateTime createdAt();
+    public abstract ZonedDateTime createdAt();
 
     @JsonProperty(UPDATED_AT)
-    public abstract DateTime updatedAt();
-
-    public static Builder builder() {
-        return Builder.create().revision(0);
-    }
+    public abstract ZonedDateTime updatedAt();
 
     public abstract Builder toBuilder();
 
+    public static Builder builder() {
+        return Builder.create();
+    }
+
+    public static EntityMetadata createDefault() {
+        return Builder.create().build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
-
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EntityMetadata.Builder();
+            return new AutoValue_EntityMetadata.Builder()
+                    .version(DEFAULT_VERSION)
+                    .rev(DEFAULT_REV)
+                    .scope(DEFAULT_SCOPE)
+                    .createdAt(ZonedDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC))
+                    .updatedAt(ZonedDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC));
         }
 
-        @JsonProperty(SCOPES)
-        public abstract Builder scopes(Set<String> scopes);
+        @JsonProperty(VERSION)
+        public abstract Builder version(String version);
 
-        @JsonProperty(REVISION)
-        public abstract Builder revision(int revision);
+        @JsonProperty(SCOPE)
+        public abstract Builder scope(String scope);
+
+        @JsonProperty(REV)
+        public abstract Builder rev(long rev);
 
         @JsonProperty(CREATED_AT)
-        public abstract Builder createdAt(DateTime createdAt);
+        public abstract Builder createdAt(ZonedDateTime createdAt);
 
         @JsonProperty(UPDATED_AT)
-        public abstract Builder updatedAt(DateTime updatedAt);
+        public abstract Builder updatedAt(ZonedDateTime updatedAt);
 
         public abstract EntityMetadata build();
     }
