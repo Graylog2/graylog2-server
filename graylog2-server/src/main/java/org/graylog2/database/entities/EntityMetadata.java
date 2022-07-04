@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.mongojack.DBUpdate;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -33,6 +34,7 @@ public abstract class EntityMetadata {
     public static final String DEFAULT_VERSION = "1";
     public static final long DEFAULT_REV = 1;
     public static final String DEFAULT_SCOPE = "default";
+    public static final ZonedDateTime DEFAULT_TIMESTAMP = ZonedDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC);
 
     public static final String VERSION = "v";
     public static final String SCOPE = "scope";
@@ -65,6 +67,31 @@ public abstract class EntityMetadata {
         return Builder.create().build();
     }
 
+    public static EntityMetadata withNewMetadataForInitialSave(EntityMetadata metadata) {
+        return metadata.toBuilder()
+                .rev(DEFAULT_REV)
+                // TODO: Should be replaced with com.mongodb.client.model.Updates.currentTimestamp() once we
+                //       moved to the new mongojack version. This method should then take a Document, similar to the
+                //       #applyMetadataUpdate() method
+                .createdAt(ZonedDateTime.now(ZoneOffset.UTC))
+                .updatedAt(ZonedDateTime.now(ZoneOffset.UTC))
+                .build();
+    }
+
+    public static void applyMetadataUpdate(DBUpdate.Builder builder) {
+        // Increment the revision by 1
+        builder.inc(withMetadataPrefix(REV));
+
+        // Set the updated_at timestamp
+        // TODO: Should be replaced with com.mongodb.client.model.Updates.currentTimestamp() once we moved to the new
+        //       mongojack version to make sure we use the database time
+        builder.set(withMetadataPrefix(UPDATED_AT), ZonedDateTime.now(ZoneOffset.UTC));
+    }
+
+    public static String withMetadataPrefix(String field) {
+        return Entity.METADATA + "." + field;
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonCreator
@@ -73,8 +100,8 @@ public abstract class EntityMetadata {
                     .version(DEFAULT_VERSION)
                     .rev(DEFAULT_REV)
                     .scope(DEFAULT_SCOPE)
-                    .createdAt(ZonedDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC))
-                    .updatedAt(ZonedDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC));
+                    .createdAt(DEFAULT_TIMESTAMP)
+                    .updatedAt(DEFAULT_TIMESTAMP);
         }
 
         @JsonProperty(VERSION)

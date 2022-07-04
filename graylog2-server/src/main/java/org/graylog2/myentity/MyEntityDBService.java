@@ -16,32 +16,21 @@
  */
 package org.graylog2.myentity;
 
-import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.entities.PaginatedEntityDbService;
-import org.mongojack.JacksonDBCollection;
+import org.graylog2.database.entities.EntityDbService;
 
 import javax.inject.Inject;
 
 /**
  * Specific MyEntity DB service implementation.
  */
-public class MyEntityDBService extends PaginatedEntityDbService<MyEntity> {
+public class MyEntityDBService extends EntityDbService<MyEntity> {
 
     public static final String COLLECTION_NAME = "my_entities";
-    private final JacksonDBCollection<MyEntity, ObjectId> dbCollection;
 
     @Inject
     public MyEntityDBService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
         super(mongoConnection, mapper, MyEntity.class, COLLECTION_NAME);
-
-        dbCollection = JacksonDBCollection.wrap(
-                mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-                MyEntity.class,
-                ObjectId.class,
-                mapper.get());
     }
-
-    // Inherit get, save, delete methods from parent PaginatedEntityDbService.
 }
