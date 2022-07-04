@@ -19,19 +19,23 @@ import { useHistory, useLocation } from 'react-router-dom';
 
 import useQuery from 'routing/useQuery';
 
+const DEFAULT_PAGE = 1;
+
 const usePaginationQueryParameter = () => {
-  const { page } = useQuery();
+  const { page: pageQueryParameter } = useQuery();
   const history = useHistory();
   const { search, pathname } = useLocation();
 
-  const query = pathname + search;
-
   const setPage = (newPage: number) => {
+    const query = pathname + search;
     const uri = new URI(query).setSearch('page', String(newPage));
     history.replace(uri.toString());
   };
 
-  return { page: Number(page) || 1, setPage };
+  const pageQueryParameterAsNumber = Number(pageQueryParameter);
+  const page = (Number.isInteger(pageQueryParameterAsNumber) && pageQueryParameterAsNumber > 0) ? pageQueryParameterAsNumber : DEFAULT_PAGE;
+
+  return { page, setPage };
 };
 
 export default usePaginationQueryParameter;
