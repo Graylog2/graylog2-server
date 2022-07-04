@@ -23,8 +23,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog2.database.entities.Entity;
 import org.graylog2.database.entities.EntityMetadata;
-import org.mongojack.Id;
-import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -36,22 +34,10 @@ import java.util.Optional;
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = MyEntity.Builder.class)
-public abstract class MyEntity implements Entity {
+public abstract class MyEntity extends Entity<MyEntity> {
 
     public static final String TITLE = "title";
     public static final String DESCRIPTION = "description";
-
-    @Override
-    @Id
-    @ObjectId
-    @Nullable
-    @JsonProperty(ID)
-    public abstract String id();
-
-    @Override
-    @Nullable
-    @JsonProperty(METADATA)
-    public abstract EntityMetadata metadata();
 
     // Sample arbitrary entity fields.
     @JsonProperty(TITLE)
@@ -60,6 +46,11 @@ public abstract class MyEntity implements Entity {
     @JsonProperty(DESCRIPTION)
     public abstract Optional<String> description();
 
+    @Override
+    public MyEntity withMetadata(EntityMetadata metadata) {
+        return toBuilder().metadata(metadata).build();
+    }
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -67,27 +58,20 @@ public abstract class MyEntity implements Entity {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public abstract static class Builder {
-
+    public abstract static class Builder extends Entity.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
-            // TODO (optional): Supply empty metadata default for existing objects.
-            return new AutoValue_MyEntity.Builder();
+            return new AutoValue_MyEntity.Builder()
+                    // This needs to be done manually for each entity, I think there is no way to do it automatically
+                    // One option could be to write an auto-value extension
+                    .metadata(EntityMetadata.createDefault());
         }
-
-        @Id
-        @ObjectId
-        @JsonProperty(ID)
-        public abstract Builder id(String id);
-
-        @JsonProperty(METADATA)
-        public abstract Builder metadata(EntityMetadata metadata);
 
         @JsonProperty(TITLE)
         public abstract Builder title(String title);
 
         @JsonProperty(DESCRIPTION)
-        public abstract Builder description(Optional<String> description);
+        public abstract Builder description(@Nullable String description);
 
         public abstract MyEntity build();
     }

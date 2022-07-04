@@ -23,23 +23,33 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nullable;
 
 /**
- * Entity interface definition, which can be used to enforce that each entity implementation
+ * Entity base class, which can be used to enforce that each entity implementation
  * has the required id and metadata fields.
- *
- * AutoValue classes cannot extend classes, so an interface is used instead. Not as good, but it's something.
  */
-public interface Entity {
-    String ID = "_id";
-    String METADATA = "_metadata";
+public abstract class Entity<DTO> {
+    private static final String ID = "id";
+    static final String METADATA = "_metadata";
 
-    // Entity annotations included in interface only as an example.
+    // The @Id and @ObjectId annotations take care of converting the "id" field name to "_id" when storing/loading
+    // values to/from the database.
     @Id
     @ObjectId
     @Nullable
     @JsonProperty(ID)
-    String id();
+    public abstract String id();
 
-    @Nullable
     @JsonProperty(METADATA)
-    EntityMetadata metadata();
+    public abstract EntityMetadata metadata();
+
+    public abstract DTO withMetadata(EntityMetadata metadata);
+
+    public static abstract class Builder<SELF extends Builder<SELF>> {
+        @Id
+        @ObjectId
+        @JsonProperty(ID)
+        public abstract SELF id(@Nullable String id);
+
+        @JsonProperty(METADATA)
+        public abstract SELF metadata(EntityMetadata metadata);
+    }
 }
