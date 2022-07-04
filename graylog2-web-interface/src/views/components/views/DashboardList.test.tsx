@@ -48,7 +48,7 @@ const createPaginatedDashboards = (count = 1) => {
   return {
     pagination: {
       total: count,
-      page: count > 0 ? count : 0,
+      page: count > 0 ? count : 1,
       perPage: 5,
       count,
     },
