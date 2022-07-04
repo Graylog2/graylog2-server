@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database.metadata;
+package org.graylog2.database.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.mongojack.Id;

@@ -21,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog2.database.metadata.Entity;
-import org.graylog2.database.metadata.EntityMetadata;
+import org.graylog2.database.entities.Entity;
+import org.graylog2.database.entities.EntityMetadata;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -41,12 +41,14 @@ public abstract class MyEntity implements Entity {
     public static final String TITLE = "title";
     public static final String DESCRIPTION = "description";
 
+    @Override
     @Id
     @ObjectId
     @Nullable
     @JsonProperty(ID)
     public abstract String id();
 
+    @Override
     @Nullable
     @JsonProperty(METADATA)
     public abstract EntityMetadata metadata();

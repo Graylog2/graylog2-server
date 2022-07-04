@@ -14,10 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database;
+package org.graylog2.database.entities;
 
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.metadata.Entity;
+import org.graylog2.database.MongoConnection;
+import org.graylog2.database.PaginatedDbService;
 
 import java.util.Optional;
 

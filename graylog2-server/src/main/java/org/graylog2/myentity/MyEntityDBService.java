@@ -19,7 +19,7 @@ package org.graylog2.myentity;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedEntityDbService;
+import org.graylog2.database.entities.PaginatedEntityDbService;
 import org.mongojack.JacksonDBCollection;
 
 import javax.inject.Inject;
