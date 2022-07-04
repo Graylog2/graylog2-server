@@ -20,17 +20,18 @@ import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.Aggregation;
 import io.searchbox.core.search.aggregation.Bucket;
 import io.searchbox.core.search.aggregation.MetricAggregation;
+import io.searchbox.core.search.aggregation.MissingAggregation;
 import io.searchbox.core.search.aggregation.RootAggregation;
 import io.searchbox.core.search.aggregation.ValueCountAggregation;
+import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.metrics.valuecount.ValueCountAggregationBuilder;
 import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
-import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
-import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +72,8 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, MetricAggreg
             value = searchResult.getTotal();
         } else if (metricAggregation instanceof ValueCountAggregation) {
             value = ((ValueCountAggregation) metricAggregation).getValueCount();
+        } else if (metricAggregation instanceof MissingAggregation) {
+            value = ((MissingAggregation) metricAggregation).getMissing();
         }
         if (value == null) {
             LOG.error("Unexpected aggregation type {}, returning 0 for the count. This is a bug.", metricAggregation);

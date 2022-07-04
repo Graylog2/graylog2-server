@@ -26,6 +26,7 @@ import type { GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore'
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
 import type { QueriesList } from 'views/actions/QueriesActions';
+import { MISSING_BUCKET_NAME } from 'views/Constants';
 
 import AddToQueryHandler from './AddToQueryHandler';
 
@@ -103,6 +104,27 @@ describe('AddToQueryHandler', () => {
     return addToQueryHandler.handle({ queryId: 'anotherQueryId', field: 'bar', value: 42, type: new FieldType('keyword', [], []), contexts: { view } })
       .then(() => {
         expect(QueriesActions.query).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND bar:42');
+      });
+  });
+
+  it('appends NOT _exists_ fragment for proper field in case of missing bucket in input', () => {
+    const query = Query.builder()
+      .query({ type: 'elasticsearch', query_string: '' })
+      .build();
+
+    queries = Immutable.OrderedMap({ queryId: query });
+
+    const addToQueryHandler = new AddToQueryHandler();
+
+    const newQuery = Query.builder()
+      .query({ type: 'elasticsearch', query_string: 'foo:23' })
+      .build();
+
+    queriesStoreListen(Immutable.OrderedMap({ anotherQueryId: newQuery }));
+
+    return addToQueryHandler.handle({ queryId: 'anotherQueryId', field: 'bar', value: MISSING_BUCKET_NAME, type: new FieldType('keyword', [], []), contexts: { view } })
+      .then(() => {
+        expect(QueriesActions.query).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND NOT _exists_:bar');
       });
   });
 
