@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Select from 'components/common/Select';
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 
 type Props = {
   disabled: boolean,

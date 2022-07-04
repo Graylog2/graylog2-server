@@ -81,6 +81,8 @@ import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualiza
 import visualizationBindings from 'views/components/visualizations/bindings';
 import { AggregationWizard } from 'views/components/aggregationwizard';
 import { filterCloudValueActions } from 'util/conditional/filterValueActions';
+import CopyValueToClipboard from 'views/logic/valueactions/CopyValueToClipboard';
+import CopyFieldToClipboard from 'views/logic/fieldactions/CopyFieldToClipboard';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -261,6 +263,13 @@ const exports: PluginExports = {
       isEnabled: ({ field, type }) => (!isFunction(field) && !type.isDecorated()),
       resetFocus: false,
     },
+    {
+      type: 'copy-field-to-clipboard',
+      title: 'Copy field name to clipboard',
+      handler: CopyFieldToClipboard,
+      isEnabled: () => true,
+      resetFocus: false,
+    },
   ],
   valueActions: filterCloudValueActions([
     {
@@ -296,6 +305,13 @@ const exports: PluginExports = {
       title: 'Highlight this value',
       handler: HighlightValueHandler,
       isEnabled: HighlightValueHandler.isEnabled,
+      resetFocus: false,
+    },
+    {
+      type: 'copy-value-to-clipboard',
+      title: 'Copy value to clipboard',
+      handler: CopyValueToClipboard,
+      isEnabled: () => true,
       resetFocus: false,
     },
   ], ['create-extractor']),

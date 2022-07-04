@@ -17,8 +17,8 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import naturalSort from 'javascript-natural-sort';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { LinkContainer } from 'components/common/router';
 import { Button } from 'components/bootstrap';
 import { Spinner } from 'components/common';

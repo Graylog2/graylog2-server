@@ -17,8 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import naturalSort from 'javascript-natural-sort';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { ShardRouting } from 'components/indices';
 
 const ShardRoutingWrap = styled.div(({ theme }) => css`

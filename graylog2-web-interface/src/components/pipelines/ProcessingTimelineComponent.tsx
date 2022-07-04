@@ -16,9 +16,9 @@
  */
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
-import naturalSort from 'javascript-natural-sort';
 import Immutable from 'immutable';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { LinkContainer, Link } from 'components/common/router';
 import { Button } from 'components/bootstrap';
 import { DataTable, Spinner, PaginatedList, SearchForm, QueryHelper } from 'components/common';
