@@ -42,11 +42,15 @@ const CustomMenuList = ({ children, innerProps, ...rest }: Props.MenuList) => {
 
   return (
     <List style={{ width: '100%' }}
-          width={300}
+          width={1}
           height={300}
-          rowHeight={30}
+          rowHeight={36}
           rowCount={rows.length}
-          rowRenderer={rowRenderer} />
+          rowRenderer={rowRenderer}
+          containerStyle={{
+            width: '100%',
+            maxWidth: '100%',
+          }} />
   );
 };
 

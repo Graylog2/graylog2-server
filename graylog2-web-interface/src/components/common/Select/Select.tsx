@@ -24,9 +24,8 @@ import { withTheme } from 'styled-components';
 import CreatableSelect from 'react-select/creatable';
 
 import { themePropTypes } from 'theme';
-import CustomMenuList from 'components/common/CustomMenuList';
-
-import Icon from './Icon';
+import CustomMenuList from 'components/common/Select/CustomMenuList';
+import Icon from 'components/common/Icon';
 
 export const CONTROL_CLASS = 'common-select-control';
 
