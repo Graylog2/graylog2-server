@@ -43,6 +43,27 @@ const GrokPatternsList = styled(DataTable)`
   }
 `;
 
+const testPattern = (pattern, callback, errCallback) => {
+  GrokPatternsStore.testPattern(pattern, callback, errCallback);
+};
+
+const _headerCellFormatter = (header) => {
+  let formattedHeaderCell;
+
+  switch (header.toLocaleLowerCase()) {
+    case 'name':
+      formattedHeaderCell = <th className="name">{header}</th>;
+      break;
+    case 'actions':
+      formattedHeaderCell = <th className="actions">{header}</th>;
+      break;
+    default:
+      formattedHeaderCell = <th>{header}</th>;
+  }
+
+  return formattedHeaderCell;
+};
+
 class GrokPatterns extends React.Component {
   constructor(props) {
     super(props);
@@ -100,10 +121,6 @@ class GrokPatterns extends React.Component {
     });
   };
 
-  testPattern = (pattern, callback, errCallback) => {
-    GrokPatternsStore.testPattern(pattern, callback, errCallback);
-  };
-
   _onPageChange = (newPage, newPerPage) => {
     const { pagination } = this.state;
     const newPagination = Object.assign(pagination, {
@@ -132,23 +149,6 @@ class GrokPatterns extends React.Component {
     }
   };
 
-  _headerCellFormatter = (header) => {
-    let formattedHeaderCell;
-
-    switch (header.toLocaleLowerCase()) {
-      case 'name':
-        formattedHeaderCell = <th className="name">{header}</th>;
-        break;
-      case 'actions':
-        formattedHeaderCell = <th className="actions">{header}</th>;
-        break;
-      default:
-        formattedHeaderCell = <th>{header}</th>;
-    }
-
-    return formattedHeaderCell;
-  };
-
   _patternFormatter = (pattern) => {
     const { patterns: unfilteredPatterns } = this.state;
     const patterns = unfilteredPatterns.filter((p) => p.name !== pattern.name);
@@ -168,7 +168,7 @@ class GrokPatterns extends React.Component {
             <EditPatternModal id={pattern.id}
                               name={pattern.name}
                               pattern={pattern.pattern}
-                              testPattern={this.testPattern}
+                              testPattern={testPattern}
                               patterns={patterns}
                               create={false}
                               reload={this.loadData}
@@ -208,7 +208,7 @@ class GrokPatterns extends React.Component {
                                 pattern=""
                                 patterns={patterns}
                                 create
-                                testPattern={this.testPattern}
+                                testPattern={testPattern}
                                 reload={this.loadData}
                                 savePattern={this.savePattern}
                                 validPatternName={this.validPatternName} />
@@ -234,7 +234,7 @@ class GrokPatterns extends React.Component {
                     <GrokPatternsList id="grok-pattern-list"
                                       className="table-striped table-hover"
                                       headers={headers}
-                                      headerCellFormatter={this._headerCellFormatter}
+                                      headerCellFormatter={_headerCellFormatter}
                                       sortByKey="name"
                                       rows={patterns}
                                       dataRowFormatter={this._patternFormatter} />
