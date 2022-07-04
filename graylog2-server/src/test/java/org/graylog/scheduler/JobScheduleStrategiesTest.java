@@ -76,6 +76,7 @@ public class JobScheduleStrategiesTest {
     public void nextTimeCron() {
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .schedule(CronJobSchedule.builder()
                         .cronExpression("0 0 1 * * ? *")
                         .timezone("Europe/Vienna")
