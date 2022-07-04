@@ -77,7 +77,7 @@ public class JobResourceHandlerService {
                 Objects.toString(trigger.lock().lastOwner(), ""),
                 trigger.triggeredAt().orElse(null),
                 trigger.lock().progress(),
-                details.isCancallable(),
+                details.isCancellable(),
                 true,
                 trigger.status());
     }

@@ -29,10 +29,10 @@ public abstract class JobTriggerDetails {
     // Used to identify a SystemJob
     public abstract String systemJobName();
 
-    public abstract boolean isCancallable();
+    public abstract boolean isCancellable();
 
-    public static JobTriggerDetails create(String info, String description, String systemJobName, boolean isCancallable) {
-        return new AutoValue_JobTriggerDetails(info, description, systemJobName, isCancallable);
+    public static JobTriggerDetails create(String info, String description, String systemJobName, boolean isCancellable) {
+        return new AutoValue_JobTriggerDetails(info, description, systemJobName, isCancellable);
     }
 
 }

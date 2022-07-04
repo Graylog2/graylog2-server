@@ -408,6 +408,7 @@ public class DBJobTriggerService {
             }
             update.set(FIELD_NEXT_TIME, triggerUpdate.nextTime().get());
         } else {
+            // TODO checking for the cancelled status could be done atomically with a $cond update pipeline once we can update to mongo 4.2
             update.set(FIELD_STATUS, wasCancelled ? JobTriggerStatus.CANCELLED : JobTriggerStatus.COMPLETE);
         }
 
@@ -480,22 +481,34 @@ public class DBJobTriggerService {
         db.updateMulti(query, update);
     }
 
-    public void updateProgress(JobTriggerDto trigger, int progress) {
+    /**
+     * Update the job progress on a trigger
+     * @param trigger  the trigger to update
+     * @param progress the job progress in percent (0-100)
+     */
+    public int updateProgress(JobTriggerDto trigger, int progress) {
         final Query query = DBQuery.is(FIELD_ID, trigger.id());
         final DBUpdate.Builder update = DBUpdate.set(FIELD_PROGRESS, progress);
-        final int n = db.update(query, update).getN();
-        if (n != 1) {
-            LOG.warn("Progress update for trigger <{}> returned unexpected write result count <{}>", trigger, n);
-        }
+        return db.update(query, update).getN();
     }
 
-    public Optional<JobTriggerDto> cancelTriggerWithQuery(Query query) {
+    /**
+     * Cancel a JobTrigger that matches a query
+     * @param query  the db query
+     * @return an Optional of the trigger that was cancelled. Empty if no matching trigger was found.
+     */
+    public Optional<JobTriggerDto> cancelTriggerByQuery(Query query) {
         final DBUpdate.Builder update = DBUpdate.set(JobTriggerDto.FIELD_IS_CANCELLED, true);
 
         return Optional.ofNullable(db.findAndModify(query, update));
     }
 
-    public boolean triggerWasCancelled(JobTriggerDto trigger) {
+    /**
+     * Checks whether the trigger was cancelled. Does so by reloading it from the DB.
+     * @param trigger the trigger to check.
+     * @return true if the trigger was cancelled.
+     */
+    private boolean triggerWasCancelled(JobTriggerDto trigger) {
         final JobTriggerDto reloadedTrigger = db.findOneById(getId(trigger));
         if (reloadedTrigger == null) {
             return false;
@@ -503,7 +516,12 @@ public class DBJobTriggerService {
         return reloadedTrigger.isCancelled();
     }
 
-    public List<JobTriggerDto> findWithQuery(Query query) {
+    /**
+     * Find triggers by using the provided query. Use judiciously!
+     * @param query  The query
+     * @return All found JobTriggers
+     */
+    public List<JobTriggerDto> findByQuery(Query query) {
         try (final DBCursor<JobTriggerDto> cursor = db.find(query).sort(DBSort.desc(FIELD_UPDATED_AT))) {
             return ImmutableList.copyOf((Iterator<? extends JobTriggerDto>) cursor);
         }

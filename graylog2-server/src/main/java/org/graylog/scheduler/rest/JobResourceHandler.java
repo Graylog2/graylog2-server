@@ -29,7 +29,6 @@ import java.util.Optional;
  */
 public interface JobResourceHandler {
 
-    // TODO should we expose the UserContext into the plugin API like this? Maybe introduce an interface...
     default List<JobTriggerDto> listAllJobs(UserContext userContext) {
         return ImmutableList.of();
     }
