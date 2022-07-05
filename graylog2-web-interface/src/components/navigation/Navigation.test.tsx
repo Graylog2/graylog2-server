@@ -229,6 +229,7 @@ describe('Navigation', () => {
       links.forEach((title) => expect(wrapper.find(`NavItem[children="${title}"]`)).toExist());
     };
 
+    // eslint-disable-next-line jest/expect-expect
     it.each`
     permissions                    | count | links
     ${[]}                          | ${5}  | ${['Search', 'Streams', 'Alerts', 'Dashboards']}
