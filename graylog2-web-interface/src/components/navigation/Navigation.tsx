@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useContext } from 'react';
 import { useLocation } from 'react-router-dom';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import type { PluginNavigationDropdownItem } from 'graylog-web-plugin';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { LinkContainer } from 'components/common/router';
@@ -29,6 +30,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes, { ENTERPRISE_ROUTE_DESCRIPTION, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
+import IfFeatureEnabled from 'components/features/IfFeatureEnabled';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -58,11 +60,15 @@ function pluginMenuItemExists(description: string): boolean {
   return !!pluginExports.find((value) => value.description?.toLowerCase() === description.toLowerCase());
 }
 
-const formatSinglePluginRoute = ({ description, path, permissions }, topLevel = false) => {
-  const link = <NavigationLink key={description} description={description} path={appPrefixed(path)} topLevel={topLevel} />;
+const formatSinglePluginRoute = ({ description, path, permissions, requiredFeatureFlag }: PluginNavigationDropdownItem, topLevel = false) => {
+  let link = <NavigationLink key={description} description={description} path={appPrefixed(path)} topLevel={topLevel} />;
 
   if (permissions) {
-    return <IfPermitted key={description} permissions={permissions}>{link}</IfPermitted>;
+    link = <IfPermitted key={description} permissions={permissions}>{link}</IfPermitted>;
+  }
+
+  if (requiredFeatureFlag) {
+    link = <IfFeatureEnabled name={requiredFeatureFlag}>{link}</IfFeatureEnabled>;
   }
 
   return link;
