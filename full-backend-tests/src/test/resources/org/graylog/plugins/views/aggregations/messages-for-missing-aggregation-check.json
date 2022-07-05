@@ -1,0 +1,127 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "0"
+          }
+        },
+        {
+          "data": {
+            "source": "fbi.org",
+            "message": "Personal data added",
+            "timestamp": "2022-01-01 01:00:00.000",
+            "fixtureType": "474877",
+            "firstName": "Joe",
+            "lastName": "Smith",
+            "age": 50,
+            "streams": [
+              "000000000000000000000001"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "1"
+          }
+        },
+        {
+          "data": {
+            "source": "fbi.org",
+            "message": "Personal data added",
+            "timestamp": "2022-01-01 01:00:00.000",
+            "fixtureType": "474877",
+            "firstName": "Jane",
+            "lastName": "Smith",
+            "age": 40,
+            "streams": [
+              "000000000000000000000001"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "2"
+          }
+        },
+        {
+          "data": {
+            "source": "fbi.org",
+            "message": "Personal data added",
+            "timestamp": "2022-01-01 01:00:00.000",
+            "fixtureType": "474877",
+            "firstName": "Joe",
+            "lastName": "Biden",
+            "age": 80,
+            "streams": [
+              "000000000000000000000001"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "3"
+          }
+        },
+        {
+          "data": {
+            "source": "fbi.org",
+            "message": "Personal data added",
+            "timestamp": "2022-01-01 01:00:00.000",
+            "fixtureType": "474877",
+            "lastName": "Cooper",
+            "age": 60,
+            "streams": [
+              "000000000000000000000001"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "4"
+          }
+        },
+        {
+          "data": {
+            "source": "fbi.org",
+            "message": "Personal data added",
+            "timestamp": "2022-01-01 01:00:00.000",
+            "fixtureType": "474877",
+            "firstName": "Bob",
+            "age": 60,
+            "streams": [
+              "000000000000000000000001"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

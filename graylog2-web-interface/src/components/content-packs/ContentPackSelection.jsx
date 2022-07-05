@@ -17,6 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { cloneDeep } from 'lodash';
+import styled from 'styled-components';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { ExpandableList, ExpandableListItem, Icon, SearchForm } from 'components/common';
@@ -28,12 +29,21 @@ import InputDescription from 'components/common/InputDescription';
 
 import style from './ContentPackSelection.css';
 
+const HeaderText = styled.span`
+  overflow-wrap: anywhere;
+`;
+
+const HeaderIcon = styled(Icon)(({ theme }) => `
+  padding-top: ${theme.spacings.xxs};
+  padding-right: ${theme.spacings.xxs};
+`);
+
 const _entityItemHeader = (entity) => {
   if (entity instanceof Entity) {
-    return <span><Icon name="archive" className={style.contentPackEntity} />{' '}<span>{entity.title}</span></span>;
+    return <><HeaderIcon name="archive" className={style.contentPackEntity} />{' '}<span>{entity.title}</span></>;
   }
 
-  return <span><Icon name="server" />{' '}<span>{entity.title}</span></span>;
+  return <><HeaderIcon name="server" />{' '}<HeaderText>{entity.title}</HeaderText></>;
 };
 
 class ContentPackSelection extends React.Component {
