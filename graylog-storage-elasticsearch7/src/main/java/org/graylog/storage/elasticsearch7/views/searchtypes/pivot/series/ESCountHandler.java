@@ -27,6 +27,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.HasAggregations;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.missing.Missing;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ValueCount;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ValueCountAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
@@ -86,7 +87,9 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
         final Tuple2<String, Class<? extends Aggregation>> objects = aggTypes(queryContext, pivot).getTypes(spec);
         if (objects == null) {
             if (aggregations instanceof MultiBucketsAggregation.Bucket) {
-                return createValueCount((MultiBucketsAggregation.Bucket) aggregations);
+                return createValueCount(((MultiBucketsAggregation.Bucket) aggregations).getDocCount());
+            } else if (aggregations instanceof Missing) {
+                return createValueCount(((Missing) aggregations).getDocCount());
             }
         } else {
             // try to saved sub aggregation type. this might fail if we refer to the total result of the entire result instead of a specific
@@ -97,8 +100,7 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
         return null;
     }
 
-    private Aggregation createValueCount(MultiBucketsAggregation.Bucket aggregations) {
-        final Long docCount = aggregations.getDocCount();
+    private Aggregation createValueCount(final Long docCount) {
         return new ValueCount() {
             @Override
             public long getValue() {

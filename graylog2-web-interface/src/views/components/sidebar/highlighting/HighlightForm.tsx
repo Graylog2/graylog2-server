@@ -21,7 +21,7 @@ import * as Immutable from 'immutable';
 import { Formik, Form, Field } from 'formik';
 import isNil from 'lodash/isNil';
 
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 import { Input, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';

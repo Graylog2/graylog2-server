@@ -19,9 +19,9 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import moment from 'moment';
-import {} from 'moment-duration-format';
-import naturalSort from 'javascript-natural-sort';
 
+import {} from 'moment-duration-format';
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Alert, Col, Row } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';

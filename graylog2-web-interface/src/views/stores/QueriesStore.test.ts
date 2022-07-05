@@ -63,20 +63,20 @@ describe('QueriesStore', () => {
     expect(ViewStore.listen).toHaveBeenCalled();
   });
 
-  it('retrieves and propagates queries from ViewStore upon updates', (done) => {
+  it('retrieves and propagates queries from ViewStore upon updates', () => new Promise<void>((resolve) => {
     const query1 = Query.builder().id('query1').build();
     const queries = [query1];
     const callback = asMock(ViewStore.listen).mock.calls[0][0];
     const unsubscribe = QueriesStore.listen((newQueries) => {
       expect(newQueries).toEqual(Immutable.OrderedMap<QueryId, Query>({ query1 }));
 
-      done();
+      resolve();
     });
 
     callback(newViewStoreStateForQueries(queries));
 
     unsubscribe();
-  });
+  }));
 
   describe('rangeType', () => {
     const query1 = Query.builder()
@@ -91,43 +91,51 @@ describe('QueriesStore', () => {
       callback(newViewStoreStateForQueries(queries));
     });
 
-    it('throws error if no type is given', () => {
-      return QueriesActions.rangeType('query1', undefined)
-        .catch((error) => expect(error).toEqual(new Error('Invalid time range type: undefined')));
+    it('throws error if no type is given', async () => {
+      const result = await QueriesActions.rangeType('query1', undefined)
+        .catch((error) => error);
+
+      expect(result).toEqual(new Error('Invalid time range type: undefined'));
     });
 
-    it('throws error if invalid type is given', () => {
-      // @ts-ignore
-      return QueriesActions.rangeType('query1', 'invalid')
-        .catch((error) => expect(error).toEqual(new Error('Invalid time range type: invalid')));
+    it('throws error if invalid type is given', async () => {
+      // @ts-expect-error
+      const result = await QueriesActions.rangeType('query1', 'invalid')
+        .catch((error) => error);
+
+      expect(result).toEqual(new Error('Invalid time range type: invalid'));
     });
 
     it('does not do anything if type stays the same', () => QueriesActions.rangeType('query1', 'relative')
       .then((newQueries) => expect(newQueries).toEqual(Immutable.OrderedMap<QueryId, Query>({ query1 }))));
 
-    it('translates current relative time range parameters to absolute ones when switching to absolute',
-      () => QueriesActions.rangeType('query1', 'absolute')
-        .then((newQueries) => expect(newQueries)
-          .toEqual(Immutable.OrderedMap<QueryId, Query>({
-            query1: query1.toBuilder()
-              .timerange({
-                type: 'absolute',
-                from: moment(fixedDate).subtract(300, 'seconds').toISOString(),
-                to: moment(fixedDate).toISOString(),
-              })
-              .build(),
-          }))));
+    it('translates current relative time range parameters to absolute ones when switching to absolute', async () => {
+      const newQueries = await QueriesActions.rangeType('query1', 'absolute');
 
-    it('translates current relative time range parameters to keyword when switching to keyword',
-      () => QueriesActions.rangeType('query1', 'keyword')
-        .then((newQueries) => expect(newQueries)
-          .toEqual(Immutable.OrderedMap<QueryId, Query>({
-            query1: query1.toBuilder()
-              .timerange({
-                type: 'keyword',
-                keyword: 'Last five Minutes',
-              })
-              .build(),
-          }))));
+      expect(newQueries.toJS())
+        .toEqual({
+          query1: query1.toBuilder()
+            .timerange({
+              type: 'absolute',
+              from: moment(fixedDate).subtract(300, 'seconds').toISOString(),
+              to: moment(fixedDate).toISOString(),
+            })
+            .build(),
+        });
+    });
+
+    it('translates current relative time range parameters to keyword when switching to keyword', async () => {
+      const newQueries = await QueriesActions.rangeType('query1', 'keyword');
+
+      expect(newQueries.toJS())
+        .toEqual({
+          query1: query1.toBuilder()
+            .timerange({
+              type: 'keyword',
+              keyword: 'Last five Minutes',
+            })
+            .build(),
+        });
+    });
   });
 });

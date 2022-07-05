@@ -27,6 +27,7 @@ module.exports = {
     require.resolve('./lib/setup-files/mock-IntersectionObserver.js'),
     require.resolve('./lib/setup-files/mock-moment-timezone.js'),
     require.resolve('./lib/setup-files/console-warnings-fail-tests.js'),
+    require.resolve('./lib/setup-files/mock-crypto-getrandomvalues.js'),
     'jest-canvas-mock',
   ],
   setupFilesAfterEnv: [
@@ -55,12 +56,8 @@ module.exports = {
     '.fixtures.[jt]s$',
   ],
   testTimeout: applyTimeoutMultiplier(5000),
-  reporters: [
-    'default',
-    [
-      'jest-junit', {
-        outputDirectory: 'target',
-      },
-    ],
-  ],
+  transform: {
+    '^.+\\.[tj]sx?$': 'babel-jest',
+  },
+  transformIgnorePatterns: ['node_modules/(?!(@react-hook|uuid)/)'],
 };
