@@ -32,11 +32,18 @@ const exampleEventDefinition = {
 jest.mock('components/permissions/EntityShareModal', () => () => <div>EntityShareModal content</div>);
 
 describe('EventDefinitionEntry', () => {
-  const renderSUT = (grnPermissions = [], permissions = []) => {
+  const renderSUT = (grnPermissions = [], permissions = [], scope = '') => {
     const currentUser = alice.toBuilder()
       .grnPermissions(Immutable.List(grnPermissions))
       .permissions(Immutable.List(permissions))
       .build();
+
+    exampleEventDefinition._metadata = {
+      scope: scope,
+      revision: 1,
+      created_at: '2022-06-13T08:47:12Z',
+      updated_at: '2022-06-29T12:00:28Z',
+    };
 
     return (
       <CurrentUserContext.Provider value={currentUser}>
@@ -74,5 +81,29 @@ describe('EventDefinitionEntry', () => {
     render(renderSUT(grnPermissions));
 
     expect(screen.getAllByRole('button', { name: /Share/ })[1]).toHaveAttribute('disabled');
+  });
+
+  it('shows "edit" button', () => {
+    render(renderSUT([], ['*'], 'DEFAULT'));
+
+    expect(screen.getAllByTestId('edit-button')).toBeVisible();
+  });
+
+  it('hides "edit" button for immutable definitions', () => {
+    render(renderSUT([], ['*'], 'ILLUMINATE'));
+
+    expect(screen.queryByTestId('edit-button')).toBeNull();
+  });
+
+  it('shows "delete" button', () => {
+    render(renderSUT([], ['*'], 'DEFAULT'));
+
+    expect(screen.getByTestId('delete-button')).toBeVisible();
+  });
+
+  it('hides "delete" button for immutable definitions', () => {
+    render(renderSUT([], ['*'], 'ILLUMINATE'));
+
+    expect(screen.queryByTestId('delete-button')).toBeNull();
   });
 });

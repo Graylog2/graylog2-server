@@ -42,6 +42,12 @@ export type EventDefinition = {
     type: string,
   },
   title: string,
+  _metadata: {
+    scope: string,
+    revision: number,
+    created_at: string,
+    updated_at: string,
+  } | null,
 };
 
 type Props = {
@@ -57,6 +63,17 @@ type Props = {
   onEnable: (eventDefinition: EventDefinition) => void,
   onDelete: (eventDefinition: EventDefinition) => void,
   onCopy: (eventDefinition: EventDefinition) => void,
+};
+
+// NOTE: Mock method to be able to move forward with tests. Remove after API
+// defined how we are getting the permissions to show and hide actions
+const getPermissionsByScope = (scope: string): { edit: boolean, delete: boolean } => {
+  switch (scope) {
+    case 'ILLUMINATE':
+      return { edit: false, delete: false };
+    default:
+      return { edit: true, delete: true };
+  }
 };
 
 const getConditionPlugin = (type: string) => PluginStore.exports('eventDefinitionTypes')
@@ -76,6 +93,13 @@ const EventDefinitionEntry = ({
 }: Props) => {
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const isScheduled = lodash.get(context, `scheduler.${eventDefinition.id}.is_scheduled`, true);
+
+  const showAction = (action: string): boolean => {
+    // TODO: update this method to check for the metadata field
+    const permissions = getPermissionsByScope(eventDefinition._metadata.scope);
+
+    return permissions[action];
+  };
 
   const handleCopy = () => {
     onCopy(eventDefinition);
@@ -101,21 +125,27 @@ const EventDefinitionEntry = ({
 
   const actions = (
     <React.Fragment key={`actions-${eventDefinition.id}`}>
-      <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
-        <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
-          <Button bsStyle="info">
-            <Icon name="edit" /> Edit
-          </Button>
-        </LinkContainer>
-      </IfPermitted>
+      {showAction('edit') && (
+        <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
+          <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
+            <Button bsStyle="info" data-testid="edit-button">
+              <Icon name="edit" /> Edit
+            </Button>
+          </LinkContainer>
+        </IfPermitted>
+      )}
       <ShareButton entityId={eventDefinition.id} entityType="event_definition" onClick={() => setShowEntityShareModal(true)} />
       <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
         <DropdownButton id="more-dropdown" title="More" pullRight>
           <MenuItem onClick={handleCopy}>Duplicate</MenuItem>
           <MenuItem divider />
           {toggle}
-          <MenuItem divider />
-          <MenuItem onClick={handleDelete}>Delete</MenuItem>
+          {showAction('edit') && (
+            <>
+              <MenuItem divider />
+              <MenuItem onClick={handleDelete} data-testid="delete-button">Delete</MenuItem>
+            </>
+          )}
         </DropdownButton>
       </IfPermitted>
     </React.Fragment>
