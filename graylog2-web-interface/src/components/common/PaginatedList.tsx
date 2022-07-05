@@ -136,7 +136,7 @@ PaginatedList.propTypes = {
 };
 
 PaginatedList.defaultProps = {
-  activePage: 0,
+  activePage: 1,
   className: undefined,
   hideFirstAndLastPageLinks: false,
   hidePreviousAndNextPageLinks: false,
