@@ -26,16 +26,20 @@ const OPTIONS = [
   { value: 'Amarillo', label: 'Yellow' },
 ];
 
+const renderAutocomplete = () => {
+  return render(
+    <Formik initialValues={{ value: 'Verde', label: 'Green' }} onSubmit={() => null}>
+      <Autocomplete fieldName="spaColor"
+                    label="Color translator"
+                    helpText="Choose a color"
+                    options={OPTIONS} />
+    </Formik>,
+  );
+};
+
 describe('Autocomplete component', () => {
   it('should render the field with a label', async () => {
-    const { getByText, baseElement } = render(
-      <Formik initialValues={{ value: 'Verde', label: 'Green' }} onSubmit={() => null}>
-        <Autocomplete fieldName="spaColor"
-                      label="Color translator"
-                      helpText="Choose a color"
-                      options={OPTIONS} />
-      </Formik>);
-
+    const { getByText, baseElement } = renderAutocomplete();
     let label = null;
     let pseudoInput = null;
 
@@ -49,30 +53,15 @@ describe('Autocomplete component', () => {
   });
 
   it('should let the user type', async () => {
-    const { baseElement } = render(
-      <Formik initialValues={{ value: 'Verde', label: 'Green' }} onSubmit={() => null}>
-        <Autocomplete fieldName="spaColor"
-                      label="Color translator"
-                      helpText="Choose a color"
-                      options={OPTIONS} />
-      </Formik>);
-
+    const { baseElement } = renderAutocomplete();
     fireEvent.change(baseElement.querySelector('input'), { target: { value: 'Naranja' } });
 
     expect(baseElement).toHaveTextContent('Naranja');
   });
 
   it('should show a list with options', async () => {
-    const { baseElement } = render(
-      <Formik initialValues={{ value: 'Verde', label: 'Green' }} onSubmit={() => null}>
-        <Autocomplete fieldName="spaColor"
-                      label="Color translator"
-                      helpText="Choose a color"
-                      options={OPTIONS} />
-      </Formik>);
-
+    const { baseElement } = renderAutocomplete();
     fireEvent.change(baseElement.querySelector('input'), { target: { value: 'ver' } });
-
     let list = null;
 
     await waitFor(() => {

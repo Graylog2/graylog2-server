@@ -54,9 +54,6 @@ const Autocomplete = ({
   helpText,
   options,
 }: autocompleteProps) => {
-  const [lOptions, setLOptions] = React.useState(options);
-  React.useEffect(() => setLOptions(options), [options]);
-
   return (
     <Field name={fieldName} help={helpText}>
       {({ field: { name, value, onChange } }) => (
@@ -68,7 +65,7 @@ const Autocomplete = ({
                   required={required}
                   allowCreate
                   onChange={(index) => onChange({ target: { value: index, name } })}
-                  options={lOptions}
+                  options={options}
                   value={value} />
           {helpText && (
             <span className="help-block">
