@@ -26,6 +26,7 @@ interface PluginRoute {
 interface PluginNavigation {
   path: string;
   description: string;
+  requiredFeatureFlag?: string;
   children?: Array<PluginNavigationDropdownItem>
 }
 

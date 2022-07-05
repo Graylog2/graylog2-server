@@ -68,17 +68,21 @@ const formatSinglePluginRoute = ({ description, path, permissions, requiredFeatu
   }
 
   if (requiredFeatureFlag) {
-    link = <IfFeatureEnabled name={requiredFeatureFlag}>{link}</IfFeatureEnabled>;
+    link = <IfFeatureEnabled key={description} name={requiredFeatureFlag}>{link}</IfFeatureEnabled>;
   }
 
   return link;
 };
 
 const formatPluginRoute = (pluginRoute, permissions, pathname) => {
+  if (pluginRoute.requiredFeatureFlag && !AppConfig.isFeatureEnabled(pluginRoute.requiredFeatureFlag)) {
+    return null;
+  }
+
   if (pluginRoute.children) {
     const activeChild = pluginRoute.children.filter(({ path }) => (path && _isActive(pathname, path)));
     const title = activeChild.length > 0 ? `${pluginRoute.description} / ${activeChild[0].description}` : pluginRoute.description;
-    const isEmpty = !pluginRoute.children.some((child) => isPermitted(permissions, child.permissions));
+    const isEmpty = !pluginRoute.children.some((child) => isPermitted(permissions, child.permissions) && (child.requiredFeatureFlag ? AppConfig.isFeatureEnabled(child.requiredFeatureFlag) : true));
 
     if (isEmpty) {
       return null;
