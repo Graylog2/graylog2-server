@@ -14,106 +14,70 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch7;
+package org.graylog.storage.elasticsearch6;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
-import com.google.common.io.Resources;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
-import org.graylog.storage.elasticsearch7.cat.CatApi;
-import org.graylog.storage.elasticsearch7.cat.NodeResponse;
+import io.searchbox.client.JestClient;
+import io.searchbox.core.CatResult;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.cluster.health.NodeRole;
 import org.graylog2.indexer.cluster.health.SIUnitParser;
-import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-class ClusterAdapterES7Test {
-    private static final String nodeId = "I-sZn-HKQhCtdf1JYPcx1A";
+class ClusterAdapterES6Test {
 
-    private ElasticsearchClient client;
-    private CatApi catApi;
-    private PlainJsonApi jsonApi;
-    private ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    private final static String SAMPLE_CAT_NODES_RESPONSE = "{" +
+            "\"result\" : " +
+            "[" +
+            "{" +
+            "\"id\":\"nodeWithCorrectInfo\"," +
+            "\"name\":\"nodeWithCorrectInfo\"," +
+            "\"role\":\"dimr\"," +
+            "\"ip\":\"182.88.0.2\"," +
+            "\"fileDescriptorMax\":1048576," +
+            "\"diskUsed\":\"45gb\"," +
+            "\"diskTotal\":\"411.5gb\"," +
+            "\"diskUsedPercent\":\"10.95\"" +
+            "}," +
+            "{" +
+            "\"id\":\"nodeWithMissingDiskStatistics\"," +
+            "\"name\":\"nodeWithMissingDiskStatistics\"," +
+            "\"role\":\"dimr\"," +
+            "\"ip\":\"182.88.0.1\"" +
+            "}" +
+            "]" +
+            "}";
 
-    private ClusterAdapterES7 clusterAdapter;
-
-    private final static NodeResponse NODE_WITH_CORRECT_INFO = NodeResponse.create("nodeWithCorrectInfo",
-            "nodeWithCorrectInfo",
-            "dimr",
-            null,
-            "182.88.0.2",
-            "45gb",
-            "411.5gb",
-            10.95d,
-            1048576L);
-    private final static NodeResponse NODE_WITH_MISSING_DISK_STATISTICS = NodeResponse.create("nodeWithMissingDiskStatistics",
-            "nodeWithMissingDiskStatistics",
-            "dimr",
-            null,
-            "182.88.0.1",
-            null,
-            null,
-            null,
-            null);
+    private ClusterAdapterES6 clusterAdapter;
 
     @BeforeEach
-    void setUp() {
-        this.client = mock(ElasticsearchClient.class);
-        this.catApi = mock(CatApi.class);
-        this.jsonApi = mock(PlainJsonApi.class);
+    void setUp() throws Exception {
+        final JestClient jestClient = mock(JestClient.class);
+        final CatResult catResult = mock(CatResult.class);
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        final JsonNode catApiJsonResponse = objectMapper.readTree(SAMPLE_CAT_NODES_RESPONSE);
 
-        this.clusterAdapter = new ClusterAdapterES7(client, Duration.seconds(1), catApi, jsonApi);
-    }
-
-    @Test
-    void handlesMissingHostField() throws Exception {
-        mockNodesResponse();
-
-        assertThat(this.clusterAdapter.nodeIdToHostName(nodeId)).isEmpty();
-    }
-
-    @Test
-    void returnsNameForNodeId() throws Exception {
-        mockNodesResponse();
-
-        assertThat(this.clusterAdapter.nodeIdToName(nodeId)).isNotEmpty()
-                .contains("es02");
-    }
-
-    @Test
-    void returnsEmptyOptionalForMissingNodeId() throws Exception {
-        mockNodesResponse();
-
-        assertThat(this.clusterAdapter.nodeIdToName("foobar")).isEmpty();
-    }
-
-    @Test
-    void returnsEmptyOptionalForHealthWhenElasticsearchExceptionThrown() {
-        when(client.execute(any())).thenThrow(new ElasticsearchException("Exception"));
-        final Optional<HealthStatus> healthStatus = clusterAdapter.health(Collections.singletonList("foo_index"));
-        assertThat(healthStatus).isEmpty();
+        doReturn(catResult).when(jestClient).execute(any());
+        doReturn(catApiJsonResponse).when(catResult).getJsonObject();
+        doReturn(true).when(catResult).isSucceeded();
+        
+        this.clusterAdapter = new ClusterAdapterES6(jestClient, Duration.minutes(1));
     }
 
     @Test
     void testFileDescriptorStats() {
-        doReturn(ImmutableList.of(NODE_WITH_CORRECT_INFO, NODE_WITH_MISSING_DISK_STATISTICS)).when(catApi).nodes();
         final Set<NodeFileDescriptorStats> nodeFileDescriptorStats = clusterAdapter.fileDescriptorStats();
 
         assertThat(nodeFileDescriptorStats)
@@ -134,7 +98,6 @@ class ClusterAdapterES7Test {
 
     @Test
     void testDiskUsageStats() {
-        doReturn(ImmutableList.of(NODE_WITH_CORRECT_INFO, NODE_WITH_MISSING_DISK_STATISTICS)).when(catApi).nodes();
         final Set<NodeDiskUsageStats> diskUsageStats = clusterAdapter.diskUsageStats();
 
         assertThat(diskUsageStats)
@@ -154,10 +117,5 @@ class ClusterAdapterES7Test {
                         }
                 );
 
-    }
-
-    private void mockNodesResponse() throws IOException {
-        when(jsonApi.perform(any(), anyString()))
-                .thenReturn(objectMapper.readTree(Resources.getResource("nodes-response-without-host-field.json")));
     }
 }

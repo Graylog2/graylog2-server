@@ -84,7 +84,11 @@ public class Indices {
     }
 
     public IndicesBlockStatus getIndicesBlocksStatus(final List<String> indices) {
-        return indicesAdapter.getIndicesBlocksStatus(indices);
+        if (indices == null || indices.isEmpty()) {
+            return new IndicesBlockStatus();
+        } else {
+            return indicesAdapter.getIndicesBlocksStatus(indices);
+        }
     }
 
     public void move(String source, String target) {
