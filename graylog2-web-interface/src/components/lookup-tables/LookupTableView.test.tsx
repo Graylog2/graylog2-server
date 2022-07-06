@@ -19,7 +19,7 @@ import { render, waitFor } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 
 import { TABLE, CACHE, DATA_ADAPTER } from './fixtures';
-import LUTTableEntry from './LUTTableEntry';
+import LookupTableView from './LookupTableView';
 
 const renderedLUT = (scope: string) => {
   TABLE._metadata = {
@@ -31,15 +31,12 @@ const renderedLUT = (scope: string) => {
 
   return render(
     <Router>
-      <LUTTableEntry table={TABLE} cache={CACHE} dataAdapter={DATA_ADAPTER} />
+      <LookupTableView table={TABLE} cache={CACHE} dataAdapter={DATA_ADAPTER} />
     </Router>,
-    {
-      container: document.body.appendChild(document.createElement('table')),
-    },
   );
 };
 
-describe('LUTTableEntry', () => {
+describe('LookupTableView', () => {
   it('should show "edit" button', async () => {
     const { getByRole } = renderedLUT('DEFAULT');
 
@@ -54,24 +51,6 @@ describe('LUTTableEntry', () => {
 
     let actionBtn = null;
     await waitFor(() => { actionBtn = queryByRole('edit-button'); });
-
-    expect(actionBtn).toBeNull();
-  });
-
-  it('should show "delete" button', async () => {
-    const { getByRole } = renderedLUT('DEFAULT');
-
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = getByRole('delete-button'); });
-
-    expect(actionBtn).toBeVisible();
-  });
-
-  it('should not show "delete" button', async () => {
-    const { queryByRole } = renderedLUT('ILLUMINATE');
-
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = queryByRole('delete-button'); });
 
     expect(actionBtn).toBeNull();
   });

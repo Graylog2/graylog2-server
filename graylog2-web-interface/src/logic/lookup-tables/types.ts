@@ -15,45 +15,38 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-type LookupCacheConfiguration = {
-  type: string,
-}
+type Metadata = {
+  scope: string,
+  revision: number,
+  created_at: string,
+  updated_at: string,
+};
 
-export type LookupTableCache = {
-  name: string,
-  description: string | null,
-  id: string | null,
+type GenericEntityType = {
+  id?: string | null,
   title: string,
-  content_pack: string | null,
-  config: LookupCacheConfiguration,
-}
-
-type LookupDataAdapterConfiguration = {
-  type: string,
-}
-
-export type LookupTableAdapter = {
-  custom_error_ttl: number | null,
+  description?: string | null,
   name: string,
-  description: string,
-  id: string | null,
-  title: string,
-  config: LookupDataAdapterConfiguration,
-  content_pack: string | null,
-  custom_error_ttl_unit: 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS' | null,
-  custom_error_ttl_enabled (boolean, optional),
+  _metadata?: Metadata | null,
+  content_pack?: string | null,
+};
+
+export type LookupTableCache = GenericEntityType & {
+  config?: { type: string },
 }
 
-export type LookupTable = {
-  cache_id: string,
-  default_multi_value_type: string | number | object | boolean | null,
-  name: string,
-  description: string | null,
-  id: string | null,
-  title: string,
-  default_single_value_type: string | number | object | boolean | null,
-  content_pack: string | null,
-  data_adapter_id: string,
-  default_multi_value: string | null,
-  default_single_value: string | null,
+export type LookupTableAdapter = GenericEntityType & {
+  custom_error_ttl?: number | null,
+  config?: { type: string },
+  custom_error_ttl_unit?: 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS' | null,
+  custom_error_ttl_enabled?: boolean,
+}
+
+export type LookupTable = GenericEntityType & {
+  cache_id?: string,
+  default_multi_value_type?: 'STRING' | 'NUMBER' | 'OBJECT' | 'BOOLEAN' | 'NULL',
+  default_single_value_type?: 'STRING' | 'NUMBER' | 'OBJECT' | 'BOOLEAN' | 'NULL',
+  data_adapter_id?: string,
+  default_multi_value?: string | null,
+  default_single_value?: string | null,
 }

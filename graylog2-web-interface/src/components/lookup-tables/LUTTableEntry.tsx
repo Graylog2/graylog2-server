@@ -23,31 +23,16 @@ import { Button } from 'components/bootstrap';
 import { ErrorPopover } from 'components/lookup-tables';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
-type GenericEntityType = {
-  id: string,
-  title: string,
-  description: string,
-  name: string,
-  _metadata: {
-    scope: string,
-    revision: number,
-    created_at: string,
-    updated_at: string,
-  } | null,
-};
-
-export type Table = GenericEntityType;
-export type Cache = GenericEntityType;
-export type DataAdapter = GenericEntityType;
+import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type Props = {
-  table: Table,
-  cache: Cache,
-  dataAdapter: DataAdapter,
+  table: LookupTable,
+  cache: LookupTableCache,
+  dataAdapter: LookupTableAdapter,
   errors?: {
-    table: Table,
-    cache: Cache,
-    dataAdapter: DataAdapter,
+    table: LookupTable,
+    cache: LookupTableCache,
+    dataAdapter: LookupTableAdapter,
   },
 };
 
@@ -72,20 +57,20 @@ const getPermissionsByScope = (scope: string): { edit: boolean, delete: boolean 
 const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
   const history = useHistory();
 
-  const showAction = (table: Table, action: string): boolean => {
+  const showAction = (table: LookupTable, action: string): boolean => {
     // TODO: Update this method to check for the metadata
-    const permissions = getPermissionsByScope(table._metadata.scope);
+    const permissions = getPermissionsByScope(table._metadata?.scope);
+
     return permissions[action];
   };
 
 
   const handleDelete = (_event: React.SyntheticEvent) => {
     const shouldDelete = window.confirm(
-      `Are you sure you want to delete lookup table "${table.title}"?`
+      `Are you sure you want to delete lookup table "${table.title}"?`,
     );
 
-    if (shouldDelete)
-      LookupTablesActions.delete(table.id).then(() => LookupTablesActions.reloadPage());
+    if (shouldDelete) LookupTablesActions.delete(table.id).then(() => LookupTablesActions.reloadPage());
   };
 
   const handleEdit = (tableName: string) => (_event: React.SyntheticEvent) => {
