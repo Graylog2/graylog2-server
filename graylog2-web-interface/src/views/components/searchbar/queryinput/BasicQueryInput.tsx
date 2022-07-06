@@ -97,7 +97,7 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
       editor.textInput.getElement().setAttribute('id', inputId);
       onLoad?.(editor);
     }
-  }, [onLoad]);
+  }, [inputId, onLoad]);
   const editorProps = useMemo(() => ({ $blockScrolling: Infinity, selectionStyle: 'line' }), []);
   const setOptions = useMemo(() => ({ indentedSoftWrap: false }), []);
 
