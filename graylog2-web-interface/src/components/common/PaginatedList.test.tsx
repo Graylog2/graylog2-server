@@ -16,10 +16,20 @@
  */
 import React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
+import { useLocation } from 'react-router-dom';
+import type { Location } from 'history';
 
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import { asMock } from 'helpers/mocking';
 
 import PaginatedList from './PaginatedList';
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useLocation: jest.fn(() => ({
+    search: '',
+  })),
+}));
 
 describe('PaginatedList', () => {
   it('should display Pagination', () => {
@@ -56,5 +66,21 @@ describe('PaginatedList', () => {
     fireEvent.change(pageSizeInput, { target: { value: 100 } });
 
     expect(onChangeStub).toHaveBeenCalledWith(1, 100);
+  });
+
+  it('should set <page> query parameter as active page', async () => {
+    const currentPage = 4;
+
+    asMock(useLocation).mockReturnValue({
+      search: `?page=${currentPage}`,
+    } as Location<{ search: string }>);
+
+    const { findByTestId } = render(<PaginatedList totalItems={200} onChange={() => {}} activePage={3}><div>The list</div></PaginatedList>);
+
+    const graylogPagination = await findByTestId('graylog-pagination');
+    const activePageElement = graylogPagination.getElementsByClassName('active');
+
+    expect(activePageElement).not.toBeNull();
+    expect(activePageElement[0].textContent).toContain(`${currentPage}`);
   });
 });
