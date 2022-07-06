@@ -56,6 +56,7 @@ public class MigrationsModule extends PluginModule {
         addMigration(GrantsMetaMigration.class);
         addMigration(V20201103145400_LegacyAuthServiceMigration.class);
         addMigration(V20211221144300_GeoIpResolverConfigMigration.class);
+        addMigration(V202207061002_DefaultEntityScope.class);
 
     }
 }
