@@ -173,6 +173,7 @@ const QueryInput = ({
   disableExecution,
   error,
   height,
+  inputId,
   isValidating,
   maxLines,
   onBlur,
@@ -213,6 +214,7 @@ const QueryInput = ({
                      disabled={false}
                      enableAutocompletion={enableSmartSearch}
                      error={error}
+                     inputId={inputId}
                      warning={warning}
                      maxLines={maxLines}
                      onBlur={onBlur}
@@ -231,6 +233,7 @@ QueryInput.propTypes = {
   completerFactory: PropTypes.func,
   disableExecution: PropTypes.bool,
   error: PropTypes.any,
+  inputId: PropTypes.string,
   height: PropTypes.number,
   isValidating: PropTypes.bool.isRequired,
   maxLines: PropTypes.number,
@@ -252,6 +255,7 @@ QueryInput.defaultProps = {
   disableExecution: false,
   error: undefined,
   height: undefined,
+  inputId: undefined,
   maxLines: undefined,
   onBlur: undefined,
   placeholder: '',
