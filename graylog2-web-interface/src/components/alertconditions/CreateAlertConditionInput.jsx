@@ -18,8 +18,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import Reflux from 'reflux';
-import naturalSort from 'javascript-natural-sort';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Select, Spinner } from 'components/common';
 import { Col, Row, Button, Input } from 'components/bootstrap';
 import { AlertConditionForm } from 'components/alertconditions';

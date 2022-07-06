@@ -23,6 +23,7 @@ import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalO
 import { QueriesActions, QueriesStore } from 'views/stores/QueriesStore';
 import SearchActions from 'views/actions/SearchActions';
 import { ViewStore } from 'views/stores/ViewStore';
+import { MISSING_BUCKET_NAME } from 'views/Constants';
 
 import ExcludeFromQueryHandler from './ExcludeFromQueryHandler';
 
@@ -98,6 +99,16 @@ describe('ExcludeFromQueryHandler', () => {
     handler.handle({ queryId: 'queryId', field: 'do', value: 'panic', type: FieldType.Unknown, contexts: {} });
 
     expect(QueriesActions.query).toHaveBeenCalledWith('queryId', 'answer:42 AND NOT do:panic');
+  });
+
+  it('appends _exists_ fragment for proper field in case of missing bucket in input', () => {
+    asMock(QueriesStore.getInitialState).mockReturnValue(mockQueries('queryId', 'answer:42'));
+
+    const handler = new ExcludeFromQueryHandler();
+
+    handler.handle({ queryId: 'queryId', field: 'do', value: MISSING_BUCKET_NAME, type: FieldType.Unknown, contexts: {} });
+
+    expect(QueriesActions.query).toHaveBeenCalledWith('queryId', 'answer:42 AND _exists_:do');
   });
 
   it('escapes special characters in field value', () => {
