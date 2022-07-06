@@ -17,23 +17,21 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-class DeletionRetentionStrategySummary extends React.Component {
-  static propTypes = {
-    config: PropTypes.object.isRequired,
-  };
+const DeletionRetentionStrategySummary = ({ config }) => {
+  return (
+    <div>
+      <dl>
+        <dt>Index retention strategy:</dt>
+        <dd>Delete</dd>
+        <dt>Max number of indices:</dt>
+        <dd>{config.max_number_of_indices}</dd>
+      </dl>
+    </div>
+  );
+};
 
-  render() {
-    return (
-      <div>
-        <dl>
-          <dt>Index retention strategy:</dt>
-          <dd>Delete</dd>
-          <dt>Max number of indices:</dt>
-          <dd>{this.props.config.max_number_of_indices}</dd>
-        </dl>
-      </div>
-    );
-  }
-}
+DeletionRetentionStrategySummary.propTypes = {
+  config: PropTypes.object.isRequired,
+};
 
 export default DeletionRetentionStrategySummary;

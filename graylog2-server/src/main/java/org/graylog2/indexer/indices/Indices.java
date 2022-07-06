@@ -24,12 +24,13 @@ import com.google.common.eventbus.EventBus;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.IgnoreIndexTemplate;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IgnoreIndexTemplate;
 import org.graylog2.indexer.IndexTemplateNotFoundException;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
@@ -80,6 +81,14 @@ public class Indices {
         this.auditEventSender = auditEventSender;
         this.eventBus = eventBus;
         this.indicesAdapter = indicesAdapter;
+    }
+
+    public IndicesBlockStatus getIndicesBlocksStatus(final List<String> indices) {
+        if (indices == null || indices.isEmpty()) {
+            return new IndicesBlockStatus();
+        } else {
+            return indicesAdapter.getIndicesBlocksStatus(indices);
+        }
     }
 
     public void move(String source, String target) {

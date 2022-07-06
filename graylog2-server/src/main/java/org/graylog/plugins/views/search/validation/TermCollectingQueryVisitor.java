@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import com.google.common.collect.Streams;
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParserConstants;
 import org.apache.lucene.search.BooleanClause;
@@ -29,26 +29,30 @@ import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Map;
 
 public class TermCollectingQueryVisitor extends QueryVisitor {
 
-    private final List<ImmutableToken> availableTokens;
-    private final List<ImmutableToken> processedTokens = new ArrayList<>();
+    private final Analyzer analyzer;
     private final List<ParsedTerm> parsedTerms = new ArrayList<>();
+    private final Map<Query, Collection<ImmutableToken>> tokenLookup;
 
-    public TermCollectingQueryVisitor(List<ImmutableToken> availableTokens) {
-        this.availableTokens = new ArrayList<>(availableTokens);
+    public TermCollectingQueryVisitor(Analyzer analyzer, Map<Query, Collection<ImmutableToken>> tokenLookup) {
+        this.analyzer = analyzer;
+        this.tokenLookup = tokenLookup;
     }
 
     @Override
     public void consumeTerms(Query query, Term... terms) {
         super.consumeTerms(query, terms);
-        processTerms(terms);
+        final Collection<ImmutableToken> tokens = tokenLookup.getOrDefault(query, Collections.emptySet());
+        processTerms(tokens, terms);
     }
 
-    private void processTerms(Term... terms) {
+    private void processTerms(Collection<ImmutableToken> tokens, Term... terms) {
         for (Term t : terms) {
 
             final ParsedTerm.Builder termBuilder = ParsedTerm.builder()
@@ -56,45 +60,56 @@ public class TermCollectingQueryVisitor extends QueryVisitor {
                     .value(t.text());
 
             if (t.field().equals(ParsedTerm.DEFAULT_FIELD) || t.field().equals(ParsedTerm.EXISTS)) {
-                streamOf(availableTokens, processedTokens)
+                tokens.stream()
                         .filter(token -> token.matches(QueryParserConstants.TERM, t.text()))
                         .findFirst()
-                        .ifPresent(token -> {
-                            termBuilder.keyToken(token);
-                            processedTokens.add(token);
-                            availableTokens.remove(token);
-                        });
+                        .ifPresent(termBuilder::keyToken);
             } else {
-                streamOf(availableTokens, processedTokens)
+                tokens.stream()
                         .filter(token -> token.kind() == QueryParserConstants.TERM)
                         .filter(token -> token.image().equals(t.field()))
                         .findFirst()
                         .ifPresent(token -> {
                             termBuilder.keyToken(token);
-                            processedTokens.add(token);
-                            availableTokens.remove(token);
+                            final String value = t.text();
+                            tokens.stream()
+                                    .filter(v -> v.kind() == QueryParserConstants.TERM)
+                                    .filter(v -> normalize(t.field(), v.image()).equals(value))
+                                    .findFirst()
+                                    .ifPresent(termBuilder::valueToken);
+
+
                         });
             }
             parsedTerms.add(termBuilder.build());
         }
     }
 
+    /**
+     * To be able to compare token values with query values, we first need to normalize the value, using the same analyzer
+     * For example using the StandardAnalyzer, it could mean difference like lowercase conversion
+     */
+    private String normalize(String fieldName, String value) {
+        return analyzer.normalize(fieldName, value).utf8ToString();
+    }
+
     @Override
     public void visitLeaf(Query query) {
+        final Collection<ImmutableToken> tokens = tokenLookup.get(query);
         if (query instanceof RegexpQuery) {
-            processTerms(((RegexpQuery) query).getRegexp());
+            processTerms(tokens, ((RegexpQuery) query).getRegexp());
         } else if (query instanceof TermRangeQuery) { // add lower and upper term as independent values, good enough for validation
             final TermRangeQuery trq = (TermRangeQuery) query;
             processTerms(
-                    new Term(trq.getField(), trq.getLowerTerm().utf8ToString()),
+                    tokens, new Term(trq.getField(), trq.getLowerTerm().utf8ToString()),
                     new Term(trq.getField(), trq.getUpperTerm().utf8ToString())
             );
         } else if (query instanceof WildcardQuery) {
-            processTerms(((WildcardQuery) query).getTerm());
+            processTerms(tokens, ((WildcardQuery) query).getTerm());
         } else if (query instanceof PrefixQuery) {
-            processTerms(((PrefixQuery) query).getPrefix());
+            processTerms(tokens, ((PrefixQuery) query).getPrefix());
         } else if (query instanceof FuzzyQuery) {
-            processTerms(((FuzzyQuery) query).getTerm());
+            processTerms(tokens, ((FuzzyQuery) query).getTerm());
         } else {
             throw new IllegalArgumentException("Unrecognized query type: " + query.getClass().getName());
         }
@@ -104,14 +119,6 @@ public class TermCollectingQueryVisitor extends QueryVisitor {
     public QueryVisitor getSubVisitor(BooleanClause.Occur occur, Query parent) {
         // the default implementation ignores MUST_NOT clauses, we want to collect all, even MUST_NOT
         return this;
-    }
-
-    /**
-     * One stream consisting of two lists. First unused, fresh tokens. If no match found there, we can fallback to the
-     * already processed tokens and find a match there.
-     */
-    private Stream<ImmutableToken> streamOf(List<ImmutableToken> availableTokens, List<ImmutableToken> processedTokens) {
-        return Streams.concat(availableTokens.stream(), processedTokens.stream());
     }
 
     public List<ParsedTerm> getParsedTerms() {
