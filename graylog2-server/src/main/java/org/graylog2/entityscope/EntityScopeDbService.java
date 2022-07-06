@@ -18,6 +18,7 @@ package org.graylog2.entityscope;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
@@ -26,6 +27,7 @@ import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
 import javax.inject.Inject;
+import java.util.Locale;
 import java.util.Optional;
 
 public class EntityScopeDbService extends PaginatedDbService<EntityScope> {
@@ -51,6 +53,25 @@ public class EntityScopeDbService extends PaginatedDbService<EntityScope> {
 
         DBObject query = new BasicDBObject(EntityScope.FIELD_TITLE, name);
         return Optional.ofNullable(db.findOne(query));
+    }
+
+    public boolean isModifiable(String scope) {
+        final Optional<EntityScope> entityScope = findByIdOrName(scope);
+
+        if (entityScope.isPresent()) {
+            return entityScope.get().modifiable();
+        }
+
+        String error = String.format(Locale.ENGLISH, "Entity Scope '%s' not found", scope);
+        throw new IllegalArgumentException(error);
+    }
+
+    private Optional<EntityScope> findByIdOrName(String scope) {
+        if (ObjectId.isValid(scope)) {
+            return get(scope);
+        } else {
+            return findByName(scope);
+        }
     }
 
 }

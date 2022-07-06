@@ -1,0 +1,20 @@
+{
+  "entity_scope": [
+    {
+      "_id": {
+        "$oid": "62c5929ccb6a3f40a314c8a7"
+      },
+      "description": "This is a test of a modifiable scope",
+      "title": "modifiable_scope",
+      "is_modifiable": true
+    },
+    {
+      "_id": {
+        "$oid": "62c5a252b5fdc874f69d4105"
+      },
+      "description": "This is a test of an unmodifiable scope",
+      "title": "unmodifiable_scope",
+      "is_modifiable": false
+    }
+  ]
+}

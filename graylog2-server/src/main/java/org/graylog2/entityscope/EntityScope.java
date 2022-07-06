@@ -94,14 +94,6 @@ public abstract class EntityScope {
                     .modifiable(true)
                     .build();
         }
-
-        public static EntityScope createUnmodifiable(String title) {
-            return builder()
-                    .title(title)
-                    .modifiable(false)
-                    .build();
-        }
-
     }
 
 }
