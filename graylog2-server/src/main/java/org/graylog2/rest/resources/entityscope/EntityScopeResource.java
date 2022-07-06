@@ -93,7 +93,7 @@ public class EntityScopeResource extends RestResource {
     public EntityScope createEntityScope(@ApiParam("entityScope") EntityScopeRequest request) {
 
         try {
-            dbService.findByName(request.title())
+            dbService.findByTitle(request.title())
                     .ifPresent(e -> {
                         throw new BadRequestException("Entity Scope already exists. " + request.title());
                     });
@@ -113,8 +113,8 @@ public class EntityScopeResource extends RestResource {
 
         try {
 
-            // Assert the name was not changed to name of other scope record
-            dbService.findByName(request.title())
+            // Assert the name was not changed to title of other scope record
+            dbService.findByTitle(request.title())
                     .filter(e -> !Objects.equal(e.id(), id))
                     .ifPresent(e -> {
                         throw new BadRequestException("Entity Scope already exists. " + request.title());

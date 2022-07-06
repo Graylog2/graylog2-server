@@ -49,14 +49,14 @@ public class EntityScopeDbService extends PaginatedDbService<EntityScope> {
                 pageSize);
     }
 
-    public Optional<EntityScope> findByName(String name) {
+    public Optional<EntityScope> findByTitle(String title) {
 
-        DBObject query = new BasicDBObject(EntityScope.FIELD_TITLE, name);
+        DBObject query = new BasicDBObject(EntityScope.FIELD_TITLE, title);
         return Optional.ofNullable(db.findOne(query));
     }
 
     public boolean isModifiable(String scope) {
-        final Optional<EntityScope> entityScope = findByIdOrName(scope);
+        final Optional<EntityScope> entityScope = findByIdOrTitle(scope);
 
         if (entityScope.isPresent()) {
             return entityScope.get().modifiable();
@@ -66,11 +66,11 @@ public class EntityScopeDbService extends PaginatedDbService<EntityScope> {
         throw new IllegalArgumentException(error);
     }
 
-    private Optional<EntityScope> findByIdOrName(String scope) {
+    private Optional<EntityScope> findByIdOrTitle(String scope) {
         if (ObjectId.isValid(scope)) {
             return get(scope);
         } else {
-            return findByName(scope);
+            return findByTitle(scope);
         }
     }
 

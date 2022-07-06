@@ -45,7 +45,7 @@ public class V202207061002_DefaultEntityScope extends Migration {
     @Override
     public void upgrade() {
 
-        Optional<EntityScope> optCurrent = dbService.findByName(DEFAULT_SCOPE.title());
+        Optional<EntityScope> optCurrent = dbService.findByTitle(DEFAULT_SCOPE.title());
         if (!optCurrent.isPresent()) {
             EntityScope saved = dbService.save(DEFAULT_SCOPE);
             LOG.debug("Created Default Entity Scope: {} - {}", saved.id(), saved.title());
