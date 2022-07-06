@@ -27,8 +27,8 @@ type GenericEntityType = {
   title: string,
   description?: string | null,
   name: string,
-  _metadata?: Metadata | null,
   content_pack?: string | null,
+  _metadata?: Metadata | null,
 };
 
 export type LookupTableCache = GenericEntityType & {

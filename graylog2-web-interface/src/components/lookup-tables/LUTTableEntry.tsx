@@ -17,12 +17,12 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
+
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { ErrorPopover } from 'components/lookup-tables';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
-
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type Props = {
@@ -57,9 +57,9 @@ const getPermissionsByScope = (scope: string): { edit: boolean, delete: boolean 
 const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
   const history = useHistory();
 
-  const showAction = (table: LookupTable, action: string): boolean => {
+  const showAction = (inTable: LookupTable, action: string): boolean => {
     // TODO: Update this method to check for the metadata
-    const permissions = getPermissionsByScope(table._metadata?.scope);
+    const permissions = getPermissionsByScope(inTable._metadata?.scope);
 
     return permissions[action];
   };
@@ -70,7 +70,9 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
       `Are you sure you want to delete lookup table "${table.title}"?`,
     );
 
-    if (shouldDelete) LookupTablesActions.delete(table.id).then(() => LookupTablesActions.reloadPage());
+    if (shouldDelete) {
+      LookupTablesActions.delete(table.id).then(() => LookupTablesActions.reloadPage());
+    }
   };
 
   const handleEdit = (tableName: string) => (_event: React.SyntheticEvent) => {
