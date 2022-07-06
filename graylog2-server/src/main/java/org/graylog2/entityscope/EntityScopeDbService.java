@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.system.entityscope;
+package org.graylog2.entityscope;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -42,14 +42,14 @@ public class EntityScopeDbService extends PaginatedDbService<EntityScope> {
 
     public PaginatedList<EntityScope> findAll(int page, int pageSize) {
         return findPaginatedWithQueryAndSort(DBQuery.empty(),
-                DBSort.asc(EntityScope.FIELD_NAME),
+                DBSort.asc(EntityScope.FIELD_TITLE),
                 page,
                 pageSize);
     }
 
     public Optional<EntityScope> findByName(String name) {
 
-        DBObject query = new BasicDBObject(EntityScope.FIELD_NAME, name);
+        DBObject query = new BasicDBObject(EntityScope.FIELD_TITLE, name);
         return Optional.ofNullable(db.findOne(query));
     }
 

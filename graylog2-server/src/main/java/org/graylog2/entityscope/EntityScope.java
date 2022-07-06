@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.system.entityscope;
+package org.graylog2.entityscope;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,33 +23,42 @@ import com.google.auto.value.AutoValue;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
+import javax.annotation.Nullable;
+
 @AutoValue
 @JsonDeserialize(builder = EntityScope.Builder.class)
 public abstract class EntityScope {
 
     private static final String FIELD_ID = "id";
     public static final String FIELD_IS_MODIFIABLE = "is_modifiable";
-    public static final String FIELD_NAME = "name";
+    public static final String FIELD_TITLE = "title";
+    public static final String FIELD_DESCRIPTION = "description";
 
     @Id
     @ObjectId
+    @Nullable
     @JsonProperty(FIELD_ID)
     public abstract String id();
 
-    @JsonProperty(FIELD_NAME)
-    public abstract String name();
+    @JsonProperty(FIELD_DESCRIPTION)
+    @Nullable
+    public abstract String description();
+
+    @JsonProperty(FIELD_TITLE)
+    public abstract String title();
 
     @JsonProperty(FIELD_IS_MODIFIABLE)
     public abstract boolean modifiable();
 
-    public static Builder build() {
+    public static Builder builder() {
         return Builder.builder();
     }
 
     public Builder toBuilder() {
-        return build()
+        return builder()
                 .id(id())
-                .name(name())
+                .title(title())
+                .description(description())
                 .modifiable(modifiable());
     }
 
@@ -61,11 +70,14 @@ public abstract class EntityScope {
         @JsonProperty(FIELD_ID)
         public abstract Builder id(String id);
 
-        @JsonProperty(FIELD_NAME)
-        public abstract Builder name(String name);
+        @JsonProperty(FIELD_TITLE)
+        public abstract Builder title(String name);
 
         @JsonProperty(FIELD_IS_MODIFIABLE)
         public abstract Builder modifiable(boolean modifiable);
+
+        @JsonProperty
+        public abstract Builder description(String description);
 
         public abstract EntityScope build();
 
@@ -75,16 +87,17 @@ public abstract class EntityScope {
                     .modifiable(true);
         }
 
-        public static EntityScope createModifiable(String name) {
+        public static EntityScope createModifiable(String title, String description) {
             return builder()
-                    .name(name)
+                    .title(title)
+                    .description(description)
                     .modifiable(true)
                     .build();
         }
 
-        public static EntityScope createUnmodifiable(String name) {
+        public static EntityScope createUnmodifiable(String title) {
             return builder()
-                    .name(name)
+                    .title(title)
                     .modifiable(false)
                     .build();
         }

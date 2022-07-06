@@ -50,6 +50,10 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String DASHBOARD_WIDGET_DELETE = PREFIX + "dashboard_widget:delete";
     public static final String DASHBOARD_WIDGET_POSITIONS_UPDATE = PREFIX + "dashboard_widget_positions:update";
     public static final String DASHBOARD_WIDGET_UPDATE = PREFIX + "dashboard_widget:update";
+
+    public static final String ENTITY_SCOPE_CREATE = PREFIX + "entity_scopes:create";
+    public static final String ENTITY_SCOPE_DELETE = PREFIX + "entity_scopes:delete";
+    public static final String ENTITY_SCOPE_UPDATE = PREFIX + "entity_scopes:update";
     public static final String ES_INDEX_CLOSE = PREFIX + "es_index:close";
     public static final String ES_INDEX_CREATE = PREFIX + "es_index:create";
     public static final String ES_INDEX_DELETE = PREFIX + "es_index:delete";
@@ -175,6 +179,9 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(DASHBOARD_WIDGET_DELETE)
             .add(DASHBOARD_WIDGET_POSITIONS_UPDATE)
             .add(DASHBOARD_WIDGET_UPDATE)
+            .add(ENTITY_SCOPE_CREATE)
+            .add(ENTITY_SCOPE_DELETE)
+            .add(ENTITY_SCOPE_UPDATE)
             .add(ES_INDEX_CLOSE)
             .add(ES_INDEX_CREATE)
             .add(ES_INDEX_DELETE)

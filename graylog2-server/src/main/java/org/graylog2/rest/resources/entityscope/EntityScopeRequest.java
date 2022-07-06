@@ -19,16 +19,23 @@ package org.graylog2.rest.resources.entityscope;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.system.entityscope.EntityScope;
+import org.graylog2.entityscope.EntityScope;
 
-import static org.graylog2.system.entityscope.EntityScope.FIELD_IS_MODIFIABLE;
-import static org.graylog2.system.entityscope.EntityScope.FIELD_NAME;
+import javax.annotation.Nullable;
+
+import static org.graylog2.entityscope.EntityScope.FIELD_DESCRIPTION;
+import static org.graylog2.entityscope.EntityScope.FIELD_IS_MODIFIABLE;
+import static org.graylog2.entityscope.EntityScope.FIELD_TITLE;
 
 @AutoValue
 public abstract class EntityScopeRequest {
 
-    @JsonProperty(FIELD_NAME)
-    public abstract String name();
+    @JsonProperty(FIELD_TITLE)
+    public abstract String title();
+
+    @JsonProperty(FIELD_DESCRIPTION)
+    @Nullable
+    public abstract String description();
 
     @JsonProperty(FIELD_IS_MODIFIABLE)
     public abstract boolean modifiable();
@@ -36,14 +43,35 @@ public abstract class EntityScopeRequest {
     public EntityScope toEntity() {
         return EntityScope.Builder
                 .builder()
-                .name(name())
+                .title(title())
+                .description(description())
+                .modifiable(modifiable())
+                .build();
+    }
+
+    /**
+     * Merge all the fields of this object with the {@link EntityScope} provided.
+     *
+     * <p>
+     * A {@link EntityScopeRequest} may not have all the fields of a {@link EntityScope}.  The objective of this method is to
+     * replace all the common fields with this object's fields.
+     * </p>
+     *
+     * @param entity entity scope
+     * @return entity scope
+     */
+    public EntityScope merge(EntityScope entity) {
+        return entity.toBuilder()
+                .title(title())
+                .description(description())
                 .modifiable(modifiable())
                 .build();
     }
 
     @JsonCreator
-    public static EntityScopeRequest create(@JsonProperty(FIELD_NAME) String name,
+    public static EntityScopeRequest create(@JsonProperty(FIELD_TITLE) String title,
+                                            @JsonProperty(FIELD_DESCRIPTION) String description,
                                             @JsonProperty(FIELD_IS_MODIFIABLE) boolean isModifiable) {
-        return new AutoValue_EntityScopeRequest(name, isModifiable);
+        return new AutoValue_EntityScopeRequest(title, description, isModifiable);
     }
 }
