@@ -1,0 +1,5 @@
+type = "a"
+message = "Add `max_index_retention_period` config file option to enforce an upper limit for time-based index retention."
+
+issues = ["graylog-plugin-cloud#1006"]
+pulls = ["12905", "12914"]

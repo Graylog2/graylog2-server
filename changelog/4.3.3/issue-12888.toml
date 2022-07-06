@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix search query validation for field names containing a `@` character."
+
+issues = ["12888"]
+pulls = ["12924"]
