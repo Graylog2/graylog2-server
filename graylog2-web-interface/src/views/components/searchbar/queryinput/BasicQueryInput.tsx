@@ -94,7 +94,11 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
     if (editor) {
       editor.renderer.setScrollMargin(6, 5);
       editor.renderer.setPadding(12);
-      editor.textInput.getElement().setAttribute('id', inputId);
+
+      if (inputId) {
+        editor.textInput.getElement().setAttribute('id', inputId);
+      }
+
       onLoad?.(editor);
     }
   }, [inputId, onLoad]);
@@ -142,7 +146,6 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
                        enableBasicAutocompletion={enableAutocompletion}
                        enableLiveAutocompletion={enableAutocompletion}
                        onBlur={onBlur}
-                       name="just-a-test"
                        onChange={onChange}
                        onExecute={onExecute} />
     );
@@ -176,7 +179,7 @@ BasicQueryInput.defaultProps = {
   enableAutocompletion: false,
   error: undefined,
   height: undefined,
-  inputId: 'query-input-id',
+  inputId: undefined,
   maxLines: 4,
   onBlur: undefined,
   onChange: undefined,
