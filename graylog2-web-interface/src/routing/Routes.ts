@@ -38,13 +38,6 @@ const Routes = {
   NOTFOUND: '/notfound',
   SEARCH: '/search',
   STREAMS: '/streams',
-  LEGACY_ALERTS: {
-    LIST: '/legacy/alerts',
-    CONDITIONS: '/legacy/alerts/conditions',
-    NEW_CONDITION: '/legacy/alerts/conditions/new',
-    NOTIFICATIONS: '/legacy/alerts/notifications',
-    NEW_NOTIFICATION: '/legacy/alerts/notifications/new',
-  },
   ALERTS: {
     LIST: '/alerts',
     DEFINITIONS: {
@@ -220,10 +213,6 @@ const Routes = {
   stream_alerts: (streamId: string) => `/alerts/?stream_id=${streamId}`,
 
   legacy_stream_search: (streamId: string) => `/streams/${streamId}/messages`,
-  show_alert: (alertId: string) => `${Routes.LEGACY_ALERTS.LIST}/${alertId}`,
-  show_alert_condition: (streamId: string, conditionId: string) => `${Routes.LEGACY_ALERTS.CONDITIONS}/${streamId}/${conditionId}`,
-  new_alert_condition_for_stream: (streamId: string) => `${Routes.LEGACY_ALERTS.NEW_CONDITION}?stream_id=${streamId}`,
-  new_alert_notification_for_stream: (streamId: string) => `${Routes.LEGACY_ALERTS.NEW_NOTIFICATION}?stream_id=${streamId}`,
 
   dashboard_show: (dashboardId: string) => `/dashboards/${dashboardId}`,
 
