@@ -20,32 +20,20 @@ import { BrowserRouter as Router } from 'react-router-dom';
 
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
-import NullCacheFieldSet from './caches/NullCacheFieldSet';
-import NullCacheSummary from './caches/NullCacheSummary';
-import CaffeineCacheFieldSet from './caches/CaffeineCacheFieldSet';
 import CaffeineCacheSummary from './caches/CaffeineCacheSummary';
-import CaffeineCacheDocumentation from './caches/CaffeineCacheDocumentation';
 import { CACHE } from './fixtures';
 import Cache from './Cache';
 
 PluginStore.register(new PluginManifest({}, {
   lookupTableCaches: [
     {
-      type: 'none',
-      displayName: 'Do not cache values',
-      formComponent: NullCacheFieldSet,
-      summaryComponent: NullCacheSummary,
-      documentationComponent: null,
-    },
-    {
       type: 'guava_cache',
       displayName: 'Node-local, in-memory cache',
-      formComponent: CaffeineCacheFieldSet,
       summaryComponent: CaffeineCacheSummary,
-      documentationComponent: CaffeineCacheDocumentation,
     },
   ],
-}));
+}
+));
 
 const renderedCache = (scope: string) => {
   CACHE._metadata = {
@@ -61,7 +49,7 @@ const renderedCache = (scope: string) => {
     expire_after_access: 60,
     expire_after_access_unit: 'SECONDS',
     expire_after_write: 0,
-    expire_after_write_unit: 'SECONDS',
+    expire_after_write_unit: null,
   };
 
   return render(
