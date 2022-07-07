@@ -8,7 +8,7 @@ import Routes from 'routing/Routes';
 import { MetricsMapper, MetricContainer, CounterRate } from 'components/metrics';
 import NumberUtils from 'util/NumberUtils';
 import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
-import { LookupTableCache } from 'src/logic/lookup-tables/types';
+import type { LookupTableCache } from 'logic/lookup-tables/types';
 import useGetPermissionsByScope from 'logic/lookup-tables/useScopePermissions';
 
 type Props = {
@@ -56,7 +56,6 @@ const CacheTableEntry = ({ cache }: Props) => {
     ), 0);
 
     const total = totalHits + totalMisses;
-
     if (total < 1) return 'N/A';
     const hitRate = (totalHits * 100.0) / total;
 

@@ -32,7 +32,14 @@ type GenericEntityType = {
 };
 
 export type LookupTableCache = GenericEntityType & {
-  config?: { type: string },
+  config?: {
+    type?: string,
+    max_size?: number,
+    expire_after_access?: number,
+    expire_after_access_unit?: 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS' | null,
+    expire_after_write?: number,
+    expire_after_write_unit?: 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS' | null,
+  },
 }
 
 export type LookupTableAdapter = GenericEntityType & {
