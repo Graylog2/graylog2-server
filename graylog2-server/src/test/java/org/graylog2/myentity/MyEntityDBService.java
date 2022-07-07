@@ -19,6 +19,7 @@ package org.graylog2.myentity;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.entities.EntityDbService;
+import org.graylog2.database.entities.EntityScopeService;
 
 import javax.inject.Inject;
 
@@ -30,7 +31,9 @@ public class MyEntityDBService extends EntityDbService<MyEntity> {
     public static final String COLLECTION_NAME = "my_entities";
 
     @Inject
-    public MyEntityDBService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
-        super(mongoConnection, mapper, MyEntity.class, COLLECTION_NAME);
+    public MyEntityDBService(MongoConnection mongoConnection,
+                             MongoJackObjectMapperProvider mapper,
+                             EntityScopeService entityScopeService) {
+        super(mongoConnection, mapper, MyEntity.class, COLLECTION_NAME, entityScopeService);
     }
 }

@@ -31,10 +31,9 @@ import java.util.Optional;
  * This example entity implements the Entity interface, since AutoValue classes cannot extend them.
  * Again, not as good, but it's something.
  */
-@AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = MyEntity.Builder.class)
-public abstract class MyEntity extends Entity<MyEntity> {
+public abstract class MyEntity extends Entity {
 
     public static final String TITLE = "title";
     public static final String DESCRIPTION = "description";

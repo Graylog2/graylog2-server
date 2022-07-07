@@ -33,7 +33,6 @@ import java.time.ZonedDateTime;
 public abstract class EntityMetadata {
     public static final String DEFAULT_VERSION = "1";
     public static final long DEFAULT_REV = 1;
-    public static final String DEFAULT_SCOPE = "default";
     public static final ZonedDateTime DEFAULT_TIMESTAMP = ZonedDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC);
 
     public static final String VERSION = "v";
@@ -99,7 +98,7 @@ public abstract class EntityMetadata {
             return new AutoValue_EntityMetadata.Builder()
                     .version(DEFAULT_VERSION)
                     .rev(DEFAULT_REV)
-                    .scope(DEFAULT_SCOPE)
+                    .scope(DefaultEntityScope.NAME)
                     .createdAt(DEFAULT_TIMESTAMP)
                     .updatedAt(DEFAULT_TIMESTAMP);
         }

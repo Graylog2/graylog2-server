@@ -16,56 +16,47 @@
  */
 package org.graylog2.database.entities;
 
-import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.mongojack.DBQuery;
-import org.mongojack.DBUpdate;
-import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
+import org.graylog2.database.PaginatedDbService;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Optional;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * DB service to serve as a base class for database services that handle entities with metadata.
  * The operative bit is <DTO extends Entity>, which ensures that the entity that the DB service is being used with
  * extends the appropriate Entity interface.
  */
-// TODO: Missing pagination implementations
-public abstract class EntityDbService<DTO extends Entity<DTO>> {
-    private final JacksonDBCollection<DTO, ObjectId> db;
+
+public abstract class EntityDbService<DTO extends Entity> extends PaginatedDbService<DTO> {
+
+    protected final EntityScopeService entityScopeService;
 
     public EntityDbService(MongoConnection mongoConnection,
                            MongoJackObjectMapperProvider mapper,
-                           Class<DTO> dtoClass,
-                           String collectionName) {
-        this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(collectionName),
-                dtoClass,
-                ObjectId.class,
-                mapper.get());
+                           Class<DTO> dtoClass, String collectionName,
+                           EntityScopeService entityScopeService) {
+        super(mongoConnection, mapper, dtoClass, collectionName);
+        this.entityScopeService = entityScopeService;
     }
 
-    public Optional<DTO> get(String id) {
-        return Optional.ofNullable(db.findOneById(new ObjectId(id)));
-    }
-
+    @Override
     public DTO save(DTO dto) {
-        ensureMutability(dto);
-        final EntityMetadata newMetadata = getUpdatedMetadata(dto);
-        final WriteResult<DTO, ObjectId> result = db.save(dto.withMetadata(newMetadata));
 
-        return result.getSavedObject();
+        ensureValidScope(dto);
+        if (dto.id() != null) {
+            ensureMutability(dto);
+        }
+        final EntityMetadata newMetadata = getUpdatedMetadata(dto);
+        return super.save(dto.withMetadata(newMetadata));
     }
 
-    private DTO saveNew(DTO dto) {
-        final EntityMetadata newMetadata = EntityMetadata.withNewMetadataForInitialSave(dto.metadata());
-        final WriteResult<DTO, ObjectId> result = db.save(dto.withMetadata(newMetadata));
-
-        return result.getSavedObject();
+    private void ensureValidScope(DTO dto) {
+        if (!entityScopeService.hasValidScope(dto)) {
+            throw new IllegalArgumentException("Invalid Entity Scope: " + dto.metadata().scope());
+        }
     }
 
     private EntityMetadata getUpdatedMetadata(DTO dirtyDto) {
@@ -90,52 +81,18 @@ public abstract class EntityDbService<DTO extends Entity<DTO>> {
                 .rev(revision)
                 .build();
     }
-
-    private DTO saveUpdated(DTO dto) {
-        ensureMutability(dto);
-
-        final String id = requireNonNull(dto.id(), "Entity ID cannot be null");
-
-        // TODO: This is not safe! We need to figure out a way to create a single update operation where we $set all
-        //       entity fields except the _metadata field and add specific metadata update operations (e.g., $inc for
-        //       the revision and date updates for the created/updated at fields)
-        //       Using db.convertToDbObject(dto) could work, the returned raw object cannot be mixed with DBUpdate, though.
-        //       This should become easier once we updated to the latest mongojack.
-        final DTO existingEntity = get(id).orElseThrow(() -> new IllegalArgumentException("Entity not found"));
-
-        final DBQuery.Query query = DBQuery.is("_id", new ObjectId(id))
-                .is(EntityMetadata.withMetadataPrefix(EntityMetadata.REV), dto.metadata().rev());
-        final DTO updatedEntity = dto.withMetadata(existingEntity.metadata());
-
-        final DTO result = db.findAndModify(query, null, null, false, updatedEntity, true, false);
-
-        if (result == null) {
-            throw new IllegalArgumentException("Entity <" + id + "> with revision <" + dto.metadata().rev() + "> not found");
-        }
-
-        final DBUpdate.Builder update = new DBUpdate.Builder();
-
-        // Adds something like the following to the builder:
-        // {"$inc": {"_metadata.rev": 1}, "$set": {"_metadata.updated_at": {"$date": 1656936934105}}}
-        EntityMetadata.applyMetadataUpdate(update);
-
-        return db.findAndModify(query, null, null, false, update, true, false);
-    }
-
-    // TODO: This needs to call out to a service that determines the mutability of an entity based on its scope
+    
     private void ensureMutability(DTO dto) {
-        if (EntityMetadata.DEFAULT_SCOPE.equals(dto.metadata().scope())) {
-            return;
+        if (!entityScopeService.isMutable(dto)) {
+            throw new IllegalArgumentException("Immutable entity cannot be modified");
         }
-
-        throw new IllegalArgumentException("Immutable entity cannot be modified");
     }
 
+    @Override
     public int delete(String id) {
         ensureMutability(get(id).orElseThrow(() -> new IllegalArgumentException("Entity not found")));
 
         // TODO: Implement without load + delete
-
-        return db.removeById(new ObjectId(requireNonNull(id, "id cannot be null"))).getN();
+        return super.delete(id);
     }
 }

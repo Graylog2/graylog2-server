@@ -26,7 +26,8 @@ import javax.annotation.Nullable;
  * Entity base class, which can be used to enforce that each entity implementation
  * has the required id and metadata fields.
  */
-public abstract class Entity<DTO> {
+// TODO: we might consider renaming these 'Entity' classes.  There is already the notion of 'Entities' in content pack management, which has an entirely different meaning.
+public abstract class Entity {
     private static final String ID = "id";
     static final String METADATA = "_metadata";
 
@@ -41,7 +42,7 @@ public abstract class Entity<DTO> {
     @JsonProperty(METADATA)
     public abstract EntityMetadata metadata();
 
-    public abstract DTO withMetadata(EntityMetadata metadata);
+    public abstract <T extends Entity> T withMetadata(EntityMetadata metadata);
 
     public static abstract class Builder<SELF extends Builder<SELF>> {
         @Id
