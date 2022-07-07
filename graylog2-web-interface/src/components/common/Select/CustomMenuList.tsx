@@ -35,9 +35,10 @@ type RowProps = {
   index: number,
   setSize: (index: number, size: number) => void,
   windowWidth: number
+  style: object
 }
 
-const Row = ({ data, index, setSize, windowWidth }: RowProps) => {
+const Row = ({ data, index, setSize, style, windowWidth }: RowProps) => {
   const rowRef = useRef(null);
 
   useEffect(() => {
@@ -45,22 +46,22 @@ const Row = ({ data, index, setSize, windowWidth }: RowProps) => {
   }, [setSize, index, windowWidth]);
 
   return (
-    <div ref={rowRef} data-testid="react-window-list-item">
+    <div ref={rowRef} data-testid="react-window-list-item" style={style}>
       {data[index]}
     </div>
   );
 };
 
-const WindowList = ({ rows }: Props.MenuList) => {
+const WindowList = ({ children }: Props.MenuList) => {
   const listRef = useRef(null);
   const sizeMap = useRef({});
 
-  const setSize = useCallback((index, size) => {
+  const setSize = useCallback((index: number, size: number) => {
     sizeMap.current = { ...sizeMap.current, [index]: size };
     listRef.current.resetAfterIndex(index);
   }, []);
 
-  const getSize = (index) => sizeMap.current[index] || 36;
+  const getSize = useCallback((index: number) => sizeMap.current[index] || 36, [sizeMap]);
 
   const [windowWidth] = useWindowResize();
 
@@ -71,17 +72,16 @@ const WindowList = ({ rows }: Props.MenuList) => {
           ({ width, height }) => (
             <List ref={listRef}
                   height={height}
-                  itemCount={rows.length}
+                  itemCount={children.length}
                   itemSize={getSize}
-                  itemData={rows}
+                  itemData={children}
                   width={width}>
               {({ data, index, style }) => (
-                <div style={style}>
-                  <Row data={data}
-                       index={index}
-                       setSize={setSize}
-                       windowWidth={windowWidth} />
-                </div>
+                <Row data={data}
+                     style={style}
+                     index={index}
+                     setSize={setSize}
+                     windowWidth={windowWidth} />
               )}
             </List>
           )
@@ -106,7 +106,7 @@ const CustomMenuList = ({ children, innerProps, ...rest }: Props.MenuList) => {
     );
   }
 
-  return <WindowList rows={rows}>{children}</WindowList>;
+  return <WindowList>{children}</WindowList>;
 };
 
 CustomMenuList.defaultProps = {

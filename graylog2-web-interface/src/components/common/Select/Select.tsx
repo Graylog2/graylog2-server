@@ -415,6 +415,18 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     }
   }
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
+  getValue = () => {
+    const { value } = this.state;
+
+    return value;
+  };
+
+  // eslint-disable-next-line react/no-unused-class-component-methods
+  clearValue = () => {
+    this.setState({ value: undefined });
+  };
+
   _extractOptionValue = (onChangeValue: Option | Array<Option>) => {
     const { multi, valueKey, delimiter } = this.props;
 
