@@ -25,23 +25,12 @@ import { Col, Row, Button, Input } from 'components/bootstrap';
 import { FormikFormGroup, JSONValueInput } from 'components/common';
 import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker } from 'components/lookup-tables';
 
-type LookupTableType = {
-  id: string|undefined,
-  title: string,
-  description: string,
-  name: string,
-  cache_id: string|undefined,
-  data_adapter_id: string|undefined,
+type LookupTableType = LookupTable & {
   enable_single_value: boolean,
-  default_single_value: string,
-  default_single_value_type: 'STRING'|'NUMBER'|'BOOLEAN'|'NULL',
   enable_multi_value: boolean,
-  default_multi_value: string,
-  default_multi_value_type: 'OBJECT'|'NULL',
-  content_pack: string | null,
 }
 
-const defaultTableValues: LookupTableType = {
+const INIT_TABLE_VALUES: LookupTableType = {
   id: undefined,
   title: '',
   description: '',
@@ -61,16 +50,31 @@ type Props = {
     saved: () => void,
     create: boolean,
     table: LookupTableType,
-}
+};
 
-const LookupTableForm = ({
-  saved,
-  create,
-  table,
-}: Props) => {
+// NOTE: Mock method to be able to move forward with tests. Remove after API
+// defined how are we getting the permissions to show and hide actions.
+const getPermissionsByScope = (scope: string): { edit: boolean, delete: boolean } => {
+  switch (scope) {
+    case 'ILLUMINATE':
+      return { edit: false, delete: false };
+    default:
+      return { edit: true, delete: true };
+  }
+};
+
+const LookupTableForm = ({ saved, create, table }: Props) => {
   const validate = (values: LookupTableType) => {
     const errors = {};
-    const requiredFields: (keyof LookupTableType)[] = ['title', 'name', 'cache_id', 'data_adapter_id', 'cache_id', 'default_single_value', 'default_multi_value'];
+    const requiredFields: (keyof LookupTableType)[] = [
+      'title',
+      'name',
+      'cache_id',
+      'data_adapter_id',
+      'cache_id',
+      'default_single_value',
+      'default_multi_value',
+    ];
 
     requiredFields.forEach((requiredField) => {
       if (!values[requiredField]) {
@@ -84,7 +88,7 @@ const LookupTableForm = ({
   };
 
   const handleSubmit = (values: LookupTableType) => {
-    let promise;
+    let promise: Promise<any>;
 
     const valuesToSave: LookupTable = _omit(values, ['enable_single_value', 'enable_multi_value']);
 
@@ -100,10 +104,17 @@ const LookupTableForm = ({
   };
 
   const initialValues: LookupTableType = {
-    ...defaultTableValues,
+    ...INIT_TABLE_VALUES,
     ...table,
     enable_single_value: table.default_single_value !== '',
     enable_multi_value: table.default_multi_value !== '',
+  };
+
+  const showAction = (inTable: LookupTable, action: string): boolean => {
+    // TODO: Update this method to check for the metadata
+    const permissions = getPermissionsByScope(inTable._metadata?.scope);
+
+    return permissions[action];
   };
 
   return (
@@ -223,7 +234,11 @@ const LookupTableForm = ({
           <fieldset>
             <Row>
               <Col mdOffset={3} md={9}>
-                <Button type="submit" bsStyle="success">{create ? 'Create Lookup Table' : 'Update Lookup Table'}</Button>
+                {create ? (
+                  <Button type="submit" bsStyle="success">Create Lookup Table</Button>
+                ) : showAction(table, 'edit') && (
+                  <Button type="submit" bsStyle="success">Update Lookup Table</Button>
+                )}
               </Col>
             </Row>
           </fieldset>
@@ -241,7 +256,7 @@ LookupTableForm.propTypes = {
 
 LookupTableForm.defaultProps = {
   create: true,
-  table: defaultTableValues,
+  table: INIT_TABLE_VALUES,
 };
 
 export default LookupTableForm;
