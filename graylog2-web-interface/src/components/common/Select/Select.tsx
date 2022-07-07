@@ -225,6 +225,7 @@ export type Props<OptionValue> = {
   inputProps?: { [key: string]: any },
   matchProp?: 'any' | 'label' | 'value',
   multi?: boolean,
+  menuPortalTarget?: HTMLElement,
   name?: string,
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void,
   onChange: (value: OptionValue) => void,
@@ -232,6 +233,8 @@ export type Props<OptionValue> = {
   optionRenderer?: (option: Option) => React.ReactElement,
   options: Array<Option>,
   placeholder: string,
+  // eslint-disable-next-line react/require-default-props
+  ref?: React.Ref<React.ComponentType>,
   size?: 'normal' | 'small',
   theme: DefaultTheme,
   required?: boolean,
@@ -384,6 +387,8 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     valueRenderer: undefined,
     menuPlacement: 'auto',
     maxMenuHeight: 300,
+    // ref: undefined,
+    menuPortalTarget: undefined,
   };
 
   constructor(props: Props<OptionValue>) {
@@ -522,6 +527,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       optionRenderer, // Do not pass down prop
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       valueRenderer, // Do not pass down prop
+      menuPortalTarget,
       ...rest
     } = this.props;
 
@@ -544,6 +550,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       getOptionValue: (option) => option[valueKey],
       filterOption: customFilter,
       components: mergedComponents,
+      menuPortalTarget: menuPortalTarget,
       isOptionDisabled: (option) => !!option.disabled,
       styles: _styles({ size, theme }),
       theme: this._selectTheme,

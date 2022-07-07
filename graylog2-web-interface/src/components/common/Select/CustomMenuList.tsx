@@ -14,12 +14,82 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { List } from 'react-virtualized';
+import React, { useRef, useCallback, useEffect } from 'react';
 import { components as Components } from 'react-select';
 import type { Props } from 'react-select/creatable';
+import { VariableSizeList as List } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import styled from 'styled-components';
 
+import useWindowResize from 'hooks/useWindowResize';
+
+const Container = styled.div`
+  flex: 1 1 auto;
+  height: 100vh;
+  max-height: 300px;
+`;
 const REACT_SELECT_MAX_OPTIONS_LENGTH = 1000;
+
+type RowProps = {
+  data: Array<object>,
+  index: number,
+  setSize: (index: number, size: number) => void,
+  windowWidth: number
+}
+
+const Row = ({ data, index, setSize, windowWidth }: RowProps) => {
+  const rowRef = useRef(null);
+
+  useEffect(() => {
+    setSize(index, rowRef.current.getBoundingClientRect().height);
+  }, [setSize, index, windowWidth]);
+
+  return (
+    <div ref={rowRef} data-testid="react-window-list-item">
+      {data[index]}
+    </div>
+  );
+};
+
+const WindowList = ({ rows }: Props.MenuList) => {
+  const listRef = useRef(null);
+  const sizeMap = useRef({});
+
+  const setSize = useCallback((index, size) => {
+    sizeMap.current = { ...sizeMap.current, [index]: size };
+    listRef.current.resetAfterIndex(index);
+  }, []);
+
+  const getSize = (index) => sizeMap.current[index] || 36;
+
+  const [windowWidth] = useWindowResize();
+
+  return (
+    <Container>
+      <AutoSizer>
+        {
+          ({ width, height }) => (
+            <List ref={listRef}
+                  height={height}
+                  itemCount={rows.length}
+                  itemSize={getSize}
+                  itemData={rows}
+                  width={width}>
+              {({ data, index, style }) => (
+                <div style={style}>
+                  <Row data={data}
+                       index={index}
+                       setSize={setSize}
+                       windowWidth={windowWidth} />
+                </div>
+              )}
+            </List>
+          )
+        }
+      </AutoSizer>
+    </Container>
+  );
+};
 
 const CustomMenuList = ({ children, innerProps, ...rest }: Props.MenuList) => {
   const rows = React.Children.toArray(children);
@@ -36,22 +106,7 @@ const CustomMenuList = ({ children, innerProps, ...rest }: Props.MenuList) => {
     );
   }
 
-  const rowRenderer = ({ key, index, style }) => {
-    return <div data-testid="react-virtualized-list-item" key={key} style={style}>{rows[index]}</div>;
-  };
-
-  return (
-    <List style={{ width: '100%' }}
-          width={1}
-          height={300}
-          rowHeight={36}
-          rowCount={rows.length}
-          rowRenderer={rowRenderer}
-          containerStyle={{
-            width: '100%',
-            maxWidth: '100%',
-          }} />
-  );
+  return <WindowList rows={rows}>{children}</WindowList>;
 };
 
 CustomMenuList.defaultProps = {

@@ -17,4 +17,5 @@
 
 import Select from './Select';
 
+export { CONTROL_CLASS } from './Select';
 export default Select;

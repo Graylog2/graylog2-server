@@ -22,10 +22,23 @@ import CustomMenuList from './CustomMenuList';
 const getChildrenList: Function = (n: number): React.ReactElement[] => {
   const list = Array(n).fill(null);
 
-  return list.map(() => <div key={Math.random()} />);
+  return list.map(() => <div key={Math.random()}>{Math.random()}</div>);
 };
 
 describe('CustomMenuList', () => {
+  const originalOffsetHeight = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetHeight');
+  const originalOffsetWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth');
+
+  beforeAll(() => {
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', { configurable: true, value: 50 });
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', { configurable: true, value: 50 });
+  });
+
+  afterAll(() => {
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', originalOffsetHeight);
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', originalOffsetWidth);
+  });
+
   it('Check if List component rendered for number of items more than 1000', () => {
     render(
       <CustomMenuList getStyles={() => {}}
@@ -33,7 +46,7 @@ describe('CustomMenuList', () => {
       </CustomMenuList>,
     );
 
-    const list = screen.getAllByTestId('react-virtualized-list-item');
+    const list = screen.getAllByTestId('react-window-list-item');
 
     expect(list.length).toBeGreaterThan(0);
   });
