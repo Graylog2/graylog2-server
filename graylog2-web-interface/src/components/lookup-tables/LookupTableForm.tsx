@@ -24,6 +24,7 @@ import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import { Col, Row, Button, Input } from 'components/bootstrap';
 import { FormikFormGroup, JSONValueInput } from 'components/common';
 import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker } from 'components/lookup-tables';
+import useGetPermissionsByScope from 'logic/lookup-tables/useScopePermissions';
 
 type LookupTableType = LookupTable & {
   enable_single_value: boolean,
@@ -52,18 +53,9 @@ type Props = {
     table: LookupTableType,
 };
 
-// NOTE: Mock method to be able to move forward with tests. Remove after API
-// defined how are we getting the permissions to show and hide actions.
-const getPermissionsByScope = (scope: string): { edit: boolean, delete: boolean } => {
-  switch (scope) {
-    case 'ILLUMINATE':
-      return { edit: false, delete: false };
-    default:
-      return { edit: true, delete: true };
-  }
-};
-
 const LookupTableForm = ({ saved, create, table }: Props) => {
+  const { getPermissionsByScope } = useGetPermissionsByScope();
+
   const validate = (values: LookupTableType) => {
     const errors = {};
     const requiredFields: (keyof LookupTableType)[] = [

@@ -21,6 +21,7 @@ import Routes from 'routing/Routes';
 import { ButtonToolbar, Row, Col, Button, Input } from 'components/bootstrap';
 import { Link } from 'components/common/router';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
+import useGetPermissionsByScope from 'logic/lookup-tables/useScopePermissions';
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type Props = {
@@ -31,19 +32,9 @@ type Props = {
 
 const INIT_INPUT = { value: '', valid: false };
 
-// NOTE: Mock method to be able to move forward with tests. Remove after API
-// defined how are we getting the permissions to show and hide actions.
-const getPermissionsByScope = (scope: string): { edit: boolean, delete: boolean } => {
-  switch (scope) {
-    case 'ILLUMINATE':
-      return { edit: false, delete: false };
-    default:
-      return { edit: true, delete: true };
-  }
-};
-
 const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
   const history = useHistory();
+  const { getPermissionsByScope } = useGetPermissionsByScope();
   const [purgeKey, setPurgeKey] = React.useState<any>(INIT_INPUT);
   const [lookupKey, setLookupKey] = React.useState<any>(INIT_INPUT);
   const [lookupResult, setLookupResult] = React.useState<any>(null);

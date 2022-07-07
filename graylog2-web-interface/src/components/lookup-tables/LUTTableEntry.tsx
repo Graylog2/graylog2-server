@@ -23,6 +23,7 @@ import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { ErrorPopover } from 'components/lookup-tables';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
+import useGetPermissionsByScope from 'logic/lookup-tables/useScopePermissions';
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type Props = {
@@ -43,19 +44,9 @@ const Actions = styled.div`
   justify-content: flex-start;
 `;
 
-// NOTE: Mock method to be able to move forward with tests. Remove after API
-// defined how are we getting the permissions to show and hide actions.
-const getPermissionsByScope = (scope: string): { edit: boolean, delete: boolean } => {
-  switch (scope) {
-    case 'ILLUMINATE':
-      return { edit: false, delete: false };
-    default:
-      return { edit: true, delete: true };
-  }
-};
-
 const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
   const history = useHistory();
+  const { getPermissionsByScope } = useGetPermissionsByScope();
 
   const showAction = (inTable: LookupTable, action: string): boolean => {
     // TODO: Update this method to check for the metadata
@@ -64,14 +55,14 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
     return permissions[action];
   };
 
-
-  const handleDelete = (_event: React.SyntheticEvent) => {
+  const handleDelete = (inTable: LookupTable) => (_event: React.SyntheticEvent) => {
+    // eslint-disable-next-line no-alert
     const shouldDelete = window.confirm(
-      `Are you sure you want to delete lookup table "${table.title}"?`,
+      `Are you sure you want to delete lookup table "${inTable.title}"?`,
     );
 
     if (shouldDelete) {
-      LookupTablesActions.delete(table.id).then(() => LookupTablesActions.reloadPage());
+      LookupTablesActions.delete(inTable.id).then(() => LookupTablesActions.reloadPage());
     }
   };
 
@@ -113,7 +104,7 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
               <Button style={{ marginLeft: '6px' }}
                       bsSize="xsmall"
                       bsStyle="primary"
-                      onClick={handleDelete}
+                      onClick={handleDelete(table)}
                       role="delete-button">
                 Delete
               </Button>
