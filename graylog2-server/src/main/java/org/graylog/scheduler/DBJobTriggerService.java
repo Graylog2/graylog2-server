@@ -139,25 +139,27 @@ public class DBJobTriggerService {
      * @return list of found job triggers
      */
     public List<JobTriggerDto> getForJob(String jobDefinitionId) {
+        final List<JobTriggerDto> triggers = getAllForJob(jobDefinitionId);
+        // We are currently expecting only one trigger per job definition. This will most probably change in the
+        // future once we extend our scheduler usage.
+        // TODO: Don't throw exception when there is more than one trigger for a job definition.
+        //       To be able to do this, we need some kind of label system to make sure we can differentiate between
+        //       automatically created triggers (e.g. by event definition) and manually created ones.
+        if (triggers.size() > 1) {
+            throw new IllegalStateException("More than one trigger for job definition <" + jobDefinitionId + ">");
+        }
+        return triggers;
+
+    }
+
+    public List<JobTriggerDto> getAllForJob(String jobDefinitionId) {
         if (isNullOrEmpty(jobDefinitionId)) {
             throw new IllegalArgumentException("jobDefinitionId cannot be null or empty");
         }
 
         final Query query = DBQuery.is(FIELD_JOB_DEFINITION_ID, jobDefinitionId);
-
         try (final DBCursor<JobTriggerDto> cursor = db.find(query)) {
-            final ImmutableList<JobTriggerDto> triggers = ImmutableList.copyOf(cursor.iterator());
-
-            // We are currently expecting only one trigger per job definition. This will most probably change in the
-            // future once we extend our scheduler usage.
-            // TODO: Don't throw exception when there is more than one trigger for a job definition.
-            //       To be able to do this, we need some kind of label system to make sure we can differentiate between
-            //       automatically created triggers (e.g. by event definition) and manually created ones.
-            if (triggers.size() > 1) {
-                throw new IllegalStateException("More than one trigger for job definition <" + jobDefinitionId + ">");
-            }
-
-            return triggers;
+            return ImmutableList.copyOf(cursor.iterator());
         }
     }
 
