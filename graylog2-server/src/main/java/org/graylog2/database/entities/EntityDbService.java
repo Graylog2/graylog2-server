@@ -16,7 +16,6 @@
  */
 package org.graylog2.database.entities;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -25,6 +24,8 @@ import org.mongojack.DBUpdate;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
@@ -37,15 +38,11 @@ import static java.util.Objects.requireNonNull;
 // TODO: Missing pagination implementations
 public abstract class EntityDbService<DTO extends Entity<DTO>> {
     private final JacksonDBCollection<DTO, ObjectId> db;
-    private final ObjectMapper objectMapper;
-    private final Class<DTO> dtoClass;
 
     public EntityDbService(MongoConnection mongoConnection,
                            MongoJackObjectMapperProvider mapper,
                            Class<DTO> dtoClass,
                            String collectionName) {
-        this.objectMapper = mapper.get();
-        this.dtoClass = dtoClass;
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(collectionName),
                 dtoClass,
                 ObjectId.class,
@@ -57,11 +54,11 @@ public abstract class EntityDbService<DTO extends Entity<DTO>> {
     }
 
     public DTO save(DTO dto) {
-        if (dto.id() == null) {
-            return saveNew(dto);
-        } else {
-            return saveUpdated(dto);
-        }
+        ensureMutability(dto);
+        final EntityMetadata newMetadata = getUpdatedMetadata(dto);
+        final WriteResult<DTO, ObjectId> result = db.save(dto.withMetadata(newMetadata));
+
+        return result.getSavedObject();
     }
 
     private DTO saveNew(DTO dto) {
@@ -69,6 +66,29 @@ public abstract class EntityDbService<DTO extends Entity<DTO>> {
         final WriteResult<DTO, ObjectId> result = db.save(dto.withMetadata(newMetadata));
 
         return result.getSavedObject();
+    }
+
+    private EntityMetadata getUpdatedMetadata(DTO dirtyDto) {
+
+        Optional<DTO> optCurrent = dirtyDto.id() == null ? Optional.empty() : get(dirtyDto.id());
+
+        final EntityMetadata metadata;
+        final long revision;
+
+        if (optCurrent.isPresent()) {
+            metadata = optCurrent.get().metadata();
+            revision = metadata.rev() + 1;
+        } else {
+            metadata = dirtyDto.metadata().toBuilder()
+                    .createdAt(ZonedDateTime.now(ZoneOffset.UTC))
+                    .build();
+            revision = EntityMetadata.DEFAULT_REV;
+        }
+
+        return metadata.toBuilder()
+                .updatedAt(ZonedDateTime.now(ZoneOffset.UTC))
+                .rev(revision)
+                .build();
     }
 
     private DTO saveUpdated(DTO dto) {
