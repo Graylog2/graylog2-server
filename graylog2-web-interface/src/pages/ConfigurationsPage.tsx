@@ -100,8 +100,8 @@ const ConfigurationsPage = () => {
     const messageProcessorsConfig = _getConfig(MESSAGE_PROCESSORS_CONFIG, configuration);
     const sidecarConfig = _getConfig(SIDECAR_CONFIG, configuration);
     const eventsConfig = _getConfig(EVENTS_CONFIG, configuration);
-    const indexDefaultsConfig = _getConfig(INDEX_DEFAULTS_CONFIG, configuration);
     const urlWhiteListConfig = _getConfig(URL_WHITELIST_CONFIG, configuration);
+    const indexDefaultsConfig = _getConfig(INDEX_DEFAULTS_CONFIG, configuration);
     const permissionsConfig = _getConfig(PERMISSIONS_CONFIG, configuration);
     Output = (
       <>
@@ -129,12 +129,6 @@ const ConfigurationsPage = () => {
                           updateConfig={_onUpdate(EVENTS_CONFIG)} />
           </ConfigletContainer>
         )}
-        {indexDefaultsConfig && (
-          <ConfigletContainer title="Storage Configuration">
-            <IndexDefaultsConfig config={indexDefaultsConfig}
-                                 updateConfig={_onUpdate(INDEX_DEFAULTS_CONFIG)} />
-          </ConfigletContainer>
-        )}
         {isPermitted(permissions, ['urlwhitelist:read']) && urlWhiteListConfig && (
           <ConfigletContainer title="URL Whitelist Configuration">
             <UrlWhiteListConfig config={urlWhiteListConfig}
@@ -148,6 +142,12 @@ const ConfigurationsPage = () => {
           <ConfigletContainer title="Permissions Configuration">
             <PermissionsConfig config={permissionsConfig}
                                updateConfig={_onUpdate(PERMISSIONS_CONFIG)} />
+          </ConfigletContainer>
+        )}
+        {indexDefaultsConfig && (
+          <ConfigletContainer title="Index Set Default Configuration">
+            <IndexDefaultsConfig config={indexDefaultsConfig}
+                                 updateConfig={_onUpdate(INDEX_DEFAULTS_CONFIG)} />
           </ConfigletContainer>
         )}
       </>

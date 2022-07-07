@@ -31,10 +31,8 @@ const IndexDefaultsConfig = createReactClass({
 
   propTypes: {
     config: PropTypes.shape({
-      events_search_timeout: PropTypes.number,
-      events_notification_retry_period: PropTypes.number,
-      events_notification_default_backlog: PropTypes.number,
-      events_catchup_window: PropTypes.number,
+      shards: PropTypes.number,
+      replicas: PropTypes.number,
     }),
     updateConfig: PropTypes.func.isRequired,
   },
@@ -42,10 +40,8 @@ const IndexDefaultsConfig = createReactClass({
   getDefaultProps() {
     return {
       config: {
-        events_search_timeout: 60000,
-        events_notification_retry_period: 300000,
-        events_notification_default_backlog: 50,
-        events_catchup_window: DEFAULT_CATCH_UP_WINDOW,
+        shards: 4,
+        replicas: 0,
       },
     };
   },
@@ -92,70 +88,35 @@ const IndexDefaultsConfig = createReactClass({
     this.setState({ config: nextConfig });
   },
 
-  _onSearchTimeoutUpdate(nextValue, nextUnit, enabled) {
-    const durationInMs = enabled ? moment.duration(nextValue, nextUnit).asMilliseconds() : 0;
-
-    if (this._searchTimeoutValidator(durationInMs)) {
-      this._propagateChanges('events_search_timeout', durationInMs);
+  _onShardsUpdate(event) {
+    const shards = FormUtils.getValueFromInput(event.target);
+    if (this._nonNegativeIntValidator(shards)) {
+      this._propagateChanges('shards', shards);
     }
   },
 
-  _onRetryPeriodUpdate(nextValue, nextUnit, enabled) {
-    const durationInMs = enabled ? moment.duration(nextValue, nextUnit).asMilliseconds() : 0;
-
-    if (this._notificationsRetryValidator(durationInMs)) {
-      this._propagateChanges('events_notification_retry_period', durationInMs);
+  _onReplicasUpdate(event) {
+    const replicas = FormUtils.getValueFromInput(event.target);
+    if (this._nonNegativeIntValidator(replicas)) {
+      this._propagateChanges('replicas', replicas);
     }
   },
 
-  _searchTimeoutValidator(milliseconds) {
-    return milliseconds >= 1000;
-  },
-
-  _notificationsRetryValidator(milliseconds) {
-    return milliseconds >= 0;
-  },
-
-  _onBacklogUpdate(event) {
-    const value = FormUtils.getValueFromInput(event.target);
-
-    this._propagateChanges('events_notification_default_backlog', value);
-  },
-
-  _onCatchUpWindowUpdate(nextValue, nextUnit, nextEnabled) {
-    const { config } = this.state;
-
-    if (config.events_catchup_window === 0 && nextEnabled) {
-      this._propagateChanges('events_catchup_window', DEFAULT_CATCH_UP_WINDOW);
-
-      return;
-    }
-
-    const catchupWindowinMs = nextEnabled ? moment.duration(nextValue, nextUnit).asMilliseconds() : 0;
-
-    this._propagateChanges('events_catchup_window', catchupWindowinMs);
-  },
-
-  _titleCase(str) {
-    return lodash.capitalize(str);
+  _nonNegativeIntValidator(value) {
+    return value >= 0;
   },
 
   render() {
     const { config } = this.state;
-    const eventsSearchTimeout = extractDurationAndUnit(config.events_search_timeout, TIME_UNITS);
-    const eventsNotificationRetryPeriod = extractDurationAndUnit(config.events_notification_retry_period, TIME_UNITS);
-    const eventsCatchupWindow = extractDurationAndUnit(config.events_catchup_window, TIME_UNITS);
-    const eventsNotificationDefaultBacklog = config.events_notification_default_backlog;
-
     return (
       <div>
         <h2>Index Defaults</h2>
-        <p>These defaults apply to new indices only.</p>
+        <p>Defaults for newly created index sets.</p>
         <dl className="deflist">
           <dt>Shards per Index:</dt>
-          <dd>{eventsNotificationDefaultBacklog}</dd>
+          <dd>{config.shards}</dd>
           <dt>Replicas per Index:</dt>
-          <dd>{eventsNotificationDefaultBacklog}</dd>
+          <dd>{config.replicas}</dd>
         </dl>
 
         <p>
@@ -166,25 +127,26 @@ const IndexDefaultsConfig = createReactClass({
         <BootstrapModalForm ref={(modal) => {
           this.modal = modal;
         }}
-                            title="Update Events System Configuration"
+                            title="Update Index Default Configuration"
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}
                             submitButtonText="Save">
           <fieldset>
+            <p>These defaults will apply for newly created index sets.</p>
             <Input id="notification-backlog-field"
                    type="number"
-                   onChange={this._onBacklogUpdate}
+                   onChange={this._onShardsUpdate}
                    label="Shards per Index"
                    help="The default number of shards to specify for each new index."
-                   value={eventsNotificationDefaultBacklog}
+                   value={config.shards}
                    min="0"
                    required />
             <Input id="notification-backlog-field"
                    type="number"
-                   onChange={this._onBacklogUpdate}
+                   onChange={this._onReplicasUpdate}
                    label="Replicas per Index"
                    help="The default number of shards to specify for each new index."
-                   value={eventsNotificationDefaultBacklog}
+                   value={config.replicas}
                    min="0"
                    required />
           </fieldset>
