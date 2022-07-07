@@ -30,7 +30,7 @@ import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import java.util.stream.Stream;
 
 public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_RESULT extends Aggregation>
-        implements BucketSpecHandler<SPEC_TYPE, AggregationBuilder, SearchResponse, AGGREGATION_RESULT, ESPivot, ESGeneratedQueryContext> {
+        implements BucketSpecHandler<SPEC_TYPE, AggregationBuilder, SearchResponse, AGGREGATION_RESULT, ESGeneratedQueryContext> {
 
     protected ESPivot.AggTypes aggTypes(ESGeneratedQueryContext queryContext, Pivot pivot) {
         return (ESPivot.AggTypes) queryContext.contextMap().get(pivot.id());
