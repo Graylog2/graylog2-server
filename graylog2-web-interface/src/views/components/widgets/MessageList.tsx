@@ -17,8 +17,9 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
-import { isEmpty, get } from 'lodash';
+import { get } from 'lodash';
 import { useContext, useState, useEffect, useCallback, useRef } from 'react';
+import PropTypes from 'prop-types';
 
 import type { WidgetComponentProps } from 'views/types';
 import connect from 'stores/connect';
@@ -53,10 +54,12 @@ const Wrapper = styled.div`
   }
 `;
 
-type State = {
-  errors: Array<{ description: string }>,
-  currentPage: number,
-};
+type Pagination = {
+  pageErrors: Array<{ description: string }>,
+  currentPage: number
+}
+
+type SearchType = { effectiveTimerange: TimeRange };
 
 export type MessageListResult = {
   messages: Array<BackendMessage>,
@@ -65,20 +68,47 @@ export type MessageListResult = {
   type: 'messages'
 };
 
-type SearchType = { effectiveTimerange: TimeRange };
 type Props = WidgetComponentProps<MessagesWidgetConfig, MessageListResult> & {
   currentView: ViewStoreState,
   pageSize?: number,
   searchTypes: { [searchTypeId: string]: SearchType },
 };
 
-const useResetScrollPositionOnPageChange = (scrollContainerRef: React.MutableRefObject<HTMLElement>, currentPage: number) => {
+const useResetPaginationOnSearchExecution = (setPagination: (pagination: Pagination) => void, currentPage) => {
+  useEffect(() => {
+    const resetPagination = () => {
+      if (currentPage !== 1) {
+        setPagination({ currentPage: 1, pageErrors: [] });
+      }
+    };
+
+    const unlistenSearchExecute = SearchActions.execute.completed.listen(resetPagination);
+
+    return () => {
+      unlistenSearchExecute();
+    };
+  }, [currentPage, setPagination]);
+};
+
+const useResetScrollPositionOnPageChange = (currentPage: number) => {
+  const scrollContainerRef = useRef<HTMLDivElement>();
+
   useEffect(() => {
     if (scrollContainerRef.current) {
       // eslint-disable-next-line no-param-reassign
       scrollContainerRef.current.scrollTop = 0;
     }
   }, [currentPage, scrollContainerRef]);
+
+  return scrollContainerRef;
+};
+
+const useRenderCompletionCallback = () => {
+  const renderCompletionCallback = useContext(RenderCompletionCallback);
+
+  useEffect(() => {
+    InputsActions.list().then(() => (renderCompletionCallback && renderCompletionCallback()));
+  }, [renderCompletionCallback]);
 };
 
 const MessageList = ({
@@ -88,22 +118,16 @@ const MessageList = ({
   currentView: { activeQuery: activeQueryId },
   fields,
 }: Props) => {
-  const renderCompletionCallback = useContext(RenderCompletionCallback);
-  const scrollContainerRef = useRef();
-  const [{ currentPage, errors }, setState] = useState<State>({
-    errors: [],
+  const [{ currentPage, pageErrors }, setPagination] = useState<Pagination>({
+    pageErrors: [],
     currentPage: 1,
   });
 
-  useResetScrollPositionOnPageChange(scrollContainerRef, currentPage);
+  const scrollContainerRef = useResetScrollPositionOnPageChange(currentPage);
+  useResetPaginationOnSearchExecution(setPagination, currentPage);
+  useRenderCompletionCallback();
 
-  const _resetPagination = useCallback(() => {
-    if (currentPage !== 1) {
-      setState({ currentPage: 1, errors: [] });
-    }
-  }, [currentPage]);
-
-  const _handlePageChange = useCallback((pageNo: number) => {
+  const handlePageChange = useCallback((pageNo: number) => {
     // execute search with new offset
     const { effectiveTimerange } = searchTypes[searchTypeId];
     const searchTypePayload: SearchTypeOptions<{
@@ -122,50 +146,36 @@ const MessageList = ({
     SearchActions.reexecuteSearchTypes(searchTypePayload, effectiveTimerange).then((response) => {
       setLoadingState(false);
 
-      setState({
-        errors: response.result.errors,
+      setPagination({
+        pageErrors: response.result.errors,
         currentPage: pageNo,
       });
     });
   }, [pageSize, searchTypeId, searchTypes, setLoadingState]);
 
-  const _onSortChange = useCallback((newSort: SortConfig[]) => {
+  const onSortChange = useCallback((newSort: SortConfig[]) => {
     const newConfig = config.toBuilder().sort(newSort).build();
 
     return onConfigChange(newConfig).then(() => {});
   }, [config, onConfigChange]);
 
-  useEffect(() => {
-    InputsActions.list().then(() => (renderCompletionCallback && renderCompletionCallback()));
-  }, [renderCompletionCallback]);
-
-  useEffect(() => {
-    const unlistenSearchExecute = SearchActions.execute.completed.listen(_resetPagination);
-
-    return () => {
-      unlistenSearchExecute();
-    };
-  }, [_resetPagination]);
-
-  const hasError = !isEmpty(errors);
-
   return (
     <WindowDimensionsContextProvider>
       <Wrapper>
-        <PaginatedList onChange={_handlePageChange}
+        <PaginatedList onChange={handlePageChange}
                        activePage={Number(currentPage)}
                        showPageSizeSelect={false}
                        totalItems={totalMessages}
                        pageSize={pageSize}>
-          {!hasError ? (
+          {!pageErrors?.length ? (
             <MessageTable activeQueryId={activeQueryId}
                           config={config}
                           scrollContainerRef={scrollContainerRef}
                           fields={fields}
-                          onSortChange={_onSortChange}
+                          onSortChange={onSortChange}
                           setLoadingState={setLoadingState}
                           messages={messages} />
-          ) : <ErrorWidget errors={errors} />}
+          ) : <ErrorWidget errors={pageErrors} />}
         </PaginatedList>
       </Wrapper>
     </WindowDimensionsContextProvider>
@@ -179,6 +189,11 @@ const mapProps = (props: {
   currentView: props.currentView,
   searchTypes: get(props, ['searches', 'result', 'results', props.currentView.activeQuery, 'searchTypes']) as { [searchTypeId: string]: SearchType },
 });
+
+MessageList.propTypes = {
+  onConfigChange: PropTypes.func,
+  pageSize: PropTypes.number,
+};
 
 MessageList.defaultProps = {
   onConfigChange: () => Promise.resolve(Immutable.OrderedMap<string, Widget>()),
