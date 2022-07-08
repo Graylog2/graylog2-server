@@ -18,6 +18,7 @@ import PropTypes from 'prop-types';
 import React, { useEffect } from 'react';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
+import NumberUtils from 'util/NumberUtils';
 import { Col, Row, Button } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
@@ -95,9 +96,9 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
       <IndexRangeSummary indexRange={indexRange} />{' '}
 
       <HideOnCloud>
-        {index.all_shards.segments} segments,{' '}
-        {index.all_shards.open_search_contexts} open search contexts,{' '}
-        {index.all_shards.documents.deleted} deleted messages
+        {NumberUtils.formatNumber(index.all_shards.segments)} segments,{' '}
+        {NumberUtils.formatNumber(index.all_shards.open_search_contexts)} open search contexts,{' '}
+        {NumberUtils.formatNumber(index.all_shards.documents.deleted)} deleted messages
         <Row style={{ marginBottom: '10' }}>
           <Col md={4} className="shard-meters">
             <ShardMeter title="Primary shard operations" shardMeter={index.primary_shards} />
