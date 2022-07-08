@@ -26,12 +26,12 @@ public class V202207061200_CreateDefaultIndexDefaultsConfig extends Migration {
 
     @Override
     public void upgrade() {
-        if (clusterConfigService.get(IndexDefaultsConfiguration.class) != null) {
+        if (clusterConfigService.get(IndexSetsDefaultsConfiguration.class) != null) {
             LOG.debug("Migration already completed.");
             return;
         }
         try {
-            clusterConfigService.write(IndexDefaultsConfiguration.createNew());
+            clusterConfigService.write(IndexSetsDefaultsConfiguration.createNew());
             LOG.debug("Index defaults config saved.");
         } catch (Exception e) {
             LOG.error("Unable to write index defaults configuration.", e);

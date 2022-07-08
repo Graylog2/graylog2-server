@@ -25,7 +25,7 @@ import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
-import IndexDefaultsConfig from 'components/configurations/IndexDefaultsConfig';
+import IndexSetsDefaultsConfig from 'components/configurations/IndexSetsDefaultsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import 'components/maps/configurations';
@@ -44,7 +44,7 @@ const SEARCHES_CLUSTER_CONFIG = 'org.graylog2.indexer.searches.SearchesClusterCo
 const MESSAGE_PROCESSORS_CONFIG = 'org.graylog2.messageprocessors.MessageProcessorsConfig';
 const SIDECAR_CONFIG = 'org.graylog.plugins.sidecar.system.SidecarConfiguration';
 const EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration';
-const INDEX_DEFAULTS_CONFIG = 'org.graylog2.configuration.IndexDefaultsConfiguration';
+const INDEX_SETS_DEFAULTS_CONFIG = 'org.graylog2.configuration.IndexSetsDefaultsConfiguration';
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 const PERMISSIONS_CONFIG = 'org.graylog2.users.UserAndTeamsConfig';
 
@@ -74,7 +74,7 @@ const ConfigurationsPage = () => {
       ConfigurationsActions.list(SEARCHES_CLUSTER_CONFIG),
       ConfigurationsActions.listMessageProcessorsConfig(MESSAGE_PROCESSORS_CONFIG),
       ConfigurationsActions.list(SIDECAR_CONFIG),
-      ConfigurationsActions.list(INDEX_DEFAULTS_CONFIG),
+      ConfigurationsActions.list(INDEX_SETS_DEFAULTS_CONFIG),
       ConfigurationsActions.list(EVENTS_CONFIG),
       ConfigurationsActions.listPermissionsConfig(PERMISSIONS_CONFIG),
     ];
@@ -101,7 +101,7 @@ const ConfigurationsPage = () => {
     const sidecarConfig = _getConfig(SIDECAR_CONFIG, configuration);
     const eventsConfig = _getConfig(EVENTS_CONFIG, configuration);
     const urlWhiteListConfig = _getConfig(URL_WHITELIST_CONFIG, configuration);
-    const indexDefaultsConfig = _getConfig(INDEX_DEFAULTS_CONFIG, configuration);
+    const indexSetsDefaultsConfig = _getConfig(INDEX_SETS_DEFAULTS_CONFIG, configuration);
     const permissionsConfig = _getConfig(PERMISSIONS_CONFIG, configuration);
     Output = (
       <>
@@ -144,10 +144,10 @@ const ConfigurationsPage = () => {
                                updateConfig={_onUpdate(PERMISSIONS_CONFIG)} />
           </ConfigletContainer>
         )}
-        {indexDefaultsConfig && (
+        {indexSetsDefaultsConfig && (
           <ConfigletContainer title="Index Set Default Configuration">
-            <IndexDefaultsConfig config={indexDefaultsConfig}
-                                 updateConfig={_onUpdate(INDEX_DEFAULTS_CONFIG)} />
+            <IndexSetsDefaultsConfig config={indexSetsDefaultsConfig}
+                                     updateConfig={_onUpdate(INDEX_SETS_DEFAULTS_CONFIG)} />
           </ConfigletContainer>
         )}
       </>

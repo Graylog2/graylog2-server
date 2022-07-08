@@ -26,8 +26,8 @@ import FormUtils from 'util/FormsUtils';
 import Input from 'components/bootstrap/Input';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 
-const IndexDefaultsConfig = createReactClass({
-  displayName: 'IndexDefaultsConfig',
+const IndexSetsDefaultsConfig = createReactClass({
+  displayName: 'IndexSetsDefaultsConfig',
 
   propTypes: {
     config: PropTypes.shape({
@@ -114,9 +114,9 @@ const IndexDefaultsConfig = createReactClass({
         <p>Defaults for newly created index sets.</p>
         <dl className="deflist">
           <dt>Shards per Index:</dt>
-          <dd>{config.shards}</dd>
+          <dd>{config.shards != null ? config.shards : <>Using <code>elasticsearch_shards</code> server configuration value</>}</dd>
           <dt>Replicas per Index:</dt>
-          <dd>{config.replicas}</dd>
+          <dd>{config.replicas != null ? config.replicas : <>Using <code>elasticsearch_replicas</code> server configuration value</>}</dd>
         </dl>
 
         <p>
@@ -127,28 +127,27 @@ const IndexDefaultsConfig = createReactClass({
         <BootstrapModalForm ref={(modal) => {
           this.modal = modal;
         }}
-                            title="Update Index Default Configuration"
+                            title="Update Index Sets Default Configuration"
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}
                             submitButtonText="Save">
           <fieldset>
             <p>These defaults will apply for newly created index sets.</p>
+            <p>Warning! Assigning values here will override the <code>elasticsearch_shards</code> and <code>elasticsearch_replicas</code> configuration values.</p>
             <Input id="notification-backlog-field"
                    type="number"
                    onChange={this._onShardsUpdate}
                    label="Shards per Index"
                    help="The default number of shards to specify for each new index."
                    value={config.shards}
-                   min="0"
-                   required />
+                   min="0" />
             <Input id="notification-backlog-field"
                    type="number"
                    onChange={this._onReplicasUpdate}
                    label="Replicas per Index"
-                   help="The default number of shards to specify for each new index."
+                   help="The default number of replicas to specify for each new index."
                    value={config.replicas}
-                   min="0"
-                   required />
+                   min="0" />
           </fieldset>
         </BootstrapModalForm>
       </div>
@@ -156,4 +155,4 @@ const IndexDefaultsConfig = createReactClass({
   },
 });
 
-export default IndexDefaultsConfig;
+export default IndexSetsDefaultsConfig;

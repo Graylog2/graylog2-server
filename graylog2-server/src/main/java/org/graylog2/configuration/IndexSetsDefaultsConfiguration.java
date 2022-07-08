@@ -28,12 +28,14 @@ import javax.annotation.Nullable;
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
-public abstract class IndexDefaultsConfiguration implements PluginConfigBean {
+public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean {
 
     public static final String SHARDS = "shards";
     public static final String REPLICAS = "replicas";
-    public static final int DEFAULT_SHARDS = 4;
-    public static final int DEFAULT_REPLICAS = 0;
+
+    // Default values are null intentionally. This allows fallback to server.conf values.
+    public static final Integer DEFAULT_SHARDS = null;
+    public static final Integer DEFAULT_REPLICAS = null;
 
     @Nullable
     @JsonProperty(SHARDS)
@@ -44,8 +46,8 @@ public abstract class IndexDefaultsConfiguration implements PluginConfigBean {
     public abstract Integer replicas();
 
     @JsonCreator
-    public static IndexDefaultsConfiguration create(@JsonProperty(SHARDS) Integer shards,
-                                                    @JsonProperty(REPLICAS) Integer replicas) {
+    public static IndexSetsDefaultsConfiguration create(@JsonProperty(SHARDS) Integer shards,
+                                                        @JsonProperty(REPLICAS) Integer replicas) {
         return builder()
                 .shards(shards)
                 .replicas(replicas)
@@ -53,21 +55,23 @@ public abstract class IndexDefaultsConfiguration implements PluginConfigBean {
     }
 
     public static Builder builder() {
-        return new AutoValue_IndexDefaultsConfiguration.Builder()
+        return new AutoValue_IndexSetsDefaultsConfiguration.Builder()
                 .shards(DEFAULT_SHARDS)
                 .replicas(DEFAULT_REPLICAS);
     }
 
-    public static IndexDefaultsConfiguration createNew() {
+    public static IndexSetsDefaultsConfiguration createNew() {
         return builder().build();
     }
 
+    public abstract Builder toBuilder();
+
     @AutoValue.Builder
     public abstract static class Builder {
-        public abstract Builder shards(int shards);
+        public abstract Builder shards(Integer shards);
 
-        public abstract Builder replicas(int replicas);
+        public abstract Builder replicas(Integer replicas);
 
-        public abstract IndexDefaultsConfiguration build();
+        public abstract IndexSetsDefaultsConfiguration build();
     }
 }

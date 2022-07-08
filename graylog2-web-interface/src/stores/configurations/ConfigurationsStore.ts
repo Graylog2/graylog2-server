@@ -28,7 +28,7 @@ type ConfigurationsActionsType = {
   listSearchesClusterConfig: () => Promise<unknown>,
   listMessageProcessorsConfig: (configType: any) => Promise<unknown>,
   listEventsClusterConfig: () => Promise<unknown>,
-  listIndexDefaultsClusterConfig: () => Promise<unknown>,
+  listIndexSetsDefaultsClusterConfig: () => Promise<unknown>,
   listWhiteListConfig: (configType: any) => Promise<unknown>,
   listPermissionsConfig: (configType: string) => Promise<unknown>,
   update: (configType: any, config: any) => Promise<void>,
@@ -42,7 +42,7 @@ export const ConfigurationsActions = singletonActions(
     listSearchesClusterConfig: { asyncResult: true },
     listMessageProcessorsConfig: { asyncResult: true },
     listEventsClusterConfig: { asyncResult: true },
-    listIndexDefaultsClusterConfig: { asyncResult: true },
+    listIndexSetsDefaultsClusterConfig: { asyncResult: true },
     listWhiteListConfig: { asyncResult: true },
     listPermissionsConfig: { asyncResult: true },
     update: { asyncResult: true },
@@ -71,7 +71,7 @@ export type ConfigurationsStoreState = {
   configuration: Record<string, any>,
   searchesClusterConfig: SearchesConfig,
   eventsClusterConfig: {},
-  indexDefaultConfig: {},
+  indexSetsDefaultConfig: {},
 };
 
 export const ConfigurationsStore = singletonStore(
@@ -82,7 +82,7 @@ export const ConfigurationsStore = singletonStore(
     configuration: {},
     searchesClusterConfig: {},
     eventsClusterConfig: {},
-    indexDefaultConfig: {},
+    indexSetsDefaultConfig: {},
     getInitialState() {
       return this.getState();
     },
@@ -92,7 +92,7 @@ export const ConfigurationsStore = singletonStore(
         configuration: this.configuration,
         searchesClusterConfig: this.searchesClusterConfig,
         eventsClusterConfig: this.eventsClusterConfig,
-        indexDefaultConfig: this.indexDefaultConfig,
+        indexSetsDefaultConfig: this.indexSetsDefaultConfig,
       };
     },
 
@@ -180,14 +180,14 @@ export const ConfigurationsStore = singletonStore(
       ConfigurationsActions.listEventsClusterConfig.promise(promise);
     },
 
-    listIndexDefaultsClusterConfig() {
-      const promise = fetch('GET', this._url('/org.graylog2.configuration.IndexDefaultsConfiguration')).then((response) => {
-        this.indexDefaultConfig = response;
+    listIndexSetsDefaultsClusterConfig() {
+      const promise = fetch('GET', this._url('/org.graylog2.configuration.IndexSetsDefaultsConfiguration')).then((response) => {
+        this.indexSetsDefaultConfig = response;
         this.propagateChanges();
 
         return response;
       });
-      ConfigurationsActions.listIndexDefaultsClusterConfig.promise(promise);
+      ConfigurationsActions.listIndexSetsDefaultsClusterConfig.promise(promise);
     },
 
     update(configType, config) {
