@@ -54,8 +54,6 @@ const mockEffectiveTimeRange = {
   type: 'absolute',
 };
 
-jest.mock('views/components/messagelist/MessageTableEntry', () => ({}));
-
 jest.mock('views/stores/ViewStore', () => ({
   ViewStore: MockStore(
     ['getInitialState', () => ({ activeQuery: 'somequery', view: { id: 'someview' } })],
@@ -70,8 +68,6 @@ jest.mock('stores/inputs/InputsStore', () => ({
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore('listSearchesClusterConfig', 'configurations'),
 }));
-
-const mockReexecuteResult = CancellablePromise.of(Promise.resolve({ result: { errors: [] }, widgetMapping: {} } as SearchExecutionResult));
 
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
@@ -123,6 +119,8 @@ describe('MessageList', () => {
     total: 1,
   };
 
+  const mockReexecuteResult = CancellablePromise.of(Promise.resolve({ result: { errors: [] }, widgetMapping: {} } as SearchExecutionResult));
+
   beforeEach(() => {
     // @ts-ignore
     messageList.MessageTableEntry = MessageTableEntry; // eslint-disable-line no-import-assign
@@ -136,10 +134,11 @@ describe('MessageList', () => {
 
   const findTable = () => screen.findByRole('table');
 
-  const findNextPageButton = async () => {
-    const paginationListItem = await screen.findByRole('listitem', { name: /next/i });
+  const clickNextPageButton = () => {
+    const paginationListItem = screen.getByRole('listitem', { name: /next/i });
 
-    return within(paginationListItem).getByRole('button');
+    const nextPageButton = within(paginationListItem).getByRole('button');
+    userEvent.click(nextPageButton);
   };
 
   const SimpleMessageList = (props: Partial<React.ComponentProps<typeof MessageList>>) => (
@@ -212,8 +211,7 @@ describe('MessageList', () => {
 
     render(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }} />);
 
-    const nextPageButton = await findNextPageButton();
-    userEvent.click(nextPageButton);
+    clickNextPageButton();
 
     await waitFor(() => expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith(searchTypePayload, mockEffectiveTimeRange));
   });
@@ -223,8 +221,7 @@ describe('MessageList', () => {
 
     render(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }} />);
 
-    const nextPageButton = await findNextPageButton();
-    userEvent.click(nextPageButton);
+    clickNextPageButton();
 
     await waitFor(() => expect(RefreshActions.disable).toHaveBeenCalledTimes(1));
   });
@@ -238,8 +235,7 @@ describe('MessageList', () => {
 
     render(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }} />);
 
-    const nextPageButton = await findNextPageButton();
-    userEvent.click(nextPageButton);
+    clickNextPageButton();
 
     await screen.findByText('Error description');
   });

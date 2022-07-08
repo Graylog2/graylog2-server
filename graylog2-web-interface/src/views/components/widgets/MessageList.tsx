@@ -21,16 +21,13 @@ import { get } from 'lodash';
 import { useContext, useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 
-import type { WidgetComponentProps } from 'views/types';
-import connect from 'stores/connect';
+import type { WidgetComponentProps, MessageResult } from 'views/types';
+import { useStore } from 'stores/connect';
 import { Messages } from 'views/Constants';
 import { ViewStore } from 'views/stores/ViewStore';
-import type { SearchStoreState } from 'views/stores/SearchStore';
 import { SearchActions, SearchStore } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import type { TimeRange } from 'views/logic/queries/Query';
-import type { ViewStoreState } from 'views/stores/ViewStore';
 import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 import { PaginatedList } from 'components/common';
 import MessageTable from 'views/components/widgets/MessageTable';
@@ -59,8 +56,6 @@ type Pagination = {
   currentPage: number
 }
 
-type SearchType = { effectiveTimerange: TimeRange };
-
 export type MessageListResult = {
   messages: Array<BackendMessage>,
   total: number,
@@ -69,9 +64,13 @@ export type MessageListResult = {
 };
 
 type Props = WidgetComponentProps<MessagesWidgetConfig, MessageListResult> & {
-  currentView: ViewStoreState,
   pageSize?: number,
-  searchTypes: { [searchTypeId: string]: SearchType },
+};
+
+const useSearchTypes = (activeQueryId: string) => {
+  const searches = useStore(SearchStore);
+
+  return get(searches, ['result', 'results', activeQueryId, 'searchTypes']);
 };
 
 const useResetPaginationOnSearchExecution = (setPagination: (pagination: Pagination) => void, currentPage) => {
@@ -113,26 +112,25 @@ const useRenderCompletionCallback = () => {
 
 const MessageList = ({
   config,
-  currentView: { activeQuery: activeQueryId },
   data: { id: searchTypeId, messages, total: totalMessages },
   fields,
   onConfigChange,
   pageSize,
-  searchTypes,
   setLoadingState,
 }: Props) => {
+  const { activeQuery: activeQueryId } = useStore(ViewStore);
   const [{ currentPage, pageErrors }, setPagination] = useState<Pagination>({
     pageErrors: [],
     currentPage: 1,
   });
-
+  const searchTypes = useSearchTypes(activeQueryId);
   const scrollContainerRef = useResetScrollPositionOnPageChange(currentPage);
   useResetPaginationOnSearchExecution(setPagination, currentPage);
   useRenderCompletionCallback();
 
   const handlePageChange = useCallback((pageNo: number) => {
     // execute search with new offset
-    const { effectiveTimerange } = searchTypes[searchTypeId];
+    const { effectiveTimerange } = searchTypes[searchTypeId] as MessageResult;
     const searchTypePayload: SearchTypeOptions<{
         limit: number,
         offset: number,
@@ -185,14 +183,6 @@ const MessageList = ({
   );
 };
 
-const mapProps = (props: {
-  currentView: ViewStoreState,
-  searches: SearchStoreState,
-}) => ({
-  currentView: props.currentView,
-  searchTypes: get(props, ['searches', 'result', 'results', props.currentView.activeQuery, 'searchTypes']) as { [searchTypeId: string]: SearchType },
-});
-
 MessageList.propTypes = {
   onConfigChange: PropTypes.func,
   pageSize: PropTypes.number,
@@ -203,7 +193,4 @@ MessageList.defaultProps = {
   pageSize: Messages.DEFAULT_LIMIT,
 };
 
-export default connect(MessageList, {
-  currentView: ViewStore,
-  searches: SearchStore,
-}, mapProps);
+export default MessageList;
