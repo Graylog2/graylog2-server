@@ -112,11 +112,14 @@ const useRenderCompletionCallback = () => {
 };
 
 const MessageList = ({
-  onConfigChange,
-  config, pageSize, searchTypes, data: { id: searchTypeId, messages, total: totalMessages },
-  setLoadingState,
+  config,
   currentView: { activeQuery: activeQueryId },
+  data: { id: searchTypeId, messages, total: totalMessages },
   fields,
+  onConfigChange,
+  pageSize,
+  searchTypes,
+  setLoadingState,
 }: Props) => {
   const [{ currentPage, pageErrors }, setPagination] = useState<Pagination>({
     pageErrors: [],
