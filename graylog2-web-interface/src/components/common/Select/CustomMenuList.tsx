@@ -18,10 +18,9 @@ import React, { useRef, useCallback, useEffect } from 'react';
 import { components as Components } from 'react-select';
 import type { Props } from 'react-select/creatable';
 import { VariableSizeList as List } from 'react-window';
-import AutoSizer from 'react-virtualized-auto-sizer';
 import styled from 'styled-components';
 
-import useWindowResize from 'hooks/useWindowResize';
+import useElementDimensions from 'hooks/useElementDimensions';
 
 const Container = styled.div`
   flex: 1 1 auto;
@@ -34,16 +33,16 @@ type RowProps = {
   data: Array<object>,
   index: number,
   setSize: (index: number, size: number) => void,
-  windowWidth: number
+  containerWidth: number
   style: object
 }
 
-const Row = ({ data, index, setSize, style, windowWidth }: RowProps) => {
+const Row = ({ data, index, setSize, style, containerWidth }: RowProps) => {
   const rowRef = useRef(null);
 
   useEffect(() => {
     setSize(index, rowRef.current.getBoundingClientRect().height);
-  }, [setSize, index, windowWidth]);
+  }, [setSize, index, containerWidth]);
 
   return (
     <div ref={rowRef} data-testid="react-window-list-item" style={style}>
@@ -53,8 +52,11 @@ const Row = ({ data, index, setSize, style, windowWidth }: RowProps) => {
 };
 
 const WindowList = ({ children }: Props.MenuList) => {
+  const containerRef = useRef(null);
   const listRef = useRef(null);
   const sizeMap = useRef({});
+  const containerDimensions = useElementDimensions(containerRef);
+  const { width, height } = containerDimensions;
 
   const setSize = useCallback((index: number, size: number) => {
     sizeMap.current = { ...sizeMap.current, [index]: size };
@@ -63,30 +65,22 @@ const WindowList = ({ children }: Props.MenuList) => {
 
   const getSize = useCallback((index: number) => sizeMap.current[index] || 36, [sizeMap]);
 
-  const [windowWidth] = useWindowResize();
-
   return (
-    <Container>
-      <AutoSizer>
-        {
-          ({ width, height }) => (
-            <List ref={listRef}
-                  height={height}
-                  itemCount={children.length}
-                  itemSize={getSize}
-                  itemData={children}
-                  width={width}>
-              {({ data, index, style }) => (
-                <Row data={data}
-                     style={style}
-                     index={index}
-                     setSize={setSize}
-                     windowWidth={windowWidth} />
-              )}
-            </List>
-          )
-        }
-      </AutoSizer>
+    <Container ref={containerRef}>
+      <List ref={listRef}
+            height={height}
+            itemCount={children.length}
+            itemSize={getSize}
+            itemData={children}
+            width={width}>
+        {({ data, index, style }) => (
+          <Row data={data}
+               style={style}
+               index={index}
+               setSize={setSize}
+               containerWidth={width} />
+        )}
+      </List>
     </Container>
   );
 };
