@@ -24,11 +24,9 @@ import asMock from 'helpers/mocking/AsMock';
 import { TIMESTAMP_FIELD, Messages } from 'views/Constants';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import { AdditionalContext } from 'views/logic/ActionContext';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import { SearchActions } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
-import * as messageList from 'views/components/messagelist';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import CancellablePromise from 'logic/rest/CancellablePromise';
@@ -37,16 +35,6 @@ import type { MessageListResult } from './MessageList';
 import MessageList from './MessageList';
 import type { TRenderCompletionCallback } from './RenderCompletionCallback';
 import RenderCompletionCallback from './RenderCompletionCallback';
-
-const MessageTableEntry = () => (
-  <AdditionalContext.Consumer>
-    {({ message }) => (
-      <tbody>
-        <tr><td>{JSON.stringify(message)}</td></tr>
-      </tbody>
-    )}
-  </AdditionalContext.Consumer>
-);
 
 const mockEffectiveTimeRange = {
   from: '2019-11-15T14:40:48.666Z',
@@ -97,8 +85,6 @@ jest.mock('views/stores/RefreshStore', () => ({
   },
 }));
 
-jest.mock('views/components/messagelist');
-
 describe('MessageList', () => {
   const config = MessagesWidgetConfig.builder().fields([]).build();
 
@@ -123,7 +109,7 @@ describe('MessageList', () => {
 
   beforeEach(() => {
     // @ts-ignore
-    messageList.MessageTableEntry = MessageTableEntry; // eslint-disable-line no-import-assign
+    // messageList.MessageTableEntry = MessageTableEntry; // eslint-disable-line no-import-assign
     asMock(SearchActions.reexecuteSearchTypes).mockReturnValue(CancellablePromise.of(Promise.resolve(mockReexecuteResult)));
     asMock(InputsStore.getInitialState).mockReturnValue(() => ({ activeQuery: 'somequery', view: { id: 'someview' } }));
   });
