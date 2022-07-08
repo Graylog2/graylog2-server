@@ -18,7 +18,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 import { isEmpty, get } from 'lodash';
-import { useContext, useState, useEffect, useCallback } from 'react';
+import { useContext, useState, useEffect, useCallback, useRef } from 'react';
 
 import type { WidgetComponentProps } from 'views/types';
 import connect from 'stores/connect';
@@ -72,16 +72,13 @@ type Props = WidgetComponentProps<MessagesWidgetConfig, MessageListResult> & {
   searchTypes: { [searchTypeId: string]: SearchType },
 };
 
-const _getListKey = (messages, currentPage) => {
-  const defaultKey = `message-list-${currentPage}`;
-
-  if (!isEmpty(messages)) {
-    const firstMessageId = messages[0].message._id;
-
-    return `${defaultKey}-${firstMessageId}`;
-  }
-
-  return defaultKey;
+const useResetScrollPositionOnPageChange = (scrollContainerRef: React.MutableRefObject<HTMLElement>, currentPage: number) => {
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      // eslint-disable-next-line no-param-reassign
+      scrollContainerRef.current.scrollTop = 0;
+    }
+  }, [currentPage, scrollContainerRef]);
 };
 
 const MessageList = ({
@@ -92,10 +89,13 @@ const MessageList = ({
   fields,
 }: Props) => {
   const renderCompletionCallback = useContext(RenderCompletionCallback);
+  const scrollContainerRef = useRef();
   const [{ currentPage, errors }, setState] = useState<State>({
     errors: [],
     currentPage: 1,
   });
+
+  useResetScrollPositionOnPageChange(scrollContainerRef, currentPage);
 
   const _resetPagination = useCallback(() => {
     if (currentPage !== 1) {
@@ -148,7 +148,6 @@ const MessageList = ({
   }, [_resetPagination]);
 
   const hasError = !isEmpty(errors);
-  const listKey = _getListKey(messages, currentPage);
 
   return (
     <WindowDimensionsContextProvider>
@@ -161,8 +160,8 @@ const MessageList = ({
           {!hasError ? (
             <MessageTable activeQueryId={activeQueryId}
                           config={config}
+                          scrollContainerRef={scrollContainerRef}
                           fields={fields}
-                          key={listKey}
                           onSortChange={_onSortChange}
                           setLoadingState={setLoadingState}
                           messages={messages} />
