@@ -19,10 +19,12 @@ import React from 'react';
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Col, Row, Button } from 'components/bootstrap';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 import DocsHelper from 'util/DocsHelper';
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import { IndexSetsComponent } from 'components/indices';
+import { IndexerClusterHealth } from 'components/indexers';
 
 class IndicesPage extends React.Component {
   render() {
@@ -51,6 +53,16 @@ class IndicesPage extends React.Component {
       <DocumentTitle title="Indices and Index Sets">
         <span>
           {pageHeader}
+
+          <HideOnCloud>
+            <IfPermitted permissions="indexercluster:read">
+              <Row className="content">
+                <Col md={12}>
+                  <IndexerClusterHealth minimal />
+                </Col>
+              </Row>
+            </IfPermitted>
+          </HideOnCloud>
 
           <Row className="content">
             <Col md={12}>

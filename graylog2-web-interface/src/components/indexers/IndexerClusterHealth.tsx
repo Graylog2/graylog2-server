@@ -29,6 +29,10 @@ import * as URLUtils from 'util/URLUtils';
 
 import IndexerClusterHealthError from './IndexerClusterHealthError';
 
+type Props = {
+  minimal: boolean,
+};
+
 const GET_INDEXER_CLUSTER_HEALTH = 'indexerCluster.health';
 const GET_INDEXER_CLUSTER_NAME = 'indexerCluster.name';
 
@@ -63,8 +67,20 @@ const useLoadHealthAndName = () => {
   });
 };
 
-const IndexerClusterHealth = () => {
+const IndexerClusterHealth = ({ minimal }: Props) => {
   const { health, name, loading, error, isSuccess } = useLoadHealthAndName();
+
+  const summary = (
+    <>
+      {isSuccess && <IndexerClusterHealthSummary health={health} name={name} />}
+      {loading && <p><Spinner /></p>}
+      {error && <IndexerClusterHealthError error={error} />}
+    </>
+  );
+
+  if (minimal) {
+    return summary;
+  }
 
   return (
     <Row className="content">
@@ -75,9 +91,8 @@ const IndexerClusterHealth = () => {
           The possible Elasticsearch cluster states and more related information is available in the{' '}
           <DocumentationLink page={DocsHelper.PAGES.CONFIGURING_ES} text="Graylog documentation" />.
         </SmallSupportLink>
-        {isSuccess && <IndexerClusterHealthSummary health={health} name={name} />}
-        {loading && <p><Spinner /></p>}
-        {error && <IndexerClusterHealthError error={error} />}
+
+        {summary}
       </Col>
     </Row>
   );
