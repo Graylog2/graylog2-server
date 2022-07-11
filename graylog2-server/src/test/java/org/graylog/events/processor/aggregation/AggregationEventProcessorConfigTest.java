@@ -78,7 +78,7 @@ public class AggregationEventProcessorConfigTest {
         objectMapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
 
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        final Set<EntityScope> scopes = org.testcontainers.shaded.com.google.common.collect.ImmutableSet.of(new DefaultEntityScope());
+        final Set<EntityScope> scopes = ImmutableSet.of(new DefaultEntityScope());
         final EntityScopeService entityScopeService = new EntityScopeService(scopes);
         this.dbService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnershipService.class), entityScopeService);
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
