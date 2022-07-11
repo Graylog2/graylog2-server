@@ -108,8 +108,6 @@ describe('MessageList', () => {
   const mockReexecuteResult = CancellablePromise.of(Promise.resolve({ result: { errors: [] }, widgetMapping: {} } as SearchExecutionResult));
 
   beforeEach(() => {
-    // @ts-ignore
-    // messageList.MessageTableEntry = MessageTableEntry; // eslint-disable-line no-import-assign
     asMock(SearchActions.reexecuteSearchTypes).mockReturnValue(CancellablePromise.of(Promise.resolve(mockReexecuteResult)));
     asMock(InputsStore.getInitialState).mockReturnValue(() => ({ activeQuery: 'somequery', view: { id: 'someview' } }));
   });
