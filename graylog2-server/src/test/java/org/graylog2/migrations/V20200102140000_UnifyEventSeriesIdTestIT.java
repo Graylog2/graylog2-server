@@ -28,6 +28,9 @@ import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScope;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -36,6 +39,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
+
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -64,7 +70,9 @@ public class V20200102140000_UnifyEventSeriesIdTestIT {
         objectMapper.registerSubtypes(new NamedType(TemplateFieldValueProvider.Config.class, TemplateFieldValueProvider.Config.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, dbEventProcessorStateService, mock(EntityOwnershipService.class));
+        final Set<EntityScope> scopes = ImmutableSet.of(new DefaultEntityScope());
+        final EntityScopeService entityScopeService = new EntityScopeService(scopes);
+        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, dbEventProcessorStateService, mock(EntityOwnershipService.class), entityScopeService);
 
         migration = new V20200102140000_UnifyEventSeriesId(clusterConfigService, eventDefinitionService, objectMapperProvider);
     }

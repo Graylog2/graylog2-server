@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.graph.MutableGraph;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.events.contentpack.entities.ContentPackMetadataEntity;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.contentpack.entities.EventNotificationHandlerConfigEntity;
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
@@ -41,11 +42,11 @@ import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.entities.Entity;
+import org.graylog2.database.entities.EntityMetadata;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.ValidationResult;
-import org.mongojack.Id;
-import org.mongojack.ObjectId;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -66,6 +67,11 @@ public abstract class EventDefinitionDto extends Entity implements EventDefiniti
     private static final String FIELD_KEY_SPEC = "key_spec";
     private static final String FIELD_NOTIFICATION_SETTINGS = "notification_settings";
     private static final String FIELD_STORAGE = "storage";
+
+    @JsonProperty(FIELD_ID)
+    @Nullable
+    @Override
+    public abstract String id();
 
     @Override
     @JsonProperty(FIELD_TITLE)
@@ -142,21 +148,21 @@ public abstract class EventDefinitionDto extends Entity implements EventDefiniti
         return validation;
     }
 
+    @Override
+    public EventDefinitionDto withMetadata(EntityMetadata metadata) {
+        return toBuilder().metadata(metadata).build();
+    }
+
     @AutoValue.Builder
-    public static abstract class Builder extends Entity.Builder<Builder> {
+    public abstract static class Builder extends Entity.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EventDefinitionDto.Builder()
+            return new $AutoValue_EventDefinitionDto.Builder()
                     .fieldSpec(ImmutableMap.of())
                     .notifications(ImmutableList.of())
-                    .storage(ImmutableList.of());
+                    .storage(ImmutableList.of())
+                    .metadata(EntityMetadata.createDefault());
         }
-
-        @Override
-        @Id
-        @ObjectId
-        @JsonProperty(FIELD_ID)
-        public abstract Builder id(String id);
 
         @JsonProperty(FIELD_TITLE)
         public abstract Builder title(String title);
@@ -233,6 +239,7 @@ public abstract class EventDefinitionDto extends Entity implements EventDefiniti
                 .fieldSpec(fieldSpec())
                 .keySpec(keySpec())
                 .storage(storage())
+                .metadata(ContentPackMetadataEntity.of(metadata()))
                 .build();
     }
 
