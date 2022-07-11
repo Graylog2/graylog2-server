@@ -51,7 +51,7 @@ const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable
   cursor: ${$clickable ? 'pointer' : 'default'};
 `);
 
-const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string }) => `
+const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string, ref: React.RefObject<HTMLElement> }) => `
   color: ${$status === 'ERROR' ? theme.colors.variant.danger : theme.colors.variant.warning};
   font-size: 22px;
 `);
@@ -162,6 +162,7 @@ const QueryValidation = () => {
   const [showExplanation, toggleShow] = useTriggerIfErrorsPersist(shake);
 
   const explanationTriggerRef = useRef(undefined);
+  const iconRef = useRef(null);
   const { errors: { queryString: queryStringErrors } } = useFormikContext();
   const { warnings } = useContext(FormWarningsContext);
 
@@ -179,7 +180,7 @@ const QueryValidation = () => {
                               $clickable
                               tabIndex={0}
                               type="button">
-            <ErrorIcon $status={status} name="exclamation-circle" />
+            <ErrorIcon ref={iconRef} $status={status} name="exclamation-circle" />
           </ExplanationTrigger>
         ) : (
           <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
@@ -194,7 +195,8 @@ const QueryValidation = () => {
                  placement="bottom"
                  target={explanationTriggerRef.current}
                  shouldUpdatePosition
-                 transition={Transition}>
+                 transition={Transition}
+                 container={explanationTriggerRef.current}>
           <StyledPopover id="query-validation-error-explanation"
                          title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
                          $shaking={shakingPopover}>
@@ -209,7 +211,7 @@ const QueryValidation = () => {
               ))}
               {plugableValidationExplanation?.map((PlugableExplanation, index) => (
                 // eslint-disable-next-line react/no-array-index-key
-                <PlugableExplanation validationState={validationState} key={index} />),
+                <PlugableExplanation validationState={validationState} key={index} explanationTriggerRef={explanationTriggerRef} />),
               )}
             </div>
           </StyledPopover>

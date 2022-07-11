@@ -275,7 +275,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
-    'views.elements.validationErrorExplanation'?: Array<React.ComponentType<{ validationState: QueryValidationState }>>;
+    'views.elements.validationErrorExplanation'?: Array<React.ComponentType<{ validationState: QueryValidationState, explanationTriggerRef: React.RefObject<HTMLElement> }>>;
     'views.export.formats'?: Array<ExportFormat>;
     'views.hooks.confirmDeletingDashboard'?: Array<(view: View) => Promise<boolean | null>>,
     'views.hooks.confirmDeletingDashboardPage'?: Array<(dashboardId: string, queryId: string, widgetIds: { [queryId: string]: Array<string> }) => Promise<boolean | null>>,

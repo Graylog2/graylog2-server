@@ -110,13 +110,14 @@ class BootstrapModalForm extends React.Component {
       onModalOpen,
       title,
       children,
+      container
     } = this.props;
     const body = (
       <div className="container-fluid">
         {children}
       </div>
     );
-
+    console.log({ container })
     return (
       <BootstrapModalWrapper ref={(c) => { this.modal = c; }}
                              onOpen={onModalOpen}
@@ -124,7 +125,9 @@ class BootstrapModalForm extends React.Component {
                              bsSize={bsSize}
                              showModal={show}
                              backdrop={backdrop}
-                             onHide={this.onModalCancel}>
+                             onHide={this.onModalCancel}
+                             container={container}
+      >
         <Modal.Header closeButton>
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
