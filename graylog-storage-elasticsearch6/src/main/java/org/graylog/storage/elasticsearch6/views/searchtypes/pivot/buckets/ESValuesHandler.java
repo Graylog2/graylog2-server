@@ -29,7 +29,6 @@ import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.BucketOrder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivotBucketSpecHandler;
 
 import javax.annotation.Nonnull;
@@ -43,7 +42,7 @@ import java.util.stream.Stream;
 public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, TermsAggregation> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Values valuesSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Values valuesSpec, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, valuesSpec, esGeneratedQueryContext);
         final TermsAggregationBuilder builder = AggregationBuilders.terms(name)
                 .minDocCount(1)

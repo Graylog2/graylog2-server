@@ -24,7 +24,6 @@ import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.bucket.range.DateRangeAggregationBuilder;
 import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivotBucketSpecHandler;
 import org.joda.time.base.AbstractDateTime;
 
@@ -35,7 +34,7 @@ import java.util.stream.Stream;
 public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket, DateRangeAggregation> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, DateRangeBucket dateRangeBucket, ESPivot searchTypeHandler, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, DateRangeBucket dateRangeBucket, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
         final DateRangeAggregationBuilder builder = AggregationBuilders.dateRange(name).field(dateRangeBucket.field());
         dateRangeBucket.ranges().forEach(r -> {
             final String from = r.from().map(AbstractDateTime::toString).orElse(null);

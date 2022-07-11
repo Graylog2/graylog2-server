@@ -131,6 +131,10 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
       color: ${theme.colors.input.colorDisabled};
     }
   }
+  
+  textarea {
+    max-width: 100%;
+  }
 
   legend small {
     color: ${theme.colors.gray[60]};
