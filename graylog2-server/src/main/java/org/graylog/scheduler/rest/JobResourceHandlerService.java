@@ -27,6 +27,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * JobResourceHandlers provide a pluggable way to list and cancel Jobs that run within the new JobScheduler.
+ * The main reason why this is currently not a generic solution, is that each Job implementation needs to
+ * perform their own permission checks. That's why every call contains the current {@link UserContext}.
+ * Another responsibility is converting {@link JobTriggerDto} to {@link SystemJobSummary} objects,
+ * to cater the existing system job endpoints.
+ * We might change this in the future, once we have a better idea on how to build a more generic job API.
+ */
 public class JobResourceHandlerService {
 
     private final Map<String, JobResourceHandler> resourceHandlers;

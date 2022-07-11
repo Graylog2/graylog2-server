@@ -20,8 +20,6 @@ import com.google.common.util.concurrent.Service;
 import com.google.inject.Scopes;
 import com.google.inject.name.Names;
 import org.graylog2.Configuration;
-import org.graylog2.cluster.lock.LockService;
-import org.graylog2.cluster.lock.MongoLockService;
 import org.graylog2.plugin.PluginModule;
 
 public class LeaderElectionModule extends PluginModule {
@@ -33,9 +31,6 @@ public class LeaderElectionModule extends PluginModule {
 
     @Override
     protected void configure() {
-
-        // TODO move to another module?
-        bind(LockService.class).to(MongoLockService.class).in(Scopes.SINGLETON);
 
         final LeaderElectionMode mode = configuration.getLeaderElectionMode();
 
