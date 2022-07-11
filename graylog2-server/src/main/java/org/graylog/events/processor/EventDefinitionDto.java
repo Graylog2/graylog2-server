@@ -40,12 +40,12 @@ import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.entities.Entity;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
 @JsonAutoDetect
 @JsonDeserialize(builder = EventDefinitionDto.Builder.class)
 @WithBeanGetter
-public abstract class EventDefinitionDto implements EventDefinition, ContentPackable<EventDefinitionEntity> {
+public abstract class EventDefinitionDto extends Entity implements EventDefinition, ContentPackable<EventDefinitionEntity> {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
@@ -66,13 +66,6 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     private static final String FIELD_KEY_SPEC = "key_spec";
     private static final String FIELD_NOTIFICATION_SETTINGS = "notification_settings";
     private static final String FIELD_STORAGE = "storage";
-
-    @Override
-    @Id
-    @ObjectId
-    @Nullable
-    @JsonProperty(FIELD_ID)
-    public abstract String id();
 
     @Override
     @JsonProperty(FIELD_TITLE)
@@ -138,7 +131,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
             final String fieldName = fieldSpecEntry.getKey();
             if (!Message.validKey(fieldName)) {
                 validation.addError(FIELD_FIELD_SPEC,
-                    "Event Definition field_spec contains invalid message field \"" + fieldName + "\"");
+                        "Event Definition field_spec contains invalid message field \"" + fieldName + "\"");
             }
         }
 
@@ -150,7 +143,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     }
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public static abstract class Builder extends Entity.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_EventDefinitionDto.Builder()
@@ -159,6 +152,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
                     .storage(ImmutableList.of());
         }
 
+        @Override
         @Id
         @ObjectId
         @JsonProperty(FIELD_ID)
@@ -219,36 +213,37 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
         }
     }
 
+    @Override
     public EventDefinitionEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         final EventProcessorConfig config = config();
         final EventProcessorConfigEntity eventProcessorConfigEntity = config.toContentPackEntity(entityDescriptorIds);
         final ImmutableList<EventNotificationHandlerConfigEntity> notificationList = ImmutableList.copyOf(
-            notifications().stream()
-                .map(notification -> notification.toContentPackEntity(entityDescriptorIds))
-                .collect(Collectors.toList()));
+                notifications().stream()
+                        .map(notification -> notification.toContentPackEntity(entityDescriptorIds))
+                        .collect(Collectors.toList()));
 
         return EventDefinitionEntity.builder()
-            .title(ValueReference.of(title()))
-            .description(ValueReference.of(description()))
-            .priority(ValueReference.of(priority()))
-            .alert(ValueReference.of(alert()))
-            .config(eventProcessorConfigEntity)
-            .notifications(notificationList)
-            .notificationSettings(notificationSettings())
-            .fieldSpec(fieldSpec())
-            .keySpec(keySpec())
-            .storage(storage())
-            .build();
+                .title(ValueReference.of(title()))
+                .description(ValueReference.of(description()))
+                .priority(ValueReference.of(priority()))
+                .alert(ValueReference.of(alert()))
+                .config(eventProcessorConfigEntity)
+                .notifications(notificationList)
+                .notificationSettings(notificationSettings())
+                .fieldSpec(fieldSpec())
+                .keySpec(keySpec())
+                .storage(storage())
+                .build();
     }
 
     @Override
     public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
         notifications().stream().map(EventNotificationHandler.Config::notificationId)
-            .forEach(id -> {
+                .forEach(id -> {
                     final EntityDescriptor depNotification = EntityDescriptor.builder()
-                        .id(ModelId.of(id))
-                        .type(ModelTypes.NOTIFICATION_V1)
-                        .build();
+                            .id(ModelId.of(id))
+                            .type(ModelTypes.NOTIFICATION_V1)
+                            .build();
                     mutableGraph.putEdge(entityDescriptor, depNotification);
                 });
         config().resolveNativeEntity(entityDescriptor, mutableGraph);
