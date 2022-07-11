@@ -84,7 +84,7 @@ public class ESTimeHandlerTest {
         when(interval.toDateInterval(timeRangeCaptor.capture())).thenReturn(DateInterval.days(1));
         when(pivot.timerange()).thenReturn(Optional.of(DerivedTimeRange.of(RelativeRange.create(4242))));
 
-        this.esTimeHandler.doCreateAggregation("foobar", pivot, time, esPivot, queryContext, query);
+        this.esTimeHandler.doCreateAggregation("foobar", pivot, time, queryContext, query);
 
         final TimeRange argumentTimeRange = timeRangeCaptor.getValue();
         assertThat(argumentTimeRange).isEqualTo(RelativeRange.create(4242));
@@ -97,7 +97,7 @@ public class ESTimeHandlerTest {
         when(pivot.timerange()).thenReturn(Optional.empty());
         when(query.timerange()).thenReturn(RelativeRange.create(2323));
 
-        this.esTimeHandler.doCreateAggregation("foobar", pivot, time, esPivot, queryContext, query);
+        this.esTimeHandler.doCreateAggregation("foobar", pivot, time, queryContext, query);
 
         final TimeRange argumentTimeRange = timeRangeCaptor.getValue();
         assertThat(argumentTimeRange).isEqualTo(RelativeRange.create(2323));
