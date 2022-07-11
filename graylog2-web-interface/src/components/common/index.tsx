@@ -21,6 +21,7 @@ const SourceCodeEditor = loadAsync(() => import('./SourceCodeEditor'));
 export { SourceCodeEditor };
 export { default as Accordion } from './Accordion';
 export { default as AccordionItem } from './AccordionItem';
+export { default as Autocomplete } from './Autocomplete/Autocomplete';
 export { default as BrowserTime } from './BrowserTime';
 export { default as Center } from './Center';
 export { default as ClipboardButton } from './ClipboardButton';
