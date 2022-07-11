@@ -69,6 +69,7 @@ import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.contentpacks.ContentPacksModule;
+import org.graylog2.database.entities.ScopedEntitiesModule;
 import org.graylog2.decorators.DecoratorBindings;
 import org.graylog2.indexer.IndexerBindings;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
@@ -182,7 +183,8 @@ public class Server extends ServerBootstrap {
                 new PrometheusMetricsModule(),
                 new ClusterConfigValidatorModule(),
                 new MapWidgetModule(),
-                new SearchFiltersModule()
+                new SearchFiltersModule(),
+                new ScopedEntitiesModule()
         );
         return modules.build();
     }
