@@ -58,3 +58,5 @@ these [instructions](https://www.mongodb.com/docs/manual/core/capped-collections
 UTF-8 encoding. 
 <br>Note that this encoding is applied to all messages received by the input. A single input
 cannot handle multiple log sources with different encodings.
+- On first server start up, the created default file system backend stores archive data based on graylog.conf ${dataDir} value.
+  OS packages set it to /var/lib/graylog-server/archives docker to /usr/share/graylog/data/archives
