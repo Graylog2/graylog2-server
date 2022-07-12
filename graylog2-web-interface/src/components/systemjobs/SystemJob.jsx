@@ -32,21 +32,8 @@ const JobWrap = styled.div`
   margin-bottom: 5px;
 `;
 
-class SystemJob extends React.Component {
-  static propTypes = {
-    job: PropTypes.shape({
-      info: PropTypes.string,
-      id: PropTypes.string,
-      percent_complete: PropTypes.number,
-      is_cancelable: PropTypes.bool,
-      name: PropTypes.string,
-      node_id: PropTypes.string,
-      started_at: PropTypes.string,
-      job_status: PropTypes.string,
-    }).isRequired,
-  };
-
-  _onAcknowledge = (job) => {
+const SystemJob = ({ job }) => {
+  const _onAcknowledge = () => {
     return (e) => {
       e.preventDefault();
 
@@ -54,7 +41,7 @@ class SystemJob extends React.Component {
     };
   };
 
-  _onCancel = (job) => {
+  const _onCancel = () => {
     return (e) => {
       e.preventDefault();
 
@@ -65,28 +52,38 @@ class SystemJob extends React.Component {
     };
   };
 
-  render() {
-    const { job } = this.props;
-    const jobIsDone = job.job_status === 'complete' || job.percent_complete === 100;
+  const jobIsDone = job.job_status === 'complete' || job.percent_complete === 100;
 
-    return (
-      <div>
-        <JobWrap>
-          <Icon name="cog" />{' '}
-          <span data-toggle="tooltip" title={job.name}>{job.info}</span>{' '}
-          - Started on <LinkToNode nodeId={job.node_id} />{' '}
-          <RelativeTime dateTime={job.started_at} />{' '}
-          {!jobIsDone && job.is_cancelable
-            ? (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={this._onCancel(job)}>Cancel Job</Button>)
-            : (<Button type="button" bsSize="xs" bsStyle="success" className="pull-right" onClick={this._onAcknowledge(job)}>Acknowledge Job</Button>)}
-        </JobWrap>
+  return (
+    <div>
+      <JobWrap>
+        <Icon name="cog" />{' '}
+        <span data-toggle="tooltip" title={job.name}>{job.info}</span>{' '}
+        - Started on <LinkToNode nodeId={job.node_id} />{' '}
+        <RelativeTime dateTime={job.started_at} />{' '}
+        {!jobIsDone && job.is_cancelable
+          ? (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={_onCancel()}>Cancel Job</Button>)
+          : (<Button type="button" bsSize="xs" bsStyle="success" className="pull-right" onClick={_onAcknowledge()}>Acknowledge Job</Button>)}
+      </JobWrap>
 
-        {jobIsDone
-          ? <span className="label label-success finished">Finished!</span>
-          : <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}
-      </div>
-    );
-  }
-}
+      {jobIsDone
+        ? <span className="label label-success finished">Finished!</span>
+        : <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}
+    </div>
+  );
+};
+
+SystemJob.propTypes = {
+  job: PropTypes.shape({
+    info: PropTypes.string,
+    id: PropTypes.string,
+    percent_complete: PropTypes.number,
+    is_cancelable: PropTypes.bool,
+    name: PropTypes.string,
+    node_id: PropTypes.string,
+    started_at: PropTypes.string,
+    job_status: PropTypes.string,
+  }).isRequired,
+};
 
 export default SystemJob;
