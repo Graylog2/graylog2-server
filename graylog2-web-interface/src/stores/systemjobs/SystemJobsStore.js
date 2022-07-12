@@ -26,6 +26,7 @@ export const SystemJobsActions = singletonActions(
   () => Reflux.createActions({
     list: { asyncResult: true },
     getJob: { asyncResult: true },
+    acknowledgeJob: { asyncResult: true },
     cancelJob: { asyncResult: true },
   }),
 );
@@ -67,6 +68,14 @@ export const SystemJobsStore = singletonStore(
       });
 
       SystemJobsActions.getJob.promise(promise);
+    },
+    acknowledgeJob(jobId) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.acknowledgeJob(jobId).url);
+      const promise = fetch('DELETE', url).then((response) => {
+        delete (this.jobsById[response.id]);
+      });
+
+      SystemJobsActions.cancelJob.promise(promise);
     },
     cancelJob(jobId) {
       const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.cancelJob(jobId).url);

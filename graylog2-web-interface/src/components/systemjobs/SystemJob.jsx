@@ -42,7 +42,16 @@ class SystemJob extends React.Component {
       name: PropTypes.string,
       node_id: PropTypes.string,
       started_at: PropTypes.string,
+      job_status: PropTypes.string,
     }).isRequired,
+  };
+
+  _onAcknowledge = (job) => {
+    return (e) => {
+      e.preventDefault();
+
+      SystemJobsActions.acknowledgeJob(job.id);
+    };
   };
 
   _onCancel = (job) => {
@@ -58,11 +67,7 @@ class SystemJob extends React.Component {
 
   render() {
     const { job } = this.props;
-    const progress = job.percent_complete < 100
-      ? <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />
-      : <span className="label label-success finished">Finished!</span>;
-    const cancel = job.is_cancelable
-      ? (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={this._onCancel(job)}>Cancel Job</Button>) : null;
+    const jobIsDone = job.job_status === 'complete' || job.percent_complete === 100;
 
     return (
       <div>
@@ -71,10 +76,14 @@ class SystemJob extends React.Component {
           <span data-toggle="tooltip" title={job.name}>{job.info}</span>{' '}
           - Started on <LinkToNode nodeId={job.node_id} />{' '}
           <RelativeTime dateTime={job.started_at} />{' '}
-          {cancel}
+          {!jobIsDone && job.is_cancelable
+            ? (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={this._onCancel(job)}>Cancel Job</Button>)
+            : (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={this._onAcknowledge(job)}>Acknowledge Job</Button>)}
         </JobWrap>
 
-        {progress}
+        {jobIsDone
+          ? <span className="label label-success finished">Finished!</span>
+          : <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}
       </div>
     );
   }
