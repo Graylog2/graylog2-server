@@ -20,6 +20,9 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 
+import java.util.Objects;
+import java.util.Optional;
+
 /**
  * A base database service to handle persistence and deletion of {@link ScopedEntity} instance.  Persistence and deletion is performed by the parent class, {@link PaginatedDbService},  this service simply performs mutability checks.
  *
@@ -41,6 +44,32 @@ public abstract class ScopedEntityPaginatedDbService<E extends ScopedEntity> ext
         this.entityScopeService = entityScopeService;
     }
 
+    public final boolean isMutable(ScopedEntity scopedEntity) {
+
+        Objects.requireNonNull(scopedEntity, "Entity must not be null");
+
+        // First, check whether this entity has been persisted, if so, the persisted entity's scope takes precedence.
+        Optional<E> current = get(scopedEntity.id());
+        if (current.isPresent()) {
+            return entityScopeService.isMutable(current.get());
+        }
+
+        // The entity does not exist in the database, This could be a new entity--check it
+        return entityScopeService.isMutable(scopedEntity);
+    }
+
+    /**
+     * Find a Mutable entity with the given ID.  <b>empty</b> is returned if the entity is not found OR if it is <b>immutable</b>.
+     *
+     * @param id target ID
+     * @return optional target entity
+     */
+    public final Optional<E> findMutableById(String id) {
+
+        return get(id)
+                .filter(entityScopeService::isMutable);
+    }
+
     @Override
     public E save(E entity) {
 
@@ -51,15 +80,15 @@ public abstract class ScopedEntityPaginatedDbService<E extends ScopedEntity> ext
         return super.save(entity);
     }
 
-    private void ensureValidScope(E entity) {
+    public final void ensureValidScope(E entity) {
         if (!entityScopeService.hasValidScope(entity)) {
             throw new IllegalArgumentException("Invalid Entity Scope: " + entity.scope());
         }
     }
 
 
-    private void ensureMutability(E entity) {
-        if (!entityScopeService.isMutable(entity)) {
+    public final void ensureMutability(E entity) {
+        if (!isMutable(entity)) {
             throw new IllegalArgumentException("Immutable entity cannot be modified");
         }
     }
