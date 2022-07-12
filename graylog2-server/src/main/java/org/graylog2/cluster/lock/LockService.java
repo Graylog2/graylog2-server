@@ -33,6 +33,14 @@ public interface LockService {
     Optional<Lock> lock(@Nonnull String resource, @Nullable String lockContext);
 
     /**
+     * Request a lock. If a lock already exists, the lock expiry time will be extended.
+     *
+     * @param resource Unique identifier for the resource that should be guarded by this lock.
+     * @return A {@link Lock} object, if a lock was obtained. An empty {@link Optional}, if no lock could be acquired.
+     */
+    Optional<Lock> lock(@Nonnull String resource);
+
+    /**
      * Extend the expiry time of an existing lock.
      *
      * @param existingLock the lock that should be extended.
@@ -41,6 +49,19 @@ public interface LockService {
     Optional<Lock> extendLock(@Nonnull Lock existingLock);
 
 
+    /**
+     * Unlock an existing lock.
+     *
+     * @param resource Unique identifier for the resource that was guarded by this lock.
+     * @param lockContext the lockContext that was used to guard this lock.
+     * @return A {@link Lock} object, if the lock could be unlocked. An empty {@link Optional}, if no lock was found.
+     */
     Optional<Lock> unlock(@Nonnull String resource, @Nullable String lockContext);
+
+    /**
+     * Unlock an existing lock.
+     * @param lock The lock to unlock.
+     * @return A {@link Lock} object, if the lock could be unlocked. An empty {@link Optional}, if no lock was found.
+     */
     Optional<Lock> unlock(Lock lock);
 }

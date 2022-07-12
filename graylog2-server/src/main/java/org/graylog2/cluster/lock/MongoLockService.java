@@ -101,15 +101,19 @@ public class MongoLockService implements LockService {
 
     @Override
     public Optional<Lock> lock(@Nonnull String resource, @Nullable String lockContext) {
-        if (lockContext == null) {
-            return doLock(resource, nodeId.toString());
-        }
-        return doLock(resource, nodeId.toString() + "-" + lockContext);
+        return doLock(resource, getLockedByString(lockContext));
+    }
+    @Override
+    public Optional<Lock> lock(@Nonnull String resource) {
+        return lock(resource, null);
     }
 
     @Override
     public Optional<Lock> extendLock(@Nonnull Lock lock) {
-        return doLock(lock.resource(), lock.lockedBy());
+        if (lock != null) {
+            return doLock(lock.resource(), lock.lockedBy());
+        }
+        return Optional.empty();
     }
 
     private Optional<Lock> doLock(@Nonnull String resource, @Nonnull String lockedBy) {
@@ -138,15 +142,15 @@ public class MongoLockService implements LockService {
 
     @Override
     public Optional<Lock> unlock(@Nonnull String resource, @Nullable String lockContext) {
-        if (lockContext == null) {
-            return doUnlock(resource, nodeId.toString());
-        }
-        return doUnlock(resource, nodeId.toString() + "-" + lockContext);
+        return doUnlock(resource, getLockedByString(lockContext));
     }
 
     @Override
     public Optional<Lock> unlock(@Nonnull Lock lock) {
-        return doUnlock(lock.resource(), lock.lockedBy());
+        if (lock != null) {
+            return doUnlock(lock.resource(), lock.lockedBy());
+        }
+        return Optional.empty();
     }
 
     private Optional<Lock> doUnlock(@Nonnull String resource, @Nonnull String lockedBy) {
@@ -178,6 +182,13 @@ public class MongoLockService implements LockService {
                 .updatedAt(updatedAt)
                 .lockedBy(doc.getString(FIELD_LOCKED_BY))
                 .build();
+    }
+
+    private String getLockedByString(@Nullable String lockContext) {
+        if (lockContext == null) {
+            return nodeId.toString();
+        }
+        return nodeId.toString() + "-" + lockContext;
     }
 }
 
