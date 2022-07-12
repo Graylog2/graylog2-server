@@ -21,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog2.database.entities.Entity;
-import org.graylog2.database.entities.EntityMetadata;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.ScopedEntity;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -32,8 +32,8 @@ import java.util.Optional;
  * Again, not as good, but it's something.
  */
 @JsonAutoDetect
-@JsonDeserialize(builder = MyEntity.Builder.class)
-public abstract class MyEntity extends Entity {
+@JsonDeserialize(builder = MyScopedEntity.Builder.class)
+public abstract class MyScopedEntity extends ScopedEntity {
 
     public static final String TITLE = "title";
     public static final String DESCRIPTION = "description";
@@ -45,11 +45,7 @@ public abstract class MyEntity extends Entity {
     @JsonProperty(DESCRIPTION)
     public abstract Optional<String> description();
 
-    @Override
-    public MyEntity withMetadata(EntityMetadata metadata) {
-        return toBuilder().metadata(metadata).build();
-    }
-
+    // TODO: try to figure out a better way to call the parent builder (ScopedEntity::Builder) to supply the default scope.
     public static Builder builder() {
         return Builder.create();
     }
@@ -57,13 +53,11 @@ public abstract class MyEntity extends Entity {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public abstract static class Builder extends Entity.Builder<Builder> {
+    public abstract static class Builder extends ScopedEntity.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_MyEntity.Builder()
-                    // This needs to be done manually for each entity, I think there is no way to do it automatically
-                    // One option could be to write an auto-value extension
-                    .metadata(EntityMetadata.createDefault());
+            return new AutoValue_MyScopedEntity.Builder()
+                    .scope(DefaultEntityScope.NAME);
         }
 
         @JsonProperty(TITLE)
@@ -72,6 +66,6 @@ public abstract class MyEntity extends Entity {
         @JsonProperty(DESCRIPTION)
         public abstract Builder description(@Nullable String description);
 
-        public abstract MyEntity build();
+        public abstract MyScopedEntity build();
     }
 }
