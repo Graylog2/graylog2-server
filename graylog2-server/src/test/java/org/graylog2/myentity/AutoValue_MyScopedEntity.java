@@ -17,30 +17,29 @@
 package org.graylog2.myentity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog2.database.entities.EntityMetadata;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-final class AutoValue_MyEntity extends MyEntity {
+final class AutoValue_MyScopedEntity extends MyScopedEntity {
 
     private final String id;
 
-    private final EntityMetadata metadata;
+    private final String scope;
 
     private final String title;
 
     private final Optional<String> description;
 
-    private AutoValue_MyEntity(
+    private AutoValue_MyScopedEntity(
             @Nullable String id,
-            EntityMetadata metadata,
+            String scope,
             String title,
             Optional<String> description) {
         this.id = id;
-        this.metadata = metadata;
+        this.scope = scope;
         this.title = title;
         this.description = description;
     }
@@ -54,10 +53,10 @@ final class AutoValue_MyEntity extends MyEntity {
         return id;
     }
 
-    @JsonProperty("_metadata")
+    @JsonProperty("_scope")
     @Override
-    public EntityMetadata metadata() {
-        return metadata;
+    public String scope() {
+        return scope;
     }
 
     @JsonProperty("title")
@@ -76,7 +75,7 @@ final class AutoValue_MyEntity extends MyEntity {
     public String toString() {
         return "MyEntity{"
                 + "id=" + id + ", "
-                + "metadata=" + metadata + ", "
+                + "scope=" + scope + ", "
                 + "title=" + title + ", "
                 + "description=" + description
                 + "}";
@@ -87,10 +86,10 @@ final class AutoValue_MyEntity extends MyEntity {
         if (o == this) {
             return true;
         }
-        if (o instanceof MyEntity) {
-            MyEntity that = (MyEntity) o;
+        if (o instanceof MyScopedEntity) {
+            MyScopedEntity that = (MyScopedEntity) o;
             return (this.id == null ? that.id() == null : this.id.equals(that.id()))
-                    && this.metadata.equals(that.metadata())
+                    && this.scope.equals(that.scope())
                     && this.title.equals(that.title())
                     && this.description.equals(that.description());
         }
@@ -103,7 +102,7 @@ final class AutoValue_MyEntity extends MyEntity {
         h$ *= 1000003;
         h$ ^= (id == null) ? 0 : id.hashCode();
         h$ *= 1000003;
-        h$ ^= metadata.hashCode();
+        h$ ^= scope.hashCode();
         h$ *= 1000003;
         h$ ^= title.hashCode();
         h$ *= 1000003;
@@ -112,43 +111,34 @@ final class AutoValue_MyEntity extends MyEntity {
     }
 
     @Override
-    public MyEntity.Builder toBuilder() {
+    public MyScopedEntity.Builder toBuilder() {
         return new Builder(this);
     }
 
-    static final class Builder extends MyEntity.Builder {
+    static final class Builder extends MyScopedEntity.Builder {
         private String id;
-        private EntityMetadata metadata;
+        private String scope;
         private String title;
         private Optional<String> description = Optional.empty();
 
         Builder() {
         }
 
-        private Builder(MyEntity source) {
+        private Builder(MyScopedEntity source) {
             this.id = source.id();
-            this.metadata = source.metadata();
+            this.scope = source.scope();
             this.title = source.title();
             this.description = source.description();
         }
 
         @Override
-        public MyEntity.Builder id(@Nullable String id) {
+        public MyScopedEntity.Builder id(@Nullable String id) {
             this.id = id;
             return this;
         }
 
         @Override
-        public MyEntity.Builder metadata(EntityMetadata metadata) {
-            if (metadata == null) {
-                throw new NullPointerException("Null metadata");
-            }
-            this.metadata = metadata;
-            return this;
-        }
-
-        @Override
-        public MyEntity.Builder title(String title) {
+        public MyScopedEntity.Builder title(String title) {
             if (title == null) {
                 throw new NullPointerException("Null title");
             }
@@ -157,26 +147,30 @@ final class AutoValue_MyEntity extends MyEntity {
         }
 
         @Override
-        public MyEntity.Builder description(@Nullable String description) {
+        public MyScopedEntity.Builder scope(String scope) {
+            this.scope = scope;
+            return this;
+        }
+
+        @Override
+        public MyScopedEntity.Builder description(@Nullable String description) {
             this.description = Optional.ofNullable(description);
             return this;
         }
 
         @Override
-        public MyEntity build() {
+        public MyScopedEntity build() {
             String missing = "";
-            if (this.metadata == null) {
-                missing += " metadata";
-            }
+
             if (this.title == null) {
                 missing += " title";
             }
             if (!missing.isEmpty()) {
                 throw new IllegalStateException("Missing required properties:" + missing);
             }
-            return new AutoValue_MyEntity(
+            return new AutoValue_MyScopedEntity(
                     this.id,
-                    this.metadata,
+                    this.scope,
                     this.title,
                     this.description);
         }

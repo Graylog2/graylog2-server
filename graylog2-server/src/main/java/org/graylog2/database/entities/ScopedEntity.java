@@ -21,36 +21,36 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import javax.ws.rs.DefaultValue;
 
 /**
  * Entity base class, which can be used to enforce that each entity implementation
  * has the required id and metadata fields.
  */
-// TODO: we might consider renaming these 'Entity' classes.  There is already the notion of 'Entities' in content pack management, which has an entirely different meaning.
-public abstract class Entity {
-    private static final String ID = "id";
-    static final String METADATA = "_metadata";
 
-    // The @Id and @ObjectId annotations take care of converting the "id" field name to "_id" when storing/loading
-    // values to/from the database.
+public abstract class ScopedEntity {
+    public static final String FIELD_ID = "id";
+    public static final String FIELD_SCOPE = "scope";
+
     @Id
     @ObjectId
     @Nullable
-    @JsonProperty(ID)
+    @JsonProperty(FIELD_ID)
     public abstract String id();
 
-    @JsonProperty(METADATA)
-    public abstract EntityMetadata metadata();
-
-    public abstract <T extends Entity> T withMetadata(EntityMetadata metadata);
+    @JsonProperty(FIELD_SCOPE)
+    @Nullable
+    public abstract String scope();
 
     public static abstract class Builder<SELF extends Builder<SELF>> {
         @Id
         @ObjectId
-        @JsonProperty(ID)
+        @JsonProperty(FIELD_ID)
         public abstract SELF id(@Nullable String id);
 
-        @JsonProperty(METADATA)
-        public abstract SELF metadata(EntityMetadata metadata);
+        @JsonProperty(FIELD_SCOPE)
+        @DefaultValue("default")
+        public abstract SELF scope(String scope);
+        
     }
 }

@@ -22,17 +22,14 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.entities.DefaultEntityScope;
-import org.graylog2.database.entities.Entity;
-import org.graylog2.database.entities.EntityMetadata;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,99 +41,99 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class MyEntityDBServiceTest {
     private static final EntityScope IMMUTABLE_SCOPE = new ImmutableEntityScope();
 
-    private MongoJackObjectMapperProvider mapperProvider;
-    private MyEntityDBService dbService;
-    private ObjectMapper objectMapper;
+    private MyScopedEntityDBService dbService;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
-        this.objectMapper = new ObjectMapperProvider().get();
-        this.mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+        ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
         Set<EntityScope> scopes = ImmutableSet.of(new DefaultEntityScope(), IMMUTABLE_SCOPE);
         EntityScopeService entityScopeService = new EntityScopeService(scopes);
 
-        this.dbService = new MyEntityDBService(mongodb.mongoConnection(), mapperProvider, entityScopeService);
+        this.dbService = new MyScopedEntityDBService(mongodb.mongoConnection(), mapperProvider, entityScopeService);
     }
 
     @Test
     void testSaveWithNewEntity() {
-        final ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 
-        final MyEntity newEntity = MyEntity.builder().title("Hello world").build();
+        final MyScopedEntity newEntity = MyScopedEntity.builder().title("Hello world").build();
 
-        final MyEntity savedEntity = dbService.save(newEntity);
+        final MyScopedEntity savedEntity = dbService.save(newEntity);
 
-        assertThat(savedEntity).isInstanceOf(Entity.class);
+        assertThat(savedEntity).isInstanceOf(ScopedEntity.class);
         assertThat(savedEntity.title()).isEqualTo("Hello world");
-        assertThat(savedEntity.metadata()).satisfies(metadata -> {
-            assertThat(metadata.version()).isEqualTo(EntityMetadata.DEFAULT_VERSION);
-            assertThat(metadata.scope()).isEqualTo(DefaultEntityScope.NAME);
-            assertThat(metadata.rev()).isEqualTo(EntityMetadata.DEFAULT_REV);
-            assertThat(metadata.createdAt()).isAfterOrEqualTo(now);
-            assertThat(metadata.updatedAt()).isAfterOrEqualTo(now);
-        });
+        assertThat(savedEntity.scope()).isEqualTo(DefaultEntityScope.NAME);
     }
 
     @Test
     void testSaveWithUpdatedEntity() {
-        final ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 
-        final MyEntity newEntity = MyEntity.builder().title("Hello world").build();
+        final MyScopedEntity newEntity = MyScopedEntity.builder().title("Hello world").build();
 
-        final MyEntity savedEntity = dbService.save(newEntity);
+        final MyScopedEntity savedEntity = dbService.save(newEntity);
 
-        final MyEntity loadedEntity = dbService.get(savedEntity.id()).orElse(null);
+        final MyScopedEntity loadedEntity = dbService.get(savedEntity.id()).orElse(null);
 
         assertThat(loadedEntity).isNotNull();
-        assertThat(loadedEntity).isInstanceOf(Entity.class);
+        assertThat(loadedEntity).isInstanceOf(ScopedEntity.class);
         assertThat(loadedEntity.title()).isEqualTo("Hello world");
-        assertThat(loadedEntity.metadata()).satisfies(metadata -> {
-            assertThat(metadata.version()).isEqualTo(EntityMetadata.DEFAULT_VERSION);
-            assertThat(metadata.scope()).isEqualTo(DefaultEntityScope.NAME);
-            assertThat(metadata.rev()).isEqualTo(EntityMetadata.DEFAULT_REV);
-            assertThat(metadata.createdAt()).isAfterOrEqualTo(now);
-            assertThat(metadata.updatedAt()).isAfterOrEqualTo(now);
-        });
+        assertThat(savedEntity.scope()).isEqualTo(DefaultEntityScope.NAME);
 
-        final MyEntity updatedEntity = loadedEntity.toBuilder()
+        final MyScopedEntity updatedEntity = loadedEntity.toBuilder()
                 .title("Another title")
                 .description("A description")
                 .build();
 
-        final MyEntity savedUpdatedEntity = dbService.save(updatedEntity);
+        final MyScopedEntity savedUpdatedEntity = dbService.save(updatedEntity);
 
         assertThat(savedUpdatedEntity).isNotNull();
-        assertThat(savedUpdatedEntity).isInstanceOf(Entity.class);
+        assertThat(savedUpdatedEntity).isInstanceOf(ScopedEntity.class);
         assertThat(savedUpdatedEntity.title()).isEqualTo("Another title");
         assertThat(savedUpdatedEntity.description()).get().isEqualTo("A description");
-        assertThat(savedUpdatedEntity.metadata()).satisfies(metadata -> {
-            assertThat(metadata.version()).isEqualTo(EntityMetadata.DEFAULT_VERSION);
-            assertThat(metadata.scope()).isEqualTo(DefaultEntityScope.NAME);
-            assertThat(metadata.rev()).isEqualTo(2);
-            assertThat(metadata.createdAt()).isEqualTo(loadedEntity.metadata().createdAt());
-            assertThat(metadata.updatedAt()).isAfter(loadedEntity.metadata().updatedAt());
-        });
+        assertThat(savedEntity.scope()).isEqualTo(DefaultEntityScope.NAME);
+
     }
 
     @Test
     void testImmutableInsert() {
 
-        MyEntity immutablyScopedEntity = createEntity("An immutable entity", IMMUTABLE_SCOPE);
+        MyScopedEntity immutablyScopedEntity = createEntity("An immutable entity", IMMUTABLE_SCOPE.getName());
 
         //This entity is immutable, but expect no error as it is an insert (new entity).
         assertDoesNotThrow(() -> dbService.save(immutablyScopedEntity));
     }
 
     @Test
+    void testSaveNewWithNullScope() {
+        MyScopedEntity entity = createEntity("A new entity with null scope", null);
+
+        // Saving entity with null scope should be okay--null scope is a valid scope
+        assertDoesNotThrow(() -> dbService.save(entity));
+    }
+
+    @Test
+    void testSaveUpdateWithNullScope() {
+        MyScopedEntity originalEntity = createEntity("A new entity with null scope", null);
+        MyScopedEntity saved = dbService.save(originalEntity);
+
+        assertThat(saved).isNotNull();
+        MyScopedEntity updated = saved.toBuilder().title("Updated Entity with null scope").build();
+
+        // We do not expect this to fail as it has a null scope which is interpreted as mutable.
+        assertDoesNotThrow(() -> dbService.save(updated));
+
+    }
+
+    @Test
     void testImmutableUpdate() {
 
-        MyEntity immutablyScopedEntity = createEntity("An immutable entity", IMMUTABLE_SCOPE);
+        MyScopedEntity immutablyScopedEntity = createEntity("An immutable entity", IMMUTABLE_SCOPE.getName());
 
         //This entity is immutable, but expect no error as it is an insert (new entity).
-        MyEntity savedEntity = dbService.save(immutablyScopedEntity);
+        MyScopedEntity savedEntity = dbService.save(immutablyScopedEntity);
 
-        MyEntity updatedEntity = savedEntity.toBuilder()
+        MyScopedEntity updatedEntity = savedEntity.toBuilder()
                 .description("Trying to update an immutable entity--this should fail")
                 .build();
 
@@ -148,44 +145,34 @@ class MyEntityDBServiceTest {
     @Test
     void testImmutableDelete() {
 
-        MyEntity immutablyScopedEntity = createEntity("An immutable entity", IMMUTABLE_SCOPE);
+        MyScopedEntity immutablyScopedEntity = createEntity("An immutable entity", IMMUTABLE_SCOPE.getName());
 
         //This entity is immutable, but expect no error as it is an insert (new entity).
-        MyEntity savedEntity = dbService.save(immutablyScopedEntity);
+        MyScopedEntity savedEntity = dbService.save(immutablyScopedEntity);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> dbService.delete(savedEntity.id()));
         String expectedError = "Immutable entity cannot be modified";
         assertEquals(expectedError, exception.getMessage());
     }
 
-    private MyEntity createEntity(String title, EntityScope scope) {
-        final EntityMetadata metadata = createMetadata(scope.getName());
-        return MyEntity.builder().title(title)
-                .metadata(metadata)
-                .build();
-    }
+    private MyScopedEntity createEntity(String title, String scope) {
 
-    private EntityMetadata createMetadata(String scope) {
-        return EntityMetadata.builder()
-                .rev(1)
-                .version("1")
+        return MyScopedEntity.builder().title(title)
                 .scope(scope)
                 .build();
     }
-
+    
     private static final class ImmutableEntityScope implements EntityScope {
 
-        private final String name = "immutable_entity_scope_test";
-        private final boolean mutable = false;
 
         @Override
         public String getName() {
-            return name;
+            return "immutable_entity_scope_test";
         }
 
         @Override
         public boolean isMutable() {
-            return mutable;
+            return false;
         }
     }
 }

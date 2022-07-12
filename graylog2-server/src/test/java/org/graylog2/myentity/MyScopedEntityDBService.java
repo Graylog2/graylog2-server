@@ -18,22 +18,22 @@ package org.graylog2.myentity;
 
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.entities.EntityDbService;
 import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ScopedEntityDbService;
 
 import javax.inject.Inject;
 
 /**
  * Specific MyEntity DB service implementation.
  */
-public class MyEntityDBService extends EntityDbService<MyEntity> {
+public class MyScopedEntityDBService extends ScopedEntityDbService<MyScopedEntity> {
 
     public static final String COLLECTION_NAME = "my_entities";
 
     @Inject
-    public MyEntityDBService(MongoConnection mongoConnection,
-                             MongoJackObjectMapperProvider mapper,
-                             EntityScopeService entityScopeService) {
-        super(mongoConnection, mapper, MyEntity.class, COLLECTION_NAME, entityScopeService);
+    public MyScopedEntityDBService(MongoConnection mongoConnection,
+                                   MongoJackObjectMapperProvider mapper,
+                                   EntityScopeService entityScopeService) {
+        super(mongoConnection, mapper, MyScopedEntity.class, COLLECTION_NAME, entityScopeService);
     }
 }

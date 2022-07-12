@@ -42,14 +42,15 @@ public class EntityScopeService {
         return Collections.unmodifiableList(new ArrayList<>(entityScopes.values()));
     }
 
-    public boolean isMutable(Entity entity) {
+    public boolean isMutable(ScopedEntity scopedEntity) {
 
-        Objects.requireNonNull(entity, "Entity must not be null");
-        Objects.requireNonNull(entity.metadata(), "Entity Metadata must not be null");
-        String scope = entity.metadata().scope();
+        Objects.requireNonNull(scopedEntity, "Entity must not be null");
 
+        String scope = scopedEntity.scope();
+
+        // TODO: Should it fail instead?
         if (scope == null || scope.isEmpty()) {
-            throw new IllegalArgumentException("Entity Scope must not be empty");
+            return true;
         }
 
         EntityScope entityScope = entityScopes.get(scope);
@@ -61,11 +62,12 @@ public class EntityScopeService {
 
     }
 
-    public boolean hasValidScope(Entity entity) {
-        Objects.requireNonNull(entity, "Entity must not be null");
-        Objects.requireNonNull(entity.metadata(), "Entity Metadata must not be null");
-        String scope = entity.metadata().scope();
+    // TODO: Give further consideration to whether the scope can be null here.
+    public boolean hasValidScope(ScopedEntity scopedEntity) {
+        Objects.requireNonNull(scopedEntity, "Entity must not be null");
 
-        return entityScopes.containsKey(scope);
+        String scope = scopedEntity.scope();
+
+        return scope == null || entityScopes.containsKey(scope);
     }
 }
