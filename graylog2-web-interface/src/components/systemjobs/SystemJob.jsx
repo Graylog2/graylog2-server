@@ -16,12 +16,31 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ProgressBar, LinkToNode, RelativeTime, Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
 import { SystemJobsActions } from 'stores/systemjobs/SystemJobsStore';
 import UserNotification from 'util/UserNotification';
+import { StyledBadge } from 'components/bootstrap/Badge';
+
+const StatusBadge = styled(StyledBadge)(({ status, theme }) => {
+  const { success, info, warning, danger } = theme.colors.variant.dark;
+  const statuses = {
+    complete: success,
+    runnable: info,
+    running: info,
+    edited: warning,
+    error: danger,
+    cancelled: warning,
+  };
+
+  return css`
+    margin-left: 4px;
+    background-color: ${statuses[status]};
+    color: ${theme.utils.readableColor(statuses[status])};
+  `;
+});
 
 const StyledProgressBar = styled(ProgressBar)`
   margin-top: 2px;
@@ -34,6 +53,8 @@ const JobWrap = styled.div`
 `;
 
 const SystemJob = ({ job }) => {
+  const jobIsDone = job.job_status === 'complete' || job.percent_complete === 100;
+
   const _onAcknowledge = () => {
     return (e) => {
       e.preventDefault();
@@ -57,8 +78,6 @@ const SystemJob = ({ job }) => {
     };
   };
 
-  const jobIsDone = job.job_status === 'complete' || job.percent_complete === 100;
-
   return (
     <div>
       <JobWrap>
@@ -66,6 +85,8 @@ const SystemJob = ({ job }) => {
         <span data-toggle="tooltip" title={job.name}>{job.info}</span>{' '}
         - Started on <LinkToNode nodeId={job.node_id} />{' '}
         <RelativeTime dateTime={job.started_at} />{' '}
+        -&nbsp;
+        <StatusBadge status={job.job_status}>{job.job_status}</StatusBadge>&nbsp;
         {!jobIsDone && job.is_cancelable
           ? (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={_onCancel()}>Cancel Job</Button>)
           : (<Button type="button" bsSize="xs" bsStyle="success" className="pull-right" onClick={_onAcknowledge()}>Acknowledge Job</Button>)}
