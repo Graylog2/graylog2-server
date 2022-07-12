@@ -17,10 +17,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { SystemJob } from 'components/systemjobs';
 
 import { Alert } from 'components/bootstrap';
 import { Icon } from 'components/common';
-import { SystemJob } from 'components/systemjobs';
 
 const SystemJobWrap = styled.div(({ theme }) => css`
   margin-top: 10px;
@@ -45,12 +45,8 @@ const StyledAlert = styled(Alert)`
   margin-top: 10px;
 `;
 
-class SystemJobsList extends React.Component {
-  static propTypes = {
-    jobs: PropTypes.arrayOf(PropTypes.object).isRequired,
-  };
-
-  _formatSystemJob = (job) => {
+const SystemJobsList = ({ jobs }): React.ReactElement => {
+  const formatSystemJob = (job) => {
     return (
       <SystemJobWrap key={`job-${job.id}`}>
         <SystemJob job={job} />
@@ -58,25 +54,26 @@ class SystemJobsList extends React.Component {
     );
   };
 
-  render() {
-    const { jobs } = this.props;
-    const formattedJobs = jobs.map(this._formatSystemJob);
+  const formattedJobs = jobs.map(formatSystemJob);
 
-    if (formattedJobs.length === 0) {
-      return (
+  return (
+    (formattedJobs.length === 0)
+      ? (
         <StyledAlert bsStyle="info">
           <Icon name="info-circle" />{' '}
           &nbsp;No active system jobs.
         </StyledAlert>
-      );
-    }
+      )
+      : (
+        <span>
+          {formattedJobs}
+        </span>
+      )
+  );
+};
 
-    return (
-      <span>
-        {formattedJobs}
-      </span>
-    );
-  }
-}
+SystemJobsList.propTypes = {
+  jobs: PropTypes.arrayOf(PropTypes.object).isRequired,
+};
 
 export default SystemJobsList;
