@@ -16,9 +16,6 @@
  */
 import loadAsync from 'routing/loadAsync';
 
-const AlertConditionsPage = loadAsync(() => import('./AlertConditionsPage'));
-const AlertNotificationsPage = loadAsync(() => import('./AlertNotificationsPage'));
-const AlertsPage = loadAsync(() => import('./AlertsPage'));
 const AuthenticationBackendCreatePage = loadAsync(() => import('./AuthenticationBackendCreatePage'));
 const AuthenticationBackendDetailsPage = loadAsync(() => import('./AuthenticationBackendDetailsPage'));
 const AuthenticationBackendEditPage = loadAsync(() => import('./AuthenticationBackendEditPage'));
@@ -34,7 +31,6 @@ const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotific
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
 const DelegatedSearchPage = loadAsync(() => import('./DelegatedSearchPage'));
-const EditAlertConditionPage = loadAsync(() => import('./EditAlertConditionPage'));
 const EditEventDefinitionPage = loadAsync(() => import('./EditEventDefinitionPage'));
 const EditEventNotificationPage = loadAsync(() => import('./EditEventNotificationPage'));
 const EditContentPackPage = loadAsync(() => import('pages/EditContentPackPage'));
@@ -60,8 +56,6 @@ const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pa
 const LUTCachesPage = loadAsync(() => import('./LUTCachesPage'));
 const LUTDataAdaptersPage = loadAsync(() => import('./LUTDataAdaptersPage'));
 const LUTTablesPage = loadAsync(() => import('./LUTTablesPage'));
-const NewAlertConditionPage = loadAsync(() => import('./NewAlertConditionPage'));
-const NewAlertNotificationPage = loadAsync(() => import('./NewAlertNotificationPage'));
 const NodeInputsPage = loadAsync(() => import('./NodeInputsPage'));
 const NodesPage = loadAsync(() => import('./NodesPage'));
 const NotFoundPage = loadAsync(() => import('./NotFoundPage'));
@@ -73,7 +67,6 @@ const RolesOverviewPage = loadAsync(() => import('./RolesOverviewPage'));
 const RuleDetailsPage = loadAsync(() => import('./RuleDetailsPage'));
 const RulesPage = loadAsync(() => import('./RulesPage'));
 const SecurityPage = loadAsync(() => import('./SecurityPage'));
-const ShowAlertPage = loadAsync(() => import('./ShowAlertPage'));
 const ShowContentPackPage = loadAsync(() => import('pages/ShowContentPackPage'));
 const ShowEventNotificationPage = loadAsync(() => import('./ShowEventNotificationPage'));
 const ShowMessagePage = loadAsync(() => import('./ShowMessagePage'));
@@ -89,7 +82,6 @@ const SidecarsPage = loadAsync(() => import('pages/SidecarsPage'));
 const SidecarStatusPage = loadAsync(() => import('pages/SidecarStatusPage'));
 const SimulatorPage = loadAsync(() => import('./SimulatorPage'));
 const StartPage = loadAsync(() => import('./StartPage'));
-const StreamAlertsOverviewPage = loadAsync(() => import('pages/StreamAlertsOverviewPage'));
 const StreamEditPage = loadAsync(() => import('./StreamEditPage'));
 const StreamOutputsPage = loadAsync(() => import('./StreamOutputsPage'));
 const StreamsPage = loadAsync(() => import('./StreamsPage'));
@@ -105,9 +97,6 @@ const UsersOverviewPage = loadAsync(() => import('./UsersOverviewPage'));
 const ViewEventDefinitionPage = loadAsync(() => import('./ViewEventDefinitionPage'));
 
 export {
-  AlertConditionsPage,
-  AlertNotificationsPage,
-  AlertsPage,
   AuthenticationCreatePage,
   AuthenticationPage,
   AuthenticationBackendCreatePage,
@@ -123,7 +112,6 @@ export {
   CreateContentPackPage,
   CreateExtractorsPage,
   DelegatedSearchPage,
-  EditAlertConditionPage,
   EditEventDefinitionPage,
   EditEventNotificationPage,
   EditContentPackPage,
@@ -149,8 +137,6 @@ export {
   LUTCachesPage,
   LUTDataAdaptersPage,
   LUTTablesPage,
-  NewAlertConditionPage,
-  NewAlertNotificationPage,
   NodeInputsPage,
   NodesPage,
   NotFoundPage,
@@ -163,7 +149,6 @@ export {
   RuleDetailsPage,
   RulesPage,
   SecurityPage,
-  ShowAlertPage,
   ShowContentPackPage,
   ShowEventNotificationPage,
   ShowMessagePage,
@@ -179,7 +164,6 @@ export {
   SidecarStatusPage,
   SimulatorPage,
   StartPage,
-  StreamAlertsOverviewPage,
   StreamEditPage,
   StreamOutputsPage,
   StreamsPage,

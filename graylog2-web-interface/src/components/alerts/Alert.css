@@ -1,8 +1,0 @@
-:local(.alertDescription) dt {
-    width: 50px;
-    text-align: left;
-}
-
-:local(.alertDescription) dd {
-    margin-left: 70px;
-}
