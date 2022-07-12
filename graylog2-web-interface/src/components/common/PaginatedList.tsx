@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
@@ -61,26 +61,21 @@ const PaginatedList = ({
 }: Props) => {
   const isMounted = useIsMountedRef();
 
-  const { page, setPage } = usePaginationQueryParameter();
+  const { page, setPage, pageSize, setPageSize } = usePaginationQueryParameter(pageSizes);
   const currentPage = page > 0 ? page : INITIAL_PAGE;
-  const [pageSize, setPageSize] = useState(propsPageSize);
   const numberPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 0;
 
   useEffect(() => {
-    if (isMounted && currentPage !== activePage) {
+    if (isMounted.current && ((currentPage !== activePage) || (pageSize !== propsPageSize))) {
       onChange(currentPage, pageSize);
+      isMounted.current = false;
     }
-  }, [isMounted, currentPage, pageSize, activePage, onChange]);
-
-  useEffect(() => {
-    setPageSize(propsPageSize);
-  }, [propsPageSize]);
+  }, [isMounted, currentPage, pageSize, activePage, propsPageSize, onChange]);
 
   const _onChangePageSize = (event: React.ChangeEvent<HTMLOptionElement>) => {
     event.preventDefault();
     const newPageSize = Number(event.target.value);
 
-    setPage(INITIAL_PAGE);
     setPageSize(newPageSize);
     onChange(INITIAL_PAGE, newPageSize);
   };
