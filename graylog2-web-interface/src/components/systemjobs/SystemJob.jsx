@@ -92,9 +92,7 @@ const SystemJob = ({ job }) => {
           : (<Button type="button" bsSize="xs" bsStyle="success" className="pull-right" onClick={_onAcknowledge()}>Acknowledge Job</Button>)}
       </JobWrap>
 
-      {jobIsDone
-        ? <span className="label label-success finished">Finished!</span>
-        : <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}
+      {!jobIsDone && <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}
     </div>
   );
 };
