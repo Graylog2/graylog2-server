@@ -88,8 +88,8 @@ const SystemJob = ({ job }) => {
         -&nbsp;
         <StatusBadge status={job.job_status}>{job.job_status}</StatusBadge>&nbsp;
         {!jobIsDone && job.is_cancelable
-          ? (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={_onCancel()}>Cancel Job</Button>)
-          : (<Button type="button" bsSize="xs" bsStyle="success" className="pull-right" onClick={_onAcknowledge()}>Acknowledge Job</Button>)}
+          ? (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={_onCancel()}>Cancel</Button>)
+          : (<Button type="button" bsSize="xs" bsStyle="success" className="pull-right" onClick={_onAcknowledge()}>Acknowledge</Button>)}
       </JobWrap>
 
       {!jobIsDone && <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}
