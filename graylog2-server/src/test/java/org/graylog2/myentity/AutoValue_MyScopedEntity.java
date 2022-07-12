@@ -53,7 +53,7 @@ final class AutoValue_MyScopedEntity extends MyScopedEntity {
         return id;
     }
 
-    @JsonProperty("_scope")
+    @JsonProperty("scope")
     @Override
     public String scope() {
         return scope;

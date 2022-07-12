@@ -21,7 +21,6 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-import javax.ws.rs.DefaultValue;
 
 /**
  * Entity base class, which can be used to enforce that each entity implementation
@@ -49,8 +48,6 @@ public abstract class ScopedEntity {
         public abstract SELF id(@Nullable String id);
 
         @JsonProperty(FIELD_SCOPE)
-        @DefaultValue("default")
         public abstract SELF scope(String scope);
-        
     }
 }
