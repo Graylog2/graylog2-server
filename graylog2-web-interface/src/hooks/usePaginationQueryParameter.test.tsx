@@ -22,6 +22,7 @@ import { asMock } from 'helpers/mocking';
 
 import usePaginationQueryParameter from './usePaginationQueryParameter';
 
+const DEFAULT_PAGE_SIZES = [10, 50, 100];
 const mockHistoryReplace = jest.fn();
 
 jest.mock('react-router-dom', () => ({
@@ -37,7 +38,7 @@ jest.mock('react-router-dom', () => ({
 
 describe('usePaginationQueryParameter custom hook', () => {
   it('should use default pagination if there is no <page> query parameter', () => {
-    const { result } = renderHook(() => usePaginationQueryParameter());
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
 
     const { page } = result.current;
 
@@ -45,7 +46,7 @@ describe('usePaginationQueryParameter custom hook', () => {
   });
 
   it('should set <page> query parameter with the value sent in setPage', () => {
-    const { result } = renderHook(() => usePaginationQueryParameter());
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
 
     const { page, setPage } = result.current;
 
@@ -65,7 +66,7 @@ describe('usePaginationQueryParameter custom hook', () => {
       search: `?page=${currentPage}`,
     } as Location<{ search: string }>);
 
-    const { result } = renderHook(() => usePaginationQueryParameter());
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
 
     const { page } = result.current;
 
