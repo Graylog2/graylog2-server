@@ -75,7 +75,7 @@ export const SystemJobsStore = singletonStore(
         delete (this.jobsById[response.id]);
       });
 
-      SystemJobsActions.cancelJob.promise(promise);
+      SystemJobsActions.acknowledgeJob.promise(promise);
     },
     cancelJob(jobId) {
       const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.cancelJob(jobId).url);

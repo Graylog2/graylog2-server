@@ -21,6 +21,7 @@ import styled from 'styled-components';
 import { ProgressBar, LinkToNode, RelativeTime, Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
 import { SystemJobsActions } from 'stores/systemjobs/SystemJobsStore';
+import UserNotification from 'util/UserNotification';
 
 const StyledProgressBar = styled(ProgressBar)`
   margin-top: 2px;
@@ -37,7 +38,9 @@ const SystemJob = ({ job }) => {
     return (e) => {
       e.preventDefault();
 
-      SystemJobsActions.acknowledgeJob(job.id);
+      SystemJobsActions.acknowledgeJob(job.id).catch((error) => {
+        UserNotification.error(error.responseMessage, 'Unable to acknowledge the job');
+      });
     };
   };
 
@@ -47,7 +50,9 @@ const SystemJob = ({ job }) => {
 
       // eslint-disable-next-line no-alert
       if (window.confirm(`Are you sure you want to cancel system job "${job.info}"?`)) {
-        SystemJobsActions.cancelJob(job.id);
+        SystemJobsActions.cancelJob(job.id).catch((error) => {
+          UserNotification.error(error.responseMessage, 'Unable to cancel the job');
+        });
       }
     };
   };
