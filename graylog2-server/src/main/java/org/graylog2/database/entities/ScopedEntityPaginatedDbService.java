@@ -29,14 +29,14 @@ import org.graylog2.database.PaginatedDbService;
  *
  * @param <E> type parameter for a {@link ScopedEntity}'s subclass.
  */
-public abstract class ScopedEntityDbService<E extends ScopedEntity> extends PaginatedDbService<E> {
+public abstract class ScopedEntityPaginatedDbService<E extends ScopedEntity> extends PaginatedDbService<E> {
 
     protected final EntityScopeService entityScopeService;
 
-    public ScopedEntityDbService(MongoConnection mongoConnection,
-                                 MongoJackObjectMapperProvider mapper,
-                                 Class<E> dtoClass, String collectionName,
-                                 EntityScopeService entityScopeService) {
+    public ScopedEntityPaginatedDbService(MongoConnection mongoConnection,
+                                          MongoJackObjectMapperProvider mapper,
+                                          Class<E> dtoClass, String collectionName,
+                                          EntityScopeService entityScopeService) {
         super(mongoConnection, mapper, dtoClass, collectionName);
         this.entityScopeService = entityScopeService;
     }
