@@ -17,8 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { SystemJob } from 'components/systemjobs';
 
+import { SystemJob } from 'components/systemjobs';
 import { Alert } from 'components/bootstrap';
 import { Icon } from 'components/common';
 

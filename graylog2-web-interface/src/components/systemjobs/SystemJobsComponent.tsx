@@ -16,8 +16,8 @@
  */
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { SystemJobsList } from 'components/systemjobs';
 
+import { SystemJobsList } from 'components/systemjobs';
 import { Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import connect from 'stores/connect';
