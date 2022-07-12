@@ -21,13 +21,13 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 
 /**
- * A base database service to handle persistence deletion of {@link ScopedEntity} instance.
+ * A base database service to handle persistence and deletion of {@link ScopedEntity} instance.  Persistence and deletion is performed by the parent class, {@link PaginatedDbService},  this service simply performs mutability checks.
  *
  * <p>
  * A {@link EntityScopeService} is used to perform the actual mutability checks based on the entity's <b>scope</b>.
  * </p>
  *
- * @param <E> type parameter for a {@link ScopedEntity}'s sub-class.
+ * @param <E> type parameter for a {@link ScopedEntity}'s subclass.
  */
 public abstract class ScopedEntityDbService<E extends ScopedEntity> extends PaginatedDbService<E> {
 
