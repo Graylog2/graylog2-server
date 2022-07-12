@@ -78,7 +78,7 @@ class SystemJob extends React.Component {
           <RelativeTime dateTime={job.started_at} />{' '}
           {!jobIsDone && job.is_cancelable
             ? (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={this._onCancel(job)}>Cancel Job</Button>)
-            : (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={this._onAcknowledge(job)}>Acknowledge Job</Button>)}
+            : (<Button type="button" bsSize="xs" bsStyle="success" className="pull-right" onClick={this._onAcknowledge(job)}>Acknowledge Job</Button>)}
         </JobWrap>
 
         {jobIsDone
