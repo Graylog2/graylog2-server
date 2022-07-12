@@ -86,7 +86,7 @@ const WindowList = ({ children }: Props.MenuList) => {
 };
 
 const CustomMenuList = ({ children, innerProps, ...rest }: Props.MenuList) => {
-  if (children?.length < REACT_SELECT_MAX_OPTIONS_LENGTH) {
+  if (!children?.length || (children.length < REACT_SELECT_MAX_OPTIONS_LENGTH)) {
     return (
       <Components.MenuList {...rest}
                            innerProps={{
