@@ -68,6 +68,10 @@ public class JobResourceHandlerService {
         return cancelJob(userContext, jobId).map(this::jobSummaryFromTrigger);
     }
 
+    public int acknowledgeJob(UserContext userContext, String jobId) {
+        return resourceHandlers.values().stream().map(h -> h.acknowledgeJob(userContext, jobId)).reduce(0, Integer::sum);
+    }
+
     public SystemJobSummary jobSummaryFromTrigger(JobTriggerDto trigger) {
         final JobResourceHandler handler = resourceHandlers.get(trigger.jobDefinitionType());
 

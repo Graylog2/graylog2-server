@@ -41,6 +41,10 @@ public interface JobResourceHandler {
         return Optional.empty();
     }
 
+    default int acknowledgeJob(UserContext userContext, String jobId) {
+        return 0;
+    }
+
     default JobTriggerDetails getTriggerDetails(JobTriggerDto triggerDto) {
         return JobTriggerDetails.EMPTY_DETAILS;
     }

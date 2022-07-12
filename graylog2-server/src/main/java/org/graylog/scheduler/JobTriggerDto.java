@@ -44,7 +44,7 @@ public abstract class JobTriggerDto {
     private static final String FIELD_CREATED_AT = "created_at";
     static final String FIELD_UPDATED_AT = "updated_at";
     static final String FIELD_TRIGGERED_AT = "triggered_at";
-    static final String FIELD_STATUS = "status";
+    public static final String FIELD_STATUS = "status";
     static final String FIELD_LOCK = "lock";
     static final String FIELD_SCHEDULE = "schedule";
     public static final String FIELD_DATA = "data";
