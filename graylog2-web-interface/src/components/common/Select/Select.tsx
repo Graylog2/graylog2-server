@@ -241,6 +241,7 @@ export type Props<OptionValue> = {
   value?: OptionValue,
   valueKey: string,
   valueRenderer?: (option: Option) => React.ReactElement,
+  async?: boolean,
 };
 
 type CustomComponents = {
@@ -358,6 +359,8 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     menuPlacement: PropTypes.oneOf(['top', 'bottom', 'auto']),
     /** Max height of the menu */
     maxMenuHeight: PropTypes.number,
+    /** Specifies if option are loaded asynchronously */
+    async: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -387,6 +390,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     valueRenderer: undefined,
     menuPlacement: 'auto',
     maxMenuHeight: 300,
+    async: false,
     // ref: undefined,
     menuPortalTarget: undefined,
   };
@@ -451,13 +455,13 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
   // Using ReactSelect.Creatable now needs to get values as objects or they are not display
   // This method takes care of formatting a string value into options react-select supports.
   _formatInputValue = (value: OptionValue): Array<Option> => {
-    const { options, displayKey, valueKey, delimiter, allowCreate } = this.props;
+    const { options, displayKey, valueKey, delimiter, allowCreate, async } = this.props;
 
     if (value === undefined || value === null || (typeof value === 'string' && value === '')) {
       return [];
     }
 
-    if (allowCreate && typeof value === 'string') {
+    if ((allowCreate || async) && typeof value === 'string') {
       return value.split(delimiter).map((optionValue: string) => {
         const predicate = {
           [valueKey]: optionValue,
@@ -540,6 +544,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       valueRenderer, // Do not pass down prop
       menuPortalTarget,
+      async,
       ...rest
     } = this.props;
 
@@ -556,6 +561,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       ...rest,
       onChange: onReactSelectChange || this._onChange,
       isMulti,
+      async,
       isDisabled,
       isClearable,
       getOptionLabel: (option) => option[displayKey] || option.label,
