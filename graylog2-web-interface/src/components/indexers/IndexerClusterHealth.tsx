@@ -30,7 +30,7 @@ import * as URLUtils from 'util/URLUtils';
 import IndexerClusterHealthError from './IndexerClusterHealthError';
 
 type Props = {
-  minimal: boolean,
+  minimal?: boolean,
 };
 
 const GET_INDEXER_CLUSTER_HEALTH = 'indexerCluster.health';
@@ -90,6 +90,10 @@ const IndexerClusterHealth = ({ minimal }: Props) => {
       </Col>
     </Row>
   );
+};
+
+IndexerClusterHealth.defaultProps = {
+  minimal: false,
 };
 
 export default IndexerClusterHealth;
