@@ -47,6 +47,7 @@ class BootstrapModalForm extends React.Component {
     cancelButtonText: PropTypes.string,
     /* Text to use in the submit button. "Submit" is the default */
     submitButtonText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+    submitButtonVisible: PropTypes.bool,
     submitButtonDisabled: PropTypes.bool,
     show: PropTypes.bool,
   };
@@ -57,6 +58,7 @@ class BootstrapModalForm extends React.Component {
     cancelButtonText: 'Cancel',
     submitButtonText: 'Submit',
     submitButtonDisabled: false,
+    submitButtonVisible: true,
     onModalOpen: () => {},
     onModalClose: () => {},
     onSubmitForm: undefined,
@@ -107,6 +109,7 @@ class BootstrapModalForm extends React.Component {
       cancelButtonText,
       show,
       submitButtonText,
+      submitButtonVisible,
       onModalOpen,
       title,
       children,
@@ -137,7 +140,7 @@ class BootstrapModalForm extends React.Component {
           </Modal.Body>
           <Modal.Footer>
             <Button type="button" onClick={this.onModalCancel}>{cancelButtonText}</Button>
-            <Button type="submit" disabled={submitButtonDisabled} bsStyle="primary">{submitButtonText}</Button>
+            {submitButtonVisible && <Button type="submit" disabled={submitButtonDisabled} bsStyle="primary">{submitButtonText}</Button> }
           </Modal.Footer>
         </form>
       </BootstrapModalWrapper>
