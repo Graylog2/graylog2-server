@@ -30,9 +30,9 @@ const SystemOverviewPage = () => {
   return (
     <DocumentTitle title="System overview">
       <span>
-        <IfPermitted permissions="notifications:read">
+        <hasPer permissions="notifications:read">
           <NotificationsList />
-        </IfPermitted>
+        </hasPer>
 
         <HideOnCloud>
           <IfPermitted permissions="systemjobs:read">
@@ -43,9 +43,7 @@ const SystemOverviewPage = () => {
         <GraylogClusterOverview />
 
         <HideOnCloud>
-          <IfPermitted permissions="indexercluster:read">
-            <IndexerClusterHealth />
-          </IfPermitted>
+          <IndexerClusterHealth />
 
           <IfPermitted permissions="indices:failures">
             <IndexerSystemOverviewComponent />

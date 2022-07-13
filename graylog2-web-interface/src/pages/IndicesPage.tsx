@@ -21,7 +21,7 @@ import Routes from 'routing/Routes';
 import { Col, Row, Button } from 'components/bootstrap';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import DocsHelper from 'util/DocsHelper';
-import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
+import { DocumentTitle, PageHeader } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import { IndexSetsComponent } from 'components/indices';
 import { IndexerClusterHealth } from 'components/indexers';
@@ -54,9 +54,7 @@ const IndicesPage = () => {
         {pageHeader}
 
         <HideOnCloud>
-          <IfPermitted permissions="indexercluster:read">
-            <IndexerClusterHealth minimal />
-          </IfPermitted>
+          <IndexerClusterHealth minimal />
         </HideOnCloud>
 
         <Row className="content">
