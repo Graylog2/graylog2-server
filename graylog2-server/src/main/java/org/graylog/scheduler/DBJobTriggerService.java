@@ -404,14 +404,11 @@ public class DBJobTriggerService {
             if (triggerUpdate.status().isPresent()) {
                 update.set(FIELD_STATUS, triggerUpdate.status().get());
             } else {
-                // nextTime has precedence over wasCancelled
                 update.set(FIELD_STATUS, JobTriggerStatus.RUNNABLE);
             }
             update.set(FIELD_NEXT_TIME, triggerUpdate.nextTime().get());
         } else {
-            // TODO checking for the cancelled status could be done atomically with a $cond update pipeline once we can update to mongo 4.2
-            final boolean wasCancelled = triggerWasCancelled(trigger);
-            update.set(FIELD_STATUS, wasCancelled ? JobTriggerStatus.CANCELLED : JobTriggerStatus.COMPLETE);
+            update.set(FIELD_STATUS, triggerUpdate.status().orElse(JobTriggerStatus.COMPLETE));
         }
 
         if (triggerUpdate.data().isPresent()) {
@@ -441,8 +438,6 @@ public class DBJobTriggerService {
                 DBQuery.is(FIELD_LOCK_OWNER, nodeId),
                 DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING)
         );
-        // TODO should this also set Once scheduled triggers to RUNNABLE?
-        // TODO should we set triggers to CANCELLED here?
         final DBUpdate.Builder update = DBUpdate.set(FIELD_LOCK_OWNER, null)
                 .set(FIELD_STATUS, JobTriggerStatus.RUNNABLE);
 
@@ -503,19 +498,6 @@ public class DBJobTriggerService {
         final DBUpdate.Builder update = DBUpdate.set(JobTriggerDto.FIELD_IS_CANCELLED, true);
 
         return Optional.ofNullable(db.findAndModify(query, update));
-    }
-
-    /**
-     * Checks whether the trigger was cancelled. Does so by reloading it from the DB.
-     * @param trigger the trigger to check.
-     * @return true if the trigger was cancelled.
-     */
-    private boolean triggerWasCancelled(JobTriggerDto trigger) {
-        final JobTriggerDto reloadedTrigger = db.findOneById(getId(trigger));
-        if (reloadedTrigger == null) {
-            return false;
-        }
-        return reloadedTrigger.isCancelled();
     }
 
     /**

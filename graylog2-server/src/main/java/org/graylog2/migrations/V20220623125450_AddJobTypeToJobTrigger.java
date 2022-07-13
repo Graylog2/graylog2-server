@@ -66,6 +66,7 @@ public class V20220623125450_AddJobTypeToJobTrigger extends Migration {
     public void upgrade() {
         final MigrationCompleted migrationCompleted = clusterConfigService.getOrDefault(MigrationCompleted.class, MigrationCompleted.createEmpty());
 
+        // TODO replace with stopwatch
         // Run this more than once in case old cluster nodes are still writing triggerDTOs with empty types
         if (migrationCompleted.executionCount() >= 3) {
             return;

@@ -34,10 +34,12 @@ public abstract class JobExecutionContext {
 
     public abstract AtomicBoolean schedulerIsRunning();
 
+    // TODO Jobs need to implement shutdown handling. Every job can decide if it wants to be restarted or not.
+    public boolean isShuttingDown() {
+        return !schedulerIsRunning().get();
+    }
+
     public boolean isCancelled() {
-        if (!schedulerIsRunning().get()) {
-            return true;
-        }
         final Optional<JobTriggerDto> triggerDto = jobTriggerService().get(trigger().id());
         return triggerDto.map(JobTriggerDto::isCancelled).orElse(false);
     }
