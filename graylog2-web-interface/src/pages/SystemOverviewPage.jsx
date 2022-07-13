@@ -30,9 +30,9 @@ const SystemOverviewPage = () => {
   return (
     <DocumentTitle title="System overview">
       <span>
-        <hasPer permissions="notifications:read">
+        <IfPermitted permissions="notifications:read">
           <NotificationsList />
-        </hasPer>
+        </IfPermitted>
 
         <HideOnCloud>
           <IfPermitted permissions="systemjobs:read">
