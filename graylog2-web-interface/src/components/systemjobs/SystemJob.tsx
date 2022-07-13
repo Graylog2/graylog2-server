@@ -54,7 +54,7 @@ const JobWrap = styled.div`
 `;
 
 const SystemJob = ({ job }) => {
-  const jobIsDone = job.job_status === 'complete' || job.percent_complete === 100;
+  const jobIsDone = job.job_status === 'complete' || job.percent_complete === 100 || job.job_status === 'cancelled';
 
   const _onAcknowledge = () => {
     return (e) => {
