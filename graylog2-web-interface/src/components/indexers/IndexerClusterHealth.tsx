@@ -70,29 +70,23 @@ const useLoadHealthAndName = () => {
 const IndexerClusterHealth = ({ minimal }: Props) => {
   const { health, name, loading, error, isSuccess } = useLoadHealthAndName();
 
-  const summary = (
-    <>
-      {isSuccess && <IndexerClusterHealthSummary health={health} name={name} />}
-      {loading && <p><Spinner /></p>}
-      {error && <IndexerClusterHealthError error={error} />}
-    </>
-  );
-
-  if (minimal) {
-    return summary;
-  }
-
   return (
     <Row className="content">
       <Col md={12}>
-        <h2>Elasticsearch cluster</h2>
+        {!minimal && (
+          <>
+            <h2>Elasticsearch cluster</h2>
 
-        <SmallSupportLink>
-          The possible Elasticsearch cluster states and more related information is available in the{' '}
-          <DocumentationLink page={DocsHelper.PAGES.CONFIGURING_ES} text="Graylog documentation" />.
-        </SmallSupportLink>
+            <SmallSupportLink>
+              The possible Elasticsearch cluster states and more related information is available in the{' '}
+              <DocumentationLink page={DocsHelper.PAGES.CONFIGURING_ES} text="Graylog documentation" />.
+            </SmallSupportLink>
+          </>
+        )}
 
-        {summary}
+        {isSuccess && <IndexerClusterHealthSummary health={health} name={name} />}
+        {loading && <p><Spinner /></p>}
+        {error && <IndexerClusterHealthError error={error} />}
       </Col>
     </Row>
   );

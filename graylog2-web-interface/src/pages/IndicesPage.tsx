@@ -55,11 +55,7 @@ const IndicesPage = () => {
 
         <HideOnCloud>
           <IfPermitted permissions="indexercluster:read">
-            <Row className="content">
-              <Col md={12}>
-                <IndexerClusterHealth minimal />
-              </Col>
-            </Row>
+            <IndexerClusterHealth minimal />
           </IfPermitted>
         </HideOnCloud>
 
