@@ -77,6 +77,8 @@ public class DBJobTriggerService {
     private static final String FIELD_TRIGGERED_AT = JobTriggerDto.FIELD_TRIGGERED_AT;
     private static final String FIELD_CONSTRAINTS = JobTriggerDto.FIELD_CONSTRAINTS;
 
+    private static final String FIELD_JOB_DEFINITION_TYPE = JobTriggerDto.FIELD_JOB_DEFINITION_TYPE;
+
     private final String nodeId;
     private final JacksonDBCollection<JobTriggerDto, ObjectId> db;
     private final JobSchedulerClock clock;
@@ -106,6 +108,7 @@ public class DBJobTriggerService {
         db.createIndex(new BasicDBObject(FIELD_END_TIME, 1));
         db.createIndex(new BasicDBObject(FIELD_NEXT_TIME, 1));
         db.createIndex(new BasicDBObject(FIELD_CONSTRAINTS, 1));
+        db.createIndex(new BasicDBObject(FIELD_JOB_DEFINITION_TYPE, 1));
     }
 
     /**
