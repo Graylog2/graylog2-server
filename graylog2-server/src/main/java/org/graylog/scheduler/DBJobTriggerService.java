@@ -386,8 +386,6 @@ public class DBJobTriggerService {
         requireNonNull(trigger, "trigger cannot be null");
         requireNonNull(triggerUpdate, "triggerUpdate cannot be null");
 
-        final boolean wasCancelled = triggerWasCancelled(trigger);
-
         final Query query = DBQuery.and(
                 // Make sure that the owner still owns the trigger
                 DBQuery.is(FIELD_LOCK_OWNER, nodeId),
@@ -412,6 +410,7 @@ public class DBJobTriggerService {
             update.set(FIELD_NEXT_TIME, triggerUpdate.nextTime().get());
         } else {
             // TODO checking for the cancelled status could be done atomically with a $cond update pipeline once we can update to mongo 4.2
+            final boolean wasCancelled = triggerWasCancelled(trigger);
             update.set(FIELD_STATUS, wasCancelled ? JobTriggerStatus.CANCELLED : JobTriggerStatus.COMPLETE);
         }
 
