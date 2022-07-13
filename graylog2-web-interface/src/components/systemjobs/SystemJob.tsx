@@ -17,6 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
 
 import { ProgressBar, LinkToNode, RelativeTime, Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
@@ -27,12 +28,12 @@ import { StyledBadge } from 'components/bootstrap/Badge';
 const StatusBadge = styled(StyledBadge)(({ status, theme }) => {
   const { success, info, warning, danger } = theme.colors.variant.dark;
   const statuses = {
+    cancelled: warning,
     complete: success,
-    runnable: info,
-    running: info,
     edited: warning,
     error: danger,
-    cancelled: warning,
+    queued: info,
+    running: info,
   };
   const color = statuses[status] ?? info;
 
@@ -53,8 +54,19 @@ const JobWrap = styled.div`
   margin-bottom: 5px;
 `;
 
+const AcknowledgeButton = styled(Button)(({ theme }: { theme: DefaultTheme }) => css`
+  && {
+    color: ${theme.colors.variant.light.default};
+    
+    :hover {
+      color: ${theme.colors.variant.default};
+    }
+  }
+`);
+
 const SystemJob = ({ job }) => {
   const jobIsOver = job.job_status === 'complete' || job.percent_complete === 100 || job.job_status === 'cancelled';
+  const mappedJobStatus = job.job_status === 'runnable' ? 'queued' : job.job_status;
 
   const _onAcknowledge = () => {
     return (e) => {
@@ -87,10 +99,10 @@ const SystemJob = ({ job }) => {
         - Started on <LinkToNode nodeId={job.node_id} />{' '}
         <RelativeTime dateTime={job.started_at} />{' '}
         -&nbsp;
-        <StatusBadge status={job.job_status}>{job.job_status}</StatusBadge>&nbsp;
+        <StatusBadge status={mappedJobStatus}>{mappedJobStatus}</StatusBadge>&nbsp;
         {!jobIsOver && job.is_cancelable
           ? (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={_onCancel()}>Cancel</Button>)
-          : (<Button type="button" bsSize="xs" bsStyle="success" className="pull-right" onClick={_onAcknowledge()}>Acknowledge</Button>)}
+          : (<AcknowledgeButton type="button" bsStyle="link" onClick={_onAcknowledge()} bsSize="xs" className="pull-right" title="Acknowledge"><Icon name="x" /></AcknowledgeButton>)}
       </JobWrap>
 
       {!jobIsOver && <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}
