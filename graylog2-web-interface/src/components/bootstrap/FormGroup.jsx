@@ -21,7 +21,7 @@ import { FormGroup as BootstrapFormGroup } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
-import { CONTROL_CLASS as COMMON_SELECT_CONTROL_CLASS } from 'components/common/Select.tsx';
+import { CONTROL_CLASS as COMMON_SELECT_CONTROL_CLASS } from 'components/common/Select/index';
 
 import FormControl from './FormControl';
 import { StyledAddon } from './InputGroup';
