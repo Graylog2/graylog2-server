@@ -34,11 +34,12 @@ const StatusBadge = styled(StyledBadge)(({ status, theme }) => {
     error: danger,
     cancelled: warning,
   };
+  const color = statuses[status] ?? info;
 
   return css`
     margin-left: 4px;
-    background-color: ${statuses[status]};
-    color: ${theme.utils.readableColor(statuses[status])};
+    background-color: ${color};
+    color: ${theme.utils.readableColor(color)};
   `;
 });
 
