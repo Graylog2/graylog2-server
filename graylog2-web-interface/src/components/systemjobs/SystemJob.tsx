@@ -54,7 +54,7 @@ const JobWrap = styled.div`
 `;
 
 const SystemJob = ({ job }) => {
-  const jobIsDone = job.job_status === 'complete' || job.percent_complete === 100 || job.job_status === 'cancelled';
+  const jobIsOver = job.job_status === 'complete' || job.percent_complete === 100 || job.job_status === 'cancelled';
 
   const _onAcknowledge = () => {
     return (e) => {
@@ -88,12 +88,12 @@ const SystemJob = ({ job }) => {
         <RelativeTime dateTime={job.started_at} />{' '}
         -&nbsp;
         <StatusBadge status={job.job_status}>{job.job_status}</StatusBadge>&nbsp;
-        {!jobIsDone && job.is_cancelable
+        {!jobIsOver && job.is_cancelable
           ? (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={_onCancel()}>Cancel</Button>)
           : (<Button type="button" bsSize="xs" bsStyle="success" className="pull-right" onClick={_onAcknowledge()}>Acknowledge</Button>)}
       </JobWrap>
 
-      {!jobIsDone && <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}
+      {!jobIsOver && <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}
     </div>
   );
 };
