@@ -19,6 +19,7 @@ package org.graylog2.migrations;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.mongodb.client.AggregateIterable;
@@ -41,6 +42,7 @@ import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class V20220623125450_AddJobTypeToJobTrigger extends Migration {
@@ -66,11 +68,7 @@ public class V20220623125450_AddJobTypeToJobTrigger extends Migration {
     public void upgrade() {
         final MigrationCompleted migrationCompleted = clusterConfigService.getOrDefault(MigrationCompleted.class, MigrationCompleted.createEmpty());
 
-        // TODO replace with stopwatch
-        // Run this more than once in case old cluster nodes are still writing triggerDTOs with empty types
-        if (migrationCompleted.executionCount() >= 3) {
-            return;
-        }
+        final Stopwatch started = Stopwatch.createStarted();
 
         final MongoCollection<Document> jobTriggers = mongoConnection.getMongoDatabase().getCollection(DBJobTriggerService.COLLECTION_NAME);
 
@@ -95,6 +93,10 @@ public class V20220623125450_AddJobTypeToJobTrigger extends Migration {
             modifiedCount = jobTriggers.bulkWrite(typeUpdate).getModifiedCount();
 
             LOG.info("Added type field to <{}> JobTriggers", modifiedCount);
+        }
+        final long elapsed = started.stop().elapsed(TimeUnit.SECONDS);
+        if (elapsed > 60) {
+            LOG.warn("Migration ran longer than expected! Took <{}> seconds", elapsed);
         }
 
         clusterConfigService.write(MigrationCompleted.
