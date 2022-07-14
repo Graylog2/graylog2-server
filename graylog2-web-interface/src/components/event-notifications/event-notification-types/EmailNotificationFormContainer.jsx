@@ -15,11 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import Immutable from 'immutable';
 import PropTypes from 'prop-types';
 
 import UsersDomain from 'domainActions/users/UsersDomain';
-import { Spinner } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import connect from 'stores/connect';
@@ -38,33 +36,36 @@ class EmailNotificationFormContainer extends React.Component {
     super(props);
 
     this.state = {
-      users: undefined,
+      pagination: { page: 1, perPage: 50, query: '' },
     };
   }
 
-  componentDidMount() {
-    this.loadUsers();
-  }
-
-  loadUsers = () => {
+  loadUsersPaginated = async (search, prevOptions) => {
+    const { pagination: { page, perPage, query } } = this.state;
     const { currentUser } = this.props;
+    let options = [];
+    let hasMore;
 
     if (isPermitted(currentUser.permissions, 'users:list')) {
-      const query = { include_permissions: false, include_sessions: false };
-      UsersDomain.loadUsers(query).then((users) => this.setState({ users }));
-    } else {
-      this.setState({ users: Immutable.List() });
+      const isNewQuery = search && search !== query;
+      const pageParam = isNewQuery ? 1 : page;
+      const response = await UsersDomain.loadUsersPaginated({ page: pageParam, perPage, query: search });
+
+      const { pagination, list: usersList } = response;
+      options = usersList.map((user) => ({ label: `${user.username} (${user.fullName})`, value: user.username })).toArray();
+
+      this.setState({ pagination: { ...pagination, page: page + 1 } });
+      hasMore = prevOptions.length < pagination.total;
     }
+
+    return {
+      options: options,
+      hasMore,
+    };
   };
 
   render() {
-    const { users } = this.state;
-
-    if (!users) {
-      return <p><Spinner text="Loading Notification information..." /></p>;
-    }
-
-    return <EmailNotificationForm {...this.props} users={users} />;
+    return <EmailNotificationForm {...this.props} users={[]} loadUsers={this.loadUsersPaginated} />;
   }
 }
 
