@@ -19,7 +19,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import type { $PropertyType } from 'utility-types';
 
-import type SharedEntity from 'logic/permissions/SharedEntity';
+import SharedEntity from 'logic/permissions/SharedEntity';
 import { Alert } from 'components/bootstrap';
 import { Pagination, PageSizeSelect } from 'components/common';
 import type { ActiveShares, CapabilitiesList, SelectedGrantees } from 'logic/permissions/EntityShareState';
@@ -120,7 +120,7 @@ const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, 
           })}
         </List>
       ) : (
-        <Alert>This {entityType} has no collaborators.</Alert>
+        <Alert>This {SharedEntity.getReadableType(entityType)} has no collaborators.</Alert>
       )}
       <PaginationWrapper>
         <StyledPagination totalPages={totalPages}

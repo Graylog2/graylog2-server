@@ -17,6 +17,7 @@
 import * as Immutable from 'immutable';
 import type { $PropertyType } from 'utility-types';
 
+import mockedPermissions from 'logic/permissions/mocked';
 import type { SharedEntityType } from 'logic/permissions/types';
 
 import Grantee from './Grantee';
@@ -85,6 +86,10 @@ export default class SharedEntity {
   static builder(): Builder {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();
+  }
+
+  static getReadableType(type: string): string {
+    return mockedPermissions.availableEntityTypes[type] || type;
   }
 }
 

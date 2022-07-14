@@ -65,10 +65,11 @@ const searchPaginatedEntitySharesResponse = (page: number, perPage: number, quer
 };
 
 const availableEntityTypes = {
-  stream: 'Stream',
   dashboard: 'Dashboard',
-  search: 'Saved Search',
   event_definition: 'Event Definition',
+  notification: 'Notification',
+  search: 'Saved Search',
+  stream: 'Stream',
 };
 
 const availableCapabilities = {

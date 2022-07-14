@@ -18,6 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import HoverForHelp from 'components/common/HoverForHelp';
+import SharedEntity from 'logic/permissions/SharedEntity';
 
 type Props = {
   type: string,
@@ -29,13 +30,9 @@ const StyledHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
 `;
 
 const SharingDisabledPopover = ({ type, description }: Props) => {
-  const getReadableType = (_type: string) => {
-    return _type.replaceAll('_', ' ');
-  };
-
   return (
     <StyledHoverForHelp title="Sharing not possible" pullRight={false}>
-      {description || `Only owners of this ${getReadableType(type)} are allowed to share it.`}
+      {description || `Only owners of this ${SharedEntity.getReadableType(type)} are allowed to share it.`}
     </StyledHoverForHelp>
   );
 };

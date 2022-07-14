@@ -26,7 +26,7 @@ import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
 import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
-import type SharedEntity from 'logic/permissions/SharedEntity';
+import SharedEntity from 'logic/permissions/SharedEntity';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 
 import type { FormValues as GranteesSelectFormValues } from './GranteesSelector';
@@ -37,11 +37,10 @@ type Props = {
   entityId: $PropertyType<SharedEntity, 'id'>,
   entityTitle: $PropertyType<SharedEntity, 'title'>,
   entityType: $PropertyType<SharedEntity, 'type'>,
-  entityTypeTitle: string | null | undefined,
   onClose: () => void,
 };
 
-const EntityShareModal = ({ description, entityId, entityType, entityTitle, entityTypeTitle, onClose }: Props) => {
+const EntityShareModal = ({ description, entityId, entityType, entityTitle, onClose }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResults?.failed);
   const entityGRN = createGRN(entityType, entityId);
@@ -82,7 +81,7 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, enti
                            onConfirm={_handleSave}
                            onModalClose={onClose}
                            showModal
-                           title={<>Sharing {entityTypeTitle ?? entityType}: <i>{entityTitle}</i></>}>
+                           title={<>Sharing {SharedEntity.getReadableType(entityType)}: <i>{entityTitle}</i></>}>
       <>
         {(entityShareState && entityShareState.entity === entityGRN) ? (
           <EntityShareSettings description={description}
@@ -105,12 +104,7 @@ EntityShareModal.propTypes = {
   entityId: PropTypes.string.isRequired,
   entityTitle: PropTypes.string.isRequired,
   entityType: PropTypes.string.isRequired,
-  entityTypeTitle: PropTypes.string,
   onClose: PropTypes.func.isRequired,
-};
-
-EntityShareModal.defaultProps = {
-  entityTypeTitle: undefined,
 };
 
 export default EntityShareModal;
