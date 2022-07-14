@@ -101,7 +101,7 @@ const SystemJob = ({ job }) => {
       <JobWrap>
         <Icon name="cog" />{' '}
         <span data-toggle="tooltip" title={job.name}>{job.info}</span>{' '}
-        - Started on <LinkToNode nodeId={job.node_id} />{' '}
+        - on <LinkToNode nodeId={job.node_id} />{' '}
         <RelativeTime dateTime={job.started_at} />{' '}
         <StatusBadge status={mappedJobStatus}>{mappedJobStatus}</StatusBadge>
         {!jobIsOver && job.is_cancelable
