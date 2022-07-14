@@ -25,6 +25,9 @@ import org.graylog2.database.PaginatedList;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 @JsonAutoDetect
 @AutoValue
@@ -69,5 +72,27 @@ public abstract class PageListResponse<T> {
             @Nullable String sort,
             @Nullable String order) {
         return new AutoValue_PageListResponse<>(query, paginatedList.pagination(), paginatedList.pagination().total(), sort, order, paginatedList);
+    }
+
+    public PageListResponse<T> withHiddenConfidentialInfo(final Predicate<T> hasConfidentialInfoChecker, final UnaryOperator<T> confidentialInfoHider) {
+        if (elements().isEmpty()) {
+            return this;
+        }
+        return PageListResponse.create(
+                query(),
+                paginationInfo(),
+                total(),
+                sort(),
+                order(),
+                elements()
+                        .stream()
+                        .map(element -> {
+                            if (hasConfidentialInfoChecker.test(element)) {
+                                return confidentialInfoHider.apply(element);
+                            } else {
+                                return element;
+                            }
+                        })
+                        .collect(Collectors.toList()));
     }
 }
