@@ -14,24 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import SharedEntity from 'logic/permissions/SharedEntity';
 import { EntityShareActions } from 'stores/permissions/EntityShareStore';
 
 import notifyingAction from '../notifyingAction';
 
 const prepare = notifyingAction({
   action: EntityShareActions.prepare,
-  error: (error, entityName, entityType) => ({
-    message: `Preparing shares for ${entityType} "${entityName}" failed with status: ${error}`,
+  error: (error, entityType, entityName) => ({
+    message: `Preparing shares for ${SharedEntity.getReadableType(entityType)} "${entityName}" failed with status: ${error}`,
   }),
 });
 
 const update = notifyingAction({
   action: EntityShareActions.update,
-  error: (error, entityName, entityType) => ({
-    message: `Updating shares for ${entityType} "${entityName}" failed with status: ${error}`,
+  error: (error, entityType, entityName) => ({
+    message: `Updating shares for ${SharedEntity.getReadableType(entityType)} "${entityName}" failed with status: ${error}`,
   }),
-  success: (entityName, entityType) => ({
-    message: `Shares for ${entityType} "${entityName}" updated successfully`,
+  success: (entityType, entityName) => ({
+    message: `Shares for ${SharedEntity.getReadableType(entityType)} "${entityName}" updated successfully`,
   }),
 });
 
