@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import { Field } from 'formik';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import lodash from 'lodash';
@@ -117,6 +118,9 @@ const TimeUnitInput = createReactClass({
     pullRight: PropTypes.bool,
     /** Lets the user clear the numeric input. */
     clearable: PropTypes.bool,
+
+    name: PropTypes.string,
+    unitName: PropTypes.string,
   },
 
   getDefaultProps() {
@@ -127,6 +131,8 @@ const TimeUnitInput = createReactClass({
       units: unitValues,
       label: '',
       help: '',
+      name: null,
+      unitName: null,
       required: false,
       enabled: undefined,
       defaultEnabled: false,
@@ -241,9 +247,14 @@ const TimeUnitInput = createReactClass({
         <InputWrapper className={wrapperClassName}>
           <InputGroup>
             {(!required && !hideCheckbox) && checkbox}
-            <FormControl type="number" disabled={!this._isChecked()} onChange={this._onUpdate} value={lodash.defaultTo(this._getEffectiveValue(), '')} />
+            <FormControl type="number"
+                         name={this.props.name}
+                         disabled={!this._isChecked()}
+                         onChange={this._onUpdate}
+                         value={lodash.defaultTo(this._getEffectiveValue(), '')} />
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
+                            name={this.props.unitName}
                             pullRight={pullRight}
                             title={unitOptions.filter((o) => o.value === unit)[0].label}
                             disabled={!this._isChecked()}>

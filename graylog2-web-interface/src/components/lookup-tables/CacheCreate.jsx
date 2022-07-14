@@ -80,7 +80,7 @@ class CacheCreate extends React.Component {
     return (
       <div>
         <Row className="content">
-          <Col lg={8}>
+          <Col lg={6}>
             <form className="form form-horizontal" onSubmit={() => {}}>
               <Input id="cache-type-select"
                      label="Cache Type"
