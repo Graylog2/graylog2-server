@@ -19,7 +19,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 
 import useQuery from 'routing/useQuery';
 
-const DEFAULT_PAGE = 1;
+export const DEFAULT_PAGE = 1;
 
 const usePaginationQueryParameter = (PAGE_SIZES: number[]) => {
   const { page: pageQueryParameter, pageSize: pageSizeQueryParameter } = useQuery();
