@@ -24,12 +24,12 @@ import javax.annotation.Nullable;
 
 /**
  * Entity base class, which can be used to enforce that each entity implementation
- * has the required id and metadata fields.
+ * has the required id and _scope fields.
  */
 
 public abstract class ScopedEntity {
     public static final String FIELD_ID = "id";
-    public static final String FIELD_SCOPE = "scope";
+    public static final String FIELD_SCOPE = "_scope";
 
     @Id
     @ObjectId
