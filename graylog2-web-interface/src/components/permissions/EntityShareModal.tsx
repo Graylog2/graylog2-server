@@ -82,19 +82,19 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
                            onModalClose={onClose}
                            showModal
                            title={<>Sharing {SharedEntity.getReadableType(entityType)}: <i>{entityTitle}</i></>}>
-      <>
-        {(entityShareState && entityShareState.entity === entityGRN) ? (
-          <EntityShareSettings description={description}
-                               entityGRN={entityGRN}
-                               entityType={entityType}
-                               entityTitle={entityTitle}
-                               entityShareState={entityShareState}
-                               granteesSelectFormRef={granteesSelectFormRef}
-                               setDisableSubmit={setDisableSubmit} />
-        ) : (
-          <Spinner />
-        )}
-      </>
+
+      {(entityShareState && entityShareState.entity === entityGRN) ? (
+        <EntityShareSettings description={description}
+                             entityGRN={entityGRN}
+                             entityType={entityType}
+                             entityTitle={entityTitle}
+                             entityShareState={entityShareState}
+                             granteesSelectFormRef={granteesSelectFormRef}
+                             setDisableSubmit={setDisableSubmit} />
+      ) : (
+        <Spinner />
+      )}
+
     </BootstrapModalConfirm>
   );
 };
