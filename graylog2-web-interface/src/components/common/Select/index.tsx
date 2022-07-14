@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as Histogram } from './Histogram';
-export { default as MessageList } from './MessageList';
-export { default as WidgetHeader } from './WidgetHeader';
+
+import Select from './Select';
+
+export { CONTROL_CLASS } from './Select';
+export default Select;
