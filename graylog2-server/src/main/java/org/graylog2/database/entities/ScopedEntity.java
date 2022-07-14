@@ -38,14 +38,18 @@ public abstract class ScopedEntity {
     public abstract String id();
 
     @JsonProperty(FIELD_SCOPE)
-    @Nullable
     public abstract String scope();
 
-    public static abstract class Builder<SELF extends Builder<SELF>> {
+    public abstract static class AbstractBuilder<SELF extends AbstractBuilder<SELF>> {
+
+        protected AbstractBuilder() {
+            scope(DefaultEntityScope.NAME);
+        }
+
         @Id
         @ObjectId
         @JsonProperty(FIELD_ID)
-        public abstract SELF id(@Nullable String id);
+        public abstract SELF id(String id);
 
         @JsonProperty(FIELD_SCOPE)
         public abstract SELF scope(String scope);

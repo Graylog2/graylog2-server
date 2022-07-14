@@ -53,7 +53,7 @@ public abstract class MyScopedEntity extends ScopedEntity {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public abstract static class Builder extends ScopedEntity.Builder<Builder> {
+    public abstract static class Builder extends AbstractBuilder<Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_MyScopedEntity.Builder()
