@@ -21,8 +21,9 @@ import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ScopedEntityPaginatedDbService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
@@ -34,7 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
 
-public class DBEventDefinitionService extends PaginatedDbService<EventDefinitionDto> {
+public class DBEventDefinitionService extends ScopedEntityPaginatedDbService<EventDefinitionDto> {
     private static final Logger LOG = LoggerFactory.getLogger(DBEventDefinitionService.class);
 
     private static final String COLLECTION_NAME = "event_definitions";
@@ -46,8 +47,8 @@ public class DBEventDefinitionService extends PaginatedDbService<EventDefinition
     public DBEventDefinitionService(MongoConnection mongoConnection,
                                     MongoJackObjectMapperProvider mapper,
                                     DBEventProcessorStateService stateService,
-                                    EntityOwnershipService entityOwnerShipService) {
-        super(mongoConnection, mapper, EventDefinitionDto.class, COLLECTION_NAME);
+                                    EntityOwnershipService entityOwnerShipService, EntityScopeService entityScopeService) {
+        super(mongoConnection, mapper, EventDefinitionDto.class, COLLECTION_NAME, entityScopeService);
         this.stateService = stateService;
         this.entityOwnerShipService = entityOwnerShipService;
     }
