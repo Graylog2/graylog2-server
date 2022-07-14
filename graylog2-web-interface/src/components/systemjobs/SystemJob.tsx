@@ -26,14 +26,19 @@ import UserNotification from 'util/UserNotification';
 import { StyledBadge } from 'components/bootstrap/Badge';
 
 const StatusBadge = styled(StyledBadge)(({ status, theme }) => {
-  const { success, info, warning, danger } = theme.colors.variant.dark;
+  const {
+    primary,
+    success,
+    info,
+    warning,
+    danger,
+  } = theme.colors.variant.dark;
   const statuses = {
     cancelled: warning,
     complete: success,
-    edited: warning,
     error: danger,
     queued: info,
-    running: info,
+    running: primary,
   };
   const color = statuses[status] ?? info;
 
@@ -65,7 +70,7 @@ const AcknowledgeButton = styled(Button)(({ theme }: { theme: DefaultTheme }) =>
 `);
 
 const SystemJob = ({ job }) => {
-  const jobIsOver = job.job_status === 'complete' || job.percent_complete === 100 || job.job_status === 'cancelled';
+  const jobIsOver = job.job_status === 'complete' || job.percent_complete === 100 || job.job_status === 'cancelled' || job.job_status === 'error';
   const mappedJobStatus = job.job_status === 'runnable' ? 'queued' : job.job_status;
 
   const _onAcknowledge = () => {
@@ -98,8 +103,7 @@ const SystemJob = ({ job }) => {
         <span data-toggle="tooltip" title={job.name}>{job.info}</span>{' '}
         - Started on <LinkToNode nodeId={job.node_id} />{' '}
         <RelativeTime dateTime={job.started_at} />{' '}
-        -&nbsp;
-        <StatusBadge status={mappedJobStatus}>{mappedJobStatus}</StatusBadge>&nbsp;
+        <StatusBadge status={mappedJobStatus}>{mappedJobStatus}</StatusBadge>
         {!jobIsOver && job.is_cancelable
           ? (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={_onCancel()}>Cancel</Button>)
           : (<AcknowledgeButton type="button" bsStyle="link" onClick={_onAcknowledge()} bsSize="xs" className="pull-right" title="Acknowledge"><Icon name="x" /></AcknowledgeButton>)}
