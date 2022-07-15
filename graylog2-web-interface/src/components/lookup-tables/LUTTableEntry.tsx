@@ -23,7 +23,7 @@ import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { ErrorPopover } from 'components/lookup-tables';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
-import useGetPermissionsByScope from 'logic/lookup-tables/useScopePermissions';
+import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type Props = {
@@ -46,16 +46,16 @@ const Actions = styled.div`
 
 const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
   const history = useHistory();
-  const { getPermissionsByScope } = useGetPermissionsByScope();
+  const { getScopePermissions } = useScopePermissions();
 
-  const showAction = (inTable: LookupTable, action: string): boolean => {
+  const showActions = (inTable: LookupTable): boolean => {
     // TODO: Update this method to check for the metadata
-    const permissions = getPermissionsByScope(inTable._metadata?.scope);
+    const permissions = getScopePermissions(inTable._metadata?.scope);
 
-    return permissions[action];
+    return permissions.is_mutable;
   };
 
-  const handleDelete = (inTable: LookupTable) => (_event: React.SyntheticEvent) => {
+  const handleDelete = (inTable: LookupTable) => () => {
     // eslint-disable-next-line no-alert
     const shouldDelete = window.confirm(
       `Are you sure you want to delete lookup table "${inTable.title}"?`,
@@ -66,7 +66,7 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
     }
   };
 
-  const handleEdit = (tableName: string) => (_event: React.SyntheticEvent) => {
+  const handleEdit = (tableName: string) => () => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.edit(tableName));
   };
 
@@ -93,23 +93,20 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
           )}
           <Link to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapter.name)}>{dataAdapter.title}</Link>
         </td>
-        <td>
+        <td>{showActions(table) && (
           <Actions>
-            {showAction(table, 'edit') && (
-              <Button bsSize="xsmall" bsStyle="info" onClick={handleEdit(table.name)} role="edit-button">
-                Edit
-              </Button>
-            )}
-            {showAction(table, 'delete') && (
-              <Button style={{ marginLeft: '6px' }}
-                      bsSize="xsmall"
-                      bsStyle="primary"
-                      onClick={handleDelete(table)}
-                      role="delete-button">
-                Delete
-              </Button>
-            )}
+            <Button bsSize="xsmall" bsStyle="info" onClick={handleEdit(table.name)} alt="edit button">
+              Edit
+            </Button>
+            <Button style={{ marginLeft: '6px' }}
+                    bsSize="xsmall"
+                    bsStyle="primary"
+                    onClick={handleDelete(table)}
+                    alt="delete button">
+              Delete
+            </Button>
           </Actions>
+        )}
         </td>
       </tr>
     </tbody>

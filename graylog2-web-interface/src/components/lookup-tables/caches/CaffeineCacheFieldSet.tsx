@@ -53,11 +53,7 @@ const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
     auxValConfig[`${name}_unit`] = unit;
 
     setStateConfig(auxConfig);
-
-    setValues({
-      ...values,
-      config: auxValConfig,
-    });
+    setValues({ ...values, config: auxValConfig });
   };
 
   return (

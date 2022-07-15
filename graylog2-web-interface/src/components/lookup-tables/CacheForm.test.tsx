@@ -19,21 +19,21 @@ import { render, waitFor } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
-import CaffeineCacheSummary from './caches/CaffeineCacheSummary';
 import { CACHE } from './fixtures';
-import Cache from './Cache';
+import CaffeineCacheFieldSet from './caches/CaffeineCacheFieldSet';
+import CacheForm from './CacheForm';
 
 PluginStore.register(new PluginManifest({}, {
   lookupTableCaches: [
     {
-      type: 'guava_cache',
+      type: 'guava_cache', // old name kept for backwards compatibility
       displayName: 'Node-local, in-memory cache',
-      summaryComponent: CaffeineCacheSummary,
+      formComponent: CaffeineCacheFieldSet,
     },
   ],
 }));
 
-const renderedCache = (scope: string) => {
+const renderedCache = (scope: string, create: boolean = false) => {
   CACHE._metadata = {
     scope: scope,
     revision: 2,
@@ -51,16 +51,24 @@ const renderedCache = (scope: string) => {
   };
 
   return render(
-    <Router><Cache cache={CACHE} /></Router>,
+    <Router>
+      <CacheForm cache={CACHE}
+                 type={CACHE.config.type}
+                 saved={() => {}}
+                 title="Data Cache"
+                 create={create}
+                 validate={() => ({})}
+                 validationErrors={{}} />
+    </Router>,
   );
 };
 
-describe('Cache', () => {
+describe('CacheForm', () => {
   it('should show "edit" button', async () => {
     const { getByAltText } = renderedCache('DEFAULT');
 
     let actionBtn = null;
-    await waitFor(() => { actionBtn = getByAltText('edit button'); });
+    await waitFor(() => { actionBtn = getByAltText('update button'); });
 
     expect(actionBtn).toBeVisible();
   });
@@ -69,7 +77,7 @@ describe('Cache', () => {
     const { queryByAltText } = renderedCache('ILLUMINATE');
 
     let actionBtn = null;
-    await waitFor(() => { actionBtn = queryByAltText('edit button'); });
+    await waitFor(() => { actionBtn = queryByAltText('update button'); });
 
     expect(actionBtn).toBeNull();
   });

@@ -38,19 +38,19 @@ const renderedLUT = (scope: string) => {
 
 describe('LookupTableView', () => {
   it('should show "edit" button', async () => {
-    const { getByRole } = renderedLUT('DEFAULT');
+    const { getByAltText } = renderedLUT('DEFAULT');
 
     let actionBtn = null;
-    await waitFor(() => { actionBtn = getByRole('edit-button'); });
+    await waitFor(() => { actionBtn = getByAltText('edit button'); });
 
     expect(actionBtn).toBeVisible();
   });
 
   it('should not show "edit" button', async () => {
-    const { queryByRole } = renderedLUT('ILLUMINATE');
+    const { queryByAltText } = renderedLUT('ILLUMINATE');
 
     let actionBtn = null;
-    await waitFor(() => { actionBtn = queryByRole('edit-button'); });
+    await waitFor(() => { actionBtn = queryByAltText('edit button'); });
 
     expect(actionBtn).toBeNull();
   });

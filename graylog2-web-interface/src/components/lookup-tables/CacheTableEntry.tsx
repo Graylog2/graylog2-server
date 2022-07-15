@@ -9,7 +9,7 @@ import { MetricsMapper, MetricContainer, CounterRate } from 'components/metrics'
 import NumberUtils from 'util/NumberUtils';
 import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
 import type { LookupTableCache } from 'logic/lookup-tables/types';
-import useGetPermissionsByScope from 'logic/lookup-tables/useScopePermissions';
+import useScopePermissions from 'hooks/useScopePermissions';
 
 type Props = {
   cache: LookupTableCache,
@@ -24,7 +24,7 @@ const Actions = styled.div`
 
 const CacheTableEntry = ({ cache }: Props) => {
   const history = useHistory();
-  const { getPermissionsByScope } = useGetPermissionsByScope();
+  const { getScopePermissions } = useScopePermissions();
 
   const countMap = {
     requests: `org.graylog2.lookup.caches.${cache.id}.requests`,
@@ -62,14 +62,14 @@ const CacheTableEntry = ({ cache }: Props) => {
     return `${NumberUtils.formatNumber(hitRate)}%`;
   };
 
-  const showAction = (inCache: LookupTableCache, action: string): boolean => {
+  const showActions = (inCache: LookupTableCache): boolean => {
     // TODO: Update this method to check for the metadata
-    const permissions = getPermissionsByScope(inCache._metadata?.scope);
+    const permissions = getScopePermissions(inCache._metadata?.scope);
 
-    return permissions[action];
+    return permissions.is_mutable;
   };
 
-  const handleEdit = (cacheName: string) => (_event: React.SyntheticEvent) => {
+  const handleEdit = (cacheName: string) => () => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cacheName));
   };
 
@@ -102,22 +102,20 @@ const CacheTableEntry = ({ cache }: Props) => {
           </MetricContainer>
         </td>
         <td>
-          <Actions>
-            {showAction(cache, 'edit') && (
-              <Button bsSize="xsmall" bsStyle="info" onClick={handleEdit(cache.name)} role="edit-button">
+          {showActions(cache) && (
+            <Actions>
+              <Button bsSize="xsmall" bsStyle="info" onClick={handleEdit(cache.name)} alt="edit button">
                 Edit
               </Button>
-            )}
-            {showAction(cache, 'delete') && (
               <Button style={{ marginLeft: '6px' }}
                       bsSize="xsmall"
                       bsStyle="primary"
                       onClick={handleDelete}
-                      role="delete-button">
+                      alt="delete button">
                 Delete
               </Button>
-            )}
-          </Actions>
+            </Actions>
+          )}
         </td>
       </tr>
     </tbody>

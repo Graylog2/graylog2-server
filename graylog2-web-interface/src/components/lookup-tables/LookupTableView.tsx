@@ -21,7 +21,7 @@ import Routes from 'routing/Routes';
 import { ButtonToolbar, Row, Col, Button, Input } from 'components/bootstrap';
 import { Link } from 'components/common/router';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
-import useGetPermissionsByScope from 'logic/lookup-tables/useScopePermissions';
+import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type Props = {
@@ -34,12 +34,12 @@ const INIT_INPUT = { value: '', valid: false };
 
 const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
   const history = useHistory();
-  const { getPermissionsByScope } = useGetPermissionsByScope();
+  const { getScopePermissions } = useScopePermissions();
   const [purgeKey, setPurgeKey] = React.useState<any>(INIT_INPUT);
   const [lookupKey, setLookupKey] = React.useState<any>(INIT_INPUT);
   const [lookupResult, setLookupResult] = React.useState<any>(null);
 
-  const handleEdit = (tableName: string) => (_event: React.SyntheticEvent) => {
+  const handleEdit = (tableName: string) => () => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.edit(tableName));
   };
 
@@ -91,11 +91,11 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
     }
   };
 
-  const showAction = (inTable: LookupTable, action: string): boolean => {
+  const showAction = (inTable: LookupTable): boolean => {
     // TODO: Update this method to check for the metadata
-    const permissions = getPermissionsByScope(inTable._metadata?.scope);
+    const permissions = getScopePermissions(inTable._metadata?.scope);
 
-    return permissions[action];
+    return permissions.is_mutable;
   };
 
   return (
@@ -115,8 +115,8 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
             <Link to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name)}>{cache.title}</Link>
           </dd>
         </dl>
-        {showAction(table, 'edit') && (
-          <Button bsStyle="success" onClick={handleEdit(table.name)} role="edit-button">
+        {showAction(table) && (
+          <Button bsStyle="success" onClick={handleEdit(table.name)} alt="edit button">
             Edit
           </Button>
         )}

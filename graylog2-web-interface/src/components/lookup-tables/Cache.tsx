@@ -16,12 +16,11 @@
  */
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
-
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 import { Row, Col, Button } from 'components/bootstrap';
-import useGetPermissionsByScope from 'logic/lookup-tables/useScopePermissions';
+import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTableCache } from 'logic/lookup-tables/types';
 
 import {
@@ -37,7 +36,7 @@ type Props = {
 
 const Cache = ({ cache }: Props) => {
   const history = useHistory();
-  const { getPermissionsByScope } = useGetPermissionsByScope();
+  const { getScopePermissions } = useScopePermissions();
   const plugins = {};
 
   PluginStore.exports('lookupTableCaches').forEach((p: any) => {
@@ -52,15 +51,15 @@ const Cache = ({ cache }: Props) => {
 
   const summary = plugin.summaryComponent;
 
-  const handleEdit = (cacheName: string) => (_event: React.SyntheticEvent) => {
+  const handleEdit = (cacheName: string) => () => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cacheName));
   };
 
-  const showAction = (inCache: LookupTableCache, action: string): boolean => {
+  const showAction = (inCache: LookupTableCache): boolean => {
     // TODO: Update this method to check for the metadata
-    const permissions = getPermissionsByScope(inCache._metadata?.scope);
+    const permissions = getScopePermissions(inCache._metadata?.scope);
 
-    return permissions[action];
+    return permissions.is_mutable;
   };
 
   return (
@@ -75,8 +74,8 @@ const Cache = ({ cache }: Props) => {
         </SummaryContainer>
         <h4>Configuration</h4>
         <div>{React.createElement(summary, { cache: cache })}</div>
-        {showAction(cache, 'edit') && (
-          <Button bsStyle="success" onClick={handleEdit(cache.name)} role="edit-button">Edit</Button>
+        {showAction(cache) && (
+          <Button bsStyle="success" onClick={handleEdit(cache.name)} alt="edit button">Edit</Button>
         )}
       </Col>
     </Row>

@@ -41,37 +41,37 @@ const renderedLUT = (scope: string) => {
 
 describe('LUTTableEntry', () => {
   it('should show "edit" button', async () => {
-    const { getByRole } = renderedLUT('DEFAULT');
+    const { getByAltText } = renderedLUT('DEFAULT');
 
     let actionBtn = null;
-    await waitFor(() => { actionBtn = getByRole('edit-button'); });
+    await waitFor(() => { actionBtn = getByAltText('edit button'); });
 
     expect(actionBtn).toBeVisible();
   });
 
   it('should not show "edit" button', async () => {
-    const { queryByRole } = renderedLUT('ILLUMINATE');
+    const { queryByAltText } = renderedLUT('ILLUMINATE');
 
     let actionBtn = null;
-    await waitFor(() => { actionBtn = queryByRole('edit-button'); });
+    await waitFor(() => { actionBtn = queryByAltText('edit button'); });
 
     expect(actionBtn).toBeNull();
   });
 
   it('should show "delete" button', async () => {
-    const { getByRole } = renderedLUT('DEFAULT');
+    const { getByAltText } = renderedLUT('DEFAULT');
 
     let actionBtn = null;
-    await waitFor(() => { actionBtn = getByRole('delete-button'); });
+    await waitFor(() => { actionBtn = getByAltText('delete button'); });
 
     expect(actionBtn).toBeVisible();
   });
 
   it('should not show "delete" button', async () => {
-    const { queryByRole } = renderedLUT('ILLUMINATE');
+    const { queryByAltText } = renderedLUT('ILLUMINATE');
 
     let actionBtn = null;
-    await waitFor(() => { actionBtn = queryByRole('delete-button'); });
+    await waitFor(() => { actionBtn = queryByAltText('delete button'); });
 
     expect(actionBtn).toBeNull();
   });

@@ -23,6 +23,7 @@ import type { LookupTableCache } from 'src/logic/lookup-tables/types';
 import { Button, Col, Row } from 'components/bootstrap';
 import { FormikFormGroup } from 'components/common';
 import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
+import useScopePermissions from 'hooks/useScopePermissions';
 
 type TitleProps = {
   title: string,
@@ -61,6 +62,7 @@ type Props = {
 const CacheForm = ({ type, saved, title, create, cache, validate, validationErrors }: Props) => {
   const configRef = React.useRef(null);
   const [generateName, setGenerateName] = React.useState<boolean>(create);
+  const { getScopePermissions } = useScopePermissions();
 
   const plugin = React.useMemo(() => {
     return PluginStore.exports('lookupTableCaches').find((p) => p.type === type);
@@ -120,6 +122,13 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
     promise.then(() => { saved(); });
   };
 
+  const showAction = (inCache: LookupTableCache): boolean => {
+    // TODO: Update this method to check for the metadata
+    const permissions = getScopePermissions(inCache._metadata?.scope);
+
+    return permissions.is_mutable;
+  };
+
   return (
     <>
       <Title title={title} typeName={pluginName} create={create} />
@@ -168,8 +177,12 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
                 {configFieldSet}
                 <fieldset>
                   <Row>
-                    <Col sm={12}>
-                      <Button type="submit" bsStyle="success">{create ? 'Create Cache' : 'Update Cache'}</Button>
+                    <Col mdOffset={3} sm={12}>
+                      {create ? (
+                        <Button type="submit" bsStyle="success">Create Cache</Button>
+                      ) : showAction(cache) && (
+                        <Button type="submit" bsStyle="success" alt="update button">Update Cache</Button>
+                      )}
                     </Col>
                   </Row>
                 </fieldset>

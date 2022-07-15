@@ -24,7 +24,7 @@ import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import { Col, Row, Button, Input } from 'components/bootstrap';
 import { FormikFormGroup, JSONValueInput } from 'components/common';
 import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker } from 'components/lookup-tables';
-import useGetPermissionsByScope from 'logic/lookup-tables/useScopePermissions';
+import useScopePermissions from 'hooks/useScopePermissions';
 
 type LookupTableType = LookupTable & {
   enable_single_value: boolean,
@@ -54,7 +54,7 @@ type Props = {
 };
 
 const LookupTableForm = ({ saved, create, table }: Props) => {
-  const { getPermissionsByScope } = useGetPermissionsByScope();
+  const { getScopePermissions } = useScopePermissions();
 
   const validate = (values: LookupTableType) => {
     const errors = {};
@@ -104,7 +104,7 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
 
   const showAction = (inTable: LookupTable, action: string): boolean => {
     // TODO: Update this method to check for the metadata
-    const permissions = getPermissionsByScope(inTable._metadata?.scope);
+    const permissions = getScopePermissions(inTable._metadata?.scope);
 
     return permissions[action];
   };
