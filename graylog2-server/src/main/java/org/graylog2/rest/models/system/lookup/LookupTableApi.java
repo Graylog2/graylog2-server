@@ -41,7 +41,7 @@ public abstract class LookupTableApi implements ScopedResponse {
     @JsonProperty("id")
     public abstract String id();
 
-
+    @Nullable
     @JsonProperty(FIELD_SCOPE)
     public abstract String scope();
 
@@ -87,7 +87,7 @@ public abstract class LookupTableApi implements ScopedResponse {
     public LookupTableDto toDto() {
         return LookupTableDto.builder()
                 .id(id())
-                .scope(scope())
+                .scope(scope() != null ? scope() : DefaultEntityScope.NAME)
                 .title(title())
                 .description(description())
                 .name(name())

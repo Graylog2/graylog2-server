@@ -17,7 +17,7 @@
 package org.graylog2.rest.models.system.lookup;
 
 public interface ScopedResponse {
-    String FIELD_SCOPE = "scope";
+    String FIELD_SCOPE = "_scope";
 
     String scope();
 }

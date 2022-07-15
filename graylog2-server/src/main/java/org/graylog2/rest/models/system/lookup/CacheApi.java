@@ -40,6 +40,7 @@ public abstract class CacheApi implements ScopedResponse {
     @JsonProperty("id")
     public abstract String id();
 
+    @Nullable
     @JsonProperty(FIELD_SCOPE)
     public abstract String scope();
 
@@ -81,7 +82,7 @@ public abstract class CacheApi implements ScopedResponse {
     public CacheDto toDto() {
         return CacheDto.builder()
                 .id(id())
-                .scope(scope())
+                .scope(scope() != null ? scope() : DefaultEntityScope.NAME)
                 .title(title())
                 .description(description())
                 .name(name())
@@ -94,7 +95,6 @@ public abstract class CacheApi implements ScopedResponse {
     public abstract static class Builder {
         @JsonProperty("id")
         public abstract Builder id(@Nullable String id);
-
 
         @JsonProperty(FIELD_SCOPE)
         public abstract Builder scope(String scope);
