@@ -18,7 +18,8 @@ import * as React from 'react';
 
 import { LinkContainer, Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { Button } from 'components/bootstrap';
+import { Button, Tooltip } from 'components/bootstrap';
+import OverlayTrigger from 'components/common/OverlayTrigger';
 import { ErrorPopover } from 'components/lookup-tables';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
@@ -39,6 +40,25 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
     }
   };
 
+  // TODO: update this method to use the new hook
+  const showAction = (action: string) => {
+    const scope = adapter._metadata ? adapter._metadata.scope : 'DEFAULT';
+
+    if (scope === 'ILLUMINATE') {
+      if (action) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const tooltip = (
+    <Tooltip id={`${adapterId}-button-tooltip`} show>
+      This adapter was created as immutable.
+    </Tooltip>
+  );
+
   return (
     <tbody>
       <tr>
@@ -54,11 +74,32 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
           </MetricContainer>
         </td>
         <td>
-          <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName)}>
-            <Button bsSize="xsmall" bsStyle="info">Edit</Button>
-          </LinkContainer>
+          {showAction('edit') ? (
+            <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName)}>
+              <Button bsSize="xsmall" bsStyle="info" data-testid="edit-button">Edit</Button>
+            </LinkContainer>
+          ) : (
+            <Button disabled bsSize="xsmall" bsStyle="primary" data-testid="edit-button">Edit</Button>
+          )}
           &nbsp;
-          <Button bsSize="xsmall" bsStyle="primary" onClick={_onDelete}>Delete</Button>
+          {showAction('delete') ? (
+            <Button bsSize="xsmall"
+                    bsStyle="primary"
+                    onClick={_onDelete}
+                    data-testid="delete-button">
+              Delete
+            </Button>
+          ) : (
+            <OverlayTrigger placement="top" overlay={tooltip}>
+              <Button disabled
+                      bsSize="xsmall"
+                      bsStyle="primary"
+                      onClick={_onDelete}
+                      data-testid="delete-button">
+                Delete
+              </Button>
+            </OverlayTrigger>
+          )}
         </td>
       </tr>
     </tbody>
