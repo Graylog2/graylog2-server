@@ -36,6 +36,7 @@ import org.graylog2.contentpacks.model.entities.LookupTableEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.LookupDefaultValue;
 import org.graylog2.lookup.db.DBLookupTableService;
@@ -49,6 +50,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import java.util.Collections;
 import java.util.Map;
@@ -62,6 +64,9 @@ public class LookupTableFacadeTest {
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
+    @Mock
+    EntityScopeService scopeService;
+
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     private DBLookupTableService lookupTableService;
@@ -74,6 +79,7 @@ public class LookupTableFacadeTest {
         lookupTableService = new DBLookupTableService(
                 mongodb.mongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper),
+                scopeService,
                 clusterEventBus);
 
         facade = new LookupTableFacade(objectMapper, lookupTableService);

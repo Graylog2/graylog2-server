@@ -16,12 +16,13 @@
  */
 package org.graylog2.lookup.db;
 
-import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ScopedEntityPaginatedDbService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.dto.LookupTableDto;
 import org.graylog2.lookup.events.LookupTablesDeleted;
@@ -30,23 +31,26 @@ import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class DBLookupTableService {
+public class DBLookupTableService extends ScopedEntityPaginatedDbService<LookupTableDto> {
+    public static final String COLLECTION_NAME = "lut_tables";
+    // TODO: rename this or get rid of it. Same name (db) as superclass.
+
     private final JacksonDBCollection<LookupTableDto, ObjectId> db;
     private final ClusterEventBus clusterEventBus;
 
     @Inject
     public DBLookupTableService(MongoConnection mongoConnection,
                                 MongoJackObjectMapperProvider mapper,
+                                EntityScopeService entityScopeService,
                                 ClusterEventBus clusterEventBus) {
+        super(mongoConnection, mapper, LookupTableDto.class, COLLECTION_NAME, entityScopeService);
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("lut_tables"),
                 LookupTableDto.class,
                 ObjectId.class,
@@ -56,6 +60,7 @@ public class DBLookupTableService {
         db.createIndex(new BasicDBObject("name", 1), new BasicDBObject("unique", true));
     }
 
+    @Override
     public Optional<LookupTableDto> get(String idOrName) {
         try {
             return Optional.ofNullable(db.findOneById(new ObjectId(idOrName)));
@@ -66,9 +71,9 @@ public class DBLookupTableService {
         }
     }
 
+    @Override
     public LookupTableDto save(LookupTableDto table) {
-        WriteResult<LookupTableDto, ObjectId> save = db.save(table);
-        final LookupTableDto savedLookupTable = save.getSavedObject();
+        final LookupTableDto savedLookupTable = super.save(table);
 
         clusterEventBus.post(LookupTablesUpdated.create(savedLookupTable));
 
@@ -109,17 +114,12 @@ public class DBLookupTableService {
         }
     }
 
-    private ImmutableList<LookupTableDto> asImmutableList(Iterator<? extends LookupTableDto> cursor) {
-        return ImmutableList.copyOf(cursor);
-    }
-
-    public void delete(String idOrName) {
+    @Override
+    public int delete(String idOrName) {
         final Optional<LookupTableDto> lookupTableDto = get(idOrName);
-        lookupTableDto
-                .map(LookupTableDto::id)
-                .map(ObjectId::new)
-                .ifPresent(db::removeById);
+        int numDeleted = super.delete(idOrName);
         lookupTableDto.ifPresent(lookupTable -> clusterEventBus.post(LookupTablesDeleted.create(lookupTable)));
+        return numDeleted;
     }
 
     public void forEach(Consumer<? super LookupTableDto> action) {

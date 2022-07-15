@@ -16,12 +16,13 @@
  */
 package org.graylog2.lookup.db;
 
-import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ScopedEntityPaginatedDbService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.events.CachesDeleted;
@@ -30,24 +31,25 @@ import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DBCacheService {
+public class DBCacheService extends ScopedEntityPaginatedDbService<CacheDto> {
+    public static final String COLLECTION_NAME = "lut_caches";
+    // TODO: rename this or get rid of it. Same name (db) as superclass.
     private final JacksonDBCollection<CacheDto, ObjectId> db;
     private final ClusterEventBus clusterEventBus;
 
     @Inject
     public DBCacheService(MongoConnection mongoConnection,
                           MongoJackObjectMapperProvider mapper,
+                          EntityScopeService entityScopeService,
                           ClusterEventBus clusterEventBus) {
-
+        super(mongoConnection, mapper, CacheDto.class, COLLECTION_NAME, entityScopeService);
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("lut_caches"),
                 CacheDto.class,
                 ObjectId.class,
@@ -67,9 +69,9 @@ public class DBCacheService {
         }
     }
 
+    @Override
     public CacheDto save(CacheDto table) {
-        WriteResult<CacheDto, ObjectId> save = db.save(table);
-        final CacheDto savedCache = save.getSavedObject();
+        final CacheDto savedCache = super.save(table);
         clusterEventBus.post(CachesUpdated.create(savedCache.id()));
 
         return savedCache;
@@ -85,16 +87,12 @@ public class DBCacheService {
         }
     }
 
-    private ImmutableList<CacheDto> asImmutableList(Iterator<? extends CacheDto> cursor) {
-        return ImmutableList.copyOf(cursor);
-    }
-
-    public void delete(String idOrName) {
+    @Override
+    public int delete(String idOrName) {
         final Optional<CacheDto> cacheDto = get(idOrName);
-        cacheDto.map(CacheDto::id)
-                .map(ObjectId::new)
-                .ifPresent(db::removeById);
+        int numDeleted = super.delete(idOrName);
         cacheDto.ifPresent(cache -> clusterEventBus.post(CachesDeleted.create(cache.id())));
+        return numDeleted;
     }
 
     public Collection<CacheDto> findByIds(Set<String> idSet) {

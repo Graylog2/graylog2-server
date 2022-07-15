@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.lookup.LookupDefaultSingleValue;
 import org.graylog2.lookup.dto.LookupTableDto;
 
@@ -31,7 +32,7 @@ import javax.validation.constraints.NotEmpty;
 @JsonAutoDetect
 @WithBeanGetter
 @JsonDeserialize(builder = AutoValue_LookupTableApi.Builder.class)
-public abstract class LookupTableApi {
+public abstract class LookupTableApi implements ScopedResponse {
 
     public static final String FIELD_DEFAULT_SINGLE_VALUE = "default_single_value";
     public static final String FIELD_DEFAULT_MULTI_VALUE = "default_multi_value";
@@ -39,6 +40,10 @@ public abstract class LookupTableApi {
     @Nullable
     @JsonProperty("id")
     public abstract String id();
+
+
+    @JsonProperty(FIELD_SCOPE)
+    public abstract String scope();
 
     @JsonProperty("title")
     @NotEmpty
@@ -82,6 +87,7 @@ public abstract class LookupTableApi {
     public LookupTableDto toDto() {
         return LookupTableDto.builder()
                 .id(id())
+                .scope(scope())
                 .title(title())
                 .description(description())
                 .name(name())
@@ -98,6 +104,7 @@ public abstract class LookupTableApi {
     public static LookupTableApi fromDto(LookupTableDto dto) {
         return builder()
                 .id(dto.id())
+                .scope(dto.scope() != null ? dto.scope() : DefaultEntityScope.NAME)
                 .name(dto.name())
                 .title(dto.title())
                 .description(dto.description())
@@ -115,6 +122,9 @@ public abstract class LookupTableApi {
     public abstract static class Builder {
         @JsonProperty("id")
         public abstract Builder id(@Nullable String id);
+
+        @JsonProperty(FIELD_SCOPE)
+        public abstract Builder scope(String scope);
 
         @JsonProperty("title")
         public abstract Builder title(String title);

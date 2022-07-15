@@ -70,6 +70,7 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
         // TODO: Create independent representation of entity?
         final Map<String, Object> configuration = objectMapper.convertValue(cacheDto.config(), TypeReferences.MAP_STRING_OBJECT);
         final LookupCacheEntity lookupCacheEntity = LookupCacheEntity.create(
+                ValueReference.of(cacheDto.scope()),
                 ValueReference.of(cacheDto.name()),
                 ValueReference.of(cacheDto.title()),
                 ValueReference.of(cacheDto.description()),
@@ -110,6 +111,7 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
         final LookupCacheEntity lookupCacheEntity = objectMapper.convertValue(entity.data(), LookupCacheEntity.class);
         final LookupCacheConfiguration configuration = objectMapper.convertValue(toValueMap(lookupCacheEntity.configuration(), parameters), LookupCacheConfiguration.class);
         final CacheDto cacheDto = CacheDto.builder()
+                .scope(lookupCacheEntity.scope().asString(parameters))
                 .name(lookupCacheEntity.name().asString(parameters))
                 .title(lookupCacheEntity.title().asString(parameters))
                 .description(lookupCacheEntity.description().asString(parameters))

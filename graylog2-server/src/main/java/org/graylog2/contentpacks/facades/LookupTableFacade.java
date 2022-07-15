@@ -82,6 +82,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
                 .orElseThrow(() -> new ContentPackException("Couldn't find lookup data adapter entity " + lookupTableDto.dataAdapterId()));
 
         final LookupTableEntity lookupTableEntity = LookupTableEntity.create(
+                ValueReference.of(lookupTableDto.scope()),
                 ValueReference.of(lookupTableDto.name()),
                 ValueReference.of(lookupTableDto.title()),
                 ValueReference.of(lookupTableDto.description()),
@@ -137,6 +138,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
             throw new MissingNativeEntityException(cacheDescriptor);
         }
         final LookupTableDto lookupTableDto = LookupTableDto.builder()
+                .scope(lookupTableEntity.scope().asString(parameters))
                 .name(lookupTableEntity.name().asString(parameters))
                 .title(lookupTableEntity.title().asString(parameters))
                 .description(lookupTableEntity.description().asString(parameters))

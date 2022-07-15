@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 
@@ -33,11 +34,14 @@ import javax.validation.constraints.NotNull;
 @JsonAutoDetect
 @WithBeanGetter
 @JsonDeserialize(builder = AutoValue_CacheApi.Builder.class)
-public abstract class CacheApi {
+public abstract class CacheApi implements ScopedResponse {
 
     @Nullable
     @JsonProperty("id")
     public abstract String id();
+
+    @JsonProperty(FIELD_SCOPE)
+    public abstract String scope();
 
     @JsonProperty("title")
     @NotEmpty
@@ -65,6 +69,7 @@ public abstract class CacheApi {
     public static CacheApi fromDto(CacheDto dto) {
         return builder()
                 .id(dto.id())
+                .scope(dto.scope() != null ? dto.scope() : DefaultEntityScope.NAME)
                 .title(dto.title())
                 .description(dto.description())
                 .name(dto.name())
@@ -76,6 +81,7 @@ public abstract class CacheApi {
     public CacheDto toDto() {
         return CacheDto.builder()
                 .id(id())
+                .scope(scope())
                 .title(title())
                 .description(description())
                 .name(name())
@@ -88,6 +94,10 @@ public abstract class CacheApi {
     public abstract static class Builder {
         @JsonProperty("id")
         public abstract Builder id(@Nullable String id);
+
+
+        @JsonProperty(FIELD_SCOPE)
+        public abstract Builder scope(String scope);
 
         @JsonProperty("title")
         public abstract Builder title(String title);

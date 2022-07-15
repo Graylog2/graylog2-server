@@ -71,6 +71,7 @@ public class LookupCacheFacadeTest {
         cacheService = new DBCacheService(
                 mongodb.mongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper),
+                null,
                 clusterEventBus);
         pluginMetaData = new HashSet<>();
 
@@ -128,6 +129,7 @@ public class LookupCacheFacadeTest {
                 .type(ModelTypes.LOOKUP_CACHE_V1)
                 .data(objectMapper.convertValue(LookupCacheEntity.create(
                         ValueReference.of("no-op-cache"),
+                        ValueReference.of("no-op-cache"),
                         ValueReference.of("No-op cache"),
                         ValueReference.of("No-op cache"),
                         ReferenceMapUtils.toReferenceMap(ImmutableMap.of("type", "none"))
@@ -157,6 +159,7 @@ public class LookupCacheFacadeTest {
                 .type(ModelTypes.LOOKUP_CACHE_V1)
                 .data(objectMapper.convertValue(LookupCacheEntity.create(
                         ValueReference.of("no-op-cache"),
+                        ValueReference.of("no-op-cache"),
                         ValueReference.of("No-op cache"),
                         ValueReference.of("No-op cache"),
                         ReferenceMapUtils.toReferenceMap(ImmutableMap.of("type", "none"))
@@ -184,6 +187,7 @@ public class LookupCacheFacadeTest {
                 .id(ModelId.of("1"))
                 .type(ModelTypes.LOOKUP_CACHE_V1)
                 .data(objectMapper.convertValue(LookupCacheEntity.create(
+                        ValueReference.of("no-op-cache"),
                         ValueReference.of("some-cache"),
                         ValueReference.of("Some cache"),
                         ValueReference.of("Some cache"),
@@ -203,6 +207,7 @@ public class LookupCacheFacadeTest {
                 .id(ModelId.of("1"))
                 .type(ModelTypes.LOOKUP_CACHE_V1)
                 .data(objectMapper.convertValue(LookupCacheEntity.create(
+                        ValueReference.of("no-op-cache"),
                         ValueReference.of("no-op-cache"),
                         ValueReference.of("No-op cache"),
                         ValueReference.of("No-op cache"),
