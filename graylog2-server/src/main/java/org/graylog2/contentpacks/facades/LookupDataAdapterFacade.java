@@ -70,6 +70,7 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
         // TODO: Create independent representation of entity?
         final Map<String, Object> configuration = objectMapper.convertValue(dataAdapterDto.config(), TypeReferences.MAP_STRING_OBJECT);
         final LookupDataAdapterEntity lookupDataAdapterEntity = LookupDataAdapterEntity.create(
+                ValueReference.of(dataAdapterDto.scope()),
                 ValueReference.of(dataAdapterDto.name()),
                 ValueReference.of(dataAdapterDto.title()),
                 ValueReference.of(dataAdapterDto.description()),
@@ -110,6 +111,7 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
         final LookupDataAdapterEntity lookupDataAdapterEntity = objectMapper.convertValue(entity.data(), LookupDataAdapterEntity.class);
         final LookupDataAdapterConfiguration configuration = objectMapper.convertValue(toValueMap(lookupDataAdapterEntity.configuration(), parameters), LookupDataAdapterConfiguration.class);
         final DataAdapterDto dataAdapterDto = DataAdapterDto.builder()
+                .scope(lookupDataAdapterEntity.scope().asString(parameters))
                 .name(lookupDataAdapterEntity.name().asString(parameters))
                 .title(lookupDataAdapterEntity.title().asString(parameters))
                 .description(lookupDataAdapterEntity.description().asString(parameters))
