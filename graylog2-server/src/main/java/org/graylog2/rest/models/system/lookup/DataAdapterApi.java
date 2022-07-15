@@ -44,6 +44,7 @@ public abstract class DataAdapterApi implements ScopedResponse {
     @JsonProperty("id")
     public abstract String id();
 
+    @Nullable
     @JsonProperty(FIELD_SCOPE)
     public abstract String scope();
 
@@ -100,7 +101,7 @@ public abstract class DataAdapterApi implements ScopedResponse {
     public DataAdapterDto toDto() {
         return DataAdapterDto.builder()
                 .id(id())
-                .scope(scope())
+                .scope(scope() != null ? scope() : DefaultEntityScope.NAME)
                 .title(title())
                 .description(description())
                 .name(name())
