@@ -495,6 +495,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(evaluatedMessage.getField("some_array_0")).isEqualTo("a");
         assertThat(evaluatedMessage.getField("some_array_1")).isEqualTo("b");
         assertThat(evaluatedMessage.getField("app.kubernetes.io_name")).isEqualTo("hal");
+        assertThat(evaluatedMessage.getField("json_some_array")).isEqualTo("[\"a\",\"b\",\"c\"]");
+        assertThat(evaluatedMessage.getField("ignore_some_array")).isNull();
     }
 
     @Test
