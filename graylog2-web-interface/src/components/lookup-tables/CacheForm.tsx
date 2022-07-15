@@ -107,7 +107,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
     }
 
     if (values.config.type !== 'none') {
-      const confErrors = configRef.current.validate();
+      const confErrors = configRef.current?.validate() || {};
       if (!_.isEmpty(confErrors)) errors.config = confErrors;
     }
 

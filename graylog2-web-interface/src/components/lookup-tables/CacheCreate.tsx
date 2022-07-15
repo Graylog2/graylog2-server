@@ -60,7 +60,7 @@ const CacheCreate = ({ saved, types, validate, validationErrors }: Props) => {
     if (type) {
       return {
         ...INIT_CACHE,
-        config: { ...types[type]?.defaultConfig },
+        config: { ...types[type]?.default_config },
       };
     }
 
