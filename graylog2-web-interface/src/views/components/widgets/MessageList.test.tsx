@@ -183,14 +183,8 @@ describe('MessageList', () => {
     await findTable();
   });
 
-  it('refreshs Inputs list upon mount', () => {
-    render(<SimpleMessageList />);
-
-    expect(InputsActions.list).toHaveBeenCalled();
-  });
-
   it('reexecute query for search type, when using pagination', async () => {
-    const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
+    const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: 0 } };
     const secondPageSize = 10;
 
     render(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }} />);
@@ -234,5 +228,11 @@ describe('MessageList', () => {
     );
 
     await waitFor(() => expect(onRenderComplete).toHaveBeenCalled());
+  });
+
+  it('refreshs Inputs list upon mount', async () => {
+    render(<SimpleMessageList />);
+
+    await waitFor(() => expect(InputsActions.list).toHaveBeenCalled());
   });
 });
