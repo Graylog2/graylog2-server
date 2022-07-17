@@ -237,7 +237,9 @@ const TimeRangeDropdown = ({
                                            validateOnMount>
         {(({ values: { nextTimeRange }, isValid, setFieldValue, submitForm }) => {
           const handleActiveTab = (nextTab) => {
-            if ('type' in nextTimeRange) {
+            if ('type' in currentTimeRange && currentTimeRange.type === nextTab) {
+              setFieldValue('nextTimeRange', currentTimeRange);
+            } else if ('type' in nextTimeRange) {
               setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab));
             } else {
               setFieldValue('nextTimeRange', defaultRanges[nextTab]);
