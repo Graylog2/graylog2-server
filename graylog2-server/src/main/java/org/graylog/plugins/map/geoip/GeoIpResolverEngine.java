@@ -72,7 +72,8 @@ public class GeoIpResolverEngine {
      * </p>
      */
 
-    private final Map<String, String> ipAddressFields = buildSchemaIpFieldMap();
+    private final Map<String, String> ipAddressFields = Stream.of(KNOWN_SCHEMA_IP_FIELDS)
+            .collect(Collectors.toMap(e -> e, mapFieldNameToPrefix()));
 
     private final GeoIpResolver<GeoLocationInformation> ipLocationResolver;
     private final GeoIpResolver<GeoAsnInformation> ipAsnResolver;
@@ -202,12 +203,6 @@ public class GeoIpResolverEngine {
         }
 
         return null;
-    }
-
-    private static Map<String, String> buildSchemaIpFieldMap() {
-
-        return Stream.of(KNOWN_SCHEMA_IP_FIELDS)
-                .collect(Collectors.toMap(e -> e, mapFieldNameToPrefix()));
     }
 
     private static Function<String, String> mapFieldNameToPrefix() {
