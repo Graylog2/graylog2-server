@@ -14,8 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import history from 'util/History';
+import AppConfig from 'util/AppConfig';
+
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import * as Immutable from 'immutable';
 import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -25,11 +28,9 @@ import User from 'logic/users/User';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import PaginatedItem from 'components/common/PaginatedItemOverview/PaginatedItem';
 import RolesSelector from 'components/permissions/RolesSelector';
-import { Spinner } from 'components/common';
 import { Alert, Col, Row, Button, ButtonToolbar, Input } from 'components/bootstrap';
-import history from 'util/History';
 import Routes from 'routing/Routes';
-import AppConfig from 'util/AppConfig';
+import { UsersActions } from 'stores/users/UsersStore';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
@@ -64,10 +65,26 @@ const _onSubmit = (formData, roles, setSubmitError) => {
   }, (error) => setSubmitError(error));
 };
 
-const _validate = (values) => {
+const _validateUsername = async (errors: { [name: string]: string }, username: string) => {
+  const newErrors = { ...errors };
+
+  try {
+    await UsersActions.loadByUsername(username);
+    newErrors.username = 'Username is already taken';
+  // eslint-disable-next-line no-empty
+  } catch (error) {}
+
+  return newErrors;
+};
+
+const _validate = async (values) => {
   let errors = {};
 
-  const { password, password_repeat: passwordRepeat } = values;
+  const { password, password_repeat: passwordRepeat, username } = values;
+
+  if (username) {
+    errors = await _validateUsername(errors, username);
+  }
 
   if (isCloud && oktaUserForm) {
     const { validations: { password: validateCloudPasswords } } = oktaUserForm;
@@ -92,7 +109,7 @@ const PasswordGroup = () => {
   return <PasswordFormGroup />;
 };
 
-const UserNameGroup = ({ users }: { users: Immutable.List<User> }) => {
+const UserNameGroup = () => {
   if (isCloud && oktaUserForm) {
     const { fields: { username: CloudUserNameFormGroup } } = oktaUserForm;
 
@@ -100,7 +117,7 @@ const UserNameGroup = ({ users }: { users: Immutable.List<User> }) => {
   }
 
   return (
-    <UsernameFormGroup users={users} />
+    <UsernameFormGroup />
   );
 };
 
@@ -118,15 +135,9 @@ const EmailGroup = () => {
 
 const UserCreate = () => {
   const initialRole = { name: 'Reader', description: 'Grants basic permissions for every Graylog user (built-in)', id: '' };
-  const [users, setUsers] = useState<Immutable.List<User> | undefined>();
   const [user, setUser] = useState(User.empty().toBuilder().roles(Immutable.Set([initialRole.name])).build());
   const [submitError, setSubmitError] = useState<RequestError | undefined>();
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
-
-  useEffect(() => {
-    const query = { include_permissions: false, include_sessions: false };
-    UsersDomain.loadUsers(query).then(setUsers);
-  }, []);
 
   const _onAssignRole = (roles: Immutable.Set<DescriptiveItem>) => {
     setSelectedRoles(selectedRoles.union(roles));
@@ -144,10 +155,6 @@ const UserCreate = () => {
 
   const _handleCancel = () => history.push(Routes.SYSTEM.USERS.OVERVIEW);
   const hasValidRole = selectedRoles.size > 0 && selectedRoles.filter((role) => role.name === 'Reader' || role.name === 'Admin');
-
-  if (!users) {
-    return <Spinner />;
-  }
 
   const showSubmitError = (errors) => {
     if (isCloud && oktaUserForm) {
@@ -171,7 +178,7 @@ const UserCreate = () => {
                 <Headline>Profile</Headline>
                 <FirstNameFormGroup />
                 <LastNameFormGroup />
-                <UserNameGroup users={users} />
+                <UserNameGroup />
                 <EmailGroup />
               </div>
               <div>
