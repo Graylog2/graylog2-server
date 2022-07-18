@@ -19,7 +19,7 @@ import * as React from 'react';
 import { LinkContainer, Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Button, Tooltip } from 'components/bootstrap';
-import OverlayTrigger from 'components/common/OverlayTrigger';
+import { OverlayElement } from 'components/common';
 import { ErrorPopover } from 'components/lookup-tables';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
@@ -53,11 +53,9 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
     return true;
   };
 
-  const tooltip = (
-    <Tooltip id={`${adapterId}-button-tooltip`} show>
-      This adapter was created as immutable.
-    </Tooltip>
-  );
+  const isEditable = showAction('edit');
+  const isDeletable = showAction('delete');
+  const immutableTooltip = <Tooltip id={`${adapterId}-immutable-tooltip`}>Action not available for immutable entities</Tooltip>
 
   return (
     <tbody>
@@ -74,13 +72,11 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
           </MetricContainer>
         </td>
         <td>
-          {showAction('edit') ? (
-            <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName)}>
+          <OverlayElement overlay={immutableTooltip} placement="top" useOverlay={isEditable}>
+            <LinkContainer disabled={!isEditable} to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName)}>
               <Button bsSize="xsmall" bsStyle="info" data-testid="edit-button">Edit</Button>
             </LinkContainer>
-          ) : (
-            <Button disabled bsSize="xsmall" bsStyle="primary" data-testid="edit-button">Edit</Button>
-          )}
+          </OverlayElement>
           &nbsp;
           {showAction('delete') ? (
             <Button bsSize="xsmall"
@@ -90,15 +86,15 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
               Delete
             </Button>
           ) : (
-            <OverlayTrigger placement="top" overlay={tooltip}>
-              <Button disabled
+            <OverlayElement placement="top" overlay={immutableTooltip} useOverlay={isDeletable}>
+              <Button disabled={!isDeletable}
                       bsSize="xsmall"
                       bsStyle="primary"
                       onClick={_onDelete}
                       data-testid="delete-button">
                 Delete
               </Button>
-            </OverlayTrigger>
+            </OverlayElement>
           )}
         </td>
       </tr>

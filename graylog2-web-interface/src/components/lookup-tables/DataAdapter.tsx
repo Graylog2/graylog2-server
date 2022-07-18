@@ -77,6 +77,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
   }
 
   const summary = plugin.summaryComponent;
+  const isEditable = showAction('edit');
 
   return (
     <Row className="content">
@@ -96,13 +97,9 @@ const DataAdapter = ({ dataAdapter }: Props) => {
         <ConfigSummaryDefinitionListWrapper>
           {React.createElement(summary, { dataAdapter: dataAdapter })}
         </ConfigSummaryDefinitionListWrapper>
-        {showAction('edit') ? (
-          <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName)}>
-            <Button bsStyle="success">Edit</Button>
-          </LinkContainer>
-        ) : (
-          <Button disabled bsStyle="success">Edit</Button>
-        )}
+        <LinkContainer disabled={!isEditable} to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName)}>
+          <Button bsStyle="success">Edit</Button>
+        </LinkContainer>
       </Col>
       <Col md={6}>
         <h3>Test lookup</h3>
