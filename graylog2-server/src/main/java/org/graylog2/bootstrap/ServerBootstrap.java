@@ -36,6 +36,7 @@ import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.ConfigurationModule;
+import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.configuration.PathConfiguration;
@@ -47,6 +48,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.bindings.FreshInstallDetectionModule;
 import org.graylog2.shared.bindings.GenericBindings;
 import org.graylog2.shared.bindings.GenericInitializerBindings;
 import org.graylog2.shared.bindings.IsDevelopmentBindings;
@@ -83,6 +85,7 @@ import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_INITIATE;
 
 public abstract class ServerBootstrap extends CmdLineTool {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
+    private boolean isFreshInstallation;
 
     public ServerBootstrap(String commandName, Configuration configuration) {
         super(commandName, configuration);
@@ -105,6 +108,14 @@ public abstract class ServerBootstrap extends CmdLineTool {
         return noPidFile;
     }
 
+    private boolean isFreshInstallation() {
+        return isFreshInstallation;
+    }
+
+    private void registerFreshInstallation() {
+        this.isFreshInstallation = true;
+    }
+
     @Override
     protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, PathConfiguration pathConfiguration) {
         super.beforeStart(tlsProtocolsConfiguration, pathConfiguration);
@@ -124,16 +135,21 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
     @Override
     protected void beforeInjectorCreation(Set<Plugin> plugins) {
-        runPreFlightChecks(plugins);
+        final boolean dbIsEmpty = runPreFlightChecks(plugins);
+        if (dbIsEmpty) {
+            registerFreshInstallation();
+        }
     }
 
-    private void runPreFlightChecks(Set<Plugin> plugins) {
+    private boolean runPreFlightChecks(Set<Plugin> plugins) {
         final List<PreflightCheckModule> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
                 .flatMap(Collection::stream).collect(Collectors.toList());
 
         final Injector injector = getPreflightInjector(preflightCheckModules);
 
         injector.getInstance(PreflightCheckService.class).runChecks();
+        // use the MongoDBPreflightCheck to detect a fresh graylog installation
+        return injector.getInstance(MongoDBPreflightCheck.class).dbIsEmpty();
     }
 
     private Injector getPreflightInjector(List<PreflightCheckModule> preflightCheckModules) {
@@ -287,6 +303,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     protected List<Module> getSharedBindingsModules() {
         final List<Module> result = super.getSharedBindingsModules();
 
+        result.add(new FreshInstallDetectionModule(isFreshInstallation()));
         result.add(new GenericBindings(isMigrationCommand()));
         result.add(new SecurityBindings());
         result.add(new ServerStatusBindings(capabilities()));
