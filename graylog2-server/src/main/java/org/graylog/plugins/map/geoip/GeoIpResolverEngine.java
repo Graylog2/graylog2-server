@@ -42,6 +42,25 @@ public class GeoIpResolverEngine {
     private static final Logger LOG = LoggerFactory.getLogger(GeoIpResolverEngine.class);
 
     /**
+     * This is a list of schema fields defined in package <b></b>org.graylog.schema</b> as of 2022-07-15.  If the schema changes,
+     * this list must be updated, until a better way of defining schema fields is developed, that allows iteration.
+     */
+    private static final String[] KNOWN_SCHEMA_IP_FIELDS = {org.graylog.schema.DestinationFields.DESTINATION_IP,
+            org.graylog.schema.DestinationFields.DESTINATION_NAT_IP,
+            org.graylog.schema.EventFields.EVENT_OBSERVER_IP,
+            org.graylog.schema.SourceFields.SOURCE_IP,
+            org.graylog.schema.SourceFields.SOURCE_IPV6,
+            org.graylog.schema.SourceFields.SOURCE_NAT_IP,
+            org.graylog.schema.NetworkFields.NETWORK_FORWARDED_IP,
+            org.graylog.schema.AssociatedFields.ASSOCIATED_IP,
+            org.graylog.schema.HostFields.HOST_IP,
+            org.graylog.schema.HostFields.HOST_IPV6,
+            org.graylog.schema.VendorFields.VENDOR_PRIVATE_IP,
+            org.graylog.schema.VendorFields.VENDOR_PRIVATE_IPV6,
+            org.graylog.schema.VendorFields.VENDOR_PUBLIC_IP,
+            org.graylog.schema.VendorFields.VENDOR_PUBLIC_IPV6};
+
+    /**
      * A mapping of fields (per the Graylog Schema) that to search that contain IP addresses.  When the user opts to
      * enforce the Graylog Schema ONLY these fields will be checked; otherwise, all message fields will be checked.
      * to see if they have valid Geo IP information.
@@ -52,6 +71,7 @@ public class GeoIpResolverEngine {
      * that will be inserted into the message.
      * </p>
      */
+
     private final Map<String, String> ipAddressFields = buildSchemaIpFieldMap();
 
     private final GeoIpResolver<GeoLocationInformation> ipLocationResolver;
@@ -186,34 +206,11 @@ public class GeoIpResolverEngine {
 
     private static Map<String, String> buildSchemaIpFieldMap() {
 
-        return Stream.of(getKnownSchemaIpFields())
+        return Stream.of(KNOWN_SCHEMA_IP_FIELDS)
                 .collect(Collectors.toMap(e -> e, mapFieldNameToPrefix()));
     }
 
     private static Function<String, String> mapFieldNameToPrefix() {
         return string -> string.replace("_ip", "");
-    }
-
-    /**
-     * This is a list of schema fields defined in package <b></b>org.graylog.schema</b> as of 2022-07-15.  If the schema changes,
-     * this list must be updated, until a better way of defining schema fields is developed, that allows iteration.
-     *
-     * @return known IP fields
-     */
-    private static String[] getKnownSchemaIpFields() {
-        return new String[]{org.graylog.schema.DestinationFields.DESTINATION_IP,
-                org.graylog.schema.DestinationFields.DESTINATION_NAT_IP,
-                org.graylog.schema.EventFields.EVENT_OBSERVER_IP,
-                org.graylog.schema.SourceFields.SOURCE_IP,
-                org.graylog.schema.SourceFields.SOURCE_IPV6,
-                org.graylog.schema.SourceFields.SOURCE_NAT_IP,
-                org.graylog.schema.NetworkFields.NETWORK_FORWARDED_IP,
-                org.graylog.schema.AssociatedFields.ASSOCIATED_IP,
-                org.graylog.schema.HostFields.HOST_IP,
-                org.graylog.schema.HostFields.HOST_IPV6,
-                org.graylog.schema.VendorFields.VENDOR_PRIVATE_IP,
-                org.graylog.schema.VendorFields.VENDOR_PRIVATE_IPV6,
-                org.graylog.schema.VendorFields.VENDOR_PUBLIC_IP,
-                org.graylog.schema.VendorFields.VENDOR_PUBLIC_IPV6};
     }
 }
