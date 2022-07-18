@@ -59,7 +59,7 @@ UTF-8 encoding.
 <br>Note that this encoding is applied to all messages received by the input. A single input
 cannot handle multiple log sources with different encodings.
 
-### Changed archived default paht
+### Changed archived default path
 On new Graylog installations, the default archiving configuration will now 
 store archives under the `data_dir` instead of `/tmp/graylog-archives`. 
 (The `data_dir` is configured in graylog.conf and defaults to `/var/lib/graylog-server`)
