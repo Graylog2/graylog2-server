@@ -20,8 +20,6 @@ import com.google.common.collect.ImmutableList;
 import org.graylog2.database.PaginatedList;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,44 +40,6 @@ class PageListResponseTest {
         assertThat(pageListResponse.sort()).isEqualTo("whatever");
         assertThat(pageListResponse.order()).isEqualTo("asc");
         assertTrue(pageListResponse.elements().containsAll(ImmutableList.of("1", "2")));
-    }
-
-    @Test
-    void hidesConfidentialInfo() {
-        PageListResponse<String> pageListResponse = PageListResponse.create("gimme me data!",
-                new PaginatedList<>(
-                        ImmutableList.of("secret:Financial fraud", "secret:Scandal", "whatever", "smth nice", "smth cool"),
-                        500, 1, 5),
-                "whatever", "asc");
-
-        final PageListResponse<String> pageListResponseWithHiddenData = pageListResponse.withHiddenConfidentialInfo(
-                s -> s.startsWith("secret"),
-                s -> "you shall not pass!");
-
-        assertThat(pageListResponseWithHiddenData.total()).isEqualTo(500);
-        assertThat(pageListResponseWithHiddenData.paginationInfo().page()).isEqualTo(1);
-        assertThat(pageListResponseWithHiddenData.paginationInfo().total()).isEqualTo(500);
-        assertThat(pageListResponseWithHiddenData.paginationInfo().perPage()).isEqualTo(5);
-        assertThat(pageListResponseWithHiddenData.sort()).isEqualTo("whatever");
-        assertThat(pageListResponseWithHiddenData.order()).isEqualTo("asc");
-        assertThat(pageListResponseWithHiddenData.query()).isEqualTo("gimme me data!");
-
-        assertThat(pageListResponseWithHiddenData.elements())
-                .isEqualTo(ImmutableList.of("you shall not pass!", "you shall not pass!", "whatever", "smth nice", "smth cool"));
-    }
-
-    @Test
-    void hidingConfidentialInfoReturnsOriginalResponseIfItContainsNoElements() {
-        PageListResponse<String> pageListResponse = PageListResponse.create("gimme me data!",
-                new PaginatedList<>(
-                        Collections.emptyList(),
-                        500, 1, 5),
-                "whatever", "asc");
-
-        final PageListResponse<String> pageListResponseWithHiddenData = pageListResponse.withHiddenConfidentialInfo(
-                s -> s.startsWith("secret"),
-                s -> "you shall not pass!");
-        assertThat(pageListResponseWithHiddenData).isSameAs(pageListResponse);
     }
 
 }
