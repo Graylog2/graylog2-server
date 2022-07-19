@@ -23,8 +23,7 @@ import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.tuple.Pair;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mongojack.DBQuery;
 import org.mongojack.internal.query.CollectionQueryCondition;
 import org.mongojack.internal.query.CompoundQueryCondition;
@@ -43,12 +42,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class SearchQueryParserTest {
 
-    @Before
-    public void setUp() throws Exception {
-    }
-
     @Test
-    public void explicitAllowedField() throws Exception {
+    void explicitAllowedField() {
         SearchQueryParser parser = new SearchQueryParser("defaultfield", ImmutableSet.of("name", "id"));
         final SearchQuery query = parser.parse("name:foo");
         final Multimap<String, SearchQueryParser.FieldValue> queryMap = query.getQueryMap();
@@ -64,7 +59,7 @@ public class SearchQueryParserTest {
     }
 
     @Test
-    public void decodeQuery() throws UnsupportedEncodingException {
+    void decodeQuery() throws UnsupportedEncodingException {
         SearchQueryParser parser = new SearchQueryParser("defaultfield", ImmutableSet.of("name", "id"));
         final String urlEncodedQuery = URLEncoder.encode("name:foo", StandardCharsets.UTF_8.name());
         final SearchQuery query = parser.parse(urlEncodedQuery);
@@ -81,7 +76,7 @@ public class SearchQueryParserTest {
     }
 
     @Test
-    public void nullQuery() {
+    void nullQuery() {
         SearchQueryParser parser = new SearchQueryParser("defaultfield", ImmutableSet.of("name", "id"));
         final SearchQuery query = parser.parse(null);
 
@@ -93,7 +88,7 @@ public class SearchQueryParserTest {
     }
 
     @Test
-    public void disallowedField() {
+    void disallowedField() {
         SearchQueryParser parser = new SearchQueryParser("defaultfield", ImmutableSet.of("name", "id"));
         final SearchQuery query = parser.parse("notallowed:foo");
         final Multimap<String, SearchQueryParser.FieldValue> queryMap = query.getQueryMap();
@@ -108,7 +103,7 @@ public class SearchQueryParserTest {
     }
 
     @Test
-    public void mappedFields() {
+    void mappedFields() {
         SearchQueryParser parser = new SearchQueryParser("defaultfield",
                 ImmutableMap.of(
                         "name", SearchQueryField.create("index_name"),
@@ -156,7 +151,7 @@ public class SearchQueryParserTest {
     }
 
     @Test
-    public void extractOperator() throws Exception {
+    void extractOperator() {
         final SearchQueryParser parser = new SearchQueryParser("defaultfield",
                 ImmutableMap.of(
                         "id", SearchQueryField.create("real_id"),
@@ -207,7 +202,7 @@ public class SearchQueryParserTest {
     }
 
     @Test
-    public void querySplitterMatcher() throws Exception {
+    void querySplitterMatcher() {
         final SearchQueryParser parser = new SearchQueryParser("defaultfield",
                 ImmutableMap.of(
                         "id", SearchQueryField.create("real_id"),
@@ -227,35 +222,77 @@ public class SearchQueryParserTest {
     }
 
     @Test
-    public void createFieldValue() throws Exception {
+    void createFieldValue() {
         final ImmutableMap<String, SearchQueryField> fields = ImmutableMap.of(
                 "id", SearchQueryField.create("real_id"),
                 "date", SearchQueryField.create("created_at", SearchQueryField.Type.DATE));
         final SearchQueryParser parser = new SearchQueryParser("defaultfield", fields);
 
-        final SearchQueryParser.FieldValue v1 = parser.createFieldValue(fields.get("id"), "abc", false);
+        final SearchQueryParser.FieldValue v1 = parser.createFieldValue(fields.get("id").getFieldType(), "abc", false);
         assertThat(v1.getOperator()).isEqualTo(SearchQueryParser.DEFAULT_STRING_OPERATOR);
         assertThat(v1.getValue()).isEqualTo("abc");
         assertThat(v1.isNegate()).isFalse();
 
-        final SearchQueryParser.FieldValue v2 = parser.createFieldValue(fields.get("id"), "=abc", true);
+        final SearchQueryParser.FieldValue v2 = parser.createFieldValue(fields.get("id").getFieldType(), "=abc", true);
         assertThat(v2.getOperator()).isEqualTo(SearchQueryOperators.EQUALS);
         assertThat(v2.getValue()).isEqualTo("abc");
         assertThat(v2.isNegate()).isTrue();
 
-        final SearchQueryParser.FieldValue v3 = parser.createFieldValue(fields.get("date"), ">=2017-03-01", false);
+        final SearchQueryParser.FieldValue v3 = parser.createFieldValue(fields.get("date").getFieldType(), ">=2017-03-01", false);
         assertThat(v3.getOperator()).isEqualTo(SearchQueryOperators.GREATER_EQUALS);
         assertThat(v3.getValue()).isEqualTo(new DateTime(2017, 3, 1, 0, 0, DateTimeZone.UTC));
         assertThat(v3.isNegate()).isFalse();
 
-        final SearchQueryParser.FieldValue v4 = parser.createFieldValue(fields.get("date"), ">=2017-03-01 12:12:12", false);
+        final SearchQueryParser.FieldValue v4 = parser.createFieldValue(fields.get("date").getFieldType(), ">=2017-03-01 12:12:12", false);
         assertThat(v4.getOperator()).isEqualTo(SearchQueryOperators.GREATER_EQUALS);
         assertThat(v4.getValue()).isEqualTo(new DateTime(2017, 3, 1, 12, 12, 12, DateTimeZone.UTC));
         assertThat(v4.isNegate()).isFalse();
 
-        final SearchQueryParser.FieldValue v5 = parser.createFieldValue(fields.get("date"), "\">=2017-03-01 12:12:12\"", false);
+        final SearchQueryParser.FieldValue v5 = parser.createFieldValue(fields.get("date").getFieldType(), "\">=2017-03-01 12:12:12\"", false);
         assertThat(v5.getOperator()).isEqualTo(SearchQueryOperators.GREATER_EQUALS);
         assertThat(v5.getValue()).isEqualTo(new DateTime(2017, 3, 1, 12, 12, 12, DateTimeZone.UTC));
         assertThat(v5.isNegate()).isFalse();
+    }
+
+    @Test
+    void fieldPrefixIsAddedToAllFieldsIfSpecified() {
+        final SearchQueryParser parser = new SearchQueryParser("name", ImmutableSet.of("name", "breed"), "pets.");
+
+        final SearchQuery searchQuery = parser.parse("Bobby breed:terrier");
+        final Multimap<String, SearchQueryParser.FieldValue> queryMap = searchQuery.getQueryMap();
+
+        assertThat(queryMap.keySet().size()).isEqualTo(2);
+        assertThat(queryMap.keySet()).containsOnly("pets.name", "pets.breed");
+        assertThat(queryMap.get("pets.name")).containsOnly(new SearchQueryParser.FieldValue("Bobby", false));
+        assertThat(queryMap.get("pets.breed")).containsOnly(new SearchQueryParser.FieldValue("terrier", false));
+        assertThat(searchQuery.hasDisallowedKeys()).isFalse();
+    }
+
+    @Test
+    void nullFieldPrefixDoesNotChangeDefaultBehavior() {
+        final SearchQueryParser parser = new SearchQueryParser("name", ImmutableSet.of("name", "breed"), null);
+
+        final SearchQuery searchQuery = parser.parse("Bobby breed:terrier");
+        final Multimap<String, SearchQueryParser.FieldValue> queryMap = searchQuery.getQueryMap();
+
+        assertThat(queryMap.keySet().size()).isEqualTo(2);
+        assertThat(queryMap.keySet()).containsOnly("name", "breed");
+        assertThat(queryMap.get("name")).containsOnly(new SearchQueryParser.FieldValue("Bobby", false));
+        assertThat(queryMap.get("breed")).containsOnly(new SearchQueryParser.FieldValue("terrier", false));
+        assertThat(searchQuery.hasDisallowedKeys()).isFalse();
+    }
+
+    @Test
+    void emptyFieldPrefixDoesNotChangeDefaultBehavior() {
+        final SearchQueryParser parser = new SearchQueryParser("name", ImmutableSet.of("name", "breed"), "");
+
+        final SearchQuery searchQuery = parser.parse("Bobby breed:terrier");
+        final Multimap<String, SearchQueryParser.FieldValue> queryMap = searchQuery.getQueryMap();
+
+        assertThat(queryMap.keySet().size()).isEqualTo(2);
+        assertThat(queryMap.keySet()).containsOnly("name", "breed");
+        assertThat(queryMap.get("name")).containsOnly(new SearchQueryParser.FieldValue("Bobby", false));
+        assertThat(queryMap.get("breed")).containsOnly(new SearchQueryParser.FieldValue("terrier", false));
+        assertThat(searchQuery.hasDisallowedKeys()).isFalse();
     }
 }

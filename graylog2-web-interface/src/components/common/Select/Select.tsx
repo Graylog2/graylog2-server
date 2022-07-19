@@ -24,8 +24,8 @@ import { withTheme } from 'styled-components';
 import CreatableSelect from 'react-select/creatable';
 
 import { themePropTypes } from 'theme';
-
-import Icon from './Icon';
+import CustomMenuList from 'components/common/Select/CustomMenuList';
+import Icon from 'components/common/Icon';
 
 export const CONTROL_CLASS = 'common-select-control';
 
@@ -233,6 +233,7 @@ export type Props<OptionValue> = {
   optionRenderer?: (option: Option) => React.ReactElement,
   options: Array<Option>,
   placeholder: string,
+  // eslint-disable-next-line react/require-default-props
   ref?: React.Ref<React.ComponentType>,
   size?: 'normal' | 'small',
   theme: DefaultTheme,
@@ -251,6 +252,27 @@ type CustomComponents = {
 type State = {
   customComponents: CustomComponents,
   value: any,
+};
+
+const getCustomComponents = (inputProps?: { [key: string]: any }, optionRenderer?: (option: Option) => React.ReactElement,
+  valueRenderer?: (option: Option) => React.ReactElement): any => {
+  const customComponents: { [key: string]: any } = {};
+
+  if (inputProps) {
+    customComponents.Input = CustomInput(inputProps);
+  }
+
+  if (optionRenderer) {
+    customComponents.Option = CustomOption(optionRenderer);
+  }
+
+  if (valueRenderer) {
+    customComponents.SingleValue = CustomSingleValue(valueRenderer);
+  }
+
+  customComponents.MenuList = CustomMenuList;
+
+  return customComponents;
 };
 
 class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
@@ -365,6 +387,8 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     valueRenderer: undefined,
     menuPlacement: 'auto',
     maxMenuHeight: 300,
+    // ref: undefined,
+    menuPortalTarget: undefined,
   };
 
   constructor(props: Props<OptionValue>) {
@@ -372,7 +396,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     const { inputProps, optionRenderer, value, valueRenderer } = props;
 
     this.state = {
-      customComponents: this.getCustomComponents(inputProps, optionRenderer, valueRenderer),
+      customComponents: getCustomComponents(inputProps, optionRenderer, valueRenderer),
       value,
     };
   }
@@ -387,35 +411,18 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     if (!isEqual(inputProps, nextProps.inputProps)
       || optionRenderer !== nextProps.optionRenderer
       || valueRenderer !== nextProps.valueRenderer) {
-      this.setState({ customComponents: this.getCustomComponents(inputProps, optionRenderer, valueRenderer) });
+      this.setState({ customComponents: getCustomComponents(inputProps, optionRenderer, valueRenderer) });
     }
   }
 
-  getCustomComponents = (inputProps?: { [key: string]: any }, optionRenderer?: (option: Option) => React.ReactElement,
-    valueRenderer?: (option: Option) => React.ReactElement): any => {
-    const customComponents: { [key: string]: any } = {};
-
-    if (inputProps) {
-      customComponents.Input = CustomInput(inputProps);
-    }
-
-    if (optionRenderer) {
-      customComponents.Option = CustomOption(optionRenderer);
-    }
-
-    if (valueRenderer) {
-      customComponents.SingleValue = CustomSingleValue(valueRenderer);
-    }
-
-    return customComponents;
-  };
-
+  // eslint-disable-next-line react/no-unused-class-component-methods
   getValue = () => {
     const { value } = this.state;
 
     return value;
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   clearValue = () => {
     this.setState({ value: undefined });
   };

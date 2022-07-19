@@ -106,7 +106,11 @@ import {
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
-const renderPluginRoute = ({ path, component: Component, parentComponent }: PluginRoute) => {
+const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
+  if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
+    return null;
+  }
+
   const ParentComponent = parentComponent ?? React.Fragment;
   const WrappedComponent = () => (
     <ParentComponent>

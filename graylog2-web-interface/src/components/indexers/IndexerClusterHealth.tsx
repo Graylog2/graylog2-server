@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useContext } from 'react';
 import { useQueries } from 'react-query';
 
+import { isPermitted } from 'util/PermissionsMixin';
 import { Spinner } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
 import { DocumentationLink, SmallSupportLink } from 'components/support';
@@ -26,8 +27,13 @@ import type FetchError from 'logic/errors/FetchError';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import IndexerClusterHealthError from './IndexerClusterHealthError';
+
+type Props = {
+  minimal?: boolean,
+};
 
 const GET_INDEXER_CLUSTER_HEALTH = 'indexerCluster.health';
 const GET_INDEXER_CLUSTER_NAME = 'indexerCluster.name';
@@ -44,8 +50,8 @@ const getIndexerClusterName = () => {
   return fetch('GET', url);
 };
 
-const useLoadHealthAndName = () => {
-  const options = { refetchInterval: 5000, retry: 0 };
+const useLoadHealthAndName = (enabled: boolean) => {
+  const options = { refetchInterval: 5000, retry: 0, enabled };
   const [
     { data: healthData, isFetching: healthIsFetching, error: healthError, isSuccess: healthIsSuccess, isRefetching: healthIsRefetching },
     { data: nameData, isFetching: nameIsFetching, error: nameError, isSuccess: nameIsSuccess, isRefetching: nameIsRefetching },
@@ -63,24 +69,39 @@ const useLoadHealthAndName = () => {
   });
 };
 
-const IndexerClusterHealth = () => {
-  const { health, name, loading, error, isSuccess } = useLoadHealthAndName();
+const IndexerClusterHealth = ({ minimal }: Props) => {
+  const currentUser = useContext(CurrentUserContext);
+  const userHasRequiredPermissions = isPermitted(currentUser.permissions, 'indexercluster:read');
+  const { health, name, loading, error, isSuccess } = useLoadHealthAndName(userHasRequiredPermissions);
+
+  if (!userHasRequiredPermissions) {
+    return null;
+  }
 
   return (
     <Row className="content">
       <Col md={12}>
-        <h2>Elasticsearch cluster</h2>
+        {!minimal && (
+          <>
+            <h2>Elasticsearch cluster</h2>
 
-        <SmallSupportLink>
-          The possible Elasticsearch cluster states and more related information is available in the{' '}
-          <DocumentationLink page={DocsHelper.PAGES.CONFIGURING_ES} text="Graylog documentation" />.
-        </SmallSupportLink>
+            <SmallSupportLink>
+              The possible Elasticsearch cluster states and more related information is available in the{' '}
+              <DocumentationLink page={DocsHelper.PAGES.CONFIGURING_ES} text="Graylog documentation" />.
+            </SmallSupportLink>
+          </>
+        )}
+
         {isSuccess && <IndexerClusterHealthSummary health={health} name={name} />}
         {loading && <p><Spinner /></p>}
         {error && <IndexerClusterHealthError error={error} />}
       </Col>
     </Row>
   );
+};
+
+IndexerClusterHealth.defaultProps = {
+  minimal: false,
 };
 
 export default IndexerClusterHealth;
