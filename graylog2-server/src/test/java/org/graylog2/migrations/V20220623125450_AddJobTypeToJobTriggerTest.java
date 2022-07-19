@@ -54,7 +54,7 @@ class V20220623125450_AddJobTypeToJobTriggerTest {
 
     @BeforeEach
     public void setUp() {
-        when(clusterConfigService.getOrDefault(any(), any())).thenReturn(V20220623125450_AddJobTypeToJobTrigger.MigrationCompleted.createEmpty());
+        when(clusterConfigService.getOrDefault(any(), any())).thenReturn(V20220623125450_AddJobTypeToJobTrigger.MigrationStatus.createEmpty());
     }
 
     @Test

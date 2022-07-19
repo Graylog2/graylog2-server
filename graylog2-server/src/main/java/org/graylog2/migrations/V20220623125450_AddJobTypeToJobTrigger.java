@@ -66,7 +66,7 @@ public class V20220623125450_AddJobTypeToJobTrigger extends Migration {
 
     @Override
     public void upgrade() {
-        final MigrationCompleted migrationCompleted = clusterConfigService.getOrDefault(MigrationCompleted.class, MigrationCompleted.createEmpty());
+        final MigrationStatus migrationStatus = clusterConfigService.getOrDefault(MigrationStatus.class, MigrationStatus.createEmpty());
 
         final Stopwatch started = Stopwatch.createStarted();
 
@@ -99,13 +99,13 @@ public class V20220623125450_AddJobTypeToJobTrigger extends Migration {
             LOG.warn("Migration ran longer than expected! Took <{}> seconds", elapsed);
         }
 
-        clusterConfigService.write(MigrationCompleted.
-                create(migrationCompleted.convertedTriggersCount() + modifiedCount,
-                        migrationCompleted.executionCount() + 1));
+        clusterConfigService.write(MigrationStatus.
+                create(migrationStatus.convertedTriggersCount() + modifiedCount,
+                        migrationStatus.executionCount() + 1));
     }
 
     @AutoValue
-    public static abstract class MigrationCompleted {
+    public static abstract class MigrationStatus {
         @JsonProperty("converted_triggers_count")
         public abstract long convertedTriggersCount();
 
@@ -113,11 +113,11 @@ public class V20220623125450_AddJobTypeToJobTrigger extends Migration {
         public abstract int executionCount();
 
         @JsonCreator
-        public static MigrationCompleted create(@JsonProperty("converted_triggers_count") long convertedTriggersCount, @JsonProperty("execution_count") int executionCount) {
-            return new AutoValue_V20220623125450_AddJobTypeToJobTrigger_MigrationCompleted(convertedTriggersCount, executionCount);
+        public static MigrationStatus create(@JsonProperty("converted_triggers_count") long convertedTriggersCount, @JsonProperty("execution_count") int executionCount) {
+            return new AutoValue_V20220623125450_AddJobTypeToJobTrigger_MigrationStatus(convertedTriggersCount, executionCount);
         }
 
-        public static MigrationCompleted createEmpty() {
+        public static MigrationStatus createEmpty() {
             return create(0, 0);
         }
     }
