@@ -39,38 +39,42 @@ const renderedCTE = (scope: string) => {
 
 describe('CacheTableEntry', () => {
   it('should show "edit" button', async () => {
-    const { getByAltText } = renderedCTE('DEFAULT');
+    const { baseElement } = renderedCTE('DEFAULT');
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = getByAltText('edit button'); });
+    await waitFor(() => {
+      const actionBtn = baseElement.querySelector('button[alt="edit button"]');
 
-    expect(actionBtn).toBeVisible();
+      expect(actionBtn).toBeVisible();
+    });
   });
 
   it('should not show "edit" button', async () => {
     const { queryByAltText } = renderedCTE('ILLUMINATE');
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = queryByAltText('edit button'); });
+    await waitFor(() => {
+      const actionBtn = queryByAltText('edit button');
 
-    expect(actionBtn).toBeNull();
+      expect(actionBtn).toBeNull();
+    });
   });
 
   it('should show "delete" button', async () => {
-    const { getByAltText } = renderedCTE('DEFAULT');
+    const { baseElement } = renderedCTE('DEFAULT');
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = getByAltText('delete button'); });
+    await waitFor(() => {
+      const actionBtn = baseElement.querySelector('button[alt="delete button"]');
 
-    expect(actionBtn).toBeVisible();
+      expect(actionBtn).toBeVisible();
+    });
   });
 
   it('should not show "delete" button', async () => {
     const { queryByAltText } = renderedCTE('ILLUMINATE');
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = queryByAltText('delete button'); });
+    await waitFor(() => {
+      const actionBtn = queryByAltText('delete button');
 
-    expect(actionBtn).toBeNull();
+      expect(actionBtn).toBeNull();
+    });
   });
 });

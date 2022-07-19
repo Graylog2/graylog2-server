@@ -16,7 +16,6 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Field } from 'formik';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import lodash from 'lodash';

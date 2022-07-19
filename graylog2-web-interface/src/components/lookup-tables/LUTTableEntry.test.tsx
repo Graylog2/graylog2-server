@@ -41,38 +41,42 @@ const renderedLUT = (scope: string) => {
 
 describe('LUTTableEntry', () => {
   it('should show "edit" button', async () => {
-    const { getByAltText } = renderedLUT('DEFAULT');
+    const { baseElement } = renderedLUT('DEFAULT');
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = getByAltText('edit button'); });
+    await waitFor(() => {
+      const actionBtn = baseElement.querySelector('button[alt="edit button"]');
 
-    expect(actionBtn).toBeVisible();
+      expect(actionBtn).toBeVisible();
+    });
   });
 
   it('should not show "edit" button', async () => {
-    const { queryByAltText } = renderedLUT('ILLUMINATE');
+    const { baseElement } = renderedLUT('ILLUMINATE');
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = queryByAltText('edit button'); });
+    await waitFor(() => {
+      const actionBtn = baseElement.querySelector('button[alt="edit button"]');
 
-    expect(actionBtn).toBeNull();
+      expect(actionBtn).toBeNull();
+    });
   });
 
   it('should show "delete" button', async () => {
-    const { getByAltText } = renderedLUT('DEFAULT');
+    const { baseElement } = renderedLUT('DEFAULT');
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = getByAltText('delete button'); });
+    await waitFor(() => {
+      const actionBtn = baseElement.querySelector('button[alt="delete button"]');
 
-    expect(actionBtn).toBeVisible();
+      expect(actionBtn).toBeVisible();
+    });
   });
 
   it('should not show "delete" button', async () => {
-    const { queryByAltText } = renderedLUT('ILLUMINATE');
+    const { baseElement } = renderedLUT('ILLUMINATE');
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = queryByAltText('delete button'); });
+    await waitFor(() => {
+      const actionBtn = baseElement.querySelector('button[alt="delete button"]');
 
-    expect(actionBtn).toBeNull();
+      expect(actionBtn).toBeNull();
+    });
   });
 });

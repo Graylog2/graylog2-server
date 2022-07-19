@@ -47,7 +47,7 @@ const renderedCache = (scope: string) => {
     expire_after_access: 60,
     expire_after_access_unit: 'SECONDS',
     expire_after_write: 0,
-    expire_after_write_unit: null,
+    expire_after_write_unit: 'MILLISECONDS',
   };
 
   return render(
@@ -57,20 +57,22 @@ const renderedCache = (scope: string) => {
 
 describe('Cache', () => {
   it('should show "edit" button', async () => {
-    const { getByAltText } = renderedCache('DEFAULT');
+    const { baseElement } = renderedCache('DEFAULT');
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = getByAltText('edit button'); });
+    await waitFor(() => {
+      const actionBtn = baseElement.querySelector('button[alt="edit button"]');
 
-    expect(actionBtn).toBeVisible();
+      expect(actionBtn).toBeVisible();
+    });
   });
 
   it('should not show "edit" button', async () => {
-    const { queryByAltText } = renderedCache('ILLUMINATE');
+    const { baseElement } = renderedCache('ILLUMINATE');
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = queryByAltText('edit button'); });
+    await waitFor(() => {
+      const actionBtn = baseElement.querySelector('button[alt="edit button"]');
 
-    expect(actionBtn).toBeNull();
+      expect(actionBtn).toBeNull();
+    });
   });
 });
