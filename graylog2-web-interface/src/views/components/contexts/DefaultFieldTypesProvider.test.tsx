@@ -28,7 +28,7 @@ import FieldTypesContext from './FieldTypesContext';
 import DefaultFieldTypesProvider from './DefaultFieldTypesProvider';
 
 jest.mock('views/logic/queries/useCurrentQuery');
-jest.mock('views/logic/fieldtypes/useFieldTypes');
+jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
 
 describe('DefaultFieldTypesProvider', () => {
   const renderSUT = () => {

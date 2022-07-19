@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useMemo } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import type { TimeRange } from 'views/logic/queries/Query';
 import { qualifyUrl } from 'util/URLUtils';
@@ -34,8 +34,7 @@ type FieldTypesRequest = {
   timerange?: TimeRange,
 };
 
-const _deserializeFieldTypes = (response: FieldTypesResponse) => response
-  .map((fieldTypeMapping) => FieldTypeMapping.fromJSON(fieldTypeMapping));
+const _deserializeFieldTypes = (response: FieldTypesResponse) => response.map((fieldTypeMapping) => FieldTypeMapping.fromJSON(fieldTypeMapping));
 
 const createFieldTypeRequest = (streams: Array<string>, timerange: TimeRange): FieldTypesRequest => {
   let request: FieldTypesRequest = {};

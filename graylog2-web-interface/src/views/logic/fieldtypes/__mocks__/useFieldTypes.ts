@@ -14,22 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = [
-  '@tanstack/react-query',
-  '@emotion/react',
-  'chroma-js',
-  'create-react-class',
-  'formik',
-  'jquery',
-  'leaflet',
-  'moment-timezone',
-  'moment',
-  'react-bootstrap',
-  'react-dom',
-  'react-router-bootstrap',
-  'react-router',
-  'react',
-  'reflux-core',
-  'reflux',
-  'styled-components',
-];
+
+const useFieldTypes = () => ({ data: [] });
+
+export default useFieldTypes;
