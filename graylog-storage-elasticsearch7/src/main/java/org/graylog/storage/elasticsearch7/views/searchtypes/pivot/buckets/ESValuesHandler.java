@@ -81,6 +81,12 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, Terms> {
                 .collect(Collectors.toList());
     }
 
+
+    @Override
+    public Optional<Long> doGetSumOfOtherDocCounts(Terms termsAggregation) {
+        return Optional.of(termsAggregation.getSumOfOtherDocCounts());
+    }
+
     @Override
     public Stream<Bucket> doHandleResult(Values bucketSpec,
                                          Terms termsAggregation) {

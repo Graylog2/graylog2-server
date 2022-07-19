@@ -27,10 +27,17 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.H
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_RESULT extends Aggregation>
         implements BucketSpecHandler<SPEC_TYPE, AggregationBuilder, SearchResponse, AGGREGATION_RESULT, ESGeneratedQueryContext> {
+
+    public Optional<Long> getSumOfOtherDocCounts(Object aggregationResult) {
+        return doGetSumOfOtherDocCounts((AGGREGATION_RESULT) aggregationResult);
+    };
+
+    public abstract Optional<Long> doGetSumOfOtherDocCounts(AGGREGATION_RESULT aggregationResult);
 
     protected ESPivot.AggTypes aggTypes(ESGeneratedQueryContext queryContext, Pivot pivot) {
         return (ESPivot.AggTypes) queryContext.contextMap().get(pivot.id());

@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivots;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -105,7 +106,7 @@ public class ESPivotTest {
     public void setUp() throws Exception {
         bucketHandlers = new HashMap<>();
         seriesHandlers = new HashMap<>();
-        this.esPivot = new ESPivot(bucketHandlers, seriesHandlers);
+        this.esPivot = new ESPivot(bucketHandlers, seriesHandlers, new ObjectMapper());
         when(pivot.id()).thenReturn("dummypivot");
     }
 
@@ -323,7 +324,7 @@ public class ESPivotTest {
 
     @Test
     public void includesCustomNameinResultIfPresent() throws InvalidRangeParametersException {
-        final ESPivot esPivot = new ESPivot(Collections.emptyMap(), Collections.emptyMap());
+        final ESPivot esPivot = new ESPivot(Collections.emptyMap(), Collections.emptyMap(), new ObjectMapper());
         final Pivot pivot = Pivot.builder()
                 .id("somePivotId")
                 .name("customPivot")

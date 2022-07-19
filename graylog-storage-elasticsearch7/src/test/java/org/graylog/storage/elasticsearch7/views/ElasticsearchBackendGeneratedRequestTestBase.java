@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch7.views;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
@@ -91,7 +92,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase {
         final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers = new HashMap<>();
         seriesHandlers.put(Average.NAME, new ESAverageHandler());
         seriesHandlers.put(Max.NAME, new ESMaxHandler());
-        elasticSearchTypeHandlers.put(Pivot.NAME, () -> new ESPivot(bucketHandlers, seriesHandlers));
+        elasticSearchTypeHandlers.put(Pivot.NAME, () -> new ESPivot(bucketHandlers, seriesHandlers, new ObjectMapper()));
 
         this.elasticsearchBackend = new ElasticsearchBackend(elasticSearchTypeHandlers,
                 client,

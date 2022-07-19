@@ -10,6 +10,7 @@
     </Appenders>
     <Loggers>
         <!-- Application Loggers -->
+        <Logger name="org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivot" level="debug"/>
         <Logger name="org.graylog2" level="info"/>
         <Logger name="com.github.joschi.jadconfig" level="warn"/>
         <!-- Prevent DEBUG message about Lucene Expressions not found. -->

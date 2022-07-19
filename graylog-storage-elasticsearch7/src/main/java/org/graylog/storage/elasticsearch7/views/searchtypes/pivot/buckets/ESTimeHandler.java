@@ -92,6 +92,11 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, ParsedDateHist
     }
 
     @Override
+    public Optional<Long> doGetSumOfOtherDocCounts(ParsedDateHistogram parsedDateHistogram) {
+        return Optional.empty();
+    }
+
+    @Override
     public Stream<Bucket> doHandleResult(Time bucketSpec,
                                          ParsedDateHistogram dateHistogramAggregation) {
         return dateHistogramAggregation.getBuckets().stream()

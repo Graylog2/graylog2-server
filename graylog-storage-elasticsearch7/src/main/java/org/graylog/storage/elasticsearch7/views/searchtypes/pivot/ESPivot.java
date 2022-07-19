@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivot;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import one.util.streamex.EntryStream;
@@ -56,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -73,6 +75,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private final Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers;
     private final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
     private static final TimeRange ALL_MESSAGES_TIMERANGE = allMessagesTimeRange();
+    private final ObjectMapper mapper;
 
     private static TimeRange allMessagesTimeRange() {
         try {
@@ -85,9 +88,11 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
     @Inject
     public ESPivot(Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers,
-                   Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers) {
+                   Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers,
+                   ObjectMapper objectMapper) {
         this.bucketHandlers = bucketHandlers;
         this.seriesHandlers = seriesHandlers;
+        this.mapper = objectMapper;
     }
 
     @Override
@@ -116,6 +121,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final MaxAggregationBuilder endTimestamp = AggregationBuilders.max("timestamp-max").field("timestamp");
         searchSourceBuilder.aggregation(startTimestamp);
         searchSourceBuilder.aggregation(endTimestamp);
+        LOG.debug("Query: \n{}",  pretty(searchSourceBuilder.toString()));
     }
 
     private List<AggregationBuilder> doGenerateBucketAggregationsTree(Query query,
@@ -239,8 +245,21 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         );
     }
 
+    // used to pretty print objects in this class for debugging purposes
+    private String pretty(Object obj) {
+        try {
+            if(obj instanceof String) {
+                obj = mapper.readTree((String)obj);
+            }
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+        } catch (IOException e) {
+            return "pretty printing failed, result: " + obj.toString();
+        }
+    }
+
     @Override
     public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResponse queryResult, Aggregations aggregations, ESGeneratedQueryContext queryContext) {
+        LOG.debug("Query Result: \n{}", pretty(queryResult.toString()));
         final AbsoluteRange effectiveTimerange = extractEffectiveTimeRange(queryResult, query, pivot);
 
         final PivotResult.Builder resultBuilder = PivotResult.builder()
@@ -260,7 +279,9 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
         processRows(resultBuilder, queryResult, queryContext, pivot, pivot.rowGroups(), new ArrayDeque<>(), initialResult);
 
-        return pivot.name().map(resultBuilder::name).orElse(resultBuilder).build();
+        SearchType.Result result = pivot.name().map(resultBuilder::name).orElse(resultBuilder).build();
+        LOG.debug("Pivot Result: \n{}", pretty(result));
+        return result;
     }
 
     private HasAggregations createInitialResult(SearchResponse queryResult) {
@@ -308,6 +329,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             final ESPivotBucketSpecHandler<? extends PivotSpec, ? extends Aggregation> handler = bucketHandlers.get(currentBucket.type());
             final Aggregation aggregationResult = handler.extractAggregationFromResult(pivot, currentBucket, aggregation, queryContext);
             final Stream<ESPivotBucketSpecHandler.Bucket> bucketStream = handler.handleResult(currentBucket, aggregationResult);
+
             // for each bucket, recurse and eventually collect all the row keys. once we reach a leaf, we'll end up in the other if branch above
             bucketStream.forEach(bucket -> {
                 // push the bucket's key and use its aggregation as the new source for sub-aggregations
@@ -315,12 +337,25 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 processRows(resultBuilder, searchResult, queryContext, pivot, tail(remainingRows), rowKeys, bucket.aggregation());
                 rowKeys.removeLast();
             });
+
             final Missing missingAggregation = aggregation.getAggregations().get(MissingBucketConstants.MISSING_AGGREGATION_NAME);
             if (missingAggregation != null && missingAggregation.getDocCount() > 0) {
                 rowKeys.addLast(MissingBucketConstants.MISSING_BUCKET_NAME);
                 processRows(resultBuilder, searchResult, queryContext, pivot, tail(remainingRows), rowKeys, missingAggregation);
                 rowKeys.removeLast();
             }
+
+            handler.getSumOfOtherDocCounts(aggregationResult).ifPresent(
+                    other -> {
+                        rowKeys.addLast("Other docs: " + other + " (row)");
+                        final PivotResult.Value v = PivotResult.Value.create(rowKeys, other, true, "row-leaf");
+                        final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.copyOf(rowKeys));
+                        rowBuilder.addValue(v);
+                        resultBuilder.addRow(rowBuilder.source("leaf").build());
+                        rowKeys.removeLast();
+                    }
+            );
+
             // also add the series for this row key if the client wants rollups
             if (pivot.rollup()) {
                 final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.copyOf(rowKeys));
@@ -328,7 +363,6 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 processSeries(rowBuilder, searchResult, queryContext, pivot, new ArrayDeque<>(), aggregation, true, "row-inner");
                 resultBuilder.addRow(rowBuilder.source("non-leaf").build());
             }
-
         }
     }
 
@@ -366,19 +400,29 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 processColumns(rowBuilder, searchResult, queryContext, pivot, tail(remainingColumns), columnKeys, bucket.aggregation());
                 columnKeys.removeLast();
             });
+
             final Missing missingAggregation = aggregation.getAggregations().get(MissingBucketConstants.MISSING_AGGREGATION_NAME);
             if (missingAggregation != null && missingAggregation.getDocCount() > 0) {
                 columnKeys.addLast(MissingBucketConstants.MISSING_BUCKET_NAME);
                 processColumns(rowBuilder, searchResult, queryContext, pivot, tail(remainingColumns), columnKeys, missingAggregation);
                 columnKeys.removeLast();
             }
+
+            handler.getSumOfOtherDocCounts(aggregationResult).ifPresent(
+                    other -> {
+                        columnKeys.addLast("Other docs: " + other + " (col)" );
+                        final PivotResult.Value v = PivotResult.Value.create(columnKeys, other, false, "col-leaf");
+                        columnKeys.removeLast();
+                        rowBuilder.addValue(v);
+                    }
+            );
+
             // also add the series for the base column key if the client wants rollups, the complete column key is processed in the leaf branch
             // don't add the empty column key rollup, because that's not the correct bucket here, it's being done in the row-leaf code
             if (pivot.rollup() && !columnKeys.isEmpty()) {
                 // columnKeys is not empty, because this is a rollup per column in a row
                 processSeries(rowBuilder, searchResult, queryContext, pivot, columnKeys, aggregation, true, "col-inner");
             }
-
         }
     }
 

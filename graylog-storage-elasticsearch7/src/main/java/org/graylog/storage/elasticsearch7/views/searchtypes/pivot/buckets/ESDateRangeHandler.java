@@ -55,6 +55,11 @@ public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket
     }
 
     @Override
+    public Optional<Long> doGetSumOfOtherDocCounts(ParsedDateRange parsedDateRange) {
+        return Optional.empty();
+    }
+
+    @Override
     public Stream<Bucket> doHandleResult(
             DateRangeBucket dateRangeBucket,
             ParsedDateRange rangeAggregation) {
