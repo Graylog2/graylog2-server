@@ -20,7 +20,7 @@ import { mount } from 'wrappedEnzyme';
 import SelectComponent, { components as Components } from 'react-select';
 import selectEvent from 'react-select-event';
 
-import Select from './Select';
+import Select from './index';
 
 const createOption = (x) => ({ label: x, value: x });
 

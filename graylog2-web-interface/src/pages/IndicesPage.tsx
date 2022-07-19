@@ -19,14 +19,16 @@ import React from 'react';
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Col, Row, Button } from 'components/bootstrap';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import { IndexSetsComponent } from 'components/indices';
+import { IndexerClusterHealth } from 'components/indexers';
 
-class IndicesPage extends React.Component {
-  render() {
-    const pageHeader = (
+const IndicesPage = () => (
+  <DocumentTitle title="Indices and Index Sets">
+    <span>
       <PageHeader title="Indices & Index Sets">
         <span>
           A Graylog stream write messages to an index set, which is a configuration for retention, sharding, and
@@ -45,22 +47,18 @@ class IndicesPage extends React.Component {
           </LinkContainer>
         </span>
       </PageHeader>
-    );
 
-    return (
-      <DocumentTitle title="Indices and Index Sets">
-        <span>
-          {pageHeader}
+      <HideOnCloud>
+        <IndexerClusterHealth minimal />
+      </HideOnCloud>
 
-          <Row className="content">
-            <Col md={12}>
-              <IndexSetsComponent />
-            </Col>
-          </Row>
-        </span>
-      </DocumentTitle>
-    );
-  }
-}
+      <Row className="content">
+        <Col md={12}>
+          <IndexSetsComponent />
+        </Col>
+      </Row>
+    </span>
+  </DocumentTitle>
+);
 
 export default IndicesPage;
