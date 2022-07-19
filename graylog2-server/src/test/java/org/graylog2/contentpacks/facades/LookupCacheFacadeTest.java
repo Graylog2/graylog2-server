@@ -35,6 +35,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.db.DBCacheService;
 import org.graylog2.lookup.dto.CacheDto;
@@ -71,7 +72,7 @@ public class LookupCacheFacadeTest {
         cacheService = new DBCacheService(
                 mongodb.mongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper),
-                null,
+                EntityScopeTestUtil.getEntityScopeService(),
                 clusterEventBus);
         pluginMetaData = new HashSet<>();
 
@@ -128,7 +129,7 @@ public class LookupCacheFacadeTest {
                 .id(ModelId.of("1"))
                 .type(ModelTypes.LOOKUP_CACHE_V1)
                 .data(objectMapper.convertValue(LookupCacheEntity.create(
-                        ValueReference.of("no-op-cache"),
+                        ValueReference.of(DefaultEntityScope.NAME),
                         ValueReference.of("no-op-cache"),
                         ValueReference.of("No-op cache"),
                         ValueReference.of("No-op cache"),
@@ -158,7 +159,7 @@ public class LookupCacheFacadeTest {
                 .id(ModelId.of("1"))
                 .type(ModelTypes.LOOKUP_CACHE_V1)
                 .data(objectMapper.convertValue(LookupCacheEntity.create(
-                        ValueReference.of("no-op-cache"),
+                        ValueReference.of(DefaultEntityScope.NAME),
                         ValueReference.of("no-op-cache"),
                         ValueReference.of("No-op cache"),
                         ValueReference.of("No-op cache"),
@@ -187,7 +188,7 @@ public class LookupCacheFacadeTest {
                 .id(ModelId.of("1"))
                 .type(ModelTypes.LOOKUP_CACHE_V1)
                 .data(objectMapper.convertValue(LookupCacheEntity.create(
-                        ValueReference.of("no-op-cache"),
+                        ValueReference.of(DefaultEntityScope.NAME),
                         ValueReference.of("some-cache"),
                         ValueReference.of("Some cache"),
                         ValueReference.of("Some cache"),
@@ -207,7 +208,7 @@ public class LookupCacheFacadeTest {
                 .id(ModelId.of("1"))
                 .type(ModelTypes.LOOKUP_CACHE_V1)
                 .data(objectMapper.convertValue(LookupCacheEntity.create(
-                        ValueReference.of("no-op-cache"),
+                        ValueReference.of(DefaultEntityScope.NAME),
                         ValueReference.of("no-op-cache"),
                         ValueReference.of("No-op cache"),
                         ValueReference.of("No-op cache"),
