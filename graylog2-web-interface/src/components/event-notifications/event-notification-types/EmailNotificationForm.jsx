@@ -18,7 +18,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { MultiSelect, SourceCodeEditor, TimezoneSelect, PaginatedSelect } from 'components/common';
+import { MultiSelect, SourceCodeEditor, TimezoneSelect } from 'components/common';
+import UsersSelectField from 'components/users/UsersSelectField';
 import { ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -85,7 +86,6 @@ class EmailNotificationForm extends React.Component {
     config: PropTypes.object.isRequired,
     validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-    loadUsers: PropTypes.func.isRequired,
   };
 
   static defaultConfig = {
@@ -129,12 +129,8 @@ class EmailNotificationForm extends React.Component {
     return (nextValue) => this.propagateChange(key, nextValue === '' ? [] : nextValue.split(','));
   };
 
-  formatUsers = (users) => {
-    return users.map((user) => ({ label: `${user.username} (${user.fullName})`, value: user.username }));
-  };
-
   render() {
-    const { config, loadUsers, validation } = this.props;
+    const { config, validation } = this.props;
 
     return (
       <>
@@ -160,15 +156,9 @@ class EmailNotificationForm extends React.Component {
         <FormGroup controlId="notification-user-recipients"
                    validationState={validation.errors.recipients ? 'error' : null}>
           <ControlLabel>User recipient(s) <small className="text-muted">(Optional)</small></ControlLabel>
-          <PaginatedSelect id="notification-user-recipients"
-                           value={Array.isArray(config.user_recipients) ? config.user_recipients.join(',') : ''}
-                           placeholder="Select user(s)..."
-                           debounceTimeout={500}
-                           async
-                           multi
-                           defaultOptions
-                           loadOptions={loadUsers}
-                           onChange={this.handleRecipientsChange('user_recipients')} />
+          <UsersSelectField id="notification-user-recipients"
+                            value={Array.isArray(config.user_recipients) ? config.user_recipients.join(',') : ''}
+                            onChange={this.handleRecipientsChange('user_recipients')} />
           <HelpBlock>
             {lodash.get(validation, 'errors.recipients[0]', 'Select Graylog users that will receive this Notification.')}
           </HelpBlock>

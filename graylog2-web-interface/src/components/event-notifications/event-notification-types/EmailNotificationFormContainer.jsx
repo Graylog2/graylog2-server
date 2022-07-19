@@ -17,58 +17,16 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import UsersDomain from 'domainActions/users/UsersDomain';
-import { isPermitted } from 'util/PermissionsMixin';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-import connect from 'stores/connect';
-
 import EmailNotificationForm from './EmailNotificationForm';
 
-class EmailNotificationFormContainer extends React.Component {
-  static propTypes = {
-    currentUser: PropTypes.object.isRequired,
-    config: PropTypes.object.isRequired,
-    validation: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
-  };
+const EmailNotificationFormContainer = (props) => {
+  return <EmailNotificationForm {...props} />;
+};
 
-  constructor(props) {
-    super(props);
+EmailNotificationFormContainer.propTypes = {
+  config: PropTypes.object.isRequired,
+  validation: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
 
-    this.state = {
-      pagination: { page: 1, perPage: 50, query: '' },
-    };
-  }
-
-  loadUsersPaginated = async (search, prevOptions) => {
-    const { pagination: { page, perPage, query } } = this.state;
-    const { currentUser } = this.props;
-    let options = [];
-    let hasMore;
-
-    if (isPermitted(currentUser.permissions, 'users:list')) {
-      const isNewQuery = search && search !== query;
-      const pageParam = isNewQuery ? 1 : page;
-      const response = await UsersDomain.loadUsersPaginated({ page: pageParam, perPage, query: search });
-
-      const { pagination, list: usersList } = response;
-      options = usersList.map((user) => ({ label: `${user.username} (${user.fullName})`, value: user.username })).toArray();
-
-      this.setState({ pagination: { ...pagination, page: page + 1 } });
-      hasMore = prevOptions.length < pagination.total;
-    }
-
-    return {
-      options: options,
-      hasMore,
-    };
-  };
-
-  render() {
-    return <EmailNotificationForm {...this.props} users={[]} loadUsers={this.loadUsersPaginated} />;
-  }
-}
-
-export default connect(EmailNotificationFormContainer,
-  { currentUser: CurrentUserStore },
-  ({ currentUser }) => ({ currentUser: currentUser ? currentUser.currentUser : currentUser }));
+export default EmailNotificationFormContainer;
