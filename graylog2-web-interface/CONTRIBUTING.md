@@ -51,22 +51,23 @@ you want to use (class or a functional component with react hooks). When you don
 - The downside of this is that it might introduce cyclic dependencies (which can be resolved by babel/webpack by proxying, but should be avoided)
 
 ### React components
-- Keep components small < 300 lines
+- Keep components small, as in < 300 lines
 - Keep components simple, so they do not contain real logic. You need to transform the structure of an object when a user clicks on a button? Create a helper function for the logic which can be reused. Place the helper function in a place where it can be found easily.
 
 ### Testing
 - When adding new functionality, try to write unit tests for every possible use case. If you are not sure where to start, try to test what is important for the user.
 - Currently, we have nearly only unit tests, but want to add more integration tests in the future. You can find examples for an integration test in `src/views/spec` 
-- There are still some tests, which implement enzyme, but we are only using @testing-library/react for new tests. 
-  We do favor testing-library for new tests, as it has been proven that it results in more reliable tests. You should not use both libraries in one file. 
+- There are still some tests which use `enzyme`, but we are only using `@testing-library/react` for new tests. 
+  We do favor `testing-library` for new tests, as it has been proven that it results in more reliable tests. You should not use both libraries in one file. In many cases, test quality can be improved by migrating a test suite from `enzyme` to `testing-library`.
+- A test should not rely on the knowledge of the inner workings of the system under test. Especially when testing React components, we prefer to test it like a user would use it.
 - Test files should be on the same level 
-  - ComponentA.jsx 
-  - ComponentA.test.jsx 
+  - `ComponentA.jsx` 
+  - `ComponentA.test.jsx` 
 - Except you have to create a few fixtures, in this case create a __tests__ directory. 
   - ComponentA.jsx
-  - __tests__/ComponentA.test.jsx
-  - __tests__/ComponentA.test.case1.json
-  - __tests__/ComponentA.text.case1.result.json
+  - `__tests__/ComponentA.test.jsx`
+  - `__tests__/ComponentA.test.case1.json`
+  - `__tests__/ComponentA.text.case1.result.json`
 - Do not use snapshot tests to test the state of a component.
   - Imagine the following case: User clicks on a button and we display an alert. You can test this behavior with a snapshot, but it has many disadvantages. You can also just use the react-testing-library method `getByText()` to check if the alert is being displayed
   - When you create a snapshot you will need to update the snapshot often, for example when the button style changes.
@@ -84,6 +85,7 @@ and ActionsProvider. The *Providers use a registration system using a key in the
 Newer code (views) is testing a different approach: Instead of importing stores differently, it uses a `singleton()` wrapper that exports stores while tracking them centrally. The benefit is that:
 - Tracking usages of stores across the code base & refactoring support of your favorite IDE still works
 - (Re-)Moving a store that is still in use will fail at compile time, not at runtime
+- Type information of the stores/actions is kept
 
 ### Good to know / gotchas
 
@@ -125,15 +127,15 @@ const e = '' ?? 'default'
 
 ### Internal packages
 We currently have a few internal packages, used for the core application and all plug-ins:
-- graylog-web-plugin contains common packages for both the core and plug-ins, webpack configuration for building plug-ins, as well as some interfaces to register and consume plugins.
-- eslint-config-graylog contains our custom linter configuration, based on eslint-config-airbnb.
-- stylelint-config-graylog contains our custom stylelint configuration, based on the default stylelint config.
+- `graylog-web-plugin` contains common packages for both the core and plug-ins, webpack configuration for building plug-ins, as well as some interfaces to register and consume plugins.
+- `eslint-config-graylog` contains our custom linter configuration, based on eslint-config-airbnb.
+- `stylelint-config-graylog` contains our custom stylelint configuration, based on the default stylelint config.
 
 ### Browser compatibility
-We currently do not have a pre release process to test different or old browser. Nevertheless you should test layout changes in at least all modern browsers (Chrome, Firefox, Safari). Bigger layout changes should also be tested in older browsers. Have a look at our [public browser compatibility list](https://docs.graylog.org/docs/web-interface#browser-compatibility).
+We currently do not have a pre-release process to test different or old browser. Nevertheless you should test layout changes in at least all modern browsers (Chrome, Firefox, Safari). Bigger layout changes should also be tested in older browsers. Have a look at our [public browser compatibility list](https://docs.graylog.org/docs/web-interface#browser-compatibility).
 
 ### Plugin System
-- Graylogs plugin system allows users to extend the graylog core product without changing its source code. There are multiple points in the application which can be extended, like the navigation.
+- Graylog's plugin system allows users to extend the graylog core product without changing its source code. There are multiple points in the application which can be extended, like the navigation.
 - In the frontend you can register anything to the plugin store with `PluginStore.register(new PluginManifest({}, { thePluginStoreKey: [thePluginData] }));` in a plugin and use it with `usePluginEntities('thePluginStoreKey');`.
 - Currently, there is no documentation about the available plugin store keys, you need to look up the usage in the code. 
 - If you want to test the UI without plugins you can run `disable_plugins=true yarn start`.
