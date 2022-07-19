@@ -33,6 +33,7 @@ import org.graylog2.contentpacks.model.entities.LookupDataAdapterEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.db.DBDataAdapterService;
 import org.graylog2.lookup.dto.DataAdapterDto;
@@ -69,6 +70,7 @@ public class LookupDataAdapterFacadeTest {
         dataAdapterService = new DBDataAdapterService(
                 mongodb.mongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper),
+                EntityScopeTestUtil.getEntityScopeService(),
                 clusterEventBus);
         pluginMetaData = new HashSet<>();
 
@@ -124,6 +126,7 @@ public class LookupDataAdapterFacadeTest {
                 .id(ModelId.of("1"))
                 .type(ModelTypes.LOOKUP_ADAPTER_V1)
                 .data(objectMapper.convertValue(LookupDataAdapterEntity.create(
+                        ValueReference.of(DefaultEntityScope.NAME),
                         ValueReference.of("http-dsv"),
                         ValueReference.of("HTTP DSV"),
                         ValueReference.of("HTTP DSV"),
@@ -150,6 +153,7 @@ public class LookupDataAdapterFacadeTest {
                 .id(ModelId.of("1"))
                 .type(ModelTypes.LOOKUP_ADAPTER_V1)
                 .data(objectMapper.convertValue(LookupDataAdapterEntity.create(
+                        ValueReference.of(DefaultEntityScope.NAME),
                         ValueReference.of("http-dsv"),
                         ValueReference.of("HTTP DSV"),
                         ValueReference.of("HTTP DSV"),
@@ -172,6 +176,7 @@ public class LookupDataAdapterFacadeTest {
                 .id(ModelId.of("1"))
                 .type(ModelTypes.LOOKUP_ADAPTER_V1)
                 .data(objectMapper.convertValue(LookupDataAdapterEntity.create(
+                        ValueReference.of(DefaultEntityScope.NAME),
                         ValueReference.of("some-name"),
                         ValueReference.of("Some title"),
                         ValueReference.of("Some description"),
@@ -209,6 +214,7 @@ public class LookupDataAdapterFacadeTest {
                 .id(ModelId.of("5adf24a04b900a0fdb4e52c8"))
                 .type(ModelTypes.LOOKUP_ADAPTER_V1)
                 .data(objectMapper.convertValue(LookupDataAdapterEntity.create(
+                        ValueReference.of(DefaultEntityScope.NAME),
                         ValueReference.of("http-dsv"),
                         ValueReference.of("HTTP DSV"),
                         ValueReference.of("HTTP DSV"),

@@ -30,7 +30,6 @@ import org.graylog2.lookup.events.CachesUpdated;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
-import org.mongojack.JacksonDBCollection;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -40,8 +39,7 @@ import java.util.stream.Collectors;
 
 public class DBCacheService extends ScopedEntityPaginatedDbService<CacheDto> {
     public static final String COLLECTION_NAME = "lut_caches";
-    // TODO: rename this or get rid of it. Same name (db) as superclass.
-    private final JacksonDBCollection<CacheDto, ObjectId> db;
+
     private final ClusterEventBus clusterEventBus;
 
     @Inject
@@ -50,22 +48,17 @@ public class DBCacheService extends ScopedEntityPaginatedDbService<CacheDto> {
                           EntityScopeService entityScopeService,
                           ClusterEventBus clusterEventBus) {
         super(mongoConnection, mapper, CacheDto.class, COLLECTION_NAME, entityScopeService);
-        this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("lut_caches"),
-                CacheDto.class,
-                ObjectId.class,
-                mapper.get());
         this.clusterEventBus = clusterEventBus;
 
         db.createIndex(new BasicDBObject("name", 1), new BasicDBObject("unique", true));
     }
 
     public Optional<CacheDto> get(String idOrName) {
-        try {
+        if (ObjectId.isValid(idOrName)) {
             return Optional.ofNullable(db.findOneById(new ObjectId(idOrName)));
-        } catch (IllegalArgumentException e) {
-            // not an ObjectId, try again with name
+        } else {
+            // not an ObjectId, try with name
             return Optional.ofNullable(db.findOne(DBQuery.is("name", idOrName)));
-
         }
     }
 
