@@ -16,9 +16,37 @@
  */
 package org.graylog2.database.entities;
 
-public interface EntityScope {
+import java.util.Objects;
 
-    String getName();
+public abstract class EntityScope {
 
-    boolean isMutable();
+    public abstract String getName();
+
+    public abstract boolean isMutable();
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 79 * hash + Objects.hashCode(this.getName());
+        hash = 79 * hash + (isMutable() ? 1 : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null) {
+            return false;
+        }
+        if (getClass() != object.getClass()) {
+            return false;
+        }
+        final DefaultEntityScope other = (DefaultEntityScope) object;
+        if (this.isMutable() != other.isMutable()) {
+            return false;
+        }
+        return Objects.equals(this.getName(), other.getName());
+    }
 }
