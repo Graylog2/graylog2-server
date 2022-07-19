@@ -986,7 +986,7 @@
     core-js-pure "^3.20.2"
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.10.2", "@babel/runtime@^7.12.0", "@babel/runtime@^7.12.1", "@babel/runtime@^7.12.13", "@babel/runtime@^7.12.5", "@babel/runtime@^7.13.10", "@babel/runtime@^7.15.4", "@babel/runtime@^7.16.3", "@babel/runtime@^7.16.5", "@babel/runtime@^7.18.3", "@babel/runtime@^7.2.0", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.2", "@babel/runtime@^7.6.3", "@babel/runtime@^7.7.2", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.10.2", "@babel/runtime@^7.12.0", "@babel/runtime@^7.12.1", "@babel/runtime@^7.12.13", "@babel/runtime@^7.12.5", "@babel/runtime@^7.13.10", "@babel/runtime@^7.15.4", "@babel/runtime@^7.16.3", "@babel/runtime@^7.18.3", "@babel/runtime@^7.2.0", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.2", "@babel/runtime@^7.6.3", "@babel/runtime@^7.7.2", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
   version "7.18.6"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.18.6.tgz#6a1ef59f838debd670421f8c7f2cbb8da9751580"
   integrity sha512-t9wi7/AW6XtKahAe20Yw0/mMljKq0B1r2fPdvaAdV/KPDZewFXdaaa6K7lxmZBZ8FBNpCiAT6iHPmd6QO9bKfQ==
@@ -1755,11 +1755,6 @@
     "@react-hook/passive-layout-effect" "^1.2.0"
     "@types/raf-schd" "^4.0.0"
     raf-schd "^4.0.2"
-
-"@seznam/compose-react-refs@^1.0.6":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@seznam/compose-react-refs/-/compose-react-refs-1.0.6.tgz#6ec4e70bdd6e32f8e70b4100f27267cf306bd8df"
-  integrity sha512-izzOXQfeQLonzrIQb8u6LQ8dk+ymz3WXTIXjvOlTXHq6sbzROg3NWU+9TTAOpEoK9Bth24/6F/XrfHJ5yR5n6Q==
 
 "@sinclair/typebox@^0.24.1":
   version "0.24.19"
@@ -6511,13 +6506,13 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
     "@types/create-react-class" "15.6.3"
     "@types/jquery" "3.5.14"
     "@types/react" "17.0.44"
-    babel-preset-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-358ea19c-9561-497d-bc36-f63a34369ec3-1657784339609/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-cea8c3b2-995a-456a-9a03-ba980e43b9ac-1658219969062/node_modules/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-358ea19c-9561-497d-bc36-f63a34369ec3-1657784339609/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-cea8c3b2-995a-456a-9a03-ba980e43b9ac-1658219969062/node_modules/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-358ea19c-9561-497d-bc36-f63a34369ec3-1657784339609/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-cea8c3b2-995a-456a-9a03-ba980e43b9ac-1658219969062/node_modules/jest-preset-graylog"
     jquery "3.6.0"
     moment "2.29.3"
     moment-timezone "0.5.34"
@@ -10028,11 +10023,6 @@ react-input-autosize@^3.0.0:
   dependencies:
     prop-types "^15.5.8"
 
-react-is-mounted-hook@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/react-is-mounted-hook/-/react-is-mounted-hook-1.1.2.tgz#0e57d237c0ed60f6a8dc0520634608a80ae864ff"
-  integrity sha512-yjq3Tj34CiFcdVOS/h6JerWLOLdJqEGKMNpTHc4kWebzz2YtIpgqMRrqxdmQhewM1KJREojdAV2tsNvBsUWyhA==
-
 react-is@^16.12.0, react-is@^16.13.1, react-is@^16.3.2, react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.6:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
@@ -10195,16 +10185,6 @@ react-router@5.2.1:
     tiny-invariant "^1.0.2"
     tiny-warning "^1.0.0"
 
-react-select-async-paginate@^0.6.1:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/react-select-async-paginate/-/react-select-async-paginate-0.6.1.tgz#979810bd09829c14175441b6219280fb53959ab8"
-  integrity sha512-oFdX8aciCoBEXuP0ouSSan4H/6lYw9w5eCiA3vw9eNSWdFmIU1HzyYrEQbVJDz027kp643e8pKKmO6pWbr21yA==
-  dependencies:
-    "@babel/runtime" "^7.16.5"
-    "@seznam/compose-react-refs" "^1.0.6"
-    react-is-mounted-hook "^1.1.2"
-    sleep-promise "^9.1.0"
-
 react-select-event@^5.0.0:
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/react-select-event/-/react-select-event-5.5.0.tgz#148067f75846f6bf07254c453083f2d3d59935f6"
@@ -10289,6 +10269,11 @@ react-ultimate-pagination@^1.2.0:
   dependencies:
     prop-types "^15.0.0"
     ultimate-pagination "1.0.0"
+
+react-window-infinite-loader@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/react-window-infinite-loader/-/react-window-infinite-loader-1.0.8.tgz#f88b1444829e732a3f4c5ae861644815329ddd88"
+  integrity sha512-907ZLAiZZfBHuZyiY0V7uiSL4P/rI6UQyCF9wES1cDWTeyNLgGLaxu+BZkcUW3R5tSCQcbCcWBl0jVIpYzrKGQ==
 
 react-window@^1.8.2:
   version "1.8.7"
@@ -11060,11 +11045,6 @@ slash@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/slash/-/slash-4.0.0.tgz#2422372176c4c6c5addb5e2ada885af984b396a7"
   integrity sha512-3dOsAHXXUkQTpOYcoAxLIorMTp4gIQr5IW3iVb7A7lFIp0VHhnynm9izx6TssdrIcVIESAlVjtnO2K8bg+Coew==
-
-sleep-promise@^9.1.0:
-  version "9.1.0"
-  resolved "https://registry.yarnpkg.com/sleep-promise/-/sleep-promise-9.1.0.tgz#101ebe65700bcd184709da95d960967b02b79d03"
-  integrity sha512-UHYzVpz9Xn8b+jikYSD6bqvf754xL2uBUzDFwiU6NcdZeifPr6UfgU43xpkPu67VMS88+TI2PSI7Eohgqf2fKA==
 
 slice-ansi@^4.0.0:
   version "4.0.0"
