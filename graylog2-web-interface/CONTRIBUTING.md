@@ -37,7 +37,7 @@ you want to use (class or a functional component with react hooks). When you don
 - We use TypeScript for new components, and we also define `PropType` definitions. Static types add better type support for the development, integrating with your IDE, while `PropType` definitions are present at runtime.
 - Names of unused parameters
   - Sometimes you need to define a parameter which is not being used, for example when you just want to use the second parameter. To satisfy TypeScript the parameter name needs to be prefixed with underscore.
-  - Instead of defining just `_`, use a more meaningful name, like `_theParameterName`. (Related to this discussion){.
+  - Instead of defining just `_`, use a more meaningful name, like `_theParameterName`. (Related to [this discussion](https://github.com/Graylog2/graylog2-server/pull/12176#pullrequestreview-940555887)).
 - `types.d.ts` can have hidden errors, like missing imports. Rename it temporary to `types.ts` to detect the most obvious ones.
 
 ### Imports
@@ -119,7 +119,7 @@ const e = '' ?? 'default'
 ```
 
 #### Avoid `Array.reduce`
-- When working with many items (like hundred or thousands). Have a look at this PR for more information.
+- When working with many items (like hundred or thousands). Have a look at [this PR](https://github.com/Graylog2/graylog2-server/pull/12162) for more information.
 
 ### Reusing components
 - We use react-bootstrap for many UI common components. To help us deal with breaking changes in their APIs, and to style the components as we want, we use our own wrappers around react bootstrap components. You can import these components from components/graylog.
