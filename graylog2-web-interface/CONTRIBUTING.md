@@ -118,8 +118,9 @@ const d = 0 ?? 'default'
 const e = '' ?? 'default'
 ```
 
-#### Avoid `Array.reduce`
-- When working with many items (like hundred or thousands). Have a look at [this PR](https://github.com/Graylog2/graylog2-server/pull/12162) for more information.
+#### Avoid `Array.reduce` for object construction
+Using `Array.reduce` to construct an object from an array is a common pattern. When working with many items (like hundreds or thousands) it can become really slow. 
+Using `Object.fromEntries` is a better alternative in most cases. Have a look at [this PR](https://github.com/Graylog2/graylog2-server/pull/12162) for more information.
 
 ### Reusing components
 - We use react-bootstrap for many UI common components. To help us deal with breaking changes in their APIs, and to style the components as we want, we use our own wrappers around react bootstrap components. You can import these components from components/graylog.
