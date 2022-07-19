@@ -16,7 +16,7 @@
  */
 package org.graylog2.database.entities;
 
-public class DefaultEntityScope implements EntityScope {
+public final class DefaultEntityScope extends EntityScope {
 
     public static final String NAME = "DEFAULT";
 

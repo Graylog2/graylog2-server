@@ -45,6 +45,7 @@ import org.graylog2.audit.formatter.AuditEventFormatter;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.database.entities.EntityScope;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
@@ -135,14 +136,14 @@ public abstract class PluginModule extends Graylog2Module {
     // This should be used by plugins that have been built for 3.0.1 or later.
     // See comments in MessageOutput.Factory and MessageOutput.Factory2 for details
     protected <T extends MessageOutput> void addMessageOutput2(Class<T> messageOutputClass,
-                                                              Class<? extends MessageOutput.Factory2<T>> factory) {
+                                                               Class<? extends MessageOutput.Factory2<T>> factory) {
         installOutput2(outputsMapBinder2(), messageOutputClass, factory);
     }
 
     protected void addRestResource(Class<? extends PluginRestResource> restResourceClass) {
         MapBinder<String, Class<? extends PluginRestResource>> pluginRestResourceMapBinder =
                 MapBinder.newMapBinder(binder(), new TypeLiteral<String>() {},
-                                       new TypeLiteral<Class<? extends PluginRestResource>>() {})
+                                new TypeLiteral<Class<? extends PluginRestResource>>() {})
                         .permitDuplicates();
         pluginRestResourceMapBinder.addBinding(this.getClass().getPackage().getName()).toInstance(restResourceClass);
     }
@@ -273,9 +274,9 @@ public abstract class PluginModule extends Graylog2Module {
     }
 
     protected void addSchedulerJob(String name,
-                                 Class<? extends Job> jobClass,
-                                 Class<? extends Job.Factory> factoryClass,
-                                 Class<? extends JobDefinitionConfig> configClass) {
+                                   Class<? extends Job> jobClass,
+                                   Class<? extends Job.Factory> factoryClass,
+                                   Class<? extends JobDefinitionConfig> configClass) {
         addSchedulerJob(name, jobClass, factoryClass, configClass, null);
     }
 
@@ -394,7 +395,13 @@ public abstract class PluginModule extends Graylog2Module {
     protected Multibinder<SchedulerCapabilities> schdulerCapabilitiesBinder() {
         return Multibinder.newSetBinder(binder(), SchedulerCapabilities.class);
     }
+
     protected void addSchedulerCapabilities(Class<? extends SchedulerCapabilities> schedulerCapabilitiesClass) {
         schdulerCapabilitiesBinder().addBinding().to(schedulerCapabilitiesClass);
+    }
+
+    protected void addEntityScope(Class<? extends EntityScope> entityScopeType) {
+        Multibinder<EntityScope> scopeBinder = Multibinder.newSetBinder(binder(), EntityScope.class);
+        scopeBinder.addBinding().to(entityScopeType);
     }
 }

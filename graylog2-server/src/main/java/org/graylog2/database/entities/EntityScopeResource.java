@@ -26,6 +26,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,6 @@ public class EntityScopeResource extends RestResource {
 
         return entityScopeService.getEntityScopes()
                 .stream()
-                .collect(Collectors.toMap(EntityScope::getName, EntityScopeResponse::of));
+                .collect(Collectors.toMap(e -> e.getName().toUpperCase(Locale.ROOT), EntityScopeResponse::of));
     }
 }

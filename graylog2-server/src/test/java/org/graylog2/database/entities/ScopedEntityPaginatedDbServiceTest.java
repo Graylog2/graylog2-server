@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MongoDBExtension.class)
-public class ScopedEntityPaginatedDbServiceTest {
+class ScopedEntityPaginatedDbServiceTest {
     private static final EntityScope IMMUTABLE_SCOPE = new ImmutableEntityScope();
 
     private TestScopedEntityDBService dbService;
@@ -134,11 +134,11 @@ public class ScopedEntityPaginatedDbServiceTest {
                 .build();
     }
 
-    private static final class ImmutableEntityScope implements EntityScope {
+    public static final class ImmutableEntityScope extends EntityScope {
 
         @Override
         public String getName() {
-            return "immutable_entity_scope_test";
+            return "IMMUTABLE_ENTITY_SCOPE_TEST";
         }
 
         @Override

@@ -58,20 +58,8 @@ public abstract class ScopedEntityPaginatedDbService<E extends ScopedEntity> ext
         return entityScopeService.isMutable(scopedEntity);
     }
 
-    /**
-     * Find a Mutable entity with the given ID.  <b>empty</b> is returned if the entity is not found OR if it is <b>immutable</b>.
-     *
-     * @param id target ID
-     * @return optional target entity
-     */
-    public final Optional<E> findMutableById(String id) {
-
-        return get(id)
-                .filter(entityScopeService::isMutable);
-    }
-
     @Override
-    public E save(E entity) {
+    public final E save(E entity) {
 
         ensureValidScope(entity);
         if (entity.id() != null) {
@@ -94,7 +82,7 @@ public abstract class ScopedEntityPaginatedDbService<E extends ScopedEntity> ext
     }
 
     @Override
-    public int delete(String id) {
+    public final int delete(String id) {
         ensureMutability(get(id).orElseThrow(() -> new IllegalArgumentException("Entity not found")));
 
         return super.delete(id);

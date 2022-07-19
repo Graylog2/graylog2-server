@@ -21,12 +21,13 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class EntityScopeService {
+public final class EntityScopeService {
 
     private final Map<String, EntityScope> entityScopes;
 
@@ -34,7 +35,7 @@ public class EntityScopeService {
     public EntityScopeService(Set<EntityScope> entityScopes) {
         this.entityScopes = Objects.requireNonNull(entityScopes)
                 .stream()
-                .collect(Collectors.toMap(EntityScope::getName, e -> e));
+                .collect(Collectors.toMap(e -> e.getName().toUpperCase(Locale.ROOT), e -> e));
     }
 
     public List<EntityScope> getEntityScopes() {
@@ -48,12 +49,11 @@ public class EntityScopeService {
 
         String scope = scopedEntity.scope();
 
-        // TODO: Should it fail instead?
         if (scope == null || scope.isEmpty()) {
             return true;
         }
 
-        EntityScope entityScope = entityScopes.get(scope);
+        EntityScope entityScope = entityScopes.get(scope.toUpperCase(Locale.ROOT));
         if (entityScope == null) {
             throw new IllegalArgumentException("Entity Scope does not exist: " + scope);
         }
@@ -61,13 +61,13 @@ public class EntityScopeService {
         return entityScope.isMutable();
 
     }
-
-    // TODO: Give further consideration to whether the scope can be null here.
+    
     public boolean hasValidScope(ScopedEntity scopedEntity) {
         Objects.requireNonNull(scopedEntity, "Entity must not be null");
 
         String scope = scopedEntity.scope();
 
-        return scope == null || entityScopes.containsKey(scope);
+        return scope != null && entityScopes.containsKey(scope);
+
     }
 }
