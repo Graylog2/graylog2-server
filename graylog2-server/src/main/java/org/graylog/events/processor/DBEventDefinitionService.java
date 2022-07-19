@@ -65,8 +65,7 @@ public class DBEventDefinitionService extends ScopedEntityPaginatedDbService<Eve
         return dto;
     }
 
-    @Override
-    public int delete(String id) {
+    public int deleteAndUnregister(String id) {
         try {
             stateService.deleteByEventDefinitionId(id);
         } catch (Exception e) {

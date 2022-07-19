@@ -146,7 +146,7 @@ public class EventDefinitionHandler {
                 .ifPresent(jobDefinition -> deleteJobDefinitionAndTrigger(jobDefinition, eventDefinition));
 
         LOG.debug("Deleting event definition <{}/{}>", eventDefinition.id(), eventDefinition.title());
-        return eventDefinitionService.delete(eventDefinitionId) > 0;
+        return eventDefinitionService.deleteAndUnregister(eventDefinitionId) > 0;
     }
 
     /**
