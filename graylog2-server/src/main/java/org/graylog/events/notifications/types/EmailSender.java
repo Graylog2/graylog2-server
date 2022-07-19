@@ -117,6 +117,10 @@ public class EmailSender {
             email.setFrom(config.sender());
         }
 
+        if (email.getFromAddress() == null) {
+            throw new TransportConfigurationException("No from address specified for email transport.");
+        }
+
         email.setSubject(buildSubject(config, model));
         email.addTo(emailAddress);
 
