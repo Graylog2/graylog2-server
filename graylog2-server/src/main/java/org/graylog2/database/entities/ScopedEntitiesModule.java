@@ -25,6 +25,7 @@ public class ScopedEntitiesModule extends PluginModule {
 
         Multibinder<EntityScope> scopeBinder = Multibinder.newSetBinder(binder(), EntityScope.class);
         scopeBinder.addBinding().to(DefaultEntityScope.class);
+        addSystemRestResource(EntityScopeResource.class);
 
     }
 }
