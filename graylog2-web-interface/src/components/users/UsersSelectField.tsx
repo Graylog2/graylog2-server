@@ -41,14 +41,9 @@ type Props = {
 const UsersSelectField = ({ value, onChange }: Props) => {
   const currentUser = useStore(CurrentUserStore, (state) => state?.currentUser);
   const [paginatedUsers, setPaginatedUsers] = useState<PaginatedUsers | undefined>();
-  const [isLoading, setIsLoading] = useState(false);
   const loadUsersPaginated = useCallback((pagination = DEFAULT_PAGINATION) => {
-    setIsLoading(true);
-
     if (isPermitted(currentUser.permissions, 'users:list')) {
       return UsersDomain.loadUsersPaginated(pagination).then((newPaginatedUser) => {
-        setIsLoading(false);
-
         return newPaginatedUser;
       });
     }
@@ -64,7 +59,7 @@ const UsersSelectField = ({ value, onChange }: Props) => {
         const list = prevUsers.list.concat(response.list);
         const newPagination = { ...prevUsers.pagination, ...response.pagination };
 
-        return { ...prevUsers, list, pagination: newPagination };
+        return { ...prevUsers, list, pagination: newPagination } as PaginatedUsers;
       });
     });
   }, 200);
