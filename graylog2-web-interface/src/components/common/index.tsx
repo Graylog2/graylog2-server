@@ -105,4 +105,3 @@ export { default as TypeAheadInput } from './TypeAheadInput';
 export { default as URLWhiteListFormModal } from './URLWhiteListFormModal';
 export { default as URLWhiteListInput } from './URLWhiteListInput';
 export { default as Wizard } from './Wizard';
-export { default as PaginatedSelect } from './PaginatedSelect';

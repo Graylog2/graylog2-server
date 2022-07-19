@@ -51,28 +51,35 @@ const Row = ({ data, index, setSize, style, containerWidth }: RowProps) => {
   );
 };
 
-const WindowList = ({ children }: Props.MenuList) => {
+export const WindowList = ({ children, listRef, ...rest }: Props.MenuList) => {
   const containerRef = useRef(null);
-  const listRef = useRef(null);
+  const vListRef = useRef(null);
   const sizeMap = useRef({});
   const containerDimensions = useElementDimensions(containerRef);
   const { width, height } = containerDimensions;
 
   const setSize = useCallback((index: number, size: number) => {
     sizeMap.current = { ...sizeMap.current, [index]: size };
-    listRef.current.resetAfterIndex(index);
-  }, []);
+    listRef.current?.resetAfterIndex(index);
+  }, [listRef]);
 
   const getSize = useCallback((index: number) => sizeMap.current[index] || 36, [sizeMap]);
 
   return (
     <Container ref={containerRef}>
-      <List ref={listRef}
+      <List ref={(currentRef) => {
+        if (listRef) {
+          listRef(currentRef);
+        }
+
+        return vListRef;
+      }}
             height={height}
             itemCount={children.length}
             itemSize={getSize}
             itemData={children}
-            width={width}>
+            width={width}
+            {...rest}>
         {({ data, index, style }) => (
           <Row data={data}
                style={style}

@@ -18,4 +18,5 @@
 import Select from './Select';
 
 export { CONTROL_CLASS } from './Select';
+export { default as PaginatedSelect } from './PaginatedSelect';
 export default Select;
