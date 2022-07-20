@@ -218,6 +218,8 @@ class FieldValueCompletion implements Completer {
 
     return (currentTokenIsFieldName || currentTokenIsFieldValue) && !nextTokenIsTerm;
   };
+
+  public identifierRegexps = [/[a-zA-Z_0-9$\\/\-\u00A2-\u2000\u2070-\uFFFF]/];
 }
 
 export default FieldValueCompletion;
