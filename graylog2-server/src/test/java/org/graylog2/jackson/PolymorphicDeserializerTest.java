@@ -6,9 +6,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.bson.types.ObjectId;
-import org.graylog.plugins.views.search.views.ViewServiceUsesViewRequirementsTest;
-import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
-import org.graylog.plugins.views.search.views.widgets.aggregation.TimeUnitIntervalDTO;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -17,16 +14,19 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.mongojack.Id;
 import org.mongojack.JacksonDBCollection;
 
-public class PolymorphicDoubleTest {
+import javax.annotation.Nullable;
+
+public class PolymorphicDeserializerTest {
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
-    JacksonDBCollection<ParentDTO, ObjectId> db;
+    JacksonDBCollection<Container, ObjectId> db;
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION)
     @JsonSubTypes({
@@ -34,21 +34,25 @@ public class PolymorphicDoubleTest {
             @JsonSubTypes.Type(ChildB.class)
     })
     public interface ParentDTO {
-        String name();
     }
 
     public static class ChildA implements ParentDTO {
         @JsonProperty
         private Double d;
-        public String name() {return "ChildA";}
-        public double d(){return d;}
     }
 
     public static class ChildB implements ParentDTO {
         @JsonProperty
         private String s;
-        public String name() {return "ChildB";}
-        public String s() {return s;}
+    }
+
+    public static class Container {
+        @Id
+        @org.mongojack.ObjectId
+        String id;
+
+        @JsonProperty("polyDto")
+        ParentDTO polyDto;
     }
 
     class MongoJackObjectMapperProviderForTest extends MongoJackObjectMapperProvider {
@@ -66,16 +70,23 @@ public class PolymorphicDoubleTest {
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProviderForTest(new ObjectMapper());
         db = JacksonDBCollection.wrap(mongodb.mongoConnection().getDatabase().getCollection("polyCollection"),
-                ParentDTO.class,
+                Container.class,
                 ObjectId.class,
                 objectMapperProvider.get(),
                 null);
     }
 
     @Test
-    @MongoDBFixtures("polymorphicDouble.json")
+    @MongoDBFixtures("polymorphicDeserializer.json")
     public void readDouble() {
-        final ParentDTO oneById = db.findOneById(new ObjectId("5ced4df1d6e8104c16f50e00"));
+        final Container oneById = db.findOneById(new ObjectId("100000000000000000000000"));
     }
+
+    @Test
+    @MongoDBFixtures("polymorphicDeserializer.json")
+    public void readString() {
+        final Container oneById = db.findOneById(new ObjectId("200000000000000000000000"));
+    }
+
 
 }
