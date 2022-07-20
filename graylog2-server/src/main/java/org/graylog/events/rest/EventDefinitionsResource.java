@@ -191,7 +191,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_DELETE)
     public void delete(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_DELETE, definitionId);
-        eventDefinitionHandler.delete(definitionId);
+        eventDefinitionHandler.delete(definitionId, false);
     }
 
     @PUT
