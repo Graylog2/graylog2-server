@@ -63,9 +63,8 @@ public class DBLookupTableService extends ScopedEntityPaginatedDbService<LookupT
         }
     }
 
-    @Override
-    public LookupTableDto save(LookupTableDto table) {
-        final LookupTableDto savedLookupTable = super.save(table);
+    public LookupTableDto saveAndPostEvent(LookupTableDto table) {
+        final LookupTableDto savedLookupTable = save(table);
 
         clusterEventBus.post(LookupTablesUpdated.create(savedLookupTable));
 
@@ -74,12 +73,6 @@ public class DBLookupTableService extends ScopedEntityPaginatedDbService<LookupT
 
     public Collection<LookupTableDto> findAll() {
         return asImmutableList(db.find());
-    }
-
-    public Collection<LookupTableDto> findByNames(Collection<String> names) {
-        final DBQuery.Query query = DBQuery.in("name", names);
-        final DBCursor<LookupTableDto> dbCursor = db.find(query);
-        return asImmutableList(dbCursor);
     }
 
     public PaginatedList<LookupTableDto> findPaginated(DBQuery.Query query, DBSort.SortBuilder sort, int page, int perPage) {
@@ -106,12 +99,10 @@ public class DBLookupTableService extends ScopedEntityPaginatedDbService<LookupT
         }
     }
 
-    @Override
-    public int delete(String idOrName) {
+    public void deleteAndPostEvent(String idOrName) {
         final Optional<LookupTableDto> lookupTableDto = get(idOrName);
-        int numDeleted = super.delete(idOrName);
+        delete(idOrName);
         lookupTableDto.ifPresent(lookupTable -> clusterEventBus.post(LookupTablesDeleted.create(lookupTable)));
-        return numDeleted;
     }
 
     public void forEach(Consumer<? super LookupTableDto> action) {

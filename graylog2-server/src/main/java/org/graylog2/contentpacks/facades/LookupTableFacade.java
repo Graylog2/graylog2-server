@@ -149,7 +149,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
                 .defaultMultiValue(lookupTableEntity.defaultMultiValue().asString(parameters))
                 .defaultMultiValueType(lookupTableEntity.defaultMultiValueType().asEnum(parameters, LookupDefaultMultiValue.Type.class))
                 .build();
-        final LookupTableDto savedLookupTableDto = lookupTableService.save(lookupTableDto);
+        final LookupTableDto savedLookupTableDto = lookupTableService.saveAndPostEvent(lookupTableDto);
         return NativeEntity.create(entity.id(), savedLookupTableDto.id(), TYPE_V1, lookupTableDto.title(), savedLookupTableDto);
     }
 
@@ -187,7 +187,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
 
     @Override
     public void delete(LookupTableDto nativeEntity) {
-        lookupTableService.delete(nativeEntity.id());
+        lookupTableService.deleteAndPostEvent(nativeEntity.id());
     }
 
     @Override
