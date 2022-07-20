@@ -118,7 +118,7 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
                 .config(configuration)
                 .build();
 
-        final CacheDto savedCacheDto = cacheService.save(cacheDto);
+        final CacheDto savedCacheDto = cacheService.saveAndPostEvent(cacheDto);
         return NativeEntity.create(entity.id(), savedCacheDto.id(), TYPE_V1, savedCacheDto.title(), savedCacheDto);
     }
 
@@ -148,7 +148,7 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
 
     @Override
     public void delete(CacheDto nativeEntity) {
-        cacheService.delete(nativeEntity.id());
+        cacheService.deleteAndPostEvent(nativeEntity.id());
     }
 
     @Override

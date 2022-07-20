@@ -62,9 +62,8 @@ public class DBDataAdapterService extends ScopedEntityPaginatedDbService<DataAda
         }
     }
 
-    @Override
-    public DataAdapterDto save(DataAdapterDto table) {
-        final DataAdapterDto savedDataAdapter = super.save(table);
+    public DataAdapterDto saveAndPostEvent(DataAdapterDto table) {
+        final DataAdapterDto savedDataAdapter = save(table);
         clusterEventBus.post(DataAdaptersUpdated.create(savedDataAdapter.id()));
 
         return savedDataAdapter;
@@ -80,12 +79,10 @@ public class DBDataAdapterService extends ScopedEntityPaginatedDbService<DataAda
         }
     }
 
-    @Override
-    public int delete(String idOrName) {
+    public void deleteAndPostEvent(String idOrName) {
         final Optional<DataAdapterDto> dataAdapterDto = get(idOrName);
-        int numDeleted = super.delete(idOrName);
+        delete(idOrName);
         dataAdapterDto.ifPresent(dataAdapter -> clusterEventBus.post(DataAdaptersDeleted.create(dataAdapter.id())));
-        return numDeleted;
     }
 
     public Collection<DataAdapterDto> findByIds(Set<String> idSet) {

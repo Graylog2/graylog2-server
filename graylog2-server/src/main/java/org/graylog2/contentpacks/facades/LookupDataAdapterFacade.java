@@ -118,7 +118,7 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
                 .config(configuration)
                 .build();
 
-        final DataAdapterDto savedDataAdapterDto = dataAdapterService.save(dataAdapterDto);
+        final DataAdapterDto savedDataAdapterDto = dataAdapterService.saveAndPostEvent(dataAdapterDto);
         return NativeEntity.create(entity.id(), savedDataAdapterDto.id(), TYPE_V1, savedDataAdapterDto.title(), savedDataAdapterDto);
     }
 
@@ -148,7 +148,7 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
 
     @Override
     public void delete(DataAdapterDto nativeEntity) {
-        dataAdapterService.delete(nativeEntity.id());
+        dataAdapterService.deleteAndPostEvent(nativeEntity.id());
     }
 
     @Override

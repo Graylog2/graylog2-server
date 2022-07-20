@@ -62,9 +62,8 @@ public class DBCacheService extends ScopedEntityPaginatedDbService<CacheDto> {
         }
     }
 
-    @Override
-    public CacheDto save(CacheDto table) {
-        final CacheDto savedCache = super.save(table);
+    public CacheDto saveAndPostEvent(CacheDto table) {
+        final CacheDto savedCache = save(table);
         clusterEventBus.post(CachesUpdated.create(savedCache.id()));
 
         return savedCache;
@@ -80,12 +79,10 @@ public class DBCacheService extends ScopedEntityPaginatedDbService<CacheDto> {
         }
     }
 
-    @Override
-    public int delete(String idOrName) {
+    public void deleteAndPostEvent(String idOrName) {
         final Optional<CacheDto> cacheDto = get(idOrName);
-        int numDeleted = super.delete(idOrName);
+        delete(idOrName);
         cacheDto.ifPresent(cache -> clusterEventBus.post(CachesDeleted.create(cache.id())));
-        return numDeleted;
     }
 
     public Collection<CacheDto> findByIds(Set<String> idSet) {
