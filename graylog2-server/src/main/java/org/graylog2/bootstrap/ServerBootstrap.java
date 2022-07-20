@@ -37,6 +37,7 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
+import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.configuration.PathConfiguration;
@@ -143,18 +144,30 @@ public abstract class ServerBootstrap extends CmdLineTool {
             return;
         }
 
-        // use the MongoDBPreflightCheck to detect a fresh graylog installation
-        final Injector injector = getMongoPreFlightInjector();
-        boolean dbIsEmpty = injector.getInstance(MongoDBPreflightCheck.class).dbIsEmpty();
-        if (dbIsEmpty) {
-            registerFreshInstallation();
-        }
+        runMongoPreflightCheck();
 
         final List<Module> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
                 .flatMap(Collection::stream).collect(Collectors.toList());
         preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
 
         getPreflightInjector(preflightCheckModules).getInstance(PreflightCheckService.class).runChecks();
+    }
+
+    private void runMongoPreflightCheck() {
+        // The MongoDBPreflightCheck is not run via the PreflightCheckService,
+        // because it also detects whether we are running on a fresh Graylog installation
+        final Injector injector = getMongoPreFlightInjector();
+        final MongoDBPreflightCheck mongoDBPreflightCheck = injector.getInstance(MongoDBPreflightCheck.class);
+        try {
+            mongoDBPreflightCheck.runCheck();
+        } catch (PreflightCheckException e) {
+            LOG.error("Preflight check failed with error: {}", e.getLocalizedMessage());
+            throw e;
+        }
+
+        if (mongoDBPreflightCheck.dbIsEmpty()) {
+            registerFreshInstallation();
+        }
     }
 
     private Injector getMongoPreFlightInjector() {

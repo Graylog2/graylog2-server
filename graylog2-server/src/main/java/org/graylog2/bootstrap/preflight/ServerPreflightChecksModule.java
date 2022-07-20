@@ -31,7 +31,7 @@ public class ServerPreflightChecksModule extends Graylog2Module {
         bind(NodeId.class).toProvider(NodeIdProvider.class);
         bind(AuditEventSender.class).to(NullAuditEventSender.class);
 
-        addPreflightCheck(MongoDBPreflightCheck.class);
+        // The MongoDBPreflightCheck is not registered here, because it is called separately from ServerBootstrap
         addPreflightCheck(SearchDbPreflightCheck.class);
         addPreflightCheck(DiskJournalPreflightCheck.class);
     }
