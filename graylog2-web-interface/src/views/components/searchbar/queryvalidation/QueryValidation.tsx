@@ -157,7 +157,7 @@ const getErrorDocumentationLink = (errorType: string) => {
 };
 
 const QueryValidation = () => {
-  const plugableValidationExplanation = usePluginEntities('views.elements.validationErrorExplanation');
+  const pluggableValidationExplanation = usePluginEntities('views.elements.validationErrorExplanation');
   const [shakingPopover, shake] = useShakeTemporarily();
   const [showExplanation, toggleShow] = useTriggerIfErrorsPersist(shake);
 
@@ -207,9 +207,9 @@ const QueryValidation = () => {
                                      text={<DocumentationIcon name="lightbulb" />} />
                 </Explanation>
               ))}
-              {plugableValidationExplanation?.map((PlugableExplanation, index) => (
+              {pluggableValidationExplanation?.map((PluggableExplanation, index) => (
                 // eslint-disable-next-line react/no-array-index-key
-                <PlugableExplanation validationState={validationState} key={index} />),
+                <PluggableExplanation validationState={validationState} key={index} />),
               )}
             </div>
           </StyledPopover>
