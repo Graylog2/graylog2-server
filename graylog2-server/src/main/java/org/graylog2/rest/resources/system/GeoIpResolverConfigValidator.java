@@ -21,6 +21,7 @@ import com.codahale.metrics.Timer;
 import com.codahale.metrics.UniformReservoir;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
+import org.graylog.plugins.map.config.S3GeoIpFileDownloader;
 import org.graylog.plugins.map.geoip.GeoAsnInformation;
 import org.graylog.plugins.map.geoip.GeoIpResolver;
 import org.graylog.plugins.map.geoip.GeoIpVendorResolverService;
@@ -45,14 +46,19 @@ import java.util.stream.Collectors;
 public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
 
     private static final Logger LOG = LoggerFactory.getLogger(GeoIpResolverConfigValidator.class);
+    private static final String S3_BUCKET_PREFIX = "s3://";
 
     private static final List<TimeUnit> VALID_UNITS = Arrays.asList(TimeUnit.SECONDS, TimeUnit.MINUTES, TimeUnit.HOURS, TimeUnit.DAYS);
 
     private final GeoIpVendorResolverService geoIpVendorResolverService;
+    private final S3GeoIpFileDownloader s3GeoIpFileDownloader;
+
 
     @Inject
-    public GeoIpResolverConfigValidator(GeoIpVendorResolverService geoIpVendorResolverService) {
+    public GeoIpResolverConfigValidator(GeoIpVendorResolverService geoIpVendorResolverService,
+                                        S3GeoIpFileDownloader s3GeoIpFileDownloader) {
         this.geoIpVendorResolverService = geoIpVendorResolverService;
+        this.s3GeoIpFileDownloader = s3GeoIpFileDownloader;
     }
 
     @Override
@@ -85,7 +91,9 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
             //AddressNotFoundException.  Any other exception suggests an actual error such as
             //a database file that does not belong to the vendor selected
             InetAddress testAddress = InetAddress.getByName("127.0.0.1");
-
+            if (config.asnDbPath().startsWith(S3_BUCKET_PREFIX) && config.cityDbPath().startsWith(S3_BUCKET_PREFIX)) {
+                s3GeoIpFileDownloader.downloadFiles(config);
+            }
             validateGeoIpLocationResolver(config, timer, testAddress);
             validateGeoIpAsnResolver(config, timer, testAddress);
 

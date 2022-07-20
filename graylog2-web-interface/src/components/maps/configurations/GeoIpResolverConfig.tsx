@@ -33,6 +33,7 @@ export type GeoIpConfigType = {
   asn_db_path: string;
   refresh_interval_unit: TimeUnit;
   refresh_interval: number;
+  use_s3: boolean;
 }
 
 export type OptionType = {
@@ -53,6 +54,7 @@ const defaultConfig: GeoIpConfigType = {
   asn_db_path: '/etc/graylog/server/GeoLite2-ASN.mmdb',
   refresh_interval_unit: 'MINUTES',
   refresh_interval: 10,
+  use_s3: false,
 };
 
 const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) => {
@@ -115,6 +117,8 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
             <dd>{config.asn_db_path}</dd>
             <dt>Database refresh interval:</dt>
             <dd>{config.refresh_interval} {config.refresh_interval_unit}</dd>
+            <dt>Pull files from S3 bucket:</dt>
+            <dd>{config.use_s3 === true ? 'Yes' : 'No'}</dd>
           </>
         )}
       </dl>
@@ -195,6 +199,14 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                                  hideCheckbox
                                  units={['SECONDS', 'MINUTES', 'HOURS', 'DAYS']} />
 
+                  <Row>
+                    <Col sm={6}>
+                      <FormikInput id="use_s3"
+                                   type="checkbox"
+                                   label="Pull files from S3 bucket"
+                                   name="use_s3" />
+                    </Col>
+                  </Row>
                 </Modal.Body>
                 <Modal.Footer>
                   <Button type="button"
