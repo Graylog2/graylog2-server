@@ -45,10 +45,12 @@ public class EntityScopeResource extends RestResource {
 
     @ApiOperation("Generate a mapping of available Entity Scopes")
     @GET
-    public Map<String, EntityScopeResponse> getAllEntityScopes() {
+    public EntityScopes getAllEntityScopes() {
 
-        return entityScopeService.getEntityScopes()
+        Map<String, EntityScopeResponse> scopes = entityScopeService.getEntityScopes()
                 .stream()
                 .collect(Collectors.toMap(e -> e.getName().toUpperCase(Locale.ROOT), EntityScopeResponse::of));
+
+        return EntityScopes.create(scopes);
     }
 }
