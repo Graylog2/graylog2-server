@@ -50,7 +50,7 @@ const formatValue = (value: string, type: string) => {
 
 const completionCaption = (fieldValue: string, input: string | number, isQuoted: boolean) => {
   if ((isQuoted ? fieldValue : escape(fieldValue)).startsWith(String(input))) {
-    return fieldValue;
+    return isQuoted ? fieldValue : escape(fieldValue);
   }
 
   return `${fieldValue} ⭢ ${input}`;
