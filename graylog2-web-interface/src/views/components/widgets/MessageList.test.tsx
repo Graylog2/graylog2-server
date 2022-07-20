@@ -184,7 +184,7 @@ describe('MessageList', () => {
   });
 
   it('reexecute query for search type, when using pagination', async () => {
-    const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: 0 } };
+    const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
     const secondPageSize = 10;
 
     render(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }} />);
