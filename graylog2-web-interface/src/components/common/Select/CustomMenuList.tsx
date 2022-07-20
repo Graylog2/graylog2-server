@@ -51,7 +51,7 @@ const Row = ({ data, index, setSize, style, containerWidth }: RowProps) => {
   );
 };
 
-export const WindowList = ({ children, listRef, ...rest }: Props.MenuList) => {
+export const WindowList = ({ children, listRef, ...rest }: Props.MenuList & { listRef?: any}) => {
   const containerRef = useRef(null);
   const vListRef = useRef(null);
   const sizeMap = useRef({});
@@ -60,20 +60,15 @@ export const WindowList = ({ children, listRef, ...rest }: Props.MenuList) => {
 
   const setSize = useCallback((index: number, size: number) => {
     sizeMap.current = { ...sizeMap.current, [index]: size };
-    listRef.current?.resetAfterIndex(index);
+    const currentRef = listRef || vListRef;
+    currentRef.current?.resetAfterIndex(index);
   }, [listRef]);
 
   const getSize = useCallback((index: number) => sizeMap.current[index] || 36, [sizeMap]);
 
   return (
     <Container ref={containerRef}>
-      <List ref={(currentRef) => {
-        if (listRef) {
-          listRef(currentRef);
-        }
-
-        return vListRef;
-      }}
+      <List ref={listRef || vListRef}
             height={height}
             itemCount={children.length}
             itemSize={getSize}
@@ -90,6 +85,10 @@ export const WindowList = ({ children, listRef, ...rest }: Props.MenuList) => {
       </List>
     </Container>
   );
+};
+
+WindowList.defaultProps = {
+  listRef: undefined,
 };
 
 const CustomMenuList = ({ children, innerProps, ...rest }: Props.MenuList) => {
