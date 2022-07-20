@@ -295,7 +295,7 @@ describe('FieldValueCompletion', () => {
         {
           name: 'C:\\Windows\\System32\\lsass.exe',
           value: 'C\\:\\\\Windows\\\\System32\\\\lsass.exe',
-          caption: 'C:\\Windows\\System32\\lsass.exe',
+          caption: 'C\\:\\\\Windows\\\\System32\\\\lsass.exe',
           score: 300,
           meta: '300 hits',
         },
