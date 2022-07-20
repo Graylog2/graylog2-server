@@ -77,7 +77,7 @@
     "plotly.js": "^2.6.3",
     "promise-polyfill": "^8.2.0",
     "qs": "^6.3.0",
-    "react-ace": "9.5.0",
+    "react-ace": "10.1.0",
     "react-beautiful-dnd": "^13.1.0",
     "react-color": "^2.14.0",
     "react-day-picker": "^7.4.8",
