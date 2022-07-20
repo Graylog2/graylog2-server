@@ -70,4 +70,5 @@ public abstract class PageListResponse<T> {
             @Nullable String order) {
         return new AutoValue_PageListResponse<>(query, paginatedList.pagination(), paginatedList.pagination().total(), sort, order, paginatedList);
     }
+
 }
