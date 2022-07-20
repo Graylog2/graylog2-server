@@ -47,14 +47,16 @@ public class ReferenceConverter extends StdConverter<JsonNode, Reference> {
                 final JsonNode value = jsonNode.path(ValueReference.FIELD_VALUE);
                 if (valueType == ValueType.BOOLEAN && value.isBoolean()) {
                     return ValueReference.of(value.booleanValue());
-                } else if (valueType == ValueType.DOUBLE) {
-                    return ValueReference.of(jsonNode.get(ValueReference.FIELD_VALUE).asDouble());
-                } else if (valueType == ValueType.FLOAT) {
-                    return ValueReference.of((float) jsonNode.get(ValueReference.FIELD_VALUE).asDouble());
-                } else if (valueType == ValueType.INTEGER) {
-                    return ValueReference.of(jsonNode.get(ValueReference.FIELD_VALUE).asInt());
-                } else if (valueType == ValueType.LONG) {
-                    return ValueReference.of((long) jsonNode.get(ValueReference.FIELD_VALUE).asInt());
+                } else if (valueType == ValueType.DOUBLE && value.isDouble()) {
+                    return ValueReference.of(value.doubleValue());
+                } else if (valueType == ValueType.FLOAT && value.isFloat()) {
+                    return ValueReference.of(value.floatValue());
+                } else if (valueType == ValueType.INTEGER && value.isInt()) {
+                    return ValueReference.of(value.intValue());
+                } else if (valueType == ValueType.LONG && (value.isLong() || value.isInt())) {
+                    //                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    // Jackson actually creates an int value for a small number so we check for both (long and int value) here
+                    return ValueReference.of(value.longValue());
                 } else if (valueType == ValueType.STRING && value.isTextual()) {
                     return ValueReference.of(value.textValue());
                 } else if (valueType == ValueType.PARAMETER && value.isTextual()) {
