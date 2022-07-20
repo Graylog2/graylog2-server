@@ -32,6 +32,7 @@ import type { BackendMessage, Message } from 'views/components/messagelist/Types
 import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
 import { SOURCE_FIELD } from 'views/Constants';
+import MessageTableProviders from 'views/components/messagelist/MessageTableProviders';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 
@@ -142,49 +143,51 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
   const toggleDetail = useCallback((id: string) => _toggleMessageDetail(id, expandedMessages, setExpandedMessages), [expandedMessages]);
 
   return (
-    <TableWrapper className="table-responsive" id="sticky-augmentations-container" ref={scrollContainerRef}>
-      <Table className="table table-condensed">
-        <TableHead>
-          <tr>
-            {selectedFields.toSeq().map((selectedFieldName) => {
-              return (
-                <th key={selectedFieldName}
-                    style={_columnStyle(selectedFieldName)}>
-                  <Field type={_fieldTypeFor(selectedFieldName, fields)}
-                         name={selectedFieldName}
-                         queryId={activeQueryId}>
-                    {selectedFieldName}
-                  </Field>
-                  <InteractiveContext.Consumer>
-                    {(interactive) => (interactive && (
+    <MessageTableProviders>
+      <TableWrapper className="table-responsive" id="sticky-augmentations-container" ref={scrollContainerRef}>
+        <Table className="table table-condensed">
+          <TableHead>
+            <tr>
+              {selectedFields.toSeq().map((selectedFieldName) => {
+                return (
+                  <th key={selectedFieldName}
+                      style={_columnStyle(selectedFieldName)}>
+                    <Field type={_fieldTypeFor(selectedFieldName, fields)}
+                           name={selectedFieldName}
+                           queryId={activeQueryId}>
+                      {selectedFieldName}
+                    </Field>
+                    <InteractiveContext.Consumer>
+                      {(interactive) => (interactive && (
                       <FieldSortIcon fieldName={selectedFieldName}
                                      onSortChange={onSortChange}
                                      setLoadingState={setLoadingState}
                                      config={config} />
-                    ))}
-                  </InteractiveContext.Consumer>
-                </th>
-              );
-            })}
-          </tr>
-        </TableHead>
-        {formattedMessages.map((message) => {
-          const messageKey = `${message.index}-${message.id}`;
+                      ))}
+                    </InteractiveContext.Consumer>
+                  </th>
+                );
+              })}
+            </tr>
+          </TableHead>
+          {formattedMessages.map((message) => {
+            const messageKey = `${message.index}-${message.id}`;
 
-          return (
-            <MessageTableEntry fields={fields}
-                               key={messageKey}
-                               message={message}
-                               config={config}
-                               showMessageRow={config?.showMessageRow}
-                               selectedFields={selectedFields}
-                               expanded={expandedMessages.contains(messageKey)}
-                               toggleDetail={toggleDetail}
-                               expandAllRenderAsync={false} />
-          );
-        })}
-      </Table>
-    </TableWrapper>
+            return (
+              <MessageTableEntry fields={fields}
+                                 key={messageKey}
+                                 message={message}
+                                 config={config}
+                                 showMessageRow={config?.showMessageRow}
+                                 selectedFields={selectedFields}
+                                 expanded={expandedMessages.contains(messageKey)}
+                                 toggleDetail={toggleDetail}
+                                 expandAllRenderAsync={false} />
+            );
+          })}
+        </Table>
+      </TableWrapper>
+    </MessageTableProviders>
   );
 };
 
