@@ -138,27 +138,31 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     private void runPreFlightChecks(Set<Plugin> plugins) {
-        final List<Module> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
-                .flatMap(Collection::stream).collect(Collectors.toList());
-
-        Injector injector = getPreflightInjector(preflightCheckModules);
-        final Boolean skipChecks = injector.getInstance(Key.get(Boolean.class, Names.named("skip_preflight_checks")));
-        if (skipChecks) {
+        if (configuration.getSkipPreflightChecks()) {
             LOG.info("Skipping preflight checks");
             return;
         }
 
         // use the MongoDBPreflightCheck to detect a fresh graylog installation
+        final Injector injector = getMongoPreFlightInjector();
         boolean dbIsEmpty = injector.getInstance(MongoDBPreflightCheck.class).dbIsEmpty();
         if (dbIsEmpty) {
             registerFreshInstallation();
         }
 
-        // recreate PreflightInjector with FreshInstallDetectionModule
+        final List<Module> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
+                .flatMap(Collection::stream).collect(Collectors.toList());
         preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
-        injector = getPreflightInjector(preflightCheckModules);
 
-        injector.getInstance(PreflightCheckService.class).runChecks();
+        getPreflightInjector(preflightCheckModules).getInstance(PreflightCheckService.class).runChecks();
+    }
+
+    private Injector getMongoPreFlightInjector() {
+        return Guice.createInjector(
+                new IsDevelopmentBindings(),
+                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new ConfigurationModule(configuration)
+        );
     }
 
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
