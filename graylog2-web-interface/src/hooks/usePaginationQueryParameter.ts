@@ -19,23 +19,31 @@ import { useHistory, useLocation } from 'react-router-dom';
 
 import useQuery from 'routing/useQuery';
 
-const DEFAULT_PAGE = 1;
+export const DEFAULT_PAGE = 1;
 
-const usePaginationQueryParameter = () => {
-  const { page: pageQueryParameter } = useQuery();
+const usePaginationQueryParameter = (PAGE_SIZES: number[]) => {
+  const { page: pageQueryParameter, pageSize: pageSizeQueryParameter } = useQuery();
   const history = useHistory();
   const { search, pathname } = useLocation();
+  const query = pathname + search;
 
   const setPage = (newPage: number) => {
-    const query = pathname + search;
     const uri = new URI(query).setSearch('page', String(newPage));
+    history.replace(uri.toString());
+  };
+
+  const setPageSize = (newPageSize: number) => {
+    const uri = new URI(query).setSearch({ page: String(DEFAULT_PAGE), pageSize: String(newPageSize) });
     history.replace(uri.toString());
   };
 
   const pageQueryParameterAsNumber = Number(pageQueryParameter);
   const page = (Number.isInteger(pageQueryParameterAsNumber) && pageQueryParameterAsNumber > 0) ? pageQueryParameterAsNumber : DEFAULT_PAGE;
 
-  return { page, setPage };
+  const pageSizeQueryParameterAsNumber = Number(pageSizeQueryParameter);
+  const pageSize = (Number.isInteger(pageSizeQueryParameterAsNumber) && PAGE_SIZES?.includes(pageSizeQueryParameterAsNumber)) ? pageSizeQueryParameterAsNumber : PAGE_SIZES[0];
+
+  return { page, setPage, pageSize, setPageSize };
 };
 
 export default usePaginationQueryParameter;
