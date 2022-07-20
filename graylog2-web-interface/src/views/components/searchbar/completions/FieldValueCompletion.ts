@@ -48,8 +48,8 @@ const formatValue = (value: string, type: string) => {
   }
 };
 
-const completionCaption = (fieldValue: string, input: string | number) => {
-  if (fieldValue.startsWith(String(input))) {
+const completionCaption = (fieldValue: string, input: string | number, isQuoted: boolean) => {
+  if ((isQuoted ? fieldValue : escape(fieldValue)).startsWith(String(input))) {
     return fieldValue;
   }
 
@@ -86,7 +86,7 @@ const formatSuggestion = (value: string, occurrence: number, input: string | num
   name: value,
   value: isQuoted ? value : escape(value),
   score: occurrence,
-  caption: completionCaption(value, input),
+  caption: completionCaption(value, input, isQuoted),
   meta: `${occurrence} hits`,
 });
 
@@ -145,7 +145,7 @@ class FieldValueCompletion implements Completer {
   private filterExistingSuggestions(input: string | number, isQuoted: boolean) {
     if (this.previousSuggestions) {
       return this.previousSuggestions.suggestions
-        .filter((suggestion) => suggestion.value.startsWith(String(input)))
+        .filter(({ value }) => (isQuoted ? value : escape(value)).startsWith(String(input)))
         .map(({ value, occurrence }) => formatSuggestion(value, occurrence, input, isQuoted));
     }
 
