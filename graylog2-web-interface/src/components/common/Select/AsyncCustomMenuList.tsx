@@ -17,19 +17,34 @@
 import * as React from 'react';
 import type { Props } from 'react-select';
 import InfiniteLoader from 'react-window-infinite-loader';
+import styled from 'styled-components';
 
 import { WindowList } from 'components/common/Select/CustomMenuList';
 
+const StyledDiv = styled.div`
+  width: 100%;
+  text-align: center ;
+  height: 36px;
+`;
+
+const getNoOptionMessgage = () => {
+  return (
+    <StyledDiv key="noOptions" className="menu-notice menu-notice--no-options">
+      No Options
+    </StyledDiv>
+  );
+};
+
 const AsyncCustomMenuList = ({ children, selectProps: { loadOptions, total } }: Props.MenuList) => {
-  const childrenArray = React.Children.toArray(children);
+  const items = children?.length ? children : [getNoOptionMessgage()];
 
   return (
-
-    <InfiniteLoader isItemLoaded={(index) => index < childrenArray.length}
+    <InfiniteLoader isItemLoaded={(index) => index < children.length}
                     itemCount={total}
                     loadMoreItems={loadOptions}>
       {({ onItemsRendered, ref }) => (
-        <WindowList listRef={ref} onItemsRendered={onItemsRendered}>{children}
+        <WindowList listRef={ref} onItemsRendered={onItemsRendered}>
+          {items}
         </WindowList>
       )}
     </InfiniteLoader>
