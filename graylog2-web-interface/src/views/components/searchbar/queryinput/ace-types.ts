@@ -70,6 +70,7 @@ export type CompletionResult = {
   value: string,
   score: number,
   meta: any,
+  caption?: string,
 };
 
 export type ResultsCallback = (obj: null, results: Array<CompletionResult>) => void;
