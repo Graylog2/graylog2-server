@@ -43,7 +43,6 @@ import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.PreflightCheckModule;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -135,24 +134,34 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
     @Override
     protected void beforeInjectorCreation(Set<Plugin> plugins) {
-        final boolean dbIsEmpty = runPreFlightChecks(plugins);
+        runPreFlightChecks(plugins);
+    }
+
+    private void runPreFlightChecks(Set<Plugin> plugins) {
+        final List<Module> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
+                .flatMap(Collection::stream).collect(Collectors.toList());
+
+        Injector injector = getPreflightInjector(preflightCheckModules);
+        final Boolean skipChecks = injector.getInstance(Key.get(Boolean.class, Names.named("skip_preflight_checks")));
+        if (skipChecks) {
+            LOG.info("Skipping preflight checks");
+            return;
+        }
+
+        // use the MongoDBPreflightCheck to detect a fresh graylog installation
+        boolean dbIsEmpty = injector.getInstance(MongoDBPreflightCheck.class).dbIsEmpty();
         if (dbIsEmpty) {
             registerFreshInstallation();
         }
-    }
 
-    private boolean runPreFlightChecks(Set<Plugin> plugins) {
-        final List<PreflightCheckModule> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
-                .flatMap(Collection::stream).collect(Collectors.toList());
-
-        final Injector injector = getPreflightInjector(preflightCheckModules);
+        // recreate PreflightInjector with FreshInstallDetectionModule
+        preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
+        injector = getPreflightInjector(preflightCheckModules);
 
         injector.getInstance(PreflightCheckService.class).runChecks();
-        // use the MongoDBPreflightCheck to detect a fresh graylog installation
-        return injector.getInstance(MongoDBPreflightCheck.class).dbIsEmpty();
     }
 
-    private Injector getPreflightInjector(List<PreflightCheckModule> preflightCheckModules) {
+    private Injector getPreflightInjector(List<Module> preflightCheckModules) {
         final Injector injector = Guice.createInjector(
                 new IsDevelopmentBindings(),
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
