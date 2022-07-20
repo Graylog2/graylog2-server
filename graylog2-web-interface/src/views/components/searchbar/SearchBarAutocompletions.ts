@@ -109,5 +109,5 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
     });
   };
 
-  get identifierRegexps() { return this.completers.reduce((prev, completer) => [...prev, ...(completer.identifierRegexps ?? [])], []); }
+  get identifierRegexps() { return this.completers.map((completer) => completer.identifierRegexps ?? []).flat(); }
 }
