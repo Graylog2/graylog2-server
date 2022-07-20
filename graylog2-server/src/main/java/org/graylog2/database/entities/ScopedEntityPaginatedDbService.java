@@ -87,4 +87,14 @@ public abstract class ScopedEntityPaginatedDbService<E extends ScopedEntity> ext
 
         return super.delete(id);
     }
+
+    /**
+     * Deletes a mutable entity. Do not call this method for API requests which support the user interface.
+     * Only call when mutable deletion is appropriate (for example when deleting from content packs service, which
+     * is an appropriate deletion override path for Illuminate).
+     */
+    public final int deleteMutable(String id) {
+        // Intentionally omit ensure mutability check.
+        return super.delete(id);
+    }
 }
