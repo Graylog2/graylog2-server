@@ -135,4 +135,12 @@ public interface EntityWithExcerptFacade<EntityClass, ExcerptClass> {
         mutableGraph.addNode(entity);
         return ImmutableGraph.copyOf(mutableGraph);
     }
+
+    /**
+     * The implementing facade should return true if the native entity supports scopes by extending
+     * <link>{@link org.graylog2.database.entities.ScopedEntity}</>.
+     */
+    default boolean usesScopedEntities() {
+        return false;
+    }
 }

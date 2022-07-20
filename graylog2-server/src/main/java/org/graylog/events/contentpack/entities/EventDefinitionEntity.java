@@ -34,17 +34,17 @@ import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.ScopedContentPackEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.entities.DefaultEntityScope;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @AutoValue
 @JsonDeserialize(builder = EventDefinitionEntity.Builder.class)
-public abstract class EventDefinitionEntity implements NativeEntityConverter<EventDefinitionDto> {
-    public static final String FIELD_SCOPE = "_scope";
+public abstract class EventDefinitionEntity extends ScopedContentPackEntity implements NativeEntityConverter<EventDefinitionDto> {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     private static final String FIELD_PRIORITY = "priority";
@@ -56,10 +56,6 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
     private static final String FIELD_NOTIFICATIONS = "notifications";
     private static final String FIELD_STORAGE = "storage";
     private static final String FIELD_IS_SCHEDULED = "is_scheduled";
-
-    @Nullable
-    @JsonProperty(FIELD_SCOPE)
-    public abstract ValueReference scope();
 
     @JsonProperty(FIELD_TITLE)
     public abstract ValueReference title();
@@ -101,14 +97,11 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public static abstract class Builder extends ScopedContentPackEntity.AbstractBuilder<EventDefinitionEntity.Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_EventDefinitionEntity.Builder().isScheduled(ValueReference.of(true));
         }
-
-        @JsonProperty(FIELD_SCOPE)
-        public abstract Builder scope(ValueReference scope);
 
         @JsonProperty(FIELD_TITLE)
         public abstract Builder title(ValueReference title);
@@ -154,6 +147,7 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
                         .collect(Collectors.toList())
         );
         return EventDefinitionDto.builder()
+                .scope(scope() != null ? scope().asString(parameters) : DefaultEntityScope.NAME)
                 .title(title().asString(parameters))
                 .description(description().asString(parameters))
                 .priority(priority().asInteger(parameters))

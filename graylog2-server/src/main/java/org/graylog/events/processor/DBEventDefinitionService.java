@@ -65,13 +65,23 @@ public class DBEventDefinitionService extends ScopedEntityPaginatedDbService<Eve
         return dto;
     }
 
-    public int deleteAndUnregister(String id) {
+    public int deleteAndUnregister(String id, boolean overrideMutable) {
+        // Must ensure mutability before deleting, so that deregistration is only performed if entity exists
+        // and is not mutable.
+        ensureMutability(get(id).orElseThrow(() -> new IllegalArgumentException("Event Definition not found.")));
+
+        // Deregister event definition.
         try {
             stateService.deleteByEventDefinitionId(id);
         } catch (Exception e) {
             LOG.error("Couldn't delete event processor state for <{}>", id, e);
         }
         entityOwnerShipService.unregisterEventDefinition(id);
+
+        // Perform deletion.
+        if (overrideMutable) {
+            return super.deleteMutable(id);
+        }
         return super.delete(id);
     }
 

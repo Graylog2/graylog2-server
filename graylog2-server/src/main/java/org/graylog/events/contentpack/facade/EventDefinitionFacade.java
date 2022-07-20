@@ -157,7 +157,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
     @Override
     public void delete(EventDefinitionDto nativeEntity) {
-        eventDefinitionHandler.delete(nativeEntity.id());
+        eventDefinitionHandler.delete(nativeEntity.id(), true);
     }
 
     @Override
@@ -209,5 +209,10 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
         eventDefinition.resolveForInstallation(entity, parameters, entities, graph);
 
         return ImmutableGraph.copyOf(graph);
+    }
+
+    @Override
+    public boolean usesScopedEntities() {
+        return true;
     }
 }

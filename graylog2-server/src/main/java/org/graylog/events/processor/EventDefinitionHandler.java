@@ -132,9 +132,10 @@ public class EventDefinitionHandler {
      * Deletes an existing event definition and its corresponding scheduler job definition and trigger.
      *
      * @param eventDefinitionId the event definition to delete
+     * @param overrideMutable Only specify true when deleting from the content packs facade
      * @return true if the event definition got deleted, false otherwise
      */
-    public boolean delete(String eventDefinitionId) {
+    public boolean delete(String eventDefinitionId, boolean overrideMutable) {
         final Optional<EventDefinitionDto> optionalEventDefinition = eventDefinitionService.get(eventDefinitionId);
         if (!optionalEventDefinition.isPresent()) {
             return false;
@@ -146,7 +147,7 @@ public class EventDefinitionHandler {
                 .ifPresent(jobDefinition -> deleteJobDefinitionAndTrigger(jobDefinition, eventDefinition));
 
         LOG.debug("Deleting event definition <{}/{}>", eventDefinition.id(), eventDefinition.title());
-        return eventDefinitionService.deleteAndUnregister(eventDefinitionId) > 0;
+        return eventDefinitionService.deleteAndUnregister(eventDefinitionId, overrideMutable) > 0;
     }
 
     /**
