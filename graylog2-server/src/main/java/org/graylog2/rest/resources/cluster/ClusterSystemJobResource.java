@@ -17,14 +17,12 @@
 package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.bson.types.ObjectId;
-import org.graylog.scheduler.JobTriggerStatus;
 import org.graylog.scheduler.rest.JobResourceHandlerService;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventTypes;
@@ -33,7 +31,6 @@ import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.ServerStatus;
-import org.graylog2.plugin.Tools;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.SystemJobSummary;
 import org.graylog2.rest.resources.system.jobs.RemoteSystemJobResource;
@@ -55,6 +52,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -90,18 +89,10 @@ public class ClusterSystemJobResource extends ProxiedResource {
         final List<SystemJobSummary> jobsFromScheduler = jobResourceHandlerService.listJobsAsSystemJobSummary(userContext);
         final String thisNodeId = serverStatus.getNodeId().toString();
 
-        final ImmutableList.Builder<SystemJobSummary> jobDummys = ImmutableList.builder();
-        // TODO remove stubs
-        jobDummys.add(
-                SystemJobSummary.create("23948098", "Restores an index from the archive", "org.graylog.plugins.archive.job.ArchiveRestoreSystemJob", "Restoring 234985 documents into index: graylog_123",thisNodeId, Tools.nowUTC(), 24, true, true, JobTriggerStatus.RUNNING),
-                SystemJobSummary.create("92948014", "Restores an index from the archive", "org.graylog.plugins.archive.job.ArchiveRestoreSystemJob", "Restoring 9285 documents into index: graylog_432", thisNodeId, Tools.nowUTC().minus(100000), 100, true, true, JobTriggerStatus.COMPLETE),
-                SystemJobSummary.create("82948013", "Restores an index from the archive", "org.graylog.plugins.archive.job.ArchiveRestoreSystemJob", "Restoring 29189 documents into index: graylog_b0rk", "dummy-node", Tools.nowUTC().minus(2000000), 0, true, true, JobTriggerStatus.CANCELLED),
-                SystemJobSummary.create("42948012", "Restores an index from the archive", "org.graylog.plugins.archive.job.ArchiveRestoreSystemJob", "Restoring 3595 documents into index: graylog_b0rk", "dummy-node", Tools.nowUTC().minus(3000000), 80, true, true, JobTriggerStatus.ERROR),
-                SystemJobSummary.create("62948014", "Restores an index from the archive", "org.graylog.plugins.archive.job.ArchiveRestoreSystemJob", "Restoring 3595 documents into index: graylog_b0rk", thisNodeId, Tools.nowUTC().minus(3000), 0, true, true, JobTriggerStatus.RUNNABLE)
-        );
-        // Add all jobs from the new scheduler
-        jobDummys.addAll(jobsFromScheduler);
-        forAllNodes.put(thisNodeId, Optional.of(ImmutableMap.of("jobs", jobDummys.build())));
+        // Merge with jobs from the new scheduler
+        final List<SystemJobSummary> jobs = forAllNodes.getOrDefault(thisNodeId, Optional.empty()).orElse(Collections.emptyMap()).getOrDefault("jobs", new ArrayList<>());
+        jobs.addAll(jobsFromScheduler);
+        forAllNodes.put(thisNodeId, Optional.of(ImmutableMap.of("jobs", jobs)));
 
         return forAllNodes;
     }
