@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 
 import { alice } from 'fixtures/users';
 import { simpleEventDefinition } from 'fixtures/eventDefinition';
@@ -83,27 +83,35 @@ describe('EventDefinitionEntry', () => {
     expect(screen.getAllByRole('button', { name: /Share/ })[1]).toHaveAttribute('disabled');
   });
 
-  it('shows "edit" button', () => {
+  it('shows "edit" button', async () => {
     render(renderSUT([], ['*'], 'DEFAULT'));
 
-    expect(screen.getAllByTestId('edit-button')).toBeVisible();
+    await waitFor(() => {
+      expect(screen.getAllByTestId('edit-button')[0]).toBeVisible();
+    });
   });
 
-  it('hides "edit" button for immutable definitions', () => {
+  it('hides "edit" button for immutable definitions', async () => {
     render(renderSUT([], ['*'], 'ILLUMINATE'));
 
-    expect(screen.queryByTestId('edit-button')).toBeNull();
+    await waitFor(() => {
+      expect(screen.queryByTestId('edit-button')).toBeNull();
+    });
   });
 
-  it('shows "delete" button', () => {
+  it('shows "delete" button', async () => {
     render(renderSUT([], ['*'], 'DEFAULT'));
 
-    expect(screen.getByTestId('delete-button')).toBeVisible();
+    await waitFor(() => {
+      expect(screen.getAllByTestId('delete-button')[0]).toBeVisible();
+    });
   });
 
-  it('hides "delete" button for immutable definitions', () => {
+  it('hides "delete" button for immutable definitions', async () => {
     render(renderSUT([], ['*'], 'ILLUMINATE'));
 
-    expect(screen.queryByTestId('delete-button')).toBeNull();
+    await waitFor(() => {
+      expect(screen.queryByTestId('delete-button')).toBeNull();
+    });
   });
 });

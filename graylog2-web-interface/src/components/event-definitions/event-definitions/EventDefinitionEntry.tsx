@@ -33,6 +33,7 @@ import {
   Label,
   MenuItem,
 } from 'components/bootstrap';
+import useScopePermissions from 'hooks/useScopePermissions';
 
 import EventDefinitionDescription from './EventDefinitionDescription';
 
@@ -65,17 +66,6 @@ type Props = {
   onCopy: (eventDefinition: EventDefinition) => void,
 };
 
-// NOTE: Mock method to be able to move forward with tests. Remove after API
-// defined how we are getting the permissions to show and hide actions
-const getPermissionsByScope = (scope: string): { edit: boolean, delete: boolean } => {
-  switch (scope) {
-    case 'ILLUMINATE':
-      return { edit: false, delete: false };
-    default:
-      return { edit: true, delete: true };
-  }
-};
-
 const getConditionPlugin = (type: string) => PluginStore.exports('eventDefinitionTypes')
   .find((edt) => edt.type === type);
 
@@ -93,12 +83,12 @@ const EventDefinitionEntry = ({
 }: Props) => {
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const isScheduled = lodash.get(context, `scheduler.${eventDefinition.id}.is_scheduled`, true);
+  const { getScopePermissions } = useScopePermissions();
 
-  const showAction = (action: string): boolean => {
-    // TODO: update this method to check for the metadata field
-    const permissions = getPermissionsByScope(eventDefinition._metadata.scope);
+  const showActions = (): boolean => {
+    const permissions = getScopePermissions(eventDefinition._metadata?.scope || 'DEFAULT');
 
-    return permissions[action];
+    return permissions.is_mutable;
   };
 
   const handleCopy = () => {
@@ -125,7 +115,7 @@ const EventDefinitionEntry = ({
 
   const actions = (
     <React.Fragment key={`actions-${eventDefinition.id}`}>
-      {showAction('edit') && (
+      {showActions() && (
         <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
           <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
             <Button bsStyle="info" data-testid="edit-button">
@@ -140,7 +130,7 @@ const EventDefinitionEntry = ({
           <MenuItem onClick={handleCopy}>Duplicate</MenuItem>
           <MenuItem divider />
           {toggle}
-          {showAction('edit') && (
+          {showActions() && (
             <>
               <MenuItem divider />
               <MenuItem onClick={handleDelete} data-testid="delete-button">Delete</MenuItem>
