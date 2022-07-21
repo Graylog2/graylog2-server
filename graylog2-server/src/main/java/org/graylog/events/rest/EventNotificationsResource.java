@@ -158,7 +158,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
         return Response.ok().entity(resourceHandler.update(dto)).build();
     }
 
-    private ValidationResult validateEmailConfiguration(NotificationDto dto, ValidationResult validationResult) {
+    private void validateEmailConfiguration(NotificationDto dto, ValidationResult validationResult) {
         if (dto.config() instanceof EmailEventNotificationConfig) {
             EmailEventNotificationConfig emailEventNotificationConfig = (EmailEventNotificationConfig) dto.config();
             if (!emailConfiguration.isEnabled()) {
@@ -168,7 +168,6 @@ public class EventNotificationsResource extends RestResource implements PluginRe
                 validationResult.addError("sender", "No default sender specified in graylog.conf. You must specify one here.");
             }
         }
-        return validationResult;
     }
 
     @DELETE
