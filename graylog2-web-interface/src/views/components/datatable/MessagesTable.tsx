@@ -47,7 +47,7 @@ const StyledTable = styled(Table)(({ theme }: { theme: DefaultTheme }) => css`
     border: 0;
     font-size: ${theme.fonts.size.small};
     font-weight: normal;
-    background-color: ${theme.colors.gray[90]};
+    background-color: ${theme.colors.table.variant.info};
     color: ${theme.utils.readableColor(theme.colors.gray[90])};
     white-space: nowrap;
   }
@@ -80,6 +80,14 @@ const StyledTable = styled(Table)(({ theme }: { theme: DefaultTheme }) => css`
       min-width: 50px;
       padding-top: 10px;
     }
+  }
+  
+  tr.fields-row:nth-child(odd) {
+    background-color: ${theme.colors.table.background};
+  }
+
+  tr.fields-row:nth-child(even) {
+    background-color: ${theme.colors.table.backgroundAlt};
   }
 
   tr.message-row td {

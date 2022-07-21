@@ -138,7 +138,9 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
                      rowPivots={rowPivots}
                      series={series} />
           </thead>
-          {formattedRows}
+          <tbody className="message-group">
+            {formattedRows}
+          </tbody>
         </MessagesTable>
       </div>
     </div>

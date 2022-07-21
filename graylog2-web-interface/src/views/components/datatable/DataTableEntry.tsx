@@ -36,7 +36,8 @@ import DecoratedValue from '../messagelist/decoration/DecoratedValue';
 
 const StyledTd = styled.td(({ isNumeric, theme }: { isNumeric: boolean, theme: DefaultTheme }) => css`
   ${isNumeric ? `font-family: ${theme.fonts.family.monospace};` : ''}
-  ${isNumeric ? 'text-align: right' : ''}
+  ${isNumeric ? 'text-align: right;' : ''}
+  background-color: transparent !important;
 `);
 
 type Field = {
@@ -92,7 +93,6 @@ const columnNameToField = (column, series = []) => {
 };
 
 const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivotValues, valuePath, item, types }: Props) => {
-  const classes = 'message-group';
   const { activeQuery } = currentView;
 
   const fieldColumns = fields.toSeq().toJS().map(({ field: fieldName, source }, i) => _c(
@@ -117,20 +117,18 @@ const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivot
   const columns = flatten([fieldColumns, columnPivotFields]);
 
   return (
-    <tbody className={classes}>
-      <tr className="fields-row">
-        {columns.map(({ field, value, path, source }, idx) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <Column key={`${activeQuery}-${field}=${value}-${idx}`}
-                  field={field}
-                  value={value}
-                  selectedQuery={activeQuery}
-                  type={fieldTypeFor(columnNameToField(field, series), types)}
-                  valuePath={path.slice()}
-                  source={source} />
-        ))}
-      </tr>
-    </tbody>
+    <tr className="fields-row">
+      {columns.map(({ field, value, path, source }, idx) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <Column key={`${activeQuery}-${field}=${value}-${idx}`}
+                field={field}
+                value={value}
+                selectedQuery={activeQuery}
+                type={fieldTypeFor(columnNameToField(field, series), types)}
+                valuePath={path.slice()}
+                source={source} />
+      ))}
+    </tr>
   );
 };
 
