@@ -85,6 +85,11 @@ public class DBDataAdapterService extends ScopedEntityPaginatedDbService<DataAda
         dataAdapterDto.ifPresent(dataAdapter -> clusterEventBus.post(DataAdaptersDeleted.create(dataAdapter.id())));
     }
 
+    public void deleteAndPostEventImmutable(String idOrName) {
+        // TODO: Uncomment when cahnges merged
+        //super.deleteMutable(idOrName);
+    }
+
     public Collection<DataAdapterDto> findByIds(Set<String> idSet) {
         final DBQuery.Query query = DBQuery.in("_id", idSet.stream().map(ObjectId::new).collect(Collectors.toList()));
         try (DBCursor<DataAdapterDto> cursor = db.find(query)) {

@@ -105,6 +105,11 @@ public class DBLookupTableService extends ScopedEntityPaginatedDbService<LookupT
         lookupTableDto.ifPresent(lookupTable -> clusterEventBus.post(LookupTablesDeleted.create(lookupTable)));
     }
 
+    public void deleteAndPostEventImmutable(String idOrName) {
+        // TODO: Uncomment when cahnges merged
+        //super.deleteMutable(idOrName);
+    }
+
     public void forEach(Consumer<? super LookupTableDto> action) {
         try (DBCursor<LookupTableDto> dbCursor = db.find()) {
             dbCursor.forEachRemaining(action);

@@ -148,7 +148,7 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
 
     @Override
     public void delete(CacheDto nativeEntity) {
-        cacheService.deleteAndPostEvent(nativeEntity.id());
+        cacheService.deleteAndPostEventImmutable(nativeEntity.id());
     }
 
     @Override

@@ -187,7 +187,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
 
     @Override
     public void delete(LookupTableDto nativeEntity) {
-        lookupTableService.deleteAndPostEvent(nativeEntity.id());
+        lookupTableService.deleteAndPostEventImmutable(nativeEntity.id());
     }
 
     @Override
