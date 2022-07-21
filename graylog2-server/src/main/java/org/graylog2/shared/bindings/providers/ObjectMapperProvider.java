@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
@@ -114,6 +115,8 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                 .setPropertyNamingStrategy(new PropertyNamingStrategy.SnakeCaseStrategy())
                 .setSubtypeResolver(subtypeResolver)
                 .setTypeFactory(typeFactory)
+                // Jackson 2.11 changes default date format to include a colon
+                .setDateFormat(new StdDateFormat().withColonInTimeZone(false))
                 .registerModule(new GuavaModule())
                 .registerModule(new JodaModule())
                 .registerModule(new Jdk8Module())

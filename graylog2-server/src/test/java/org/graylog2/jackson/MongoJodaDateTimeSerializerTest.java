@@ -18,6 +18,7 @@ package org.graylog2.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -26,7 +27,10 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class MongoJodaDateTimeSerializerTest {
-    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    private final ObjectMapper objectMapper =
+            new ObjectMapperProvider().get()
+                    // Jackson 2.11 changes default date format to include a colon
+                    .setDateFormat(new StdDateFormat().withColonInTimeZone(false));
 
     @Test
     public void serializeZonedDateTime() throws Exception {
@@ -34,7 +38,7 @@ public class MongoJodaDateTimeSerializerTest {
         final String valueAsString = objectMapper.writeValueAsString(testBean);
         assertThat(valueAsString)
                 .isNotNull()
-                .isEqualTo("{\"date_time\":\"2016-12-13T14:00:00.000+00:00\"}");
+                .isEqualTo("{\"date_time\":\"2016-12-13T14:00:00.000+0000\"}");
     }
 
     @Test
