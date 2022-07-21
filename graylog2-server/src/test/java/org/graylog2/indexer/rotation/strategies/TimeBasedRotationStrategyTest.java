@@ -80,6 +80,7 @@ public class TimeBasedRotationStrategyTest {
     public void setUp() {
         when(indexSetConfig.id()).thenReturn("index-set-id");
         when(indexSetConfig.title()).thenReturn("index-set-title");
+        when(indices.numberOfMessages(anyString())).thenReturn(20L);
         rotationStrategy = new TimeBasedRotationStrategy(indices, nodeId, auditEventSender, configuration);
     }
 
@@ -440,5 +441,27 @@ public class TimeBasedRotationStrategyTest {
         // ideally we wouldn't rotate here, because the index is only 1 hour old
         rotationStrategy.rotate(indexSet);
         verify(indexSet, times(1)).cycle();
+    }
+
+    @Test
+    public void shouldSkipRotationOnEmptyIndex() throws Exception {
+        final DateTime initialTime = new DateTime(2022, 7, 21, 13, 00, 00, 0, DateTimeZone.UTC);
+        final Period period = hours(1);
+        final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
+        DateTimeUtils.setCurrentMillisProvider(clock);
+
+        when(indexSet.getConfig()).thenReturn(indexSetConfig);
+        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
+        when(indices.indexCreationDate(anyString())).thenReturn(Optional.of(initialTime.minus(minutes(11))));
+        when(indexSet.getNewestIndex()).thenReturn("ignored");
+        when(indexSet.getConfig()).thenReturn(indexSetConfig);
+        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period, null));
+        when(indices.numberOfMessages(anyString())).thenReturn(0L);
+
+        rotationStrategy.rotate(indexSet);
+        clock.tick(minutes(60));
+        rotationStrategy.rotate(indexSet);
+
+        verify(indexSet, never()).cycle();
     }
 }
