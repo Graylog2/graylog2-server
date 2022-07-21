@@ -33,6 +33,7 @@ import {
   Label,
   MenuItem,
 } from 'components/bootstrap';
+import useScopePermissions from 'hooks/useScopePermissions';
 
 import EventDefinitionDescription from './EventDefinitionDescription';
 
@@ -42,6 +43,7 @@ export type EventDefinition = {
     type: string,
   },
   title: string,
+  _scope: string,
 };
 
 type Props = {
@@ -76,6 +78,13 @@ const EventDefinitionEntry = ({
 }: Props) => {
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const isScheduled = lodash.get(context, `scheduler.${eventDefinition.id}.is_scheduled`, true);
+  const { getScopePermissions } = useScopePermissions();
+
+  const showActions = (): boolean => {
+    const permissions = getScopePermissions(eventDefinition?._scope || 'DEFAULT');
+
+    return permissions.is_mutable;
+  };
 
   const handleCopy = () => {
     onCopy(eventDefinition);
@@ -101,21 +110,27 @@ const EventDefinitionEntry = ({
 
   const actions = (
     <React.Fragment key={`actions-${eventDefinition.id}`}>
-      <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
-        <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
-          <Button bsStyle="info">
-            <Icon name="edit" /> Edit
-          </Button>
-        </LinkContainer>
-      </IfPermitted>
+      {showActions() && (
+        <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
+          <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
+            <Button bsStyle="info" data-testid="edit-button">
+              <Icon name="edit" /> Edit
+            </Button>
+          </LinkContainer>
+        </IfPermitted>
+      )}
       <ShareButton entityId={eventDefinition.id} entityType="event_definition" onClick={() => setShowEntityShareModal(true)} />
       <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
         <DropdownButton id="more-dropdown" title="More" pullRight>
           <MenuItem onClick={handleCopy}>Duplicate</MenuItem>
           <MenuItem divider />
           {toggle}
-          <MenuItem divider />
-          <MenuItem onClick={handleDelete}>Delete</MenuItem>
+          {showActions() && (
+            <>
+              <MenuItem divider />
+              <MenuItem onClick={handleDelete} data-testid="delete-button">Delete</MenuItem>
+            </>
+          )}
         </DropdownButton>
       </IfPermitted>
     </React.Fragment>
