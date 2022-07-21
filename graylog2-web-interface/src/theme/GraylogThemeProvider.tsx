@@ -38,13 +38,13 @@ interface generateCustomThemeColorsType {
 }
 
 interface generateThemeType {
-  changeMode: (ThemeMode) => void,
+  changeMode: (mode: ThemeMode) => void,
   mode: ThemeMode,
   initialLoad?: boolean,
   generateCustomThemeColors: ({ graylogColors, mode, initialLoad }: generateCustomThemeColorsType) => Promise<Colors> | undefined,
 }
 
-function buildTheme(currentThemeColors, changeMode, mode): DefaultTheme {
+function buildTheme(currentThemeColors: DefaultTheme['colors'], changeMode: DefaultTheme['changeMode'], mode: DefaultTheme['mode']): DefaultTheme {
   const formattedUtils = {
     ...utils,
     colorLevel: utils.colorLevel(currentThemeColors),
@@ -77,12 +77,15 @@ const _generateTheme = ({ changeMode, mode, generateCustomThemeColors, initialLo
     });
   }
 
-  return Promise.resolve(colors[mode]).then((currentThemeColors) => {
-    return buildTheme(currentThemeColors, changeMode, mode);
-  });
+  return Promise.resolve(buildTheme(colors[mode], changeMode, mode));
 };
 
-const GraylogThemeProvider = ({ children, initialThemeModeOverride }) => {
+type Props = {
+  children: React.ReactNode,
+  initialThemeModeOverride: ThemeMode,
+};
+
+const GraylogThemeProvider = ({ children, initialThemeModeOverride }: Props) => {
   const [mode, changeMode] = useCurrentThemeMode(initialThemeModeOverride);
 
   const themeCustomizer = usePluginEntities('customization.theme.customizer');

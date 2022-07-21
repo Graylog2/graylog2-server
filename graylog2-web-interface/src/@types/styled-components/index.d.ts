@@ -35,7 +35,7 @@ declare module 'styled-components' {
     utils: Utils,
     mode: ThemeMode,
     spacings: Spacings,
-    changeMode: (string) => void,
+    changeMode: (mode: ThemeMode) => void,
     components: { [component: string]: any }
   }
 }
