@@ -157,7 +157,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
     @Override
     public void delete(EventDefinitionDto nativeEntity) {
-        eventDefinitionHandler.delete(nativeEntity.id(), true);
+        eventDefinitionHandler.deleteImmutable(nativeEntity.id());
     }
 
     @Override
