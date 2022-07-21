@@ -7172,13 +7172,13 @@ graceful-fs@^4.2.9:
     "@types/create-react-class" "15.6.3"
     "@types/jquery" "3.5.14"
     "@types/react" "18.0.15"
-    babel-preset-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-38b3a26a-52aa-45cd-8967-d9e6c98d9805-1658327675925/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-182ed4be-cc04-49b2-8c6e-07de808b6556-1658362790159/node_modules/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-38b3a26a-52aa-45cd-8967-d9e6c98d9805-1658327675925/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-182ed4be-cc04-49b2-8c6e-07de808b6556-1658362790159/node_modules/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-38b3a26a-52aa-45cd-8967-d9e6c98d9805-1658327675925/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-182ed4be-cc04-49b2-8c6e-07de808b6556-1658362790159/node_modules/jest-preset-graylog"
     jquery "3.6.0"
     moment "2.29.4"
     moment-timezone "0.5.34"
@@ -11232,11 +11232,6 @@ react-ultimate-pagination@^1.2.0:
   dependencies:
     prop-types "^15.0.0"
     ultimate-pagination "1.0.0"
-
-react-window-infinite-loader@^1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/react-window-infinite-loader/-/react-window-infinite-loader-1.0.8.tgz#f88b1444829e732a3f4c5ae861644815329ddd88"
-  integrity sha512-907ZLAiZZfBHuZyiY0V7uiSL4P/rI6UQyCF9wES1cDWTeyNLgGLaxu+BZkcUW3R5tSCQcbCcWBl0jVIpYzrKGQ==
 
 react-window@^1.8.2:
   version "1.8.7"

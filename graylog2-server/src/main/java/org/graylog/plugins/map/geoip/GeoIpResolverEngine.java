@@ -92,22 +92,32 @@ public class GeoIpResolverEngine {
                 continue;
             }
 
-            // IF the user has opted NOT to enforce the Graylog Schema, the key will likely not
-            // be in the field map--in such cases use the key (full field name) as the prefix.
+            // For reserved IPs just mark as reserved. Otherwise, enforce Graylog schema on only relevant IP fields
+            // or add legacy fields on all IP fields in the message if enforcement is disabled.
             final String prefix = enforceGraylogSchema ? ipAddressFields.getOrDefault(key, key) : key;
-
             if (ReservedIpChecker.getInstance().isReservedIpAddress(address.getHostAddress())) {
                 message.addField(prefix + "_reserved_ip", true);
+            } else if (enforceGraylogSchema) {
+                addGIMGeoIpDataIfPresent(message, address, prefix);
             } else {
-                addGeoIpDataIfPresent(message, address, prefix);
+                addLegacyGeoIpDataIfPresent(message, address, prefix);
             }
-
         }
 
         return true;
     }
 
-    private void addGeoIpDataIfPresent(Message message, InetAddress address, String newFieldPrefix) {
+    // Pre-4.3 logic for adding geo fields to message.
+    private void addLegacyGeoIpDataIfPresent(Message message, InetAddress address, String key) {
+        ipLocationResolver.getGeoIpData(address).ifPresent(locationInformation -> {
+            // We will store the coordinates as a "lat,long" string
+            message.addField(key + "_geolocation", locationInformation.latitude() + "," + locationInformation.longitude());
+            message.addField(key + "_country_code", locationInformation.countryIsoCode());
+            message.addField(key + "_city_name", locationInformation.cityName());
+        });
+    }
+
+    private void addGIMGeoIpDataIfPresent(Message message, InetAddress address, String newFieldPrefix) {
         ipLocationResolver.getGeoIpData(address).ifPresent(locationInformation -> {
             message.addField(newFieldPrefix + "_geo_coordinates", locationInformation.latitude() + "," + locationInformation.longitude());
             message.addField(newFieldPrefix + "_geo_country_iso", locationInformation.countryIsoCode());
