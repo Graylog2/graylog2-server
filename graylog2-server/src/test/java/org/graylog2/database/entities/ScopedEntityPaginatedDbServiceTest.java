@@ -127,6 +127,16 @@ class ScopedEntityPaginatedDbServiceTest {
         assertEquals(expectedError, exception.getMessage());
     }
 
+    @Test
+    void testImmutableOverrideDelete() {
+
+        TestScopedEntity immutablyScopedEntity = createEntity("An immutable entity", IMMUTABLE_SCOPE.getName());
+
+        TestScopedEntity savedEntity = dbService.save(immutablyScopedEntity);
+        assertEquals(1, dbService.deleteImmutable(savedEntity.id()));
+
+    }
+
     private TestScopedEntity createEntity(String title, String scope) {
 
         return TestScopedEntity.builder().title(title)

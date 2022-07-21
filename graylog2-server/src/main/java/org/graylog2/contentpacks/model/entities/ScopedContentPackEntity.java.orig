@@ -16,6 +16,13 @@
  */
 package org.graylog2.contentpacks.model.entities;
 
+<<<<<<< HEAD
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
+
+public interface ScopedContentPackEntity {
+    String FIELD_SCOPE = "scope";
+    ValueReference scope();
+=======
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.entities.DefaultEntityScope;
@@ -43,4 +50,5 @@ public abstract class ScopedContentPackEntity {
         @JsonProperty(FIELD_SCOPE)
         public abstract SELF scope(ValueReference scope);
     }
+>>>>>>> Add support for scoped entities in Content Packs
 }
