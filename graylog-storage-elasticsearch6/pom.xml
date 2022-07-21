@@ -36,7 +36,7 @@
 
     <properties>
         <elasticsearch.version>6.8.10-3</elasticsearch.version>
-        <jest.version>2.4.15+jackson</jest.version>
+        <jest.version>2.4.16+jackson-SNAPSHOT</jest.version>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
