@@ -53,6 +53,7 @@ public class DBDataAdapterService extends ScopedEntityPaginatedDbService<DataAda
         db.createIndex(new BasicDBObject("name", 1), new BasicDBObject("unique", true));
     }
 
+    @Override
     public Optional<DataAdapterDto> get(String idOrName) {
         if (ObjectId.isValid(idOrName)) {
             return Optional.ofNullable(db.findOneById(new ObjectId(idOrName)));
@@ -63,7 +64,7 @@ public class DBDataAdapterService extends ScopedEntityPaginatedDbService<DataAda
     }
 
     public DataAdapterDto saveAndPostEvent(DataAdapterDto table) {
-        final DataAdapterDto savedDataAdapter = save(table);
+        final DataAdapterDto savedDataAdapter = super.save(table);
         clusterEventBus.post(DataAdaptersUpdated.create(savedDataAdapter.id()));
 
         return savedDataAdapter;
@@ -81,13 +82,12 @@ public class DBDataAdapterService extends ScopedEntityPaginatedDbService<DataAda
 
     public void deleteAndPostEvent(String idOrName) {
         final Optional<DataAdapterDto> dataAdapterDto = get(idOrName);
-        delete(idOrName);
+        super.delete(idOrName);
         dataAdapterDto.ifPresent(dataAdapter -> clusterEventBus.post(DataAdaptersDeleted.create(dataAdapter.id())));
     }
 
     public void deleteAndPostEventImmutable(String idOrName) {
-        // TODO: Uncomment when cahnges merged
-        //super.deleteMutable(idOrName);
+        super.deleteImmutable(idOrName);
     }
 
     public Collection<DataAdapterDto> findByIds(Set<String> idSet) {

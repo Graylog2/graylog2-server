@@ -53,6 +53,7 @@ public class DBCacheService extends ScopedEntityPaginatedDbService<CacheDto> {
         db.createIndex(new BasicDBObject("name", 1), new BasicDBObject("unique", true));
     }
 
+    @Override
     public Optional<CacheDto> get(String idOrName) {
         if (ObjectId.isValid(idOrName)) {
             return Optional.ofNullable(db.findOneById(new ObjectId(idOrName)));
@@ -63,7 +64,7 @@ public class DBCacheService extends ScopedEntityPaginatedDbService<CacheDto> {
     }
 
     public CacheDto saveAndPostEvent(CacheDto table) {
-        final CacheDto savedCache = save(table);
+        final CacheDto savedCache = super.save(table);
         clusterEventBus.post(CachesUpdated.create(savedCache.id()));
 
         return savedCache;
@@ -81,13 +82,12 @@ public class DBCacheService extends ScopedEntityPaginatedDbService<CacheDto> {
 
     public void deleteAndPostEvent(String idOrName) {
         final Optional<CacheDto> cacheDto = get(idOrName);
-        delete(idOrName);
+        super.delete(idOrName);
         cacheDto.ifPresent(cache -> clusterEventBus.post(CachesDeleted.create(cache.id())));
     }
 
     public void deleteAndPostEventImmutable(String idOrName) {
-        // TODO: Uncomment when cahnges merged
-        //super.deleteMutable(idOrName);
+        super.deleteImmutable(idOrName);
     }
 
     public Collection<CacheDto> findByIds(Set<String> idSet) {

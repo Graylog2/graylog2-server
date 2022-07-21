@@ -27,7 +27,7 @@ import org.graylog2.database.entities.DefaultEntityScope;
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-public abstract class LookupTableEntity implements ScopedContentPackEntity {
+public abstract class LookupTableEntity extends ScopedContentPackEntity {
     @JsonProperty(FIELD_SCOPE)
     public abstract ValueReference scope();
     @JsonProperty("name")
