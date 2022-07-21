@@ -48,7 +48,7 @@ const StyledTable = styled(Table)(({ theme }: { theme: DefaultTheme }) => css`
     font-size: ${theme.fonts.size.small};
     font-weight: normal;
     background-color: ${theme.colors.table.variant.info};
-    color: ${theme.utils.readableColor(theme.colors.gray[90])};
+    color: ${theme.utils.contrastingColor(theme.colors.table.variant.info)};
     white-space: nowrap;
   }
   
@@ -83,7 +83,7 @@ const StyledTable = styled(Table)(({ theme }: { theme: DefaultTheme }) => css`
   }
   
   tr.fields-row:nth-child(odd) {
-    background-color: ${theme.colors.table.background};
+    background-color: ${theme.colors.global.contentBackground};
   }
 
   tr.fields-row:nth-child(even) {
