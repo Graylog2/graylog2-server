@@ -121,7 +121,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mongojack</groupId>
+            <groupId>org.graylog.repackaged.mongojack</groupId>
             <artifactId>mongojack</artifactId>
         </dependency>
 
