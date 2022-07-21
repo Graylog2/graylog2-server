@@ -19,6 +19,7 @@ ace.define('ace/mode/lucene_highlight_rules', ['require', 'exports', 'module', '
   const oop = require('../lib/oop');
   const { TextHighlightRules } = require('./text_highlight_rules');
 
+  // eslint-disable-next-line func-names
   const LuceneHighlightRules = function () {
     this.$rules = {
       start: [
@@ -97,6 +98,7 @@ ace.define('ace/mode/lucene_highlight_rules', ['require', 'exports', 'module', '
           regex: /\(\?[:=!]|\)|\{\d+\b,?\d*\}|[+*]\?|[()$^+*?.]/,
         }, {
           token: 'constant.language.escape',
+          // eslint-disable-next-line no-useless-escape
           regex: '<\d+-\d+>|[~&@]',
         }, {
           token: 'constant.language.delimiter',
@@ -147,6 +149,7 @@ ace.define('ace/mode/lucene', ['require', 'exports', 'module', 'ace/lib/oop', 'a
   const TextMode = require('./text').Mode;
   const { LuceneHighlightRules } = require('./lucene_highlight_rules');
 
+  // eslint-disable-next-line func-names
   const Mode = function () {
     this.HighlightRules = LuceneHighlightRules;
     this.$behaviour = this.$defaultBehaviour;
@@ -154,6 +157,7 @@ ace.define('ace/mode/lucene', ['require', 'exports', 'module', 'ace/lib/oop', 'a
 
   oop.inherits(Mode, TextMode);
 
+  // eslint-disable-next-line func-names
   (function () {
     this.$id = 'ace/mode/lucene';
   }).call(Mode.prototype);
@@ -162,6 +166,7 @@ ace.define('ace/mode/lucene', ['require', 'exports', 'module', 'ace/lib/oop', 'a
   exports.Mode = Mode;
 });
 
+// eslint-disable-next-line func-names
 (function () {
   // eslint-disable-next-line no-undef
   ace.require(['ace/mode/lucene'], (m) => {
