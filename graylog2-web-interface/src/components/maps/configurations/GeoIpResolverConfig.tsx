@@ -17,12 +17,13 @@
 import React, { useEffect, useState } from 'react';
 import { Field, Form, Formik } from 'formik';
 
-import { IfPermitted, Select } from 'components/common';
+import { IfPermitted, Select, TimeUnitInput } from 'components/common';
 import { Button, Col, Input, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
 import { DocumentationLink } from 'components/support';
 
 export type GeoVendorType = 'MAXMIND' | 'IPINFO'
+export type TimeUnit = 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS'
 
 export type GeoIpConfigType = {
   enabled: boolean;
@@ -30,6 +31,8 @@ export type GeoIpConfigType = {
   db_vendor_type: GeoVendorType;
   city_db_path: string;
   asn_db_path: string;
+  refresh_interval_unit: TimeUnit;
+  refresh_interval: number;
 }
 
 export type OptionType = {
@@ -48,6 +51,8 @@ const defaultConfig: GeoIpConfigType = {
   db_vendor_type: 'MAXMIND',
   city_db_path: '/etc/graylog/server/GeoLite2-City.mmdb',
   asn_db_path: '/etc/graylog/server/GeoLite2-ASN.mmdb',
+  refresh_interval_unit: 'MINUTES',
+  refresh_interval: 10,
 };
 
 const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) => {
@@ -175,6 +180,13 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                                disabled={!values.enabled}
                                label="Path to the ASN database"
                                name="asn_db_path" />
+                  <TimeUnitInput label="Database refresh interval"
+                                 help="Interval at which the database files are checked for modifications and refreshed changes are detected on disk."
+                                 value={values.refresh_interval}
+                                 unit={values.refresh_interval_unit || 'MINUTES'}
+                                 defaultEnabled={values.enabled}
+                                 hideCheckbox
+                                 units={['SECONDS', 'MINUTES', 'HOURS', 'DAYS']} />
 
                 </Modal.Body>
                 <Modal.Footer>

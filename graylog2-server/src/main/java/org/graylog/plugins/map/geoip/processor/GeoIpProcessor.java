@@ -20,6 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
+import org.graylog.plugins.map.geoip.GeoIpDbFileChangedEvent;
 import org.graylog.plugins.map.geoip.GeoIpResolverEngine;
 import org.graylog.plugins.map.geoip.GeoIpVendorResolverService;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
@@ -103,6 +104,13 @@ public class GeoIpProcessor implements MessageProcessor {
         if (!GeoIpResolverConfig.class.getCanonicalName().equals(event.type())) {
             return;
         }
+
+        scheduler.schedule(this::reload, 0, TimeUnit.SECONDS);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onDatabaseFileChangedEvent(GeoIpDbFileChangedEvent event) {
 
         scheduler.schedule(this::reload, 0, TimeUnit.SECONDS);
     }

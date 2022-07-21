@@ -20,6 +20,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import org.graylog.plugins.map.geoip.GeoAsnInformation;
+import org.graylog.plugins.map.geoip.GeoIpDbFileChangeMonitorService;
 import org.graylog.plugins.map.geoip.GeoIpResolver;
 import org.graylog.plugins.map.geoip.GeoIpResolverFactory;
 import org.graylog.plugins.map.geoip.GeoLocationInformation;
@@ -52,5 +53,7 @@ public class MapWidgetModule extends PluginModule {
                 .implement(ipinfoCityTl, Names.named("IPINFO_CITY"), IpInfoLocationResolver.class)
                 .implement(ipInfoAsnTl, Names.named("IPINFO_ASN"), IpInfoIpAsnResolver.class)
                 .build(GeoIpResolverFactory.class));
+
+        bind(GeoIpDbFileChangeMonitorService.class).asEagerSingleton();
     }
 }
