@@ -38,12 +38,7 @@ describe('EventDefinitionEntry', () => {
       .permissions(Immutable.List(permissions))
       .build();
 
-    exampleEventDefinition._metadata = {
-      scope: scope,
-      revision: 1,
-      created_at: '2022-06-13T08:47:12Z',
-      updated_at: '2022-06-29T12:00:28Z',
-    };
+    exampleEventDefinition._scope = scope;
 
     return (
       <CurrentUserContext.Provider value={currentUser}>

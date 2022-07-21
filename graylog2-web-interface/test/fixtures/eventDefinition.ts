@@ -44,10 +44,5 @@ export const simpleEventDefinition = {
     type: 'persist-to-streams-v1',
   }],
   title: 'Event Definition 1',
-  _metadata: {
-    scope: 'DEFAULT',
-    revision: 1,
-    created_at: 'test',
-    updated_at: 'test',
-  },
+  _scope: 'DEFAULT',
 };

@@ -43,12 +43,7 @@ export type EventDefinition = {
     type: string,
   },
   title: string,
-  _metadata: {
-    scope: string,
-    revision: number,
-    created_at: string,
-    updated_at: string,
-  } | null,
+  _scope: string,
 };
 
 type Props = {
@@ -86,7 +81,7 @@ const EventDefinitionEntry = ({
   const { getScopePermissions } = useScopePermissions();
 
   const showActions = (): boolean => {
-    const permissions = getScopePermissions(eventDefinition._metadata?.scope || 'DEFAULT');
+    const permissions = getScopePermissions(eventDefinition?._scope || 'DEFAULT');
 
     return permissions.is_mutable;
   };
