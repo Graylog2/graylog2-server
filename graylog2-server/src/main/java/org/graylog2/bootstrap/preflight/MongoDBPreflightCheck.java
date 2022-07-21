@@ -25,7 +25,9 @@ import com.github.rholder.retry.WaitStrategies;
 import com.github.zafarkhaja.semver.Version;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoTimeoutException;
+import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoConnectionImpl;
 import org.graylog2.database.MongoDBVersionCheck;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,24 +37,29 @@ import javax.inject.Named;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class MongoDBPreflightCheck implements PreflightCheck {
+public class MongoDBPreflightCheck {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBPreflightCheck.class);
 
     private final int mongoVersionProbeAttempts;
     private final MongoConnection mongoConnection;
 
-    @Inject
-    public MongoDBPreflightCheck(
-            @Named(value = "mongodb_version_probe_attempts") int mongoVersionProbeAttempts,
-            MongoConnection mongoConnection
+    private final AtomicBoolean dbIsEmpty;
 
-            ) {
+    @Inject
+    public MongoDBPreflightCheck(@Named(value = "mongodb_version_probe_attempts") int mongoVersionProbeAttempts,
+                                 MongoDbConfiguration configuration) {
         this.mongoVersionProbeAttempts = mongoVersionProbeAttempts;
-        this.mongoConnection = mongoConnection;
+        // We build our own MongoConnection instance here, so we can close it without interfering with other users
+        this.mongoConnection = new MongoConnectionImpl(configuration);
+        dbIsEmpty = new AtomicBoolean(false);
     }
 
-    @Override
+    public boolean dbIsEmpty() {
+        return dbIsEmpty.get();
+    }
+
     public void runCheck() throws PreflightCheckException {
         try {
             final Version mongoVersion = RetryerBuilder.<Version>newBuilder()
@@ -77,6 +84,9 @@ public class MongoDBPreflightCheck implements PreflightCheck {
                     .build()
                     .call(() -> {
                         try (MongoClient mongoClient = (MongoClient) mongoConnection.connect()) {
+                            // Detect an empty, pristine database. It should have no collections
+                            final String firstCollectionName = mongoConnection.getMongoDatabase().listCollectionNames().first();
+                            dbIsEmpty.set(firstCollectionName == null);
                             return MongoDBVersionCheck.getVersion(mongoClient);
                         }
                     });
