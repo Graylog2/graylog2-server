@@ -34,6 +34,7 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class DBEventDefinitionService extends ScopedEntityPaginatedDbService<EventDefinitionDto> {
     private static final Logger LOG = LoggerFactory.getLogger(DBEventDefinitionService.class);
@@ -65,8 +66,16 @@ public class DBEventDefinitionService extends ScopedEntityPaginatedDbService<Eve
         return dto;
     }
 
-    public int deleteAndUnregister(String id, boolean overrideMutable) {
-        // Must ensure mutability before deleting, so that deregistration is only performed if entity exists
+    public int deleteUnregister(String id) {
+        return doDeleteUnregister(id, () -> super.delete(id));
+    }
+
+    public int deleteUnregisterImmutable(String id) {
+        return doDeleteUnregister(id, () -> super.deleteMutable(id));
+    }
+
+    private int doDeleteUnregister(String id, Supplier<Integer> deleteSupplier) {
+        // Must ensure mutability before deleting, so that de-registration is only performed if entity exists
         // and is not mutable.
         ensureMutability(get(id).orElseThrow(() -> new IllegalArgumentException("Event Definition not found.")));
 
@@ -77,12 +86,7 @@ public class DBEventDefinitionService extends ScopedEntityPaginatedDbService<Eve
             LOG.error("Couldn't delete event processor state for <{}>", id, e);
         }
         entityOwnerShipService.unregisterEventDefinition(id);
-
-        // Perform deletion.
-        if (overrideMutable) {
-            return super.deleteMutable(id);
-        }
-        return super.delete(id);
+        return deleteSupplier.get();
     }
 
     /**
