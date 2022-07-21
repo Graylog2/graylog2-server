@@ -63,17 +63,19 @@ const seriesWithName = (fn, name) => Series.forFunction(fn)
   .build();
 
 describe('DataTableEntry', () => {
-  const SUT = (props) => (
+  const SUT = (props: Partial<React.ComponentProps<typeof DataTableEntry>>) => (
     <table>
-      <DataTableEntry columnPivots={columnPivots}
-                      columnPivotValues={columnPivotValues}
-                      currentView={currentView}
-                      fields={fields}
-                      item={item}
-                      series={series}
-                      types={List([])}
-                      valuePath={valuePath}
-                      {...props} />
+      <tbody>
+        <DataTableEntry columnPivots={columnPivots}
+                        columnPivotValues={columnPivotValues}
+                        currentView={currentView}
+                        fields={fields}
+                        item={item}
+                        series={series}
+                        types={List([])}
+                        valuePath={valuePath}
+                        {...props} />
+      </tbody>
     </table>
   );
 
