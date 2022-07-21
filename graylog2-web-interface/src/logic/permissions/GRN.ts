@@ -51,6 +51,8 @@ export const getShowRouteFromGRN = (grn: string) => {
       return Routes.getPluginRoute('SEARCH_VIEWID')(id);
     case 'stream':
       return Routes.stream_search(id);
+    case 'search_filter':
+      return Routes.getPluginRoute('MY-FILTERS_DETAILS_FILTERID')(id)
     default:
       return assertUnreachable(grn, type);
   }

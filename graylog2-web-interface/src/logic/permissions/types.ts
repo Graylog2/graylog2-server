@@ -27,6 +27,7 @@ export type GRNType =
   | 'event_definition'
   | 'notification'
   | 'search'
+  | 'search_filter'
   | 'stream'
   | 'global';
 
