@@ -439,6 +439,7 @@ public class TimeBasedRotationStrategyTest {
         // index creation: 01:31 -> anchor 01:00 (without resetting it would be 01:30)
 
         // ideally we wouldn't rotate here, because the index is only 1 hour old
+        when(indices.numberOfMessages(anyString())).thenReturn(1L);
         rotationStrategy.rotate(indexSet);
         verify(indexSet, times(1)).cycle();
     }
