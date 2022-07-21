@@ -43,7 +43,8 @@ const AsyncCustomMenuList = ({ children, selectProps: { loadOptions, total } }: 
                     itemCount={total}
                     loadMoreItems={loadOptions}>
       {({ onItemsRendered, ref }) => (
-        <WindowList listRef={ref} onItemsRendered={onItemsRendered}>
+        <WindowList listRef={ref}
+                    onItemsRendered={onItemsRendered}>
           {items}
         </WindowList>
       )}

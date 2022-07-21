@@ -67,7 +67,7 @@ export const WindowList = ({ children, listRef, ...rest }: Props.MenuList & { li
   const getSize = useCallback((index: number) => sizeMap.current[index] || 36, [sizeMap]);
 
   return (
-    <Container ref={containerRef}>
+    <Container ref={containerRef} data-testid="infinite-loader-container">
       <List ref={listRef || vListRef}
             height={height}
             itemCount={children.length}
