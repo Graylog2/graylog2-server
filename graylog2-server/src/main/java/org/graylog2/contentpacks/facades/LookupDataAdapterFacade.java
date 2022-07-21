@@ -148,7 +148,7 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
 
     @Override
     public void delete(DataAdapterDto nativeEntity) {
-        dataAdapterService.deleteAndPostEvent(nativeEntity.id());
+        dataAdapterService.deleteAndPostEventImmutable(nativeEntity.id());
     }
 
     @Override

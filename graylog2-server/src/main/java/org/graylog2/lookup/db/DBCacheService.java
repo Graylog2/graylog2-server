@@ -85,6 +85,11 @@ public class DBCacheService extends ScopedEntityPaginatedDbService<CacheDto> {
         cacheDto.ifPresent(cache -> clusterEventBus.post(CachesDeleted.create(cache.id())));
     }
 
+    public void deleteAndPostEventImmutable(String idOrName) {
+        // TODO: Uncomment when cahnges merged
+        //super.deleteMutable(idOrName);
+    }
+
     public Collection<CacheDto> findByIds(Set<String> idSet) {
         final DBQuery.Query query = DBQuery.in("_id", idSet.stream().map(ObjectId::new).collect(Collectors.toList()));
         try (DBCursor<CacheDto> cursor = db.find(query)) {
