@@ -43,6 +43,7 @@ import javax.inject.Singleton;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -223,7 +224,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         final DateTime nextAnchor = calculateNextAnchor(currentAnchor, normalizedPeriod, now);
         anchor.put(indexSetId, nextAnchor);
 
-        if (indices.numberOfMessages(index) == 0) {
+        if (isEmptyIndexSet(indexSet)) {
             log.debug("Index {} contains no messages, skipping rotation!", index);
             final String message = new MessageFormat("Index contains no messages, skipping rotation! Next rotation at {0} {1}", Locale.ENGLISH)
                     .format(new Object[]{
@@ -237,6 +238,16 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
                         nextAnchor,
                         overriding ? ELASTICSEARCH_MAX_WRITE_INDEX_AGE_OVERRIDES_CONFIGURED_PERIOD : ""});
         return new SimpleResult(true, message);
+    }
+
+    private boolean isEmptyIndexSet(IndexSet indexSet) {
+        final Set<String> allIndices = indices.getIndices(indexSet);
+        for (String index : allIndices) {
+            if (indices.numberOfMessages(index) > 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private Pair<Period, Boolean> getNormalizedRotationPeriod(TimeBasedRotationStrategyConfig config) {
