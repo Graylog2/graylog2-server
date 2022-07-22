@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
@@ -32,9 +31,10 @@ import java.util.concurrent.TimeUnit;
 @AutoValue
 public abstract class GeoIpResolverConfig {
 
-    private static final int DEFAULT_INTERVAL_MINUTES = 10;
+    private static final Long DEFAULT_INTERVAL = 10L;
     public static final String FIELD_REFRESH_INTERVAL_UNIT = "refresh_interval_unit";
     public static final String FIELD_REFRESH_INTERVAL = "refresh_interval";
+    public static final TimeUnit DEFAULT_INTERVAL_UNIT = TimeUnit.MINUTES;
 
     @JsonProperty("enabled")
     public abstract boolean enabled();
@@ -56,12 +56,11 @@ public abstract class GeoIpResolverConfig {
     public abstract TimeUnit refreshIntervalUnit();
 
     @JsonProperty(FIELD_REFRESH_INTERVAL)
-    @Min(0)
-    public abstract long refreshInterval();
+    public abstract Long refreshInterval();
 
     public Duration refreshIntervalAsDuration() {
         if (refreshIntervalUnit() == null) {
-            return Duration.ofMinutes(DEFAULT_INTERVAL_MINUTES);
+            return Duration.ofMinutes(DEFAULT_INTERVAL);
         }
         return Duration.ofMillis(refreshIntervalUnit().toMillis(refreshInterval()));
     }
@@ -73,15 +72,15 @@ public abstract class GeoIpResolverConfig {
                                              @JsonProperty("city_db_path") String cityDbPath,
                                              @JsonProperty("asn_db_path") String asnDbPath,
                                              @JsonProperty(FIELD_REFRESH_INTERVAL_UNIT) TimeUnit refreshIntervalUnit,
-                                             @JsonProperty(FIELD_REFRESH_INTERVAL) long refreshInterval) {
+                                             @JsonProperty(FIELD_REFRESH_INTERVAL) Long refreshInterval) {
         return builder()
                 .enabled(cityEnabled)
                 .enforceGraylogSchema(enforceGraylogSchema)
                 .databaseVendorType(databaseVendorType == null ? DatabaseVendorType.MAXMIND : databaseVendorType)
                 .cityDbPath(cityDbPath)
                 .asnDbPath(asnDbPath)
-                .refreshIntervalUnit(refreshIntervalUnit)
-                .refreshInterval(refreshInterval)
+                .refreshIntervalUnit(refreshIntervalUnit == null ? DEFAULT_INTERVAL_UNIT : refreshIntervalUnit)
+                .refreshInterval(refreshInterval == null ? DEFAULT_INTERVAL : refreshInterval)
                 .build();
     }
 
@@ -92,8 +91,8 @@ public abstract class GeoIpResolverConfig {
                 .enforceGraylogSchema(false)
                 .cityDbPath("/etc/graylog/server/GeoLite2-City.mmdb")
                 .asnDbPath("/etc/graylog/server/GeoLite2-ASN.mmdb")
-                .refreshIntervalUnit(TimeUnit.MINUTES)
-                .refreshInterval(DEFAULT_INTERVAL_MINUTES)
+                .refreshIntervalUnit(DEFAULT_INTERVAL_UNIT)
+                .refreshInterval(DEFAULT_INTERVAL)
                 .build();
     }
 
@@ -117,7 +116,7 @@ public abstract class GeoIpResolverConfig {
 
         public abstract Builder refreshIntervalUnit(TimeUnit unit);
 
-        public abstract Builder refreshInterval(long interval);
+        public abstract Builder refreshInterval(Long interval);
 
         public abstract GeoIpResolverConfig build();
     }

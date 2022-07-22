@@ -181,6 +181,10 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                                label="Path to the ASN database"
                                name="asn_db_path" />
                   <TimeUnitInput label="Database refresh interval"
+                                 update={(value, unit) => {
+                                   setFieldValue('refresh_interval', value);
+                                   setFieldValue('refresh_interval_unit', unit);
+                                 }}
                                  help="Interval at which the database files are checked for modifications and refreshed changes are detected on disk."
                                  value={values.refresh_interval}
                                  unit={values.refresh_interval_unit || 'MINUTES'}

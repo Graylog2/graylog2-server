@@ -22,9 +22,7 @@ import org.graylog.plugins.map.config.DatabaseType;
 import org.graylog.plugins.map.config.DatabaseVendorType;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.utilities.FileInfo;
 import org.graylog2.plugin.validate.ConfigValidationException;
 import org.graylog2.rest.resources.system.GeoIpResolverConfigValidator;
@@ -36,7 +34,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
@@ -55,8 +52,7 @@ public final class GeoIpDbFileChangeMonitorService {
     private final GeoIpResolverConfigValidator geoIpResolverConfigValidator;
 
     private final ClusterConfigService clusterConfigService;
-    private final ClusterEventBus clusterEventBus;
-    private final NodeId nodeId;
+    private final EventBus eventBus;
     private Duration dbRefreshInterval = Duration.ZERO;
     private FileInfo cityDbFileInfo = FileInfo.empty();
     private FileInfo asnDbFileInfo = FileInfo.empty();
@@ -64,22 +60,19 @@ public final class GeoIpDbFileChangeMonitorService {
 
     @Inject
     public GeoIpDbFileChangeMonitorService(@Named("daemonScheduler") ScheduledExecutorService scheduler,
-                                           ClusterEventBus clusterEventBus,
                                            EventBus eventBus,
-                                           NodeId nodeId,
                                            ClusterConfigService clusterConfigService,
                                            GeoIpVendorResolverService geoIpVendorResolverService) {
         this.scheduler = Objects.requireNonNull(scheduler);
-        this.clusterEventBus = Objects.requireNonNull(clusterEventBus);
-        this.nodeId = Objects.requireNonNull(nodeId);
+        this.eventBus = Objects.requireNonNull(eventBus);
         this.clusterConfigService = Objects.requireNonNull(clusterConfigService);
         this.geoIpResolverConfigValidator = new GeoIpResolverConfigValidator(geoIpVendorResolverService);
 
-        registerToEvents(eventBus);
+        registerToEvents();
         updateConfiguration();
     }
 
-    private void registerToEvents(EventBus eventBus) {
+    private void registerToEvents() {
         eventBus.register(this);
     }
 
@@ -100,8 +93,8 @@ public final class GeoIpDbFileChangeMonitorService {
         if (changes.isEmpty()) {
             LOG.debug("GeoIP Database files have not changed--will not refresh");
         } else {
-            GeoIpDbFileChangedEvent event = GeoIpDbFileChangedEvent.create(Instant.now(), nodeId.toString(), changes);
-            clusterEventBus.post(event);
+            GeoIpDbFileChangedEvent event = GeoIpDbFileChangedEvent.create();
+            eventBus.post(event);
         }
     }
 
