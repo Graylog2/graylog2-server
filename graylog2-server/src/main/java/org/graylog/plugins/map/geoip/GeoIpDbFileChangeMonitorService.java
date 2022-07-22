@@ -41,6 +41,17 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A service to check whether the ASN and City MaxMind/IPInfo database files have changed, as well as whether the configuration has changed.
+ *
+ * <p>
+ * If the database files have changed, a {@link GeoIpDbFileChangedEvent} is posted, to which {@link org.graylog.plugins.map.geoip.processor.GeoIpProcessor} subscribes and reloads the {@link GeoIpResolverEngine}.
+ * </p>
+ *
+ * <p>
+ * This service also subscribes to {@link ClusterConfigChangedEvent} to update the database files to be monitored, as well as to update the scheduled task ({@link #refreshDatabases()}) which checks for file changes.
+ * </p>
+ */
 @Singleton
 public final class GeoIpDbFileChangeMonitorService {
 
@@ -88,7 +99,7 @@ public final class GeoIpDbFileChangeMonitorService {
 
         LOG.debug("Starting GeoIP database refresh");
 
-        Map<DatabaseType, FileInfo.Change> changes = checkForChange();
+        Map<DatabaseType, FileInfo.Change> changes = checkForChanges();
 
         if (changes.isEmpty()) {
             LOG.debug("GeoIP Database files have not changed--will not refresh");
@@ -98,7 +109,7 @@ public final class GeoIpDbFileChangeMonitorService {
         }
     }
 
-    private Map<DatabaseType, FileInfo.Change> checkForChange() {
+    private Map<DatabaseType, FileInfo.Change> checkForChanges() {
         FileInfo.Change cityDbChange = cityDbFileInfo.checkForChange();
         FileInfo.Change asnDbChange = asnDbFileInfo.checkForChange();
 
