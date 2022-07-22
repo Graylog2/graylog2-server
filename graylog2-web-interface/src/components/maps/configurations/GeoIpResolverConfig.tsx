@@ -189,6 +189,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                                  value={values.refresh_interval}
                                  unit={values.refresh_interval_unit || 'MINUTES'}
                                  defaultEnabled={values.enabled}
+                                 enabled={values.enabled}
                                  hideCheckbox
                                  units={['SECONDS', 'MINUTES', 'HOURS', 'DAYS']} />
 
