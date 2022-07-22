@@ -42,6 +42,7 @@ type Props = {
   entityShareState: EntityShareState,
   setDisableSubmit: (boolean) => void,
   granteesSelectFormRef: React.Ref<FormikProps<GranteesSelectFormValues>>,
+  showShareableEntityURL?: boolean
 };
 
 const Section = styled.div`
@@ -78,6 +79,7 @@ const EntityShareSettings = ({
   entityTitle,
   setDisableSubmit,
   granteesSelectFormRef,
+  showShareableEntityURL,
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
 
@@ -144,9 +146,11 @@ const EntityShareSettings = ({
                                availableGrantees={availableGrantees} />
         </Section>
       )}
+      {showShareableEntityURL && (
       <Section>
         <ShareableEntityURL entityGRN={entityGRN} />
       </Section>
+      )}
     </>
   );
 };
@@ -156,6 +160,11 @@ EntityShareSettings.propTypes = {
   entityGRN: PropTypes.string.isRequired,
   entityShareState: PropTypes.object.isRequired,
   setDisableSubmit: PropTypes.func.isRequired,
+  showShareableEntityURL: PropTypes.bool,
+};
+
+EntityShareSettings.defaultProps = {
+  showShareableEntityURL: true,
 };
 
 export default EntityShareSettings;
