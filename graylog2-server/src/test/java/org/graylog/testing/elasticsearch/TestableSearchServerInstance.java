@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.utility.DockerImageName;
@@ -67,6 +68,9 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
         if (!containersByVersion.containsKey(version)) {
             GenericContainer<?> container = buildContainer(image, network);
             container.start();
+            if (LOG.isDebugEnabled()) {
+                container.followOutput(new Slf4jLogConsumer(LOG));
+            }
             containersByVersion.put(version, container);
         }
         return containersByVersion.get(version);

@@ -28,7 +28,6 @@ import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
@@ -39,7 +38,7 @@ import java.net.URI;
 
 public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstanceES7.class);
-    private static final String ES_VERSION = "7.10.2";
+    protected static final String ES_VERSION = "7.10.2";
     private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
 
     private final RestHighLevelClient restHighLevelClient;
@@ -95,7 +94,6 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
 
         return new ElasticsearchInstanceES7(image, searchVersion, network);
     }
-
 
     protected static String imageNameFrom(Version version) {
         return DEFAULT_IMAGE_OSS + ":" + version.toString();
