@@ -25,10 +25,7 @@ import org.graylog.autovalue.WithBeanGetter;
 @AutoValue
 @WithBeanGetter
 public abstract class GeoIpDbFileChangedEvent {
-
-    private GeoIpDbFileChangedEvent() {
-    }
-
+    
     @JsonCreator
     public static GeoIpDbFileChangedEvent create() {
         return new AutoValue_GeoIpDbFileChangedEvent();
