@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 
 import { alice } from 'fixtures/users';
 import { simpleEventDefinition } from 'fixtures/eventDefinition';
@@ -32,18 +32,21 @@ const exampleEventDefinition = {
 jest.mock('components/permissions/EntityShareModal', () => () => <div>EntityShareModal content</div>);
 
 describe('EventDefinitionEntry', () => {
-  const renderSUT = (grnPermissions = [], permissions = []) => {
+  const renderSUT = (grnPermissions = [], permissions = [], scope = 'DEFAULT') => {
     const currentUser = alice.toBuilder()
       .grnPermissions(Immutable.List(grnPermissions))
       .permissions(Immutable.List(permissions))
       .build();
 
+    exampleEventDefinition._scope = scope;
+    console.log(exampleEventDefinition);
+
     return (
       <CurrentUserContext.Provider value={currentUser}>
-        <EventDefinitionEntry onDelete={() => {}}
-                              onCopy={() => {}}
-                              onDisable={() => {}}
-                              onEnable={() => {}}
+        <EventDefinitionEntry onDelete={() => { }}
+                              onCopy={() => { }}
+                              onDisable={() => { }}
+                              onEnable={() => { }}
                               context={{ scheduler: {} }}
                               eventDefinition={exampleEventDefinition} />
       </CurrentUserContext.Provider>
@@ -74,5 +77,37 @@ describe('EventDefinitionEntry', () => {
     render(renderSUT(grnPermissions));
 
     expect(screen.getAllByRole('button', { name: /Share/ })[1]).toHaveAttribute('disabled');
+  });
+
+  it.only('shows "edit" button', async () => {
+    render(renderSUT([], ['*']));
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId('edit-button')[0]).toBeVisible();
+    });
+  });
+
+  it('hides "edit" button for immutable definitions', async () => {
+    render(renderSUT([], ['*'], 'ILLUMINATE'));
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('edit-button')).toBeNull();
+    });
+  });
+
+  it('shows "delete" button', async () => {
+    render(renderSUT([], ['*']));
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId('delete-button')[0]).toBeVisible();
+    });
+  });
+
+  it('hides "delete" button for immutable definitions', async () => {
+    render(renderSUT([], ['*'], 'ILLUMINATE'));
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('delete-button')).toBeNull();
+    });
   });
 });
