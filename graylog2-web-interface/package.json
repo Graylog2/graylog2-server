@@ -169,7 +169,6 @@
     "yargs": "^17.0.1"
   },
   "resolutions": {
-    "moment": "2.29.4",
     "immer": "9.0.6",
     "nth-check": "2.0.1",
     "glob-parent": "5.1.2"
