@@ -82,7 +82,9 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
 
     @Override
     public RotationStrategyConfig defaultConfiguration() {
-        return TimeBasedRotationStrategyConfig.createDefault(elasticsearchConfiguration.getMaxWriteIndexAge());
+        return TimeBasedRotationStrategyConfig.builder()
+                .maxRotationPeriod(elasticsearchConfiguration.getMaxWriteIndexAge())
+                .build();
     }
 
     /**
@@ -224,7 +226,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         final DateTime nextAnchor = calculateNextAnchor(currentAnchor, normalizedPeriod, now);
         anchor.put(indexSetId, nextAnchor);
 
-        if (isEmptyIndexSet(indexSet)) {
+        if (!config.rotateEmptyIndexSets() && isEmptyIndexSet(indexSet)) {
             log.debug("Index {} contains no messages, skipping rotation!", index);
             final String message = new MessageFormat("Index contains no messages, skipping rotation! Next rotation at {0} {1}", Locale.ENGLISH)
                     .format(new Object[]{
