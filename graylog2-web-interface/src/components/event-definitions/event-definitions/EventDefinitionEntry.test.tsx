@@ -39,7 +39,6 @@ describe('EventDefinitionEntry', () => {
       .build();
 
     exampleEventDefinition._scope = scope;
-    console.log(exampleEventDefinition);
 
     return (
       <CurrentUserContext.Provider value={currentUser}>
@@ -79,7 +78,7 @@ describe('EventDefinitionEntry', () => {
     expect(screen.getAllByRole('button', { name: /Share/ })[1]).toHaveAttribute('disabled');
   });
 
-  it.only('shows "edit" button', async () => {
+  it('shows "edit" button', async () => {
     render(renderSUT([], ['*']));
 
     await waitFor(() => {
