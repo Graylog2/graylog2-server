@@ -38,7 +38,7 @@ type SuggestionsResponse = {
 
 const suggestionsUrl = qualifyUrl('/search/suggest');
 
-const unquote = (s: string) => s.replace(/^"(.+(?="$))"$/, '$1');
+const unquote = (s: string) => s.replace(/^"(.*(?="$))"$/, '$1');
 
 const formatValue = (value: string, type: string) => {
   switch (type) {
@@ -56,6 +56,8 @@ const completionCaption = (fieldValue: string, input: string | number) => {
   return `${fieldValue} ⭢ ${input}`;
 };
 
+const isValueToken = (token: Line) => ['term', 'string'].includes(token?.type);
+
 const getFieldNameAndInput = (currentToken: Token | undefined | null, lastToken: Token | undefined | null) => {
   if (currentToken?.type === 'keyword' && currentToken?.value.endsWith(':')) {
     return {
@@ -65,7 +67,7 @@ const getFieldNameAndInput = (currentToken: Token | undefined | null, lastToken:
     };
   }
 
-  if (['term', 'string'].includes(currentToken?.type) && lastToken?.type === 'keyword') {
+  if (isValueToken(currentToken) && lastToken?.type === 'keyword') {
     return {
       fieldName: lastToken.value.slice(0, -1),
       input: formatValue(currentToken.value, currentToken.type),
@@ -211,7 +213,7 @@ class FieldValueCompletion implements Completer {
     const nextToken = currentLineTokens[currentTokenIndex + 1];
 
     const currentTokenIsFieldName = currentToken?.type === 'keyword' && currentToken?.value.endsWith(':');
-    const currentTokenIsFieldValue = currentToken?.type === 'term' && previousToken?.type === 'keyword';
+    const currentTokenIsFieldValue = isValueToken(currentToken) && previousToken?.type === 'keyword';
     const nextTokenIsTerm = nextToken?.type === 'term';
 
     return (currentTokenIsFieldName || currentTokenIsFieldValue) && !nextTokenIsTerm;

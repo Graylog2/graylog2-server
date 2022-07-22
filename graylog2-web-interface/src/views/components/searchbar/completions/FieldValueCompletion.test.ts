@@ -147,6 +147,26 @@ describe('FieldValueCompletion', () => {
       expect(suggestions).toEqual(expectedSuggestions);
     });
 
+    it('returns suggestions, field value is an empty quoted string', async () => {
+      const currentToken = createCurrentToken('string', '""', 1, 12);
+      const lastToken = {
+        type: 'keyword',
+        value: 'http_method:',
+      };
+      const completer = new FieldValueCompletion();
+
+      const suggestions = await completer.getCompletions({
+        ...requestDefaults,
+        currentToken,
+        lastToken,
+        prefix: '',
+        tokens: [lastToken, currentToken],
+        currentTokenIdx: 1,
+      });
+
+      expect(suggestions).toEqual(expectedSuggestions);
+    });
+
     it('returns suggestions when field type can only be found in all field types', async () => {
       const currentToken = createKeywordToken('http_method:');
 
@@ -394,6 +414,13 @@ describe('FieldValueCompletion', () => {
     it('returns true if current token is a keyword and ends with ":"', async () => {
       const completer = new FieldValueCompletion();
       const result = completer.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }, null]]);
+
+      expect(result).toEqual(true);
+    });
+
+    it('returns true if current token is a string and consits only of ""', async () => {
+      const completer = new FieldValueCompletion();
+      const result = completer.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:' }, { type: 'string', value: '""', index: 1, start: 12 }, null]]);
 
       expect(result).toEqual(true);
     });
