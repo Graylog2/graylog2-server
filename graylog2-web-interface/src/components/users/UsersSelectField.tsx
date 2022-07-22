@@ -15,15 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useContext } from 'react';
 import debounce from 'lodash/debounce';
 import type { PaginatedUsers } from 'src/stores/users/UsersStore';
 
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { isPermitted } from 'util/PermissionsMixin';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 import { Spinner } from 'components/common';
-import { useStore } from 'stores/connect';
 
 import PaginatedSelect from '../common/Select/PaginatedSelect';
 
@@ -39,7 +38,7 @@ type Props = {
 }
 
 const UsersSelectField = ({ value, onChange }: Props) => {
-  const currentUser = useStore(CurrentUserStore, (state) => state?.currentUser);
+  const currentUser = useContext(CurrentUserContext);
   const [paginatedUsers, setPaginatedUsers] = useState<PaginatedUsers | undefined>();
   const loadUsersPaginated = useCallback((pagination = DEFAULT_PAGINATION) => {
     if (isPermitted(currentUser.permissions, 'users:list')) {
@@ -79,13 +78,13 @@ const UsersSelectField = ({ value, onChange }: Props) => {
   }, 200);
 
   if (!paginatedUsers) {
-    return <p><Spinner text="Loading Notification information..." /></p>;
+    return <p><Spinner text="Loading User select..." /></p>;
   }
 
   const { list, pagination: { total } } = paginatedUsers;
 
   return (
-    <PaginatedSelect id="notification-user-recipients"
+    <PaginatedSelect id="user-select-list"
                      value={value}
                      placeholder="Select user(s)..."
                      options={formatUsers(list.toArray())}
