@@ -16,30 +16,19 @@
  */
 import { useQuery } from 'react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
+import fetchScopePermissions from 'hooks/api/fetchScopePermissions';
+
+interface ScopeParams {
+  is_mutable: boolean;
+}
+
+type ScopeName = 'DEFAULT' | 'ILLUMINATE';
+
+type EntityScopeRecord = Record<ScopeName, ScopeParams>;
 
 type EntityScopeType = {
-  entity_scopes: {
-    default: {
-      is_mutable: boolean,
-    },
-    illuminate: {
-      is_mutable: boolean,
-    },
-  }
-};
-
-const fetchScopePermissions = async () => {
-  try {
-    const data = await fetch('GET', qualifyUrl(ApiRoutes.EntityScopeController.getScope().url));
-
-    return data;
-  } catch (e) {
-    return UserNotification.error(e.message);
-  }
+  entity_scopes: EntityScopeRecord,
 };
 
 const useGetPermissionsByScope = () => {
@@ -58,7 +47,7 @@ const useGetPermissionsByScope = () => {
   const getScopePermissions = (inScope: string) => {
     const scope = inScope ? inScope.toUpperCase() : 'DEFAULT';
 
-    return isLoading ? {} : data.entity_scopes[scope];
+    return isLoading ? { is_mutable: false } : data.entity_scopes[scope];
   };
 
   return { getScopePermissions };
