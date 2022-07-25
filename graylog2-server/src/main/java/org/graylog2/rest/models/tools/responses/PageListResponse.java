@@ -24,7 +24,7 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.PaginatedList;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
+import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
@@ -50,7 +50,7 @@ public abstract class PageListResponse<T> {
     public abstract String order();
 
     @JsonProperty("elements")
-    public abstract Collection<T> elements();
+    public abstract List<T> elements();
 
     @JsonCreator
     public static <T> PageListResponse<T> create(
@@ -59,7 +59,7 @@ public abstract class PageListResponse<T> {
             @JsonProperty("total") long total,
             @JsonProperty("sort") @Nullable String sort,
             @JsonProperty("order") @Nullable String order,
-            @JsonProperty("elements") Collection<T> elements) {
+            @JsonProperty("elements") List<T> elements) {
         return new AutoValue_PageListResponse<>(query, paginationInfo, total, sort, order, elements);
     }
 

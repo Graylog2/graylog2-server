@@ -37,6 +37,7 @@ import org.graylog.scheduler.JobDefinitionConfig;
 import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.JobTriggerData;
 import org.graylog.scheduler.capabilities.SchedulerCapabilities;
+import org.graylog.scheduler.rest.JobResourceHandler;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendConfig;
 import org.graylog2.audit.AuditEventType;
@@ -396,5 +397,13 @@ public abstract class PluginModule extends Graylog2Module {
     }
     protected void addSchedulerCapabilities(Class<? extends SchedulerCapabilities> schedulerCapabilitiesClass) {
         schdulerCapabilitiesBinder().addBinding().to(schedulerCapabilitiesClass);
+    }
+
+    protected MapBinder<String, JobResourceHandler> jobResourceHandlerBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, JobResourceHandler.class);
+    }
+
+    protected void addJobResourceHandler(String jobType, Class<? extends JobResourceHandler> jobResourceHandlerClass) {
+        jobResourceHandlerBinder().addBinding(jobType).to(jobResourceHandlerClass);
     }
 }
