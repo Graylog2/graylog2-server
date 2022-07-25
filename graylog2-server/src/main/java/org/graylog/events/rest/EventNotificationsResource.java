@@ -168,19 +168,22 @@ public class EventNotificationsResource extends RestResource implements PluginRe
             }
             if (isNullOrEmpty(emailConfiguration.getFromEmail()) && isNullOrEmpty(emailEventNotificationConfig.sender())) {
                 validationResult.addError("sender", "No default sender specified in graylog.conf. You must specify one here.");
-            } else if (!isNullOrEmpty(emailEventNotificationConfig.sender())) {
-                try {
-                    InternetAddress email = new InternetAddress(emailEventNotificationConfig.sender());
-                    email.validate();
-                } catch (AddressException e) {
-                    validationResult.addError("sender", "Invalid email address.");
-                }
             } else {
-                try {
-                    InternetAddress email = new InternetAddress(emailConfiguration.getFromEmail());
-                    email.validate();
-                } catch (AddressException e) {
-                    validationResult.addError("sender", "Invalid sender email address specified in graylog.conf. Please correct or set a custom sender for this notification.");
+                if (!isNullOrEmpty(emailEventNotificationConfig.sender())) {
+                    try {
+                        InternetAddress email = new InternetAddress(emailEventNotificationConfig.sender());
+                        email.validate();
+                    } catch (AddressException e) {
+                        validationResult.addError("sender", "Invalid email address.");
+                    }
+                }
+                if (!isNullOrEmpty(emailConfiguration.getFromEmail())) {
+                    try {
+                        InternetAddress email = new InternetAddress(emailConfiguration.getFromEmail());
+                        email.validate();
+                    } catch (AddressException e) {
+                        validationResult.addError("sender", "Invalid default sender email address specified in graylog.conf.");
+                    }
                 }
             }
         }
