@@ -112,6 +112,7 @@ class EventNotificationFormContainer extends React.Component {
 
           if (errorResponse.status === 400 && body && body.failed) {
             this.setState({ validation: body });
+            this.scrollToFirstError();
           }
         },
       );
@@ -131,6 +132,7 @@ class EventNotificationFormContainer extends React.Component {
 
           if (errorResponse.status === 400 && body && body.failed) {
             this.setState({ validation: body });
+            this.scrollToFirstError();
           }
         },
       );
@@ -138,6 +140,12 @@ class EventNotificationFormContainer extends React.Component {
 
     onSubmit(promise);
   };
+
+  scrollToFirstError() {
+    if (document.getElementsByClassName('has-error')[0] !== undefined) {
+      document.getElementsByClassName('has-error')[0].scrollIntoView(true);
+    }
+  }
 
   handleTest = () => {
     const { notification } = this.state;
@@ -195,6 +203,9 @@ class EventNotificationFormContainer extends React.Component {
       </>
     );
   }
+
 }
+
+
 
 export default EventNotificationFormContainer;
