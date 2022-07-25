@@ -25,6 +25,15 @@ import { SystemJobsActions } from 'stores/systemjobs/SystemJobsStore';
 import UserNotification from 'util/UserNotification';
 import { StyledBadge } from 'components/bootstrap/Badge';
 
+enum JobStatus {
+  Cancelled = 'cancelled',
+  Complete = 'complete',
+  Error = 'error',
+  Paused = 'paused',
+  Runnable = 'runnable',
+  Running = 'running',
+}
+
 const StatusBadge = styled(StyledBadge)(({ status, theme }) => {
   const {
     primary,
@@ -70,8 +79,11 @@ const AcknowledgeButton = styled(Button)(({ theme }: { theme: DefaultTheme }) =>
 `);
 
 const SystemJob = ({ job }) => {
-  const jobIsOver = job.job_status === 'complete' || job.percent_complete === 100 || job.job_status === 'cancelled' || job.job_status === 'error';
-  const mappedJobStatus = job.job_status === 'runnable' ? 'queued' : job.job_status;
+  const jobIsOver = job.job_status === JobStatus.Complete
+                    || job.percent_complete === 100
+                    || job.job_status === JobStatus.Cancelled
+                    || job.job_status === JobStatus.Error;
+  const mappedJobStatus = job.job_status === JobStatus.Runnable ? 'queued' : job.job_status;
 
   const _onAcknowledge = () => {
     return (e) => {
@@ -123,7 +135,7 @@ SystemJob.propTypes = {
     name: PropTypes.string,
     node_id: PropTypes.string,
     started_at: PropTypes.string,
-    job_status: PropTypes.string,
+    job_status: PropTypes.oneOf(Object.values(JobStatus)),
   }).isRequired,
 };
 
