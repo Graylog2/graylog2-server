@@ -60,6 +60,12 @@ class EventNotificationFormContainer extends React.Component {
     onSubmit: () => {},
   };
 
+  static scrollToFirstError() {
+    if (document.getElementsByClassName('has-error')[0] !== undefined) {
+      document.getElementsByClassName('has-error')[0].scrollIntoView(true);
+    }
+  }
+
   constructor(props) {
     super(props);
 
@@ -86,6 +92,7 @@ class EventNotificationFormContainer extends React.Component {
     this.setState({ notification: nextNotification, isDirty: true, testResult: initialTestResult });
   };
 
+  // eslint-disable-next-line class-methods-use-this
   handleCancel = () => {
     history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
   };
@@ -112,7 +119,7 @@ class EventNotificationFormContainer extends React.Component {
 
           if (errorResponse.status === 400 && body && body.failed) {
             this.setState({ validation: body });
-            this.scrollToFirstError();
+            EventNotificationFormContainer.scrollToFirstError();
           }
         },
       );
@@ -132,7 +139,7 @@ class EventNotificationFormContainer extends React.Component {
 
           if (errorResponse.status === 400 && body && body.failed) {
             this.setState({ validation: body });
-            this.scrollToFirstError();
+            EventNotificationFormContainer.scrollToFirstError();
           }
         },
       );
@@ -140,12 +147,6 @@ class EventNotificationFormContainer extends React.Component {
 
     onSubmit(promise);
   };
-
-  scrollToFirstError() {
-    if (document.getElementsByClassName('has-error')[0] !== undefined) {
-      document.getElementsByClassName('has-error')[0].scrollIntoView(true);
-    }
-  }
 
   handleTest = () => {
     const { notification } = this.state;
@@ -203,9 +204,6 @@ class EventNotificationFormContainer extends React.Component {
       </>
     );
   }
-
 }
-
-
 
 export default EventNotificationFormContainer;
