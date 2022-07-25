@@ -32,6 +32,10 @@ const usePaginationQueryParameter = (PAGE_SIZES: number[]) => {
     history.replace(uri.toString());
   };
 
+  const resetPage = () => {
+    setPage(DEFAULT_PAGE);
+  };
+
   const setPageSize = (newPageSize: number) => {
     const uri = new URI(query).setSearch({ page: String(DEFAULT_PAGE), pageSize: String(newPageSize) });
     history.replace(uri.toString());
@@ -43,7 +47,7 @@ const usePaginationQueryParameter = (PAGE_SIZES: number[]) => {
   const pageSizeQueryParameterAsNumber = Number(pageSizeQueryParameter);
   const pageSize = (Number.isInteger(pageSizeQueryParameterAsNumber) && PAGE_SIZES?.includes(pageSizeQueryParameterAsNumber)) ? pageSizeQueryParameterAsNumber : PAGE_SIZES[0];
 
-  return { page, setPage, pageSize, setPageSize };
+  return { page, setPage, resetPage, pageSize, setPageSize };
 };
 
 export default usePaginationQueryParameter;
