@@ -22,6 +22,7 @@ import { IfPermitted, PaginatedList, SearchForm, Spinner, EntityList, ShareButto
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import QueryHelper from 'components/common/QueryHelper';
 import type ViewClass from 'views/logic/views/View';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 import DashboardListItem from './DashboardListItem';
 
@@ -65,8 +66,11 @@ const reducer = (state, action) => {
 };
 
 const DashboardList = ({ pagination, handleSearch, handleDashboardDelete, dashboards }) => {
+  const PAGE_SIZES = [10, 50, 100];
   const [{ query, page, perPage }, dispatch] = useReducer(reducer, { query: '', page: 1, perPage: 10 });
   const [dashboardToShare, setDashboardToShare] = useState<ViewClass>();
+
+  const { resetPage } = usePaginationQueryParameter(PAGE_SIZES);
 
   const execSearch = useCallback(() => handleSearch(query, page, perPage), [handleSearch, page, perPage, query]);
 
@@ -79,6 +83,16 @@ const DashboardList = ({ pagination, handleSearch, handleDashboardDelete, dashbo
       dispatch({ type: 'dashboardDelete' });
       execSearch();
     }, () => {});
+  };
+
+  const onSearch = (newQuery) => {
+    resetPage();
+    dispatch({ type: 'search', payload: { newQuery } });
+  };
+
+  const onReset = () => {
+    resetPage();
+    dispatch({ type: 'searchReset' });
   };
 
   if (!dashboards) {
@@ -111,11 +125,11 @@ const DashboardList = ({ pagination, handleSearch, handleDashboardDelete, dashbo
                      activePage={page}
                      totalItems={pagination.total}
                      pageSize={perPage}
-                     pageSizes={[10, 50, 100]}>
+                     pageSizes={PAGE_SIZES}>
         <div style={{ marginBottom: 15 }}>
-          <SearchForm onSearch={(newQuery) => dispatch({ type: 'search', payload: { newQuery } })}
+          <SearchForm onSearch={onSearch}
                       queryHelpComponent={<QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />}
-                      onReset={() => dispatch({ type: 'searchReset' })}
+                      onReset={onReset}
                       topMargin={0} />
         </div>
         <EntityList items={items}
