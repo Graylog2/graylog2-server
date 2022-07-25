@@ -18,6 +18,7 @@ package org.graylog.plugins.map.geoip;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog.plugins.map.config.DatabaseType;
 import org.graylog.plugins.map.config.DatabaseVendorType;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
@@ -52,8 +53,9 @@ import java.util.concurrent.TimeUnit;
  * This service also subscribes to {@link ClusterConfigChangedEvent} to update the database files to be monitored, as well as to update the scheduled task ({@link #refreshDatabases()}) which checks for file changes.
  * </p>
  */
+
 @Singleton
-public final class GeoIpDbFileChangeMonitorService {
+public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GeoIpDbFileChangeMonitorService.class.getSimpleName());
 
@@ -78,13 +80,6 @@ public final class GeoIpDbFileChangeMonitorService {
         this.eventBus = Objects.requireNonNull(eventBus);
         this.clusterConfigService = Objects.requireNonNull(clusterConfigService);
         this.geoIpResolverConfigValidator = new GeoIpResolverConfigValidator(geoIpVendorResolverService);
-
-        registerToEvents();
-        updateConfiguration();
-    }
-
-    private void registerToEvents() {
-        eventBus.register(this);
     }
 
     @Subscribe
@@ -93,6 +88,19 @@ public final class GeoIpDbFileChangeMonitorService {
         if (GeoIpResolverConfig.class.getCanonicalName().equals(event.type())) {
             scheduler.schedule(this::updateConfiguration, 0, TimeUnit.SECONDS);
         }
+    }
+
+    @Override
+    protected void startUp() throws Exception {
+
+        eventBus.register(this);
+        updateConfiguration();
+    }
+
+    @Override
+    protected void shutDown() throws Exception {
+
+        eventBus.unregister(this);
     }
 
     private void refreshDatabases() {

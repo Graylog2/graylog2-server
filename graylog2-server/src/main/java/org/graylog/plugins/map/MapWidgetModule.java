@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.map;
 
+import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
@@ -54,6 +55,6 @@ public class MapWidgetModule extends PluginModule {
                 .implement(ipInfoAsnTl, Names.named("IPINFO_ASN"), IpInfoIpAsnResolver.class)
                 .build(GeoIpResolverFactory.class));
 
-        bind(GeoIpDbFileChangeMonitorService.class).asEagerSingleton();
+        serviceBinder().addBinding().to(GeoIpDbFileChangeMonitorService.class).in(Scopes.SINGLETON);
     }
 }

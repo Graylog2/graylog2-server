@@ -113,6 +113,8 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
             <dd>{config.city_db_path}</dd>
             <dt>ASN database path:</dt>
             <dd>{config.asn_db_path}</dd>
+            <dt>Database refresh interval:</dt>
+            <dd>{config.refresh_interval} {config.refresh_interval_unit}</dd>
           </>
         )}
       </dl>
