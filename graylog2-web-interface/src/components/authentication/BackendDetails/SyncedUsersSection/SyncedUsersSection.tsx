@@ -24,6 +24,7 @@ import AuthenticationDomain from 'domainActions/authentication/AuthenticationDom
 import { DataTable, PaginatedList, Spinner, EmptyResult } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 import SyncedUsersOverviewItem from './SyncedUsersOverviewItem';
 import SyncedUsersFilter from './SyncedUsersFilter';
@@ -58,7 +59,10 @@ type Props = {
   authenticationBackend: AuthenticationBackend,
 };
 
+const _userOverviewItem = (user, roles) => <SyncedUsersOverviewItem user={user} roles={roles} />;
+
 const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
+  const { resetPage } = usePaginationQueryParameter();
   const [loading, setLoading] = useState(false);
   const [paginatedUsers, setPaginatedUsers] = useState<PaginatedUsers | undefined>();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
@@ -67,11 +71,14 @@ const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
 
   useEffect(() => _loadSyncedTeams(authenticationBackend.id, pagination, setLoading, setPaginatedUsers), [authenticationBackend.id, pagination]);
 
+  const onSearch = (newQuery) => {
+    resetPage();
+    setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page });
+  };
+
   if (!paginatedUsers) {
     return <Spinner />;
   }
-
-  const _userOverviewItem = (user) => <SyncedUsersOverviewItem user={user} roles={roles} />;
 
   return (
     <SectionComponent title="Synchronized Users" showLoading={loading}>
@@ -80,8 +87,8 @@ const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
       </p>
       <PaginatedList activePage={page} totalItems={paginatedUsers.pagination.total} onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}>
         <DataTable className="table-hover"
-                   customFilter={<SyncedUsersFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />}
-                   dataRowFormatter={_userOverviewItem}
+                   customFilter={<SyncedUsersFilter onSearch={onSearch} />}
+                   dataRowFormatter={(user) => _userOverviewItem(user, roles)}
                    filterKeys={[]}
                    filterLabel="Filter Users"
                    headerCellFormatter={_headerCellFormatter}
