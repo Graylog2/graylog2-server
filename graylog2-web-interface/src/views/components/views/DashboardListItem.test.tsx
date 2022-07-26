@@ -59,7 +59,7 @@ describe('Render DashboardListItem', () => {
     await screen.findByText('search-title-0');
     await screen.findByText('desc');
     await screen.findByText('sum');
-    await screen.findByText('2020-01-01 00:00:00');
+    await screen.findByText('2020-01-01 01:00:00');
   });
 
   it('should render text "Last saved" if current user the same as an owner', async () => {

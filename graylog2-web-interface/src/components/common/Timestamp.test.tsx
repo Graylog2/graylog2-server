@@ -29,7 +29,7 @@ describe('Timestamp', () => {
   it('should render date time', () => {
     render(<Timestamp dateTime="2020-01-01T10:00:00.000Z" />);
 
-    expect(screen.getByText('2020-01-01 10:00:00')).toBeInTheDocument();
+    expect(screen.getByText('2020-01-01 11:00:00')).toBeInTheDocument();
   });
 
   it('should render date time based on defined time zone', () => {
@@ -47,18 +47,18 @@ describe('Timestamp', () => {
   it('should display current time, when date time is not defined', () => {
     render(<Timestamp />);
 
-    expect(screen.getByText('2020-01-01 00:00:00')).toBeInTheDocument();
+    expect(screen.getByText('2020-01-01 01:00:00')).toBeInTheDocument();
   });
 
   it('should display current time, when date time is undefined', () => {
     render(<Timestamp dateTime={undefined} />);
 
-    expect(screen.getByText('2020-01-01 00:00:00')).toBeInTheDocument();
+    expect(screen.getByText('2020-01-01 01:00:00')).toBeInTheDocument();
   });
 
   it('should display current time, when date time is null', () => {
     render(<Timestamp dateTime={null} />);
 
-    expect(screen.getByText('2020-01-01 00:00:00')).toBeInTheDocument();
+    expect(screen.getByText('2020-01-01 01:00:00')).toBeInTheDocument();
   });
 });

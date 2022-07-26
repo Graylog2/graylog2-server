@@ -19,7 +19,7 @@ import type { DateTime } from 'util/DateTime';
 import { adjustFormat, toDateObject } from 'util/DateTime';
 import type { UserDateTimeContextType } from 'contexts/UserDateTimeContext';
 
-const userTimezone = 'UTC';
+const userTimezone = 'Europe/Berlin';
 const userDateTimeContextValue: UserDateTimeContextType = {
   formatTime: (dateTime: DateTime) => adjustFormat(dateTime),
   toUserTimezone: (dateTime: DateTime) => toDateObject(dateTime, undefined, userTimezone),
