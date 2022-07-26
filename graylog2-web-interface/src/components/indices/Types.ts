@@ -135,9 +135,6 @@ export const RetentionStrategyConfigPropType = PropTypes.exact({
 export const JsonSchemaStringPropertyTypePropType = PropTypes.exact({
   type: PropTypes.string.isRequired,
 });
-export const JsonSchemaBooleanPropertyTypePropType = PropTypes.exact({
-  type: PropTypes.bool,
-});
 export const JsonSchemaIndexActionPropertyTypePropType = PropTypes.exact({
   type: PropTypes.string.isRequired,
   enum: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -148,7 +145,7 @@ export const RotationPropertiesPropType = PropTypes.exact({
   type: JsonSchemaStringPropertyTypePropType.isRequired,
   max_size: JsonSchemaStringPropertyTypePropType,
   max_docs_per_index: JsonSchemaStringPropertyTypePropType,
-  rotate_empty_index_sets: JsonSchemaBooleanPropertyTypePropType,
+  rotate_empty_index_sets: JsonSchemaStringPropertyTypePropType,
 });
 export const RotationJsonSchemaPropType = PropTypes.exact({
   type: PropTypes.string,

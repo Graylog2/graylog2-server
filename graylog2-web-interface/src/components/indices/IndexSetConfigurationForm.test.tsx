@@ -143,6 +143,7 @@ const rotationStrategies = [
       type: 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig',
       rotation_period: 'P1D',
       max_rotation_period: null,
+      rotate_empty_index_sets: false,
     },
     json_schema: {
       type: 'object',
@@ -153,6 +154,9 @@ const rotationStrategies = [
         },
         max_rotation_period: {
           type: 'string',
+        },
+        rotate_empty_index_sets: {
+          type: 'boolean',
         },
         type: {
           type: 'string',
