@@ -39,8 +39,9 @@ export type TimeBasedRotationStrategyConfig = {
   type: string,
   rotation_period: string,
   max_rotation_period: string,
+  rotate_empty_index_sets: boolean,
 }
-export type RotationStrategyConfig = SizeBasedRotationStrategyConfig | MessageCountRotationStrategyConfig| TimeBasedRotationStrategyConfig;
+export type RotationStrategyConfig = SizeBasedRotationStrategyConfig | MessageCountRotationStrategyConfig | TimeBasedRotationStrategyConfig;
 export type RetentionStrategyConfig = {
   type: string,
   max_number_of_indices?: number,
@@ -53,11 +54,15 @@ export interface JsonSchemaIndexActionPropertyType {
   type: string,
   enum: Array<string>,
 }
+export interface JsonSchemaBooleanPropertyType {
+  type: boolean;
+}
 export interface RotationProperties {
   rotation_period?: JsonSchemaStringPropertyType,
   max_rotation_period?: JsonSchemaStringPropertyType,
   type: JsonSchemaStringPropertyType,
   max_size?: JsonSchemaStringPropertyType,
+  rotate_empty_index_sets: JsonSchemaBooleanPropertyType,
 }
 export interface RotationJsonSchema {
   type: string,
@@ -111,6 +116,7 @@ export const TimeBasedRotationStrategyConfigPropType = PropTypes.exact({
   type: PropTypes.string.isRequired,
   rotation_period: PropTypes.string.isRequired,
   max_rotation_period: PropTypes.string,
+  rotate_empty_index_sets: PropTypes.bool,
 });
 
 export const RotationStrategyConfigPropType = PropTypes.oneOfType([
@@ -129,6 +135,9 @@ export const RetentionStrategyConfigPropType = PropTypes.exact({
 export const JsonSchemaStringPropertyTypePropType = PropTypes.exact({
   type: PropTypes.string.isRequired,
 });
+export const JsonSchemaBooleanPropertyTypePropType = PropTypes.exact({
+  type: PropTypes.bool,
+});
 export const JsonSchemaIndexActionPropertyTypePropType = PropTypes.exact({
   type: PropTypes.string.isRequired,
   enum: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -139,6 +148,7 @@ export const RotationPropertiesPropType = PropTypes.exact({
   type: JsonSchemaStringPropertyTypePropType.isRequired,
   max_size: JsonSchemaStringPropertyTypePropType,
   max_docs_per_index: JsonSchemaStringPropertyTypePropType,
+  rotate_empty_index_sets: JsonSchemaBooleanPropertyTypePropType,
 });
 export const RotationJsonSchemaPropType = PropTypes.exact({
   type: PropTypes.string,
