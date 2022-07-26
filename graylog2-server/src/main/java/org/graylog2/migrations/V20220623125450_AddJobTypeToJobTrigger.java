@@ -22,14 +22,13 @@ import com.google.auto.value.AutoValue;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
-import com.mongodb.client.AggregateIterable;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.UpdateOneModel;
 import com.mongodb.client.model.Updates;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobTriggerDto;
@@ -40,8 +39,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -71,22 +70,20 @@ public class V20220623125450_AddJobTypeToJobTrigger extends Migration {
         final Stopwatch started = Stopwatch.createStarted();
 
         final MongoCollection<Document> jobTriggers = mongoConnection.getMongoDatabase().getCollection(DBJobTriggerService.COLLECTION_NAME);
+        final MongoCollection<Document> jobDefinitions = mongoConnection.getMongoDatabase().getCollection(DBJobDefinitionService.COLLECTION_NAME);
+
 
         // Duplicate the type field from the JobDefinition config to their JobTriggers
-        // Yes, this is what it takes to perform a join in MongoDB  ¯\_(ツ)_/¯
-        final AggregateIterable<Document> query = jobTriggers.aggregate(
-                ImmutableList.of(
-                        Aggregates.match(Filters.exists(JobTriggerDto.FIELD_JOB_DEFINITION_TYPE, false)),
-                        Aggregates.project(Projections.computed("job_definition_id", new Document("$toObjectId", "$job_definition_id"))),
-                        Aggregates.lookup(DBJobDefinitionService.COLLECTION_NAME, "job_definition_id", "_id", "job_definition"),
-                        Aggregates.project(Projections.computed("job_definition", new Document("$arrayElemAt", Arrays.asList("$job_definition", 0)))),
-                        Aggregates.project(Projections.computed("job_type", "$job_definition.config.type"))
-                )
-        );
+
+        // We cannot use aggregations because Mongo 3.6 does not support $toString or $toObjectId
+        final Map<ObjectId, String> typeMap = Streams.stream(jobDefinitions.find())
+                .collect(Collectors.toMap(d -> d.getObjectId("_id"), d -> d.getEmbedded(ImmutableList.of("config", "type"), String.class)));
+
+        final FindIterable<Document> query = jobTriggers.find(Filters.exists(JobTriggerDto.FIELD_JOB_DEFINITION_TYPE, false));
 
         List<UpdateOneModel<Document>> typeUpdate = Streams.stream(query).map(d -> new UpdateOneModel<Document>(
                 Filters.eq("_id", d.getObjectId("_id")),
-                Updates.set(JobTriggerDto.FIELD_JOB_DEFINITION_TYPE, d.getString("job_type")))).collect(Collectors.toList());
+                Updates.set(JobTriggerDto.FIELD_JOB_DEFINITION_TYPE, typeMap.get(d.getObjectId("_id"))))).collect(Collectors.toList());
 
         long modifiedCount = 0;
         if (!typeUpdate.isEmpty()) {
