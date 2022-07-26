@@ -143,7 +143,7 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
                  label="Rotate empty index sets"
                  onChange={this._onRotateEmptyIndexSetsUpdate('rotate_empty_index_sets')}
                  checked={rotateEmptyIndexSets}
-                 help="Don't apply the rotation strategy on empty index sets." />
+                 help="Apply the rotation strategy on empty index sets." />
         </Input>
       </div>
     );
