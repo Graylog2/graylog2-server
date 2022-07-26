@@ -106,7 +106,9 @@ public class DBLookupTableService extends ScopedEntityPaginatedDbService<LookupT
     }
 
     public void deleteAndPostEventImmutable(String idOrName) {
+        final Optional<LookupTableDto> lookupTableDto = get(idOrName);
         super.deleteImmutable(idOrName);
+        lookupTableDto.ifPresent(lookupTable -> clusterEventBus.post(LookupTablesDeleted.create(lookupTable)));
     }
 
     public void forEach(Consumer<? super LookupTableDto> action) {

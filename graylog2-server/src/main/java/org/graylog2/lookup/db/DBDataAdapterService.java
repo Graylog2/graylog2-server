@@ -87,7 +87,9 @@ public class DBDataAdapterService extends ScopedEntityPaginatedDbService<DataAda
     }
 
     public void deleteAndPostEventImmutable(String idOrName) {
+        final Optional<DataAdapterDto> dataAdapterDto = get(idOrName);
         super.deleteImmutable(idOrName);
+        dataAdapterDto.ifPresent(dataAdapter -> clusterEventBus.post(DataAdaptersDeleted.create(dataAdapter.id())));
     }
 
     public Collection<DataAdapterDto> findByIds(Set<String> idSet) {
