@@ -15,14 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext } from 'react';
+import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
 import styled from 'styled-components';
 import moment from 'moment';
 
-import UserDateTimeContext from 'contexts/UserDateTimeContext';
 import connect, { useStore } from 'stores/connect';
 import { Spinner, FlatContentRow } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
@@ -57,6 +56,7 @@ import useParameters from 'views/hooks/useParameters';
 import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
 import type { SearchBarControl } from 'views/types';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 import {
@@ -148,7 +148,7 @@ const SearchBar = ({
   onSubmit = defaultProps.onSubmit,
 }: Props) => {
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
-  const { userTimezone } = useContext(UserDateTimeContext);
+  const { userTimezone } = useUserDateTime();
   const { parameters } = useParameters();
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });

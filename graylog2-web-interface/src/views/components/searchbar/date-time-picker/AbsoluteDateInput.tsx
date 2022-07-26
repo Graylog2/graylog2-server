@@ -17,12 +17,11 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { useContext } from 'react';
 
 import { Icon } from 'components/common';
 import { Button, Input } from 'components/bootstrap';
-import UserDateTimeContext from 'contexts/UserDateTimeContext';
 import { DATE_TIME_FORMATS } from 'util/DateTime';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 const Wrapper = styled.div`
   margin: 9px 6px;
@@ -34,7 +33,7 @@ const Wrapper = styled.div`
 `;
 
 const AbsoluteDateInput = ({ name, disabled, onChange, value, hasError }) => {
-  const { formatTime } = useContext(UserDateTimeContext);
+  const { formatTime } = useUserDateTime();
   const _onSetTimeToNow = () => onChange(formatTime(new Date(), 'complete'));
   const _onChange = (event) => onChange(event.target.value);
 

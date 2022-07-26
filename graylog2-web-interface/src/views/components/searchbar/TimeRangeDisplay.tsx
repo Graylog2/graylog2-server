@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useRef, useState, useContext } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { isTypeKeyword, isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { readableRange } from 'views/logic/queries/TimeRangeToString';
 import ToolsStore from 'stores/tools/ToolsStore';
-import UserDateTimeContext from 'contexts/UserDateTimeContext';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 type Props = {
   timerange: TimeRange | NoTimeRangeOverride | null | undefined,
@@ -88,7 +88,7 @@ const dateOutput = (timerange: TimeRange) => {
 };
 
 const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => {
-  const { userTimezone } = useContext(UserDateTimeContext);
+  const { userTimezone } = useUserDateTime();
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
   const dateTested = useRef(false);
 

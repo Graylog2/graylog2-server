@@ -28,7 +28,7 @@ import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validate from 'views/components/searchbar/validate';
 import usePluginEntities from 'views/logic/usePluginEntities';
-import UserDateTimeContext from 'contexts/UserDateTimeContext';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 type Props = {
   children: ((props: FormikProps<SearchBarFormValues>) => React.ReactNode) | React.ReactNode,
@@ -50,7 +50,7 @@ export const normalizeSearchBarFormValues = ({ timerange, ...rest }: SearchBarFo
 
 const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef, validateQueryString }: Props) => {
   const [enableReinitialize, setEnableReinitialize] = useState(true);
-  const { formatTime, userTimezone } = useContext(UserDateTimeContext);
+  const { formatTime, userTimezone } = useUserDateTime();
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const { setFieldWarning } = useContext(FormWarningsContext);
   const _onSubmit = useCallback((values: SearchBarFormValues) => {

@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useCallback, useContext } from 'react';
+import { useMemo, useCallback } from 'react';
 import { Field } from 'formik';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
 
-import UserDateTimeContext from 'contexts/UserDateTimeContext';
 import { useStore } from 'stores/connect';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
 import { FlatContentRow, Spinner } from 'components/common';
@@ -49,6 +48,7 @@ import {
 import type { SearchBarControl } from 'views/types';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -117,7 +117,7 @@ const useInitialFormValues = (timerange, queryString) => {
 };
 
 const DashboardSearchBar = () => {
-  const { userTimezone } = useContext(UserDateTimeContext);
+  const { userTimezone } = useUserDateTime();
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
   const { timerange, query: { query_string: queryString = '' } = {} } = useStore(GlobalOverrideStore) ?? {};
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');

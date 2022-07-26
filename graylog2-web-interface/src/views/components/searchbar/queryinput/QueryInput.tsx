@@ -28,7 +28,7 @@ import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import usePluginEntities from 'views/logic/usePluginEntities';
-import UserDateTimeContext from 'contexts/UserDateTimeContext';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import type { AutoCompleter, Editor } from './ace-types';
 import type { BaseProps } from './BasicQueryInput';
@@ -190,7 +190,7 @@ const QueryInput = ({
   wrapEnabled,
   name,
 }: Props) => {
-  const { userTimezone } = useContext(UserDateTimeContext);
+  const { userTimezone } = useUserDateTime();
   const isInitialTokenizerUpdate = useRef(true);
   const { enableSmartSearch } = useContext(UserPreferencesContext);
   const completer = useCompleter({ streams, timeRange, completerFactory, userTimezone });

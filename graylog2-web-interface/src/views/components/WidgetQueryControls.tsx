@@ -51,7 +51,7 @@ import {
 } from 'views/components/searchbar/pluggableSearchBarControlsHandler';
 import type { SearchBarControl } from 'views/types';
 import usePluginEntities from 'views/logic/usePluginEntities';
-import UserDateTimeContext from 'contexts/UserDateTimeContext';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
@@ -111,7 +111,7 @@ const _resetQueryOverride = () => GlobalOverrideActions.resetQuery().then(Search
 
 const useBindApplySearchControlsChanges = (formRef) => {
   const { bindApplySearchControlsChanges } = useContext(WidgetEditApplyAllChangesContext);
-  const { userTimezone } = useContext(UserDateTimeContext);
+  const { userTimezone } = useUserDateTime();
 
   useEffect(() => {
     bindApplySearchControlsChanges((newWidget: Widget) => {
@@ -157,7 +157,7 @@ const _validateQueryString = (values: SearchBarFormValues, globalOverride: Globa
 
 const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
   const widget = useContext(WidgetContext);
-  const { userTimezone } = useContext(UserDateTimeContext);
+  const { userTimezone } = useUserDateTime();
   const config = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
   const isValidatingQuery = !!useIsFetching('validateSearchQuery');
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');

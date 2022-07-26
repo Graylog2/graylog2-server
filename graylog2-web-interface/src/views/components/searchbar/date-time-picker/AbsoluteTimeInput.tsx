@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef, useContext } from 'react';
+import { useRef } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
@@ -25,7 +25,7 @@ import { Icon } from 'components/common';
 import { Button, FormGroup, InputGroup, FormControl } from 'components/bootstrap';
 import type { IconName } from 'components/common/Icon';
 import { DATE_TIME_FORMATS } from 'util/DateTime';
-import UserDateTimeContext from 'contexts/UserDateTimeContext';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 const TIME_ICON_BOD = 'hourglass-start';
 const TIME_ICON_MID = 'hourglass-half';
@@ -198,7 +198,7 @@ const fieldUpdate = (value: string, toUserTimezone: (date: Date) => Moment) => {
 
 const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
   const hourIcon = useRef<IconName>(TIME_ICON_MID);
-  const { toUserTimezone } = useContext(UserDateTimeContext);
+  const { toUserTimezone } = useUserDateTime();
 
   const {
     initialDateTime,

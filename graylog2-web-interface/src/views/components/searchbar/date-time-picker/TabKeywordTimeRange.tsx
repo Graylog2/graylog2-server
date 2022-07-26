@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect, useRef, useState, useContext } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import trim from 'lodash/trim';
@@ -26,8 +26,8 @@ import { Col, FormControl, FormGroup, Panel, Row } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import ToolsStore from 'stores/tools/ToolsStore';
-import UserDateTimeContext from 'contexts/UserDateTimeContext';
 import type { KeywordTimeRange } from 'views/logic/queries/Query';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
 
@@ -44,7 +44,7 @@ const ErrorMessage = styled.span(({ theme }) => css`
   display: block;
 `);
 
-const _parseKeywordPreview = (data: Pick<KeywordTimeRange, 'from' | 'to' | 'timezone'>, formatTime: (dateTime: string, tz: string) => string) => {
+const _parseKeywordPreview = (data: Pick<KeywordTimeRange, 'from' | 'to' | 'timezone'>, formatTime: (dateTime: string, format: string) => string) => {
   const { timezone } = data;
 
   return {
@@ -61,7 +61,7 @@ type Props = {
 };
 
 const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: Props) => {
-  const { formatTime, userTimezone } = useContext(UserDateTimeContext);
+  const { formatTime, userTimezone } = useUserDateTime();
   const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
   const mounted = useRef(true);
   const keywordRef = useRef<string>();

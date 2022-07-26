@@ -61,7 +61,7 @@ export const onSubmittingTimerange = (timerange: TimeRange, userTz: string): Tim
   }
 };
 
-export const onInitializingTimerange = (timerange: TimeRange, formatTime: (dateTime: string, tz: DateTimeFormats) => string): SearchBarFormValues['timerange'] => {
+export const onInitializingTimerange = (timerange: TimeRange, formatTime: (dateTime: string, format: DateTimeFormats) => string): SearchBarFormValues['timerange'] => {
   const { type } = timerange;
 
   switch (timerange.type) {

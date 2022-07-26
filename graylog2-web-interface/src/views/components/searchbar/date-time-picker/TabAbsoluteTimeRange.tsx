@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import moment from 'moment';
@@ -23,7 +23,7 @@ import { useFormikContext } from 'formik';
 
 import { Icon, Accordion, AccordionItem } from 'components/common';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import UserDateTimeContext from 'contexts/UserDateTimeContext';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
 import AbsoluteTimestamp from './AbsoluteTimestamp';
@@ -77,7 +77,7 @@ const FlexWrap = styled.div`
 
 const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
   const { values: { nextTimeRange } } = useFormikContext<TimeRangeDropDownFormValues & { nextTimeRange: AbsoluteTimeRange }>();
-  const { toUserTimezone } = useContext(UserDateTimeContext);
+  const { toUserTimezone } = useUserDateTime();
   const [activeAccordion, setActiveAccordion] = useState<'Timestamp' | 'Calendar' | undefined>();
   const toStartDate = moment(nextTimeRange.from).toDate();
   const fromStartDate = limitDuration ? toUserTimezone(new Date()).seconds(-limitDuration).toDate() : undefined;
