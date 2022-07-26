@@ -28,6 +28,7 @@ import {
 import { Button, Col, Row } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import QueryHelper from 'components/common/QueryHelper';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 import styles from './EventDefinitions.css';
 import type { EventDefinition } from './EventDefinitionEntry';
@@ -70,6 +71,14 @@ type Props = {
 };
 
 const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPageChange, onQueryChange, onDelete, onCopy, onEnable, onDisable }: Props) => {
+  const pageSizes = [10, 25, 50];
+  const { resetPage } = usePaginationQueryParameter(pageSizes);
+
+  const _handleQueryChange = (newQuery) => {
+    resetPage();
+    onQueryChange(newQuery);
+  };
+
   if (pagination.grandTotal === 0) {
     return <EmptyContent />;
   }
@@ -87,8 +96,8 @@ const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPage
     <Row>
       <Col md={12}>
         <SearchForm query={query}
-                    onSearch={onQueryChange}
-                    onReset={onQueryChange}
+                    onSearch={_handleQueryChange}
+                    onReset={_handleQueryChange}
                     searchButtonLabel="Find"
                     placeholder="Find Event Definitions"
                     wrapperClass={styles.inline}
@@ -105,7 +114,7 @@ const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPage
 
         <PaginatedList activePage={pagination.page}
                        pageSize={pagination.pageSize}
-                       pageSizes={[10, 25, 50]}
+                       pageSizes={pageSizes}
                        totalItems={pagination.total}
                        onChange={onPageChange}>
           <div className={styles.definitionList}>
