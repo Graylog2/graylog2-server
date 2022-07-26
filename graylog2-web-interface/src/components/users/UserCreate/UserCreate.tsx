@@ -14,14 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import history from 'util/History';
+import AppConfig from 'util/AppConfig';
+
 import * as React from 'react';
 import { useState } from 'react';
 import * as Immutable from 'immutable';
 import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import history from 'util/History';
-import AppConfig from 'util/AppConfig';
 import type { DescriptiveItem } from 'components/common/PaginatedItemOverview';
 import User from 'logic/users/User';
 import UsersDomain from 'domainActions/users/UsersDomain';
@@ -30,6 +31,7 @@ import RolesSelector from 'components/permissions/RolesSelector';
 import { Alert, Col, Row, Button, ButtonToolbar, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { UsersActions } from 'stores/users/UsersStore';
+import debounceWithPromise from 'views/logic/debounceWithPromise';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
@@ -76,13 +78,15 @@ const _validateUsername = async (errors: { [name: string]: string }, username: s
   return newErrors;
 };
 
+const debouncedValidateUsername = debounceWithPromise(_validateUsername, 350);
+
 const _validate = async (values) => {
   let errors = {};
 
   const { password, password_repeat: passwordRepeat, username } = values;
 
   if (username) {
-    errors = await _validateUsername(errors, username);
+    errors = await debouncedValidateUsername(errors, username);
   }
 
   if (isCloud && oktaUserForm) {
