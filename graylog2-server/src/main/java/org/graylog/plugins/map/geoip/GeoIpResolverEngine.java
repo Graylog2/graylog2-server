@@ -42,23 +42,16 @@ public class GeoIpResolverEngine {
     private static final Logger LOG = LoggerFactory.getLogger(GeoIpResolverEngine.class);
 
     /**
-     * This is a list of schema fields defined in package <b></b>org.graylog.schema</b> as of 2022-07-15.  If the schema changes,
+     * This is a list of schema fields defined in package <b></b>org.graylog.schema</b> as of 2022-07-15 which we want to scan for IP addresses.  If the schema changes, or we need to add/remove fields,
      * this list must be updated, until a better way of defining schema fields is developed, that allows iteration.
      */
     private static final String[] KNOWN_SCHEMA_IP_FIELDS = {org.graylog.schema.DestinationFields.DESTINATION_IP,
             org.graylog.schema.DestinationFields.DESTINATION_NAT_IP,
             org.graylog.schema.EventFields.EVENT_OBSERVER_IP,
-            org.graylog.schema.SourceFields.SOURCE_IP,
-            org.graylog.schema.SourceFields.SOURCE_IPV6,
             org.graylog.schema.SourceFields.SOURCE_NAT_IP,
             org.graylog.schema.NetworkFields.NETWORK_FORWARDED_IP,
-            org.graylog.schema.AssociatedFields.ASSOCIATED_IP,
-            org.graylog.schema.HostFields.HOST_IP,
-            org.graylog.schema.HostFields.HOST_IPV6,
-            org.graylog.schema.VendorFields.VENDOR_PRIVATE_IP,
-            org.graylog.schema.VendorFields.VENDOR_PRIVATE_IPV6,
-            org.graylog.schema.VendorFields.VENDOR_PUBLIC_IP,
-            org.graylog.schema.VendorFields.VENDOR_PUBLIC_IPV6};
+            org.graylog.schema.SourceFields.SOURCE_IP,
+            org.graylog.schema.HostFields.HOST_IP};
 
     /**
      * A mapping of fields (per the Graylog Schema) that to search that contain IP addresses.  When the user opts to
