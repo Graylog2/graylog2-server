@@ -151,6 +151,6 @@ describe('DashboardSearchBar pluggable controls', () => {
       customKey: 'Initial Value',
       queryString: '',
       timeRange: undefined,
-    }, 'UTC'));
+    }, 'Europe/Berlin'));
   });
 });
