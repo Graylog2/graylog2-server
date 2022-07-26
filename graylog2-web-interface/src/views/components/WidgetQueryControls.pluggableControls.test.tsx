@@ -33,7 +33,6 @@ import FormikInput from '../../components/common/FormikInput';
 
 const testTimeout = applyTimeoutMultiplier(30000);
 
-jest.mock('hooks/useUserDateTime');
 jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
 jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 jest.mock('hooks/useFeature', () => (key: string) => key === 'search_filter');

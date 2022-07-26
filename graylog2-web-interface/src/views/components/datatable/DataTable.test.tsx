@@ -29,8 +29,6 @@ import DataTable from 'views/components/datatable/DataTable';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
-jest.mock('hooks/useUserDateTime');
-
 describe('DataTable', () => {
   const currentView = { activeQuery: 'deadbeef-23' };
 

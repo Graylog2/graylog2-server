@@ -39,8 +39,6 @@ jest.mock('util/AppConfig', () => ({
   gl2ServerUrl: jest.fn(() => undefined),
 }));
 
-jest.mock('hooks/useUserDateTime');
-
 describe('<Sidebar />', () => {
   const viewMetaData = {
     activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',

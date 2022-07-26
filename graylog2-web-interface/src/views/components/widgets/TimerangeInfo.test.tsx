@@ -63,8 +63,6 @@ jest.mock('views/stores/SearchStore', () => ({
   ),
 }));
 
-jest.mock('hooks/useUserDateTime');
-
 describe('TimerangeInfo', () => {
   const widget = Widget.empty();
 

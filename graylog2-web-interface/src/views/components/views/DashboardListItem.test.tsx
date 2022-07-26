@@ -25,7 +25,6 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 import DashboardListItem from './DashboardListItem';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
-jest.mock('hooks/useUserDateTime');
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
 jest.useFakeTimers()

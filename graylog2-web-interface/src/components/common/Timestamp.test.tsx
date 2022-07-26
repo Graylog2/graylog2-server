@@ -19,8 +19,6 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import Timestamp from './Timestamp';
 
-jest.mock('hooks/useUserDateTime');
-
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
 jest.useFakeTimers()

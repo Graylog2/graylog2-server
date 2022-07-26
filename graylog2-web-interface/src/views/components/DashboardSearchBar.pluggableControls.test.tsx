@@ -33,7 +33,6 @@ import DashboardSearchBar from './DashboardSearchBar';
 const testTimeout = applyTimeoutMultiplier(30000);
 
 jest.mock('views/components/ViewActionsMenu', () => () => <span>View Actions</span>);
-jest.mock('hooks/useUserDateTime');
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
 jest.mock('views/stores/GlobalOverrideStore', () => ({

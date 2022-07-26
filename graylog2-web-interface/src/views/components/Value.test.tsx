@@ -23,8 +23,6 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import Value from './Value';
 import InteractiveContext from './contexts/InteractiveContext';
 
-jest.mock('hooks/useUserDateTime');
-
 describe('Value', () => {
   const openActionsMenu = (value) => {
     userEvent.click(screen.getByText(value));
