@@ -64,7 +64,7 @@ public class DBLookupTableService extends ScopedEntityPaginatedDbService<LookupT
     }
 
     public LookupTableDto saveAndPostEvent(LookupTableDto table) {
-        final LookupTableDto savedLookupTable = save(table);
+        final LookupTableDto savedLookupTable = super.save(table);
 
         clusterEventBus.post(LookupTablesUpdated.create(savedLookupTable));
 
@@ -101,13 +101,14 @@ public class DBLookupTableService extends ScopedEntityPaginatedDbService<LookupT
 
     public void deleteAndPostEvent(String idOrName) {
         final Optional<LookupTableDto> lookupTableDto = get(idOrName);
-        delete(idOrName);
+        super.delete(idOrName);
         lookupTableDto.ifPresent(lookupTable -> clusterEventBus.post(LookupTablesDeleted.create(lookupTable)));
     }
 
     public void deleteAndPostEventImmutable(String idOrName) {
-        // TODO: Uncomment when cahnges merged
-        //super.deleteMutable(idOrName);
+        final Optional<LookupTableDto> lookupTableDto = get(idOrName);
+        super.deleteImmutable(idOrName);
+        lookupTableDto.ifPresent(lookupTable -> clusterEventBus.post(LookupTablesDeleted.create(lookupTable)));
     }
 
     public void forEach(Consumer<? super LookupTableDto> action) {

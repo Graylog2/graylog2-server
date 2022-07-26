@@ -27,7 +27,13 @@ import org.graylog2.database.entities.DefaultEntityScope;
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
+<<<<<<< HEAD
+public abstract class LookupTableEntity implements ScopedContentPackEntity {
+    @JsonProperty(FIELD_SCOPE)
+    public abstract ValueReference scope();
+=======
 public abstract class LookupTableEntity extends ScopedContentPackEntity {
+>>>>>>> Remove duplicate scope field from entities that extend ScopedContentPackEntity. Update deleteImmutable functions to post event.
     @JsonProperty("name")
     public abstract ValueReference name();
 
