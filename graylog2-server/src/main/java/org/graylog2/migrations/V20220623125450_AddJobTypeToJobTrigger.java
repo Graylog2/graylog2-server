@@ -28,7 +28,6 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOneModel;
 import com.mongodb.client.model.Updates;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobTriggerDto;
@@ -76,14 +75,15 @@ public class V20220623125450_AddJobTypeToJobTrigger extends Migration {
         // Duplicate the type field from the JobDefinition config to their JobTriggers
 
         // We cannot use aggregations because Mongo 3.6 does not support $toString or $toObjectId
-        final Map<ObjectId, String> typeMap = Streams.stream(jobDefinitions.find())
-                .collect(Collectors.toMap(d -> d.getObjectId("_id"), d -> d.getEmbedded(ImmutableList.of("config", "type"), String.class)));
+        final Map<String, String> typeMap = Streams.stream(jobDefinitions.find())
+                .collect(Collectors.toMap(d -> d.getObjectId("_id").toString(), d -> d.getEmbedded(ImmutableList.of("config", "type"), String.class)));
 
         final FindIterable<Document> query = jobTriggers.find(Filters.exists(JobTriggerDto.FIELD_JOB_DEFINITION_TYPE, false));
 
         List<UpdateOneModel<Document>> typeUpdate = Streams.stream(query).map(d -> new UpdateOneModel<Document>(
                 Filters.eq("_id", d.getObjectId("_id")),
-                Updates.set(JobTriggerDto.FIELD_JOB_DEFINITION_TYPE, typeMap.get(d.getObjectId("_id"))))).collect(Collectors.toList());
+                Updates.set(JobTriggerDto.FIELD_JOB_DEFINITION_TYPE, typeMap.get(d.getString(JobTriggerDto.FIELD_JOB_DEFINITION_ID)))))
+                .collect(Collectors.toList());
 
         long modifiedCount = 0;
         if (!typeUpdate.isEmpty()) {
