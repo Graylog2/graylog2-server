@@ -25,6 +25,7 @@ import AuthenticationDomain from 'domainActions/authentication/AuthenticationDom
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import { DataTable, PaginatedList, Spinner } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 import BackendsFilter from './BackendsFilter';
 import BackendsOverviewItem from './BackendsOverviewItem';
@@ -74,7 +75,12 @@ const _loadBackends = (pagination, setLoading, setPaginatedBackends) => {
 const _updateListOnBackendDelete = (refreshOverview) => AuthenticationActions.delete.completed.listen(refreshOverview);
 const _updateListOnBackendActivation = (refreshOverview) => AuthenticationActions.setActiveBackend.completed.listen(refreshOverview);
 
+const _backendsOverviewItem = (authBackend, context, paginatedRoles) => (
+  <BackendsOverviewItem authenticationBackend={authBackend} isActive={authBackend.id === context?.activeBackend?.id} roles={paginatedRoles.list} />
+);
+
 const BackendsOverview = () => {
+  const { resetPage } = usePaginationQueryParameter();
   const [loading, setLoading] = useState();
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
   const [paginatedBackends, setPaginatedBackends] = useState<PaginatedBackends | undefined>();
@@ -88,6 +94,11 @@ const BackendsOverview = () => {
   useEffect(() => _loadBackends(pagination, setLoading, setPaginatedBackends), [pagination]);
   useEffect(() => _updateListOnBackendDelete(_refreshOverview), [_refreshOverview]);
   useEffect(() => _updateListOnBackendActivation(_refreshOverview), [_refreshOverview]);
+
+  const onSearch = (newQuery) => {
+    resetPage();
+    setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page });
+  };
 
   if (!paginatedBackends || !paginatedRoles) {
     return <Spinner />;
@@ -107,10 +118,8 @@ const BackendsOverview = () => {
                        totalItems={paginatedBackends.pagination.total}
                        activePage={page}>
           <DataTable className="table-hover"
-                     customFilter={<BackendsFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />}
-                     dataRowFormatter={(authBackend) => (
-                       <BackendsOverviewItem authenticationBackend={authBackend} isActive={authBackend.id === context?.activeBackend?.id} roles={paginatedRoles.list} />
-                     )}
+                     customFilter={<BackendsFilter onSearch={onSearch} />}
+                     dataRowFormatter={(authBackend) => _backendsOverviewItem(authBackend, context, paginatedRoles)}
                      filterKeys={[]}
                      filterLabel="Filter services"
                      headerCellFormatter={_headerCellFormatter}
