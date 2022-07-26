@@ -16,23 +16,20 @@
  */
 package org.graylog.storage.elasticsearch6.views.searchtypes.pivot.buckets;
 
-import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.TermsAggregation;
-import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.BucketOrder;
-import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivot;
-import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivotBucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.BucketOrder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivotBucketSpecHandler;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -45,7 +42,7 @@ import java.util.stream.Stream;
 public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, TermsAggregation> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Values valuesSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Values valuesSpec, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, valuesSpec, esGeneratedQueryContext);
         final TermsAggregationBuilder builder = AggregationBuilders.terms(name)
                 .minDocCount(1)
@@ -85,11 +82,8 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, TermsAggre
     }
 
     @Override
-    public Stream<Bucket> doHandleResult(Pivot pivot, Values bucketSpec,
-                                         SearchResult searchResult,
-                                         TermsAggregation termsAggregation,
-                                         ESPivot searchTypeHandler,
-                                         ESGeneratedQueryContext esGeneratedQueryContext) {
+    public Stream<Bucket> doHandleResult(Values bucketSpec,
+                                         TermsAggregation termsAggregation) {
         return termsAggregation.getBuckets().stream()
                 .map(entry -> Bucket.create(entry.getKeyAsString(), entry));
     }

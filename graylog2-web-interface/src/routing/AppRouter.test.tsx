@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import { StoreMock as MockStore } from 'helpers/mocking';
@@ -24,6 +24,7 @@ import { adminUser as currentUser } from 'fixtures/users';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import history from 'util/History';
+import AppConfig from 'util/AppConfig';
 
 import AppRouter from './AppRouter';
 
@@ -39,9 +40,18 @@ jest.mock('pages/StartPage', () => () => <>This is the start page</>);
 jest.mock('views/logic/usePluginEntities');
 jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore() }));
 
+jest.mock('util/AppConfig', () => ({
+  gl2AppPathPrefix: jest.fn(() => ''),
+  gl2ServerUrl: jest.fn(() => undefined),
+  gl2DevMode: jest.fn(() => false),
+  isFeatureEnabled: jest.fn(() => false),
+  isCloud: jest.fn(() => false),
+}));
+
 describe('AppRouter', () => {
   beforeEach(() => {
     asMock(usePluginEntities).mockReturnValue([]);
+    AppConfig.isFeatureEnabled = jest.fn(() => false);
   });
 
   const AppRouterWithContext = () => (
@@ -56,21 +66,55 @@ describe('AppRouter', () => {
     await findByText('This is the start page');
   });
 
-  it('renders null-parent component plugin routes without application chrome', async () => {
-    asMock(usePluginEntities).mockReturnValue([{ parentComponent: null, component: () => <span>Hey there!</span>, path: '/' }]);
-
-    const { findByText, queryByTitle } = render(<AppRouterWithContext />);
-
-    await findByText('Hey there!');
-
-    expect(queryByTitle('Graylog Logo')).toBeNull();
-  });
-
   it('renders a not found page for unknown URLs', async () => {
     const { findByText } = render(<AppRouterWithContext />);
 
     history.push('/this-url-is-not-registered-and-should-never-be');
 
     await findByText('Page not found');
+  });
+
+  describe('plugin routes', () => {
+    it('renders simple plugin routes', async () => {
+      asMock(usePluginEntities).mockReturnValue([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route' }]);
+      const { findByText } = render(<AppRouterWithContext />);
+
+      history.push('/a-plugin-route');
+
+      await findByText('Hey there!');
+    });
+
+    it('renders null-parent component plugin routes without application chrome', async () => {
+      asMock(usePluginEntities).mockReturnValue([{ parentComponent: null, component: () => <span>Hey there!</span>, path: '/' }]);
+
+      const { findByText, queryByTitle } = render(<AppRouterWithContext />);
+
+      history.push('/');
+
+      await findByText('Hey there!');
+
+      expect(queryByTitle('Graylog Logo')).toBeNull();
+    });
+
+    it('does not render plugin route when required feature flag is not enabled', async () => {
+      asMock(usePluginEntities).mockReturnValue([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }]);
+      render(<AppRouterWithContext />);
+
+      history.push('/a-plugin-route');
+
+      await screen.findByText('Page not found');
+
+      expect(screen.queryByText('Hey there!')).not.toBeInTheDocument();
+    });
+
+    it('render plugin route when required feature flag is enabled', async () => {
+      asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
+      asMock(usePluginEntities).mockReturnValue([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }]);
+      const { findByText } = render(<AppRouterWithContext />);
+
+      history.push('/a-plugin-route');
+
+      await findByText('Hey there!');
+    });
   });
 });

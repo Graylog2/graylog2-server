@@ -22,7 +22,7 @@ import type { List } from 'immutable';
 import { isPermitted } from 'util/PermissionsMixin';
 import type Grantee from 'logic/permissions/Grantee';
 import { Link } from 'components/common/router';
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
 import { getShowRouteFromGRN } from 'logic/permissions/GRN';

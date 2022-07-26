@@ -21,7 +21,7 @@ import { flatten, isEqual, uniqWith } from 'lodash';
 
 import connect from 'stores/connect';
 import expandRows from 'views/logic/ExpandRows';
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 import { ViewStore } from 'views/stores/ViewStore';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';

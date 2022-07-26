@@ -25,6 +25,7 @@ Object {
               },
             ],
           },
+          "filters": undefined,
           "id": "d3cf19bd-f933-4f7b-aa4a-e7cd3fc1c18e",
           "query": Object {
             "query_string": "",
@@ -121,6 +122,7 @@ Object {
               "show_message_row": true,
             },
             "filter": undefined,
+            "filters": Immutable.List [],
             "id": "8209351b-407a-455b-9942-cefea43b76ae",
             "query": Object {
               "query_string": "",
@@ -164,6 +166,7 @@ Object {
               "visualization_config": null,
             },
             "filter": undefined,
+            "filters": Immutable.List [],
             "id": "527ed7fe-722d-4cf1-bd42-ed2b29a5a59a",
             "query": Object {
               "query_string": "",

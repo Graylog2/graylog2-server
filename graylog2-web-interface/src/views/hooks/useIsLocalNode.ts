@@ -14,24 +14,37 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { PluginStore } from 'graylog-web-plugin/plugin';
 import { useState, useEffect } from 'react';
 
-import usePluginEntities from 'views/logic/usePluginEntities';
+export const isLocalNode = async (nodeId: string) => {
+  const forwarderPlugin = PluginStore.exports('forwarder');
+  const _isLocalNode = forwarderPlugin?.[0]?.isLocalNode;
+
+  try {
+    if (nodeId && _isLocalNode) {
+      return _isLocalNode(nodeId);
+    }
+  } catch (e) {
+    // Do nothing
+  }
+
+  return true;
+};
 
 const useIsLocalNode = (nodeId: string) => {
-  const forwarderPlugin = usePluginEntities('forwarder');
-  const _isLocalNode = forwarderPlugin?.[0]?.isLocalNode;
-  const [isLocalNode, setIsLocalNode] = useState<boolean | undefined>();
+  const [_isLocalNode, setIsLocalNode] = useState<boolean | undefined>();
 
   useEffect(() => {
-    if (nodeId && _isLocalNode) {
-      _isLocalNode(nodeId).then(setIsLocalNode, () => setIsLocalNode(true));
-    } else {
-      setIsLocalNode(true);
-    }
+    const checkIsLocalNode = async () => {
+      const result = await isLocalNode(nodeId);
+      setIsLocalNode(result);
+    };
+
+    checkIsLocalNode().catch(() => setIsLocalNode(true));
   }, [nodeId, _isLocalNode]);
 
-  return { isLocalNode };
+  return { isLocalNode: _isLocalNode };
 };
 
 export default useIsLocalNode;

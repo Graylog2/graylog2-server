@@ -47,6 +47,7 @@ export type CompleterContext = Readonly<{
 export interface Completer {
   getCompletions(context: CompleterContext): Array<CompletionResult> | Promise<Array<CompletionResult>>;
   shouldShowCompletions?: (currentLine: number, lines: Array<Array<Line>>) => boolean;
+  identifierRegexps?: RegExp[];
 }
 
 const onCompleterError = (error: Error) => {
@@ -71,8 +72,6 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
   }
 
   getCompletions = async (editor: Editor, _session: Session, pos: Position, prefix: string, callback: ResultsCallback) => {
-    // eslint-disable-next-line no-param-reassign
-    editor.completer.autoSelect = false;
     const tokens = editor.session.getTokens(pos.row);
     const currentToken = editor.session.getTokenAt(pos.row, pos.column);
     const currentTokenIdx = tokens.findIndex((t) => (t === currentToken));
@@ -109,4 +108,6 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
       return false;
     });
   };
+
+  get identifierRegexps() { return this.completers.map((completer) => completer.identifierRegexps ?? []).flat(); }
 }

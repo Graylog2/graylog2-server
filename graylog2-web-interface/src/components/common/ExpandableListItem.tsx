@@ -27,6 +27,7 @@ const ItemWrap = styled.li(({ padded }: { padded: boolean }) => css`
 `);
 
 const Container = styled.div(({ theme }) => css`
+  display: flex;
   font-size: ${theme.fonts.size.body};
   line-height: 20px;
 
@@ -76,6 +77,7 @@ const HeaderWrap = styled.span(({ theme }) => css`
 `);
 
 const Header = styled.button`
+  display: flex;
   border: 0;
   padding: 0;
   text-align: left;
@@ -94,6 +96,13 @@ const ExpandableContent = styled.div(({ theme }) => css`
   margin-top: 10px;
   padding-left: 5px;
 `);
+
+const _filterInputProps = (props) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { expanded, indetermined, stayExpanded, padded, ...inputProps } = props;
+
+  return inputProps;
+};
 
 type Props = React.ComponentProps<typeof Checkbox> & {
   header: React.ReactNode,
@@ -208,13 +217,6 @@ class ExpandableListItem extends React.Component<Props, State> {
     }
   };
 
-  _filterInputProps = (props) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { expanded, indetermined, stayExpanded, padded, ...inputProps } = props;
-
-    return inputProps;
-  };
-
   _clickOnHeader = () => {
     if (this._checkbox) {
       this._checkbox.click();
@@ -226,7 +228,7 @@ class ExpandableListItem extends React.Component<Props, State> {
     const { padded } = this.props;
     const { checked, expandable, selectable, header, subheader, children, ...otherProps } = this.props;
     const headerToRender = selectable ? (<Header type="button" tabIndex={0} onClick={this._clickOnHeader}>{header}</Header>) : header;
-    const inputProps = this._filterInputProps(otherProps);
+    const inputProps = _filterInputProps(otherProps);
 
     return (
       <ItemWrap padded={padded}>

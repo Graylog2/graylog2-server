@@ -23,6 +23,7 @@ import com.google.common.collect.Maps;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
@@ -32,6 +33,7 @@ import org.graylog2.plugin.streams.Stream;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -47,6 +49,7 @@ import java.util.stream.Collectors;
 @JsonAutoDetect
 public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
     String TYPE_FIELD = "type";
+    String FIELD_SEARCH_FILTERS = "filters";
 
     @JsonProperty(TYPE_FIELD)
     String type();
@@ -60,6 +63,9 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
     @Nullable
     @JsonProperty("filter")
     Filter filter();
+
+    @JsonProperty(FIELD_SEARCH_FILTERS)
+    List<UsedSearchFilter> filters();
 
     @JsonProperty
     Optional<DerivedTimeRange> timerange();
@@ -77,9 +83,9 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
     }
 
     interface Builder {
-        public abstract Builder streams(Set<String> streams);
+        Builder streams(Set<String> streams);
 
-        public abstract SearchTypeEntity build();
+        SearchTypeEntity build();
     }
 
     @JsonAutoDetect
@@ -99,6 +105,10 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
         @Nullable
         @JsonProperty
         private Filter filter;
+
+        @Nullable
+        @JsonProperty(FIELD_SEARCH_FILTERS)
+        private List<UsedSearchFilter> filters;
 
         @Nullable
         @JsonProperty
@@ -129,6 +139,11 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
         @Override
         public Filter filter() {
             return filter;
+        }
+
+        @Override
+        public List<UsedSearchFilter> filters() {
+            return filters;
         }
 
         @Override

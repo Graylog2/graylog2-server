@@ -37,7 +37,7 @@ import type {
   WidgetConfigFormValues,
 } from 'views/components/aggregationwizard';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
-import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import type { TimeRange, NoTimeRangeOverride, AbsoluteTimeRange } from 'views/logic/queries/Query';
 import type View from 'views/logic/views/View';
 import type User from 'logic/users/User';
 import type { Message } from 'views/components/messagelist/Types';
@@ -45,6 +45,7 @@ import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import type Query from 'views/logic/queries/Query';
 
 export type BackendWidgetPosition = {
   id: string,
@@ -95,7 +96,7 @@ export interface WidgetExport {
   needsControlledHeight: (widget: { config: Widget['config'] }) => boolean;
   searchResultTransformer?: (data: Array<unknown>) => unknown;
   searchTypes: (widget: Widget) => Array<any>;
-  titleGenerator?: (widget: Widget) => string;
+  titleGenerator?: (widget: { config: Widget['config'] }) => string;
   reportStyle?: () => { width: React.CSSProperties['width'] };
   exportComponent?: React.ComponentType<{ widget: Widget }>;
 }
@@ -182,6 +183,7 @@ export type SearchTypeResult = {
 export type MessageResult = {
   type: 'messages',
   total: number,
+  effectiveTimerange: AbsoluteTimeRange,
 };
 
 export interface SearchTypeResultTypes {
@@ -238,12 +240,26 @@ export interface CombinedSearchBarFormValues {
 export interface SearchBarControl {
   component: React.ComponentType;
   id: string;
-  onSubmit?: (values: CombinedSearchBarFormValues) => Promise<void>,
+  onSearchSubmit?: <T extends Query | undefined>(values: CombinedSearchBarFormValues, currentQuery?: T) => Promise<T>,
+  onDashboardWidgetSubmit: (values: CombinedSearchBarFormValues, currentWidget: Widget) => Promise<Widget | void>,
   onValidate?: (values: CombinedSearchBarFormValues) => FormikErrors<{}>,
   placement: 'left' | 'right';
-  useInitialValues?: () => ({ [key: string]: any }),
+  useInitialSearchValues?: (currentQuery?: Query) => ({ [key: string]: any }),
+  useInitialDashboardWidgetValues?: (currentWidget: Widget) => ({ [key: string]: any }),
   validationPayload: (values: CombinedSearchBarFormValues) => ({ [key: string]: any }),
 }
+
+export type SearchFilter = {
+  type: 'referenced' | 'inlineQueryString',
+  id?: string,
+  title?: string,
+  description?: string
+  queryString: string
+  negation?: boolean,
+  disabled?: boolean,
+}
+
+export type FiltersType = Immutable.List<SearchFilter>
 
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
@@ -259,6 +275,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
     'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<MessageDetailContextProviderProps>>;
+    'views.components.widgets.messageTable.contextProviders'?: Array<React.ComponentType>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;

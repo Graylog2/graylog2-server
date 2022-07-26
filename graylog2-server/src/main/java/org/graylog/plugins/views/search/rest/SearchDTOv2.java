@@ -27,6 +27,8 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,7 +43,7 @@ public abstract class SearchDTOv2 {
     public abstract String id();
 
     @JsonProperty
-    public abstract Set<QueryDTOv2> queries();
+    public abstract LinkedHashSet<QueryDTOv2> queries();
 
     @JsonProperty
     public abstract Set<Parameter> parameters();
@@ -53,7 +55,7 @@ public abstract class SearchDTOv2 {
                 .queries(search.queries()
                         .stream()
                         .map(QueryDTOv2::fromQuery)
-                        .collect(Collectors.toSet()))
+                        .collect(Collectors.toCollection(LinkedHashSet::new)))
                 .build();
     }
 
@@ -69,7 +71,11 @@ public abstract class SearchDTOv2 {
         public abstract String id();
 
         @JsonProperty
-        public abstract Builder queries(Set<QueryDTOv2> queries);
+        public abstract Builder queries(LinkedHashSet<QueryDTOv2> queries);
+
+        public Builder queries(QueryDTOv2... queries) {
+            return this.queries(new LinkedHashSet<>(Arrays.asList(queries)));
+        }
 
         @JsonProperty
         public abstract Builder parameters(Set<Parameter> parameters);
@@ -79,7 +85,7 @@ public abstract class SearchDTOv2 {
         @JsonCreator
         static Builder create() {
             return new AutoValue_SearchDTOv2.Builder()
-                    .queries(ImmutableSet.of())
+                    .queries(new LinkedHashSet<>())
                     .parameters(of());
         }
     }

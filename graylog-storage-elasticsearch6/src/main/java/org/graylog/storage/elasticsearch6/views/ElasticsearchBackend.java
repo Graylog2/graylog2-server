@@ -40,6 +40,7 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders;
@@ -76,6 +77,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final IndexLookup indexLookup;
     private final QueryStringDecorators queryStringDecorators;
     private final ESGeneratedQueryContext.Factory queryContextFactory;
+    private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
     private final boolean allowLeadingWildcard;
 
     @Inject
@@ -84,6 +86,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                 IndexLookup indexLookup,
                                 QueryStringDecorators queryStringDecorators,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
+                                UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
                                 @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard,
                                 ObjectMapper objectMapper) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
@@ -92,6 +95,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         this.queryStringDecorators = queryStringDecorators;
         this.queryContextFactory = queryContextFactory;
+        this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
@@ -114,6 +118,12 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         final BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
                 .filter(normalizedRootQuery);
+
+        usedSearchFiltersToQueryStringsMapper.map(query.filters())
+                .stream()
+                .map(searchFilterQueryString -> this.queryStringDecorators.decorate(searchFilterQueryString, job, query))
+                .map(this::normalizeQueryString)
+                .forEach(boolQuery::filter);
 
         // add the optional root query filters
         generateFilterClause(query.filter(), job, query)
@@ -158,6 +168,12 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 final QueryBuilder normalizedSearchTypeQuery = normalizeQueryString(searchTypeQueryString);
                 searchTypeOverrides.must(normalizedSearchTypeQuery);
             });
+
+            usedSearchFiltersToQueryStringsMapper.map(searchType.filters())
+                    .stream()
+                    .map(searchFilterQueryString -> this.queryStringDecorators.decorate(searchFilterQueryString, job, query))
+                    .map(this::normalizeQueryString)
+                    .forEach(searchTypeOverrides::must);
 
             searchTypeSourceBuilder.query(searchTypeOverrides);
 

@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.elasticsearch6.views.searchtypes.pivot.buckets;
 
-import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.DateHistogramAggregation;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -31,7 +30,6 @@ import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.B
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivotBucketSpecHandler;
 
 import javax.annotation.Nonnull;
@@ -42,7 +40,7 @@ import java.util.stream.Stream;
 public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, DateHistogramAggregation> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Time timeSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Time timeSpec, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
         final DateHistogramInterval dateHistogramInterval = new DateHistogramInterval(timeSpec.interval().toDateInterval(query.effectiveTimeRange(pivot)).toString());
         final Optional<BucketOrder> ordering = orderForPivot(pivot, timeSpec, esGeneratedQueryContext);
         final DateHistogramAggregationBuilder builder = AggregationBuilders.dateHistogram(name)
@@ -85,12 +83,8 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, DateHistogramA
     }
 
     @Override
-    public Stream<Bucket> doHandleResult(Pivot pivot,
-                                         Time bucketSpec,
-                                         SearchResult searchResult,
-                                         DateHistogramAggregation dateHistogramAggregation,
-                                         ESPivot searchTypeHandler,
-                                         ESGeneratedQueryContext esGeneratedQueryContext) {
+    public Stream<Bucket> doHandleResult(Time bucketSpec,
+                                         DateHistogramAggregation dateHistogramAggregation) {
         return dateHistogramAggregation.getBuckets().stream()
                 .map(dateHistogram -> Bucket.create(dateHistogram.getTimeAsString(), dateHistogram));
     }

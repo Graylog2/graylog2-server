@@ -24,12 +24,14 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,10 +53,15 @@ public abstract class EventListEntity implements SearchTypeEntity {
     @Override
     public abstract Filter filter();
 
+    @Override
+    @JsonProperty(FIELD_SEARCH_FILTERS)
+    public abstract List<UsedSearchFilter> filters();
+
     @JsonCreator
     public static Builder builder() {
         return new AutoValue_EventListEntity.Builder()
                 .type(NAME)
+                .filters(Collections.emptyList())
                 .streams(Collections.emptySet());
     }
 
@@ -70,6 +77,7 @@ public abstract class EventListEntity implements SearchTypeEntity {
         @JsonCreator
         public static Builder createDefault() {
             return builder()
+                    .filters(Collections.emptyList())
                     .streams(Collections.emptySet());
         }
 
@@ -86,14 +94,19 @@ public abstract class EventListEntity implements SearchTypeEntity {
         public abstract Builder filter(@Nullable Filter filter);
 
         @JsonProperty
+        public abstract Builder filters(List<UsedSearchFilter> filters);
+
+        @JsonProperty
         public abstract Builder query(@Nullable BackendQuery query);
 
         @JsonProperty
         public abstract Builder timerange(@Nullable DerivedTimeRange timeRange);
 
+        @Override
         @JsonProperty
         public abstract Builder streams(Set<String> streams);
 
+        @Override
         public abstract EventListEntity build();
     }
 
@@ -104,6 +117,7 @@ public abstract class EventListEntity implements SearchTypeEntity {
                 .streams(mappedStreams(nativeEntities))
                 .id(id())
                 .filter(filter())
+                .filters(filters())
                 .query(query().orElse(null))
                 .timerange(timerange().orElse(null))
                 .name(name().orElse(null))

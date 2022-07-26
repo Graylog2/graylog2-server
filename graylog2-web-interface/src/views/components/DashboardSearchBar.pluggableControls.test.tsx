@@ -71,7 +71,7 @@ describe('DashboardSearchBar pluggable controls', () => {
     );
   };
 
-  const mockOnSubmit = jest.fn(() => Promise.resolve());
+  const mockOnSubmit = jest.fn((_values, entity) => Promise.resolve(entity));
   const mockOnValidate = jest.fn(() => Promise.resolve({}));
 
   beforeAll(() => {
@@ -80,12 +80,18 @@ describe('DashboardSearchBar pluggable controls', () => {
         () => ({
           id: 'pluggable-search-bar-control',
           component: PluggableSearchBarControl,
-          useInitialValues: () => {
+          useInitialSearchValues: () => {
             return ({
               pluggableControl: 'Initial Value',
             });
           },
-          onSubmit: mockOnSubmit,
+          useInitialDashboardWidgetValues: () => {
+            return ({
+              pluggableControl: 'Initial Value',
+            });
+          },
+          onSearchSubmit: mockOnSubmit,
+          onDashboardWidgetSubmit: mockOnSubmit,
           validationPayload: (values) => {
             // @ts-ignore
             const { pluggableControl } = values;
@@ -119,11 +125,14 @@ describe('DashboardSearchBar pluggable controls', () => {
     await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
     userEvent.click(searchButton);
 
-    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith({
-      pluggableControl: 'Initial Value',
-      queryString: '',
-      timerange: undefined,
-    }));
+    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith(
+      {
+        pluggableControl: 'Initial Value',
+        queryString: '',
+        timerange: undefined,
+      },
+      undefined,
+    ));
   }, testTimeout);
 
   it('should register validation handler', async () => {

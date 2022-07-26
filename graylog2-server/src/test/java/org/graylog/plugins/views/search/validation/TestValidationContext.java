@@ -30,7 +30,7 @@ import java.util.Set;
 
 public class TestValidationContext {
 
-    public static final LuceneQueryParser LUCENE_QUERY_PARSER = new LuceneQueryParser();
+    public static final LuceneQueryParser LUCENE_QUERY_PARSER = new LuceneQueryParser(false);
 
     private final String queryString;
     private final Set<MappedFieldTypeDTO> fields;

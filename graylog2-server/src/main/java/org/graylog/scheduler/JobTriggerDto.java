@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.clock.JobSchedulerSystemClock;
 import org.joda.time.DateTime;
@@ -28,11 +29,14 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = JobTriggerDto.Builder.class)
 public abstract class JobTriggerDto {
-    private static final String FIELD_ID = "id";
+    public static final String FIELD_ID = "id";
+
+    public static final String FIELD_JOB_DEFINITION_TYPE = "job_definition_type";
     public static final String FIELD_JOB_DEFINITION_ID = "job_definition_id";
     static final String FIELD_START_TIME = "start_time";
     static final String FIELD_END_TIME = "end_time";
@@ -40,10 +44,12 @@ public abstract class JobTriggerDto {
     private static final String FIELD_CREATED_AT = "created_at";
     static final String FIELD_UPDATED_AT = "updated_at";
     static final String FIELD_TRIGGERED_AT = "triggered_at";
-    static final String FIELD_STATUS = "status";
+    public static final String FIELD_STATUS = "status";
     static final String FIELD_LOCK = "lock";
     static final String FIELD_SCHEDULE = "schedule";
-    static final String FIELD_DATA = "data";
+    public static final String FIELD_DATA = "data";
+    static final String FIELD_CONSTRAINTS = "constraints";
+    public static final String FIELD_IS_CANCELLED = "is_cancelled";
 
     @Id
     @ObjectId
@@ -51,6 +57,8 @@ public abstract class JobTriggerDto {
     @JsonProperty(FIELD_ID)
     public abstract String id();
 
+    @JsonProperty(FIELD_JOB_DEFINITION_TYPE)
+    public abstract String jobDefinitionType();
     @JsonProperty(FIELD_JOB_DEFINITION_ID)
     public abstract String jobDefinitionId();
 
@@ -84,6 +92,11 @@ public abstract class JobTriggerDto {
     @JsonProperty(FIELD_DATA)
     public abstract Optional<JobTriggerData> data();
 
+    @JsonProperty(FIELD_CONSTRAINTS)
+    public abstract Set<String> constraints();
+
+    @JsonProperty(FIELD_IS_CANCELLED)
+    public abstract boolean isCancelled();
     public static Builder builder() {
         return Builder.create();
     }
@@ -110,6 +123,8 @@ public abstract class JobTriggerDto {
                     .updatedAt(now)
                     .nextTime(now)
                     .status(JobTriggerStatus.RUNNABLE)
+                    .isCancelled(false)
+                    .constraints(ImmutableSet.of())
                     .lock(JobTriggerLock.empty());
         }
 
@@ -117,6 +132,9 @@ public abstract class JobTriggerDto {
         @ObjectId
         @JsonProperty(FIELD_ID)
         public abstract Builder id(String id);
+
+        @JsonProperty(FIELD_JOB_DEFINITION_TYPE)
+        public abstract Builder jobDefinitionType(String type);
 
         @JsonProperty(FIELD_JOB_DEFINITION_ID)
         public abstract Builder jobDefinitionId(String jobDefinitionId);
@@ -150,6 +168,12 @@ public abstract class JobTriggerDto {
 
         @JsonProperty(FIELD_DATA)
         public abstract Builder data(@Nullable JobTriggerData data);
+
+        @JsonProperty(FIELD_CONSTRAINTS)
+        public abstract Builder constraints(Set<String> constraints);
+
+        @JsonProperty(FIELD_IS_CANCELLED)
+        public abstract Builder isCancelled(boolean isCancelled);
 
         public abstract JobTriggerDto build();
     }

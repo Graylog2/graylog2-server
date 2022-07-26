@@ -25,16 +25,24 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public abstract class AbstractCodec implements Codec {
     private static final Logger log = LoggerFactory.getLogger(AbstractCodec.class);
 
     protected final Configuration configuration;
-
+    protected final Charset charset;
     private String name;
 
     protected AbstractCodec(Configuration configuration) {
         this.configuration = configuration;
+        if (configuration.stringIsSet(Codec.Config.CK_CHARSET_NAME)) {
+            this.charset = Charset.forName(configuration.getString(Codec.Config.CK_CHARSET_NAME));
+        }
+        else {
+            this.charset = StandardCharsets.UTF_8;
+        }
     }
 
     @Override
@@ -75,6 +83,14 @@ public abstract class AbstractCodec implements Codec {
                     null,
                     "The source is a hostname derived from the received packet by default. Set this if you want to override " +
                             "it with a custom string.",
+                    ConfigurationField.Optional.OPTIONAL
+            ));
+
+            configurationRequest.addField(new TextField(
+                    CK_CHARSET_NAME,
+                    "Encoding",
+                    StandardCharsets.UTF_8.name(),
+                    "Default encoding is UTF-8. Set this to a standard charset name if you want override the default.",
                     ConfigurationField.Optional.OPTIONAL
             ));
 

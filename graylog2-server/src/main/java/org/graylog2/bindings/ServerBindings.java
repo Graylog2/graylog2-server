@@ -23,6 +23,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
+import org.graylog.scheduler.capabilities.ServerNodeCapabilitiesModule;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.EmailRecipients;
@@ -35,6 +36,7 @@ import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.leader.FakeLeaderElectionModule;
 import org.graylog2.cluster.leader.LeaderElectionModule;
+import org.graylog2.cluster.lock.LockServiceModule;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokModule;
 import org.graylog2.grok.GrokPatternRegistry;
@@ -132,6 +134,8 @@ public class ServerBindings extends Graylog2Module {
         } else {
             install(new LeaderElectionModule(configuration));
         }
+        install(new LockServiceModule());
+        install(new ServerNodeCapabilitiesModule());
 
         // Just to create the binders so they are present in the injector. Prevents a server startup error when no
         // outputs are bound that implement MessageOutput.Factory2.

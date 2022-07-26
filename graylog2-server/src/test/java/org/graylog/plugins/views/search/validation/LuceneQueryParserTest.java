@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class LuceneQueryParserTest {
 
-    private final LuceneQueryParser parser = new LuceneQueryParser();
+    private final LuceneQueryParser parser = new LuceneQueryParser(false);
 
 
     @Test
@@ -84,7 +84,7 @@ class LuceneQueryParserTest {
     @Test
     void testGtQuery() throws ParseException {
         final ParsedQuery query = parser.parse("http_response_code:>400");
-        assertThat(query.terms()).extracting(ParsedTerm::value).contains("400");
+        assertThat(query.terms()).extracting(ParsedTerm::value).contains(">400");
     }
 
     @Test
@@ -203,5 +203,28 @@ class LuceneQueryParserTest {
         assertThat(query.terms())
                 .extracting(ParsedTerm::field)
                 .containsOnly("unknown_field");
+    }
+
+    @Test
+    void testLeadingWildcardsParsingDependsOnParserSettings() throws ParseException {
+        assertThatThrownBy(() -> parser.parse("foo:*bar"))
+                .isInstanceOf(ParseException.class);
+
+        assertThatThrownBy(() -> parser.parse("foo:?bar"))
+                .isInstanceOf(ParseException.class);
+
+        final LuceneQueryParser leadingWildcardsTolerantParser = new LuceneQueryParser(true);
+        assertThat(leadingWildcardsTolerantParser.parse("foo:*bar"))
+                .isNotNull();
+        assertThat(leadingWildcardsTolerantParser.parse("foo:?bar"))
+                .isNotNull();
+    }
+
+    @Test
+    void testFieldWithSpecialChars() throws ParseException {
+        final ParsedQuery query = parser.parse("_exists_:\"filebeat_@metadata_beat\"");
+        assertThat(query.allFieldNames())
+                .hasSize(1)
+                .allSatisfy(field -> assertThat(field).isEqualTo("filebeat_@metadata_beat"));
     }
 }

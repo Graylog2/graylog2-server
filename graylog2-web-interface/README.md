@@ -1,7 +1,7 @@
 # Graylog Web Interface
 
 ## Requirements
-- [Node.js](https://nodejs.org/), at this time we use v8.9.1
+- [Node.js](https://nodejs.org/)
 - [Yarn](https://yarnpkg.com/)
 
 **Note:** NPM v5 changed completely the way it builds local modules, breaking the Graylog web interface build. Please use Yarn instead of NPM v5.
@@ -24,6 +24,10 @@ You can start the development server in any other host and port that you like:
 
 E.g. `yarn start --host=0.0.0.0 --port=8000` will start the development server in all available network interfaces using the port 8000.
 
+## Contributing
+
+Please have a look at the [CONTRIBUTING.md](CONTRIBUTING.md) for an overview of our conventions, best practices and tips.
+
 ## Frontend documentation and component gallery
 There's an online version of the frontend documentation and component gallery at:
 
@@ -34,9 +38,10 @@ The online version is automatically deployed and reflects the current state of t
 ### Run documentation locally
 You may also run the documentation locally to contribute to it or see a different version than the current master:
 
-1. Run `yarn install`
-1. Run `yarn run docs:server`
-1. Go to [http://localhost:6060](http://localhost:6060) on your favourite browser to see the local documentation
+1. Change to `docs` folder: `cd docs`
+2. Run `yarn install`
+3. Run `yarn run docs:server`
+4. Go to [http://localhost:6060](http://localhost:6060) on your favourite browser to see the local documentation
 
 ## Configure your editor
 

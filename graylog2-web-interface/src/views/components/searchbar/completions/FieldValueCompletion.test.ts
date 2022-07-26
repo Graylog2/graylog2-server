@@ -17,23 +17,26 @@
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import FieldType from 'views/logic/fieldtypes/FieldType';
+import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
 import fetch from 'logic/rest/FetchProvider';
 import type { FieldTypes } from 'views/components/searchbar/SearchBarAutocompletions';
 
 import FieldValueCompletion from './FieldValueCompletion';
 
-const httpMethodField = new FieldTypeMapping('http_method', new FieldType('string', ['enumerable'], []));
-const actionField = new FieldTypeMapping('action', new FieldType('string', ['enumerable'], []));
-const messageField = new FieldTypeMapping('message', new FieldType('string', [], []));
+const httpMethodField = FieldTypeMapping.create('http_method', FieldType.create('string', [Properties.Enumerable], []));
+const actionField = FieldTypeMapping.create('action', FieldType.create('string', [Properties.Enumerable], []));
+const messageField = FieldTypeMapping.create('message', FieldType.create('string', [], []));
+const processField = FieldTypeMapping.create('process', FieldType.create('string', [Properties.Enumerable]));
 
 const fieldTypes: FieldTypes = {
   all: {
     http_method: httpMethodField,
+    process: processField,
   },
   query: {
     http_method: httpMethodField,
     action: actionField,
+    process: processField,
   },
 };
 
@@ -67,22 +70,26 @@ describe('FieldValueCompletion', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    asMock(fetch).mockReturnValue(Promise.resolve(suggestionsResponse));
+    asMock(fetch).mockResolvedValue(suggestionsResponse);
   });
 
   describe('getCompletions', () => {
+    const requestDefaults = {
+      currentToken: null,
+      lastToken: null,
+      prefix: '',
+      tokens: [],
+      currentTokenIdx: -1,
+      timeRange: undefined,
+      streams: undefined,
+      fieldTypes,
+    };
+
     it('returns empty list if inputs are empty', () => {
       const completer = new FieldValueCompletion();
 
       expect(completer.getCompletions({
-        currentToken: null,
-        lastToken: null,
-        prefix: '',
-        tokens: [],
-        currentTokenIdx: -1,
-        timeRange: undefined,
-        streams: undefined,
-        fieldTypes,
+        ...requestDefaults,
       })).toEqual([]);
     });
 
@@ -91,14 +98,10 @@ describe('FieldValueCompletion', () => {
       const completer = new FieldValueCompletion();
 
       const suggestions = await completer.getCompletions({
+        ...requestDefaults,
         currentToken,
-        lastToken: null,
-        prefix: '',
         tokens: [currentToken],
         currentTokenIdx: 0,
-        timeRange: undefined,
-        streams: undefined,
-        fieldTypes,
       });
 
       expect(suggestions).toEqual(expectedSuggestions);
@@ -113,14 +116,52 @@ describe('FieldValueCompletion', () => {
       const completer = new FieldValueCompletion();
 
       const suggestions = await completer.getCompletions({
+        ...requestDefaults,
         currentToken,
         lastToken,
         prefix: 'P',
         tokens: [lastToken, currentToken],
         currentTokenIdx: 1,
-        timeRange: undefined,
-        streams: undefined,
-        fieldTypes,
+      });
+
+      expect(suggestions).toEqual(expectedSuggestions);
+    });
+
+    it('returns suggestions, field value is a quoted string', async () => {
+      const currentToken = createCurrentToken('string', '"P"', 1, 12);
+      const lastToken = {
+        type: 'keyword',
+        value: 'http_method:',
+      };
+      const completer = new FieldValueCompletion();
+
+      const suggestions = await completer.getCompletions({
+        ...requestDefaults,
+        currentToken,
+        lastToken,
+        prefix: 'P',
+        tokens: [lastToken, currentToken],
+        currentTokenIdx: 1,
+      });
+
+      expect(suggestions).toEqual(expectedSuggestions);
+    });
+
+    it('returns suggestions, field value is an empty quoted string', async () => {
+      const currentToken = createCurrentToken('string', '""', 1, 12);
+      const lastToken = {
+        type: 'keyword',
+        value: 'http_method:',
+      };
+      const completer = new FieldValueCompletion();
+
+      const suggestions = await completer.getCompletions({
+        ...requestDefaults,
+        currentToken,
+        lastToken,
+        prefix: '',
+        tokens: [lastToken, currentToken],
+        currentTokenIdx: 1,
       });
 
       expect(suggestions).toEqual(expectedSuggestions);
@@ -132,13 +173,10 @@ describe('FieldValueCompletion', () => {
       const completer = new FieldValueCompletion();
 
       const suggestions = await completer.getCompletions({
+        ...requestDefaults,
         currentToken,
-        lastToken: null,
-        prefix: '',
         tokens: [currentToken],
         currentTokenIdx: 0,
-        timeRange: undefined,
-        streams: undefined,
         fieldTypes: {
           all: { http_method: httpMethodField },
           query: {},
@@ -153,14 +191,10 @@ describe('FieldValueCompletion', () => {
       const completer = new FieldValueCompletion();
 
       const suggestions = await completer.getCompletions({
+        ...requestDefaults,
         currentToken,
-        lastToken: null,
-        prefix: '',
         tokens: [currentToken],
         currentTokenIdx: 0,
-        timeRange: undefined,
-        streams: undefined,
-        fieldTypes,
       });
 
       expect(suggestions).toEqual([]);
@@ -171,13 +205,10 @@ describe('FieldValueCompletion', () => {
       const completer = new FieldValueCompletion();
 
       const suggestions = await completer.getCompletions({
+        ...requestDefaults,
         currentToken,
-        lastToken: null,
-        prefix: '',
         tokens: [currentToken],
         currentTokenIdx: 0,
-        timeRange: undefined,
-        streams: undefined,
         fieldTypes: { all: {}, query: {} },
       });
 
@@ -190,13 +221,10 @@ describe('FieldValueCompletion', () => {
       const completer = new FieldValueCompletion();
 
       const suggestions = await completer.getCompletions({
+        ...requestDefaults,
         currentToken,
-        lastToken: null,
-        prefix: '',
         tokens: [currentToken],
         currentTokenIdx: 0,
-        timeRange: undefined,
-        streams: undefined,
         fieldTypes: { all: { message: messageField }, query: { message: messageField } },
       });
 
@@ -217,19 +245,17 @@ describe('FieldValueCompletion', () => {
         type: 'keyword',
         value: 'http_method:',
       };
-      asMock(fetch).mockReturnValue(Promise.resolve(response));
+      asMock(fetch).mockResolvedValue(response);
 
       const completer = new FieldValueCompletion();
 
       const suggestions = await completer.getCompletions({
+        ...requestDefaults,
         currentToken,
         lastToken,
         prefix: 'PSOT',
         tokens: [lastToken, currentToken],
         currentTokenIdx: 1,
-        timeRange: undefined,
-        streams: undefined,
-        fieldTypes,
       });
 
       const expectedCorrections = [
@@ -237,6 +263,43 @@ describe('FieldValueCompletion', () => {
       ];
 
       expect(suggestions).toEqual(expectedCorrections);
+    });
+
+    it('escapes value for suggestions correctly', async () => {
+      const response = {
+        field: 'process',
+        input: '',
+        sum_other_docs_count: 0,
+        suggestions: [
+          { value: 'C:\\Windows\\System32\\lsass.exe', occurrence: 300 },
+        ],
+      };
+      const currentToken = createCurrentToken('term', '', 1, 12);
+      const lastToken = {
+        type: 'keyword',
+        value: 'process:',
+      };
+      asMock(fetch).mockResolvedValue(response);
+
+      const completer = new FieldValueCompletion();
+
+      const suggestions = await completer.getCompletions({
+        ...requestDefaults,
+        currentToken,
+        lastToken,
+        tokens: [lastToken, currentToken],
+        currentTokenIdx: 1,
+      });
+
+      expect(suggestions).toEqual([
+        {
+          name: 'C:\\Windows\\System32\\lsass.exe',
+          value: 'C\\:\\\\Windows\\\\System32\\\\lsass.exe',
+          caption: 'C\\:\\\\Windows\\\\System32\\\\lsass.exe',
+          score: 300,
+          meta: '300 hits',
+        },
+      ]);
     });
 
     describe('refetching suggestions', () => {
@@ -262,19 +325,17 @@ describe('FieldValueCompletion', () => {
       ];
 
       it('is fetching further suggestions when there are some', async () => {
-        asMock(fetch).mockReturnValue(Promise.resolve(firstResponse));
+        asMock(fetch).mockResolvedValue(firstResponse);
 
         const completer = new FieldValueCompletion();
 
         const firstSuggestions = await completer.getCompletions({
+          ...requestDefaults,
           currentToken,
           lastToken,
           prefix: 'a',
           tokens: [lastToken, currentToken],
           currentTokenIdx: 1,
-          timeRange: undefined,
-          streams: undefined,
-          fieldTypes,
         });
 
         expect(firstSuggestions).toEqual(expectedFirstSuggestions);
@@ -288,17 +349,15 @@ describe('FieldValueCompletion', () => {
             { value: 'action4', occurrence: 100 },
           ],
         };
-        asMock(fetch).mockReturnValue(Promise.resolve(secondResponse));
+        asMock(fetch).mockResolvedValue(secondResponse);
 
         const secondSuggestions = await completer.getCompletions({
+          ...requestDefaults,
           currentToken,
           lastToken,
           prefix: 'ac',
           tokens: [lastToken, currentToken],
           currentTokenIdx: 1,
-          timeRange: undefined,
-          streams: undefined,
-          fieldTypes,
         });
 
         expect(secondSuggestions).toEqual([
@@ -308,32 +367,28 @@ describe('FieldValueCompletion', () => {
       });
 
       it('is not fetching further suggestions when there are none', async () => {
-        asMock(fetch).mockReturnValue(Promise.resolve({ ...firstResponse, sum_other_docs_count: 0 }));
+        asMock(fetch).mockResolvedValue({ ...firstResponse, sum_other_docs_count: 0 });
 
         const completer = new FieldValueCompletion();
 
         const firstSuggestions = await completer.getCompletions({
+          ...requestDefaults,
           currentToken,
           lastToken,
           prefix: 'a',
           tokens: [lastToken, currentToken],
           currentTokenIdx: 1,
-          timeRange: undefined,
-          streams: undefined,
-          fieldTypes,
         });
 
         expect(firstSuggestions).toEqual(expectedFirstSuggestions);
 
         const secondSuggestions = await completer.getCompletions({
+          ...requestDefaults,
           currentToken,
           lastToken,
           prefix: 'ac',
           tokens: [lastToken, currentToken],
           currentTokenIdx: 1,
-          timeRange: undefined,
-          streams: undefined,
-          fieldTypes,
         });
 
         expect(secondSuggestions).toEqual(expectedFirstSuggestions);
@@ -359,6 +414,13 @@ describe('FieldValueCompletion', () => {
     it('returns true if current token is a keyword and ends with ":"', async () => {
       const completer = new FieldValueCompletion();
       const result = completer.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }, null]]);
+
+      expect(result).toEqual(true);
+    });
+
+    it('returns true if current token is a string and consits only of ""', async () => {
+      const completer = new FieldValueCompletion();
+      const result = completer.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:' }, { type: 'string', value: '""', index: 1, start: 12 }, null]]);
 
       expect(result).toEqual(true);
     });

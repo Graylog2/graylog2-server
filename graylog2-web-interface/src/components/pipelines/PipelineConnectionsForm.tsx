@@ -16,8 +16,8 @@
  */
 import PropTypes from 'prop-types';
 import React, { useMemo, useRef, useState } from 'react';
-import naturalSort from 'javascript-natural-sort';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Link } from 'components/common/router';
 import { SelectableList } from 'components/common';
 import { ControlLabel, FormGroup, HelpBlock, Button, BootstrapModalForm } from 'components/bootstrap';

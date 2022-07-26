@@ -99,6 +99,17 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Arrays.stream(annotation.extraPorts()).boxed());
     }
 
+    public static List<String> getEnabledFeatureFlags(Lifecycle lifecycle, Class<?> annotatedClass) {
+        return AnnotationSupport.findAnnotation(annotatedClass, ContainerMatrixTestsConfiguration.class)
+                .map(annotation -> {
+                    if (annotation.serverLifecycle().equals(lifecycle)) {
+                        return Arrays.asList(annotation.enabledFeatureFlags());
+                    } else {
+                        return new ArrayList<String>();
+                    }
+                }).orElse(new ArrayList<>());
+    }
+
     public static List<URL> getMongoDBFixtures(Lifecycle lifecycle, Class<?> annotatedClass) {
         final List<URL> urls = new ArrayList<>();
         AnnotationSupport.findAnnotation(annotatedClass, ContainerMatrixTestsConfiguration.class).ifPresent(anno -> {
@@ -119,6 +130,13 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
             }
         });
         return urls;
+    }
+
+    private List<String> getEnabledFeatureFlags(Lifecycle lifecycle, Set<Class<?>> annotatedClasses) {
+        return annotatedClasses.stream()
+                .map(zclass -> getEnabledFeatureFlags(lifecycle, zclass))
+                .flatMap(list -> list.stream())
+                .collect(Collectors.toList());
     }
 
     private List<URL> getMongoDBFixtures(Set<Class<?>> annotatedClasses) {
@@ -182,7 +200,8 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                                                                     searchVersion,
                                                                     mongoVersion,
                                                                     extraPorts,
-                                                                    mongoDBFixtures);
+                                                                    mongoDBFixtures,
+                                                                    getEnabledFeatureFlags(Lifecycle.VM, annotated));
                                                             new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
                                                             engineDescriptor.addChild(testsDescriptor);
                                                         })
@@ -201,7 +220,8 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                                                                     esVersion,
                                                                     mongoVersion,
                                                                     extraPorts,
-                                                                    new ArrayList<>());
+                                                                    new ArrayList<>(),
+                                                                    getEnabledFeatureFlags(Lifecycle.CLASS, annotated));
                                                             new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
                                                             engineDescriptor.addChild(testsDescriptor);
                                                         })

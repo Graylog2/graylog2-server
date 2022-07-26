@@ -16,17 +16,29 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 public class LuceneQueryParser {
 
-    public static final StandardAnalyzer ANALYZER = new StandardAnalyzer();
+    public static final Analyzer ANALYZER = new WhitespaceAnalyzer();
+
+    private final boolean allowLeadingWildcard;
+
+    @Inject
+    public LuceneQueryParser(@Named("allow_leading_wildcard_searches") final boolean allowLeadingWildcard) {
+        this.allowLeadingWildcard = allowLeadingWildcard;
+    }
 
     public ParsedQuery parse(final String query) throws ParseException {
         final TokenCollectingQueryParser parser = new TokenCollectingQueryParser(ParsedTerm.DEFAULT_FIELD, ANALYZER);
         parser.setSplitOnWhitespace(true);
+        parser.setAllowLeadingWildcard(allowLeadingWildcard);
 
         final Query parsed = parser.parse(query);
         final ParsedQuery.Builder builder = ParsedQuery.builder().query(query);

@@ -122,7 +122,7 @@ public class GelfCodec extends AbstractCodec {
     @Override
     public Message decode(@Nonnull final RawMessage rawMessage) {
         final GELFMessage gelfMessage = new GELFMessage(rawMessage.getPayload(), rawMessage.getRemoteAddress());
-        final String json = gelfMessage.getJSON(decompressSizeLimit);
+        final String json = gelfMessage.getJSON(decompressSizeLimit, charset);
 
         final JsonNode node;
 

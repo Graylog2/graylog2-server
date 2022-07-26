@@ -46,7 +46,12 @@ const usePluggableControls = () => {
 
 const renderControls = (controls: Array<SearchBarControl>) => controls?.map(({ component: ControlComponent, id }) => <ControlComponent key={id} />);
 
-const PluggableSearchBarControls = () => {
+type Props = {
+  showLeftControls?: boolean,
+  showRightControls?: boolean,
+}
+
+const PluggableSearchBarControls = ({ showLeftControls, showRightControls }: Props) => {
   const [hidePluggableControlsPreview, setHidePluggableControlsPreview] = useState(!!Store.get(PLUGGABLE_CONTROLS_HIDDEN_KEY));
   const { leftControls, rightControls } = usePluggableControls();
   const hasSearchFilterFeatureFlag = useFeature('search_filter');
@@ -63,16 +68,21 @@ const PluggableSearchBarControls = () => {
   return (
     <Container>
       <div>
-        {hasSearchFilterFeatureFlag && (
+        {hasSearchFilterFeatureFlag && showLeftControls && (
           <>
             {renderControls(leftControls)}
             <SearchFilterBanner onHide={onHidePluggableControlsPreview} pluggableControls={leftControls} />
           </>
         )}
       </div>
-      <div>{renderControls(rightControls)}</div>
+      <div>{showRightControls && renderControls(rightControls)}</div>
     </Container>
   );
+};
+
+PluggableSearchBarControls.defaultProps = {
+  showLeftControls: true,
+  showRightControls: true,
 };
 
 export default PluggableSearchBarControls;

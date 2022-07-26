@@ -51,6 +51,7 @@ export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType =
         ...searchType,
         widgetId: widget.id,
         ...filterForWidget(widget),
+        filters: widget.filters,
       })))
     .reduce((acc, cur) => acc.merge(cur), Immutable.Set<SearchTypeWithWidgetId>())
     .map((searchType) => {

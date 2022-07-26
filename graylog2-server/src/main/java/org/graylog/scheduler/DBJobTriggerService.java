@@ -22,11 +22,13 @@ import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
 import one.util.streamex.StreamEx;
 import org.bson.types.ObjectId;
+import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.utilities.MongoQueryUtils;
 import org.joda.time.DateTime;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
@@ -34,11 +36,14 @@ import org.mongojack.DBQuery.Query;
 import org.mongojack.DBSort;
 import org.mongojack.DBUpdate;
 import org.mongojack.JacksonDBCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -54,10 +59,13 @@ import static org.graylog.scheduler.JobSchedulerConfiguration.LOCK_EXPIRATION_DU
 // This class does NOT use PaginatedDbService because we use the triggers collection for locking and need to handle
 // updates very carefully.
 public class DBJobTriggerService {
-    static final String COLLECTION_NAME = "scheduler_triggers";
+    private final static Logger LOG = LoggerFactory.getLogger(DBJobTriggerService.class);
+    public static final String COLLECTION_NAME = "scheduler_triggers";
     private static final String FIELD_ID = "_id";
     static final String FIELD_JOB_DEFINITION_ID = JobTriggerDto.FIELD_JOB_DEFINITION_ID;
     private static final String FIELD_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_OWNER;
+    private static final String FIELD_LAST_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_LAST_OWNER;
+    private static final String FIELD_PROGRESS = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_PROGRESS;
     private static final String FIELD_LAST_LOCK_TIME = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_LAST_LOCK_TIME;
     private static final String FIELD_NEXT_TIME = JobTriggerDto.FIELD_NEXT_TIME;
     private static final String FIELD_START_TIME = JobTriggerDto.FIELD_START_TIME;
@@ -67,10 +75,14 @@ public class DBJobTriggerService {
     private static final String FIELD_DATA = JobTriggerDto.FIELD_DATA;
     private static final String FIELD_UPDATED_AT = JobTriggerDto.FIELD_UPDATED_AT;
     private static final String FIELD_TRIGGERED_AT = JobTriggerDto.FIELD_TRIGGERED_AT;
+    private static final String FIELD_CONSTRAINTS = JobTriggerDto.FIELD_CONSTRAINTS;
+
+    private static final String FIELD_JOB_DEFINITION_TYPE = JobTriggerDto.FIELD_JOB_DEFINITION_TYPE;
 
     private final String nodeId;
     private final JacksonDBCollection<JobTriggerDto, ObjectId> db;
     private final JobSchedulerClock clock;
+    private final SchedulerCapabilitiesService schedulerCapabilitiesService;
     private final Duration lockExpirationDuration;
 
     @Inject
@@ -78,9 +90,11 @@ public class DBJobTriggerService {
                                MongoJackObjectMapperProvider mapper,
                                NodeId nodeId,
                                JobSchedulerClock clock,
+                               SchedulerCapabilitiesService schedulerCapabilitiesService,
                                @Named(LOCK_EXPIRATION_DURATION) Duration lockExpirationDuration) {
         this.nodeId = nodeId.toString();
         this.clock = clock;
+        this.schedulerCapabilitiesService = schedulerCapabilitiesService;
         this.lockExpirationDuration = lockExpirationDuration;
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 JobTriggerDto.class,
@@ -93,6 +107,8 @@ public class DBJobTriggerService {
         db.createIndex(new BasicDBObject(FIELD_START_TIME, 1));
         db.createIndex(new BasicDBObject(FIELD_END_TIME, 1));
         db.createIndex(new BasicDBObject(FIELD_NEXT_TIME, 1));
+        db.createIndex(new BasicDBObject(FIELD_CONSTRAINTS, 1));
+        db.createIndex(new BasicDBObject(FIELD_JOB_DEFINITION_TYPE, 1));
     }
 
     /**
@@ -273,7 +289,7 @@ public class DBJobTriggerService {
     }
 
     /**
-     * Deletes completed {@link OnceJobSchedule} triggers that are older than the provided time
+     * Deletes completed / cancelled {@link OnceJobSchedule} triggers that are older than the provided time
      *
      * @param timeValue the time range of triggers to be removed
      * @param unit      the unit of the provided timeValue
@@ -282,7 +298,10 @@ public class DBJobTriggerService {
     public int deleteCompletedOnceSchedulesOlderThan(long timeValue, TimeUnit unit) {
         final Query query = DBQuery.and(
                 DBQuery.is(FIELD_LOCK_OWNER, null),
-                DBQuery.is(FIELD_STATUS, JobTriggerStatus.COMPLETE),
+                DBQuery.or(
+                        DBQuery.is(FIELD_STATUS, JobTriggerStatus.COMPLETE),
+                        DBQuery.is(FIELD_STATUS, JobTriggerStatus.CANCELLED)
+                ),
                 DBQuery.is(FIELD_SCHEDULE + "." + JobSchedule.TYPE_FIELD, OnceJobSchedule.TYPE_NAME),
                 DBQuery.lessThan(FIELD_UPDATED_AT, clock.nowUTC().minus(unit.toMillis(timeValue)))
         );
@@ -309,11 +328,15 @@ public class DBJobTriggerService {
     public Optional<JobTriggerDto> nextRunnableTrigger() {
         final DateTime now = clock.nowUTC();
 
+        final Query constraintsQuery = MongoQueryUtils.getArrayIsContainedQuery(FIELD_CONSTRAINTS, schedulerCapabilitiesService.getNodeCapabilities());
+
         final Query query = DBQuery.or(DBQuery.and(
                         // We cannot lock a trigger that is already locked by another node
                         DBQuery.is(FIELD_LOCK_OWNER, null),
                         DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNABLE),
                         DBQuery.lessThanEquals(FIELD_START_TIME, now),
+                        constraintsQuery,
+
                         DBQuery.or( // Skip triggers that have an endTime which is due
                                 DBQuery.notExists(FIELD_END_TIME),
                                 DBQuery.is(FIELD_END_TIME, null),
@@ -326,12 +349,14 @@ public class DBJobTriggerService {
                         DBQuery.notEquals(FIELD_LOCK_OWNER, null),
                         DBQuery.notEquals(FIELD_LOCK_OWNER, nodeId),
                         DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING),
+                        constraintsQuery,
                         DBQuery.lessThan(FIELD_LAST_LOCK_TIME, now.minus(lockExpirationDuration.toMilliseconds())))
         );
         // We want to lock the trigger with the oldest next time
         final DBSort.SortBuilder sort = DBSort.asc(FIELD_NEXT_TIME);
 
         final DBUpdate.Builder lockUpdate = DBUpdate.set(FIELD_LOCK_OWNER, nodeId)
+                .set(FIELD_LAST_LOCK_OWNER, nodeId)
                 .set(FIELD_STATUS, JobTriggerStatus.RUNNING)
                 .set(FIELD_TRIGGERED_AT, Optional.of(now))
                 .set(FIELD_LAST_LOCK_TIME, now);
@@ -383,7 +408,7 @@ public class DBJobTriggerService {
             }
             update.set(FIELD_NEXT_TIME, triggerUpdate.nextTime().get());
         } else {
-            update.set(FIELD_STATUS, JobTriggerStatus.COMPLETE);
+            update.set(FIELD_STATUS, triggerUpdate.status().orElse(JobTriggerStatus.COMPLETE));
         }
 
         if (triggerUpdate.data().isPresent()) {
@@ -451,5 +476,38 @@ public class DBJobTriggerService {
         );
         DBUpdate.Builder update = DBUpdate.set(FIELD_LAST_LOCK_TIME, now);
         db.updateMulti(query, update);
+    }
+
+    /**
+     * Update the job progress on a trigger
+     * @param trigger  the trigger to update
+     * @param progress the job progress in percent (0-100)
+     */
+    public int updateProgress(JobTriggerDto trigger, int progress) {
+        final Query query = DBQuery.is(FIELD_ID, trigger.id());
+        final DBUpdate.Builder update = DBUpdate.set(FIELD_PROGRESS, progress);
+        return db.update(query, update).getN();
+    }
+
+    /**
+     * Cancel a JobTrigger that matches a query
+     * @param query  the db query
+     * @return an Optional of the trigger that was cancelled. Empty if no matching trigger was found.
+     */
+    public Optional<JobTriggerDto> cancelTriggerByQuery(Query query) {
+        final DBUpdate.Builder update = DBUpdate.set(JobTriggerDto.FIELD_IS_CANCELLED, true);
+
+        return Optional.ofNullable(db.findAndModify(query, update));
+    }
+
+    /**
+     * Find triggers by using the provided query. Use judiciously!
+     * @param query  The query
+     * @return All found JobTriggers
+     */
+    public List<JobTriggerDto> findByQuery(Query query) {
+        try (final DBCursor<JobTriggerDto> cursor = db.find(query).sort(DBSort.desc(FIELD_UPDATED_AT))) {
+            return ImmutableList.copyOf((Iterator<? extends JobTriggerDto>) cursor);
+        }
     }
 }
