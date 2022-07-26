@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @AutoValue
@@ -31,14 +32,30 @@ public abstract class JobExecutionContext {
 
     public abstract JobTriggerUpdates jobTriggerUpdates();
 
-    public abstract AtomicBoolean isRunning();
+    public abstract AtomicBoolean schedulerIsRunning();
 
-    public static JobExecutionContext create(JobTriggerDto trigger, JobDefinitionDto definition, JobTriggerUpdates jobTriggerUpdates, AtomicBoolean isRunning) {
+    // TODO Jobs need to implement shutdown handling. Every job can decide if it wants to be restarted or not.
+    public boolean isShuttingDown() {
+        return !schedulerIsRunning().get();
+    }
+
+    public boolean isCancelled() {
+        final Optional<JobTriggerDto> triggerDto = jobTriggerService().get(trigger().id());
+        return triggerDto.map(JobTriggerDto::isCancelled).orElse(false);
+    }
+
+    abstract DBJobTriggerService jobTriggerService();
+    public void updateProgress(int progress) {
+        jobTriggerService().updateProgress(trigger(), progress);
+    }
+
+    public static JobExecutionContext create(JobTriggerDto trigger, JobDefinitionDto definition, JobTriggerUpdates jobTriggerUpdates, AtomicBoolean schedulerIsRunning, DBJobTriggerService jobTriggerService) {
         return builder()
                 .trigger(trigger)
                 .definition(definition)
                 .jobTriggerUpdates(jobTriggerUpdates)
-                .isRunning(isRunning)
+                .schedulerIsRunning(schedulerIsRunning)
+                .jobTriggerService(jobTriggerService)
                 .build();
     }
 
@@ -61,7 +78,9 @@ public abstract class JobExecutionContext {
 
         public abstract Builder jobTriggerUpdates(JobTriggerUpdates jobTriggerUpdates);
 
-        public abstract Builder isRunning(AtomicBoolean isRunning);
+        public abstract Builder schedulerIsRunning(AtomicBoolean isRunning);
+
+        public abstract Builder jobTriggerService(DBJobTriggerService jobTriggerService);
 
         public abstract JobExecutionContext build();
     }
