@@ -17,11 +17,11 @@
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
+import DocsHelper from 'util/DocsHelper';
 import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button, ButtonToolbar } from 'components/bootstrap';
 import { SearchForm, PaginatedList, DocumentTitle, PageHeader, Spinner, QueryHelper } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
-import DocsHelper from 'util/DocsHelper';
 import RuleList from 'components/rules/RuleList';
 import RuleMetricsConfigContainer from 'components/rules/RuleMetricsConfigContainer';
 import Routes from 'routing/Routes';
@@ -30,6 +30,7 @@ import type { Pagination } from 'stores/PaginationTypes';
 import type { MetricsConfigType, PaginatedRules, RuleType } from 'stores/rules/RulesStore';
 import { RulesActions } from 'stores/rules/RulesStore';
 import useLocationSearchPagination from 'hooks/useLocationSearchPagination';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 const Flex = styled.div`
   display: flex;
@@ -56,6 +57,7 @@ const _loadRuleMetricData = (setMetricsConfig) => {
 };
 
 const RulesPage = () => {
+  const { resetPage } = usePaginationQueryParameter();
   const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   const [openMetricsConfig, toggleMetricsConfig] = useState<boolean>(false);
   const [metricsConfig, setMetricsConfig] = useState<MetricsConfigType>();
@@ -79,6 +81,7 @@ const RulesPage = () => {
   };
 
   const handleSearch = (nextQuery) => {
+    resetPage();
     setPagination({ ...pagination, query: nextQuery, page: DEFAULT_PAGINATION.page });
   };
 
@@ -113,6 +116,7 @@ const RulesPage = () => {
     return <Button onClick={toggleMetricsConfig}>Debug Metrics</Button>;
   };
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   const RulesButtonToolbar = () => (
     <ButtonToolbar className="pull-right">
       <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
