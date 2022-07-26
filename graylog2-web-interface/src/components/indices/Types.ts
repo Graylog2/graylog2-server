@@ -55,7 +55,7 @@ export interface JsonSchemaIndexActionPropertyType {
   enum: Array<string>,
 }
 export interface JsonSchemaBooleanPropertyType {
-  type: boolean;
+  type: string;
 }
 export interface RotationProperties {
   rotation_period?: JsonSchemaStringPropertyType,
