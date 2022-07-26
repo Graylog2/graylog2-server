@@ -17,10 +17,10 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
+import { SystemJobsList } from 'components/systemjobs';
 import { Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import connect from 'stores/connect';
-import { SystemJobsList } from 'components/systemjobs';
 import { SystemJobsActions, SystemJobsStore } from 'stores/systemjobs/SystemJobsStore';
 
 const SystemJobsComponent = ({ jobs }) => {
@@ -70,4 +70,4 @@ SystemJobsComponent.defaultProps = {
 
 export default connect(SystemJobsComponent,
   { systemJobsStore: SystemJobsStore },
-  ({ systemJobsStore }) => ({ jobs: systemJobsStore.jobs }));
+  ({ systemJobsStore }) => ({ jobs: (systemJobsStore as any).jobs }));
