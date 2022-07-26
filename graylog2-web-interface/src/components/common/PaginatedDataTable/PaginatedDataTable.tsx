@@ -21,6 +21,7 @@ import PropTypes from 'prop-types';
 import type { Pagination } from 'stores/PaginationTypes';
 import DataTable from 'components/common/DataTable';
 import PaginatedList from 'components/common/PaginatedList';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 import Filter from './Filter';
 
@@ -90,6 +91,7 @@ type DataTablePagination = {
  * If you want to display a lists which gets paginated by the backend, wrap use the DataTable in combination with the PaginatedList.
  */
 const PaginatedDataTable = ({ rows = [], pagination: initialPagination, filterKeys, filterLabel, displayKey, filterBy, id, ...rest }: Props) => {
+  const { resetPage } = usePaginationQueryParameter();
   const [{ perPage, page }, setPagination] = useState<DataTablePagination>(initialPagination);
   const [filteredRows, setFilteredRows] = useState(rows);
   const paginatedRows = _paginatedRows(filteredRows, perPage, page);
@@ -104,6 +106,7 @@ const PaginatedDataTable = ({ rows = [], pagination: initialPagination, filterKe
   };
 
   const _resetPagination = () => {
+    resetPage();
     setPagination({ perPage, page: initialPagination.page });
   };
 
