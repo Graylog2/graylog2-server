@@ -39,6 +39,7 @@ import org.junit.platform.engine.TestExecutionResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,8 +52,8 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
 
     private <T> T instantiateFactory(Class<? extends T> providerClass) {
         try {
-            return providerClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+            return providerClass.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException("Unable to construct instance of " + providerClass.getSimpleName() + ": ", e);
         }
     }

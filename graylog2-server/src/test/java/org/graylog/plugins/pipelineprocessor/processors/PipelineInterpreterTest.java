@@ -594,7 +594,7 @@ public class PipelineInterpreterTest {
         ));
 
         // when
-        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField(new Long(1))));
+        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField(Long.valueOf(1))));
 
         // then
         assertThat(processed)
@@ -611,7 +611,7 @@ public class PipelineInterpreterTest {
     }
 
     @Test
-    public void process_noEvaluationErrorsResultIntoNoMessageProcessingErrors() throws Exception {
+    public void process_noEvaluationErrorsResultIntoNoMessageProcessingErrors() {
         // given
         when(ruleService.loadAll()).thenReturn(ImmutableList.of(RuleDao.create("valid_rule", "valid_rule",
                 "valid_rule",
@@ -640,14 +640,14 @@ public class PipelineInterpreterTest {
         ));
 
         // when
-        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField(new Long(5))));
+        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField(Long.valueOf(5))));
 
         // then
         assertThat(processed)
                 .hasSize(1)
                 .hasOnlyOneElementSatisfying(m -> {
                     assertThat(m.processingErrors()).isEmpty();
-                    assertThat(m.getField("num_sqr")).isEqualTo(new Double(25.0));
+                    assertThat(m.getField("num_sqr")).isEqualTo(Double.valueOf(25.0));
                 });
     }
 
