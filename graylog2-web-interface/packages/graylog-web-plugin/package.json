@@ -45,7 +45,6 @@
     "eslint-config-graylog": "file:../eslint-config-graylog",
     "formik": "2.2.9",
     "html-webpack-plugin": "^5.5.0",
-    "javascript-natural-sort": "0.7.1",
     "jest-preset-graylog": "file:../jest-preset-graylog",
     "jquery": "3.6.0",
     "moment": "2.29.4",
