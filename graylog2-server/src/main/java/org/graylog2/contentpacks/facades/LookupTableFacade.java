@@ -82,6 +82,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
                 .orElseThrow(() -> new ContentPackException("Couldn't find lookup data adapter entity " + lookupTableDto.dataAdapterId()));
 
         final LookupTableEntity lookupTableEntity = LookupTableEntity.create(
+                ValueReference.of(lookupTableDto.scope()),
                 ValueReference.of(lookupTableDto.name()),
                 ValueReference.of(lookupTableDto.title()),
                 ValueReference.of(lookupTableDto.description()),
@@ -137,6 +138,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
             throw new MissingNativeEntityException(cacheDescriptor);
         }
         final LookupTableDto lookupTableDto = LookupTableDto.builder()
+                .scope(lookupTableEntity.scope().asString(parameters))
                 .name(lookupTableEntity.name().asString(parameters))
                 .title(lookupTableEntity.title().asString(parameters))
                 .description(lookupTableEntity.description().asString(parameters))
@@ -147,7 +149,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
                 .defaultMultiValue(lookupTableEntity.defaultMultiValue().asString(parameters))
                 .defaultMultiValueType(lookupTableEntity.defaultMultiValueType().asEnum(parameters, LookupDefaultMultiValue.Type.class))
                 .build();
-        final LookupTableDto savedLookupTableDto = lookupTableService.save(lookupTableDto);
+        final LookupTableDto savedLookupTableDto = lookupTableService.saveAndPostEvent(lookupTableDto);
         return NativeEntity.create(entity.id(), savedLookupTableDto.id(), TYPE_V1, lookupTableDto.title(), savedLookupTableDto);
     }
 
@@ -185,7 +187,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
 
     @Override
     public void delete(LookupTableDto nativeEntity) {
-        lookupTableService.delete(nativeEntity.id());
+        lookupTableService.deleteAndPostEventImmutable(nativeEntity.id());
     }
 
     @Override

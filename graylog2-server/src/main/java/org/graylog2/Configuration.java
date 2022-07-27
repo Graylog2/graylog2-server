@@ -299,6 +299,10 @@ public class Configuration extends BaseConfiguration {
         return runMigrations;
     }
 
+    public boolean getSkipPreflightChecks() {
+        return skipPreflightChecks;
+    }
+
     @Override
     public String getNodeIdFile() {
         return nodeIdFile;
