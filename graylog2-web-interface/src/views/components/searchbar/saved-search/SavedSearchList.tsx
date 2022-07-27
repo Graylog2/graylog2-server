@@ -19,6 +19,7 @@ import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import UserNotification from 'util/UserNotification';
 import type { PaginatedViews } from 'views/stores/ViewManagementStore';
 import { SavedSearchesActions } from 'views/stores/SavedSearchesStore';
 import { Alert, Modal, ListGroup, ListGroupItem, Button } from 'components/bootstrap';
@@ -26,7 +27,6 @@ import { Icon, PaginatedList, SearchForm, Spinner } from 'components/common';
 import type View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import UserNotification from 'util/UserNotification';
 import QueryHelper from 'components/common/QueryHelper';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
@@ -65,13 +65,6 @@ const DeleteButton = styled.span(({ theme }) => `
   color: ${theme.colors.gray[60]};
 `);
 
-const DEFAULT_PAGINATION = {
-  query: '',
-  page: 1,
-  perPage: 10,
-  count: 0,
-};
-
 const onLoad = (toggleModal, selectedSavedSearchId, loadFunc) => {
   if (!selectedSavedSearchId || !loadFunc) {
     return;
@@ -107,33 +100,27 @@ const _loadSavesSearches = (pagination, setLoading, setPaginatedSavedSearches) =
   });
 };
 
-const _updateListOnSearchDelete = (perPage, query, setPagination) => ViewManagementActions.delete.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
+const _updateListOnSearchDelete = (resetPage) => ViewManagementActions.delete.completed.listen(() => resetPage());
 
 const SavedSearchList = ({ toggleModal, deleteSavedSearch, activeSavedSearchId }: Props) => {
-  const { resetPage } = usePaginationQueryParameter();
+  const { page, pageSize: perPage, resetPage } = usePaginationQueryParameter();
   const [paginatedSavedSearches, setPaginatedSavedSearches] = useState<PaginatedViews | undefined>();
-  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
+  const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
-  const { page, query, perPage } = pagination;
   const { list: savedSearches, pagination: { total = 0 } = {} } = paginatedSavedSearches || {};
 
-  useEffect(() => _loadSavesSearches(pagination, setLoading, setPaginatedSavedSearches), [pagination]);
-  useEffect(() => _updateListOnSearchDelete(perPage, query, setPagination), [perPage, query]);
+  useEffect(() => _loadSavesSearches({ query, page, perPage }, setLoading, setPaginatedSavedSearches), [query, page, perPage]);
+  useEffect(() => _updateListOnSearchDelete(resetPage), [resetPage]);
 
   const handleSearch = (newQuery: string) => {
     resetPage();
-    setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page });
+    setQuery(newQuery);
   };
-
-  const handlePageSizeChange = (newPage: number, newPerPage: number) => setPagination({ ...pagination, page: newPage, perPage: newPerPage });
 
   return (
     <Modal show>
       <Modal.Body>
-        <PaginatedList onChange={handlePageSizeChange}
-                       activePage={page}
-                       totalItems={total}
-                       pageSize={perPage}>
+        <PaginatedList totalItems={total}>
           <SearchForm focusAfterMount
                       onSearch={handleSearch}
                       queryHelpComponent={<QueryHelper entityName="search" commonFields={['id', 'title']} />}
