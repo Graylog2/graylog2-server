@@ -30,11 +30,6 @@ import SyncedUsersOverviewItem from './SyncedUsersOverviewItem';
 import SyncedUsersFilter from './SyncedUsersFilter';
 
 const TABLE_HEADERS = ['Username', 'Full Name', 'Roles', 'Actions'];
-const DEFAULT_PAGINATION = {
-  page: 1,
-  perPage: 10,
-  query: '',
-};
 
 const _headerCellFormatter = (header) => {
   switch (header.toLowerCase()) {
@@ -62,18 +57,17 @@ type Props = {
 const _userOverviewItem = (user, roles) => <SyncedUsersOverviewItem user={user} roles={roles} />;
 
 const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
-  const { resetPage } = usePaginationQueryParameter();
+  const { page, pageSize: perPage, resetPage } = usePaginationQueryParameter();
   const [loading, setLoading] = useState(false);
   const [paginatedUsers, setPaginatedUsers] = useState<PaginatedUsers | undefined>();
-  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
+  const [query, setQuery] = useState('');
   const { list: users } = paginatedUsers || {};
-  const { page } = pagination;
 
-  useEffect(() => _loadSyncedTeams(authenticationBackend.id, pagination, setLoading, setPaginatedUsers), [authenticationBackend.id, pagination]);
+  useEffect(() => _loadSyncedTeams(authenticationBackend.id, { query, page, perPage }, setLoading, setPaginatedUsers), [authenticationBackend.id, query, page, perPage]);
 
   const onSearch = (newQuery) => {
     resetPage();
-    setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page });
+    setQuery(newQuery);
   };
 
   if (!paginatedUsers) {
@@ -85,7 +79,7 @@ const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
       <p className="description">
         Found {paginatedUsers.pagination.total} synchronized users.
       </p>
-      <PaginatedList activePage={page} totalItems={paginatedUsers.pagination.total} onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}>
+      <PaginatedList totalItems={paginatedUsers.pagination.total}>
         <DataTable className="table-hover"
                    customFilter={<SyncedUsersFilter onSearch={onSearch} />}
                    dataRowFormatter={(user) => _userOverviewItem(user, roles)}
