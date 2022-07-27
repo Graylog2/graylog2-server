@@ -80,10 +80,12 @@ const formatSuggestion = (value: string, occurrence: number, input: string | num
   meta: `${occurrence} hits`,
 });
 
+type PreviousSuggestions = Array<{ value: string, occurrence: number }> | undefined;
+
 class FieldValueCompletion implements Completer {
   private previousSuggestions: undefined | {
     furtherSuggestionsCount: number,
-    suggestions: SuggestionsResponse['suggestions'],
+    suggestions: PreviousSuggestions,
     fieldName: string,
     input: string | number,
     timeRange: TimeRange | NoTimeRangeOverride | undefined,
