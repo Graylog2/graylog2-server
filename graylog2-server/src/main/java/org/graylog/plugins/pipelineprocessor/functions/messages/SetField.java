@@ -58,11 +58,14 @@ public class SetField extends AbstractFunction<Void> {
         try {
             value = valueParam.required(args, context);
         } catch (Exception e) {
-            // swallow the exception;
+            // swallow the exception if there is an available default value;
+            if (!args.isPresent("default")) {
+                throw e;
+            }
         }
         finally {
             if (value == null) {
-                value = defaultParam.required(args, context);
+                value = defaultParam.optional(args, context).orElse(null);
             }
         }
 
