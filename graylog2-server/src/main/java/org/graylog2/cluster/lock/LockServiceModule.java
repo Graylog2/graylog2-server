@@ -14,11 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import AceEditor from 'react-ace';
+package org.graylog2.cluster.lock;
 
-import './ace-queryinput';
-import 'ace-builds/src-noconflict/ext-language_tools';
-import './custom-lucene-mode';
-import 'ace-builds/webpack-resolver';
+import com.google.inject.Scopes;
+import org.graylog2.plugin.PluginModule;
 
-export default AceEditor;
+public class LockServiceModule extends PluginModule {
+    @Override
+    protected void configure() {
+        bind(LockService.class).to(MongoLockService.class).in(Scopes.SINGLETON);
+    }
+}

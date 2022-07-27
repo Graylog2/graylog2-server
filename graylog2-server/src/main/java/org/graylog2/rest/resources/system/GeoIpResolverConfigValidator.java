@@ -33,7 +33,11 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * A {@link ClusterConfigValidator} to validate configuration objects of type {@link GeoIpResolverConfig}.
@@ -41,6 +45,8 @@ import java.util.Locale;
 public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
 
     private static final Logger LOG = LoggerFactory.getLogger(GeoIpResolverConfigValidator.class);
+
+    private static final List<TimeUnit> VALID_UNITS = Arrays.asList(TimeUnit.SECONDS, TimeUnit.MINUTES, TimeUnit.HOURS, TimeUnit.DAYS);
 
     private final GeoIpVendorResolverService geoIpVendorResolverService;
 
@@ -68,15 +74,22 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
     private void validateConfig(GeoIpResolverConfig config) throws ConfigValidationException {
         Timer timer = new Timer(new UniformReservoir());
         try {
+
+            if (!VALID_UNITS.contains(config.refreshIntervalUnit())) {
+                String valid = VALID_UNITS.stream().map(TimeUnit::name).collect(Collectors.joining(","));
+                String error = String.format(Locale.ENGLISH, "Invalid '%s'. Valid units are '%s'", GeoIpResolverConfig.FIELD_REFRESH_INTERVAL_UNIT, valid);
+                throw new IllegalArgumentException(error);
+            }
+
             //A test address.  This will NOT be in any database, but should only produce an
             //AddressNotFoundException.  Any other exception suggests an actual error such as
-            //a database file that does does not belong to the vendor selected
+            //a database file that does not belong to the vendor selected
             InetAddress testAddress = InetAddress.getByName("127.0.0.1");
 
             validateGeoIpLocationResolver(config, timer, testAddress);
             validateGeoIpAsnResolver(config, timer, testAddress);
 
-        } catch (UnknownHostException | IllegalArgumentException e) {
+        } catch (UnknownHostException | IllegalArgumentException | IllegalStateException e) {
             throw new ConfigValidationException(e.getMessage());
         }
     }
