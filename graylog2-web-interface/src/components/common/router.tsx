@@ -47,6 +47,7 @@ type ChildrenProps = {
 type Props = {
   children: React.ReactElement<ChildrenProps, React.ComponentType>,
   onClick?: () => unknown,
+  disabled?: boolean,
   to: string,
 };
 
