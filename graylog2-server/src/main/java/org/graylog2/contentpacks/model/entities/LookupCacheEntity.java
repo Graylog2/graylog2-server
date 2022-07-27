@@ -29,8 +29,6 @@ import org.graylog2.database.entities.DefaultEntityScope;
 @WithBeanGetter
 @JsonAutoDetect
 public abstract class LookupCacheEntity extends ScopedContentPackEntity {
-    @JsonProperty(FIELD_SCOPE)
-    public abstract ValueReference scope();
     @JsonProperty("name")
     public abstract ValueReference name();
 

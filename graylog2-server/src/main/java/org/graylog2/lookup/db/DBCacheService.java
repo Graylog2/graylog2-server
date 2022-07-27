@@ -87,7 +87,9 @@ public class DBCacheService extends ScopedEntityPaginatedDbService<CacheDto> {
     }
 
     public void deleteAndPostEventImmutable(String idOrName) {
+        final Optional<CacheDto> cacheDto = get(idOrName);
         super.deleteImmutable(idOrName);
+        cacheDto.ifPresent(cache -> clusterEventBus.post(CachesDeleted.create(cache.id())));
     }
 
     public Collection<CacheDto> findByIds(Set<String> idSet) {
