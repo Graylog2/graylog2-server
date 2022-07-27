@@ -170,6 +170,9 @@ const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: Agg
   const rowPivots = groupBy.groupings.filter((grouping) => grouping.direction === 'row').map(groupingToPivot);
   const columnPivots = groupBy.groupings.filter((grouping) => grouping.direction === 'column').map(groupingToPivot);
   const { columnRollup } = groupBy;
+  console.log("X2");
+  console.log(config);
+  console.log(columnRollup);
 
   return config
     .rowPivots(rowPivots)
@@ -195,7 +198,7 @@ const GroupByElement: AggregationElement = {
   onCreate: (formValues: WidgetConfigFormValues): WidgetConfigFormValues => ({
     ...formValues,
     groupBy: {
-      columnRollup: formValues.groupBy ? formValues.groupBy.columnRollup : true,
+      columnRollup: formValues.groupBy ? formValues.groupBy.columnRollup : false,
       groupings: [
         ...(formValues.groupBy?.groupings ?? []),
         createEmptyGrouping(),
@@ -209,18 +212,16 @@ const GroupByElement: AggregationElement = {
     return ({
       ...newFormValues,
       groupBy: {
-        columnRollup: newFormValues.groupBy.columnRollup ?? true,
+        columnRollup: newFormValues.groupBy.columnRollup ?? false,
         groupings: newGroupings,
       },
     });
   }),
   fromConfig: (config: AggregationWidgetConfig) => {
     const groupings = pivotsToGrouping(config);
-
     if (isEmpty(groupings)) {
       return undefined;
     }
-
     return {
       groupBy: {
         columnRollup: config.rollup,
