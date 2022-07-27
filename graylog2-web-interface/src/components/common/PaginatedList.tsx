@@ -16,11 +16,9 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useEffect } from 'react';
 
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
-import useIsMountedRef from 'hooks/useIsMountedRef';
 
 import Pagination from './Pagination';
 import PageSizeSelect from './PageSizeSelect';
@@ -29,13 +27,11 @@ const DEFAULT_PAGE_SIZES = [10, 50, 100];
 export const INITIAL_PAGE = 1;
 
 type Props = {
-  activePage?: number,
   children: React.ReactNode,
   className?: string,
   hideFirstAndLastPageLinks?: boolean
   hidePreviousAndNextPageLinks?: boolean
-  onChange: (currentPage: number, pageSize: number) => void,
-  pageSize?: number,
+  onChange?: (currentPage: number, pageSize: number) => void,
   pageSizes?: Array<number>,
   showPageSizeSelect?: boolean,
   totalItems: number,
@@ -48,41 +44,29 @@ type Props = {
  * the selected page is displayed on screen.
  */
 const PaginatedList = ({
-  activePage,
   children,
   className,
   hideFirstAndLastPageLinks,
   hidePreviousAndNextPageLinks,
   onChange,
-  pageSize: propsPageSize,
   pageSizes,
   showPageSizeSelect,
   totalItems,
 }: Props) => {
-  const isMounted = useIsMountedRef();
-
   const { page, setPage, pageSize, setPageSize } = usePaginationQueryParameter(pageSizes);
-  const currentPage = page > 0 ? page : INITIAL_PAGE;
   const numberPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 0;
-
-  useEffect(() => {
-    if (isMounted.current && ((currentPage !== activePage) || (pageSize !== propsPageSize))) {
-      onChange(currentPage, pageSize);
-      isMounted.current = false;
-    }
-  }, [isMounted, currentPage, pageSize, activePage, propsPageSize, onChange]);
 
   const _onChangePageSize = (event: React.ChangeEvent<HTMLOptionElement>) => {
     event.preventDefault();
     const newPageSize = Number(event.target.value);
 
     setPageSize(newPageSize);
-    onChange(INITIAL_PAGE, newPageSize);
+    if (onChange) onChange(INITIAL_PAGE, newPageSize);
   };
 
   const _onChangePage = (pageNum: number) => {
     setPage(pageNum);
-    onChange(pageNum, pageSize);
+    if (onChange) onChange(pageNum, pageSize);
   };
 
   return (
@@ -96,7 +80,7 @@ const PaginatedList = ({
       <IfInteractive>
         <div className={`text-center pagination-wrapper ${className ?? ''}`}>
           <Pagination totalPages={numberPages}
-                      currentPage={currentPage}
+                      currentPage={page}
                       hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
                       hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
                       onChange={_onChangePage} />
@@ -107,21 +91,17 @@ const PaginatedList = ({
 };
 
 PaginatedList.propTypes = {
-  /** The active page number. If not specified the active page number will be tracked internally. */
-  activePage: PropTypes.number,
   /** React element containing items of the current selected page. */
   children: PropTypes.node.isRequired,
   /**
    * Function that will be called when the page changes.
    * It receives the current page and the page size as arguments.
    */
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
   /** boolean flag to hide first and last page links */
   hideFirstAndLastPageLinks: PropTypes.bool,
   /**  boolean flag to hide previous and next page links */
   hidePreviousAndNextPageLinks: PropTypes.bool,
-  /** Number of items per page. */
-  pageSize: PropTypes.number,
   /** Array of different items per page that are allowed. */
   pageSizes: PropTypes.arrayOf(PropTypes.number),
   /** Whether to show the page size selector or not. */
@@ -131,13 +111,12 @@ PaginatedList.propTypes = {
 };
 
 PaginatedList.defaultProps = {
-  activePage: 1,
   className: undefined,
   hideFirstAndLastPageLinks: false,
   hidePreviousAndNextPageLinks: false,
-  pageSize: DEFAULT_PAGE_SIZES[0],
   pageSizes: DEFAULT_PAGE_SIZES,
   showPageSizeSelect: true,
+  onChange: undefined,
 };
 
 export default PaginatedList;
