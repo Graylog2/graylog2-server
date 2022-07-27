@@ -88,6 +88,7 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, enti
         <EntityShareSettings description={description}
                              entityGRN={entityGRN}
                              entityType={entityType}
+                             entityTypeTitle={entityTypeTitle}
                              entityTitle={entityTitle}
                              entityShareState={entityShareState}
                              granteesSelectFormRef={granteesSelectFormRef}
