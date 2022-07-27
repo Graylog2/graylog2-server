@@ -14,11 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import AceEditor from 'react-ace';
+package org.graylog.plugins.map.geoip;
 
-import './ace-queryinput';
-import 'ace-builds/src-noconflict/ext-language_tools';
-import './custom-lucene-mode';
-import 'ace-builds/webpack-resolver';
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
-export default AceEditor;
+@JsonAutoDetect
+@AutoValue
+@WithBeanGetter
+public abstract class GeoIpDbFileChangedEvent {
+    
+    @JsonCreator
+    public static GeoIpDbFileChangedEvent create() {
+        return new AutoValue_GeoIpDbFileChangedEvent();
+    }
+
+
+}

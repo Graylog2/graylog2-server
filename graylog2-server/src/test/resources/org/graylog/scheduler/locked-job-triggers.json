@@ -5,6 +5,7 @@
         "$oid": "54e3deadbeefdeadbeef0000"
       },
       "job_definition_id": "54e3deadbeefdeadbeefaff3",
+      "job_definition_type": "event-processor-execution-v1",
       "start_time": {
         "$date": "2019-01-01T00:00:00.000Z"
       },
@@ -35,6 +36,7 @@
         "$oid": "54e3deadbeefdeadbeef0001"
       },
       "job_definition_id": "54e3deadbeefdeadbeefaff3",
+      "job_definition_type": "event-processor-execution-v1",
       "start_time": {
         "$date": "2019-01-01T00:00:00.000Z"
       },
@@ -76,6 +78,7 @@
         "$oid": "54e3deadbeefdeadbeef0002"
       },
       "job_definition_id": "54e3deadbeefdeadbeefaff4",
+      "job_definition_type": "event-processor-execution-v1",
       "start_time": {
         "$date": "2019-01-01T00:00:00.000Z"
       },
@@ -117,6 +120,7 @@
         "$oid": "54e3deadbeefdeadbeef0003"
       },
       "job_definition_id": "54e3deadbeefdeadbeefaff4",
+      "job_definition_type": "event-processor-execution-v1",
       "start_time": {
         "$date": "2019-01-01T00:00:00.000Z"
       },
