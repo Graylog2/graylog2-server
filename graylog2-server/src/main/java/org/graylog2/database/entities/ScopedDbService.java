@@ -32,14 +32,14 @@ import java.util.Optional;
  *
  * @param <E> type parameter for a {@link ScopedEntity}'s subclass.
  */
-public abstract class ScopedEntityPaginatedDbService<E extends ScopedEntity> extends PaginatedDbService<E> {
+public abstract class ScopedDbService<E extends ScopedEntity> extends PaginatedDbService<E> {
 
     protected final EntityScopeService entityScopeService;
 
-    public ScopedEntityPaginatedDbService(MongoConnection mongoConnection,
-                                          MongoJackObjectMapperProvider mapper,
-                                          Class<E> dtoClass, String collectionName,
-                                          EntityScopeService entityScopeService) {
+    public ScopedDbService(MongoConnection mongoConnection,
+                           MongoJackObjectMapperProvider mapper,
+                           Class<E> dtoClass, String collectionName,
+                           EntityScopeService entityScopeService) {
         super(mongoConnection, mapper, dtoClass, collectionName);
         this.entityScopeService = entityScopeService;
     }
