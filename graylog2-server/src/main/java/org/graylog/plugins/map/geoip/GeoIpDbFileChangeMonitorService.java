@@ -151,7 +151,7 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
                 this.cityDbFileInfo = getDbFileInfo(config.cityDbPath());
                 this.asnDbFileInfo = getDbFileInfo(config.asnDbPath());
             } else {
-                LOG.info("GeoIP Processor is disabled.  Will not schedule GeoIP database file change monitor");
+                LOG.debug("GeoIP Processor is disabled.  Will not schedule GeoIP database file change monitor");
                 cancelScheduledRefreshTask();
 
                 // Set interval to ZERO to allow rescheduling when enabled again, even if interval is not changed.
@@ -167,7 +167,7 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
         if (refreshTask != null) {
             boolean canceled = refreshTask.cancel(true);
             if (canceled) {
-                LOG.info("The GeoIP database file change monitor was running.  It has been cancelled");
+                LOG.debug("The GeoIP database file change monitor was running.  It has been cancelled");
                 refreshTask = null;
             } else {
                 LOG.warn("The GeoIP database file change monitor was running and failed to stop it");
