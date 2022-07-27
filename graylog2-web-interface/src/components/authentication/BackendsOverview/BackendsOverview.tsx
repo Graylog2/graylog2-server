@@ -32,12 +32,6 @@ import BackendsOverviewItem from './BackendsOverviewItem';
 
 const TABLE_HEADERS = ['Title', 'Description', 'Default Roles', 'Actions'];
 
-const DEFAULT_PAGINATION = {
-  page: 1,
-  perPage: 10,
-  query: '',
-};
-
 const Header = styled.div`
   display: flex;
   align-items: center;
@@ -80,24 +74,23 @@ const _backendsOverviewItem = (authBackend, context, paginatedRoles) => (
 );
 
 const BackendsOverview = () => {
-  const { resetPage } = usePaginationQueryParameter();
+  const { page, pageSize: perPage, resetPage } = usePaginationQueryParameter();
   const [loading, setLoading] = useState();
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
   const [paginatedBackends, setPaginatedBackends] = useState<PaginatedBackends | undefined>();
-  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
+  const [query, setQuery] = useState('');
   const { list: backends, context } = paginatedBackends || {};
-  const { page, perPage, query } = pagination;
 
-  const _refreshOverview = useCallback(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }), [perPage, query]);
+  const _refreshOverview = useCallback(() => resetPage(), [resetPage]);
 
   useEffect(() => _loadRoles(setPaginatedRoles), []);
-  useEffect(() => _loadBackends(pagination, setLoading, setPaginatedBackends), [pagination]);
+  useEffect(() => _loadBackends({ query, page, perPage }, setLoading, setPaginatedBackends), [query, page, perPage]);
   useEffect(() => _updateListOnBackendDelete(_refreshOverview), [_refreshOverview]);
   useEffect(() => _updateListOnBackendActivation(_refreshOverview), [_refreshOverview]);
 
   const onSearch = (newQuery) => {
     resetPage();
-    setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page });
+    setQuery(newQuery);
   };
 
   if (!paginatedBackends || !paginatedRoles) {
@@ -114,9 +107,7 @@ const BackendsOverview = () => {
         <p className="description">
           Found {paginatedBackends.pagination.total} configured authentication services on the system.
         </p>
-        <PaginatedList onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}
-                       totalItems={paginatedBackends.pagination.total}
-                       activePage={page}>
+        <PaginatedList totalItems={paginatedBackends.pagination.total}>
           <DataTable className="table-hover"
                      customFilter={<BackendsFilter onSearch={onSearch} />}
                      dataRowFormatter={(authBackend) => _backendsOverviewItem(authBackend, context, paginatedRoles)}
