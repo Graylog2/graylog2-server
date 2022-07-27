@@ -1,25 +1,38 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import { useQuery } from 'react-query';
 
 import UserNotification from 'util/UserNotification';
+import fetchScopePermissions from 'hooks/api/fetchScopePermissions';
 
-// NOTE: Mock method to be able to move forward with tests. Remove after API
-// defined how are we getting the permissions to show and hide actions.
-const fetchScopePermissions = async () => {
+interface ScopeParams {
+  is_mutable: boolean;
+}
 
-  return new Promise((resolve: any) => {
-    setTimeout(() => {
-      console.log('data resolved');
+type ScopeName = 'DEFAULT' | 'ILLUMINATE';
 
-      return resolve({
-        ILLUMINATE: { is_mutable: false },
-        DEFAULT: { is_mutable: true },
-      });
-    }, 1000);
-  });
+type EntityScopeRecord = Record<ScopeName, ScopeParams>;
+
+type EntityScopeType = {
+  entity_scopes: EntityScopeRecord,
 };
 
 const useGetPermissionsByScope = () => {
-  const { data, isLoading, isError, error } = useQuery<any, Error>(
+  const { data, isLoading, isError, error } = useQuery<EntityScopeType, Error>(
     'scope-permissions',
     fetchScopePermissions,
     {
@@ -34,7 +47,7 @@ const useGetPermissionsByScope = () => {
   const getScopePermissions = (inScope: string) => {
     const scope = inScope ? inScope.toUpperCase() : 'DEFAULT';
 
-    return isLoading ? {} : data[scope];
+    return isLoading ? { is_mutable: false } : data.entity_scopes[scope];
   };
 
   return { getScopePermissions };
