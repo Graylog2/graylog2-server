@@ -487,14 +487,14 @@ public class TimeBasedRotationStrategyTest {
     }
 
     @Test
-    public void testRotationOnEmptyIndexSetsWhenEnabled() throws Exception {
+    public void testRotationOnEmptyIndexSetWhenEnabled() throws Exception {
         final DateTime initialTime = new DateTime(2022, 7, 21, 13, 00, 00, 0, DateTimeZone.UTC);
         final Period period = hours(1);
         final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
         DateTimeUtils.setCurrentMillisProvider(clock);
 
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.builder().rotateEmptyIndexSets(true).rotationPeriod(period).build());
+        when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.builder().rotateEmptyIndexSet(true).rotationPeriod(period).build());
         when(indices.indexCreationDate(anyString())).thenReturn(Optional.of(initialTime.minus(minutes(11))));
 
         when(indexSet.getNewestIndex()).thenReturn(IGNORED);

@@ -41,8 +41,8 @@ public abstract class TimeBasedRotationStrategyConfig implements RotationStrateg
     @Nullable
     public abstract Period maxRotationPeriod();
 
-    @JsonProperty("rotate_empty_index_sets")
-    public abstract boolean rotateEmptyIndexSets();
+    @JsonProperty("rotate_empty_index_set")
+    public abstract boolean rotateEmptyIndexSet();
 
     public static Builder builder() {
         return Builder.create();
@@ -55,7 +55,7 @@ public abstract class TimeBasedRotationStrategyConfig implements RotationStrateg
             return new AutoValue_TimeBasedRotationStrategyConfig.Builder()
                     .type(TimeBasedRotationStrategyConfig.class.getCanonicalName())
                     .rotationPeriod(DEFAULT_DAYS)
-                    .rotateEmptyIndexSets(false);
+                    .rotateEmptyIndexSet(false);
         }
 
         @JsonProperty(TYPE_FIELD)
@@ -68,8 +68,8 @@ public abstract class TimeBasedRotationStrategyConfig implements RotationStrateg
         @Nullable
         public abstract Builder maxRotationPeriod(Period maxRotationPeriod);
 
-        @JsonProperty("rotate_empty_index_sets")
-        public abstract Builder rotateEmptyIndexSets(boolean rotateEmptyIndexSets);
+        @JsonProperty("rotate_empty_index_set")
+        public abstract Builder rotateEmptyIndexSet(boolean rotateEmptyIndexSet);
 
         public abstract TimeBasedRotationStrategyConfig build();
     }

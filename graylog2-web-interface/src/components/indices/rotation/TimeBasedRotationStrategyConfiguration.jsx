@@ -38,14 +38,14 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
       config: {
         rotation_period: rotationPeriod,
         max_rotation_period: rotationLimit,
-        rotate_empty_index_sets: rotateEmptyIndexSets,
+        rotate_empty_index_set: rotateEmptyIndexSet,
       },
     } = this.props;
 
     this.state = {
       rotation_period: rotationPeriod,
       rotationLimit,
-      rotate_empty_index_sets: rotateEmptyIndexSets,
+      rotate_empty_index_set: rotateEmptyIndexSet,
     };
   }
 
@@ -71,14 +71,14 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
     };
   };
 
-  _onRotateEmptyIndexSetsUpdate = (field) => {
+  _onRotateEmptyIndexSetUpdate = (field) => {
     const { updateConfig } = this.props;
 
     return () => {
       const update = {};
-      const rotateEmptyIndexSets = this.inputs[field].getValue();
+      const rotateEmptyIndexSet = this.inputs[field].getValue();
 
-      update[field] = rotateEmptyIndexSets;
+      update[field] = rotateEmptyIndexSet;
 
       this.setState(update);
 
@@ -114,7 +114,7 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
   render() {
     const {
       rotation_period: rotationPeriod,
-      rotate_empty_index_sets: rotateEmptyIndexSets,
+      rotate_empty_index_set: rotateEmptyIndexSet,
       rotationLimit,
     } = this.state;
     const maxRotationPeriodHelpText = rotationLimit ? ` The max rotation period is set to ${moment.duration(rotationLimit).humanize()} by Administrator.` : '';
@@ -136,14 +136,14 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
         <Input id="rotate-empty-index-sets"
                labelClassName="col-sm-3"
                wrapperClassName="col-sm-9"
-               label="Empty index sets">
+               label="Empty index set">
           <Input id="rotate-empty-index-sets-checkbox"
                  type="checkbox"
-                 ref={(rotateEmptyIndexSetsRef) => { this.inputs.rotate_empty_index_sets = rotateEmptyIndexSetsRef; }}
-                 label="Rotate empty index sets"
-                 onChange={this._onRotateEmptyIndexSetsUpdate('rotate_empty_index_sets')}
-                 checked={rotateEmptyIndexSets}
-                 help="Apply the rotation strategy on empty index sets." />
+                 ref={(rotateEmptyIndexSetRef) => { this.inputs.rotate_empty_index_set = rotateEmptyIndexSetRef; }}
+                 label="Rotate empty index set"
+                 onChange={this._onRotateEmptyIndexSetUpdate('rotate_empty_index_set')}
+                 checked={rotateEmptyIndexSet}
+                 help="Apply the rotation strategy even when all indexes are empty (not recommended)." />
         </Input>
       </div>
     );

@@ -226,9 +226,9 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         final DateTime nextAnchor = calculateNextAnchor(currentAnchor, normalizedPeriod, now);
         anchor.put(indexSetId, nextAnchor);
 
-        if (!config.rotateEmptyIndexSets() && isEmptyIndexSet(indexSet)) {
-            log.debug("Index {} contains no messages, skipping rotation!", index);
-            final String message = new MessageFormat("Index contains no messages, skipping rotation! Next rotation at {0} {1}", Locale.ENGLISH)
+        if (!config.rotateEmptyIndexSet() && isEmptyIndexSet(indexSet)) {
+            log.debug("Index set {} contains no messages, skipping rotation!", indexSet);
+            final String message = new MessageFormat("Index set contains no messages, skipping rotation! Next rotation at {0} {1}", Locale.ENGLISH)
                     .format(new Object[]{
                             nextAnchor,
                             overriding ? ELASTICSEARCH_MAX_WRITE_INDEX_AGE_OVERRIDES_CONFIGURED_PERIOD : ""});

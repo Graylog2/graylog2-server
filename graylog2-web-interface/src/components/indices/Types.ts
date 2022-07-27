@@ -39,7 +39,7 @@ export type TimeBasedRotationStrategyConfig = {
   type: string,
   rotation_period: string,
   max_rotation_period: string,
-  rotate_empty_index_sets: boolean,
+  rotate_empty_index_set: boolean,
 }
 export type RotationStrategyConfig = SizeBasedRotationStrategyConfig | MessageCountRotationStrategyConfig | TimeBasedRotationStrategyConfig;
 export type RetentionStrategyConfig = {
@@ -62,7 +62,7 @@ export interface RotationProperties {
   max_rotation_period?: JsonSchemaStringPropertyType,
   type: JsonSchemaStringPropertyType,
   max_size?: JsonSchemaStringPropertyType,
-  rotate_empty_index_sets: JsonSchemaBooleanPropertyType,
+  rotate_empty_index_set: JsonSchemaBooleanPropertyType,
 }
 export interface RotationJsonSchema {
   type: string,
@@ -116,7 +116,7 @@ export const TimeBasedRotationStrategyConfigPropType = PropTypes.exact({
   type: PropTypes.string.isRequired,
   rotation_period: PropTypes.string.isRequired,
   max_rotation_period: PropTypes.string,
-  rotate_empty_index_sets: PropTypes.bool,
+  rotate_empty_index_set: PropTypes.bool,
 });
 
 export const RotationStrategyConfigPropType = PropTypes.oneOfType([
@@ -145,7 +145,7 @@ export const RotationPropertiesPropType = PropTypes.exact({
   type: JsonSchemaStringPropertyTypePropType.isRequired,
   max_size: JsonSchemaStringPropertyTypePropType,
   max_docs_per_index: JsonSchemaStringPropertyTypePropType,
-  rotate_empty_index_sets: JsonSchemaStringPropertyTypePropType,
+  rotate_empty_index_set: JsonSchemaStringPropertyTypePropType,
 });
 export const RotationJsonSchemaPropType = PropTypes.exact({
   type: PropTypes.string,
