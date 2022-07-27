@@ -17,18 +17,17 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
-import { isEmpty, get } from 'lodash';
+import { get } from 'lodash';
+import { useContext, useState, useEffect, useCallback, useRef } from 'react';
+import PropTypes from 'prop-types';
 
-import type { WidgetComponentProps } from 'views/types';
-import connect from 'stores/connect';
+import type { WidgetComponentProps, MessageResult } from 'views/types';
+import { useStore } from 'stores/connect';
 import { Messages } from 'views/Constants';
 import { ViewStore } from 'views/stores/ViewStore';
-import type { SearchStoreState } from 'views/stores/SearchStore';
 import { SearchActions, SearchStore } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import type { TimeRange } from 'views/logic/queries/Query';
-import type { ViewStoreState } from 'views/stores/ViewStore';
 import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 import { PaginatedList } from 'components/common';
 import MessageTable from 'views/components/widgets/MessageTable';
@@ -52,10 +51,10 @@ const Wrapper = styled.div`
   }
 `;
 
-type State = {
-  errors: Array<{ description: string }>,
-  currentPage: number,
-};
+type Pagination = {
+  pageErrors: Array<{ description: string }>,
+  currentPage: number
+}
 
 export type MessageListResult = {
   messages: Array<BackendMessage>,
@@ -64,58 +63,83 @@ export type MessageListResult = {
   type: 'messages'
 };
 
-type SearchType = { effectiveTimerange: TimeRange };
 type Props = WidgetComponentProps<MessagesWidgetConfig, MessageListResult> & {
-  currentView: ViewStoreState,
   pageSize?: number,
-  searchTypes: { [searchTypeId: string]: SearchType },
 };
 
-class MessageList extends React.Component<Props, State> {
-  static defaultProps = {
-    onConfigChange: () => Promise.resolve(Immutable.OrderedMap<string, Widget>()),
-    pageSize: Messages.DEFAULT_LIMIT,
-  };
+const useSearchTypes = (activeQueryId: string) => {
+  const searches = useStore(SearchStore);
 
-  static contextType = RenderCompletionCallback;
+  return get(searches, ['result', 'results', activeQueryId, 'searchTypes']);
+};
 
-  constructor(props: Props, context?: any) {
-    super(props, context);
-
-    this.state = {
-      errors: [],
-      currentPage: 1,
+const useResetPaginationOnSearchExecution = (setPagination: (pagination: Pagination) => void, currentPage) => {
+  useEffect(() => {
+    const resetPagination = () => {
+      if (currentPage !== 1) {
+        setPagination({ currentPage: 1, pageErrors: [] });
+      }
     };
-  }
 
-  componentDidMount() {
-    const onRenderComplete = this.context;
+    const unlistenSearchExecute = SearchActions.execute.completed.listen(resetPagination);
 
-    InputsActions.list().then(() => (onRenderComplete && onRenderComplete()));
-    SearchActions.execute.completed.listen(this._resetPagination);
-  }
+    return () => {
+      unlistenSearchExecute();
+    };
+  }, [currentPage, setPagination]);
+};
 
-  _resetPagination = () => {
-    const { currentPage } = this.state;
+const useResetScrollPositionOnPageChange = (currentPage: number) => {
+  const scrollContainerRef = useRef<HTMLDivElement>();
 
-    if (currentPage !== 1) {
-      this.setState({ currentPage: 1, errors: [] });
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      // eslint-disable-next-line no-param-reassign
+      scrollContainerRef.current.scrollTop = 0;
     }
-  };
+  }, [currentPage, scrollContainerRef]);
 
-  _handlePageChange = (pageNo: number) => {
+  return scrollContainerRef;
+};
+
+const useRenderCompletionCallback = () => {
+  const renderCompletionCallback = useContext(RenderCompletionCallback);
+
+  useEffect(() => {
+    InputsActions.list().then(() => (renderCompletionCallback && renderCompletionCallback()));
+  }, [renderCompletionCallback]);
+};
+
+const MessageList = ({
+  config,
+  data: { id: searchTypeId, messages, total: totalMessages },
+  fields,
+  onConfigChange,
+  pageSize,
+  setLoadingState,
+}: Props) => {
+  const { activeQuery: activeQueryId } = useStore(ViewStore);
+  const [{ currentPage, pageErrors }, setPagination] = useState<Pagination>({
+    pageErrors: [],
+    currentPage: 1,
+  });
+  const searchTypes = useSearchTypes(activeQueryId);
+  const scrollContainerRef = useResetScrollPositionOnPageChange(currentPage);
+  useResetPaginationOnSearchExecution(setPagination, currentPage);
+  useRenderCompletionCallback();
+
+  const handlePageChange = useCallback((pageNo: number) => {
     // execute search with new offset
-    const { pageSize, searchTypes, data: { id: searchTypeId }, setLoadingState } = this.props;
-    const { effectiveTimerange } = searchTypes[searchTypeId];
+    const { effectiveTimerange } = searchTypes[searchTypeId] as MessageResult;
     const searchTypePayload: SearchTypeOptions<{
-      limit: number,
-      offset: number,
-    }> = {
-      [searchTypeId]: {
-        limit: pageSize,
-        offset: pageSize * (pageNo - 1),
-      },
-    };
+        limit: number,
+        offset: number,
+      }> = {
+        [searchTypeId]: {
+          limit: pageSize,
+          offset: pageSize * (pageNo - 1),
+        },
+      };
 
     RefreshActions.disable();
     setLoadingState(true);
@@ -123,81 +147,50 @@ class MessageList extends React.Component<Props, State> {
     SearchActions.reexecuteSearchTypes(searchTypePayload, effectiveTimerange).then((response) => {
       setLoadingState(false);
 
-      this.setState({
-        errors: response.result.errors,
+      setPagination({
+        pageErrors: response.result.errors,
         currentPage: pageNo,
       });
     });
-  };
+  }, [pageSize, searchTypeId, searchTypes, setLoadingState]);
 
-  _getListKey = () => {
-    // When the component receives new messages, we want to reset the scroll position, by defining a new key or the MessageTable.
-    const { data: { messages } } = this.props;
-    const { currentPage } = this.state;
-    const defaultKey = `message-list-${currentPage}`;
-
-    if (!isEmpty(messages)) {
-      const firstMessageId = messages[0].message._id;
-
-      return `${defaultKey}-${firstMessageId}`;
-    }
-
-    return defaultKey;
-  };
-
-  _onSortChange = (newSort: SortConfig[]) => {
-    const { onConfigChange, config } = this.props;
+  const onSortChange = useCallback((newSort: SortConfig[]) => {
     const newConfig = config.toBuilder().sort(newSort).build();
 
     return onConfigChange(newConfig).then(() => {});
-  };
+  }, [config, onConfigChange]);
 
-  render() {
-    const {
-      config,
-      currentView: { activeQuery: activeQueryId },
-      data: { messages, total: totalMessages },
-      fields,
-      pageSize,
-      setLoadingState,
-    } = this.props;
-    const { currentPage, errors } = this.state;
-    const hasError = !isEmpty(errors);
-    const listKey = this._getListKey();
+  return (
+    <WindowDimensionsContextProvider>
+      <Wrapper>
+        <PaginatedList onChange={handlePageChange}
+                       activePage={Number(currentPage)}
+                       showPageSizeSelect={false}
+                       totalItems={totalMessages}
+                       pageSize={pageSize}>
+          {!pageErrors?.length ? (
+            <MessageTable activeQueryId={activeQueryId}
+                          config={config}
+                          scrollContainerRef={scrollContainerRef}
+                          fields={fields}
+                          onSortChange={onSortChange}
+                          setLoadingState={setLoadingState}
+                          messages={messages} />
+          ) : <ErrorWidget errors={pageErrors} />}
+        </PaginatedList>
+      </Wrapper>
+    </WindowDimensionsContextProvider>
+  );
+};
 
-    return (
-      <WindowDimensionsContextProvider>
-        <Wrapper>
-          <PaginatedList onChange={this._handlePageChange}
-                         activePage={Number(currentPage)}
-                         showPageSizeSelect={false}
-                         totalItems={totalMessages}
-                         pageSize={pageSize}>
-            {!hasError ? (
-              <MessageTable activeQueryId={activeQueryId}
-                            config={config}
-                            fields={fields}
-                            key={listKey}
-                            onSortChange={this._onSortChange}
-                            setLoadingState={setLoadingState}
-                            messages={messages} />
-            ) : <ErrorWidget errors={errors} />}
-          </PaginatedList>
-        </Wrapper>
-      </WindowDimensionsContextProvider>
-    );
-  }
-}
+MessageList.propTypes = {
+  onConfigChange: PropTypes.func,
+  pageSize: PropTypes.number,
+};
 
-const mapProps = (props: {
-  currentView: ViewStoreState,
-  searches: SearchStoreState,
-}) => ({
-  currentView: props.currentView,
-  searchTypes: get(props, ['searches', 'result', 'results', props.currentView.activeQuery, 'searchTypes']) as { [searchTypeId: string]: SearchType },
-});
+MessageList.defaultProps = {
+  onConfigChange: () => Promise.resolve(Immutable.OrderedMap<string, Widget>()),
+  pageSize: Messages.DEFAULT_LIMIT,
+};
 
-export default connect(MessageList, {
-  currentView: ViewStore,
-  searches: SearchStore,
-}, mapProps);
+export default MessageList;

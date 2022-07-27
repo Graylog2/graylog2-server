@@ -105,10 +105,12 @@ public class SearchQueryParser {
     private final String defaultField;
     private final SearchQueryField defaultFieldKey;
 
+    private String fieldPrefix = "";
+
     /**
      * Constructs a new parser without field mapping.
      *
-     * @param defaultField the name of the default field
+     * @param defaultField  the name of the default field
      * @param allowedFields the names of allowed fields in the query
      */
     public SearchQueryParser(@Nonnull String defaultField, @Nonnull Set<String> allowedFields) {
@@ -117,9 +119,21 @@ public class SearchQueryParser {
     }
 
     /**
+     * Constructs a new parser without field mapping.
+     *
+     * @param defaultField  the name of the default field
+     * @param allowedFields the names of allowed fields in the query
+     * @param fieldPrefix   Prefix appended to ALL the fields in the query. Useful if querying nested fields.
+     */
+    public SearchQueryParser(@Nonnull String defaultField, @Nonnull Set<String> allowedFields, String fieldPrefix) {
+        this(defaultField, allowedFields);
+        this.fieldPrefix = fieldPrefix;
+    }
+
+    /**
      * Constructs a new parser with explicit field mapping.
      *
-     * @param defaultField the name of the default field (already mapped)
+     * @param defaultField             the name of the default field (already mapped)
      * @param allowedFieldsWithMapping the map of field mappings, keys are the allowed fields, values are the replacements
      */
     public SearchQueryParser(@Nonnull String defaultField,
@@ -155,7 +169,7 @@ public class SearchQueryParser {
             final String entry = matcher.group();
 
             if (!entry.contains(":")) {
-                builder.put(defaultField, createFieldValue(defaultFieldKey, entry, false));
+                builder.put(withPrefixIfNeeded(defaultField), createFieldValue(defaultFieldKey.getFieldType(), entry, false));
                 continue;
             }
 
@@ -178,9 +192,9 @@ public class SearchQueryParser {
                 }
                 final SearchQueryField translatedKey = dbFieldMapping.get(cleanKey);
                 if (translatedKey != null) {
-                    builder.put(translatedKey.getDbField(), createFieldValue(translatedKey, v, negate));
+                    builder.put(withPrefixIfNeeded(translatedKey.getDbField()), createFieldValue(translatedKey.getFieldType(), v, negate));
                 } else {
-                    builder.put(defaultField, createFieldValue(defaultFieldKey, v, negate));
+                    builder.put(withPrefixIfNeeded(defaultField), createFieldValue(defaultFieldKey.getFieldType(), v, negate));
                 }
             });
 
@@ -188,6 +202,14 @@ public class SearchQueryParser {
         }
 
         return new SearchQuery(queryString, builder.build(), disallowedKeys.build());
+    }
+
+    private String withPrefixIfNeeded(final String fieldName) {
+        if (fieldPrefix == null || fieldPrefix.isEmpty()) {
+            return fieldName;
+        } else {
+            return fieldPrefix + fieldName;
+        }
     }
 
     /* YOLO operator parser
@@ -245,10 +267,9 @@ public class SearchQueryParser {
      * We try to convert the value types according to the data type of the query field.
      */
     @VisibleForTesting
-    FieldValue createFieldValue(SearchQueryField field, String quotedStringValue, boolean negate) {
+    FieldValue createFieldValue(SearchQueryField.Type fieldType, String quotedStringValue, boolean negate) {
         // Make sure there are no quotes in the value (e.g. `"foo"' --> `foo')
         final String value = quotedStringValue.replaceAll(QUOTE_REPLACE_REGEX, "");
-        final SearchQueryField.Type fieldType = field.getFieldType();
         final Pair<String, SearchQueryOperator> pair = extractOperator(value, fieldType == STRING ? DEFAULT_STRING_OPERATOR : DEFAULT_OPERATOR);
 
         switch (fieldType) {
@@ -296,8 +317,12 @@ public class SearchQueryParser {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof FieldValue)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof FieldValue)) {
+                return false;
+            }
             FieldValue that = (FieldValue) o;
             return isNegate() == that.isNegate() &&
                     Objects.equals(getOperator(), that.getOperator()) &&

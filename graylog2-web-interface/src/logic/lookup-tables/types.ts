@@ -31,8 +31,17 @@ type GenericEntityType = {
   _metadata?: Metadata | null,
 };
 
+export type LookupTableCacheConfig = {
+  type?: string,
+  max_size?: number,
+  expire_after_access?: number,
+  expire_after_access_unit?: 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS' | null,
+  expire_after_write?: number,
+  expire_after_write_unit?: 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS' | null,
+};
+
 export type LookupTableCache = GenericEntityType & {
-  config?: { type: string },
+  config?: LookupTableCacheConfig
 }
 
 export type LookupTableAdapter = GenericEntityType & {
