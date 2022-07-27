@@ -16,8 +16,7 @@
  */
 import { isEqual } from 'lodash';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { SearchSuggestions } from '@graylog/server-api';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
@@ -29,15 +28,6 @@ import type { Token, Line, CompletionResult } from '../queryinput/ace-types';
 
 const SUGGESTIONS_PAGE_SIZE = 50;
 
-type SuggestionsResponse = {
-  field: string,
-  input: string,
-  suggestions: Array<{ value: string, occurrence: number }> | undefined,
-  sum_other_docs_count: number,
-}
-
-const suggestionsUrl = qualifyUrl('/search/suggest');
-
 const unquote = (s: string) => s.replace(/^"(.*(?="$))"$/, '$1');
 
 const formatValue = (value: string, type: string) => {
@@ -48,9 +38,9 @@ const formatValue = (value: string, type: string) => {
   }
 };
 
-const completionCaption = (fieldValue: string, input: string | number) => {
-  if (fieldValue.startsWith(String(input))) {
-    return fieldValue;
+const completionCaption = (fieldValue: string, input: string | number, isQuoted: boolean) => {
+  if ((isQuoted ? fieldValue : escape(fieldValue)).startsWith(String(input))) {
+    return isQuoted ? fieldValue : escape(fieldValue);
   }
 
   return `${fieldValue} ⭢ ${input}`;
@@ -86,14 +76,16 @@ const formatSuggestion = (value: string, occurrence: number, input: string | num
   name: value,
   value: isQuoted ? value : escape(value),
   score: occurrence,
-  caption: completionCaption(value, input),
+  caption: completionCaption(value, input, isQuoted),
   meta: `${occurrence} hits`,
 });
+
+type PreviousSuggestions = Array<{ value: string, occurrence: number }> | undefined;
 
 class FieldValueCompletion implements Completer {
   private previousSuggestions: undefined | {
     furtherSuggestionsCount: number,
-    suggestions: SuggestionsResponse['suggestions'],
+    suggestions: PreviousSuggestions,
     fieldName: string,
     input: string | number,
     timeRange: TimeRange | NoTimeRangeOverride | undefined,
@@ -145,7 +137,7 @@ class FieldValueCompletion implements Completer {
   private filterExistingSuggestions(input: string | number, isQuoted: boolean) {
     if (this.previousSuggestions) {
       return this.previousSuggestions.suggestions
-        .filter((suggestion) => suggestion.value.startsWith(String(input)))
+        .filter(({ value }) => (isQuoted ? value : escape(value)).startsWith(String(input)))
         .map(({ value, occurrence }) => formatSuggestion(value, occurrence, input, isQuoted));
     }
 
@@ -175,13 +167,13 @@ class FieldValueCompletion implements Completer {
 
     const normalizedTimeRange = (!timeRange || isNoTimeRangeOverride(timeRange)) ? undefined : onSubmittingTimerange(timeRange);
 
-    return fetch('POST', suggestionsUrl, {
+    return SearchSuggestions.suggestFieldValue({
       field: fieldName,
-      input,
+      input: input as string,
       timerange: normalizedTimeRange,
       streams,
       size: SUGGESTIONS_PAGE_SIZE,
-    }).then(({ suggestions, sum_other_docs_count: furtherSuggestionsCount }: SuggestionsResponse) => {
+    }).then(({ suggestions, sum_other_docs_count: furtherSuggestionsCount }) => {
       if (!suggestions) {
         return [];
       }
@@ -218,6 +210,8 @@ class FieldValueCompletion implements Completer {
 
     return (currentTokenIsFieldName || currentTokenIsFieldValue) && !nextTokenIsTerm;
   };
+
+  public identifierRegexps = [/[a-zA-Z_0-9$\\/\-\u00A2-\u2000\u2070-\uFFFF]/];
 }
 
 export default FieldValueCompletion;

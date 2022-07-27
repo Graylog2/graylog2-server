@@ -502,3 +502,49 @@ Object {
   ],
 }
 `;
+
+exports[`parse parses operation with query parameter 1`] = `
+Object {
+  "description": undefined,
+  "models": Object {},
+  "name": "grok",
+  "routes": Array [
+    Object {
+      "operations": Array [
+        Object {
+          "method": "POST",
+          "nickname": "bulkUpdatePatternsFromTextFile",
+          "parameters": Array [
+            Object {
+              "description": "Strategy to apply when importing.",
+              "name": "import-strategy",
+              "paramType": "query",
+              "required": false,
+              "type": Object {
+                "name": "string",
+                "options": Array [
+                  "ABORT_ON_CONFLICT",
+                  "REPLACE_ON_CONFLICT",
+                  "DROP_ALL_EXISTING",
+                ],
+                "type": "enum",
+              },
+            },
+          ],
+          "path": undefined,
+          "produces": Array [
+            "application/json",
+          ],
+          "summary": "Add a list of new patterns",
+          "type": Object {
+            "name": "unknown",
+            "optional": false,
+            "type": "type_reference",
+          },
+        },
+      ],
+      "path": "/system/grok",
+    },
+  ],
+}
+`;
