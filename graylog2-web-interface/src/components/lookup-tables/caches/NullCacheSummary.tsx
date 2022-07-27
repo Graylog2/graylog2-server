@@ -14,23 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
 
-class NullCacheFieldSet extends React.Component {
-  static propTypes = {
-    config: PropTypes.object.isRequired,
-    updateConfig: PropTypes.func.isRequired,
-    handleFormEvent: PropTypes.func.isRequired,
-    // eslint-disable-next-line react/no-unused-prop-types
-    validationState: PropTypes.func.isRequired,
-    // eslint-disable-next-line react/no-unused-prop-types
-    validationMessage: PropTypes.func.isRequired,
-  };
+const NullCacheSummary = () => (<p>This cache has no configuration.</p>);
 
-  render() {
-    return null;
-  }
-}
-
-export default NullCacheFieldSet;
+export default NullCacheSummary;

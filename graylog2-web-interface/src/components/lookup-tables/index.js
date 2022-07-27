@@ -19,7 +19,7 @@ import {} from './caches';
 
 export { default as LookupTablesOverview } from './LookupTablesOverview';
 export { default as LUTTableEntry } from './LUTTableEntry';
-export { default as LookupTable } from './LookupTable';
+export { default as LookupTableView } from './LookupTableView';
 export { default as LookupTableForm } from './LookupTableForm';
 export { default as LookupTableCreate } from './LookupTableCreate';
 

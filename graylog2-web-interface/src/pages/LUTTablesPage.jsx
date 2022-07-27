@@ -23,7 +23,7 @@ import Routes from 'routing/Routes';
 import history from 'util/History';
 import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { LookupTable, LookupTableCreate, LookupTableForm, LookupTablesOverview } from 'components/lookup-tables';
+import { LookupTableView, LookupTableCreate, LookupTableForm, LookupTablesOverview } from 'components/lookup-tables';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
@@ -140,9 +140,9 @@ class LUTTablesPage extends React.Component {
         );
       } else {
         content = (
-          <LookupTable dataAdapter={dataAdapter}
-                       cache={cache}
-                       table={table} />
+          <LookupTableView dataAdapter={dataAdapter}
+                           cache={cache}
+                           table={table} />
         );
       }
     } else if (this._isCreating(this.props)) {

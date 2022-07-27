@@ -24,24 +24,14 @@ import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import { Col, Row, Button, Input } from 'components/bootstrap';
 import { FormikFormGroup, JSONValueInput } from 'components/common';
 import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker } from 'components/lookup-tables';
+import useScopePermissions from 'hooks/useScopePermissions';
 
-type LookupTableType = {
-  id: string|undefined,
-  title: string,
-  description: string,
-  name: string,
-  cache_id: string|undefined,
-  data_adapter_id: string|undefined,
+type LookupTableType = LookupTable & {
   enable_single_value: boolean,
-  default_single_value: string,
-  default_single_value_type: 'STRING'|'NUMBER'|'BOOLEAN'|'NULL',
   enable_multi_value: boolean,
-  default_multi_value: string,
-  default_multi_value_type: 'OBJECT'|'NULL',
-  content_pack: string | null,
 }
 
-const defaultTableValues: LookupTableType = {
+const INIT_TABLE_VALUES: LookupTableType = {
   id: undefined,
   title: '',
   description: '',
@@ -58,19 +48,25 @@ const defaultTableValues: LookupTableType = {
 };
 
 type Props = {
-    saved: () => void,
-    create: boolean,
-    table: LookupTableType,
-}
+  saved: () => void,
+  create: boolean,
+  table: LookupTableType,
+};
 
-const LookupTableForm = ({
-  saved,
-  create,
-  table,
-}: Props) => {
+const LookupTableForm = ({ saved, create, table }: Props) => {
+  const { getScopePermissions } = useScopePermissions();
+
   const validate = (values: LookupTableType) => {
     const errors = {};
-    const requiredFields: (keyof LookupTableType)[] = ['title', 'name', 'cache_id', 'data_adapter_id', 'cache_id', 'default_single_value', 'default_multi_value'];
+    const requiredFields: (keyof LookupTableType)[] = [
+      'title',
+      'name',
+      'cache_id',
+      'data_adapter_id',
+      'cache_id',
+      'default_single_value',
+      'default_multi_value',
+    ];
 
     requiredFields.forEach((requiredField) => {
       if (!values[requiredField]) {
@@ -84,7 +80,7 @@ const LookupTableForm = ({
   };
 
   const handleSubmit = (values: LookupTableType) => {
-    let promise;
+    let promise: Promise<any>;
 
     const valuesToSave: LookupTable = _omit(values, ['enable_single_value', 'enable_multi_value']);
 
@@ -100,10 +96,17 @@ const LookupTableForm = ({
   };
 
   const initialValues: LookupTableType = {
-    ...defaultTableValues,
+    ...INIT_TABLE_VALUES,
     ...table,
     enable_single_value: table.default_single_value !== '',
     enable_multi_value: table.default_multi_value !== '',
+  };
+
+  const showAction = (inTable: LookupTable, action: string): boolean => {
+    // TODO: Update this method to check for the metadata
+    const permissions = getPermissionsByScope(inTable._metadata?.scope);
+
+    return permissions[action];
   };
 
   return (
@@ -156,24 +159,23 @@ const LookupTableForm = ({
                        setFieldValue('default_single_value_type', 'NULL');
                      }
                    }} />
-            {values.enable_single_value
-            && (
-            <JSONValueInput label="Default single value"
-                            help={(touched.default_single_value && errors.default_single_value) || 'The single value that is being used as lookup result if the data adapter or cache does not find a value.'}
-                            validationState={(touched.default_single_value && errors.default_single_value) ? 'error' : undefined}
-                            onBlur={() => setFieldTouched('default_single_value', true)}
-                            update={(value, valueType) => {
-                              setValues({
-                                ...values,
-                                default_single_value: value,
-                                default_single_value_type: valueType,
-                              });
-                            }}
-                            value={values.default_single_value}
-                            valueType={values.default_single_value_type || 'NULL'}
-                            allowedTypes={['STRING', 'NUMBER', 'BOOLEAN', 'NULL']}
-                            labelClassName="col-sm-3"
-                            wrapperClassName="col-sm-9" />
+            {values.enable_single_value && (
+              <JSONValueInput label="Default single value"
+                              help={(touched.default_single_value && errors.default_single_value) || 'The single value that is being used as lookup result if the data adapter or cache does not find a value.'}
+                              validationState={(touched.default_single_value && errors.default_single_value) ? 'error' : undefined}
+                              onBlur={() => setFieldTouched('default_single_value', true)}
+                              update={(value, valueType) => {
+                                setValues({
+                                  ...values,
+                                  default_single_value: value,
+                                  default_single_value_type: valueType,
+                                });
+                              }}
+                              value={values.default_single_value}
+                              valueType={values.default_single_value_type || 'NULL'}
+                              allowedTypes={['STRING', 'NUMBER', 'BOOLEAN', 'NULL']}
+                              labelClassName="col-sm-3"
+                              wrapperClassName="col-sm-9" />
             )}
 
             <Input id="enable_multi_value"
@@ -191,24 +193,23 @@ const LookupTableForm = ({
                        setFieldValue('default_multi_value_type', 'NULL');
                      }
                    }} />
-            {values.enable_multi_value
-            && (
-            <JSONValueInput label="Default multi value"
-                            help={(touched.default_multi_value && errors.default_multi_value) || 'The multi value that is being used as lookup result if the data adapter or cache does not find a value.'}
-                            validationState={(touched.default_multi_value && errors.default_multi_value) ? 'error' : undefined}
-                            onBlur={() => setFieldTouched('default_multi_value', true)}
-                            update={(value, valueType) => {
-                              setValues({
-                                ...values,
-                                default_multi_value: value,
-                                default_multi_value_type: valueType,
-                              });
-                            }}
-                            value={values.default_multi_value}
-                            valueType={values.default_multi_value_type || 'NULL'}
-                            allowedTypes={['OBJECT', 'NULL']}
-                            labelClassName="col-sm-3"
-                            wrapperClassName="col-sm-9" />
+            {values.enable_multi_value && (
+              <JSONValueInput label="Default multi value"
+                              help={(touched.default_multi_value && errors.default_multi_value) || 'The multi value that is being used as lookup result if the data adapter or cache does not find a value.'}
+                              validationState={(touched.default_multi_value && errors.default_multi_value) ? 'error' : undefined}
+                              onBlur={() => setFieldTouched('default_multi_value', true)}
+                              update={(value, valueType) => {
+                                setValues({
+                                  ...values,
+                                  default_multi_value: value,
+                                  default_multi_value_type: valueType,
+                                });
+                              }}
+                              value={values.default_multi_value}
+                              valueType={values.default_multi_value_type || 'NULL'}
+                              allowedTypes={['OBJECT', 'NULL']}
+                              labelClassName="col-sm-3"
+                              wrapperClassName="col-sm-9" />
             )}
           </fieldset>
 
@@ -223,7 +224,11 @@ const LookupTableForm = ({
           <fieldset>
             <Row>
               <Col mdOffset={3} md={9}>
-                <Button type="submit" bsStyle="success">{create ? 'Create Lookup Table' : 'Update Lookup Table'}</Button>
+                {create ? (
+                  <Button type="submit" bsStyle="success">Create Lookup Table</Button>
+                ) : showAction(table, 'edit') && (
+                  <Button type="submit" bsStyle="success">Update Lookup Table</Button>
+                )}
               </Col>
             </Row>
           </fieldset>
@@ -241,7 +246,7 @@ LookupTableForm.propTypes = {
 
 LookupTableForm.defaultProps = {
   create: true,
-  table: defaultTableValues,
+  table: INIT_TABLE_VALUES,
 };
 
 export default LookupTableForm;
