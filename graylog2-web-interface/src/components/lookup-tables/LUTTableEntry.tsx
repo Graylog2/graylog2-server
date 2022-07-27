@@ -24,6 +24,7 @@ import { Button } from 'components/bootstrap';
 import { ErrorPopover } from 'components/lookup-tables';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import useScopePermissions from 'hooks/useScopePermissions';
+
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type Props = {
@@ -43,6 +44,7 @@ const Actions = styled.div`
   align-items: center;
   justify-content: flex-start;
 `;
+
 
 const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
   const history = useHistory();

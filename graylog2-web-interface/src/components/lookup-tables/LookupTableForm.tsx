@@ -104,7 +104,7 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
 
   const showAction = (inTable: LookupTable, action: string): boolean => {
     // TODO: Update this method to check for the metadata
-    const permissions = getScopePermissions(inTable._metadata?.scope);
+    const permissions = getPermissionsByScope(inTable._metadata?.scope);
 
     return permissions[action];
   };

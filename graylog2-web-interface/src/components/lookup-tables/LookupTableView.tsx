@@ -22,6 +22,7 @@ import { ButtonToolbar, Row, Col, Button, Input } from 'components/bootstrap';
 import { Link } from 'components/common/router';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import useScopePermissions from 'hooks/useScopePermissions';
+
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type Props = {
@@ -35,11 +36,13 @@ const INIT_INPUT = { value: '', valid: false };
 const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
   const history = useHistory();
   const { getScopePermissions } = useScopePermissions();
+
   const [purgeKey, setPurgeKey] = React.useState<any>(INIT_INPUT);
   const [lookupKey, setLookupKey] = React.useState<any>(INIT_INPUT);
   const [lookupResult, setLookupResult] = React.useState<any>(null);
 
-  const handleEdit = (tableName: string) => () => {
+
+  const handleEdit = (tableName: string) => (_event: React.SyntheticEvent) => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.edit(tableName));
   };
 

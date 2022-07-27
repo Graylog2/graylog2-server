@@ -41,42 +41,38 @@ const renderedLUT = (scope: string) => {
 
 describe('LUTTableEntry', () => {
   it('should show "edit" button', async () => {
-    const { baseElement } = renderedLUT('DEFAULT');
+    const { getByRole } = renderedLUT('DEFAULT');
 
-    await waitFor(() => {
-      const actionBtn = baseElement.querySelector('button[alt="edit button"]');
+    let actionBtn = null;
+    await waitFor(() => { actionBtn = getByRole('edit-button'); });
 
-      expect(actionBtn).toBeVisible();
-    });
+    expect(actionBtn).toBeVisible();
   });
 
   it('should not show "edit" button', async () => {
-    const { baseElement } = renderedLUT('ILLUMINATE');
+    const { queryByRole } = renderedLUT('ILLUMINATE');
 
-    await waitFor(() => {
-      const actionBtn = baseElement.querySelector('button[alt="edit button"]');
+    let actionBtn = null;
+    await waitFor(() => { actionBtn = queryByRole('edit-button'); });
 
-      expect(actionBtn).toBeNull();
-    });
+    expect(actionBtn).toBeNull();
   });
 
   it('should show "delete" button', async () => {
-    const { baseElement } = renderedLUT('DEFAULT');
+    const { getByRole } = renderedLUT('DEFAULT');
 
-    await waitFor(() => {
-      const actionBtn = baseElement.querySelector('button[alt="delete button"]');
+    let actionBtn = null;
+    await waitFor(() => { actionBtn = getByRole('delete-button'); });
 
-      expect(actionBtn).toBeVisible();
-    });
+    expect(actionBtn).toBeVisible();
   });
 
   it('should not show "delete" button', async () => {
-    const { baseElement } = renderedLUT('ILLUMINATE');
+    const { queryByRole } = renderedLUT('ILLUMINATE');
 
-    await waitFor(() => {
-      const actionBtn = baseElement.querySelector('button[alt="delete button"]');
+    let actionBtn = null;
+    await waitFor(() => { actionBtn = queryByRole('delete-button'); });
 
-      expect(actionBtn).toBeNull();
-    });
+    expect(actionBtn).toBeNull();
   });
 });
