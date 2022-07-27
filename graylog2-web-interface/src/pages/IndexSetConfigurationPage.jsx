@@ -46,8 +46,10 @@ class IndexSetConfigurationPage extends React.Component {
   }
 
   _formCancelLink = () => {
-    if (this.props.location.query.from === 'details') {
-      return Routes.SYSTEM.INDEX_SETS.SHOW(this.state.indexSet.id);
+    const { location: { query: { from } }, indexSet } = this.props;
+
+    if (from === 'details') {
+      return Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id);
     }
 
     return Routes.SYSTEM.INDICES.LIST;

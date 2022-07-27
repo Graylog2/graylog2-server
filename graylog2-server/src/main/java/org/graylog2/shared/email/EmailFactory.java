@@ -31,6 +31,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.function.Supplier;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 /**
  * Utility class to create preconfigured {@link Email} instances by applying the settings from
  * {@link EmailConfiguration}.
@@ -113,7 +115,9 @@ public class EmailFactory {
         email.setSSLOnConnect(configuration.isUseSsl());
         email.setStartTLSEnabled(configuration.isUseTls());
 
-        email.setFrom(configuration.getFromEmail());
+        if (!isNullOrEmpty(configuration.getFromEmail())) {
+            email.setFrom(configuration.getFromEmail());
+        }
 
         return email;
     }
