@@ -308,7 +308,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 m.upgrade();
             } catch (Exception e) {
                 if (configuration.ignoreMigrationFailures()) {
-                    LOG.warn("  Ignoring migration failure: {}", e.getMessage());
+                    LOG.warn("Ignoring failure of migration <{}>: {}", m.getClass().getCanonicalName(), e.getMessage());
                 } else {
                     throw e;
                 }
