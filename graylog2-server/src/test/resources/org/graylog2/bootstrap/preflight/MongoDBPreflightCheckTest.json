@@ -1,0 +1,10 @@
+{
+  "some_collection": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeefaffe"
+      },
+      "title": "Dummy object"
+    }
+  ]
+}

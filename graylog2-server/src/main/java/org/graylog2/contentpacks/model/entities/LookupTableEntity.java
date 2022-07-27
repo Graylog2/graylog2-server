@@ -22,12 +22,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.lookup.LookupDefaultSingleValue;
+import org.graylog2.database.entities.DefaultEntityScope;
 
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-public abstract class LookupTableEntity {
+public abstract class LookupTableEntity extends ScopedContentPackEntity {
+    @JsonProperty(FIELD_SCOPE)
+    public abstract ValueReference scope();
     @JsonProperty("name")
     public abstract ValueReference name();
 
@@ -57,6 +59,7 @@ public abstract class LookupTableEntity {
 
     @JsonCreator
     public static LookupTableEntity create(
+            @JsonProperty(FIELD_SCOPE) ValueReference scope,
             @JsonProperty("name") ValueReference name,
             @JsonProperty("title") ValueReference title,
             @JsonProperty("description") ValueReference description,
@@ -66,6 +69,9 @@ public abstract class LookupTableEntity {
             @JsonProperty("default_single_value_type") ValueReference defaultSingleValueType,
             @JsonProperty("default_multi_value") ValueReference defaultMultiValue,
             @JsonProperty("default_multi_value_type") ValueReference defaultMultiValueType) {
-        return new AutoValue_LookupTableEntity(name, title, description, cacheName, dataAdapterName, defaultSingleValue, defaultSingleValueType, defaultMultiValue, defaultMultiValueType);
+
+        ValueReference nullSafeScope = scope == null ? ValueReference.of(DefaultEntityScope.NAME) : scope;
+
+        return new AutoValue_LookupTableEntity(nullSafeScope, name, title, description, cacheName, dataAdapterName, defaultSingleValue, defaultSingleValueType, defaultMultiValue, defaultMultiValueType);
     }
 }

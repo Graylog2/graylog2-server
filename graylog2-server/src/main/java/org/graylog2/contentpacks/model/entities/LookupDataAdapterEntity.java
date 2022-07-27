@@ -21,16 +21,16 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.contentpacks.model.entities.references.Reference;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-
-import java.util.Map;
+import org.graylog2.database.entities.DefaultEntityScope;
 
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-public abstract class LookupDataAdapterEntity {
+public abstract class LookupDataAdapterEntity extends ScopedContentPackEntity {
+    @JsonProperty(FIELD_SCOPE)
+    public abstract ValueReference scope();
     @JsonProperty("name")
     public abstract ValueReference name();
 
@@ -45,10 +45,14 @@ public abstract class LookupDataAdapterEntity {
 
     @JsonCreator
     public static LookupDataAdapterEntity create(
+            @JsonProperty(FIELD_SCOPE) ValueReference scope,
             @JsonProperty("name") ValueReference name,
             @JsonProperty("title") ValueReference title,
             @JsonProperty("description") ValueReference description,
             @JsonProperty("configuration") ReferenceMap configuration) {
-        return new AutoValue_LookupDataAdapterEntity(name, title, description, configuration);
+
+        ValueReference nullSafeScope = scope == null ? ValueReference.of(DefaultEntityScope.NAME) : scope;
+
+        return new AutoValue_LookupDataAdapterEntity(nullSafeScope, name, title, description, configuration);
     }
 }

@@ -16,12 +16,13 @@
  */
 package org.graylog2.lookup.db;
 
-import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ScopedEntityPaginatedDbService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.events.CachesDeleted;
@@ -29,47 +30,41 @@ import org.graylog2.lookup.events.CachesUpdated;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
-import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DBCacheService {
-    private final JacksonDBCollection<CacheDto, ObjectId> db;
+public class DBCacheService extends ScopedEntityPaginatedDbService<CacheDto> {
+    public static final String COLLECTION_NAME = "lut_caches";
+
     private final ClusterEventBus clusterEventBus;
 
     @Inject
     public DBCacheService(MongoConnection mongoConnection,
                           MongoJackObjectMapperProvider mapper,
+                          EntityScopeService entityScopeService,
                           ClusterEventBus clusterEventBus) {
-
-        this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("lut_caches"),
-                CacheDto.class,
-                ObjectId.class,
-                mapper.get());
+        super(mongoConnection, mapper, CacheDto.class, COLLECTION_NAME, entityScopeService);
         this.clusterEventBus = clusterEventBus;
 
         db.createIndex(new BasicDBObject("name", 1), new BasicDBObject("unique", true));
     }
 
+    @Override
     public Optional<CacheDto> get(String idOrName) {
-        try {
+        if (ObjectId.isValid(idOrName)) {
             return Optional.ofNullable(db.findOneById(new ObjectId(idOrName)));
-        } catch (IllegalArgumentException e) {
-            // not an ObjectId, try again with name
+        } else {
+            // not an ObjectId, try with name
             return Optional.ofNullable(db.findOne(DBQuery.is("name", idOrName)));
-
         }
     }
 
-    public CacheDto save(CacheDto table) {
-        WriteResult<CacheDto, ObjectId> save = db.save(table);
-        final CacheDto savedCache = save.getSavedObject();
+    public CacheDto saveAndPostEvent(CacheDto table) {
+        final CacheDto savedCache = super.save(table);
         clusterEventBus.post(CachesUpdated.create(savedCache.id()));
 
         return savedCache;
@@ -85,16 +80,14 @@ public class DBCacheService {
         }
     }
 
-    private ImmutableList<CacheDto> asImmutableList(Iterator<? extends CacheDto> cursor) {
-        return ImmutableList.copyOf(cursor);
+    public void deleteAndPostEvent(String idOrName) {
+        final Optional<CacheDto> cacheDto = get(idOrName);
+        super.delete(idOrName);
+        cacheDto.ifPresent(cache -> clusterEventBus.post(CachesDeleted.create(cache.id())));
     }
 
-    public void delete(String idOrName) {
-        final Optional<CacheDto> cacheDto = get(idOrName);
-        cacheDto.map(CacheDto::id)
-                .map(ObjectId::new)
-                .ifPresent(db::removeById);
-        cacheDto.ifPresent(cache -> clusterEventBus.post(CachesDeleted.create(cache.id())));
+    public void deleteAndPostEventImmutable(String idOrName) {
+        super.deleteImmutable(idOrName);
     }
 
     public Collection<CacheDto> findByIds(Set<String> idSet) {
