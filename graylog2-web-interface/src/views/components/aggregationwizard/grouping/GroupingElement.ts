@@ -216,11 +216,11 @@ const GroupByElement: AggregationElement = {
   }),
   fromConfig: (config: AggregationWidgetConfig) => {
     const groupings = pivotsToGrouping(config);
-    
+
     if (isEmpty(groupings)) {
       return undefined;
     }
-    
+
     return {
       groupBy: {
         columnRollup: config.rollup,
