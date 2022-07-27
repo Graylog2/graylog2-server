@@ -16,13 +16,11 @@
  */
 import * as Immutable from 'immutable';
 import URI from 'urijs';
-import type { $PropertyType } from 'utility-types';
 
 import Routes from 'routing/Routes';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
-import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
-
-import { addToQuery, escape } from '../../views/logic/queries/QueryHelper';
+import { toSearchTimerange } from 'views/logic/TimeRange';
+import { addToQuery, escape } from 'views/logic/queries/QueryHelper';
 
 type InternalState = {
   id: string,
@@ -31,31 +29,6 @@ type InternalState = {
   streams: Array<string>,
   highlightedMessage: string,
   filterFields: { [key: string]: unknown },
-};
-
-const _searchTimerange = (timerange: TimeRange) => {
-  const { type } = timerange;
-  const result = { rangetype: type };
-
-  switch (timerange.type) {
-    case 'relative':
-      if (isTypeRelativeWithStartOnly(timerange)) {
-        return { ...result, relative: timerange.range };
-      }
-
-      if (isTypeRelativeWithEnd(timerange)) {
-        if ('to' in timerange) {
-          return { ...result, from: timerange.from, to: timerange.to };
-        }
-
-        return { ...result, from: timerange.from };
-      }
-
-      return result;
-    case 'keyword': return { ...result, keyword: timerange.keyword };
-    case 'absolute': return { ...result, from: timerange.from, to: timerange.to };
-    default: return result;
-  }
 };
 
 const _mergeFilterFieldsToQuery = (query: QueryString, filterFields: { [key: string]: unknown } = {}) => Object.keys(filterFields)
@@ -67,12 +40,12 @@ export default class SearchLink {
   _value: InternalState;
 
   constructor(
-    id: $PropertyType<InternalState, 'id'>,
-    timerange: $PropertyType<InternalState, 'timerange'>,
-    query: $PropertyType<InternalState, 'query'>,
-    streams: $PropertyType<InternalState, 'streams'>,
-    highlightedMessage: $PropertyType<InternalState, 'highlightedMessage'>,
-    filterFields: $PropertyType<InternalState, 'filterFields'>,
+    id: InternalState['id'],
+    timerange: InternalState['timerange'],
+    query: InternalState['query'],
+    streams: InternalState['streams'],
+    highlightedMessage: InternalState['highlightedMessage'],
+    filterFields: InternalState['filterFields'],
   ) {
     this._value = {
       id,
@@ -117,7 +90,7 @@ export default class SearchLink {
     const { id, query, highlightedMessage, streams, filterFields, timerange } = this._value;
     const queryWithFilterFields = _mergeFilterFieldsToQuery(query, filterFields);
 
-    const searchTimerange = timerange ? _searchTimerange(timerange) : {};
+    const searchTimerange = timerange ? toSearchTimerange(timerange) : {};
 
     const params = {
       ...searchTimerange,
@@ -147,27 +120,27 @@ class Builder {
     this.value = value;
   }
 
-  id(value: $PropertyType<InternalState, 'id'>) {
+  id(value: InternalState['id']) {
     return new Builder(this.value.set('id', value));
   }
 
-  timerange(value: $PropertyType<InternalState, 'timerange'>) {
+  timerange(value: InternalState['timerange']) {
     return new Builder(this.value.set('timerange', value));
   }
 
-  query(value: $PropertyType<InternalState, 'query'>) {
+  query(value: InternalState['query']) {
     return new Builder(this.value.set('query', value));
   }
 
-  streams(value: $PropertyType<InternalState, 'streams'>) {
+  streams(value: InternalState['streams']) {
     return new Builder(this.value.set('streams', value));
   }
 
-  highlightedMessage(value: $PropertyType<InternalState, 'highlightedMessage'>) {
+  highlightedMessage(value: InternalState['highlightedMessage']) {
     return new Builder(this.value.set('highlightedMessage', value));
   }
 
-  filterFields(value: $PropertyType<InternalState, 'filterFields'>) {
+  filterFields(value: InternalState['filterFields']) {
     return new Builder(this.value.set('filterFields', value));
   }
 
