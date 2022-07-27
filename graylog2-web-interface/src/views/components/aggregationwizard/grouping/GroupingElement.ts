@@ -170,9 +170,6 @@ const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: Agg
   const rowPivots = groupBy.groupings.filter((grouping) => grouping.direction === 'row').map(groupingToPivot);
   const columnPivots = groupBy.groupings.filter((grouping) => grouping.direction === 'column').map(groupingToPivot);
   const { columnRollup } = groupBy;
-  console.log("X2");
-  console.log(config);
-  console.log(columnRollup);
 
   return config
     .rowPivots(rowPivots)
