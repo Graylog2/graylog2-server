@@ -202,6 +202,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "run_migrations")
     private boolean runMigrations = true;
 
+    @Parameter(value = "ignore_migration_failures")
+    private boolean ignoreMigrationFailures = false;
+
     @Parameter(value = "skip_preflight_checks")
     private boolean skipPreflightChecks = false;
 
@@ -297,6 +300,10 @@ public class Configuration extends BaseConfiguration {
 
     public boolean runMigrations() {
         return runMigrations;
+    }
+
+    public boolean ignoreMigrationFailures() {
+        return ignoreMigrationFailures;
     }
 
     public boolean getSkipPreflightChecks() {

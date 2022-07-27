@@ -87,7 +87,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
     private boolean isFreshInstallation;
 
-    public ServerBootstrap(String commandName, Configuration configuration) {
+    protected ServerBootstrap(String commandName, Configuration configuration) {
         super(commandName, configuration);
         this.commandName = commandName;
     }
@@ -284,7 +284,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("Services started, startup times in ms: {}", serviceManager.startupTimes());
 
         activityWriter.write(new Activity("Started up.", Main.class));
-        LOG.info("Graylog " + commandName + " up and running.");
+        LOG.info("Graylog {} up and running.", commandName);
         auditEventSender.success(AuditActor.system(nodeId), NODE_STARTUP_COMPLETE, auditEventContext);
 
         // Block forever.
@@ -304,7 +304,15 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         ImmutableSortedSet.copyOf(migrations).forEach(m -> {
             LOG.debug("Running migration <{}>", m.getClass().getCanonicalName());
-            m.upgrade();
+            try {
+                m.upgrade();
+            } catch (Exception e) {
+                if (configuration.ignoreMigrationFailures()) {
+                    LOG.warn("  Ignoring migration failure: {}", e.getMessage());
+                } else {
+                    throw e;
+                }
+            }
         });
     }
 
