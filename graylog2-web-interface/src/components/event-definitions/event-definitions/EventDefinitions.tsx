@@ -112,9 +112,7 @@ const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPage
           </IfPermitted>
         </SearchForm>
 
-        <PaginatedList activePage={pagination.page}
-                       pageSize={pagination.pageSize}
-                       pageSizes={pageSizes}
+        <PaginatedList pageSizes={pageSizes}
                        totalItems={pagination.total}
                        onChange={onPageChange}>
           <div className={styles.definitionList}>
