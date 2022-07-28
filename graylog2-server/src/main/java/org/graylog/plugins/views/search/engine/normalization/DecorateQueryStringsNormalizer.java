@@ -76,9 +76,9 @@ public class DecorateQueryStringsNormalizer implements SearchNormalizer {
     }
 
     public Search normalize(Search search, SearchUser searchUser, ExecutionState executionState) {
-        final Set<Query> newQueries = search.queries().stream()
+        final ImmutableSet<Query> newQueries = search.queries().stream()
                 .map(query -> normalizeQuery(query, search))
-                .collect(Collectors.toSet());
-        return search.toBuilder().queries(ImmutableSet.copyOf(newQueries)).build();
+                .collect(ImmutableSet.toImmutableSet());
+        return search.toBuilder().queries(newQueries).build();
     }
 }
