@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useReducer, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 import { ButtonToolbar, DropdownButton, MenuItem } from 'components/bootstrap';
@@ -47,30 +47,11 @@ ItemActions.propTypes = {
   onDashboardDelete: PropTypes.func.isRequired,
 };
 
-const reducer = (state, action) => {
-  const { payload = {} } = action;
-  const { newQuery, newPage, newPerPage } = payload;
-
-  switch (action.type) {
-    case 'search':
-      return { ...state, query: newQuery, page: 1 };
-    case 'searchReset':
-      return { ...state, query: '', page: 1 };
-    case 'pageChange':
-      return { ...state, page: newPage, perPage: newPerPage };
-    case 'dashboardDelete':
-      return { ...state, page: 1 };
-    default:
-      return state;
-  }
-};
-
 const DashboardList = ({ pagination, handleSearch, handleDashboardDelete, dashboards }) => {
   const PAGE_SIZES = [10, 50, 100];
-  const [{ query, page, perPage }, dispatch] = useReducer(reducer, { query: '', page: 1, perPage: 10 });
+  const { page, pageSize: perPage, resetPage } = usePaginationQueryParameter(PAGE_SIZES);
+  const [query, setQuery] = useState('');
   const [dashboardToShare, setDashboardToShare] = useState<ViewClass>();
-
-  const { resetPage } = usePaginationQueryParameter(PAGE_SIZES);
 
   const execSearch = useCallback(() => handleSearch(query, page, perPage), [handleSearch, page, perPage, query]);
 
@@ -80,19 +61,19 @@ const DashboardList = ({ pagination, handleSearch, handleDashboardDelete, dashbo
 
   const onDashboardDelete = (dashboard) => () => {
     handleDashboardDelete(dashboard).then(() => {
-      dispatch({ type: 'dashboardDelete' });
+      resetPage();
       execSearch();
     }, () => {});
   };
 
   const onSearch = (newQuery) => {
     resetPage();
-    dispatch({ type: 'search', payload: { newQuery } });
+    setQuery(newQuery);
   };
 
   const onReset = () => {
     resetPage();
-    dispatch({ type: 'searchReset' });
+    setQuery('');
   };
 
   if (!dashboards) {
@@ -121,10 +102,7 @@ const DashboardList = ({ pagination, handleSearch, handleDashboardDelete, dashbo
                           entityTitle={dashboardToShare.title}
                           onClose={() => setDashboardToShare(undefined)} />
       )}
-      <PaginatedList onChange={(newPage, newPerPage) => dispatch({ type: 'pageChange', payload: { newPage, newPerPage } })}
-                     activePage={page}
-                     totalItems={pagination.total}
-                     pageSize={perPage}
+      <PaginatedList totalItems={pagination.total}
                      pageSizes={PAGE_SIZES}>
         <div style={{ marginBottom: 15 }}>
           <SearchForm onSearch={onSearch}
