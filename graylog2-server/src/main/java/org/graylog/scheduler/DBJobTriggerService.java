@@ -131,14 +131,14 @@ public class DBJobTriggerService {
     }
 
     /**
-     * Returns all job triggers for the given job definition ID.
+     * Returns one trigger for the given job definition ID.
      *
      * TODO: Don't throw exception when there is more than one trigger for a job definition. (see source code)
      *
      * @param jobDefinitionId the job definition ID
-     * @return list of found job triggers
+     * @return One found job trigger
      */
-    public List<JobTriggerDto> getOneForJob(String jobDefinitionId) {
+    public Optional<JobTriggerDto> getOneForJob(String jobDefinitionId) {
         final List<JobTriggerDto> triggers = getAllForJob(jobDefinitionId);
         // We are currently expecting only one trigger per job definition. This will most probably change in the
         // future once we extend our scheduler usage.
@@ -148,8 +148,7 @@ public class DBJobTriggerService {
         if (triggers.size() > 1) {
             throw new IllegalStateException("More than one trigger for job definition <" + jobDefinitionId + ">");
         }
-        return triggers;
-
+        return triggers.stream().findFirst();
     }
 
     public List<JobTriggerDto> getAllForJob(String jobDefinitionId) {

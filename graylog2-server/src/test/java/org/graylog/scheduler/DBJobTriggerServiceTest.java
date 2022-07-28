@@ -194,11 +194,11 @@ public class DBJobTriggerServiceTest {
                 .hasMessageContaining("jobDefinitionId");
 
 
-        assertThat(dbJobTriggerService.getOneForJob("54e3deadbeefdeadbeefaff4")).hasSize(1).satisfies(triggers ->
-                assertThat(triggers.get(0)).satisfies(trigger -> {
+        assertThat(dbJobTriggerService.getOneForJob("54e3deadbeefdeadbeefaff4")).isPresent()
+                .hasValueSatisfying(trigger -> {
                     assertThat(trigger.id()).isEqualTo("54e3deadbeefdeadbeef0002");
                     assertThat(trigger.jobDefinitionId()).isEqualTo("54e3deadbeefdeadbeefaff4");
-                }));
+                });
 
         assertThat(dbJobTriggerService.getOneForJob("doesntexist")).isEmpty();
 
