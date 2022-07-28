@@ -27,12 +27,14 @@ const DEFAULT_PAGE_SIZES = [10, 50, 100];
 export const INITIAL_PAGE = 1;
 
 type Props = {
+  activePage: number,
   children: React.ReactNode,
   className?: string,
   hideFirstAndLastPageLinks?: boolean
   hidePreviousAndNextPageLinks?: boolean
   onChange?: (currentPage: number, pageSize: number) => void,
   pageSizes?: Array<number>,
+  pageSize?: number,
   showPageSizeSelect?: boolean,
   totalItems: number,
 };
@@ -44,17 +46,20 @@ type Props = {
  * the selected page is displayed on screen.
  */
 const PaginatedList = ({
+  activePage,
   children,
   className,
   hideFirstAndLastPageLinks,
   hidePreviousAndNextPageLinks,
   onChange,
+  pageSize: propPageSize,
   pageSizes,
   showPageSizeSelect,
   totalItems,
 }: Props) => {
-  const { page, setPage, pageSize, setPageSize } = usePaginationQueryParameter(pageSizes);
-  const numberPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 0;
+  const { page, setPage, pageSize: queryParamPageSize, setPageSize } = usePaginationQueryParameter(pageSizes);
+  const pageSize = showPageSizeSelect ? queryParamPageSize : propPageSize;
+  const numberPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 0 * activePage;
 
   const _onChangePageSize = (event: React.ChangeEvent<HTMLOptionElement>) => {
     event.preventDefault();
@@ -91,6 +96,7 @@ const PaginatedList = ({
 };
 
 PaginatedList.propTypes = {
+  activePage: PropTypes.number,
   /** React element containing items of the current selected page. */
   children: PropTypes.node.isRequired,
   /**
@@ -104,6 +110,8 @@ PaginatedList.propTypes = {
   hidePreviousAndNextPageLinks: PropTypes.bool,
   /** Array of different items per page that are allowed. */
   pageSizes: PropTypes.arrayOf(PropTypes.number),
+  /** Number of items per page. */
+  pageSize: PropTypes.number,
   /** Whether to show the page size selector or not. */
   showPageSizeSelect: PropTypes.bool,
   /** Total amount of items in all pages. */
@@ -111,10 +119,12 @@ PaginatedList.propTypes = {
 };
 
 PaginatedList.defaultProps = {
+  activePage: 1,
   className: undefined,
   hideFirstAndLastPageLinks: false,
   hidePreviousAndNextPageLinks: false,
   pageSizes: DEFAULT_PAGE_SIZES,
+  pageSize: DEFAULT_PAGE_SIZES[0],
   showPageSizeSelect: true,
   onChange: undefined,
 };
