@@ -22,7 +22,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.EntityScopeService;
-import org.graylog2.database.entities.ScopedEntityPaginatedDbService;
+import org.graylog2.database.entities.ScopedDbService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.events.CachesDeleted;
@@ -37,7 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DBCacheService extends ScopedEntityPaginatedDbService<CacheDto> {
+public class DBCacheService extends ScopedDbService<CacheDto> {
     public static final String COLLECTION_NAME = "lut_caches";
 
     private final ClusterEventBus clusterEventBus;
