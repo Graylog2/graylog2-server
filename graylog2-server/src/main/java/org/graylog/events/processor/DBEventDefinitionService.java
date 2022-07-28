@@ -23,7 +23,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.EntityScopeService;
-import org.graylog2.database.entities.ScopedEntityPaginatedDbService;
+import org.graylog2.database.entities.ScopedDbService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
@@ -36,7 +36,7 @@ import java.util.Locale;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class DBEventDefinitionService extends ScopedEntityPaginatedDbService<EventDefinitionDto> {
+public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto> {
     private static final Logger LOG = LoggerFactory.getLogger(DBEventDefinitionService.class);
 
     private static final String COLLECTION_NAME = "event_definitions";
@@ -74,7 +74,7 @@ public class DBEventDefinitionService extends ScopedEntityPaginatedDbService<Eve
     }
 
     public int deleteUnregisterImmutable(String id) {
-        return doDeleteUnregister(id, () -> super.deleteMutable(id));
+        return doDeleteUnregister(id, () -> super.deleteImmutable(id));
     }
 
     private int doDeleteUnregister(String id, Supplier<Integer> deleteSupplier) {
