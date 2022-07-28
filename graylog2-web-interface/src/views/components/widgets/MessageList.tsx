@@ -52,11 +52,6 @@ const Wrapper = styled.div`
   }
 `;
 
-type Pagination = {
-  pageErrors: Array<{ description: string }>,
-  currentPage: number
-}
-
 export type MessageListResult = {
   messages: Array<BackendMessage>,
   total: number,
@@ -74,15 +69,13 @@ const useSearchTypes = (activeQueryId: string) => {
   return get(searches, ['result', 'results', activeQueryId, 'searchTypes']);
 };
 
-const useResetPaginationOnSearchExecution = (setPagination: (pagination: Pagination) => void, currentPage) => {
-  const { resetPage } = usePaginationQueryParameter();
-
+const useResetPaginationOnSearchExecution = (resetPage: () => void, setPageErrors: (pageErrors: { description: string }[]) => void, currentPage) => {
   useEffect(() => {
     const resetPagination = () => {
       resetPage();
 
       if (currentPage !== 1) {
-        setPagination({ currentPage: 1, pageErrors: [] });
+        setPageErrors([]);
       }
     };
 
@@ -91,7 +84,7 @@ const useResetPaginationOnSearchExecution = (setPagination: (pagination: Paginat
     return () => {
       unlistenSearchExecute();
     };
-  }, [currentPage, setPagination, resetPage]);
+  }, [currentPage, setPageErrors, resetPage]);
 };
 
 const useResetScrollPositionOnPageChange = (currentPage: number) => {
@@ -123,14 +116,12 @@ const MessageList = ({
   pageSize,
   setLoadingState,
 }: Props) => {
+  const { page, resetPage } = usePaginationQueryParameter();
   const { activeQuery: activeQueryId } = useStore(ViewStore);
-  const [{ currentPage, pageErrors }, setPagination] = useState<Pagination>({
-    pageErrors: [],
-    currentPage: 1,
-  });
+  const [pageErrors, setPageErrors] = useState<{ description: string }[]>([]);
   const searchTypes = useSearchTypes(activeQueryId);
-  const scrollContainerRef = useResetScrollPositionOnPageChange(currentPage);
-  useResetPaginationOnSearchExecution(setPagination, currentPage);
+  const scrollContainerRef = useResetScrollPositionOnPageChange(page);
+  useResetPaginationOnSearchExecution(resetPage, setPageErrors, page);
   useRenderCompletionCallback();
 
   const handlePageChange = useCallback((pageNo: number) => {
@@ -152,12 +143,9 @@ const MessageList = ({
     SearchActions.reexecuteSearchTypes(searchTypePayload, effectiveTimerange).then((response) => {
       setLoadingState(false);
 
-      setPagination({
-        pageErrors: response.result.errors,
-        currentPage: pageNo,
-      });
+      setPageErrors(response.result.errors);
     });
-  }, [pageSize, searchTypeId, searchTypes, setLoadingState]);
+  }, [pageSize, searchTypeId, searchTypes, setLoadingState, setPageErrors]);
 
   const onSortChange = useCallback((newSort: SortConfig[]) => {
     const newConfig = config.toBuilder().sort(newSort).build();
@@ -169,7 +157,6 @@ const MessageList = ({
     <WindowDimensionsContextProvider>
       <Wrapper>
         <PaginatedList onChange={handlePageChange}
-                       activePage={Number(currentPage)}
                        showPageSizeSelect={false}
                        totalItems={totalMessages}
                        pageSize={pageSize}>
