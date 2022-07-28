@@ -401,9 +401,12 @@ public abstract class PluginModule extends Graylog2Module {
         schdulerCapabilitiesBinder().addBinding().to(schedulerCapabilitiesClass);
     }
 
-    protected void addEntityScope(Class<? extends EntityScope> entityScopeType) {
-        Multibinder<EntityScope> scopeBinder = Multibinder.newSetBinder(binder(), EntityScope.class);
-        scopeBinder.addBinding().to(entityScopeType);
+    protected MapBinder<String, JobResourceHandler> jobResourceHandlerBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, JobResourceHandler.class);
+    }
+
+    protected void addJobResourceHandler(String jobType, Class<? extends JobResourceHandler> jobResourceHandlerClass) {
+        jobResourceHandlerBinder().addBinding(jobType).to(jobResourceHandlerClass);
     }
 
     protected void addEntityScope(Class<? extends EntityScope> entityScopeType) {
