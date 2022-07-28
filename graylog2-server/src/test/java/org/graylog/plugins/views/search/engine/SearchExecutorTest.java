@@ -211,8 +211,10 @@ public class SearchExecutorTest {
 
         final SearchJob searchJob = this.searchExecutor.execute(search, searchUser, ExecutionState.empty());
 
-        final Query query = searchJob.getSearch().queries().stream().findFirst().orElseThrow(IllegalStateException::new);
-        final SearchType resultingSearchType = query.searchTypes().stream().findFirst().orElseThrow(IllegalStateException::new);
+        final Query query = searchJob.getSearch().queries().stream().findFirst()
+                .orElseThrow(() -> new AssertionError("Search unexpectedly contains no queries."));
+        final SearchType resultingSearchType = query.searchTypes().stream().findFirst()
+                .orElseThrow(() -> new AssertionError("Query unexpectedly contains no search types."));
         assertThat(resultingSearchType.query())
                 .isPresent()
                 .contains(ElasticsearchQueryString.of("decorated"));
