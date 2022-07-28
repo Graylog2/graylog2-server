@@ -19,6 +19,10 @@ import { render, waitFor } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
+import { asMock } from 'helpers/mocking';
+import { exampleEntityScope } from 'fixtures/entityScope';
+import fetchScopePermissions from 'hooks/api/fetchScopePermissions';
+
 import CaffeineCacheSummary from './caches/CaffeineCacheSummary';
 import { CACHE } from './fixtures';
 import Cache from './Cache';
@@ -33,13 +37,10 @@ PluginStore.register(new PluginManifest({}, {
   ],
 }));
 
+jest.mock('hooks/api/fetchScopePermissions', () => jest.fn());
+
 const renderedCache = (scope: string) => {
-  CACHE._metadata = {
-    scope: scope,
-    revision: 2,
-    created_at: '2022-06-13T08:47:12Z',
-    updated_at: '2022-06-29T12:00:28Z',
-  };
+  CACHE._scope = scope;
 
   CACHE.config = {
     type: 'guava_cache',
@@ -57,6 +58,8 @@ const renderedCache = (scope: string) => {
 
 describe('Cache', () => {
   it('should show "edit" button', async () => {
+    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+
     const { baseElement } = renderedCache('DEFAULT');
 
     await waitFor(() => {
@@ -67,6 +70,8 @@ describe('Cache', () => {
   });
 
   it('should not show "edit" button', async () => {
+    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+
     const { baseElement } = renderedCache('ILLUMINATE');
 
     await waitFor(() => {

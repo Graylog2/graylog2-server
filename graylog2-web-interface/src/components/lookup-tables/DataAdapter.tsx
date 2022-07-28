@@ -24,6 +24,7 @@ import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
+import useScopePermissions from 'hooks/useScopePermissions';
 
 import ConfigSummaryDefinitionListWrapper from './ConfigSummaryDefinitionListWrapper';
 
@@ -34,6 +35,7 @@ type Props = {
 const DataAdapter = ({ dataAdapter }: Props) => {
   const [lookupKey, setLookupKey] = React.useState(null);
   const [lookupResult, setLookupResult] = React.useState(null);
+  const { getScopePermissions } = useScopePermissions();
 
   const _onChange = (event) => {
     setLookupKey(getValueFromInput(event.target));
@@ -47,17 +49,10 @@ const DataAdapter = ({ dataAdapter }: Props) => {
     });
   };
 
-  // Use the new scope checking hook once it's merged
-  const showAction = (action: string) => {
-    const scope = dataAdapter._metadata ? dataAdapter._metadata.scope : 'DEFAULT';
+  const showAction = (): boolean => {
+    const permissions = getScopePermissions(dataAdapter._scope);
 
-    if (scope === 'ILLUMINATE') {
-      if (action) {
-        return false;
-      }
-    }
-
-    return false;
+    return permissions.is_mutable;
   };
 
   const plugins = {};
@@ -77,7 +72,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
   }
 
   const summary = plugin.summaryComponent;
-  const isEditable = showAction('edit');
+  const isEditable = showAction();
 
   return (
     <Row className="content">

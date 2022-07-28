@@ -24,6 +24,7 @@ import { ErrorPopover } from 'components/lookup-tables';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
+import useScopePermissions from 'hooks/useScopePermissions';
 
 type Props = {
   adapter: LookupTableAdapter,
@@ -32,6 +33,7 @@ type Props = {
 
 const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
   const { name: adapterName, title: adapterTitle, description: adapterDescription, id: adapterId } = adapter;
+  const { getScopePermissions } = useScopePermissions();
 
   const _onDelete = () => {
     // eslint-disable-next-line no-alert
@@ -40,21 +42,15 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
     }
   };
 
-  // TODO: update this method to use the new hook
-  const showAction = (action: string) => {
-    const scope = adapter._metadata ? adapter._metadata.scope : 'DEFAULT';
+  const showActions = () => {
+    const scope = adapter._scope ? adapter._scope : 'DEFAULT';
 
-    if (scope === 'ILLUMINATE') {
-      if (action) {
-        return false;
-      }
-    }
+    const permissions = getScopePermissions(scope);
 
-    return true;
+    return permissions.is_mutable;
   };
 
-  const isEditable = showAction('edit');
-  const isDeletable = showAction('delete');
+  const isMutable = showActions();
   const immutableTooltip = <Tooltip id={`${adapterId}-immutable-tooltip`}>Action not available for immutable entities</Tooltip>
 
   return (
@@ -72,13 +68,13 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
           </MetricContainer>
         </td>
         <td>
-          <OverlayElement overlay={immutableTooltip} placement="top" useOverlay={isEditable}>
-            <LinkContainer disabled={!isEditable} to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName)}>
-              <Button bsSize="xsmall" bsStyle="info" data-testid="edit-button">Edit</Button>
+          <OverlayElement overlay={immutableTooltip} placement="top" useOverlay={isMutable}>
+            <LinkContainer data-testid="edit-button" disabled={!isMutable} to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName)}>
+              <Button bsSize="xsmall" bsStyle="info">Edit</Button>
             </LinkContainer>
           </OverlayElement>
           &nbsp;
-          {showAction('delete') ? (
+          {showActions() ? (
             <Button bsSize="xsmall"
                     bsStyle="primary"
                     onClick={_onDelete}
@@ -86,8 +82,8 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
               Delete
             </Button>
           ) : (
-            <OverlayElement placement="top" overlay={immutableTooltip} useOverlay={isDeletable}>
-              <Button disabled={!isDeletable}
+              <OverlayElement placement="top" overlay={immutableTooltip} useOverlay={isMutable}>
+                <Button disabled={!isMutable}
                       bsSize="xsmall"
                       bsStyle="primary"
                       onClick={_onDelete}

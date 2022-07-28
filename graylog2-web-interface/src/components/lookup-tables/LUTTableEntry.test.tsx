@@ -18,16 +18,17 @@ import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 
+import { asMock } from 'helpers/mocking';
+import { exampleEntityScope } from 'fixtures/entityScope';
+import fetchScopePermissions from 'hooks/api/fetchScopePermissions';
+
 import { TABLE, CACHE, DATA_ADAPTER } from './fixtures';
 import LUTTableEntry from './LUTTableEntry';
 
+jest.mock('hooks/api/fetchScopePermissions', () => jest.fn());
+
 const renderedLUT = (scope: string) => {
-  TABLE._metadata = {
-    scope: scope,
-    revision: 2,
-    created_at: '2022-06-13T08:47:12Z',
-    updated_at: '2022-06-29T12:00:28Z',
-  };
+  TABLE._scope = scope;
 
   return render(
     <Router>
@@ -41,38 +42,50 @@ const renderedLUT = (scope: string) => {
 
 describe('LUTTableEntry', () => {
   it('should show "edit" button', async () => {
-    const { getByRole } = renderedLUT('DEFAULT');
+    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = getByRole('edit-button'); });
+    const { baseElement } = renderedLUT('DEFAULT');
 
-    expect(actionBtn).toBeVisible();
+    await waitFor(() => {
+      const actionBtn = baseElement.querySelector('button[alt="edit button"]');
+
+      expect(actionBtn).toBeVisible();
+    });
   });
 
   it('should not show "edit" button', async () => {
-    const { queryByRole } = renderedLUT('ILLUMINATE');
+    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = queryByRole('edit-button'); });
+    const { baseElement } = renderedLUT('ILLUMINATE');
 
-    expect(actionBtn).toBeNull();
+    await waitFor(() => {
+      const actionBtn = baseElement.querySelector('button[alt="edit button"]');
+
+      expect(actionBtn).toBeNull();
+    });
   });
 
   it('should show "delete" button', async () => {
-    const { getByRole } = renderedLUT('DEFAULT');
+    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = getByRole('delete-button'); });
+    const { baseElement } = renderedLUT('DEFAULT');
 
-    expect(actionBtn).toBeVisible();
+    await waitFor(() => {
+      const actionBtn = baseElement.querySelector('button[alt="delete button"]');
+
+      expect(actionBtn).toBeNull();
+    });
   });
 
   it('should not show "delete" button', async () => {
-    const { queryByRole } = renderedLUT('ILLUMINATE');
+    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = queryByRole('delete-button'); });
+    const { baseElement } = renderedLUT('ILLUMINATE');
 
-    expect(actionBtn).toBeNull();
+    await waitFor(() => {
+      const actionBtn = baseElement.querySelector('button[alt="delete button"]');
+
+      expect(actionBtn).toBeNull();
+    });
   });
 });

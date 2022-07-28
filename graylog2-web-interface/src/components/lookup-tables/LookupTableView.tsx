@@ -22,7 +22,6 @@ import { ButtonToolbar, Row, Col, Button, Input } from 'components/bootstrap';
 import { Link } from 'components/common/router';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import useScopePermissions from 'hooks/useScopePermissions';
-
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type Props = {
@@ -41,8 +40,7 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
   const [lookupKey, setLookupKey] = React.useState<any>(INIT_INPUT);
   const [lookupResult, setLookupResult] = React.useState<any>(null);
 
-
-  const handleEdit = (tableName: string) => (_event: React.SyntheticEvent) => {
+  const handleEdit = (tableName: string) => () => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.edit(tableName));
   };
 
@@ -95,8 +93,7 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
   };
 
   const showAction = (inTable: LookupTable): boolean => {
-    // TODO: Update this method to check for the metadata
-    const permissions = getScopePermissions(inTable._metadata?.scope);
+    const permissions = getScopePermissions(inTable._scope);
 
     return permissions.is_mutable;
   };

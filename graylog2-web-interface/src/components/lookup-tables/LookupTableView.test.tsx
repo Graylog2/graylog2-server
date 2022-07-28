@@ -18,16 +18,17 @@ import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 
+import { asMock } from 'helpers/mocking';
+import { exampleEntityScope } from 'fixtures/entityScope';
+import fetchScopePermissions from 'hooks/api/fetchScopePermissions';
+
 import { TABLE, CACHE, DATA_ADAPTER } from './fixtures';
 import LookupTableView from './LookupTableView';
 
+jest.mock('hooks/api/fetchScopePermissions', () => jest.fn());
+
 const renderedLUT = (scope: string) => {
-  TABLE._metadata = {
-    scope: scope,
-    revision: 2,
-    created_at: '2022-06-13T08:47:12Z',
-    updated_at: '2022-06-29T12:00:28Z',
-  };
+  TABLE._scope = scope;
 
   return render(
     <Router>
@@ -38,6 +39,8 @@ const renderedLUT = (scope: string) => {
 
 describe('LookupTableView', () => {
   it('should show "edit" button', async () => {
+    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+
     const { baseElement } = renderedLUT('DEFAULT');
 
     await waitFor(() => {
@@ -48,6 +51,8 @@ describe('LookupTableView', () => {
   });
 
   it('should not show "edit" button', async () => {
+    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+
     const { baseElement } = renderedLUT('ILLUMINATE');
 
     await waitFor(() => {

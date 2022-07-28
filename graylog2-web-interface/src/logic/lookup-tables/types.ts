@@ -14,21 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-type Metadata = {
-  scope: string,
-  revision: number,
-  created_at: string,
-  updated_at: string,
-};
-
 type GenericEntityType = {
   id?: string | null,
   title: string,
   description?: string | null,
   name: string,
   content_pack?: string | null,
-  _metadata?: Metadata | null,
+  _scope?: string,
 };
 
 export type LookupTableCacheConfig = {
@@ -49,6 +41,7 @@ export type LookupTableAdapter = GenericEntityType & {
   config?: { type: string },
   custom_error_ttl_unit?: 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS' | null,
   custom_error_ttl_enabled?: boolean,
+  _scope: string;
 }
 
 export type LookupTable = GenericEntityType & {

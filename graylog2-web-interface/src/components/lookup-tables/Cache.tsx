@@ -56,8 +56,7 @@ const Cache = ({ cache }: Props) => {
   };
 
   const showAction = (inCache: LookupTableCache): boolean => {
-    // TODO: Update this method to check for the metadata
-    const permissions = getScopePermissions(inCache._metadata?.scope);
+    const permissions = getScopePermissions(inCache._scope);
 
     return permissions.is_mutable;
   };

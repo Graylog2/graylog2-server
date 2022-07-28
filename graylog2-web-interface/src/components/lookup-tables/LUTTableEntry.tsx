@@ -50,9 +50,8 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
   const history = useHistory();
   const { getScopePermissions } = useScopePermissions();
 
-  const showActions = (inTable: LookupTable): boolean => {
-    // TODO: Update this method to check for the metadata
-    const permissions = getScopePermissions(inTable._metadata?.scope);
+  const showActions = (): boolean => {
+    const permissions = getScopePermissions(table._scope);
 
     return permissions.is_mutable;
   };
@@ -95,7 +94,7 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
           )}
           <Link to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapter.name)}>{dataAdapter.title}</Link>
         </td>
-        <td>{showActions(table) && (
+        <td>{showActions() && (
           <Actions>
             <Button bsSize="xsmall" bsStyle="info" onClick={handleEdit(table.name)} alt="edit button">
               Edit

@@ -18,16 +18,15 @@ import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 
+import { exampleEntityScope } from 'fixtures/entityScope';
+import { asMock } from 'helpers/mocking';
+import fetchScopePermissions from 'hooks/api/fetchScopePermissions';
+
 import { CACHE } from './fixtures';
 import CacheTableEntry from './CacheTableEntry';
 
 const renderedCTE = (scope: string) => {
-  CACHE._metadata = {
-    scope: scope,
-    revision: 2,
-    created_at: '2022-06-13T08:47:12Z',
-    updated_at: '2022-06-29T12:00:28Z',
-  };
+  CACHE._scope = scope;
 
   return render(
     <Router><CacheTableEntry cache={CACHE} /></Router>,
@@ -37,8 +36,12 @@ const renderedCTE = (scope: string) => {
   );
 };
 
+jest.mock('hooks/api/fetchScopePermissions', () => jest.fn());
+
 describe('CacheTableEntry', () => {
   it('should show "edit" button', async () => {
+    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+
     const { baseElement } = renderedCTE('DEFAULT');
 
     await waitFor(() => {
@@ -49,6 +52,8 @@ describe('CacheTableEntry', () => {
   });
 
   it('should not show "edit" button', async () => {
+    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+
     const { queryByAltText } = renderedCTE('ILLUMINATE');
 
     await waitFor(() => {
@@ -59,6 +64,8 @@ describe('CacheTableEntry', () => {
   });
 
   it('should show "delete" button', async () => {
+    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+
     const { baseElement } = renderedCTE('DEFAULT');
 
     await waitFor(() => {
@@ -69,6 +76,8 @@ describe('CacheTableEntry', () => {
   });
 
   it('should not show "delete" button', async () => {
+    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+
     const { queryByAltText } = renderedCTE('ILLUMINATE');
 
     await waitFor(() => {

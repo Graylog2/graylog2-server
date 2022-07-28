@@ -18,16 +18,16 @@ import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 
+import { asMock } from 'helpers/mocking';
 import { DATA_ADAPTER } from './fixtures';
+import { exampleEntityScope } from 'fixtures/entityScope';
 import DataAdapterTableEntry from './DataAdapterTableEntry';
+import fetchScopePermissions from 'hooks/api/fetchScopePermissions';
+
+jest.mock('hooks/api/fetchScopePermissions', () => jest.fn());
 
 const renderedDataAdapter = (scope: string) => {
-  DATA_ADAPTER._metadata = {
-    scope: scope,
-    revision: 2,
-    created_at: '2022-06-13T08:47:12Z',
-    updated_at: '2022-06-29T12:00:28Z',
-  };
+  DATA_ADAPTER._scope = scope;
 
   return render(
     <Router>
@@ -41,38 +41,42 @@ const renderedDataAdapter = (scope: string) => {
 
 describe('DataAdapterTableEntry', () => {
   it('should show "edit" button for non ILLUMINATE entities', async () => {
+    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+    
     const { getByTestId } = renderedDataAdapter('DEFAULT');
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = getByTestId('edit-button'); });
-
-    expect(actionBtn).not.toBeDisabled();
+    await waitFor(() => {
+      expect(getByTestId('edit-button')).not.toBeDisabled();
+    });
   });
 
-  it('should not show "edit" button for ILLUMINATE entities', async () => {
+  it('should disable "edit" button for ILLUMINATE entities', async () => {
+    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+
     const { getByTestId } = renderedDataAdapter('ILLUMINATE');
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = getByTestId('edit-button'); });
-
-    expect(actionBtn).toBeDisabled();
+    await waitFor(() => {
+      expect(getByTestId('edit-button')).toHaveClass('disabled');
+    });
   });
 
   it('should show "delete" button for non ILLUMINATE entities', async () => {
+    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+
     const { getByTestId } = renderedDataAdapter('DEFAULT');
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = getByTestId('delete-button'); });
-
-    expect(actionBtn).not.toBeDisabled();
+    await waitFor(() => {
+      expect(getByTestId('delete-button')).not.toBeDisabled();
+    });
   });
 
-  it('should not show "delete" button for ILLUMINATE entities', async () => {
+  it('should disable "delete" button for ILLUMINATE entities', async () => {
+    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+
     const { getByTestId } = renderedDataAdapter('ILLUMINATE');
 
-    let actionBtn = null;
-    await waitFor(() => { actionBtn = getByTestId('delete-button'); });
-
-    expect(actionBtn).toBeDisabled();
+    await waitFor(() => {
+      expect(getByTestId('delete-button')).toBeDisabled();
+    });
   });
 });
