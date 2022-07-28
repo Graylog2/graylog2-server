@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import type * as Immutable from 'immutable';
 
-import PaginatedList from 'components/common/PaginatedList';
+import PaginatedList, { INITIAL_PAGE } from 'components/common/PaginatedList';
 import SearchForm from 'components/common/SearchForm';
 import Spinner from 'components/common/Spinner';
 import EmptyResult from 'components/common/EmptyResult';
@@ -59,6 +59,7 @@ type Props = {
 };
 
 const pageSizes = [5, 10, 30];
+export const DEFAULT_PAGINATION = { page: INITIAL_PAGE, perPage: pageSizes[0], query: '' };
 
 const PaginatedItemOverview = ({
   onLoad,
