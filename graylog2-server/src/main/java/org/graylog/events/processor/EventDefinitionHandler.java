@@ -334,7 +334,7 @@ public class EventDefinitionHandler {
     }
 
     private Optional<JobTriggerDto> getJobTrigger(JobDefinitionDto jobDefinition) {
-        final List<JobTriggerDto> jobTriggers = jobTriggerService.getForJob(jobDefinition.id());
+        final List<JobTriggerDto> jobTriggers = jobTriggerService.getOneForJob(jobDefinition.id());
 
         if (jobTriggers.isEmpty()) {
             return Optional.empty();

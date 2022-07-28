@@ -138,7 +138,7 @@ public class DBJobTriggerService {
      * @param jobDefinitionId the job definition ID
      * @return list of found job triggers
      */
-    public List<JobTriggerDto> getForJob(String jobDefinitionId) {
+    public List<JobTriggerDto> getOneForJob(String jobDefinitionId) {
         final List<JobTriggerDto> triggers = getAllForJob(jobDefinitionId);
         // We are currently expecting only one trigger per job definition. This will most probably change in the
         // future once we extend our scheduler usage.

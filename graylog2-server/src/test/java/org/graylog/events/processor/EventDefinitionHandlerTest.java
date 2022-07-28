@@ -316,7 +316,7 @@ public class EventDefinitionHandlerTest {
         assertThat(newJobDefinition.description()).isEqualTo(newDescription);
         assertThat(((EventProcessorExecutionJob.Config) newJobDefinition.config()).processingHopSize()).isEqualTo(550000);
 
-        assertThat(jobTriggerService.getForJob(newJobDefinition.id()).get(0)).satisfies(trigger -> {
+        assertThat(jobTriggerService.getOneForJob(newJobDefinition.id()).get(0)).satisfies(trigger -> {
             final IntervalJobSchedule schedule = (IntervalJobSchedule) trigger.schedule();
             assertThat(schedule.interval()).isEqualTo(550000);
         });
