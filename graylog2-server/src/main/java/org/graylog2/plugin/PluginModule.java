@@ -405,4 +405,9 @@ public abstract class PluginModule extends Graylog2Module {
         Multibinder<EntityScope> scopeBinder = Multibinder.newSetBinder(binder(), EntityScope.class);
         scopeBinder.addBinding().to(entityScopeType);
     }
+
+    protected void addEntityScope(Class<? extends EntityScope> entityScopeType) {
+        Multibinder<EntityScope> scopeBinder = Multibinder.newSetBinder(binder(), EntityScope.class);
+        scopeBinder.addBinding().to(entityScopeType);
+    }
 }
