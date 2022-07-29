@@ -56,7 +56,6 @@ import java.util.stream.Collectors;
 @JsonDeserialize(builder = EventDefinitionDto.Builder.class)
 @WithBeanGetter
 public abstract class EventDefinitionDto extends ScopedEntity implements EventDefinition, ContentPackable<EventDefinitionEntity> {
-    public static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_NOTIFICATIONS = "notifications";
