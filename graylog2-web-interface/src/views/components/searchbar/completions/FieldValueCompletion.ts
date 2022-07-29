@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { isEqual } from 'lodash';
-
 import { SearchSuggestions } from '@graylog/server-api';
+
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
