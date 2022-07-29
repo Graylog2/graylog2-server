@@ -18,13 +18,15 @@ import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+import { asMock } from 'helpers/mocking';
 import mockComponent from 'helpers/mocking/MockComponent';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
-import 'helpers/mocking/react-dom_mock';
 import SavedSearchForm from './SavedSearchForm';
 
 jest.mock('react-overlays', () => ({ Position: mockComponent('MockPosition') }));
 jest.mock('components/common/Portal', () => ({ children }) => (children));
+jest.mock('views/logic/usePluginEntities');
 
 describe('SavedSearchForm', () => {
   const props = {
@@ -85,43 +87,55 @@ describe('SavedSearchForm', () => {
 
       expect(onSave).toHaveBeenCalledTimes(1);
     });
+
+    it('should handle saveAsSearch', async () => {
+      const onSaveAs = jest.fn();
+
+      render(<SavedSearchForm {...props}
+                              saveAsSearch={onSaveAs} />);
+
+      const saveAsButton = await screen.findByRole('button', { name: 'Save as' });
+      userEvent.click(saveAsButton);
+
+      expect(onSaveAs).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not handle saveAsSearch if disabled', async () => {
+      const onSaveAs = jest.fn();
+
+      render(<SavedSearchForm {...props}
+                              disableCreateNew
+                              saveAsSearch={onSaveAs} />);
+
+      const saveAsButton = await screen.findByRole('button', { name: 'Save as' });
+      userEvent.click(saveAsButton);
+
+      expect(onSaveAs).toHaveBeenCalledTimes(0);
+    });
+
+    it('should handle create new', async () => {
+      const onSaveAs = jest.fn();
+
+      render(<SavedSearchForm {...props}
+                              saveAsSearch={onSaveAs}
+                              isCreateNew />);
+
+      const createNewButton = await screen.findByRole('button', { name: /create new/i });
+      userEvent.click(createNewButton);
+
+      expect(onSaveAs).toHaveBeenCalledTimes(1);
+    });
   });
 
-  it('should handle saveAsSearch', async () => {
-    const onSaveAs = jest.fn();
+  it('should render pluggable components', async () => {
+    const pluginComponentMock = jest.fn(() => <div>Pluggable component!</div>);
 
-    render(<SavedSearchForm {...props}
-                            saveAsSearch={onSaveAs} />);
+    asMock(usePluginEntities).mockImplementation((entityKey) => ({
+      'views.components.saveViewForm': [{ component: pluginComponentMock, id: 'example-plugin-component' }],
+    }[entityKey]));
 
-    const saveAsButton = await screen.findByRole('button', { name: 'Save as' });
-    userEvent.click(saveAsButton);
+    render(<SavedSearchForm {...props} />);
 
-    expect(onSaveAs).toHaveBeenCalledTimes(1);
-  });
-
-  it('should not handle saveAsSearch if disabled', async () => {
-    const onSaveAs = jest.fn();
-
-    render(<SavedSearchForm {...props}
-                            disableCreateNew
-                            saveAsSearch={onSaveAs} />);
-
-    const saveAsButton = await screen.findByRole('button', { name: 'Save as' });
-    userEvent.click(saveAsButton);
-
-    expect(onSaveAs).toHaveBeenCalledTimes(0);
-  });
-
-  it('should handle create new', async () => {
-    const onSaveAs = jest.fn();
-
-    render(<SavedSearchForm {...props}
-                            saveAsSearch={onSaveAs}
-                            isCreateNew />);
-
-    const createNewButton = await screen.findByRole('button', { name: /create new/i });
-    userEvent.click(createNewButton);
-
-    expect(onSaveAs).toHaveBeenCalledTimes(1);
+    await screen.findByText('Pluggable component!');
   });
 });

@@ -284,7 +284,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<MessageDetailContextProviderProps>>;
     'views.components.widgets.messageTable.contextProviders'?: Array<React.ComponentType>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
-    'views.components.saveViewForm'?: Array<React.ComponentType<{ disabledViewCreation?: boolean}>>;
+    'views.components.saveViewForm'?: Array<{ component: React.ComponentType<{ disabledViewCreation?: boolean }>, id: string }>;
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
     'views.elements.validationErrorExplanation'?: Array<React.ComponentType<{ validationState: QueryValidationState }>>;
