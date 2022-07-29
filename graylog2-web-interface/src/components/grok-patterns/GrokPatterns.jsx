@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import {
@@ -66,6 +67,10 @@ const _headerCellFormatter = (header) => {
 };
 
 class GrokPatterns extends React.Component {
+  static propTypes = {
+    paginationQueryParameter: PropTypes.object.isRequired,
+  };
+
   constructor(props) {
     super(props);
 
@@ -91,6 +96,7 @@ class GrokPatterns extends React.Component {
 
   loadData = (callback, page = this.props.paginationQueryParameter.page, perPage = this.props.paginationQueryParameter.pageSize) => {
     const { pagination: { query } } = this.state;
+
     this.loadPromise = GrokPatternsStore.searchPaginated(page, perPage, query)
       .then(({ patterns, pagination }) => {
         if (callback) {
