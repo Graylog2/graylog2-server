@@ -29,6 +29,7 @@ import {
 import { Button, Col, Row } from 'components/bootstrap';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { GrokPatternsStore } from 'stores/grok-patterns/GrokPatternsStore';
 
 import GrokPatternQueryHelper from './GrokPatternQueryHelper';
@@ -71,8 +72,6 @@ class GrokPatterns extends React.Component {
     this.state = {
       patterns: [],
       pagination: {
-        page: 1,
-        perPage: 10,
         count: 0,
         total: 0,
         query: '',
@@ -90,9 +89,8 @@ class GrokPatterns extends React.Component {
     }
   }
 
-  loadData = (callback) => {
-    const { pagination: { page, perPage, query } } = this.state;
-
+  loadData = (callback, page = this.props.paginationQueryParameter.page, perPage = this.props.paginationQueryParameter.pageSize) => {
+    const { pagination: { query } } = this.state;
     this.loadPromise = GrokPatternsStore.searchPaginated(page, perPage, query)
       .then(({ patterns, pagination }) => {
         if (callback) {
@@ -122,23 +120,20 @@ class GrokPatterns extends React.Component {
   };
 
   _onPageChange = (newPage, newPerPage) => {
-    const { pagination } = this.state;
-    const newPagination = Object.assign(pagination, {
-      page: newPage,
-      perPage: newPerPage,
-    });
-    this.setState({ pagination: newPagination }, this.loadData);
+    this.loadData(null, newPage, newPerPage);
   };
 
   _onSearch = (query, resetLoadingCallback) => {
     const { pagination } = this.state;
     const newPagination = Object.assign(pagination, { query: query });
+    this.props.paginationQueryParameter.resetPage();
     this.setState({ pagination: newPagination }, () => this.loadData(resetLoadingCallback));
   };
 
   _onReset = () => {
     const { pagination } = this.state;
     const newPagination = Object.assign(pagination, { query: '' });
+    this.props.paginationQueryParameter.resetPage();
     this.setState({ pagination: newPagination }, this.loadData);
   };
 
@@ -249,4 +244,4 @@ class GrokPatterns extends React.Component {
   }
 }
 
-export default GrokPatterns;
+export default withPaginationQueryParameter(GrokPatterns);
