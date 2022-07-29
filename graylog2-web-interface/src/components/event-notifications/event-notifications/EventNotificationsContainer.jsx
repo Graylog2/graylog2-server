@@ -37,6 +37,7 @@ const fetchData = ({ page, pageSize, query }) => {
 
 const handleDelete = (definition) => {
   return () => {
+    // eslint-disable-next-line no-alert
     if (window.confirm(`Are you sure you want to delete "${definition.title}"?`)) {
       EventNotificationsActions.delete(definition);
     }
