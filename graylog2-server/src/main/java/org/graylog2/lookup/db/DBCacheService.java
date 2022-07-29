@@ -53,7 +53,6 @@ public class DBCacheService extends ScopedDbService<CacheDto> {
         db.createIndex(new BasicDBObject("name", 1), new BasicDBObject("unique", true));
     }
 
-    @Override
     public Optional<CacheDto> get(String idOrName) {
         if (ObjectId.isValid(idOrName)) {
             return Optional.ofNullable(db.findOneById(new ObjectId(idOrName)));
