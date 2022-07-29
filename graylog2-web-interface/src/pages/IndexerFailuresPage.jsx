@@ -33,12 +33,10 @@ class IndexerFailuresPage extends React.Component {
       this.setState({ total: response.count });
     });
 
-    this.loadData(1, this.defaultPageSize);
+    this.loadData();
   }
 
-  defaultPageSize = 50;
-
-  loadData = (page, size) => {
+  loadData = (page = this.props.paginationQueryParameter.page, size = this.props.paginationQueryParameter.pageSize) => {
     IndexerFailuresStore.list(size, (page - 1) * size).then((response) => {
       this.setState({ failures: response.failures });
     });
@@ -81,4 +79,4 @@ class IndexerFailuresPage extends React.Component {
   }
 }
 
-export default IndexerFailuresPage;
+export default withPaginationQueryParameter(IndexerFailuresPage);
