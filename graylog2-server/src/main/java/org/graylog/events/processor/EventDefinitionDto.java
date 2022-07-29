@@ -229,6 +229,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
                 .collect(Collectors.toList()));
 
         return EventDefinitionEntity.builder()
+            .scope(ValueReference.of(scope()))
             .title(ValueReference.of(title()))
             .description(ValueReference.of(description()))
             .priority(ValueReference.of(priority()))
