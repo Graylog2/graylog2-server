@@ -269,4 +269,9 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
 
         return ImmutableGraph.copyOf(mutableGraph);
     }
+
+    @Override
+    public boolean usesScopedEntities() {
+        return true;
+    }
 }

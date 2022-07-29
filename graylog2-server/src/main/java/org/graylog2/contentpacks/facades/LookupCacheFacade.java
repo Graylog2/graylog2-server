@@ -172,4 +172,9 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
         final ModelId modelId = entityDescriptor.id();
         return cacheService.get(modelId.id()).map(cacheDto -> exportNativeEntity(cacheDto, entityDescriptorIds));
     }
+
+    @Override
+    public boolean usesScopedEntities() {
+        return true;
+    }
 }
