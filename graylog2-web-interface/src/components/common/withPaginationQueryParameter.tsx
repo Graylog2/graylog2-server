@@ -18,9 +18,13 @@ import * as React from 'react';
 
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
-function withPaginationQueryParameter(Component) {
+export type PaginationQueryParameterObject = {
+  pageSizes?: number[];
+};
+
+function withPaginationQueryParameter(Component, obj?: PaginationQueryParameterObject) {
   return function WrappedComponent(props) {
-    const result = usePaginationQueryParameter();
+    const result = usePaginationQueryParameter(obj?.pageSizes);
 
     return <Component {...props} paginationQueryParameter={result} />;
   };
