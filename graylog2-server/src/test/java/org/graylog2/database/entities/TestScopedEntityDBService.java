@@ -21,7 +21,7 @@ import org.graylog2.database.MongoConnection;
 
 import javax.inject.Inject;
 
-public class TestScopedEntityDBService extends ScopedEntityPaginatedDbService<TestScopedEntity> {
+public class TestScopedEntityDBService extends ScopedDbService<TestScopedEntity> {
 
     public static final String COLLECTION_NAME = "test_entities";
 

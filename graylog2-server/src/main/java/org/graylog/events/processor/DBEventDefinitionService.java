@@ -23,7 +23,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.EntityScopeService;
-import org.graylog2.database.entities.ScopedEntityPaginatedDbService;
+import org.graylog2.database.entities.ScopedDbService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
@@ -36,7 +36,7 @@ import java.util.Locale;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class DBEventDefinitionService extends ScopedEntityPaginatedDbService<EventDefinitionDto> {
+public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto> {
     private static final Logger LOG = LoggerFactory.getLogger(DBEventDefinitionService.class);
 
     private static final String COLLECTION_NAME = "event_definitions";
@@ -67,6 +67,9 @@ public class DBEventDefinitionService extends ScopedEntityPaginatedDbService<Eve
     }
 
     public int deleteUnregister(String id) {
+        // Must ensure mutability before deleting, so that de-registration is only performed if entity exists
+        // and is not mutable.
+        ensureMutability(get(id).orElseThrow(() -> new IllegalArgumentException("Event Definition not found.")));
         return doDeleteUnregister(id, () -> super.delete(id));
     }
 
@@ -75,10 +78,6 @@ public class DBEventDefinitionService extends ScopedEntityPaginatedDbService<Eve
     }
 
     private int doDeleteUnregister(String id, Supplier<Integer> deleteSupplier) {
-        // Must ensure mutability before deleting, so that de-registration is only performed if entity exists
-        // and is not mutable.
-        ensureMutability(get(id).orElseThrow(() -> new IllegalArgumentException("Event Definition not found.")));
-
         // Deregister event definition.
         try {
             stateService.deleteByEventDefinitionId(id);

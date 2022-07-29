@@ -40,6 +40,7 @@ import org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutorSe
 import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 import org.reflections.Reflections;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -148,8 +149,8 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
 
     private <T> T instantiateFactory(Class<? extends T> providerClass) {
         try {
-            return providerClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+            return providerClass.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException("Unable to construct instance of " + providerClass.getSimpleName() + ": ", e);
         }
     }

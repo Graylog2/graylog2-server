@@ -338,6 +338,7 @@ public class EventDefinitionHandler {
 
     private JobTriggerDto newJobTrigger(JobDefinitionDto jobDefinition, EventProcessorSchedulerConfig schedulerConfig) {
         return JobTriggerDto.builderWithClock(clock)
+                .jobDefinitionType(EventProcessorExecutionJob.TYPE_NAME)
                 .jobDefinitionId(requireNonNull(jobDefinition.id(), "Job definition ID cannot be null"))
                 .nextTime(clock.nowUTC())
                 .schedule(schedulerConfig.schedule())

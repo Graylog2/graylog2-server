@@ -28,6 +28,8 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityCheckStatus;
+import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityChecker;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewResolverDecoder;
@@ -46,8 +48,7 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -80,7 +81,6 @@ import static java.util.Locale.ENGLISH;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class ViewsResource extends RestResource implements PluginRestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(ViewsResource.class);
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(ViewDTO.FIELD_ID))
             .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
@@ -92,16 +92,19 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final ClusterEventBus clusterEventBus;
     private final SearchDomain searchDomain;
     private final Map<String, ViewResolver> viewResolvers;
+    private final SearchFilterVisibilityChecker searchFilterVisibilityChecker;
 
     @Inject
     public ViewsResource(ViewService dbService,
                          ClusterEventBus clusterEventBus, SearchDomain searchDomain,
-                         Map<String, ViewResolver> viewResolvers) {
+                         Map<String, ViewResolver> viewResolvers,
+                         SearchFilterVisibilityChecker searchFilterVisibilityChecker) {
         this.dbService = dbService;
         this.clusterEventBus = clusterEventBus;
         this.searchDomain = searchDomain;
         this.viewResolvers = viewResolvers;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        this.searchFilterVisibilityChecker = searchFilterVisibilityChecker;
     }
 
     @GET
@@ -236,9 +239,15 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         final Set<String> widgetPositions = dto.state().values().stream()
                 .flatMap(v -> v.widgetPositions().keySet().stream()).collect(Collectors.toSet());
 
-        if(!widgetPositions.containsAll(widgetIds)) {
+        if (!widgetPositions.containsAll(widgetIds)) {
             final Sets.SetView<String> diff = Sets.difference(widgetPositions, widgetIds);
             throw new BadRequestException("Widget positions don't correspond to widgets, missing widget possitions: " + diff);
+        }
+
+        final SearchFilterVisibilityCheckStatus searchFilterVisibilityCheckStatus = searchFilterVisibilityChecker.checkSearchFilterVisibility(
+                filterID -> isPermitted(RestPermissions.SEARCH_FILTERS_READ, filterID), search);
+        if (!searchFilterVisibilityCheckStatus.allSearchFiltersVisible()) {
+            throw new BadRequestException(searchFilterVisibilityCheckStatus.toMessage());
         }
     }
 

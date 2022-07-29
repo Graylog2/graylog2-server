@@ -112,9 +112,9 @@ public class Generator {
         final StringBuilder prefixedPath = new StringBuilder();
 
         if (pluginMapping.containsKey(resourceClass)) {
-            prefixedPath.append(pluginPathPrefix);
-            prefixedPath.append("/");
-            prefixedPath.append(pluginMapping.get(resourceClass));
+            prefixedPath.append(pluginPathPrefix)
+                    .append("/")
+                    .append(pluginMapping.get(resourceClass));
         }
 
         if (!resourcePath.startsWith("/")) {
@@ -147,9 +147,7 @@ public class Generator {
 
             apis.add(apiDescription);
         }
-        Collections.sort(apis, (o1, o2) -> ComparisonChain.start().compare(o1.get("name").toString(), o2.get("name").toString()).result());
-        Map<String, String> info = Maps.newHashMap();
-        info.put("title", "Graylog REST API");
+        apis.sort((o1, o2) -> ComparisonChain.start().compare(o1.get("name").toString(), o2.get("name").toString()).result());
 
         overviewResult.put("apiVersion", ServerVersion.VERSION.toString());
         overviewResult.put("swaggerVersion", EMULATED_SWAGGER_VERSION);
@@ -604,6 +602,8 @@ public class Generator {
 
                 if (annotation instanceof QueryParam) {
                     paramKind = Parameter.Kind.QUERY;
+                    final String annotationValue = ((QueryParam)annotation).value();
+                    param.setName(annotationValue);
                 } else if (annotation instanceof PathParam) {
                     final String annotationValue = ((PathParam)annotation).value();
                     if (!Strings.isNullOrEmpty(annotationValue)) {
@@ -612,8 +612,12 @@ public class Generator {
                     paramKind = Parameter.Kind.PATH;
                 } else if (annotation instanceof HeaderParam) {
                     paramKind = Parameter.Kind.HEADER;
+                    final String annotationValue = ((HeaderParam)annotation).value();
+                    param.setName(annotationValue);
                 } else if (annotation instanceof FormParam) {
                     paramKind = Parameter.Kind.FORM;
+                    final String annotationValue = ((FormParam)annotation).value();
+                    param.setName(annotationValue);
                 }
             }
 

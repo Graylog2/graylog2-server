@@ -19,7 +19,6 @@ package org.graylog.plugins.map.geoip;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.net.InetAddresses;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
@@ -33,12 +32,26 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
 public class GeoIpResolverEngine {
     private static final Logger LOG = LoggerFactory.getLogger(GeoIpResolverEngine.class);
+
+    /**
+     * This is a list of schema fields defined in package <b></b>org.graylog.schema</b> as of 2022-07-15 which we want to scan for IP addresses.  If the schema changes, or we need to add/remove fields,
+     * this list must be updated, until a better way of defining schema fields is developed, that allows iteration.
+     */
+    private static final String[] KNOWN_SCHEMA_IP_FIELDS = {org.graylog.schema.DestinationFields.DESTINATION_IP,
+            org.graylog.schema.DestinationFields.DESTINATION_NAT_IP,
+            org.graylog.schema.EventFields.EVENT_OBSERVER_IP,
+            org.graylog.schema.SourceFields.SOURCE_NAT_IP,
+            org.graylog.schema.NetworkFields.NETWORK_FORWARDED_IP,
+            org.graylog.schema.SourceFields.SOURCE_IP,
+            org.graylog.schema.HostFields.HOST_IP};
 
     /**
      * A mapping of fields (per the Graylog Schema) that to search that contain IP addresses.  When the user opts to
@@ -51,11 +64,9 @@ public class GeoIpResolverEngine {
      * that will be inserted into the message.
      * </p>
      */
-    private final Map<String, String> ipAddressFields = new ImmutableMap.Builder<String, String>()
-            .put("source_ip", "source")
-            .put("host_ip", "host")
-            .put("destination_ip", "destination")
-            .build();
+
+    private final Map<String, String> ipAddressFields = Stream.of(KNOWN_SCHEMA_IP_FIELDS)
+            .collect(Collectors.toMap(e -> e, mapFieldNameToPrefix()));
 
     private final GeoIpResolver<GeoLocationInformation> ipLocationResolver;
     private final GeoIpResolver<GeoAsnInformation> ipAsnResolver;
@@ -92,22 +103,32 @@ public class GeoIpResolverEngine {
                 continue;
             }
 
-            // IF the user has opted NOT to enforce the Graylog Schema, the key will likely not
-            // be in the field map--in such cases use the key (full field name) as the prefix.
+            // For reserved IPs just mark as reserved. Otherwise, enforce Graylog schema on only relevant IP fields
+            // or add legacy fields on all IP fields in the message if enforcement is disabled.
             final String prefix = enforceGraylogSchema ? ipAddressFields.getOrDefault(key, key) : key;
-
             if (ReservedIpChecker.getInstance().isReservedIpAddress(address.getHostAddress())) {
                 message.addField(prefix + "_reserved_ip", true);
+            } else if (enforceGraylogSchema) {
+                addGIMGeoIpDataIfPresent(message, address, prefix);
             } else {
-                addGeoIpDataIfPresent(message, address, prefix);
+                addLegacyGeoIpDataIfPresent(message, address, prefix);
             }
-
         }
 
         return true;
     }
 
-    private void addGeoIpDataIfPresent(Message message, InetAddress address, String newFieldPrefix) {
+    // Pre-4.3 logic for adding geo fields to message.
+    private void addLegacyGeoIpDataIfPresent(Message message, InetAddress address, String key) {
+        ipLocationResolver.getGeoIpData(address).ifPresent(locationInformation -> {
+            // We will store the coordinates as a "lat,long" string
+            message.addField(key + "_geolocation", locationInformation.latitude() + "," + locationInformation.longitude());
+            message.addField(key + "_country_code", locationInformation.countryIsoCode());
+            message.addField(key + "_city_name", locationInformation.cityName());
+        });
+    }
+
+    private void addGIMGeoIpDataIfPresent(Message message, InetAddress address, String newFieldPrefix) {
         ipLocationResolver.getGeoIpData(address).ifPresent(locationInformation -> {
             message.addField(newFieldPrefix + "_geo_coordinates", locationInformation.latitude() + "," + locationInformation.longitude());
             message.addField(newFieldPrefix + "_geo_country_iso", locationInformation.countryIsoCode());
@@ -185,5 +206,9 @@ public class GeoIpResolverEngine {
         }
 
         return null;
+    }
+
+    private static Function<String, String> mapFieldNameToPrefix() {
+        return string -> string.replace("_ip", "");
     }
 }

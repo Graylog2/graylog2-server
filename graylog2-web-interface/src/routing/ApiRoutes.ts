@@ -261,6 +261,7 @@ const ApiRoutes = {
   SystemJobsApiController: {
     list: () => { return { url: '/cluster/jobs' }; },
     getJob: (jobId: string) => { return { url: `/cluster/jobs/${jobId}` }; },
+    acknowledgeJob: (jobId: string) => { return { url: `/system/jobs/acknowledge/${jobId}` }; },
     cancelJob: (jobId: string) => { return { url: `/cluster/jobs/${jobId}` }; },
   },
   SystemMessagesApiController: {
