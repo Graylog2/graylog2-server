@@ -72,7 +72,7 @@ const SavedSearchForm = (props: Props) => {
                            placeholder="Enter title"
                            onChange={onChangeTitle} />
             </FormGroup>
-            {pluggableFormComponents?.map((Component) => (<Component disabledCreateNew={disableSaveAs} />))}
+            {pluggableFormComponents?.map((Component) => (<Component disabledViewCreation={disableSaveAs} />))}
             <ButtonToolbar>
               {!isCreateNew && (
                 <Button bsStyle="primary"
