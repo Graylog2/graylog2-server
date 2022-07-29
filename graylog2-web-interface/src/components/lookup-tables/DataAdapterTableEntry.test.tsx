@@ -19,10 +19,11 @@ import { render, waitFor } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 
 import { asMock } from 'helpers/mocking';
-import { DATA_ADAPTER } from './fixtures';
 import { exampleEntityScope } from 'fixtures/entityScope';
-import DataAdapterTableEntry from './DataAdapterTableEntry';
 import fetchScopePermissions from 'hooks/api/fetchScopePermissions';
+
+import { DATA_ADAPTER } from './fixtures';
+import DataAdapterTableEntry from './DataAdapterTableEntry';
 
 jest.mock('hooks/api/fetchScopePermissions', () => jest.fn());
 
@@ -42,7 +43,7 @@ const renderedDataAdapter = (scope: string) => {
 describe('DataAdapterTableEntry', () => {
   it('should show "edit" button for non ILLUMINATE entities', async () => {
     asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
-    
+
     const { getByTestId } = renderedDataAdapter('DEFAULT');
 
     await waitFor(() => {
