@@ -17,9 +17,11 @@
 import React from 'react';
 import { Position } from 'react-overlays';
 import styled from 'styled-components';
+import { ButtonToolbar } from 'react-bootstrap';
 
 import { Portal } from 'components/common';
 import { Button, ControlLabel, FormControl, FormGroup, Popover } from 'components/bootstrap';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 import styles from './SavedSearchForm.css';
 
@@ -56,6 +58,7 @@ const SavedSearchForm = (props: Props) => {
   } = props;
   const disableSaveAs = !value || value === '' || disableCreateNew;
   const createNewTitle = isCreateNew ? 'Create new' : 'Save as';
+  const pluggableFormComponents = usePluginEntities('views.components.saveViewForm');
 
   return (
     <Portal>
@@ -70,29 +73,31 @@ const SavedSearchForm = (props: Props) => {
                            placeholder="Enter title"
                            onChange={onChangeTitle} />
             </FormGroup>
-            {!isCreateNew
-            && (
-              <Button bsStyle="primary"
+            {pluggableFormComponents?.map((Component) => (<Component disabledCreateNew={disableSaveAs} />))}
+            <ButtonToolbar>
+              {!isCreateNew && (
+                <Button bsStyle="primary"
+                        className={styles.button}
+                        type="submit"
+                        bsSize="sm"
+                        onClick={saveSearch}>
+                  Save
+                </Button>
+              )}
+              <Button disabled={disableSaveAs}
+                      bsStyle="info"
                       className={styles.button}
                       type="submit"
                       bsSize="sm"
-                      onClick={saveSearch}>
-                Save
+                      onClick={saveAsSearch}>
+                {createNewTitle}
               </Button>
-            )}
-            <Button disabled={disableSaveAs}
-                    bsStyle="info"
-                    className={styles.button}
-                    type="submit"
-                    bsSize="sm"
-                    onClick={saveAsSearch}>
-              {createNewTitle}
-            </Button>
-            <Button className={styles.button}
-                    onClick={toggleModal}
-                    bsSize="sm">
-              Cancel
-            </Button>
+              <Button className={styles.button}
+                      onClick={toggleModal}
+                      bsSize="sm">
+                Cancel
+              </Button>
+            </ButtonToolbar>
           </StyledForm>
         </Popover>
       </Position>
