@@ -20,27 +20,49 @@ import PropTypes from 'prop-types';
 import { Spinner } from 'components/common';
 import connect from 'stores/connect';
 import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 
-import EventNotifications from './EventNotifications';
+import EventNotifications, { PAGE_SIZES } from './EventNotifications';
 // Import built-in Event Notification Types
 
 import {} from '../event-notification-types';
 
+const fetchData = ({ page, pageSize, query }) => {
+  return EventNotificationsActions.listPaginated({
+    query: query,
+    page: page,
+    pageSize: pageSize,
+  });
+};
+
+const handleDelete = (definition) => {
+  return () => {
+    if (window.confirm(`Are you sure you want to delete "${definition.title}"?`)) {
+      EventNotificationsActions.delete(definition);
+    }
+  };
+};
+
 class EventNotificationsContainer extends React.Component {
   static propTypes = {
     notifications: PropTypes.object,
+    paginationQueryParameter: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
     notifications: undefined,
   };
 
-  state = {
-    testResult: {},
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      testResult: {},
+    };
+  }
 
   componentDidMount() {
-    this.fetchData({});
+    fetchData({ page: this.props.paginationQueryParameter.page, pageSize: this.props.paginationQueryParameter.pageSize });
   }
 
   componentWillUnmount() {
@@ -49,33 +71,20 @@ class EventNotificationsContainer extends React.Component {
     }
   }
 
-  fetchData = ({ page, pageSize, query }) => {
-    return EventNotificationsActions.listPaginated({
-      query: query,
-      page: page,
-      pageSize: pageSize,
-    });
-  };
-
   handlePageChange = (nextPage, nextPageSize) => {
     const { notifications } = this.props;
 
-    this.fetchData({ page: nextPage, pageSize: nextPageSize, query: notifications.query });
+    fetchData({ page: nextPage, pageSize: nextPageSize, query: notifications.query });
   };
 
   handleQueryChange = (nextQuery, callback = () => {}) => {
-    const { notifications } = this.props;
-    const promise = this.fetchData({ query: nextQuery, pageSize: notifications.pagination.pageSize });
+    const { pageSize, resetPage } = this.props.paginationQueryParameter;
+
+    resetPage();
+
+    const promise = fetchData({ query: nextQuery, pageSize });
 
     promise.finally(callback);
-  };
-
-  handleDelete = (definition) => {
-    return () => {
-      if (window.confirm(`Are you sure you want to delete "${definition.title}"?`)) {
-        EventNotificationsActions.delete(definition);
-      }
-    };
   };
 
   handleTest = (definition) => {
@@ -133,10 +142,10 @@ class EventNotificationsContainer extends React.Component {
                           testResult={testResult}
                           onPageChange={this.handlePageChange}
                           onQueryChange={this.handleQueryChange}
-                          onDelete={this.handleDelete}
+                          onDelete={handleDelete}
                           onTest={this.handleTest} />
     );
   }
 }
 
-export default connect(EventNotificationsContainer, { notifications: EventNotificationsStore });
+export default connect(withPaginationQueryParameter(EventNotificationsContainer, { pageSizes: PAGE_SIZES }), { notifications: EventNotificationsStore });
