@@ -26,6 +26,7 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.joda.time.Period;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 @JsonAutoDetect
 @AutoValue
@@ -62,11 +63,10 @@ public abstract class TimeBasedRotationStrategyConfig implements RotationStrateg
         public abstract Builder type(String type);
 
         @JsonProperty("rotation_period")
-        public abstract Builder rotationPeriod(Period rotationPeriod);
+        public abstract Builder rotationPeriod(@NotNull Period rotationPeriod);
 
         @JsonProperty("max_rotation_period")
-        @Nullable
-        public abstract Builder maxRotationPeriod(Period maxRotationPeriod);
+        public abstract Builder maxRotationPeriod(@Nullable Period maxRotationPeriod);
 
         @JsonProperty("rotate_empty_index_set")
         public abstract Builder rotateEmptyIndexSet(boolean rotateEmptyIndexSet);

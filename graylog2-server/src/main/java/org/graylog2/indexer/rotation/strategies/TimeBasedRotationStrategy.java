@@ -61,7 +61,7 @@ import static org.joda.time.DateTimeFieldType.year;
 public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(TimeBasedRotationStrategy.class);
     public static final String NAME = "time";
-    public static final String ELASTICSEARCH_MAX_WRITE_INDEX_AGE_OVERRIDES_CONFIGURED_PERIOD = "(elasticsearch_max_write_index_age overrides configured period)";
+    public static final String OVERRIDE_HINT = "(elasticsearch_max_write_index_age overrides configured period)";
 
     private final Indices indices;
     private Map<String, DateTime> anchor;
@@ -190,7 +190,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         checkState(!isNullOrEmpty(index), "Index name must not be null or empty");
         checkState(!isNullOrEmpty(indexSetId), "Index set ID must not be null or empty");
         checkState(indexSetConfig.rotationStrategy() instanceof TimeBasedRotationStrategyConfig,
-                "Invalid rotation strategy config <{}> for index set <{}>"
+                "Invalid rotation strategy config <%s> for index set <%s>"
                 , indexSetConfig.rotationStrategy().getClass().getCanonicalName(), indexSet);
 
         final TimeBasedRotationStrategyConfig config = (TimeBasedRotationStrategyConfig) indexSetConfig.rotationStrategy();
@@ -218,7 +218,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         if (nextRotation.isAfter(now)) {
             final String message = new MessageFormat("Next rotation at {0} {1}", Locale.ENGLISH)
                     .format(new Object[]{nextRotation,
-                            overriding ? ELASTICSEARCH_MAX_WRITE_INDEX_AGE_OVERRIDES_CONFIGURED_PERIOD : ""});
+                            overriding ? OVERRIDE_HINT : ""});
             return new SimpleResult(false, message);
         }
 
@@ -231,14 +231,14 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
             final String message = new MessageFormat("Index set contains no messages, skipping rotation! Next rotation at {0} {1}", Locale.ENGLISH)
                     .format(new Object[]{
                             nextAnchor,
-                            overriding ? ELASTICSEARCH_MAX_WRITE_INDEX_AGE_OVERRIDES_CONFIGURED_PERIOD : ""});
+                            overriding ? OVERRIDE_HINT : ""});
             return new SimpleResult(false, message);
         }
 
         final String message = new MessageFormat("Rotation period {0} elapsed, next rotation at {1} {2}", Locale.ENGLISH)
                 .format(new Object[]{now,
                         nextAnchor,
-                        overriding ? ELASTICSEARCH_MAX_WRITE_INDEX_AGE_OVERRIDES_CONFIGURED_PERIOD : ""});
+                        overriding ? OVERRIDE_HINT : ""});
         return new SimpleResult(true, message);
     }
 
