@@ -17,7 +17,7 @@
 import type MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfig';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
-import type { FiltersType } from 'views/types';
+import type { SearchFilter } from 'views/types';
 
 import type { ElasticsearchQueryString, TimeRange } from './Query';
 
@@ -43,7 +43,7 @@ type SearchTypePivot = {
 
 type SearchTypeBase = {
   filter: string | undefined | null,
-  filters: FiltersType | undefined,
+  filters: Array<SearchFilter> | undefined,
   id: string,
   name: string | undefined | null,
   query: ElasticsearchQueryString | undefined | null,
