@@ -22,7 +22,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.EntityScopeService;
-import org.graylog2.database.entities.ScopedEntityPaginatedDbService;
+import org.graylog2.database.entities.ScopedDbService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.dto.LookupTableDto;
 import org.graylog2.lookup.events.LookupTablesDeleted;
@@ -37,7 +37,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class DBLookupTableService extends ScopedEntityPaginatedDbService<LookupTableDto> {
+public class DBLookupTableService extends ScopedDbService<LookupTableDto> {
     public static final String COLLECTION_NAME = "lut_tables";
 
     private final ClusterEventBus clusterEventBus;
