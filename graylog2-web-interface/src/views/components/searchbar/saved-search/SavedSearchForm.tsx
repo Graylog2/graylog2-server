@@ -17,10 +17,9 @@
 import React from 'react';
 import { Position } from 'react-overlays';
 import styled from 'styled-components';
-import { ButtonToolbar } from 'react-bootstrap';
 
+import { ButtonToolbar, Button, ControlLabel, FormControl, FormGroup, Popover } from 'components/bootstrap';
 import { Portal } from 'components/common';
-import { Button, ControlLabel, FormControl, FormGroup, Popover } from 'components/bootstrap';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
 import styles from './SavedSearchForm.css';

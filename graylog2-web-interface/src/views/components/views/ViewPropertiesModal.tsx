@@ -23,6 +23,7 @@ import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
 import type View from 'views/logic/views/View';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 type Props = {
   onClose: () => void,
@@ -35,6 +36,7 @@ type Props = {
 const ViewPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle }: Props) => {
   const [updatedView, setUpdatedView] = useState(view);
   const viewType = ViewTypeLabel({ type: updatedView.type });
+  const pluggableFormComponents = usePluginEntities('views.components.saveViewForm');
 
   const _onChange = (event) => {
     const { name } = event.target;
@@ -93,6 +95,7 @@ const ViewPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle }:
              help={`A longer, helpful description of the ${viewType} and its functionality.`}
              onChange={_onChange}
              value={updatedView.description} />
+      {pluggableFormComponents?.map((Component) => (<Component />))}
     </BootstrapModalForm>
   );
 };
