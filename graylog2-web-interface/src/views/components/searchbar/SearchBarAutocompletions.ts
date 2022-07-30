@@ -47,6 +47,7 @@ export type CompleterContext = Readonly<{
 export interface Completer {
   getCompletions(context: CompleterContext): Array<CompletionResult> | Promise<Array<CompletionResult>>;
   shouldShowCompletions?: (currentLine: number, lines: Array<Array<Line>>) => boolean;
+  identifierRegexps?: RegExp[];
 }
 
 const onCompleterError = (error: Error) => {
@@ -107,4 +108,6 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
       return false;
     });
   };
+
+  get identifierRegexps() { return this.completers.map((completer) => completer.identifierRegexps ?? []).flat(); }
 }

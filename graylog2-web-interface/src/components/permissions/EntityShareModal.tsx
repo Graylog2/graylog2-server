@@ -38,9 +38,10 @@ type Props = {
   entityTitle: $PropertyType<SharedEntity, 'title'>,
   entityType: $PropertyType<SharedEntity, 'type'>,
   onClose: () => void,
+  showShareableEntityURL?: boolean
 };
 
-const EntityShareModal = ({ description, entityId, entityType, entityTitle, onClose }: Props) => {
+const EntityShareModal = ({ description, entityId, entityType, entityTitle, onClose, showShareableEntityURL }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResults?.failed);
   const entityGRN = createGRN(entityType, entityId);
@@ -90,7 +91,8 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
                              entityTitle={entityTitle}
                              entityShareState={entityShareState}
                              granteesSelectFormRef={granteesSelectFormRef}
-                             setDisableSubmit={setDisableSubmit} />
+                             setDisableSubmit={setDisableSubmit}
+                             showShareableEntityURL={showShareableEntityURL} />
       ) : (
         <Spinner />
       )}
@@ -105,6 +107,11 @@ EntityShareModal.propTypes = {
   entityTitle: PropTypes.string.isRequired,
   entityType: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
+  showShareableEntityURL: PropTypes.bool,
+};
+
+EntityShareModal.defaultProps = {
+  showShareableEntityURL: true,
 };
 
 export default EntityShareModal;

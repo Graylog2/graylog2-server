@@ -15,9 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { isEqual } from 'lodash';
+import { SearchSuggestions } from '@graylog/server-api';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
@@ -29,43 +28,40 @@ import type { Token, Line, CompletionResult } from '../queryinput/ace-types';
 
 const SUGGESTIONS_PAGE_SIZE = 50;
 
-type SuggestionsResponse = {
-  field: string,
-  input: string,
-  suggestions: Array<{ value: string, occurrence: number }> | undefined,
-  sum_other_docs_count: number,
-}
-
-const suggestionsUrl = qualifyUrl('/search/suggest');
+const unquote = (s: string) => s.replace(/^"(.*(?="$))"$/, '$1');
 
 const formatValue = (value: string, type: string) => {
-  if (type === 'constant.numeric') {
-    return Number(value);
+  switch (type) {
+    case 'constant.numeric': return Number(value);
+    case 'string': return unquote(value);
+    default: return value;
   }
-
-  return value;
 };
 
-const completionCaption = (fieldValue: string, input: string | number) => {
-  if (fieldValue.startsWith(String(input))) {
-    return fieldValue;
+const completionCaption = (fieldValue: string, input: string | number, isQuoted: boolean) => {
+  if ((isQuoted ? fieldValue : escape(fieldValue)).startsWith(String(input))) {
+    return isQuoted ? fieldValue : escape(fieldValue);
   }
 
   return `${fieldValue} ⭢ ${input}`;
 };
+
+const isValueToken = (token: Line) => ['term', 'string'].includes(token?.type);
 
 const getFieldNameAndInput = (currentToken: Token | undefined | null, lastToken: Token | undefined | null) => {
   if (currentToken?.type === 'keyword' && currentToken?.value.endsWith(':')) {
     return {
       fieldName: currentToken.value.slice(0, -1),
       input: '',
+      isQuoted: false,
     };
   }
 
-  if (currentToken?.type === 'term' && lastToken?.type === 'keyword') {
+  if (isValueToken(currentToken) && lastToken?.type === 'keyword') {
     return {
       fieldName: lastToken.value.slice(0, -1),
       input: formatValue(currentToken.value, currentToken.type),
+      isQuoted: currentToken?.type === 'string',
     };
   }
 
@@ -76,10 +72,20 @@ const isEnumerableField = (field: FieldTypeMapping | undefined) => {
   return field?.type.isEnumerable() ?? false;
 };
 
+const formatSuggestion = (value: string, occurrence: number, input: string | number, isQuoted: boolean): CompletionResult => ({
+  name: value,
+  value: isQuoted ? value : escape(value),
+  score: occurrence,
+  caption: completionCaption(value, input, isQuoted),
+  meta: `${occurrence} hits`,
+});
+
+type PreviousSuggestions = Array<{ value: string, occurrence: number }> | undefined;
+
 class FieldValueCompletion implements Completer {
   private previousSuggestions: undefined | {
     furtherSuggestionsCount: number,
-    completions: Array<CompletionResult>,
+    suggestions: PreviousSuggestions,
     fieldName: string,
     input: string | number,
     timeRange: TimeRange | NoTimeRangeOverride | undefined,
@@ -128,9 +134,11 @@ class FieldValueCompletion implements Completer {
       && !furtherSuggestionsCount;
   }
 
-  private filterExistingSuggestions(input: string | number) {
+  private filterExistingSuggestions(input: string | number, isQuoted: boolean) {
     if (this.previousSuggestions) {
-      return this.previousSuggestions.completions.filter((completion) => completion.name.startsWith(String(input)));
+      return this.previousSuggestions.suggestions
+        .filter(({ value }) => (isQuoted ? value : escape(value)).startsWith(String(input)))
+        .map(({ value, occurrence }) => formatSuggestion(value, occurrence, input, isQuoted));
     }
 
     return [];
@@ -143,40 +151,32 @@ class FieldValueCompletion implements Completer {
     streams,
     fieldTypes,
   }: CompleterContext) => {
-    const { fieldName, input } = getFieldNameAndInput(currentToken, lastToken);
+    const { fieldName, input, isQuoted } = getFieldNameAndInput(currentToken, lastToken);
 
     if (!this.shouldFetchCompletions(fieldName, fieldTypes)) {
       return [];
     }
 
     if (this.alreadyFetchedAllSuggestions(input, fieldName, streams, timeRange)) {
-      const existingSuggestions = this.filterExistingSuggestions(input);
+      const existingSuggestions = this.filterExistingSuggestions(input, isQuoted);
 
-      if (existingSuggestions.length) {
+      if (existingSuggestions.length > 0) {
         return existingSuggestions;
       }
     }
 
     const normalizedTimeRange = (!timeRange || isNoTimeRangeOverride(timeRange)) ? undefined : onSubmittingTimerange(timeRange);
 
-    return fetch('POST', suggestionsUrl, {
+    return SearchSuggestions.suggestFieldValue({
       field: fieldName,
-      input,
+      input: input as string,
       timerange: normalizedTimeRange,
       streams,
       size: SUGGESTIONS_PAGE_SIZE,
-    }).then(({ suggestions, sum_other_docs_count: furtherSuggestionsCount }: SuggestionsResponse) => {
+    }).then(({ suggestions, sum_other_docs_count: furtherSuggestionsCount }) => {
       if (!suggestions) {
         return [];
       }
-
-      const completions = suggestions.map(({ value, occurrence }) => ({
-        name: value,
-        value: escape(value),
-        score: occurrence,
-        caption: completionCaption(value, input),
-        meta: `${occurrence} hits`,
-      }));
 
       this.previousSuggestions = {
         furtherSuggestionsCount,
@@ -184,10 +184,10 @@ class FieldValueCompletion implements Completer {
         timeRange,
         fieldName,
         input,
-        completions,
+        suggestions,
       };
 
-      return completions;
+      return suggestions.map(({ value, occurrence }) => formatSuggestion(value, occurrence, input, isQuoted));
     });
   };
 
@@ -205,11 +205,13 @@ class FieldValueCompletion implements Completer {
     const nextToken = currentLineTokens[currentTokenIndex + 1];
 
     const currentTokenIsFieldName = currentToken?.type === 'keyword' && currentToken?.value.endsWith(':');
-    const currentTokenIsFieldValue = currentToken?.type === 'term' && previousToken?.type === 'keyword';
+    const currentTokenIsFieldValue = isValueToken(currentToken) && previousToken?.type === 'keyword';
     const nextTokenIsTerm = nextToken?.type === 'term';
 
     return (currentTokenIsFieldName || currentTokenIsFieldValue) && !nextTokenIsTerm;
   };
+
+  public identifierRegexps = [/[a-zA-Z_0-9$\\/\-\u00A2-\u2000\u2070-\uFFFF]/];
 }
 
 export default FieldValueCompletion;

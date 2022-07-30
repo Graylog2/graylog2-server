@@ -212,6 +212,13 @@ export type MessagePreviewOption = {
   sort: number,
 }
 
+type ExternalActionsHookData = {
+      error: Error | null;
+      externalValueActions: Array<ActionDefinition> | null;
+      isLoading: boolean;
+      isError: boolean
+}
+
 type MessageAugmentation = {
   id: string,
   component: React.ComponentType<{ message: Message }>,
@@ -265,7 +272,7 @@ declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
     enterpriseWidgets?: Array<WidgetExport>;
-    externalValueActions?: Array<ActionDefinition>;
+    useExternalActions?: Array<() => ExternalActionsHookData>,
     fieldActions?: Array<ActionDefinition>;
     messageAugmentations?: Array<MessageAugmentation>;
     searchTypes?: Array<SearchType<any, any>>;
@@ -275,6 +282,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
     'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<MessageDetailContextProviderProps>>;
+    'views.components.widgets.messageTable.contextProviders'?: Array<React.ComponentType>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;

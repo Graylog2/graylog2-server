@@ -78,6 +78,7 @@ type Props = {
   }) => Promise<EntityShareState | undefined | null>,
   selectedGrantees: SelectedGrantees,
   title: string,
+  entityTypeTitle?: string | null | undefined,
 };
 
 const _paginatedGrantees = (selectedGrantees: SelectedGrantees, pageSize: number, currentPage: number) => {
@@ -87,7 +88,7 @@ const _paginatedGrantees = (selectedGrantees: SelectedGrantees, pageSize: number
   return selectedGrantees.slice(begin, end);
 };
 
-const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, availableCapabilities, selectedGrantees, className, title }: Props) => {
+const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, entityTypeTitle, availableCapabilities, selectedGrantees, className, title }: Props) => {
   const initialPageSize = PageSizeSelect.defaultPageSizes[0];
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [currentPage, setCurrentPage] = useState(1);
@@ -133,6 +134,7 @@ const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, 
 
 GranteesList.defaultProps = {
   className: undefined,
+  entityTypeTitle: undefined,
 };
 
 export default GranteesList;

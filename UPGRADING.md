@@ -7,6 +7,14 @@ Please make sure to create a MongoDB database backup before starting the upgrade
 
 ## Breaking Changes
 
+## New Default Message Processing Order
+
+The new default Message Processing order will run the
+`Message Filter Chain` before the `Pipeline Processor`.
+
+This applies only to new Graylog installations.
+Existing setups keep the former default order for backwards compatibility.
+
 ## API Endpoint Deprecations
 
 The following API endpoints are deprecated beginning with 4.4.
@@ -58,3 +66,8 @@ these [instructions](https://www.mongodb.com/docs/manual/core/capped-collections
 UTF-8 encoding. 
 <br>Note that this encoding is applied to all messages received by the input. A single input
 cannot handle multiple log sources with different encodings.
+
+### Changed archived default path
+On new Graylog installations, the default archiving configuration will now 
+store archives under the `data_dir` instead of `/tmp/graylog-archives`. 
+(The `data_dir` is configured in graylog.conf and defaults to `/var/lib/graylog-server`)

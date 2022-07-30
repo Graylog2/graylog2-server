@@ -31,6 +31,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -69,7 +70,7 @@ public class MongoLockService implements LockService {
     @Inject
     public MongoLockService(NodeId nodeId,
                             MongoConnection mongoConnection,
-                            @Named("lock_service_lock_ttl") Duration leaderElectionLockTTL) {
+                            @Named("lock_service_lock_ttl") Duration lockTTL) {
         this.nodeId = nodeId;
 
         collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
@@ -77,7 +78,7 @@ public class MongoLockService implements LockService {
         collection.createIndex(Indexes.ascending(FIELD_RESOURCE), new IndexOptions().unique(true));
 
         final Bson updatedAtKey = Indexes.ascending(FIELD_UPDATED_AT);
-        final IndexOptions indexOptions = new IndexOptions().expireAfter(leaderElectionLockTTL.getSeconds(), TimeUnit.SECONDS);
+        final IndexOptions indexOptions = new IndexOptions().expireAfter(lockTTL.getSeconds(), TimeUnit.SECONDS);
         ensureTTLIndex(collection, updatedAtKey, indexOptions);
     }
 
@@ -98,23 +99,34 @@ public class MongoLockService implements LockService {
         collection.createIndex(updatedAtKey, indexOptions);
     }
 
-    /**
-     * Request a lock. If a lock already exists, the lock expiry time will be extended.
-     *
-     * @param resource Unique identifier for the resource that should be guarded by this lock.
-     * @return A {@link Lock} object, if a lock was obtained. An empty {@link Optional}, if no lock could be acquired.
-     */
+    @Override
+    public Optional<Lock> lock(@Nonnull String resource, @Nullable String lockContext) {
+        return doLock(resource, getLockedByString(lockContext));
+    }
     @Override
     public Optional<Lock> lock(@Nonnull String resource) {
+        return lock(resource, null);
+    }
+
+    @Override
+    public Optional<Lock> extendLock(@Nonnull Lock lock) {
+        if (lock != null) {
+            return doLock(lock.resource(), lock.lockedBy());
+        }
+        return Optional.empty();
+    }
+
+    private Optional<Lock> doLock(@Nonnull String resource, @Nonnull String lockedBy) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(resource));
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(lockedBy));
 
         try {
             final Document doc = collection.findOneAndUpdate(
-                    and(eq(FIELD_RESOURCE, resource), eq(FIELD_LOCKED_BY, nodeId.toString())),
+                    and(eq(FIELD_RESOURCE, resource), eq(FIELD_LOCKED_BY, lockedBy)),
                     Updates.combine(
                             currentDate(FIELD_UPDATED_AT),
-                            setOnInsert(FIELD_RESOURCE, resource), // not necessary, but added for clarify
-                            setOnInsert(FIELD_LOCKED_BY, nodeId.toString()) // not necessary, but added for clarify
+                            setOnInsert(FIELD_RESOURCE, resource),
+                            setOnInsert(FIELD_LOCKED_BY, lockedBy)
                     ),
                     new FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER));
 
@@ -129,12 +141,25 @@ public class MongoLockService implements LockService {
     }
 
     @Override
-    public Optional<Lock> unlock(@Nonnull String resource) {
+    public Optional<Lock> unlock(@Nonnull String resource, @Nullable String lockContext) {
+        return doUnlock(resource, getLockedByString(lockContext));
+    }
+
+    @Override
+    public Optional<Lock> unlock(@Nonnull Lock lock) {
+        if (lock != null) {
+            return doUnlock(lock.resource(), lock.lockedBy());
+        }
+        return Optional.empty();
+    }
+
+    private Optional<Lock> doUnlock(@Nonnull String resource, @Nonnull String lockedBy) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(resource));
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(lockedBy));
 
         final Document deletedDocument =
                 collection.findOneAndDelete(
-                        and(eq(FIELD_RESOURCE, resource), eq(FIELD_LOCKED_BY, nodeId.toString())));
+                        and(eq(FIELD_RESOURCE, resource), eq(FIELD_LOCKED_BY, lockedBy)));
 
         if (deletedDocument != null) {
             return Optional.of(toLock(deletedDocument));
@@ -157,6 +182,13 @@ public class MongoLockService implements LockService {
                 .updatedAt(updatedAt)
                 .lockedBy(doc.getString(FIELD_LOCKED_BY))
                 .build();
+    }
+
+    private String getLockedByString(@Nullable String lockContext) {
+        if (lockContext == null) {
+            return nodeId.toString();
+        }
+        return nodeId.toString() + "-" + lockContext;
     }
 }
 
