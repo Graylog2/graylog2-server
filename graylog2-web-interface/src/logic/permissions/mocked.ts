@@ -69,6 +69,7 @@ const availableEntityTypes = {
   event_definition: 'Event Definition',
   notification: 'Notification',
   search: 'Saved Search',
+  search_filter: 'Search Filter',
   stream: 'Stream',
 };
 
