@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { ButtonToolbar, DropdownButton, MenuItem } from 'components/bootstrap';
@@ -22,7 +22,6 @@ import { IfPermitted, PaginatedList, SearchForm, Spinner, EntityList, ShareButto
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import QueryHelper from 'components/common/QueryHelper';
 import type ViewClass from 'views/logic/views/View';
-import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 import DashboardListItem from './DashboardListItem';
 
@@ -48,32 +47,12 @@ ItemActions.propTypes = {
 };
 
 const DashboardList = ({ pagination, handleSearch, handleDashboardDelete, dashboards }) => {
-  const PAGE_SIZES = [10, 50, 100];
-  const { page, pageSize: perPage, resetPage } = usePaginationQueryParameter(PAGE_SIZES);
-  const [query, setQuery] = useState('');
   const [dashboardToShare, setDashboardToShare] = useState<ViewClass>();
-
-  const execSearch = useCallback(() => handleSearch(query, page, perPage), [handleSearch, page, perPage, query]);
-
-  useEffect(() => {
-    execSearch();
-  }, [query, page, perPage, execSearch]);
 
   const onDashboardDelete = (dashboard) => () => {
     handleDashboardDelete(dashboard).then(() => {
-      resetPage();
-      execSearch();
+      handleSearch();
     }, () => {});
-  };
-
-  const onSearch = (newQuery) => {
-    resetPage();
-    setQuery(newQuery);
-  };
-
-  const onReset = () => {
-    resetPage();
-    setQuery('');
   };
 
   if (!dashboards) {
@@ -102,12 +81,11 @@ const DashboardList = ({ pagination, handleSearch, handleDashboardDelete, dashbo
                           entityTitle={dashboardToShare.title}
                           onClose={() => setDashboardToShare(undefined)} />
       )}
-      <PaginatedList totalItems={pagination.total}
-                     pageSizes={PAGE_SIZES}>
+      <PaginatedList totalItems={pagination.total}>
         <div style={{ marginBottom: 15 }}>
-          <SearchForm onSearch={onSearch}
+          <SearchForm onSearch={handleSearch}
                       queryHelpComponent={<QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />}
-                      onReset={onReset}
+                      onReset={() => handleSearch('')}
                       topMargin={0} />
         </div>
         <EntityList items={items}

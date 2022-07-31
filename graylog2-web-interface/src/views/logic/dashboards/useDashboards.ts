@@ -22,18 +22,12 @@ import { useStore } from 'stores/connect';
 
 export type Dashboards = DashboardsStoreState;
 
-type SearchQuery = {
-  query?: string,
-  page?: number,
-  perPage?: number
-};
-
-const useDashboards = (searchQuery: SearchQuery): Readonly<Dashboards> => {
+const useDashboards = (searchQuery: string, page: number, pageSize: number): Readonly<Dashboards> => {
   const dashboards = useStore(DashboardsStore);
 
   useEffect(() => {
-    DashboardsActions.search(searchQuery?.query ?? '', searchQuery?.page ?? 1, searchQuery?.perPage ?? 10);
-  }, [searchQuery]);
+    DashboardsActions.search(searchQuery, page, pageSize);
+  }, [searchQuery, page, pageSize]);
 
   return dashboards;
 };
