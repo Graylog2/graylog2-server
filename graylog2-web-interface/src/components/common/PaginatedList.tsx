@@ -27,7 +27,7 @@ const DEFAULT_PAGE_SIZES = [10, 50, 100];
 export const INITIAL_PAGE = 1;
 
 type Props = {
-  activePage: number,
+  activePage?: number,
   children: React.ReactNode,
   className?: string,
   hideFirstAndLastPageLinks?: boolean
@@ -37,6 +37,7 @@ type Props = {
   pageSize?: number,
   showPageSizeSelect?: boolean,
   totalItems: number,
+  useQueryParameter?: boolean,
 };
 
 /**
@@ -56,21 +57,24 @@ const PaginatedList = ({
   pageSizes,
   showPageSizeSelect,
   totalItems,
+  useQueryParameter,
 }: Props) => {
   const { page, setPage, pageSize: queryParamPageSize, setPageSize } = usePaginationQueryParameter(pageSizes);
-  const pageSize = showPageSizeSelect ? queryParamPageSize : propPageSize;
-  const numberPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 0 * activePage;
+  const currentPage = useQueryParameter ? page : Math.max(activePage, INITIAL_PAGE);
+  const pageSize = (useQueryParameter && showPageSizeSelect) ? queryParamPageSize : propPageSize;
+
+  const numberPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 0;
 
   const _onChangePageSize = (event: React.ChangeEvent<HTMLOptionElement>) => {
     event.preventDefault();
     const newPageSize = Number(event.target.value);
 
-    setPageSize(newPageSize);
+    if (useQueryParameter) setPageSize(newPageSize);
     if (onChange) onChange(INITIAL_PAGE, newPageSize);
   };
 
   const _onChangePage = (pageNum: number) => {
-    setPage(pageNum);
+    if (useQueryParameter) setPage(pageNum);
     if (onChange) onChange(pageNum, pageSize);
   };
 
@@ -85,7 +89,7 @@ const PaginatedList = ({
       <IfInteractive>
         <div className={`text-center pagination-wrapper ${className ?? ''}`}>
           <Pagination totalPages={numberPages}
-                      currentPage={page}
+                      currentPage={currentPage}
                       hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
                       hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
                       onChange={_onChangePage} />
@@ -96,6 +100,7 @@ const PaginatedList = ({
 };
 
 PaginatedList.propTypes = {
+  /** The active page number. If not specified the active page number will be tracked internally. */
   activePage: PropTypes.number,
   /** React element containing items of the current selected page. */
   children: PropTypes.node.isRequired,
@@ -116,6 +121,8 @@ PaginatedList.propTypes = {
   showPageSizeSelect: PropTypes.bool,
   /** Total amount of items in all pages. */
   totalItems: PropTypes.number.isRequired,
+  /** boolean flag to see if we should save and use page and pageSize as query parameters */
+  useQueryParameter: PropTypes.bool,
 };
 
 PaginatedList.defaultProps = {
@@ -127,6 +134,7 @@ PaginatedList.defaultProps = {
   pageSize: DEFAULT_PAGE_SIZES[0],
   showPageSizeSelect: true,
   onChange: undefined,
+  useQueryParameter: true,
 };
 
 export default PaginatedList;
