@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import Reflux from 'reflux';
@@ -22,16 +23,19 @@ import lodash from 'lodash';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { Spinner } from 'components/common';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { CollectorConfigurationsActions, CollectorConfigurationsStore } from 'stores/sidecars/CollectorConfigurationsStore';
 import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
 import { SidecarsActions } from 'stores/sidecars/SidecarsStore';
 import { SidecarsAdministrationActions, SidecarsAdministrationStore } from 'stores/sidecars/SidecarsAdministrationStore';
 
-import CollectorsAdministration from './CollectorsAdministration';
+import CollectorsAdministration, { PAGE_SIZES } from './CollectorsAdministration';
 
 const CollectorsAdministrationContainer = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     nodeId: PropTypes.string,
+    paginationQueryParameter: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connect(CollectorsStore, 'collectors'), Reflux.connect(SidecarsAdministrationStore, 'sidecars'), Reflux.connect(CollectorConfigurationsStore, 'configurations')],
@@ -60,29 +64,15 @@ const CollectorsAdministrationContainer = createReactClass({
     }
   },
 
-  loadData(nodeId) {
-    const query = nodeId ? `node_id:${nodeId}` : '';
-
-    CollectorsActions.all();
-    SidecarsAdministrationActions.list({ query: query });
-    CollectorConfigurationsActions.all();
-  },
-
-  reloadSidecars() {
-    if (this.state.sidecars) {
-      SidecarsAdministrationActions.refreshList();
-    }
-  },
-
   handlePageChange(page, pageSize) {
-    const { filters, pagination, query } = this.state.sidecars;
-    const effectivePage = pagination.pageSize !== pageSize ? 1 : page;
+    const { filters, query } = this.state.sidecars;
 
-    SidecarsAdministrationActions.list({ query: query, filters: filters, page: effectivePage, pageSize: pageSize });
+    SidecarsAdministrationActions.list({ query, filters, page, pageSize });
   },
 
   handleFilter(property, value) {
-    const { filters, pagination, query } = this.state.sidecars;
+    const { resetPage, pageSize } = this.props.paginationQueryParameter;
+    const { filters, query } = this.state.sidecars;
     let newFilters;
 
     if (property) {
@@ -92,21 +82,27 @@ const CollectorsAdministrationContainer = createReactClass({
       newFilters = {};
     }
 
-    SidecarsAdministrationActions.list({ query: query, filters: newFilters, pageSize: pagination.pageSize });
+    resetPage();
+
+    SidecarsAdministrationActions.list({ query, filters: newFilters, pageSize, page: 1 });
   },
 
   handleQueryChange(query = '', callback = () => {}) {
-    const { filters, pagination } = this.state.sidecars;
+    const { resetPage, pageSize } = this.props.paginationQueryParameter;
+    const { filters } = this.state.sidecars;
 
-    SidecarsAdministrationActions.list({ query: query, filters: filters, pageSize: pagination.pageSize }).finally(callback);
+    resetPage();
+
+    SidecarsAdministrationActions.list({ query, filters, pageSize, page: 1 }).finally(callback);
   },
 
   handleConfigurationChange(selectedSidecars, selectedConfigurations, doneCallback) {
     SidecarsActions.assignConfigurations(selectedSidecars, selectedConfigurations).then((response) => {
       doneCallback();
-      const { query, filters, pagination } = this.state.sidecars;
+      const { query, filters } = this.state.sidecars;
+      const { page, pageSize } = this.props.paginationQueryParameter;
 
-      SidecarsAdministrationActions.list({ query: query, filters: filters, pageSize: pagination.pageSize, page: pagination.page });
+      SidecarsAdministrationActions.list({ query, filters, pageSize, page });
 
       return response;
     });
@@ -118,6 +114,21 @@ const CollectorsAdministrationContainer = createReactClass({
 
       return response;
     });
+  },
+
+  reloadSidecars() {
+    if (this.state.sidecars) {
+      SidecarsAdministrationActions.refreshList();
+    }
+  },
+
+  loadData(nodeId) {
+    const { page, pageSize } = this.props.paginationQueryParameter;
+    const query = nodeId ? `node_id:${nodeId}` : '';
+
+    CollectorsActions.all();
+    SidecarsAdministrationActions.list({ query, page, pageSize });
+    CollectorConfigurationsActions.all();
   },
 
   render() {
@@ -163,4 +174,4 @@ const CollectorsAdministrationContainer = createReactClass({
   },
 });
 
-export default CollectorsAdministrationContainer;
+export default withPaginationQueryParameter(CollectorsAdministrationContainer, { pageSizes: PAGE_SIZES });
