@@ -81,22 +81,40 @@ type Props = {
   useResponsiveTable?: boolean,
 };
 
+type DataTablePagination = {
+  perPage: number,
+  page: number,
+};
+
 /**
  * Component that renders a paginated data table. Should only be used for lists which are not already paginated.
  * If you want to display a lists which gets paginated by the backend, wrap use the DataTable in combination with the PaginatedList.
  */
-const PaginatedDataTable = ({ rows = [], filterKeys, filterLabel, displayKey, filterBy, id, ...rest }: Props) => {
-  const { page, pageSize: perPage, resetPage } = usePaginationQueryParameter();
+const PaginatedDataTable = ({ rows = [], pagination: initialPagination, filterKeys, filterLabel, displayKey, filterBy, id, ...rest }: Props) => {
+  const { resetPage } = usePaginationQueryParameter();
+  const [{ perPage, page }, setPagination] = useState<DataTablePagination>(initialPagination);
   const [filteredRows, setFilteredRows] = useState(rows);
   const paginatedRows = _paginatedRows(filteredRows, perPage, page);
 
   useEffect(() => {
     setFilteredRows(rows);
+    setPagination(initialPagination);
+  }, [rows, initialPagination]);
+
+  const _onPageChange = (newPage, newPerPage) => {
+    setPagination({ page: newPage, perPage: newPerPage });
+  };
+
+  const _resetPagination = () => {
     resetPage();
-  }, [rows, resetPage]);
+    setPagination({ perPage, page: initialPagination.page });
+  };
 
   return (
     <PaginatedList totalItems={filteredRows.length}
+                   pageSize={perPage}
+                   activePage={page}
+                   onChange={_onPageChange}
                    showPageSizeSelect>
       <DataTable {...rest}
                  id={id}
@@ -105,7 +123,7 @@ const PaginatedDataTable = ({ rows = [], filterKeys, filterLabel, displayKey, fi
                            filterKeys={filterKeys}
                            setFilteredRows={setFilteredRows}
                            rows={rows}
-                           resetPagination={resetPage}
+                           resetPagination={_resetPagination}
                            displayKey={displayKey}
                            filterBy={filterBy}
                            filterLabel={filterLabel} />
