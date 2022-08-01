@@ -36,13 +36,14 @@ class ImportsViewModal extends React.Component {
     },
   };
 
+  PAGE_SIZE = 10;
+
   constructor(props) {
     super(props);
     this.state = ImportsViewModal.initialState;
   }
 
-  PAGE_SIZE = 10;
-
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => {
     this._loadUploads(this.state.pagination.page);
     this.uploadsModal.open();
@@ -75,6 +76,7 @@ class ImportsViewModal extends React.Component {
     this.props.onApply(selectedUpload);
   };
 
+  // eslint-disable-next-line class-methods-use-this
   _buildVariableName = (name) => {
     return `\${sidecar.${name}}`;
   };
