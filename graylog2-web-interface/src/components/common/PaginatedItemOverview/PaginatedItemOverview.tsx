@@ -107,7 +107,8 @@ const PaginatedItemOverview = ({
                    pageSize={pagination.perPage}
                    totalItems={paginatedList?.pagination?.total ?? 0}
                    pageSizes={pageSizes}
-                   activePage={pagination.page}>
+                   activePage={pagination.page}
+                   useQueryParameter={false}>
       <SearchForm onSearch={(newQuery) => setPagination({ ...pagination, page: INITIAL_PAGE, query: newQuery })}
                   label="Filter"
                   wrapperClass="has-bm"
