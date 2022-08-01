@@ -22,6 +22,7 @@ import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog.plugins.map.config.DatabaseType;
 import org.graylog.plugins.map.config.DatabaseVendorType;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
+import org.graylog.plugins.map.config.S3GeoIpFileDownloader;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.utilities.FileInfo;
@@ -75,11 +76,12 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
     public GeoIpDbFileChangeMonitorService(@Named("daemonScheduler") ScheduledExecutorService scheduler,
                                            EventBus eventBus,
                                            ClusterConfigService clusterConfigService,
-                                           GeoIpVendorResolverService geoIpVendorResolverService) {
+                                           GeoIpVendorResolverService geoIpVendorResolverService,
+                                           S3GeoIpFileDownloader s3GeoIpFileDownloader) {
         this.scheduler = Objects.requireNonNull(scheduler);
         this.eventBus = Objects.requireNonNull(eventBus);
         this.clusterConfigService = Objects.requireNonNull(clusterConfigService);
-        this.geoIpResolverConfigValidator = new GeoIpResolverConfigValidator(geoIpVendorResolverService);
+        this.geoIpResolverConfigValidator = new GeoIpResolverConfigValidator(geoIpVendorResolverService, s3GeoIpFileDownloader);
     }
 
     @Subscribe
