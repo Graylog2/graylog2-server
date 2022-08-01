@@ -49,8 +49,7 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
   const { getScopePermissions } = useScopePermissions();
 
   const showActions = (inTable: LookupTable): boolean => {
-    // TODO: Update this method to check for the metadata
-    const permissions = getScopePermissions(inTable._metadata?.scope);
+    const permissions = getScopePermissions(inTable);
 
     return permissions.is_mutable;
   };

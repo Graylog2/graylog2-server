@@ -92,8 +92,7 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
   };
 
   const showAction = (inTable: LookupTable): boolean => {
-    // TODO: Update this method to check for the metadata
-    const permissions = getScopePermissions(inTable._metadata?.scope);
+    const permissions = getScopePermissions(inTable);
 
     return permissions.is_mutable;
   };

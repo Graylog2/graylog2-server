@@ -102,11 +102,10 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
     enable_multi_value: table.default_multi_value !== '',
   };
 
-  const showAction = (inTable: LookupTable, action: string): boolean => {
-    // TODO: Update this method to check for the metadata
-    const permissions = getScopePermissions(inTable._metadata?.scope);
+  const showAction = (inTable: LookupTable): boolean => {
+    const permissions = getScopePermissions(inTable);
 
-    return permissions[action];
+    return permissions.is_mutable;
   };
 
   return (
@@ -226,7 +225,7 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
               <Col mdOffset={3} md={9}>
                 {create ? (
                   <Button type="submit" bsStyle="success">Create Lookup Table</Button>
-                ) : showAction(table, 'edit') && (
+                ) : showAction(table) && (
                   <Button type="submit" bsStyle="success">Update Lookup Table</Button>
                 )}
               </Col>

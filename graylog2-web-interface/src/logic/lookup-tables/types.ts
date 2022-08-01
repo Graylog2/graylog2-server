@@ -15,20 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-type Metadata = {
-  scope: string,
-  revision: number,
-  created_at: string,
-  updated_at: string,
-};
-
-type GenericEntityType = {
+export type GenericEntityType = {
   id?: string | null,
   title: string,
   description?: string | null,
   name: string,
   content_pack?: string | null,
-  _metadata?: Metadata | null,
+  scope?: string | null,
 };
 
 export type LookupTableCacheConfig = {
