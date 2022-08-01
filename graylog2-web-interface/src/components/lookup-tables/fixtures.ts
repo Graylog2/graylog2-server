@@ -5,7 +5,7 @@ export const TABLE: LookupTable = {
   title: 'Watchlist (Internal - Do not remove)',
   description: 'A basic description',
   name: 'watchlist',
-  _metadata: null,
+  scope: null,
 };
 
 export const CACHE: LookupTableCache = {
@@ -13,7 +13,7 @@ export const CACHE: LookupTableCache = {
   title: 'Watchlist (Internal - Do not remove)',
   description: 'A cache for the Watchlist entries to speed up lookup.',
   name: 'watchlist-cache',
-  _metadata: null,
+  scope: null,
 };
 
 export const DATA_ADAPTER: LookupTableAdapter = {
@@ -21,5 +21,5 @@ export const DATA_ADAPTER: LookupTableAdapter = {
   title: 'Watchlist (Internal - Do not remove)',
   description: 'The Lookup Adapter for the Watchlist.',
   name: 'watchlist-mongo',
-  _metadata: null,
+  scope: null,
 };
