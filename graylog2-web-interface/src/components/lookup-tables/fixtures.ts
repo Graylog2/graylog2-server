@@ -23,3 +23,18 @@ export const DATA_ADAPTER: LookupTableAdapter = {
   name: 'watchlist-mongo',
   scope: null,
 };
+
+export const MockedEntityScopesPermissions = {
+  get: async () => {
+    return new Promise((resolve: any) => {
+      setTimeout(() => {
+        return resolve({
+          entity_scopes: {
+            ILLUMINATE: { is_mutable: false },
+            DEFAULT: { is_mutable: true },
+          },
+        });
+      }, 1000);
+    });
+  },
+};

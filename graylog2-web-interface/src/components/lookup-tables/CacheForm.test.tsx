@@ -20,10 +20,12 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
-import { CACHE } from './fixtures';
+import { CACHE, MockedEntityScopesPermissions } from './fixtures';
 import CaffeineCacheFieldSet from './caches/CaffeineCacheFieldSet';
 import CacheForm from './CacheForm';
 import NullCacheFieldSet from './caches/NullCacheFieldSet';
+
+jest.mock('logic/permissions/ScopePermissions', () => (MockedEntityScopesPermissions));
 
 PluginStore.register(new PluginManifest({}, {
   lookupTableCaches: [

@@ -129,6 +129,7 @@ const ApiRoutes = {
     prepare: (entityGRN: string) => { return { url: `/authz/shares/entities/${entityGRN}/prepare` }; },
     update: (entityGRN: string) => { return { url: `/authz/shares/entities/${entityGRN}` }; },
     userSharesPaginated: (username: string) => { return { url: `/authz/shares/user/${username}` }; },
+    entityScopes: () => { return { url: '/entity_scopes' }; },
   },
   HTTPHeaderAuthConfigController: {
     load: () => ({ url: '/system/authentication/http-header-auth-config' }),

@@ -1,27 +1,13 @@
 import { useQuery } from 'react-query';
 
+import EntityScopesPermissions from 'logic/permissions/ScopePermissions';
 import UserNotification from 'util/UserNotification';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
-
-// NOTE: Mock method to be able to move forward with tests. Remove after API
-// defined how are we getting the permissions to show and hide actions.
-const fetchScopePermissions = async () => {
-  return new Promise((resolve: any) => {
-    setTimeout(() => {
-      console.log('data resolved');
-
-      return resolve({
-        ILLUMINATE: { is_mutable: false },
-        DEFAULT: { is_mutable: true },
-      });
-    }, 1000);
-  });
-};
 
 const useGetPermissionsByScope = () => {
   const { data, isLoading, isError, error } = useQuery<any, Error>(
     'scope-permissions',
-    fetchScopePermissions,
+    EntityScopesPermissions.get,
     {
       retry: 1,
       cacheTime: 1000 * 60 * 60 * 3, // cache for 3 hours
@@ -34,7 +20,7 @@ const useGetPermissionsByScope = () => {
   const getScopePermissions = (entity: GenericEntityType) => {
     const scope = entity.scope ? entity.scope.toUpperCase() : 'DEFAULT';
 
-    return isLoading ? {} : data[scope];
+    return isLoading ? {} : data.entity_scopes[scope];
   };
 
   return { getScopePermissions };

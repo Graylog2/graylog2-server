@@ -20,8 +20,10 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import CaffeineCacheSummary from './caches/CaffeineCacheSummary';
-import { CACHE } from './fixtures';
+import { CACHE, MockedEntityScopesPermissions } from './fixtures';
 import Cache from './Cache';
+
+jest.mock('logic/permissions/ScopePermissions', () => (MockedEntityScopesPermissions));
 
 PluginStore.register(new PluginManifest({}, {
   lookupTableCaches: [

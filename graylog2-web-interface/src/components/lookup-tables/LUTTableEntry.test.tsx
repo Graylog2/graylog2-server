@@ -18,8 +18,10 @@ import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-import { TABLE, CACHE, DATA_ADAPTER } from './fixtures';
+import { TABLE, CACHE, DATA_ADAPTER, MockedEntityScopesPermissions } from './fixtures';
 import LUTTableEntry from './LUTTableEntry';
+
+jest.mock('logic/permissions/ScopePermissions', () => (MockedEntityScopesPermissions));
 
 const renderedLUT = (scope: string) => {
   TABLE.scope = scope;

@@ -18,8 +18,10 @@ import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-import { CACHE } from './fixtures';
+import { CACHE, MockedEntityScopesPermissions } from './fixtures';
 import CacheTableEntry from './CacheTableEntry';
+
+jest.mock('logic/permissions/ScopePermissions', () => (MockedEntityScopesPermissions));
 
 const renderedCTE = (scope: string) => {
   CACHE.scope = scope;
