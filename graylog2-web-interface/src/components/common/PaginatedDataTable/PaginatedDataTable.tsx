@@ -112,7 +112,8 @@ const PaginatedDataTable = ({ rows = [], pagination: initialPagination, filterKe
                    pageSize={perPage}
                    activePage={page}
                    onChange={_onPageChange}
-                   showPageSizeSelect>
+                   showPageSizeSelect
+                   useQueryParameter={false}>
       <DataTable {...rest}
                  id={id}
                  customFilter={(
