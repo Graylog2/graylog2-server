@@ -320,6 +320,7 @@ public class EventDefinitionHandler {
 
     private JobTriggerDto newJobTrigger(JobDefinitionDto jobDefinition, EventProcessorSchedulerConfig schedulerConfig) {
         return JobTriggerDto.builderWithClock(clock)
+                .jobDefinitionType(EventProcessorExecutionJob.TYPE_NAME)
                 .jobDefinitionId(requireNonNull(jobDefinition.id(), "Job definition ID cannot be null"))
                 .nextTime(clock.nowUTC())
                 .schedule(schedulerConfig.schedule())
@@ -333,17 +334,11 @@ public class EventDefinitionHandler {
     }
 
     private Optional<JobTriggerDto> getJobTrigger(JobDefinitionDto jobDefinition) {
-        final List<JobTriggerDto> jobTriggers = jobTriggerService.getForJob(jobDefinition.id());
-
-        if (jobTriggers.isEmpty()) {
-            return Optional.empty();
-        }
-
-        // DBJobTriggerService#getForJob currently returns only one trigger. (raises an exception otherwise)
+        // DBJobTriggerService#getOneForJob currently returns only one trigger. (raises an exception otherwise)
         // Once we allow multiple triggers per job definition, this code will fail. We need some kind of label
         // to figure out which trigger was created automatically. (e.g. event processor)
         // TODO: Fix this code for multiple triggers per job definition
-        return Optional.ofNullable(jobTriggers.get(0));
+        return jobTriggerService.getOneForJob(jobDefinition.id());
     }
 
     private void updateJobTrigger(EventDefinitionDto eventDefinition,

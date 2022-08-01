@@ -7,6 +7,14 @@ Please make sure to create a MongoDB database backup before starting the upgrade
 
 ## Breaking Changes
 
+## New Default Message Processing Order
+
+The new default Message Processing order will run the
+`Message Filter Chain` before the `Pipeline Processor`.
+
+This applies only to new Graylog installations.
+Existing setups keep the former default order for backwards compatibility.
+
 ## API Endpoint Deprecations
 
 The following API endpoints are deprecated beginning with 4.4.

@@ -22,6 +22,8 @@ import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityCheckStatus;
+import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityChecker;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewService;
@@ -33,17 +35,18 @@ import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserImpl;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import javax.annotation.Nullable;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
 import java.util.Collections;
@@ -61,6 +64,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -95,6 +99,9 @@ public class ViewsResourceTest {
     @Mock
     private SearchDomain searchDomain;
 
+    @Mock
+    private SearchFilterVisibilityChecker searchFilterVisibilityChecker;
+
     private ViewsResource viewsResource;
 
     @BeforeEach
@@ -104,6 +111,7 @@ public class ViewsResourceTest {
         final Search search = mock(Search.class, RETURNS_DEEP_STUBS);
         when(search.queries()).thenReturn(ImmutableSet.of());
         when(searchDomain.getForUser(eq("6141d457d3a6b9d73c8ac55a"), eq(searchUser))).thenReturn(Optional.of(search));
+        when(searchFilterVisibilityChecker.checkSearchFilterVisibility(any(), any())).thenReturn(new SearchFilterVisibilityCheckStatus());
     }
 
     class ViewsTestResource extends ViewsResource {
@@ -112,7 +120,7 @@ public class ViewsResourceTest {
         }
 
         ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain, Map<String, ViewResolver> viewResolvers) {
-            super(viewService, clusterEventBus, searchDomain, viewResolvers);
+            super(viewService, clusterEventBus, searchDomain, viewResolvers, searchFilterVisibilityChecker);
             this.userService = userService;
         }
 
@@ -130,25 +138,79 @@ public class ViewsResourceTest {
 
     @Test
     public void creatingViewAddsCurrentUserAsOwner() throws Exception {
-        final ViewDTO.Builder builder = mock(ViewDTO.Builder.class);
-
-        when(view.toBuilder()).thenReturn(builder);
-        when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
-        when(view.searchId()).thenReturn("6141d457d3a6b9d73c8ac55a");
-        when(builder.owner(any())).thenReturn(builder);
-        when(builder.build()).thenReturn(view);
-
-        final UserImpl testUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "testuser"));
-
-        final UserContext userContext = mock(UserContext.class);
-        when(userContext.getUser()).thenReturn(testUser);
-        when(searchUser.username()).thenReturn("testuser");
-
+        final ViewDTO.Builder builder = mockView(ViewDTO.Type.DASHBOARD);
+        final UserContext userContext = mockUser();
         this.viewsResource.create(view, userContext, searchUser);
 
         final ArgumentCaptor<String> ownerCaptor = ArgumentCaptor.forClass(String.class);
         verify(builder, times(1)).owner(ownerCaptor.capture());
         assertThat(ownerCaptor.getValue()).isEqualTo("testuser");
+    }
+
+    @Test
+    public void throwsExceptionWhenCreatingSearchWithFilterThatUserIsNotAllowedToSee() throws Exception {
+        mockView(ViewDTO.Type.SEARCH);
+        final UserContext userContext = mockUser();
+        doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<You cannot see this filter>>")))
+                .when(searchFilterVisibilityChecker)
+                .checkSearchFilterVisibility(any(), any());
+
+        Assert.assertThrows(BadRequestException.class, () -> this.viewsResource.create(view, userContext, searchUser));
+    }
+
+    @Test
+    public void throwsExceptionWhenCreatingDashboardWithFilterThatUserIsNotAllowedToSee() throws Exception {
+        mockView(ViewDTO.Type.DASHBOARD);
+        final UserContext userContext = mockUser();
+        doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<You cannot see this filter>>")))
+                .when(searchFilterVisibilityChecker)
+                .checkSearchFilterVisibility(any(), any());
+
+        Assert.assertThrows(BadRequestException.class, () -> this.viewsResource.create(view, userContext, searchUser));
+    }
+
+    @Test
+    public void throwsExceptionWhenUpdatingSearchWithFilterThatUserIsNotAllowedToSee() throws Exception {
+        final ViewDTO.Builder builder = mockView(ViewDTO.Type.SEARCH);
+        mockUser();
+        doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<You cannot see this filter>>")))
+                .when(searchFilterVisibilityChecker)
+                .checkSearchFilterVisibility(any(), any());
+
+        Assert.assertThrows(BadRequestException.class, () -> this.viewsResource.update(view.id(), builder.build(), searchUser));
+    }
+
+    @Test
+    public void throwsExceptionWhenUpdatingDashboardWithFilterThatUserIsNotAllowedToSee() throws Exception {
+        final ViewDTO.Builder builder = mockView(ViewDTO.Type.DASHBOARD);
+        mockUser();
+        doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<You cannot see this filter>>")))
+                .when(searchFilterVisibilityChecker)
+                .checkSearchFilterVisibility(any(), any());
+
+        Assert.assertThrows(BadRequestException.class, () -> this.viewsResource.update(view.id(), builder.build(), searchUser));
+    }
+
+    private UserContext mockUser() {
+        final UserImpl testUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "testuser"));
+
+        final UserContext userContext = mock(UserContext.class);
+        when(userContext.getUser()).thenReturn(testUser);
+        when(searchUser.username()).thenReturn("testuser");
+        when(searchUser.canUpdateView(any())).thenReturn(true);
+        return userContext;
+    }
+
+    private ViewDTO.Builder mockView(final ViewDTO.Type type) {
+        final ViewDTO.Builder builder = mock(ViewDTO.Builder.class);
+
+        when(view.toBuilder()).thenReturn(builder);
+        when(view.type()).thenReturn(type);
+        when(view.searchId()).thenReturn("6141d457d3a6b9d73c8ac55a");
+        when(builder.owner(any())).thenReturn(builder);
+        when(builder.id(any())).thenReturn(builder);
+        when(builder.build()).thenReturn(view);
+        return builder;
     }
 
     @Test

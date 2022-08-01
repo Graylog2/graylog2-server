@@ -37,6 +37,7 @@ const typeMappings = {
   DateTime: 'string',
   ChunkedOutput: 'unknown',
   ZonedDateTime: 'string',
+  Void: 'void',
 };
 const isPrimitiveType = (type: RawType): type is PrimitiveType => ('type' in type && Object.keys(primitiveTypeMappings).includes(type.type));
 const mapPrimitiveType = (type: keyof typeof primitiveTypeMappings) => primitiveTypeMappings[type];
@@ -77,7 +78,7 @@ type ObjectType = {
   id: string;
   type: 'object';
   properties: Record<string, RawType>;
-  additionalProperties?: RawType;
+  additional_properties?: string | RawType;
 }
 
 type RawType = PrimitiveType | EnumType | ArrayType | RefType | ObjectType;
@@ -175,8 +176,10 @@ function createType(rawTypeDefinition: RawType): Type {
       )
       : {};
 
-    const additionalProperties = typeDefinition.additionalProperties
-      ? createType(typeDefinition.additionalProperties)
+    const additionalProperties = typeDefinition.additional_properties
+      ? createType(typeof typeDefinition.additional_properties === 'string'
+        ? { type: typeDefinition.additional_properties }
+        : typeDefinition.additional_properties)
       : undefined;
 
     return createTypeLiteralNode(properties, additionalProperties);
@@ -252,7 +255,7 @@ type RawOperation = {
   nickname: string;
   type: string | RawType;
   parameters: Array<RawParameter>;
-  path: string;
+  path?: string;
   produces: Array<RawContentType>;
 }
 
