@@ -46,7 +46,9 @@ const renderedCache = ({
   scope, inCache = { ...CACHE },
   create = false,
   withConfig = true,
+  // eslint-disable-next-line
   validate = () => { console.log('validation called'); },
+  // eslint-disable-next-line
   saved = () => { console.log('saved called'); },
   validationErrors = {},
 

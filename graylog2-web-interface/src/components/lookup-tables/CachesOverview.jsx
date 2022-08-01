@@ -52,6 +52,7 @@ class CachesOverview extends React.Component {
     LookupTableCachesActions.searchPaginated(pagination.page, pagination.per_page);
   };
 
+  // eslint-disable-next-line
   _helpPopover = () => {
     return (
       <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">

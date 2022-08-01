@@ -92,15 +92,18 @@ class LUTTablesPage extends React.Component {
     }
   };
 
+  // eslint-disable-next-line
   _saved = () => {
     // reset detail state
     history.push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
   };
 
+  // eslint-disable-next-line
   _isCreating = ({ action }) => {
     return action === 'create';
   };
 
+  // eslint-disable-next-line
   _validateTable = (table) => {
     LookupTablesActions.validate(table);
   };
