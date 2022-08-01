@@ -23,7 +23,6 @@ import SearchForm from 'components/common/SearchForm';
 import Spinner from 'components/common/Spinner';
 import EmptyResult from 'components/common/EmptyResult';
 import type { ListPagination, Pagination } from 'stores/PaginationTypes';
-import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 import PaginatedItem from './PaginatedItem';
 
@@ -70,7 +69,6 @@ const PaginatedItemOverview = ({
   resultsWrapperComponent: ResultsWrapperComponent,
   overrideItemComponent: OverrideItemComponent,
 }: Props) => {
-  const { resetPage } = usePaginationQueryParameter(pageSizes);
   const [paginatedList, setPaginatedList] = useState<PaginatedListType | undefined>();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   useEffect(() => overrideList && setPaginatedList(overrideList), [overrideList]);
@@ -86,11 +84,6 @@ const PaginatedItemOverview = ({
 
     return () => { isSubscribed = false; };
   }, [pagination, onLoad]);
-
-  const onSearch = (newQuery) => {
-    resetPage();
-    setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page });
-  };
 
   if (!paginatedList) {
     return <Spinner />;
@@ -115,7 +108,7 @@ const PaginatedItemOverview = ({
                    totalItems={paginatedList?.pagination?.total ?? 0}
                    pageSizes={pageSizes}
                    activePage={pagination.page}>
-      <SearchForm onSearch={onSearch}
+      <SearchForm onSearch={(newQuery) => setPagination({ ...pagination, page: INITIAL_PAGE, query: newQuery })}
                   label="Filter"
                   wrapperClass="has-bm"
                   placeholder="Enter query to filter"
