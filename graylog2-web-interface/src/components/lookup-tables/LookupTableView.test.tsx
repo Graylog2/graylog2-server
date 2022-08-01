@@ -22,12 +22,7 @@ import { TABLE, CACHE, DATA_ADAPTER } from './fixtures';
 import LookupTableView from './LookupTableView';
 
 const renderedLUT = (scope: string) => {
-  TABLE._metadata = {
-    scope: scope,
-    revision: 2,
-    created_at: '2022-06-13T08:47:12Z',
-    updated_at: '2022-06-29T12:00:28Z',
-  };
+  TABLE.scope = scope;
 
   return render(
     <Router>

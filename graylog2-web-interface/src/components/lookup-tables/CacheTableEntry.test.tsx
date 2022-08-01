@@ -22,12 +22,7 @@ import { CACHE } from './fixtures';
 import CacheTableEntry from './CacheTableEntry';
 
 const renderedCTE = (scope: string) => {
-  CACHE._metadata = {
-    scope: scope,
-    revision: 2,
-    created_at: '2022-06-13T08:47:12Z',
-    updated_at: '2022-06-29T12:00:28Z',
-  };
+  CACHE.scope = scope;
 
   return render(
     <Router><CacheTableEntry cache={CACHE} /></Router>,

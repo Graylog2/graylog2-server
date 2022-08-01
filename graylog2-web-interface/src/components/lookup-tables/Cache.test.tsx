@@ -34,12 +34,7 @@ PluginStore.register(new PluginManifest({}, {
 }));
 
 const renderedCache = (scope: string) => {
-  CACHE._metadata = {
-    scope: scope,
-    revision: 2,
-    created_at: '2022-06-13T08:47:12Z',
-    updated_at: '2022-06-29T12:00:28Z',
-  };
+  CACHE.scope = scope;
 
   CACHE.config = {
     type: 'guava_cache',
