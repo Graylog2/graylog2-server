@@ -124,7 +124,8 @@ class ImportsViewModal extends React.Component {
       <PaginatedList totalItems={totalUploads}
                      pageSize={pageSize}
                      showPageSizeSelect={false}
-                     onChange={this._loadUploads}>
+                     onChange={this._loadUploads}
+                     useQueryParameter={false}>
         <table className="table">
           <thead>
             <tr><th>Sidecar</th><th>Collector</th><th>Created</th><th>Action</th></tr>
