@@ -57,7 +57,8 @@ const SavedSearchForm = (props: Props) => {
   } = props;
   const disableSaveAs = !value || value === '' || disableCreateNew;
   const createNewTitle = isCreateNew ? 'Create new' : 'Save as';
-  const pluggableFormComponents = usePluginEntities('views.components.saveViewForm');
+  const pluggableFormComponentsFn = usePluginEntities('views.components.saveViewForm') || [];
+  const pluggableFormComponents = pluggableFormComponentsFn.map((controlFn) => controlFn()).filter((control) => !!control);
 
   return (
     <Portal>

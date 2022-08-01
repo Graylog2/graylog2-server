@@ -38,6 +38,10 @@ import type User from 'logic/users/User';
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
 import { loadAsDashboard, loadNewSearch } from 'views/logic/views/Actions';
 import IfPermitted from 'components/common/IfPermitted';
+import usePluginEntities from 'views/logic/usePluginEntities';
+import {
+  executePluggableSearchDuplicationHandler as executePluggableDuplicationHandler,
+} from 'views/logic/views/pluggableSaveViewFormHandler';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchList from './SavedSearchList';
@@ -68,6 +72,7 @@ const SavedSearchControls = () => {
   const disableReset = !(dirty || loaded);
   const savedViewTitle = loaded ? 'Saved search' : 'Save search';
   const title = dirty ? 'Unsaved changes' : savedViewTitle;
+  const pluggableSaveViewControls = usePluginEntities('views.components.saveViewForm');
 
   const toggleFormModal = () => setShowForm((cur) => !cur);
   const toggleListModal = () => setShowList((cur) => !cur);
@@ -99,12 +104,14 @@ const SavedSearchControls = () => {
       .catch((error) => UserNotification.error(`Saving view failed: ${_extractErrorMessage(error)}`, 'Error!'));
   };
 
-  const saveAsSearch = () => {
+  const saveAsSearch = async () => {
     if (!newTitle || newTitle === '') {
       return;
     }
 
-    const newView = view.toBuilder()
+    const viewWithPluginData = await executePluggableDuplicationHandler(view, currentUser.permissions, pluggableSaveViewControls);
+
+    const newView = viewWithPluginData.toBuilder()
       .newId()
       .title(newTitle)
       .type(View.Type.Search)
