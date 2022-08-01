@@ -207,7 +207,7 @@ describe('MessageList', () => {
 
     clickNextPageButton();
 
-    await waitFor(() => expect(RefreshActions.disable).toHaveBeenCalled());
+    await waitFor(() => expect(RefreshActions.disable).toHaveBeenCalledTimes(1));
   });
 
   it('displays error description, when using pagination throws an error', async () => {
