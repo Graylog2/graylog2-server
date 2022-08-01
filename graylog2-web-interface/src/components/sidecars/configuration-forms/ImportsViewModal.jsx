@@ -20,36 +20,29 @@ import React from 'react';
 import { Button, Alert, Modal, Tooltip } from 'components/bootstrap';
 import { OverlayTrigger, PaginatedList, Spinner, Timestamp, Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import UserNotification from 'util/UserNotification';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
-
-const _buildVariableName = (name) => {
-  return `\${sidecar.${name}}`;
-};
 
 class ImportsViewModal extends React.Component {
   static propTypes = {
     onApply: PropTypes.func.isRequired,
-    paginationQueryParameter: PropTypes.object.isRequired,
   };
 
   static initialState = {
     uploads: undefined,
     totalUploads: 0,
     pagination: {
-      page: this.props.paginationQueryParameter.page,
+      page: 1,
     },
   };
-
-  PAGE_SIZE = 10;
 
   constructor(props) {
     super(props);
     this.state = ImportsViewModal.initialState;
   }
 
-  // eslint-disable-next-line react/no-unused-class-component-methods
+  PAGE_SIZE = 10;
+
   open = () => {
     this._loadUploads(this.state.pagination.page);
     this.uploadsModal.open();
@@ -80,6 +73,10 @@ class ImportsViewModal extends React.Component {
 
   _onApplyButton = (selectedUpload) => {
     this.props.onApply(selectedUpload);
+  };
+
+  _buildVariableName = (name) => {
+    return `\${sidecar.${name}}`;
   };
 
   _formatUpload(upload) {
@@ -145,7 +142,7 @@ class ImportsViewModal extends React.Component {
       <BootstrapModalWrapper bsSize="large" ref={(c) => { this.uploadsModal = c; }}>
         <Modal.Header closeButton>
           <Modal.Title><span>Imports from the old Collector system</span></Modal.Title>
-          Edit the imported configuration after pressing the Apply button by hand. Dynamic values like the node ID can be replaced with the variables system, e.g. <code>{_buildVariableName('nodeId')}</code>
+          Edit the imported configuration after pressing the Apply button by hand. Dynamic values like the node ID can be replaced with the variables system, e.g. <code>{this._buildVariableName('nodeId')}</code>
         </Modal.Header>
         <Modal.Body>
           {this._formatModalBody()}
@@ -158,4 +155,4 @@ class ImportsViewModal extends React.Component {
   }
 }
 
-export default withPaginationQueryParameter(ImportsViewModal);
+export default ImportsViewModal;
