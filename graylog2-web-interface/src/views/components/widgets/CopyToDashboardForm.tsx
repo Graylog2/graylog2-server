@@ -21,7 +21,6 @@ import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
 import connect from 'stores/connect';
 import { PaginatedList, SearchForm } from 'components/common';
 import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
-import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 type Props = {
   onCancel: () => void,
@@ -31,21 +30,17 @@ type Props = {
 };
 
 const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list = [], pagination }, onSubmit }: Props) => {
-  const pageSizes = [5, 10, 15];
-  const { resetPage } = usePaginationQueryParameter(pageSizes);
   const [selectedDashboard, setSelectedDashboard] = useState<string | null>(null);
   const [paginationState, setPaginationState] = useState({ query: '', page: 1, perPage: 5 });
 
   const handleSearch = useCallback((query) => {
-    resetPage();
-
     setPaginationState({
       ...paginationState,
       query,
     });
 
     setSelectedDashboard(null);
-  }, [paginationState, setSelectedDashboard, setPaginationState, resetPage]);
+  }, [paginationState, setSelectedDashboard, setPaginationState]);
 
   const handleSearchReset = useCallback(() => handleSearch(''), [handleSearch]);
 
@@ -87,7 +82,7 @@ const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list = [], pagi
                        activePage={paginationState.page}
                        totalItems={pagination.total}
                        pageSize={paginationState.perPage}
-                       pageSizes={pageSizes}>
+                       pageSizes={[5, 10, 15]}>
           {renderResult}
         </PaginatedList>
       </Modal.Body>
