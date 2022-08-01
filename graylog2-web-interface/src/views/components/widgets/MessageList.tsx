@@ -37,7 +37,6 @@ import type { BackendMessage } from 'views/components/messagelist/Types';
 import type Widget from 'views/logic/widgets/Widget';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 import { InputsActions } from 'stores/inputs/InputsStore';
-import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
 
@@ -75,12 +74,8 @@ const useSearchTypes = (activeQueryId: string) => {
 };
 
 const useResetPaginationOnSearchExecution = (setPagination: (pagination: Pagination) => void, currentPage) => {
-  const { resetPage } = usePaginationQueryParameter();
-
   useEffect(() => {
     const resetPagination = () => {
-      resetPage();
-
       if (currentPage !== 1) {
         setPagination({ currentPage: 1, pageErrors: [] });
       }
@@ -91,7 +86,7 @@ const useResetPaginationOnSearchExecution = (setPagination: (pagination: Paginat
     return () => {
       unlistenSearchExecute();
     };
-  }, [currentPage, setPagination, resetPage]);
+  }, [currentPage, setPagination]);
 };
 
 const useResetScrollPositionOnPageChange = (currentPage: number) => {
