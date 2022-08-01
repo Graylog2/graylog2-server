@@ -28,7 +28,8 @@ export type GRNType =
   | 'notification'
   | 'search'
   | 'stream'
-  | 'global';
+  | 'global'
+  | 'search_filter';
 
 export type CapabilityType = {
   id: GRN,

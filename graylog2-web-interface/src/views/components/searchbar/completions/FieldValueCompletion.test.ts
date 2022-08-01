@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { SearchSuggestions } from '@graylog/server-api';
+
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
-import fetch from 'logic/rest/FetchProvider';
 import type { FieldTypes } from 'views/components/searchbar/SearchBarAutocompletions';
 
 import FieldValueCompletion from './FieldValueCompletion';
@@ -46,8 +47,13 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
   ),
 }));
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn());
 jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore('get') }));
+
+jest.mock('@graylog/server-api', () => ({
+  SearchSuggestions: {
+    suggestFieldValue: jest.fn(),
+  },
+}));
 
 describe('FieldValueCompletion', () => {
   const suggestionsResponse = {
@@ -58,6 +64,7 @@ describe('FieldValueCompletion', () => {
       { value: 'POST', occurrence: 300 },
       { value: 'PUT', occurrence: 400 },
     ],
+    error: undefined,
   };
   const expectedSuggestions = [
     { name: 'POST', value: 'POST', caption: 'POST', score: 300, meta: '300 hits' },
@@ -70,7 +77,7 @@ describe('FieldValueCompletion', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    asMock(fetch).mockResolvedValue(suggestionsResponse);
+    asMock(SearchSuggestions.suggestFieldValue).mockResolvedValue(suggestionsResponse);
   });
 
   describe('getCompletions', () => {
@@ -239,13 +246,14 @@ describe('FieldValueCompletion', () => {
         suggestions: [
           { value: 'POST', occurrence: 300 },
         ],
+        error: undefined,
       };
       const currentToken = createCurrentToken('term', 'PSOT', 1, 12);
       const lastToken = {
         type: 'keyword',
         value: 'http_method:',
       };
-      asMock(fetch).mockResolvedValue(response);
+      asMock(SearchSuggestions.suggestFieldValue).mockResolvedValue(response);
 
       const completer = new FieldValueCompletion();
 
@@ -273,13 +281,14 @@ describe('FieldValueCompletion', () => {
         suggestions: [
           { value: 'C:\\Windows\\System32\\lsass.exe', occurrence: 300 },
         ],
+        error: undefined,
       };
       const currentToken = createCurrentToken('term', '', 1, 12);
       const lastToken = {
         type: 'keyword',
         value: 'process:',
       };
-      asMock(fetch).mockResolvedValue(response);
+      asMock(SearchSuggestions.suggestFieldValue).mockResolvedValue(response);
 
       const completer = new FieldValueCompletion();
 
@@ -295,7 +304,7 @@ describe('FieldValueCompletion', () => {
         {
           name: 'C:\\Windows\\System32\\lsass.exe',
           value: 'C\\:\\\\Windows\\\\System32\\\\lsass.exe',
-          caption: 'C:\\Windows\\System32\\lsass.exe',
+          caption: 'C\\:\\\\Windows\\\\System32\\\\lsass.exe',
           score: 300,
           meta: '300 hits',
         },
@@ -317,6 +326,7 @@ describe('FieldValueCompletion', () => {
           { value: 'action1', occurrence: 400 },
           { value: 'action2', occurrence: 300 },
         ],
+        error: undefined,
       };
 
       const expectedFirstSuggestions = [
@@ -325,7 +335,7 @@ describe('FieldValueCompletion', () => {
       ];
 
       it('is fetching further suggestions when there are some', async () => {
-        asMock(fetch).mockResolvedValue(firstResponse);
+        asMock(SearchSuggestions.suggestFieldValue).mockResolvedValue(firstResponse);
 
         const completer = new FieldValueCompletion();
 
@@ -348,8 +358,9 @@ describe('FieldValueCompletion', () => {
             { value: 'action3', occurrence: 200 },
             { value: 'action4', occurrence: 100 },
           ],
+          error: undefined,
         };
-        asMock(fetch).mockResolvedValue(secondResponse);
+        asMock(SearchSuggestions.suggestFieldValue).mockResolvedValue(secondResponse);
 
         const secondSuggestions = await completer.getCompletions({
           ...requestDefaults,
@@ -367,7 +378,7 @@ describe('FieldValueCompletion', () => {
       });
 
       it('is not fetching further suggestions when there are none', async () => {
-        asMock(fetch).mockResolvedValue({ ...firstResponse, sum_other_docs_count: 0 });
+        asMock(SearchSuggestions.suggestFieldValue).mockResolvedValue({ ...firstResponse, sum_other_docs_count: 0 });
 
         const completer = new FieldValueCompletion();
 

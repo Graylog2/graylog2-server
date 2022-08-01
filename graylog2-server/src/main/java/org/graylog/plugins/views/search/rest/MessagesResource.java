@@ -62,7 +62,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -193,10 +192,12 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
     @ApiOperation("Retrieve results for export job")
     @GET
-    @Path("job/{exportJobId}/{filename:.*}")
+    @Path("job/{exportJobId}/{filename}")
     public ChunkedOutput<SimpleMessageChunk> retrieveForExportJob(@ApiParam(value = "ID of an existing export job", name = "exportJobId")
                                                                   @PathParam("exportJobId") String exportJobId,
-                                                                  @Context SearchUser searchUser) throws UnsupportedEncodingException {
+                                                                  @ApiParam(value = "Resulting filename", name = "filename")
+                                                                  @PathParam("filename") String filename,
+                                                                  @Context SearchUser searchUser) {
         final ExportJob exportJob = exportJobService.get(exportJobId)
                 .orElseThrow(() -> new NotFoundException("Unable to find export job with id <" + exportJobId + ">!"));
 

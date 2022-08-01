@@ -1,4 +1,4 @@
-FROM openjdk:8-jre-slim-buster
+FROM eclipse-temurin:8-jre-jammy
 
 ARG GRAYLOG_VERSION
 ARG BUILD_DATE
@@ -13,7 +13,6 @@ WORKDIR ${GRAYLOG_HOME}
 
 # hadolint ignore=DL3027,DL3008
 RUN \
-  echo "export JAVA_HOME=/usr/local/openjdk-8"     > /etc/profile.d/graylog.sh && \
   echo "export BUILD_DATE=${BUILD_DATE}"           >> /etc/profile.d/graylog.sh && \
   echo "export GRAYLOG_VERSION=${GRAYLOG_VERSION}" >> /etc/profile.d/graylog.sh && \
   echo "export GRAYLOG_SERVER_JAVA_OPTS='-Dlog4j2.formatMsgNoLookups=true -Djdk.tls.acknowledgeCloseNotify=true -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:NewRatio=1 -XX:MaxMetaspaceSize=256m -server -XX:+ResizeTLAB -XX:+UseConcMarkSweepGC -XX:+CMSConcurrentMTEnabled -XX:+CMSClassUnloadingEnabled -XX:+UseParNewGC -XX:-OmitStackTraceInFastThrow " ${DEBUG_OPTS} "'" >> /etc/profile.d/graylog.sh && \
@@ -50,6 +49,10 @@ RUN \
     "${GRAYLOG_USER}" && \
   chown --recursive "${GRAYLOG_USER}":"${GRAYLOG_GROUP}" ${GRAYLOG_HOME} && \
   setcap 'cap_net_bind_service=+ep' "${JAVA_HOME}/bin/java" && \
+  # https://github.com/docker-library/openjdk/blob/da594d91b0364d5f1a32e0ce6b4d3fd8a9116844/8/jdk/slim-bullseye/Dockerfile#L105
+  # https://github.com/docker-library/openjdk/issues/331#issuecomment-498834472
+  find "$JAVA_HOME/lib" -name '*.so' -exec dirname '{}' ';' | sort -u > /etc/ld.so.conf.d/docker-openjdk.conf && \
+  ldconfig && \
   apt-get remove --assume-yes --purge \
     apt-utils > /dev/null && \
   rm -f /etc/apt/sources.list.d/* && \

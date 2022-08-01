@@ -212,6 +212,13 @@ export type MessagePreviewOption = {
   sort: number,
 }
 
+type ExternalActionsHookData = {
+      error: Error | null;
+      externalValueActions: Array<ActionDefinition> | null;
+      isLoading: boolean;
+      isError: boolean
+}
+
 type MessageAugmentation = {
   id: string,
   component: React.ComponentType<{ message: Message }>,
@@ -265,7 +272,7 @@ declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
     enterpriseWidgets?: Array<WidgetExport>;
-    externalValueActions?: Array<ActionDefinition>;
+    useExternalActions?: Array<() => ExternalActionsHookData>,
     fieldActions?: Array<ActionDefinition>;
     messageAugmentations?: Array<MessageAugmentation>;
     searchTypes?: Array<SearchType<any, any>>;
