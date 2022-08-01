@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 
 import { Modal, Button, ListGroup, ListGroupItem } from 'components/bootstrap';
 import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
@@ -32,25 +32,36 @@ type Props = {
 
 const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list = [], pagination }, onSubmit }: Props) => {
   const pageSizes = [5, 10, 15];
-  const { page, pageSize: perPage, resetPage } = usePaginationQueryParameter(pageSizes);
+  const { resetPage } = usePaginationQueryParameter(pageSizes);
   const [selectedDashboard, setSelectedDashboard] = useState<string | null>(null);
-  const [query, setQuery] = useState('');
+  const [paginationState, setPaginationState] = useState({ query: '', page: 1, perPage: 5 });
 
-  const handleSearch = (newQuery) => {
+  const handleSearch = useCallback((query) => {
     resetPage();
-    setQuery(newQuery);
-    setSelectedDashboard(null);
-  };
 
-  const handleSearchReset = () => handleSearch('');
+    setPaginationState({
+      ...paginationState,
+      query,
+    });
 
-  const handlePageChange = () => {
     setSelectedDashboard(null);
-  };
+  }, [paginationState, setSelectedDashboard, setPaginationState, resetPage]);
+
+  const handleSearchReset = useCallback(() => handleSearch(''), [handleSearch]);
+
+  const handlePageChange = useCallback((page: number, perPage: number) => {
+    setPaginationState({
+      ...paginationState,
+      page,
+      perPage,
+    });
+
+    setSelectedDashboard(null);
+  }, [paginationState, setSelectedDashboard, setPaginationState]);
 
   useEffect(() => {
-    DashboardsActions.search(query, page, perPage);
-  }, [query, page, perPage]);
+    DashboardsActions.search(paginationState.query, paginationState.page, paginationState.perPage);
+  }, [paginationState]);
 
   const dashboardList = list.map((dashboard) => {
     return (
@@ -73,7 +84,9 @@ const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list = [], pagi
         <SearchForm onSearch={handleSearch}
                     onReset={handleSearchReset} />
         <PaginatedList onChange={handlePageChange}
+                       activePage={paginationState.page}
                        totalItems={pagination.total}
+                       pageSize={paginationState.perPage}
                        pageSizes={pageSizes}>
           {renderResult}
         </PaginatedList>
