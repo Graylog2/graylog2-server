@@ -195,7 +195,7 @@ describe('MessageList', () => {
   });
 
   it('disables refresh actions, when using pagination', async () => {
-    const secondPageSize = Messages.DEFAULT_LIMIT + 10;
+    const secondPageSize = 10;
 
     render(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }} />);
 
@@ -209,7 +209,7 @@ describe('MessageList', () => {
       result: { errors: [{ description: 'Error description' }] },
     } as SearchExecutionResult)));
 
-    const secondPageSize = 2 * Messages.DEFAULT_LIMIT + 10;
+    const secondPageSize = 10;
 
     render(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }} />);
 
