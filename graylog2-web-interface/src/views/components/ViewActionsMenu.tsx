@@ -37,6 +37,10 @@ import type User from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
+import usePluginEntities from 'views/logic/usePluginEntities';
+import {
+  executePluggableDashboardDuplicationHandler as executePluggableDuplicationHandler,
+} from 'views/logic/views/pluggableSaveViewFormHandler';
 
 import ViewPropertiesModal from './views/ViewPropertiesModal';
 import IfDashboard from './dashboard/IfDashboard';
@@ -62,6 +66,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
       },
     },
   } = useSearchPageLayout();
+  const pluggableSaveViewControls = usePluginEntities('views.components.saveViewForm');
   const [shareViewOpen, setShareViewOpen] = useState(false);
   const [debugOpen, setDebugOpen] = useState(false);
   const [saveAsViewOpen, setSaveAsViewOpen] = useState(false);
@@ -79,41 +84,53 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
     </>
   );
 
+  const _onSaveAsView = async (newView: View) => {
+    const isViewDuplication = !!view.id;
+
+    if (isViewDuplication) {
+      const viewWithPluginData = await executePluggableDuplicationHandler(newView, currentUser.permissions, pluggableSaveViewControls);
+
+      return onSaveAsView(viewWithPluginData);
+    }
+
+    return onSaveAsView(newView);
+  };
+
   return (
     <ButtonGroup>
       {showSaveButton && (
-      <Button onClick={() => onSaveView(view)}
-              disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}
-              title="Save dashboard">
-        <Icon name="save" /> Save
-      </Button>
+        <Button onClick={() => onSaveView(view)}
+                disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}
+                title="Save dashboard">
+          <Icon name="save" /> Save
+        </Button>
       )}
       {showSaveAsButton && (
-      <Button onClick={() => setSaveAsViewOpen(true)}
-              disabled={hasUndeclaredParameters}
-              title="Save as new dashboard">
-        <Icon name="copy" /> Save as
-      </Button>
+        <Button onClick={() => setSaveAsViewOpen(true)}
+                disabled={hasUndeclaredParameters}
+                title="Save as new dashboard">
+          <Icon name="copy" /> Save as
+        </Button>
       )}
       {showShareButton && (
-      <ShareButton entityType="dashboard"
-                   entityId={view.id}
-                   onClick={() => setShareViewOpen(true)}
-                   bsStyle="default"
-                   disabledInfo={isNewView && 'Only saved dashboards can be shared.'} />
+        <ShareButton entityType="dashboard"
+                     entityId={view.id}
+                     onClick={() => setShareViewOpen(true)}
+                     bsStyle="default"
+                     disabledInfo={isNewView && 'Only saved dashboards can be shared.'} />
       )}
       {showDropDownButton && (
-      <DropdownButton title={<Icon name="ellipsis-h" />} id="query-tab-actions-dropdown" pullRight noCaret>
-        <MenuItem onSelect={() => setEditViewOpen(true)} disabled={isNewView || !allowedToEdit}>
-          <Icon name="edit" /> Edit metadata
-        </MenuItem>
-        <MenuItem onSelect={() => setExportOpen(true)}><Icon name="cloud-download-alt" /> Export</MenuItem>
-        {debugOverlay}
-        <IfDashboard>
-          <MenuItem divider />
-          <BigDisplayModeConfiguration view={view} disabled={isNewView} />
-        </IfDashboard>
-      </DropdownButton>
+        <DropdownButton title={<Icon name="ellipsis-h" />} id="query-tab-actions-dropdown" pullRight noCaret>
+          <MenuItem onSelect={() => setEditViewOpen(true)} disabled={isNewView || !allowedToEdit}>
+            <Icon name="edit" /> Edit metadata
+          </MenuItem>
+          <MenuItem onSelect={() => setExportOpen(true)}><Icon name="cloud-download-alt" /> Export</MenuItem>
+          {debugOverlay}
+          <IfDashboard>
+            <MenuItem divider />
+            <BigDisplayModeConfiguration view={view} disabled={isNewView} />
+          </IfDashboard>
+        </DropdownButton>
       )}
       {debugOpen && <DebugOverlay show onClose={() => setDebugOpen(false)} />}
       {saveAsViewOpen && (
@@ -121,7 +138,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
                              view={view.toBuilder().newId().build()}
                              title="Save new dashboard"
                              onClose={() => setSaveAsViewOpen(false)}
-                             onSave={(newView) => onSaveAsView(newView)} />
+                             onSave={(newView) => _onSaveAsView(newView)} />
       )}
       {editViewOpen && (
         <ViewPropertiesModal show

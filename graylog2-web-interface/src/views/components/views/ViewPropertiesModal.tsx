@@ -36,7 +36,8 @@ type Props = {
 const ViewPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle }: Props) => {
   const [updatedView, setUpdatedView] = useState(view);
   const viewType = ViewTypeLabel({ type: updatedView.type });
-  const pluggableFormComponents = usePluginEntities('views.components.saveViewForm');
+  const pluggableFormComponentsFn = usePluginEntities('views.components.saveViewForm') || [];
+  const pluggableFormComponents = pluggableFormComponentsFn.map((controlFn) => controlFn()).filter((control) => !!control);
 
   const _onChange = (event) => {
     const { name } = event.target;
@@ -95,7 +96,7 @@ const ViewPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle }:
              help={`A longer, helpful description of the ${viewType} and its functionality.`}
              onChange={_onChange}
              value={updatedView.description} />
-      {pluggableFormComponents?.map((Component) => (<Component />))}
+      {pluggableFormComponents?.map(({ component: Component, id }) => (<Component key={id} />))}
     </BootstrapModalForm>
   );
 };

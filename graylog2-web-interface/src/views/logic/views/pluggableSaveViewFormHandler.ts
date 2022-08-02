@@ -5,7 +5,6 @@ import UserNotification from 'util/UserNotification';
 
 const executeDuplicationHandler = async (view: View, userPermissions: Immutable.List<string>, duplicationHandlers): Promise<View> => {
   let updatedView = view.toBuilder().build();
-  console.log('2', view, updatedView);
 
   // eslint-disable-next-line no-restricted-syntax
   for (const duplicationHandler of duplicationHandlers) {
@@ -28,8 +27,13 @@ const executeDuplicationHandler = async (view: View, userPermissions: Immutable.
 };
 
 export const executePluggableSearchDuplicationHandler = (view: View, userPermissions, pluggableSaveViewControls) => {
-  console.log('1', view);
   const pluginSubmitHandlers = pluggableSaveViewControls?.map((pluginFn) => pluginFn()?.onSearchDuplication).filter((pluginData) => !!pluginData);
+
+  return executeDuplicationHandler(view, userPermissions, pluginSubmitHandlers);
+};
+
+export const executePluggableDashboardDuplicationHandler = (view: View, userPermissions, pluggableSaveViewControls) => {
+  const pluginSubmitHandlers = pluggableSaveViewControls?.map((pluginFn) => pluginFn()?.onDashboardDuplication).filter((pluginData) => !!pluginData);
 
   return executeDuplicationHandler(view, userPermissions, pluginSubmitHandlers);
 };
