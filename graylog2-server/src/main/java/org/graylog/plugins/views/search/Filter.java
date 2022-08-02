@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.graylog.plugins.views.search.filter.OrFilter;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -41,12 +42,14 @@ public interface Filter {
     @JsonProperty("filters")
     Set<Filter> filters();
 
+    default Filter withFilters(Set<Filter> filters) { return toGenericBuilder().filters(filters).build(); }
+
     Builder toGenericBuilder();
 
     interface Builder {
-        public abstract Builder filters(Set<Filter> filters);
+        Builder filters(Set<Filter> filters);
 
-        public abstract Filter build();
+        Filter build();
     }
 
     @JsonAutoDetect

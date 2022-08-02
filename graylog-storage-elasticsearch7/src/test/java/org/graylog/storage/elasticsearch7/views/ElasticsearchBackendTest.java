@@ -27,8 +27,6 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
 import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.ReferencedQueryStringSearchFilter;
@@ -41,7 +39,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryStri
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,7 +46,6 @@ import javax.inject.Provider;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -64,7 +60,7 @@ public class ElasticsearchBackendTest {
     @Before
     public void setup() {
         Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
-        handlers.put(MessageList.NAME, () -> new ESMessageList(new QueryStringDecorators(Optional.empty())));
+        handlers.put(MessageList.NAME, ESMessageList::new);
 
         usedSearchFiltersToQueryStringsMapper = mock(UsedSearchFiltersToQueryStringsMapper.class);
         doReturn(Collections.emptySet()).when(usedSearchFiltersToQueryStringsMapper).map(any());
@@ -72,8 +68,7 @@ public class ElasticsearchBackendTest {
         backend = new ElasticsearchBackend(handlers,
                 null,
                 mock(IndexLookup.class),
-                new QueryStringDecorators(Optional.empty()),
-                (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
                 usedSearchFiltersToQueryStringsMapper,
                 false);
     }
@@ -88,7 +83,7 @@ public class ElasticsearchBackendTest {
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
         final SearchJob job = new SearchJob("deadbeef", search, "admin");
 
-        backend.generate(job, query, new SearchConfig(Period.ZERO));
+        backend.generate(job, query, Collections.emptySet());
     }
 
     @Test
@@ -128,7 +123,7 @@ public class ElasticsearchBackendTest {
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
         final SearchJob job = new SearchJob("deadbeef", search, "admin");
 
-        final ESGeneratedQueryContext queryContext = backend.generate(job, query, new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext queryContext = backend.generate(job, query, Collections.emptySet());
         final QueryBuilder esQuery = queryContext.searchSourceBuilder(new SearchType.Fallback()).query();
         assertThat(esQuery)
                 .isNotNull()
