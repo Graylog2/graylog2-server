@@ -387,6 +387,14 @@
           } else {
             produces = this.produces;
           }
+          tags = o.tags || o.responseClass;
+          if (tags === "array") {
+            ref = null;
+            if (o.items) {
+              ref = o.items["tags"] || o.items["$ref"];
+            }
+            tags = "array[" + ref + "]";
+          }
           type = o.type || o.responseClass;
           if (type === "array") {
             ref = null;
@@ -407,7 +415,7 @@
             responseMessages = o.errorResponses;
           }
           o.nickname = this.sanitize(o.nickname);
-          op = new SwaggerOperation(o.nickname, resource_path, method, o.parameters, o.summary, o.notes, type, responseMessages, this, consumes, produces);
+          op = new SwaggerOperation(o.nickname, resource_path, method, o.parameters, o.summary, o.notes, tags, type, responseMessages, this, consumes, produces);
           this.operations[op.nickname] = op;
           _results.push(this.operationsArray.push(op));
         }
@@ -599,7 +607,7 @@
   })();
 
   SwaggerOperation = (function() {
-    function SwaggerOperation(nickname, path, method, parameters, summary, notes, type, responseMessages, resource, consumes, produces) {
+    function SwaggerOperation(nickname, path, method, parameters, summary, notes, tags, type, responseMessages, resource, consumes, produces) {
       var parameter, v, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3,
         _this = this;
       this.nickname = nickname;
@@ -608,6 +616,7 @@
       this.parameters = parameters != null ? parameters : [];
       this.summary = summary;
       this.notes = notes;
+      this.tags = tags;
       this.type = type;
       this.responseMessages = responseMessages;
       this.resource = resource;

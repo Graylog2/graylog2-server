@@ -355,6 +355,16 @@ function program11(depth0,data) {
   return "\n          <div class='sandbox_header'>\n            <input class='submit' name='commit' type='button' value='Try it out!' />\n            <a href='#' class='response_hider' style='display:none'>Hide Response</a>\n            <img alt='Throbber' class='response_throbber' src='images/throbber.gif' style='display:none' />\n          </div>\n          ";
   }
 
+  function program12(depth0,data) {
+    var buffer = "", stack1;
+    if (stack1 = depth0.tags.join(", ")) {
+      buffer += "\n        <h4>Tags</h4>\n        <p>";
+      buffer += stack1;
+      buffer += "</p>\n        ";
+    }
+    return buffer;
+  }
+
   buffer += "\n  <ul class='operations' >\n    <li class='";
   if (stack1 = helpers.method) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.method; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
@@ -453,6 +463,9 @@ function program11(depth0,data) {
   buffer += escapeExpression(stack1)
     + "_content' style='display:none'>\n        ";
   stack1 = helpers['if'].call(depth0, depth0.notes, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n        ";
+  stack1 = helpers['if'].call(depth0, depth0.tags, {hash:{},inverse:self.noop,fn:self.program(2, program12, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n        ";
   stack1 = helpers['if'].call(depth0, depth0.type, {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
