@@ -175,7 +175,7 @@ public class IndexSetValidatorTest {
                 .description("A test index-set.")
                 .indexPrefix("graylog1")
                 .indexWildcard("graylog1_*")
-                .rotationStrategy(TimeBasedRotationStrategyConfig.create(Period.days(1), Period.days(1)))
+                .rotationStrategy(TimeBasedRotationStrategyConfig.builder().maxRotationPeriod(Period.days(1)).build())
                 .rotationStrategyClass(TimeBasedRotationStrategyConfig.class.getCanonicalName())
                 .retentionStrategy(NoopRetentionStrategyConfig.create(10))
                 .retentionStrategyClass(NoopRetentionStrategy.class.getCanonicalName())

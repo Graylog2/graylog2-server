@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.elasticsearch6.views;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.google.inject.name.Named;
 import io.searchbox.client.JestClient;
@@ -30,10 +29,9 @@ import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
-import org.graylog.plugins.views.search.engine.SearchConfig;
+import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -75,7 +73,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers;
     private final JestClient jestClient;
     private final IndexLookup indexLookup;
-    private final QueryStringDecorators queryStringDecorators;
     private final ESGeneratedQueryContext.Factory queryContextFactory;
     private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
     private final boolean allowLeadingWildcard;
@@ -84,109 +81,91 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
                                 JestClient jestClient,
                                 IndexLookup indexLookup,
-                                QueryStringDecorators queryStringDecorators,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
                                 UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
-                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard,
-                                ObjectMapper objectMapper) {
+                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.jestClient = jestClient;
         this.indexLookup = indexLookup;
 
-        this.queryStringDecorators = queryStringDecorators;
         this.queryContextFactory = queryContextFactory;
         this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
-    private QueryBuilder normalizeQueryString(String queryString) {
+    private QueryBuilder translateQueryString(String queryString) {
         return (queryString.isEmpty() || queryString.trim().equals("*"))
                 ? QueryBuilders.matchAllQuery()
                 : QueryBuilders.queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
     }
 
     @Override
-    public ESGeneratedQueryContext generate(SearchJob job, Query query, SearchConfig searchConfig) {
+    public ESGeneratedQueryContext generate(SearchJob job, Query query, Set<SearchError> validationErrors) {
         final BackendQuery backendQuery = query.query();
-
-        validateQueryTimeRange(query, searchConfig);
 
         final Set<SearchType> searchTypes = query.searchTypes();
 
-        final String queryString = this.queryStringDecorators.decorate(backendQuery.queryString(), job, query);
-        final QueryBuilder normalizedRootQuery = normalizeQueryString(queryString);
+        final QueryBuilder normalizedRootQuery = translateQueryString(backendQuery.queryString());
 
         final BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
                 .filter(normalizedRootQuery);
 
         usedSearchFiltersToQueryStringsMapper.map(query.filters())
                 .stream()
-                .map(searchFilterQueryString -> this.queryStringDecorators.decorate(searchFilterQueryString, job, query))
-                .map(this::normalizeQueryString)
+                .map(this::translateQueryString)
                 .forEach(boolQuery::filter);
 
         // add the optional root query filters
         generateFilterClause(query.filter(), job, query)
-                .map(boolQuery::filter);
+                .ifPresent(boolQuery::filter);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(boolQuery)
                 .from(0)
                 .size(0);
 
-        final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, job, query);
-        for (SearchType searchType : searchTypes) {
+        final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, job, query, validationErrors);
+        searchTypes.stream()
+                .filter(searchType -> !isSearchTypeWithError(queryContext, searchType.id()))
+                .forEach(searchType -> {
+                    final String type = searchType.type();
+                    final Provider<ESSearchTypeHandler<? extends SearchType>> searchTypeHandler = elasticsearchSearchTypeHandlers.get(type);
+                    if (searchTypeHandler == null) {
+                        LOG.error("Unknown search type {} for elasticsearch backend, cannot generate query part. Skipping this search type.", type);
+                        queryContext.addError(new SearchTypeError(query, searchType.id(), "Unknown search type '" + type + "' for elasticsearch backend, cannot generate query"));
+                        return;
+                    }
 
-            final Optional<SearchTypeError> searchTypeError = validateSearchType(query, searchType, searchConfig);
-            if(searchTypeError.isPresent()) {
-                LOG.error("Invalid search type {} for elasticsearch backend, cannot generate query part. Skipping this search type.", searchType.type());
-                queryContext.addError(searchTypeError.get());
-                continue;
-            }
+                    final SearchSourceBuilder searchTypeSourceBuilder = queryContext.searchSourceBuilder(searchType);
 
+                    final Set<String> effectiveStreamIds = query.effectiveStreams(searchType);
 
-            final SearchSourceBuilder searchTypeSourceBuilder = queryContext.searchSourceBuilder(searchType);
-
-            final Set<String> effectiveStreamIds = searchType.effectiveStreams().isEmpty()
-                    ? query.usedStreamIds()
-                    : searchType.effectiveStreams();
-
-            final BoolQueryBuilder searchTypeOverrides = QueryBuilders.boolQuery()
-                    .must(searchTypeSourceBuilder.query())
-                    .must(
-                            Objects.requireNonNull(
-                                    TimeRangeQueryFactory.create(
-                                            query.effectiveTimeRange(searchType)
-                                    ),
-                                    "Timerange for search type " + searchType.id() + " cannot be found in query or search type."
+                    final BoolQueryBuilder searchTypeOverrides = QueryBuilders.boolQuery()
+                            .must(searchTypeSourceBuilder.query())
+                            .must(
+                                    Objects.requireNonNull(
+                                            TimeRangeQueryFactory.create(
+                                                    query.effectiveTimeRange(searchType)
+                                            ),
+                                            "Timerange for search type " + searchType.id() + " cannot be found in query or search type."
+                                    )
                             )
-                    )
-                    .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
+                            .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
 
-            searchType.query().ifPresent(searchTypeBackendQuery -> {
-                final String searchTypeQueryString = this.queryStringDecorators.decorate(searchTypeBackendQuery.queryString(), job, query);
-                final QueryBuilder normalizedSearchTypeQuery = normalizeQueryString(searchTypeQueryString);
-                searchTypeOverrides.must(normalizedSearchTypeQuery);
-            });
+                    searchType.query().ifPresent(searchTypeBackendQuery -> {
+                        final QueryBuilder normalizedSearchTypeQuery = translateQueryString(searchTypeBackendQuery.queryString());
+                        searchTypeOverrides.must(normalizedSearchTypeQuery);
+                    });
 
-            usedSearchFiltersToQueryStringsMapper.map(searchType.filters())
-                    .stream()
-                    .map(searchFilterQueryString -> this.queryStringDecorators.decorate(searchFilterQueryString, job, query))
-                    .map(this::normalizeQueryString)
-                    .forEach(searchTypeOverrides::must);
+                    usedSearchFiltersToQueryStringsMapper.map(searchType.filters())
+                            .stream()
+                            .map(this::translateQueryString)
+                            .forEach(searchTypeOverrides::must);
 
             searchTypeSourceBuilder.query(searchTypeOverrides);
 
-            final String type = searchType.type();
-            final Provider<ESSearchTypeHandler<? extends SearchType>> searchTypeHandler = elasticsearchSearchTypeHandlers.get(type);
-            if (searchTypeHandler == null) {
-                LOG.error("Unknown search type {} for elasticsearch backend, cannot generate query part. Skipping this search type.", type);
-                queryContext.addError(new SearchTypeError(query, searchType.id(), "Unknown search type '" + type + "' for elasticsearch backend, cannot generate query"));
-                continue;
-            }
-
-            searchTypeHandler.get().generateQueryPart(job, query, searchType, queryContext);
-        }
+                    searchTypeHandler.get().generateQueryPart(job, query, searchType, queryContext);
+                });
 
         return queryContext;
     }
@@ -216,7 +195,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 // Skipping stream filter, will be extracted elsewhere
                 return Optional.empty();
             case QueryStringFilter.NAME:
-                return Optional.of(QueryBuilders.queryStringQuery(this.queryStringDecorators.decorate(((QueryStringFilter) filter).query(), job, query)));
+                return Optional.of(QueryBuilders.queryStringQuery(((QueryStringFilter) filter).query()));
         }
         return Optional.empty();
     }
@@ -248,11 +227,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                         && !searchType.timerange().isPresent()) {
                                     return Optional.empty();
                                 }
-                                final Set<String> usedStreamIds = searchType.effectiveStreams().isEmpty()
-                                        ? query.usedStreamIds()
-                                        : searchType.effectiveStreams();
-
-                                return Optional.of(indexLookup.indexNamesForStreamsInTimeRange(usedStreamIds, query.effectiveTimeRange(searchType)));
+                                return Optional.of(indexLookup.indexNamesForStreamsInTimeRange(query.effectiveStreams(searchType), query.effectiveTimeRange(searchType)));
                             })
                             .orElse(affectedIndices);
 
