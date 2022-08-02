@@ -339,7 +339,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         // TODO: Once we introduce "EventProcessor owners" this should only load the permitted streams of the
         //       user who created this EventProcessor.
         search = search.addStreamsToQueriesWithoutStreams(() -> permittedStreams.load((streamId) -> true));
-        final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username));
+        final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username), Collections.emptySet());
         try {
             Uninterruptibles.getUninterruptibly(
                 searchJob.getResultFuture(),

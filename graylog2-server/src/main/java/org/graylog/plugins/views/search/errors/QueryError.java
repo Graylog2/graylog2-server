@@ -35,16 +35,25 @@ public class QueryError implements SearchError {
 
     private final String description;
 
+    private final boolean fatal;
+
     public QueryError(@Nonnull Query query, Throwable throwable) {
-        this.query = query;
-        this.throwable = throwable;
-        this.description = getRootCauseMessage(throwable);
+        this(query, getRootCauseMessage(throwable));
     }
 
     public QueryError(@Nonnull Query query, String description) {
+        this(query, null, description, false);
+    }
+
+    public QueryError(@Nonnull Query query, String description, boolean fatal) {
+        this(query, null, description, fatal);
+    }
+
+    public QueryError(Query query, @Nullable Throwable throwable, String description, boolean fatal) {
         this.query = query;
+        this.throwable = throwable;
         this.description = description;
-        this.throwable = null;
+        this.fatal = fatal;
     }
 
     @JsonProperty("query_id")
@@ -64,5 +73,10 @@ public class QueryError implements SearchError {
             return null;
         }
         return ExceptionUtils.getFullStackTrace(throwable);
+    }
+
+    @Override
+    public boolean fatal() {
+        return fatal;
     }
 }

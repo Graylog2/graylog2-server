@@ -18,8 +18,8 @@ package org.graylog.plugins.views.search;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.rest.ExecutionState;
+import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
@@ -110,7 +110,7 @@ public class SearchTest {
 
         ExecutionState executionState = partialResultsMapWithSearchTypes("oans");
 
-        Search after = before.applyExecutionState(objectMapperProvider.get(), executionState);
+        Search after = before.applyExecutionState(executionState);
 
         assertThat(searchTypeIdsFrom(after)).containsOnly("oans");
     }
@@ -121,7 +121,7 @@ public class SearchTest {
 
         ExecutionState executionState = partialResultsMapWithSearchTypes("oans", "gsuffa");
 
-        Search after = before.applyExecutionState(objectMapperProvider.get(), executionState);
+        Search after = before.applyExecutionState(executionState);
 
         assertThat(searchTypeIdsFrom(after)).containsExactlyInAnyOrder("oans", "gsuffa");
     }

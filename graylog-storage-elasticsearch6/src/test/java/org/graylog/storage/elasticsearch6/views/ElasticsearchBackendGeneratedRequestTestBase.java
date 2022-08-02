@@ -27,7 +27,6 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -55,7 +54,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -94,10 +92,9 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
         this.elasticsearchBackend = new ElasticsearchBackend(elasticSearchTypeHandlers,
                 jestClient,
                 indexLookup,
-                new QueryStringDecorators(Optional.empty()),
-                (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
-                false, objectMapper);
+        false);
     }
 
     SearchJob searchJobForQuery(Query query) {
