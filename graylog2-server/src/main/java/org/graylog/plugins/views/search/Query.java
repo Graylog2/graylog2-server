@@ -91,6 +91,12 @@ public abstract class Query implements ContentPackable<QueryEntity> {
                 .orElse(this.timerange());
     }
 
+    public Set<String> effectiveStreams(SearchType searchType) {
+        return searchType.effectiveStreams().isEmpty()
+                ? this.usedStreamIds()
+                : searchType.effectiveStreams();
+    }
+
     @Nonnull
     @JsonProperty("search_types")
     public abstract ImmutableSet<SearchType> searchTypes();
