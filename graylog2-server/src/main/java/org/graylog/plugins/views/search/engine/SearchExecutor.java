@@ -14,29 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest;
+package org.graylog.plugins.views.search.engine;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
-import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchJobService;
-import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.engine.normalization.SearchNormalization;
+import org.graylog.plugins.views.search.engine.validation.SearchValidation;
+import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.plugins.views.search.permissions.StreamPermissions;
+import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class SearchExecutor {
     private static final Logger LOG = LoggerFactory.getLogger(SearchExecutor.class);
@@ -44,20 +43,20 @@ public class SearchExecutor {
     private final SearchDomain searchDomain;
     private final SearchJobService searchJobService;
     private final QueryEngine queryEngine;
-    private final SearchExecutionGuard executionGuard;
-    private final ObjectMapper objectMapper;
+    private final SearchValidation searchValidation;
+    private final SearchNormalization searchNormalization;
 
     @Inject
     public SearchExecutor(SearchDomain searchDomain,
                           SearchJobService searchJobService,
                           QueryEngine queryEngine,
-                          SearchExecutionGuard executionGuard,
-                          ObjectMapper objectMapper) {
+                          SearchValidation searchValidation,
+                          SearchNormalization searchNormalization) {
         this.searchDomain = searchDomain;
         this.searchJobService = searchJobService;
         this.queryEngine = queryEngine;
-        this.executionGuard = executionGuard;
-        this.objectMapper = objectMapper;
+        this.searchValidation = searchValidation;
+        this.searchNormalization = searchNormalization;
     }
 
     public SearchJob execute(String searchId, SearchUser searchUser, ExecutionState executionState) {
@@ -67,13 +66,19 @@ public class SearchExecutor {
     }
 
     public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState) {
-        final Search searchWithStreams = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadAll());
+        final Search preValidationSearch = searchNormalization.preValidation(search, searchUser, executionState);
 
-        final Search searchWithExecutionState = searchWithStreams.applyExecutionState(objectMapper, firstNonNull(executionState, ExecutionState.empty()));
+        final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
 
-        authorize(searchWithExecutionState, searchUser);
+        if (hasFatalError(validationErrors)) {
+            return searchJobWithFatalError(searchJobService.create(preValidationSearch, searchUser.username()), validationErrors);
+        }
 
-        final SearchJob searchJob = queryEngine.execute(searchJobService.create(searchWithExecutionState, searchUser.username()));
+        final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
+
+        final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors);
+
+        validationErrors.forEach(searchJob::addError);
 
         try {
             Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 60000, TimeUnit.MILLISECONDS);
@@ -90,7 +95,13 @@ public class SearchExecutor {
         return searchJob;
     }
 
-    private void authorize(Search search, StreamPermissions streamPermissions) {
-        this.executionGuard.check(search, streamPermissions::canReadStream);
+    private SearchJob searchJobWithFatalError(SearchJob searchJob, Set<SearchError> validationErrors) {
+        validationErrors.forEach(searchJob::addError);
+
+        return searchJob;
+    }
+
+    private boolean hasFatalError(Set<SearchError> validationErrors) {
+        return validationErrors.stream().anyMatch(SearchError::fatal);
     }
 }
