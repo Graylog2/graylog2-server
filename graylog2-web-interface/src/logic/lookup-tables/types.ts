@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-type GenericEntityType = {
+export type GenericEntityType = {
   id?: string | null,
   title: string,
   description?: string | null,
@@ -41,7 +41,6 @@ export type LookupTableAdapter = GenericEntityType & {
   config?: { type: string },
   custom_error_ttl_unit?: 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS' | null,
   custom_error_ttl_enabled?: boolean,
-  _scope: string;
 }
 
 export type LookupTable = GenericEntityType & {

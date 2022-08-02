@@ -39,3 +39,16 @@ export const DATA_ADAPTER: LookupTableAdapter = {
   name: 'watchlist-mongo',
   _scope: null,
 };
+
+export const mockedFetchScopePermissions = async () => {
+  return new Promise((resolve: any) => {
+    setTimeout(() => {
+      return resolve({
+        entity_scopes: {
+          ILLUMINATE: { is_mutable: false },
+          DEFAULT: { is_mutable: true },
+        },
+      });
+    }, 1000);
+  });
+};

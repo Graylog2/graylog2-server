@@ -103,7 +103,7 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
   };
 
   const showAction = (inTable: LookupTable): boolean => {
-    const permissions = getScopePermissions(inTable._scope);
+    const permissions = getScopePermissions(inTable);
 
     return permissions.is_mutable;
   };

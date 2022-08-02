@@ -24,7 +24,6 @@ import { Button } from 'components/bootstrap';
 import { ErrorPopover } from 'components/lookup-tables';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import useScopePermissions from 'hooks/useScopePermissions';
-
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type Props = {
@@ -45,13 +44,12 @@ const Actions = styled.div`
   justify-content: flex-start;
 `;
 
-
 const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
   const history = useHistory();
   const { getScopePermissions } = useScopePermissions();
 
-  const showActions = (): boolean => {
-    const permissions = getScopePermissions(table._scope);
+  const showActions = (inTable: LookupTable): boolean => {
+    const permissions = getScopePermissions(inTable);
 
     return permissions.is_mutable;
   };
@@ -94,7 +92,7 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
           )}
           <Link to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapter.name)}>{dataAdapter.title}</Link>
         </td>
-        <td>{showActions() && (
+        <td>{showActions(table) && (
           <Actions>
             <Button bsSize="xsmall" bsStyle="info" onClick={handleEdit(table.name)} alt="edit button">
               Edit

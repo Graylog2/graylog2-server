@@ -56,7 +56,7 @@ const Cache = ({ cache }: Props) => {
   };
 
   const showAction = (inCache: LookupTableCache): boolean => {
-    const permissions = getScopePermissions(inCache._scope);
+    const permissions = getScopePermissions(inCache);
 
     return permissions.is_mutable;
   };

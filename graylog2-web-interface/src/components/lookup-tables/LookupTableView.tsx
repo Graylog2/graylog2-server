@@ -35,7 +35,6 @@ const INIT_INPUT = { value: '', valid: false };
 const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
   const history = useHistory();
   const { getScopePermissions } = useScopePermissions();
-
   const [purgeKey, setPurgeKey] = React.useState<any>(INIT_INPUT);
   const [lookupKey, setLookupKey] = React.useState<any>(INIT_INPUT);
   const [lookupResult, setLookupResult] = React.useState<any>(null);
@@ -93,7 +92,7 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
   };
 
   const showAction = (inTable: LookupTable): boolean => {
-    const permissions = getScopePermissions(inTable._scope);
+    const permissions = getScopePermissions(inTable);
 
     return permissions.is_mutable;
   };

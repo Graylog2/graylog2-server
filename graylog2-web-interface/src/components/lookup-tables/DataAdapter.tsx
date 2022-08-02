@@ -50,7 +50,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
   };
 
   const showAction = (): boolean => {
-    const permissions = getScopePermissions(dataAdapter._scope);
+    const permissions = getScopePermissions(dataAdapter);
 
     return permissions.is_mutable;
   };

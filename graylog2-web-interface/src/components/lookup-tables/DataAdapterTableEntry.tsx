@@ -43,15 +43,13 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
   };
 
   const showActions = () => {
-    const scope = adapter._scope ? adapter._scope : 'DEFAULT';
-
-    const permissions = getScopePermissions(scope);
+    const permissions = getScopePermissions(adapter);
 
     return permissions.is_mutable;
   };
 
   const isMutable = showActions();
-  const immutableTooltip = <Tooltip id={`${adapterId}-immutable-tooltip`}>Action not available for immutable entities</Tooltip>
+  const immutableTooltip = <Tooltip id={`${adapterId}-immutable-tooltip`}>Action not available for immutable entities</Tooltip>;
 
   return (
     <tbody>
@@ -82,8 +80,8 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
               Delete
             </Button>
           ) : (
-              <OverlayElement placement="top" overlay={immutableTooltip} useOverlay={isMutable}>
-                <Button disabled={!isMutable}
+            <OverlayElement placement="top" overlay={immutableTooltip} useOverlay={isMutable}>
+              <Button disabled={!isMutable}
                       bsSize="xsmall"
                       bsStyle="primary"
                       onClick={_onDelete}

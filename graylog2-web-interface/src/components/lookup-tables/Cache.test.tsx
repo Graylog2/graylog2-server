@@ -19,13 +19,11 @@ import { render, waitFor } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
-import { asMock } from 'helpers/mocking';
-import { exampleEntityScope } from 'fixtures/entityScope';
-import fetchScopePermissions from 'hooks/api/fetchScopePermissions';
-
 import CaffeineCacheSummary from './caches/CaffeineCacheSummary';
-import { CACHE } from './fixtures';
+import { CACHE, mockedFetchScopePermissions } from './fixtures';
 import Cache from './Cache';
+
+jest.mock('hooks/api/fetchScopePermissions', () => (mockedFetchScopePermissions));
 
 PluginStore.register(new PluginManifest({}, {
   lookupTableCaches: [
@@ -36,8 +34,6 @@ PluginStore.register(new PluginManifest({}, {
     },
   ],
 }));
-
-jest.mock('hooks/api/fetchScopePermissions', () => jest.fn());
 
 const renderedCache = (scope: string) => {
   CACHE._scope = scope;
@@ -58,8 +54,6 @@ const renderedCache = (scope: string) => {
 
 describe('Cache', () => {
   it('should show "edit" button', async () => {
-    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
-
     const { baseElement } = renderedCache('DEFAULT');
 
     await waitFor(() => {
@@ -70,8 +64,6 @@ describe('Cache', () => {
   });
 
   it('should not show "edit" button', async () => {
-    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
-
     const { baseElement } = renderedCache('ILLUMINATE');
 
     await waitFor(() => {

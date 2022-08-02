@@ -17,22 +17,12 @@
 import { useQuery } from 'react-query';
 
 import UserNotification from 'util/UserNotification';
-import fetchScopePermissions from 'hooks/api/fetchScopePermissions';
+import type { GenericEntityType } from 'logic/lookup-tables/types';
 
-interface ScopeParams {
-  is_mutable: boolean;
-}
-
-type ScopeName = 'DEFAULT' | 'ILLUMINATE';
-
-type EntityScopeRecord = Record<ScopeName, ScopeParams>;
-
-type EntityScopeType = {
-  entity_scopes: EntityScopeRecord,
-};
+import fetchScopePermissions from './api/fetchScopePermissions';
 
 const useGetPermissionsByScope = () => {
-  const { data, isLoading, isError, error } = useQuery<EntityScopeType, Error>(
+  const { data, isLoading, isError, error } = useQuery<any, Error>(
     'scope-permissions',
     fetchScopePermissions,
     {
@@ -44,10 +34,10 @@ const useGetPermissionsByScope = () => {
 
   if (isError && error) UserNotification.error(error.message);
 
-  const getScopePermissions = (inScope: string) => {
-    const scope = inScope ? inScope.toUpperCase() : 'DEFAULT';
+  const getScopePermissions = (entity: GenericEntityType) => {
+    const scope = entity._scope ? entity._scope.toUpperCase() : 'DEFAULT';
 
-    return isLoading ? { is_mutable: false } : data.entity_scopes[scope];
+    return isLoading ? {} : data.entity_scopes[scope];
   };
 
   return { getScopePermissions };

@@ -18,14 +18,10 @@ import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-import { asMock } from 'helpers/mocking';
-import { exampleEntityScope } from 'fixtures/entityScope';
-import fetchScopePermissions from 'hooks/api/fetchScopePermissions';
-
-import { TABLE, CACHE, DATA_ADAPTER } from './fixtures';
+import { TABLE, CACHE, DATA_ADAPTER, mockedFetchScopePermissions } from './fixtures';
 import LUTTableEntry from './LUTTableEntry';
 
-jest.mock('hooks/api/fetchScopePermissions', () => jest.fn());
+jest.mock('hooks/api/fetchScopePermissions', () => (mockedFetchScopePermissions));
 
 const renderedLUT = (scope: string) => {
   TABLE._scope = scope;
@@ -42,8 +38,6 @@ const renderedLUT = (scope: string) => {
 
 describe('LUTTableEntry', () => {
   it('should show "edit" button', async () => {
-    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
-
     const { baseElement } = renderedLUT('DEFAULT');
 
     await waitFor(() => {
@@ -54,8 +48,6 @@ describe('LUTTableEntry', () => {
   });
 
   it('should not show "edit" button', async () => {
-    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
-
     const { baseElement } = renderedLUT('ILLUMINATE');
 
     await waitFor(() => {
@@ -66,20 +58,16 @@ describe('LUTTableEntry', () => {
   });
 
   it('should show "delete" button', async () => {
-    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
-
     const { baseElement } = renderedLUT('DEFAULT');
 
     await waitFor(() => {
       const actionBtn = baseElement.querySelector('button[alt="delete button"]');
 
-      expect(actionBtn).toBeNull();
+      expect(actionBtn).toBeVisible();
     });
   });
 
   it('should not show "delete" button', async () => {
-    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
-
     const { baseElement } = renderedLUT('ILLUMINATE');
 
     await waitFor(() => {

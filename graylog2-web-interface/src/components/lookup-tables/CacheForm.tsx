@@ -123,7 +123,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
   };
 
   const showAction = (inCache: LookupTableCache): boolean => {
-    const permissions = getScopePermissions(inCache._scope);
+    const permissions = getScopePermissions(inCache);
 
     return permissions.is_mutable;
   };

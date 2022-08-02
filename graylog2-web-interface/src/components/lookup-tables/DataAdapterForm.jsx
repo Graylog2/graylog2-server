@@ -222,6 +222,7 @@ class DataAdapterForm extends React.Component {
     });
   };
 
+  // eslint-disable-next-line
   _sanitizeTitle = (title) => {
     return title.trim().replace(/\W+/g, '-').toLocaleLowerCase();
   };
@@ -252,6 +253,7 @@ class DataAdapterForm extends React.Component {
     return <span>{defaultText}</span>;
   };
 
+  // eslint-disable-next-line
   _renderTitle = (title, typeName, create) => {
     const TagName = create ? 'h3' : 'h2';
 
