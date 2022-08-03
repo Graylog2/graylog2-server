@@ -48,6 +48,7 @@ import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.filter.WebAppNotFoundResponseFilter;
 import org.graylog2.shared.rest.CORSFilter;
+import org.graylog2.shared.rest.EmbeddingControlFilter;
 import org.graylog2.shared.rest.NodeIdResponseFilter;
 import org.graylog2.shared.rest.NotAuthorizedResponseFilter;
 import org.graylog2.shared.rest.PrintModelProcessor;
@@ -122,7 +123,8 @@ public class JerseyService extends AbstractIdleService {
 
     @Inject
     public JerseyService(final HttpConfiguration configuration,
-                         Configuration graylogConfiguration, Set<Class<? extends DynamicFeature>> dynamicFeatures,
+                         Configuration graylogConfiguration,
+                         Set<Class<? extends DynamicFeature>> dynamicFeatures,
                          Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                          Set<Class<? extends ExceptionMapper>> exceptionMappers,
                          @Named("additionalJerseyComponents") final Set<Class> additionalComponents,
@@ -260,7 +262,8 @@ public class JerseyService extends AbstractIdleService {
                         RequestIdFilter.class,
                         XHRFilter.class,
                         NotAuthorizedResponseFilter.class,
-                        WebAppNotFoundResponseFilter.class)
+                        WebAppNotFoundResponseFilter.class,
+                        EmbeddingControlFilter.class)
                 // Replacing this with a lambda leads to missing subtypes - https://github.com/Graylog2/graylog2-server/pull/10617#discussion_r630236360
                 .register(new ContextResolver<ObjectMapper>() {
                     @Override

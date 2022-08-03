@@ -7,6 +7,20 @@ Please make sure to create a MongoDB database backup before starting the upgrade
 
 ## Breaking Changes
 
+## Disallowing embedding the frontend by default
+
+To prevent [click-jacking](https://developer.mozilla.org/en-US/docs/Web/Security/Types_of_attacks#click-jacking), we are now preventing the frontend to be embedded in `<frame>`/`<iframe>`/etc. elements by sending the `X-Frame-Options`-header with all HTTP responses. The header value depends on the new configuration setting `http_allow_embedding`. The different combinations are:
+
+| `http_allow_embedding` | `X-Frame-Options`-header value |
+|------------------------|--------------------------------|
+| not set                | `DENY`                         |
+| `false`                | `DENY`                         |
+| `true`                 | `SAMEORIGIN`                   |
+
+If you want to be able to embed the Graylog frontend in another HTML page, you most probably want to set `http_allow_embedding` to `true`. Only do this if you are aware of the implications!
+
+For further information about the meanings of the different header values and how they are interpreted by browsers, please read [this](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options).
+
 ### Notable API Endpoint Changes ##
 
 | Endpoint                        | Description                 |
