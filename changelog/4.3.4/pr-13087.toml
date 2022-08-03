@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix search query value suggestions when quoting is used."
+
+issues = [""]
+pulls = ["13087"]

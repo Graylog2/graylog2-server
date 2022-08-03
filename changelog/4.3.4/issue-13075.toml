@@ -1,0 +1,5 @@
+type = "a"
+message = "Add automatic database reload to the GeoIP message processor."
+
+issues = ["13075"]
+pulls = ["13106"]

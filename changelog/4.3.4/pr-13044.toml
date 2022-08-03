@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Don't render inactive notifications."
+
+issues = ["graylog-plugin-enterprise#3477"]
+pulls = ["13044"]

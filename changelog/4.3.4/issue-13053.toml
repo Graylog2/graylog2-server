@@ -1,0 +1,5 @@
+type = "a"
+message = "Add `ignore_migration_failures` config file option to make it possible to skip problematic migrations during an upgrade. (default is off and it's not recommended in general)"
+
+issues = ["13053"]
+pulls = ["13137"]

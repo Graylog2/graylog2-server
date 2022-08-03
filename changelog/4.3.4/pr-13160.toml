@@ -1,0 +1,5 @@
+type = "s"
+message = "Add `X-Frame-Options` HTTP header to fix a potential clickjacking issue when the frontend is embedded into other pages with an iframe."
+
+issues = ["graylog-plugin-enterprise#3884"]
+pulls = ["13160"]

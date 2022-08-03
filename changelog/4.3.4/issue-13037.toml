@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix `FetchError` issue in search query validation."
+
+issues = ["13037"]
+pulls = ["13089"]
