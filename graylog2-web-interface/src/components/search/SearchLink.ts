@@ -19,7 +19,7 @@ import URI from 'urijs';
 
 import Routes from 'routing/Routes';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
-import { toSearchTimeRange } from 'views/logic/TimeRange';
+import { timeRangeToQueryParameter } from 'views/logic/TimeRange';
 import { addToQuery, escape } from 'views/logic/queries/QueryHelper';
 
 type InternalState = {
@@ -90,7 +90,7 @@ export default class SearchLink {
     const { id, query, highlightedMessage, streams, filterFields, timerange } = this._value;
     const queryWithFilterFields = _mergeFilterFieldsToQuery(query, filterFields);
 
-    const searchTimerange = timerange ? toSearchTimeRange(timerange) : {};
+    const searchTimerange = timerange ? timeRangeToQueryParameter(timerange) : {};
 
     const params = {
       ...searchTimerange,

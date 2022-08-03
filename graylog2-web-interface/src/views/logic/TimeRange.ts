@@ -18,34 +18,34 @@ import type { TimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import assertUnreachable from 'logic/assertUnreachable';
 
-type SearchRelativeRangeStartOnly = {
+type RelativeRangeStartOnlyQueryParameter = {
   rangetype: 'relative',
   relative: string,
 };
 
-type SearchRelativeRangeWithEnd = {
+type RelativeRangeWithEndQueryParameter = {
   rangetype: 'relative',
   from: string,
   to?: string,
 };
 
-type SearchRelativeRange = SearchRelativeRangeStartOnly | SearchRelativeRangeWithEnd
+type RelativeRangeQueryParameter = RelativeRangeStartOnlyQueryParameter | RelativeRangeWithEndQueryParameter;
 
-type SearchAbsoluteRange = {
+type AbsoluteRangeQueryParameter = {
   rangetype: 'absolute',
   from: string,
   to: string,
 };
 
-type SearchKeywordRange = {
+type KeywordRangeQueryParameter = {
   rangetype: 'keyword',
   keyword: string,
   timezone?: string,
 };
 
-export type SearchTimeRange = SearchAbsoluteRange | SearchRelativeRange | SearchKeywordRange;
+export type TimeRangeQueryParameter = AbsoluteRangeQueryParameter | RelativeRangeQueryParameter | KeywordRangeQueryParameter;
 
-export const toSearchTimeRange = (timeRange: TimeRange): SearchTimeRange => {
+export const timeRangeToQueryParameter = (timeRange: TimeRange): TimeRangeQueryParameter => {
   switch (timeRange.type) {
     case 'relative':
       if (isTypeRelativeWithStartOnly(timeRange)) {
@@ -67,7 +67,7 @@ export const toSearchTimeRange = (timeRange: TimeRange): SearchTimeRange => {
   }
 };
 
-const parseRelativeTimeRange = (range: SearchRelativeRange): RelativeTimeRange => {
+const parseRelativeTimeRange = (range: RelativeRangeQueryParameter): RelativeTimeRange => {
   const parseRangeValue = (rangeValue: string) => parseInt(rangeValue, 10);
 
   if ('relative' in range) {
@@ -87,7 +87,7 @@ const parseRelativeTimeRange = (range: SearchRelativeRange): RelativeTimeRange =
   return assertUnreachable(range, 'Invalid relative range specified: ');
 };
 
-export const fromSearchTimeRange = (range: SearchTimeRange): TimeRange => {
+export const timeRangeFromQueryParameter = (range: TimeRangeQueryParameter): TimeRange => {
   switch (range?.rangetype) {
     case 'relative':
       return parseRelativeTimeRange(range);
