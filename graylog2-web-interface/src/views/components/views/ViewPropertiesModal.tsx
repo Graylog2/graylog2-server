@@ -74,29 +74,31 @@ const ViewPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle }:
                         onSubmitForm={_onSave}
                         submitButtonText="Save"
                         bsSize="large">
-      <Input id="title"
-             type="text"
-             name="title"
-             label="Title"
-             help={`The title of the ${viewType}.`}
-             required
-             onChange={_onChange}
-             value={updatedView.title} />
-      <Input id="summary"
-             type="text"
-             name="summary"
-             label="Summary"
-             help={`A helpful summary of the ${viewType}.`}
-             onChange={_onChange}
-             value={updatedView.summary} />
-      <Input id="description"
-             type="textarea"
-             name="description"
-             label="Description"
-             help={`A longer, helpful description of the ${viewType} and its functionality.`}
-             onChange={_onChange}
-             value={updatedView.description} />
-      {pluggableFormComponents?.map(({ component: Component, id }) => (<Component key={id} />))}
+      <>
+        <Input id="title"
+               type="text"
+               name="title"
+               label="Title"
+               help={`The title of the ${viewType}.`}
+               required
+               onChange={_onChange}
+               value={updatedView.title} />
+        <Input id="summary"
+               type="text"
+               name="summary"
+               label="Summary"
+               help={`A helpful summary of the ${viewType}.`}
+               onChange={_onChange}
+               value={updatedView.summary} />
+        <Input id="description"
+               type="textarea"
+               name="description"
+               label="Description"
+               help={`A longer, helpful description of the ${viewType} and its functionality.`}
+               onChange={_onChange}
+               value={updatedView.description} />
+        {pluggableFormComponents?.map(({ component: Component, id }) => (<Component key={id} />))}
+      </>
     </BootstrapModalForm>
   );
 };

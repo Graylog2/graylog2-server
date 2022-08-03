@@ -128,10 +128,8 @@ describe('SavedSearchForm', () => {
   });
 
   it('should render pluggable components', async () => {
-    const pluginComponentMock = jest.fn(() => <div>Pluggable component!</div>);
-
     asMock(usePluginEntities).mockImplementation((entityKey) => ({
-      'views.components.saveViewForm': [{ component: pluginComponentMock, id: 'example-plugin-component' }],
+      'views.components.saveViewForm': [() => ({ component: () => <div>Pluggable component!</div>, id: 'example-plugin-component' })],
     }[entityKey]));
 
     render(<SavedSearchForm {...props} />);
