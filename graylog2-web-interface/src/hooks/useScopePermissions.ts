@@ -17,7 +17,9 @@
 import { useQuery } from 'react-query';
 
 import UserNotification from 'util/UserNotification';
-import fetchScopePermissions from 'hooks/api/fetchScopePermissions';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
+import ApiRoutes from 'routing/ApiRoutes';
 
 interface ScopeParams {
   is_mutable: boolean;
@@ -31,26 +33,31 @@ type EntityScopeType = {
   entity_scopes: EntityScopeRecord,
 };
 
-const useGetPermissionsByScope = () => {
-  const { data, isLoading, isError, error } = useQuery<EntityScopeType, Error>(
-    'scope-permissions',
+const fetchScopePermissions: () => Promise<EntityScopeType> = () => {
+  return fetch('GET', qualifyUrl(ApiRoutes.EntityScopeController.getScope().url));
+};
+
+const useGetPermissionsByScope = (inScope: string) => {
+  const { data, isLoading } = useQuery(
+    ['scope-permissions'],
     fetchScopePermissions,
     {
+      onError: (fetchError: Error) => {
+        UserNotification.error(`Error fetching entity scope permissions: ${fetchError.message}`);
+      },
       retry: 1,
       cacheTime: 1000 * 60 * 60 * 3, // cache for 3 hours
       staleTime: 1000 * 60 * 60 * 3, // data is valid for 3 hours
     },
   );
 
-  if (isError && error) UserNotification.error(error.message);
+  const scope = inScope ? inScope.toUpperCase() : 'DEFAULT';
+  const permissions: ScopeParams = isLoading ? { is_mutable: false } : data.entity_scopes[scope];
 
-  const getScopePermissions = (inScope: string) => {
-    const scope = inScope ? inScope.toUpperCase() : 'DEFAULT';
-
-    return isLoading ? { is_mutable: false } : data.entity_scopes[scope];
+  return {
+    isLoading,
+    data: permissions,
   };
-
-  return { getScopePermissions };
 };
 
 export default useGetPermissionsByScope;

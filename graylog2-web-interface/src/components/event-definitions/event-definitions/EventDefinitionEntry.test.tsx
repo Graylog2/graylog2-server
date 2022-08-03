@@ -22,7 +22,7 @@ import { asMock } from 'helpers/mocking';
 import { alice } from 'fixtures/users';
 import { simpleEventDefinition } from 'fixtures/eventDefinition';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import fetchScopePermissions from 'hooks/api/fetchScopePermissions';
+import useGetPermissionsByScope from 'hooks/useScopePermissions';
 
 import EventDefinitionEntry from './EventDefinitionEntry';
 
@@ -31,15 +31,20 @@ const exampleEventDefinition = {
   id: 'event-definition-id',
 };
 
-const exampleEntityScope = {
-  entity_scopes: {
-    DEFAULT: { is_mutable: true },
-    ILLUMINATE: { is_mutable: false },
-  },
+type entityScope = {
+  is_mutable: boolean;
 };
 
+type getPermissionsByScopeReturnType = {
+  isLoading: boolean;
+  data: entityScope;
+};
+
+const exampleEntityScopeMutable: getPermissionsByScopeReturnType = { isLoading: false, data: { is_mutable: true } };
+const exampleEntityScopeImmutable: getPermissionsByScopeReturnType = { isLoading: false, data: { is_mutable: false } };
+
 jest.mock('components/permissions/EntityShareModal', () => () => <div>EntityShareModal content</div>);
-jest.mock('hooks/api/fetchScopePermissions', () => jest.fn());
+jest.mock('hooks/useScopePermissions', () => jest.fn());
 
 describe('EventDefinitionEntry', () => {
   const renderSUT = (grnPermissions = [], permissions = [], scope = 'DEFAULT') => {
@@ -63,7 +68,7 @@ describe('EventDefinitionEntry', () => {
   };
 
   it('allows sharing for owners', async () => {
-    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+    asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeMutable);
 
     const grnPermissions = ['entity:own:grn::::event_definition:event-definition-id'];
     render(renderSUT(grnPermissions));
@@ -75,7 +80,7 @@ describe('EventDefinitionEntry', () => {
   });
 
   it('allows sharing for admins', async () => {
-    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+    asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeMutable);
 
     render(renderSUT([], ['*']));
 
@@ -86,7 +91,7 @@ describe('EventDefinitionEntry', () => {
   });
 
   it('does not allow sharing for viewer', () => {
-    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+    asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeMutable);
 
     const grnPermissions = ['entity:view:grn::::event_definition:event-definition-id'];
     render(renderSUT(grnPermissions));
@@ -95,7 +100,7 @@ describe('EventDefinitionEntry', () => {
   });
 
   it('shows "edit" button', async () => {
-    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+    asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeMutable);
 
     render(renderSUT([], ['*'], 'DEFAULT'));
 
@@ -105,7 +110,7 @@ describe('EventDefinitionEntry', () => {
   });
 
   it('hides "edit" button for immutable definitions', async () => {
-    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+    asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeImmutable);
 
     render(renderSUT([], ['*'], 'ILLUMINATE'));
 
@@ -115,7 +120,7 @@ describe('EventDefinitionEntry', () => {
   });
 
   it('shows "delete" button', async () => {
-    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+    asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeMutable);
 
     render(renderSUT([], ['*'], 'DEFAULT'));
 
@@ -125,7 +130,7 @@ describe('EventDefinitionEntry', () => {
   });
 
   it('hides "delete" button for immutable definitions', async () => {
-    asMock(fetchScopePermissions).mockResolvedValueOnce(exampleEntityScope);
+    asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeImmutable);
 
     render(renderSUT([], ['*'], 'ILLUMINATE'));
 

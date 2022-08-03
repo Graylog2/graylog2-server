@@ -18,6 +18,7 @@ import React, { useState } from 'react';
 import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import Routes from 'routing/Routes';
 import { Link, LinkContainer } from 'components/common/router';
@@ -26,6 +27,7 @@ import {
   IfPermitted,
   Icon,
   ShareButton,
+  Spinner,
 } from 'components/common';
 import {
   Button,
@@ -33,7 +35,6 @@ import {
   Label,
   MenuItem,
 } from 'components/bootstrap';
-import useScopePermissions from 'hooks/useScopePermissions';
 
 import EventDefinitionDescription from './EventDefinitionDescription';
 
@@ -78,12 +79,10 @@ const EventDefinitionEntry = ({
 }: Props) => {
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const isScheduled = lodash.get(context, `scheduler.${eventDefinition.id}.is_scheduled`, true);
-  const { getScopePermissions } = useScopePermissions();
+  const { isLoading, data } = useGetPermissionsByScope(eventDefinition?._scope || 'DEFAULT');
 
   const showActions = (): boolean => {
-    const permissions = getScopePermissions(eventDefinition?._scope || 'DEFAULT');
-
-    return permissions.is_mutable;
+    return data.is_mutable;
   };
 
   const handleCopy = () => {
@@ -144,6 +143,12 @@ const EventDefinitionEntry = ({
   }
 
   const linkTitle = <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{eventDefinition.title}</Link>;
+
+  if (isLoading) {
+    return (
+      <Spinner text="Loading Event Definitions" />
+    );
+  }
 
   return (
     <>
