@@ -25,7 +25,7 @@ import {
   createElasticsearchQueryString,
 } from 'views/logic/queries/Query';
 import type { SearchTimeRange } from 'views/logic/TimeRange';
-import { fromSearchTimerange } from 'views/logic/TimeRange';
+import { fromSearchTimeRange } from 'views/logic/TimeRange';
 import { DEFAULT_RANGE_TYPE } from 'views/Constants';
 
 type StreamsQuery = {
@@ -36,9 +36,9 @@ export type RawQuery = (SearchTimeRange | { relative?: string }) & StreamsQuery 
 
 // eslint-disable-next-line no-nested-ternary
 const normalizeTimeRange = (query: {} | SearchTimeRange): TimeRange | undefined => (query && 'rangetype' in query
-  ? fromSearchTimerange(query)
+  ? fromSearchTimeRange(query)
   : 'relative' in query
-    ? fromSearchTimerange({ ...query, rangetype: DEFAULT_RANGE_TYPE })
+    ? fromSearchTimeRange({ ...query, rangetype: DEFAULT_RANGE_TYPE })
     : undefined);
 
 const normalizeStreams = (query: StreamsQuery = {}): Array<string> => {

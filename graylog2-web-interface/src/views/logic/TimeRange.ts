@@ -45,25 +45,25 @@ type SearchKeywordRange = {
 
 export type SearchTimeRange = SearchAbsoluteRange | SearchRelativeRange | SearchKeywordRange;
 
-export const toSearchTimerange = (timerange: TimeRange): SearchTimeRange => {
-  switch (timerange.type) {
+export const toSearchTimeRange = (timeRange: TimeRange): SearchTimeRange => {
+  switch (timeRange.type) {
     case 'relative':
-      if (isTypeRelativeWithStartOnly(timerange)) {
-        return { rangetype: 'relative', relative: String(timerange.range) };
+      if (isTypeRelativeWithStartOnly(timeRange)) {
+        return { rangetype: 'relative', relative: String(timeRange.range) };
       }
 
-      if (isTypeRelativeWithEnd(timerange)) {
-        if ('to' in timerange) {
-          return { rangetype: 'relative', from: String(timerange.from), to: String(timerange.to) };
+      if (isTypeRelativeWithEnd(timeRange)) {
+        if ('to' in timeRange) {
+          return { rangetype: 'relative', from: String(timeRange.from), to: String(timeRange.to) };
         }
 
-        return { rangetype: 'relative', from: String(timerange.from) };
+        return { rangetype: 'relative', from: String(timeRange.from) };
       }
 
-      return assertUnreachable(timerange, 'Unexpected timerange: ');
-    case 'keyword': return { rangetype: 'keyword', keyword: timerange.keyword };
-    case 'absolute': return { rangetype: 'absolute', from: timerange.from, to: timerange.to };
-    default: return assertUnreachable(timerange, 'Unexpected time range type: ');
+      return assertUnreachable(timeRange, 'Unexpected timeRange: ');
+    case 'keyword': return { rangetype: 'keyword', keyword: timeRange.keyword };
+    case 'absolute': return { rangetype: 'absolute', from: timeRange.from, to: timeRange.to };
+    default: return assertUnreachable(timeRange, 'Unexpected time range type: ');
   }
 };
 
@@ -87,7 +87,7 @@ const parseRelativeTimeRange = (range: SearchRelativeRange): RelativeTimeRange =
   return assertUnreachable(range, 'Invalid relative range specified: ');
 };
 
-export const fromSearchTimerange = (range: SearchTimeRange): TimeRange => {
+export const fromSearchTimeRange = (range: SearchTimeRange): TimeRange => {
   switch (range?.rangetype) {
     case 'relative':
       return parseRelativeTimeRange(range);
