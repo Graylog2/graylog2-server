@@ -72,7 +72,7 @@ const SavedSearchControls = () => {
   const disableReset = !(dirty || loaded);
   const savedViewTitle = loaded ? 'Saved search' : 'Save search';
   const title = dirty ? 'Unsaved changes' : savedViewTitle;
-  const pluggableSaveViewControls = usePluginEntities('views.components.saveViewForm');
+  const pluggableSaveViewControlFns = usePluginEntities('views.components.saveViewForm');
 
   const toggleFormModal = () => setShowForm((cur) => !cur);
   const toggleListModal = () => setShowList((cur) => !cur);
@@ -109,7 +109,7 @@ const SavedSearchControls = () => {
       return;
     }
 
-    const viewWithPluginData = await executePluggableDuplicationHandler(view, currentUser.permissions, pluggableSaveViewControls);
+    const viewWithPluginData = await executePluggableDuplicationHandler(view, currentUser.permissions, pluggableSaveViewControlFns);
 
     const newView = viewWithPluginData.toBuilder()
       .newId()

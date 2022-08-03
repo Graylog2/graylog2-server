@@ -66,7 +66,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
       },
     },
   } = useSearchPageLayout();
-  const pluggableSaveViewControls = usePluginEntities('views.components.saveViewForm');
+  const pluggableSaveViewControlFns = usePluginEntities('views.components.saveViewForm');
   const [shareViewOpen, setShareViewOpen] = useState(false);
   const [debugOpen, setDebugOpen] = useState(false);
   const [saveAsViewOpen, setSaveAsViewOpen] = useState(false);
@@ -88,7 +88,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
     const isViewDuplication = !!view.id;
 
     if (isViewDuplication) {
-      const viewWithPluginData = await executePluggableDuplicationHandler(newView, currentUser.permissions, pluggableSaveViewControls);
+      const viewWithPluginData = await executePluggableDuplicationHandler(newView, currentUser.permissions, pluggableSaveViewControlFns);
 
       return onSaveAsView(viewWithPluginData);
     }

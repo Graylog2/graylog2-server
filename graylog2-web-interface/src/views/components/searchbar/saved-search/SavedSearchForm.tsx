@@ -57,8 +57,8 @@ const SavedSearchForm = (props: Props) => {
   } = props;
   const disableSaveAs = !value || value === '' || disableCreateNew;
   const createNewTitle = isCreateNew ? 'Create new' : 'Save as';
-  const pluggableFormComponentsFn = usePluginEntities('views.components.saveViewForm') || [];
-  const pluggableFormComponents = pluggableFormComponentsFn.map((controlFn) => controlFn()).filter((control) => !!control);
+  const pluggableSaveViewControlFns = usePluginEntities('views.components.saveViewForm');
+  const pluggableSaveViewControls = pluggableSaveViewControlFns.map((controlFn) => controlFn()).filter((control) => !!control);
 
   return (
     <Portal>
@@ -74,7 +74,7 @@ const SavedSearchForm = (props: Props) => {
                            placeholder="Enter title"
                            onChange={onChangeTitle} />
             </FormGroup>
-            {pluggableFormComponents?.map(({ component: Component, id }) => (<Component key={id} disabledViewCreation={disableSaveAs} />))}
+            {pluggableSaveViewControls?.map(({ component: Component, id }) => (Component && <Component key={id} disabledViewCreation={disableSaveAs} />))}
             <ButtonToolbar>
               {!isCreateNew && (
                 <Button bsStyle="primary"
