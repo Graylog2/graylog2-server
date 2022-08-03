@@ -35,22 +35,16 @@ import java.util.concurrent.CompletableFuture;
 // execution must come before results, as it signals the overall "done" state
 @JsonPropertyOrder({"execution", "results"})
 public class SearchJob implements ParameterProvider {
-    @JsonProperty
     private final String id;
 
-    @JsonIgnore
     private final Search search;
 
-    @JsonProperty
     private final String owner;
 
-    @JsonIgnore
     private CompletableFuture<Void> resultFuture;
 
     private final Map<String, CompletableFuture<QueryResult>> queryResults = Maps.newHashMap();
 
-    @JsonProperty("errors")
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Set<SearchError> errors = Sets.newHashSet();
 
     public SearchJob(String id, Search search, String owner) {
@@ -59,10 +53,12 @@ public class SearchJob implements ParameterProvider {
         this.owner = owner;
     }
 
+    @JsonProperty
     public String getId() {
         return id;
     }
 
+    @JsonIgnore
     public Search getSearch() {
         return search;
     }
@@ -72,14 +68,18 @@ public class SearchJob implements ParameterProvider {
         return search.id();
     }
 
+    @JsonProperty
     public String getOwner() {
         return owner;
     }
 
+    @JsonProperty("errors")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public Set<SearchError> getErrors() {
         return errors;
     }
 
+    @JsonIgnore
     public CompletableFuture<Void> getResultFuture() {
         return resultFuture;
     }
@@ -106,6 +106,7 @@ public class SearchJob implements ParameterProvider {
         return queryResults.get(queryId);
     }
 
+    @JsonIgnore
     public SearchJob seal() {
         // for each QueryResult future, add an exception handler so we at least get a FAILED result instead of the generic exception for everything
         this.resultFuture = CompletableFuture.allOf(queryResults.values().toArray(new CompletableFuture[0]));

@@ -7,6 +7,28 @@ Please make sure to create a MongoDB database backup before starting the upgrade
 
 ## Breaking Changes
 
+## Disallowing embedding the frontend by default
+
+To prevent [click-jacking](https://developer.mozilla.org/en-US/docs/Web/Security/Types_of_attacks#click-jacking), we are now preventing the frontend to be embedded in `<frame>`/`<iframe>`/etc. elements by sending the `X-Frame-Options`-header with all HTTP responses. The header value depends on the new configuration setting `http_allow_embedding`. The different combinations are:
+
+| `http_allow_embedding` | `X-Frame-Options`-header value |
+|------------------------|--------------------------------|
+| not set                | `DENY`                         |
+| `false`                | `DENY`                         |
+| `true`                 | `SAMEORIGIN`                   |
+
+If you want to be able to embed the Graylog frontend in another HTML page, you most probably want to set `http_allow_embedding` to `true`. Only do this if you are aware of the implications!
+
+For further information about the meanings of the different header values and how they are interpreted by browsers, please read [this](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options).
+
+## New Default Message Processing Order
+
+The new default Message Processing order will run the
+`Message Filter Chain` before the `Pipeline Processor`.
+
+This applies only to new Graylog installations.
+Existing setups keep the former default order for backwards compatibility.
+
 ## API Endpoint Deprecations
 
 The following API endpoints are deprecated beginning with 4.4.
@@ -58,3 +80,8 @@ these [instructions](https://www.mongodb.com/docs/manual/core/capped-collections
 UTF-8 encoding. 
 <br>Note that this encoding is applied to all messages received by the input. A single input
 cannot handle multiple log sources with different encodings.
+
+### Changed archived default path
+On new Graylog installations, the default archiving configuration will now 
+store archives under the `data_dir` instead of `/tmp/graylog-archives`. 
+(The `data_dir` is configured in graylog.conf and defaults to `/var/lib/graylog-server`)

@@ -111,7 +111,8 @@ public class TokenCollectingQueryParser extends QueryParser {
     @Override
     protected Query getBooleanQuery(List<BooleanClause> clauses) throws ParseException {
         final Query delegate = super.getBooleanQuery(clauses);
-        return new FixedBooleanQuery((BooleanQuery) delegate);
+        // if the superclass returns null, we also return null to mimic the same behaviour
+        return delegate != null ? new FixedBooleanQuery((BooleanQuery) delegate) : null;
     }
 
     /**

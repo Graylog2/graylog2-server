@@ -63,6 +63,28 @@ const Nav = styled(BootstrapNav)(({ theme }) => css`
         }
       }
     }
+    
+    &.nav-sm {
+      > li > a {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+    };
+
+    &.nav-xs {
+      > li > a {
+        padding: 2px 6px;
+        font-size: 12px;
+      }
+    };
+
+    &.nav-lg {
+      > li > a {
+        padding: 14px 18px;
+        font-size: 18px;
+        line-height: 1.3;
+      }
+    };
 
     &${navTabsStyles} /* This is a known non-issue that stylelint won't ignore but will hopefully be patched soon https://github.com/stylelint/stylelint/issues/4574 */
   }

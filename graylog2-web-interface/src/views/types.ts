@@ -37,7 +37,7 @@ import type {
   WidgetConfigFormValues,
 } from 'views/components/aggregationwizard';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
-import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import type { TimeRange, NoTimeRangeOverride, AbsoluteTimeRange } from 'views/logic/queries/Query';
 import type View from 'views/logic/views/View';
 import type User from 'logic/users/User';
 import type { Message } from 'views/components/messagelist/Types';
@@ -183,6 +183,7 @@ export type SearchTypeResult = {
 export type MessageResult = {
   type: 'messages',
   total: number,
+  effectiveTimerange: AbsoluteTimeRange,
 };
 
 export interface SearchTypeResultTypes {
@@ -209,6 +210,13 @@ export type MessagePreviewOption = {
   help?: string,
   onChange: (config: MessagesWidgetConfig, onConfigChange: (config: MessagesWidgetConfig) => void) => void
   sort: number,
+}
+
+type ExternalActionsHookData = {
+      error: Error | null;
+      externalValueActions: Array<ActionDefinition> | null;
+      isLoading: boolean;
+      isError: boolean
 }
 
 type MessageAugmentation = {
@@ -254,6 +262,8 @@ export type SearchFilter = {
   title?: string,
   description?: string
   queryString: string
+  negation?: boolean,
+  disabled?: boolean,
 }
 
 export type FiltersType = Immutable.List<SearchFilter>
@@ -262,7 +272,7 @@ declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
     enterpriseWidgets?: Array<WidgetExport>;
-    externalValueActions?: Array<ActionDefinition>;
+    useExternalActions?: Array<() => ExternalActionsHookData>,
     fieldActions?: Array<ActionDefinition>;
     messageAugmentations?: Array<MessageAugmentation>;
     searchTypes?: Array<SearchType<any, any>>;
@@ -272,6 +282,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
     'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<MessageDetailContextProviderProps>>;
+    'views.components.widgets.messageTable.contextProviders'?: Array<React.ComponentType>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;

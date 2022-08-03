@@ -94,7 +94,8 @@ const webpackConfig = {
           loader: 'babel-loader',
           options: {
             cacheDirectory: 'target/web/cache',
-            presets: ['graylog'],
+            // eslint-disable-next-line global-require
+            presets: [require('babel-preset-graylog')],
           },
         },
         exclude: /node_modules|\.node_cache/,

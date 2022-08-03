@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - '**.[jt]sx?'
+    types:
+      - opened
+      - edited
+      - synchronize
 
 jobs:
   linter:

@@ -30,11 +30,15 @@ class LookupTable extends React.Component {
     dataAdapter: PropTypes.object.isRequired,
   };
 
-  state = {
-    lookupKey: null,
-    lookupResult: null,
-    purgeKey: null,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      lookupKey: null,
+      lookupResult: null,
+      purgeKey: null,
+    };
+  }
 
   _onChange = (event) => {
     this.setState({ lookupKey: FormsUtils.getValueFromInput(event.target) });
@@ -81,7 +85,7 @@ class LookupTable extends React.Component {
             <dt>Cache</dt>
             <dd><Link to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(this.props.cache.name)}>{this.props.cache.title}</Link></dd>
           </dl>
-          <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.edit(this.props.table.name)}>
+          <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.edit(encodeURIComponent(this.props.table.name))}>
             <Button bsStyle="success">Edit</Button>
           </LinkContainer>
           {

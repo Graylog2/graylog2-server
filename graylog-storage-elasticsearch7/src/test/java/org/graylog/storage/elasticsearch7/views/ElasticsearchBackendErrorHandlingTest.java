@@ -26,7 +26,6 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -45,7 +44,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -81,8 +79,7 @@ public class ElasticsearchBackendErrorHandlingTest {
                 ),
                 client,
                 indexLookup,
-                new QueryStringDecorators(Optional.empty()),
-                (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
                 false);
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any())).thenReturn(Collections.emptySet());
@@ -113,6 +110,7 @@ public class ElasticsearchBackendErrorHandlingTest {
                 new SearchSourceBuilder(),
                 searchJob,
                 query,
+                Collections.emptySet(),
                 mock(FieldTypesLookup.class)
         );
 

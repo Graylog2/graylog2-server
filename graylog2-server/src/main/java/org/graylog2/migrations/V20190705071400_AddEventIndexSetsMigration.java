@@ -156,7 +156,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                 .shards(elasticsearchConfiguration.getShards())
                 .replicas(elasticsearchConfiguration.getReplicas())
                 .rotationStrategyClass(TimeBasedRotationStrategy.class.getCanonicalName())
-                .rotationStrategy(TimeBasedRotationStrategyConfig.create(Period.months(1), null))
+                .rotationStrategy(TimeBasedRotationStrategyConfig.builder().rotationPeriod(Period.months(1)).build())
                 .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
                 .retentionStrategy(DeletionRetentionStrategyConfig.create(12))
                 .creationDate(ZonedDateTime.now(ZoneOffset.UTC))

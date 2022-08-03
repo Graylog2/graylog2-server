@@ -20,7 +20,7 @@ import { Builder } from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
 
 type Query = { [key: string]: string | number | boolean };
-type Headers = { [key: string]: string | number | boolean };
+type Headers = { [key: string]: string | number | boolean | string[] };
 
 const request = (method: string, path: string, body: any, query: Query, headers: Headers) => {
   const pathWithQueryParameters = Object.entries(query).length > 0 ? `${path}?${Qs.stringify(query)}` : path;

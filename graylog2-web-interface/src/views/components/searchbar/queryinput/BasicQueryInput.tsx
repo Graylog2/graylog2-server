@@ -34,6 +34,7 @@ export type BaseProps = {
   value: string,
   warning?: QueryValidationState,
   wrapEnabled?: boolean,
+  inputId?: string,
 };
 
 type EnabledInputProps = BaseProps & {
@@ -85,6 +86,7 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
     warning,
     wrapEnabled,
     onLoad,
+    inputId,
   } = props;
   const theme = useTheme();
   const markers = useMemo(() => getMarkers(error, warning), [error, warning]);
@@ -92,9 +94,14 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
     if (editor) {
       editor.renderer.setScrollMargin(6, 5);
       editor.renderer.setPadding(12);
+
+      if (inputId) {
+        editor.textInput.getElement().setAttribute('id', inputId);
+      }
+
       onLoad?.(editor);
     }
-  }, [onLoad]);
+  }, [inputId, onLoad]);
   const editorProps = useMemo(() => ({ $blockScrolling: Infinity, selectionStyle: 'line' }), []);
   const setOptions = useMemo(() => ({ indentedSoftWrap: false }), []);
 
@@ -154,6 +161,7 @@ BasicQueryInput.propTypes = {
   enableAutocompletion: PropTypes.bool,
   error: PropTypes.any,
   height: PropTypes.number,
+  inputId: PropTypes.string,
   maxLines: PropTypes.number,
   onBlur: PropTypes.func,
   onChange: PropTypes.func,
@@ -171,6 +179,7 @@ BasicQueryInput.defaultProps = {
   enableAutocompletion: false,
   error: undefined,
   height: undefined,
+  inputId: undefined,
   maxLines: 4,
   onBlur: undefined,
   onChange: undefined,

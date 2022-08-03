@@ -25,9 +25,6 @@ import AppConfig from 'util/AppConfig';
 import Routes from 'routing/Routes';
 import { appPrefixed } from 'util/URLUtils';
 import {
-  AlertConditionsPage,
-  AlertNotificationsPage,
-  AlertsPage,
   AuthenticationCreatePage,
   AuthenticationBackendCreatePage,
   AuthenticationBackendDetailsPage,
@@ -43,7 +40,6 @@ import {
   CreateEventNotificationPage,
   CreateExtractorsPage,
   DelegatedSearchPage,
-  EditAlertConditionPage,
   EditEventDefinitionPage,
   EditEventNotificationPage,
   EditContentPackPage,
@@ -67,8 +63,6 @@ import {
   LUTCachesPage,
   LUTDataAdaptersPage,
   LUTTablesPage,
-  NewAlertConditionPage,
-  NewAlertNotificationPage,
   NodeInputsPage,
   NodesPage,
   NotFoundPage,
@@ -81,7 +75,6 @@ import {
   RuleDetailsPage,
   RulesPage,
   SecurityPage,
-  ShowAlertPage,
   ShowContentPackPage,
   ShowEventNotificationPage,
   ShowMessagePage,
@@ -113,7 +106,11 @@ import {
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
-const renderPluginRoute = ({ path, component: Component, parentComponent }: PluginRoute) => {
+const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
+  if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
+    return null;
+  }
+
   const ParentComponent = parentComponent ?? React.Fragment;
   const WrappedComponent = () => (
     <ParentComponent>
@@ -163,12 +160,6 @@ const AppRouter = () => {
                       <Route exact path={Routes.stream_edit(':streamId')} component={StreamEditPage} />
                       {!isCloud && <Route exact path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />}
 
-                      <Route exact path={Routes.LEGACY_ALERTS.LIST} component={AlertsPage} />
-                      <Route exact path={Routes.LEGACY_ALERTS.CONDITIONS} component={AlertConditionsPage} />
-                      <Route exact path={Routes.LEGACY_ALERTS.NEW_CONDITION} component={NewAlertConditionPage} />
-                      <Route exact path={Routes.LEGACY_ALERTS.NOTIFICATIONS} component={AlertNotificationsPage} />
-                      <Route exact path={Routes.LEGACY_ALERTS.NEW_NOTIFICATION} component={NewAlertNotificationPage} />
-
                       <Route exact path={Routes.ALERTS.LIST} component={EventsPage} />
                       <Route exact path={Routes.ALERTS.DEFINITIONS.LIST} component={EventDefinitionsPage} />
                       <Route exact path={Routes.ALERTS.DEFINITIONS.CREATE} component={CreateEventDefinitionPage} />
@@ -186,10 +177,6 @@ const AppRouter = () => {
                       <Route exact
                              path={Routes.ALERTS.NOTIFICATIONS.show(':notificationId')}
                              component={ShowEventNotificationPage} />
-                      <Route exact
-                             path={Routes.show_alert_condition(':streamId', ':conditionId')}
-                             component={EditAlertConditionPage} />
-                      <Route exact path={Routes.show_alert(':alertId')} component={ShowAlertPage} />
 
                       {!isCloud && <Route exact path={Routes.SYSTEM.INPUTS} component={InputsPage} />}
                       {!isCloud && <Route exact path={Routes.node_inputs(':nodeId')} component={NodeInputsPage} />}
