@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { asMock, MockStore } from 'helpers/mocking';
@@ -36,20 +36,31 @@ import history from 'util/History';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { ViewStore } from 'views/stores/ViewStore';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 import SavedSearchControls from './SavedSearchControls';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: (x) => x }));
+jest.mock('views/logic/usePluginEntities');
+jest.mock('util/History');
+
+jest.mock('bson-objectid', () => jest.fn(() => ({
+  toString: jest.fn(() => 'new-search-id'),
+})));
 
 jest.mock('views/stores/ViewStore', () => ({
   ViewActions: {
-    create: { completed: { listen: jest.fn() } },
-    load: { completed: { listen: jest.fn() } },
+    create: mockAction(),
+    load: mockAction(),
   },
   ViewStore: MockStore(),
 }));
 
-jest.mock('util/History');
+jest.mock('views/stores/ViewManagementStore', () => ({
+  ViewManagementActions: {
+    create: jest.fn((v) => Promise.resolve(v)).mockName('create'),
+  },
+}));
 
 describe('SavedSearchControls', () => {
   const createViewStoreState = (dirty = true, id = undefined) => ({
@@ -99,6 +110,7 @@ describe('SavedSearchControls', () => {
 
   const findShareButton = () => screen.findByRole('button', { name: 'Share' });
   const expectShareButton = findShareButton;
+  const findCreateNewButton = () => screen.findByRole('button', { name: /create new/i });
 
   SimpleSavedSearchControls.defaultProps = {
     loadNewView: () => Promise.resolve(),
@@ -106,10 +118,13 @@ describe('SavedSearchControls', () => {
     currentUser,
   };
 
+  beforeEach(() => {
+    asMock(ViewStore.getInitialState).mockReturnValue(defaultViewStoreState);
+    asMock(usePluginEntities).mockReturnValue([]);
+  });
+
   describe('Button handling', () => {
-    beforeEach(() => {
-      asMock(ViewStore.getInitialState).mockReturnValue(defaultViewStoreState);
-    });
+    const findTitleInput = () => screen.getByRole('textbox', { name: /title/i });
 
     it('should export current search as dashboard', async () => {
       const user = currentUser.toBuilder()
@@ -166,7 +181,7 @@ describe('SavedSearchControls', () => {
       render(<SimpleSavedSearchControls loadNewView={loadNewView} />);
 
       const resetSearch = await screen.findByText('Reset search');
-      fireEvent.click(resetSearch);
+      userEvent.click(resetSearch);
 
       expect(loadNewView).toHaveBeenCalledTimes(1);
     });
@@ -178,11 +193,54 @@ describe('SavedSearchControls', () => {
 
       render(<SimpleSavedSearchControls onLoadView={onLoadView} />);
 
-      fireEvent.click(await screen.findByTitle('Save search'));
-      userEvent.type(await screen.findByPlaceholderText('Enter title'), 'Test');
-      fireEvent.click(await screen.findByText('Create new'));
+      userEvent.click(await screen.findByTitle('Save search'));
+      userEvent.type(await await findTitleInput(), 'Test');
+      userEvent.click(await findCreateNewButton());
 
       await waitFor(() => expect(onLoadView).toHaveBeenCalledTimes(1));
+    });
+
+    it('should duplicate a saved search', async () => {
+      const viewStoreState = createViewStoreState(false, 'some-id');
+      asMock(ViewStore.getInitialState).mockReturnValue(viewStoreState);
+      render(<SimpleSavedSearchControls />);
+
+      userEvent.click(await screen.findByTitle('Saved search'));
+      userEvent.type(await findTitleInput(), ' and further title');
+      userEvent.click(await findCreateNewButton());
+
+      const updatedView = viewStoreState.view.toBuilder()
+        .title('title and further title')
+        .id('new-search-id')
+        .build();
+
+      await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView));
+    });
+
+    it('should extend a saved search with plugin data on duplication', async () => {
+      asMock(usePluginEntities).mockImplementation((entityKey) => ({
+        'views.components.saveViewForm': [() => ({
+          component: () => <div>Pluggable component!</div>,
+          id: 'example-plugin-component',
+          onSearchDuplication: (view: View) => Promise.resolve(view.toBuilder().summary('This search has been extended by a plugin').build()),
+        })],
+      }[entityKey]));
+
+      const viewStoreState = createViewStoreState(false, 'some-id');
+      asMock(ViewStore.getInitialState).mockReturnValue(viewStoreState);
+      render(<SimpleSavedSearchControls />);
+
+      userEvent.click(await screen.findByTitle('Saved search'));
+      userEvent.type(await findTitleInput(), ' and further title');
+      userEvent.click(await findCreateNewButton());
+
+      const updatedView = viewStoreState.view.toBuilder()
+        .title('title and further title')
+        .summary('This search has been extended by a plugin')
+        .id('new-search-id')
+        .build();
+
+      await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView));
     });
 
     describe('has "Share" option', () => {
