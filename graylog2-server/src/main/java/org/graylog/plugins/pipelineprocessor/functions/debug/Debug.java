@@ -21,8 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-
-import java.util.Optional;
+import org.graylog2.plugin.Message;
 
 import static com.google.common.collect.ImmutableList.of;
 
@@ -33,21 +32,18 @@ public class Debug extends AbstractFunction<Void> {
     public static final String NAME = "debug";
 
     public Debug() {
-        valueParam = ParameterDescriptor.object("value")
-                .description("The value to print in the graylog-server log.")
-                .optional().build();
+        valueParam = ParameterDescriptor.object("value").description("The value to print in the graylog-server log.").build();
     }
 
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
-        final Optional<Object> value = valueParam.optional(args, context);
+        final Object value = valueParam.required(args, context);
 
-        if (value.isPresent()) {
-            log.info("PIPELINE DEBUG: {}", value.get());
+        if (value instanceof Message) {
+            log.info("PIPELINE DEBUG Message: <{}>", ((Message) value).toDumpString());
         } else {
-            log.info("PIPELINE DEBUG Message: <{}>", context.currentMessage().toDumpString());
+            log.info("PIPELINE DEBUG: {}", value);
         }
-
         return null;
     }
 
@@ -58,7 +54,7 @@ public class Debug extends AbstractFunction<Void> {
                 .returnType(Void.class)
                 .params(of(valueParam))
                 .description("Print the passed value as string in the graylog-server log." +
-                        " If no parameter is supplied it will print the current $message." +
+                        " You can also pass $message to print the current Message object." +
                         " Note that this will only appear in the log of the graylog-server node" +
                         " that is processing the message you are trying to debug.")
                 .build();
