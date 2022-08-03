@@ -16,8 +16,10 @@
  */
 import React from 'react';
 import * as mockImmutable from 'immutable';
-import { render, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen, within, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
+import { asMock, MockStore } from 'helpers/mocking';
 import { alice } from 'fixtures/users';
 import type User from 'logic/users/User';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
@@ -25,21 +27,25 @@ import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import SearchPageLayoutContext, { SAVE_COPY, BLANK } from 'views/components/contexts/SearchPageLayoutContext';
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+import { ViewStore } from 'views/stores/ViewStore';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 import ViewActionsMenu from './ViewActionsMenu';
 
-const mockView = View.create().toBuilder().id('view-id').type(View.Type.Dashboard)
-  .search(Search.builder().build())
-  .title('View title')
-  .createdAt(new Date('2019-10-16T14:38:44.681Z'))
-  .build();
+jest.mock('views/logic/usePluginEntities');
 
-jest.mock('views/stores/ViewStore', () => ({
-  ViewStore: {
-    getInitialState: () => ({ isNew: false, view: mockView }),
-    listen: () => jest.fn(),
+jest.mock('bson-objectid', () => jest.fn(() => ({
+  toString: jest.fn(() => 'new-dashboard-id'),
+})));
+
+jest.mock('views/stores/ViewManagementStore', () => ({
+  ViewManagementActions: {
+    create: jest.fn((v) => Promise.resolve(v)).mockName('create'),
   },
 }));
+
+jest.mock('views/stores/ViewStore', () => ({ ViewStore: MockStore() }));
 
 jest.mock('views/stores/SearchMetadataStore', () => ({
   SearchMetadataStore: {
@@ -82,6 +88,12 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
 }));
 
 describe('ViewActionsMenu', () => {
+  const mockView = View.create().toBuilder().id('view-id').type(View.Type.Dashboard)
+    .search(Search.builder().build())
+    .title('View title')
+    .createdAt(new Date('2019-10-16T14:38:44.681Z'))
+    .build();
+
   const currentUser = alice.toBuilder()
     .grnPermissions(mockImmutable.List(['entity:own:grn::::dashboard:view-id']))
     .permissions(mockImmutable.List(['dashboards:edit:view-id', 'view:edit:view-id']))
@@ -100,29 +112,73 @@ describe('ViewActionsMenu', () => {
     providerOverrides: undefined,
   };
 
-  it('should open modal to save new dashboard', () => {
-    const { getByTitle, getByText } = render(<SimpleViewActionMenu />);
-    const saveAsMenuItem = getByTitle(/Save as new dashboard/);
+  const submitDashboardSaveForm = async () => {
+    const saveDashboardModal = await screen.findByTestId('modal-form');
 
-    fireEvent.click(saveAsMenuItem);
+    const saveButton = within(saveDashboardModal).getByRole('button', {
+      name: /save/i,
+      hidden: true,
+    });
 
-    expect(getByText('Save new dashboard')).not.toBeNull();
+    userEvent.click(saveButton);
+  };
+
+  const openDashboardSaveForm = async () => {
+    const saveAsMenuItem = await screen.findByRole('button', { name: /save as new dashboard/i });
+
+    userEvent.click(saveAsMenuItem);
+  };
+
+  beforeEach(() => {
+    asMock(ViewStore.getInitialState).mockReturnValue({ isNew: false, view: mockView, activeQuery: undefined, dirty: false });
+    asMock(usePluginEntities).mockReturnValue([]);
+  });
+
+  it('should save a new dashboard', async () => {
+    asMock(ViewStore.getInitialState).mockReturnValue({ isNew: false, view: mockView.toBuilder().id(undefined).build(), activeQuery: undefined, dirty: false });
+    render(<SimpleViewActionMenu />);
+
+    await openDashboardSaveForm();
+    await submitDashboardSaveForm();
+
+    const updatedDashboard = mockView.toBuilder().id('new-dashboard-id').build();
+
+    await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedDashboard));
+  });
+
+  it('should extend a dashboard with plugin data on duplication', async () => {
+    asMock(usePluginEntities).mockImplementation((entityKey) => ({
+      'views.components.saveViewForm': [() => ({
+        component: () => <div>Pluggable component!</div>,
+        id: 'example-plugin-component',
+        onDashboardDuplication: (view: View) => Promise.resolve(view.toBuilder().summary('This dashboard has been extended by a plugin').build()),
+      })],
+    }[entityKey]));
+
+    render(<SimpleViewActionMenu />);
+
+    await openDashboardSaveForm();
+    await submitDashboardSaveForm();
+
+    const updatedDashboard = mockView.toBuilder().id('new-dashboard-id').summary('This dashboard has been extended by a plugin').build();
+
+    await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedDashboard));
   });
 
   it('should open edit dashboard meta information modal', async () => {
     const { getByText, findByText } = render(<SimpleViewActionMenu />);
     const editMenuItem = getByText(/Edit metadata/i);
 
-    fireEvent.click(editMenuItem);
+    userEvent.click(editMenuItem);
 
     await findByText(/Editing dashboard/);
   });
 
-  it('should dashboard share modal', () => {
+  it('should dopen ashboard share modal', () => {
     const { getByText } = render(<SimpleViewActionMenu />);
     const openShareButton = getByText(/Share/i);
 
-    fireEvent.click(openShareButton);
+    userEvent.click(openShareButton);
 
     expect(getByText(/Sharing/i)).not.toBeNull();
   });
