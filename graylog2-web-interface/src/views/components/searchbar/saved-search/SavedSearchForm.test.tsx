@@ -41,6 +41,10 @@ describe('SavedSearchForm', () => {
   };
   const findByHeadline = () => screen.findByRole('heading', { name: /name of search/i });
 
+  beforeEach(() => {
+    asMock(usePluginEntities).mockReturnValue([]);
+  });
+
   describe('render the SavedSearchForm', () => {
     it('should render create new', async () => {
       render(<SavedSearchForm {...props}
