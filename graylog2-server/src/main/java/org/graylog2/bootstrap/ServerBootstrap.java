@@ -83,7 +83,7 @@ import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_INITIATE;
 public abstract class ServerBootstrap extends CmdLineTool {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
 
-    public ServerBootstrap(String commandName, Configuration configuration) {
+    protected ServerBootstrap(String commandName, Configuration configuration) {
         super(commandName, configuration);
         this.commandName = commandName;
     }
@@ -240,7 +240,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("Services started, startup times in ms: {}", serviceManager.startupTimes());
 
         activityWriter.write(new Activity("Started up.", Main.class));
-        LOG.info("Graylog " + commandName + " up and running.");
+        LOG.info("Graylog {} up and running.", commandName);
         auditEventSender.success(AuditActor.system(nodeId), NODE_STARTUP_COMPLETE, auditEventContext);
 
         // Block forever.
@@ -260,7 +260,15 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         ImmutableSortedSet.copyOf(migrations).forEach(m -> {
             LOG.debug("Running migration <{}>", m.getClass().getCanonicalName());
-            m.upgrade();
+            try {
+                m.upgrade();
+            } catch (Exception e) {
+                if (configuration.ignoreMigrationFailures()) {
+                    LOG.warn("Ignoring failure of migration <{}>: {}", m.getClass().getCanonicalName(), e.getMessage());
+                } else {
+                    throw e;
+                }
+            }
         });
     }
 

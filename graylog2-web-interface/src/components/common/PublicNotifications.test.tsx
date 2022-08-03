@@ -47,6 +47,17 @@ const mockedNotifications = {
     isGlobal: true,
     isDismissible: true,
   },
+  '6075a2999f4efa083977b75c': {
+    title: 'Inactive alert',
+    shortMessage: 'inactive alert',
+    longMessage: 'inactive alert should be visible',
+    atLogin: true,
+    variant: 'danger',
+    hiddenTitle: false,
+    isActive: false,
+    isGlobal: true,
+    isDismissible: true,
+  },
 } as Notifications;
 const mockedConfigNotifications = {
   '607468afaaa2380afe0757f1': {
@@ -95,7 +106,7 @@ const beforeMock = () => {
 describe('PublicNotifications', () => {
   beforeEach(beforeMock);
 
-  it('should render notifications', () => {
+  it('should render all active notifications', () => {
     render(<PublicNotifications />);
 
     const alerts = screen.getAllByRole('alert');
