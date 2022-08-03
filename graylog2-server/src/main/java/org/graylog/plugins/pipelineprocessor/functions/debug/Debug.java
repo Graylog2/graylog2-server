@@ -16,23 +16,34 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.debug;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.plugin.Message;
+import org.slf4j.Logger;
 
 import static com.google.common.collect.ImmutableList.of;
 
 public class Debug extends AbstractFunction<Void> {
 
     private final ParameterDescriptor<Object, Object> valueParam;
+    private final Logger logger;
 
     public static final String NAME = "debug";
 
     public Debug() {
         valueParam = ParameterDescriptor.object("value").description("The value to print in the graylog-server log.").build();
+        logger = log;
+    }
+
+    // Only used in unit tests
+    @VisibleForTesting
+    public Debug(Logger logger) {
+        valueParam = ParameterDescriptor.object("value").description("The value to print in the graylog-server log.").build();
+        this.logger = logger;
     }
 
     @Override
@@ -40,9 +51,9 @@ public class Debug extends AbstractFunction<Void> {
         final Object value = valueParam.required(args, context);
 
         if (value instanceof Message) {
-            log.info("PIPELINE DEBUG Message: <{}>", ((Message) value).toDumpString());
+            logger.info("PIPELINE DEBUG Message: <{}>", ((Message) value).toDumpString());
         } else {
-            log.info("PIPELINE DEBUG: {}", value);
+            logger.info("PIPELINE DEBUG: {}", value);
         }
         return null;
     }
