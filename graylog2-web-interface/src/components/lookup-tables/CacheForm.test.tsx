@@ -46,9 +46,9 @@ const renderedCache = ({
   scope, inCache = { ...CACHE },
   create = false,
   withConfig = true,
-  // eslint-disable-next-line
+  // eslint-disable-next-line no-console
   validate = () => { console.log('validation called'); },
-  // eslint-disable-next-line
+  // eslint-disable-next-line no-console
   saved = () => { console.log('saved called'); },
   validationErrors = {},
 
@@ -88,7 +88,7 @@ describe('CacheForm', () => {
     const { baseElement } = renderedCache({ scope: 'DEFAULT' });
 
     await waitFor(() => {
-      //eslint-disable-next-line no-node-access
+      // eslint-disable-next-line
       expect(baseElement.querySelector('button[alt="update button"]')).toBeVisible();
     });
   });
@@ -97,7 +97,7 @@ describe('CacheForm', () => {
     const { baseElement } = renderedCache({ scope: 'ILLUMINATE' });
 
     await waitFor(() => {
-      //eslint-disable-next-line no-node-access
+      // eslint-disable-next-line
       expect(baseElement.querySelector('button[alt="update button"]')).toBeNull();
     });
   });
