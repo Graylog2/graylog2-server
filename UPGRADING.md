@@ -45,6 +45,12 @@ The following API endpoints have been removed in 4.4.
 | ------------------------------------------- | --------------------------- |
 | `PUT /example/placeholder`                  | TODO placeholder comment    |
 
+## API Endpoint Changes
+
+| Endpoint                                         | Description                                                                                                                                                                       |
+|--------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `POST & PUT /system/inputs/{inputId}/extractors` | Renamed request body parameter `cut_or_copy` to `cursor_strategy` & changed type of request body parameter `converters` to List<Map<String, Object>> as returned in the GET calls |                                                                                                
+
 ## Java Code API Changes
 
 The following Java Code API changes have been made in 4.4.

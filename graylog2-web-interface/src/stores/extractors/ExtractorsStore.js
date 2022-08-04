@@ -39,22 +39,17 @@ export const ExtractorsActions = singletonActions(
 );
 
 function getExtractorDTO(extractor) {
-  const converters = {};
-
-  extractor.converters.forEach((converter) => {
-    converters[converter.type] = converter.config;
-  });
 
   const conditionValue = extractor.condition_type && extractor.condition_type !== 'none' ? extractor.condition_value : '';
 
   return {
     title: extractor.title,
-    cut_or_copy: extractor.cursor_strategy || 'copy',
+    cursor_strategy: extractor.cursor_strategy || 'copy',
     source_field: extractor.source_field,
     target_field: extractor.target_field,
     extractor_type: extractor.type || extractor.extractor_type, // "extractor_type" needed for imports
     extractor_config: extractor.extractor_config,
-    converters: converters,
+    converters: extractor.converters,
     condition_type: extractor.condition_type || 'none',
     condition_value: conditionValue,
     order: extractor.order,
