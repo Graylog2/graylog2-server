@@ -86,15 +86,15 @@ describe('SystemMenu', () => {
     permissions                    | count | links
     ${[]}                          | ${2}  | ${['Overview', 'Nodes']}
     ${['clusterconfigentry:read']} | ${3}  | ${['Configurations']}
-    ${['inputs:read']}             | ${4}  | ${['Inputs']}
-    ${['grok_pattern:read']}       | ${4}  | ${['Grok Patterns']}
+    ${['inputs:read']}             | ${3}  | ${['Inputs']}
+    ${['grok_pattern:read']}       | ${3}  | ${['Grok Patterns']}
     ${['outputs:read']}            | ${3}  | ${['Outputs']}
     ${['indices:read']}            | ${3}  | ${['Indices']}
     ${['loggers:read']}            | ${3}  | ${['Logging']}
     ${['authentication:edit']}     | ${3}  | ${['Authentication']}
     ${['users:list']}              | ${3}  | ${['Users and Teams']}
     ${['roles:read']}              | ${3}  | ${['Roles']}
-    ${['contentpack:read']}        | ${4}  | ${['Content Packs']}
+    ${['contentpack:read']}        | ${3}  | ${['Content Packs']}
     ${['lookuptables:read']}       | ${3}  | ${['Lookup Tables']}
     ${['sidecars:read']}           | ${3}  | ${['Sidecars']}
     ${['pipeline:read', 'pipeline_connection:read']} | ${3}  | ${['Pipelines']}
