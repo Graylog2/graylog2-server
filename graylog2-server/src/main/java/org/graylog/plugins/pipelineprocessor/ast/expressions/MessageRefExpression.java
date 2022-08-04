@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
+import org.graylog2.plugin.Message;
 
 import java.util.Collections;
 
@@ -36,6 +37,9 @@ public class MessageRefExpression extends BaseExpression {
 
     @Override
     public Object evaluateUnsafe(EvaluationContext context) {
+        if (fieldExpr == null) {
+            return context.currentMessage();
+        }
         final Object fieldName = fieldExpr.evaluateUnsafe(context);
         if (fieldName == null) {
             return null;
@@ -45,15 +49,24 @@ public class MessageRefExpression extends BaseExpression {
 
     @Override
     public Class getType() {
+        if (fieldExpr == null) {
+            return Message.class;
+        }
         return Object.class;
     }
 
     @Override
     public String toString() {
+        if (fieldExpr == null) {
+            return "$message";
+        }
         return "$message." + fieldExpr.toString();
     }
 
     public Expression getFieldExpr() {
+        if (fieldExpr == null) {
+            return this;
+        }
         return fieldExpr;
     }
 
