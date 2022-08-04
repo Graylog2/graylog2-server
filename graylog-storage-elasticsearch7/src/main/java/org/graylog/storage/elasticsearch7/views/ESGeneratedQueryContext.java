@@ -18,12 +18,10 @@ package org.graylog.storage.elasticsearch7.views;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
@@ -34,10 +32,10 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.util.UniqueNamer;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -46,9 +44,9 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
 
     private final ElasticsearchBackend elasticsearchBackend;
     private final Map<String, SearchSourceBuilder> searchTypeQueries = Maps.newHashMap();
-    private Map<Object, Object> contextMap = Maps.newHashMap();
+    private final Map<Object, Object> contextMap = Maps.newHashMap();
     private final UniqueNamer uniqueNamer = new UniqueNamer("agg-");
-    private Set<SearchError> errors = Sets.newHashSet();
+    private final Set<SearchError> errors;
     private final SearchSourceBuilder ssb;
     private final SearchJob job;
     private final Query query;
@@ -61,12 +59,14 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
             @Assisted SearchSourceBuilder ssb,
             @Assisted SearchJob job,
             @Assisted Query query,
+            @Assisted Collection<SearchError> validationErrors,
             FieldTypesLookup fieldTypes) {
         this.elasticsearchBackend = elasticsearchBackend;
         this.ssb = ssb;
         this.job = job;
         this.query = query;
         this.fieldTypes = fieldTypes;
+        this.errors = new HashSet<>(validationErrors);
     }
 
     public interface Factory {
@@ -74,7 +74,8 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
                 ElasticsearchBackend elasticsearchBackend,
                 SearchSourceBuilder ssb,
                 SearchJob job,
-                Query query
+                Query query,
+                Collection<SearchError> validationErrors
         );
     }
 
@@ -114,14 +115,6 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
 
     public String seriesName(SeriesSpec seriesSpec, Pivot pivot) {
         return pivot.id() + "-series-" + seriesSpec.literal();
-    }
-
-    public void addAggregation(AggregationBuilder builder, SearchType searchType) {
-        this.searchTypeQueries().get(searchType.id()).aggregation(builder);
-    }
-
-    public void addAggregations(Collection<AggregationBuilder> builders, SearchType searchType) {
-        builders.forEach(builder -> this.searchTypeQueries().get(searchType.id()).aggregation(builder));
     }
 
     public Optional<String> fieldType(Set<String> streamIds, String field) {

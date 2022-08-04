@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -75,8 +74,6 @@ public class MessagesResource extends RestResource implements PluginRestResource
     private final CommandFactory commandFactory;
     private final SearchDomain searchDomain;
     private final SearchExecutionGuard executionGuard;
-    private final PermittedStreams permittedStreams;
-    private final ObjectMapper objectMapper;
     private final ExportJobService exportJobService;
     private final QueryValidationService queryValidationService;
 
@@ -90,15 +87,11 @@ public class MessagesResource extends RestResource implements PluginRestResource
             CommandFactory commandFactory,
             SearchDomain searchDomain,
             SearchExecutionGuard executionGuard,
-            PermittedStreams permittedStreams,
-            ObjectMapper objectMapper,
             @SuppressWarnings("UnstableApiUsage") EventBus eventBus,
             ExportJobService exportJobService, QueryValidationService queryValidationService) {
         this.commandFactory = commandFactory;
         this.searchDomain = searchDomain;
         this.executionGuard = executionGuard;
-        this.permittedStreams = permittedStreams;
-        this.objectMapper = objectMapper;
         this.exportJobService = exportJobService;
         this.queryValidationService = queryValidationService;
         this.messagesExporterFactory = context -> new AuditingMessagesExporter(context, eventBus, exporter);
@@ -249,7 +242,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
         search = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadAll());
 
-        search = search.applyExecutionState(objectMapper, executionState);
+        search = search.applyExecutionState(executionState);
 
         executionGuard.check(search, searchUser::canReadStream);
 

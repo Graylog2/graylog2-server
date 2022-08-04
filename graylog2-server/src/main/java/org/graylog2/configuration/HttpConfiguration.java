@@ -83,6 +83,9 @@ public class HttpConfiguration {
     @Parameter(value = "http_external_uri")
     private URI httpExternalUri;
 
+    @Parameter(value = "http_allow_embedding")
+    private boolean httpAllowEmbedding = false;
+
     public HostAndPort getHttpBindAddress() {
         return httpBindAddress
                 .requireBracketsForIPv6()
