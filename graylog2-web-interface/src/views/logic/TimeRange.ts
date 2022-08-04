@@ -60,7 +60,7 @@ export const timeRangeToQueryParameter = (timeRange: TimeRange): TimeRangeQueryP
         return { rangetype: 'relative', from: String(timeRange.from) };
       }
 
-      return assertUnreachable(timeRange, 'Unexpected timeRange: ');
+      return assertUnreachable(timeRange, 'Unexpected time range: ');
     case 'keyword': return { rangetype: 'keyword', keyword: timeRange.keyword };
     case 'absolute': return { rangetype: 'absolute', from: timeRange.from, to: timeRange.to };
     default: return assertUnreachable(timeRange, 'Unexpected time range type: ');
