@@ -20,10 +20,10 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import CaffeineCacheSummary from './caches/CaffeineCacheSummary';
-import { CACHE, mockedFetchScopePermissions } from './fixtures';
+import { CACHE, mockedUseScopePermissions } from './fixtures';
 import Cache from './Cache';
 
-jest.mock('hooks/api/fetchScopePermissions', () => (mockedFetchScopePermissions));
+jest.mock('hooks/useScopePermissions', () => (mockedUseScopePermissions));
 
 PluginStore.register(new PluginManifest({}, {
   lookupTableCaches: [
@@ -57,9 +57,7 @@ describe('Cache', () => {
     const { baseElement } = renderedCache('DEFAULT');
 
     await waitFor(() => {
-      const actionBtn = baseElement.querySelector('button[alt="edit button"]');
-
-      expect(actionBtn).toBeVisible();
+      expect(baseElement.querySelector('button[alt="edit button"]')).toBeVisible();
     });
   });
 
@@ -67,9 +65,7 @@ describe('Cache', () => {
     const { baseElement } = renderedCache('ILLUMINATE');
 
     await waitFor(() => {
-      const actionBtn = baseElement.querySelector('button[alt="edit button"]');
-
-      expect(actionBtn).toBeNull();
+      expect(baseElement.querySelector('button[alt="edit button"]')).toBeNull();
     });
   });
 });

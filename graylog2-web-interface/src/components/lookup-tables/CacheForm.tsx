@@ -62,7 +62,7 @@ type Props = {
 const CacheForm = ({ type, saved, title, create, cache, validate, validationErrors }: Props) => {
   const configRef = React.useRef(null);
   const [generateName, setGenerateName] = React.useState<boolean>(create);
-  const { getScopePermissions } = useScopePermissions();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
 
   const plugin = React.useMemo(() => {
     return PluginStore.exports('lookupTableCaches').find((p) => p.type === type);
@@ -122,12 +122,6 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
     promise.then(() => { saved(); });
   };
 
-  const showAction = (inCache: LookupTableCache): boolean => {
-    const permissions = getScopePermissions(inCache);
-
-    return permissions.is_mutable;
-  };
-
   return (
     <>
       <Title title={title} typeName={pluginName} create={create} />
@@ -179,7 +173,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
                     <Col mdOffset={3} sm={12}>
                       {create ? (
                         <Button type="submit" bsStyle="success">Create Cache</Button>
-                      ) : showAction(cache) && (
+                      ) : (!loadingScopePermissions && scopePermissions?.is_mutable) && (
                         <Button type="submit" bsStyle="success" alt="update button">Update Cache</Button>
                       )}
                     </Col>

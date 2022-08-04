@@ -35,7 +35,7 @@ type Props = {
 const DataAdapter = ({ dataAdapter }: Props) => {
   const [lookupKey, setLookupKey] = React.useState(null);
   const [lookupResult, setLookupResult] = React.useState(null);
-  const { getScopePermissions } = useScopePermissions();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(dataAdapter);
 
   const _onChange = (event) => {
     setLookupKey(getValueFromInput(event.target));
@@ -47,12 +47,6 @@ const DataAdapter = ({ dataAdapter }: Props) => {
     LookupTableDataAdaptersActions.lookup(dataAdapter.name, lookupKey).then((result) => {
       setLookupResult(result);
     });
-  };
-
-  const showAction = (): boolean => {
-    const permissions = getScopePermissions(dataAdapter);
-
-    return permissions.is_mutable;
   };
 
   const plugins = {};
@@ -72,7 +66,6 @@ const DataAdapter = ({ dataAdapter }: Props) => {
   }
 
   const summary = plugin.summaryComponent;
-  const isEditable = showAction();
 
   return (
     <Row className="content">
@@ -92,9 +85,11 @@ const DataAdapter = ({ dataAdapter }: Props) => {
         <ConfigSummaryDefinitionListWrapper>
           {React.createElement(summary, { dataAdapter: dataAdapter })}
         </ConfigSummaryDefinitionListWrapper>
-        <LinkContainer disabled={!isEditable} to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName)}>
-          <Button bsStyle="success">Edit</Button>
-        </LinkContainer>
+        {(!loadingScopePermissions && scopePermissions?.is_mutable) && (
+          <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName)}>
+            <Button bsStyle="success">Edit</Button>
+          </LinkContainer>
+        )}
       </Col>
       <Col md={6}>
         <h3>Test lookup</h3>

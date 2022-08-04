@@ -19,6 +19,7 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
+import { Spinner } from 'components/common';
 import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { MetricsMapper, MetricContainer, CounterRate } from 'components/metrics';
@@ -40,7 +41,7 @@ const Actions = styled.div`
 
 const CacheTableEntry = ({ cache }: Props) => {
   const history = useHistory();
-  const { getScopePermissions } = useScopePermissions();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
 
   const countMap = {
     requests: `org.graylog2.lookup.caches.${cache.id}.requests`,
@@ -78,12 +79,6 @@ const CacheTableEntry = ({ cache }: Props) => {
     return `${NumberUtils.formatNumber(hitRate)}%`;
   };
 
-  const showActions = (inCache: LookupTableCache): boolean => {
-    const permissions = getScopePermissions(inCache);
-
-    return permissions.is_mutable;
-  };
-
   const handleEdit = (cacheName: string) => () => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cacheName));
   };
@@ -117,7 +112,7 @@ const CacheTableEntry = ({ cache }: Props) => {
           </MetricContainer>
         </td>
         <td>
-          {showActions(cache) && (
+          {loadingScopePermissions ? <Spinner /> : scopePermissions.is_mutable && (
             <Actions>
               <Button bsSize="xsmall" bsStyle="info" onClick={handleEdit(cache.name)} alt="edit button">
                 Edit

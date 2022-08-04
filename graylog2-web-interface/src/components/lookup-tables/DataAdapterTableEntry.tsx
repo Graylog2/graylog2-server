@@ -15,16 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useHistory } from 'react-router-dom';
+import styled from 'styled-components';
 
-import { LinkContainer, Link } from 'components/common/router';
+import { Link } from 'components/common/router';
+import { Spinner } from 'components/common';
 import Routes from 'routing/Routes';
-import { Button, Tooltip } from 'components/bootstrap';
-import { OverlayElement } from 'components/common';
+import { Button } from 'components/bootstrap';
 import { ErrorPopover } from 'components/lookup-tables';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 import useScopePermissions from 'hooks/useScopePermissions';
+
+const Actions = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+`;
 
 type Props = {
   adapter: LookupTableAdapter,
@@ -32,8 +41,13 @@ type Props = {
 };
 
 const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
+  const history = useHistory();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(adapter);
   const { name: adapterName, title: adapterTitle, description: adapterDescription, id: adapterId } = adapter;
-  const { getScopePermissions } = useScopePermissions();
+
+  const _onEdit = () => () => {
+    history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName));
+  };
 
   const _onDelete = () => {
     // eslint-disable-next-line no-alert
@@ -41,15 +55,6 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
       LookupTableDataAdaptersActions.delete(adapter.id).then(() => LookupTableDataAdaptersActions.reloadPage());
     }
   };
-
-  const showActions = () => {
-    const permissions = getScopePermissions(adapter);
-
-    return permissions.is_mutable;
-  };
-
-  const isMutable = showActions();
-  const immutableTooltip = <Tooltip id={`${adapterId}-immutable-tooltip`}>Action not available for immutable entities</Tooltip>;
 
   return (
     <tbody>
@@ -66,29 +71,19 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
           </MetricContainer>
         </td>
         <td>
-          <OverlayElement overlay={immutableTooltip} placement="top" useOverlay={isMutable}>
-            <LinkContainer data-testid="edit-button" disabled={!isMutable} to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName)}>
-              <Button bsSize="xsmall" bsStyle="info">Edit</Button>
-            </LinkContainer>
-          </OverlayElement>
-          &nbsp;
-          {showActions() ? (
-            <Button bsSize="xsmall"
-                    bsStyle="primary"
-                    onClick={_onDelete}
-                    data-testid="delete-button">
-              Delete
-            </Button>
-          ) : (
-            <OverlayElement placement="top" overlay={immutableTooltip} useOverlay={isMutable}>
-              <Button disabled={!isMutable}
+          {loadingScopePermissions ? <Spinner /> : scopePermissions.is_mutable && (
+            <Actions>
+              <Button bsSize="xsmall" bsStyle="info" onClick={_onEdit} alt="edit button">
+                Edit
+              </Button>
+              <Button style={{ marginLeft: '6px' }}
                       bsSize="xsmall"
                       bsStyle="primary"
                       onClick={_onDelete}
-                      data-testid="delete-button">
+                      alt="delete button">
                 Delete
               </Button>
-            </OverlayElement>
+            </Actions>
           )}
         </td>
       </tr>

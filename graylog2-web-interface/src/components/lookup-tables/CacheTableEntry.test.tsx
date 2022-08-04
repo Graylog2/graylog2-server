@@ -18,10 +18,12 @@ import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-import { CACHE, mockedFetchScopePermissions } from './fixtures';
+import { asMock } from 'helpers/mocking';
+
+import { CACHE, mockedUseScopePermissions } from './fixtures';
 import CacheTableEntry from './CacheTableEntry';
 
-jest.mock('hooks/api/fetchScopePermissions', () => (mockedFetchScopePermissions));
+jest.mock('hooks/useScopePermissions', () => (mockedUseScopePermissions));
 
 const renderedCTE = (scope: string) => {
   CACHE._scope = scope;
@@ -35,13 +37,28 @@ const renderedCTE = (scope: string) => {
 };
 
 describe('CacheTableEntry', () => {
+  it('should show Loading spinner while loading scope permissions', async () => {
+    asMock(mockedUseScopePermissions).mockReturnValueOnce({
+      loadingScopePermissions: true,
+      scopePermissions: null,
+    });
+
+    const { queryByAltText, queryByText } = renderedCTE('DEFAULT');
+
+    await waitFor(() => {
+      expect(queryByAltText('edit button')).toBeNull();
+    });
+
+    await waitFor(() => {
+      expect(queryByText('Loading...')).toBeVisible();
+    });
+  });
+
   it('should show "edit" button', async () => {
     const { baseElement } = renderedCTE('DEFAULT');
 
     await waitFor(() => {
-      const actionBtn = baseElement.querySelector('button[alt="edit button"]');
-
-      expect(actionBtn).toBeVisible();
+      expect(baseElement.querySelector('button[alt="edit button"]')).toBeVisible();
     });
   });
 
@@ -49,9 +66,7 @@ describe('CacheTableEntry', () => {
     const { queryByAltText } = renderedCTE('ILLUMINATE');
 
     await waitFor(() => {
-      const actionBtn = queryByAltText('edit button');
-
-      expect(actionBtn).toBeNull();
+      expect(queryByAltText('edit button')).toBeNull();
     });
   });
 
@@ -59,9 +74,7 @@ describe('CacheTableEntry', () => {
     const { baseElement } = renderedCTE('DEFAULT');
 
     await waitFor(() => {
-      const actionBtn = baseElement.querySelector('button[alt="delete button"]');
-
-      expect(actionBtn).toBeVisible();
+      expect(baseElement.querySelector('button[alt="delete button"]')).toBeVisible();
     });
   });
 
@@ -69,9 +82,7 @@ describe('CacheTableEntry', () => {
     const { queryByAltText } = renderedCTE('ILLUMINATE');
 
     await waitFor(() => {
-      const actionBtn = queryByAltText('delete button');
-
-      expect(actionBtn).toBeNull();
+      expect(queryByAltText('delete button')).toBeNull();
     });
   });
 });

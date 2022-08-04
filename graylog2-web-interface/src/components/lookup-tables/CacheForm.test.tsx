@@ -20,12 +20,12 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
-import { CACHE, mockedFetchScopePermissions } from './fixtures';
+import { CACHE, mockedUseScopePermissions } from './fixtures';
 import CaffeineCacheFieldSet from './caches/CaffeineCacheFieldSet';
 import CacheForm from './CacheForm';
 import NullCacheFieldSet from './caches/NullCacheFieldSet';
 
-jest.mock('hooks/api/fetchScopePermissions', () => (mockedFetchScopePermissions));
+jest.mock('hooks/useScopePermissions', () => (mockedUseScopePermissions));
 
 PluginStore.register(new PluginManifest({}, {
   lookupTableCaches: [
@@ -88,10 +88,7 @@ describe('CacheForm', () => {
     const { baseElement } = renderedCache({ scope: 'DEFAULT' });
 
     await waitFor(() => {
-      // eslint-disable-next-line testing-library/no-node-access
-      const actionBtn = baseElement.querySelector('button[alt="update button"]');
-
-      expect(actionBtn).toBeVisible();
+      expect(baseElement.querySelector('button[alt="update button"]')).toBeVisible();
     });
   });
 
@@ -99,10 +96,7 @@ describe('CacheForm', () => {
     const { baseElement } = renderedCache({ scope: 'ILLUMINATE' });
 
     await waitFor(() => {
-      // eslint-disable-next-line testing-library/no-node-access
-      const actionBtn = baseElement.querySelector('button[alt="update button"]');
-
-      expect(actionBtn).toBeNull();
+      expect(baseElement.querySelector('button[alt="update button"]')).toBeNull();
     });
   });
 

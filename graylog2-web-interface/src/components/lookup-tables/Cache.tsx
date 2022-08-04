@@ -36,7 +36,7 @@ type Props = {
 
 const Cache = ({ cache }: Props) => {
   const history = useHistory();
-  const { getScopePermissions } = useScopePermissions();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
   const plugins = {};
 
   PluginStore.exports('lookupTableCaches').forEach((p: any) => {
@@ -55,12 +55,6 @@ const Cache = ({ cache }: Props) => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cacheName));
   };
 
-  const showAction = (inCache: LookupTableCache): boolean => {
-    const permissions = getScopePermissions(inCache);
-
-    return permissions.is_mutable;
-  };
-
   return (
     <Row className="content">
       <Col md={12}>
@@ -73,7 +67,7 @@ const Cache = ({ cache }: Props) => {
         </SummaryContainer>
         <h4>Configuration</h4>
         <div>{React.createElement(summary, { cache: cache })}</div>
-        {showAction(cache) && (
+        {(!loadingScopePermissions && scopePermissions?.is_mutable) && (
           <Button bsStyle="success" onClick={handleEdit(cache.name)} alt="edit button">Edit</Button>
         )}
       </Col>

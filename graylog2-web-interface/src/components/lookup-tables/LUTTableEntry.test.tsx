@@ -18,10 +18,12 @@ import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-import { TABLE, CACHE, DATA_ADAPTER, mockedFetchScopePermissions } from './fixtures';
+import { asMock } from 'helpers/mocking';
+
+import { TABLE, CACHE, DATA_ADAPTER, mockedUseScopePermissions } from './fixtures';
 import LUTTableEntry from './LUTTableEntry';
 
-jest.mock('hooks/api/fetchScopePermissions', () => (mockedFetchScopePermissions));
+jest.mock('hooks/useScopePermissions', () => (mockedUseScopePermissions));
 
 const renderedLUT = (scope: string) => {
   TABLE._scope = scope;
@@ -37,13 +39,28 @@ const renderedLUT = (scope: string) => {
 };
 
 describe('LUTTableEntry', () => {
+  it('should show Loading spinner while loading scope permissions', async () => {
+    asMock(mockedUseScopePermissions).mockReturnValueOnce({
+      loadingScopePermissions: true,
+      scopePermissions: null,
+    });
+
+    const { queryByAltText, queryByText } = renderedLUT('DEFAULT');
+
+    await waitFor(() => {
+      expect(queryByAltText('edit button')).toBeNull();
+    });
+
+    await waitFor(() => {
+      expect(queryByText('Loading...')).toBeVisible();
+    });
+  });
+
   it('should show "edit" button', async () => {
     const { baseElement } = renderedLUT('DEFAULT');
 
     await waitFor(() => {
-      const actionBtn = baseElement.querySelector('button[alt="edit button"]');
-
-      expect(actionBtn).toBeVisible();
+      expect(baseElement.querySelector('button[alt="edit button"]')).toBeVisible();
     });
   });
 
@@ -51,9 +68,7 @@ describe('LUTTableEntry', () => {
     const { baseElement } = renderedLUT('ILLUMINATE');
 
     await waitFor(() => {
-      const actionBtn = baseElement.querySelector('button[alt="edit button"]');
-
-      expect(actionBtn).toBeNull();
+      expect(baseElement.querySelector('button[alt="edit button"]')).toBeNull();
     });
   });
 
@@ -61,9 +76,7 @@ describe('LUTTableEntry', () => {
     const { baseElement } = renderedLUT('DEFAULT');
 
     await waitFor(() => {
-      const actionBtn = baseElement.querySelector('button[alt="delete button"]');
-
-      expect(actionBtn).toBeVisible();
+      expect(baseElement.querySelector('button[alt="delete button"]')).toBeVisible();
     });
   });
 
@@ -71,9 +84,7 @@ describe('LUTTableEntry', () => {
     const { baseElement } = renderedLUT('ILLUMINATE');
 
     await waitFor(() => {
-      const actionBtn = baseElement.querySelector('button[alt="delete button"]');
-
-      expect(actionBtn).toBeNull();
+      expect(baseElement.querySelector('button[alt="delete button"]')).toBeNull();
     });
   });
 });

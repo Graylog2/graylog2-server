@@ -19,6 +19,7 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
+import { Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { ErrorPopover } from 'components/lookup-tables';
@@ -46,13 +47,7 @@ const Actions = styled.div`
 
 const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
   const history = useHistory();
-  const { getScopePermissions } = useScopePermissions();
-
-  const showActions = (inTable: LookupTable): boolean => {
-    const permissions = getScopePermissions(inTable);
-
-    return permissions.is_mutable;
-  };
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
 
   const handleDelete = (inTable: LookupTable) => () => {
     // eslint-disable-next-line no-alert
@@ -92,20 +87,21 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
           )}
           <Link to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapter.name)}>{dataAdapter.title}</Link>
         </td>
-        <td>{showActions(table) && (
-          <Actions>
-            <Button bsSize="xsmall" bsStyle="info" onClick={handleEdit(table.name)} alt="edit button">
-              Edit
-            </Button>
-            <Button style={{ marginLeft: '6px' }}
-                    bsSize="xsmall"
-                    bsStyle="primary"
-                    onClick={handleDelete(table)}
-                    alt="delete button">
-              Delete
-            </Button>
-          </Actions>
-        )}
+        <td>
+          {loadingScopePermissions ? <Spinner /> : scopePermissions.is_mutable && (
+            <Actions>
+              <Button bsSize="xsmall" bsStyle="info" onClick={handleEdit(table.name)} alt="edit button">
+                Edit
+              </Button>
+              <Button style={{ marginLeft: '6px' }}
+                      bsSize="xsmall"
+                      bsStyle="primary"
+                      onClick={handleDelete(table)}
+                      alt="delete button">
+                Delete
+              </Button>
+            </Actions>
+          )}
         </td>
       </tr>
     </tbody>

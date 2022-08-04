@@ -14,7 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
+import type {
+  LookupTable,
+  LookupTableCache,
+  LookupTableAdapter,
+  GenericEntityType
+} from 'logic/lookup-tables/types';
 
 export const TABLE: LookupTable = {
   id: '62a9e6bdf3d7456348ef8e53',
@@ -40,15 +45,14 @@ export const DATA_ADAPTER: LookupTableAdapter = {
   _scope: null,
 };
 
-export const mockedFetchScopePermissions = async () => {
-  return new Promise((resolve: any) => {
-    setTimeout(() => {
-      return resolve({
-        entity_scopes: {
-          ILLUMINATE: { is_mutable: false },
-          DEFAULT: { is_mutable: true },
-        },
-      });
-    }, 1000);
-  });
-};
+export const mockedUseScopePermissions = jest.fn((entity: GenericEntityType) => {
+  const SCOPES = {
+    ILLUMINATE: { is_mutable: false },
+    DEFAULT: { is_mutable: true },
+  };
+
+  return {
+    loadingScopePermissions: false,
+    scopePermissions: SCOPES[entity._scope],
+  };
+});

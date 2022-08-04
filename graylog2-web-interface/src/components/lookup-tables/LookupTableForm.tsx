@@ -54,7 +54,7 @@ type Props = {
 };
 
 const LookupTableForm = ({ saved, create, table }: Props) => {
-  const { getScopePermissions } = useScopePermissions();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
 
   const validate = (values: LookupTableType) => {
     const errors = {};
@@ -100,12 +100,6 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
     ...table,
     enable_single_value: table.default_single_value !== '',
     enable_multi_value: table.default_multi_value !== '',
-  };
-
-  const showAction = (inTable: LookupTable): boolean => {
-    const permissions = getScopePermissions(inTable);
-
-    return permissions.is_mutable;
   };
 
   return (
@@ -225,7 +219,7 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
               <Col mdOffset={3} md={9}>
                 {create ? (
                   <Button type="submit" bsStyle="success">Create Lookup Table</Button>
-                ) : showAction(table) && (
+                ) : (!loadingScopePermissions && scopePermissions?.is_mutable) && (
                   <Button type="submit" bsStyle="success">Update Lookup Table</Button>
                 )}
               </Col>

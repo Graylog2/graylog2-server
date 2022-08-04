@@ -16,31 +16,34 @@
  */
 import { useQuery } from 'react-query';
 
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
+import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
 
-import fetchScopePermissions from './api/fetchScopePermissions';
+function fetchScopePermissions() {
+  return fetch('GET', qualifyUrl(ApiRoutes.EntityScopeController.getScope().url));
+}
 
-const useGetPermissionsByScope = () => {
-  const { data, isLoading, isError, error } = useQuery<any, Error>(
-    'scope-permissions',
+const useGetPermissionsByScope = (entity: GenericEntityType) => {
+  const { data, isLoading, error } = useQuery<any, Error>(
+    ['scope-permissions'],
     fetchScopePermissions,
     {
+      onError: () => UserNotification.error(error.message),
       retry: 1,
       cacheTime: 1000 * 60 * 60 * 3, // cache for 3 hours
       staleTime: 1000 * 60 * 60 * 3, // data is valid for 3 hours
     },
   );
 
-  if (isError && error) UserNotification.error(error.message);
+  const scope = entity._scope ? entity._scope.toUpperCase() : 'DEFAULT';
 
-  const getScopePermissions = (entity: GenericEntityType) => {
-    const scope = entity._scope ? entity._scope.toUpperCase() : 'DEFAULT';
-
-    return isLoading ? {} : data.entity_scopes[scope];
+  return {
+    loadingScopePermissions: isLoading,
+    scopePermissions: data.entity_scopes[scope],
   };
-
-  return { getScopePermissions };
 };
 
 export default useGetPermissionsByScope;

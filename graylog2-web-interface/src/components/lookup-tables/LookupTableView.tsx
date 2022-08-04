@@ -34,7 +34,7 @@ const INIT_INPUT = { value: '', valid: false };
 
 const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
   const history = useHistory();
-  const { getScopePermissions } = useScopePermissions();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
   const [purgeKey, setPurgeKey] = React.useState<any>(INIT_INPUT);
   const [lookupKey, setLookupKey] = React.useState<any>(INIT_INPUT);
   const [lookupResult, setLookupResult] = React.useState<any>(null);
@@ -91,12 +91,6 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
     }
   };
 
-  const showAction = (inTable: LookupTable): boolean => {
-    const permissions = getScopePermissions(inTable);
-
-    return permissions.is_mutable;
-  };
-
   return (
     <Row className="content">
       <Col md={6}>
@@ -114,7 +108,7 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
             <Link to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name)}>{cache.title}</Link>
           </dd>
         </dl>
-        {showAction(table) && (
+        {(!loadingScopePermissions && scopePermissions?.is_mutable) && (
           <Button bsStyle="success" onClick={handleEdit(table.name)} alt="edit button">
             Edit
           </Button>

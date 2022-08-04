@@ -18,10 +18,10 @@ import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-import { TABLE, CACHE, DATA_ADAPTER, mockedFetchScopePermissions } from './fixtures';
+import { TABLE, CACHE, DATA_ADAPTER, mockedUseScopePermissions } from './fixtures';
 import LookupTableView from './LookupTableView';
 
-jest.mock('hooks/api/fetchScopePermissions', () => (mockedFetchScopePermissions));
+jest.mock('hooks/useScopePermissions', () => (mockedUseScopePermissions));
 
 const renderedLUT = (scope: string) => {
   TABLE._scope = scope;
@@ -38,9 +38,7 @@ describe('LookupTableView', () => {
     const { baseElement } = renderedLUT('DEFAULT');
 
     await waitFor(() => {
-      const actionBtn = baseElement.querySelector('button[alt="edit button"]');
-
-      expect(actionBtn).toBeVisible();
+      expect(baseElement.querySelector('button[alt="edit button"]')).toBeVisible();
     });
   });
 
@@ -48,9 +46,7 @@ describe('LookupTableView', () => {
     const { baseElement } = renderedLUT('ILLUMINATE');
 
     await waitFor(() => {
-      const actionBtn = baseElement.querySelector('button[alt="edit button"]');
-
-      expect(actionBtn).toBeNull();
+      expect(baseElement.querySelector('button[alt="edit button"]')).toBeNull();
     });
   });
 });
