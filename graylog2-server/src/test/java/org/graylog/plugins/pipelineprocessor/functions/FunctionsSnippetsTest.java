@@ -152,8 +152,11 @@ import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.slf4j.Logger;
 
 import javax.inject.Provider;
 import java.util.Arrays;
@@ -194,6 +197,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     private static LookupTableService lookupTableService;
     private static LookupTableService.Function lookupServiceFunction;
     private static LookupTable lookupTable;
+
+    private static Logger loggerMock;
 
     @BeforeClass
     @SuppressForbidden("Allow using default thread factory")
@@ -240,6 +245,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         lookupServiceFunction = new LookupTableService.Function(lookupTableService, "table");
         when(lookupTableService.newBuilder().lookupTable(anyString()).build()).thenReturn(lookupServiceFunction);
 
+        loggerMock = mock(Logger.class);
         // input related functions
         // TODO needs mock
         //functions.put(FromInput.NAME, new FromInput());
@@ -337,7 +343,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(IsIp.NAME, new IsIp());
         functions.put(IsJson.NAME, new IsJson());
         functions.put(IsUrl.NAME, new IsUrl());
-        functions.put(Debug.NAME, new Debug());
+        functions.put(Debug.NAME, new Debug(loggerMock));
 
         final GrokPatternService grokPatternService = mock(GrokPatternService.class);
         final GrokPattern greedyPattern = GrokPattern.create("GREEDY", ".*");
@@ -862,6 +868,22 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.hasField("field_1")).isFalse();
         assertThat(message.hasField("field_2")).isTrue();
         assertThat(message.hasField("field_b")).isTrue();
+    }
+
+    @Test
+    public void debug() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message in = new Message("some message", "somehost.graylog.org", Tools.nowUTC());
+        in.addField("somefield", "somevalue");
+
+        evaluateRule(rule, in);
+
+        InOrder inOrder = Mockito.inOrder(loggerMock);
+        inOrder.verify(loggerMock).info("PIPELINE DEBUG: {}", "moo");
+        inOrder.verify(loggerMock).info("PIPELINE DEBUG: {}", "somevalue");
+        inOrder.verify(loggerMock, times(2)).info("PIPELINE DEBUG Message: <{}>", in.toDumpString());
+        inOrder.verify(loggerMock).info("PIPELINE DEBUG: {}", (Object) null);
+        inOrder.verify(loggerMock).info("PIPELINE DEBUG: {}", "message converted with to_string: " + in.toString());
     }
 
     @Test

@@ -52,7 +52,7 @@ class LUTTableEntry extends React.Component {
         <tr>
           <td>
             {this.props.errors.table && (<ErrorPopover placement="right" errorText={this.props.errors.table} title="Lookup Table problem" />)}
-            <Link to={Routes.SYSTEM.LOOKUPTABLES.show(this.props.table.name)}>{this.props.table.title}</Link>
+            <Link to={Routes.SYSTEM.LOOKUPTABLES.show(encodeURIComponent(this.props.table.name))}>{this.props.table.title}</Link>
           </td>
           <td>{this.props.table.description}</td>
           <td>{this.props.table.name}</td>
@@ -65,7 +65,7 @@ class LUTTableEntry extends React.Component {
             <Link to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(this.props.dataAdapter.name)}>{this.props.dataAdapter.title}</Link>
           </td>
           <td>
-            <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.edit(this.props.table.name)}>
+            <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.edit(encodeURIComponent(this.props.table.name))}>
               <Button bsSize="xsmall" bsStyle="info">Edit</Button>
             </LinkContainer>
           &nbsp;

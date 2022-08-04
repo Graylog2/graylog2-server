@@ -28,7 +28,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 public class CommandFactory {
     private final QueryStringDecorator queryStringDecorator;
@@ -81,7 +80,7 @@ public class CommandFactory {
         ExportMessagesCommand.Builder commandBuilder = builderFrom(resultFormat)
                 .timeRange(resultFormat.timerange().orElse(toAbsolute(timeRangeFrom(query, searchType))))
                 .queryString(queryStringFrom(search, query, searchType))
-                .streams(streamsFrom(query, searchType))
+                .streams(query.effectiveStreams(searchType))
                 .decorators(decorators);
 
         return commandBuilder.build();
@@ -161,11 +160,5 @@ public class CommandFactory {
         String queryString = undecorated.queryString();
         String decorated = queryStringDecorator.decorateQueryString(queryString, search, query);
         return ElasticsearchQueryString.of(decorated);
-    }
-
-    private Set<String> streamsFrom(Query query, SearchType searchType) {
-        return searchType.effectiveStreams().isEmpty() ?
-                query.usedStreamIds() :
-                searchType.effectiveStreams();
     }
 }
