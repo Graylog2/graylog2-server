@@ -5,10 +5,11 @@ then
     debug($message.somefield);
     debug($message);
 
-    debug($message.nullfield);
 
     let messagevar = $message;
     debug(messagevar);
+
+    debug($message.nullfield);
 
     debug("message converted with to_string: " + to_string($message));
 end

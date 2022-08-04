@@ -152,6 +152,8 @@ import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.slf4j.Logger;
@@ -876,10 +878,12 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         evaluateRule(rule, in);
 
-        verify(loggerMock).info("PIPELINE DEBUG: {}", "moo");
-        verify(loggerMock).info("PIPELINE DEBUG: {}", "somevalue");
-        verify(loggerMock, times(2)).info("PIPELINE DEBUG Message: <{}>", in.toDumpString());
-        verify(loggerMock).info("PIPELINE DEBUG: {}", (Object) null);
+        InOrder inOrder = Mockito.inOrder(loggerMock);
+        inOrder.verify(loggerMock).info("PIPELINE DEBUG: {}", "moo");
+        inOrder.verify(loggerMock).info("PIPELINE DEBUG: {}", "somevalue");
+        inOrder.verify(loggerMock, times(2)).info("PIPELINE DEBUG Message: <{}>", in.toDumpString());
+        inOrder.verify(loggerMock).info("PIPELINE DEBUG: {}", (Object) null);
+        inOrder.verify(loggerMock).info("PIPELINE DEBUG: {}", "message converted with to_string: " + in.toString());
     }
 
     @Test
