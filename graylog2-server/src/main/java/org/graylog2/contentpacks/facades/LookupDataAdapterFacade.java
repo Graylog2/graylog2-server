@@ -172,4 +172,9 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
         final ModelId modelId = entityDescriptor.id();
         return dataAdapterService.get(modelId.id()).map(dataAdapterDto -> exportNativeEntity(dataAdapterDto, entityDescriptorIds));
     }
+
+    @Override
+    public boolean usesScopedEntities() {
+        return true;
+    }
 }
