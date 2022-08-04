@@ -149,13 +149,13 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['dashboards:create', 'inputs:create', 'streams:create']}>
         <NavigationLink path={Routes.SYSTEM.CONTENTPACKS.LIST} description="Content Packs" />
       </IfPermitted>
-      <IfPermitted permissions={['inputs:read']}>
+      <IfPermitted permissions={['grok_pattern:read']}>
         <NavigationLink path={Routes.SYSTEM.GROKPATTERNS} description="Grok Patterns" />
       </IfPermitted>
-      <IfPermitted permissions={['inputs:edit']}>
+      <IfPermitted permissions={['lut_table:read', 'lut_cache:read', 'lut_adapter:read']}>
         <NavigationLink path={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} description="Lookup Tables" />
       </IfPermitted>
-      <IfPermitted permissions={['inputs:create']}>
+      <IfPermitted permissions={['pipeline:read']}>
         <NavigationLink path={Routes.SYSTEM.PIPELINES.OVERVIEW} description="Pipelines" />
       </IfPermitted>
       <IfPermitted permissions={['sidecars:read']}>
