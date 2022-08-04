@@ -88,6 +88,7 @@ describe('CacheForm', () => {
     const { baseElement } = renderedCache({ scope: 'DEFAULT' });
 
     await waitFor(() => {
+      //eslint-disable-next-line no-node-access
       expect(baseElement.querySelector('button[alt="update button"]')).toBeVisible();
     });
   });
@@ -96,6 +97,7 @@ describe('CacheForm', () => {
     const { baseElement } = renderedCache({ scope: 'ILLUMINATE' });
 
     await waitFor(() => {
+      //eslint-disable-next-line no-node-access
       expect(baseElement.querySelector('button[alt="update button"]')).toBeNull();
     });
   });

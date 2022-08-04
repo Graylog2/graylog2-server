@@ -18,7 +18,7 @@ import type {
   LookupTable,
   LookupTableCache,
   LookupTableAdapter,
-  GenericEntityType
+  GenericEntityType,
 } from 'logic/lookup-tables/types';
 
 export const TABLE: LookupTable = {
