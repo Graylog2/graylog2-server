@@ -1,0 +1,36 @@
+package org.graylog2.configuration;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import static org.graylog2.configuration.IndexSetsDefaultsConfiguration.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL;
+import static org.graylog2.configuration.IndexSetsDefaultsConfiguration.DEFAULT_INDEX_ANALYZER;
+import static org.graylog2.configuration.IndexSetsDefaultsConfiguration.DEFAULT_INDEX_OPTIMIZATION_DISABLED;
+import static org.graylog2.configuration.IndexSetsDefaultsConfiguration.DEFAULT_INDEX_OPTIMIZATION_MAX_SEGMENTS;
+import static org.graylog2.configuration.IndexSetsDefaultsConfiguration.DEFAULT_INDEX_PREFIX;
+import static org.graylog2.configuration.IndexSetsDefaultsConfiguration.DEFAULT_REPLICAS;
+import static org.graylog2.configuration.IndexSetsDefaultsConfiguration.DEFAULT_RETENTION_STRATEGY_CLASS;
+import static org.graylog2.configuration.IndexSetsDefaultsConfiguration.DEFAULT_RETENTION_STRATEGY_CONFIG;
+import static org.graylog2.configuration.IndexSetsDefaultsConfiguration.DEFAULT_ROTATION_STRATEGY_CLASS;
+import static org.graylog2.configuration.IndexSetsDefaultsConfiguration.DEFAULT_ROTATION_STRATEGY_CONFIG;
+import static org.graylog2.configuration.IndexSetsDefaultsConfiguration.DEFAULT_SHARDS;
+
+class IndexSetsDefaultsConfigurationTest {
+
+    @Test
+    void testDefaults() {
+        final IndexSetsDefaultsConfiguration config =
+                IndexSetsDefaultsConfiguration.createDefault();
+        Assertions.assertEquals(DEFAULT_INDEX_PREFIX, config.indexPrefix());
+        Assertions.assertEquals(DEFAULT_INDEX_ANALYZER, config.indexAnalyzer());
+        Assertions.assertEquals(DEFAULT_SHARDS, config.shards());
+        Assertions.assertEquals(DEFAULT_REPLICAS, config.replicas());
+        Assertions.assertEquals(DEFAULT_INDEX_OPTIMIZATION_DISABLED, config.indexOptimizationDisabled());
+        Assertions.assertEquals(DEFAULT_INDEX_OPTIMIZATION_MAX_SEGMENTS, config.indexOptimizationMaxNumSegments());
+        Assertions.assertEquals(DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, config.fieldTypeRefreshInterval());
+        Assertions.assertEquals(DEFAULT_ROTATION_STRATEGY_CLASS, config.rotationStrategyClass());
+        Assertions.assertEquals(DEFAULT_ROTATION_STRATEGY_CONFIG, config.rotationStrategyConfig());
+        Assertions.assertEquals(DEFAULT_RETENTION_STRATEGY_CLASS, config.retentionStrategyClass());
+        Assertions.assertEquals(DEFAULT_RETENTION_STRATEGY_CONFIG, config.retentionStrategyConfig());
+    }
+}

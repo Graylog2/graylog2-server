@@ -17,7 +17,7 @@
 package org.graylog2.migrations;
 
 import com.google.inject.multibindings.Multibinder;
-import org.graylog2.configuration.V202207061200_CreateDefaultIndexDefaultsConfig;
+import org.graylog2.configuration.V202207051200_CreateDefaultIndexDefaultsConfig;
 import org.graylog2.migrations.V20180214093600_AdjustDashboardPositionToNewResolution.Migration;
 import org.graylog2.migrations.V20200803120800_GrantsMigrations.GrantsMetaMigration;
 import org.graylog2.plugin.PluginModule;
@@ -59,7 +59,7 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20211221144300_GeoIpResolverConfigMigration.class);
         addMigration(V20220719130704_ImprovedDefaultProcessingOrderMigration.class);
         addMigration(V20220623125450_AddJobTypeToJobTrigger.class);
-        addMigration(V202207061200_CreateDefaultIndexDefaultsConfig.class);
+        addMigration(V202207051200_CreateDefaultIndexDefaultsConfig.class);
 
     }
 }

@@ -24,20 +24,20 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 
-public class V202207061200_CreateDefaultIndexDefaultsConfig extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V202207061200_CreateDefaultIndexDefaultsConfig.class);
+public class V202207051200_CreateDefaultIndexDefaultsConfig extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V202207051200_CreateDefaultIndexDefaultsConfig.class);
 
     private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public V202207061200_CreateDefaultIndexDefaultsConfig(ClusterConfigService clusterConfigService) {
+    public V202207051200_CreateDefaultIndexDefaultsConfig(ClusterConfigService clusterConfigService) {
         this.clusterConfigService = clusterConfigService;
     }
 
     @Override
     public ZonedDateTime createdAt() {
         // this migration should run early
-        return ZonedDateTime.parse("2022-07-06T12:00:00Z");
+        return ZonedDateTime.parse("2022-08-05T12:00:00Z");
     }
 
     @Override
@@ -47,7 +47,7 @@ public class V202207061200_CreateDefaultIndexDefaultsConfig extends Migration {
             return;
         }
         try {
-            clusterConfigService.write(IndexSetsDefaultsConfiguration.createNew());
+            clusterConfigService.write(IndexSetsDefaultsConfiguration.createDefault());
             LOG.debug("Index defaults config saved.");
         } catch (Exception e) {
             LOG.error("Unable to write index defaults configuration.", e);
