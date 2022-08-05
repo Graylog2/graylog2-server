@@ -335,7 +335,8 @@ public class AggregationEventProcessor implements EventProcessor {
             final Message message = new Message(eventMessage, "", result.effectiveTimerange().to());
             message.addFields(fields);
 
-            LOG.debug("Creating event {}/{} - {} {} ({})", eventDefinition.title(), eventDefinition.id(), keyResult.key(), seriesString(keyResult), fields);
+            LOG.info("Creating event {}/{} - {} {} ({}) from={} to={}", eventDefinition.title(), eventDefinition.id(), keyResult.key(), seriesString(keyResult), fields,
+                    event.getTimerangeStart(), event.getTimerangeEnd());
             eventsWithContext.add(EventWithContext.create(event, message));
         }
 

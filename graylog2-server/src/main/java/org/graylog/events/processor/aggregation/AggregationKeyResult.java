@@ -35,6 +35,8 @@ public abstract class AggregationKeyResult {
 
     public abstract ImmutableList<AggregationSeriesValue> seriesValues();
 
+    public abstract Optional<DateTime> from();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -42,7 +44,7 @@ public abstract class AggregationKeyResult {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public abstract static class Builder {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_AggregationKeyResult.Builder();
@@ -53,6 +55,8 @@ public abstract class AggregationKeyResult {
         public abstract Builder key(List<String> key);
 
         public abstract Builder seriesValues(List<AggregationSeriesValue> seriesValues);
+
+        public abstract Builder from(@Nullable DateTime from);
 
         public abstract AggregationKeyResult build();
     }
