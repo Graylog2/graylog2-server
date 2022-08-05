@@ -21,8 +21,9 @@ import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ScopedDbService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
@@ -33,8 +34,9 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
-public class DBEventDefinitionService extends PaginatedDbService<EventDefinitionDto> {
+public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto> {
     private static final Logger LOG = LoggerFactory.getLogger(DBEventDefinitionService.class);
 
     private static final String COLLECTION_NAME = "event_definitions";
@@ -46,8 +48,8 @@ public class DBEventDefinitionService extends PaginatedDbService<EventDefinition
     public DBEventDefinitionService(MongoConnection mongoConnection,
                                     MongoJackObjectMapperProvider mapper,
                                     DBEventProcessorStateService stateService,
-                                    EntityOwnershipService entityOwnerShipService) {
-        super(mongoConnection, mapper, EventDefinitionDto.class, COLLECTION_NAME);
+                                    EntityOwnershipService entityOwnerShipService, EntityScopeService entityScopeService) {
+        super(mongoConnection, mapper, EventDefinitionDto.class, COLLECTION_NAME, entityScopeService);
         this.stateService = stateService;
         this.entityOwnerShipService = entityOwnerShipService;
     }
@@ -64,15 +66,26 @@ public class DBEventDefinitionService extends PaginatedDbService<EventDefinition
         return dto;
     }
 
-    @Override
-    public int delete(String id) {
+    public int deleteUnregister(String id) {
+        // Must ensure mutability before deleting, so that de-registration is only performed if entity exists
+        // and is not mutable.
+        ensureMutability(get(id).orElseThrow(() -> new IllegalArgumentException("Event Definition not found.")));
+        return doDeleteUnregister(id, () -> super.delete(id));
+    }
+
+    public int deleteUnregisterImmutable(String id) {
+        return doDeleteUnregister(id, () -> super.deleteImmutable(id));
+    }
+
+    private int doDeleteUnregister(String id, Supplier<Integer> deleteSupplier) {
+        // Deregister event definition.
         try {
             stateService.deleteByEventDefinitionId(id);
         } catch (Exception e) {
             LOG.error("Couldn't delete event processor state for <{}>", id, e);
         }
         entityOwnerShipService.unregisterEventDefinition(id);
-        return super.delete(id);
+        return deleteSupplier.get();
     }
 
     /**
