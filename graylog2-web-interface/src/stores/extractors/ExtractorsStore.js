@@ -39,7 +39,6 @@ export const ExtractorsActions = singletonActions(
 );
 
 function getExtractorDTO(extractor) {
-
   const conditionValue = extractor.condition_type && extractor.condition_type !== 'none' ? extractor.condition_value : '';
 
   return {
@@ -196,7 +195,9 @@ export const ExtractorsStore = singletonStore(
       const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.order(inputId).url);
       const orderedExtractorsMap = {};
 
-      orderedExtractors.forEach((extractor, idx) => orderedExtractorsMap[idx] = extractor.id);
+      orderedExtractors.forEach((extractor, idx) => {
+        orderedExtractorsMap[idx] = extractor.id;
+      });
 
       const promise = fetch('POST', url, { order: orderedExtractorsMap });
 
@@ -225,8 +226,8 @@ export const ExtractorsStore = singletonStore(
         const promise = this._silentExtractorCreate(inputId, extractor);
 
         promise
-          .then(() => successfulImports++)
-          .catch(() => failedImports++);
+          .then(() => { successfulImports += 1 })
+          .catch(() => { failedImports += 1 });
 
         promises.push(promise);
       });
