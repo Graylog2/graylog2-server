@@ -16,13 +16,14 @@
  */
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import usePluginEntities from 'views/logic/usePluginEntities';
 import Routes from 'routing/Routes';
 import { Row, Col, Button } from 'components/bootstrap';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTableCache } from 'logic/lookup-tables/types';
 
+import type { CachePluginType } from './types';
 import {
   SummaryContainer,
   SummaryRow,
@@ -37,19 +38,11 @@ type Props = {
 const Cache = ({ cache }: Props) => {
   const history = useHistory();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
-  const plugins = {};
-
-  PluginStore.exports('lookupTableCaches').forEach((p: any) => {
-    plugins[p.type] = p;
-  });
-
-  const plugin = plugins[cache.config.type];
+  const plugin = usePluginEntities('lookupTableCaches').find((p: CachePluginType) => p.type === cache.config?.type);
 
   if (!plugin) {
     return <p>Unknown cache type {cache.config.type}. Is the plugin missing?</p>;
   }
-
-  const summary = plugin.summaryComponent;
 
   const handleEdit = (cacheName: string) => () => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cacheName));
@@ -66,9 +59,14 @@ const Cache = ({ cache }: Props) => {
           </SummaryRow>
         </SummaryContainer>
         <h4>Configuration</h4>
-        <div>{React.createElement(summary, { cache: cache })}</div>
+        <div>{React.createElement(plugin.summaryComponent, { cache: cache })}</div>
         {(!loadingScopePermissions && scopePermissions?.is_mutable) && (
-          <Button bsStyle="success" onClick={handleEdit(cache.name)} alt="edit button">Edit</Button>
+          <Button bsStyle="success"
+                  onClick={handleEdit(cache.name)}
+                  role="button"
+                  name="edit">
+            Edit
+          </Button>
         )}
       </Col>
     </Row>

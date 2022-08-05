@@ -90,14 +90,19 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
         <td>
           {loadingScopePermissions ? <Spinner /> : scopePermissions.is_mutable && (
             <Actions>
-              <Button bsSize="xsmall" bsStyle="info" onClick={handleEdit(table.name)} alt="edit button">
+              <Button bsSize="xsmall"
+                      bsStyle="info"
+                      onClick={handleEdit(table.name)}
+                      role="button"
+                      name="edit">
                 Edit
               </Button>
               <Button style={{ marginLeft: '6px' }}
                       bsSize="xsmall"
                       bsStyle="primary"
                       onClick={handleDelete(table)}
-                      alt="delete button">
+                      role="button"
+                      name="delete">
                 Delete
               </Button>
             </Actions>

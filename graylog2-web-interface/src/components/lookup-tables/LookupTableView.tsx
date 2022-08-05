@@ -30,13 +30,14 @@ type Props = {
   dataAdapter: LookupTableAdapter,
 };
 
+type InputType = { value: string, valid: boolean };
 const INIT_INPUT = { value: '', valid: false };
 
 const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
   const history = useHistory();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
-  const [purgeKey, setPurgeKey] = React.useState<any>(INIT_INPUT);
-  const [lookupKey, setLookupKey] = React.useState<any>(INIT_INPUT);
+  const [purgeKey, setPurgeKey] = React.useState<InputType>(INIT_INPUT);
+  const [lookupKey, setLookupKey] = React.useState<InputType>(INIT_INPUT);
   const [lookupResult, setLookupResult] = React.useState<any>(null);
 
   const handleEdit = (tableName: string) => () => {
@@ -109,7 +110,10 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
           </dd>
         </dl>
         {(!loadingScopePermissions && scopePermissions?.is_mutable) && (
-          <Button bsStyle="success" onClick={handleEdit(table.name)} alt="edit button">
+          <Button bsStyle="success"
+                  onClick={handleEdit(table.name)}
+                  role="button"
+                  name="edit">
             Edit
           </Button>
         )}

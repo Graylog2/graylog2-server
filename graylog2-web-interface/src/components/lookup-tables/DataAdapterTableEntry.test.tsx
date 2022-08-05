@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, waitFor } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 
 import { asMock } from 'helpers/mocking';
@@ -26,11 +26,12 @@ import DataAdapterTableEntry from './DataAdapterTableEntry';
 jest.mock('hooks/useScopePermissions', () => (mockedUseScopePermissions));
 
 const renderedDataAdapter = (scope: string) => {
-  DATA_ADAPTER._scope = scope;
+  const auxDataAdapter = { ...DATA_ADAPTER };
+  auxDataAdapter._scope = scope;
 
   return render(
     <Router>
-      <DataAdapterTableEntry adapter={DATA_ADAPTER} error={null} />
+      <DataAdapterTableEntry adapter={auxDataAdapter} error={null} />
     </Router>,
     {
       container: document.body.appendChild(document.createElement('table')),
@@ -45,46 +46,33 @@ describe('DataAdapterTableEntry', () => {
       scopePermissions: null,
     });
 
-    const { queryByAltText, queryByText } = renderedDataAdapter('DEFAULT');
+    renderedDataAdapter('DEFAULT');
 
-    await waitFor(() => {
-      expect(queryByAltText('edit button')).toBeNull();
-    });
-
-    await waitFor(() => {
-      expect(queryByText('Loading...')).toBeVisible();
-    });
+    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
   it('should show "edit" button for non ILLUMINATE entities', async () => {
-    const { baseElement } = renderedDataAdapter('DEFAULT');
+    renderedDataAdapter('DEFAULT');
 
-    await waitFor(() => {
-      expect(baseElement.querySelector('button[alt="edit button"]')).toBeVisible();
-    });
+    expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
   });
 
   it('should disable "edit" button for ILLUMINATE entities', async () => {
-    const { queryByAltText } = renderedDataAdapter('ILLUMINATE');
+    renderedDataAdapter('ILLUMINATE');
 
-    await waitFor(() => {
-      expect(queryByAltText('edit button')).toBeNull();
-    });
+    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
   });
 
   it('should show "delete" button for non ILLUMINATE entities', async () => {
-    const { baseElement } = renderedDataAdapter('DEFAULT');
+    renderedDataAdapter('DEFAULT');
 
-    await waitFor(() => {
-      expect(baseElement.querySelector('button[alt="delete button"]')).toBeVisible();
-    });
+    expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
   });
 
   it('should disable "delete" button for ILLUMINATE entities', async () => {
-    const { queryByAltText } = renderedDataAdapter('ILLUMINATE');
+    renderedDataAdapter('ILLUMINATE');
 
-    await waitFor(() => {
-      expect(queryByAltText('delete button')).toBeNull();
-    });
+    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
   });
 });

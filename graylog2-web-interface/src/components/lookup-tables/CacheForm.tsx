@@ -18,7 +18,7 @@ import * as React from 'react';
 import _ from 'lodash';
 import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import type { LookupTableCache } from 'src/logic/lookup-tables/types';
+import type { LookupTableCache, validationErrorsType } from 'src/logic/lookup-tables/types';
 
 import { Button, Col, Row } from 'components/bootstrap';
 import { FormikFormGroup } from 'components/common';
@@ -55,8 +55,8 @@ type Props = {
   title: string,
   create?: boolean,
   cache?: LookupTableCache,
-  validate?: (arg: any) => void,
-  validationErrors?: any,
+  validate?: (arg: LookupTableCache) => void,
+  validationErrors?: validationErrorsType,
 };
 
 const CacheForm = ({ type, saved, title, create, cache, validate, validationErrors }: Props) => {
@@ -174,7 +174,12 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
                       {create ? (
                         <Button type="submit" bsStyle="success">Create Cache</Button>
                       ) : (!loadingScopePermissions && scopePermissions?.is_mutable) && (
-                        <Button type="submit" bsStyle="success" alt="update button">Update Cache</Button>
+                        <Button type="submit"
+                                bsStyle="success"
+                                role="button"
+                                name="update">
+                          Update Cache
+                        </Button>
                       )}
                     </Col>
                   </Row>

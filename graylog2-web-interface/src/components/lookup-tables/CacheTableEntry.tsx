@@ -114,14 +114,19 @@ const CacheTableEntry = ({ cache }: Props) => {
         <td>
           {loadingScopePermissions ? <Spinner /> : scopePermissions.is_mutable && (
             <Actions>
-              <Button bsSize="xsmall" bsStyle="info" onClick={handleEdit(cache.name)} alt="edit button">
+              <Button bsSize="xsmall"
+                      bsStyle="info"
+                      onClick={handleEdit(cache.name)}
+                      role="button"
+                      name="edit">
                 Edit
               </Button>
               <Button style={{ marginLeft: '6px' }}
                       bsSize="xsmall"
                       bsStyle="primary"
                       onClick={handleDelete}
-                      alt="delete button">
+                      role="button"
+                      name="delete">
                 Delete
               </Button>
             </Actions>

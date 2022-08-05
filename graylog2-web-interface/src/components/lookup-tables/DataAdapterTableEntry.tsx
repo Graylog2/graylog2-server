@@ -45,7 +45,7 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(adapter);
   const { name: adapterName, title: adapterTitle, description: adapterDescription, id: adapterId } = adapter;
 
-  const _onEdit = () => () => {
+  const _onEdit = () => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName));
   };
 
@@ -73,14 +73,19 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
         <td>
           {loadingScopePermissions ? <Spinner /> : scopePermissions.is_mutable && (
             <Actions>
-              <Button bsSize="xsmall" bsStyle="info" onClick={_onEdit} alt="edit button">
+              <Button bsSize="xsmall"
+                      bsStyle="info"
+                      onClick={_onEdit}
+                      role="button"
+                      name="edit">
                 Edit
               </Button>
               <Button style={{ marginLeft: '6px' }}
                       bsSize="xsmall"
                       bsStyle="primary"
                       onClick={_onDelete}
-                      alt="delete button">
+                      role="button"
+                      name="delete">
                 Delete
               </Button>
             </Actions>

@@ -51,7 +51,6 @@ const renderedCache = ({
   // eslint-disable-next-line no-console
   saved = () => { console.log('saved called'); },
   validationErrors = {},
-
 }) => {
   const mockCache = { ...inCache };
 
@@ -85,20 +84,18 @@ const renderedCache = ({
 
 describe('CacheForm', () => {
   it('should show "Update Cache" button', async () => {
-    const { baseElement } = renderedCache({ scope: 'DEFAULT' });
+    renderedCache({ scope: 'DEFAULT' });
 
     await waitFor(() => {
-      // eslint-disable-next-line
-      expect(baseElement.querySelector('button[alt="update button"]')).toBeVisible();
+      expect(screen.getByRole('button', { name: /update/i })).toBeInTheDocument();
     });
   });
 
   it('should not show "Update Cache" button', async () => {
-    const { baseElement } = renderedCache({ scope: 'ILLUMINATE' });
+    renderedCache({ scope: 'ILLUMINATE' });
 
     await waitFor(() => {
-      // eslint-disable-next-line
-      expect(baseElement.querySelector('button[alt="update button"]')).toBeNull();
+      expect(screen.queryByRole('button', { name: /update/i })).not.toBeInTheDocument();
     });
   });
 

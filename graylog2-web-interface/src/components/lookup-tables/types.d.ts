@@ -14,7 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-interface CachePluginType {
+export interface CachePluginType {
+  type: string;
+  displayName: string;
+  formComponent?: any,
+  summaryComponent?: any,
+  documentationComponent?: any,
+}
+
+export interface DataAdapterPluginType {
   type: string;
   displayName: string;
   formComponent?: any,
@@ -25,5 +33,6 @@ interface CachePluginType {
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     'lookupTableCaches'?: Array<CachePluginType>;
+    'lookupTableAdapters'?: Array<DataAdapterPluginType>;
   }
 }

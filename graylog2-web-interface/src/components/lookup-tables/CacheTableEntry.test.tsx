@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, waitFor } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 
 import { asMock } from 'helpers/mocking';
@@ -26,10 +26,11 @@ import CacheTableEntry from './CacheTableEntry';
 jest.mock('hooks/useScopePermissions', () => (mockedUseScopePermissions));
 
 const renderedCTE = (scope: string) => {
-  CACHE._scope = scope;
+  const auxCache = { ...CACHE };
+  auxCache._scope = scope;
 
   return render(
-    <Router><CacheTableEntry cache={CACHE} /></Router>,
+    <Router><CacheTableEntry cache={auxCache} /></Router>,
     {
       container: document.body.appendChild(document.createElement('table')),
     },
@@ -43,46 +44,33 @@ describe('CacheTableEntry', () => {
       scopePermissions: null,
     });
 
-    const { queryByAltText, queryByText } = renderedCTE('DEFAULT');
+    renderedCTE('DEFAULT');
 
-    await waitFor(() => {
-      expect(queryByAltText('edit button')).toBeNull();
-    });
-
-    await waitFor(() => {
-      expect(queryByText('Loading...')).toBeVisible();
-    });
+    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
   it('should show "edit" button', async () => {
-    const { baseElement } = renderedCTE('DEFAULT');
+    renderedCTE('DEFAULT');
 
-    await waitFor(() => {
-      expect(baseElement.querySelector('button[alt="edit button"]')).toBeVisible();
-    });
+    expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
   });
 
   it('should not show "edit" button', async () => {
-    const { queryByAltText } = renderedCTE('ILLUMINATE');
+    renderedCTE('ILLUMINATE');
 
-    await waitFor(() => {
-      expect(queryByAltText('edit button')).toBeNull();
-    });
+    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
   });
 
   it('should show "delete" button', async () => {
-    const { baseElement } = renderedCTE('DEFAULT');
+    renderedCTE('DEFAULT');
 
-    await waitFor(() => {
-      expect(baseElement.querySelector('button[alt="delete button"]')).toBeVisible();
-    });
+    expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
   });
 
   it('should not show "delete" button', async () => {
-    const { queryByAltText } = renderedCTE('ILLUMINATE');
+    renderedCTE('ILLUMINATE');
 
-    await waitFor(() => {
-      expect(queryByAltText('delete button')).toBeNull();
-    });
+    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
   });
 });

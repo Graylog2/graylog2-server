@@ -39,10 +39,11 @@ const useGetPermissionsByScope = (entity: GenericEntityType) => {
   );
 
   const scope = entity._scope ? entity._scope.toUpperCase() : 'DEFAULT';
+  const permissions = isLoading ? {} : data.entity_scopes[scope];
 
   return {
     loadingScopePermissions: isLoading,
-    scopePermissions: data.entity_scopes[scope],
+    scopePermissions: permissions,
   };
 };
 

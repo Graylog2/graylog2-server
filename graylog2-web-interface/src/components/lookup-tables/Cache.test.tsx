@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, waitFor } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -54,18 +54,14 @@ const renderedCache = (scope: string) => {
 
 describe('Cache', () => {
   it('should show "edit" button', async () => {
-    const { baseElement } = renderedCache('DEFAULT');
+    renderedCache('DEFAULT');
 
-    await waitFor(() => {
-      expect(baseElement.querySelector('button[alt="edit button"]')).toBeVisible();
-    });
+    expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
   });
 
   it('should not show "edit" button', async () => {
-    const { baseElement } = renderedCache('ILLUMINATE');
+    renderedCache('ILLUMINATE');
 
-    await waitFor(() => {
-      expect(baseElement.querySelector('button[alt="edit button"]')).toBeNull();
-    });
+    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
   });
 });

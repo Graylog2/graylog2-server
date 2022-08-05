@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, waitFor } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import { BrowserRouter as Router } from 'react-router-dom';
 
 import { asMock } from 'helpers/mocking';
@@ -26,11 +26,12 @@ import LUTTableEntry from './LUTTableEntry';
 jest.mock('hooks/useScopePermissions', () => (mockedUseScopePermissions));
 
 const renderedLUT = (scope: string) => {
-  TABLE._scope = scope;
+  const auxTable = { ...TABLE };
+  auxTable._scope = scope;
 
   return render(
     <Router>
-      <LUTTableEntry table={TABLE} cache={CACHE} dataAdapter={DATA_ADAPTER} />
+      <LUTTableEntry table={auxTable} cache={CACHE} dataAdapter={DATA_ADAPTER} />
     </Router>,
     {
       container: document.body.appendChild(document.createElement('table')),
@@ -45,46 +46,36 @@ describe('LUTTableEntry', () => {
       scopePermissions: null,
     });
 
-    const { queryByAltText, queryByText } = renderedLUT('DEFAULT');
+    renderedLUT('DEFAULT');
+
+    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
 
     await waitFor(() => {
-      expect(queryByAltText('edit button')).toBeNull();
-    });
-
-    await waitFor(() => {
-      expect(queryByText('Loading...')).toBeVisible();
+      expect(screen.getByText('Loading...')).toBeInTheDocument();
     });
   });
 
   it('should show "edit" button', async () => {
-    const { baseElement } = renderedLUT('DEFAULT');
+    renderedLUT('DEFAULT');
 
-    await waitFor(() => {
-      expect(baseElement.querySelector('button[alt="edit button"]')).toBeVisible();
-    });
+    expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
   });
 
   it('should not show "edit" button', async () => {
-    const { baseElement } = renderedLUT('ILLUMINATE');
+    renderedLUT('ILLUMINATE');
 
-    await waitFor(() => {
-      expect(baseElement.querySelector('button[alt="edit button"]')).toBeNull();
-    });
+    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
   });
 
   it('should show "delete" button', async () => {
-    const { baseElement } = renderedLUT('DEFAULT');
+    renderedLUT('DEFAULT');
 
-    await waitFor(() => {
-      expect(baseElement.querySelector('button[alt="delete button"]')).toBeVisible();
-    });
+    expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
   });
 
   it('should not show "delete" button', async () => {
-    const { baseElement } = renderedLUT('ILLUMINATE');
+    renderedLUT('ILLUMINATE');
 
-    await waitFor(() => {
-      expect(baseElement.querySelector('button[alt="delete button"]')).toBeNull();
-    });
+    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
   });
 });

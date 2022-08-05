@@ -36,9 +36,21 @@ export type LookupTableCache = GenericEntityType & {
   config?: LookupTableCacheConfig
 }
 
+export type LookupTableDataAdapterConfig = {
+  type?: string,
+  path?: string,
+  override_type?: string,
+  separator?: string,
+  quotechar?: string,
+  key_column?: string,
+  value_column?: string,
+  check_interval?: number,
+  case_insensitive_lookup?: boolean,
+};
+
 export type LookupTableAdapter = GenericEntityType & {
+  config?: LookupTableDataAdapterConfig,
   custom_error_ttl?: number | null,
-  config?: { type: string },
   custom_error_ttl_unit?: 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS' | null,
   custom_error_ttl_enabled?: boolean,
 }
@@ -51,3 +63,5 @@ export type LookupTable = GenericEntityType & {
   default_multi_value?: string | null,
   default_single_value?: string | null,
 }
+
+export type validationErrorsType = { name?: string, message?: string };

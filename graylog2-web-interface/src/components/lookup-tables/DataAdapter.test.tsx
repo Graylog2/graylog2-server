@@ -16,32 +16,54 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
-import { TABLE, CACHE, DATA_ADAPTER, mockedUseScopePermissions } from './fixtures';
-import LookupTableView from './LookupTableView';
+import CSVFileAdapterSummary from './adapters/CSVFileAdapterSummary';
+import { DATA_ADAPTER, mockedUseScopePermissions } from './fixtures';
+import DataAdapter from './DataAdapter';
 
 jest.mock('hooks/useScopePermissions', () => (mockedUseScopePermissions));
 
-const renderedLUT = (scope: string) => {
-  TABLE._scope = scope;
+PluginStore.register(new PluginManifest({}, {
+  lookupTableAdapters: [
+    {
+      type: 'csvfile',
+      displayName: 'CSV File',
+      summaryComponent: CSVFileAdapterSummary,
+    },
+  ],
+}));
+
+const renderedDataAdapter = (scope: string) => {
+  const auxDataAdapter = { ...DATA_ADAPTER };
+  auxDataAdapter._scope = scope;
+
+  auxDataAdapter.config = {
+    type: 'csvfile',
+    path: '/data/node-01/illuminate/csv/ciscoasa/data/cisco_asa_event_codes.csv',
+    override_type: 'mongo',
+    separator: ',',
+    quotechar: '"',
+    key_column: 'cisco_event_code',
+    value_column: 'gim_event_type_code',
+    check_interval: 60,
+    case_insensitive_lookup: false,
+  };
 
   return render(
-    <Router>
-      <LookupTableView table={TABLE} cache={CACHE} dataAdapter={DATA_ADAPTER} />
-    </Router>,
+    <DataAdapter dataAdapter={auxDataAdapter} />,
   );
 };
 
-describe('LookupTableView', () => {
+describe('DataAdapter', () => {
   it('should show "edit" button', async () => {
-    renderedLUT('DEFAULT');
+    renderedDataAdapter('DEFAULT');
 
     expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
   });
 
   it('should not show "edit" button', async () => {
-    renderedLUT('ILLUMINATE');
+    renderedDataAdapter('ILLUMINATE');
 
     expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
   });

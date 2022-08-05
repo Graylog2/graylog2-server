@@ -15,9 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
-import type { PluginExports } from 'graylog-web-plugin/plugin';
 
+import usePluginEntities from 'views/logic/usePluginEntities';
 import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
@@ -26,6 +25,7 @@ import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTable
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 import useScopePermissions from 'hooks/useScopePermissions';
 
+import type { DataAdapterPluginType } from './types';
 import ConfigSummaryDefinitionListWrapper from './ConfigSummaryDefinitionListWrapper';
 
 type Props = {
@@ -33,38 +33,29 @@ type Props = {
 };
 
 const DataAdapter = ({ dataAdapter }: Props) => {
-  const [lookupKey, setLookupKey] = React.useState(null);
+  const [lookupKey, setLookupKey] = React.useState('');
   const [lookupResult, setLookupResult] = React.useState(null);
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(dataAdapter);
 
-  const _onChange = (event) => {
+  const _onChange = (event: React.SyntheticEvent) => {
     setLookupKey(getValueFromInput(event.target));
   };
 
-  const _lookupKey = (e) => {
-    e.preventDefault();
+  const _lookupKey = (event: React.SyntheticEvent) => {
+    event.preventDefault();
 
-    LookupTableDataAdaptersActions.lookup(dataAdapter.name, lookupKey).then((result) => {
+    LookupTableDataAdaptersActions.lookup(dataAdapter.name, lookupKey).then((result: LookupTableAdapter[]) => {
       setLookupResult(result);
     });
   };
 
-  const plugins = {};
-
-  const pluginList = PluginStore.exports('lookupTableAdapters' as keyof PluginExports) as Array<any>;
-
-  pluginList.forEach((p) => {
-    plugins[p.type] = p;
-  });
-
-  const plugin = plugins[dataAdapter.config.type];
-
-  const { title: adapterTitle, description: adapterDescription, name: adapterName } = dataAdapter;
+  const plugin = usePluginEntities('lookupTableAdapters').find((p: DataAdapterPluginType) => p.type === dataAdapter.config?.type);
 
   if (!plugin) {
     return <p>Unknown data adapter type {dataAdapter.config.type}. Is the plugin missing?</p>;
   }
 
+  const { title: adapterTitle, description: adapterDescription, name: adapterName } = dataAdapter;
   const summary = plugin.summaryComponent;
 
   return (
@@ -87,7 +78,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
         </ConfigSummaryDefinitionListWrapper>
         {(!loadingScopePermissions && scopePermissions?.is_mutable) && (
           <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName)}>
-            <Button bsStyle="success">Edit</Button>
+            <Button bsStyle="success" role="button" name="edit">Edit</Button>
           </LinkContainer>
         )}
       </Col>

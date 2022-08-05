@@ -15,14 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
-import type { LookupTableCache } from 'src/logic/lookup-tables/types';
+import type { LookupTableCache, validationErrorsType } from 'src/logic/lookup-tables/types';
 
+import usePluginEntities from 'views/logic/usePluginEntities';
 import { Row, Col, Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 
 import CacheForm from './CacheForm';
+import type { CachePluginType } from './types';
 
 const INIT_CACHE: LookupTableCache = {
   id: null,
@@ -32,28 +33,32 @@ const INIT_CACHE: LookupTableCache = {
   config: { type: 'none' },
 };
 
+type TypesType = { type?: string, lable?: string };
+type cacheTypeOptionsType = { value: string, label: string }
+
 type Props = {
   saved: () => void,
-  types: any,
+  types: TypesType[],
   validate: () => void,
-  validationErrors: any,
+  validationErrors: validationErrorsType,
 };
 
 const CacheCreate = ({ saved, types, validate, validationErrors }: Props) => {
   const [type, setType] = React.useState<string>(null);
+  const cachePlugins = usePluginEntities('lookupTableCaches');
 
   const plugins = React.useMemo(() => (
-    PluginStore.exports('lookupTableCaches').reduce((acc: any, plugin: any) => {
+    cachePlugins.reduce((acc: any, plugin: CachePluginType) => {
       acc[plugin.type] = plugin;
 
       return acc;
     }, {})
-  ), []);
+  ), [cachePlugins]);
 
   const cacheTypes = React.useMemo(() => (
     Object.values(types)
-      .map((inType: any) => ({ value: inType.type, label: plugins[inType.type].displayName }))
-      .sort((a: any, b: any) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()))
+      .map((inType: TypesType) => ({ value: inType.type, label: plugins[inType.type].displayName }))
+      .sort((a: cacheTypeOptionsType, b: cacheTypeOptionsType) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()))
   ), [types, plugins]);
 
   const cache = React.useMemo(() => {
