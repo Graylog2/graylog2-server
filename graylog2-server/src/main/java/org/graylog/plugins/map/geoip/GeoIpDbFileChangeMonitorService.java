@@ -16,14 +16,18 @@
  */
 package org.graylog.plugins.map.geoip;
 
+import com.codahale.metrics.Timer;
+import com.codahale.metrics.UniformReservoir;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog.plugins.map.config.DatabaseType;
 import org.graylog.plugins.map.config.DatabaseVendorType;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
-import org.graylog.plugins.map.config.S3GeoIpFileDownloader;
+import org.graylog.plugins.map.config.S3GeoIpFileService;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.utilities.FileInfo;
 import org.graylog2.plugin.validate.ConfigValidationException;
@@ -34,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.EnumMap;
@@ -64,6 +69,8 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
 
     private final ScheduledExecutorService scheduler;
     private final GeoIpResolverConfigValidator geoIpResolverConfigValidator;
+    private final S3GeoIpFileService s3GeoIpFileService;
+    private final NotificationService notificationService;
 
     private final ClusterConfigService clusterConfigService;
     private final EventBus eventBus;
@@ -77,11 +84,14 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
                                            EventBus eventBus,
                                            ClusterConfigService clusterConfigService,
                                            GeoIpVendorResolverService geoIpVendorResolverService,
-                                           S3GeoIpFileDownloader s3GeoIpFileDownloader) {
+                                           S3GeoIpFileService s3GeoIpFileService,
+                                           NotificationService notificationService) {
         this.scheduler = Objects.requireNonNull(scheduler);
         this.eventBus = Objects.requireNonNull(eventBus);
+        this.s3GeoIpFileService = Objects.requireNonNull(s3GeoIpFileService);
         this.clusterConfigService = Objects.requireNonNull(clusterConfigService);
-        this.geoIpResolverConfigValidator = new GeoIpResolverConfigValidator(geoIpVendorResolverService, s3GeoIpFileDownloader);
+        this.geoIpResolverConfigValidator = new GeoIpResolverConfigValidator(geoIpVendorResolverService, s3GeoIpFileService, clusterConfigService);
+        this.notificationService = notificationService;
     }
 
     @Subscribe
@@ -120,16 +130,46 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
     }
 
     private Map<DatabaseType, FileInfo.Change> checkForChanges() {
-        FileInfo.Change cityDbChange = cityDbFileInfo.checkForChange();
-        FileInfo.Change asnDbChange = asnDbFileInfo.checkForChange();
 
         if (config == null) {
             config = getCurrentConfig();
         }
+        Map<DatabaseType, FileInfo.Change> changes = new EnumMap<>(DatabaseType.class);
+        // If using S3 for database file storage, check to see if the files are new
+        if (config.useS3() && s3GeoIpFileService.checkForNewFilesInS3(config)) {
+            try {
+                // Download the new files to a temporary location to be validated
+                LOG.debug("Pulling DB files from S3");
+                s3GeoIpFileService.downloadFilesToTempLocation(config);
+                GeoIpResolverConfig tempConfig = config.toBuilder()
+                        .cityDbPath(s3GeoIpFileService.getTempCityFile())
+                        .asnDbPath(s3GeoIpFileService.getTempAsnFile())
+                        .build();
+                Timer timer = new Timer(new UniformReservoir());
+                geoIpResolverConfigValidator.validateGeoIpLocationResolver(tempConfig, timer);
+                geoIpResolverConfigValidator.validateGeoIpAsnResolver(tempConfig, timer);
+
+                // Now that the new files have passed validation, move them to the active file location
+                s3GeoIpFileService.moveTempFilesToActive();
+                LOG.debug("Pulled new files from S3");
+            } catch (IOException e) {
+                String message = "Failed to download Geo Processor DB files from S3. Unable to refresh. Leaving old files in place on disk.";
+                sendFailedSyncNotification(message);
+                LOG.error(message);
+                return changes;
+            } catch (IllegalArgumentException | IllegalStateException validationError) {
+                String message = "Geo Processor DB files from S3 failed validation. Upload valid files to S3. Leaving old files in place on disk.";
+                sendFailedSyncNotification(message);
+                LOG.error(message);
+                s3GeoIpFileService.cleanupTempFiles();
+                return changes;
+            }
+        }
+        FileInfo.Change cityDbChange = cityDbFileInfo.checkForChange();
+        FileInfo.Change asnDbChange = asnDbFileInfo.checkForChange();
 
         DatabaseVendorType vendorType = config.databaseVendorType();
 
-        Map<DatabaseType, FileInfo.Change> changes = new EnumMap<>(DatabaseType.class);
         if (cityDbChange.isChanged()) {
             changes.put(vendorType.getCityDbType(), cityDbChange);
             cityDbFileInfo = cityDbChange.fileInfo();
@@ -150,8 +190,14 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
 
             if (config.enabled()) {
                 reScheduleRefreshIfNeeded();
-                this.cityDbFileInfo = getDbFileInfo(config.cityDbPath());
-                this.asnDbFileInfo = getDbFileInfo(config.asnDbPath());
+                String asnFile = config.asnDbPath();
+                String cityFile = config.cityDbPath();
+                if (config.useS3()) {
+                    cityFile = s3GeoIpFileService.getActiveCityFile();
+                    asnFile = s3GeoIpFileService.getActiveAsnFile();
+                }
+                this.cityDbFileInfo = getDbFileInfo(cityFile);
+                this.asnDbFileInfo = getDbFileInfo(asnFile);
             } else {
                 LOG.debug("GeoIP Processor is disabled.  Will not schedule GeoIP database file change monitor");
                 cancelScheduledRefreshTask();
@@ -211,6 +257,15 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
     private GeoIpResolverConfig getCurrentConfig() {
         return clusterConfigService.getOrDefault(GeoIpResolverConfig.class,
                 GeoIpResolverConfig.defaultConfig());
+    }
+
+    private void sendFailedSyncNotification(String description) {
+        final Notification notification = notificationService.buildNow()
+                .addType(Notification.Type.GENERIC)
+                .addSeverity(Notification.Severity.NORMAL)
+                .addDetail("title", "Geo Processor S3 Sync Failure")
+                .addDetail("description", description);
+        notificationService.publishIfFirst(notification);
     }
 
 }

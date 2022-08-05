@@ -21,19 +21,20 @@ import com.codahale.metrics.Timer;
 import com.codahale.metrics.UniformReservoir;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
-import org.graylog.plugins.map.config.S3GeoIpFileDownloader;
+import org.graylog.plugins.map.config.S3GeoIpFileService;
 import org.graylog.plugins.map.geoip.GeoAsnInformation;
 import org.graylog.plugins.map.geoip.GeoIpResolver;
 import org.graylog.plugins.map.geoip.GeoIpVendorResolverService;
 import org.graylog.plugins.map.geoip.GeoLocationInformation;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.validate.ClusterConfigValidator;
 import org.graylog2.plugin.validate.ConfigValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -46,19 +47,24 @@ import java.util.stream.Collectors;
 public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
 
     private static final Logger LOG = LoggerFactory.getLogger(GeoIpResolverConfigValidator.class);
-    private static final String S3_BUCKET_PREFIX = "s3://";
 
     private static final List<TimeUnit> VALID_UNITS = Arrays.asList(TimeUnit.SECONDS, TimeUnit.MINUTES, TimeUnit.HOURS, TimeUnit.DAYS);
 
+    //A test address.  This will NOT be in any database, but should only produce an
+    //AddressNotFoundException.  Any other exception suggests an actual error such as
+    //a database file that does not belong to the vendor selected
+    private final InetAddress testAddress = InetAddress.getLoopbackAddress();
     private final GeoIpVendorResolverService geoIpVendorResolverService;
-    private final S3GeoIpFileDownloader s3GeoIpFileDownloader;
-
+    private final S3GeoIpFileService s3GeoIpFileService;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
     public GeoIpResolverConfigValidator(GeoIpVendorResolverService geoIpVendorResolverService,
-                                        S3GeoIpFileDownloader s3GeoIpFileDownloader) {
+                                        S3GeoIpFileService s3GeoIpFileService,
+                                        ClusterConfigService clusterConfigService) {
         this.geoIpVendorResolverService = geoIpVendorResolverService;
-        this.s3GeoIpFileDownloader = s3GeoIpFileDownloader;
+        this.s3GeoIpFileService = s3GeoIpFileService;
+        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
@@ -87,22 +93,49 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
                 throw new IllegalArgumentException(error);
             }
 
-            //A test address.  This will NOT be in any database, but should only produce an
-            //AddressNotFoundException.  Any other exception suggests an actual error such as
-            //a database file that does not belong to the vendor selected
-            InetAddress testAddress = InetAddress.getByName("127.0.0.1");
-            if (config.asnDbPath().startsWith(S3_BUCKET_PREFIX) && config.cityDbPath().startsWith(S3_BUCKET_PREFIX)) {
-                s3GeoIpFileDownloader.downloadFiles(config);
-            }
-            validateGeoIpLocationResolver(config, timer, testAddress);
-            validateGeoIpAsnResolver(config, timer, testAddress);
 
-        } catch (UnknownHostException | IllegalArgumentException | IllegalStateException e) {
+            GeoIpResolverConfig curConfig = clusterConfigService.getOrDefault(GeoIpResolverConfig.class,
+                    GeoIpResolverConfig.defaultConfig());
+            boolean moveTemporaryFiles = false;
+            if (config.useS3()) {
+                // Make sure the paths are valid S3 object paths
+                if (config.asnDbPath().startsWith(S3GeoIpFileService.S3_BUCKET_PREFIX) && config.cityDbPath().startsWith(S3GeoIpFileService.S3_BUCKET_PREFIX)) {
+                    // Check this before modifying the config's DB paths to the active file locations on disk
+                    boolean bucketsChanged = !curConfig.cityDbPath().equals(config.cityDbPath()) || !curConfig.asnDbPath().equals(config.asnDbPath());
+                    config = config.toBuilder()
+                            .cityDbPath(s3GeoIpFileService.getActiveCityFile())
+                            .asnDbPath(s3GeoIpFileService.getActiveAsnFile())
+                            .build();
+                    // If neither of the paths have changed, don't worry about downloading the DB files. The
+                    // GeoIpDbFileChangeMonitorService will handle syncing the files on successful configuration saving
+                    if (bucketsChanged) {
+                        s3GeoIpFileService.downloadFilesToTempLocation(config);
+                        // Set the DB paths to the temp file locations so the newly downloaded files can be validated
+                        config = config.toBuilder()
+                                .cityDbPath(s3GeoIpFileService.getTempCityFile())
+                                .asnDbPath(s3GeoIpFileService.getTempAsnFile())
+                                .build();
+                        moveTemporaryFiles = true;
+                    }
+                } else {
+                    throw new ConfigValidationException("Database file paths must be valid S3 object paths when using S3.");
+                }
+            }
+
+            // Validate the DB files
+            validateGeoIpLocationResolver(config, timer);
+            validateGeoIpAsnResolver(config, timer);
+
+            // If the files were downloaded from S3 and validated successfully, move the temporary files to be active files
+            if (moveTemporaryFiles) {
+                s3GeoIpFileService.moveTempFilesToActive();
+            }
+        } catch (IllegalArgumentException | IllegalStateException | IOException e) {
             throw new ConfigValidationException(e.getMessage());
         }
     }
 
-    private void validateGeoIpAsnResolver(GeoIpResolverConfig config, Timer timer, InetAddress testAddress) {
+    public void validateGeoIpAsnResolver(GeoIpResolverConfig config, Timer timer) {
         //ASN file is optional--do not validate if not provided.
         if (config.enabled() && StringUtils.isNotBlank(config.asnDbPath())) {
             GeoIpResolver<GeoAsnInformation> asnResolver = geoIpVendorResolverService.createAsnResolver(config, timer);
@@ -118,14 +151,12 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
         }
     }
 
-    private void validateGeoIpLocationResolver(GeoIpResolverConfig config, Timer timer, InetAddress testAddress) {
+    public void validateGeoIpLocationResolver(GeoIpResolverConfig config, Timer timer) {
         GeoIpResolver<GeoLocationInformation> cityResolver = geoIpVendorResolverService.createCityResolver(config, timer);
         if (config.enabled() && !cityResolver.isEnabled()) {
             String msg = String.format(Locale.ENGLISH, "Invalid '%s' City Geo IP database file '%s'.  Make sure the file exists and is valid for '%1$s'", config.databaseVendorType(), config.cityDbPath());
             throw new IllegalArgumentException(msg);
         }
-
-
         cityResolver.getGeoIpData(testAddress);
         if (cityResolver.getLastError().isPresent()) {
             String error = String.format(Locale.ENGLISH, "Error querying Geo Location.  Make sure you have selected a valid database type for '%s'", config.databaseVendorType());
