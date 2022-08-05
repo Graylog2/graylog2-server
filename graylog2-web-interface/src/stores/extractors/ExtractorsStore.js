@@ -226,8 +226,8 @@ export const ExtractorsStore = singletonStore(
         const promise = this._silentExtractorCreate(inputId, extractor);
 
         promise
-          .then(() => { successfulImports += 1 })
-          .catch(() => { failedImports += 1 });
+          .then(() => { successfulImports += 1; })
+          .catch(() => { failedImports += 1; });
 
         promises.push(promise);
       });
