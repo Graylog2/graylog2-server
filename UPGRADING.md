@@ -45,6 +45,16 @@ The following API endpoints have been removed in 4.4.
 | ------------------------------------------- | --------------------------- |
 | `PUT /example/placeholder`                  | TODO placeholder comment    |
 
+## Java Code API Deprecations
+
+The following Java Code API deprecations have been made in 4.4.
+
+- The `org.graylog2.plugin.PluginModule.addNotificationType(name, notificationClass, handlerClass, factoryClass)`
+  method has been deprecated in favor of a new/preferred version, which also properly registers the notification 
+  config content pack entity, so that instances the corresponding content pack entity can can be installed successfully:
+`org.graylog2.plugin.PluginModule.addNotificationType(name, notificationClass, handlerClass, factoryClass, contentPackEntityName, contentPackEntityClass)`. 
+  See <PR link> for more info.
+
 ## Java Code API Changes
 
 The following Java Code API changes have been made in 4.4.

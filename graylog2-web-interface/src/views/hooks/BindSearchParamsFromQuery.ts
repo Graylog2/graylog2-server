@@ -21,7 +21,7 @@ import View from 'views/logic/views/View';
 import type { RawQuery } from 'views/logic/NormalizeSearchURLQueryParams';
 import normalizeSearchURLQueryParams from 'views/logic/NormalizeSearchURLQueryParams';
 
-const bindSearchParamsFromQuery: ViewHook = ({ query, view }: {query: RawQuery, view: View }) => {
+const bindSearchParamsFromQuery: ViewHook = ({ query, view }: { query: RawQuery, view: View }) => {
   if (view.type !== View.Type.Search) {
     return Promise.resolve(true);
   }

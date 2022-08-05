@@ -93,12 +93,6 @@ public class EventsModule extends PluginModule {
 
         registerJacksonSubtype(AggregationEventProcessorConfigEntity.class,
             AggregationEventProcessorConfigEntity.TYPE_NAME);
-        registerJacksonSubtype(HttpEventNotificationConfigEntity.class,
-            HttpEventNotificationConfigEntity.TYPE_NAME);
-        registerJacksonSubtype(EmailEventNotificationConfigEntity.class,
-            EmailEventNotificationConfigEntity.TYPE_NAME);
-        registerJacksonSubtype(LegacyAlarmCallbackEventNotificationConfigEntity.class,
-            LegacyAlarmCallbackEventNotificationConfigEntity.TYPE_NAME);
 
         addEventProcessor(AggregationEventProcessorConfig.TYPE_NAME,
                 AggregationEventProcessor.class,
@@ -134,15 +128,21 @@ public class EventsModule extends PluginModule {
         addNotificationType(EmailEventNotificationConfig.TYPE_NAME,
                 EmailEventNotificationConfig.class,
                 EmailEventNotification.class,
-                EmailEventNotification.Factory.class);
+                EmailEventNotification.Factory.class,
+                EmailEventNotificationConfigEntity.TYPE_NAME,
+                EmailEventNotificationConfigEntity.class);
         addNotificationType(HTTPEventNotificationConfig.TYPE_NAME,
                 HTTPEventNotificationConfig.class,
                 HTTPEventNotification.class,
-                HTTPEventNotification.Factory.class);
+                HTTPEventNotification.Factory.class,
+                HttpEventNotificationConfigEntity.TYPE_NAME,
+                HttpEventNotificationConfigEntity.class);
         addNotificationType(LegacyAlarmCallbackEventNotificationConfig.TYPE_NAME,
                 LegacyAlarmCallbackEventNotificationConfig.class,
                 LegacyAlarmCallbackEventNotification.class,
-                LegacyAlarmCallbackEventNotification.Factory.class);
+                LegacyAlarmCallbackEventNotification.Factory.class,
+                LegacyAlarmCallbackEventNotificationConfigEntity.TYPE_NAME,
+                LegacyAlarmCallbackEventNotificationConfigEntity.class);
 
         addJobSchedulerSchedule(IntervalJobSchedule.TYPE_NAME, IntervalJobSchedule.class);
         addJobSchedulerSchedule(OnceJobSchedule.TYPE_NAME, OnceJobSchedule.class);
