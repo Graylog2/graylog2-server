@@ -264,7 +264,7 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
         final Notification notification = notificationService.buildNow()
                 .addType(Notification.Type.GENERIC)
                 .addSeverity(Notification.Severity.NORMAL)
-                .addDetail("title", "Geo Processor S3 Sync Failure")
+                .addDetail("title", "Geo-Location Processor S3 Sync Failure")
                 .addDetail("description", description);
         notificationService.publishIfFirst(notification);
     }
