@@ -80,16 +80,19 @@ public class S3GeoIpFileService {
         try {
             cleanupTempFiles();
             BucketsAndKeys bucketsAndKeys = getBucketsAndKeys(config);
-            GetObjectResponse asnResponse = s3Client.getObject(GetObjectRequest.builder()
-                    .bucket(bucketsAndKeys.asnBucket())
-                    .key(bucketsAndKeys.asnKey()).build(), tempAsnPath);
             GetObjectResponse cityResponse = s3Client.getObject(GetObjectRequest.builder()
                     .bucket(bucketsAndKeys.cityBucket())
                     .key(bucketsAndKeys.cityKey()).build(), tempCityPath);
-            setFilePermissions(tempAsnPath);
             setFilePermissions(tempCityPath);
-            tempAsnFileLastModified = asnResponse.lastModified();
             tempCityFileLastModified = cityResponse.lastModified();
+
+            if (!config.asnDbPath().isEmpty()) {
+                GetObjectResponse asnResponse = s3Client.getObject(GetObjectRequest.builder()
+                        .bucket(bucketsAndKeys.asnBucket())
+                        .key(bucketsAndKeys.asnKey()).build(), tempAsnPath);
+                setFilePermissions(tempAsnPath);
+                tempAsnFileLastModified = asnResponse.lastModified();
+            }
         } catch (Exception e) {
             LOG.error("Failed to retrieve S3 files. {}", e.toString());
             cleanupTempFiles();
@@ -106,18 +109,25 @@ public class S3GeoIpFileService {
     public boolean checkForNewFilesInS3(GeoIpResolverConfig config) {
         BucketsAndKeys bucketsAndKeys = getBucketsAndKeys(config);
 
-        S3Object asnObj = getS3Object(bucketsAndKeys.asnBucket(), bucketsAndKeys.asnKey());
-        if (asnObj == null) {
-            LOG.warn("No ASN database file found in S3. Aborting S3 file refresh.");
+        S3Object cityObj = getS3Object(bucketsAndKeys.asnBucket(), bucketsAndKeys.asnKey());
+        if (cityObj == null) {
+            LOG.warn("No city database file '{}' found in S3 bucket '{}'. Aborting S3 file refresh.",
+                    bucketsAndKeys.cityKey(), bucketsAndKeys.cityBucket());
             return false;
         }
 
-        S3Object cityObj = getS3Object(bucketsAndKeys.asnBucket(), bucketsAndKeys.asnKey());
-        if (cityObj == null) {
-            LOG.warn("No city database file found in S3. Aborting S3 file refresh.");
-            return false;
+        boolean asnUpdated = false;
+        if (!config.asnDbPath().isEmpty()) {
+            S3Object asnObj = getS3Object(bucketsAndKeys.asnBucket(), bucketsAndKeys.asnKey());
+            if (asnObj == null) {
+                LOG.warn("No ASN database file '{}' found in S3 bucket '{}'. Aborting S3 file refresh.",
+                        bucketsAndKeys.asnKey(), bucketsAndKeys.asnBucket());
+                return false;
+            }
+            asnUpdated = asnObj.lastModified().isAfter(asnFileLastModified);
         }
-        return asnObj.lastModified().isAfter(asnFileLastModified) || cityObj.lastModified().isAfter(cityFileLastModified);
+
+        return cityObj.lastModified().isAfter(cityFileLastModified) || asnUpdated;
     }
 
     /**
@@ -127,10 +137,12 @@ public class S3GeoIpFileService {
      * @throws IOException if the files fail to be moved to the active location
      */
     public void moveTempFilesToActive() throws IOException {
-        Files.move(tempAsnPath, asnPath, StandardCopyOption.REPLACE_EXISTING);
         Files.move(tempCityPath, cityPath, StandardCopyOption.REPLACE_EXISTING);
-        asnFileLastModified = tempAsnFileLastModified;
         cityFileLastModified = tempCityFileLastModified;
+        if (Files.exists(tempAsnPath)) {
+            Files.move(tempAsnPath, asnPath, StandardCopyOption.REPLACE_EXISTING);
+            asnFileLastModified = tempAsnFileLastModified;
+        }
         tempAsnFileLastModified = null;
         tempCityFileLastModified = null;
     }
@@ -205,17 +217,21 @@ public class S3GeoIpFileService {
 
     // Convert the asnDbPath and cityDbPath to S3 buckets and keys
     private BucketsAndKeys getBucketsAndKeys(GeoIpResolverConfig config) {
-        String asnFile = config.asnDbPath();
-        int asnLastSlash = asnFile.lastIndexOf("/");
-        String asnBucket = asnFile.substring(S3GeoIpFileService.S3_BUCKET_PREFIX.length(), asnLastSlash);
-        String asnKey = asnFile.substring(asnLastSlash + 1);
-        LOG.debug("ASN Bucket = {}, ASN Key = {}", asnBucket, asnKey);
-
         String cityFile = config.cityDbPath();
         int cityLastSlash = cityFile.lastIndexOf("/");
         String cityBucket = cityFile.substring(S3GeoIpFileService.S3_BUCKET_PREFIX.length(), cityLastSlash);
         String cityKey = cityFile.substring(cityLastSlash + 1);
         LOG.debug("City Bucket = {}, City Key = {}", cityBucket, cityKey);
+
+        String asnBucket = "";
+        String asnKey = "";
+        if (!config.asnDbPath().isEmpty()) {
+            String asnFile = config.asnDbPath();
+            int asnLastSlash = asnFile.lastIndexOf("/");
+            asnBucket = asnFile.substring(S3GeoIpFileService.S3_BUCKET_PREFIX.length(), asnLastSlash);
+            asnKey = asnFile.substring(asnLastSlash + 1);
+        }
+        LOG.debug("ASN Bucket = {}, ASN Key = {}", asnBucket, asnKey);
 
         return BucketsAndKeys.create(asnBucket, asnKey, cityBucket, cityKey);
     }

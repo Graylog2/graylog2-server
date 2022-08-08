@@ -93,29 +93,30 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
                 throw new IllegalArgumentException(error);
             }
 
-
             GeoIpResolverConfig curConfig = clusterConfigService.getOrDefault(GeoIpResolverConfig.class,
                     GeoIpResolverConfig.defaultConfig());
             boolean moveTemporaryFiles = false;
             if (config.useS3()) {
                 // Make sure the paths are valid S3 object paths
-                if (config.asnDbPath().startsWith(S3GeoIpFileService.S3_BUCKET_PREFIX) && config.cityDbPath().startsWith(S3GeoIpFileService.S3_BUCKET_PREFIX)) {
-                    // Check this before modifying the config's DB paths to the active file locations on disk
+                boolean asnFileExists = !config.asnDbPath().isEmpty();
+                if (config.cityDbPath().startsWith(S3GeoIpFileService.S3_BUCKET_PREFIX) &&
+                        (!asnFileExists || config.asnDbPath().startsWith(S3GeoIpFileService.S3_BUCKET_PREFIX))) {
                     boolean bucketsChanged = !curConfig.cityDbPath().equals(config.cityDbPath()) || !curConfig.asnDbPath().equals(config.asnDbPath());
-                    config = config.toBuilder()
-                            .cityDbPath(s3GeoIpFileService.getActiveCityFile())
-                            .asnDbPath(s3GeoIpFileService.getActiveAsnFile())
-                            .build();
-                    // If neither of the paths have changed, don't worry about downloading the DB files. The
-                    // GeoIpDbFileChangeMonitorService will handle syncing the files on successful configuration saving
                     if (bucketsChanged) {
                         s3GeoIpFileService.downloadFilesToTempLocation(config);
                         // Set the DB paths to the temp file locations so the newly downloaded files can be validated
                         config = config.toBuilder()
                                 .cityDbPath(s3GeoIpFileService.getTempCityFile())
-                                .asnDbPath(s3GeoIpFileService.getTempAsnFile())
+                                .asnDbPath(asnFileExists ? s3GeoIpFileService.getTempAsnFile() : "")
                                 .build();
                         moveTemporaryFiles = true;
+                    } else {
+                        // If neither of the paths have changed, don't worry about downloading the DB files. The
+                        // GeoIpDbFileChangeMonitorService will handle syncing the files if necessary
+                        config = config.toBuilder()
+                                .cityDbPath(s3GeoIpFileService.getActiveCityFile())
+                                .asnDbPath(asnFileExists ? s3GeoIpFileService.getActiveAsnFile() : "")
+                                .build();
                     }
                 } else {
                     throw new ConfigValidationException("Database file paths must be valid S3 object paths when using S3.");
@@ -126,7 +127,7 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
             validateGeoIpLocationResolver(config, timer);
             validateGeoIpAsnResolver(config, timer);
 
-            // If the files were downloaded from S3 and validated successfully, move the temporary files to be active files
+            // If the files were downloaded from S3 and validated successfully, move the temporary files to be active
             if (moveTemporaryFiles) {
                 s3GeoIpFileService.moveTempFilesToActive();
             }
