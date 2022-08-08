@@ -90,6 +90,8 @@ these [instructions](https://www.mongodb.com/docs/manual/core/capped-collections
 UTF-8 encoding. 
 <br>Note that this encoding is applied to all messages received by the input. A single input
 cannot handle multiple log sources with different encodings.
+- The permissions for which options are populated in the System dropdown menu were updated to more closely match the page that they link to. See [graylog2-server#13188](https://github.com/Graylog2/graylog2-server/pull/13188) for details.
+The Page permissions remain unchanged but this could affect the workflow for users with legacy permissions.
 
 ### Changed archived default path
 On new Graylog installations, the default archiving configuration will now 
