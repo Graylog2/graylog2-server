@@ -16,11 +16,13 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 
+import { asMock } from 'helpers/mocking';
 import { alice } from 'fixtures/users';
 import { simpleEventDefinition } from 'fixtures/eventDefinition';
 import CurrentUserContext from 'contexts/CurrentUserContext';
+import useGetPermissionsByScope from 'hooks/useScopePermissions';
 
 import EventDefinitionEntry from './EventDefinitionEntry';
 
@@ -29,21 +31,36 @@ const exampleEventDefinition = {
   id: 'event-definition-id',
 };
 
+type entityScope = {
+  is_mutable: boolean;
+};
+
+type getPermissionsByScopeReturnType = {
+  isLoading: boolean;
+  data: entityScope;
+};
+
+const exampleEntityScopeMutable: getPermissionsByScopeReturnType = { isLoading: false, data: { is_mutable: true } };
+const exampleEntityScopeImmutable: getPermissionsByScopeReturnType = { isLoading: false, data: { is_mutable: false } };
+
 jest.mock('components/permissions/EntityShareModal', () => () => <div>EntityShareModal content</div>);
+jest.mock('hooks/useScopePermissions', () => jest.fn());
 
 describe('EventDefinitionEntry', () => {
-  const renderSUT = (grnPermissions = [], permissions = []) => {
+  const renderSUT = (grnPermissions = [], permissions = [], scope = 'DEFAULT') => {
     const currentUser = alice.toBuilder()
       .grnPermissions(Immutable.List(grnPermissions))
       .permissions(Immutable.List(permissions))
       .build();
 
+    exampleEventDefinition._scope = scope;
+
     return (
       <CurrentUserContext.Provider value={currentUser}>
-        <EventDefinitionEntry onDelete={() => {}}
-                              onCopy={() => {}}
-                              onDisable={() => {}}
-                              onEnable={() => {}}
+        <EventDefinitionEntry onDelete={() => { }}
+                              onCopy={() => { }}
+                              onDisable={() => { }}
+                              onEnable={() => { }}
                               context={{ scheduler: {} }}
                               eventDefinition={exampleEventDefinition} />
       </CurrentUserContext.Provider>
@@ -51,6 +68,8 @@ describe('EventDefinitionEntry', () => {
   };
 
   it('allows sharing for owners', async () => {
+    asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeMutable);
+
     const grnPermissions = ['entity:own:grn::::event_definition:event-definition-id'];
     render(renderSUT(grnPermissions));
 
@@ -61,6 +80,8 @@ describe('EventDefinitionEntry', () => {
   });
 
   it('allows sharing for admins', async () => {
+    asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeMutable);
+
     render(renderSUT([], ['*']));
 
     const button = screen.getAllByRole('button', { name: /Share/ })[0];
@@ -70,9 +91,51 @@ describe('EventDefinitionEntry', () => {
   });
 
   it('does not allow sharing for viewer', () => {
+    asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeMutable);
+
     const grnPermissions = ['entity:view:grn::::event_definition:event-definition-id'];
     render(renderSUT(grnPermissions));
 
     expect(screen.getAllByRole('button', { name: /Share/ })[1]).toHaveAttribute('disabled');
+  });
+
+  it('shows "edit" button', async () => {
+    asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeMutable);
+
+    render(renderSUT([], ['*'], 'DEFAULT'));
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId('edit-button')[0]).toBeVisible();
+    });
+  });
+
+  it('hides "edit" button for immutable definitions', async () => {
+    asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeImmutable);
+
+    render(renderSUT([], ['*'], 'ILLUMINATE'));
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('edit-button')).toBeNull();
+    });
+  });
+
+  it('shows "delete" button', async () => {
+    asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeMutable);
+
+    render(renderSUT([], ['*'], 'DEFAULT'));
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId('delete-button')[0]).toBeVisible();
+    });
+  });
+
+  it('hides "delete" button for immutable definitions', async () => {
+    asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeImmutable);
+
+    render(renderSUT([], ['*'], 'ILLUMINATE'));
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('delete-button')).toBeNull();
+    });
   });
 });
