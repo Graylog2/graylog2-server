@@ -22,12 +22,24 @@ import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
 
+type ScopeParams = {
+  is_mutable: boolean,
+}
+
+type ScopeName = 'DEFAULT' | 'ILLUMINATE';
+
+type EntityScopeRecord = Record<ScopeName, ScopeParams>;
+
+type EntityScopeType = {
+  entity_scopes: EntityScopeRecord,
+};
+
 function fetchScopePermissions() {
   return fetch('GET', qualifyUrl(ApiRoutes.EntityScopeController.getScope().url));
 }
 
-const useGetPermissionsByScope = (entity: GenericEntityType) => {
-  const { data, isLoading, error } = useQuery<any, Error>(
+const useGetPermissionsByScope = (entity: Partial<GenericEntityType>) => {
+  const { data, isLoading, error } = useQuery<EntityScopeType, Error>(
     ['scope-permissions'],
     fetchScopePermissions,
     {
@@ -39,7 +51,7 @@ const useGetPermissionsByScope = (entity: GenericEntityType) => {
   );
 
   const scope = entity._scope ? entity._scope.toUpperCase() : 'DEFAULT';
-  const permissions = isLoading ? {} : data.entity_scopes[scope];
+  const permissions: ScopeParams = isLoading ? { is_mutable: false } : data.entity_scopes[scope];
 
   return {
     loadingScopePermissions: isLoading,

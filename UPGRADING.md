@@ -45,6 +45,16 @@ The following API endpoints have been removed in 4.4.
 | ------------------------------------------- | --------------------------- |
 | `PUT /example/placeholder`                  | TODO placeholder comment    |
 
+## Java Code API Deprecations
+
+The following Java Code API deprecations have been made in 4.4.
+
+- The `org.graylog2.plugin.PluginModule.addNotificationType(name, notificationClass, handlerClass, factoryClass)`
+  method has been deprecated in favor of a new/preferred version, which also properly registers the notification 
+  config content pack entity, so that instances the corresponding content pack entity can can be installed successfully:
+`org.graylog2.plugin.PluginModule.addNotificationType(name, notificationClass, handlerClass, factoryClass, contentPackEntityName, contentPackEntityClass)`. 
+  See <PR link> for more info.
+
 ## Java Code API Changes
 
 The following Java Code API changes have been made in 4.4.
@@ -80,6 +90,8 @@ these [instructions](https://www.mongodb.com/docs/manual/core/capped-collections
 UTF-8 encoding. 
 <br>Note that this encoding is applied to all messages received by the input. A single input
 cannot handle multiple log sources with different encodings.
+- The permissions for which options are populated in the System dropdown menu were updated to more closely match the page that they link to. See [graylog2-server#13188](https://github.com/Graylog2/graylog2-server/pull/13188) for details.
+The Page permissions remain unchanged but this could affect the workflow for users with legacy permissions.
 
 ### Changed archived default path
 On new Graylog installations, the default archiving configuration will now 
