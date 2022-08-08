@@ -143,7 +143,7 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
                 s3GeoIpFileService.downloadFilesToTempLocation(config);
                 GeoIpResolverConfig tempConfig = config.toBuilder()
                         .cityDbPath(s3GeoIpFileService.getTempCityFile())
-                        .asnDbPath(s3GeoIpFileService.getTempAsnFile())
+                        .asnDbPath(config.asnDbPath().isEmpty() ? "" : s3GeoIpFileService.getTempAsnFile())
                         .build();
                 Timer timer = new Timer(new UniformReservoir());
                 geoIpResolverConfigValidator.validateGeoIpLocationResolver(tempConfig, timer);
