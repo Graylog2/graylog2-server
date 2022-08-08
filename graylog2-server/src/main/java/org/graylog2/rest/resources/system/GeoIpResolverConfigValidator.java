@@ -21,6 +21,7 @@ import com.codahale.metrics.Timer;
 import com.codahale.metrics.UniformReservoir;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
+import org.graylog.plugins.map.config.S3DownloadException;
 import org.graylog.plugins.map.config.S3GeoIpFileService;
 import org.graylog.plugins.map.geoip.GeoAsnInformation;
 import org.graylog.plugins.map.geoip.GeoIpResolver;
@@ -131,7 +132,7 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
             if (moveTemporaryFiles) {
                 s3GeoIpFileService.moveTempFilesToActive();
             }
-        } catch (IllegalArgumentException | IllegalStateException | IOException e) {
+        } catch (IllegalArgumentException | IllegalStateException | S3DownloadException | IOException e) {
             throw new ConfigValidationException(e.getMessage());
         }
     }

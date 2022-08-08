@@ -90,12 +90,12 @@ public class S3GeoIpFileService {
     }
 
     /**
-     * Downloads the Geo Processor city and ASN database files ot a temporary location so that they can be validated
+     * Downloads the Geo Processor city and ASN database files to a temporary location so that they can be validated
      *
      * @param config current Geo Location Processor configuration
-     * @throws IOException if the files are
+     * @throws IOException if the files fail to be downloaded
      */
-    public void downloadFilesToTempLocation(GeoIpResolverConfig config) throws IOException {
+    public void downloadFilesToTempLocation(GeoIpResolverConfig config) throws S3DownloadException {
 
         try {
             cleanupTempFiles();
@@ -116,7 +116,7 @@ public class S3GeoIpFileService {
         } catch (Exception e) {
             LOG.error("Failed to retrieve S3 files. {}", e.toString());
             cleanupTempFiles();
-            throw e;
+            throw new S3DownloadException(e.getMessage());
         }
     }
 

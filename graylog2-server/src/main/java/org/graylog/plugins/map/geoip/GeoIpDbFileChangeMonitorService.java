@@ -24,6 +24,7 @@ import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog.plugins.map.config.DatabaseType;
 import org.graylog.plugins.map.config.DatabaseVendorType;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
+import org.graylog.plugins.map.config.S3DownloadException;
 import org.graylog.plugins.map.config.S3GeoIpFileService;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.notifications.Notification;
@@ -152,16 +153,16 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
                 // Now that the new files have passed validation, move them to the active file location
                 s3GeoIpFileService.moveTempFilesToActive();
                 LOG.debug("Pulled new files from S3");
-            } catch (IOException e) {
-                String message = "Failed to download Geo Processor DB files from S3. Unable to refresh. Leaving old files in place on disk.";
-                sendFailedSyncNotification(message);
-                LOG.error(message);
-                return changes;
             } catch (IllegalArgumentException | IllegalStateException validationError) {
                 String message = "Geo Processor DB files from S3 failed validation. Upload valid files to S3. Leaving old files in place on disk.";
                 sendFailedSyncNotification(message);
                 LOG.error(message);
                 s3GeoIpFileService.cleanupTempFiles();
+                return changes;
+            } catch (S3DownloadException | IOException e) {
+                String message = "Failed to download Geo Processor DB files from S3. Unable to refresh. Leaving old files in place on disk.";
+                sendFailedSyncNotification(message);
+                LOG.error(message);
                 return changes;
             }
         }
