@@ -129,7 +129,7 @@ public class S3GeoIpFileService {
     public boolean checkForNewFilesInS3(GeoIpResolverConfig config) {
         BucketsAndKeys bucketsAndKeys = getBucketsAndKeys(config);
 
-        S3Object cityObj = getS3Object(bucketsAndKeys.asnBucket(), bucketsAndKeys.asnKey());
+        S3Object cityObj = getS3Object(bucketsAndKeys.cityBucket(), bucketsAndKeys.cityKey());
         if (cityObj == null) {
             LOG.warn("No city database file '{}' found in S3 bucket '{}'. Aborting S3 file refresh.",
                     bucketsAndKeys.cityKey(), bucketsAndKeys.cityBucket());
