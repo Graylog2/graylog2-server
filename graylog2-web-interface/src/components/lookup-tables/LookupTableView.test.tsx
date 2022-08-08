@@ -24,11 +24,12 @@ import LookupTableView from './LookupTableView';
 jest.mock('hooks/useScopePermissions', () => (mockedUseScopePermissions));
 
 const renderedLUT = (scope: string) => {
-  TABLE._scope = scope;
+  const table = { ...TABLE };
+  table._scope = scope;
 
   return render(
     <Router>
-      <LookupTableView table={TABLE} cache={CACHE} dataAdapter={DATA_ADAPTER} />
+      <LookupTableView table={table} cache={CACHE} dataAdapter={DATA_ADAPTER} />
     </Router>,
   );
 };
