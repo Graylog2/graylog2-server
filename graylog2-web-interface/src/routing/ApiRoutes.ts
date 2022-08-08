@@ -134,9 +134,6 @@ const ApiRoutes = {
     userSharesPaginated: (username: string) => { return { url: `/authz/shares/user/${username}` }; },
     entityScopes: () => { return { url: '/entity_scopes' }; },
   },
-  EntityScopeController: {
-    getScope: () => ({ url: '/entity_scopes' }),
-  },
   HTTPHeaderAuthConfigController: {
     load: () => ({ url: '/system/authentication/http-header-auth-config' }),
     update: () => ({ url: '/system/authentication/http-header-auth-config' }),
