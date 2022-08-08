@@ -39,7 +39,7 @@
   "dependencies": {
     "@types/create-react-class": "15.6.3",
     "@types/jquery": "3.5.14",
-    "@types/react": "18.0.15",
+    "@types/react": "18.0.16",
     "babel-preset-graylog": "file:../babel-preset-graylog",
     "create-react-class": "15.7.0",
     "eslint-config-graylog": "file:../eslint-config-graylog",
