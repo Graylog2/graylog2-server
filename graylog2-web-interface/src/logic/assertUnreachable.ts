@@ -14,14 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
-import qs from 'qs';
+const serialize = (o: any) => JSON.stringify(o, null, 2);
 
-const useQuery = () => {
-  const { search } = useLocation();
-
-  return useMemo(() => qs.parse(search, { ignoreQueryPrefix: true }), [search]);
+const assertUnreachable = (ignored: never, message: string): never => {
+  throw new Error(`${message}: ${serialize(ignored)}`);
 };
 
-export default useQuery;
+export default assertUnreachable;

@@ -40,6 +40,7 @@ import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.mongojack.Id;
@@ -54,8 +55,7 @@ import java.util.stream.Collectors;
 @JsonAutoDetect
 @JsonDeserialize(builder = EventDefinitionDto.Builder.class)
 @WithBeanGetter
-public abstract class EventDefinitionDto implements EventDefinition, ContentPackable<EventDefinitionEntity> {
-    public static final String FIELD_ID = "id";
+public abstract class EventDefinitionDto extends ScopedEntity implements EventDefinition, ContentPackable<EventDefinitionEntity> {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_NOTIFICATIONS = "notifications";
@@ -150,7 +150,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     }
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public static abstract class Builder extends ScopedEntity.AbstractBuilder<Builder>  {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_EventDefinitionDto.Builder()
@@ -228,6 +228,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
                 .collect(Collectors.toList()));
 
         return EventDefinitionEntity.builder()
+            .scope(ValueReference.of(scope()))
             .title(ValueReference.of(title()))
             .description(ValueReference.of(description()))
             .priority(ValueReference.of(priority()))
