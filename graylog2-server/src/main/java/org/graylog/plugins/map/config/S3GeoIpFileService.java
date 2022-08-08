@@ -36,6 +36,10 @@ import java.time.Instant;
  * Location Processor configuration is changed and the new configuration has different S3 objects than the old.
  * - {@link org.graylog.plugins.map.geoip.GeoIpDbFileChangeMonitorService} will check to see if new files need to be
  * downloaded each time the service runs based on the lastModified times of the S3 objects.
+ *
+ * This class relies on the {@link DefaultCredentialsProvider} and not any settings that may be configured in the
+ * Graylog AWS plugin configuration. See https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/credentials.html#credentials-chain
+ * for how to configure your environment so that the default provider retrieves credentials properly.
  */
 @Singleton
 public class S3GeoIpFileService {
