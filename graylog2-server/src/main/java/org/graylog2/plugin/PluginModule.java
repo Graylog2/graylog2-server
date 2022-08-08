@@ -22,6 +22,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.fields.providers.FieldValueProvider;
 import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationConfig;
@@ -301,6 +302,12 @@ public abstract class PluginModule extends Graylog2Module {
         return MapBinder.newMapBinder(binder(), String.class, EventNotification.Factory.class);
     }
 
+    /**
+     * Deprecated. Please use the below version of the method that also accepts the contentPackEntityName and
+     * contentPackEntityClass arguments, so that content pack entities are properly registered.
+     * TODO: Consider removing in Graylog 5.0.
+     */
+    @Deprecated
     protected void addNotificationType(String name,
                                        Class<? extends EventNotificationConfig> notificationClass,
                                        Class<? extends EventNotification> handlerClass,
@@ -308,6 +315,16 @@ public abstract class PluginModule extends Graylog2Module {
         install(new FactoryModuleBuilder().implement(EventNotification.class, handlerClass).build(factoryClass));
         eventNotificationBinder().addBinding(name).to(factoryClass);
         registerJacksonSubtype(notificationClass, name);
+    }
+
+    protected void addNotificationType(String name,
+                                       Class<? extends EventNotificationConfig> notificationClass,
+                                       Class<? extends EventNotification> handlerClass,
+                                       Class<? extends EventNotification.Factory> factoryClass,
+                                       String contentPackEntityName,
+                                       Class<? extends EventNotificationConfigEntity> contentPackEntityClass) {
+        addNotificationType(name, notificationClass, handlerClass, factoryClass);
+        registerJacksonSubtype(contentPackEntityClass, contentPackEntityName);
     }
 
     protected void addGRNType(GRNType type, Class<? extends GRNDescriptorProvider> descriptorProvider) {
