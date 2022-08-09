@@ -77,7 +77,8 @@ const _validateUsername = async (errors: { [name: string]: string }, username: s
   return newErrors;
 };
 
-const debouncedValidateUsername = debounceWithPromise(_validateUsername, 350);
+const debounceTimeoutMs = 600;
+const debouncedValidateUsername = debounceWithPromise(_validateUsername, debounceTimeoutMs);
 
 const _validate = async (values) => {
   let errors = {};
