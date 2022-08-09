@@ -39,11 +39,20 @@ const mockLoadRolesPromise = Promise.resolve({
   count: 0,
   total: 0,
 });
+const mockExistingUser = existingUser.username;
 
 jest.mock('stores/users/UsersStore', () => ({
   UsersActions: {
     create: jest.fn(() => Promise.resolve()),
     loadUsers: jest.fn(() => mockLoadUsersPromise),
+    loadByUsername: jest.fn((u) => {
+      if (u === mockExistingUser) {
+        Promise.resolve();
+      } else {
+        // eslint-disable-next-line no-throw-literal
+        throw {};
+      }
+    }),
   },
 }));
 
