@@ -16,6 +16,8 @@
  */
 package org.junit.jupiter.engine.descriptor;
 
+import com.google.common.collect.Lists;
+import org.apache.commons.lang3.tuple.Pair;
 import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
 import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
 import org.graylog.testing.completebackend.Lifecycle;
@@ -32,8 +34,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
     public static final String SEGMENT_TYPE = "matrix";
@@ -46,6 +50,7 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
     private final Set<Integer> extraPorts = Collections.synchronizedSet(new HashSet<>());
     private final Set<URL> mongoDBFixtures = Collections.synchronizedSet(new HashSet<>());
     private final Set<String> enabledFeatureFlags = Collections.synchronizedSet(new HashSet<>());
+    private final boolean withMailServerEnabled;
 
     public ContainerMatrixTestsDescriptor(TestDescriptor parent,
                                           Lifecycle lifecycle,
@@ -57,10 +62,10 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
                                           MongodbServer mongoVersion,
                                           Set<Integer> extraPorts,
                                           List<URL> mongoDBFixtures,
-                                          List<String> enabledFeatureFlags) {
+                                          List<String> enabledFeatureFlags, boolean withMailServerEnabled) {
         super(parent.getUniqueId().append(SEGMENT_TYPE,
-                        createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion)),
-                createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion));
+                        createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled)),
+                createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled));
         setParent(parent);
         this.lifecycle = lifecycle;
         this.mavenProjectDirProvider = mavenProjectDirProvider;
@@ -70,6 +75,7 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         this.extraPorts.addAll(extraPorts);
         this.mongoDBFixtures.addAll(mongoDBFixtures);
         this.enabledFeatureFlags.addAll(enabledFeatureFlags);
+        this.withMailServerEnabled = withMailServerEnabled;
     }
 
     public ContainerMatrixTestsDescriptor(TestDescriptor parent,
@@ -87,10 +93,24 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         this.mongoVersion = MongodbServer.DEFAULT_VERSION;
         this.extraPorts.addAll(extraPorts);
         this.mongoDBFixtures.addAll(mongoDBFixtures);
+        this.withMailServerEnabled = false;
     }
 
-    protected static String createKey(Lifecycle lifecycle, String mavenProjectDirProvider, String pluginJarsProvider, SearchVersion esVersion, MongodbServer mongoVersion) {
-        return "Lifecycle: " + lifecycle.name() + ", MavenProjectDirProvider: " + mavenProjectDirProvider + ", PluginJarsProvider: " + pluginJarsProvider + ", Search: " + esVersion + ", MongoDB: " + mongoVersion.getVersion();
+    protected static String createKey(Lifecycle lifecycle, String mavenProjectDirProvider, String pluginJarsProvider, SearchVersion searchVersion, MongodbServer mongoVersion, boolean withMailServerEnabled) {
+        final List<Pair<String, Object>> values = Lists.newArrayList(
+                Pair.of("Lifecycle", lifecycle.name()),
+                Pair.of("MavenProjectDirProvider", mavenProjectDirProvider),
+                Pair.of("PluginJarsProvider", pluginJarsProvider),
+                Pair.of("Search", searchVersion),
+                Pair.of("MongoDB", mongoVersion.getVersion())
+        );
+
+        if(withMailServerEnabled) {
+            values.add(Pair.of("Mailserver", "enabled"));
+        }
+
+        return values.stream().map(pair -> String.format("%s: %s", pair.getKey(), pair.getValue()))
+                .collect(Collectors.joining(", "));
     }
 
     public Class<? extends MavenProjectDirProvider> getMavenProjectDirProvider() {
@@ -132,5 +152,9 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
 
     public List<String> getEnabledFeatureFlags() {
         return new ArrayList<>(enabledFeatureFlags);
+    }
+
+    public boolean withEnabledMailServer() {
+        return withMailServerEnabled;
     }
 }

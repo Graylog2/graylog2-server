@@ -18,16 +18,18 @@ package org.graylog.testing.fullbackend;
 
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.completebackend.MailServerInstance;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.SearchUtils;
+import org.hamcrest.Matchers;
 
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ContainerMatrixTestsConfiguration
+@ContainerMatrixTestsConfiguration(withMailServerEnabled = true)
 class BackendStartupIT {
 
     private final GraylogBackend sut;
@@ -70,5 +72,14 @@ class BackendStartupIT {
     void importsElasticsearchFixtures() {
         sut.importElasticsearchFixture("one-message.json", getClass());
         assertThat(SearchUtils.waitForMessage(requestSpec, "hello from es fixture")).isTrue();
+    }
+
+    @ContainerMatrixTest
+    void startsMailServer() {
+        final MailServerInstance mailServer = sut.getEmailServerInstance().orElseThrow(() -> new IllegalStateException("Mail server should be accessible"));
+        given()
+                .get(mailServer.getEndpointURI() + "/api/v2/messages")
+                .then()
+                .assertThat().body("count", Matchers.equalTo(0));
     }
 }

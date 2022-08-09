@@ -21,6 +21,7 @@ import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.testcontainers.containers.Network;
 
 import java.lang.reflect.Constructor;
+import java.util.Optional;
 
 public class RunningGraylogBackend implements GraylogBackend {
     private final SearchServerInstance searchServerInstance;
@@ -77,5 +78,11 @@ public class RunningGraylogBackend implements GraylogBackend {
     @Override
     public String getLogs() {
         return "noop -> because the server is running, check the logs in the console ;-)";
+    }
+
+    @Override
+    public Optional<MailServerInstance> getEmailServerInstance() {
+        // TODO: this could verify if there is the mailhog listening on a port and deliver it as a running instance of the mailserver
+        throw new NotImplementedException("Feature not implemented on Running backends (no container)");
     }
 }
