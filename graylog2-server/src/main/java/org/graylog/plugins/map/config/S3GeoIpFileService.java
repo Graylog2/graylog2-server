@@ -66,8 +66,9 @@ public class S3GeoIpFileService {
     public static final String ACTIVE_CITY_FILE = "standard_location-from-s3.mmdb";
     public static final String TEMP_ASN_FILE = "temp-" + ACTIVE_ASN_FILE;
     public static final String TEMP_CITY_FILE = "temp-" + ACTIVE_CITY_FILE;
+    public static final String NULL_S3_CLIENT_MESSAGE = "Unable to create DefaultCredentialsProvider for the S3 Client. Geo Location Processor S3 file refresh is disabled.";
 
-    private final S3Client s3Client;
+    private S3Client s3Client;
     private final Path asnPath;
     private final Path cityPath;
     private final Path tempAsnPath;
@@ -80,9 +81,14 @@ public class S3GeoIpFileService {
 
     @Inject
     public S3GeoIpFileService(@Named(GeoIpProcessorConfig.S3_DOWNLOAD_LOCATION) String s3DownloadLocation) {
-        final S3ClientBuilder clientBuilder = S3Client.builder();
-        clientBuilder.credentialsProvider(DefaultCredentialsProvider.create());
-        this.s3Client = clientBuilder.build();
+        try {
+            final S3ClientBuilder clientBuilder = S3Client.builder();
+            clientBuilder.credentialsProvider(DefaultCredentialsProvider.create());
+            this.s3Client = clientBuilder.build();
+        } catch (Exception e) {
+            this.s3Client = null;
+            LOG.warn(NULL_S3_CLIENT_MESSAGE + " If not trying to use the Geo Location Processor S3 file refresh feature, the following error can safely be ignored.\n\tERROR: {}", e.getMessage());
+        }
         this.asnPath = Paths.get(s3DownloadLocation, S3GeoIpFileService.ACTIVE_ASN_FILE);
         this.cityPath = Paths.get(s3DownloadLocation, S3GeoIpFileService.ACTIVE_CITY_FILE);
         this.tempAsnPath = Paths.get(s3DownloadLocation, S3GeoIpFileService.TEMP_ASN_FILE);
@@ -93,9 +99,12 @@ public class S3GeoIpFileService {
      * Downloads the Geo Processor city and ASN database files to a temporary location so that they can be validated
      *
      * @param config current Geo Location Processor configuration
-     * @throws IOException if the files fail to be downloaded
+     * @throws S3DownloadException if the files fail to be downloaded
      */
     public void downloadFilesToTempLocation(GeoIpResolverConfig config) throws S3DownloadException {
+        if (s3ClientIsNull()) {
+            return;
+        }
 
         try {
             cleanupTempFiles();
@@ -127,6 +136,10 @@ public class S3GeoIpFileService {
      * @return true if the files in S3 have been modified since they were last synced
      */
     public boolean checkForNewFilesInS3(GeoIpResolverConfig config) {
+        if (s3ClientIsNull()) {
+            return false;
+        }
+
         BucketsAndKeys bucketsAndKeys = getBucketsAndKeys(config);
 
         S3Object cityObj = getS3Object(bucketsAndKeys.cityBucket(), bucketsAndKeys.cityKey());
@@ -222,6 +235,14 @@ public class S3GeoIpFileService {
             LOG.error("Failed to delete temporary Geo Processor DB files. Manual cleanup of '{}' and '{}' may be necessary",
                     getTempAsnFile(), getTempCityFile());
         }
+    }
+
+    public boolean s3ClientIsNull() {
+        if (s3Client == null) {
+            LOG.warn(NULL_S3_CLIENT_MESSAGE);
+            return true;
+        }
+        return false;
     }
 
     private void setFilePermissions(Path filePath) {

@@ -98,6 +98,9 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
                     GeoIpResolverConfig.defaultConfig());
             boolean moveTemporaryFiles = false;
             if (config.useS3()) {
+                if (s3GeoIpFileService.s3ClientIsNull()) {
+                    throw new ConfigValidationException("Unable to use S3 for file refresh without AWS credentials. See documentation for steps to properly configure AWS credentials.");
+                }
                 // Make sure the paths are valid S3 object paths
                 boolean asnFileExists = !config.asnDbPath().isEmpty();
                 if (config.cityDbPath().startsWith(S3GeoIpFileService.S3_BUCKET_PREFIX) &&
