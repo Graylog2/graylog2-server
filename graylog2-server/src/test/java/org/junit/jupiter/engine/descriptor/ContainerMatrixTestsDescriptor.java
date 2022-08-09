@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -109,7 +110,7 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
             values.add(Pair.of("Mailserver", "enabled"));
         }
 
-        return values.stream().map(pair -> String.format("%s: %s", pair.getKey(), pair.getValue()))
+        return values.stream().map(pair -> String.format(Locale.ROOT, "%s: %s", pair.getKey(), pair.getValue()))
                 .collect(Collectors.joining(", "));
     }
 
