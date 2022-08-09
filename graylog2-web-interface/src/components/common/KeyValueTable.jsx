@@ -18,7 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
-import { Button, Input, Table } from 'components/bootstrap';
+import { Input } from 'components/bootstrap';
+import { Button, Table } from 'components/graylog';
 import ObjectUtils from 'util/ObjectUtils';
 
 const StyledDiv = styled.div`
@@ -152,25 +153,25 @@ class KeyValueTable extends React.Component {
         <td>
           <StyledDiv>
             <Input type="text"
-                   name="newKey"
-                   id="newKey"
-                   data-testid="newKey"
-                   bsSize="small"
-                   placeholder={this.props.headers[0]}
-                   value={this.state.newKey}
-                   onChange={this._bindValue} />
+              name="newKey"
+              id="newKey"
+              data-testid="newKey"
+              bsSize="small"
+              placeholder={this.props.headers[0]}
+              value={this.state.newKey}
+              onChange={this._bindValue} />
           </StyledDiv>
         </td>
         <td>
           <StyledDiv>
             <Input type="text"
-                   name="newValue"
-                   id="newValue"
-                   data-testid="newValue"
-                   bsSize="small"
-                   placeholder={this.props.headers[1]}
-                   value={this.state.newValue}
-                   onChange={this._bindValue} />
+              name="newValue"
+              id="newValue"
+              data-testid="newValue"
+              bsSize="small"
+              placeholder={this.props.headers[1]}
+              value={this.state.newValue}
+              onChange={this._bindValue} />
           </StyledDiv>
         </td>
         <td>
@@ -203,7 +204,7 @@ KeyValueTable.defaultProps = {
   actionsSize: 'xsmall',
   className: '',
   containerClassName: '',
-  onChange: () => {},
+  onChange: () => { },
 };
 
 export default KeyValueTable;
