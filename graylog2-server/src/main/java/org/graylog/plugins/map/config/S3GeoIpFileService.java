@@ -87,7 +87,8 @@ public class S3GeoIpFileService {
             this.s3Client = clientBuilder.build();
         } catch (Exception e) {
             this.s3Client = null;
-            LOG.warn(NULL_S3_CLIENT_MESSAGE + " If not trying to use the Geo Location Processor S3 file refresh feature, the following error can safely be ignored.\n\tERROR: {}", e.getMessage());
+            LOG.warn(NULL_S3_CLIENT_MESSAGE);
+            LOG.debug("If not trying to use the Geo Location Processor S3 file refresh feature, the following error can safely be ignored.\n\tERROR : {}", e.getMessage());
         }
         this.asnPath = Paths.get(s3DownloadLocation, S3GeoIpFileService.ACTIVE_ASN_FILE);
         this.cityPath = Paths.get(s3DownloadLocation, S3GeoIpFileService.ACTIVE_CITY_FILE);
