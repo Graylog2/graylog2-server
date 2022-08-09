@@ -31,6 +31,8 @@ public class EngineBindings extends ViewsModule {
         bind(SearchValidation.class).to(PluggableSearchValidation.class);
 
         registerSearchNormalizer(DecorateQueryStringsNormalizer.class);
+        // Triggering set binder explicitly, so no injection errors are being caused if no implementation is bound.
+        searchPostValidationNormalizerBinder();
         registerSearchValidator(TimeRangeValidator.class);
     }
 }
