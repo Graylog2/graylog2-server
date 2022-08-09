@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
@@ -37,10 +37,10 @@ import type User from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
-import usePluginEntities from 'views/logic/usePluginEntities';
 import {
   executePluggableDashboardDuplicationHandler as executePluggableDuplicationHandler,
 } from 'views/logic/views/pluggableSaveViewFormHandler';
+import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
 import ViewPropertiesModal from './views/ViewPropertiesModal';
 import IfDashboard from './dashboard/IfDashboard';
@@ -66,7 +66,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
       },
     },
   } = useSearchPageLayout();
-  const pluggableSaveViewControlFns = usePluginEntities('views.components.saveViewForm');
+  const pluggableSaveViewControls = useSaveViewFormControls();
   const [shareViewOpen, setShareViewOpen] = useState(false);
   const [debugOpen, setDebugOpen] = useState(false);
   const [saveAsViewOpen, setSaveAsViewOpen] = useState(false);
@@ -84,17 +84,17 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
     </>
   );
 
-  const _onSaveAsView = async (newView: View) => {
+  const _onSaveAsView = useCallback(async (newView: View) => {
     const isViewDuplication = !!view.id;
 
     if (isViewDuplication) {
-      const viewWithPluginData = await executePluggableDuplicationHandler(newView, currentUser.permissions, pluggableSaveViewControlFns);
+      const viewWithPluginData = await executePluggableDuplicationHandler(newView, currentUser.permissions, pluggableSaveViewControls);
 
       return onSaveAsView(viewWithPluginData);
     }
 
     return onSaveAsView(newView);
-  };
+  }, [currentUser.permissions, pluggableSaveViewControls, view.id]);
 
   return (
     <ButtonGroup>

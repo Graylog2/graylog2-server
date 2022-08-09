@@ -271,8 +271,8 @@ export type FiltersType = Immutable.List<SearchFilter>
 export type SaveViewControls = {
   component: React.ComponentType<{ disabledViewCreation?: boolean }>,
   id: string,
-  onSearchDuplication: (view: View, userPermissions: Immutable.List<string>) => Promise<View>,
-  onDashboardDuplication: (view: View, userPermissions: Immutable.List<string>) => Promise<View>,
+  onSearchDuplication?: (view: View, userPermissions: Immutable.List<string>) => Promise<View>,
+  onDashboardDuplication?: (view: View, userPermissions: Immutable.List<string>) => Promise<View>,
 }
 
 declare module 'graylog-web-plugin/plugin' {

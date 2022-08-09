@@ -20,7 +20,7 @@ import styled from 'styled-components';
 
 import { ButtonToolbar, Button, ControlLabel, FormControl, FormGroup, Popover } from 'components/bootstrap';
 import { Portal } from 'components/common';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
 import styles from './SavedSearchForm.css';
 
@@ -57,8 +57,7 @@ const SavedSearchForm = (props: Props) => {
   } = props;
   const disableSaveAs = !value || value === '' || disableCreateNew;
   const createNewTitle = isCreateNew ? 'Create new' : 'Save as';
-  const pluggableSaveViewControlFns = usePluginEntities('views.components.saveViewForm');
-  const pluggableSaveViewControls = pluggableSaveViewControlFns.map((controlFn) => controlFn()).filter((control) => !!control);
+  const pluggableSaveViewControls = useSaveViewFormControls();
 
   return (
     <Portal>

@@ -36,12 +36,12 @@ import history from 'util/History';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { ViewStore } from 'views/stores/ViewStore';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
 import SavedSearchControls from './SavedSearchControls';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: (x) => x }));
-jest.mock('views/logic/usePluginEntities');
+jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('util/History');
 
 jest.mock('bson-objectid', () => jest.fn(() => ({
@@ -120,7 +120,7 @@ describe('SavedSearchControls', () => {
 
   beforeEach(() => {
     asMock(ViewStore.getInitialState).mockReturnValue(defaultViewStoreState);
-    asMock(usePluginEntities).mockReturnValue([]);
+    asMock(useSaveViewFormControls).mockReturnValue([]);
   });
 
   describe('Button handling', () => {
@@ -194,7 +194,7 @@ describe('SavedSearchControls', () => {
       render(<SimpleSavedSearchControls onLoadView={onLoadView} />);
 
       userEvent.click(await screen.findByTitle('Save search'));
-      userEvent.type(await await findTitleInput(), 'Test');
+      userEvent.type(await findTitleInput(), 'Test');
       userEvent.click(await findCreateNewButton());
 
       await waitFor(() => expect(onLoadView).toHaveBeenCalledTimes(1));
@@ -218,13 +218,11 @@ describe('SavedSearchControls', () => {
     });
 
     it('should extend a saved search with plugin data on duplication', async () => {
-      asMock(usePluginEntities).mockImplementation((entityKey) => ({
-        'views.components.saveViewForm': [() => ({
-          component: () => <div>Pluggable component!</div>,
-          id: 'example-plugin-component',
-          onSearchDuplication: (view: View) => Promise.resolve(view.toBuilder().summary('This search has been extended by a plugin').build()),
-        })],
-      }[entityKey]));
+      asMock(useSaveViewFormControls).mockReturnValue([{
+        component: () => <div>Pluggable component!</div>,
+        id: 'example-plugin-component',
+        onSearchDuplication: (view: View) => Promise.resolve(view.toBuilder().summary('This search has been extended by a plugin').build()),
+      }]);
 
       const viewStoreState = createViewStoreState(false, 'some-id');
       asMock(ViewStore.getInitialState).mockReturnValue(viewStoreState);

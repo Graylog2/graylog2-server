@@ -23,7 +23,7 @@ import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
 import type View from 'views/logic/views/View';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
 type Props = {
   onClose: () => void,
@@ -36,10 +36,9 @@ type Props = {
 const ViewPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle }: Props) => {
   const [updatedView, setUpdatedView] = useState(view);
   const viewType = ViewTypeLabel({ type: updatedView.type });
-  const pluggableFormComponentsFn = usePluginEntities('views.components.saveViewForm');
-  const pluggableFormComponents = pluggableFormComponentsFn.map((controlFn) => controlFn()).filter((control) => !!control);
+  const pluggableFormComponents = useSaveViewFormControls();
 
-  const _onChange = (event) => {
+  const _onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
     let value = FormsUtils.getValueFromInput(event.target);
     const trimmedValue = value.trim();

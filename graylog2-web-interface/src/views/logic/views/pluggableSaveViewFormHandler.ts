@@ -43,14 +43,14 @@ const executeDuplicationHandler = async (view: View, userPermissions: Immutable.
   return updatedView;
 };
 
-export const executePluggableSearchDuplicationHandler = (view: View, userPermissions: Immutable.List<string>, pluggableSaveViewControlsFns: Array<() => SaveViewControls>) => {
-  const pluginDuplicationHandlers = pluggableSaveViewControlsFns?.map((pluginFn) => pluginFn()?.onSearchDuplication).filter((pluginData) => !!pluginData);
+export const executePluggableSearchDuplicationHandler = (view: View, userPermissions: Immutable.List<string>, pluggableSaveViewControls: Array<SaveViewControls>) => {
+  const pluginDuplicationHandlers = pluggableSaveViewControls?.map(({ onSearchDuplication }) => onSearchDuplication).filter((pluginData) => !!pluginData);
 
   return executeDuplicationHandler(view, userPermissions, pluginDuplicationHandlers);
 };
 
-export const executePluggableDashboardDuplicationHandler = (view: View, userPermissions: Immutable.List<string>, pluggableSaveViewControlsFns: Array<() => SaveViewControls>) => {
-  const pluginDuplicationHandlers = pluggableSaveViewControlsFns?.map((pluginFn) => pluginFn()?.onDashboardDuplication).filter((pluginData) => !!pluginData);
+export const executePluggableDashboardDuplicationHandler = (view: View, userPermissions: Immutable.List<string>, pluggableSaveViewControls: Array<SaveViewControls>) => {
+  const pluginDuplicationHandlers = pluggableSaveViewControls?.map(({ onDashboardDuplication }) => onDashboardDuplication).filter((pluginData) => !!pluginData);
 
   return executeDuplicationHandler(view, userPermissions, pluginDuplicationHandlers);
 };

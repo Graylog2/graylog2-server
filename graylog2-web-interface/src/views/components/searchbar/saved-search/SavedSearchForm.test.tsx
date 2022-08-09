@@ -20,13 +20,13 @@ import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import mockComponent from 'helpers/mocking/MockComponent';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
 import SavedSearchForm from './SavedSearchForm';
 
 jest.mock('react-overlays', () => ({ Position: mockComponent('MockPosition') }));
 jest.mock('components/common/Portal', () => ({ children }) => (children));
-jest.mock('views/logic/usePluginEntities');
+jest.mock('views/hooks/useSaveViewFormControls');
 
 describe('SavedSearchForm', () => {
   const props = {
@@ -42,7 +42,7 @@ describe('SavedSearchForm', () => {
   const findByHeadline = () => screen.findByRole('heading', { name: /name of search/i });
 
   beforeEach(() => {
-    asMock(usePluginEntities).mockReturnValue([]);
+    asMock(useSaveViewFormControls).mockReturnValue([]);
   });
 
   describe('render the SavedSearchForm', () => {
@@ -132,9 +132,7 @@ describe('SavedSearchForm', () => {
   });
 
   it('should render pluggable components', async () => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({
-      'views.components.saveViewForm': [() => ({ component: () => <div>Pluggable component!</div>, id: 'example-plugin-component' })],
-    }[entityKey]));
+    asMock(useSaveViewFormControls).mockReturnValue([{ component: () => <div>Pluggable component!</div>, id: 'example-plugin-component' }]);
 
     render(<SavedSearchForm {...props} />);
 

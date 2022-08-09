@@ -29,11 +29,11 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 import SearchPageLayoutContext, { SAVE_COPY, BLANK } from 'views/components/contexts/SearchPageLayoutContext';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import { ViewStore } from 'views/stores/ViewStore';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
 import ViewActionsMenu from './ViewActionsMenu';
 
-jest.mock('views/logic/usePluginEntities');
+jest.mock('views/hooks/useSaveViewFormControls');
 
 jest.mock('bson-objectid', () => jest.fn(() => ({
   toString: jest.fn(() => 'new-dashboard-id'),
@@ -131,7 +131,7 @@ describe('ViewActionsMenu', () => {
 
   beforeEach(() => {
     asMock(ViewStore.getInitialState).mockReturnValue({ isNew: false, view: mockView, activeQuery: undefined, dirty: false });
-    asMock(usePluginEntities).mockReturnValue([]);
+    asMock(useSaveViewFormControls).mockReturnValue([]);
   });
 
   it('should save a new dashboard', async () => {
@@ -147,13 +147,12 @@ describe('ViewActionsMenu', () => {
   });
 
   it('should extend a dashboard with plugin data on duplication', async () => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({
-      'views.components.saveViewForm': [() => ({
-        component: () => <div>Pluggable component!</div>,
-        id: 'example-plugin-component',
-        onDashboardDuplication: (view: View) => Promise.resolve(view.toBuilder().summary('This dashboard has been extended by a plugin').build()),
-      })],
-    }[entityKey]));
+    asMock(useSaveViewFormControls).mockReturnValue([{
+      component: () => <div>Pluggable component!</div>,
+      id: 'example-plugin-component',
+      onDashboardDuplication: (view: View) => Promise.resolve(view.toBuilder().summary('This dashboard has been extended by a plugin').build()),
+    }],
+    );
 
     render(<SimpleViewActionMenu />);
 
@@ -174,7 +173,7 @@ describe('ViewActionsMenu', () => {
     await findByText(/Editing dashboard/);
   });
 
-  it('should dopen ashboard share modal', () => {
+  it('should open dashboard share modal', () => {
     const { getByText } = render(<SimpleViewActionMenu />);
     const openShareButton = getByText(/Share/i);
 
