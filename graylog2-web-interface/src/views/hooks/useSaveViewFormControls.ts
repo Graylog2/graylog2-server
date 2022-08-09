@@ -14,12 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useMemo } from 'react';
+
 import usePluginEntities from 'views/logic/usePluginEntities';
 
 const useSaveViewFormControls = () => {
   const pluggableSaveViewControlFns = usePluginEntities('views.components.saveViewForm');
 
-  return pluggableSaveViewControlFns.map((controlFn) => controlFn()).filter((control) => !!control);
+  return useMemo(() => {
+    return pluggableSaveViewControlFns.map((controlFn) => controlFn()).filter((control) => !!control);
+  }, [pluggableSaveViewControlFns]);
 };
 
 export default useSaveViewFormControls;
