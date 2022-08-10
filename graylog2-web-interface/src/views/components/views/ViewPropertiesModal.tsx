@@ -14,15 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { isEqual } from 'lodash';
 
 import * as FormsUtils from 'util/FormsUtils';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
 import type View from 'views/logic/views/View';
+import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
 type Props = {
   onClose: () => void,
@@ -32,40 +33,12 @@ type Props = {
   show: boolean
 };
 
-type State = {
-  view: View,
-  title: string,
-};
+const ViewPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle }: Props) => {
+  const [updatedView, setUpdatedView] = useState(view);
+  const viewType = ViewTypeLabel({ type: updatedView.type });
+  const pluggableFormComponents = useSaveViewFormControls();
 
-export default class ViewPropertiesModal extends React.Component<Props, State> {
-  static propTypes = {
-    onClose: PropTypes.func.isRequired,
-    onSave: PropTypes.func.isRequired,
-    show: PropTypes.bool.isRequired,
-    title: PropTypes.string.isRequired,
-    view: PropTypes.object.isRequired,
-  };
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      view: props.view,
-      title: props.title,
-    };
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const { title } = this.props;
-    const { view } = this.state;
-
-    if (title !== nextProps.title || !isEqual(view, nextProps.view)) {
-      this.setState({ view: nextProps.view, title: nextProps.title });
-    }
-  }
-
-  // eslint-disable-next-line consistent-return
-  _onChange = (event) => {
+  const _onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
     let value = FormsUtils.getValueFromInput(event.target);
     const trimmedValue = value.trim();
@@ -75,56 +48,66 @@ export default class ViewPropertiesModal extends React.Component<Props, State> {
     }
 
     switch (name) {
-      case 'title': return this.setState((state) => ({ view: state.view.toBuilder().title(value).build() }));
-      case 'summary': return this.setState((state) => ({ view: state.view.toBuilder().summary(value).build() }));
-      case 'description': return this.setState((state) => ({ view: state.view.toBuilder().description(value).build() }));
-      default: break;
+      case 'title':
+        setUpdatedView((_updatedView) => _updatedView.toBuilder().title(value).build());
+        break;
+      case 'summary':
+        setUpdatedView((_updatedView) => _updatedView.toBuilder().summary(value).build());
+        break;
+      case 'description':
+        setUpdatedView((_updatedView) => _updatedView.toBuilder().description(value).build());
+        break;
+      default:
     }
   };
 
-  _onSave = () => {
-    const { onClose, onSave } = this.props;
-    const { view } = this.state;
-
+  const _onSave = () => {
     onSave(view);
     onClose();
   };
 
-  render() {
-    const { view: { title = '', summary = '', description = '' }, title: modalTitle } = this.state;
-    const { onClose, show, view } = this.props;
-    const viewType = ViewTypeLabel({ type: view.type });
-
-    return (
-      <BootstrapModalForm show={show}
-                          title={modalTitle}
-                          onCancel={onClose}
-                          onSubmitForm={this._onSave}
-                          submitButtonText="Save"
-                          bsSize="large">
+  return (
+    <BootstrapModalForm show={show}
+                        title={modalTitle}
+                        onCancel={onClose}
+                        onSubmitForm={_onSave}
+                        submitButtonText="Save"
+                        bsSize="large">
+      <>
         <Input id="title"
                type="text"
                name="title"
                label="Title"
                help={`The title of the ${viewType}.`}
                required
-               onChange={this._onChange}
-               value={title} />
+               onChange={_onChange}
+               value={updatedView.title} />
         <Input id="summary"
                type="text"
                name="summary"
                label="Summary"
                help={`A helpful summary of the ${viewType}.`}
-               onChange={this._onChange}
-               value={summary} />
+               onChange={_onChange}
+               value={updatedView.summary} />
         <Input id="description"
                type="textarea"
                name="description"
                label="Description"
                help={`A longer, helpful description of the ${viewType} and its functionality.`}
-               onChange={this._onChange}
-               value={description} />
-      </BootstrapModalForm>
-    );
-  }
-}
+               onChange={_onChange}
+               value={updatedView.description} />
+        {pluggableFormComponents?.map(({ component: Component, id }) => (Component && <Component key={id} />))}
+      </>
+    </BootstrapModalForm>
+  );
+};
+
+ViewPropertiesModal.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+  show: PropTypes.bool.isRequired,
+  title: PropTypes.string.isRequired,
+  view: PropTypes.object.isRequired,
+};
+
+export default ViewPropertiesModal;

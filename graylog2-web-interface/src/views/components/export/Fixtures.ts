@@ -32,6 +32,7 @@ const searchType = {
   type: 'messages',
   streams: [],
   sort: [],
+  filters: [],
   filter: '',
   name: null,
   query: null,
