@@ -21,7 +21,7 @@ exports[`<ListField> should render an empty field 1`] = `
 
 <div>
   <div
-    class="FormGroup__StyledFormGroup-sc-18chxk8-0 form-group"
+    class="form-group"
   >
     <label
       class="c0 control-label"
