@@ -150,6 +150,7 @@ class FieldValueCompletion implements Completer {
     timeRange,
     streams,
     fieldTypes,
+    userTimezone,
   }: CompleterContext) => {
     const { fieldName, input, isQuoted } = getFieldNameAndInput(currentToken, lastToken);
 
@@ -165,7 +166,7 @@ class FieldValueCompletion implements Completer {
       }
     }
 
-    const normalizedTimeRange = (!timeRange || isNoTimeRangeOverride(timeRange)) ? undefined : onSubmittingTimerange(timeRange);
+    const normalizedTimeRange = (!timeRange || isNoTimeRangeOverride(timeRange)) ? undefined : onSubmittingTimerange(timeRange, userTimezone);
 
     return SearchSuggestions.suggestFieldValue({
       field: fieldName,

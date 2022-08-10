@@ -22,6 +22,7 @@ import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { isTypeKeyword, isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { readableRange } from 'views/logic/queries/TimeRangeToString';
 import ToolsStore from 'stores/tools/ToolsStore';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 type Props = {
   timerange: TimeRange | NoTimeRangeOverride | null | undefined,
@@ -87,13 +88,14 @@ const dateOutput = (timerange: TimeRange) => {
 };
 
 const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => {
+  const { userTimezone } = useUserDateTime();
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
   const dateTested = useRef(false);
 
   useEffect(() => {
     if (isTypeKeyword(timerange) && !timerange.from) {
       if (!dateTested.current) {
-        ToolsStore.testNaturalDate(timerange.keyword)
+        ToolsStore.testNaturalDate(timerange.keyword, userTimezone)
           .then((response) => {
             dateTested.current = true;
 
@@ -108,7 +110,7 @@ const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => {
     } else if (timerange && 'type' in timerange) {
       setTimeOutput(dateOutput(timerange));
     }
-  }, [dateTested, timerange]);
+  }, [dateTested, timerange, userTimezone]);
 
   return (
     <TimeRangeWrapper aria-label="Search Time Range, Opens Time Range Selector On Click" role="button" onClick={toggleDropdownShow}>

@@ -33,20 +33,23 @@ const queryExists = (query: string | ElasticsearchQueryString) => {
   return typeof query === 'object' ? !!query.query_string : !!query;
 };
 
-export const validateQuery = ({
-  queryString,
-  timeRange,
-  streams,
-  filter,
-  ...rest
-}: ValidationQuery): Promise<QueryValidationState> => {
+export const validateQuery = (
+  {
+    queryString,
+    timeRange,
+    streams,
+    filter,
+    ...rest
+  }: ValidationQuery,
+  userTimezone: string,
+): Promise<QueryValidationState> => {
   if (!queryExists(queryString) && !queryExists(filter)) {
     return Promise.resolve({ status: 'OK', explanations: [] });
   }
 
   const payload = {
     query: queryString,
-    timerange: timeRange ? onSubmittingTimerange(timeRange) : undefined,
+    timerange: timeRange ? onSubmittingTimerange(timeRange, userTimezone) : undefined,
     streams,
     filter,
     ...rest,
