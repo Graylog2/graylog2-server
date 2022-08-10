@@ -45,7 +45,6 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 
 @Path("/api-browser")
-@HideOnCloud
 public class DocumentationBrowserResource extends RestResource {
     private final MimetypesFileTypeMap mimeTypes;
     private final HttpConfiguration httpConfiguration;

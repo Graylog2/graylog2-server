@@ -50,7 +50,6 @@ import static org.graylog2.shared.initializers.JerseyService.PLUGIN_PREFIX;
 
 @Api(value = "Documentation", description = "Documentation of this API in JSON format.")
 @Path("/api-docs")
-@HideOnCloud
 public class DocumentationResource extends RestResource {
 
     private final Generator generator;
