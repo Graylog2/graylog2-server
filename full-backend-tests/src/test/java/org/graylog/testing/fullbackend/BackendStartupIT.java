@@ -18,6 +18,7 @@ package org.graylog.testing.fullbackend;
 
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.completebackend.MailServerContainer;
 import org.graylog.testing.completebackend.MailServerInstance;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;

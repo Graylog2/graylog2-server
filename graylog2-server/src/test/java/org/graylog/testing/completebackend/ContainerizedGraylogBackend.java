@@ -44,7 +44,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     private Network network;
     private SearchServerInstance searchServer;
     private MongoDBInstance mongodb;
-    private MailServerInstance emailServerInstance;
+    private MailServerContainer emailServerInstance;
     private NodeInstance node;
 
     private ContainerizedGraylogBackend() {
@@ -71,7 +71,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         Future<SearchServerInstance> esFuture = executor.submit(() -> searchServerInstanceFactory.create(network));
         MongoDBInstance mongoDB = MongoDBInstance.createStartedWithUniqueName(network, Lifecycle.CLASS, mongodbVersion);
         if(withMailServerEnabled) {
-            this.emailServerInstance = MailServerInstance.createStarted(network);
+            this.emailServerInstance = MailServerContainer.createStarted(network);
         }
         mongoDB.dropDatabase();
         mongoDB.importFixtures(mongoDBFixtures);
@@ -176,7 +176,11 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         node.close();
         mongodb.close();
         searchServer.close();
-        getEmailServerInstance().ifPresent(MailServerInstance::close);
+
+        if (emailServerInstance != null) {
+            emailServerInstance.close();
+        }
+
         network.close();
     }
 

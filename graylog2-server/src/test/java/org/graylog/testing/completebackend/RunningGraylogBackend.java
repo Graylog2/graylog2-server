@@ -20,7 +20,10 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.testcontainers.containers.Network;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.Socket;
+import java.net.URI;
 import java.util.Optional;
 
 public class RunningGraylogBackend implements GraylogBackend {
@@ -82,7 +85,19 @@ public class RunningGraylogBackend implements GraylogBackend {
 
     @Override
     public Optional<MailServerInstance> getEmailServerInstance() {
-        // TODO: this could verify if there is the mailhog listening on a port and deliver it as a running instance of the mailserver
-        throw new NotImplementedException("Feature not implemented on Running backends (no container)");
+
+        if (isPortOpen("localhost", MailServerContainer.API_PORT)) {
+            return Optional.of(() -> URI.create("http://localhost:" + MailServerContainer.API_PORT));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private static boolean isPortOpen(final String host, final int port) {
+        try (Socket ignored = new Socket(host, port)) {
+            return true;
+        } catch (IOException ignored) {
+            return false;
+        }
     }
 }
