@@ -1592,12 +1592,17 @@
   resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-6.1.1.tgz#7dc996042d21fc1ae850e3173b5c67b0549f9105"
   integrity sha512-wVn5WJPirFTnzN6tR95abCx+ocH+3IFLXAgyavnf9hUmN0CfWoDjPT/BAWsUVwSlYYVBeCLJxaqi7ZGe4uSjBA==
 
+"@fortawesome/fontawesome-common-types@6.1.2":
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-6.1.2.tgz#c1095b1bbabf19f37f9ff0719db38d92a410bcfe"
+  integrity sha512-wBaAPGz1Awxg05e0PBRkDRuTsy4B3dpBm+zreTTyd9TH4uUM27cAL4xWyWR0rLJCrRwzVsQ4hF3FvM6rqydKPA==
+
 "@fortawesome/fontawesome-svg-core@^6.1.1":
-  version "6.1.1"
-  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-svg-core/-/fontawesome-svg-core-6.1.1.tgz#3424ec6182515951816be9b11665d67efdce5b5f"
-  integrity sha512-NCg0w2YIp81f4V6cMGD9iomfsIj7GWrqmsa0ZsPh59G7PKiGN1KymZNxmF00ssuAlo/VZmpK6xazsGOwzKYUMg==
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-svg-core/-/fontawesome-svg-core-6.1.2.tgz#11e2e8583a7dea75d734e4d0e53d91c63fae7511"
+  integrity sha512-853G/Htp0BOdXnPoeCPTjFrVwyrJHpe8MhjB/DYE9XjwhnNDfuBCd3aKc2YUYbEfHEcBws4UAA0kA9dymZKGjA==
   dependencies:
-    "@fortawesome/fontawesome-common-types" "6.1.1"
+    "@fortawesome/fontawesome-common-types" "6.1.2"
 
 "@fortawesome/free-brands-svg-icons@^6.1.1":
   version "6.1.1"
@@ -2209,10 +2214,10 @@
   dependencies:
     "@babel/core" "^7.17.9"
 
-"@testing-library/dom@8.16.1":
-  version "8.16.1"
-  resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-8.16.1.tgz#96e528c9752d60061128f043e2b43566c0aba2d9"
-  integrity sha512-XEV2mBxgv6DKjL3+U3WEUzBgT2CjYksoXGlLrrJXYP8OvRfGkBonvelkorazpFlp8tkEecO06r43vN4DIEyegQ==
+"@testing-library/dom@8.17.1":
+  version "8.17.1"
+  resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-8.17.1.tgz#2d7af4ff6dad8d837630fecd08835aee08320ad7"
+  integrity sha512-KnH2MnJUzmFNPW6RIKfd+zf2Wue8mEKX0M3cpX6aKl5ZXrJM1/c/Pc8c2xDNYQCnJO48Sm5ITbMXgqTr3h4jxQ==
   dependencies:
     "@babel/code-frame" "^7.10.4"
     "@babel/runtime" "^7.12.5"
@@ -2428,9 +2433,9 @@
     "@types/node" "*"
 
 "@types/chroma-js@^2.1.3":
-  version "2.1.3"
-  resolved "https://registry.yarnpkg.com/@types/chroma-js/-/chroma-js-2.1.3.tgz#0b03d737ff28fad10eb884e0c6cedd5ffdc4ba0a"
-  integrity sha512-1xGPhoSGY1CPmXLCBcjVZSQinFjL26vlR8ZqprsBWiFyED4JacJJ9zHhh5aaUXqbY9B37mKQ73nlydVAXmr1+g==
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/@types/chroma-js/-/chroma-js-2.1.4.tgz#52e3a8453000cdb9ad76357c2c47dbed702d136f"
+  integrity sha512-l9hWzP7cp7yleJUI7P2acmpllTJNYf5uU6wh50JzSIZt3fFHe+w2FM6w9oZGBTYzjjm2qHdnQvI+fF/JF/E5jQ==
 
 "@types/classnames@^2.2.9":
   version "2.2.9"
@@ -6006,7 +6011,7 @@ eslint-config-airbnb@19.0.4:
     eslint-import-resolver-webpack "0.13.2"
     eslint-plugin-compat "4.0.2"
     eslint-plugin-import "2.25.3"
-    eslint-plugin-jest "26.8.1"
+    eslint-plugin-jest "26.8.2"
     eslint-plugin-jest-dom "4.0.2"
     eslint-plugin-jest-formatting "3.1.0"
     eslint-plugin-jsx-a11y "6.6.1"
@@ -6095,10 +6100,10 @@ eslint-plugin-jest-formatting@3.1.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-jest-formatting/-/eslint-plugin-jest-formatting-3.1.0.tgz#b26dd5a40f432b642dcc880021a771bb1c93dcd2"
   integrity sha512-XyysraZ1JSgGbLSDxjj5HzKKh0glgWf+7CkqxbTqb7zEhW7X2WHo5SBQ8cGhnszKN+2Lj3/oevBlHNbHezoc/A==
 
-eslint-plugin-jest@26.8.1:
-  version "26.8.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-26.8.1.tgz#f870a9912f6fe65e16e181cbb368229cd5889c65"
-  integrity sha512-0+OSTIPjIIfl9heUxZyuU1gDEMW2sLvoVBGwiCIp+iEqUYt0Yqr5M5BjAyVShJaisICmCALdVv0nd1UDX/QaYw==
+eslint-plugin-jest@26.8.2:
+  version "26.8.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-26.8.2.tgz#42a1248a5ade2bc589eb0f9c4e0608dd89b18cf3"
+  integrity sha512-67oh0FKaku9y48OpLzL3uK9ckrgLb83Sp5gxxTbtOGDw9lq6D8jw/Psj/9CipkbK406I2M7mvx1q+pv/MdbvxA==
   dependencies:
     "@typescript-eslint/utils" "^5.10.0"
 
@@ -8576,7 +8581,7 @@ jest-pnp-resolver@^1.2.2:
   version "1.0.0"
   dependencies:
     "@jest/types" "28.1.3"
-    "@testing-library/dom" "8.16.1"
+    "@testing-library/dom" "8.17.1"
     "@testing-library/jest-dom" "5.16.5"
     "@testing-library/react" "12.1.5"
     "@testing-library/react-hooks" "^8.0.0"
