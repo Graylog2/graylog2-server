@@ -61,7 +61,7 @@
     "crossfilter": "1.3.x",
     "dompurify": "^2.0.11",
     "graylog-web-plugin": "file:packages/graylog-web-plugin",
-    "immutable": "^3.8.1",
+    "immutable": "^4.1.0",
     "interactjs": "^1.4.0-rc.13",
     "intersection-observer": "^0.12.0",
     "leaflet": "^1.5.1",
