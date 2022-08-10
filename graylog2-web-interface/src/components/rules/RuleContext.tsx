@@ -24,7 +24,7 @@ let VALIDATE_TIMEOUT;
 
 export const PipelineRulesContext = createContext(undefined);
 
-const savePipelineRule = (nextRule: RuleType, callback: (rule: RuleType) => void = () => {}) => {
+const savePipelineRule = (nextRule: RuleType, callback: (rule: RuleType) => void = () => {}, onError: (error: object) => void = () => {}) => {
   let promise;
 
   if (nextRule?.id) {
@@ -33,7 +33,7 @@ const savePipelineRule = (nextRule: RuleType, callback: (rule: RuleType) => void
     promise = RulesActions.save(nextRule);
   }
 
-  promise.then((response) => callback(response));
+  promise.then(callback).catch(onError);
 };
 
 type Props = {
@@ -87,8 +87,8 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
       RulesActions.parse(savedRule, () => callback(savedRule));
     };
 
-    const handleSavePipelineRule = (callback: (rule: RuleType) => void = () => {}) => {
-      validateBeforeSave((nextRule) => savePipelineRule(nextRule, callback));
+    const handleSavePipelineRule = (callback: (rule: RuleType) => void = () => {}, onError: (error: object) => void = () => {}) => {
+      validateBeforeSave((nextRule) => savePipelineRule(nextRule, callback, onError));
     };
 
     const onChangeSource = (source: string) => {
