@@ -16,8 +16,7 @@
  */
 package org.junit.jupiter.engine.descriptor;
 
-import com.google.common.collect.Lists;
-import org.apache.commons.lang3.tuple.Pair;
+import com.google.common.collect.ImmutableMap;
 import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
 import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
 import org.graylog.testing.completebackend.Lifecycle;
@@ -34,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -98,19 +96,18 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
     }
 
     protected static String createKey(Lifecycle lifecycle, String mavenProjectDirProvider, String pluginJarsProvider, SearchVersion searchVersion, MongodbServer mongoVersion, boolean withMailServerEnabled) {
-        final List<Pair<String, Object>> values = Lists.newArrayList(
-                Pair.of("Lifecycle", lifecycle.name()),
-                Pair.of("MavenProjectDirProvider", mavenProjectDirProvider),
-                Pair.of("PluginJarsProvider", pluginJarsProvider),
-                Pair.of("Search", searchVersion),
-                Pair.of("MongoDB", mongoVersion.getVersion())
-        );
+        final ImmutableMap.Builder<String, Object> values = ImmutableMap.<String, Object>builder()
+                .put("Lifecycle", lifecycle.name())
+                .put("MavenProjectDirProvider", mavenProjectDirProvider)
+                .put("PluginJarsProvider", pluginJarsProvider)
+                .put("Search", searchVersion)
+                .put("MongoDB", mongoVersion.getVersion());
 
         if(withMailServerEnabled) {
-            values.add(Pair.of("Mailserver", "enabled"));
+            values.put("Mailserver", "enabled");
         }
 
-        return values.stream().map(pair -> String.format(Locale.ROOT, "%s: %s", pair.getKey(), pair.getValue()))
+        return values.build().entrySet().stream().map(pair -> String.format(Locale.ROOT, "%s: %s", pair.getKey(), pair.getValue()))
                 .collect(Collectors.joining(", "));
     }
 
