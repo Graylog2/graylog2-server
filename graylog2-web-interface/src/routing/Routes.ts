@@ -57,7 +57,7 @@ const Routes = {
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
   GETTING_STARTED: '/gettingstarted',
-  GLOBAL_API_BROWSER_URL: '/api-browser/global/index.html',
+  GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
   SYSTEM: {
     CONFIGURATIONS: '/system/configurations',
     CONTENTPACKS: {
