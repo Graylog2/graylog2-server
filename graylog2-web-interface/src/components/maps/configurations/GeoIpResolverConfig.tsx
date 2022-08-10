@@ -151,6 +151,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                     <Col sm={6}>
                       <FormikInput id="enforce_graylog_schema"
                                    type="checkbox"
+                                   disabled={!values.enabled}
                                    label="Enforce default Graylog schema"
                                    name="enforce_graylog_schema" />
                     </Col>
@@ -203,6 +204,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                     <Col sm={6}>
                       <FormikInput id="use_s3"
                                    type="checkbox"
+                                   disabled={!values.enabled}
                                    label="Pull files from S3 bucket"
                                    name="use_s3" />
                     </Col>

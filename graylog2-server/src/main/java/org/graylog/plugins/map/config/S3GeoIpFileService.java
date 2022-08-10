@@ -94,6 +94,12 @@ public class S3GeoIpFileService {
         this.cityPath = Paths.get(s3DownloadLocation, S3GeoIpFileService.ACTIVE_CITY_FILE);
         this.tempAsnPath = Paths.get(s3DownloadLocation, S3GeoIpFileService.TEMP_ASN_FILE);
         this.tempCityPath = Paths.get(s3DownloadLocation, S3GeoIpFileService.TEMP_CITY_FILE);
+        if (Files.exists(cityPath)) {
+            cityFileLastModified = Instant.ofEpochMilli(cityPath.toFile().lastModified());
+        }
+        if (Files.exists(asnPath)) {
+            asnFileLastModified = Instant.ofEpochMilli(asnPath.toFile().lastModified());
+        }
     }
 
     /**
