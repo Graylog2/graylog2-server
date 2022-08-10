@@ -17,6 +17,8 @@
 package org.graylog2.lookup;
 
 import com.google.inject.Scopes;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.MapBinderBinding;
 import org.graylog2.Configuration;
 import org.graylog2.lookup.adapters.CSVFileDataAdapter;
 import org.graylog2.lookup.adapters.DSVHTTPDataAdapter;
@@ -26,6 +28,8 @@ import org.graylog2.lookup.caches.CaffeineLookupCache;
 import org.graylog2.lookup.caches.NullCache;
 import org.graylog2.lookup.db.DBLookupTableConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.plugin.lookup.LookupDataAdapter;
+import org.graylog2.system.SystemEntity;
 import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 
@@ -43,6 +47,8 @@ public class LookupModule extends Graylog2Module {
         binder().bind(AllowedAuxiliaryPathChecker.class).in(Scopes.SINGLETON);
 
         bind(LookupTableConfigService.class).to(DBLookupTableConfigService.class).asEagerSingleton();
+        // Triggering map binder once, so it does not break injection when no instance is bound.
+        MapBinder.newMapBinder(binder(), String.class, LookupDataAdapter.Factory2.class, SystemEntity.class);
         serviceBinder().addBinding().to(LookupTableService.class).asEagerSingleton();
 
         installLookupCache(NullCache.NAME,
