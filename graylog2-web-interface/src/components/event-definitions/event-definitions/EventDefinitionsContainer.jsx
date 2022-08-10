@@ -82,12 +82,12 @@ class EventDefinitionsContainer extends React.Component {
   handlePageChange = (nextPage, nextPageSize) => {
     const { eventDefinitions } = this.props;
 
-    this.fetchData({ page: nextPage, pageSize: nextPageSize, query: eventDefinitions.query });
+    EventDefinitionsContainer.fetchData({ page: nextPage, pageSize: nextPageSize, query: eventDefinitions.query });
   };
 
   handleQueryChange = (nextQuery, callback = () => {}) => {
     const { eventDefinitions } = this.props;
-    const promise = this.fetchData({ query: nextQuery, pageSize: eventDefinitions.pagination.pageSize });
+    const promise = EventDefinitionsContainer.fetchData({ query: nextQuery, pageSize: eventDefinitions.pagination.pageSize });
 
     promise.finally(callback);
   };
