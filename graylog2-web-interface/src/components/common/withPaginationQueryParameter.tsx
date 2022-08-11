@@ -22,7 +22,7 @@ export type PaginationQueryParameterObject = {
   pageSizes?: number[];
 };
 
-function withPaginationQueryParameter(Component, obj?: PaginationQueryParameterObject) {
+function withPaginationQueryParameter(Component: React.ComponentType, obj?: PaginationQueryParameterObject) {
   return function WrappedComponent(props) {
     const result = usePaginationQueryParameter(obj?.pageSizes);
 
