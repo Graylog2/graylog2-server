@@ -1,7 +1,14 @@
 package org.graylog2.configuration;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.graylog2.configuration.IndexSetsDefaultsConfiguration.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL;
 import static org.graylog2.configuration.IndexSetsDefaultsConfiguration.DEFAULT_INDEX_ANALYZER;
@@ -32,5 +39,14 @@ class IndexSetsDefaultsConfigurationTest {
         Assertions.assertEquals(DEFAULT_ROTATION_STRATEGY_CONFIG, config.rotationStrategyConfig());
         Assertions.assertEquals(DEFAULT_RETENTION_STRATEGY_CLASS, config.retentionStrategyClass());
         Assertions.assertEquals(DEFAULT_RETENTION_STRATEGY_CONFIG, config.retentionStrategyConfig());
+    }
+
+    @Test
+    void testConvert() {
+        // Verify that JSON annotation in class are properly defined so that the
+        // ClusterConfigService can perform needed payload conversions on reads/writes.
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        final Map map = objectMapper.convertValue(IndexSetsDefaultsConfiguration.createDefault(), HashMap.class);
+        objectMapper.convertValue(map, IndexSetsDefaultsConfiguration.class);
     }
 }

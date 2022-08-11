@@ -113,10 +113,20 @@ const IndexSetsDefaultsConfig = createReactClass({
         <h2>Index Defaults</h2>
         <p>Defaults for newly created index sets.</p>
         <dl className="deflist">
+          <dt>Index prefix:</dt>
+          <dd>{config.indexPrefix}</dd>
+          <dt>Index analyzer:</dt>
+          <dd>{config.indexAnalyzer}</dd>
           <dt>Shards per Index:</dt>
-          <dd>{config.shards != null ? config.shards : <>Using <code>elasticsearch_shards</code> server configuration value</>}</dd>
+          <dd>{config.shards}</dd>
           <dt>Replicas per Index:</dt>
-          <dd>{config.replicas != null ? config.replicas : <>Using <code>elasticsearch_replicas</code> server configuration value</>}</dd>
+          <dd>{config.replicas}</dd>
+          <dt>Max. Number of Segments:</dt>
+          <dd>{config.indexOptimizationMaxNumSegments}</dd>
+          <dt>Index optimization disabled:</dt>
+          <dd>{config.indexOptimizationDisabled}</dd>
+          <dt>Field type refresh interval</dt>
+          <dd>{config.fieldTypeRefreshInterval}</dd>
         </dl>
 
         <p>
@@ -133,21 +143,47 @@ const IndexSetsDefaultsConfig = createReactClass({
                             submitButtonText="Save">
           <fieldset>
             <p>These defaults will apply for newly created index sets.</p>
-            <p>Warning! Assigning values here will override the <code>elasticsearch_shards</code> and <code>elasticsearch_replicas</code> configuration values.</p>
-            <Input id="notification-backlog-field"
+            <Input id="index-prefix-field"
+                   type="text"
+                   onChange={}
+                   label="Index Prefix"
+                   help=""
+                   value={config.indexPrefix} />
+            <Input id="index-analyzer-field"
+                   type="text"
+                   onChange={}
+                   label="Analyzer"
+                   help=""
+                   value={config.indexAnalyzer} />
+            <Input id="shards-field"
                    type="number"
                    onChange={this._onShardsUpdate}
-                   label="Shards per Index"
-                   help="The default number of shards to specify for each new index."
+                   label="Index shards"
+                   help=""
                    value={config.shards}
                    min="0" />
-            <Input id="notification-backlog-field"
+            <Input id="replicas-field"
                    type="number"
                    onChange={this._onReplicasUpdate}
-                   label="Replicas per Index"
-                   help="The default number of replicas to specify for each new index."
+                   label="Index replicas"
+                   help=""
                    value={config.replicas}
                    min="0" />
+            <Input id="max-segments-field"
+                   type="number"
+                   onChange={this._onReplicasUpdate}
+                   label="Max. number of segments"
+                   help=""
+                   value={config.indexOptimizationMaxNumSegments}
+                   min="1" />
+            <label htmlFor="index-optimization-disabled-checkbox">Relative Timerange Options</label>
+            <Input id="index-optimization-disabled-checkbox"
+                   type="checkbox"
+                   label="Disable index optimization after rotation"
+                   name="enabled"
+                   checked={config.indexOptimizationDisabled}
+                   onChange={this._onChecked} />
+            min="1" />
           </fieldset>
         </BootstrapModalForm>
       </div>

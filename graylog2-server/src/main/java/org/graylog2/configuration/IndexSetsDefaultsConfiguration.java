@@ -18,6 +18,7 @@ package org.graylog2.configuration;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
@@ -29,7 +30,7 @@ import org.joda.time.Duration;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
+@JsonDeserialize(builder = AutoValue_IndexSetsDefaultsConfiguration.Builder.class)
 public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean {
 
     // Defaults
@@ -112,27 +113,38 @@ public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean
 
     @AutoValue.Builder
     public abstract static class Builder {
-        public abstract Builder indexPrefix(@JsonProperty(INDEX_PREFIX) String indexPrefix);
+        @JsonProperty(INDEX_PREFIX)
+        public abstract Builder indexPrefix(String indexPrefix);
 
-        public abstract Builder indexAnalyzer(@JsonProperty(INDEX_ANALYZER) String indexAnalyzer);
+        @JsonProperty(INDEX_ANALYZER)
+        public abstract Builder indexAnalyzer(String indexAnalyzer);
 
-        public abstract Builder shards(@JsonProperty(SHARDS) int shards);
+        @JsonProperty(SHARDS)
+        public abstract Builder shards(int shards);
 
-        public abstract Builder replicas(@JsonProperty(REPLICAS) int replicas);
+        @JsonProperty(REPLICAS)
+        public abstract Builder replicas(int replicas);
 
-        public abstract Builder indexOptimizationMaxNumSegments(@JsonProperty(INDEX_OPTIMIZATION_MAX_SEGMENTS) int indexOptimizationMaxNumSegments);
+        @JsonProperty(INDEX_OPTIMIZATION_MAX_SEGMENTS)
+        public abstract Builder indexOptimizationMaxNumSegments(int indexOptimizationMaxNumSegments);
 
-        public abstract Builder indexOptimizationDisabled(@JsonProperty(INDEX_OPTIMIZATION_DISABLED) boolean indexOptimizationDisabled);
+        @JsonProperty(INDEX_OPTIMIZATION_DISABLED)
+        public abstract Builder indexOptimizationDisabled(boolean indexOptimizationDisabled);
 
-        public abstract Builder fieldTypeRefreshInterval(@JsonProperty(FIELD_TYPE_REFRESH_INTERVAL) Duration fieldTypeRefreshInterval);
+        @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL)
+        public abstract Builder fieldTypeRefreshInterval(Duration fieldTypeRefreshInterval);
 
-        public abstract Builder rotationStrategyClass(@JsonProperty(ROTATION_STRATEGY_CLASS) String rotationStrategyClass);
+        @JsonProperty(ROTATION_STRATEGY_CLASS)
+        public abstract Builder rotationStrategyClass(String rotationStrategyClass);
 
-        public abstract Builder rotationStrategyConfig(@JsonProperty(ROTATION_STRATEGY_CONFIG) RotationStrategyConfig rotationStrategyConfig);
+        @JsonProperty(ROTATION_STRATEGY_CONFIG)
+        public abstract Builder rotationStrategyConfig(RotationStrategyConfig rotationStrategyConfig);
 
-        public abstract Builder retentionStrategyClass(@JsonProperty(RETENTION_STRATEGY_CLASS) String retentionStrategyClass);
+        @JsonProperty(RETENTION_STRATEGY_CLASS)
+        public abstract Builder retentionStrategyClass(String retentionStrategyClass);
 
-        public abstract Builder retentionStrategyConfig(@JsonProperty(RETENTION_STRATEGY_CONFIG) RetentionStrategyConfig retentionStrategyConfig);
+        @JsonProperty(RETENTION_STRATEGY_CONFIG)
+        public abstract Builder retentionStrategyConfig(RetentionStrategyConfig retentionStrategyConfig);
 
         public abstract IndexSetsDefaultsConfiguration build();
     }
