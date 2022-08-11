@@ -20,9 +20,8 @@ import type { DayModifiers } from 'react-day-picker';
 import DayPicker from 'react-day-picker';
 import styled, { css } from 'styled-components';
 
-import DateTime from 'logic/datetimes/DateTime';
-
 import 'react-day-picker/lib/style.css';
+import { toDateObject, adjustFormat } from 'util/DateTime';
 
 const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   width: 100%;
@@ -71,7 +70,7 @@ const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
 
   if (date) {
     try {
-      selectedDate = DateTime.parseFromString(date);
+      selectedDate = toDateObject(date);
     } catch (e) {
       // don't do anything
     }
@@ -83,9 +82,9 @@ const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
         return false;
       }
 
-      const dateTime = DateTime.ignoreTZ(moddedDate);
+      const dateTime = toDateObject(adjustFormat(moddedDate, 'complete'));
 
-      return (selectedDate.toString(DateTime.Formats.DATE) === dateTime.toString(DateTime.Formats.DATE));
+      return (adjustFormat(selectedDate, 'date') === adjustFormat(dateTime, 'date'));
     },
     disabled: {
       before: new Date(fromDate),

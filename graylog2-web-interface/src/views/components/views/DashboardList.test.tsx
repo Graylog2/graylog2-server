@@ -23,7 +23,6 @@ import Search from 'views/logic/search/Search';
 import DashboardList from './DashboardList';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
-jest.mock('hooks/useUserDateTime');
 
 const createPaginatedDashboards = (count = 1) => {
   const dashboards: Array<View> = [];

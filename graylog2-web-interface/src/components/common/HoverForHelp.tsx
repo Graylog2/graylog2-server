@@ -64,7 +64,7 @@ type Props = {
   placement?: 'top' | 'right' | 'bottom' | 'left',
   iconSize?: SizeProp
   pullRight?: boolean,
-  title: string,
+  title?: string,
   testId?: string,
   type?: 'info' | 'error',
 };
@@ -84,7 +84,7 @@ HoverForHelp.propTypes = {
   id: PropTypes.string,
   placement: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
   pullRight: PropTypes.bool,
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
   testId: PropTypes.string,
 };
 
@@ -94,6 +94,7 @@ HoverForHelp.defaultProps = {
   pullRight: true,
   placement: 'bottom',
   testId: undefined,
+  title: undefined,
   type: 'info',
   iconSize: undefined,
 };

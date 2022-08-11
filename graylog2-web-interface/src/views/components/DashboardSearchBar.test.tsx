@@ -30,7 +30,6 @@ import DashboardSearchBar from './DashboardSearchBar';
 
 jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 jest.mock('views/components/ViewActionsMenu', () => () => <span>View Actions</span>);
-jest.mock('hooks/useUserDateTime');
 
 jest.mock('views/stores/GlobalOverrideStore', () => ({
   GlobalOverrideStore: MockStore(),

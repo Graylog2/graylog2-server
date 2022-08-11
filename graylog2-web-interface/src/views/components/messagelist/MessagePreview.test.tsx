@@ -25,7 +25,6 @@ import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import MessagePreview from './MessagePreview';
 
 jest.mock('views/logic/usePluginEntities', () => jest.fn());
-jest.mock('hooks/useUserDateTime');
 
 describe('MessagePreview', () => {
   afterEach(() => {

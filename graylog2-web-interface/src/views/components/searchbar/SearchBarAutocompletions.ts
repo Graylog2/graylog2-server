@@ -42,11 +42,13 @@ export type CompleterContext = Readonly<{
   timeRange?: TimeRange | NoTimeRangeOverride,
   streams?: Array<string>,
   fieldTypes?: FieldTypes,
+  userTimezone: string,
 }>;
 
 export interface Completer {
   getCompletions(context: CompleterContext): Array<CompletionResult> | Promise<Array<CompletionResult>>;
   shouldShowCompletions?: (currentLine: number, lines: Array<Array<Line>>) => boolean;
+  identifierRegexps?: RegExp[];
 }
 
 const onCompleterError = (error: Error) => {
@@ -63,11 +65,14 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
 
   private readonly fieldTypes: FieldTypes;
 
-  constructor(completers: Array<Completer>, timeRange: TimeRange | NoTimeRangeOverride | undefined, streams: Array<string>, fieldTypes: FieldTypes) {
+  private readonly userTimezone: string;
+
+  constructor(completers: Array<Completer>, timeRange: TimeRange | NoTimeRangeOverride | undefined, streams: Array<string>, fieldTypes: FieldTypes, userTimezone: string) {
     this.completers = completers;
     this.timeRange = timeRange;
     this.streams = streams;
     this.fieldTypes = fieldTypes;
+    this.userTimezone = userTimezone;
   }
 
   getCompletions = async (editor: Editor, _session: Session, pos: Position, prefix: string, callback: ResultsCallback) => {
@@ -81,7 +86,17 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
       this.completers
         .map(async (completer) => {
           try {
-            return await completer.getCompletions({ currentToken, lastToken, prefix, tokens, currentTokenIdx, timeRange: this.timeRange, streams: this.streams, fieldTypes: this.fieldTypes });
+            return await completer.getCompletions({
+              currentToken,
+              lastToken,
+              prefix,
+              tokens,
+              currentTokenIdx,
+              timeRange: this.timeRange,
+              streams: this.streams,
+              fieldTypes: this.fieldTypes,
+              userTimezone: this.userTimezone,
+            });
           } catch (e) {
             onCompleterError(e);
           }
@@ -107,4 +122,6 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
       return false;
     });
   };
+
+  get identifierRegexps() { return this.completers.map((completer) => completer.identifierRegexps ?? []).flat(); }
 }

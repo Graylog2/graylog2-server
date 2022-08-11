@@ -205,6 +205,8 @@ export const EventDefinitionsStore = singletonStore(
       delete eventDefinition.id;
       // Modify the title to indicate a copy
       eventDefinition.title = `COPY-${eventDefinition.title}`;
+      // Set the scope to DEFAULT
+      eventDefinition._scope = 'DEFAULT';
 
       const promise = fetch('POST', this.eventDefinitionsUrl({ query: { schedule: false } }), this.setAlertFlag(eventDefinition));
 

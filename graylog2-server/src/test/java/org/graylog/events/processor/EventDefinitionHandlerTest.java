@@ -37,6 +37,10 @@ import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoConnection;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScope;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -50,7 +54,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,6 +70,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class EventDefinitionHandlerTest {
+    public static final Set<EntityScope> ENTITY_SCOPES = Collections.singleton(new DefaultEntityScope());
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
@@ -103,7 +110,7 @@ public class EventDefinitionHandlerTest {
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
-        this.eventDefinitionService = spy(new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnershipService.class)));
+        this.eventDefinitionService = spy(new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES)));
         this.jobDefinitionService = spy(new DBJobDefinitionService(mongodb.mongoConnection(), mapperProvider));
         this.jobTriggerService = spy(new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, schedulerCapabilitiesService, Duration.minutes(5)));
 
@@ -316,7 +323,9 @@ public class EventDefinitionHandlerTest {
         assertThat(newJobDefinition.description()).isEqualTo(newDescription);
         assertThat(((EventProcessorExecutionJob.Config) newJobDefinition.config()).processingHopSize()).isEqualTo(550000);
 
-        assertThat(jobTriggerService.getForJob(newJobDefinition.id()).get(0)).satisfies(trigger -> {
+        assertThat(jobTriggerService.getOneForJob(newJobDefinition.id()))
+                .isPresent()
+                .hasValueSatisfying(trigger -> {
             final IntervalJobSchedule schedule = (IntervalJobSchedule) trigger.schedule();
             assertThat(schedule.interval()).isEqualTo(550000);
         });
@@ -341,22 +350,6 @@ public class EventDefinitionHandlerTest {
                 .description(newDescription)
                 .build();
 
-        doThrow(new NullPointerException("yolo1")).when(eventDefinitionService).save(any());
-
-        assertThatCode(() -> handler.update(updatedDto, true))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("yolo1");
-
-        assertThat(eventDefinitionService.get(existingDto.id())).isPresent().get().satisfies(dto -> {
-            assertThat(dto.id()).isEqualTo(existingDto.id());
-            assertThat(dto.title()).isEqualTo(existingDto.title());
-            assertThat(dto.description()).isEqualTo(existingDto.description());
-        });
-
-        assertThat(jobDefinitionService.get("54e3deadbeefdeadbeef0001")).isPresent().get().satisfies(definition -> {
-            assertThat(definition.title()).isEqualTo(existingJobDefinition.title());
-            assertThat(definition.description()).isEqualTo(existingJobDefinition.description());
-        });
 
         // Reset all before doing new stubs
         reset(eventDefinitionService);

@@ -19,6 +19,11 @@ import moment from 'moment-timezone';
 import AppConfig from 'util/AppConfig';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
+// PLEASE NOTE: This is legacy code and should no longer be used. Instead, please use `utils/DateTime` and `contexts/UserDateTimeContext` and `components/common/Timestamp`.
+// - `utils/DateTime` if you just need to transform a date
+// - `contexts/UserDateTimeContext` whenever you need a date, based on the user timezone
+// - `components/common/Timestamp` whenever you want to display a date based on the user timezone
+
 class DateTime {
   private dateTime: moment.Moment | undefined;
 

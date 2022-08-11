@@ -212,8 +212,8 @@ describe('Aggregation Widget', () => {
       const updatedWidget = dataTableWidget
         .toBuilder()
         .timerange({
-          from: '2019-12-31T23:55:00.000Z',
-          to: '2020-01-01T00:00:00.000Z',
+          from: '2019-12-31T23:55:00.000+00:00',
+          to: '2020-01-01T00:00:00.000+00:00',
           type: 'absolute',
         })
         .build();
@@ -228,13 +228,13 @@ describe('Aggregation Widget', () => {
       userEvent.click(absoluteTabButton);
 
       const timeRangeLivePreview = await screen.findByTestId('time-range-live-preview');
-      await within(timeRangeLivePreview).findByText('2019-12-31 18:00:00.000');
+      await within(timeRangeLivePreview).findByText('2020-01-01 00:55:00.000');
 
       const applyTimeRangeChangesButton = await screen.findByRole('button', { name: 'Apply' });
       userEvent.click(applyTimeRangeChangesButton);
 
       const timeRangeDisplay = await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
-      await within(timeRangeDisplay).findByText('2019-12-31 18:00:00.000');
+      await within(timeRangeDisplay).findByText('2020-01-01 00:55:00.000');
 
       // Submit all changes
       const saveButton = screen.getByText('Apply Changes');
