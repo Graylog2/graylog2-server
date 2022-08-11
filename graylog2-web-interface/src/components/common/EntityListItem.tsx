@@ -53,13 +53,14 @@ type Props = {
   description?: React.ReactNode,
   actions?: React.ReactNode | Array<React.ReactNode>,
   contentRow?: React.ReactNode,
+  id?: string,
 }
 
 /**
  * Component that let you render an entity item using a similar look and feel as other entities in Graylog.
  * This component is meant to use alongside `EntityList`. Look there for an example of how to use this component.
  */
-const EntityListItem = ({ actions, contentRow, description, title, titleSuffix }: Props) => {
+const EntityListItem = ({ actions, contentRow, description, title, titleSuffix, id }: Props) => {
   const wrappedTitleSuffix = titleSuffix ? <small>{titleSuffix}</small> : null;
   const actionsContainer = (
     <div className="item-actions text-right">
@@ -68,7 +69,7 @@ const EntityListItem = ({ actions, contentRow, description, title, titleSuffix }
   );
 
   return (
-    <StyledListItem>
+    <StyledListItem id={id}>
       <Row className="row-sm">
         <Col md={12}>
           <div className="pull-right hidden-xs">
@@ -111,6 +112,8 @@ EntityListItem.propTypes = {
    * to show configuration options.
    */
   contentRow: PropTypes.node,
+  /** Optional `id` attribute of the entity list item (useful for direct linking). */
+  id: PropTypes.string,
 };
 
 EntityListItem.defaultProps = {
@@ -118,6 +121,7 @@ EntityListItem.defaultProps = {
   contentRow: undefined,
   description: undefined,
   titleSuffix: undefined,
+  id: undefined,
 };
 
 export default EntityListItem;
