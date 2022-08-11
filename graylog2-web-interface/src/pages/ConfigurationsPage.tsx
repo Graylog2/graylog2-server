@@ -26,7 +26,7 @@ import MessageProcessorsConfig from 'components/configurations/MessageProcessors
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
-import IndexConfig from 'components/configurations/IndexConfig';
+import IndexSetsDefaultsConfig from 'components/configurations/IndexSetsDefaultsConfig';
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import 'components/maps/configurations';
 import type { Store } from 'stores/StoreTypes';
@@ -146,7 +146,7 @@ const ConfigurationsPage = () => {
         )}
         {indexSetsDefaultsConfig && (
           <ConfigletContainer title="Index Set Default Configuration">
-            <IndexConfig config={indexSetsDefaultsConfig}
+            <IndexSetsDefaultsConfig config={indexSetsDefaultsConfig}
                                      updateConfig={_onUpdate(INDEX_SETS_DEFAULTS_CONFIG)} />
           </ConfigletContainer>
         )}
