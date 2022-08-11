@@ -29,8 +29,18 @@ const entities = [
 const items = entities.map(entity => {
   // You can encapsulate `EntityListItem` into its own component,
   // so it's easy to see what data you transform and feed into it.
+  //
+  // You can optionally pass an `id` property to `EntityListItem`
+  // to set its ID, which can then be used for linking directly to
+  // that item.  By default `EntityList` prop `scrollToHashId`
+  // is `true`, so it will attempt to scroll to the value of
+  // `window.location.hash`. For example, you could link to
+  // "/some/path#entity-2", a page with an `EntityList` containing
+  // an `EntityListItem` with an ID "entity-2", to go directly
+  // to that item.
   return (
     <EntityListItem key={`entity-${entity.id}`}
+                    id={`entity-${entity.id}`}
                     title={entity.title}
                     titleSuffix={entity.nickname}
                     description={entity.description}
