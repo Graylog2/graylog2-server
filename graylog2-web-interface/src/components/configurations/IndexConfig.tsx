@@ -20,17 +20,15 @@ import PropTypes from 'prop-types';
 import {Button} from 'components/bootstrap';
 import {IfPermitted} from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import type {WhiteListConfig} from 'stores/configurations/ConfigurationsStore';
-import IndexConfigForm from 'components/configurations/IndexConfigForm';
 
 type State = {
-  config: WhiteListConfig,
+  config: any,
   isValid: boolean,
 };
 
 type Props = {
-  config: WhiteListConfig,
-  updateConfig: (config: WhiteListConfig) => Promise<void>,
+  config: any,
+  updateConfig: (config: any) => Promise<void>,
 };
 
 class IndexConfig extends React.Component<Props, State> {
@@ -74,7 +72,7 @@ class IndexConfig extends React.Component<Props, State> {
     }
   };
 
-  _update = (config: WhiteListConfig, isValid: boolean) => {
+  _update = (config: any, isValid: boolean) => {
     const updatedState = {config, isValid};
 
     this.setState(updatedState);
@@ -122,13 +120,11 @@ class IndexConfig extends React.Component<Props, State> {
 
         <BootstrapModalForm ref={(configModal) => { this.configModal = configModal; }}
                             bsSize="lg"
-                            title="Update Whitelist Configuration"
+                            title="Update Index Defaults Configuration"
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}
                             submitButtonDisabled={!isValid}
                             submitButtonText="Save">
-          <h3>Whitelist URLs</h3>
-          <IndexConfigForm config={config} onUpdate={this._update} />
         </BootstrapModalForm>
       </div>
     );
