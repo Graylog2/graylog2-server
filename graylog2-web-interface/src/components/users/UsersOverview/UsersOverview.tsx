@@ -76,7 +76,7 @@ const _loadUsers = (pagination, setLoading, setPaginatedUsers) => {
   });
 };
 
-const _updateListOnUserDelete = (callback) => UsersActions.delete.completed.listen(() => callback());
+const _updateListOnUserDelete = (callback: () => void) => UsersActions.delete.completed.listen(() => callback());
 const _updateListOnUserSetStatus = (pagination, setLoading, setPaginatedUsers) => UsersActions.setStatus.completed.listen(() => _loadUsers(pagination, setLoading, setPaginatedUsers));
 
 const UsersOverview = () => {
@@ -95,7 +95,7 @@ const UsersOverview = () => {
     return <Spinner />;
   }
 
-  const handleSearch = (newQuery) => {
+  const handleSearch = (newQuery: string) => {
     resetPage();
     setQuery(newQuery);
   };
