@@ -26,6 +26,7 @@ import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import { DataTable, PaginatedList, Spinner } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
 import BackendsFilter from './BackendsFilter';
 import BackendsOverviewItem from './BackendsOverviewItem';
@@ -69,7 +70,7 @@ const _loadBackends = (pagination, setLoading, setPaginatedBackends) => {
 const _updateListOnBackendDelete = (refreshOverview) => AuthenticationActions.delete.completed.listen(refreshOverview);
 const _updateListOnBackendActivation = (refreshOverview) => AuthenticationActions.setActiveBackend.completed.listen(refreshOverview);
 
-const _backendsOverviewItem = (authBackend, context, paginatedRoles) => (
+const _backendsOverviewItem = (authBackend: AuthenticationBackend, context: { activeBackend: AuthenticationBackend }, paginatedRoles: PaginatedRoles) => (
   <BackendsOverviewItem authenticationBackend={authBackend} isActive={authBackend.id === context?.activeBackend?.id} roles={paginatedRoles.list} />
 );
 
@@ -88,7 +89,7 @@ const BackendsOverview = () => {
   useEffect(() => _updateListOnBackendDelete(_refreshOverview), [_refreshOverview]);
   useEffect(() => _updateListOnBackendActivation(_refreshOverview), [_refreshOverview]);
 
-  const onSearch = (newQuery) => {
+  const onSearch = (newQuery: string) => {
     resetPage();
     setQuery(newQuery);
   };
