@@ -62,7 +62,7 @@ const ViewPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle }:
   };
 
   const _onSave = () => {
-    onSave(view);
+    onSave(updatedView);
     onClose();
   };
 
