@@ -106,7 +106,7 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
                 if (config.cityDbPath().startsWith(S3GeoIpFileService.S3_BUCKET_PREFIX) &&
                         (!asnFileExists || config.asnDbPath().startsWith(S3GeoIpFileService.S3_BUCKET_PREFIX))) {
                     boolean bucketsChanged = !curConfig.cityDbPath().equals(config.cityDbPath()) || !curConfig.asnDbPath().equals(config.asnDbPath());
-                    if (bucketsChanged) {
+                    if (bucketsChanged || s3GeoIpFileService.fileRefreshRequired(config)) {
                         s3GeoIpFileService.downloadFilesToTempLocation(config);
                         // Set the DB paths to the temp file locations so the newly downloaded files can be validated
                         config = config.toBuilder()
@@ -115,8 +115,6 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
                                 .build();
                         moveTemporaryFiles = true;
                     } else {
-                        // If neither of the paths have changed, don't worry about downloading the DB files. The
-                        // GeoIpDbFileChangeMonitorService will handle syncing the files if necessary
                         config = config.toBuilder()
                                 .cityDbPath(s3GeoIpFileService.getActiveCityFile())
                                 .asnDbPath(asnFileExists ? s3GeoIpFileService.getActiveAsnFile() : "")

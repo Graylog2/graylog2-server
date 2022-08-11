@@ -17,16 +17,22 @@
 package org.graylog.plugins.map.config;
 
 import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
+import com.github.joschi.jadconfig.validators.PathReadableValidator;
+import org.graylog2.configuration.PathConfiguration;
 
 import javax.inject.Singleton;
+import java.nio.file.Path;
 
 @Singleton
-public class GeoIpProcessorConfig {
+public class GeoIpProcessorConfig extends PathConfiguration {
     private static final String PREFIX = "geo_ip_processor";
     public static final String S3_DOWNLOAD_LOCATION = PREFIX + "_s3_download_location";
 
-    @Parameter(value = S3_DOWNLOAD_LOCATION, required = true, validator = StringNotBlankValidator.class)
-    private String s3DownloadLocation = "/etc/graylog/server/";
+    @Parameter(value = S3_DOWNLOAD_LOCATION, required = true, validators = PathReadableValidator.class)
+    private final Path s3DownloadLocation = DEFAULT_DATA_DIR.resolve("geolocation");
+
+    public Path getS3DownloadLocation() {
+        return s3DownloadLocation;
+    }
 
 }

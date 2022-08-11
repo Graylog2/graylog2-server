@@ -137,7 +137,7 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
         }
         Map<DatabaseType, FileInfo.Change> changes = new EnumMap<>(DatabaseType.class);
         // If using S3 for database file storage, check to see if the files are new
-        if (config.useS3() && s3GeoIpFileService.checkForNewFilesInS3(config)) {
+        if (config.useS3() && s3GeoIpFileService.fileRefreshRequired(config)) {
             try {
                 // Download the new files to a temporary location to be validated
                 LOG.debug("Pulling DB files from S3");
@@ -187,30 +187,32 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
 
         try {
             config = getCurrentConfig();
-            geoIpResolverConfigValidator.validate(config);
 
             if (config.enabled()) {
                 reScheduleRefreshIfNeeded();
                 String asnFile = config.asnDbPath();
                 String cityFile = config.cityDbPath();
                 if (config.useS3()) {
-                    try {
-                        // This should only be true in multi-Graylog-node environments if the processor config is
-                        // changed on a different Graylog node. The files may not yet exist on-disk on this node and
-                        // will need to be downloaded first. The files have already been validated on the original node.
-                        if (s3GeoIpFileService.checkForNewFilesInS3(config)) {
-                            s3GeoIpFileService.downloadFilesToTempLocation(config);
-                            s3GeoIpFileService.moveTempFilesToActive();
-                        }
-                    } catch (S3DownloadException | IOException e) {
-                        String commonMessage = "Failed to pull new Geo-Location Processor database files from S3.";
-                        sendFailedSyncNotification(commonMessage + " Geo-Location Processor may not be functional on all nodes.");
-                        LOG.error("{} Geo-Location Processor will not be functional on this node.", commonMessage);
-                        return;
-                    }
                     cityFile = s3GeoIpFileService.getActiveCityFile();
                     asnFile = s3GeoIpFileService.getActiveAsnFile();
+                    if (s3GeoIpFileService.fileRefreshRequired(config)) {
+                        try {
+                            // This should only be true in multi-Graylog-node environments if the processor config is
+                            // changed on a different Graylog node. The files may not yet exist on-disk on this node and
+                            // will need to be downloaded first. The files have already been validated on the original node.
+                            if (s3GeoIpFileService.fileRefreshRequired(config)) {
+                                s3GeoIpFileService.downloadFilesToTempLocation(config);
+                                s3GeoIpFileService.moveTempFilesToActive();
+                            }
+                        } catch (S3DownloadException | IOException e) {
+                            String commonMessage = "Failed to pull new Geo-Location Processor database files from S3.";
+                            sendFailedSyncNotification(commonMessage + " Geo-Location Processor may not be functional on all nodes.");
+                            LOG.error("{} Geo-Location Processor will not be functional on this node.", commonMessage);
+                            return;
+                        }
+                    }
                 }
+                geoIpResolverConfigValidator.validate(config);
                 this.cityDbFileInfo = getDbFileInfo(cityFile);
                 this.asnDbFileInfo = getDbFileInfo(asnFile);
             } else {

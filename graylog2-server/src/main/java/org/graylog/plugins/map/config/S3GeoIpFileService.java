@@ -19,9 +19,7 @@ package org.graylog.plugins.map.config;
 import com.google.auto.value.AutoValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
@@ -29,13 +27,11 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 
@@ -53,7 +49,7 @@ import java.time.Instant;
  * - {@link org.graylog.plugins.map.geoip.GeoIpDbFileChangeMonitorService} will check to see if new files need to be
  * downloaded each time the service runs based on the lastModified times of the S3 objects.
  *
- * This class relies on the {@link DefaultCredentialsProvider} and not any settings that may be configured in the
+ * This class relies on the DefaultCredentialsProvider and not any settings that may be configured in the
  * Graylog AWS plugin configuration. See https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/credentials.html#credentials-chain
  * for how to configure your environment so that the default provider retrieves credentials properly.
  */
@@ -80,20 +76,26 @@ public class S3GeoIpFileService {
     private Instant tempCityFileLastModified = null;
 
     @Inject
-    public S3GeoIpFileService(@Named(GeoIpProcessorConfig.S3_DOWNLOAD_LOCATION) String s3DownloadLocation) {
+    public S3GeoIpFileService(GeoIpProcessorConfig config) {
         try {
-            final S3ClientBuilder clientBuilder = S3Client.builder();
-            clientBuilder.credentialsProvider(DefaultCredentialsProvider.create());
-            this.s3Client = clientBuilder.build();
+            this.s3Client = S3Client.builder().build();
         } catch (Exception e) {
             this.s3Client = null;
             LOG.warn(NULL_S3_CLIENT_MESSAGE);
             LOG.debug("If not trying to use the Geo Location Processor S3 file refresh feature, the following error can safely be ignored.\n\tERROR : {}", e.getMessage());
         }
-        this.asnPath = Paths.get(s3DownloadLocation, S3GeoIpFileService.ACTIVE_ASN_FILE);
-        this.cityPath = Paths.get(s3DownloadLocation, S3GeoIpFileService.ACTIVE_CITY_FILE);
-        this.tempAsnPath = Paths.get(s3DownloadLocation, S3GeoIpFileService.TEMP_ASN_FILE);
-        this.tempCityPath = Paths.get(s3DownloadLocation, S3GeoIpFileService.TEMP_CITY_FILE);
+        this.asnPath = config.getS3DownloadLocation().resolve(S3GeoIpFileService.ACTIVE_ASN_FILE);
+        this.cityPath = config.getS3DownloadLocation().resolve(S3GeoIpFileService.ACTIVE_CITY_FILE);
+        this.tempAsnPath = config.getS3DownloadLocation().resolve(S3GeoIpFileService.TEMP_ASN_FILE);
+        this.tempCityPath = config.getS3DownloadLocation().resolve(S3GeoIpFileService.TEMP_CITY_FILE);
+        if (!Files.exists(config.getS3DownloadLocation())) {
+            try {
+                Files.createDirectory(config.getS3DownloadLocation());
+            } catch (IOException e) {
+                LOG.error("Unable to create S3 download directory at {}. Geo-Location Processor S3 file refresh will be broken on this node.",
+                        config.getS3DownloadLocation().toAbsolutePath());
+            }
+        }
         if (Files.exists(cityPath)) {
             cityFileLastModified = Instant.ofEpochMilli(cityPath.toFile().lastModified());
         }
@@ -137,16 +139,19 @@ public class S3GeoIpFileService {
     }
 
     /**
-     * Checks to see if either the ASN or city database file has been updated since the last refresh
+     * Checks to see if either the database files need to be pulled down from S3
      *
      * @param config current Geo Location Processor configuration
      * @return true if the files in S3 have been modified since they were last synced
      */
-    public boolean checkForNewFilesInS3(GeoIpResolverConfig config) {
+    public boolean fileRefreshRequired(GeoIpResolverConfig config) {
         if (s3ClientIsNull()) {
             return false;
         }
-
+        // If either database file doesn't already exist then they need to be downloaded
+        if (!Files.exists(cityPath) || (!config.asnDbPath().isEmpty() && !Files.exists(asnPath))) {
+            return true;
+        }
         BucketsAndKeys bucketsAndKeys = getBucketsAndKeys(config);
 
         S3Object cityObj = getS3Object(bucketsAndKeys.cityBucket(), bucketsAndKeys.cityKey());
