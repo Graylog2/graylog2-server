@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
+import { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
@@ -31,6 +32,7 @@ type Props = {
   bsNoItemsStyle?: 'info' | 'success' | 'warning',
   noItemsText?: string | React.ReactNode,
   items: Array<React.ReactNode>,
+  scrollToHashId: boolean,
 }
 
 /**
@@ -38,7 +40,16 @@ type Props = {
  * action buttons, etc. You need to use this component alongside `EntityListItem` in order to get a similar
  * look and feel among different entities.
  */
-const EntityList = ({ bsNoItemsStyle, items, noItemsText }: Props) => {
+const EntityList = ({ bsNoItemsStyle, items, noItemsText, scrollToHashId }: Props) => {
+  const scrollNeeded = useRef(scrollToHashId && !!window.location.hash);
+
+  useEffect(() => {
+    if (items.length && scrollNeeded.current) {
+      scrollNeeded.current = false;
+      document.getElementById(window.location.hash.slice(1))?.scrollIntoView();
+    }
+  }, [items]);
+
   if (items.length === 0) {
     return (
       <Alert bsStyle={bsNoItemsStyle}>
@@ -58,6 +69,7 @@ const EntityList = ({ bsNoItemsStyle, items, noItemsText }: Props) => {
 EntityList.defaultProps = {
   bsNoItemsStyle: 'info',
   noItemsText: 'No items available',
+  scrollToHashId: true,
 };
 
 EntityList.propTypes = {
@@ -70,6 +82,8 @@ EntityList.propTypes = {
   ]),
   /** Array of `EntityListItem` that will be shown.  */
   items: PropTypes.array.isRequired,
+  /** Whether to scroll to an element ID specified in window.location.hash */
+  scrollToHashId: PropTypes.bool,
 };
 
 export default EntityList;
