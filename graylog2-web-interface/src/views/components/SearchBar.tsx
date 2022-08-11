@@ -59,11 +59,12 @@ import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import useUserDateTime from 'hooks/useUserDateTime';
 
 import SearchBarForm from './searchbar/SearchBarForm';
+
 import {
   executeSearchSubmitHandler as executePluggableSubmitHandler,
   useInitialSearchValues as usePluggableInitialValues,
   pluggableValidationPayload,
-} from './searchbar/pluggableSearchBarControlsHandler';
+} from '../logic/searchbar/pluggableSearchBarControlsHandler';
 
 type Props = {
   availableStreams: Array<{ key: string, value: string }>,

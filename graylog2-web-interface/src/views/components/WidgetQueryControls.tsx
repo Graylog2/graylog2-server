@@ -48,7 +48,7 @@ import {
   executeDashboardWidgetSubmitHandler as executePluggableSubmitHandler,
   useInitialDashboardWidgetValues as usePluggableInitialValues,
   pluggableValidationPayload,
-} from 'views/components/searchbar/pluggableSearchBarControlsHandler';
+} from 'views/logic/searchbar/pluggableSearchBarControlsHandler';
 import type { SearchBarControl } from 'views/types';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
