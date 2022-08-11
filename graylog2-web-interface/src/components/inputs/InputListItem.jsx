@@ -184,11 +184,12 @@ const InputListItem = createReactClass({
     );
 
     return (
-      <EntityListItem key={`entry-list-${this.props.input.id}`}
-                      title={this.props.input.title}
+      <EntityListItem key={`entry-list-${input.id}`}
+                      id={`input-${input.id}`}
+                      title={input.title}
                       titleSuffix={titleSuffix}
                       description={subtitle}
-                      createdFromContentPack={!!this.props.input.content_pack}
+                      createdFromContentPack={!!input.content_pack}
                       actions={actions}
                       contentRow={additionalContent} />
     );

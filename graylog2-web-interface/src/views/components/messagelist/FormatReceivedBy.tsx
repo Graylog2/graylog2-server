@@ -19,6 +19,7 @@ import type * as Immutable from 'immutable';
 
 import { Spinner } from 'components/common';
 import NodeName from 'views/components/messagelist/NodeName';
+import Routes from 'routing/Routes';
 import type { Input } from 'components/messageloaders/Types';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
@@ -27,7 +28,11 @@ type Inputs = Immutable.Map<string, Input>;
 const _inputName = (inputs: Inputs, inputId: string) => {
   const input = inputs.get(inputId);
 
-  return input ? <span style={{ wordBreak: 'break-word' }}>{input.title}</span> : 'deleted input';
+  return input ? (
+    <span style={{ wordBreak: 'break-word' }}>
+      <a href={`${Routes.SYSTEM.INPUTS}#input-${input.id}`}>{input.title}</a>
+    </span>
+  ) : 'deleted input';
 };
 
 const FormatReceivedBy = ({ isLocalNode, inputs, sourceInputId, sourceNodeId }: {isLocalNode: boolean, inputs: Inputs, sourceNodeId: string, sourceInputId: string }) => {
