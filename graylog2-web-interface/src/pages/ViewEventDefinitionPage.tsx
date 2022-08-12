@@ -23,7 +23,7 @@ import { LinkContainer } from 'components/common/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import DocumentationLink from 'components/support/DocumentationLink';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -73,7 +73,6 @@ const ViewEventDefinitionPage = ({ params }: Props) => {
         <span>
           <PageHeader title="View Event Definition">
             <Spinner text="Loading Event Definition..." />
-            <></>
           </PageHeader>
         </span>
       </DocumentTitle>
@@ -83,7 +82,16 @@ const ViewEventDefinitionPage = ({ params }: Props) => {
   return (
     <DocumentTitle title={`View "${eventDefinition.title}" Event Definition`}>
       <span>
-        <PageHeader title={`View "${eventDefinition.title}" Event Definition`}>
+        <PageHeader title={`View "${eventDefinition.title}" Event Definition`}
+                    subactions={(
+                      <ButtonToolbar>
+                        <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
+                          <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(params.definitionId)}>
+                            <Button bsStyle="success">Edit Event Definition</Button>
+                          </LinkContainer>
+                        </IfPermitted>
+                      </ButtonToolbar>
+          )}>
           <span>
             Event Definitions allow you to create Events from different Conditions and alert on them.
           </span>
