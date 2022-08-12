@@ -15,18 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import * as React from 'react';
 
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 import { NodesStore } from 'stores/nodes/NodesStore';
 
 import Icon from './Icon';
 import Spinner from './Spinner';
 
+import connect from '../../stores/connect';
 /**
  * Component that creates a link to a Graylog node. The information in the link includes:
  *  - Marker indicating whether the Graylog node is leader or not
@@ -35,22 +35,22 @@ import Spinner from './Spinner';
  *
  * All this information will be obtained from the `NodesStore`.
  */
-const LinkToNode = createReactClass({
-  displayName: 'LinkToNode',
 
-  propTypes: {
+class LinkToNode extends React.Component {
+  static propTypes = {
     /** Node ID that will be used to generate the link. */
     nodeId: PropTypes.string.isRequired,
-  },
-
-  mixins: [Reflux.connect(NodesStore)],
+    nodeStore: PropTypes.object.isRequired,
+  };
 
   render() {
-    if (!this.state.nodes) {
+    const { nodes } = this.props.nodeStore;
+
+    if (!nodes) {
       return <Spinner />;
     }
 
-    const node = this.state.nodes[this.props.nodeId];
+    const node = nodes[this.props.nodeId];
 
     if (node) {
       const iconName = node.is_leader ? 'star' : 'code-branch';
@@ -61,7 +61,7 @@ const LinkToNode = createReactClass({
         <>
           <Icon name={iconName} className={iconClass} title={iconTitle} />
           {' '}
-          {node.short_node_id} / {node.hostname}
+          {node.short_node_id}<HideOnCloud> / {node.hostname}</HideOnCloud>
         </>
       );
 
@@ -75,7 +75,10 @@ const LinkToNode = createReactClass({
     }
 
     return <i>Unknown Node</i>;
-  },
-});
+  }
+}
 
-export default LinkToNode;
+export default connect(
+  LinkToNode,
+  { nodeStore: NodesStore },
+);
