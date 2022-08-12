@@ -23,7 +23,6 @@ import { Link, LinkContainer } from 'components/common/router';
 import { OverlayTrigger, EmptyEntity, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
 import { Alert, Col, Label, Row, Table, Tooltip, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import DateTime from 'logic/datetimes/DateTime';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import { isPermitted } from 'util/PermissionsMixin';
 

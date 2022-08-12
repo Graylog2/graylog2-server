@@ -29,8 +29,6 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
   },
 }));
 
-jest.mock('hooks/useUserDateTime');
-
 describe('TimeRangeInput', () => {
   const defaultTimeRange = { type: 'relative', range: 300 };
 

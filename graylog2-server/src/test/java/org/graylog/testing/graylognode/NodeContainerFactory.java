@@ -135,6 +135,14 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_ROOT_PASSWORD_SHA2", ADMIN_PW_SHA2)
                 .withEnv("GRAYLOG_LB_RECOGNITION_PERIOD_SECONDS", "0")
                 .withEnv("GRAYLOG_VERSIONCHECKS", "false")
+
+                .withEnv("GRAYLOG_TRANSPORT_EMAIL_ENABLED", "true")
+                .withEnv("GRAYLOG_TRANSPORT_EMAIL_HOSTNAME", "mailserver")
+                .withEnv("GRAYLOG_TRANSPORT_EMAIL_PORT", "1025")
+                .withEnv("GRAYLOG_TRANSPORT_EMAIL_USE_AUTH", "false")
+                .withEnv("GRAYLOG_TRANSPORT_EMAIL_SUBJECT_PREFIX", "[graylog]")
+                .withEnv("GRAYLOG_TRANSPORT_EMAIL_FROM", "developers@graylog.com")
+
                 .waitingFor(new WaitAllStrategy()
                         .withStrategy(Wait.forLogMessage(".*Graylog server up and running.*", 1))
                         // To be able to search for data we need the index ranges to be computed. Since this is an async

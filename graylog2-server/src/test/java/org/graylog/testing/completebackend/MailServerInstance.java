@@ -14,21 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
-import type { Optional } from 'utility-types';
+package org.graylog.testing.completebackend;
 
-import type { ChartDataConfig } from 'views/components/visualizations/ChartData';
-import { chartData } from 'views/components/visualizations/ChartData';
-import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
-import useUserDateTime from 'hooks/useUserDateTime';
+import java.net.URI;
 
-const useChartData = (rows: Rows, config: Optional<ChartDataConfig, 'formatTime'>) => {
-  const { formatTime } = useUserDateTime();
-
-  return useMemo(() => chartData(rows, {
-    formatTime,
-    ...config,
-  }), [config, formatTime, rows]);
-};
-
-export default useChartData;
+public interface MailServerInstance {
+    URI getEndpointURI();
+}

@@ -24,7 +24,7 @@ import type { VisualizationComponentProps } from 'views/components/aggregationbu
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
-import UserDateTimeContext from 'contexts/UserDateTimeContext';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import MapVisualization from './MapVisualization';
 
@@ -74,7 +74,7 @@ const WorldMapVisualization = makeVisualization(({
   const hasMetric = !isEmpty(config.series);
   const markerRadiusSize = !hasMetric ? 1 : undefined;
   const seriesExtractor = hasMetric ? extractSeries() : _createSeriesWithoutMetric;
-  const { formatTime } = useContext(UserDateTimeContext);
+  const { formatTime } = useUserDateTime();
 
   const pipeline = flow([
     transformKeys(config.rowPivots, config.columnPivots, formatTime),

@@ -253,7 +253,7 @@ export interface SearchBarControl {
   placement: 'left' | 'right';
   useInitialSearchValues?: (currentQuery?: Query) => ({ [key: string]: any }),
   useInitialDashboardWidgetValues?: (currentWidget: Widget) => ({ [key: string]: any }),
-  validationPayload: (values: CombinedSearchBarFormValues) => ({ [key: string]: any }),
+  validationPayload?: (values: CombinedSearchBarFormValues) => ({ [key: string]: any }),
 }
 
 export type SearchFilter = {
@@ -267,6 +267,13 @@ export type SearchFilter = {
 }
 
 export type FiltersType = Immutable.List<SearchFilter>
+
+export type SaveViewControls = {
+  component: React.ComponentType<{ disabledViewCreation?: boolean }>,
+  id: string,
+  onSearchDuplication?: (view: View, userPermissions: Immutable.List<string>) => Promise<View>,
+  onDashboardDuplication?: (view: View, userPermissions: Immutable.List<string>) => Promise<View>,
+}
 
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
@@ -284,6 +291,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<MessageDetailContextProviderProps>>;
     'views.components.widgets.messageTable.contextProviders'?: Array<React.ComponentType>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
+    'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
     'views.elements.validationErrorExplanation'?: Array<React.ComponentType<{ validationState: QueryValidationState }>>;

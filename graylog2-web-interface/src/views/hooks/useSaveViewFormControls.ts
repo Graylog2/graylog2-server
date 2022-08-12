@@ -15,20 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useMemo } from 'react';
-import type { Optional } from 'utility-types';
 
-import type { ChartDataConfig } from 'views/components/visualizations/ChartData';
-import { chartData } from 'views/components/visualizations/ChartData';
-import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
-import useUserDateTime from 'hooks/useUserDateTime';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
-const useChartData = (rows: Rows, config: Optional<ChartDataConfig, 'formatTime'>) => {
-  const { formatTime } = useUserDateTime();
+const useSaveViewFormControls = () => {
+  const pluggableSaveViewControlFns = usePluginEntities('views.components.saveViewForm');
 
-  return useMemo(() => chartData(rows, {
-    formatTime,
-    ...config,
-  }), [config, formatTime, rows]);
+  return useMemo(() => {
+    return pluggableSaveViewControlFns.map((controlFn) => controlFn()).filter((control) => !!control);
+  }, [pluggableSaveViewControlFns]);
 };
 
-export default useChartData;
+export default useSaveViewFormControls;
