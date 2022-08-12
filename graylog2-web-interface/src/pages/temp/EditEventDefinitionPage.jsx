@@ -81,6 +81,7 @@ class EditEventDefinitionPage extends React.Component {
   render() {
     const { params, currentUser } = this.props;
     const { eventDefinition } = this.state;
+    console.log(currentUser, params);
 
     if (!isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
       history.push(Routes.NOTFOUND);
