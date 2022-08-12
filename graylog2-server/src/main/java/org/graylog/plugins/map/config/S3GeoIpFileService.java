@@ -65,6 +65,7 @@ public class S3GeoIpFileService {
     public static final String NULL_S3_CLIENT_MESSAGE = "Unable to create DefaultCredentialsProvider for the S3 Client. Geo Location Processor S3 file refresh is disabled.";
 
     private S3Client s3Client;
+    private final Path downloadDir;
     private final Path asnPath;
     private final Path cityPath;
     private final Path tempAsnPath;
@@ -77,25 +78,11 @@ public class S3GeoIpFileService {
 
     @Inject
     public S3GeoIpFileService(GeoIpProcessorConfig config) {
-        try {
-            this.s3Client = S3Client.builder().build();
-        } catch (Exception e) {
-            this.s3Client = null;
-            LOG.warn(NULL_S3_CLIENT_MESSAGE);
-            LOG.debug("If not trying to use the Geo Location Processor S3 file refresh feature, the following error can safely be ignored.\n\tERROR : {}", e.getMessage());
-        }
-        this.asnPath = config.getS3DownloadLocation().resolve(S3GeoIpFileService.ACTIVE_ASN_FILE);
-        this.cityPath = config.getS3DownloadLocation().resolve(S3GeoIpFileService.ACTIVE_CITY_FILE);
-        this.tempAsnPath = config.getS3DownloadLocation().resolve(S3GeoIpFileService.TEMP_ASN_FILE);
-        this.tempCityPath = config.getS3DownloadLocation().resolve(S3GeoIpFileService.TEMP_CITY_FILE);
-        if (!Files.exists(config.getS3DownloadLocation())) {
-            try {
-                Files.createDirectory(config.getS3DownloadLocation());
-            } catch (IOException e) {
-                LOG.error("Unable to create S3 download directory at {}. Geo-Location Processor S3 file refresh will be broken on this node.",
-                        config.getS3DownloadLocation().toAbsolutePath());
-            }
-        }
+        this.downloadDir = config.getS3DownloadLocation();
+        this.asnPath = downloadDir.resolve(S3GeoIpFileService.ACTIVE_ASN_FILE);
+        this.cityPath = downloadDir.resolve(S3GeoIpFileService.ACTIVE_CITY_FILE);
+        this.tempAsnPath = downloadDir.resolve(S3GeoIpFileService.TEMP_ASN_FILE);
+        this.tempCityPath = downloadDir.resolve(S3GeoIpFileService.TEMP_CITY_FILE);
         if (Files.exists(cityPath)) {
             cityFileLastModified = Instant.ofEpochMilli(cityPath.toFile().lastModified());
         }
@@ -111,21 +98,21 @@ public class S3GeoIpFileService {
      * @throws S3DownloadException if the files fail to be downloaded
      */
     public void downloadFilesToTempLocation(GeoIpResolverConfig config) throws S3DownloadException {
-        if (s3ClientIsNull()) {
+        if (s3ClientIsNull() || !ensureDownloadDirectory()) {
             return;
         }
 
         try {
             cleanupTempFiles();
             BucketsAndKeys bucketsAndKeys = getBucketsAndKeys(config);
-            GetObjectResponse cityResponse = s3Client.getObject(GetObjectRequest.builder()
+            GetObjectResponse cityResponse = getS3Client().getObject(GetObjectRequest.builder()
                     .bucket(bucketsAndKeys.cityBucket())
                     .key(bucketsAndKeys.cityKey()).build(), tempCityPath);
             setFilePermissions(tempCityPath);
             tempCityFileLastModified = cityResponse.lastModified();
 
             if (!config.asnDbPath().isEmpty()) {
-                GetObjectResponse asnResponse = s3Client.getObject(GetObjectRequest.builder()
+                GetObjectResponse asnResponse = getS3Client().getObject(GetObjectRequest.builder()
                         .bucket(bucketsAndKeys.asnBucket())
                         .key(bucketsAndKeys.asnKey()).build(), tempAsnPath);
                 setFilePermissions(tempAsnPath);
@@ -250,11 +237,7 @@ public class S3GeoIpFileService {
     }
 
     public boolean s3ClientIsNull() {
-        if (s3Client == null) {
-            LOG.warn(NULL_S3_CLIENT_MESSAGE);
-            return true;
-        }
-        return false;
+        return getS3Client() == null;
     }
 
     private void setFilePermissions(Path filePath) {
@@ -294,7 +277,7 @@ public class S3GeoIpFileService {
     // as a prefix.
     private S3Object getS3Object(String bucket, String key) {
         ListObjectsV2Request listObjectsRequest = ListObjectsV2Request.builder().bucket(bucket).prefix(key).build();
-        ListObjectsV2Response listObjectsResponse = s3Client.listObjectsV2(listObjectsRequest);
+        ListObjectsV2Response listObjectsResponse = getS3Client().listObjectsV2(listObjectsRequest);
         S3Object obj = null;
         for (S3Object o : listObjectsResponse.contents()) {
             if (o.key().equals(key)) {
@@ -303,6 +286,30 @@ public class S3GeoIpFileService {
             }
         }
         return obj;
+    }
+
+    private S3Client getS3Client() {
+        if (s3Client == null) {
+            try {
+                s3Client = S3Client.create();
+            } catch (Exception e) {
+                LOG.warn(NULL_S3_CLIENT_MESSAGE);
+                LOG.debug("If not trying to use the Geo Location Processor S3 file refresh feature, the following error can safely be ignored.\n\tERROR : {}", e.getMessage());
+            }
+        }
+        return s3Client;
+    }
+
+    private boolean ensureDownloadDirectory() {
+        if (!Files.exists(downloadDir)) {
+            try {
+                Files.createDirectory(downloadDir);
+            } catch (IOException e) {
+                LOG.error("Unable to create S3 download directory at {}. Geo-Location Processor S3 file refresh will be broken on this node.",
+                        downloadDir.toAbsolutePath());
+            }
+        }
+        return Files.exists(downloadDir);
     }
 
     /**
