@@ -36,7 +36,7 @@ import connect from '../../stores/connect';
  * All this information will be obtained from the `NodesStore`.
  */
 
-class LinkToNode extends React.Component {
+class LinkToNode extends React.PureComponent {
   static propTypes = {
     /** Node ID that will be used to generate the link. */
     nodeId: PropTypes.string.isRequired,
