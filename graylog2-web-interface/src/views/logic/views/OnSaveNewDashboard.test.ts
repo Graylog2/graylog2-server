@@ -20,7 +20,7 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 
 import View from './View';
-import OnSaveAsViewAction from './OnSaveAsViewAction';
+import OnSaveNewDashboard from './OnSaveNewDashboard';
 import { loadDashboard } from './Actions';
 
 jest.mock('views/stores/ViewManagementStore', () => ({
@@ -38,7 +38,7 @@ jest.mock('views/stores/ViewStore', () => ({
 jest.mock('util/UserNotification');
 jest.mock('views/logic/views/Actions');
 
-describe('OnSaveAsViewAction', () => {
+describe('OnSaveNewDashboard', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -46,7 +46,7 @@ describe('OnSaveAsViewAction', () => {
   it('saves a given new view', async () => {
     const view = View.create();
 
-    await OnSaveAsViewAction(view);
+    await OnSaveNewDashboard(view);
 
     expect(ViewManagementActions.create).toHaveBeenCalled();
     expect(ViewManagementActions.create).toHaveBeenCalledWith(view);
@@ -55,7 +55,7 @@ describe('OnSaveAsViewAction', () => {
   it('loads saved view', async () => {
     const view = View.create();
 
-    await OnSaveAsViewAction(view);
+    await OnSaveNewDashboard(view);
 
     expect(ViewActions.load).toHaveBeenCalled();
     expect(ViewActions.load).toHaveBeenCalledWith(view);
@@ -64,7 +64,7 @@ describe('OnSaveAsViewAction', () => {
   it('redirects to saved view', async () => {
     const view = View.create();
 
-    await OnSaveAsViewAction(view);
+    await OnSaveNewDashboard(view);
 
     expect(loadDashboard).toHaveBeenCalledWith('deadbeef');
   });
@@ -72,7 +72,7 @@ describe('OnSaveAsViewAction', () => {
   it('shows notification upon success', async () => {
     const view = View.create().toBuilder().title('Test View').build();
 
-    await OnSaveAsViewAction(view);
+    await OnSaveNewDashboard(view);
 
     expect(UserNotification.success).toHaveBeenCalled();
     expect(UserNotification.success).toHaveBeenCalledWith(`Saving view "${view.title}" was successful!`, 'Success!');
@@ -83,7 +83,7 @@ describe('OnSaveAsViewAction', () => {
 
     const view = View.create();
 
-    await OnSaveAsViewAction(view);
+    await OnSaveNewDashboard(view);
 
     expect(ViewActions.load).not.toHaveBeenCalled();
     expect(loadDashboard).not.toHaveBeenCalled();

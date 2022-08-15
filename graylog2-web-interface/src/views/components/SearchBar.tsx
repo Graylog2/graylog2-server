@@ -242,9 +242,9 @@ const SearchBar = ({
                         </SearchButtonAndQuery>
 
                         {!editing && (
-                        <ViewActionsWrapper>
-                          <SavedSearchControls />
-                        </ViewActionsWrapper>
+                          <ViewActionsWrapper>
+                            <SavedSearchControls />
+                          </ViewActionsWrapper>
                         )}
                       </BottomRow>
                       <PluggableSearchBarControls />

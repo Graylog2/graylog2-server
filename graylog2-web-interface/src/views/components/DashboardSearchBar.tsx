@@ -26,7 +26,7 @@ import { FlatContentRow, Spinner } from 'components/common';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
-import ViewActionsMenu from 'views/components/ViewActionsMenu';
+import DashboardActionsMenu from 'views/components/DashboardActionsMenu';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import BottomRow from 'views/components/searchbar/BottomRow';
 import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
@@ -197,7 +197,7 @@ const DashboardSearchBar = () => {
 
                         {!editing && (
                           <ViewActionsWrapper>
-                            <ViewActionsMenu />
+                            <DashboardActionsMenu />
                           </ViewActionsWrapper>
                         )}
                       </BottomRow>
