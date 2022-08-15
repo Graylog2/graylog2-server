@@ -30,7 +30,6 @@ import onSaveView from 'views/logic/views/OnSaveViewAction';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import ExportModal from 'views/components/export/ExportModal';
-import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import useCurrentUser from 'hooks/useCurrentUser';
 import * as ViewsPermissions from 'views/Permissions';
@@ -51,7 +50,7 @@ const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) => (
   || isPermitted(currentUser?.permissions, [ViewsPermissions.View.Edit(view.id)])
 );
 
-const SavedSearchControls = () => {
+const SearchActionsMenu = () => {
   const theme = useTheme();
   const { view, dirty } = useStore(ViewStore);
   const viewLoaderFunc = useContext(ViewLoaderContext);
@@ -67,7 +66,6 @@ const SavedSearchControls = () => {
   const [newTitle, setNewTitle] = useState((view && view.title) || '');
 
   const loaded = (view && view.id);
-  const viewTypeLabel = ViewTypeLabel({ type: view?.type });
   const savedSearchColor = dirty ? theme.colors.variant.warning : theme.colors.variant.info;
   const disableReset = !(dirty || loaded);
   const savedViewTitle = loaded ? 'Saved search' : 'Save search';
@@ -200,11 +198,11 @@ const SavedSearchControls = () => {
         <EntityShareModal entityId={view.id}
                           entityType="search"
                           entityTitle={view.title}
-                          description={`Search for a User or Team to add as collaborator on this ${viewTypeLabel}.`}
+                          description="Search for a User or Team to add as collaborator on this saved search."
                           onClose={toggleShareSearch} />
       )}
     </ButtonGroup>
   );
 };
 
-export default SavedSearchControls;
+export default SearchActionsMenu;

@@ -28,7 +28,7 @@ import { Row, Col } from 'components/bootstrap';
 import BottomRow from 'views/components/searchbar/BottomRow';
 import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
 import SearchButton from 'views/components/searchbar/SearchButton';
-import SavedSearchControls from 'views/components/searchbar/saved-search/SavedSearchControls';
+import SearchActionsMenu from 'views/components/searchbar/saved-search/SearchActionsMenu';
 import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
 import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
@@ -243,7 +243,7 @@ const SearchBar = ({
 
                         {!editing && (
                           <ViewActionsWrapper>
-                            <SavedSearchControls />
+                            <SearchActionsMenu />
                           </ViewActionsWrapper>
                         )}
                       </BottomRow>
