@@ -20,16 +20,16 @@ import userEvent from '@testing-library/user-event';
 
 import View from 'views/logic/views/View';
 
-import ViewPropertiesModal from './ViewPropertiesModal';
+import DashboardPropertiesModal from './DashboardPropertiesModal';
 
-describe('ViewPropertiesModal', () => {
+describe('DashboardPropertiesModal', () => {
   it('should use updated view when saving', async () => {
     const onSave = jest.fn();
     const view = View.builder()
       .type(View.Type.Dashboard)
       .title('')
       .build();
-    render(<ViewPropertiesModal onClose={jest.fn()} onSave={onSave} title="Saving new dashboard" view={view} show />);
+    render(<DashboardPropertiesModal onClose={jest.fn()} onSave={onSave} title="Saving new dashboard" view={view} show />);
 
     await screen.findByText('Saving new dashboard');
     const titleInput = await screen.findByRole('textbox', { name: /title/i, hidden: true });

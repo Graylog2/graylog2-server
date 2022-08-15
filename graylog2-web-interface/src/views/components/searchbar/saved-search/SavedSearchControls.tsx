@@ -35,7 +35,7 @@ import EntityShareModal from 'components/permissions/EntityShareModal';
 import useCurrentUser from 'hooks/useCurrentUser';
 import * as ViewsPermissions from 'views/Permissions';
 import type User from 'logic/users/User';
-import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
+import ViewPropertiesModal from 'views/components/views/DashboardPropertiesModal';
 import { loadAsDashboard, loadNewSearch } from 'views/logic/views/Actions';
 import IfPermitted from 'components/common/IfPermitted';
 import {

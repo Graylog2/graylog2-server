@@ -42,7 +42,7 @@ import {
 } from 'views/logic/views/pluggableSaveViewFormHandler';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
-import ViewPropertiesModal from './views/ViewPropertiesModal';
+import DashboardPropertiesModal from './views/DashboardPropertiesModal';
 import IfDashboard from './dashboard/IfDashboard';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
 
@@ -134,18 +134,18 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
       )}
       {debugOpen && <DebugOverlay show onClose={() => setDebugOpen(false)} />}
       {saveAsViewOpen && (
-        <ViewPropertiesModal show
-                             view={view.toBuilder().newId().build()}
-                             title="Save new dashboard"
-                             onClose={() => setSaveAsViewOpen(false)}
-                             onSave={(newView) => _onSaveAsView(newView)} />
+        <DashboardPropertiesModal show
+                                  view={view.toBuilder().newId().build()}
+                                  title="Save new dashboard"
+                                  onClose={() => setSaveAsViewOpen(false)}
+                                  onSave={(newView) => _onSaveAsView(newView)} />
       )}
       {editViewOpen && (
-        <ViewPropertiesModal show
-                             view={view}
-                             title="Editing dashboard"
-                             onClose={() => setEditViewOpen(false)}
-                             onSave={onSaveView} />
+        <DashboardPropertiesModal show
+                                  view={view}
+                                  title="Editing dashboard"
+                                  onClose={() => setEditViewOpen(false)}
+                                  onSave={onSaveView} />
       )}
 
       {shareViewOpen && (
