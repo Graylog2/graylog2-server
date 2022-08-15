@@ -807,26 +807,27 @@
                                 <exclude>META-INF/*.RSA</exclude>
                             </excludes>
                         </filter>
-<!--                        <filter>-->
-<!--                            <artifact>software.amazon.awssdk:bundle</artifact>-->
-<!--                            <includes>-->
-<!--                                &lt;!&ndash; Include core AWS SDK packages. &ndash;&gt;-->
-<!--                                <include>software/amazon/awssdk/annotations/**</include>-->
-<!--                                <include>software/amazon/awssdk/auth/**</include>-->
-<!--                                <include>software/amazon/awssdk/awscore/**</include>-->
-<!--                                <include>software/amazon/awssdk/core/**</include>-->
-<!--                                <include>software/amazon/awssdk/http/**</include>-->
-<!--                                <include>software/amazon/awssdk/internal/http/**</include>-->
-<!--                                <include>software/amazon/awssdk/profiles/**</include>-->
-<!--                                <include>software/amazon/awssdk/protocols/**</include>-->
-<!--                                <include>software/amazon/awssdk/regions/**</include>-->
-<!--                                <include>software/amazon/awssdk/thirdparty/**</include>-->
-<!--                                <include>software/amazon/awssdk/utils/**</include>-->
-<!--                                <include>software/amazon/awssdk/metrics/**</include>-->
-<!--                                &lt;!&ndash; S3 is the only service used here. &ndash;&gt;-->
-<!--                                <include>software/amazon/awssdk/services/s3/**</include>-->
-<!--                            </includes>-->
-<!--                        </filter>-->
+                        <filter>
+                            <artifact>software.amazon.awssdk:bundle</artifact>
+                            <includes>
+                                <!-- Include core AWS SDK packages. -->
+                                <include>software/amazon/awssdk/annotations/**</include>
+                                <include>software/amazon/awssdk/auth/**</include>
+                                <include>software/amazon/awssdk/awscore/**</include>
+                                <include>software/amazon/awssdk/core/**</include>
+                                <include>software/amazon/awssdk/http/**</include>
+                                <include>software/amazon/awssdk/internal/http/**</include>
+                                <include>software/amazon/awssdk/profiles/**</include>
+                                <include>software/amazon/awssdk/protocols/**</include>
+                                <include>software/amazon/awssdk/regions/**</include>
+                                <include>software/amazon/awssdk/thirdparty/**</include>
+                                <include>software/amazon/awssdk/utils/**</include>
+                                <include>software/amazon/awssdk/metrics/**</include>
+                                <!-- S3 is the only service used here. -->
+                                <include>software/amazon/awssdk/services/s3/**</include>
+                                <include>software/amazon/awssdk/services/sts/**</include>
+                            </includes>
+                        </filter>
                     </filters>
                 </configuration>
                 <executions>
