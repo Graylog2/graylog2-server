@@ -19,6 +19,7 @@ package org.graylog2.shared.rest.resources.documentation;
 import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
+import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.RestTools;
 import org.graylog2.shared.rest.HideOnCloud;
@@ -52,11 +53,15 @@ public class DocumentationBrowserResource extends RestResource {
     private final ClassLoader classLoader = ClassLoader.getSystemClassLoader();
     private final Engine templateEngine;
 
+    private final Configuration configuration;
+
     @Inject
-    public DocumentationBrowserResource(MimetypesFileTypeMap mimeTypes, HttpConfiguration httpConfiguration, Engine templateEngine) {
+    public DocumentationBrowserResource(
+            MimetypesFileTypeMap mimeTypes, HttpConfiguration httpConfiguration, Engine templateEngine, Configuration configuration) {
         this.mimeTypes = requireNonNull(mimeTypes, "mimeTypes");
         this.httpConfiguration = requireNonNull(httpConfiguration, "httpConfiguration");
         this.templateEngine = requireNonNull(templateEngine, "templateEngine");
+        this.configuration = configuration;
     }
 
     @GET
@@ -96,7 +101,7 @@ public class DocumentationBrowserResource extends RestResource {
                 "globalModePath", "global/index.html",
                 "globalUriMarker", "/global",
                 "showWarning", "true",
-                "isCloud", "true");
+                "isCloud", configuration.isCloud());
         return templateEngine.transform(template, model);
     }
 
