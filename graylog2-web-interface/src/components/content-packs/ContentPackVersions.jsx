@@ -161,7 +161,7 @@ class ContentPackVersions extends React.Component {
       <DataTable id="content-packs-versions"
                  headers={headers}
                  headerCellFormatter={this.headerFormatter}
-                 isNumericSort
+                 useNumericSort
                  sortBy={(c) => c.rev.toString()}
                  dataRowFormatter={this.rowFormatter}
                  rows={contentPacks}

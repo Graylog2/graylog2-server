@@ -97,7 +97,7 @@ class DataTable extends React.Component {
      */
     useResponsiveTable: PropTypes.bool,
     /** boolean value to set sort numeric  */
-    isNumericSort: PropTypes.bool,
+    useNumericSort: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -116,7 +116,7 @@ class DataTable extends React.Component {
     headerCellFormatter: (header) => { return (<th>{header}</th>); },
     sortByKey: undefined,
     sortBy: undefined,
-    isNumericSort: false,
+    useNumericSort: false,
   };
 
   constructor(props) {
@@ -144,16 +144,16 @@ class DataTable extends React.Component {
 
   getFormattedDataRows = () => {
     let i = 0;
-    const { sortByKey, sortBy, dataRowFormatter, isNumericSort } = this.props;
+    const { sortByKey, sortBy, dataRowFormatter, useNumericSort } = this.props;
     let sortedDataRows = this._getEffectiveRows();
 
     if (sortByKey) {
       sortedDataRows = sortedDataRows.sort((a, b) => {
-        return a[sortByKey].localeCompare(b[sortByKey], undefined, { numeric: isNumericSort });
+        return a[sortByKey].localeCompare(b[sortByKey], undefined, { numeric: useNumericSort });
       });
     } else if (sortBy) {
       sortedDataRows = sortedDataRows.sort((a, b) => {
-        return sortBy(a).localeCompare(sortBy(b), undefined, { numeric: isNumericSort });
+        return sortBy(a).localeCompare(sortBy(b), undefined, { numeric: useNumericSort });
       });
     }
 
