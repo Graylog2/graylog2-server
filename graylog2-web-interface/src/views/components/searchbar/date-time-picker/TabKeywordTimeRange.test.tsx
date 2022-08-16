@@ -38,12 +38,6 @@ const TabKeywordTimeRange = ({ defaultValue, ...props }: { defaultValue: string 
   </Formik>
 );
 
-jest.mock('logic/datetimes/DateTime', () => ({
-  fromUTCDateTime: (date) => date,
-  getUserTimezone: () => 'Europe/Berlin',
-  fromDateTimeAndTZ: (date) => date,
-}));
-
 describe('TabKeywordTimeRange', () => {
   beforeEach(() => {
     asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.resolve({
@@ -73,6 +67,7 @@ describe('TabKeywordTimeRange', () => {
   const asyncRender = async (element) => {
     let wrapper;
 
+    // eslint-disable-next-line testing-library/no-unnecessary-act
     await act(async () => { wrapper = render(element); });
 
     if (!wrapper) {
@@ -102,7 +97,7 @@ describe('TabKeywordTimeRange', () => {
 
     await asyncRender(<TabKeywordTimeRange defaultValue="Last hour" />);
 
-    expect(ToolsStore.testNaturalDate).toHaveBeenCalledWith('Last hour');
+    expect(ToolsStore.testNaturalDate).toHaveBeenCalledWith('Last hour', 'Europe/Berlin');
   });
 
   it('sets validation state to error if initial value is empty', async () => {

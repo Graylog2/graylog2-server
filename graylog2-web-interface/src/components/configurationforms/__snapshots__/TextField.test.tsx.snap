@@ -35,8 +35,7 @@ exports[`<TextField> should render a password field 1`] = `
   box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
 }
 
-.c1.form-control:not([type="range"])[disabled],
-.c1.form-control:not([type="range"])[readonly],
+.c1.form-control:not([type="range"])[disabled],.c1.form-control:not([type="range"])[readonly],
 fieldset[disabled] .c1.form-control:not([type="range"]) {
   background-color: #dddddd;
   color: #9b9b9b;
@@ -59,7 +58,7 @@ fieldset[disabled] .c1.form-control:not([type="range"]) {
 
 <div>
   <div
-    class="FormGroup__StyledFormGroup-sc-18chxk8-0 form-group"
+    class="form-group"
   >
     <label
       class="c0 control-label"
@@ -132,8 +131,7 @@ exports[`<TextField> should render a textarea field 1`] = `
   box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
 }
 
-.c1.form-control:not([type="range"])[disabled],
-.c1.form-control:not([type="range"])[readonly],
+.c1.form-control:not([type="range"])[disabled],.c1.form-control:not([type="range"])[readonly],
 fieldset[disabled] .c1.form-control:not([type="range"]) {
   background-color: #dddddd;
   color: #9b9b9b;
@@ -156,7 +154,7 @@ fieldset[disabled] .c1.form-control:not([type="range"]) {
 
 <div>
   <div
-    class="FormGroup__StyledFormGroup-sc-18chxk8-0 form-group"
+    class="form-group"
   >
     <label
       class="c0 control-label"
@@ -229,8 +227,7 @@ exports[`<TextField> should render an empty field 1`] = `
   box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
 }
 
-.c1.form-control:not([type="range"])[disabled],
-.c1.form-control:not([type="range"])[readonly],
+.c1.form-control:not([type="range"])[disabled],.c1.form-control:not([type="range"])[readonly],
 fieldset[disabled] .c1.form-control:not([type="range"]) {
   background-color: #dddddd;
   color: #9b9b9b;
@@ -253,7 +250,7 @@ fieldset[disabled] .c1.form-control:not([type="range"]) {
 
 <div>
   <div
-    class="FormGroup__StyledFormGroup-sc-18chxk8-0 form-group"
+    class="form-group"
   >
     <label
       class="c0 control-label"

@@ -52,7 +52,6 @@ jest.mock('views/stores/SearchExecutionStateStore', () => ({
 
 jest.mock('views/logic/usePluginEntities');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
-jest.mock('logic/datetimes/DateTime', () => ({}));
 
 type SUTProps = {
   // eslint-disable-next-line react/require-default-props

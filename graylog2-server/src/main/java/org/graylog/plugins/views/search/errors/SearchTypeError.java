@@ -25,21 +25,34 @@ public class SearchTypeError extends QueryError {
     @Nonnull
     private final String searchTypeId;
 
+    private final boolean fatal;
+
     public SearchTypeError(@Nonnull Query query, @Nonnull String searchTypeId, Throwable throwable) {
         super(query, throwable);
 
         this.searchTypeId = searchTypeId;
+        this.fatal = false;
     }
 
     public SearchTypeError(@Nonnull Query query, @Nonnull String searchTypeId, String description) {
+        this(query, searchTypeId, description, false);
+    }
+
+    public SearchTypeError(@Nonnull Query query, @Nonnull String searchTypeId, String description, boolean fatal) {
         super(query, description);
 
         this.searchTypeId = searchTypeId;
+        this.fatal = fatal;
     }
 
     @Nonnull
     @JsonProperty("search_type_id")
     public String searchTypeId() {
         return searchTypeId;
+    }
+
+    @Override
+    public boolean fatal() {
+        return fatal;
     }
 }

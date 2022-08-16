@@ -185,28 +185,45 @@ public class DBJobTriggerServiceTest {
     @Test
     @MongoDBFixtures("job-triggers.json")
     public void getForJob() {
-        assertThatCode(() -> dbJobTriggerService.getForJob(null))
+        assertThatCode(() -> dbJobTriggerService.getOneForJob(null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("jobDefinitionId");
 
-        assertThatCode(() -> dbJobTriggerService.getForJob(""))
+        assertThatCode(() -> dbJobTriggerService.getOneForJob(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("jobDefinitionId");
 
 
-        assertThat(dbJobTriggerService.getForJob("54e3deadbeefdeadbeefaff4")).hasSize(1).satisfies(triggers ->
-                assertThat(triggers.get(0)).satisfies(trigger -> {
+        assertThat(dbJobTriggerService.getOneForJob("54e3deadbeefdeadbeefaff4")).isPresent()
+                .hasValueSatisfying(trigger -> {
                     assertThat(trigger.id()).isEqualTo("54e3deadbeefdeadbeef0002");
                     assertThat(trigger.jobDefinitionId()).isEqualTo("54e3deadbeefdeadbeefaff4");
-                }));
+                });
 
-        assertThat(dbJobTriggerService.getForJob("doesntexist")).isEmpty();
+        assertThat(dbJobTriggerService.getOneForJob("doesntexist")).isEmpty();
 
         // We expect a ISE when there is more than one trigger for a single job definition
-        assertThatCode(() -> dbJobTriggerService.getForJob("54e3deadbeefdeadbeefaff3"))
+        assertThatCode(() -> dbJobTriggerService.getOneForJob("54e3deadbeefdeadbeefaff3"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("54e3deadbeefdeadbeefaff3");
     }
+
+    @Test
+    @MongoDBFixtures("job-triggers.json")
+    public void getAllForJob() {
+
+        // We expect a ISE when there is more than one trigger for a single job definition
+        assertThatCode(() -> dbJobTriggerService.getOneForJob("54e3deadbeefdeadbeefaff3"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("54e3deadbeefdeadbeefaff3");
+
+        // But we can also obtain all by calling following method:
+        assertThat(dbJobTriggerService.getAllForJob("54e3deadbeefdeadbeefaff3"))
+                .hasSize(2)
+                .allSatisfy(trigger -> assertThat(trigger.jobDefinitionId()).isEqualTo("54e3deadbeefdeadbeefaff3"));
+    }
+
+
 
     @Test
     @MongoDBFixtures("job-triggers.json")

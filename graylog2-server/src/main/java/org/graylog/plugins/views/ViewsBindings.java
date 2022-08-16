@@ -39,6 +39,7 @@ import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.engine.EngineBindings;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.engine.SearchConfigProvider;
@@ -245,6 +246,8 @@ public class ViewsBindings extends ViewsModule {
         // The ViewResolver binder must be explicitly initialized to avoid an initialization error when
         // no values are bound.
         viewResolverBinder();
+
+        install(new EngineBindings());
     }
 
     private void registerExportBackendProvider() {

@@ -40,8 +40,6 @@ jest.mock('stores/tools/ToolsStore', () => ({
   testNaturalDate: jest.fn(),
 }));
 
-jest.mock('hooks/useUserDateTime');
-
 const defaultProps = {
   currentTimeRange: {
     type: 'relative',

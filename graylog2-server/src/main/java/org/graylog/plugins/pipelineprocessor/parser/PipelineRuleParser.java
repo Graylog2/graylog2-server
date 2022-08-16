@@ -83,6 +83,7 @@ import org.graylog.plugins.pipelineprocessor.parser.errors.SyntaxError;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredVariable;
 import org.graylog.plugins.pipelineprocessor.parser.errors.WrongNumberOfArgs;
+import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Period;
@@ -814,8 +815,9 @@ public class PipelineRuleParser {
         @Override
         public void exitMessageRef(RuleLangParser.MessageRefContext ctx) {
             final MessageRefExpression expr = (MessageRefExpression) parseContext.expressions().get(ctx);
-            if (!expr.getFieldExpr().getType().equals(String.class)) {
-                parseContext.addError(new IncompatibleType(ctx, String.class, expr.getFieldExpr().getType()));
+            final Class type = expr.getFieldExpr().getType();
+            if (!type.equals(String.class) && !type.equals(Message.class)) {
+                parseContext.addError(new IncompatibleType(ctx, String.class, type));
             }
         }
 

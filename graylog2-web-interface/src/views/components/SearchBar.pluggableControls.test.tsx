@@ -186,6 +186,6 @@ describe('SearchBar pluggable controls', () => {
       queryString: '*',
       streams: [],
       timeRange: { from: 300, type: 'relative' },
-    }));
+    }, 'Europe/Berlin'));
   });
 });
