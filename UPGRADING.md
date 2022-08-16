@@ -29,6 +29,13 @@ The new default Message Processing order will run the
 This applies only to new Graylog installations.
 Existing setups keep the former default order for backwards compatibility.
 
+## Disallow Disk Journal on Network Filesystems
+
+On new Graylog installations, the disk journal directory cannot be placed
+on network filesystems such as NFS, CIFS, etc anymore.
+Existing installations will just receive a warning about this.
+
+
 ## API Endpoint Deprecations
 
 The following API endpoints are deprecated beginning with 4.4.
