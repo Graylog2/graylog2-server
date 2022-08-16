@@ -22,7 +22,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.CountRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.CountResponse;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
-import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceSmallES7;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
@@ -32,7 +31,7 @@ import org.junit.Rule;
 
 public class MessagesBatchES7IT extends MessagesBatchIT {
     @Rule
-    public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceSmallES7.create();
+    public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create("256m");
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 

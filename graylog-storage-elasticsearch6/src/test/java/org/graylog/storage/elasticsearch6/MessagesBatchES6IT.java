@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.searchbox.core.Count;
 import io.searchbox.core.CountResult;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
-import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceSmallES6;
+import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
@@ -36,7 +36,7 @@ import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 @Ignore("This does not run on ES6 yet. It will just die with OOM")
 public class MessagesBatchES6IT extends MessagesBatchIT {
     @Rule
-    public final TestableSearchServerInstance elasticsearch = ElasticsearchInstanceSmallES6.create();
+    public final TestableSearchServerInstance elasticsearch = ElasticsearchInstanceES6.create("256m");
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -44,8 +44,6 @@ public class MessagesBatchES6IT extends MessagesBatchIT {
     protected SearchServerInstance elasticsearch() {
         return this.elasticsearch;
     }
-
-    private final IndexingHelper indexingHelper = new IndexingHelper();
 
     @Override
     protected MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry) {

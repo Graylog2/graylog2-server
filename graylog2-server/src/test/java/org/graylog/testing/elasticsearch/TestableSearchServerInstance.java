@@ -17,6 +17,7 @@
 package org.graylog.testing.elasticsearch;
 
 import com.google.common.io.Resources;
+import org.graylog2.shared.utilities.StringUtils;
 import org.graylog2.storage.SearchVersion;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
@@ -50,6 +51,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     private static final String NETWORK_ALIAS = "elasticsearch";
 
     private final SearchVersion version;
+    private String heapSize;
     protected final GenericContainer<?> container;
 
     @Override
@@ -58,8 +60,9 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     @Override
     public abstract FixtureImporter fixtureImporter();
 
-    protected TestableSearchServerInstance(String image, SearchVersion version, Network network) {
+    protected TestableSearchServerInstance(String image, SearchVersion version, Network network, String heapSize) {
         this.version = version;
+        this.heapSize = heapSize;
         this.container = createContainer(image, version, network);
     }
 
@@ -81,13 +84,17 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
         return new ElasticsearchContainer(DockerImageName.parse(image).asCompatibleSubstituteFor("docker.elastic.co/elasticsearch/elasticsearch"))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
                 .withReuse(isNull(System.getenv("BUILD_ID")))
-                .withEnv("ES_JAVA_OPTS", "-Xms2g -Xmx2g -Dlog4j2.formatMsgNoLookups=true")
+                .withEnv("ES_JAVA_OPTS", getEsJavaOpts())
                 .withEnv("discovery.type", "single-node")
                 .withEnv("action.auto_create_index", "false")
                 .withEnv("cluster.info.update.interval", "10s")
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
                 .waitingFor(Wait.forHttp("/").forPort(ES_PORT));
+    }
+
+    private String getEsJavaOpts() {
+        return StringUtils.f("-Xms%s -Xmx%s -Dlog4j2.formatMsgNoLookups=true", heapSize, heapSize);
     }
 
     @Override
