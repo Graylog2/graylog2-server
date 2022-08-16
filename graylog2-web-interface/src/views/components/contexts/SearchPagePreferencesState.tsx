@@ -22,7 +22,7 @@ import View from 'views/logic/views/View';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import type { UserPreferences } from 'contexts/UserPreferencesContext';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import Store from 'logic/local-storage/Store';
 import { PreferencesActions } from 'stores/users/PreferencesStore';
 import type User from 'logic/users/User';
@@ -75,7 +75,7 @@ const _updateUserSidebarPinningPref = (currentUser: User, userPreferences: UserP
 };
 
 const SearchPagePreferencesState = ({ children }: Props) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const userPreferences = useContext(UserPreferencesContext);
   const viewType = useContext(ViewTypeContext);
   const [state, setState] = useState({

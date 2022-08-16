@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import styled from 'styled-components';
 
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import { LinkContainer } from 'components/common/router';
 import type UserOverview from 'logic/users/UserOverview';
 import UsersDomain from 'domainActions/users/UsersDomain';
@@ -67,7 +66,7 @@ const ReadOnlyActions = ({ user }: { user: UserOverview }) => {
 };
 
 const EditActions = ({ user, user: { username, id, fullName, accountStatus, external, readOnly } }: { user: UserOverview }) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
 
   const _toggleStatus = () => {
     if (accountStatus === 'enabled') {

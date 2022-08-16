@@ -32,7 +32,7 @@ import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import ExportModal from 'views/components/export/ExportModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import EntityShareModal from 'components/permissions/EntityShareModal';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import * as ViewsPermissions from 'views/Permissions';
 import type User from 'logic/users/User';
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
@@ -55,7 +55,7 @@ const SavedSearchControls = () => {
   const theme = useTheme();
   const { view, dirty } = useStore(ViewStore);
   const viewLoaderFunc = useContext(ViewLoaderContext);
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const loadNewView = useContext(NewViewLoaderContext);
   const isAllowedToEdit = (view && view.id) && _isAllowedToEdit(view, currentUser);
   const formTarget = useRef();
