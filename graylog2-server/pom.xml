@@ -707,17 +707,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.11.935</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>bundle</artifactId>
             <version>${aws-java-sdk-2.version}</version>
@@ -823,9 +812,13 @@
                                 <include>software/amazon/awssdk/thirdparty/**</include>
                                 <include>software/amazon/awssdk/utils/**</include>
                                 <include>software/amazon/awssdk/metrics/**</include>
-                                <!-- S3 is the only service used here. -->
+                                <!-- Include only needed service packages. -->
                                 <include>software/amazon/awssdk/services/s3/**</include>
                                 <include>software/amazon/awssdk/services/sts/**</include>
+                                <include>software/amazon/awssdk/services/cloudwatchlogs/**</include>
+                                <include>software/amazon/awssdk/services/dynamodb/**</include>
+                                <include>software/amazon/awssdk/services/iam/**</include>
+                                <include>software/amazon/awssdk/services/kinesis/**</include>
                             </includes>
                         </filter>
                     </filters>
