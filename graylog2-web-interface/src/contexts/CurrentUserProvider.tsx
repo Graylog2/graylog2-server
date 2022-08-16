@@ -24,7 +24,7 @@ import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import CurrentUserContext from './CurrentUserContext';
 
-const CurrentUserProvider = ({ children }) => {
+const CurrentUserProvider = ({ children }: { children: JSX.Element }) => {
   const currentUserJSON = useStore(CurrentUserStore, (state) => get(state, 'currentUser'));
   const currentUser = currentUserJSON ? User.fromJSON(currentUserJSON) : undefined;
 
@@ -37,8 +37,29 @@ const CurrentUserProvider = ({ children }) => {
     : children;
 };
 
-CurrentUserProvider.propTypes = {
-  children: PropTypes.node.isRequired,
+const UserProvider = ({ children, user: userOverride }: { children: JSX.Element, user?: User}) => {
+  if (userOverride) {
+    return (
+      <CurrentUserContext.Provider value={userOverride}>
+        {children}
+      </CurrentUserContext.Provider>
+    );
+  }
+
+  return (
+    <CurrentUserProvider>
+      {children}
+    </CurrentUserProvider>
+  );
 };
 
-export default CurrentUserProvider;
+UserProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+  user: PropTypes.object,
+};
+
+UserProvider.defaultProps = {
+  user: PropTypes.object,
+};
+
+export default UserProvider;
