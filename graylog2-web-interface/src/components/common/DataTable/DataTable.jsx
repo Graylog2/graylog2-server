@@ -28,6 +28,7 @@ const StyledTable = styled.table`
   ${tableCss}
 `;
 
+// eslint-disable-next-line react/prop-types
 const NoData = ({ noDataText }) => {
   if (typeof noDataText === 'string') {
     return (
@@ -111,10 +112,11 @@ class DataTable extends React.Component {
     noDataText: 'No data available.',
     rowClassName: '',
     useResponsiveTable: true,
+    // eslint-disable-next-line react/no-unstable-nested-components
     headerCellFormatter: (header) => { return (<th>{header}</th>); },
     sortByKey: undefined,
     sortBy: undefined,
-    isNumericSort: false
+    isNumericSort: false,
   };
 
   constructor(props) {
