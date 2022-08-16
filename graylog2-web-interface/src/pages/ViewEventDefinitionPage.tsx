@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useEffect, useContext } from 'react';
+import PropTypes from 'prop-types';
 
 import { useStore } from 'stores/connect';
 import withParams from 'routing/withParams';
@@ -34,7 +35,7 @@ import { EventNotificationsActions, EventNotificationsStore } from 'stores/event
 
 type Props = {
   params: {
-    definitionId: string,
+    definitionId?: string,
   },
 };
 
@@ -125,6 +126,12 @@ const ViewEventDefinitionPage = ({ params }: Props) => {
       </span>
     </DocumentTitle>
   );
+};
+
+ViewEventDefinitionPage.propTypes = {
+  params: PropTypes.exact({
+    definitionId: PropTypes.string,
+  }).isRequired,
 };
 
 export default withParams(ViewEventDefinitionPage);
