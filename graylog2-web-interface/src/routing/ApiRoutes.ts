@@ -130,6 +130,9 @@ const ApiRoutes = {
     update: (entityGRN: string) => { return { url: `/authz/shares/entities/${entityGRN}` }; },
     userSharesPaginated: (username: string) => { return { url: `/authz/shares/user/${username}` }; },
   },
+  EntityScopeController: {
+    getScope: () => ({ url: '/entity_scopes' }),
+  },
   HTTPHeaderAuthConfigController: {
     load: () => ({ url: '/system/authentication/http-header-auth-config' }),
     update: () => ({ url: '/system/authentication/http-header-auth-config' }),
@@ -258,6 +261,7 @@ const ApiRoutes = {
   SystemJobsApiController: {
     list: () => { return { url: '/cluster/jobs' }; },
     getJob: (jobId: string) => { return { url: `/cluster/jobs/${jobId}` }; },
+    acknowledgeJob: (jobId: string) => { return { url: `/system/jobs/acknowledge/${jobId}` }; },
     cancelJob: (jobId: string) => { return { url: `/cluster/jobs/${jobId}` }; },
   },
   SystemMessagesApiController: {

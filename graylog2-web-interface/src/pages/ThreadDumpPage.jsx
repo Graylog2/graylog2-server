@@ -20,8 +20,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Row, Col } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import DateTime from 'logic/datetimes/DateTime';
+import { DocumentTitle, PageHeader, Spinner, Timestamp } from 'components/common';
 import withParams from 'routing/withParams';
 import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
@@ -57,7 +56,7 @@ const ThreadDumpPage = createReactClass({
       <span>
         Thread dump of node {this.state.node.short_node_id} / {this.state.node.hostname}
         &nbsp;
-        <small>Taken at {DateTime.now().toString(DateTime.Formats.COMPLETE)}</small>
+        <small>Taken at <Timestamp dateTime={new Date()} /></small>
       </span>
     );
 

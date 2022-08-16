@@ -34,7 +34,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-@Api(value = "Search/Messages", description = "Simple search returning (matching) messages only, as CSV.")
+@Api(value = "Search/Export", description = "Creating/Managing Export Jobs.")
 @Path("/views/export")
 @RequiresAuthentication
 public class ExportJobsResource extends RestResource {

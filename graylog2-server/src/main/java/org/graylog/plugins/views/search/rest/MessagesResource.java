@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -62,7 +61,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -76,8 +74,6 @@ public class MessagesResource extends RestResource implements PluginRestResource
     private final CommandFactory commandFactory;
     private final SearchDomain searchDomain;
     private final SearchExecutionGuard executionGuard;
-    private final PermittedStreams permittedStreams;
-    private final ObjectMapper objectMapper;
     private final ExportJobService exportJobService;
     private final QueryValidationService queryValidationService;
 
@@ -91,15 +87,11 @@ public class MessagesResource extends RestResource implements PluginRestResource
             CommandFactory commandFactory,
             SearchDomain searchDomain,
             SearchExecutionGuard executionGuard,
-            PermittedStreams permittedStreams,
-            ObjectMapper objectMapper,
             @SuppressWarnings("UnstableApiUsage") EventBus eventBus,
             ExportJobService exportJobService, QueryValidationService queryValidationService) {
         this.commandFactory = commandFactory;
         this.searchDomain = searchDomain;
         this.executionGuard = executionGuard;
-        this.permittedStreams = permittedStreams;
-        this.objectMapper = objectMapper;
         this.exportJobService = exportJobService;
         this.queryValidationService = queryValidationService;
         this.messagesExporterFactory = context -> new AuditingMessagesExporter(context, eventBus, exporter);
@@ -193,10 +185,12 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
     @ApiOperation("Retrieve results for export job")
     @GET
-    @Path("job/{exportJobId}/{filename:.*}")
+    @Path("job/{exportJobId}/{filename}")
     public ChunkedOutput<SimpleMessageChunk> retrieveForExportJob(@ApiParam(value = "ID of an existing export job", name = "exportJobId")
                                                                   @PathParam("exportJobId") String exportJobId,
-                                                                  @Context SearchUser searchUser) throws UnsupportedEncodingException {
+                                                                  @ApiParam(value = "Resulting filename", name = "filename")
+                                                                  @PathParam("filename") String filename,
+                                                                  @Context SearchUser searchUser) {
         final ExportJob exportJob = exportJobService.get(exportJobId)
                 .orElseThrow(() -> new NotFoundException("Unable to find export job with id <" + exportJobId + ">!"));
 
@@ -248,7 +242,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
         search = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadAll());
 
-        search = search.applyExecutionState(objectMapper, executionState);
+        search = search.applyExecutionState(executionState);
 
         executionGuard.check(search, searchUser::canReadStream);
 

@@ -56,13 +56,15 @@ import useParameters from 'views/hooks/useParameters';
 import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
 import type { SearchBarControl } from 'views/types';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import SearchBarForm from './searchbar/SearchBarForm';
+
 import {
   executeSearchSubmitHandler as executePluggableSubmitHandler,
   useInitialSearchValues as usePluggableInitialValues,
   pluggableValidationPayload,
-} from './searchbar/pluggableSearchBarControlsHandler';
+} from '../logic/searchbar/pluggableSearchBarControlsHandler';
 
 type Props = {
   availableStreams: Array<{ key: string, value: string }>,
@@ -129,7 +131,7 @@ const useInitialFormValues = ({ currentQuery, queryFilters }: { currentQuery: Qu
   return ({ timerange, streams, queryString, ...initialValuesFromPlugins });
 };
 
-const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>) => {
+const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, userTimezone: string) => {
   const request = {
     timeRange: values?.timerange,
     streams: values?.streams,
@@ -137,7 +139,7 @@ const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarCon
     ...pluggableValidationPayload(values, pluggableSearchBarControls),
   };
 
-  return debouncedValidateQuery(request);
+  return debouncedValidateQuery(request, userTimezone);
 };
 
 const SearchBar = ({
@@ -147,6 +149,7 @@ const SearchBar = ({
   onSubmit = defaultProps.onSubmit,
 }: Props) => {
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
+  const { userTimezone } = useUserDateTime();
   const { parameters } = useParameters();
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });
@@ -169,7 +172,7 @@ const SearchBar = ({
               <SearchBarForm initialValues={initialValues}
                              limitDuration={limitDuration}
                              onSubmit={_onSubmit}
-                             validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls)}>
+                             validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls, userTimezone)}>
                 {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
                   const disableSearchSubmit = isSubmitting || isValidating || !isValid;
 

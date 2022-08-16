@@ -185,28 +185,45 @@ public class DBJobTriggerServiceTest {
     @Test
     @MongoDBFixtures("job-triggers.json")
     public void getForJob() {
-        assertThatCode(() -> dbJobTriggerService.getForJob(null))
+        assertThatCode(() -> dbJobTriggerService.getOneForJob(null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("jobDefinitionId");
 
-        assertThatCode(() -> dbJobTriggerService.getForJob(""))
+        assertThatCode(() -> dbJobTriggerService.getOneForJob(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("jobDefinitionId");
 
 
-        assertThat(dbJobTriggerService.getForJob("54e3deadbeefdeadbeefaff4")).hasSize(1).satisfies(triggers ->
-                assertThat(triggers.get(0)).satisfies(trigger -> {
+        assertThat(dbJobTriggerService.getOneForJob("54e3deadbeefdeadbeefaff4")).isPresent()
+                .hasValueSatisfying(trigger -> {
                     assertThat(trigger.id()).isEqualTo("54e3deadbeefdeadbeef0002");
                     assertThat(trigger.jobDefinitionId()).isEqualTo("54e3deadbeefdeadbeefaff4");
-                }));
+                });
 
-        assertThat(dbJobTriggerService.getForJob("doesntexist")).isEmpty();
+        assertThat(dbJobTriggerService.getOneForJob("doesntexist")).isEmpty();
 
         // We expect a ISE when there is more than one trigger for a single job definition
-        assertThatCode(() -> dbJobTriggerService.getForJob("54e3deadbeefdeadbeefaff3"))
+        assertThatCode(() -> dbJobTriggerService.getOneForJob("54e3deadbeefdeadbeefaff3"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("54e3deadbeefdeadbeefaff3");
     }
+
+    @Test
+    @MongoDBFixtures("job-triggers.json")
+    public void getAllForJob() {
+
+        // We expect a ISE when there is more than one trigger for a single job definition
+        assertThatCode(() -> dbJobTriggerService.getOneForJob("54e3deadbeefdeadbeefaff3"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("54e3deadbeefdeadbeefaff3");
+
+        // But we can also obtain all by calling following method:
+        assertThat(dbJobTriggerService.getAllForJob("54e3deadbeefdeadbeefaff3"))
+                .hasSize(2)
+                .allSatisfy(trigger -> assertThat(trigger.jobDefinitionId()).isEqualTo("54e3deadbeefdeadbeefaff3"));
+    }
+
+
 
     @Test
     @MongoDBFixtures("job-triggers.json")
@@ -244,6 +261,7 @@ public class DBJobTriggerServiceTest {
     public void createTrigger() {
         final JobTriggerDto trigger = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .schedule(IntervalJobSchedule.builder()
                         .interval(1)
                         .unit(TimeUnit.SECONDS)
@@ -264,6 +282,7 @@ public class DBJobTriggerServiceTest {
         final JobTriggerDto trigger = JobTriggerDto.Builder.create(clock)
                 .id("5b983c77d06b3f114bf130e2")
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .schedule(IntervalJobSchedule.builder()
                         .interval(1)
                         .unit(TimeUnit.SECONDS)
@@ -279,6 +298,7 @@ public class DBJobTriggerServiceTest {
     public void updateTrigger() {
         final JobTriggerDto originalTrigger = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .schedule(IntervalJobSchedule.builder()
                         .interval(15)
                         .unit(TimeUnit.SECONDS)
@@ -295,6 +315,7 @@ public class DBJobTriggerServiceTest {
 
         final JobTriggerDto updatedTrigger = originalTrigger.toBuilder()
                 .jobDefinitionId("xyz-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .startTime(now)
                 .endTime(now)
                 .nextTime(now)
@@ -346,6 +367,7 @@ public class DBJobTriggerServiceTest {
 
         final JobTriggerDto trigger1 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .nextTime(clock.nowUTC().plusSeconds(11))
                 .schedule(schedule)
                 .build());
@@ -353,6 +375,7 @@ public class DBJobTriggerServiceTest {
         // This trigger should never be fired because its status is COMPLETE
         dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .status(JobTriggerStatus.COMPLETE)
                 .nextTime(clock.nowUTC().plusSeconds(10))
                 .schedule(schedule)
@@ -361,6 +384,7 @@ public class DBJobTriggerServiceTest {
         // This trigger should never be fired because its status is PAUSED
         dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .status(JobTriggerStatus.PAUSED)
                 .nextTime(clock.nowUTC().plusSeconds(10))
                 .schedule(schedule)
@@ -369,6 +393,7 @@ public class DBJobTriggerServiceTest {
         // This trigger should never be fired because its status is ERROR
         dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .status(JobTriggerStatus.ERROR)
                 .nextTime(clock.nowUTC().plusSeconds(10))
                 .schedule(schedule)
@@ -399,6 +424,7 @@ public class DBJobTriggerServiceTest {
 
         final JobTriggerDto trigger1 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .nextTime(clock.nowUTC().plusSeconds(11))
                 .schedule(IntervalJobSchedule.builder()
                         .interval(1)
@@ -408,6 +434,7 @@ public class DBJobTriggerServiceTest {
 
         final JobTriggerDto trigger2 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .nextTime(clock.nowUTC().plusSeconds(10))
                 .schedule(IntervalJobSchedule.builder()
                         .interval(1)
@@ -417,6 +444,7 @@ public class DBJobTriggerServiceTest {
 
         final JobTriggerDto trigger3 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .nextTime(clock.nowUTC().plusSeconds(30))
                 .schedule(IntervalJobSchedule.builder()
                         .interval(1)
@@ -426,6 +454,7 @@ public class DBJobTriggerServiceTest {
 
         final JobTriggerDto trigger4 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .startTime(clock.nowUTC().plusSeconds(60))
                 .nextTime(clock.nowUTC().plusSeconds(30))
                 .schedule(IntervalJobSchedule.builder()
@@ -539,6 +568,7 @@ public class DBJobTriggerServiceTest {
     public void releaseTrigger() {
         final JobTriggerDto trigger1 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .schedule(IntervalJobSchedule.builder()
                         .interval(1)
                         .unit(TimeUnit.SECONDS)
@@ -578,6 +608,7 @@ public class DBJobTriggerServiceTest {
     public void releaseTriggerWithoutNextTime() {
         final JobTriggerDto trigger1 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .schedule(IntervalJobSchedule.builder()
                         .interval(1)
                         .unit(TimeUnit.SECONDS)
@@ -614,6 +645,7 @@ public class DBJobTriggerServiceTest {
     public void releaseTriggerWithStatus() {
         final JobTriggerDto trigger1 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .schedule(IntervalJobSchedule.builder()
                         .interval(1)
                         .unit(TimeUnit.SECONDS)
@@ -665,6 +697,7 @@ public class DBJobTriggerServiceTest {
     public void setTriggerError() {
         final JobTriggerDto trigger1 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .schedule(IntervalJobSchedule.builder()
                         .interval(1)
                         .unit(TimeUnit.SECONDS)
@@ -780,6 +813,7 @@ public class DBJobTriggerServiceTest {
     public void triggerWithConstraints() {
         final JobTriggerDto.Builder triggerBuilder = JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .nextTime(clock.nowUTC().minusSeconds(10))
                 .schedule(IntervalJobSchedule.builder()
                         .interval(1)

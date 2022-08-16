@@ -25,6 +25,8 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.scheduler.rest.JobResourceHandlerService;
+import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.system.NodeId;
@@ -54,11 +56,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @RequiresAuthentication
 @Api(value = "System/Jobs", description = "System Jobs")
@@ -71,13 +73,17 @@ public class SystemJobResource extends RestResource {
     private final SystemJobManager systemJobManager;
     private final NodeId nodeId;
 
+    private final JobResourceHandlerService jobResourceHandlerService;
+
     @Inject
     public SystemJobResource(SystemJobFactory systemJobFactory,
                              SystemJobManager systemJobManager,
-                             NodeId nodeId) {
+                             NodeId nodeId,
+                             JobResourceHandlerService jobResourceHandlerService) {
         this.systemJobFactory = systemJobFactory;
         this.systemJobManager = systemJobManager;
         this.nodeId = nodeId;
+        this.jobResourceHandlerService = jobResourceHandlerService;
     }
 
     @GET
@@ -92,7 +98,7 @@ public class SystemJobResource extends RestResource {
             if (isPermitted(RestPermissions.SYSTEMJOBS_READ, entry.getKey())) {
                 final SystemJob systemJob = entry.getValue();
                 jobs.add(SystemJobSummary.create(
-                        UUID.fromString(systemJob.getId()),
+                        systemJob.getId(),
                         systemJob.getDescription(),
                         systemJob.getClassName(),
                         systemJob.getInfo(),
@@ -127,7 +133,7 @@ public class SystemJobResource extends RestResource {
         }
 
         return SystemJobSummary.create(
-                UUID.fromString(systemJob.getId()),
+                systemJob.getId(),
                 systemJob.getDescription(),
                 systemJob.getClassName(),
                 systemJob.getInfo(),
@@ -194,7 +200,7 @@ public class SystemJobResource extends RestResource {
         }
 
         return SystemJobSummary.create(
-                UUID.fromString(systemJob.getId()),
+                systemJob.getId(),
                 systemJob.getDescription(),
                 systemJob.getClassName(),
                 systemJob.getInfo(),
@@ -204,5 +210,18 @@ public class SystemJobResource extends RestResource {
                 systemJob.isCancelable(),
                 systemJob.providesProgress()
         );
+    }
+
+    @DELETE
+    @Path("/acknowledge/{jobId}")
+    @ApiOperation(value = "Acknowledge job with the given ID")
+    @AuditEvent(type = AuditEventTypes.SYSTEM_JOB_ACKNOWLEDGE)
+    public Response acknowledgeJob(@Context UserContext userContext,
+                                                    @ApiParam(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) {
+        final int n = jobResourceHandlerService.acknowledgeJob(userContext, jobId);
+        if (n < 1) {
+            throw new NotFoundException("System job with ID <" + jobId + "> not found!");
+        }
+        return Response.accepted().build();
     }
 }

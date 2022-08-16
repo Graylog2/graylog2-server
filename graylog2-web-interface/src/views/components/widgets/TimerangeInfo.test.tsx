@@ -43,7 +43,7 @@ const mockSearchStoreState = (storeState: {} = {}): {} => ({
           'search-type-id': {
             type: 'pivot',
             effective_timerange: {
-              type: 'absolute', from: '2021-03-27T14:32:31.894Z', to: '2021-04-26T14:32:48.000Z',
+              type: 'absolute', from: '2021-04-26T12:32:48.000Z', to: '2021-04-26T14:32:48.000Z',
             },
           },
         },
@@ -63,8 +63,6 @@ jest.mock('views/stores/SearchStore', () => ({
   ),
 }));
 
-jest.mock('hooks/useUserDateTime');
-
 describe('TimerangeInfo', () => {
   const widget = Widget.empty();
 
@@ -76,7 +74,7 @@ describe('TimerangeInfo', () => {
     const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 3000 }).build();
     render(<TimerangeInfo widget={relativeWidget} activeQuery="active-query-id" widgetId="widget-id" />);
 
-    expect(screen.getByTitle('2021-03-27 14:32:31 - 2021-04-26 14:32:48')).toBeInTheDocument();
+    expect(screen.getByTitle('2021-04-26T14:32:48.000+02:00 - 2021-04-26T16:32:48.000+02:00')).toBeInTheDocument();
   });
 
   it('should display a relative timerange', () => {
@@ -100,13 +98,13 @@ describe('TimerangeInfo', () => {
     expect(screen.getByText('All Time')).toBeInTheDocument();
   });
 
-  it('should display a absolute timerange', () => {
+  it('should display an absolute timerange', () => {
     const absoluteWidget = widget.toBuilder()
       .timerange({ type: 'absolute', from: '2021-03-27T14:32:31.894Z', to: '2021-04-26T14:32:48.000Z' })
       .build();
     render(<TimerangeInfo widget={absoluteWidget} />);
 
-    expect(screen.getByText('2021-03-27 14:32:31 - 2021-04-26 14:32:48')).toBeInTheDocument();
+    expect(screen.getByText('2021-03-27 15:32:31.894 - 2021-04-26 16:32:48.000')).toBeInTheDocument();
   });
 
   it('should display a keyword timerange', () => {
