@@ -22,7 +22,6 @@ import com.google.common.io.Resources;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.RestTools;
-import org.graylog2.shared.rest.HideOnCloud;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -101,7 +100,7 @@ public class DocumentationBrowserResource extends RestResource {
                 "globalModePath", "global/index.html",
                 "globalUriMarker", "/global",
                 "showWarning", "true",
-                "isCloud", configuration.isCloud());
+                "isCloud", configuration.isCloud() ? "true" : "");
         return templateEngine.transform(template, model);
     }
 
