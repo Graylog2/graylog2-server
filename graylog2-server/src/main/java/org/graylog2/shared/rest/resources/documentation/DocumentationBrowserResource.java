@@ -95,7 +95,8 @@ public class DocumentationBrowserResource extends RestResource {
                 "baseUri", relativePath.resolve(HttpConfiguration.PATH_API).toString(),
                 "globalModePath", "global/index.html",
                 "globalUriMarker", "/global",
-                "showWarning", "true");
+                "showWarning", "true",
+                "isCloud", "true");
         return templateEngine.transform(template, model);
     }
 
