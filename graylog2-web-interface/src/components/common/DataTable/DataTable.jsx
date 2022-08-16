@@ -95,6 +95,8 @@ class DataTable extends React.Component {
      * The main reason to disable this is if the table is clipping a dropdown menu or another component in a table edge.
      */
     useResponsiveTable: PropTypes.bool,
+    /** boolean value to set sort numeric  */
+    isNumericSort: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -112,6 +114,7 @@ class DataTable extends React.Component {
     headerCellFormatter: (header) => { return (<th>{header}</th>); },
     sortByKey: undefined,
     sortBy: undefined,
+    isNumericSort: false
   };
 
   constructor(props) {
@@ -139,16 +142,16 @@ class DataTable extends React.Component {
 
   getFormattedDataRows = () => {
     let i = 0;
-    const { sortByKey, sortBy, dataRowFormatter } = this.props;
+    const { sortByKey, sortBy, dataRowFormatter, isNumericSort } = this.props;
     let sortedDataRows = this._getEffectiveRows();
 
     if (sortByKey) {
       sortedDataRows = sortedDataRows.sort((a, b) => {
-        return a[sortByKey].localeCompare(b[sortByKey]);
+        return a[sortByKey].localeCompare(b[sortByKey], undefined, { numeric: isNumericSort });
       });
     } else if (sortBy) {
       sortedDataRows = sortedDataRows.sort((a, b) => {
-        return sortBy(a).localeCompare(sortBy(b));
+        return sortBy(a).localeCompare(sortBy(b), undefined, { numeric: isNumericSort });
       });
     }
 
