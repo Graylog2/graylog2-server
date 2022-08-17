@@ -20,13 +20,14 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
+import com.mongodb.lang.Nullable;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
-import org.joda.time.Duration;
+
+import java.util.concurrent.TimeUnit;
 
 @JsonAutoDetect
 @AutoValue
@@ -40,7 +41,8 @@ public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean
     public static final Integer DEFAULT_REPLICAS = 0;
     public static final boolean DEFAULT_INDEX_OPTIMIZATION_DISABLED = false;
     public static final Integer DEFAULT_INDEX_OPTIMIZATION_MAX_SEGMENTS = 1;
-    public static final Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5);
+    public static final int DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = 5;
+    public static final TimeUnit DEFAULT_FIELD_TYPE_REFRESH_INTERVAL_UNIT = TimeUnit.SECONDS;
     public static final String DEFAULT_ROTATION_STRATEGY_CLASS = SizeBasedRotationStrategyConfig.class.getCanonicalName();
     public static final RotationStrategyConfig DEFAULT_ROTATION_STRATEGY_CONFIG = SizeBasedRotationStrategyConfig.createDefault();
     public static final String DEFAULT_RETENTION_STRATEGY_CLASS = SizeBasedRotationStrategyConfig.class.getCanonicalName();
@@ -54,11 +56,13 @@ public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean
     public static final String INDEX_OPTIMIZATION_DISABLED = "index_optimization_disabled";
     public static final String INDEX_OPTIMIZATION_MAX_SEGMENTS = "index_optimization_max_num_segments";
     public static final String FIELD_TYPE_REFRESH_INTERVAL = "field_type_refresh_interval";
+    public static final String FIELD_TYPE_REFRESH_INTERVAL_UNIT = "field_type_refresh_interval_unit";
     public static final String ROTATION_STRATEGY_CLASS = "rotation_strategy_class";
     public static final String ROTATION_STRATEGY_CONFIG = "rotation_strategy_config";
     public static final String RETENTION_STRATEGY_CLASS = "retention_strategy_class";
     public static final String RETENTION_STRATEGY_CONFIG = "retention_strategy_config";
 
+    @Nullable
     @JsonProperty(INDEX_PREFIX)
     public abstract String indexPrefix();
 
@@ -78,7 +82,10 @@ public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean
     public abstract boolean indexOptimizationDisabled();
 
     @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL)
-    public abstract Duration fieldTypeRefreshInterval();
+    public abstract long fieldTypeRefreshInterval();
+
+    @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL_UNIT)
+    public abstract TimeUnit fieldTypeRefreshIntervalUnit();
 
     @JsonProperty(ROTATION_STRATEGY_CLASS)
     public abstract String rotationStrategyClass();
@@ -101,6 +108,7 @@ public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean
                 .indexOptimizationDisabled(DEFAULT_INDEX_OPTIMIZATION_DISABLED)
                 .indexOptimizationMaxNumSegments(DEFAULT_INDEX_OPTIMIZATION_MAX_SEGMENTS)
                 .fieldTypeRefreshInterval(DEFAULT_FIELD_TYPE_REFRESH_INTERVAL)
+                .fieldTypeRefreshIntervalUnit(DEFAULT_FIELD_TYPE_REFRESH_INTERVAL_UNIT)
                 .rotationStrategyClass(DEFAULT_ROTATION_STRATEGY_CLASS)
                 .rotationStrategyConfig(DEFAULT_ROTATION_STRATEGY_CONFIG)
                 .retentionStrategyClass(DEFAULT_RETENTION_STRATEGY_CLASS)
@@ -132,7 +140,10 @@ public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean
         public abstract Builder indexOptimizationDisabled(boolean indexOptimizationDisabled);
 
         @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL)
-        public abstract Builder fieldTypeRefreshInterval(Duration fieldTypeRefreshInterval);
+        public abstract Builder fieldTypeRefreshInterval(long fieldTypeRefreshInterval);
+
+        @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL_UNIT)
+        public abstract Builder fieldTypeRefreshIntervalUnit(TimeUnit fieldTypeRefreshIntervalUnit);
 
         @JsonProperty(ROTATION_STRATEGY_CLASS)
         public abstract Builder rotationStrategyClass(String rotationStrategyClass);

@@ -14,36 +14,32 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, {useState} from 'react';
 
 import {Form, Formik} from 'formik';
-import type {DefaultTheme} from 'styled-components';
-import styled, {css} from 'styled-components';
-import {useState} from 'react';
 
-import {IfPermitted, InputDescription} from 'components/common';
+import {IfPermitted, TimeUnitInput} from 'components/common';
 import {Button, Col, Modal, Row} from 'components/bootstrap';
 import FormikInput from '../common/FormikInput';
+import lodash from 'lodash';
 
 type IndexConfig = {
-  indexPrefix: string,
-  indexAnalyzer: String,
+  index_prefix: string,
+  index_analyzer: string,
   shards: number,
   replicas: number,
-  indexOptimizationMaxNumSegments: number,
-  indexOptimizationDisabled: boolean,
-  fieldTypeRefreshInterval: number,
+  index_optimization_max_num_segments: number,
+  index_optimization_disabled: boolean,
+  field_type_refresh_interval: number,
+  field_type_refresh_interval_unit: string,
 }
+
+const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 
 type Props = {
   config: IndexConfig,
   updateConfig: (arg: IndexConfig) => void,
 };
-
-const LabelSpan = styled.span(({theme}: { theme: DefaultTheme }) => css`
-  margin-left: ${theme.spacings.sm};
-  font-weight: bold;
-`);
 
 const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
 
@@ -51,13 +47,13 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
 
   const handleSaveConfig = async (config: IndexConfig) => updateConfig(config);
 
-  const _saveConfig = (values) => {
+  const saveConfig = (values) => {
     handleSaveConfig(values).then(() => {
       setShowModal(false);
     });
   };
 
-  const _resetConfig = () => {
+  const resetConfig = () => {
     setShowModal(false);
   };
 
@@ -67,23 +63,23 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
       <p>Defaults for newly created index sets.</p>
       <dl className="deflist">
         <dt>Index prefix:</dt>
-        <dd>{config.indexPrefix}</dd>
+        <dd>{!config.index_prefix ? '<none>' : config.index_prefix}</dd>
         <dt>Index analyzer:</dt>
-        <dd>{config.indexAnalyzer}</dd>
+        <dd>{config.index_analyzer}</dd>
         <dt>Shards per Index:</dt>
         <dd>{config.shards}</dd>
         <dt>Replicas per Index:</dt>
         <dd>{config.replicas}</dd>
         <dt>Max. Number of Segments:</dt>
-        <dd>{config.indexOptimizationMaxNumSegments}</dd>
+        <dd>{config.index_optimization_max_num_segments}</dd>
         <dt>Index optimization disabled:</dt>
-        <dd>{config.indexOptimizationDisabled}</dd>
-        <dt>Field type refresh interval</dt>
-        <dd>{config.fieldTypeRefreshInterval}</dd>
+        <dd>{config.index_optimization_disabled ? 'Yes' : 'No'}</dd>
+        <dt>Field type refresh interval:</dt>
+        <dd>{config.field_type_refresh_interval} {lodash.capitalize(config.field_type_refresh_interval_unit)}</dd>
       </dl>
 
       <p>
-        <IfPermitted permissions="clusterconfigentry:edit">
+        <IfPermitted permissions="indices:changestate">
           <Button
             bsStyle="info"
             bsSize="xs"
@@ -92,15 +88,10 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
             }}>Update</Button>
         </IfPermitted>
       </p>
-      {/* TODO: Remove the this, because not class */}
-      {/* TODO: Don't use the _underscore function name. Just use name */}
-      {/* TODO: Always define the function as a variable. Always start with const =  */}
-      {/* TODO: const funcName = (name: type) => {} */}
-      {/* TODO: Want to use functional component with hook */}
 
-      <Modal show={showModal} onHide={_resetConfig} aria-modal="true" aria-labelledby="dialog_label">
-        <Formik onSubmit={_saveConfig} initialValues={config}>
-          {({isSubmitting}) => {
+      <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
+        <Formik onSubmit={saveConfig} initialValues={config}>
+          {({values, setFieldValue, isSubmitting}) => {
             return (
               <Form>
                 <Modal.Header closeButton>
@@ -111,26 +102,52 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
                   <div>
                     <Row>
                       <Col sm={12}>
+                        {/* TODO: Descriptions and help text <InputDescription help={<>A relevant description</>} />*/}
+                        {/* TODO: Analyzer validation? Dropdown?*/}
                         <FormikInput label="Index Prefix"
-                                     name="indexPrefix"
-                                     id="index-prefix"
-                                     help="The prefix."
-                                     required />
-                        <InputDescription help={<>A relevant description</>} />
+                                     name="index_prefix"
+                                     id="index_prefix"
+                                     help="The prefix." />
+                        <FormikInput label="Index Analyzer"
+                                     name="index_analyzer"
+                                     id="index_analyzer" />
+                        <FormikInput label="Shards per Index"
+                                     name="shards"
+                                     id="shards" />
+                        <FormikInput label="Replicas"
+                                     name="replicas"
+                                     id="replicas" />
+                        <FormikInput label="Max. Number of Segments"
+                                     name="index_optimization_max_num_segments"
+                                     id="index_optimization_max_num_segments" />
+                        <FormikInput label="Index Optimization Disabled"
+                                     name="replicas"
+                                     type="checkbox"
+                                     id="index_optimization_disabled" />
+
+                        <TimeUnitInput label="Field type refresh interval"
+                                       update={(value, unit) => {
+                                         setFieldValue('field_type_refresh_interval', value);
+                                         setFieldValue('field_type_refresh_interval_unit', unit);
+                                       }}
+                                       value={values.field_type_refresh_interval}
+                                       unit={values.field_type_refresh_interval_unit}
+                                       enabled={true}
+                                       hideCheckbox
+                                       units={TIME_UNITS} />
                       </Col>
                     </Row>
                   </div>
                 </Modal.Body>
 
                 <Modal.Footer>
-                  <Button type="button" bsStyle="link" onClick={_resetConfig}>Close</Button>
+                  <Button type="button" bsStyle="link" onClick={resetConfig}>Close</Button>
                   <Button type="submit" bsStyle="success"
                           disabled={isSubmitting}>{isSubmitting ? 'Saving' : 'Save'}</Button>
                 </Modal.Footer>
               </Form>
             );
           }}
-
         </Formik>
       </Modal>
     </div>
