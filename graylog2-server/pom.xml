@@ -112,7 +112,7 @@
 
         <dependency>
             <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver</artifactId>
+            <artifactId>mongodb-driver-sync</artifactId>
         </dependency>
 
         <dependency>
@@ -121,7 +121,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mongojack</groupId>
+            <groupId>org.graylog.repackaged.mongojack</groupId>
             <artifactId>mongojack</artifactId>
         </dependency>
 

@@ -86,7 +86,7 @@ public class V20191203120602_MigrateSavedSearchesToViewsTest {
 
         @Override
         public String get() {
-            return new ObjectId(date, 42, (short) 23, counter.incrementAndGet()).toHexString();
+            return new ObjectId(date, counter.incrementAndGet()).toHexString();
         }
     }
 
