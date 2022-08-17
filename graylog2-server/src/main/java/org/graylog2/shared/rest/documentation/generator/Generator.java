@@ -88,6 +88,7 @@ public class Generator {
     private static final Logger LOG = LoggerFactory.getLogger(Generator.class);
 
     public static final String EMULATED_SWAGGER_VERSION = "1.2";
+    public static final String CLOUD_VISIBLE = "cloud";
 
     private static final Map<String, Object> overviewResult = Maps.newHashMap();
 
@@ -95,16 +96,18 @@ public class Generator {
     private final Map<Class<?>, String> pluginMapping;
     private final String pluginPathPrefix;
     private final ObjectMapper mapper;
-
-    public Generator(Set<Class<?>> resourceClasses, Map<Class<?>, String> pluginMapping, String pluginPathPrefix, ObjectMapper mapper) {
+    private final boolean isCloud;
+    public Generator(Set<Class<?>> resourceClasses, Map<Class<?>, String> pluginMapping,
+                     String pluginPathPrefix, ObjectMapper mapper, boolean isCloud) {
         this.resourceClasses = resourceClasses;
         this.pluginMapping = pluginMapping;
         this.pluginPathPrefix = pluginPathPrefix;
         this.mapper = mapper;
+        this.isCloud = isCloud;
     }
 
-    public Generator(Set<Class<?>> resourceClasses, ObjectMapper mapper) {
-        this(resourceClasses, ImmutableMap.of(), "", mapper);
+    public Generator(Set<Class<?>> resourceClasses, ObjectMapper mapper, boolean isCloud) {
+        this(resourceClasses, ImmutableMap.of(), "", mapper, isCloud);
     }
 
     private String prefixedPath(Class<?> resourceClass, @Nullable String resourceAnnotationPath) {
@@ -140,6 +143,11 @@ public class Generator {
             }
 
             final String prefixedPath = prefixedPath(clazz, path.value());
+            if (isCloud && Arrays.stream(info.tags()).noneMatch(CLOUD_VISIBLE::equalsIgnoreCase)) {
+                LOG.info("Hiding in cloud: {}", prefixedPath);
+                continue;
+            }
+
             final Map<String, Object> apiDescription = Maps.newHashMap();
             apiDescription.put("name", prefixedPath.startsWith(pluginPathPrefix) ? "Plugins/" + info.value() : info.value());
             apiDescription.put("path", prefixedPath);
@@ -670,7 +678,7 @@ public class Generator {
         return route;
     }
 
-    private final static Set<String> PRIMITIVES = ImmutableSet.of(
+    private static final Set<String> PRIMITIVES = ImmutableSet.of(
             "boolean",
             "Boolean",
             "Double",
