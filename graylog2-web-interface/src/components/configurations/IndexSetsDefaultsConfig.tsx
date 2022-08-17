@@ -22,6 +22,7 @@ import {IfPermitted, TimeUnitInput} from 'components/common';
 import {Button, Col, Modal, Row} from 'components/bootstrap';
 import FormikInput from '../common/FormikInput';
 import lodash from 'lodash';
+import styled, {DefaultTheme, css} from 'styled-components';
 
 type IndexConfig = {
   index_prefix: string,
@@ -41,12 +42,20 @@ type Props = {
   updateConfig: (arg: IndexConfig) => void,
 };
 
+const StyledDefList = styled.dl.attrs({
+  className: 'deflist',
+})(({ theme }: { theme: DefaultTheme }) => css`
+  &&.deflist {
+    dd {
+      padding-left: ${theme.spacings.md};
+      margin-left: 200px;
+    }
+  }
+`);
+
 const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
-
   const [showModal, setShowModal] = useState<boolean>(false);
-
   const handleSaveConfig = async (config: IndexConfig) => updateConfig(config);
-
   const saveConfig = (values) => {
     handleSaveConfig(values).then(() => {
       setShowModal(false);
@@ -61,7 +70,7 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
     <div>
       <h2>Index Defaults</h2>
       <p>Defaults for newly created index sets.</p>
-      <dl className="deflist">
+      <StyledDefList>
         <dt>Index prefix:</dt>
         <dd>{!config.index_prefix ? '<none>' : config.index_prefix}</dd>
         <dt>Index analyzer:</dt>
@@ -76,7 +85,7 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
         <dd>{config.index_optimization_disabled ? 'Yes' : 'No'}</dd>
         <dt>Field type refresh interval:</dt>
         <dd>{config.field_type_refresh_interval} {lodash.capitalize(config.field_type_refresh_interval_unit)}</dd>
-      </dl>
+      </StyledDefList>
 
       <p>
         <IfPermitted permissions="indices:changestate">
@@ -121,10 +130,9 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
                                      name="index_optimization_max_num_segments"
                                      id="index_optimization_max_num_segments" />
                         <FormikInput label="Index Optimization Disabled"
-                                     name="replicas"
                                      type="checkbox"
+                                     name="index_optimization_disabled"
                                      id="index_optimization_disabled" />
-
                         <TimeUnitInput label="Field type refresh interval"
                                        update={(value, unit) => {
                                          setFieldValue('field_type_refresh_interval', value);
