@@ -50,7 +50,14 @@ describe('<ViewEventDefinitionPage />', () => {
   ) => {
     const user = alice.toBuilder().permissions(Immutable.List(permissions)).build();
 
-    return <CurrentUserContext.Provider value={user}><ViewEventDefinitionPage params={{ definitionId: mockEventDefinition.id }} /></CurrentUserContext.Provider>;
+    // @ts-ignore
+    const EventDefintionPageWithParams = <ViewEventDefinitionPage params={{ definitionId: mockEventDefinition.id }} />;
+
+    return (
+      <CurrentUserContext.Provider value={user}>
+        {EventDefintionPageWithParams}
+      </CurrentUserContext.Provider>
+    );
   };
 
   EventDefinitionPageWithPermissions.defaultProps = { permissions: [] };
