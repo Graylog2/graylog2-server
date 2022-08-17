@@ -255,7 +255,7 @@ public class S3GeoIpFileService {
     private BucketsAndKeys getBucketsAndKeys(GeoIpResolverConfig config) {
         String cityFile = config.cityDbPath();
         int cityLastSlash = cityFile.lastIndexOf("/");
-        String cityBucket = cityFile.substring(S3GeoIpFileService.S3_BUCKET_PREFIX.length(), cityLastSlash);
+        String cityBucket = cityFile.substring(S3_BUCKET_PREFIX.length(), cityLastSlash);
         String cityKey = cityFile.substring(cityLastSlash + 1);
         LOG.debug("City Bucket = {}, City Key = {}", cityBucket, cityKey);
 
@@ -264,7 +264,7 @@ public class S3GeoIpFileService {
         if (!config.asnDbPath().isEmpty()) {
             String asnFile = config.asnDbPath();
             int asnLastSlash = asnFile.lastIndexOf("/");
-            asnBucket = asnFile.substring(S3GeoIpFileService.S3_BUCKET_PREFIX.length(), asnLastSlash);
+            asnBucket = asnFile.substring(S3_BUCKET_PREFIX.length(), asnLastSlash);
             asnKey = asnFile.substring(asnLastSlash + 1);
         }
         LOG.debug("ASN Bucket = {}, ASN Key = {}", asnBucket, asnKey);
