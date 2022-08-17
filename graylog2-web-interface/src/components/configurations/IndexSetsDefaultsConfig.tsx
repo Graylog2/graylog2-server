@@ -24,7 +24,7 @@ import FormikInput from '../common/FormikInput';
 import lodash from 'lodash';
 import styled, {DefaultTheme, css} from 'styled-components';
 
-type IndexConfig = {
+export type IndexConfig = {
   index_prefix: string,
   index_analyzer: string,
   shards: number,

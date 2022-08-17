@@ -32,6 +32,8 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 import { RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
 import type { RetentionStrategy, RotationStrategy, RetentionStrategyContext } from 'components/indices/Types';
+import useIndexDefaults from 'pages/useIndexDefaults';
+import {IndexConfig} from 'components/configurations/IndexSetsDefaultsConfig';
 
 type Props = {
   indexSet: Partial<IndexSet> | null | undefined,
@@ -40,7 +42,20 @@ type Props = {
   retentionStrategiesContext?: RetentionStrategyContext | null | undefined,
 }
 
+const fallbackDefaults : IndexConfig =  {
+  index_prefix: '',
+  index_analyzer: 'standard',
+  shards: 4,
+  replicas: 0,
+  index_optimization_max_num_segments: 1,
+  index_optimization_disabled: false,
+  field_type_refresh_interval: 5,
+  field_type_refresh_interval_unit: "SECONDS" }
+
 const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retentionStrategiesContext, indexSet }: Props) => {
+
+  const { isLoading, config } = useIndexDefaults(fallbackDefaults);
+
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies();
     IndicesConfigurationActions.loadRetentionStrategies();
