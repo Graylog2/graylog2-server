@@ -15,136 +15,127 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
-import mockComponent from 'helpers/mocking/MockComponent';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
-import 'helpers/mocking/react-dom_mock';
+import { asMock } from 'helpers/mocking';
+import mockComponent from 'helpers/mocking/MockComponent';
+import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
+
 import SavedSearchForm from './SavedSearchForm';
 
 jest.mock('react-overlays', () => ({ Position: mockComponent('MockPosition') }));
-jest.mock('react-portal', () => ({ Portal: mockComponent('MockPortal') }));
+jest.mock('components/common/Portal', () => ({ children }) => (children));
+jest.mock('views/hooks/useSaveViewFormControls');
 
 describe('SavedSearchForm', () => {
+  const props = {
+    value: 'new Title',
+    onChangeTitle: () => {},
+    saveAsSearch: () => {},
+    disableCreateNew: false,
+    toggleModal: () => {},
+    isCreateNew: false,
+    target: () => {},
+    saveSearch: () => {},
+  };
+  const findByHeadline = () => screen.findByRole('heading', { name: /name of search/i });
+
+  beforeEach(() => {
+    asMock(useSaveViewFormControls).mockReturnValue([]);
+  });
+
   describe('render the SavedSearchForm', () => {
-    it('should render create new', () => {
-      const wrapper = mount(<SavedSearchForm value="new Title"
-                                             onChangeTitle={() => {}}
-                                             saveAsSearch={() => {}}
-                                             disableCreateNew={false}
-                                             toggleModal={() => {}}
-                                             isCreateNew
-                                             target={() => {}}
-                                             saveSearch={() => {}} />);
+    it('should render create new', async () => {
+      render(<SavedSearchForm {...props}
+                              isCreateNew />);
 
-      expect(wrapper).toExist();
+      await findByHeadline();
     });
 
-    it('should render save', () => {
-      const wrapper = mount(<SavedSearchForm value="new Title"
-                                             onChangeTitle={() => {}}
-                                             saveAsSearch={() => {}}
-                                             disableCreateNew={false}
-                                             toggleModal={() => {}}
-                                             isCreateNew={false}
-                                             target={() => {}}
-                                             saveSearch={() => {}} />);
+    it('should render save', async () => {
+      render(<SavedSearchForm {...props} />);
 
-      expect(wrapper).toExist();
+      await findByHeadline();
     });
 
-    it('should render disabled create new', () => {
-      const wrapper = mount(<SavedSearchForm value="new Title"
-                                             onChangeTitle={() => {}}
-                                             saveAsSearch={() => {}}
-                                             disableCreateNew
-                                             toggleModal={() => {}}
-                                             isCreateNew={false}
-                                             target={() => {}}
-                                             saveSearch={() => {}} />);
+    it('should render disabled create new', async () => {
+      render(<SavedSearchForm {...props}
+                              disableCreateNew />);
 
-      expect(wrapper).toExist();
+      await findByHeadline();
     });
   });
 
   describe('callbacks', () => {
-    it('should handle toggleModal', () => {
+    it('should handle toggleModal', async () => {
       const onToggleModal = jest.fn();
-      const wrapper = mount(<SavedSearchForm value="new Title"
-                                             onChangeTitle={() => {}}
-                                             saveAsSearch={() => {}}
-                                             disableCreateNew
-                                             toggleModal={onToggleModal}
-                                             isCreateNew={false}
-                                             target={() => {}}
-                                             saveSearch={() => {}} />);
 
-      wrapper.find('button[children="Cancel"]').simulate('click');
+      render(<SavedSearchForm {...props}
+                              toggleModal={onToggleModal} />);
+
+      const cancelButton = await screen.findByRole('button', { name: /cancel/i });
+      userEvent.click(cancelButton);
 
       expect(onToggleModal).toHaveBeenCalledTimes(1);
     });
 
-    it('should handle saveSearch', () => {
+    it('should handle saveSearch', async () => {
       const onSave = jest.fn();
-      const wrapper = mount(<SavedSearchForm value="new Title"
-                                             onChangeTitle={() => {}}
-                                             saveAsSearch={() => {}}
-                                             disableCreateNew
-                                             toggleModal={() => {}}
-                                             isCreateNew={false}
-                                             target={() => {}}
-                                             saveSearch={onSave} />);
 
-      wrapper.find('button[children="Save"]').simulate('click');
+      render(<SavedSearchForm {...props}
+                              saveSearch={onSave} />);
+
+      const saveButton = await screen.findByRole('button', { name: 'Save' });
+      userEvent.click(saveButton);
 
       expect(onSave).toHaveBeenCalledTimes(1);
     });
+
+    it('should handle saveAsSearch', async () => {
+      const onSaveAs = jest.fn();
+
+      render(<SavedSearchForm {...props}
+                              saveAsSearch={onSaveAs} />);
+
+      const saveAsButton = await screen.findByRole('button', { name: 'Save as' });
+      userEvent.click(saveAsButton);
+
+      expect(onSaveAs).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not handle saveAsSearch if disabled', async () => {
+      const onSaveAs = jest.fn();
+
+      render(<SavedSearchForm {...props}
+                              disableCreateNew
+                              saveAsSearch={onSaveAs} />);
+
+      const saveAsButton = await screen.findByRole('button', { name: 'Save as' });
+      userEvent.click(saveAsButton);
+
+      expect(onSaveAs).toHaveBeenCalledTimes(0);
+    });
+
+    it('should handle create new', async () => {
+      const onSaveAs = jest.fn();
+
+      render(<SavedSearchForm {...props}
+                              saveAsSearch={onSaveAs}
+                              isCreateNew />);
+
+      const createNewButton = await screen.findByRole('button', { name: /create new/i });
+      userEvent.click(createNewButton);
+
+      expect(onSaveAs).toHaveBeenCalledTimes(1);
+    });
   });
 
-  it('should handle saveAsSearch', () => {
-    const onSaveAs = jest.fn();
-    const wrapper = mount(<SavedSearchForm value="new Title"
-                                           onChangeTitle={() => {}}
-                                           saveAsSearch={onSaveAs}
-                                           disableCreateNew={false}
-                                           toggleModal={() => {}}
-                                           isCreateNew={false}
-                                           target={() => {}}
-                                           saveSearch={() => {}} />);
+  it('should render pluggable components', async () => {
+    asMock(useSaveViewFormControls).mockReturnValue([{ component: () => <div>Pluggable component!</div>, id: 'example-plugin-component' }]);
 
-    wrapper.find('button[children="Save as"]').simulate('click');
+    render(<SavedSearchForm {...props} />);
 
-    expect(onSaveAs).toHaveBeenCalledTimes(1);
-  });
-
-  it('should not handle saveAsSearch if disabled', () => {
-    const onSaveAs = jest.fn();
-    const wrapper = mount(<SavedSearchForm value="new Title"
-                                           onChangeTitle={() => {}}
-                                           saveAsSearch={onSaveAs}
-                                           disableCreateNew
-                                           toggleModal={() => {}}
-                                           isCreateNew={false}
-                                           target={() => {}}
-                                           saveSearch={() => {}} />);
-
-    wrapper.find('button[children="Save as"]').simulate('click');
-
-    expect(onSaveAs).toHaveBeenCalledTimes(0);
-  });
-
-  it('should handle create new', () => {
-    const onSaveAs = jest.fn();
-    const wrapper = mount(<SavedSearchForm value="new Title"
-                                           onChangeTitle={() => {}}
-                                           saveAsSearch={onSaveAs}
-                                           disableCreateNew={false}
-                                           toggleModal={() => {}}
-                                           isCreateNew
-                                           target={() => {}}
-                                           saveSearch={() => {}} />);
-
-    wrapper.find('button[children="Create new"]').simulate('click');
-
-    expect(onSaveAs).toHaveBeenCalledTimes(1);
+    await screen.findByText('Pluggable component!');
   });
 });

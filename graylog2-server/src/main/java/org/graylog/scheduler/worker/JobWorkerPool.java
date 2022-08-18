@@ -45,7 +45,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class JobWorkerPool implements GracefulShutdownHook {
     public interface Factory {
-        JobWorkerPool create(String name, int poolSize);
+        JobWorkerPool create(String name, int poolSize, Runnable shutdownCallback);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(JobWorkerPool.class);
@@ -53,17 +53,19 @@ public class JobWorkerPool implements GracefulShutdownHook {
     private static final String EXECUTOR_NAME = NAME_PREFIX + "-executor";
     private static final Pattern NAME_PATTERN = Pattern.compile("[a-zA-Z0-9\\-]+");
 
-    private final GracefulShutdownService gracefulShutdownService;
+    private final int poolSize;
     private final ExecutorService executor;
     private final Semaphore slots;
-
+    private final Runnable shutdownCallback;
 
     @Inject
     public JobWorkerPool(@Assisted String name,
                          @Assisted int poolSize,
+                         @Assisted Runnable shutdownCallback,
                          GracefulShutdownService gracefulShutdownService,
                          MetricRegistry metricRegistry) {
-        this.gracefulShutdownService = gracefulShutdownService;
+        this.shutdownCallback = shutdownCallback;
+        this.poolSize = poolSize;
         checkArgument(NAME_PATTERN.matcher(name).matches(), "Pool name must match %s", NAME_PATTERN);
 
         this.executor = buildExecutor(name, poolSize, metricRegistry);
@@ -89,6 +91,15 @@ public class JobWorkerPool implements GracefulShutdownHook {
      */
     public boolean hasFreeSlots() {
         return freeSlots() > 0;
+    }
+
+    /**
+     * Checks if there are any slots used in the worker pool
+     *
+     * @return true if there are slots used, false otherwise
+     */
+    public boolean anySlotsUsed() {
+        return poolSize != freeSlots();
     }
 
     /**
@@ -127,34 +138,9 @@ public class JobWorkerPool implements GracefulShutdownHook {
         executor.shutdown();
         if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
             LOG.warn("Timeout shutting down worker pool after 60 seconds");
+        } else {
+            shutdownCallback.run();
         }
-    }
-
-    /**
-     * Shutdown the worker pool. This doesn't wait for currently running jobs to complete.
-     * Use {@link #awaitTermination(long, TimeUnit)} to do that.
-     */
-    public void shutdown() {
-        executor.shutdown();
-        try {
-            gracefulShutdownService.unregister(this);
-        } catch (IllegalStateException ignore) {
-            // Server is already shutting down, we can ignore it
-        }
-    }
-
-    /**
-     * Blocks until all jobs have completed execution after a shutdown request, or the timeout occurs, or the
-     * current thread is interrupted, whichever happens first.
-     *
-     * @param timeout the maximum time to wait
-     * @param unit    the time unit of the timeout argument
-     * @return {@code true} if this pool terminated and
-     * {@code false} if the timeout elapsed before termination
-     * @throws InterruptedException if interrupted while waiting
-     */
-    public void awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
-        executor.awaitTermination(timeout, unit);
     }
 
     private static ExecutorService buildExecutor(String name, int poolSize, MetricRegistry metricRegistry) {
@@ -172,9 +158,9 @@ public class JobWorkerPool implements GracefulShutdownHook {
 
     private void registerMetrics(MetricRegistry metricRegistry, int poolSize) {
         metricRegistry.register(MetricRegistry.name(this.getClass(), "waiting_for_slots"),
-                (Gauge<Integer>) () -> slots.getQueueLength());
+                (Gauge<Integer>) slots::getQueueLength);
         metricRegistry.register(MetricRegistry.name(this.getClass(), "free_slots"),
-                (Gauge<Integer>) () -> freeSlots());
+                (Gauge<Integer>) this::freeSlots);
         metricRegistry.register(MetricRegistry.name(this.getClass(), "total_slots"),
                 (Gauge<Integer>) () -> poolSize);
 

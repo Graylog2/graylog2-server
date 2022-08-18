@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import asMock from 'helpers/mocking/AsMock';
 
+import asMock from 'helpers/mocking/AsMock';
 import { createWidget } from 'views/logic/WidgetTestHelpers';
 
 import { widgetDefinition } from './Widgets';

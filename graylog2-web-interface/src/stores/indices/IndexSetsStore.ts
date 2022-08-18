@@ -15,60 +15,83 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
+import PropTypes from 'prop-types';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import type { RetentionStrategyConfig, RotationStrategyConfig } from 'components/indices/Types';
+import { RetentionStrategyConfigPropType, RotationStrategyConfigPropType } from 'components/indices/Types';
 
+export const IndexSetPropType = PropTypes.shape({
+  can_be_default: PropTypes.bool,
+  id: PropTypes.string,
+  title: PropTypes.string,
+  description: PropTypes.string.isRequired,
+  index_prefix: PropTypes.string.isRequired,
+  shards: PropTypes.number.isRequired,
+  replicas: PropTypes.number.isRequired,
+  rotation_strategy_class: PropTypes.string.isRequired,
+  rotation_strategy: RotationStrategyConfigPropType.isRequired,
+  retention_strategy_class: PropTypes.string.isRequired,
+  retention_strategy: RetentionStrategyConfigPropType.isRequired,
+  creation_date: PropTypes.string,
+  index_analyzer: PropTypes.string.isRequired,
+  index_optimization_max_num_segments: PropTypes.number.isRequired,
+  index_optimization_disabled: PropTypes.bool.isRequired,
+  field_type_refresh_interval: PropTypes.number.isRequired,
+  index_template_type: PropTypes.string,
+  writable: PropTypes.bool.isRequired,
+  default: PropTypes.bool.isRequired,
+});
 export type IndexSet = {
-  can_be_default: boolean,
-  id: string,
+  can_be_default?: boolean,
+  id?: string,
   title: string,
   description: string,
   index_prefix: string,
   shards: number,
   replicas: number,
   rotation_strategy_class: string,
-  rotation_strategy: {
-    type: string,
-    max_docs_per_index: number,
-  },
+  rotation_strategy: RotationStrategyConfig,
   retention_strategy_class: string,
-  retention_strategy: {
-    type: string,
-    max_docs_per_index: number,
-    index_action: string,
-  },
-  creation_date: string,
+  retention_strategy: RetentionStrategyConfig
+  creation_date?: string,
   index_analyzer: string,
   index_optimization_max_num_segments: number,
   index_optimization_disabled: boolean,
   field_type_refresh_interval: number,
-  index_template_type: string,
+  index_template_type?: string,
   writable: boolean,
-  default: boolean,
+  default?: boolean,
 };
 
+type IndexSetStats = {
+  [key: string]: {
+    documents: number,
+    indices: number,
+    size: number,
+  },
+}
 type IndexSetsResponseType = {
   total: number,
   index_sets: Array<IndexSet>,
-  stats: {
-    [key: string]: {
-      documents: number,
-      indices: number,
-      size: number,
-    },
-  },
+  stats: IndexSetStats,
 };
-
+type IndexSetsStoreState = {
+  indexSetsCount: number,
+  indexSets: Array<IndexSet>,
+  indexSetStats: IndexSetStats,
+  indexSet: IndexSet,
+}
 type IndexSetsActionsType = {
   list: () => Promise<unknown>,
   listPaginated: () => Promise<unknown>,
   get: (indexSetId: string) => Promise<unknown>,
-  update: () => Promise<unknown>,
-  create: () => Promise<unknown>,
+  update: (indexSet: IndexSet) => Promise<unknown>,
+  create: (indexSet: IndexSet) => Promise<unknown>,
   delete: () => Promise<unknown>,
   setDefault: () => Promise<unknown>,
   stats: () => Promise<unknown>,
@@ -89,11 +112,12 @@ export const IndexSetsActions = singletonActions(
 
 export const IndexSetsStore = singletonStore(
   'core.IndexSets',
-  () => Reflux.createStore({
+  () => Reflux.createStore<IndexSetsStoreState>({
     listenables: [IndexSetsActions],
     indexSetsCount: undefined,
     indexSets: undefined,
     indexSetStats: undefined,
+    indexSet: undefined,
 
     getInitialState() {
       return {

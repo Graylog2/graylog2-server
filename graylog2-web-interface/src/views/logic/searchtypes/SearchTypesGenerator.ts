@@ -15,16 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import uuid from 'uuid/v4';
 
-import Widget from 'views/logic/widgets/Widget';
-import { SearchTypeList } from 'views/logic/queries/Query';
-import { SearchType } from 'views/logic/queries/SearchType';
+import type Widget from 'views/logic/widgets/Widget';
+import type { SearchTypeList } from 'views/logic/queries/Query';
+import type { SearchType } from 'views/logic/queries/SearchType';
+import generateId from 'logic/generateId';
 
 import { widgetDefinition } from '../Widgets';
 import searchTypeDefinition from '../SearchType';
-import type { SearchTypeIds, WidgetMapping } from '../views/types';
-import { WidgetId } from '../views/types';
+import type { SearchTypeIds, WidgetMapping, WidgetId } from '../views/types';
 
 const filterForWidget = (widget) => (widget.filter ? { filter: { type: 'query_string', query: widget.filter } } : {});
 
@@ -45,13 +44,14 @@ export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType =
       .searchTypes(widget)
       .map((searchType) => ({
 
-        id: uuid(),
+        id: generateId(),
         timerange: widget.timerange,
         query: widget.query,
         streams: widget.streams,
         ...searchType,
         widgetId: widget.id,
         ...filterForWidget(widget),
+        filters: widget.filters,
       })))
     .reduce((acc, cur) => acc.merge(cur), Immutable.Set<SearchTypeWithWidgetId>())
     .map((searchType) => {

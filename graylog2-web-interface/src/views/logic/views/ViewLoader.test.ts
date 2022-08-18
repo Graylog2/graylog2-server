@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import mockAction from 'helpers/mocking/MockAction';
 
+import mockAction from 'helpers/mocking/MockAction';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { ViewActions } from 'views/stores/ViewStore';
@@ -48,7 +48,7 @@ const viewJson: ViewJson = {
   search_id: 'foosearch',
   properties: Immutable.List(),
   state: {},
-  created_at: new Date('2019-05-24T12:34:04.993Z'),
+  created_at: '2019-05-24T12:34:04.993Z',
   owner: 'admin',
   requires: {},
 };

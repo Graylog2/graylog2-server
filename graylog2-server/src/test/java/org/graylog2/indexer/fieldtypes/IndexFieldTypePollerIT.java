@@ -71,12 +71,14 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
     private TestIndexSet indexSet;
 
     protected abstract IndicesAdapter createIndicesAdapter();
+
     protected abstract IndexFieldTypePollerAdapter createIndexFieldTypePollerAdapter();
 
     @Before
     public void setUp() throws Exception {
         final Node node = mock(Node.class);
-        @SuppressWarnings("UnstableApiUsage") final Indices indices = new Indices(
+        @SuppressWarnings("UnstableApiUsage")
+        final Indices indices = new Indices(
                 new IndexMappingFactory(node, ImmutableMap.of(
                         MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider()
                 )),
@@ -115,7 +117,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
         assertThat(dto.fields()).containsOnly(
                 FieldTypeDTO.create("message", "text"),
                 FieldTypeDTO.create("full_message", "text"),
-                FieldTypeDTO.create("source", "text"),
+                FieldTypeDTO.create("source", "text", Collections.singleton(FieldTypeDTO.Properties.FIELDDATA)),
                 FieldTypeDTO.create("http_status", "keyword"),
                 FieldTypeDTO.create("http_response_time", "long"),
                 FieldTypeDTO.create("timestamp", "date"),
@@ -139,7 +141,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
         assertThat(dto.fields()).containsOnly(
                 FieldTypeDTO.create("message", "text"),
                 FieldTypeDTO.create("full_message", "text"),
-                FieldTypeDTO.create("source", "text"),
+                FieldTypeDTO.create("source", "text", Collections.singleton(FieldTypeDTO.Properties.FIELDDATA)),
                 FieldTypeDTO.create("http_status", "keyword"),
                 FieldTypeDTO.create("http_response_time", "long"),
                 FieldTypeDTO.create("timestamp", "date"),

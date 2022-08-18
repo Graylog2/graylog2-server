@@ -14,17 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { Map } from 'immutable';
-import uuid from 'uuid/v4';
+import { Map, List } from 'immutable';
+import * as Immutable from 'immutable';
 
-import { QueryString, TimeRange } from 'views/logic/queries/Query';
+import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import { singleton } from 'logic/singleton';
+import generateId from 'logic/generateId';
+import isDeepEqual from 'stores/isDeepEqual';
+import type { FiltersType, SearchFilter } from 'views/types';
 
 export type WidgetState = {
   id: string;
   type: string;
   config: any;
   filter: string | null | undefined;
+  filters?: FiltersType,
   timerange: TimeRange | null | undefined;
   query: QueryString | null | undefined;
   streams: Array<string>;
@@ -34,14 +38,16 @@ type DeserializesWidgets = {
   fromJSON: (value) => Widget;
 };
 
+const isNullish = (o: any) => (o === null || o === undefined);
+
 class Widget {
   _value: WidgetState;
 
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static Builder: typeof Builder;
 
-  constructor(id: string, type: string, config: any, filter?: string, timerange?: TimeRange, query?: QueryString, streams: Array<string> = []) {
-    this._value = { id, type, config, filter: filter === null ? undefined : filter, timerange, query, streams };
+  constructor(id: string, type: string, config: any, filter?: string, timerange?: TimeRange, query?: QueryString, streams?: Array<string>, filters?: FiltersType | Array<SearchFilter>) {
+    this._value = { id, type, config, filter: filter === null ? undefined : filter, filters: List(filters), timerange, query, streams };
   }
 
   get id(): string {
@@ -58,6 +64,10 @@ class Widget {
 
   get filter(): string | null | undefined {
     return this._value.filter;
+  }
+
+  get filters(): FiltersType | null | undefined {
+    return this._value.filters;
   }
 
   get timerange(): TimeRange | null | undefined {
@@ -77,6 +87,24 @@ class Widget {
     return false;
   }
 
+  equals(other: any): boolean {
+    if (other === undefined) {
+      return false;
+    }
+
+    if (!(other instanceof Widget)) {
+      return false;
+    }
+
+    return this.id === other.id
+      && ((isNullish(this.filter) && isNullish(other.filter)) || isDeepEqual(this.filter, other.filter))
+      && ((isNullish(this.filters) && isNullish(other.filters)) || isDeepEqual(this.filters, other.filters))
+      && isDeepEqual(this.config, other.config)
+      && isDeepEqual(this.timerange, other.timerange)
+      && isDeepEqual(this.query, other.query)
+      && isDeepEqual(this.streams, other.streams);
+  }
+
   duplicate(newId: string): Widget {
     return this.toBuilder().id(newId).build();
   }
@@ -88,13 +116,14 @@ class Widget {
       type,
       config,
       filter,
+      filters,
       timerange,
       query,
       streams,
     } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Map({ id, type, config, filter, timerange, query, streams }));
+    return new Builder(Map({ id, type, config, filter, filters, timerange, query, streams }));
   }
 
   toJSON() {
@@ -103,12 +132,13 @@ class Widget {
       type,
       config,
       filter,
+      filters,
       timerange,
       query,
       streams,
     } = this._value;
 
-    return { id, type: type.toLocaleLowerCase(), config, filter, timerange, query, streams };
+    return { id, type: type.toLowerCase(), config, filter, filters, timerange, query, streams };
   }
 
   static fromJSON(value: WidgetState): Widget {
@@ -117,17 +147,18 @@ class Widget {
       type,
       config,
       filter,
+      filters,
       timerange,
       query,
       streams,
     } = value;
-    const implementingClass = Widget.__registrations[type.toLocaleLowerCase()];
+    const implementingClass = Widget.__registrations[type.toLowerCase()];
 
     if (implementingClass) {
       return implementingClass.fromJSON(value);
     }
 
-    return new Widget(id, type, config, filter, timerange, query, streams);
+    return new Widget(id, type, config, filter, timerange, query, streams, filters);
   }
 
   static empty() {
@@ -144,7 +175,7 @@ class Widget {
   } = {};
 
   static registerSubtype(type: string, implementingClass: DeserializesWidgets) {
-    this.__registrations[type.toLocaleLowerCase()] = implementingClass;
+    this.__registrations[type.toLowerCase()] = implementingClass;
   }
 }
 
@@ -162,7 +193,7 @@ class Builder {
   }
 
   newId() {
-    return this.id(uuid());
+    return this.id(generateId());
   }
 
   type(value: string) {
@@ -179,6 +210,12 @@ class Builder {
 
   filter(value: string) {
     this.value = this.value.set('filter', value);
+
+    return this;
+  }
+
+  filters(value: FiltersType | null | undefined) {
+    this.value = this.value.set('filters', value ? Immutable.List(value) : value);
 
     return this;
   }
@@ -207,12 +244,13 @@ class Builder {
       type,
       config,
       filter,
+      filters,
       timerange,
       query,
       streams,
     } = this.value.toObject();
 
-    return new Widget(id, type, config, filter, timerange, query, streams);
+    return new Widget(id, type, config, filter, timerange, query, streams, filters);
   }
 }
 

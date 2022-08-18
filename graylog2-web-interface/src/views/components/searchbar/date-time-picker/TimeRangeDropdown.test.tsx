@@ -16,23 +16,23 @@
  */
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
+
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
-
 import ToolsStore from 'stores/tools/ToolsStore';
 
-import { DateTimeContext } from './DateTimeProvider';
-import OriginalTimeRangeDropDown, { TimeRangeDropdownProps } from './TimeRangeDropdown';
+import type { TimeRangeDropdownProps } from './TimeRangeDropdown';
+import OriginalTimeRangeDropDown from './TimeRangeDropdown';
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {
     refresh: jest.fn(() => Promise.resolve()),
   },
   SearchConfigStore: MockStore(
-    ['listen', () => jest.fn()],
     'get',
+    'refresh',
     ['getInitialState', () => ({ searchesClusterConfig: mockSearchClusterConfig })],
-    ['refresh', () => jest.fn()],
   ),
 }));
 
@@ -45,6 +45,7 @@ const defaultProps = {
     type: 'relative',
     from: 300,
   },
+  limitDuration: 259200,
   noOverride: false,
   setCurrentTimeRange: jest.fn(),
   toggleDropdownShow: jest.fn(),
@@ -52,12 +53,7 @@ const defaultProps = {
 } as const;
 
 const TimeRangeDropdown = (allProps: TimeRangeDropdownProps) => (
-  <DateTimeContext.Provider value={{
-    limitDuration: 259200,
-  }}>
-    <OriginalTimeRangeDropDown {...allProps} />
-  </DateTimeContext.Provider>
-
+  <OriginalTimeRangeDropDown {...allProps} />
 );
 
 describe('TimeRangeDropdown', () => {
@@ -125,7 +121,7 @@ describe('TimeRangeDropdown', () => {
     const timestampContent = await screen.findByText(/Date should be formatted as/i);
 
     expect(timestampContent).toBeInTheDocument();
-  });
+  }, applyTimeoutMultiplier(15000));
 
   it('Renders No Override Tab for Dashboard', async () => {
     render(<TimeRangeDropdown {...defaultProps} currentTimeRange={{}} noOverride />);

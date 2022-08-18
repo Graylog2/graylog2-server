@@ -22,7 +22,7 @@ import MetricConfiguration from './MetricConfiguration';
 import MetricElement from './MetricElement';
 
 import ElementConfigurationContainer from '../ElementConfigurationContainer';
-import { WidgetConfigFormValues } from '../WidgetConfigForm';
+import type { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const MetricsConfiguration = () => {
   const { values: { metrics }, setValues, values } = useFormikContext<WidgetConfigFormValues>();
@@ -36,9 +36,9 @@ const MetricsConfiguration = () => {
                 validateOnChange={false}
                 render={() => (
                   <>
-                    {metrics.map((metric, index) => {
+                    {metrics.map((_metric, index) => {
                       return (
-                      // eslint-disable-next-line react/no-array-index-key
+                        // eslint-disable-next-line react/no-array-index-key
                         <ElementConfigurationContainer key={`metrics-${index}`}
                                                        onRemove={removeMetric(index)}
                                                        elementTitle={MetricElement.title}>

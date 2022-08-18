@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { VisualizationType } from 'views/types';
-
 import AreaVisualization from 'views/components/visualizations/area/AreaVisualization';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
@@ -28,13 +27,13 @@ const DEFAULT_INTERPOLATION = 'linear';
 
 const validate = hasAtLeastOneMetric('Area chart');
 
-const areaChart: VisualizationType<AreaVisualizationConfig, AreaVisualizationConfigFormValues> = {
+const areaChart: VisualizationType<typeof AreaVisualization.type, AreaVisualizationConfig, AreaVisualizationConfigFormValues> = {
   type: AreaVisualization.type,
   displayName: 'Area Chart',
   component: AreaVisualization,
   config: {
     createConfig: () => ({ interpolation: DEFAULT_INTERPOLATION }),
-    fromConfig: (config: AreaVisualizationConfig) => ({ interpolation: config.interpolation }),
+    fromConfig: (config: AreaVisualizationConfig) => ({ interpolation: config?.interpolation }),
     toConfig: (formValues: AreaVisualizationConfigFormValues) => AreaVisualizationConfig.create(formValues.interpolation),
     fields: [{
       name: 'interpolation',

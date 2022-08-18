@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { alice } from 'fixtures/users';
 
+import { alice } from 'fixtures/users';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import View from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
@@ -49,6 +49,7 @@ describe('ActionMenuItem', () => {
         fields: [],
       },
       valuePath: [],
+      isLocalNode: true,
     },
   };
 

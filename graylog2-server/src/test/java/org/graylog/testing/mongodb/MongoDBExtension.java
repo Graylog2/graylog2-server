@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.mongodb;
 
+import org.graylog.testing.containermatrix.MongodbServer;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -50,7 +51,7 @@ import static org.junit.platform.commons.support.AnnotationSupport.findAnnotatio
  * <p>See {@link MongoDBExtensionTest} and {@link MongoDBExtensionWithRegistrationAsStaticFieldTest} for usage examples.
  */
 public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback, AfterEachCallback, ParameterResolver, InvocationInterceptor {
-    private final String version;
+    private final MongodbServer version;
 
     private enum Lifecycle {
         ALL_TESTS, SINGLE_TEST
@@ -60,25 +61,25 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(MongoDBExtension.class);
 
     /**
-     * Create new extension instance using the {@link MongoDBTestService#DEFAULT_VERSION default version}.
+     * Create new extension instance using the {@link MongodbServer#DEFAULT_VERSION}  default version}.
      *
      * @return the new extension instance
      */
     public static MongoDBExtension createWithDefaultVersion() {
-        return new MongoDBExtension(MongoDBTestService.DEFAULT_VERSION);
+        return new MongoDBExtension(MongodbServer.DEFAULT_VERSION);
     }
 
-    public static MongoDBExtension create(String version) {
+    public static MongoDBExtension create(MongodbServer version) {
         return new MongoDBExtension(requireNonNull(version, "version cannot be null"));
     }
 
     // This is used by the JUnit 5 extension system
     @SuppressWarnings("unused")
     public MongoDBExtension() {
-        this(MongoDBTestService.DEFAULT_VERSION);
+        this(MongodbServer.DEFAULT_VERSION);
     }
 
-    public MongoDBExtension(String version) {
+    public MongoDBExtension(MongodbServer version) {
         this.version = version;
     }
 

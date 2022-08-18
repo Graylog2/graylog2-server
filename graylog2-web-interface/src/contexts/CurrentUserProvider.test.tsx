@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
+
 import asMock from 'helpers/mocking/AsMock';
 import { alice } from 'fixtures/users';
 import { StoreMock as MockStore } from 'helpers/mocking';
-
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import CurrentUserContext from './CurrentUserContext';

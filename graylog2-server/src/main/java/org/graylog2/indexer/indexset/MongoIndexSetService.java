@@ -130,6 +130,11 @@ public class MongoIndexSetService implements IndexSetService {
         return collection.find(DBQuery.in("_id", ids)).toArray();
     }
 
+    @Override
+    public List<IndexSetConfig> findMany(DBQuery.Query query) {
+        return ImmutableList.copyOf((Iterator<? extends IndexSetConfig>) collection.find(query).sort(DBSort.asc("title")));
+    }
+
     /**
      * {@inheritDoc}
      */

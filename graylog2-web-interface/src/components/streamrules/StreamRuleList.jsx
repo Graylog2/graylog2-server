@@ -38,7 +38,7 @@ class StreamRuleList extends React.Component {
     matchData: {},
     onSubmit: () => {},
     onDelete: () => {},
-  }
+  };
 
   _formatStreamRules = (streamRules) => {
     if (streamRules && streamRules.length > 0) {

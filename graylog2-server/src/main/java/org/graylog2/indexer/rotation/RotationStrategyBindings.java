@@ -16,17 +16,34 @@
  */
 package org.graylog2.indexer.rotation;
 
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.graylog2.plugin.PluginModule;
 
 public class RotationStrategyBindings extends PluginModule {
+    private final ElasticsearchConfiguration elasticsearchConfiguration;
+
+    public RotationStrategyBindings(ElasticsearchConfiguration elasticsearchConfiguration) {
+        this.elasticsearchConfiguration = elasticsearchConfiguration;
+    }
+
     @Override
     protected void configure() {
-        addRotationStrategy(MessageCountRotationStrategy.class);
-        addRotationStrategy(SizeBasedRotationStrategy.class);
-        addRotationStrategy(TimeBasedRotationStrategy.class);
+        for (String strategy : elasticsearchConfiguration.getEnabledRotationStrategies()) {
+            switch (strategy) {
+                case MessageCountRotationStrategy.NAME:
+                    addRotationStrategy(MessageCountRotationStrategy.class);
+                    break;
+                case SizeBasedRotationStrategy.NAME:
+                    addRotationStrategy(SizeBasedRotationStrategy.class);
+                    break;
+                case TimeBasedRotationStrategy.NAME:
+                    addRotationStrategy(TimeBasedRotationStrategy.class);
+                    break;
+            }
+        }
     }
 
 }

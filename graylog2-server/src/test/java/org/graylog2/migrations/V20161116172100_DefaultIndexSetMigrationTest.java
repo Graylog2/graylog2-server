@@ -177,6 +177,11 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
         public RotationStrategyConfig defaultConfiguration() {
             return new StubRotationStrategyConfig();
         }
+
+        @Override
+        public String getStrategyName() {
+            return "StubRotationStrategy";
+        }
     }
 
     private static class StubRotationStrategyConfig implements RotationStrategyConfig {
@@ -206,6 +211,11 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
         @Override
         public String type() {
             return StubRetentionStrategy.class.getCanonicalName();
+        }
+
+        @Override
+        public int maxNumberOfIndices() {
+            return 0;
         }
     }
 }

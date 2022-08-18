@@ -17,9 +17,9 @@
 package org.graylog2.storage.providers;
 
 import org.graylog2.indexer.IndexToolsAdapter;
-import org.graylog2.plugin.Version;
-import org.graylog2.storage.ElasticsearchVersion;
+import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.VersionAwareProvider;
+import org.graylog2.storage.SearchVersion;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class IndexToolsAdapterProvider extends VersionAwareProvider<IndexToolsAdapter> {
     @Inject
-    public IndexToolsAdapterProvider(@ElasticsearchVersion Version version, Map<Version, Provider<IndexToolsAdapter>> pluginBindings) {
+    public IndexToolsAdapterProvider(@DetectedSearchVersion SearchVersion version, Map<SearchVersion, Provider<IndexToolsAdapter>> pluginBindings) {
         super(version, pluginBindings);
     }
 }

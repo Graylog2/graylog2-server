@@ -49,8 +49,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * https://www.timeanddate.com/calendar/days/#:~:text=According%20to%20international%20standard%20ISO,last%20day%20of%20the%20week.
  * - should we be able to set this to sun/mon depending on the tz/country?
  *
- *
- * TODO: when we align to day start/end in the future, all timestamps have to be updated
  */
 public class NaturalDateParserTest {
     private NaturalDateParser naturalDateParser;
@@ -162,14 +160,12 @@ public class NaturalDateParserTest {
     @Test
     public void testThisMonth() throws Exception {
         DateTime reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 09:45:23");
-        DateTime startOfDay = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 00:00:00");
         NaturalDateParser.Result result = naturalDateParser.parse("this month", reference.toDate());
-        assertThat(result.getFrom()).as("is the same as the start of the day of the reference date").isEqualTo(startOfDay);
 
-//        DateTime first = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("01.06.2021 09:45:23");
-//        DateTime firstNextMonth = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("01.07.2021 09:45:23");
-//        assertThat(result.getFrom()).as("should start at the beginning of the month").isEqualTo(first);
-//        assertThat(result.getTo()).as("should be the 1st day of the following month").isEqualTo(firstNextMonth);
+        DateTime first = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("01.06.2021 00:00:00");
+        DateTime firstNextMonth = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("01.07.2021 00:00:00");
+        assertThat(result.getFrom()).as("should start at the beginning of the month").isEqualTo(first);
+        assertThat(result.getTo()).as("should be the 1st day of the following month").isEqualTo(firstNextMonth);
     }
 
     @Test
@@ -200,7 +196,7 @@ public class NaturalDateParserTest {
         assertThat(result.getFrom()).as("should be Monday, 14.").isEqualTo(startOfMonday);
         assertThat(result.getTo()).as("should be Friday, 18.").isEqualTo(endOfFriday);
 
-        /* fails with current Natty implementaiton
+        /* fails with current Natty implementation
         reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("14.06.2021 09:45:23");
         result = naturalDateParser.parse("monday to friday", reference.toDate());
         assertThat(result.getFrom()).as("should be Monday, 14.").isEqualTo(startOfMonday);

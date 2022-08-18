@@ -15,16 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 import { useState } from 'react';
-import styled, { DefaultTheme, css } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Formik, Form } from 'formik';
 
-import EntityShareState, { CapabilitiesList } from 'logic/permissions/EntityShareState';
-import Grantee from 'logic/permissions/Grantee';
+import type { CapabilitiesList } from 'logic/permissions/EntityShareState';
+import type EntityShareState from 'logic/permissions/EntityShareState';
+import type Grantee from 'logic/permissions/Grantee';
 import { Spinner, IconButton } from 'components/common';
-import Capability from 'logic/permissions/Capability';
-import SelectedGrantee, { CurrentState as CurrentGranteeState } from 'logic/permissions/SelectedGrantee';
+import type Capability from 'logic/permissions/Capability';
+import type { CurrentState as CurrentGranteeState } from 'logic/permissions/SelectedGrantee';
+import type SelectedGrantee from 'logic/permissions/SelectedGrantee';
 
 import GranteeIcon from './GranteeIcon';
 import CapabilitySelect from './CapabilitySelect';

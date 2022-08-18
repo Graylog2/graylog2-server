@@ -18,14 +18,15 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Map as MockMap } from 'immutable';
 import { mount } from 'wrappedEnzyme';
-import { MockStore, asMock } from 'helpers/mocking';
 
+import { MockStore, asMock } from 'helpers/mocking';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Widget from 'views/components/widgets/Widget';
 import _Widget from 'views/logic/widgets/Widget';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
-import FieldTypesContext, { FieldTypes } from 'views/components/contexts/FieldTypesContext';
+import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import ViewState from 'views/logic/views/ViewState';
 
 import WidgetGrid from './WidgetGrid';
@@ -45,11 +46,6 @@ jest.mock('graylog-web-plugin/plugin', () => ({
       },
     ]),
   },
-}));
-
-jest.mock('react-sizeme', () => ({
-  // eslint-disable-next-line react/prop-types
-  SizeMe: ({ children }) => <div>{children({ size: { width: 200 } })}</div>,
 }));
 
 jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);

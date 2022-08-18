@@ -22,8 +22,8 @@ import styled, { css } from 'styled-components';
 import { MenuItem } from 'components/bootstrap';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import type { QueryId } from 'views/logic/queries/Query';
-import ViewState from 'views/logic/views/ViewState';
-import { QueriesList } from 'views/actions/QueriesActions';
+import type ViewState from 'views/logic/views/ViewState';
+import type { QueriesList } from 'views/actions/QueriesActions';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 
 import QueryActionDropdown from './QueryActionDropdown';
@@ -36,7 +36,7 @@ type Props = {
   active: boolean,
   allowsClosing?: boolean,
   id: QueryId,
-  onClose: () => Promise<void> | Promise<ViewState>,
+  onClose: () => Promise<void | ViewState>,
   openEditModal: (string) => void,
   title: string,
 };
@@ -64,7 +64,7 @@ const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, title }
           <MenuItem onSelect={() => _onDuplicate()}>Duplicate</MenuItem>
           <MenuItem onSelect={() => openEditModal(titleValue)}>Edit Title</MenuItem>
           <MenuItem divider />
-          <MenuItem onSelect={onClose} disabled={!allowsClosing}>Close</MenuItem>
+          <MenuItem onSelect={onClose} disabled={!allowsClosing}>Delete</MenuItem>
         </QueryActionDropdown>
       )}
     </>

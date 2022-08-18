@@ -24,6 +24,7 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
+import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
@@ -64,6 +65,19 @@ public class IndexRotationThread extends Periodical {
         this.indices = indices;
         this.nodeId = nodeId;
         this.rotationStrategyMap = rotationStrategyMap;
+    }
+
+    @Override
+    public void initialize() {
+        // The time based index rotation strategy has state which needs to be reset in case this periodical gets
+        // re-used due to a leader change.
+        // This is by no means ideal, but easier than to remove state from the rotation strategy without changing its
+        // behaviour.
+        final Provider<RotationStrategy> rotationStrategyProvider =
+                rotationStrategyMap.get(TimeBasedRotationStrategy.class.getCanonicalName());
+        if (rotationStrategyProvider != null) {
+            ((TimeBasedRotationStrategy) rotationStrategyProvider.get()).reset();
+        }
     }
 
     @Override
@@ -184,7 +198,7 @@ public class IndexRotationThread extends Periodical {
     }
 
     @Override
-    public boolean masterOnly() {
+    public boolean leaderOnly() {
         return true;
     }
 

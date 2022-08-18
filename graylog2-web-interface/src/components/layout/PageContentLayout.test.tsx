@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+
 import { MockStore } from 'helpers/mocking';
 
 import PageContentLayout from './PageContentLayout';
@@ -27,7 +28,6 @@ jest.mock('stores/system/SystemStore', () => ({
       system: { version: '23.42.0-SNAPSHOT+SPECIALFEATURE', hostname: 'hopper.local' },
     })],
     ['jvm', jest.fn(() => Promise.resolve({ info: 'SomeJDK v12.0.0' }))],
-    ['listen', jest.fn(() => () => {})],
   ),
 }));
 

@@ -15,19 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import MockStore from 'helpers/mocking/StoreMock';
+import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
+import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
+import MockStore from 'helpers/mocking/StoreMock';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
-import WidgetFocusContext, {
-  WidgetEditingState,
-  WidgetFocusingState,
-} from 'views/components/contexts/WidgetFocusContext';
+import type { WidgetEditingState, WidgetFocusingState } from 'views/components/contexts/WidgetFocusContext';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import DashboardSearchBar from './DashboardSearchBar';
 
+jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 jest.mock('views/components/ViewActionsMenu', () => () => <span>View Actions</span>);
 
 jest.mock('views/stores/GlobalOverrideStore', () => ({
@@ -38,74 +39,78 @@ jest.mock('views/stores/GlobalOverrideStore', () => ({
 }));
 
 jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
   SearchActions: {
     refresh: jest.fn(),
   },
 }));
 
 jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigStore: MockStore(['getInitialState', () => ({})]),
+  SearchConfigStore: MockStore(['getInitialState', () => ({ searchesClusterConfig: mockSearchesClusterConfig })]),
   SearchConfigActions: {
     refresh: jest.fn(() => Promise.resolve()),
   },
 }));
 
-jest.mock('views/components/searchbar/AsyncQueryInput', () => () => null);
+jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => () => Promise.resolve({
+  status: 'OK',
+  explanations: [],
+}));
 
-const config = {
-  analysis_disabled_fields: ['full_message', 'message'],
-  query_time_range_limit: 'PT0S',
-  relative_timerange_options: { PT0S: 'Search in all messages', P5m: 'Search in last five minutes' },
-  surrounding_filter_fields: ['file', 'source', 'gl2_source_input', 'source_file'],
-  surrounding_timerange_options: { PT1S: 'One second', PT2S: 'Two seconds' },
-};
+jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
 describe('DashboardSearchBar', () => {
-  const onExecute = jest.fn();
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
   it('should render the DashboardSearchBar', async () => {
-    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+    render(<DashboardSearchBar />);
 
     await screen.findByLabelText('Open Time Range Selector');
     await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
     await screen.findByLabelText('Refresh Search Controls');
-    await screen.findByTitle('Perform search');
+    await screen.findByRole('button', { name: /perform search/i });
   });
 
   it('defaults to no override being selected', async () => {
-    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+    render(<DashboardSearchBar />);
 
     await screen.findByText('No Override');
   });
 
-  it('should refresh search when button is clicked', async () => {
-    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+  it('should call SearchActions.refresh on submit when there are no changes', async () => {
+    render(<DashboardSearchBar />);
 
-    const searchButton = screen.getByTitle('Perform search');
+    const searchButton = await screen.findByRole('button', { name: /perform search/i });
+
+    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
 
     userEvent.click(searchButton);
 
     await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
   });
 
-  it('should call onExecute and set global override when search is performed', async () => {
-    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+  it('should call SearchActions.refresh and set global override on submit when there are changes', async () => {
+    render(<DashboardSearchBar />);
 
     const timeRangeInput = await screen.findByText(/no override/i);
 
-    act(() => {
-      userEvent.click(timeRangeInput);
-    });
-
+    userEvent.click(timeRangeInput);
     userEvent.click(await screen.findByRole('tab', { name: 'Relative' }));
     userEvent.click(await screen.findByRole('button', { name: 'Apply' }));
 
-    const searchButton = await screen.findByTitle('Perform search (changes were made after last search execution)');
+    const searchButton = await screen.findByRole('button', {
+      name: /perform search \(changes were made after last search execution\)/i,
+    });
+
+    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
 
     userEvent.click(searchButton);
 
     await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'relative', from: 300 }, ''));
-  });
+    await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
+  }, applyTimeoutMultiplier(10000));
 
   it('should hide the save and load controls if a widget is being edited', async () => {
     const focusedWidget: WidgetEditingState = { id: 'foo', editing: true, focusing: true };
@@ -119,7 +124,7 @@ describe('DashboardSearchBar', () => {
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <DashboardSearchBar onExecute={onExecute} config={config} />
+        <DashboardSearchBar />
       </WidgetFocusContext.Provider>,
     );
 
@@ -142,7 +147,7 @@ describe('DashboardSearchBar', () => {
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <DashboardSearchBar onExecute={onExecute} config={config} />
+        <DashboardSearchBar />
       </WidgetFocusContext.Provider>,
     );
 

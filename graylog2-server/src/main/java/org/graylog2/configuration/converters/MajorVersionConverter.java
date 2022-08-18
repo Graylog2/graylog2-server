@@ -17,17 +17,24 @@
 package org.graylog2.configuration.converters;
 
 import com.github.joschi.jadconfig.Converter;
-import org.graylog2.plugin.Version;
+import org.graylog2.storage.SearchVersion;
 
-public class MajorVersionConverter implements Converter<Version> {
+public class MajorVersionConverter implements Converter<SearchVersion> {
     @Override
-    public Version convertFrom(String value) {
-        final int majorVersion = Integer.parseInt(value);
-        return Version.from(majorVersion, 0, 0);
+    public SearchVersion convertFrom(String value) {
+        try {
+            // only major version - we know it's elasticsearch
+            final int majorVersion = Integer.parseInt(value);
+            return SearchVersion.elasticsearch(majorVersion, 0, 0);
+        } catch (NumberFormatException nfe) {
+            // It's probably a distribution:version format
+            // caution, this format assumes full version X.Y.Z, not just major number
+            return SearchVersion.decode(value);
+        }
     }
 
     @Override
-    public String convertTo(Version value) {
-        return value.toString();
+    public String convertTo(SearchVersion value) {
+        return value.encode();
     }
 }

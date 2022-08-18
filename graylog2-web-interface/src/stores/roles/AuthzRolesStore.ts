@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
 import type { PaginatedUsersResponse } from 'stores/users/UsersStore';
 import type { Store } from 'stores/StoreTypes';
@@ -27,7 +27,8 @@ import { singletonStore } from 'logic/singleton';
 import PaginationURL from 'util/PaginationURL';
 import Role from 'logic/roles/Role';
 import type { RoleJSON } from 'logic/roles/Role';
-import AuthzRolesActions, { PaginatedRoles, PaginatedUsers, RoleContext } from 'actions/roles/AuthzRolesActions';
+import type { PaginatedRoles, PaginatedUsers, RoleContext } from 'actions/roles/AuthzRolesActions';
+import AuthzRolesActions from 'actions/roles/AuthzRolesActions';
 import UserOverview from 'logic/users/UserOverview';
 import type { PaginatedListJSON, Pagination } from 'stores/PaginationTypes';
 
@@ -36,7 +37,15 @@ export type PaginatedRolesResponse = PaginatedListJSON & {
   context?: RoleContext,
 };
 
-const _responseToPaginatedList = ({ count, total, page, per_page, query, roles = [], context = { users: undefined } }: PaginatedRolesResponse) => ({
+const _responseToPaginatedList = ({
+  count,
+  total,
+  page,
+  per_page,
+  query,
+  roles = [],
+  context = { users: undefined },
+}: PaginatedRolesResponse) => ({
   list: Immutable.List(roles.map((r) => Role.fromJSON(r))),
   pagination: {
     query,
@@ -106,7 +115,11 @@ const AuthzRolesStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    loadUsersForRole(roleId: string, roleName: string, { page, perPage, query }: Pagination): Promise<PaginatedUsers> {
+    loadUsersForRole(roleId: string, _roleName: string, {
+      page,
+      perPage,
+      query,
+    }: Pagination): Promise<PaginatedUsers> {
       const apiUrl = encodeApiUrl(ApiRoutes.AuthzRolesController.loadUsersForRole, [roleId]);
       const url = PaginationURL(apiUrl, page, perPage, query);
 

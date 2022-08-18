@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { SyntheticEvent } from 'react';
+import type { SyntheticEvent } from 'react';
 
-import { Input } from 'components/bootstrap';
+import type { Input } from 'components/bootstrap';
 
 import FormikInput from './FormikInput';
 
@@ -40,6 +40,7 @@ type Props = {
   required?: boolean,
   bsSize?: 'large' | 'small' | 'xsmall',
   validate?: (any) => string | undefined,
+  rows?: number,
 };
 
 /** Displays the FormikInput with a specific layout */
@@ -70,6 +71,7 @@ FormikFormGroup.defaultProps = {
   maxLength: undefined,
   required: false,
   validate: () => undefined,
+  rows: undefined,
 };
 
 export default FormikFormGroup;

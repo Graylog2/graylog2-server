@@ -17,9 +17,9 @@
 package org.graylog2.storage.providers;
 
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
-import org.graylog2.plugin.Version;
-import org.graylog2.storage.ElasticsearchVersion;
+import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.VersionAwareProvider;
+import org.graylog2.storage.SearchVersion;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -29,8 +29,8 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEventsElasticsearchAdap
         extends VersionAwareProvider<V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter> {
     @Inject
     public V20200730000000_AddGl2MessageIdFieldAliasForEventsElasticsearchAdapterProvider(
-            @ElasticsearchVersion Version version,
-            Map<Version, Provider<V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter>> pluginBindings) {
+            @DetectedSearchVersion SearchVersion version,
+            Map<SearchVersion, Provider<V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter>> pluginBindings) {
         super(version, pluginBindings);
     }
 }

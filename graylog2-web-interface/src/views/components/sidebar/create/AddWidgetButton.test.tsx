@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-import { PluginExports, PluginStore } from 'graylog-web-plugin/plugin';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import AddWidgetButton from './AddWidgetButton';
 

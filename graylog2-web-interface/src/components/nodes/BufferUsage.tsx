@@ -22,7 +22,8 @@ import styled, { css } from 'styled-components';
 import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';
 import { useStore } from 'stores/connect';
-import { MetricsActions, MetricsStore, GaugeMetric } from 'stores/metrics/MetricsStore';
+import type { GaugeMetric } from 'stores/metrics/MetricsStore';
+import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
 import { Button } from '../bootstrap';
 import { ProgressBar, Spinner } from '../common';

@@ -19,7 +19,6 @@ import React from 'react';
 
 import { Timestamp } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
-import DateTime from 'logic/datetimes/DateTime';
 
 import 'components/content-packs/ContentPackDetails.css';
 import ContentPackInstallEntityList from './ContentPackInstallEntityList';
@@ -40,7 +39,7 @@ const ContentPackInstallView = (props) => {
             <dt>Installed by:</dt>
             <dd>{createdBy}&nbsp;</dd>
             <dt>Installed at:</dt>
-            <dd><Timestamp dateTime={createdAt} format={DateTime.Formats.COMPLETE} tz="browser" /></dd>
+            <dd><Timestamp dateTime={createdAt} /></dd>
           </dl>
         </Col>
       </Row>

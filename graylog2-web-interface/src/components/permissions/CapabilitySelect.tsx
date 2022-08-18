@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 import { useCallback } from 'react';
 import { Field } from 'formik';
 

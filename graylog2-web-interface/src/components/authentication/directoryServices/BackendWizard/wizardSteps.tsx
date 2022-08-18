@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import { FormikProps } from 'formik';
+import type * as Immutable from 'immutable';
+import type { FormikProps } from 'formik';
 
-import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
-import Role from 'logic/roles/Role';
-import { StepKey } from 'components/common/Wizard';
+import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import type Role from 'logic/roles/Role';
+import type { StepKey } from 'components/common/Wizard';
 
-import { WizardFormValues } from './BackendWizardContext';
+import type { WizardFormValues } from './BackendWizardContext';
 import ServerConfigStep, { STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
 import UserSyncStep, { STEP_KEY as USER_SYNC_KEY } from './UserSyncStep';
 import GroupSyncStep, { STEP_KEY as GROUP_SYNC_KEY } from './GroupSyncStep';

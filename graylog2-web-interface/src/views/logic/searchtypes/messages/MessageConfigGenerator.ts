@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import MessagesWidget from 'views/logic/widgets/MessagesWidget';
+import type MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfig';
 
 const MessageConfigGenerator = (widget: MessagesWidget) => {

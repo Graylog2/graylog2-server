@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { List } from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
+
 import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
-
 import StreamsContext from 'contexts/StreamsContext';
 import { NotFoundErrorType } from 'logic/errors/ReportedErrors';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
@@ -48,7 +48,7 @@ jest.mock('views/stores/ViewManagementStore', () => ({
 
 jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {
-    execute: mockAction(jest.fn()),
+    execute: mockAction(),
   },
 }));
 
@@ -78,7 +78,7 @@ describe('ShowViewPage', () => {
     properties: List<any>(),
     state: {},
     dashboard_state: { widgets: [], positions: [] },
-    created_at: new Date(),
+    created_at: '2022-01-01 00:00:00',
     owner: 'admin',
     requires: {},
   } as ViewJson;
@@ -96,7 +96,9 @@ describe('ShowViewPage', () => {
   });
 
   it('renders Spinner while loading', async () => {
-    const mockGet = () => new Promise<ViewJson>((resolve) => setTimeout(resolve, 30000, viewJson));
+    const mockGet = () => new Promise<ViewJson>((resolve) => {
+      setTimeout(resolve, 30000, viewJson);
+    });
 
     asMock(ViewManagementActions.get).mockImplementation(mockAction(mockGet));
 
@@ -123,7 +125,9 @@ describe('ShowViewPage', () => {
 
     await waitFor(() => {
       expect(ErrorsActions.report).toHaveBeenCalledTimes(1);
+    });
 
+    await waitFor(() => {
       expect(ErrorsActions.report).toHaveBeenCalledWith({
         error,
         type: NotFoundErrorType,
@@ -133,7 +137,7 @@ describe('ShowViewPage', () => {
 
   it('passes loaded view to ViewDeserializer', async () => {
     asMock(ViewManagementActions.get).mockImplementation(mockAction(jest.fn(() => Promise.resolve(viewJson))));
-    SearchExecutionStateActions.setParameterValues = mockAction(jest.fn());
+    SearchExecutionStateActions.setParameterValues = mockAction();
     const search = Search.create().toBuilder().parameters([]).build();
 
     asMock(ViewDeserializer).mockImplementation((response: ViewJson) => {

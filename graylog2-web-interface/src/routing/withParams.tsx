@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
-import { Subtract } from 'utility-types';
+import type { Subtract } from 'utility-types';
 
 type ParamsContext = {
   params: {

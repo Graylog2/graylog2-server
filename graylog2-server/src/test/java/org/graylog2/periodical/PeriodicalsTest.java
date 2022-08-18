@@ -206,7 +206,7 @@ public class PeriodicalsTest {
             }
 
             @Override
-            public boolean masterOnly() {
+            public boolean leaderOnly() {
                 return false;
             }
 

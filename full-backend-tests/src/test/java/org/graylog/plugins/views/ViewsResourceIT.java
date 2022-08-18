@@ -17,15 +17,15 @@
 package org.graylog.plugins.views;
 
 import io.restassured.specification.RequestSpecification;
-import org.graylog.storage.elasticsearch7.ElasticsearchInstanceES7Factory;
-import org.graylog.testing.completebackend.ApiIntegrationTest;
-import org.junit.jupiter.api.Test;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.SearchServer;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 
 import static io.restassured.RestAssured.given;
-import static org.graylog.testing.completebackend.Lifecycle.METHOD;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ApiIntegrationTest(serverLifecycle = METHOD, elasticsearchFactory = ElasticsearchInstanceES7Factory.class)
+@ContainerMatrixTestsConfiguration
 public class ViewsResourceIT {
     private final RequestSpecification requestSpec;
 
@@ -33,7 +33,7 @@ public class ViewsResourceIT {
         this.requestSpec = requestSpec;
     }
 
-    @Test
+    @ContainerMatrixTest
     void testEmptyBody() {
         given()
                 .spec(requestSpec)
@@ -44,7 +44,7 @@ public class ViewsResourceIT {
                 .assertThat().body("message[0]", equalTo("View is mandatory"));
     }
 
-    @Test
+    @ContainerMatrixTest
     void testCreateViewRequestWithoutPersistedSearch() {
         given()
                 .spec(requestSpec)
@@ -56,7 +56,7 @@ public class ViewsResourceIT {
                 .assertThat().body("message", equalTo("Search 6141d457d3a6b9d73c8ac55a not available"));
     }
 
-    @Test
+    @ContainerMatrixTest
     void testCreateSearchPersistView() {
         given()
                 .spec(requestSpec)
@@ -75,12 +75,12 @@ public class ViewsResourceIT {
                 .statusCode(200);
     }
 
-    @Test
+    @ContainerMatrixTest
     void testInvalidSearchType() {
         given()
                 .spec(requestSpec)
                 .when()
-                .body(getClass().getClassLoader().getResourceAsStream("org/graylog/plugins/views/save-search-request.json"))
+                .body(getClass().getClassLoader().getResourceAsStream("org/graylog/plugins/views/save-search-request-invalid.json"))
                 .post("/views/search")
                 .then()
                 .statusCode(201);

@@ -24,18 +24,21 @@ class UniqueChunkIdPlugin {
     const randomId = crypto.randomBytes(4).toString('hex');
     // eslint-disable-next-line prefer-template
     const prefix = randomId + '-';
+
     compiler.hooks.compilation.tap(pluginName, (compilation) => {
-      compilation.hooks.optimizeChunkIds.tap(pluginName, chunks => chunks.map((chunk) => {
+      compilation.hooks.optimizeChunkIds.tap(pluginName, (chunks) => new Set([...chunks].map((chunk) => {
         // eslint-disable-next-line prefer-template, no-param-reassign
         if (chunk.id && chunk.id.startsWith && chunk.id.startsWith(prefix)) {
           return chunk;
         }
+
         // eslint-disable-next-line no-param-reassign
         chunk.id = prefix + chunk.id;
         // eslint-disable-next-line prefer-template, no-param-reassign
-        chunk.ids = chunk.ids.map(id => randomId + '-' + id);
+        chunk.ids = chunk.ids.map((id) => randomId + '-' + id);
+
         return chunk;
-      }));
+      })));
     });
   }
 }

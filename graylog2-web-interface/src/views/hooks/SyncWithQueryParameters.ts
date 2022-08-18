@@ -31,6 +31,7 @@ const useActionListeners = (actions, callback, dependencies) => {
     const unsubscribes = actions.map((action) => action.listen(callback));
 
     return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, dependencies);
 };
 
@@ -95,10 +96,11 @@ export const syncWithQueryParameters = (query: string, action: (string) => unkno
 };
 
 export const useSyncWithQueryParameters = (query: string) => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => syncWithQueryParameters(query, history.replace), []);
 
   useActionListeners(
-    [QueriesActions.update.completed, QueriesActions.query.completed],
+    [QueriesActions.update.completed, QueriesActions.forceUpdate.completed, QueriesActions.query.completed, QueriesActions.timerange.completed],
     () => syncWithQueryParameters(query),
     [query],
   );

@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import styled, { css, withTheme, DefaultTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import styled, { css, withTheme } from 'styled-components';
 import defer from 'lodash/defer';
 
 import { Icon } from 'components/common';

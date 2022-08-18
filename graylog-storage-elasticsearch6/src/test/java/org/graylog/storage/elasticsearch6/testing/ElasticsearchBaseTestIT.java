@@ -17,7 +17,8 @@
 package org.graylog.storage.elasticsearch6.testing;
 
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -25,10 +26,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ElasticsearchBaseTestIT extends ElasticsearchBaseTest {
     @Rule
-    public final ElasticsearchInstance elasticsearch = ElasticsearchInstanceES6.create();
+    public final TestableSearchServerInstance elasticsearch = ElasticsearchInstanceES6.create();
 
     @Override
-    protected ElasticsearchInstance elasticsearch() {
+    protected SearchServerInstance elasticsearch() {
         return this.elasticsearch;
     }
 

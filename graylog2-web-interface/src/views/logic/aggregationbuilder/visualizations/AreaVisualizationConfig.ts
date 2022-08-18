@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
 import VisualizationConfig from './VisualizationConfig';
 import type { InterpolationMode } from './Interpolation';
@@ -59,7 +59,7 @@ export default class AreaVisualizationConfig extends VisualizationConfig {
     return { interpolation };
   }
 
-  static fromJSON(type: string, value: AreaVisualizationConfigJSON = { interpolation: 'linear' }) {
+  static fromJSON(_type: string, value: AreaVisualizationConfigJSON = { interpolation: 'linear' }) {
     const { interpolation = 'linear' } = value;
 
     return AreaVisualizationConfig.create(interpolation);

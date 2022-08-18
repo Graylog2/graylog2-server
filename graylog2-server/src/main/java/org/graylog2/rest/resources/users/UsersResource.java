@@ -40,7 +40,6 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.rest.models.users.requests.ChangePasswordRequest;
-import org.graylog2.rest.models.users.requests.ChangeUserRequest;
 import org.graylog2.rest.models.users.requests.CreateUserRequest;
 import org.graylog2.rest.models.users.requests.PermissionEditRequest;
 import org.graylog2.rest.models.users.requests.Startpage;
@@ -59,11 +58,13 @@ import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.MongoDbSession;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.users.ChangeUserRequest;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.RoleService;
+import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.UserOverviewDTO;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -121,7 +122,7 @@ import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
 @Produces(MediaType.APPLICATION_JSON)
 @Api(value = "Users", description = "User accounts")
 public class UsersResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UsersResource.class);
 
     private final UserManagementService userManagementService;
     private final PaginatedUserService paginatedUserService;
@@ -151,6 +152,9 @@ public class UsersResource extends RestResource {
         this.searchQueryParser = new SearchQueryParser(UserOverviewDTO.FIELD_FULL_NAME, SEARCH_FIELD_MAPPING);
     }
 
+    /**
+     * @deprecated
+     */
     @GET
     @Deprecated
     @Path("{username}")
@@ -201,24 +205,33 @@ public class UsersResource extends RestResource {
         final boolean isSelf = requestingUser.equals(user.getId());
         final boolean canEditUserPermissions = isPermitted(USERS_PERMISSIONSEDIT, user.getName());
 
-        return toUserResponse(user, isSelf || canEditUserPermissions, AllUserSessions.create(sessionService));
+        return toUserResponse(user, isSelf || canEditUserPermissions, Optional.of(AllUserSessions.create(sessionService)));
     }
 
+    /**
+     * @deprecated Use the paginated call instead
+     */
     @GET
     @Deprecated
     @RequiresPermissions(RestPermissions.USERS_LIST)
-    @ApiOperation(value = "List all users", notes = "The permissions assigned to the users are always included.")
-    public UserList listUsers() {
+    @ApiOperation(value = "List all users", notes = "Permissions and session data included by default")
+    public UserList listUsers(
+            @ApiParam(name = "include_permissions") @QueryParam("include_permissions") @DefaultValue("true") boolean includePermissions,
+            @ApiParam(name = "include_sessions") @QueryParam("include_sessions") @DefaultValue("true") boolean includeSessions) {
+        return listUsersSelective(includePermissions, includeSessions);
+     }
+
+    private UserList listUsersSelective(boolean includePermissions, boolean includeSessions) {
         final List<User> users = userManagementService.loadAll();
-        final AllUserSessions sessions = AllUserSessions.create(sessionService);
+        final Optional<AllUserSessions> optSessions = includeSessions ? Optional.of(AllUserSessions.create(sessionService)) : Optional.empty();
 
         final List<UserSummary> resultUsers = Lists.newArrayListWithCapacity(users.size() + 1);
         userManagementService.getRootUser().ifPresent(adminUser ->
-                resultUsers.add(toUserResponse(adminUser, sessions))
+                resultUsers.add(toUserResponse(adminUser, includePermissions, optSessions))
         );
 
         for (User user : users) {
-            resultUsers.add(toUserResponse(user, sessions));
+            resultUsers.add(toUserResponse(user, includePermissions, optSessions));
         }
 
         return UserList.create(resultUsers);
@@ -295,6 +308,9 @@ public class UsersResource extends RestResource {
             LOG.error(msg);
             throw new BadRequestException(msg);
         }
+        if (rolesContainAdmin(cr.roles()) && cr.isServiceAccount()) {
+            throw new BadRequestException("Cannot assign Admin role to service account");
+        }
 
         // Create user.
         User user = userManagementService.create();
@@ -304,6 +320,7 @@ public class UsersResource extends RestResource {
         user.setEmail(cr.email());
         user.setPermissions(cr.permissions());
         setUserRoles(cr.roles(), user);
+        user.setServiceAccount(cr.isServiceAccount());
 
         if (cr.timezone() != null) {
             user.setTimeZone(cr.timezone());
@@ -387,6 +404,7 @@ public class UsersResource extends RestResource {
         }
 
         if (isPermitted(USERS_ROLESEDIT, user.getName())) {
+            checkAdminRoleForServiceAccount(cr, user);
             setUserRoles(cr.roles(), user);
         }
 
@@ -417,7 +435,27 @@ public class UsersResource extends RestResource {
                 user.setSessionTimeoutMs(sessionTimeoutMs);
             }
         }
-        userManagementService.update(user);
+
+        if (cr.isServiceAccount() != null) {
+            user.setServiceAccount(cr.isServiceAccount());
+        }
+
+        userManagementService.update(user, cr);
+    }
+
+    private boolean rolesContainAdmin(List<String> roles) {
+        return roles != null && roles.stream().anyMatch(RoleServiceImpl.ADMIN_ROLENAME::equalsIgnoreCase);
+    }
+
+    private void checkAdminRoleForServiceAccount(ChangeUserRequest cr, User user) {
+        if (user.isServiceAccount() && rolesContainAdmin(cr.roles())) {
+            throw new BadRequestException("Cannot assign Admin role to service account");
+        }
+        if (cr.isServiceAccount() != null && cr.isServiceAccount()) {
+            if (user.getRoleIds().contains(roleService.getAdminRoleObjectId())) {
+                throw new BadRequestException("Cannot make Admin into service account");
+            }
+        }
     }
 
     @DELETE
@@ -672,10 +710,10 @@ public class UsersResource extends RestResource {
     }
 
     private UserSummary toUserResponse(User user, AllUserSessions sessions) {
-        return toUserResponse(user, true, sessions);
+        return toUserResponse(user, true, Optional.of(sessions));
     }
 
-    private UserSummary toUserResponse(User user, boolean includePermissions, AllUserSessions sessions) {
+    private UserSummary toUserResponse(User user, boolean includePermissions, Optional<AllUserSessions> optSessions) {
         final Set<String> roleIds = user.getRoleIds();
         Set<String> roleNames = Collections.emptySet();
 
@@ -690,12 +728,15 @@ public class UsersResource extends RestResource {
         boolean sessionActive = false;
         Date lastActivity = null;
         String clientAddress = null;
-        final Optional<MongoDbSession> mongoDbSession = sessions.forUser(user);
-        if (mongoDbSession.isPresent()) {
-            final MongoDbSession session = mongoDbSession.get();
-            sessionActive = true;
-            lastActivity = session.getLastAccessTime();
-            clientAddress = session.getHost();
+        if (optSessions.isPresent()) {
+            final AllUserSessions sessions = optSessions.get();
+            final Optional<MongoDbSession> mongoDbSession = sessions.forUser(user);
+            if (mongoDbSession.isPresent()) {
+                final MongoDbSession session = mongoDbSession.get();
+                sessionActive = true;
+                lastActivity = session.getLastAccessTime();
+                clientAddress = session.getHost();
+            }
         }
         List<WildcardPermission> wildcardPermissions;
         List<GRNPermission> grnPermissions;
@@ -726,7 +767,8 @@ public class UsersResource extends RestResource {
                 sessionActive,
                 lastActivity,
                 clientAddress,
-                user.getAccountStatus()
+                user.getAccountStatus(),
+                user.isServiceAccount()
         );
     }
 

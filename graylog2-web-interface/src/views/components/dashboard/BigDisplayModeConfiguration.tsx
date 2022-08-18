@@ -23,7 +23,7 @@ import { Checkbox, ControlLabel, FormGroup, HelpBlock, MenuItem } from 'componen
 import Input from 'components/bootstrap/Input';
 import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
-import View from 'views/logic/views/View';
+import type View from 'views/logic/views/View';
 import queryTitle from 'views/logic/queries/QueryTitle';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 

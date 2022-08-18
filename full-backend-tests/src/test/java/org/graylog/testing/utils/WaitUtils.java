@@ -18,29 +18,44 @@ package org.graylog.testing.utils;
 
 import org.glassfish.jersey.internal.util.Producer;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.Optional;
+
 import static org.junit.Assert.fail;
 
 public final class WaitUtils {
 
-    private WaitUtils() {}
+    private static final int TIMEOUT_MS = 10000;
+    private static final int SLEEP_MS = 500;
 
-    public static  void waitFor(Producer<Boolean> predicate, String timeoutErrorMessage) {
-        int timeOutMs = 5000;
-        int msPassed = 0;
-        int waitMs = 500;
-        while (msPassed <= timeOutMs) {
-            if (predicate.call()) {
-                return;
-            }
-            msPassed += waitMs;
-            wait(waitMs);
-        }
-        fail(timeoutErrorMessage);
+    private WaitUtils() {
     }
 
-    private static  void wait(int waitMs) {
+    public static void waitFor(Producer<Boolean> predicate, String timeoutErrorMessage) {
+        waitForObject(() -> predicate.call() ? Optional.of(true) : Optional.empty(), timeoutErrorMessage);
+    }
+
+    public static <T> T waitForObject(Producer<Optional<T>> predicate, String timeoutErrorMessage) {
+        return waitForObject(predicate, timeoutErrorMessage, Duration.of(TIMEOUT_MS, ChronoUnit.MILLIS));
+    }
+
+    public static <T> T waitForObject(Producer<Optional<T>> predicate, String timeoutErrorMessage, Duration timeout) {
+        int msPassed = 0;
+        while (msPassed <= timeout.toMillis()) {
+            final Optional<T> result = predicate.call();
+            if (result != null && result.isPresent()) {
+                return result.get();
+            }
+            msPassed += SLEEP_MS;
+            sleep();
+        }
+        throw new AssertionError(timeoutErrorMessage);
+    }
+
+    private static void sleep() {
         try {
-            Thread.sleep(waitMs);
+            Thread.sleep(WaitUtils.SLEEP_MS);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

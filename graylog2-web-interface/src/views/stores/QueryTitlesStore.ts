@@ -20,7 +20,8 @@ import { isEqual } from 'lodash';
 
 import { singletonStore } from 'logic/singleton';
 
-import { ViewStore, ViewStoreState } from './ViewStore';
+import type { ViewStoreState } from './ViewStore';
+import { ViewStore } from './ViewStore';
 
 type QueryTitlesStoreState = Immutable.Map<string, string>;
 

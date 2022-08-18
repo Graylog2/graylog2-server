@@ -14,18 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
+import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
-import EventHandler, { Shapes } from 'views/logic/searchtypes/events/EventHandler';
-import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
+import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
+import useChartData from 'views/components/visualizations/useChartData';
+import useEvents from 'views/components/visualizations/useEvents';
 
 import type { ChartDefinition } from '../ChartData';
-import { chartData } from '../ChartData';
 import XYPlot from '../XYPlot';
 
 const getChartColor = (fullData, name) => {
@@ -42,8 +43,13 @@ const getChartColor = (fullData, name) => {
 
 const setChartColor = (chart, colors) => ({ line: { color: colors.get(chart.name) } });
 
-const LineVisualization = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
-  const visualizationConfig = (config.visualizationConfig || LineVisualizationConfig.empty()) as LineVisualizationConfig;
+const LineVisualization = makeVisualization(({
+  config,
+  data,
+  effectiveTimerange,
+  height,
+}: VisualizationComponentProps) => {
+  const visualizationConfig = (config.visualizationConfig ?? LineVisualizationConfig.empty()) as LineVisualizationConfig;
   const { interpolation = 'linear' } = visualizationConfig;
   const chartGenerator = useCallback((type, name, labels, values): ChartDefinition => ({
     type,
@@ -53,16 +59,17 @@ const LineVisualization = makeVisualization(({ config, data, effectiveTimerange,
     line: { shape: toPlotly(interpolation) },
   }), [interpolation]);
 
-  const rows = retrieveChartData(data);
-  const chartDataResult = chartData(config, rows, 'scatter', chartGenerator);
-  const layout: { shapes?: Shapes } = {};
+  const rows = useMemo(() => retrieveChartData(data), [data]);
+  const _chartDataResult = useChartData(rows, {
+    widgetConfig: config,
+    chartType: 'scatter',
+    generator: chartGenerator,
+  });
 
-  if (config.eventAnnotation && data.events) {
-    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events);
+  const { eventChartData, shapes } = useEvents(config, data.events);
 
-    chartDataResult.push(eventChartData);
-    layout.shapes = shapes;
-  }
+  const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
+  const layout: { shapes?: Shapes } = shapes ? { shapes } : {};
 
   return (
     <XYPlot config={config}

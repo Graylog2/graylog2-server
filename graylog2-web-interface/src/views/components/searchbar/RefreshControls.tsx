@@ -95,7 +95,7 @@ class RefreshControls extends React.Component<Props> {
     }
 
     return <ButtonLabel>{buttonText}</ButtonLabel>;
-  }
+  };
 
   render() {
     const { refreshConfig } = this.props;

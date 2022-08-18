@@ -27,7 +27,6 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
@@ -59,7 +58,7 @@ import static org.mockito.Mockito.when;
 
 public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBackendTestBase {
     private static Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = ImmutableMap.of(
-            MessageList.NAME, () -> new ESMessageList(new QueryStringDecorators.Fake())
+            MessageList.NAME, ESMessageList::new
     );
 
     @Rule
@@ -87,8 +86,8 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         this.backend = new ElasticsearchBackend(handlers,
                 jestClient,
                 indexLookup,
-                new QueryStringDecorators.Fake(),
-                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
+                usedSearchFilters -> Collections.emptySet(),
                 false);
     }
 
@@ -116,7 +115,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
     @Test
     public void queryDoesNotFallBackToUsingAllIndicesWhenNoIndexRangesAreReturned() throws Exception {
         final ESGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
-        backend.doRun(job, query, context, Collections.emptySet());
+        backend.doRun(job, query, context);
 
         verify(jestClient, times(1)).execute(clientRequestCaptor.capture(), any());
 
@@ -131,7 +130,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         DateTimeUtils.setCurrentMillisFixed(datetimeFixture);
 
         final ESGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
-        backend.doRun(job, query, context, Collections.emptySet());
+        backend.doRun(job, query, context);
 
         ArgumentCaptor<TimeRange> captor = ArgumentCaptor.forClass(TimeRange.class);
 
@@ -171,7 +170,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("streamId"), RelativeRange.create(600)))
                 .thenReturn(ImmutableSet.of("index1", "index2"));
 
-        backend.doRun(job, query, context, Collections.emptySet());
+        backend.doRun(job, query, context);
 
         verify(jestClient, times(1)).execute(clientRequestCaptor.capture(), any());
 
@@ -193,7 +192,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1", "stream2"), RelativeRange.create(600)))
                 .thenReturn(ImmutableSet.of("index1", "index2"));
 
-        backend.doRun(job, query, context, Collections.emptySet());
+        backend.doRun(job, query, context);
 
         verify(jestClient, times(1)).execute(clientRequestCaptor.capture(), any());
 

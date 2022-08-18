@@ -60,7 +60,6 @@ public class RestPermissions implements PluginPermissions {
     public static final String DECORATORS_READ = "decorators:read";
     public static final String DEFLECTOR_CYCLE = "deflector:cycle";
     public static final String DEFLECTOR_READ = "deflector:read";
-    public static final String FREELICENSES_CREATE = "freelicenses:create";
     public static final String LICENSEINFOS_READ = "licenseinfos:read";
     public static final String EVENT_DEFINITIONS_CREATE = "eventdefinitions:create";
     public static final String EVENT_DEFINITIONS_DELETE = "eventdefinitions:delete";
@@ -132,6 +131,9 @@ public class RestPermissions implements PluginPermissions {
     public static final String STREAMS_CREATE = "streams:create";
     public static final String STREAMS_EDIT = "streams:edit";
     public static final String STREAMS_READ = "streams:read";
+    public static final String SEARCH_FILTERS_READ = "search_filters:read";
+    public static final String SEARCH_FILTERS_EDIT = "search_filters:edit";
+    public static final String SEARCH_FILTERS_DELETE = "search_filters:delete";
     public static final String SYSTEM_READ = "system:read";
     public static final String SYSTEMJOBS_CREATE = "systemjobs:create";
     public static final String SYSTEMJOBS_DELETE = "systemjobs:delete";
@@ -185,7 +187,6 @@ public class RestPermissions implements PluginPermissions {
             .add(create(DECORATORS_READ, ""))
             .add(create(DEFLECTOR_CYCLE, ""))
             .add(create(DEFLECTOR_READ, ""))
-            .add(create(FREELICENSES_CREATE, ""))
             .add(create(LICENSEINFOS_READ, ""))
             .add(create(EVENT_DEFINITIONS_CREATE, ""))
             .add(create(EVENT_DEFINITIONS_DELETE, ""))
@@ -277,6 +278,9 @@ public class RestPermissions implements PluginPermissions {
             .add(create(USERS_TOKENCREATE, ""))
             .add(create(USERS_TOKENLIST, ""))
             .add(create(USERS_TOKENREMOVE, ""))
+            .add(create(SEARCH_FILTERS_READ, ""))
+            .add(create(SEARCH_FILTERS_EDIT, ""))
+            .add(create(SEARCH_FILTERS_DELETE, ""))
             .build();
 
     // Standard set of PERMISSIONS of readers.

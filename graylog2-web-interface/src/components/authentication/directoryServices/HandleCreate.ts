@@ -14,14 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
 import UserNotification from 'util/UserNotification';
-import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
 
-import { WizardFormValues, AuthBackendMeta } from './BackendWizard/BackendWizardContext';
+import type { WizardFormValues, AuthBackendMeta } from './BackendWizard/BackendWizardContext';
 
 export default (payload: WizardSubmitPayload, formValues: WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync: boolean | undefined = true) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();

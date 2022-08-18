@@ -58,6 +58,7 @@ import org.graylog.plugins.pipelineprocessor.functions.dates.periods.PeriodParse
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Seconds;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Weeks;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Years;
+import org.graylog.plugins.pipelineprocessor.functions.debug.Debug;
 import org.graylog.plugins.pipelineprocessor.functions.debug.MetricCounterIncrement;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Decode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Encode;
@@ -82,6 +83,7 @@ import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddress;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IsIp;
 import org.graylog.plugins.pipelineprocessor.functions.json.IsJson;
+import org.graylog.plugins.pipelineprocessor.functions.json.JsonFlatten;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
@@ -150,8 +152,11 @@ import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.slf4j.Logger;
 
 import javax.inject.Provider;
 import java.util.Arrays;
@@ -192,6 +197,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     private static LookupTableService lookupTableService;
     private static LookupTableService.Function lookupServiceFunction;
     private static LookupTable lookupTable;
+
+    private static Logger loggerMock;
 
     @BeforeClass
     @SuppressForbidden("Allow using default thread factory")
@@ -238,6 +245,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         lookupServiceFunction = new LookupTableService.Function(lookupTableService, "table");
         when(lookupTableService.newBuilder().lookupTable(anyString()).build()).thenReturn(lookupServiceFunction);
 
+        loggerMock = mock(Logger.class);
         // input related functions
         // TODO needs mock
         //functions.put(FromInput.NAME, new FromInput());
@@ -267,6 +275,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         functions.put(JsonParse.NAME, new JsonParse(objectMapper));
+        functions.put(JsonFlatten.NAME, new JsonFlatten(objectMapper));
         functions.put(SelectJsonPath.NAME, new SelectJsonPath(objectMapper));
 
         functions.put(DateConversion.NAME, new DateConversion());
@@ -334,6 +343,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(IsIp.NAME, new IsIp());
         functions.put(IsJson.NAME, new IsJson());
         functions.put(IsUrl.NAME, new IsUrl());
+        functions.put(Debug.NAME, new Debug(loggerMock));
 
         final GrokPatternService grokPatternService = mock(GrokPatternService.class);
         final GrokPattern greedyPattern = GrokPattern.create("GREEDY", ".*");
@@ -458,6 +468,41 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(evaluatedMessage.getField("array")).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(evaluatedMessage.getField("store")).isInstanceOf(Map.class);
         assertThat(evaluatedMessage.getField("expensive")).isEqualTo(10);
+    }
+
+    @Test
+    public void flattenJson() {
+        final String nestedJson = "{\n" +
+                "    \"store\": {\n" +
+                "        \"book\": {\n" +
+                "            \"category\": \"reference\",\n" +
+                "            \"author\": \"Nigel Rees\",\n" +
+                "            \"title\": \"Sayings of the Century\",\n" +
+                "            \"price\": 8.95\n" +
+                "        },\n" +
+                "        \"bicycle\": {\n" +
+                "            \"color\": \"red\",\n" +
+                "            \"price\": 19.95\n" +
+                "        }\n" +
+                "    },\n" +
+                "    \"some_array\": [ \"a\", \"b\", \"c\" ],\n" +
+                "    \"app.kubernetes.io_name\": \"hal\"\n" +
+                "}";
+
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = new Message("JSON", "test", Tools.nowUTC());
+        message.addField("nested_json", nestedJson);
+        final Message evaluatedMessage = evaluateRule(rule, message);
+
+        assertThat(evaluatedMessage.getField("message")).isEqualTo("JSON");
+        assertThat(evaluatedMessage.getField("nested_json")).isEqualTo(nestedJson);
+        assertThat(evaluatedMessage.getField("store_book_author")).isEqualTo("Nigel Rees");
+        assertThat(evaluatedMessage.getField("store_bicycle_color")).isEqualTo("red");
+        assertThat(evaluatedMessage.getField("some_array_0")).isEqualTo("a");
+        assertThat(evaluatedMessage.getField("some_array_1")).isEqualTo("b");
+        assertThat(evaluatedMessage.getField("app.kubernetes.io_name")).isEqualTo("hal");
+        assertThat(evaluatedMessage.getField("json_some_array")).isEqualTo("[\"a\",\"b\",\"c\"]");
+        assertThat(evaluatedMessage.getField("ignore_some_array")).isNull();
     }
 
     @Test
@@ -826,6 +871,22 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    public void debug() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message in = new Message("some message", "somehost.graylog.org", Tools.nowUTC());
+        in.addField("somefield", "somevalue");
+
+        evaluateRule(rule, in);
+
+        InOrder inOrder = Mockito.inOrder(loggerMock);
+        inOrder.verify(loggerMock).info("PIPELINE DEBUG: {}", "moo");
+        inOrder.verify(loggerMock).info("PIPELINE DEBUG: {}", "somevalue");
+        inOrder.verify(loggerMock, times(2)).info("PIPELINE DEBUG Message: <{}>", in.toDumpString());
+        inOrder.verify(loggerMock).info("PIPELINE DEBUG: {}", (Object) null);
+        inOrder.verify(loggerMock).info("PIPELINE DEBUG: {}", "message converted with to_string: " + in.toString());
+    }
+
+    @Test
     public void comparisons() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final EvaluationContext context = contextForRuleEval(rule, new Message("", "", Tools.nowUTC()));
@@ -943,6 +1004,33 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         assertThat(message.getField("dup_first")).isEqualTo("1");
         assertThat(message.getField("dup_last")).isEqualTo("2");
+
+        assertThat(message.getField("spacequote1")).isEqualTo("\"a space quote\"");
+        assertThat(message.getField("spacequote2")).isEqualTo("a space quote");
+        assertThat(message.getField("spacequote3")).isEqualTo("'a space quote'");
+        assertThat(message.getField("spacequote4")).isEqualTo("a space quote");
+        assertThat(message.getField("spacequote5")).isEqualTo("a space 'quote'");
+        assertThat(message.getField("spacequote6")).isEqualTo("a space \"quote\"");
+        assertThat(message.getField("spacequote7")).isEqualTo("it's a space 'quote'");
+
+        assertThat(message.getField("sq1")).isEqualTo("a");
+        assertThat(message.getField("sq2")).isEqualTo("b");
+        assertThat(message.getField("sq3")).isEqualTo("c");
+        assertThat(message.getField("sq4")).isEqualTo("' d '");
+        assertThat(message.getField("sq5")).isEqualTo("\" e\"");
+        assertThat(message.getField("sq6")).isEqualTo("it\"s a space");
+
+        assertThat(message.getField("sq7")).isEqualTo("a, b");
+        assertThat(message.getField("sq8")).isEqualTo("c|d");
+        assertThat(message.getField("sq9")).isEqualTo("e| \"f, g\" | h");
+        assertThat(message.getField("sq10")).isEqualTo("' i,j '");
+        assertThat(message.getField("sq11")).isEqualTo("\" k|\"");
+        assertThat(message.getField("sq12")).isEqualTo("l\"m n, o");
+
+        assertThat(message.getField("dup-spacequote")).isEqualTo("it's a space 'quote'|another");
+
+        assertThat(message.getField("sq@1")).isEqualTo("space quote");
+        assertThat(message.getField("sq@2")).isEqualTo("hello");
     }
 
     @Test

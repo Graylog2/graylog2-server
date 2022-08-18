@@ -103,21 +103,18 @@ const SimulationChanges = createReactClass({
     return <FieldValue key={`${field}-value`} removed={isRemoved}>{String(value)}</FieldValue>;
   },
 
-  _formatAddedFields(originalMessage, processedMessage) {
-    const originalFields = Object.keys(originalMessage.fields);
-    const processedFields = Object.keys(processedMessage.fields);
+  _formatAddedFields(addedFields) {
+    const keys = Object.keys(addedFields);
 
-    const addedFields = processedFields.filter((field) => originalFields.indexOf(field) === -1);
-
-    if (addedFields.length === 0) {
+    if (keys.length === 0) {
       return null;
     }
 
     const formattedFields = [];
 
-    addedFields.sort().forEach((field) => {
+    keys.sort().forEach((field) => {
       formattedFields.push(this._formatFieldTitle(field));
-      formattedFields.push(this._formatFieldValue(field, processedMessage.fields[field]));
+      formattedFields.push(this._formatFieldValue(field, addedFields[field]));
     });
 
     return (
@@ -130,21 +127,18 @@ const SimulationChanges = createReactClass({
     );
   },
 
-  _formatRemovedFields(originalMessage, processedMessage) {
-    const originalFields = Object.keys(originalMessage.fields);
-    const processedFields = Object.keys(processedMessage.fields);
+  _formatRemovedFields(removedFields) {
+    const keys = Object.keys(removedFields);
 
-    const removedFields = originalFields.filter((field) => processedFields.indexOf(field) === -1);
-
-    if (removedFields.length === 0) {
+    if (keys.length === 0) {
       return null;
     }
 
     const formattedFields = [];
 
-    removedFields.sort().forEach((field) => {
+    keys.sort().forEach((field) => {
       formattedFields.push(this._formatFieldTitle(field));
-      formattedFields.push(this._formatFieldValue(field, originalMessage.fields[field]));
+      formattedFields.push(this._formatFieldValue(field, removedFields[field]));
     });
 
     return (
@@ -157,42 +151,19 @@ const SimulationChanges = createReactClass({
     );
   },
 
-  _formatMutatedFields(originalMessage, processedMessage) {
-    const originalFields = Object.keys(originalMessage.fields);
-    const processedFields = Object.keys(processedMessage.fields);
+  _formatMutatedFields(mutatedFields) {
+    const keys = Object.keys(mutatedFields);
 
-    const mutatedFields = [];
-
-    originalFields.forEach((field) => {
-      if (processedFields.indexOf(field) === -1) {
-        return;
-      }
-
-      const originalValue = originalMessage.fields[field];
-      const processedValue = processedMessage.fields[field];
-
-      if (typeof originalValue !== typeof processedValue) {
-        mutatedFields.push(field);
-
-        return;
-      }
-
-      // Convert to JSON to avoid problems comparing objects or arrays. Yes, this sucks :/
-      if (JSON.stringify(originalValue) !== JSON.stringify(processedValue)) {
-        mutatedFields.push(field);
-      }
-    });
-
-    if (mutatedFields.length === 0) {
+    if (keys.length === 0) {
       return null;
     }
 
     const formattedFields = [];
 
-    mutatedFields.sort().forEach((field) => {
+    keys.sort().forEach((field) => {
       formattedFields.push(this._formatFieldTitle(field));
-      formattedFields.push(this._formatFieldValue(`${field}-original`, originalMessage.fields[field], true));
-      formattedFields.push(this._formatFieldValue(field, processedMessage.fields[field]));
+      formattedFields.push(this._formatFieldValue(`${field}-original`, mutatedFields[field].before, true));
+      formattedFields.push(this._formatFieldValue(field, mutatedFields[field].after));
     });
 
     return (
@@ -215,9 +186,9 @@ const SimulationChanges = createReactClass({
 
     const processedMessage = processedMessages.find((message) => message.id === originalMessage.id);
 
-    const formattedAddedFields = this._formatAddedFields(originalMessage, processedMessage);
-    const formattedRemovedFields = this._formatRemovedFields(originalMessage, processedMessage);
-    const formattedMutatedFields = this._formatMutatedFields(originalMessage, processedMessage);
+    const formattedAddedFields = this._formatAddedFields(processedMessage.decoration_stats.added_fields);
+    const formattedRemovedFields = this._formatRemovedFields(processedMessage.decoration_stats.removed_fields);
+    const formattedMutatedFields = this._formatMutatedFields(processedMessage.decoration_stats.changed_fields);
 
     if (!formattedAddedFields && !formattedRemovedFields && !formattedMutatedFields) {
       return <p>Original message would be not be modified during processing.</p>;

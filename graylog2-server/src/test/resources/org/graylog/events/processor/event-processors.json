@@ -4,24 +4,24 @@
       "_id": {
         "$oid": "54e3deadbeefdeadbeef0000"
       },
-      "title" : "Test",
-      "description" : "A test event definition",
-      "priority" : 2,
+      "title": "Test",
+      "description": "A test event definition",
+      "priority": 2,
       "alert": true,
       "notification_settings": {
         "grace_period_ms": 60000
       },
-      "config" : {
-        "type" : "__test_event_processor_config__",
-        "message" : "This is a test event processor",
+      "config": {
+        "type": "__test_event_processor_config__",
+        "message": "This is a test event processor",
         "search_within_ms": 300000,
         "execute_every_ms": 60000
       },
-      "field_spec" : {},
-      "key_spec" : [
+      "field_spec": {},
+      "key_spec": [
         "username"
       ],
-      "notifications" : [],
+      "notifications": [],
       "storage": []
     }
   ],
@@ -30,25 +30,36 @@
       "_id": {
         "$oid": "54e3deadbeefdeadbeef0001"
       },
-      "title" : "Test",
-      "description" : "A test event definition",
-      "config" : {
-        "type" : "event-processor-execution-v1",
-        "event_definition_id" : "54e3deadbeefdeadbeef0000",
-        "processing_window_size" : 300000,
-        "processing_hop_size" : 60000,
-        "parameters" : {
-          "type" : "__test_event_processor_parameters__",
-          "timerange" : {
-            "type" : "absolute",
-            "from" : {
+      "title": "Test",
+      "description": "A test event definition",
+      "config": {
+        "type": "event-processor-execution-v1",
+        "event_definition_id": "54e3deadbeefdeadbeef0000",
+        "processing_window_size": 300000,
+        "processing_hop_size": 60000,
+        "parameters": {
+          "type": "__test_event_processor_parameters__",
+          "timerange": {
+            "type": "absolute",
+            "from": {
               "$date": "2019-01-01T00:00:00.000Z"
             },
-            "to" : {
+            "to": {
               "$date": "2019-01-01T00:05:00.000Z"
             }
           }
         }
+      }
+    },
+    {
+      "_id": {
+        "$oid": "61efd3dffa224c448ec54305"
+      },
+      "title": "Test Notification",
+      "description": "",
+      "config": {
+        "type": "notification-execution-v1",
+        "notification_id": "61efd3dffa224c448ec54304"
       }
     }
   ],
@@ -58,6 +69,7 @@
         "$oid": "54e3deadbeefdeadbeef0002"
       },
       "job_definition_id": "54e3deadbeefdeadbeef0001",
+      "job_definition_type": "event-processor-execution-v1",
       "start_time": {
         "$date": "2019-01-01T00:00:00.000Z"
       },
@@ -88,6 +100,122 @@
         },
         "timerange_to": {
           "$date": "2019-01-01T03:00:00.000Z"
+        }
+      }
+    },
+    {
+      "_id": {
+        "$oid": "61fbcca5b2507945cc120001"
+      },
+      "job_definition_id": "61efd3dffa224c448ec54305",
+      "job_definition_type": "notification-execution-v1",
+      "start_time": {
+        "$date": "2022-02-03T12:37:57.648Z"
+      },
+      "end_time": null,
+      "next_time": {
+        "$date": "2022-02-03T12:37:57.648Z"
+      },
+      "created_at": {
+        "$date": "2022-02-03T12:37:57.648Z"
+      },
+      "updated_at": {
+        "$date": "2022-02-03T12:37:57.648Z"
+      },
+      "status": "runnable",
+      "lock": {
+        "owner": null,
+        "clock": 0,
+        "progress": 0
+      },
+      "schedule": {
+        "type": "once"
+      },
+      "data": {
+        "type": "notification-execution-v1",
+        "event_dto": {
+          "id": "01FTZSESRD48CZN9S8T0HZ90HA",
+          "event_definition_type": "aggregation-v1",
+          "event_definition_id": "54e3deadbeefdeadbeef0000",
+          "origin_context": "urn:graylog:message:es:graylog-master_104:0cf3a621-84ee-11ec-a53a-da728054284a",
+          "timestamp": {
+            "$date": "2022-02-03T12:37:29.355Z"
+          },
+          "timestamp_processing": {
+            "$date": "2022-02-03T12:37:57.645Z"
+          },
+          "timerange_start": null,
+          "timerange_end": null,
+          "streams": [],
+          "source_streams": [
+            "000000000000000000000001"
+          ],
+          "message": "Test Event",
+          "source": "example.com",
+          "key_tuple": [],
+          "key": "",
+          "priority": 2,
+          "alert": true,
+          "fields": {},
+          "group_by_fields": {}
+        }
+      }
+    },
+    {
+      "_id": {
+        "$oid": "61fbcca5b2507945cc120002"
+      },
+      "job_definition_id": "61efd3dffa224c448ec54305",
+      "job_definition_type": "notification-execution-v1",
+      "start_time": {
+        "$date": "2022-02-03T12:37:57.648Z"
+      },
+      "end_time": null,
+      "next_time": {
+        "$date": "2022-02-03T12:37:57.648Z"
+      },
+      "created_at": {
+        "$date": "2022-02-03T12:37:57.648Z"
+      },
+      "updated_at": {
+        "$date": "2022-02-03T12:37:57.648Z"
+      },
+      "status": "runnable",
+      "lock": {
+        "owner": null,
+        "clock": 0,
+        "progress": 0
+      },
+      "schedule": {
+        "type": "once"
+      },
+      "data": {
+        "type": "notification-execution-v1",
+        "event_dto": {
+          "id": "01FTZSESRD48CZN9S8T0HZ90HA",
+          "event_definition_type": "aggregation-v1",
+          "event_definition_id": "61fb9a7457d1d758cd811172",
+          "origin_context": "urn:graylog:message:es:graylog-master_104:0cf3a621-84ee-11ec-a53a-da728054284a",
+          "timestamp": {
+            "$date": "2022-02-03T12:37:29.355Z"
+          },
+          "timestamp_processing": {
+            "$date": "2022-02-03T12:37:57.645Z"
+          },
+          "timerange_start": null,
+          "timerange_end": null,
+          "streams": [],
+          "source_streams": [
+            "000000000000000000000001"
+          ],
+          "message": "Test Event",
+          "source": "example.com",
+          "key_tuple": [],
+          "key": "",
+          "priority": 2,
+          "alert": true,
+          "fields": {},
+          "group_by_fields": {}
         }
       }
     }

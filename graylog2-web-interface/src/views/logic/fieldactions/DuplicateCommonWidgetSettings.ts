@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Widget from '../widgets/Widget';
+import type Widget from '../widgets/Widget';
 
 const duplicateCommonWidgetSettings = (
 // @ts-ignore

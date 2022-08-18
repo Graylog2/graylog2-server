@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 
 import type { RefluxActions } from 'stores/StoreTypes';
 import type { QueryId, TimeRange, TimeRangeTypes } from 'views/logic/queries/Query';
-import Query from 'views/logic/queries/Query';
-import ViewState from 'views/logic/views/ViewState';
+import type Query from 'views/logic/queries/Query';
+import type ViewState from 'views/logic/views/ViewState';
 import { singletonActions } from 'logic/singleton';
 
 export type QueriesList = Immutable.OrderedMap<QueryId, Query>;
@@ -34,6 +34,7 @@ type QueriesActionsType = RefluxActions<{
   remove: (queryId: QueryId) => Promise<QueriesList>,
   timerange: (queryId: QueryId, newTimeRange: TimeRange) => Promise<QueriesList>,
   update: (queryId: QueryId, query: Query) => Promise<QueriesList>,
+  forceUpdate: (queryId: QueryId, query: Query) => Promise<QueriesList>,
 }>;
 
 // eslint-disable-next-line import/prefer-default-export
@@ -48,5 +49,6 @@ export const QueriesActions: QueriesActionsType = singletonActions(
     remove: { asyncResult: true },
     timerange: { asyncResult: true },
     update: { asyncResult: true },
+    forceUpdate: { asyncResult: true },
   }),
 );

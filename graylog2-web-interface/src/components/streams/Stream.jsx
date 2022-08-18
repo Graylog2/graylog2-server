@@ -113,7 +113,7 @@ class Stream extends React.Component {
     this.setState({ showEntityShareModal: true });
   };
 
-  _onDelete= (stream) => {
+  _onDelete = (stream) => {
     // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to remove this stream?')) {
       StreamsStore.remove(stream.id, (response) => {
@@ -122,7 +122,7 @@ class Stream extends React.Component {
         return response;
       });
     }
-  }
+  };
 
   _onResume = () => {
     const { stream } = this.props;
@@ -131,7 +131,7 @@ class Stream extends React.Component {
 
     StreamsStore.resume(stream.id, (response) => response)
       .finally(() => this.setState({ loading: false }));
-  }
+  };
 
   _onUpdate = (streamId, stream) => {
     StreamsStore.update(streamId, stream, (response) => {
@@ -139,7 +139,7 @@ class Stream extends React.Component {
 
       return response;
     });
-  }
+  };
 
   _onClone = (streamId, stream) => {
     StreamsStore.cloneStream(streamId, stream, (response) => {
@@ -147,7 +147,7 @@ class Stream extends React.Component {
 
       return response;
     });
-  }
+  };
 
   _onPause = () => {
     const { stream } = this.props;
@@ -159,13 +159,13 @@ class Stream extends React.Component {
       StreamsStore.pause(stream.id, (response) => response)
         .finally(() => this.setState({ loading: false }));
     }
-  }
+  };
 
   _onSaveStreamRule = (streamRuleId, streamRule) => {
     const { stream } = this.props;
 
     StreamRulesStore.create(stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success'));
-  }
+  };
 
   render() {
     const { indexSets, stream, permissions, streamRuleTypes, user } = this.props;

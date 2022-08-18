@@ -18,7 +18,9 @@ package org.graylog2.storage.versionprobe;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
@@ -29,6 +31,7 @@ import okhttp3.Request;
 import okhttp3.ResponseBody;
 import org.graylog2.plugin.Version;
 import org.graylog2.shared.utilities.ExceptionUtils;
+import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Converter;
@@ -65,12 +68,28 @@ public class VersionProbe {
         this.delayBetweenAttempts = elasticsearchVersionProbeDelay;
     }
 
-    public Optional<Version> probe(final Collection<URI> hosts) {
+    public Optional<SearchVersion> probe(final Collection<URI> hosts) {
         try {
-            return RetryerBuilder.<Optional<Version>>newBuilder()
+            return RetryerBuilder.<Optional<SearchVersion>>newBuilder()
                     .retryIfResult(input -> !input.isPresent())
                     .retryIfExceptionOfType(IOException.class)
                     .retryIfRuntimeException()
+                    .withRetryListener(new RetryListener() {
+                        @Override
+                        public void onRetry(Attempt attempt) {
+                            if (attempt.hasResult()) {
+                                final Object result = attempt.getResult();
+                                if (result instanceof Optional && ((Optional<?>) result).isPresent()) {
+                                    return;
+                                }
+                            }
+                            if (connectionAttempts == 0) {
+                                LOG.info("Elasticsearch is not available. Retry #{}", attempt.getAttemptNumber());
+                            } else {
+                                LOG.info("Elasticsearch is not available. Retry #{}/{}", attempt.getAttemptNumber(), connectionAttempts);
+                            }
+                        }
+                    })
                     .withWaitStrategy(WaitStrategies.fixedWait(delayBetweenAttempts.getQuantity(), delayBetweenAttempts.getUnit()))
                     .withStopStrategy((connectionAttempts == 0) ? StopStrategies.neverStop() : StopStrategies.stopAfterAttempt(connectionAttempts))
                     .build().call(() -> this.probeAllHosts(hosts));
@@ -80,7 +99,7 @@ public class VersionProbe {
         return Optional.empty();
     }
 
-    private Optional<Version> probeAllHosts(final Collection<URI> hosts) {
+    private Optional<SearchVersion> probeAllHosts(final Collection<URI> hosts) {
         return hosts
                 .stream()
                 .map(this::probeSingleHost)
@@ -89,7 +108,7 @@ public class VersionProbe {
                 .orElse(Optional.empty());
     }
 
-    private Optional<Version> probeSingleHost(URI host) {
+    private Optional<SearchVersion> probeSingleHost(URI host) {
         final Retrofit retrofit;
         try {
             retrofit = new Retrofit.Builder()
@@ -117,7 +136,6 @@ public class VersionProbe {
 
         return rootResponse(root, errorLogger)
                 .map(RootResponse::version)
-                .map(VersionResponse::number)
                 .flatMap(this::parseVersion);
     }
 
@@ -141,12 +159,12 @@ public class VersionProbe {
         return okHttpClient;
     }
 
-    private Optional<Version> parseVersion(String versionString) {
+    private Optional<SearchVersion> parseVersion(VersionResponse versionResponse) {
         try {
-            final com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.valueOf(versionString);
-            return Optional.of(new Version(version));
+            final com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.valueOf(versionResponse.number());
+            return Optional.of(SearchVersion.create(versionResponse.distribution(), version));
         } catch (Exception e) {
-            LOG.error("Unable to parse version retrieved from Elasticsearch node: <{}>", versionString, e);
+            LOG.error("Unable to parse version retrieved from Elasticsearch node: <{}>", versionResponse.number(), e);
             return Optional.empty();
         }
     }

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+
 import { alice } from 'fixtures/users';
 
 import ProfileSection from './ProfileSection';

@@ -17,19 +17,27 @@
 package org.graylog.testing.backenddriver;
 
 import com.google.common.collect.ImmutableSet;
+import io.restassured.path.json.JsonPath;
 import io.restassured.specification.RequestSpecification;
 import org.bson.types.ObjectId;
-import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog.plugins.views.search.rest.QueryDTO;
+import org.graylog.plugins.views.search.rest.SearchDTO;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.testing.utils.JsonUtils;
 import org.graylog.testing.utils.RangeUtils;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * WIP. This class illustrates how we could reuse common functionality for integration tests.
@@ -41,12 +49,14 @@ import static io.restassured.RestAssured.given;
  */
 public class SearchDriver {
 
+    private static final Logger LOG = LoggerFactory.getLogger(SearchDriver.class);
+
     /**
      * @param requestSpec @see io.restassured.specification.RequestSpecification
      * @return all messages' "message" field as List<String>
      */
     public static List<String> searchAllMessages(RequestSpecification requestSpec) {
-      return searchAllMessagesInTimeRange(requestSpec, RangeUtils.allMessagesTimeRange());
+        return searchAllMessagesInTimeRange(requestSpec, RangeUtils.allMessagesTimeRange());
     }
 
     public static List<String> searchAllMessagesInTimeRange(RequestSpecification requestSpec, TimeRange timeRange) {
@@ -55,26 +65,36 @@ public class SearchDriver {
 
         String body = allMessagesJson(queryId, messageListId, timeRange);
 
-        return given()
+        final JsonPath response = given()
                 .spec(requestSpec)
                 .when()
                 .body(body)
                 .post("/views/search/sync")
                 .then()
                 .statusCode(200)
-                .extract()
-                .jsonPath().getList(allMessagesJsonPath(queryId, messageListId), String.class);
+                .assertThat().body("execution.completed_exceptionally", notNullValue())
+                .extract().body().jsonPath();
+
+        if (response.get("execution.completed_exceptionally")) {
+            final Object errors = response.getString("errors");
+            LOG.warn("Failed to obtain messages: {}", errors);
+        }
+
+        return response.getList(allMessagesJsonPath(queryId, messageListId), String.class);
     }
 
     private static String allMessagesJson(String queryId, String messageListId, TimeRange timeRange) {
         MessageList messageList = MessageList.builder().id(messageListId).build();
-        Query q = Query.builder()
+        QueryDTO q = QueryDTO.builder()
                 .id(queryId)
                 .query(ElasticsearchQueryString.of(""))
                 .timerange(timeRange)
                 .searchTypes(ImmutableSet.of(messageList))
                 .build();
-        Search s = Search.builder().id(new ObjectId().toHexString()).queries(ImmutableSet.of(q)).build();
+        SearchDTO s = SearchDTO.builder()
+                .id(new ObjectId().toHexString())
+                .queries(q)
+                .build();
 
         return JsonUtils.toJsonString(s);
     }
@@ -82,5 +102,13 @@ public class SearchDriver {
     @SuppressWarnings("SameParameterValue")
     private static String allMessagesJsonPath(String queryId, String messageListId) {
         return "results." + queryId + ".search_types." + messageListId + ".messages.message.message";
+    }
+
+    public static List<MappedFieldTypeDTO> getFieldTypes(RequestSpecification requestSpecification) {
+        final MappedFieldTypeDTO[] as = given()
+                .spec(requestSpecification)
+                .get("/views/fields")
+                .as(MappedFieldTypeDTO[].class);
+        return Arrays.asList(as);
     }
 }

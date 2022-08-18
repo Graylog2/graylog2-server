@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -41,7 +41,6 @@ type Props = {
 };
 
 const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string, id: string) => {
-  // eslint-disable-next-line react/destructuring-assignment
   const streamList = streams.map((stream) => {
     if (stream.is_default) {
       return <MenuItem key={stream.id} disabled title="Cannot test against the default stream">{stream.title}</MenuItem>;
@@ -89,6 +88,7 @@ const MessageActions = ({ index, id, fields, decorationStats, disabled, disableS
       <Button href={messageUrl}>Permalink</Button>
 
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />
+      <ClipboardButton title="Copy message" bsSize="small" text={JSON.stringify(fields, null, 2)} />
       {surroundingSearchButton}
       {disableTestAgainstStream ? null : _getTestAgainstStreamButton(streams, index, id)}
     </ButtonGroup>

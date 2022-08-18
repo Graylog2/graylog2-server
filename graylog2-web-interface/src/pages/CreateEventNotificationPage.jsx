@@ -82,5 +82,4 @@ CreateEventDefinitionPage.propTypes = {
 
 export default connect(CreateEventDefinitionPage, {
   currentUser: CurrentUserStore,
-},
-({ currentUser }) => ({ currentUser: currentUser.currentUser }));
+}, ({ currentUser }) => ({ currentUser: currentUser.currentUser }));

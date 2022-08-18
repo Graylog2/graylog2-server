@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useContext } from 'react';
 import PropTypes from 'prop-types';
 
-import QueryResult from 'views/logic/QueryResult';
+import type QueryResult from 'views/logic/QueryResult';
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import { Icon } from 'components/common';
@@ -37,7 +37,7 @@ type Props = {
 const ViewDescription = ({ results, viewMetadata }: Props) => {
   const isAdHocSearch = !viewMetadata.id;
   const viewType = useContext(ViewTypeContext);
-  const viewTypeLabel = viewType ? <ViewTypeLabel type={viewType} /> : '';
+  const viewTypeLabel = viewType ? ViewTypeLabel({ type: viewType }) : '';
   const resultsSection = (
     <>
       <SectionSubheadline>

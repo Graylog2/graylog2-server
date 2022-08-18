@@ -15,16 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 import { useContext } from 'react';
-import { Formik, Form, Field, FormikProps } from 'formik';
+import type { FormikProps } from 'formik';
+import { Formik, Form, Field } from 'formik';
 
-import Role from 'logic/roles/Role';
+import type Role from 'logic/roles/Role';
 import { validateField, formHasErrors } from 'util/FormsUtils';
 import { Icon, FormikFormGroup, Select } from 'components/common';
 import { Alert, Button, ButtonToolbar, Row, Col, Panel, Input } from 'components/bootstrap';
 
-import BackendWizardContext, { WizardFormValues } from './BackendWizardContext';
+import type { WizardFormValues } from './BackendWizardContext';
+import BackendWizardContext from './BackendWizardContext';
 
 export const STEP_KEY = 'user-synchronization';
 // Form validation needs to include all input names

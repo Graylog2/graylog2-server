@@ -1,0 +1,31 @@
+{
+  "id": "6141d457d3a6b9d73c8ac55c",
+  "queries": [
+    {
+      "id": "278992f6-8930-43f5-9dd7-11bbc4e3b797",
+      "query": {
+        "type": "elasticsearch",
+        "query_string": ""
+      },
+      "timerange": {
+        "type": "relative",
+        "from": 300
+      },
+      "search_types": [
+        {
+          "size": 100,
+          "streams": [],
+          "fields": [
+            "timestamp",
+            "source",
+            "message"
+          ],
+          "type": "logs",
+          "id": "967d2217-fd99-48a6-b829-5acdab906807",
+          "sort": "DESC"
+        }
+      ]
+    }
+  ],
+  "parameters": []
+}

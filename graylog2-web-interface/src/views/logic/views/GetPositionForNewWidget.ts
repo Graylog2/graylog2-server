@@ -16,7 +16,7 @@
  */
 import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import Widget from 'views/logic/widgets/Widget';
+import type Widget from 'views/logic/widgets/Widget';
 
 const GetPositionForNewWidget = (widget: Widget) => {
   const { defaultHeight, defaultWidth } = widgetDefinition(widget.type);

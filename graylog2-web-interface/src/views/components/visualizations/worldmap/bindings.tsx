@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { VisualizationType } from 'views/types';
-
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import WorldMapVisualization from 'views/components/visualizations/worldmap/WorldMapVisualization';
@@ -32,7 +31,7 @@ const DEFAULT_FORM_VALUES = {
   centerY: 0,
 };
 
-const worldMap: VisualizationType = {
+const worldMap: VisualizationType<typeof WorldMapVisualization.type> = {
   type: WorldMapVisualization.type,
   displayName: 'World Map',
   component: WorldMapVisualization,

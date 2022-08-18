@@ -148,5 +148,4 @@ class EditEventDefinitionPage extends React.Component {
 
 export default connect(withParams(EditEventDefinitionPage), {
   currentUser: CurrentUserStore,
-},
-({ currentUser }) => ({ currentUser: currentUser.currentUser }));
+}, ({ currentUser }) => ({ currentUser: currentUser.currentUser }));

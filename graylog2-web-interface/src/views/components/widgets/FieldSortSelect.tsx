@@ -17,12 +17,12 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 
 import CustomPropTypes from 'views/components/CustomPropTypes';
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 import Direction from 'views/logic/aggregationbuilder/Direction';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Select from 'components/common/Select';
 

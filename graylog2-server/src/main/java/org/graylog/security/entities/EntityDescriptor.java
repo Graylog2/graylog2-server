@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.grn.GRN;
+import org.graylog.security.shares.Grantee;
 
 import java.util.Collections;
 import java.util.Set;
@@ -41,9 +42,9 @@ public abstract class EntityDescriptor {
     public abstract String title();
 
     @JsonProperty("owners")
-    public abstract ImmutableSet<Owner> owners();
+    public abstract ImmutableSet<Grantee> owners();
 
-    public static EntityDescriptor create(GRN id, String title, Set<Owner> owners) {
+    public static EntityDescriptor create(GRN id, String title, Set<Grantee> owners) {
         return builder()
                 .id(id)
                 .title(title)
@@ -71,27 +72,8 @@ public abstract class EntityDescriptor {
         public abstract Builder title(String title);
 
         @JsonProperty("owners")
-        public abstract Builder owners(Set<Owner> owners);
+        public abstract Builder owners(Set<Grantee> owners);
 
         public abstract EntityDescriptor build();
-    }
-
-    @AutoValue
-    public static abstract class Owner {
-        @JsonProperty("id")
-        public abstract GRN id();
-
-        @JsonProperty("type")
-        public String type() {
-            return id().type();
-        }
-
-        @JsonProperty("title")
-        public abstract String title();
-
-        @JsonCreator
-        public static Owner create(GRN id, String title) {
-            return new AutoValue_EntityDescriptor_Owner(id, title);
-        }
     }
 }

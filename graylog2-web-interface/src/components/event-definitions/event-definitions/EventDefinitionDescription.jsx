@@ -23,6 +23,7 @@ import styled, { css } from 'styled-components';
 
 import { Button, Col, Row } from 'components/bootstrap';
 import { Icon, Pluralize, Timestamp } from 'components/common';
+import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 
 const DetailsList = styled.dl`
 `;
@@ -33,7 +34,7 @@ const DetailTitle = styled.dt`
 `;
 
 const DetailValue = styled.dd(({ theme }) => css`
-  margin-left: 150px;
+  margin-left: 180px;
   word-wrap: break-word;
 
   &:not(:last-child) {
@@ -53,15 +54,7 @@ class EventDefinitionDescription extends React.Component {
     context: {},
   };
 
-  constructor() {
-    super();
-
-    this.state = {
-      showDetails: false,
-    };
-  }
-
-  renderSchedulingInformation = (definition) => {
+  static renderSchedulingInformation = (definition) => {
     let schedulingInformation = 'Not scheduled.';
 
     if (definition.config.search_within_ms && definition.config.execute_every_ms) {
@@ -76,7 +69,7 @@ class EventDefinitionDescription extends React.Component {
     return schedulingInformation;
   };
 
-  renderNotificationsInformation = (definition) => {
+  static renderNotificationsInformation = (definition) => {
     let notificationsInformation = <span>Does <b>not</b> trigger any Notifications.</span>;
 
     if (definition.notifications.length > 0) {
@@ -90,6 +83,23 @@ class EventDefinitionDescription extends React.Component {
 
     return notificationsInformation;
   };
+
+  static clearNotifications = (definition) => {
+    return () => {
+      // eslint-disable-next-line no-alert
+      if (window.confirm(`Are you sure you want to clear queued notifications for "${definition.title}"?`)) {
+        EventDefinitionsActions.clearNotificationQueue(definition);
+      }
+    };
+  };
+
+  constructor() {
+    super();
+
+    this.state = {
+      showDetails: false,
+    };
+  }
 
   renderDetails = (definition, context) => {
     const { showDetails } = this.state;
@@ -137,6 +147,14 @@ class EventDefinitionDescription extends React.Component {
               </>
             )}
             {timerange}
+            <DetailTitle>Queued notifications:</DetailTitle>
+            <DetailValue>{scheduleCtx.queued_notifications}
+              {scheduleCtx.queued_notifications > 0 && (
+                <Button bsStyle="link" bsSize="xsmall" onClick={EventDefinitionDescription.clearNotifications(definition)}>
+                  clear
+                </Button>
+              )}
+            </DetailValue>
           </DetailsList>
         </Col>
       </Row>
@@ -157,7 +175,7 @@ class EventDefinitionDescription extends React.Component {
       <>
         <p>{definition.description}</p>
         <p>
-          {this.renderSchedulingInformation(definition)} {this.renderNotificationsInformation(definition)}
+          {EventDefinitionDescription.renderSchedulingInformation(definition)} {EventDefinitionDescription.renderNotificationsInformation(definition)}
           <Button bsStyle="link" bsSize="xsmall" onClick={this.handleDetailsToggle}>
             {showDetails ? 'Hide' : 'Show'} details
           </Button>

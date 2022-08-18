@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.rest;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,6 +27,8 @@ import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.db.PaginatedRuleService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineServiceHelper;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
@@ -48,6 +51,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
@@ -63,8 +67,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Api(value = "Pipelines/Rules", description = "Rules for the pipeline message processor")
@@ -77,28 +84,35 @@ public class RuleResource extends RestResource implements PluginRestResource {
     private static final Logger log = LoggerFactory.getLogger(RuleResource.class);
 
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put(RuleDao.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put(RuleDao.FIELD_TITLE, SearchQueryField.create(RuleDao.FIELD_TITLE))
             .put(RuleDao.FIELD_DESCRIPTION, SearchQueryField.create(RuleDao.FIELD_DESCRIPTION))
             .build();
 
     private final RuleService ruleService;
+    private final PipelineService pipelineService;
     private final RuleMetricsConfigService ruleMetricsConfigService;
     private final PipelineRuleParser pipelineRuleParser;
     private final FunctionRegistry functionRegistry;
     private final PaginatedRuleService paginatedRuleService;
     private final SearchQueryParser searchQueryParser;
+    private final PipelineServiceHelper pipelineServiceHelper;
 
     @Inject
     public RuleResource(RuleService ruleService,
+                        PipelineService pipelineService,
                         RuleMetricsConfigService ruleMetricsConfigService,
                         PipelineRuleParser pipelineRuleParser,
                         PaginatedRuleService paginatedRuleService,
-                        FunctionRegistry functionRegistry) {
+                        FunctionRegistry functionRegistry,
+                        PipelineServiceHelper pipelineServiceHelper) {
         this.ruleService = ruleService;
+        this.pipelineService = pipelineService;
         this.ruleMetricsConfigService = ruleMetricsConfigService;
         this.pipelineRuleParser = pipelineRuleParser;
         this.functionRegistry = functionRegistry;
         this.paginatedRuleService = paginatedRuleService;
+        this.pipelineServiceHelper = pipelineServiceHelper;
 
         this.searchQueryParser = new SearchQueryParser(RuleDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
@@ -123,7 +137,14 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .createdAt(now)
                 .modifiedAt(now)
                 .build();
-        final RuleDao save = ruleService.save(newRuleSource);
+
+        final RuleDao save;
+        try {
+            save = ruleService.save(newRuleSource);
+        } catch (IllegalArgumentException e) {
+            log.error(e.getMessage(), e);
+            throw new BadRequestException(e.getMessage());
+        }
 
         log.debug("Created new rule {}", save);
         return RuleSource.fromDao(pipelineRuleParser, save);
@@ -190,8 +211,38 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .collect(Collectors.toList());
         final PaginatedList<RuleSource> rules = new PaginatedList<>(ruleSourceList,
                 result.pagination().total(), result.pagination().page(), result.pagination().perPage());
-        return PaginatedResponse.create("rules", rules);
+        return PaginatedResponse.create("rules", rules,
+                prepareContextForPaginatedResponse(result.delegate()));
     }
+
+    @VisibleForTesting
+    @Nonnull
+    Map<String, Object> prepareContextForPaginatedResponse(@Nonnull List<RuleDao> rules) {
+        final Map<String, RuleDao> ruleTitleMap = rules
+                .stream()
+                .collect(Collectors.toMap(RuleDao::title, dao -> dao));
+
+        final Map<String, List<PipelineCompactSource>> result = new HashMap<>();
+        rules.forEach(r -> result.put(r.id(), new ArrayList<>()));
+
+        pipelineServiceHelper.groupByRuleName(
+                        pipelineService::loadAll, ruleTitleMap.keySet())
+                .forEach((ruleTitle, pipelineDaos) -> {
+                    result.put(
+                            ruleTitleMap.get(ruleTitle).id(),
+                            pipelineDaos.stream()
+                                    .map(dao -> PipelineCompactSource.builder()
+                                            .id(dao.id())
+                                            .title(dao.title())
+                                            .build())
+                                    .collect(Collectors.toList())
+                    );
+                });
+
+        return ImmutableMap.of("used_in_pipelines", result);
+    }
+
+
 
     @ApiOperation(value = "Get a processing rule", notes = "It can take up to a second until the change is applied")
     @Path("/{id}")
@@ -235,7 +286,14 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .source(update.source())
                 .modifiedAt(DateTime.now(DateTimeZone.UTC))
                 .build();
-        final RuleDao savedRule = ruleService.save(toSave);
+
+        final RuleDao savedRule;
+        try {
+            savedRule = ruleService.save(toSave);
+        } catch (IllegalArgumentException e) {
+            log.error(e.getMessage(), e);
+            throw new BadRequestException(e.getMessage());
+        }
 
         return RuleSource.fromDao(pipelineRuleParser, savedRule);
     }

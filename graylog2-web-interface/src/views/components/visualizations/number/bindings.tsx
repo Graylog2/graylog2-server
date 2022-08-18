@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { VisualizationType } from 'views/types';
 
+import type { VisualizationType } from 'views/types';
 import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 
@@ -25,7 +25,7 @@ type NumberVisualizationConfigFormValues = {
   trend_preference: 'LOWER' | 'NEUTRAL' | 'HIGHER',
 };
 
-const singleNumber: VisualizationType<NumberVisualizationConfig, NumberVisualizationConfigFormValues> = {
+const singleNumber: VisualizationType<typeof NumberVisualization.type, NumberVisualizationConfig, NumberVisualizationConfigFormValues> = {
   type: NumberVisualization.type,
   displayName: 'Single Number',
   component: NumberVisualization,

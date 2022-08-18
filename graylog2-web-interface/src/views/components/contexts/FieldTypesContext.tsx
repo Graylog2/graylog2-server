@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { List, Map } from 'immutable';
+import type { List, Map } from 'immutable';
 
 import { singleton } from 'logic/singleton';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 type FieldTypeMappingsList = List<FieldTypeMapping>;
 export type FieldTypes = {

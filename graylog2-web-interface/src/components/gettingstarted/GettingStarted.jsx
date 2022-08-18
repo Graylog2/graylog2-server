@@ -69,12 +69,12 @@ class GettingStarted extends React.Component {
     gettingStartedUrl: PropTypes.string.isRequired,
     noDismissButton: PropTypes.bool,
     onDismiss: PropTypes.func,
-  }
+  };
 
   static defaultProps = {
     noDismissButton: false,
     onDismiss: () => {},
-  }
+  };
 
   constructor(props) {
     super(props);

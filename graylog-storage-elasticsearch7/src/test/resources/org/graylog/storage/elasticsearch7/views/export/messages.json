@@ -36,7 +36,7 @@
             "gl2_message_id": "1",
             "source": "source-2",
             "message": "He",
-            "timestamp": "2015-01-01 02:00:00.000",
+            "timestamp": "2015-01-01 01:59:59.999",
             "streams": [
               "stream-02"
             ]

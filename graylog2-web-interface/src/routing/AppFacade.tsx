@@ -23,10 +23,12 @@ import { useStore } from 'stores/connect';
 import LoginQueryClientProvider from 'contexts/LoginQueryClientProvider';
 import 'bootstrap/less/bootstrap.less';
 import 'toastr/toastr.less';
-import { Store } from 'stores/StoreTypes';
-import { CurrentUserStoreState, CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type { Store } from 'stores/StoreTypes';
+import type { CurrentUserStoreState } from 'stores/users/CurrentUserStore';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { ServerAvailabilityStore } from 'stores/sessions/ServerAvailabilityStore';
-import { SessionStoreState, SessionStore } from 'stores/sessions/SessionStore';
+import type { SessionStoreState } from 'stores/sessions/SessionStore';
+import { SessionStore } from 'stores/sessions/SessionStore';
 
 const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
@@ -37,7 +39,7 @@ const SERVER_PING_TIMEOUT = 20000;
 const AppFacade = () => {
   const currentUser = useStore(CurrentUserStore as Store<CurrentUserStoreState>, (state) => state?.currentUser);
   const server = useStore(ServerAvailabilityStore, (state) => state?.server);
-  const sessionId = useStore(SessionStore as Store<SessionStoreState>, (state) => (state?.sessionId ?? ''));
+  const username = useStore(SessionStore as Store<SessionStoreState>, (state) => (state?.username ?? ''));
 
   useEffect(() => {
     const interval = setInterval(ServerAvailabilityStore.ping, SERVER_PING_TIMEOUT);
@@ -49,7 +51,7 @@ const AppFacade = () => {
     return <ServerUnavailablePage server={server} />;
   }
 
-  if (!sessionId) {
+  if (!username) {
     return (
       <LoginQueryClientProvider>
         <LoginPage />

@@ -16,25 +16,45 @@
  */
 package org.graylog.storage.elasticsearch7;
 
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.MainResponse;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog2.indexer.cluster.NodeAdapter;
+import org.graylog2.storage.SearchVersion;
 
 import javax.inject.Inject;
+import java.util.Locale;
 import java.util.Optional;
 
 public class NodeAdapterES7 implements NodeAdapter {
-    private final ElasticsearchClient client;
+    private final PlainJsonApi jsonApi;
 
     @Inject
-    public NodeAdapterES7(ElasticsearchClient client) {
-        this.client = client;
+    public NodeAdapterES7(ElasticsearchClient client, ObjectMapper objectMapper) {
+        this.jsonApi = new PlainJsonApi(objectMapper, client);
+    }
+
+    NodeAdapterES7(final PlainJsonApi jsonApi) {
+        this.jsonApi = jsonApi;
     }
 
     @Override
-    public Optional<String> version() {
-        final MainResponse result = client.execute(RestHighLevelClient::info,
-                "Unable to retrieve Elasticsearch version from node");
-        return Optional.of(result.getVersion().getNumber());
+    public Optional<SearchVersion> version() {
+
+        final Request request = new Request("GET", "/?filter_path=version.number,version.distribution");
+        final Optional<JsonNode> resp = Optional.of(jsonApi.perform(request, "Unable to retrieve cluster information"));
+
+        final Optional<String> version = resp.map(r -> r.path("version")).map(r -> r.path("number")).map(JsonNode::textValue);
+
+        final SearchVersion.Distribution distribution = resp.map(r -> r.path("version")).map(r -> r.path("distribution")).map(JsonNode::textValue)
+                .map(d -> d.toUpperCase(Locale.ROOT))
+                .map(SearchVersion.Distribution::valueOf)
+                .orElse(SearchVersion.Distribution.ELASTICSEARCH);
+
+        return version
+                .map(this::parseVersion)
+                .map(v -> SearchVersion.create(distribution, v));
     }
+
+
 }

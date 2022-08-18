@@ -18,7 +18,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import { Subtract } from 'utility-types';
+import type { Subtract } from 'utility-types';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Select } from 'components/common';
@@ -173,8 +173,7 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
     event.preventDefault();
 
     setLoading(true);
-    const promise = MessagesActions.loadRawMessage(message, remoteAddress,
-      codec, codecConfiguration);
+    const promise = MessagesActions.loadRawMessage(message, remoteAddress, codec, codecConfiguration);
 
     promise.then((loadedMessage) => {
       onMessageLoaded(

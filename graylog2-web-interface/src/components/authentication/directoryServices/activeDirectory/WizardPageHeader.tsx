@@ -23,7 +23,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
-import { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
+import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 
 type Props = {
   authenticationBackend?: DirectoryServiceBackend,

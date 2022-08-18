@@ -51,8 +51,7 @@ class RegexReplaceExtractorConfiguration extends React.Component {
     this.setState({ trying: true });
 
     const { configuration } = this.props;
-    const promise = ToolsStore.testRegexReplace(configuration.regex, configuration.replacement,
-      configuration.replace_all, this.props.exampleMessage);
+    const promise = ToolsStore.testRegexReplace(configuration.regex, configuration.replacement, configuration.replace_all, this.props.exampleMessage);
 
     promise.then((result) => {
       if (!result.matched) {

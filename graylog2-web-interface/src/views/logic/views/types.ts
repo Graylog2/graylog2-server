@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 
 export type SearchTypeIds = Immutable.Set<string>;
 export type WidgetId = string;

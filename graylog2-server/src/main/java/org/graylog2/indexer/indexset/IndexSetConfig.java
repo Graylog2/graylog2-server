@@ -51,6 +51,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String FIELD_INDEX_PREFIX = "index_prefix";
     public static final String FIELD_CREATION_DATE = "creation_date";
     public static final String FIELD_INDEX_TEMPLATE_TYPE = "index_template_type";
+    public static final String FIELD_REGULAR = "regular";
     public static final String INDEX_PREFIX_REGEX = "^[a-z0-9][a-z0-9_+-]*$";
 
     public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
@@ -78,7 +79,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
      * Indicates whether this index set is intended to
      * store messages ingested by user, not by the system
      */
-    @JsonProperty("regular")
+    @JsonProperty(FIELD_REGULAR)
     public abstract Optional<Boolean> isRegular();
 
     @JsonProperty(FIELD_INDEX_PREFIX)
@@ -156,7 +157,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("title") @NotBlank String title,
                                         @JsonProperty("description") @Nullable String description,
                                         @JsonProperty("writable") @Nullable Boolean isWritable,
-                                        @JsonProperty("regular") @Nullable Boolean isRegular,
+                                        @JsonProperty(FIELD_REGULAR) @Nullable Boolean isRegular,
                                         @JsonProperty(FIELD_INDEX_PREFIX) @Pattern(regexp = INDEX_PREFIX_REGEX) String indexPrefix,
                                         @JsonProperty("index_match_pattern") @Nullable String indexMatchPattern,
                                         @JsonProperty("index_wildcard") @Nullable String indexWildcard,

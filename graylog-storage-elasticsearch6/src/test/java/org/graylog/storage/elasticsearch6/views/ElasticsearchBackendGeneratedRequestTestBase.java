@@ -27,7 +27,6 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -93,9 +92,9 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
         this.elasticsearchBackend = new ElasticsearchBackend(elasticSearchTypeHandlers,
                 jestClient,
                 indexLookup,
-                new QueryStringDecorators.Fake(),
-                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
-                false);
+                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
+                usedSearchFilters -> Collections.emptySet(),
+        false);
     }
 
     SearchJob searchJobForQuery(Query query) {
@@ -115,7 +114,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
     }
 
     String run(SearchJob searchJob, Query query, ESGeneratedQueryContext queryContext, Set<QueryResult> predecessorResults) throws IOException {
-        this.elasticsearchBackend.doRun(searchJob, query, queryContext, predecessorResults);
+        this.elasticsearchBackend.doRun(searchJob, query, queryContext);
 
         verify(jestClient, times(1)).execute(clientRequestCaptor.capture(), any());
 

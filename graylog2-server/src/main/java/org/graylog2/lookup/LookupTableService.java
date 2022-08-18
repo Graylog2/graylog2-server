@@ -36,6 +36,7 @@ import org.graylog2.lookup.events.LookupTablesUpdated;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupResult;
+import org.graylog2.system.SystemEntity;
 import org.graylog2.utilities.LoggingServiceListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +81,7 @@ public class LookupTableService extends AbstractIdleService {
     private final Map<String, LookupCache.Factory> cacheFactories;
     private final Map<String, LookupDataAdapter.Factory> adapterFactories;
     private final Map<String, LookupDataAdapter.Factory2> adapterFactories2;
+    private final Map<String, LookupDataAdapter.Factory2> systemAdapterFactories;
     private final ScheduledExecutorService scheduler;
     private final EventBus eventBus;
     private final LookupDataAdapterRefreshService adapterRefreshService;
@@ -97,15 +99,25 @@ public class LookupTableService extends AbstractIdleService {
                               Map<String, LookupCache.Factory> cacheFactories,
                               Map<String, LookupDataAdapter.Factory> adapterFactories,
                               Map<String, LookupDataAdapter.Factory2> adapterFactories2,
+                              @SystemEntity Map<String, LookupDataAdapter.Factory2> systemAdapterFactories,
                               @Named("daemonScheduler") ScheduledExecutorService scheduler,
                               EventBus eventBus) {
         this.configService = configService;
         this.cacheFactories = cacheFactories;
         this.adapterFactories = adapterFactories;
         this.adapterFactories2 = adapterFactories2;
+        this.systemAdapterFactories = systemAdapterFactories;
         this.scheduler = scheduler;
         this.eventBus = eventBus;
         this.adapterRefreshService = new LookupDataAdapterRefreshService(scheduler, liveTables);
+    }
+
+    protected LookupTableConfigService getConfigService() {
+        return configService;
+    }
+
+    protected ScheduledExecutorService getScheduler() {
+        return scheduler;
     }
 
     @Override
@@ -160,7 +172,7 @@ public class LookupTableService extends AbstractIdleService {
         adapterRefreshService.stopAsync();
     }
 
-    private class DataAdapterListener extends Service.Listener {
+    protected class DataAdapterListener extends Service.Listener {
         private final DataAdapterDto dto;
         private final LookupDataAdapter adapter;
         private final CountDownLatch latch;
@@ -361,7 +373,7 @@ public class LookupTableService extends AbstractIdleService {
         scheduler.schedule(() -> deleted.lookupTableNames().forEach(liveTables::remove), 0, TimeUnit.SECONDS);
     }
 
-    private CountDownLatch createAndStartAdapters() {
+    protected CountDownLatch createAndStartAdapters() {
         final Map<DataAdapterDto, LookupDataAdapter> adapters = createAdapters(configService.loadAllDataAdapters());
         final CountDownLatch latch = new CountDownLatch(toIntExact(adapters.size()));
 
@@ -379,8 +391,9 @@ public class LookupTableService extends AbstractIdleService {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private LookupDataAdapter createAdapter(DataAdapterDto dto) {
+    protected LookupDataAdapter createAdapter(DataAdapterDto dto) {
         try {
+            final LookupDataAdapter.Factory2 systemFactory = systemAdapterFactories.get(dto.config().type());
             final LookupDataAdapter.Factory2 factory2 = adapterFactories2.get(dto.config().type());
             final LookupDataAdapter.Factory factory = adapterFactories.get(dto.config().type());
             final LookupDataAdapter adapter;
@@ -389,23 +402,30 @@ public class LookupTableService extends AbstractIdleService {
                 adapter = factory2.create(dto);
             } else if (factory != null) {
                 adapter = factory.create(dto.id(), dto.name(), dto.config());
+            } else if (systemFactory != null) {
+                adapter = systemFactory.create(dto);
             } else {
                 LOG.warn("Unable to load data adapter {} of type {}, missing a factory. Is a required plugin missing?", dto.name(), dto.config().type());
                 // TODO system notification
                 return null;
             }
-            adapter.addListener(new LoggingServiceListener(
-                            "Data Adapter",
-                            String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(adapter)),
-                            LOG),
-                    scheduler);
-            // Each adapter needs to be added to the refresh scheduler
-            adapter.addListener(adapterRefreshService.newServiceListener(adapter), scheduler);
+            addListeners(adapter, dto);
             return adapter;
         } catch (Exception e) {
             LOG.error("Couldn't create adapter <{}/{}>", dto.name(), dto.id(), e);
             return null;
         }
+    }
+
+    protected void addListeners(LookupDataAdapter adapter, DataAdapterDto dto) {
+
+        adapter.addListener(new LoggingServiceListener(
+                        "Data Adapter",
+                        String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(adapter)),
+                        LOG),
+                scheduler);
+        // Each adapter needs to be added to the refresh scheduler
+        adapter.addListener(adapterRefreshService.newServiceListener(adapter), scheduler);
     }
 
     private CountDownLatch createAndStartCaches() {

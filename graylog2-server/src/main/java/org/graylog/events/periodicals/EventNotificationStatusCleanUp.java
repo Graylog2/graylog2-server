@@ -54,7 +54,7 @@ public class EventNotificationStatusCleanUp extends Periodical {
     }
 
     @Override
-    public boolean masterOnly() {
+    public boolean leaderOnly() {
         return true;
     }
 

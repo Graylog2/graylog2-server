@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.graylog.failure.ProcessingFailureCause;
+import org.graylog2.inputs.converters.DateConverter;
 import org.graylog2.inputs.extractors.ExtractorException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.Extractor.Result;
@@ -956,6 +957,28 @@ public class ExtractorTest {
 
         assertThat(msg.getField("message")).isEqualTo("the message");
         assertThat(extractor.getConverterExceptionCount()).isEqualTo(0L);
+    }
+
+    @Test
+    // Test for https://github.com/Graylog2/graylog2-server/issues/11495
+    // The Extractor returns a string that is not directly assignable to the timestamp field.
+    // The converter however, will parse that string and everything is fine.
+    public void testConvertersWithTimestamp() throws Exception {
+        final Converter converter = new DateConverter(ImmutableMap.of(
+                "date_format", "yyyy-MM-dd HH:mm:ss,SSS"
+        ));
+
+        final TestExtractor extractor = new TestExtractor.Builder()
+                .targetField("timestamp")
+                .converters(Collections.singletonList(converter))
+                .callback(() -> new Result[]{new Result("2021-10-20 09:05:39,892", -1, -1)})
+                .build();
+
+        final Message msg = createMessage("the message");
+
+        extractor.runExtractor(msg);
+
+        assertThat(msg.getTimestamp()).isEqualTo(new DateTime(2021, 10, 20, 9, 5, 39, 892, UTC));
     }
 
     private Message createMessage(String message) {

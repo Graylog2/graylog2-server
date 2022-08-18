@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
+import { DEFAULT_MESSAGE_FIELDS, MISSING_BUCKET_NAME } from 'views/Constants';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
 import TitleTypes from 'views/stores/TitleTypes';
@@ -23,7 +23,7 @@ import type { ValueActionHandler, ValuePath } from './ValueActionHandler';
 
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
-import Widget from '../widgets/Widget';
+import type Widget from '../widgets/Widget';
 import { createElasticsearchQueryString } from '../queries/Query';
 import { TitlesActions } from '../../stores/TitlesStore';
 import duplicateCommonWidgetSettings from '../fieldactions/DuplicateCommonWidgetSettings';
@@ -52,7 +52,7 @@ const ShowDocumentsHandler: ValueActionHandler<Contexts> = ({ contexts: { valueP
   }), {});
   const widgetQuery = widget && widget.query ? widget.query.query_string : '';
   const valuePathQuery = Object.entries(mergedObject)
-    .map(([k, v]) => `${k}:${escape(String(v))}`)
+    .map(([k, v]) => (v === MISSING_BUCKET_NAME ? `NOT _exists_:${k}` : `${k}:${escape(String(v))}`))
     .reduce((prev: string, next: string) => addToQuery(prev, next), '');
   const query = addToQuery(widgetQuery, valuePathQuery);
   const valuePathFields = extractFieldsFromValuePath(valuePath);

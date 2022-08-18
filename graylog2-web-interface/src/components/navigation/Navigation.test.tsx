@@ -18,11 +18,11 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { Route, MemoryRouter } from 'react-router-dom';
+
 import mockComponent from 'helpers/mocking/MockComponent';
 import { alice as currentUser } from 'fixtures/users';
 import { asMock } from 'helpers/mocking';
-import { Route, MemoryRouter } from 'react-router-dom';
-
 import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -112,12 +112,25 @@ describe('Navigation', () => {
               { path: '/completelydiffrent', description: 'Completely Different', permissions: 'completelydifferent' },
             ],
           },
+          {
+            description: 'Feature flag test',
+            path: '/',
+            requiredFeatureFlag: 'enable_main_nav_item',
+          },
+          {
+            description: 'Feature flag dropdown test',
+            path: '/',
+            children: [
+              { path: '/newpluginroute', description: 'New dropdown route', requiredFeatureFlag: 'enable_dropdown_nav_item' },
+            ],
+          },
         ],
       },
     };
 
     beforeEach(() => {
       AppConfig.gl2AppPathPrefix = jest.fn(() => '');
+      AppConfig.isFeatureEnabled = jest.fn(() => false);
       PluginStore.register(plugin);
     });
 
@@ -144,6 +157,19 @@ describe('Navigation', () => {
       expect(findLink(wrapper, 'Archives')).not.toExist();
     });
 
+    it('does not contain navigation elements from plugins when elements require a feature flag to be enabled', () => {
+      const wrapper = mount(<SimpleNavigation component={Navigation} />);
+
+      expect(findLink(wrapper, 'Feature flag test')).not.toExist();
+    });
+
+    it('contains navigation elements from plugins when elements require a feature flag which is enabled', () => {
+      asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
+      const wrapper = mount(<SimpleNavigation component={Navigation} />);
+
+      expect(findLink(wrapper, 'Feature flag test')).toExist();
+    });
+
     it('contains restricted navigation elements from plugins if permissions are present', () => {
       const wrapper = mount(<SimpleNavigation component={Navigation}
                                               permissions={['archive:read']} />);
@@ -162,6 +188,19 @@ describe('Navigation', () => {
                                               permissions={['somethingelse', 'completelydifferent']} />);
 
       expect(wrapper.find('NavDropdown[title="Neat Stuff"]')).toExist();
+    });
+
+    it('does not render dropdown contributed by plugin if required feature flag is not enabled', () => {
+      const wrapper = mount(<SimpleNavigation component={Navigation} />);
+
+      expect(wrapper.find('NavDropdown[title="Feature flag dropdown test"]')).not.toExist();
+    });
+
+    it('renders dropdown contributed by plugin if required feature flag is enabled', () => {
+      asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
+      const wrapper = mount(<SimpleNavigation component={Navigation} />);
+
+      expect(wrapper.find('NavDropdown[title="Feature flag dropdown test"]')).toExist();
     });
 
     it('sets dropdown title based on match', () => {
@@ -190,6 +229,7 @@ describe('Navigation', () => {
       links.forEach((title) => expect(wrapper.find(`NavItem[children="${title}"]`)).toExist());
     };
 
+    // eslint-disable-next-line jest/expect-expect
     it.each`
     permissions                    | count | links
     ${[]}                          | ${5}  | ${['Search', 'Streams', 'Alerts', 'Dashboards']}

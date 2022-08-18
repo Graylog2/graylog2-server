@@ -17,10 +17,10 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+
 import MockStore from 'helpers/mocking/StoreMock';
 import { alice } from 'fixtures/users';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
-
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import RangePresetDropdown from './RangePresetDropdown';

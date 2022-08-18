@@ -17,8 +17,8 @@
 import Reflux from 'reflux';
 
 import { singletonActions, singletonStore } from 'logic/singleton';
-import { Store } from 'stores/StoreTypes';
-import { SearchesConfig } from 'components/search/SearchConfig';
+import type { Store } from 'stores/StoreTypes';
+import type { SearchesConfig } from 'components/search/SearchConfig';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 
 type SearchConfigActionsType = {

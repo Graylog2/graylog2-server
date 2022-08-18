@@ -15,16 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
-import { WidgetComponentProps } from 'views/types';
 import { useContext } from 'react';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { WidgetComponentProps } from 'views/types';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { Events } from 'views/logic/searchtypes/events/EventHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import OnVisualizationConfigChangeContext, { OnVisualizationConfigChange } from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
+import type { OnVisualizationConfigChange } from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
+import OnVisualizationConfigChangeContext from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
 import FullSizeContainer from './FullSizeContainer';
@@ -64,7 +65,7 @@ export type VisualizationComponent<T extends string> =
 
 export const retrieveChartData = (data: VisualizationResult): Rows => data.chart ?? data[Object.keys(data).filter((name) => name !== 'events')[0]];
 
-export const makeVisualization = <T extends string>(component: React.ComponentType<VisualizationComponentProps>, type: T): VisualizationComponent<T> => {
+export const makeVisualization = <T extends string> (component: React.ComponentType<VisualizationComponentProps>, type: T): VisualizationComponent<T> => {
   const visualizationComponent = component as VisualizationComponent<T>;
 
   visualizationComponent.type = type;
@@ -72,7 +73,7 @@ export const makeVisualization = <T extends string>(component: React.ComponentTy
   return visualizationComponent;
 };
 
-const _visualizationForType = <T extends string>(type: T): VisualizationComponent<T> => {
+const _visualizationForType = <T extends string> (type: T): VisualizationComponent<T> => {
   const visualizationTypes = PluginStore.exports('visualizationTypes');
   const visualization = visualizationTypes.filter((viz) => viz.type === type)[0];
 
@@ -91,7 +92,13 @@ const getResult = (value: RowResult | EventResult): Rows | Events => {
   return value.rows;
 };
 
-const AggregationBuilder = ({ config, data, editing = false, fields, toggleEdit }: WidgetComponentProps<AggregationWidgetConfig>) => {
+const AggregationBuilder = ({
+  config,
+  data,
+  editing = false,
+  fields,
+  toggleEdit,
+}: WidgetComponentProps<AggregationWidgetConfig>) => {
   const onVisualizationConfigChange = useContext(OnVisualizationConfigChangeContext);
 
   if (!config || config.isEmpty) {
@@ -100,12 +107,14 @@ const AggregationBuilder = ({ config, data, editing = false, fields, toggleEdit 
 
   const VisComponent = _visualizationForType(config.visualization || defaultVisualizationType);
   const { effective_timerange: effectiveTimerange } = data.chart || Object.values(data)[0] || {};
-  const rows = Object.entries(data)
-    .map((tuple) => tuple as ([string, RowResult] | ['events', EventResult]))
-    .map(
-      ([key, value]): [string, Rows | Events] => [key, getResult(value)],
-    )
-    .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
+
+  const rows = Object.fromEntries(
+    Object.entries(data)
+      .map((tuple) => tuple as ([string, RowResult] | ['events', EventResult]))
+      .map(
+        ([key, value]): [string, Rows | Events] => [key, getResult(value)],
+      ),
+  ) as VisualizationResult;
 
   return (
     <FullSizeContainer>

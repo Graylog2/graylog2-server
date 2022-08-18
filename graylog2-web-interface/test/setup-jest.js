@@ -15,7 +15,3 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 /// <reference types="jest-enzyme" />
-
-import sizeMe from 'react-sizeme';
-
-sizeMe.noPlaceholders = true;

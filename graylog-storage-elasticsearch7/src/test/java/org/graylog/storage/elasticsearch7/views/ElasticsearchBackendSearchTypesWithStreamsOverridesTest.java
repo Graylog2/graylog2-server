@@ -133,7 +133,7 @@ public class ElasticsearchBackendSearchTypesWithStreamsOverridesTest extends Ela
         final SearchJob job = searchJobForQuery(query);
         final ESGeneratedQueryContext context = this.elasticsearchBackend.generate(job, query, Collections.emptySet());
 
-        this.elasticsearchBackend.doRun(job, query, context, Collections.emptySet());
+        this.elasticsearchBackend.doRun(job, query, context);
 
         verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
 

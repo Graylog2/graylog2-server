@@ -16,13 +16,14 @@
  */
 package org.graylog.scheduler;
 
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.scheduler.audit.JobSchedulerAuditEventTypes;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.clock.JobSchedulerSystemClock;
 import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
 import org.graylog.scheduler.eventbus.JobSchedulerEventBusProvider;
-import org.graylog.scheduler.rest.JobSchedulerResource;
+import org.graylog.scheduler.worker.JobWorkerPool;
 import org.graylog2.plugin.PluginModule;
 
 /**
@@ -35,10 +36,12 @@ public class JobSchedulerModule extends PluginModule {
         bind(JobSchedulerClock.class).toInstance(JobSchedulerSystemClock.INSTANCE);
         bind(JobSchedulerEventBus.class).toProvider(JobSchedulerEventBusProvider.class).asEagerSingleton();
 
+        install(new FactoryModuleBuilder().build(JobExecutionEngine.Factory.class));
+        install(new FactoryModuleBuilder().build(JobWorkerPool.Factory.class));
+        install(new FactoryModuleBuilder().build(JobTriggerUpdates.Factory.class));
+
         OptionalBinder.newOptionalBinder(binder(), JobSchedulerConfig.class)
                 .setDefault().to(DefaultJobSchedulerConfig.class);
-
-        addSystemRestResource(JobSchedulerResource.class);
 
         addInitializer(JobSchedulerService.class);
         addAuditEventTypes(JobSchedulerAuditEventTypes.class);

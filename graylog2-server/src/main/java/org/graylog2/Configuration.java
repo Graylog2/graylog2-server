@@ -27,6 +27,11 @@ import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
+import org.graylog2.cluster.leader.AutomaticLeaderElectionService;
+import org.graylog2.cluster.leader.LeaderElectionMode;
+import org.graylog2.cluster.leader.LeaderElectionService;
+import org.graylog2.cluster.lock.MongoLockService;
+import org.graylog2.configuration.converters.JavaDurationConverter;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.utilities.IPSubnetConverter;
@@ -44,31 +49,42 @@ import java.util.Set;
  */
 @SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends BaseConfiguration {
-    @Parameter(value = "is_master", required = true)
+
+    /**
+     * Deprecated! Use isLeader() instead.
+     */
+    @Parameter(value = "is_master")
     private boolean isMaster = true;
 
-    @Parameter(value = "password_secret", required = true, validator = StringNotBlankValidator.class)
+    /**
+     * Used for initializing static leader election. You shouldn't use this for other purposes, but if you must, don't
+     * use @{@link javax.inject.Named} injection but the getter isLeader() instead.
+     **/
+    @Parameter(value = "is_leader")
+    private Boolean isLeader;
+
+    @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
     private String passwordSecret;
 
-    @Parameter(value = "output_batch_size", required = true, validator = PositiveIntegerValidator.class)
+    @Parameter(value = "output_batch_size", required = true, validators = PositiveIntegerValidator.class)
     private int outputBatchSize = 500;
 
-    @Parameter(value = "output_flush_interval", required = true, validator = PositiveIntegerValidator.class)
+    @Parameter(value = "output_flush_interval", required = true, validators = PositiveIntegerValidator.class)
     private int outputFlushInterval = 1;
 
-    @Parameter(value = "outputbuffer_processors", required = true, validator = PositiveIntegerValidator.class)
+    @Parameter(value = "outputbuffer_processors", required = true, validators = PositiveIntegerValidator.class)
     private int outputBufferProcessors = 3;
 
-    @Parameter(value = "outputbuffer_processor_threads_max_pool_size", required = true, validator = PositiveIntegerValidator.class)
+    @Parameter(value = "outputbuffer_processor_threads_max_pool_size", required = true, validators = PositiveIntegerValidator.class)
     private int outputBufferProcessorThreadsMaxPoolSize = 30;
 
-    @Parameter(value = "outputbuffer_processor_threads_core_pool_size", required = true, validator = PositiveIntegerValidator.class)
+    @Parameter(value = "outputbuffer_processor_threads_core_pool_size", required = true, validators = PositiveIntegerValidator.class)
     private int outputBufferProcessorThreadsCorePoolSize = 3;
 
-    @Parameter(value = "outputbuffer_processor_keep_alive_time", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "outputbuffer_processor_keep_alive_time", validators = PositiveIntegerValidator.class)
     private int outputBufferProcessorKeepAliveTime = 5000;
 
-    @Parameter(value = "node_id_file", validator = NodeIdFileValidator.class)
+    @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
     private String nodeIdFile = "/etc/graylog/server/node-id";
 
     @Parameter(value = "root_username")
@@ -90,34 +106,43 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "allow_highlighting")
     private boolean allowHighlighting = false;
 
-    @Parameter(value = "lb_recognition_period_seconds", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "lb_recognition_period_seconds", validators = PositiveIntegerValidator.class)
     private int loadBalancerRecognitionPeriodSeconds = 3;
 
-    @Parameter(value = "lb_throttle_threshold_percentage", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "lb_throttle_threshold_percentage", validators = PositiveIntegerValidator.class)
     private int loadBalancerThrottleThresholdPercentage = 100;
 
-    @Parameter(value = "stream_processing_timeout", validator = PositiveLongValidator.class)
+    @Parameter(value = "stream_processing_timeout", validators = PositiveLongValidator.class)
     private long streamProcessingTimeout = 2000;
 
-    @Parameter(value = "stream_processing_max_faults", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "stream_processing_max_faults", validators = PositiveIntegerValidator.class)
     private int streamProcessingMaxFaults = 3;
 
-    @Parameter(value = "output_module_timeout", validator = PositiveLongValidator.class)
+    @Parameter(value = "output_module_timeout", validators = PositiveLongValidator.class)
     private long outputModuleTimeout = 10000;
 
-    @Parameter(value = "output_fault_count_threshold", validator = PositiveLongValidator.class)
+    @Parameter(value = "output_fault_count_threshold", validators = PositiveLongValidator.class)
     private long outputFaultCountThreshold = 5;
 
-    @Parameter(value = "output_fault_penalty_seconds", validator = PositiveLongValidator.class)
+    @Parameter(value = "output_fault_penalty_seconds", validators = PositiveLongValidator.class)
     private long outputFaultPenaltySeconds = 30;
 
-    @Parameter(value = "stale_master_timeout", validator = PositiveIntegerValidator.class)
+    /**
+     * Deprecated! Use staleLeaderTimeout instead
+     */
+    @Parameter(value = "stale_master_timeout", validators = PositiveIntegerValidator.class)
     private int staleMasterTimeout = 2000;
 
-    @Parameter(value = "ldap_connection_timeout", validator = PositiveIntegerValidator.class)
+    /**
+     * Don't use @{@link javax.inject.Named} injection but the getter getStaleLeaderTimeout() instead.
+     **/
+    @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
+    private Integer staleLeaderTimeout;
+
+    @Parameter(value = "ldap_connection_timeout", validators = PositiveIntegerValidator.class)
     private int ldapConnectionTimeout = 2000;
 
-    @Parameter(value = "alert_check_interval", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "alert_check_interval", validators = PositiveIntegerValidator.class)
     @Deprecated
     private int alertCheckInterval = 60;
 
@@ -131,13 +156,13 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "default_message_output_class")
     private String defaultMessageOutputClass = "";
 
-    @Parameter(value = "dashboard_widget_default_cache_time", validator = PositiveDurationValidator.class)
+    @Parameter(value = "dashboard_widget_default_cache_time", validators = PositiveDurationValidator.class)
     private Duration dashboardWidgetDefaultCacheTime = Duration.seconds(10L);
 
     @Parameter(value = "user_password_default_algorithm")
     private String userPasswordDefaultAlgorithm = "bcrypt";
 
-    @Parameter(value = "user_password_bcrypt_salt_size", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "user_password_bcrypt_salt_size", validators = PositiveIntegerValidator.class)
     private int userPasswordBCryptSaltSize = 10;
 
     @Parameter(value = "content_packs_loader_enabled")
@@ -149,7 +174,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "content_packs_auto_install", converter = TrimmedStringSetConverter.class)
     private Set<String> contentPacksAutoInstall = Collections.emptySet();
 
-    @Parameter(value = "index_ranges_cleanup_interval", validator = PositiveDurationValidator.class)
+    @Parameter(value = "index_ranges_cleanup_interval", validators = PositiveDurationValidator.class)
     private Duration indexRangesCleanupInterval = Duration.hours(1L);
 
     @Parameter(value = "trusted_proxies", converter = IPSubnetConverter.class)
@@ -171,12 +196,70 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "is_cloud")
     private boolean isCloud = false;
 
+    @Parameter(value = "auto_restart_inputs")
+    private boolean autoRestartInputs = false;
+
+    @Parameter(value = "run_migrations")
+    private boolean runMigrations = true;
+
+    @Parameter(value = "ignore_migration_failures")
+    private boolean ignoreMigrationFailures = false;
+
+    @Parameter(value = "skip_preflight_checks")
+    private boolean skipPreflightChecks = false;
+
+    @Parameter(value = "leader_election_mode", converter = LeaderElectionMode.Converter.class)
+    private LeaderElectionMode leaderElectionMode = LeaderElectionMode.STATIC;
+
+    @Parameter(value = "leader_election_lock_polling_interval", converter = JavaDurationConverter.class)
+    private java.time.Duration leaderElectionLockPollingInterval = AutomaticLeaderElectionService.DEFAULT_POLLING_INTERVAL;
+
+    @Parameter(value = "lock_service_lock_ttl", converter = JavaDurationConverter.class)
+    private java.time.Duration lockServiceLockTTL = MongoLockService.MIN_LOCK_TTL;
+
+    /**
+     * @deprecated Use {@link #isLeader()} instead.
+     */
+    @Deprecated
     public boolean isMaster() {
-        return isMaster;
+        return isLeader();
     }
 
+    /**
+     * Returns the <em>configured</em> leader status. This is only valid for static leader election. You should probably
+     * use {@link LeaderElectionService#isLeader()} instead.
+     */
+    public boolean isLeader() {
+        return isLeader != null ? isLeader : isMaster;
+    }
+
+    /**
+     * @deprecated Use {@link #setIsLeader(boolean)} instead
+     */
+    @Deprecated
     public void setIsMaster(boolean is) {
-        isMaster = is;
+        setIsLeader(is);
+    }
+
+    /**
+     * We should remove this method after refactoring {@link org.graylog2.cluster.leader.StaticLeaderElectionService}
+     * and {@link org.graylog2.commands.Server} so that they don't need this to communicate demotion from leader to
+     * follower anymore.
+     */
+    public void setIsLeader(boolean is) {
+        isLeader = isMaster = is;
+    }
+
+    public LeaderElectionMode getLeaderElectionMode() {
+        return leaderElectionMode;
+    }
+
+    public java.time.Duration getLockServiceLockTTL() {
+        return lockServiceLockTTL;
+    }
+
+    public java.time.Duration getLeaderElectionLockPollingInterval() {
+        return leaderElectionLockPollingInterval;
     }
 
     public String getPasswordSecret() {
@@ -209,6 +292,22 @@ public class Configuration extends BaseConfiguration {
 
     public boolean isCloud() {
         return isCloud;
+    }
+
+    public boolean getAutoRestartInputs() {
+        return autoRestartInputs;
+    }
+
+    public boolean runMigrations() {
+        return runMigrations;
+    }
+
+    public boolean ignoreMigrationFailures() {
+        return ignoreMigrationFailures;
+    }
+
+    public boolean getSkipPreflightChecks() {
+        return skipPreflightChecks;
     }
 
     @Override
@@ -264,8 +363,16 @@ public class Configuration extends BaseConfiguration {
         return outputFaultPenaltySeconds;
     }
 
+    /**
+     * @deprecated Use getStaleLeaderTimeout instead
+     */
+    @Deprecated
     public int getStaleMasterTimeout() {
-        return staleMasterTimeout;
+        return getStaleLeaderTimeout();
+    }
+
+    public int getStaleLeaderTimeout() {
+        return staleLeaderTimeout != null ? staleLeaderTimeout : staleMasterTimeout;
     }
 
     public int getLdapConnectionTimeout() {
@@ -364,6 +471,22 @@ public class Configuration extends BaseConfiguration {
         }
     }
 
+    @ValidatorMethod
+    public void validateLeaderElectionTimeouts() throws ValidationException {
+        if (leaderElectionMode != LeaderElectionMode.AUTOMATIC) {
+            return;
+        }
+        if (lockServiceLockTTL.compareTo(MongoLockService.MIN_LOCK_TTL) < 0) {
+            throw new ValidationException("The minimum valid \"lock_service_lock_ttl\" is 60 seconds");
+        }
+        if (leaderElectionLockPollingInterval.compareTo(java.time.Duration.ofSeconds(1)) < 0) {
+            throw new ValidationException("The minimum valid \"leader_election_lock_polling_interval\" is 1 second");
+        }
+        if (lockServiceLockTTL.compareTo(leaderElectionLockPollingInterval) < 1) {
+            throw new ValidationException("The \"leader_election_lock_polling_interval\" needs to be greater than the \"lock_service_lock_ttl\"!");
+        }
+    }
+
     /**
      * The root user is disabled if the {@link RootAccountRealm} is deactivated.
      */
@@ -419,7 +542,7 @@ public class Configuration extends BaseConfiguration {
                 // all good
                 return;
             }
-            throw new ValidationException("Node ID file at path " + path + " isn't " + b +". Please specify the correct path or change the permissions");
+            throw new ValidationException("Node ID file at path " + path + " isn't " + b + ". Please specify the correct path or change the permissions");
         }
     }
 }

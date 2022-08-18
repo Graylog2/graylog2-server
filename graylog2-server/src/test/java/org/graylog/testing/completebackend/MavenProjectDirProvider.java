@@ -17,7 +17,22 @@
 package org.graylog.testing.completebackend;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public interface MavenProjectDirProvider {
     Path getProjectDir();
+
+    Path getFileCopyBaseDir();
+
+    default List<String> getFilesToAddToBinDir() {
+        return new ArrayList<>();
+    }
+
+    String getUniqueId();
+
+    default boolean includeFrontend() {
+        return false;
+    }
+
 }

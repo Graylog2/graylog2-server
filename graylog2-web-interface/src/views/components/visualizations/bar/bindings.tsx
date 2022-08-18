@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { VisualizationType } from 'views/types';
 
+import type { VisualizationType } from 'views/types';
 import BarVisualization from 'views/components/visualizations/bar/BarVisualization';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
@@ -29,7 +29,7 @@ const DEFAULT_BARMODE = 'group';
 
 const validate = hasAtLeastOneMetric('Bar chart');
 
-const barChart: VisualizationType<BarVisualizationConfig, BarVisualizationConfigFormValues> = {
+const barChart: VisualizationType<typeof BarVisualization.type, BarVisualizationConfig, BarVisualizationConfigFormValues> = {
   type: BarVisualization.type,
   displayName: 'Bar Chart',
   component: BarVisualization,

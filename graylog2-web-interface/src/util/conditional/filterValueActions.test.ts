@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import asMock from 'helpers/mocking/AsMock';
-
-import { ActionDefinition } from 'views/components/actions/ActionHandler';
+import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 import AppConfig from 'util/AppConfig';
 
 import filterValueActions, { filterCloudValueActions } from './filterValueActions';

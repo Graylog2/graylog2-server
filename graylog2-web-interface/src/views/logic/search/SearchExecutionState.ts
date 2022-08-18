@@ -16,7 +16,7 @@
  */
 import * as Immutable from 'immutable';
 
-import GlobalOverride from './GlobalOverride';
+import type GlobalOverride from './GlobalOverride';
 
 import ParameterBinding from '../parameters/ParameterBinding';
 

@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 
-import Role from 'logic/roles/Role';
-import UserOverview from 'logic/users/UserOverview';
+import type Role from 'logic/roles/Role';
+import type UserOverview from 'logic/users/UserOverview';
 import { singletonActions } from 'logic/singleton';
 import type { PaginatedList, Pagination } from 'stores/PaginationTypes';
 

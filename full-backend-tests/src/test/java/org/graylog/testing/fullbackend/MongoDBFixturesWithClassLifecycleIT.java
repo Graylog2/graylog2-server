@@ -17,20 +17,20 @@
 package org.graylog.testing.fullbackend;
 
 import io.restassured.specification.RequestSpecification;
-import org.graylog.storage.elasticsearch6.ElasticsearchInstanceES6Factory;
-import org.graylog.testing.completebackend.ApiIntegrationTest;
 import org.graylog.testing.completebackend.GraylogBackend;
-import org.graylog.testing.completebackend.Lifecycle;
-import org.junit.jupiter.api.Test;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.SearchServer;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 
-
-@ApiIntegrationTest(serverLifecycle = Lifecycle.CLASS, elasticsearchFactory = ElasticsearchInstanceES6Factory.class,
-        mongoDBFixtures = "access-token.json")
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, searchVersions = {SearchServer.ES6}, mongoVersions = {MongodbServer.MONGO4})
 class MongoDBFixturesWithClassLifecycleIT {
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
@@ -40,18 +40,25 @@ class MongoDBFixturesWithClassLifecycleIT {
         this.requestSpec = requestSpec;
     }
 
-    @Test
+    @BeforeAll
+    public void importMongoFixtures() {
+        this.sut.importMongoDBFixture("access-token.json", MongoDBFixturesWithClassLifecycleIT.class);
+    }
+
+    @ContainerMatrixTest
     void oneTokenPresentWithTestMethodA() {
         assertTokenPresent();
     }
 
-    @Test
+    @ContainerMatrixTest
     void oneTokenPresentWithTestMethodB() {
         assertTokenPresent();
     }
 
     private void assertTokenPresent() {
-        List<?> tokens = given().spec(requestSpec)
+        List<?> tokens = given()
+                .config(sut.withGraylogBackendFailureConfig())
+                .spec(requestSpec)
                 .when()
                 .get("users/local:admin/tokens")
                 .then()

@@ -20,7 +20,7 @@ import styled from 'styled-components';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { LinkContainer } from 'components/common/router';
-import UserOverview from 'logic/users/UserOverview';
+import type UserOverview from 'logic/users/UserOverview';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import Routes from 'routing/Routes';
 import { Button, Tooltip, DropdownButton, MenuItem } from 'components/bootstrap';

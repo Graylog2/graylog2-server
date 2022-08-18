@@ -26,8 +26,8 @@ import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import ColorPreview, { GradientColorPreview } from 'views/components/sidebar/highlighting/ColorPreview';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import { COLORSCALES } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
-import { defaultCompare } from 'views/logic/DefaultCompare';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import { defaultCompare } from 'logic/DefaultCompare';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 type Props = {
   field: FieldTypeMapping,

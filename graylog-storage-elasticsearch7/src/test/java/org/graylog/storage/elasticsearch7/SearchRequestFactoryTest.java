@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.utilities.AssertJsonPath.assertJsonPath;
 
 class SearchRequestFactoryTest {
@@ -51,5 +52,18 @@ class SearchRequestFactoryTest {
             request.jsonPathAsListOf("$.query.bool.filter..range.timestamp.to", String.class)
                     .containsExactly("2020-07-23 11:08:32.243");
         });
+    }
+
+    @Test
+    void scrollSearchDoesNotHighlgiht() {
+        final SearchSourceBuilder search = this.searchRequestFactory.create(ScrollCommand.builder()
+                .indices(Collections.singleton("graylog_0"))
+                .range(AbsoluteRange.create(
+                        DateTime.parse("2020-07-23T11:03:32.243Z"),
+                        DateTime.parse("2020-07-23T11:08:32.243Z")
+                ))
+                .build());
+
+        assertThat(search.toString()).doesNotContain("\"highlight\":");
     }
 }

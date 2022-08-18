@@ -35,13 +35,17 @@ module.exports = {
         '@typescript-eslint/no-redeclare': ['error'],
         'no-shadow': 'off',
         '@typescript-eslint/no-shadow': ['error'],
+        '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
       },
     },
     {
       files: ['*.js', '*.jsx'],
     },
     {
-      files: ['*.test.js', '*.test.jsx', '*.test.ts', '*.test.tsx'],
+      files: [
+        '*.test.js', '*.test.jsx', '*.test.ts', '*.test.tsx',
+        '*.it.js', '*.it.jsx', '*.it.ts', '*.it.tsx',
+      ],
       plugins: [
         'jest',
         'testing-library',
@@ -52,7 +56,8 @@ module.exports = {
       ],
       rules: {
         'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*'] }],
-        'testing-library/no-debug': 'warn',
+        'react/jsx-no-constructed-context-values': 'off',
+        'testing-library/no-debugging-utils': 'warn',
         'testing-library/prefer-screen-queries': 'off',
         'testing-library/render-result-naming-convention': 'off',
       },
@@ -75,6 +80,7 @@ module.exports = {
   rules: {
     'arrow-body-style': 'off',
     camelcase: 'off',
+    'function-paren-newline': 'off',
     'import/extensions': 'off',
     'import/no-extraneous-dependencies': 'off',
     'import/no-unresolved': 'off',
@@ -104,7 +110,9 @@ module.exports = {
     'no-underscore-dangle': 'off',
     'object-curly-newline': ['error', { multiline: true, consistent: true }],
     'object-shorthand': ['error', 'methods'],
+    'react/destructuring-assignment': 'off',
     'react/forbid-prop-types': 'off',
+    'react/function-component-definition': 'off',
     'react/jsx-closing-bracket-location': ['warn', 'after-props'],
     'react/jsx-curly-spacing': ['warn', { when: 'never', children: true }],
     'react/jsx-filename-extension': [1, { extensions: ['.jsx', '.tsx'] }],
@@ -154,6 +162,7 @@ module.exports = {
         config: './webpack.config.js',
       },
     },
+    'import/internal-regex': '^(actions|components|contexts|domainActions|fixtures|helpers|hooks|logic|routing|stores|util|theme|views)/',
     polyfills: [
       'fetch',
       'IntersectionObserver',

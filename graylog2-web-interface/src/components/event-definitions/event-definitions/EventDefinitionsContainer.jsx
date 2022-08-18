@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Spinner } from 'components/common';
+import { ConfirmDialog, Spinner } from 'components/common';
 import connect from 'stores/connect';
 import { EventDefinitionsActions, EventDefinitionsStore } from 'stores/event-definitions/EventDefinitionsStore';
 
@@ -25,16 +25,38 @@ import {} from 'components/event-definitions/event-definition-types';
 
 import EventDefinitions from './EventDefinitions';
 
+const DIALOG_TYPES = {
+  COPY: 'copy',
+  DELETE: 'delete',
+  DISABLE: 'disable',
+  ENABLE: 'enable',
+};
+
+const DIALOG_TEXT = {
+  [DIALOG_TYPES.COPY]: {
+    dialogTitle: 'Copy Event Definition',
+    dialogBody: (definitionTitle) => `Are you sure you want to create a copy of "${definitionTitle}"?`,
+  },
+  [DIALOG_TYPES.DELETE]: {
+    dialogTitle: 'Delete Event Definition',
+    dialogBody: (definitionTitle) => `Are you sure you want to delete "${definitionTitle}"?`,
+  },
+  [DIALOG_TYPES.DISABLE]: {
+    dialogTitle: 'Disable Event Definition',
+    dialogBody: (definitionTitle) => `Are you sure you want to disable "${definitionTitle}"?`,
+  },
+  [DIALOG_TYPES.ENABLE]: {
+    dialogTitle: 'Enable Event Definition',
+    dialogBody: (definitionTitle) => `Are you sure you want to enable "${definitionTitle}"?`,
+  },
+};
+
 class EventDefinitionsContainer extends React.Component {
   static propTypes = {
     eventDefinitions: PropTypes.object.isRequired,
   };
 
-  componentDidMount() {
-    this.fetchData({});
-  }
-
-  fetchData = ({ page, pageSize, query }) => {
+  static fetchData = ({ page, pageSize, query }) => {
     return EventDefinitionsActions.listPaginated({
       query: query,
       page: page,
@@ -42,60 +64,142 @@ class EventDefinitionsContainer extends React.Component {
     });
   };
 
+  constructor(props) {
+    super(props);
+    this.props = props;
+
+    this.state = {
+      currentDefinition: null,
+      showDialog: false,
+      dialogType: null,
+    };
+  }
+
+  componentDidMount() {
+    EventDefinitionsContainer.fetchData({});
+  }
+
   handlePageChange = (nextPage, nextPageSize) => {
     const { eventDefinitions } = this.props;
 
-    this.fetchData({ page: nextPage, pageSize: nextPageSize, query: eventDefinitions.query });
+    EventDefinitionsContainer.fetchData({ page: nextPage, pageSize: nextPageSize, query: eventDefinitions.query });
   };
 
   handleQueryChange = (nextQuery, callback = () => {}) => {
     const { eventDefinitions } = this.props;
-    const promise = this.fetchData({ query: nextQuery, pageSize: eventDefinitions.pagination.pageSize });
+    const promise = EventDefinitionsContainer.fetchData({ query: nextQuery, pageSize: eventDefinitions.pagination.pageSize });
 
     promise.finally(callback);
   };
 
-  handleDelete = (definition) => {
-    return () => {
-      if (window.confirm(`Are you sure you want to delete "${definition.title}"?`)) {
-        EventDefinitionsActions.delete(definition);
-      }
-    };
+  handleAction = (action) => (definition) => {
+    switch (action) {
+      case DIALOG_TYPES.COPY:
+        this.setState({
+          showDialog: true,
+          dialogType: DIALOG_TYPES.COPY,
+          currentDefinition: definition,
+        });
+
+        break;
+      case DIALOG_TYPES.DELETE:
+        this.setState({
+          showDialog: true,
+          dialogType: DIALOG_TYPES.DELETE,
+          currentDefinition: definition,
+        });
+
+        break;
+      case DIALOG_TYPES.ENABLE:
+        this.setState({
+          showDialog: true,
+          dialogType: DIALOG_TYPES.ENABLE,
+          currentDefinition: definition,
+        });
+
+        break;
+      case DIALOG_TYPES.DISABLE:
+        this.setState({
+          showDialog: true,
+          dialogType: DIALOG_TYPES.DISABLE,
+          currentDefinition: definition,
+        });
+
+        break;
+      default:
+        break;
+    }
   };
 
-  handleEnable = (definition) => {
-    return () => {
-      if (window.confirm(`Are you sure you want to enable "${definition.title}"?`)) {
-        EventDefinitionsActions.enable(definition);
-      }
-    };
+  handleConfirm = () => {
+    const { dialogType, currentDefinition } = this.state;
+
+    switch (dialogType) {
+      case 'copy':
+        EventDefinitionsActions.copy(currentDefinition);
+        this.handleClearState();
+        break;
+      case 'delete':
+        EventDefinitionsActions.delete(currentDefinition);
+        this.handleClearState();
+        break;
+      case 'enable':
+        EventDefinitionsActions.enable(currentDefinition);
+        this.handleClearState();
+        break;
+      case 'disable':
+        EventDefinitionsActions.disable(currentDefinition);
+        this.handleClearState();
+        break;
+      default:
+        break;
+    }
   };
 
-  handleDisable = (definition) => {
-    return () => {
-      if (window.confirm(`Are you sure you want to disable "${definition.title}"?`)) {
-        EventDefinitionsActions.disable(definition);
-      }
-    };
+  handleClearState = () => {
+    this.setState({
+      showDialog: false,
+      currentDefinition: null,
+      dialogType: null,
+    });
   };
 
   render() {
     const { eventDefinitions } = this.props;
+
+    const {
+      currentDefinition,
+      dialogType,
+      showDialog,
+    } = this.state;
 
     if (!eventDefinitions.eventDefinitions) {
       return <Spinner text="Loading Event Definitions information..." />;
     }
 
     return (
-      <EventDefinitions eventDefinitions={eventDefinitions.eventDefinitions}
-                        context={eventDefinitions.context}
-                        pagination={eventDefinitions.pagination}
-                        query={eventDefinitions.query}
-                        onPageChange={this.handlePageChange}
-                        onQueryChange={this.handleQueryChange}
-                        onDelete={this.handleDelete}
-                        onEnable={this.handleEnable}
-                        onDisable={this.handleDisable} />
+      <>
+        <EventDefinitions eventDefinitions={eventDefinitions.eventDefinitions}
+                          context={eventDefinitions.context}
+                          pagination={eventDefinitions.pagination}
+                          query={eventDefinitions.query}
+                          onPageChange={this.handlePageChange}
+                          onQueryChange={this.handleQueryChange}
+                          onDelete={this.handleAction(DIALOG_TYPES.DELETE)}
+                          onCopy={this.handleAction(DIALOG_TYPES.COPY)}
+                          onEnable={this.handleAction(DIALOG_TYPES.ENABLE)}
+                          onDisable={this.handleAction(DIALOG_TYPES.DISABLE)} />
+        {showDialog && (
+        <ConfirmDialog id="copy-event-definition-dialog"
+                       title={DIALOG_TEXT[dialogType].dialogTitle}
+                       show
+                       onConfirm={this.handleConfirm}
+                       onCancel={this.handleClearState}>
+          {DIALOG_TEXT[dialogType].dialogBody(currentDefinition.title)}
+        </ConfirmDialog>
+        )}
+      </>
+
     );
   }
 }

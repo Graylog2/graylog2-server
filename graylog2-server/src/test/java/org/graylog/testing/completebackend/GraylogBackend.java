@@ -16,136 +16,42 @@
  */
 package org.graylog.testing.completebackend;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
-import org.graylog.testing.graylognode.NodeInstance;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.restassured.RestAssured;
+import io.restassured.config.FailureConfig;
+import io.restassured.config.RestAssuredConfig;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.testcontainers.containers.Network;
 
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.Optional;
 
-public class GraylogBackend {
+public interface GraylogBackend {
+    String uri();
 
-    private static final Logger LOG = LoggerFactory.getLogger(GraylogBackend.class);
-    private final Network network;
-    private final ElasticsearchInstance es;
-    private final MongoDBInstance mongodb;
-    private final NodeInstance node;
+    int apiPort();
 
-    private static GraylogBackend instance;
+    SearchServerInstance searchServerInstance();
 
-    public static GraylogBackend createStarted(int[] extraPorts,
-            ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
-            List<URL> mongoDBFixtures) {
-        if (instance == null) {
-            instance = createStartedBackend(extraPorts, elasticsearchInstanceFactory, pluginJars, mavenProjectDir,
-                    mongoDBFixtures);
-        } else {
-            instance.fullReset(mongoDBFixtures);
-            LOG.info("Reusing running backend");
-        }
+    int mappedPortFor(int originalPort);
 
-        return instance;
-    }
+    void importMongoDBFixture(String resourcePath, Class<?> testClass);
 
-    // Starting ES instance in parallel thread to save time.
-    // MongoDB and the node have to be started in sequence however, because the the node might crash,
-    // if a MongoDb instance isn't already present while it's starting up.
-    private static GraylogBackend createStartedBackend(int[] extraPorts,
-            ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
-            List<URL> mongoDBFixtures) {
-        Network network = Network.newNetwork();
+    void importElasticsearchFixture(String resourcePath, Class<?> testClass);
 
-        ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("build-es-container-for-api-it").build());
+    Network network();
 
-        Future<ElasticsearchInstance> esFuture = executor.submit(() -> elasticsearchInstanceFactory.create(network));
+    String getLogs();
 
-        MongoDBInstance mongoDB =
-                MongoDBInstance.createStarted(network, MongoDBInstance.Lifecycle.CLASS);
-        mongoDB.dropDatabase();
-        mongoDB.importFixtures(mongoDBFixtures);
+    Optional<MailServerInstance> getEmailServerInstance();
 
-        try {
-            // Wait for ES before starting the Graylog node to avoid any race conditions
-            ElasticsearchInstance esInstance = esFuture.get();
-            NodeInstance node = NodeInstance.createStarted(
-                    network,
-                    MongoDBInstance.internalUri(),
-                    ElasticsearchInstance.internalUri(),
-                    elasticsearchInstanceFactory.version(),
-                    extraPorts,
-                    pluginJars, mavenProjectDir);
-            final GraylogBackend backend = new GraylogBackend(network, esInstance, mongoDB, node);
-
-            // ensure that all containers and networks will be removed after all tests finish
-            // We can't close the resources in an afterAll callback, as the instances are cached and reused
-            // so we need a solution that will be triggered only once after all test classes
-            Runtime.getRuntime().addShutdownHook(new Thread(backend::close));
-
-            return backend;
-        } catch (InterruptedException | ExecutionException e) {
-            LOG.error("Container creation aborted", e);
-            throw new RuntimeException(e);
-        } finally {
-            executor.shutdown();
-        }
-    }
-
-    private GraylogBackend(Network network, ElasticsearchInstance es, MongoDBInstance mongodb, NodeInstance node) {
-        this.network = network;
-        this.es = es;
-        this.mongodb = mongodb;
-        this.node = node;
-    }
-
-    public void purgeData() {
-        mongodb.dropDatabase();
-        es.cleanUp();
-    }
-
-    public void fullReset(List<URL> mongoDBFixtures) {
-        LOG.debug("Resetting backend.");
-        purgeData();
-        mongodb.importFixtures(mongoDBFixtures);
-        node.restart();
-    }
-
-    public void importElasticsearchFixture(String resourcePath, Class<?> testClass) {
-        es.importFixtureResource(resourcePath, testClass);
-    }
-
-    public String uri() {
-        return node.uri();
-    }
-
-    public int apiPort() {
-        return node.apiPort();
-    }
-
-    public void printServerLog() {
-        node.printLog();
-    }
-
-    public int mappedPortFor(int originalPort) {
-        return node.mappedPortFor(originalPort);
-    }
-
-    public Network network() {
-        return this.network;
-    }
-
-    public void close() {
-        node.close();
-        mongodb.close();
-        es.close();
-        network.close();
+    default RestAssuredConfig withGraylogBackendFailureConfig() {
+        return RestAssured.config().failureConfig(FailureConfig.failureConfig().with().failureListeners(
+                (reqSpec, respSpec, resp) -> {
+                    if (resp.statusCode() >= 500) {
+                        System.out.println("------------------------ Output from graylog docker container start ------------------------");
+                        System.out.println(this.getLogs());
+                        System.out.println("------------------------ Output from graylog docker container ends  ------------------------");
+                    }
+                })
+        );
     }
 }

@@ -1,12 +1,14 @@
 name: Fix linter hints
 
-on: 
+on:
   schedule:
     - cron: '0 */8 * * *'
 
+  workflow_dispatch:
+
 jobs:
   build:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: graylog2-web-interface
@@ -22,6 +24,8 @@ jobs:
           path: ~/.cache/yarn
       - name: Install dependencies
         run: yarn install
+      - name: Resetting lockfile
+        run: git checkout yarn.lock
       - name: Run lint --fix
         continue-on-error: true
         run: yarn lint --fix

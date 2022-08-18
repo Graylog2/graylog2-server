@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8">
     <title><%=htmlWebpackPlugin.options.title || 'Webpack App'%></title>
+    <script defer src="/config.js"></script>
+    <% for (var vendorChunk in vendorModule().files.js) { %>
+    <script defer src="/<%= vendorModule().files.js[vendorChunk] %>"></script>
+    <% } %>
     <%= htmlWebpackPlugin.tags.headTags %>
   </head>
   <body>
-    <script src="/config.js"></script>
-    <% for (var vendorChunk in htmlWebpackPlugin.options.vendorModule().files.js) { %>
-    <script src="/<%= htmlWebpackPlugin.options.vendorModule().files.js[vendorChunk] %>"></script>
-    <% } %>
     <%= htmlWebpackPlugin.tags.bodyTags %>
   </body>
 </html>

@@ -17,8 +17,8 @@
 /* eslint-disable import/prefer-default-export */
 import { useState, useEffect } from 'react';
 
-import { LoadActiveResponse } from 'stores/authentication/AuthenticationStore';
-import { ListenableAction, PromiseProvider } from 'stores/StoreTypes';
+import type { LoadActiveResponse } from 'stores/authentication/AuthenticationStore';
+import type { ListenableAction, PromiseProvider } from 'stores/StoreTypes';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 
 const useActiveBackend = <T extends PromiseProvider>(listenableActions: Array<ListenableAction<T>> = []) => {

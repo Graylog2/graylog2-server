@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
 import VisualizationConfig from './VisualizationConfig';
 
@@ -79,7 +79,7 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
     return other && 'trend' in other && other.trend === this.trend;
   }
 
-  static fromJSON(type: string, value: NumberVisualizationConfigJSON) {
+  static fromJSON(_type: string, value: NumberVisualizationConfigJSON) {
     const { trend, trend_preference: trendPreference } = value;
 
     return NumberVisualizationConfig.create(trend, trendPreference);

@@ -52,10 +52,12 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.graylog2.Configuration;
+import org.graylog2.bootstrap.commands.MigrateCmd;
+import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.featureflag.FeatureFlagsFactory;
-import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.DocsHelper;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginLoaderConfig;
@@ -66,12 +68,14 @@ import org.graylog2.plugin.Version;
 import org.graylog2.plugin.system.NodeIdPersistenceException;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
+import org.graylog2.shared.bindings.IsDevelopmentBindings;
 import org.graylog2.shared.bindings.PluginBindings;
 import org.graylog2.shared.metrics.MetricRegistryFactory;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.utilities.ExceptionUtils;
-import org.graylog2.storage.UnsupportedElasticsearchException;
+import org.graylog2.storage.SearchVersion;
+import org.graylog2.storage.UnsupportedSearchException;
 import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,7 +113,7 @@ public abstract class CmdLineTool implements CliCommand {
     protected static final String TMPDIR = System.getProperty("java.io.tmpdir", "/tmp");
 
     protected final JadConfig jadConfig;
-    protected final BaseConfiguration configuration;
+    protected final Configuration configuration;
     protected final ChainingClassLoader chainingClassLoader;
 
     @Option(name = "--dump-config", description = "Show the effective Graylog configuration and exit")
@@ -133,11 +137,11 @@ public abstract class CmdLineTool implements CliCommand {
     protected Injector coreConfigInjector;
     protected FeatureFlags featureFlags;
 
-    protected CmdLineTool(BaseConfiguration configuration) {
+    protected CmdLineTool(Configuration configuration) {
         this(null, configuration);
     }
 
-    protected CmdLineTool(String commandName, BaseConfiguration configuration) {
+    protected CmdLineTool(String commandName, Configuration configuration) {
         jadConfig = new JadConfig();
         jadConfig.addConverterFactory(new GuavaConverterFactory());
         jadConfig.addConverterFactory(new JodaTimeConverterFactory());
@@ -181,13 +185,31 @@ public abstract class CmdLineTool implements CliCommand {
 
     protected abstract List<Object> getCommandConfigurationBeans();
 
+    public boolean isMigrationCommand() {
+        return commandName.equals(MigrateCmd.MIGRATION_COMMAND);
+    }
+
     /**
      * Things that have to run before the {@link #startCommand()} method is being called.
+     * Please note that this happens *before* the configuration file has been parsed.
      */
     protected void beforeStart() {
     }
 
-    protected void beforeStart(TLSProtocolsConfiguration configuration) {
+    /**
+     * Things that have to run before the {@link #startCommand()} method is being called.
+     * Please note that this happens *before* the configuration file has been parsed.
+     */
+    protected void beforeStart(TLSProtocolsConfiguration configuration, PathConfiguration pathConfiguration) {
+    }
+
+    /**
+     * Things that have to run before the guice injector is created.
+     * This call happens *after* the configuration file has been parsed.
+     *
+     * @param plugins The already loaded plugins
+     */
+    protected void beforeInjectorCreation(Set<Plugin> plugins) {
     }
 
     protected static void applySecuritySettings(TLSProtocolsConfiguration configuration) {
@@ -232,8 +254,17 @@ public abstract class CmdLineTool implements CliCommand {
 
     @Override
     public void run() {
+        // Setup logger first to ensure we can log any caught Throwable to the configured log file
         final Level logLevel = setupLogger();
+        try {
+            doRun(logLevel);
+        } catch (Throwable e) {
+            LOG.error("Startup error:", e);
+            throw e;
+        }
+    }
 
+    public void doRun(Level logLevel) {
         if (isDumpDefaultConfig()) {
             dumpDefaultConfigAndExit();
         }
@@ -245,7 +276,7 @@ public abstract class CmdLineTool implements CliCommand {
         installCommandConfig();
 
         beforeStart();
-        beforeStart(parseAndGetTLSConfiguration());
+        beforeStart(parseAndGetTLSConfiguration(), parseAndGetPathConfiguration(configFile));
 
         processConfiguration(jadConfig);
 
@@ -269,7 +300,10 @@ public abstract class CmdLineTool implements CliCommand {
         final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
 
+        beforeInjectorCreation(plugins);
+
         injector = setupInjector(
+                new IsDevelopmentBindings(),
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
                 new PluginBindings(plugins),
                 binder -> binder.bind(MetricRegistry.class).toInstance(metricRegistry)
@@ -299,6 +333,12 @@ public abstract class CmdLineTool implements CliCommand {
         processConfiguration(jadConfig);
 
         return tlsConfiguration;
+    }
+
+    private PathConfiguration parseAndGetPathConfiguration(String configFile) {
+        final PathConfiguration pathConfiguration = new PathConfiguration();
+        processConfiguration(new JadConfig(getConfigRepositories(configFile), pathConfiguration));
+        return pathConfiguration;
     }
 
     private void installCommandConfig() {
@@ -514,9 +554,9 @@ public abstract class CmdLineTool implements CliCommand {
             } else if (rootCause instanceof AccessDeniedException) {
                 LOG.error(UI.wallString("Unable to access file " + rootCause.getMessage()));
                 System.exit(-2);
-            } else if (rootCause instanceof UnsupportedElasticsearchException) {
-                final Version elasticsearchVersion = ((UnsupportedElasticsearchException) rootCause).getElasticsearchMajorVersion();
-                LOG.error(UI.wallString("Unsupported Elasticsearch version: " + elasticsearchVersion, DocsHelper.PAGE_ES_VERSIONS.toString()));
+            } else if (rootCause instanceof UnsupportedSearchException) {
+                final SearchVersion search = ((UnsupportedSearchException) rootCause).getSearchMajorVersion();
+                LOG.error(UI.wallString("Unsupported search version: " + search, DocsHelper.PAGE_ES_VERSIONS.toString()));
                 System.exit(-3);
             } else if (rootCause instanceof ElasticsearchProbeException) {
                 LOG.error(UI.wallString(rootCause.getMessage(), DocsHelper.PAGE_ES_CONFIGURATION.toString()));

@@ -17,43 +17,49 @@
 package org.graylog.storage.elasticsearch6.testing;
 
 import com.github.joschi.jadconfig.util.Duration;
-import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableList;
 import io.searchbox.client.JestClient;
 import org.graylog.storage.elasticsearch6.jest.JestClientProvider;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Client;
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog.testing.elasticsearch.FixtureImporter;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
-import org.testcontainers.elasticsearch.ElasticsearchContainer;
 
 import java.net.URI;
 
-public class ElasticsearchInstanceES6 extends ElasticsearchInstance {
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstance.class);
-    private static final String ES_VERSION = "6.8.4";
+public class ElasticsearchInstanceES6 extends TestableSearchServerInstance {
+    private static final Logger LOG = LoggerFactory.getLogger(SearchServerInstance.class);
+    private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
 
     private final Client client;
     private final JestClient jestClient;
     private final FixtureImporter fixtureImporter;
 
-    public ElasticsearchInstanceES6(String image, Version version, Network network) {
+    public ElasticsearchInstanceES6(String image, SearchVersion version, Network network) {
         super(image, version, network);
-        this.jestClient = jestClientFrom(this.container);
+        this.jestClient = jestClientFrom();
         this.client = new ClientES6(jestClient);
         this.fixtureImporter = new FixtureImporterES6(jestClient);
     }
 
     @Override
-    protected Client client() {
+    public SearchServer searchServer() {
+        return SearchServer.ES6;
+    }
+
+    @Override
+    public Client client() {
         return this.client;
     }
 
     @Override
-    protected FixtureImporter fixtureImporter() {
+    public FixtureImporter fixtureImporter() {
         return this.fixtureImporter;
     }
 
@@ -61,16 +67,15 @@ public class ElasticsearchInstanceES6 extends ElasticsearchInstance {
         return this.jestClient;
     }
 
-    public static ElasticsearchInstance create() {
+    public static TestableSearchServerInstance create() {
         return create(Network.newNetwork());
     }
 
-    public static ElasticsearchInstance create(Network network) {
-        return create(ES_VERSION, network);
+    public static TestableSearchServerInstance create(Network network) {
+        return create(SearchServer.ES6.getSearchVersion(), network);
     }
 
-    public static ElasticsearchInstance create(String versionString, Network network) {
-        final Version version = Version.valueOf(versionString);
+    public static TestableSearchServerInstance create(SearchVersion version, Network network) {
         final String image = imageNameFrom(version);
 
         LOG.debug("Creating instance {}", image);
@@ -78,9 +83,13 @@ public class ElasticsearchInstanceES6 extends ElasticsearchInstance {
         return new ElasticsearchInstanceES6(image, version, network);
     }
 
-    private JestClient jestClientFrom(ElasticsearchContainer container) {
+    protected static String imageNameFrom(SearchVersion version) {
+        return DEFAULT_IMAGE_OSS + ":" + version.version().toString();
+    }
+
+    private JestClient jestClientFrom() {
         return new JestClientProvider(
-                ImmutableList.of(URI.create("http://" + container.getHttpHostAddress())),
+                ImmutableList.of(URI.create("http://" + getHttpHostAddress())),
                 Duration.seconds(60),
                 Duration.seconds(60),
                 Duration.seconds(60),
@@ -96,5 +105,10 @@ public class ElasticsearchInstanceES6 extends ElasticsearchInstance {
                 null,
                 new ObjectMapperProvider().get()
         ).get();
+    }
+
+    @Override
+    public String getHttpHostAddress() {
+        return this.container.getHost() + ":" + this.container.getMappedPort(9200);
     }
 }

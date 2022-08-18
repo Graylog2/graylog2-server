@@ -15,13 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
+
 import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
-
-import { GlobalOverrideActions, GlobalOverrideStore, GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
+import type { GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
+import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import { QueriesActions, QueriesStore } from 'views/stores/QueriesStore';
 import SearchActions from 'views/actions/SearchActions';
 import { ViewStore } from 'views/stores/ViewStore';
+import { MISSING_BUCKET_NAME } from 'views/Constants';
 
 import ExcludeFromQueryHandler from './ExcludeFromQueryHandler';
 
@@ -99,6 +101,16 @@ describe('ExcludeFromQueryHandler', () => {
     expect(QueriesActions.query).toHaveBeenCalledWith('queryId', 'answer:42 AND NOT do:panic');
   });
 
+  it('appends _exists_ fragment for proper field in case of missing bucket in input', () => {
+    asMock(QueriesStore.getInitialState).mockReturnValue(mockQueries('queryId', 'answer:42'));
+
+    const handler = new ExcludeFromQueryHandler();
+
+    handler.handle({ queryId: 'queryId', field: 'do', value: MISSING_BUCKET_NAME, type: FieldType.Unknown, contexts: {} });
+
+    expect(QueriesActions.query).toHaveBeenCalledWith('queryId', 'answer:42 AND _exists_:do');
+  });
+
   it('escapes special characters in field value', () => {
     asMock(QueriesStore.getInitialState).mockReturnValue(mockQueries('queryId', '*'));
 
@@ -124,7 +136,7 @@ describe('ExcludeFromQueryHandler', () => {
         .build());
 
       GlobalOverrideActions.query = mockAction(jest.fn(() => Promise.resolve(undefined as GlobalOverrideStoreState)));
-      SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
+      SearchActions.refresh = mockAction();
     });
 
     it('retrieves query string from global override', () => {

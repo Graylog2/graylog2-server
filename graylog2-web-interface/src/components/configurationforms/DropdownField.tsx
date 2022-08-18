@@ -18,7 +18,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { DropdownField as DropdownFieldType } from 'components/configurationforms/types';
+import type { DropdownField as DropdownFieldType } from 'components/configurationforms/types';
 import { Input } from 'components/bootstrap';
 import { optionalMarker } from 'components/configurationforms/FieldHelpers';
 

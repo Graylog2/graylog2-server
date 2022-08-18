@@ -24,16 +24,17 @@ import { Col, Row } from 'components/bootstrap';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import MessageDetail from 'views/components/messagelist/MessageDetail';
 import withParams from 'routing/withParams';
-import { Stream } from 'views/stores/StreamsStore';
-import { Input } from 'components/messageloaders/Types';
+import type { Stream } from 'views/stores/StreamsStore';
+import type { Input } from 'components/messageloaders/Types';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-import { Message } from 'views/components/messagelist/Types';
+import type { Message } from 'views/components/messagelist/Types';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import { MessagesActions } from 'stores/messages/MessagesStore';
 import { NodesActions } from 'stores/nodes/NodesStore';
+import { isLocalNode } from 'views/hooks/useIsLocalNode';
 
 type Props = {
   params: {
@@ -65,19 +66,22 @@ const useMessage = (index: string, messageId: string) => {
   const [inputs, setInputs] = useState<Immutable.Map<string, Input>>(Immutable.Map());
 
   useEffect(() => {
-    MessagesActions.loadMessage(index, messageId)
-      .then((_message) => {
-        setMessage(_message);
+    const fetchData = async () => {
+      const _message = await MessagesActions.loadMessage(index, messageId);
+      setMessage(_message);
 
-        return _message.source_input_id ? InputsActions.get(_message.source_input_id) : Promise.resolve();
-      })
-      .then((input) => {
+      if (_message.source_input_id && await isLocalNode(_message.fields.gl2_source_node)) {
+        const input = await InputsActions.get(_message.source_input_id);
+
         if (input) {
           const newInputs = Immutable.Map({ [input.id]: input });
 
           setInputs(newInputs);
         }
-      });
+      }
+    };
+
+    fetchData();
   }, [index, messageId, setMessage, setInputs]);
 
   return { message, inputs };
@@ -91,14 +95,22 @@ type FieldTypesProviderProps = {
 
 const FieldTypesProvider = ({ streams, timestamp, children }: FieldTypesProviderProps) => {
   const { data: fieldTypes } = useFieldTypes(streams, { type: 'absolute', from: timestamp, to: timestamp });
-  const fieldTypesList = Immutable.List(fieldTypes);
-  const types = { all: fieldTypesList, queryFields: Immutable.Map({ query: fieldTypesList }) };
+  const types = useMemo(() => {
+    const fieldTypesList = Immutable.List(fieldTypes);
+
+    return ({ all: fieldTypesList, queryFields: Immutable.Map({ query: fieldTypesList }) });
+  }, [fieldTypes]);
 
   return (
     <FieldTypesContext.Provider value={types}>
       {children}
     </FieldTypesContext.Provider>
   );
+};
+
+type MessageFields = {
+  streams: Array<string>,
+  timestamp: string,
 };
 
 const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
@@ -117,14 +129,15 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
     && allStreams !== undefined), [message, streams, inputs, allStreams]);
 
   if (isLoaded) {
-    const { streams: messageStreams, timestamp } = message.fields;
+    const { streams: messageStreams, timestamp } = message.fields as MessageFields;
+    const fieldTypesStreams = messageStreams.filter((streamId) => streams.has(streamId));
 
     return (
       <DocumentTitle title={`Message ${messageId} on ${index}`}>
         <Row className="content" id="sticky-augmentations-container">
           <Col md={12}>
             <WindowDimensionsContextProvider>
-              <FieldTypesProvider streams={messageStreams as Array<string>} timestamp={timestamp as string}>
+              <FieldTypesProvider streams={fieldTypesStreams} timestamp={timestamp}>
                 <InteractiveContext.Provider value={false}>
                   <MessageDetail fields={Immutable.List()}
                                  streams={streams}

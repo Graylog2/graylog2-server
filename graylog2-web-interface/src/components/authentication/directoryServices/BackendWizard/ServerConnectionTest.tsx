@@ -17,13 +17,14 @@
 import * as React from 'react';
 import { useState, useContext } from 'react';
 
-import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { Button } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 
 import ConnectionErrors, { NotificationContainer } from './ConnectionErrors';
-import BackendWizardContext, { WizardFormValues } from './BackendWizardContext';
+import type { WizardFormValues } from './BackendWizardContext';
+import BackendWizardContext from './BackendWizardContext';
 
 const _addRequiredRequestPayload = (formValues) => {
   const necessaryAttributes = { ...formValues };

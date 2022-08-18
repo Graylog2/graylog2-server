@@ -46,6 +46,11 @@ public class DefaultPluginJarsProvider implements PluginJarsProvider {
         );
     }
 
+    @Override
+    public String getUniqueId() {
+        return "default";
+    }
+
     protected Path getProjectReposPath() {
         return new File(PropertyLoader.get(PROPERTIES_FILE, "project_repos_dir")).toPath();
     }

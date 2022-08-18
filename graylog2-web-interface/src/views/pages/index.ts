@@ -17,7 +17,6 @@
 import loadAsync from 'routing/loadAsync';
 
 const DashboardsPage = loadAsync(() => import(/* webpackChunkname: "DashboardsPage" */ './DashboardsPage'));
-const ViewManagementPage = loadAsync(() => import(/* webpackChunkName: "ViewManagementPage" */ './ViewManagementPage'));
 /* eslint-disable import/no-cycle */
 const NewSearchPage = loadAsync(() => import(/* webpackChunkName: "NewSearchPage" */ './NewSearchPage'));
 const StreamSearchPage = loadAsync(() => import(/* webpackChunkName: "StreamSearchPage" */ './StreamSearchPage'));
@@ -31,5 +30,4 @@ export {
   ShowViewPage,
   StreamSearchPage,
   NewDashboardPage,
-  ViewManagementPage,
 };

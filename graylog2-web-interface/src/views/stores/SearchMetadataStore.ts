@@ -23,11 +23,11 @@ import { singletonActions, singletonStore } from 'logic/singleton';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 
 const parseSearchUrl = URLUtils.qualifyUrl('/views/search/metadata');
-const parseSearchIdUrl = (id) => URLUtils.qualifyUrl(`/views/search/metadata/${id}`);
+const parseSearchIdUrl = (id: string) => URLUtils.qualifyUrl(`/views/search/metadata/${id}`);
 
 export type SearchMetadataActionsType = RefluxActions<{
-  parseSearch: (any) => Promise<SearchMetadata>,
-  parseSearchId: (string) => Promise<SearchMetadata>,
+  parseSearch: (searchRequest: any) => Promise<SearchMetadata>,
+  parseSearchId: (searchId: string) => Promise<SearchMetadata>,
 }>;
 
 export const SearchMetadataActions: SearchMetadataActionsType = singletonActions(

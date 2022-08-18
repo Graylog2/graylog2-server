@@ -19,10 +19,11 @@ import * as Immutable from 'immutable';
 import { act, fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
-import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
+import type { PluginRegistration } from 'graylog-web-plugin/plugin';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
-import { MockStore } from 'helpers/mocking';
 
+import { MockStore } from 'helpers/mocking';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import DataTable from 'views/components/datatable/DataTable';
 import FieldType, { FieldTypes } from 'views/logic/fieldtypes/FieldType';

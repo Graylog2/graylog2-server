@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
 import { LinkContainer } from 'components/common/router';
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 import Routes from 'routing/Routes';
 import { ButtonToolbar, Button } from 'components/bootstrap';
 

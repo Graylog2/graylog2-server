@@ -17,6 +17,7 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
@@ -32,13 +33,15 @@ import java.util.Locale;
 
 public class MessageCountRotationStrategy extends AbstractRotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(MessageCountRotationStrategy.class);
+    public static final String NAME = "count";
 
     private final Indices indices;
 
     @Inject
     public MessageCountRotationStrategy(Indices indices, NodeId nodeId,
-                                        AuditEventSender auditEventSender) {
-        super(auditEventSender, nodeId);
+                                        AuditEventSender auditEventSender,
+                                        ElasticsearchConfiguration elasticsearchConfiguration) {
+        super(auditEventSender, nodeId, elasticsearchConfiguration);
         this.indices = indices;
     }
 
@@ -64,9 +67,9 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
         try {
             final long numberOfMessages = indices.numberOfMessages(index);
             return new Result(index,
-                              numberOfMessages,
-                              config.maxDocsPerIndex(),
-                              numberOfMessages > config.maxDocsPerIndex());
+                    numberOfMessages,
+                    config.maxDocsPerIndex(),
+                    numberOfMessages > config.maxDocsPerIndex());
         } catch (IndexNotFoundException e) {
             log.error("Unknown index, cannot perform rotation", e);
             return null;
@@ -103,5 +106,10 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
         public boolean shouldRotate() {
             return shouldRotate;
         }
+    }
+
+    @Override
+    public String getStrategyName() {
+        return NAME;
     }
 }

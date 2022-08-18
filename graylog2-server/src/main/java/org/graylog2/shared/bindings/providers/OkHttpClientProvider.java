@@ -17,6 +17,7 @@
 package org.graylog2.shared.bindings.providers;
 
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import okhttp3.Authenticator;
@@ -92,7 +93,6 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
                 .readTimeout(readTimeout.getQuantity(), readTimeout.getUnit());
 
         if (httpProxyUri != null) {
-            final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(httpProxyUri.getHost(), httpProxyUri.getPort()));
             final ProxySelector proxySelector = new ProxySelector() {
                 @Override
                 public List<Proxy> select(URI uri) {
@@ -112,6 +112,8 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
                     } catch (UnknownHostException e) {
                         LOG.debug("Unable to resolve host name for proxy selection: ", e);
                     }
+
+                    final Proxy proxy = new Proxy(Proxy.Type.HTTP, getProxyAddress());
                     return ImmutableList.of(proxy);
                 }
 
@@ -165,5 +167,10 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
             }
             return response.request().newBuilder().addHeader(PROXY_AUTHORIZATION, credentials).build();
         }
+    }
+
+    @VisibleForTesting
+    public InetSocketAddress getProxyAddress() {
+        return new InetSocketAddress(httpProxyUri.getHost(), httpProxyUri.getPort());
     }
 }

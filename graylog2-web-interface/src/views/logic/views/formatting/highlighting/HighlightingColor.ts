@@ -14,27 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as chroma from 'chroma-js';
+import type * as chroma from 'chroma-js';
 
 import scaleForGradient from 'views/components/sidebar/highlighting/Scale';
 
 export type HighlightingColorJson = StaticColorJson | GradientColorJson;
 
 abstract class HighlightingColor {
-  abstract get type(): 'static' | 'gradient';
+  abstract get type (): 'static' | 'gradient';
 
   static fromJSON(json: HighlightingColorJson) {
     switch (json.type) {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      case 'gradient': return GradientColor.fromJSON(json);
+      case 'gradient':
+        return GradientColor.fromJSON(json);
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      case 'static': return StaticColor.fromJSON(json);
+      case 'static':
+        return StaticColor.fromJSON(json);
       default: // @ts-ignore
         throw new Error(`Invalid highlighting color type: ${json.type}`);
     }
   }
 
-  abstract colorFor(value: any);
+  abstract colorFor (value: any);
 
   isStatic(): this is StaticColor {
     return this.type === 'static';
@@ -67,8 +69,7 @@ export class StaticColor extends HighlightingColor {
     return this._color;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  colorFor(value: any) {
+  colorFor() {
     return this.color;
   }
 

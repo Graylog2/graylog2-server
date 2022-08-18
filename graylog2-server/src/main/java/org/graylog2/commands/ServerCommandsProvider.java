@@ -20,6 +20,7 @@ import com.github.rvesse.airline.builder.CliBuilder;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.bootstrap.CliCommand;
 import org.graylog2.bootstrap.CliCommandsProvider;
+import org.graylog2.bootstrap.commands.MigrateCmd;
 import org.graylog2.commands.journal.JournalDecode;
 import org.graylog2.commands.journal.JournalShow;
 import org.graylog2.commands.journal.JournalTruncate;
@@ -29,6 +30,7 @@ public class ServerCommandsProvider implements CliCommandsProvider {
     public void addTopLevelCommandsOrGroups(CliBuilder<CliCommand> builder) {
 
         builder.withCommand(Server.class);
+        builder.withCommand(MigrateCmd.class);
 
         builder.withGroup("journal")
                 .withDescription("Manage the persisted message journal")

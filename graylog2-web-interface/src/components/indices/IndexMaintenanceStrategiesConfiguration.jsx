@@ -15,130 +15,187 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
+import { useState, useCallback } from 'react';
+import { useFormikContext } from 'formik';
+import styled from 'styled-components';
 
-import { Input } from 'components/bootstrap';
-import { Select } from 'components/common';
+import { Input, Alert } from 'components/bootstrap';
+import { Select, Icon } from 'components/common';
 
-class IndexMaintenanceStrategiesConfiguration extends React.Component {
-  static propTypes = {
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    selectPlaceholder: PropTypes.string.isRequired,
-    pluginExports: PropTypes.array.isRequired,
-    strategies: PropTypes.array.isRequired,
-    activeConfig: PropTypes.object.isRequired,
-    updateState: PropTypes.func.isRequired,
-  };
+const TIME_BASED_ROTATION_STRATEGY = 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy';
+const NOOP_RETENTION_STRATEGY = 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy';
 
-  state = {
-    activeStrategy: this.props.activeConfig.strategy,
-    activeConfig: this.props.activeConfig.config,
-    newStrategy: this.props.activeConfig.strategy,
-    newConfig: this.props.activeConfig.config,
-  };
+const StyledH3 = styled.h3`
+  margin-bottom: 10px;
+`;
+const StyledSelect = styled(Select)`
+  margin-bottom: 10px;
+`;
+const StyledAlert = styled(Alert)`
+  overflow: auto;
+  margin-right: 15px;
+  margin-left: 15px;
+`;
 
-  _getDefaultStrategyConfig = (selectedStrategy) => {
-    const result = this.props.strategies.filter((strategy) => strategy.type === selectedStrategy)[0];
+const _getStrategyJsonSchema = (selectedStrategy, strategies) => {
+  const result = strategies.filter((s) => s.type === selectedStrategy)[0];
 
-    return result ? result.default_config : undefined;
-  };
+  return result ? result.json_schema : undefined;
+};
 
-  _getStrategyJsonSchema = (selectedStrategy) => {
-    const result = this.props.strategies.filter((strategy) => strategy.type === selectedStrategy)[0];
+const _getDefaultStrategyConfig = (selectedStrategy, strategies) => {
+  const result = strategies.filter((s) => s.type === selectedStrategy)[0];
 
-    return result ? result.json_schema : undefined;
-  };
+  return result ? result.default_config : undefined;
+};
 
-  _getStrategyConfig = (selectedStrategy) => {
-    if (this.state.activeStrategy === selectedStrategy) {
-      // If the newly selected strategy is the current active strategy, we use the active configuration.
-      return this.state.activeConfig;
-    }
+const _getTimeBaseStrategyWithElasticLimit = (activeConfig, strategies) => {
+  const timeBasedStrategy = _getDefaultStrategyConfig(TIME_BASED_ROTATION_STRATEGY, strategies);
 
-    // If the newly selected strategy is not the current active strategy, we use the selected strategy's default config.
-    return this._getDefaultStrategyConfig(selectedStrategy);
-  };
+  return { ...activeConfig, max_rotation_period: timeBasedStrategy?.max_rotation_period };
+};
 
-  _onSelect = (newStrategy) => {
-    if (!newStrategy || newStrategy.length < 1) {
-      this.setState({ newStrategy: undefined });
+const _getStrategyConfig = (selectedStrategy, activeStrategy, activeConfig, strategies) => {
+  if (activeStrategy === selectedStrategy) {
+    // If the newly selected strategy is the current active strategy, we use the active configuration.
+    return activeStrategy === TIME_BASED_ROTATION_STRATEGY ? _getTimeBaseStrategyWithElasticLimit(activeConfig, strategies) : activeConfig;
+  }
+
+  // If the newly selected strategy is not the current active strategy, we use the selected strategy's default config.
+  return _getDefaultStrategyConfig(selectedStrategy, strategies);
+};
+
+const _getConfigurationComponent = (selectedStrategy, pluginExports, strategies, strategy, config, onConfigUpdate) => {
+  if (!selectedStrategy || selectedStrategy.length < 1) {
+    return null;
+  }
+
+  const strategyPlugin = pluginExports.filter((exportedStrategy) => exportedStrategy.type === selectedStrategy)[0];
+
+  if (!strategyPlugin) {
+    return null;
+  }
+
+  const strategyConfig = _getStrategyConfig(selectedStrategy, strategy, config, strategies);
+  const element = React.createElement(strategyPlugin.configComponent, {
+    config: strategyConfig,
+    jsonSchema: _getStrategyJsonSchema(selectedStrategy, strategies),
+    updateConfig: onConfigUpdate,
+  });
+
+  return (<span key={strategy.type}>{element}</span>);
+};
+
+const IndexMaintenanceStrategiesConfiguration = ({
+  title,
+  description,
+  selectPlaceholder,
+  pluginExports,
+  strategies,
+  retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod },
+  activeConfig: { strategy, config },
+  getState,
+}) => {
+  const [newStrategy, setNewStrategy] = useState(strategy);
+  const {
+    setValues,
+    values,
+    values: {
+      rotation_strategy_class: rotationStrategyClass,
+      retention_strategy_class: retentionStrategyClass,
+    },
+  } = useFormikContext();
+
+  const _onSelect = (selectedStrategy) => {
+    if (!selectedStrategy || selectedStrategy.length < 1) {
+      setNewStrategy(undefined);
 
       return;
     }
 
-    const newConfig = this._getStrategyConfig(newStrategy);
+    const newConfig = _getStrategyConfig(selectedStrategy, strategy, config, strategies);
 
-    this.setState({ newStrategy: newStrategy, newConfig: newConfig });
-    this.props.updateState(newStrategy, newConfig);
+    setNewStrategy(selectedStrategy);
+    setValues({ ...values, ...getState(selectedStrategy, newConfig) });
   };
 
-  _addConfigType = (strategy, data) => {
+  const _onConfigUpdate = useCallback((newConfig) => {
+    const _addConfigType = (selectedStrategy, data) => {
     // The config object needs to have the "type" field set to the "default_config.type" to make the REST call work.
-    const result = this.props.strategies.filter((s) => s.type === strategy)[0];
-    const copy = data;
+      const result = strategies.filter((s) => s.type === selectedStrategy)[0];
+      const copy = data;
 
-    if (result) {
-      copy.type = result.default_config.type;
-    }
+      if (result) {
+        copy.type = result.default_config.type;
+      }
 
-    return copy;
+      return copy;
+    };
+
+    const configuration = _addConfigType(newStrategy, newConfig);
+    setValues({ ...values, ...getState(newStrategy, configuration) });
+  }, [getState, newStrategy, setValues, strategies, values]);
+
+  const _availableSelectOptions = () => {
+    return pluginExports
+      .filter((c) => strategies.find(({ type }) => type === c.type))
+      .map((c) => {
+        return { value: c.type, label: c.displayName };
+      });
   };
 
-  _onConfigUpdate = (newConfig) => {
-    const config = this._addConfigType(this.state.newStrategy, newConfig);
-
-    this.setState({ newConfig: config });
-    this.props.updateState(this.state.newStrategy, config);
+  const _activeSelection = () => {
+    return newStrategy;
   };
 
-  _availableSelectOptions = () => {
-    return this.props.pluginExports.map((config) => {
-      return { value: config.type, label: config.displayName };
-    });
-  };
+  const retentionIsNotNoop = retentionStrategyClass !== NOOP_RETENTION_STRATEGY;
+  const shouldShowMaxRetentionWarning = maxRetentionPeriod && rotationStrategyClass === TIME_BASED_ROTATION_STRATEGY && retentionIsNotNoop;
 
-  _getConfigurationComponent = (selectedStrategy) => {
-    if (!selectedStrategy || selectedStrategy.length < 1) {
-      return null;
-    }
+  return (
+    <span>
+      <StyledH3>{title}</StyledH3>
+      <StyledAlert>
+        <Icon name="info-circle" />{' '} {description}
+      </StyledAlert>
+      {shouldShowMaxRetentionWarning && (
+      <StyledAlert bsStyle="warning">
+        <Icon name="exclamation-triangle" />{' '} The effective retention period value calculated from the <b>Rotation period</b> and the
+        <b> max number of indices</b> should not be greater than the <b>Max retention period</b> of <b>{maxRetentionPeriod}</b> set by the Administrator.
+      </StyledAlert>
+      )}
+      <Input id="strategy-select"
+             labelClassName="col-sm-3"
+             wrapperClassName="col-sm-9"
+             label={selectPlaceholder}>
+        <StyledSelect placeholder={selectPlaceholder}
+                      options={_availableSelectOptions()}
+                      matchProp="label"
+                      value={_activeSelection()}
+                      onChange={_onSelect} />
+      </Input>
+      {_getConfigurationComponent(_activeSelection(), pluginExports, strategies, strategy, config, _onConfigUpdate)}
+    </span>
+  );
+};
 
-    const strategy = this.props.pluginExports.filter((exportedStrategy) => exportedStrategy.type === selectedStrategy)[0];
+IndexMaintenanceStrategiesConfiguration.propTypes = {
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  selectPlaceholder: PropTypes.string.isRequired,
+  pluginExports: PropTypes.array.isRequired,
+  strategies: PropTypes.array.isRequired,
+  retentionStrategiesContext: PropTypes.shape({
+    max_index_retention_period: PropTypes.string,
+  }),
+  activeConfig: PropTypes.object.isRequired,
+  getState: PropTypes.func.isRequired,
+};
 
-    if (!strategy) {
-      return null;
-    }
-
-    const strategyConfig = this._getStrategyConfig(selectedStrategy);
-    const element = React.createElement(strategy.configComponent, {
-      config: strategyConfig,
-      jsonSchema: this._getStrategyJsonSchema(selectedStrategy),
-      updateConfig: this._onConfigUpdate,
-    });
-
-    return (<span key={strategy.type}>{element}</span>);
-  };
-
-  _activeSelection = () => {
-    return this.state.newStrategy;
-  };
-
-  render() {
-    return (
-      <span>
-        <h3>{this.props.title}</h3>
-        <p className="description">{this.props.description}</p>
-        <Input id="strategy-select" label={this.props.selectPlaceholder}>
-          <Select placeholder={this.props.selectPlaceholder}
-                  options={this._availableSelectOptions()}
-                  matchProp="label"
-                  value={this._activeSelection()}
-                  onChange={this._onSelect} />
-        </Input>
-        {this._getConfigurationComponent(this._activeSelection())}
-      </span>
-    );
-  }
-}
+IndexMaintenanceStrategiesConfiguration.defaultProps = {
+  retentionStrategiesContext: {
+    max_index_retention_period: undefined,
+  },
+};
 
 export default IndexMaintenanceStrategiesConfiguration;

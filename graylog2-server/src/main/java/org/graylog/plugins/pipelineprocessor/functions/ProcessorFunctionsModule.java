@@ -75,15 +75,17 @@ import org.graylog.plugins.pipelineprocessor.functions.ips.CidrMatch;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IsIp;
 import org.graylog.plugins.pipelineprocessor.functions.json.IsJson;
+import org.graylog.plugins.pipelineprocessor.functions.json.JsonFlatten;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.Lookup;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupClearKey;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupRemoveStringList;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetValue;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupStringList;
-import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetStringList;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupStringListContains;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
@@ -198,6 +200,7 @@ public class ProcessorFunctionsModule extends PluginModule {
 
         // json
         addMessageProcessorFunction(JsonParse.NAME, JsonParse.class);
+        addMessageProcessorFunction(JsonFlatten.NAME, JsonFlatten.class);
         addMessageProcessorFunction(SelectJsonPath.NAME, SelectJsonPath.class);
 
         // dates
@@ -267,6 +270,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(LookupSetStringList.NAME, LookupSetStringList.class);
         addMessageProcessorFunction(LookupAddStringList.NAME, LookupAddStringList.class);
         addMessageProcessorFunction(LookupRemoveStringList.NAME, LookupRemoveStringList.class);
+        addMessageProcessorFunction(LookupStringListContains.NAME, LookupStringListContains.class);
 
         // Debug
         addMessageProcessorFunction(Debug.NAME, Debug.class);

@@ -16,29 +16,30 @@
  */
 import * as React from 'react';
 import { useContext, useState } from 'react';
-import { List, Set } from 'immutable';
+import type { List } from 'immutable';
+import { OrderedSet } from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Field, Formik, Form } from 'formik';
 
 import connect from 'stores/connect';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
-import View from 'views/logic/views/View';
-import Widget from 'views/logic/widgets/Widget';
+import type View from 'views/logic/views/View';
+import type Widget from 'views/logic/widgets/Widget';
 import { Icon, Spinner } from 'components/common';
 import { Modal, Button } from 'components/bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ExportWidgetSelection from 'views/components/export/ExportWidgetSelection';
 import { MESSAGE_FIELD, SOURCE_FIELD, TIMESTAMP_FIELD } from 'views/Constants';
-import { ExportSettings as ExportSettingsType } from 'views/components/ExportSettingsContext';
+import type { ExportSettings as ExportSettingsType } from 'views/components/ExportSettingsContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 import ExportSettings from './ExportSettings';
 import ExportStrategy from './ExportStrategy';
 import startDownload from './startDownload';
 
-const DEFAULT_FIELDS = Set([TIMESTAMP_FIELD, SOURCE_FIELD, MESSAGE_FIELD]);
+const DEFAULT_FIELDS = OrderedSet([TIMESTAMP_FIELD, SOURCE_FIELD, MESSAGE_FIELD]);
 
 const Content = styled.div`
   margin-left: 15px;
@@ -52,12 +53,12 @@ export type Props = {
   view: View,
 };
 
-const _getInitialWidgetFields = (selectedWidget: Widget): Set<string> => {
+const _getInitialWidgetFields = (selectedWidget: Widget): OrderedSet<string> => {
   if (selectedWidget.config.showMessageRow) {
-    return Set<string>(selectedWidget.config.fields).add(MESSAGE_FIELD).toSet();
+    return OrderedSet<string>(selectedWidget.config.fields).add(MESSAGE_FIELD).toOrderedSet();
   }
 
-  return Set(selectedWidget.config.fields);
+  return OrderedSet(selectedWidget.config.fields);
 };
 
 const _getInitialFields = (selectedWidget) => {
@@ -122,26 +123,26 @@ const ExportModal = ({ closeModal, view, directExportWidgetId, executionState }:
               <Modal.Body>
                 <Content>
                   {showWidgetSelection && (
-                  <Field name="selectedWidget">
-                    {({ field: { name, onChange } }) => {
-                      const onChangeSelectWidget = ({ value }) => {
-                        setSelectedFields(_getInitialFields(value));
+                    <Field name="selectedWidget">
+                      {({ field: { name, onChange } }) => {
+                        const onChangeSelectWidget = (widget) => {
+                          setSelectedFields(_getInitialFields(widget));
 
-                        return onChange({ target: { name, value } });
-                      };
+                          return onChange({ target: { name, value: widget } });
+                        };
 
-                      return (
-                        <ExportWidgetSelection selectWidget={onChangeSelectWidget}
-                                               view={view}
-                                               widgets={exportableWidgets.toList()} />
-                      );
-                    }}
-                  </Field>
+                        return (
+                          <ExportWidgetSelection selectWidget={onChangeSelectWidget}
+                                                 view={view}
+                                                 widgets={exportableWidgets.toList()} />
+                        );
+                      }}
+                    </Field>
                   )}
                   {!showWidgetSelection && (
-                  <ExportSettings fields={fields}
-                                  selectedWidget={initialSelectedWidget}
-                                  view={view} />
+                    <ExportSettings fields={fields}
+                                    selectedWidget={initialSelectedWidget}
+                                    view={view} />
                   )}
                 </Content>
               </Modal.Body>

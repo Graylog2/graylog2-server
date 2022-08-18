@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { compact, camelCase, mapKeys, mapValues } from 'lodash';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 import PropTypes from 'prop-types';
-import { FormikProps } from 'formik';
+import type { FormikProps } from 'formik';
 
 import history from 'util/History';
 import { validateField } from 'util/FormsUtils';
@@ -28,24 +28,18 @@ import { Row, Col, Alert } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Routes from 'routing/Routes';
-import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
-import Wizard, { Step, StepKey } from 'components/common/Wizard';
-import FetchError from 'logic/errors/FetchError';
-import { LoadResponse as LoadBackendResponse } from 'stores/authentication/AuthenticationStore';
-import { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
+import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import type { Step, StepKey } from 'components/common/Wizard';
+import Wizard from 'components/common/Wizard';
+import type FetchError from 'logic/errors/FetchError';
+import type { LoadResponse as LoadBackendResponse } from 'stores/authentication/AuthenticationStore';
+import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 
-import BackendWizardContext, { WizardStepsState, WizardFormValues, AuthBackendMeta } from './BackendWizardContext';
-import {
-  FORM_VALIDATION as SERVER_CONFIG_VALIDATION,
-  STEP_KEY as SERVER_CONFIG_KEY,
-} from './ServerConfigStep';
-import {
-  FORM_VALIDATION as USER_SYNC_VALIDATION,
-  STEP_KEY as USER_SYNC_KEY,
-} from './UserSyncStep';
-import {
-  STEP_KEY as GROUP_SYNC_KEY,
-} from './GroupSyncStep';
+import type { WizardStepsState, WizardFormValues, AuthBackendMeta } from './BackendWizardContext';
+import BackendWizardContext from './BackendWizardContext';
+import { FORM_VALIDATION as SERVER_CONFIG_VALIDATION, STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
+import { FORM_VALIDATION as USER_SYNC_VALIDATION, STEP_KEY as USER_SYNC_KEY } from './UserSyncStep';
+import { STEP_KEY as GROUP_SYNC_KEY } from './GroupSyncStep';
 import wizardSteps from './wizardSteps';
 import Sidebar from './Sidebar';
 
@@ -68,9 +62,8 @@ const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: st
 
 const _formatBackendValidationErrors = (backendErrors: { [inputNameJSON: string]: string[] }) => {
   const backendErrorStrings = mapValues(backendErrors, (errorArray) => `Server validation error: ${errorArray.join(' ')}`);
-  const formattedBackendErrors = mapKeys(backendErrorStrings, (value, key) => camelCase(key));
 
-  return formattedBackendErrors;
+  return mapKeys(backendErrorStrings, (_value, key) => camelCase(key));
 };
 
 export const _passwordPayload = (backendId: string | null | undefined, systemUserPassword: string | null | undefined) => {
@@ -228,7 +221,7 @@ type Props = {
   authBackendMeta: AuthBackendMeta,
   initialStepKey: $PropertyType<Step, 'key'>,
   initialValues: WizardFormValues,
-  excludedFields: {[ inputName: string ]: boolean },
+  excludedFields: { [inputName: string]: boolean },
   help: { [inputName: string]: React.ReactElement | string | null | undefined },
   onSubmit: (WizardSubmitPayload, WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync?: boolean) => Promise<LoadBackendResponse>,
 };
@@ -257,6 +250,8 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     [USER_SYNC_KEY]: useRef<FormikProps<WizardFormValues>>(null),
     [GROUP_SYNC_KEY]: useRef<FormikProps<WizardFormValues>>(null),
   };
+
+  const wizardContextValue = useMemo(() => ({ ...stepsState, setStepsState }), [stepsState, setStepsState]);
 
   useEffect(() => _loadRoles(setPaginatedRoles), []);
 
@@ -351,7 +346,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
   );
 
   return (
-    <BackendWizardContext.Provider value={{ ...stepsState, setStepsState }}>
+    <BackendWizardContext.Provider value={wizardContextValue}>
       {MatchingGroupsProvider
         ? (
           <MatchingGroupsProvider prepareSubmitPayload={_getSubmitPayload}>

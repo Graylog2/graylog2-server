@@ -28,12 +28,14 @@ import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.realm.AuthorizingRealm;
+import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
+import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
-import org.graylog2.contentpacks.facades.EntityFacade;
+import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -52,6 +54,7 @@ import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
+import org.graylog2.plugin.validate.ClusterConfigValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -361,6 +364,14 @@ public abstract class Graylog2Module extends AbstractModule {
         return MapBinder.newMapBinder(binder(), String.class, AuthorizingRealm.class);
     }
 
+    protected MapBinder<String, PreflightCheck> preflightChecksBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, PreflightCheck.class);
+    }
+
+    protected void addPreflightCheck(Class<? extends PreflightCheck> preflightCheck) {
+        preflightChecksBinder().addBinding(preflightCheck.getCanonicalName()).to(preflightCheck);
+    }
+
     protected MapBinder<String, SearchResponseDecorator.Factory> searchResponseDecoratorBinder() {
         return MapBinder.newMapBinder(binder(), String.class, SearchResponseDecorator.Factory.class);
     }
@@ -461,8 +472,8 @@ public abstract class Graylog2Module extends AbstractModule {
         return Multibinder.newSetBinder(binder(), Migration.class);
     }
 
-    protected MapBinder<ModelType, EntityFacade<?>> entityFacadeBinder() {
-        return MapBinder.newMapBinder(binder(), new TypeLiteral<ModelType>() {}, new TypeLiteral<EntityFacade<?>>() {});
+    protected MapBinder<ModelType, EntityWithExcerptFacade<?, ?>> entityFacadeBinder() {
+        return MapBinder.newMapBinder(binder(), new TypeLiteral<ModelType>() {}, new TypeLiteral<EntityWithExcerptFacade<?, ?>>() {});
     }
 
     protected Multibinder<ConstraintChecker> constraintCheckerBinder() {
@@ -492,5 +503,22 @@ public abstract class Graylog2Module extends AbstractModule {
                 new TypeLiteral<Class<?>>() {},
                 Names.named(SYSTEM_REST_RESOURCES)
         );
+    }
+
+    protected MapBinder<Class<?>, ClusterConfigValidator> clusterConfigMapBinder() {
+        TypeLiteral<Class<?>> keyType = new TypeLiteral<Class<?>>() {};
+        TypeLiteral<ClusterConfigValidator> valueType = new TypeLiteral<ClusterConfigValidator>() {};
+        return MapBinder.newMapBinder(binder(), keyType, valueType);
+    }
+
+    protected MapBinder<String, ViewResolver> viewResolverBinder() {
+        return MapBinder.newMapBinder(binder(),
+                TypeLiteral.get(String.class),
+                new TypeLiteral<ViewResolver>() {});
+    }
+
+    protected void installViewResolver(String name,
+                                       Class<? extends ViewResolver> resolverClass) {
+        viewResolverBinder().addBinding(name).to(resolverClass).asEagerSingleton();
     }
 }

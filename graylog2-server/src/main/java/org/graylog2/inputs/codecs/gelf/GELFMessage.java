@@ -21,6 +21,8 @@ import org.graylog2.plugin.Tools;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class GELFMessage {
@@ -67,7 +69,11 @@ public class GELFMessage {
      * @see Tools#decompressGzip(byte[], long)
      * @see Tools#decompressZlib(byte[], long)
      */
+
     public String getJSON(long maxBytes) {
+        return getJSON(maxBytes, StandardCharsets.UTF_8);
+    }
+    public String getJSON(long maxBytes, Charset charset) {
         try {
             switch (getGELFType()) {
                 case ZLIB:
@@ -75,14 +81,16 @@ public class GELFMessage {
                 case GZIP:
                     return Tools.decompressGzip(payload, maxBytes);
                 case UNCOMPRESSED:
-                    return new String(payload, StandardCharsets.UTF_8);
+                    return new String(payload, charset);
                 case CHUNKED:
                 case UNSUPPORTED:
                     throw new IllegalStateException("Unknown GELF type. Not supported.");
             }
-        } catch (final IOException e) {
-            // Note that the UnsupportedEncodingException thrown by 'new String' can never happen because UTF-8
-            // is a mandatory JRE encoding which is always present. So we only need to mention the decompress exceptions here.
+        }
+        catch (final UnsupportedEncodingException e) {
+            throw new IllegalStateException("Unexpected encoding", e);
+        }
+        catch (final IOException e) {
             throw new IllegalStateException("Failed to decompress the GELF message payload", e);
         }
         return null;

@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { ThemeMode } from 'theme/constants';
-import { Colors, ColorVariants, ThemeColorModes } from 'theme/colors';
+import type { ThemeMode } from 'theme/constants';
+import type { Colors, ColorVariants, ThemeColorModes } from 'theme/colors';
 
 interface CustomizationHooks {
   useThemeCustomizer: () => ({

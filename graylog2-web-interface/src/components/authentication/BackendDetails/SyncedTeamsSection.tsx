@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import { EnterprisePluginNotFound } from 'components/common';
 import { getEnterpriseAuthenticationPlugin } from 'util/AuthenticationService';
-import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 type Props = {

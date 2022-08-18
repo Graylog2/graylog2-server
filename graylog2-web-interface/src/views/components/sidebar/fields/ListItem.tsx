@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import { List } from 'immutable';
+import type { List } from 'immutable';
 
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Field from 'views/components/Field';
 
 import FieldTypeIcon from './FieldTypeIcon';

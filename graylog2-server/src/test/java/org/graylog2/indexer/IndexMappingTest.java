@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.zafarkhaja.semver.Version;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.storage.SearchVersion;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -59,7 +60,7 @@ class IndexMappingTest {
             "7.0.0"
     })
     void createsValidMappingTemplates(String versionString) throws Exception {
-        final Version version = Version.valueOf(versionString);
+        final SearchVersion version = SearchVersion.elasticsearch(versionString);
         final IndexMappingTemplate mapping = new MessageIndexTemplateProvider().create(version, null);
 
         final Map<String, Object> template = mapping.toTemplate(indexSetConfig, "sampleIndexTemplate");
@@ -68,8 +69,8 @@ class IndexMappingTest {
         JSONAssert.assertEquals(json(template), fixture, true);
     }
 
-    private String fixtureFor(Version version) {
-        final String fixtureFileName = String.format(Locale.ENGLISH, "expected_template%s.json", version.getMajorVersion());
+    private String fixtureFor(SearchVersion version) {
+        final String fixtureFileName = String.format(Locale.ENGLISH, "expected_template%s.json", version.version().getMajorVersion());
         return resourceFile(fixtureFileName);
     }
 

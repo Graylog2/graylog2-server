@@ -21,7 +21,8 @@ import React from 'react';
 import LookupTableParameterEdit from 'components/lookup-table-parameters/LookupTableParameterEdit';
 import { Button, BootstrapModalForm } from 'components/bootstrap';
 import type { LookupTable } from 'logic/lookup-tables/types';
-import LookupTableParameter, { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
+import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
+import type LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 
 type Props = {
   queryParameters: Array<LookupTableParameterJson>,
@@ -80,7 +81,7 @@ class EditQueryParameterModal extends React.Component<Props, State> {
     const { queryParameter } = this.props;
 
     this.setState({ queryParameter });
-  }
+  };
 
   propagateChanges = () => {
     const { queryParameters, onChange, queryParameter: prevQueryParameter } = this.props;

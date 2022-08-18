@@ -30,9 +30,12 @@ import retrofit2.Response;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -59,12 +62,24 @@ public abstract class ProxiedResource extends RestResource {
         this.nodeService = nodeService;
         this.remoteInterfaceProvider = remoteInterfaceProvider;
         this.executor = executorService;
-        final List<String> authenticationTokens = httpHeaders.getRequestHeader("Authorization");
-        if (authenticationTokens != null && authenticationTokens.size() >= 1) {
-            this.authenticationToken = authenticationTokens.get(0);
-        } else {
-            this.authenticationToken = null;
+        this.authenticationToken = authenticationToken(httpHeaders);
+    }
+
+    public static String authenticationToken(HttpHeaders httpHeaders) {
+        final List<String> authorizationHeader = httpHeaders.getRequestHeader("Authorization");
+        if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
+            return authorizationHeader.get(0);
         }
+
+        final Cookie authenticationCookie = httpHeaders.getCookies().get("authentication");
+        if (authenticationCookie != null) {
+            final String sessionId = authenticationCookie.getValue();
+            final String credentials = sessionId + ":session";
+            final String base64Credentials = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
+            return "Basic " + base64Credentials;
+        }
+
+        return null;
     }
 
     /**
@@ -143,14 +158,12 @@ public abstract class ProxiedResource extends RestResource {
     /**
      * This method concurrently performs an API call on all active nodes.
      *
-     * @param remoteInterfaceProvider provides an instance of Retrofit HTTP client for the target API
+     * @param remoteInterfaceProvider     provides an instance of Retrofit HTTP client for the target API
      * @param remoteInterfaceCallProvider provides an invocation of a Retrofit method for the intended API call.
-     * @param responseTransformer applies transformations to HTTP response body
-     *
-     * @param <RemoteInterfaceType> Type of the Retrofit HTTP client
-     * @param <RemoteCallResponseType> Type of the API call response body
-     * @param <FinalResponseType> Type after applying the transformations
-     *
+     * @param responseTransformer         applies transformations to HTTP response body
+     * @param <RemoteInterfaceType>       Type of the Retrofit HTTP client
+     * @param <RemoteCallResponseType>    Type of the API call response body
+     * @param <FinalResponseType>         Type after applying the transformations
      * @return Detailed report on call results per each active node.
      */
     protected <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> Map<String, CallResult<FinalResponseType>> requestOnAllNodes(
@@ -188,28 +201,36 @@ public abstract class ProxiedResource extends RestResource {
     }
 
     /**
-     * Execute the given remote interface function on the master node.
-     * <p>
-     * This is used to forward an API request to the master node. It is useful in situations where an API call can
-     * only be executed on the master node.
-     * <p>
-     * The returned {@link MasterResponse} object is constructed from the remote response's status code and body.
+     * @deprecated Use {@link #requestOnLeader(Function, Function)} instead.
      */
     protected <RemoteInterfaceType, RemoteCallResponseType> MasterResponse<RemoteCallResponseType> requestOnMaster(
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
             Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider
     ) throws IOException {
-        final Node masterNode = nodeService.allActive().values().stream()
-                .filter(Node::isMaster)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No active master node found"));
-
-        return MasterResponse.create(
-                doNodeApiCall(masterNode.getNodeId(), remoteInterfaceProvider, remoteInterfaceFunction, Function.identity())
-        );
+        return MasterResponse.create(requestOnLeader(remoteInterfaceFunction, remoteInterfaceProvider));
     }
 
-    private  <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> NodeResponse<FinalResponseType> doNodeApiCall(
+    /**
+     * Execute the given remote interface function on the leader node.
+     * <p>
+     * This is used to forward an API request to the leader node. It is useful in situations where an API call can only
+     * be executed on the leader node.
+     * <p>
+     * The returned {@link NodeResponse} object is constructed from the remote response's status code and body.
+     */
+    protected <RemoteInterfaceType, RemoteCallResponseType> NodeResponse<RemoteCallResponseType> requestOnLeader(
+            Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
+            Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider
+    ) throws IOException {
+        final Node leaderNode = nodeService.allActive().values().stream()
+                .filter(Node::isLeader)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No active leader node found"));
+
+        return doNodeApiCall(leaderNode.getNodeId(), remoteInterfaceProvider, remoteInterfaceFunction, Function.identity());
+    }
+
+    private <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> NodeResponse<FinalResponseType> doNodeApiCall(
             String nodeId,
             Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider,
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
@@ -258,6 +279,7 @@ public abstract class ProxiedResource extends RestResource {
     public static abstract class NodeResponse<ResponseType> {
         /**
          * Indicates whether the request has been successful or not.
+         *
          * @return {@code true} for a successful request, {@code false} otherwise
          */
         @JsonProperty("success")
@@ -281,6 +303,7 @@ public abstract class ProxiedResource extends RestResource {
 
         /**
          * Returns the error response if the request wasn't successful. Otherwise it returns an empty {@link Optional}.
+         *
          * @return error response or empty {@link Optional}
          */
         public abstract Optional<byte[]> error();
@@ -306,16 +329,15 @@ public abstract class ProxiedResource extends RestResource {
         }
 
         public static <ResponseType> NodeResponse<ResponseType> create(boolean isSuccess,
-                                                                         int code,
-                                                                         @Nullable ResponseType entity,
-                                                                         @Nullable byte[] error) {
+                                                                       int code,
+                                                                       @Nullable ResponseType entity,
+                                                                       @Nullable byte[] error) {
             return new AutoValue_ProxiedResource_NodeResponse<>(isSuccess, code, Optional.ofNullable(entity), Optional.ofNullable(error));
         }
     }
 
     /**
-     * TODO: To replace by {@link NodeResponse}.
-     * Mind backward compatibility with existing plugins.
+     * @deprecated Use {@link NodeResponse} instead.
      */
     @Deprecated
     @AutoValue

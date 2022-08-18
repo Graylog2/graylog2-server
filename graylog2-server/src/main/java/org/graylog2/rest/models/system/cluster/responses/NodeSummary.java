@@ -28,18 +28,31 @@ import org.graylog.autovalue.WithBeanGetter;
 public abstract class NodeSummary {
     @JsonProperty
     public abstract String clusterId();
+
     @JsonProperty
     public abstract String nodeId();
+
     @JsonProperty
     public abstract String type();
+
+    @Deprecated
     @JsonProperty("is_master")
-    public abstract boolean isMaster();
+    public boolean isMaster() {
+        return isLeader();
+    }
+
+    @JsonProperty("is_leader")
+    public abstract boolean isLeader();
+
     @JsonProperty
     public abstract String transportAddress();
+
     @JsonProperty
     public abstract String lastSeen();
+
     @JsonProperty
     public abstract String shortNodeId();
+
     @JsonProperty
     public abstract String hostname();
 
@@ -47,11 +60,11 @@ public abstract class NodeSummary {
     public static NodeSummary create(@JsonProperty("cluster_id") String clusterId,
                                      @JsonProperty("node_id") String nodeId,
                                      @JsonProperty("type") String type,
-                                     @JsonProperty("is_master") boolean isMaster,
+                                     @JsonProperty("is_leader") boolean isLeader,
                                      @JsonProperty("transport_address") String transportAddress,
                                      @JsonProperty("last_seen") String lastSeen,
                                      @JsonProperty("short_node_id") String shortNodeId,
                                      @JsonProperty("hostname") String hostname) {
-        return new AutoValue_NodeSummary(clusterId, nodeId, type, isMaster, transportAddress, lastSeen, shortNodeId, hostname);
+        return new AutoValue_NodeSummary(clusterId, nodeId, type, isLeader, transportAddress, lastSeen, shortNodeId, hostname);
     }
 }

@@ -19,7 +19,7 @@ import moment from 'moment';
 import 'moment-duration-format';
 import 'moment-precise-range-plugin';
 
-import { AbsoluteTimeRange, KeywordTimeRange, RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange, KeywordTimeRange, RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 
 export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', placeholder = 'All Time') => {
@@ -29,8 +29,9 @@ export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' 
     return placeholder;
   }
 
-  const dateAgo = moment().subtract(rangeAsSeconds, 'seconds');
-  const rangeTimespan = moment.preciseDiff(moment(), dateAgo);
+  const reference = moment();
+  const dateAgo = moment(reference).subtract(rangeAsSeconds, 'seconds');
+  const rangeTimespan = moment.preciseDiff(reference, dateAgo);
 
   return `${rangeTimespan} ago`;
 };

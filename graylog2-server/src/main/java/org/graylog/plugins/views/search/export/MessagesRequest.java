@@ -23,10 +23,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nonnull;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 
@@ -45,6 +48,7 @@ public abstract class MessagesRequest {
     private static final String FIELD_QUERY_STRING = "query_string";
     private static final String FIELD_FIELDS = "fields_in_order";
     private static final String FIELD_CHUNK_SIZE = "chunk_size";
+    private static final String FIELD_TIME_ZONE = "time_zone";
 
     @JsonProperty(FIELD_TIMERANGE)
     public abstract TimeRange timeRange();
@@ -62,6 +66,9 @@ public abstract class MessagesRequest {
     @JsonProperty(FIELD_CHUNK_SIZE)
     public abstract int chunkSize();
 
+    @JsonProperty(FIELD_TIME_ZONE)
+    public abstract Optional<DateTimeZone> timeZone();
+
     @JsonProperty
     @Positive
     public abstract OptionalInt limit();
@@ -72,6 +79,14 @@ public abstract class MessagesRequest {
 
     public static Builder builder() {
         return Builder.create();
+    }
+
+    public MessagesRequest withTimeZone(@Nonnull DateTimeZone timeZone) {
+        return toBuilder().timeZone(timeZone).build();
+    }
+
+    public MessagesRequest withStreams(@Nonnull Set<String> streams) {
+        return toBuilder().streams(streams).build();
     }
 
     public abstract Builder toBuilder();
@@ -96,6 +111,9 @@ public abstract class MessagesRequest {
 
         @JsonProperty(FIELD_CHUNK_SIZE)
         public abstract Builder chunkSize(int chunkSize);
+
+        @JsonProperty(FIELD_TIME_ZONE)
+        public abstract Builder timeZone(DateTimeZone timeZone);
 
         @JsonProperty
         public abstract Builder limit(Integer limit);

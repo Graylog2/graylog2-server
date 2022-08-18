@@ -22,7 +22,7 @@ import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackEntitiesList from 'components/content-packs/ContentPackEntitiesList';
 import Entity from 'logic/content-packs/Entity';
 
-jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
+jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 
 describe('<ContentPackEntitiesList />', () => {
   const parameter = {
@@ -86,15 +86,15 @@ describe('<ContentPackEntitiesList />', () => {
   it('should filter entities', () => {
     const wrapper = mount(<ContentPackEntitiesList contentPack={contentPack} />);
 
-    expect(wrapper.find("td[children='test']").exists()).toBe(true);
+    expect(wrapper.find('td[children=\'test\']').exists()).toBe(true);
 
     wrapper.find('input').simulate('change', { target: { value: 'Bad' } });
     wrapper.find('form').simulate('submit');
 
-    expect(wrapper.find("td[children='test']").exists()).toBe(false);
+    expect(wrapper.find('td[children=\'test\']').exists()).toBe(false);
 
-    wrapper.find("button[children='Reset']").simulate('click');
+    wrapper.find('button[children=\'Reset\']').simulate('click');
 
-    expect(wrapper.find("td[children='test']").exists()).toBe(true);
+    expect(wrapper.find('td[children=\'test\']').exists()).toBe(true);
   });
 });

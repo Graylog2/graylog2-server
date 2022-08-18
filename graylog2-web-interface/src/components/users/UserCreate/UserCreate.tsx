@@ -15,21 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import * as Immutable from 'immutable';
-import { useEffect, useState } from 'react';
 import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import history from 'util/History';
+import AppConfig from 'util/AppConfig';
 import type { DescriptiveItem } from 'components/common/PaginatedItemOverview';
 import User from 'logic/users/User';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import PaginatedItem from 'components/common/PaginatedItemOverview/PaginatedItem';
 import RolesSelector from 'components/permissions/RolesSelector';
-import { Spinner } from 'components/common';
 import { Alert, Col, Row, Button, ButtonToolbar, Input } from 'components/bootstrap';
-import history from 'util/History';
 import Routes from 'routing/Routes';
-import AppConfig from 'util/AppConfig';
+import { UsersActions } from 'stores/users/UsersStore';
+import debounceWithPromise from 'views/logic/debounceWithPromise';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
@@ -38,6 +39,7 @@ import LastNameFormGroup from './LastNameFormGroup';
 import EmailFormGroup from './EmailFormGroup';
 import PasswordFormGroup, { validatePasswords } from './PasswordFormGroup';
 import UsernameFormGroup from './UsernameFormGroup';
+import ServiceAccountFormGroup from './ServiceAccountFormGroup';
 
 import { Headline } from '../../common/Section/SectionComponent';
 
@@ -63,10 +65,29 @@ const _onSubmit = (formData, roles, setSubmitError) => {
   }, (error) => setSubmitError(error));
 };
 
-const _validate = (values) => {
+const _validateUsername = async (errors: { [name: string]: string }, username: string) => {
+  const newErrors = { ...errors };
+
+  try {
+    await UsersActions.loadByUsername(username);
+    newErrors.username = 'Username is already taken';
+  // eslint-disable-next-line no-empty
+  } catch (error) {}
+
+  return newErrors;
+};
+
+const debounceTimeoutMs = 600;
+const debouncedValidateUsername = debounceWithPromise(_validateUsername, debounceTimeoutMs);
+
+const _validate = async (values) => {
   let errors = {};
 
-  const { password, password_repeat: passwordRepeat } = values;
+  const { password, password_repeat: passwordRepeat, username } = values;
+
+  if (username) {
+    errors = await debouncedValidateUsername(errors, username);
+  }
 
   if (isCloud && oktaUserForm) {
     const { validations: { password: validateCloudPasswords } } = oktaUserForm;
@@ -81,16 +102,45 @@ const _validate = (values) => {
 
 type RequestError = { additional: { res: { text: string }}};
 
+const PasswordGroup = () => {
+  if (isCloud && oktaUserForm) {
+    const { fields: { password: CloudPasswordFormGroup } } = oktaUserForm;
+
+    return <CloudPasswordFormGroup />;
+  }
+
+  return <PasswordFormGroup />;
+};
+
+const UserNameGroup = () => {
+  if (isCloud && oktaUserForm) {
+    const { fields: { username: CloudUserNameFormGroup } } = oktaUserForm;
+
+    return CloudUserNameFormGroup && <CloudUserNameFormGroup />;
+  }
+
+  return (
+    <UsernameFormGroup />
+  );
+};
+
+const EmailGroup = () => {
+  if (isCloud && oktaUserForm) {
+    const { fields: { email: CloudEmailFormGroup } } = oktaUserForm;
+
+    return CloudEmailFormGroup && <CloudEmailFormGroup />;
+  }
+
+  return (
+    <EmailFormGroup />
+  );
+};
+
 const UserCreate = () => {
   const initialRole = { name: 'Reader', description: 'Grants basic permissions for every Graylog user (built-in)', id: '' };
-  const [users, setUsers] = useState<Immutable.List<User> | undefined>();
   const [user, setUser] = useState(User.empty().toBuilder().roles(Immutable.Set([initialRole.name])).build());
   const [submitError, setSubmitError] = useState<RequestError | undefined>();
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
-
-  useEffect(() => {
-    UsersDomain.loadUsers().then(setUsers);
-  }, []);
 
   const _onAssignRole = (roles: Immutable.Set<DescriptiveItem>) => {
     setSelectedRoles(selectedRoles.union(roles));
@@ -108,56 +158,6 @@ const UserCreate = () => {
 
   const _handleCancel = () => history.push(Routes.SYSTEM.USERS.OVERVIEW);
   const hasValidRole = selectedRoles.size > 0 && selectedRoles.filter((role) => role.name === 'Reader' || role.name === 'Admin');
-
-  const getUserNameGroup = () => {
-    if (isCloud && oktaUserForm) {
-      const { fields: { username: CloudUserNameFormGroup } } = oktaUserForm;
-
-      return (
-        <>
-          {CloudUserNameFormGroup && <CloudUserNameFormGroup />}
-        </>
-      );
-    }
-
-    return (
-      <>
-        <UsernameFormGroup users={users} />
-      </>
-    );
-  };
-
-  const getEmailGroup = () => {
-    if (isCloud && oktaUserForm) {
-      const { fields: { email: CloudEmailFormGroup } } = oktaUserForm;
-
-      return (
-        <>
-          {CloudEmailFormGroup && <CloudEmailFormGroup />}
-        </>
-      );
-    }
-
-    return (
-      <>
-        <EmailFormGroup />
-      </>
-    );
-  };
-
-  const getPasswordGroup = () => {
-    if (isCloud && oktaUserForm) {
-      const { fields: { password: CloudPasswordFormGroup } } = oktaUserForm;
-
-      return <CloudPasswordFormGroup />;
-    }
-
-    return <PasswordFormGroup />;
-  };
-
-  if (!users) {
-    return <Spinner />;
-  }
 
   const showSubmitError = (errors) => {
     if (isCloud && oktaUserForm) {
@@ -181,13 +181,14 @@ const UserCreate = () => {
                 <Headline>Profile</Headline>
                 <FirstNameFormGroup />
                 <LastNameFormGroup />
-                {getUserNameGroup()}
-                {getEmailGroup()}
+                <UserNameGroup />
+                <EmailGroup />
               </div>
               <div>
                 <Headline>Settings</Headline>
                 <TimeoutFormGroup />
                 <TimezoneFormGroup />
+                <ServiceAccountFormGroup />
               </div>
               <div>
                 <Headline>Roles</Headline>
@@ -214,7 +215,7 @@ const UserCreate = () => {
               </div>
               <div>
                 <Headline>Password</Headline>
-                {getPasswordGroup()}
+                <PasswordGroup />
               </div>
               {submitError && (
                 <Row>

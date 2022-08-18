@@ -17,21 +17,22 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen, within } from 'wrappedTestingLibrary';
-import mockAction from 'helpers/mocking/MockAction';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
-import MockStore from 'helpers/mocking/StoreMock';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
-import { createSearch } from 'fixtures/searches';
 
+import MockStore from 'helpers/mocking/StoreMock';
+import mockAction from 'helpers/mocking/MockAction';
+import { createSearch } from 'fixtures/searches';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import WidgetModel from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import View, { ViewType } from 'views/logic/views/View';
+import type { ViewType } from 'views/logic/views/View';
+import View from 'views/logic/views/View';
 import { ViewStore } from 'views/stores/ViewStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
@@ -51,10 +52,6 @@ const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
-
-jest.mock('views/stores/FieldTypesStore', () => ({
-  FieldTypesStore: MockStore(['getInitialState', () => ({ all: {}, queryFields: {} })]),
-}));
 
 const MockWidgetStoreState = Immutable.Map();
 
@@ -78,6 +75,13 @@ jest.mock('views/stores/StreamsStore', () => ({
       { title: 'Stream 1', id: 'stream-id-1' },
     ],
   })]),
+}));
+
+jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
+  SearchActions: {
+    execute: mockAction(),
+  },
 }));
 
 const viewsPlugin = new PluginManifest({}, viewsBindings);
@@ -139,6 +143,7 @@ describe('Aggregation Widget', () => {
     ...props
   }: AggregationWidgetProps) => (
     <ViewTypeContext.Provider value={viewType}>
+      {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
       <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
         <WidgetFocusContext.Provider value={widgetFocusContextState}>
           <WidgetContext.Provider value={propsWidget}>
@@ -146,7 +151,6 @@ describe('Aggregation Widget', () => {
                     id="widgetId"
                     fields={Immutable.List([])}
                     onPositionsChange={() => {}}
-                    onSizeChange={() => {}}
                     title="Widget Title"
                     position={new WidgetPosition(1, 1, 1, 1)}
                     {...props} />
@@ -208,8 +212,8 @@ describe('Aggregation Widget', () => {
       const updatedWidget = dataTableWidget
         .toBuilder()
         .timerange({
-          from: '2019-12-31T23:55:00.000Z',
-          to: '2020-01-01T00:00:00.000Z',
+          from: '2019-12-31T23:55:00.000+00:00',
+          to: '2020-01-01T00:00:00.000+00:00',
           type: 'absolute',
         })
         .build();
@@ -224,13 +228,13 @@ describe('Aggregation Widget', () => {
       userEvent.click(absoluteTabButton);
 
       const timeRangeLivePreview = await screen.findByTestId('time-range-live-preview');
-      await within(timeRangeLivePreview).findByText('2019-12-31 18:00:00.000');
+      await within(timeRangeLivePreview).findByText('2020-01-01 00:55:00.000');
 
       const applyTimeRangeChangesButton = await screen.findByRole('button', { name: 'Apply' });
       userEvent.click(applyTimeRangeChangesButton);
 
       const timeRangeDisplay = await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
-      await within(timeRangeDisplay).findByText('2019-12-31 18:00:00.000');
+      await within(timeRangeDisplay).findByText('2020-01-01 00:55:00.000');
 
       // Submit all changes
       const saveButton = screen.getByText('Apply Changes');

@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
-import asMock from 'helpers/mocking/AsMock';
 import userEvent from '@testing-library/user-event';
 
+import asMock from 'helpers/mocking/AsMock';
 import ExtraWidgetActions from 'views/components/widgets/ExtraWidgetActions';
 import Widget from 'views/logic/widgets/Widget';
 import usePluginEntities from 'views/logic/usePluginEntities';

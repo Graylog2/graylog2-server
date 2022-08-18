@@ -37,7 +37,10 @@ class MessageFieldExtractorActions extends React.Component {
 
   _refreshExtractorRoutes = (props) => {
     this.newExtractorRoutes = ExtractorUtils.getNewExtractorRoutes(props.message.source_node_id,
-      props.message.source_input_id, props.fieldName, props.message.index, props.message.id);
+      props.message.source_input_id,
+      props.fieldName,
+      props.message.index,
+      props.message.id);
   };
 
   _formatExtractorMenuItem = (extractorType) => {

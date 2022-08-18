@@ -16,7 +16,7 @@
  */
 import { get } from 'lodash';
 
-import View from 'views/logic/views/View';
+import type View from 'views/logic/views/View';
 import SearchTypesGenerator from 'views/logic/searchtypes/SearchTypesGenerator';
 
 const UpdateSearchForWidgets = (view: View): View => {

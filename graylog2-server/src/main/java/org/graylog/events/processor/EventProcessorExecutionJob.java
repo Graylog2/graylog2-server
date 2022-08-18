@@ -116,18 +116,8 @@ public class EventProcessorExecutionJob implements Job {
 
             // By using the processingWindowSize and the processingHopSize we can implement hopping and tumbling
             // windows. (a tumbling window is simply a hopping window where windowSize and hopSize are the same)
-            //
-            // TODO: Adding a millisecond is a hack! Adjust search infrastructure to handle the time range overlap issue.
-            // We are adding one millisecond to the next "from" value to avoid overlap with the previous timerange.
-            // Our Elasticsearch search queries do "timestamp >= from && timestamp <= to" (inclusive), so without
-            // the additional millisecond, the next "from" would be the same value as the current "to". This could
-            // lead to duplicate events or (more) incorrect aggregations when processing consecutive time ranges.
-            // Adding a millisecond to the next "from" value should be "okay" for now because the current date type
-            // we are using in Elasticsearch is only using millisecond precision. ("date") Once we switch to a
-            // different date type with nanosecond precision (e.g. "date_nanos"), this workaround will break and we
-            // will miss messages.
             DateTime nextTo = to.plus(config.processingHopSize());
-            DateTime nextFrom = nextTo.minus(config.processingWindowSize()).plusMillis(1);
+            DateTime nextFrom = nextTo.minus(config.processingWindowSize());
 
             // If the event processor is catching up on old data (e.g. the server was shut down for a significant time),
             // we can switch to a bigger scheduling window: `processingCatchUpWindowSize`.

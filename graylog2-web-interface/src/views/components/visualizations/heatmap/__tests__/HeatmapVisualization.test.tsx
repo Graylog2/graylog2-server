@@ -17,19 +17,26 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
-import mockComponent from 'helpers/mocking/MockComponent';
 
+import mockComponent from 'helpers/mocking/MockComponent';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
+import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
 
 import * as fixtures from './HeatmapVisualization.fixtures';
 
 import HeatmapVisualization from '../HeatmapVisualization';
 
 jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
+
+const SUT = (props: React.ComponentProps<typeof HeatmapVisualization>) => (
+  <UserDateTimeProvider tz="Europe/Berlin">
+    <HeatmapVisualization {...props} />
+  </UserDateTimeProvider>
+);
 
 describe('HeatmapVisualization', () => {
   it('generates correct props for plot component', () => {
@@ -58,14 +65,14 @@ describe('HeatmapVisualization', () => {
       },
     ];
 
-    const wrapper = mount(<HeatmapVisualization data={fixtures.validData}
-                                                config={config}
-                                                effectiveTimerange={effectiveTimerange}
-                                                fields={Immutable.List()}
-                                                height={1024}
-                                                onChange={() => {}}
-                                                toggleEdit={() => {}}
-                                                width={800} />);
+    const wrapper = mount(<SUT data={fixtures.validData}
+                               config={config}
+                               effectiveTimerange={effectiveTimerange}
+                               fields={Immutable.List()}
+                               height={1024}
+                               onChange={() => {}}
+                               toggleEdit={() => {}}
+                               width={800} />);
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', plotLayout);
@@ -103,16 +110,14 @@ describe('HeatmapVisualization', () => {
       },
     ];
 
-    const wrapper = mount(<HeatmapVisualization data={{ chart: [] }}
-                                                config={config}
-                                                effectiveTimerange={effectiveTimerange}
-                                                fields={Immutable.List()}
-                                                height={1024}
-                                                onChange={() => {
-                                                }}
-                                                toggleEdit={() => {
-                                                }}
-                                                width={800} />);
+    const wrapper = mount(<SUT data={{ chart: [] }}
+                               config={config}
+                               effectiveTimerange={effectiveTimerange}
+                               fields={Immutable.List()}
+                               height={1024}
+                               onChange={() => {}}
+                               toggleEdit={() => {}}
+                               width={800} />);
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', plotLayout);

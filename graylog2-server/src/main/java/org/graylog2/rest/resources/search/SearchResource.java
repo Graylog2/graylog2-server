@@ -17,9 +17,23 @@
 package org.graylog2.rest.resources.search;
 
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.glassfish.jersey.server.ChunkedOutput;
+import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.QueryResult;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.engine.SearchExecutor;
+import org.graylog.plugins.views.search.filter.QueryStringFilter;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.ExecutionState;
+import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.results.ResultMessage;
@@ -31,6 +45,7 @@ import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
@@ -45,7 +60,9 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -60,13 +77,26 @@ public abstract class SearchResource extends RestResource {
     protected final Searches searches;
     private final ClusterConfigService clusterConfigService;
     private final DecoratorProcessor decoratorProcessor;
+    private final SearchExecutor searchExecutor;
 
     public SearchResource(Searches searches,
                           ClusterConfigService clusterConfigService,
-                          DecoratorProcessor decoratorProcessor) {
+                          DecoratorProcessor decoratorProcessor,
+                          SearchExecutor searchExecutor) {
         this.searches = searches;
         this.clusterConfigService = clusterConfigService;
         this.decoratorProcessor = decoratorProcessor;
+        this.searchExecutor = searchExecutor;
+    }
+
+    protected SearchResponse search(String query, int limit, String filter, boolean decorate, SearchUser searchUser, List<String> fieldList, Sort sorting, TimeRange timeRange) {
+        final Search search = createSearch(query, limit, filter, fieldList, sorting, timeRange);
+
+        final Optional<String> streamId = Searches.extractStreamId(filter);
+
+        final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
+
+        return extractSearchResponse(searchJob, query, decorate, fieldList, timeRange, streamId);
     }
 
     protected List<String> parseFields(String fields) {
@@ -113,6 +143,20 @@ public abstract class SearchResource extends RestResource {
         return decorate ? decoratorProcessor.decorate(result, streamId) : result;
     }
 
+    protected SearchResponse buildSearchResponse(String query, MessageList.Result results, List<String> fieldList, long tookMs, TimeRange timeRange, boolean decorate, Optional<String> streamId) {
+        final SearchResponse result = SearchResponse.create(query,
+                query,
+                Collections.emptySet(),
+                results.messages(),
+                fieldList == null ? Collections.emptySet() : ImmutableSet.copyOf(fieldList),
+                tookMs,
+                results.totalResults(),
+                timeRange.getFrom(),
+                timeRange.getTo());
+
+        return decorate ? decoratorProcessor.decorate(result, streamId) : result;
+    }
+
     protected Set<IndexRangeSummary> indexRangeListToValueList(Set<IndexRange> indexRanges) {
         final Set<IndexRangeSummary> result = Sets.newHashSetWithExpectedSize(indexRanges.size());
 
@@ -146,6 +190,62 @@ public abstract class SearchResource extends RestResource {
             LOG.error("Falling back to default sorting.", e);
             return Sorting.DEFAULT;
         }
+    }
+
+    protected Sort buildSortOrder(String sort) {
+        if (isNullOrEmpty(sort)) {
+            return Sort.create("timestamp", Sort.Order.DESC);
+        }
+
+        if (!sort.contains(":")) {
+            throw new IllegalArgumentException("Invalid sorting parameter: " + sort);
+        }
+
+        String[] parts = sort.split(":");
+
+        return Sort.create(parts[0], Sort.Order.valueOf(parts[1].toUpperCase(Locale.ENGLISH)));
+    }
+
+    protected Search createSearch(String queryString, int limit, String filter, List<String> fieldList, Sort sorting, TimeRange timeRange) {
+        final SearchType searchType = createMessageList(sorting, limit, fieldList);
+
+        final Query query = Query.builder()
+                .query(ElasticsearchQueryString.of(queryString))
+                .filter(QueryStringFilter.builder()
+                        .query(Strings.isNullOrEmpty(filter) ? "*" : filter)
+                        .build())
+                .timerange(timeRange)
+                .searchTypes(Collections.singleton(searchType))
+                .build();
+        return Search.Builder.create()
+                .queries(ImmutableSet.of(query))
+                .build();
+    }
+
+    private SearchType createMessageList(Sort sorting, int limit, List<String> fieldList) {
+        MessageList.Builder messageListBuilder = MessageList.builder()
+                .sort(Collections.singletonList(sorting));
+        messageListBuilder = limit > 0 ? messageListBuilder.limit(limit) : messageListBuilder;
+        messageListBuilder = fieldList != null && !fieldList.isEmpty() ? messageListBuilder.fields(fieldList) : messageListBuilder;
+        return messageListBuilder.build();
+    }
+
+    protected SearchResponse extractSearchResponse(SearchJob searchJob, String query, boolean decorate, List<String> fieldList, TimeRange timeRange, Optional<String> streamId) {
+        final QueryResult queryResult = searchJob.results()
+                .values()
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Missing query result"));
+        final MessageList.Result result = queryResult.searchTypes()
+                .values()
+                .stream()
+                .findFirst()
+                .map(searchTypeResult -> (MessageList.Result)searchTypeResult)
+                .orElseThrow(() -> new IllegalStateException("Missing search type result!"));
+
+        final long tookMs = queryResult.executionStats().duration();
+
+        return buildSearchResponse(query, result, fieldList, tookMs, timeRange, decorate, streamId);
     }
 
     protected ChunkedOutput<ScrollResult.ScrollChunk> buildChunkedOutput(final ScrollResult scroll) {

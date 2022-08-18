@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import asMock from 'helpers/mocking/AsMock';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+import asMock from 'helpers/mocking/AsMock';
 import AppConfig from 'util/AppConfig';
 
 import HideOnCloud from './HideOnCloud';

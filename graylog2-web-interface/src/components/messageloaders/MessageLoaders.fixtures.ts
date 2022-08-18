@@ -17,7 +17,7 @@
 
 import { Map } from 'immutable';
 
-import { Input } from 'components/messageloaders/Types';
+import type { Input } from 'components/messageloaders/Types';
 
 export const input: Input = {
   title: 'syslog udp',

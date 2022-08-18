@@ -21,12 +21,9 @@ import com.jayway.jsonpath.JsonPath;
 import com.revinate.assertj.json.JsonPathAssert;
 import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHits;
@@ -39,7 +36,6 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -49,7 +45,7 @@ public class ESMessageListTest {
 
     @Test
     public void includesCustomNameInResultIfPresent() {
-        final ESMessageList esMessageList = new ESMessageList(new QueryStringDecorators(Collections.emptySet()));
+        final ESMessageList esMessageList = new ESMessageList();
         final MessageList messageList = someMessageList().toBuilder().name("customResult").build();
 
         final org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse result =
@@ -83,24 +79,12 @@ public class ESMessageListTest {
     }
 
     @Test
-    public void appliesDecoratorsToQueryStringIfHighlightingActivated() {
-        final QueryStringDecorator queryStringDecorator = (String queryString, SearchJob job, Query query, Set<QueryResult> results) -> "Foobar!";
-
-        final MessageList messageList = someMessageList();
-
-        ESGeneratedQueryContext queryContext = generateQueryPartWithHighlighting(messageList, Collections.singleton(queryStringDecorator));
-
-        final DocumentContext doc = JsonPath.parse(queryContext.searchSourceBuilder(messageList).toString());
-        JsonPathAssert.assertThat(doc).jsonPathAsString("$.highlight.highlight_query.query_string.query").isEqualTo("Foobar!");
-    }
-
-    @Test
     public void passesTypeOfSortingFieldAsUnmappedType() {
         final MessageList messageList = someMessageListWithSorting("stream1", "somefield");
         final ESGeneratedQueryContext context = mockQueryContext(messageList);
         when(context.fieldType(Collections.singleton("stream1"), "somefield")).thenReturn(Optional.of("long"));
 
-        final ESGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, Collections.emptySet(), context);
+        final ESGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, context);
 
         final DocumentContext doc = JsonPath.parse(queryContext.searchSourceBuilder(messageList).toString());
         JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[0].somefield.unmapped_type").isEqualTo("long");
@@ -112,7 +96,7 @@ public class ESMessageListTest {
         final ESGeneratedQueryContext context = mockQueryContext(messageList);
         when(context.fieldType(Collections.singleton("stream1"), "somefield")).thenReturn(Optional.empty());
 
-        final ESGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, Collections.emptySet(), context);
+        final ESGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, context);
 
         final DocumentContext doc = JsonPath.parse(queryContext.searchSourceBuilder(messageList).toString());
         assertThat(doc.read("$.sort[0].somefield", Map.class)).doesNotContainKey("unmapped_type");
@@ -154,21 +138,17 @@ public class ESMessageListTest {
     }
 
     private ESGeneratedQueryContext generateQueryPartWithHighlighting(MessageList messageList) {
-        return generateQueryPartFor(messageList, true, Collections.emptySet());
-    }
-
-    private ESGeneratedQueryContext generateQueryPartWithHighlighting(MessageList messageList, Set<QueryStringDecorator> decorators) {
-        return generateQueryPartFor(messageList, true, decorators);
+        return generateQueryPartFor(messageList, true);
     }
 
     private ESGeneratedQueryContext generateQueryPartWithoutHighlighting(MessageList messageList) {
-        return generateQueryPartFor(messageList, false, Collections.emptySet());
+        return generateQueryPartFor(messageList, false);
     }
 
-    private ESGeneratedQueryContext generateQueryPartFor(MessageList messageList, boolean allowHighlighting, Set<QueryStringDecorator> decorators) {
+    private ESGeneratedQueryContext generateQueryPartFor(MessageList messageList, boolean allowHighlighting) {
         final ESGeneratedQueryContext context = mockQueryContext(messageList);
 
-        return generateQueryPartWithContextFor(messageList, allowHighlighting, decorators, context);
+        return generateQueryPartWithContextFor(messageList, allowHighlighting, context);
     }
 
     private ESGeneratedQueryContext mockQueryContext(MessageList messageList) {
@@ -181,10 +161,8 @@ public class ESMessageListTest {
 
     private ESGeneratedQueryContext generateQueryPartWithContextFor(MessageList messageList,
                                                                     boolean allowHighlighting,
-                                                                    Set<QueryStringDecorator> decorators,
                                                                     ESGeneratedQueryContext context) {
         ESMessageList sut = new ESMessageList(
-                new QueryStringDecorators(decorators),
                 new LegacyDecoratorProcessor.Fake(),
                 allowHighlighting);
 

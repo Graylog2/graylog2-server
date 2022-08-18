@@ -95,7 +95,7 @@ class DataAdapterForm extends React.Component {
 
   updateState = (dataAdapter) => {
     this.setState(this._initialState(dataAdapter));
-  }
+  };
 
   _initialState = (dataAdapter) => {
     const adapter = ObjectUtils.clone(dataAdapter);
@@ -223,7 +223,7 @@ class DataAdapterForm extends React.Component {
   };
 
   _sanitizeTitle = (title) => {
-    return title.trim().replace(/\W+/g, '-').toLowerCase();
+    return title.trim().replace(/\W+/g, '-').toLocaleLowerCase();
   };
 
   _validationState = (fieldName) => {

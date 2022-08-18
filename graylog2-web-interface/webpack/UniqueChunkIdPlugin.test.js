@@ -65,7 +65,7 @@ describe('UniqueChunkIdPlugin', () => {
     const callback = compilation.hooks.optimizeChunkIds.tap.mock.calls[0][1];
     const result = callback(chunks);
 
-    expect(result).toHaveLength(2);
+    expect(result.size).toBe(2);
     expect(result).toMatchSnapshot();
   });
 
@@ -79,7 +79,7 @@ describe('UniqueChunkIdPlugin', () => {
     const callback = compilation.hooks.optimizeChunkIds.tap.mock.calls[0][1];
     const result = callback(chunks);
 
-    expect(result).toHaveLength(2);
+    expect(result.size).toBe(2);
     expect(result).toMatchSnapshot();
   });
 
@@ -93,7 +93,7 @@ describe('UniqueChunkIdPlugin', () => {
     const callback = compilation.hooks.optimizeChunkIds.tap.mock.calls[0][1];
     const result = callback(chunks);
 
-    expect(result).toHaveLength(2);
+    expect(result.size).toBe(2);
     expect(result).toMatchSnapshot();
   });
 });

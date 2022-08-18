@@ -15,17 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import { TextOverflowEllipsis } from 'components/common';
-import Widget from 'views/logic/widgets/Widget';
+import type Widget from 'views/logic/widgets/Widget';
 import timerangeToString from 'views/logic/queries/TimeRangeToString';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { useStore } from 'stores/connect';
 import { SearchStore } from 'views/stores/SearchStore';
-import TimeLocalizeContext from 'contexts/TimeLocalizeContext';
 import { GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
+import useUserDateTime from 'hooks/useUserDateTime';
+import type { DateTime } from 'util/DateTime';
 
 type Props = {
   className?: string,
@@ -44,19 +44,21 @@ const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) => resul
   .searchTypes[searchTypeId]?.effective_timerange;
 
 const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
-  const { localizeTime } = useContext(TimeLocalizeContext);
+  const { formatTime } = useUserDateTime();
   const { result, widgetMapping } = useStore(SearchStore);
   const globalOverride = useStore(GlobalOverrideStore);
 
+  const toLocalTimeWithMS = (dateTime: DateTime) => formatTime(dateTime, 'complete');
+  const toInternalTime = (dateTime: DateTime) => formatTime(dateTime, 'internal');
   const globalTimerangeString = globalOverride?.timerange
-    ? `Global Override: ${timerangeToString(globalOverride.timerange)}` : undefined;
+    ? `Global Override: ${timerangeToString(globalOverride.timerange, toLocalTimeWithMS)}` : undefined;
 
-  const configuredTimerange = timerangeToString(widget.timerange || DEFAULT_TIMERANGE, localizeTime);
+  const configuredTimerange = timerangeToString(widget.timerange || DEFAULT_TIMERANGE, toLocalTimeWithMS);
 
   const searchTypeId = widgetId ? widgetMapping?.get(widgetId)?.first() : undefined;
 
   const effectiveTimerange = (activeQuery && searchTypeId) ? getEffectiveWidgetTimerange(result, activeQuery, searchTypeId) : undefined;
-  const effectiveTimerangeString = effectiveTimerange ? timerangeToString(effectiveTimerange, localizeTime) : 'Effective widget time range is currently not available.';
+  const effectiveTimerangeString = effectiveTimerange ? timerangeToString(effectiveTimerange, toInternalTime) : 'Effective widget time range is currently not available.';
 
   return (
     <Wrapper className={className}>

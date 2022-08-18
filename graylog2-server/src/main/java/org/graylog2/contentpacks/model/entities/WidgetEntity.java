@@ -24,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -70,6 +71,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_FILTER = "filter";
+    public static final String FIELD_SEARCH_FILTERS = "filters";
     public static final String FIELD_CONFIG = "config";
     public static final String FIELD_TIMERANGE = "timerange";
     public static final String FIELD_QUERY = "query";
@@ -84,6 +86,9 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
     @JsonProperty(FIELD_FILTER)
     @Nullable
     public abstract String filter();
+
+    @JsonProperty(FIELD_SEARCH_FILTERS)
+    public abstract List<UsedSearchFilter> filters();
 
     @JsonProperty(FIELD_TIMERANGE)
     public abstract Optional<TimeRange> timerange();
@@ -112,6 +117,9 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         @JsonProperty(FIELD_FILTER)
         public abstract Builder filter(@Nullable String filter);
 
+        @JsonProperty(FIELD_SEARCH_FILTERS)
+        public abstract Builder filters(List<UsedSearchFilter> filters);
+
         @JsonProperty(FIELD_TIMERANGE)
         public abstract Builder timerange(@Nullable TimeRange timerange);
 
@@ -133,7 +141,9 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
 
         @JsonCreator
         static Builder builder() {
-            return new AutoValue_WidgetEntity.Builder().streams(Collections.emptySet());
+            return new AutoValue_WidgetEntity.Builder()
+                    .streams(Collections.emptySet())
+                    .filters(Collections.emptyList());
         }
     }
 
@@ -142,6 +152,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         final WidgetDTO.Builder widgetBuilder = WidgetDTO.builder()
                 .config(this.config())
                 .filter(this.filter())
+                .filters(this.filters())
                 .id(this.id())
                 .streams(this.streams().stream()
                         .map(id -> EntityDescriptor.create(id, ModelTypes.STREAM_V1))

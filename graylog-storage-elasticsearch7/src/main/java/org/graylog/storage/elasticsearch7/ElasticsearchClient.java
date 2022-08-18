@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch7;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.Streams;
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.config.RequestConfig;
@@ -25,15 +26,21 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSe
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RequestOptions;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.ResponseException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
+import org.graylog.storage.elasticsearch7.errors.ResponseError;
+import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -43,14 +50,19 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class ElasticsearchClient {
     private static final Pattern invalidWriteTarget = Pattern.compile("no write index is defined for alias \\[(?<target>[\\w_]+)\\]");
 
+    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchClient.class);
+
     private final RestHighLevelClient client;
     private final boolean compressionEnabled;
+    private final ObjectMapper objectMapper;
 
     @Inject
     public ElasticsearchClient(RestHighLevelClient client,
-                               @Named("elasticsearch_compression_enabled") boolean compressionEnabled) {
+                               @Named("elasticsearch_compression_enabled") boolean compressionEnabled,
+                               ObjectMapper objectMapper) {
         this.client = client;
         this.compressionEnabled = compressionEnabled;
+        this.objectMapper = objectMapper;
     }
 
     public SearchResponse search(SearchRequest searchRequest, String errorMessage) {
@@ -136,6 +148,9 @@ public class ElasticsearchClient {
                     throw InvalidWriteTargetException.create(target);
                 }
             }
+            if (isBatchSizeTooLargeException(elasticsearchException)) {
+                throw new BatchSizeTooLargeException(elasticsearchException.getMessage());
+            }
         }
         return new ElasticsearchException(errorMessage, e);
     }
@@ -159,8 +174,21 @@ public class ElasticsearchClient {
         }
     }
 
-    private boolean isIndexNotFoundException(ElasticsearchException e) {
-        return e.getMessage().contains("index_not_found_exception");
+    private boolean isIndexNotFoundException(ElasticsearchException elasticsearchException) {
+        return elasticsearchException.getMessage().contains("index_not_found_exception");
+    }
+
+    private boolean isBatchSizeTooLargeException(ElasticsearchException elasticsearchException) {
+        try {
+            final ParsedElasticsearchException parsedException = ParsedElasticsearchException.from(elasticsearchException.getMessage());
+            if (parsedException.type().equals("search_phase_execution_exception")) {
+                ParsedElasticsearchException parsedCause = ParsedElasticsearchException.from(elasticsearchException.getRootCause().getMessage());
+                return parsedCause.reason().contains("Batch size is too large");
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
     }
 
     public static RequestOptions withTimeout(RequestOptions requestOptions, Duration timeout) {
@@ -177,5 +205,23 @@ public class ElasticsearchClient {
                 .setRequestConfig(requestConfigWithTimeout)
                 .build();
 
+    }
+
+    public Optional<ResponseError> parseResponseException(ElasticsearchException ex) {
+        if (ex.getCause() != null) {
+            final Throwable[] suppressed = ex.getCause().getSuppressed();
+            if (suppressed.length > 0) {
+                final Throwable realCause = suppressed[0];
+                if (realCause instanceof ResponseException) {
+                    try {
+                        final ResponseError err = objectMapper.readValue(((ResponseException) realCause).getResponse().getEntity().getContent(), ResponseError.class);
+                        return Optional.of(err);
+                    } catch (IOException ioe) {
+                        LOG.warn("Failed to parse exception", ioe);
+                    }
+                }
+            }
+        }
+        return Optional.empty();
     }
 }

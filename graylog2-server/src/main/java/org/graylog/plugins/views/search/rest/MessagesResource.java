@@ -16,8 +16,6 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,24 +39,30 @@ import org.graylog.plugins.views.search.export.ResultFormat;
 import org.graylog.plugins.views.search.export.SearchExportJob;
 import org.graylog.plugins.views.search.export.SearchTypeExportJob;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
-import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.validation.QueryValidationService;
+import org.graylog.plugins.views.search.validation.ValidationMessage;
+import org.graylog.plugins.views.search.validation.ValidationRequest;
+import org.graylog.plugins.views.search.validation.ValidationResponse;
+import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
+import org.joda.time.DateTimeZone;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import java.io.UnsupportedEncodingException;
-import java.util.Map;
+import javax.ws.rs.core.Context;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -66,13 +70,12 @@ import java.util.function.Function;
 @Path("/views/search/messages")
 @RequiresAuthentication
 public class MessagesResource extends RestResource implements PluginRestResource {
-
+    private static final DateTimeZone FALLBACK_TIME_ZONE = DateTimeZone.UTC;
     private final CommandFactory commandFactory;
     private final SearchDomain searchDomain;
     private final SearchExecutionGuard executionGuard;
-    private final PermittedStreams permittedStreams;
-    private final ObjectMapper objectMapper;
     private final ExportJobService exportJobService;
+    private final QueryValidationService queryValidationService;
 
     //allow mocking
     Function<Consumer<Consumer<SimpleMessageChunk>>, ChunkedOutput<SimpleMessageChunk>> asyncRunner = ChunkedRunner::runAsync;
@@ -84,16 +87,13 @@ public class MessagesResource extends RestResource implements PluginRestResource
             CommandFactory commandFactory,
             SearchDomain searchDomain,
             SearchExecutionGuard executionGuard,
-            PermittedStreams permittedStreams,
-            ObjectMapper objectMapper,
             @SuppressWarnings("UnstableApiUsage") EventBus eventBus,
-            ExportJobService exportJobService) {
+            ExportJobService exportJobService, QueryValidationService queryValidationService) {
         this.commandFactory = commandFactory;
         this.searchDomain = searchDomain;
         this.executionGuard = executionGuard;
-        this.permittedStreams = permittedStreams;
-        this.objectMapper = objectMapper;
         this.exportJobService = exportJobService;
+        this.queryValidationService = queryValidationService;
         this.messagesExporterFactory = context -> new AuditingMessagesExporter(context, eventBus, exporter);
     }
 
@@ -104,23 +104,47 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @POST
     @Produces(MoreMediaTypes.TEXT_CSV)
     @NoAuditEvent("Has custom audit events")
-    public ChunkedOutput<SimpleMessageChunk> retrieve(@ApiParam @Valid MessagesRequest rawrequest) {
-        final MessagesRequest request = fillInIfNecessary(rawrequest);
+    public ChunkedOutput<SimpleMessageChunk> retrieve(@ApiParam @Valid MessagesRequest rawrequest,
+                                                      @Context SearchUser searchUser) {
 
-        executionGuard.checkUserIsPermittedToSeeStreams(request.streams(), this::hasStreamReadPermission);
+        final MessagesRequest request = fillInIfNecessary(rawrequest, searchUser);
 
-        ExportMessagesCommand command = commandFactory.buildFromRequest(request);
+        final ValidationRequest.Builder validationReq = ValidationRequest.builder();
+        Optional.ofNullable(rawrequest.queryString()).ifPresent(validationReq::query);
+        Optional.ofNullable(rawrequest.timeRange()).ifPresent(validationReq::timerange);
+        Optional.ofNullable(rawrequest.streams()).ifPresent(validationReq::streams);
+        final ValidationResponse validationResponse = queryValidationService.validate(validationReq.build());
+        if (validationResponse.status().equals(ValidationStatus.ERROR)) {
+            validationResponse.explanations().stream().findFirst().map(ValidationMessage::errorMessage).ifPresent(message -> {
+                throw new BadRequestException("Request validation failed: " + message);
+            });
+        }
+
+        executionGuard.checkUserIsPermittedToSeeStreams(request.streams(), searchUser::canReadStream);
+
+         ExportMessagesCommand command = commandFactory.buildFromRequest(request);
 
         return asyncRunner.apply(chunkConsumer -> exporter().export(command, chunkConsumer));
     }
 
-    private MessagesRequest fillInIfNecessary(MessagesRequest requestFromClient) {
+    private MessagesRequest fillInIfNecessary(MessagesRequest requestFromClient, SearchUser searchUser) {
         MessagesRequest request = requestFromClient != null ? requestFromClient : MessagesRequest.withDefaults();
 
         if (request.streams().isEmpty()) {
-            request = request.toBuilder().streams(loadAllAllowedStreamsForUser()).build();
+            request = request.withStreams(searchUser.streams().loadAll());
         }
+
+        if (!request.timeZone().isPresent()) {
+            request = request.withTimeZone(searchUser.timeZone().orElse(FALLBACK_TIME_ZONE));
+        }
+
         return request;
+    }
+
+    private ResultFormat fillInIfNecessary(ResultFormat resultFormat, SearchUser searchUser) {
+        return resultFormat.timeZone().isPresent()
+                ? resultFormat
+                : resultFormat.withTimeZone(searchUser.timeZone().orElse(FALLBACK_TIME_ZONE));
     }
 
     @ApiOperation(value = "Export a search result as CSV")
@@ -130,10 +154,11 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @NoAuditEvent("Has custom audit events")
     public ChunkedOutput<SimpleMessageChunk> retrieveForSearch(
             @ApiParam(value = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
-            @ApiParam(value = "Optional overrides") @Valid ResultFormat formatFromClient) {
-        ResultFormat format = emptyIfNull(formatFromClient);
+            @ApiParam(value = "Optional overrides") @Valid ResultFormat formatFromClient,
+            @Context SearchUser searchUser) {
+        ResultFormat format = fillInIfNecessary(emptyIfNull(formatFromClient), searchUser);
 
-        Search search = loadSearch(searchId, format.executionState());
+        Search search = loadSearch(searchId, format.executionState(), searchUser);
 
         ExportMessagesCommand command = commandFactory.buildWithSearchOnly(search, format);
 
@@ -147,10 +172,11 @@ public class MessagesResource extends RestResource implements PluginRestResource
     public ChunkedOutput<SimpleMessageChunk> retrieveForSearchType(
             @ApiParam(value = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
             @ApiParam(value = "ID of a Message Table contained in the Search", name = "searchTypeId") @PathParam("searchTypeId") String searchTypeId,
-            @ApiParam(value = "Optional overrides") @Valid ResultFormat formatFromClient) {
-        ResultFormat format = emptyIfNull(formatFromClient);
+            @ApiParam(value = "Optional overrides") @Valid ResultFormat formatFromClient,
+            @Context SearchUser searchUser) {
+        ResultFormat format = fillInIfNecessary(emptyIfNull(formatFromClient), searchUser);
 
-        Search search = loadSearch(searchId, format.executionState());
+        Search search = loadSearch(searchId, format.executionState(), searchUser);
 
         ExportMessagesCommand command = commandFactory.buildWithMessageList(search, searchTypeId, format);
 
@@ -159,29 +185,32 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
     @ApiOperation("Retrieve results for export job")
     @GET
-    @Path("job/{exportJobId}/{filename:.*}")
+    @Path("job/{exportJobId}/{filename}")
     public ChunkedOutput<SimpleMessageChunk> retrieveForExportJob(@ApiParam(value = "ID of an existing export job", name = "exportJobId")
-                                         @PathParam("exportJobId") String exportJobId) throws UnsupportedEncodingException {
+                                                                  @PathParam("exportJobId") String exportJobId,
+                                                                  @ApiParam(value = "Resulting filename", name = "filename")
+                                                                  @PathParam("filename") String filename,
+                                                                  @Context SearchUser searchUser) {
         final ExportJob exportJob = exportJobService.get(exportJobId)
                 .orElseThrow(() -> new NotFoundException("Unable to find export job with id <" + exportJobId + ">!"));
 
-        return outputFor(exportJob);
+        return outputFor(exportJob, searchUser);
     }
 
-    private ChunkedOutput<SimpleMessageChunk> outputFor(ExportJob exportJob) {
+    private ChunkedOutput<SimpleMessageChunk> outputFor(ExportJob exportJob, SearchUser searchUser) {
         if (exportJob instanceof MessagesRequestExportJob) {
             final MessagesRequest messagesRequest = ((MessagesRequestExportJob) exportJob).messagesRequest();
-            return this.retrieve(messagesRequest);
+            return this.retrieve(messagesRequest, searchUser);
         }
 
         if (exportJob instanceof SearchExportJob) {
             final SearchExportJob searchExportJob = (SearchExportJob) exportJob;
-            return this.retrieveForSearch(searchExportJob.searchId(), searchExportJob.resultFormat());
+            return this.retrieveForSearch(searchExportJob.searchId(), searchExportJob.resultFormat(), searchUser);
         }
 
         if (exportJob instanceof SearchTypeExportJob) {
-            final SearchTypeExportJob searchTypeExportJob = (SearchTypeExportJob)exportJob;
-            return this.retrieveForSearchType(searchTypeExportJob.searchId(), searchTypeExportJob.searchTypeId(), searchTypeExportJob.resultFormat());
+            final SearchTypeExportJob searchTypeExportJob = (SearchTypeExportJob) exportJob;
+            return this.retrieveForSearchType(searchTypeExportJob.searchId(), searchTypeExportJob.searchTypeId(), searchTypeExportJob.resultFormat(), searchUser);
         }
 
         throw new IllegalStateException("Invalid type of export job: " + exportJob.getClass());
@@ -207,28 +236,16 @@ public class MessagesResource extends RestResource implements PluginRestResource
         return format == null ? ResultFormat.empty() : format;
     }
 
-    private Search loadSearch(String searchId, Map<String, Object> executionState) {
-        Search search = searchDomain.getForUser(searchId, getCurrentUser(), this::hasViewReadPermission)
+    private Search loadSearch(String searchId, ExecutionState executionState, SearchUser searchUser) {
+        Search search = searchDomain.getForUser(searchId, searchUser)
                 .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
 
-        search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
+        search = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadAll());
 
-        search = search.applyExecutionState(objectMapper, executionState);
+        search = search.applyExecutionState(executionState);
 
-        executionGuard.check(search, this::hasStreamReadPermission);
+        executionGuard.check(search, searchUser::canReadStream);
 
         return search;
-    }
-
-    private boolean hasViewReadPermission(ViewDTO view) {
-        return isPermitted(ViewsRestPermissions.VIEW_READ, view.id());
-    }
-
-    private ImmutableSet<String> loadAllAllowedStreamsForUser() {
-        return permittedStreams.load(this::hasStreamReadPermission);
-    }
-
-    private boolean hasStreamReadPermission(String streamId) {
-        return isPermitted(RestPermissions.STREAMS_READ, streamId);
     }
 }

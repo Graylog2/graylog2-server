@@ -17,9 +17,11 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import { Button } from 'components/bootstrap';
 import timerangeToString from 'views/logic/queries/TimeRangeToString';
+import type { DateTime } from 'util/DateTime';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import TimeRangeButton from './TimeRangeButton';
 
@@ -62,16 +64,22 @@ type Props = {
   value: TimeRange,
 };
 
-const WidgetTimeRangeOverride = ({ value, onReset }: Props) => (
-  <Wrapper>
-    <TimeRangeButton disabled />
-    <TimeRangeInfo>
-      <TimeRangeString>{timerangeToString(value)}</TimeRangeString>
-      <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-time-range">
-        Reset Global Override
-      </ResetButton>
-    </TimeRangeInfo>
-  </Wrapper>
-);
+const WidgetTimeRangeOverride = ({ value, onReset }: Props) => {
+  const { formatTime } = useUserDateTime();
+  const localTimeWithMS = timerangeToString(value, (dateTime: DateTime) => formatTime(dateTime, 'complete'));
+  const internalTime = timerangeToString(value, (dateTime: DateTime) => formatTime(dateTime, 'internal'));
+
+  return (
+    <Wrapper>
+      <TimeRangeButton disabled />
+      <TimeRangeInfo>
+        <TimeRangeString title={internalTime}>{localTimeWithMS}</TimeRangeString>
+        <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-time-range">
+          Reset Global Override
+        </ResetButton>
+      </TimeRangeInfo>
+    </Wrapper>
+  );
+};
 
 export default WidgetTimeRangeOverride;

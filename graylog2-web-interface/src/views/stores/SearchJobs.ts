@@ -16,8 +16,8 @@
  */
 import fetch from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
-import Search from 'views/logic/search/Search';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type Search from 'views/logic/search/Search';
+import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 const executeQueryUrl = (id) => URLUtils.qualifyUrl(`/views/search/${id}/execute`);
 const jobStatusUrl = (jobId) => URLUtils.qualifyUrl(`/views/search/status/${jobId}`);

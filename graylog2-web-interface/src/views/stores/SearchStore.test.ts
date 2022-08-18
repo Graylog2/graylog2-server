@@ -16,7 +16,6 @@
  */
 import asMock from 'helpers/mocking/AsMock';
 import { MockStore } from 'helpers/mocking';
-
 import fetch from 'logic/rest/FetchProvider';
 import Search from 'views/logic/search/Search';
 
@@ -27,7 +26,7 @@ jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore(
 
 describe('SearchStore', () => {
   it('assigns a new search id when creating a search', () => {
-    asMock(fetch).mockImplementation((method: string, url: string, body: any) => Promise.resolve(body && JSON.parse(body)));
+    asMock(fetch).mockImplementation((_method: string, _url: string, body: any) => Promise.resolve(body && JSON.parse(body)));
     const newSearch = Search.create();
 
     return SearchActions.create(newSearch).then(({ search }) => {

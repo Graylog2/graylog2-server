@@ -17,14 +17,15 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
-import SharedEntity from 'logic/permissions/SharedEntity';
+import type SharedEntity from 'logic/permissions/SharedEntity';
 import { Alert } from 'components/bootstrap';
 import { Pagination, PageSizeSelect } from 'components/common';
-import EntityShareState, { ActiveShares, CapabilitiesList, SelectedGrantees } from 'logic/permissions/EntityShareState';
-import Grantee from 'logic/permissions/Grantee';
-import Capability from 'logic/permissions/Capability';
+import type { ActiveShares, CapabilitiesList, SelectedGrantees } from 'logic/permissions/EntityShareState';
+import type EntityShareState from 'logic/permissions/EntityShareState';
+import type Grantee from 'logic/permissions/Grantee';
+import type Capability from 'logic/permissions/Capability';
 
 import GranteesListItem from './GranteesListItem';
 
@@ -77,6 +78,7 @@ type Props = {
   }) => Promise<EntityShareState | undefined | null>,
   selectedGrantees: SelectedGrantees,
   title: string,
+  entityTypeTitle?: string | null | undefined,
 };
 
 const _paginatedGrantees = (selectedGrantees: SelectedGrantees, pageSize: number, currentPage: number) => {
@@ -86,7 +88,7 @@ const _paginatedGrantees = (selectedGrantees: SelectedGrantees, pageSize: number
   return selectedGrantees.slice(begin, end);
 };
 
-const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, availableCapabilities, selectedGrantees, className, title }: Props) => {
+const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, entityTypeTitle, availableCapabilities, selectedGrantees, className, title }: Props) => {
   const initialPageSize = PageSizeSelect.defaultPageSizes[0];
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [currentPage, setCurrentPage] = useState(1);
@@ -119,7 +121,7 @@ const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, 
           })}
         </List>
       ) : (
-        <Alert>This {entityType} has no collaborators.</Alert>
+        <Alert>This {entityTypeTitle || entityType} has no collaborators.</Alert>
       )}
       <PaginationWrapper>
         <StyledPagination totalPages={totalPages}
@@ -132,6 +134,7 @@ const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, 
 
 GranteesList.defaultProps = {
   className: undefined,
+  entityTypeTitle: undefined,
 };
 
 export default GranteesList;

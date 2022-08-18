@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import * as Immutable from 'immutable';
 
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
@@ -31,10 +31,18 @@ const WidgetFieldTypesContextProvider = ({ children }: Props) => {
   const { timerange, streams } = useContext(WidgetContext);
   const query = useCurrentQuery();
   const { data: fieldTypes } = useFieldTypes(streams, timerange);
-  const fieldTypesList = Immutable.List(fieldTypes);
+
+  const fieldTypesContextValue = useMemo(() => {
+    const fieldTypesList = Immutable.List(fieldTypes);
+
+    return ({
+      all: fieldTypesList,
+      queryFields: Immutable.Map({ [query.id]: fieldTypesList }),
+    });
+  }, [fieldTypes, query.id]);
 
   return (
-    <FieldTypesContext.Provider value={{ all: fieldTypesList, queryFields: Immutable.Map({ [query.id]: fieldTypesList }) }}>
+    <FieldTypesContext.Provider value={fieldTypesContextValue}>
       {children}
     </FieldTypesContext.Provider>
   );

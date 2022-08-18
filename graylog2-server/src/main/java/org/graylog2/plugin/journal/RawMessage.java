@@ -129,6 +129,10 @@ public class RawMessage implements Serializable {
 
     @Nullable
     public static RawMessage decode(final byte[] buffer, final Object messageQueueId) {
+        if (buffer == null) {
+            log.error("Cannot read <null> message from journal, ignoring this message.");
+            return null;
+        }
         try {
             final JournalMessage journalMessage = JournalMessage.parseFrom(buffer);
 

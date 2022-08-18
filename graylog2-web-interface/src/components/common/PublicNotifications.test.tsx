@@ -16,10 +16,10 @@
  */
 import React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
-import { Notifications } from 'theme/types';
-import { asMock } from 'helpers/mocking';
-import { PluginExports } from 'graylog-web-plugin/plugin';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 
+import type { Notifications } from 'theme/types';
+import { asMock } from 'helpers/mocking';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
 import PublicNotifications from './PublicNotifications';
@@ -44,6 +44,17 @@ const mockedNotifications = {
     variant: 'danger',
     hiddenTitle: false,
     isActive: true,
+    isGlobal: true,
+    isDismissible: true,
+  },
+  '6075a2999f4efa083977b75c': {
+    title: 'Inactive alert',
+    shortMessage: 'inactive alert',
+    longMessage: 'inactive alert should be visible',
+    atLogin: true,
+    variant: 'danger',
+    hiddenTitle: false,
+    isActive: false,
     isGlobal: true,
     isDismissible: true,
   },
@@ -95,7 +106,7 @@ const beforeMock = () => {
 describe('PublicNotifications', () => {
   beforeEach(beforeMock);
 
-  it('should render notifications', () => {
+  it('should render all active notifications', () => {
     render(<PublicNotifications />);
 
     const alerts = screen.getAllByRole('alert');

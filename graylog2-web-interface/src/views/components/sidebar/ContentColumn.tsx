@@ -17,8 +17,8 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
-import { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
+import type { SearchPreferencesLayout } from 'views/components/contexts/SearchPagePreferencesContext';
+import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import { IconButton } from 'components/common';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import viewTitle from 'views/logic/views/ViewTitle';
@@ -26,7 +26,7 @@ import viewTitle from 'views/logic/views/ViewTitle';
 type Props = {
   children: React.ReactNode,
   closeSidebar: () => void,
-  searchPageLayout: SearchPageLayout | undefined | null,
+  searchPageLayout: SearchPreferencesLayout | undefined | null,
   sectionTitle: string,
   viewMetadata: ViewMetadata,
 };

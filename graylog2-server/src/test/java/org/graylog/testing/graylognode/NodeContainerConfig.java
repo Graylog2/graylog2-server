@@ -17,9 +17,14 @@
 package org.graylog.testing.graylognode;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.graylog.testing.completebackend.MavenProjectDirProvider;
+import org.graylog.testing.completebackend.PluginJarsProvider;
+import org.graylog2.storage.SearchVersion;
 import org.testcontainers.containers.Network;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class NodeContainerConfig {
 
@@ -29,17 +34,23 @@ public class NodeContainerConfig {
 
     public final Network network;
     public final String mongoDbUri;
-    public final String elasticsearchVersion;
+    public final SearchVersion elasticsearchVersion;
     public final String elasticsearchUri;
     public final int[] extraPorts;
     public final boolean enableDebugging;
     public final boolean skipPackaging;
+    public final PluginJarsProvider pluginJarsProvider;
+    public final MavenProjectDirProvider mavenProjectDirProvider;
+    private final List<String> enabledFeatureFlags;
 
-    public static NodeContainerConfig create(Network network, String mongoDbUri, String elasticsearchUri, String elasticsearchVersion, int[] extraPorts) {
-        return new NodeContainerConfig(network, mongoDbUri, elasticsearchUri, elasticsearchVersion, extraPorts);
-    }
-
-    public NodeContainerConfig(Network network, String mongoDbUri, String elasticsearchUri, String elasticsearchVersion, int[] extraPorts) {
+    public NodeContainerConfig(Network network,
+                               String mongoDbUri,
+                               String elasticsearchUri,
+                               SearchVersion elasticsearchVersion,
+                               int[] extraPorts,
+                               PluginJarsProvider pluginJarsProvider,
+                               MavenProjectDirProvider mavenProjectDirProvider,
+                               List<String> enabledFeatureFlags) {
         this.network = network;
         this.mongoDbUri = mongoDbUri;
         this.elasticsearchUri = elasticsearchUri;
@@ -47,6 +58,9 @@ public class NodeContainerConfig {
         this.extraPorts = extraPorts == null ? new int[0] : extraPorts;
         this.enableDebugging = flagFromEnvVar("GRAYLOG_IT_DEBUG_SERVER");
         this.skipPackaging = flagFromEnvVar("GRAYLOG_IT_SKIP_PACKAGING");
+        this.pluginJarsProvider = pluginJarsProvider;
+        this.mavenProjectDirProvider = mavenProjectDirProvider;
+        this.enabledFeatureFlags = enabledFeatureFlags == null ? Collections.emptyList() : enabledFeatureFlags;
     }
 
     private static boolean flagFromEnvVar(String flagName) {
@@ -63,5 +77,9 @@ public class NodeContainerConfig {
         }
 
         return Arrays.stream(allPorts).boxed().toArray(Integer[]::new);
+    }
+
+    public List<String> getEnabledFeatureFlags() {
+        return enabledFeatureFlags;
     }
 }

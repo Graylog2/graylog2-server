@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.search;
 
+import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
@@ -48,13 +49,16 @@ public class SearchResourceTest {
     @Mock
     private DecoratorProcessor decoratorProcessor;
 
+    @Mock
+    private SearchExecutor searchExecutor;
+
     private SearchResource searchResource;
     private Period queryLimitPeriod;
 
     @Before
     public void setUp() {
         queryLimitPeriod = Period.parse("P1D");
-        searchResource = new SearchResource(searches, clusterConfigService, decoratorProcessor) {
+        searchResource = new SearchResource(searches, clusterConfigService, decoratorProcessor, searchExecutor) {
         };
 
         when(clusterConfigService.get(SearchesClusterConfig.class)).thenReturn(SearchesClusterConfig.createDefault()
@@ -87,7 +91,7 @@ public class SearchResourceTest {
                 .queryTimeRangeLimit(Period.ZERO)
                 .build());
 
-        final SearchResource resource = new SearchResource(searches, clusterConfigService, decoratorProcessor) {
+        final SearchResource resource = new SearchResource(searches, clusterConfigService, decoratorProcessor, searchExecutor) {
         };
 
         final DateTime from = new DateTime(2015, 1, 15, 12, 0, DateTimeZone.UTC);

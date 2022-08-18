@@ -14,28 +14,36 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import uuid from 'uuid/v4';
 import { Set } from 'immutable';
-import { $Shape } from 'utility-types';
+import type { $Shape } from 'utility-types';
 
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import Pivot, { TimeConfigType, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
 import type { Definition } from 'views/logic/aggregationbuilder/Series';
-import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { TimeConfigType, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
+import type Pivot from 'views/logic/aggregationbuilder/Pivot';
+import type NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type { TimeUnit } from 'views/Constants';
+import generateId from 'logic/generateId';
 
-import SortConfig from '../../aggregationbuilder/SortConfig';
+import type SortConfig from '../../aggregationbuilder/SortConfig';
 
 const mapTimeunit = (unit: TimeUnit) => {
   switch (unit) {
-    case 'seconds': return 's';
-    case 'minutes': return 'm';
-    case 'hours': return 'h';
-    case 'days': return 'd';
-    case 'weeks': return 'w';
-    case 'months': return 'M';
-    default: throw new Error(`Invalid time unit: ${unit}`);
+    case 'seconds':
+      return 's';
+    case 'minutes':
+      return 'm';
+    case 'hours':
+      return 'h';
+    case 'days':
+      return 'd';
+    case 'weeks':
+      return 'w';
+    case 'months':
+      return 'M';
+    default:
+      throw new Error(`Invalid time unit: ${unit}`);
   }
 };
 
@@ -61,7 +69,11 @@ const formatPivot = (pivot: Pivot): FormattedPivot => {
         const { interval } = config as TimeConfigType;
 
         const { unit, value } = (interval as TimeUnitConfig);
-        (newConfig as { interval: FormattedInterval }).interval = { type: 'timeunit', timeunit: `${value}${mapTimeunit(unit)}` };
+
+        (newConfig as { interval: FormattedInterval }).interval = {
+          type: 'timeunit',
+          timeunit: `${value}${mapTimeunit(unit)}`,
+        };
       }
 
       break;
@@ -79,7 +91,13 @@ type FormattedSeries = $Shape<{
   id: string,
 } & Definition>;
 
-const generateConfig = (id: string, name: string, { rollup, rowPivots, columnPivots, series, sort }: AggregationWidgetConfig) => ({
+const generateConfig = (id: string, name: string, {
+  rollup,
+  rowPivots,
+  columnPivots,
+  series,
+  sort,
+}: AggregationWidgetConfig) => ({
   id,
   name,
   type: 'pivot',
@@ -94,7 +112,7 @@ const generateConfig = (id: string, name: string, { rollup, rowPivots, columnPiv
 });
 
 export default ({ config }: { config: AggregationWidgetConfig }) => {
-  const chartConfig = generateConfig(uuid(), 'chart', config);
+  const chartConfig = generateConfig(generateId(), 'chart', config);
 
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const configBuilder = ConfigBuilder.create([chartConfig]);
@@ -102,7 +120,7 @@ export default ({ config }: { config: AggregationWidgetConfig }) => {
   // TODO: This should go into a visualization config specific function
   if (config.visualization === 'numeric' && config.visualizationConfig && (config.visualizationConfig as NumberVisualizationConfig).trend) {
     const trendConfig = {
-      ...(generateConfig(uuid(), 'trend', config)),
+      ...(generateConfig(generateId(), 'trend', config)),
       timerange: { type: 'offset', source: 'search_type', id: chartConfig.id },
     };
 
@@ -111,7 +129,7 @@ export default ({ config }: { config: AggregationWidgetConfig }) => {
 
   if (config.eventAnnotation) {
     const eventAnnotationConfig = {
-      id: uuid(),
+      id: generateId(),
       name: 'events',
       type: 'events',
     };

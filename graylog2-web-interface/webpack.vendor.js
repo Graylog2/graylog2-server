@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // webpack.vendor.js
-const webpack = require('webpack');
 const path = require('path');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
+const webpack = require('webpack');
 const AssetsPlugin = require('assets-webpack-plugin');
 const merge = require('webpack-merge');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -41,9 +41,13 @@ const webpackConfig = {
     vendor: vendorModules,
   },
   output: {
+    publicPath: '',
     path: BUILD_PATH,
     filename: '[name].js',
     library: '__[name]',
+    clean: {
+      keep: /vendor-module\.json/,
+    },
   },
   plugins: [
     new webpack.DllPlugin({
@@ -52,7 +56,7 @@ const webpackConfig = {
     }),
     new AssetsPlugin({
       filename: 'vendor-module.json',
-      path: BUILD_PATH,
+      useCompilerPath: true,
       processOutput(assets) {
         const jsfiles = [];
         const cssfiles = [];
@@ -91,8 +95,9 @@ if (TARGET.startsWith('build')) {
   module.exports = merge(webpackConfig, {
     mode: 'production',
     optimization: {
+      concatenateModules: false,
+      sideEffects: false,
       minimizer: [new TerserPlugin({
-        sourceMap: true,
         terserOptions: {
           compress: {
             warnings: false,
@@ -107,7 +112,6 @@ if (TARGET.startsWith('build')) {
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production'),
       }),
-      new CleanWebpackPlugin(),
       new webpack.LoaderOptionsPlugin({
         minimize: true,
       }),

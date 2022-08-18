@@ -84,8 +84,7 @@ public class FailureSubmissionService {
     }
 
     private boolean submitProcessingErrorsInternal(Message message, List<Message.ProcessingError> processingErrors) {
-        if (!failureHandlingConfiguration.submitProcessingFailures()) {
-            // We don't handle processing errors
+        if (processingErrors.isEmpty()) {
             return true;
         }
 
@@ -94,9 +93,11 @@ public class FailureSubmissionService {
             return true;
         }
 
-        if (processingErrors.isEmpty()) {
+        if (!failureHandlingConfiguration.submitProcessingFailures()) {
+            // We don't handle processing errors
             return true;
         }
+
         if (!failureHandlingConfiguration.keepFailedMessageDuplicate()) {
             message.setFilterOut(true);
         }

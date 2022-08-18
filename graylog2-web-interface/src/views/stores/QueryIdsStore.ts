@@ -16,11 +16,12 @@
  */
 import Reflux from 'reflux';
 import { isEqual } from 'lodash';
-import { OrderedSet } from 'immutable';
+import type { OrderedSet } from 'immutable';
 
 import { singletonStore } from 'logic/singleton';
 
-import { ViewStore, ViewStoreState } from './ViewStore';
+import type { ViewStoreState } from './ViewStore';
+import { ViewStore } from './ViewStore';
 
 // eslint-disable-next-line import/prefer-default-export
 export const QueryIdsStore = singletonStore(

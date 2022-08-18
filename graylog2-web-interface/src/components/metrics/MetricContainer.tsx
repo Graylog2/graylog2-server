@@ -21,7 +21,7 @@ import TimeHelper from 'util/TimeHelper';
 import connect from 'stores/connect';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import type { ClusterMetric } from 'stores/metrics/MetricsStore';
-import { Store } from 'stores/StoreTypes';
+import type { Store } from 'stores/StoreTypes';
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
 type Props = {

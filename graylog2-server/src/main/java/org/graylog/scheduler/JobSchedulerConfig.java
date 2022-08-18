@@ -20,12 +20,6 @@ package org.graylog.scheduler;
  * Used by the scheduler to configure itself.
  */
 public interface JobSchedulerConfig {
-    /**
-     * Determines if the scheduler can start.
-     *
-     * @return true if the scheduler can be started, false otherwise
-     */
-    boolean canStart();
 
     /**
      * Determines if the scheduler can execute the next loop iteration.

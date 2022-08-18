@@ -26,12 +26,14 @@ import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.TermsQueryBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.TermsQueryBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch6.TimeRangeQueryFactory;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.Message;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,10 +49,10 @@ import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
-import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
-import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.termsQuery;
+import static org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
+import static org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders.termsQuery;
 import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 
 @SuppressWarnings("rawtypes")
@@ -77,11 +79,11 @@ public class ElasticsearchExportBackend implements ExportBackend {
             List<SearchResult.Hit<Map, Void>> hits = search(command);
 
             if (hits.isEmpty()) {
-                publishChunk(chunkCollector, hits, command.fieldsInOrder(), SimpleMessageChunk.ChunkOrder.LAST);
+                publishChunk(chunkCollector, hits, command.fieldsInOrder(), command.timeZone(), SimpleMessageChunk.ChunkOrder.LAST);
                 return;
             }
 
-            boolean success = publishChunk(chunkCollector, hits, command.fieldsInOrder(), isFirstChunk ? SimpleMessageChunk.ChunkOrder.FIRST : SimpleMessageChunk.ChunkOrder.INTERMEDIATE);
+            boolean success = publishChunk(chunkCollector, hits, command.fieldsInOrder(), command.timeZone(), isFirstChunk ? SimpleMessageChunk.ChunkOrder.FIRST : SimpleMessageChunk.ChunkOrder.INTERMEDIATE);
             if (!success) {
                 return;
             }
@@ -89,7 +91,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
             totalCount += hits.size();
             if (command.limit().isPresent() && totalCount >= command.limit().getAsInt()) {
                 LOG.info("Limit of {} reached. Stopping message retrieval.", command.limit().getAsInt());
-                publishChunk(chunkCollector, Collections.emptyList(), command.fieldsInOrder(), SimpleMessageChunk.ChunkOrder.LAST);
+                publishChunk(chunkCollector, Collections.emptyList(), command.fieldsInOrder(), command.timeZone(), SimpleMessageChunk.ChunkOrder.LAST);
                 return;
             }
 
@@ -152,8 +154,8 @@ public class ElasticsearchExportBackend implements ExportBackend {
         return indexLookup.indexNamesForStreamsInTimeRange(command.streams(), command.timeRange());
     }
 
-    private boolean publishChunk(Consumer<SimpleMessageChunk> chunkCollector, List<SearchResult.Hit<Map, Void>> hits, LinkedHashSet<String> desiredFieldsInOrder, SimpleMessageChunk.ChunkOrder chunkOrder) {
-        SimpleMessageChunk chunk = chunkFrom(hits, desiredFieldsInOrder, chunkOrder);
+    private boolean publishChunk(Consumer<SimpleMessageChunk> chunkCollector, List<SearchResult.Hit<Map, Void>> hits, LinkedHashSet<String> desiredFieldsInOrder, DateTimeZone timeZone, SimpleMessageChunk.ChunkOrder chunkOrder) {
+        SimpleMessageChunk chunk = chunkFrom(hits, desiredFieldsInOrder, timeZone, chunkOrder);
 
         try {
             chunkCollector.accept(chunk);
@@ -164,8 +166,8 @@ public class ElasticsearchExportBackend implements ExportBackend {
         }
     }
 
-    private SimpleMessageChunk chunkFrom(List<SearchResult.Hit<Map, Void>> hits, LinkedHashSet<String> desiredFieldsInOrder, SimpleMessageChunk.ChunkOrder chunkOrder) {
-        LinkedHashSet<SimpleMessage> messages = messagesFrom(hits);
+    private SimpleMessageChunk chunkFrom(List<SearchResult.Hit<Map, Void>> hits, LinkedHashSet<String> desiredFieldsInOrder, DateTimeZone timeZone, SimpleMessageChunk.ChunkOrder chunkOrder) {
+        LinkedHashSet<SimpleMessage> messages = messagesFrom(hits, timeZone);
 
         return SimpleMessageChunk.builder()
                 .fieldsInOrder(desiredFieldsInOrder)
@@ -174,18 +176,18 @@ public class ElasticsearchExportBackend implements ExportBackend {
                 .build();
     }
 
-    private LinkedHashSet<SimpleMessage> messagesFrom(List<SearchResult.Hit<Map, Void>> hits) {
+    private LinkedHashSet<SimpleMessage> messagesFrom(List<SearchResult.Hit<Map, Void>> hits, DateTimeZone timeZone) {
         return hits.stream()
-                .map(h -> buildHitWithAllFields(h.source, h.index))
+                .map(h -> buildHitWithAllFields(h.source, h.index, timeZone))
                 .collect(toCollection(LinkedHashSet::new));
     }
 
-    private SimpleMessage buildHitWithAllFields(Map source, String index) {
+    private SimpleMessage buildHitWithAllFields(Map source, String index, DateTimeZone timeZone) {
         LinkedHashMap<String, Object> fields = new LinkedHashMap<>();
 
         for (Object key : source.keySet()) {
             String name = (String) key;
-            Object value = valueFrom(source, name);
+            Object value = valueFrom(source, name, timeZone);
             fields.put(name, value);
         }
 
@@ -195,16 +197,17 @@ public class ElasticsearchExportBackend implements ExportBackend {
         return SimpleMessage.from(index, fields);
     }
 
-    private Object valueFrom(Map source, String name) {
+    private Object valueFrom(Map source, String name, DateTimeZone timeZone) {
         if (name.equals(Message.FIELD_TIMESTAMP)) {
-            return fixTimestampFormat(source.get(Message.FIELD_TIMESTAMP));
+            return fixTimestampFormat(source.get(Message.FIELD_TIMESTAMP), timeZone);
         }
         return source.get(name);
     }
 
-    private Object fixTimestampFormat(Object rawTimestamp) {
+    private Object fixTimestampFormat(Object rawTimestamp, DateTimeZone timeZone) {
         try {
-            return ES_DATE_FORMAT_FORMATTER.parseDateTime(String.valueOf(rawTimestamp)).toString();
+           final DateTime parsed = ES_DATE_FORMAT_FORMATTER.parseDateTime(String.valueOf(rawTimestamp));
+           return parsed.withZone(timeZone).toString();
         } catch (IllegalArgumentException e) {
             LOG.warn("Could not parse timestamp {}", rawTimestamp, e);
             return rawTimestamp;

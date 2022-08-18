@@ -16,6 +16,9 @@
  */
 package org.graylog.testing.mongodb;
 
+import com.google.common.io.Resources;
+import org.graylog.testing.completebackend.Lifecycle;
+import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog2.database.MongoConnection;
 import org.junit.rules.ExternalResource;
 import org.junit.runner.Description;
@@ -25,7 +28,10 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
 import java.net.URL;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -42,10 +48,6 @@ import java.util.concurrent.ConcurrentMap;
  * }</pre>
  */
 public class MongoDBInstance extends ExternalResource implements AutoCloseable {
-    public enum Lifecycle {
-        METHOD, CLASS
-    }
-
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBInstance.class);
 
     private static final String DEFAULT_INSTANCE_NAME = "default";
@@ -66,31 +68,41 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     }
 
     public static MongoDBInstance createWithDefaults(Network network, Lifecycle lifecycle) {
-        return new MongoDBInstance(DEFAULT_INSTANCE_NAME, lifecycle, MongoDBContainer.DEFAULT_VERSION, network);
+        return new MongoDBInstance(DEFAULT_INSTANCE_NAME, lifecycle, MongodbServer.DEFAULT_VERSION, network);
     }
 
-    public static MongoDBInstance createStarted(Network network, Lifecycle lifecycle) {
-        MongoDBInstance mongoDb = createWithDefaults(network, lifecycle);
+    private static MongoDBInstance createWithNameAndVersion(Network network, Lifecycle lifecycle, String name, MongodbServer version) {
+        return new MongoDBInstance(name, lifecycle, version, network);
+    }
+
+    public static MongoDBInstance createStarted(Network network, Lifecycle lifecycle, MongodbServer version) {
+        final MongoDBInstance mongoDb = createWithNameAndVersion(network, lifecycle, DEFAULT_INSTANCE_NAME, version);
         mongoDb.start();
         return mongoDb;
     }
 
-    private MongoDBInstance(String instanceName, Lifecycle lifecycle, String version, Network network) {
+    public static MongoDBInstance createStartedWithUniqueName(Network network, Lifecycle lifecycle, MongodbServer version) {
+        final MongoDBInstance mongoDb = createWithNameAndVersion(network, lifecycle, UUID.randomUUID().toString(), version);
+        mongoDb.start();
+        return mongoDb;
+    }
+
+    private MongoDBInstance(String instanceName, Lifecycle lifecycle, MongodbServer version, Network network) {
         this.lifecycle = lifecycle;
 
         switch (lifecycle) {
-            case CLASS:
+            case VM:
                 this.service = CACHED_SERVICE.computeIfAbsent(instanceName, k -> createContainer(version, network));
                 break;
-            case METHOD:
-                this.service = createContainer(version, network);
+            case CLASS:
+                this.service = CACHED_SERVICE.computeIfAbsent(instanceName, k -> createContainer(version, network));
                 break;
             default:
                 throw new IllegalArgumentException("Support for lifecycle " + lifecycle.toString() + " not implemented yet");
         }
     }
 
-    private MongoDBTestService createContainer(String version, Network network) {
+    private MongoDBTestService createContainer(MongodbServer version, Network network) {
         return MongoDBTestService.create(version, network);
     }
 
@@ -141,13 +153,6 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     @Override
     protected void after() {
         dropDatabase();
-        switch (lifecycle) {
-            case CLASS:
-                break;
-            case METHOD:
-                close();
-                break;
-        }
     }
 
     /**
@@ -163,8 +168,16 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     }
 
     public void importFixtures(List<URL> fixtureResources) {
-        if (! fixtureResources.isEmpty()) {
+        if (!fixtureResources.isEmpty()) {
             new MongoDBFixtureImporter(fixtureResources).importResources(service.mongoDatabase());
+        }
+    }
+
+    public void importFixture(String resourceName, Class<?> testClass) {
+        if (!Paths.get(resourceName).isAbsolute()) {
+            new MongoDBFixtureImporter(Arrays.asList(Resources.getResource(testClass, resourceName))).importResources(service.mongoDatabase());
+        } else {
+            new MongoDBFixtureImporter(Arrays.asList(Resources.getResource(resourceName))).importResources(service.mongoDatabase());
         }
     }
 }

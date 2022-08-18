@@ -14,12 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
 import { useContext } from 'react';
+import type { List } from 'immutable';
 
-import { Link } from 'components/common/router';
-import { defaultCompare } from 'views/logic/DefaultCompare';
 import { isPermitted } from 'util/PermissionsMixin';
+import type Grantee from 'logic/permissions/Grantee';
+import { Link } from 'components/common/router';
+import { defaultCompare } from 'logic/DefaultCompare';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
 import { getShowRouteFromGRN } from 'logic/permissions/GRN';
@@ -30,20 +33,24 @@ type Props = {
 
 const TitleWithLink = ({ to, title }: { to: string, title: string }) => <Link to={to}>{title}</Link>;
 
-const _getOwnerTitle = ({ type, id, title }, userPermissions) => {
-  const link = getShowRouteFromGRN(id);
+const assertUnreachable = (type: 'error'): never => {
+  throw new Error(`Owner of entity has not supported type: ${type}`);
+};
 
+const _getOwnerTitle = ({ type, id, title }: Grantee, userPermissions: List<string>) => {
   switch (type) {
     case 'user':
       if (!isPermitted(userPermissions, 'users:list')) return title;
 
-      return <TitleWithLink to={link} title={title} />;
+      return <TitleWithLink to={getShowRouteFromGRN(id)} title={title} />;
     case 'team':
       if (!isPermitted(userPermissions, 'teams:list')) return title;
 
-      return <TitleWithLink to={link} title={title} />;
+      return <TitleWithLink to={getShowRouteFromGRN(id)} title={title} />;
+    case 'global':
+      return 'Everyone';
     default:
-      throw new Error(`Owner of entity has not supported type: ${type}`);
+      return assertUnreachable(type);
   }
 };
 

@@ -150,6 +150,11 @@ public class IndexRotationThreadTest {
                 public Class<? extends RotationStrategyConfig> configurationClass() {
                     return null;
                 }
+
+                @Override
+                public String getStrategyName() {
+                    return null;
+                }
             };
         }
 

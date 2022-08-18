@@ -16,8 +16,7 @@
  */
 import Reflux from 'reflux';
 
-import { PREFERENCES_THEME_MODE } from 'theme/constants';
-import type { ThemeMode } from 'theme/constants';
+import type { PREFERENCES_THEME_MODE, ThemeMode } from 'theme/constants';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';

@@ -16,9 +16,7 @@
  */
 package org.graylog.plugins.views.search.engine;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import one.util.streamex.StreamEx;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.QueryMetadataDecorator;
@@ -33,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Map;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -52,38 +50,15 @@ public class QueryEngine {
 
     // TODO proper thread pool with tunable settings
     private final Executor queryPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("query-engine-%d").build());
-    private final QueryBackend<? extends GeneratedQueryContext> elasticsearchBackend;
+    private final QueryBackend<? extends GeneratedQueryContext> backend;
 
     @Inject
-    public QueryEngine(QueryBackend<? extends GeneratedQueryContext> elasticsearchBackend,
+    public QueryEngine(QueryBackend<? extends GeneratedQueryContext> backend,
                        Set<QueryMetadataDecorator> queryMetadataDecorators,
                        QueryParser queryParser) {
-        this.elasticsearchBackend = elasticsearchBackend;
+        this.backend = backend;
         this.queryMetadataDecorators = queryMetadataDecorators;
         this.queryParser = queryParser;
-    }
-
-    // TODO: Backwards-compatible constructor to avoid breakage. Remove at some point.
-    @Deprecated
-    public QueryEngine(Map<String, QueryBackend<? extends GeneratedQueryContext>> backends,
-                       Set<QueryMetadataDecorator> queryMetadataDecorators,
-                       QueryParser queryParser) {
-        this(backends.get("elasticsearch"), queryMetadataDecorators, queryParser);
-    }
-
-    private static Set<QueryResult> allOfResults(Set<CompletableFuture<QueryResult>> futures) {
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                .handle((aVoid, throwable) -> futures.stream()
-                        .map(f -> f.handle((queryResult, throwable1) -> {
-                            if (throwable1 != null) {
-                                return QueryResult.incomplete();
-                            } else {
-                                return queryResult;
-                            }
-                        }))
-                        .map(CompletableFuture::join)
-                        .collect(ImmutableSet.toImmutableSet()))
-                .join();
     }
 
     public QueryMetadata parse(Search search, Query query) {
@@ -95,13 +70,16 @@ public class QueryEngine {
                 .orElse(parsedMetadata);
     }
 
-    public SearchJob execute(SearchJob searchJob) {
-        final QueryPlan plan = new QueryPlan(this, searchJob);
+    public SearchJob execute(SearchJob searchJob, Set<SearchError> validationErrors) {
+        final Set<Query> validQueries = searchJob.getSearch().queries()
+                .stream()
+                .filter(query -> !isQueryWithError(validationErrors, query))
+                .collect(Collectors.toSet());
 
-        plan.queries().forEach(query -> searchJob.addQueryResultFuture(query.id(),
+        validQueries.forEach(query -> searchJob.addQueryResultFuture(query.id(),
                 // generate and run each query, making sure we never let an exception escape
                 // if need be we default to an empty result with a failed state and the wrapped exception
-                CompletableFuture.supplyAsync(() -> prepareAndRun(plan, searchJob, query), queryPool)
+                CompletableFuture.supplyAsync(() -> prepareAndRun(searchJob, query, validationErrors), queryPool)
                         .handle((queryResult, throwable) -> {
                             if (throwable != null) {
                                 final Throwable cause = throwable.getCause();
@@ -118,11 +96,8 @@ public class QueryEngine {
                             return queryResult;
                         })
         ));
-        // the root is always complete
-        searchJob.addQueryResultFuture("", CompletableFuture.completedFuture(QueryResult.emptyResult()));
 
-        plan.breadthFirst().forEachOrdered(query -> {
-            // if the query has an immediate result, we don't need to generate anything. this is currently only true for the dummy root query
+        validQueries.forEach(query -> {
             final CompletableFuture<QueryResult> queryResultFuture = searchJob.getQueryResultFuture(query.id());
             if (!queryResultFuture.isDone()) {
                 // this is not going to throw an exception, because we will always replace it with a placeholder "FAILED" result above
@@ -133,43 +108,31 @@ public class QueryEngine {
             }
         });
 
-        LOG.debug("Search job {} executing with plan {}", searchJob.getId(), plan);
+        LOG.debug("Search job {} executing", searchJob.getId());
         return searchJob.seal();
     }
 
-    private QueryResult prepareAndRun(QueryPlan plan, SearchJob searchJob, Query query) {
-        final Set<Query> predecessors = plan.predecessors(query);
-        LOG.debug("[{}] Processing query, requires {} results, has {} subqueries",
-                defaultIfEmpty(query.id(), "root"), predecessors.size(), plan.successors(query).size());
-
-        final QueryBackend<? extends GeneratedQueryContext> backend = getQueryBackend(query);
+    private QueryResult prepareAndRun(SearchJob searchJob, Query query, Set<SearchError> validationErrors) {
         LOG.debug("[{}] Using {} to generate query", query.id(), backend);
-
-        LOG.debug("[{}] Waiting for results: {}", query.id(), predecessors);
-        // gather all required results to be able to execute the current query
-        final Set<QueryResult> results = allOfResults(predecessors.stream()
-                .map(Query::id)
-                .map(searchJob::getQueryResultFuture)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet())
-        );
-        LOG.debug("[{}] Preparing query execution with results of queries: ({})",
-                query.id(), StreamEx.of(results.stream()).map(QueryResult::query).map(Query::id).joining());
-
         // with all the results done, we can execute the current query and eventually complete our own result
         // if any of this throws an exception, the handle in #execute will convert it to an error and return a "failed" result instead
         // if the backend already returns a "failed result" then nothing special happens here
-        final GeneratedQueryContext generatedQueryContext = backend.generate(searchJob, query, results);
+        final GeneratedQueryContext generatedQueryContext = backend.generate(searchJob, query, validationErrors);
         LOG.trace("[{}] Generated query {}, running it on backend {}", query.id(), generatedQueryContext, backend);
-        final QueryResult result = backend.run(searchJob, query, generatedQueryContext, results);
+        final QueryResult result = backend.run(searchJob, query, generatedQueryContext);
         LOG.debug("[{}] Query returned {}", query.id(), result);
         if (!generatedQueryContext.errors().isEmpty()) {
             generatedQueryContext.errors().forEach(searchJob::addError);
+
         }
         return result;
     }
 
-    private QueryBackend<? extends GeneratedQueryContext> getQueryBackend(Query query) {
-        return elasticsearchBackend;
+    private boolean isQueryWithError(Collection<SearchError> validationErrors, Query query) {
+        return validationErrors.stream()
+                .filter(q -> q instanceof QueryError)
+                .map(q -> (QueryError) q)
+                .map(QueryError::queryId)
+                .anyMatch(id -> Objects.equals(id, query.id()));
     }
 }

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
 import VisualizationConfig from './VisualizationConfig';
 import type { InterpolationMode } from './Interpolation';
@@ -61,7 +61,7 @@ export default class LineVisualizationConfig extends VisualizationConfig {
     return { interpolation };
   }
 
-  static fromJSON(type: string, value: LineVisualizationConfigJSON) {
+  static fromJSON(_type: string, value: LineVisualizationConfigJSON) {
     return LineVisualizationConfig.create(value?.interpolation ?? this.DEFAULT_INTERPOLATION);
   }
 }

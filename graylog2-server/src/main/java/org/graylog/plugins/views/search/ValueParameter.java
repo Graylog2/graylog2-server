@@ -23,6 +23,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
+import java.util.Map;
+import java.util.Optional;
+
 /**
  * Parameters describe variable inputs to queries.
  * <p>
@@ -48,16 +51,10 @@ public abstract class ValueParameter implements Parameter {
 
     public abstract Builder toBuilder();
 
-    public ValueParameter applyExecutionState(ObjectMapper objectMapper, JsonNode state) {
-        final JsonNode bindingState = state.path(name());
-
-        if (bindingState.isMissingNode()) {
-            return this;
-        }
-
-        final Binding binding = objectMapper.convertValue(bindingState, Binding.class);
-
-        return toBuilder().binding(binding).build();
+    public ValueParameter applyBindings(Map<String, Binding> bindings) {
+        return Optional.ofNullable(bindings.get(name()))
+                .map(b -> toBuilder().binding(b).build())
+                .orElse(this);
     }
 
     @AutoValue.Builder

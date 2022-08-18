@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { WidgetConfigFormValues } from 'views/components/aggregationwizard';
+import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 
 export const areAtLeastNMetricsConfigured = (formValues: WidgetConfigFormValues, minimumMetrics: number) => formValues.metrics?.length >= minimumMetrics;
 export const areAtLeastNGroupingsConfigured = (formValues: WidgetConfigFormValues, minimumGroupings: number) => formValues.groupBy?.groupings?.length >= minimumGroupings;

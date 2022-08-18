@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { $PropertyType } from 'utility-types/dist/utility-types';
-import * as Immutable from 'immutable';
+import type { $PropertyType } from 'utility-types/dist/utility-types';
+import type * as Immutable from 'immutable';
 
-import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
 export interface SharedBackendConfig {
   type: string;
@@ -32,6 +32,7 @@ export interface OktaBackendConfig extends SharedBackendConfig {
 }
 export interface OidcBackendConfig extends SharedBackendConfig {
   baseUrl?: string;
+  claims?: { [key: string]: string },
 }
 
 export type BackendConfig = OktaBackendConfig | OidcBackendConfig;
@@ -48,6 +49,7 @@ export interface OktaBackendConfigJson extends SharedBackendConfigJson {
 
 export interface OidcBackendConfigJson extends SharedBackendConfigJson {
   base_url: string;
+  claims: { [key: string]: string };
 }
 
 export type BackendConfigJson = OktaBackendConfigJson | OidcBackendConfigJson

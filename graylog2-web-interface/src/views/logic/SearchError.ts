@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { QueryId } from 'views/logic/queries/Query';
-import { SearchTypeId } from 'views/logic/SearchType';
+import type { QueryId } from 'views/logic/queries/Query';
+import type { SearchTypeId } from 'views/logic/SearchType';
 
 export type SearchErrorResponse = {
   query_id: QueryId,

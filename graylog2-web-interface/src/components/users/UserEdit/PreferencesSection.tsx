@@ -21,8 +21,9 @@ import { PREFERENCES_THEME_MODE } from 'theme/constants';
 import { Button, Row, Col, Input } from 'components/bootstrap';
 import { FormikFormGroup, ReadOnlyFormGroup } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import User from 'logic/users/User';
-import { PreferencesActions, PreferencesUpdateMap } from 'stores/users/PreferencesStore';
+import type User from 'logic/users/User';
+import type { PreferencesUpdateMap } from 'stores/users/PreferencesStore';
+import { PreferencesActions } from 'stores/users/PreferencesStore';
 
 type Props = {
   user: User,

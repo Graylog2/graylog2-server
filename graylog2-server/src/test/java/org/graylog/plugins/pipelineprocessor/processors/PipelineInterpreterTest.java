@@ -42,6 +42,7 @@ import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
+import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
@@ -61,8 +62,10 @@ import org.mockito.Mockito;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -88,7 +91,18 @@ public class PipelineInterpreterTest {
                     "then\n" +
                     "  set_field(\"foobar\", \"covfefe\");\n" +
                     "end", null, null);
-
+    private static final java.util.function.Function<String, RuleDao> RULE_SET_FIELD = (name) -> RuleDao.create("false", "false", "false",
+            "rule \"" + name + "\"\n" +
+                    "when true\n" +
+                    "then\n" +
+                    "  set_field(\"" + name + "\", \"value\");" +
+                    "end", null, null);
+    private static final RuleDao RULE_DROP_MESSAGE = RuleDao.create("false", "false", "false",
+            "rule \"drop_message\"\n" +
+                    "when true\n" +
+                    "then\n" +
+                    "  drop_message();" +
+                    "end", null, null);
     private final MessageQueueAcknowledger messageQueueAcknowledger = mock(MessageQueueAcknowledger.class);
 
     private final RuleService ruleService = Mockito.mock(RuleService.class);
@@ -317,12 +331,75 @@ public class PipelineInterpreterTest {
         assertThat(actualMessage.getFieldAs(String.class, "foobar")).isEqualTo("covfefe");
     }
 
+    @Test
+    public void testDroppedMessageWillHaltProcessingAfterCurrentStage() {
+        final RuleService ruleService = mock(MongoDbRuleService.class);
+        when(ruleService.loadAll()).thenReturn(ImmutableList.of(
+                RULE_SET_FIELD.apply("1-a"),
+                RULE_SET_FIELD.apply("1-b"),
+                RULE_SET_FIELD.apply("2-a"),
+                RULE_SET_FIELD.apply("2-b"),
+                RULE_DROP_MESSAGE
+        ));
+
+        final PipelineService pipelineService = mock(MongoDbPipelineService.class);
+        when(pipelineService.loadAll()).thenReturn(ImmutableList.of(
+                PipelineDao.create("p1", "title1", "description",
+                        "pipeline \"pipeline1\"\n" +
+                                "stage 0 match pass\n" +
+                                "    rule \"1-a\";\n" +
+                                "    rule \"drop_message\";\n" +
+                                "stage 1 match pass\n" +
+                                "    rule \"1-b\";\n" +
+                                "end\n",
+                        Tools.nowUTC(),
+                        null),
+                PipelineDao.create("p2", "title2", "description",
+                        "pipeline \"pipeline2\"\n" +
+                                "stage 0 match pass\n" +
+                                "    rule \"2-a\";\n" +
+                                "stage 1 match pass\n" +
+                                "    rule \"2-b\";\n" +
+                                "end\n",
+                        Tools.nowUTC(),
+                        null)
+        ));
+
+        final Map<String, Function<?>> functions = ImmutableMap.of(
+                SetField.NAME, new SetField(),
+                DropMessage.NAME, new DropMessage()
+        );
+        final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, functions);
+
+        final Messages processed = interpreter.process(messageInDefaultStream("message", "test"));
+
+        assertThat(processed).isInstanceOf(MessageCollection.class);
+
+        // Use MessageCollection#source here to get access to the unfiltered messages
+        final List<Message> messages = ImmutableList.copyOf(((MessageCollection) processed).source());
+        assertThat(messages).hasSize(1);
+
+        final Message actualMessage = messages.get(0);
+
+        assertThat(actualMessage.getFilterOut()).isTrue();
+
+        // Even though "drop_message" has been called in one of the stages, all stages of the same number should
+        // have been executed
+        assertThat(actualMessage.getFieldAs(String.class, "1-a")).isEqualTo("value");
+        assertThat(actualMessage.getFieldAs(String.class, "2-a")).isEqualTo("value");
+
+        // The second stage in both pipelines should not have been executed due to the "drop_message" call
+        assertThat(actualMessage.getField("1-b")).isNull();
+        assertThat(actualMessage.getField("2-b")).isNull();
+    }
+
     @SuppressForbidden("Allow using default thread factory")
     private PipelineInterpreter createPipelineInterpreter(RuleService ruleService, PipelineService pipelineService, Map<String, Function<?>> functions) {
         final RuleMetricsConfigService ruleMetricsConfigService = mock(RuleMetricsConfigService.class);
         when(ruleMetricsConfigService.get()).thenReturn(RuleMetricsConfigDto.createDefault());
         final PipelineStreamConnectionsService pipelineStreamConnectionsService = mock(MongoDbPipelineStreamConnectionsService.class);
-        final PipelineConnections pipelineConnections = PipelineConnections.create("p1", DEFAULT_STREAM_ID, Collections.singleton("p1"));
+        final Set<String> pipelineIds = pipelineService.loadAll().stream().map(PipelineDao::id).collect(Collectors.toSet());
+        final PipelineConnections pipelineConnections = PipelineConnections.create("p1", DEFAULT_STREAM_ID, pipelineIds);
         when(pipelineStreamConnectionsService.loadAll()).thenReturn(Collections.singleton(pipelineConnections));
 
         final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
@@ -514,10 +591,10 @@ public class PipelineInterpreterTest {
                 SetField.NAME, new SetField(),
                 DoubleConversion.NAME, new DoubleConversion(),
                 HasField.NAME, new HasField()
-                ));
+        ));
 
         // when
-        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField(new Long(1))));
+        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField(Long.valueOf(1))));
 
         // then
         assertThat(processed)
@@ -534,7 +611,7 @@ public class PipelineInterpreterTest {
     }
 
     @Test
-    public void process_noEvaluationErrorsResultIntoNoMessageProcessingErrors() throws Exception {
+    public void process_noEvaluationErrorsResultIntoNoMessageProcessingErrors() {
         // given
         when(ruleService.loadAll()).thenReturn(ImmutableList.of(RuleDao.create("valid_rule", "valid_rule",
                 "valid_rule",
@@ -563,14 +640,14 @@ public class PipelineInterpreterTest {
         ));
 
         // when
-        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField(new Long(5))));
+        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField(Long.valueOf(5))));
 
         // then
         assertThat(processed)
                 .hasSize(1)
                 .hasOnlyOneElementSatisfying(m -> {
                     assertThat(m.processingErrors()).isEmpty();
-                    assertThat(m.getField("num_sqr")).isEqualTo(new Double(25.0));
+                    assertThat(m.getField("num_sqr")).isEqualTo(Double.valueOf(25.0));
                 });
     }
 

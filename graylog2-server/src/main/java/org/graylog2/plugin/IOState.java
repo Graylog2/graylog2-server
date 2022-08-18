@@ -31,6 +31,7 @@ public class IOState<T extends Stoppable> {
         IOState<T> create(T stoppable);
         IOState<T> create(T stoppable, Type state);
     }
+
     public enum Type {
         CREATED,
         INITIALIZED,
@@ -74,12 +75,27 @@ public class IOState<T extends Stoppable> {
         return state;
     }
 
-    public void setState(Type state) {
+    public boolean canBeStarted() {
+        switch (getState()) {
+            case RUNNING:
+            case STARTING:
+                return false;
+            default:
+                return true;
+        }
+    }
+
+    public void setState(Type state, String detailedMessage) {
         final IOStateChangedEvent<T> evt = IOStateChangedEvent.create(this.state, state, this);
 
         this.state = state;
-        this.setDetailedMessage(null);
+        this.setDetailedMessage(detailedMessage);
         this.eventbus.post(evt);
+
+    }
+
+    public void setState(Type state) {
+        setState(state, null);
     }
 
     public DateTime getStartedAt() {
@@ -110,8 +126,12 @@ public class IOState<T extends Stoppable> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         IOState that = (IOState) o;
 

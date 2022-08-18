@@ -21,8 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
@@ -33,6 +31,10 @@ import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.EmptyTimeRange;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
+import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
+import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -40,13 +42,11 @@ import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -63,7 +63,6 @@ import static java.util.stream.Collectors.toSet;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = Query.Builder.class)
 public abstract class Query implements ContentPackable<QueryEntity> {
-    private static final Logger LOG = LoggerFactory.getLogger(Query.class);
 
     @Nullable
     @JsonProperty
@@ -75,6 +74,9 @@ public abstract class Query implements ContentPackable<QueryEntity> {
     @Nullable
     @JsonProperty
     public abstract Filter filter();
+
+    @JsonProperty
+    public abstract List<UsedSearchFilter> filters();
 
     @Nonnull
     @JsonProperty
@@ -89,6 +91,12 @@ public abstract class Query implements ContentPackable<QueryEntity> {
                 .orElse(this.timerange());
     }
 
+    public Set<String> effectiveStreams(SearchType searchType) {
+        return searchType.effectiveStreams().isEmpty()
+                ? this.usedStreamIds()
+                : searchType.effectiveStreams();
+    }
+
     @Nonnull
     @JsonProperty("search_types")
     public abstract ImmutableSet<SearchType> searchTypes();
@@ -99,45 +107,36 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         return Query.Builder.createWithDefaults();
     }
 
-    Query applyExecutionState(ObjectMapper objectMapper, JsonNode state) {
-        if (state.isMissingNode()) {
+    Query applyExecutionState(ExecutionStateGlobalOverride state) {
+        if (state == null || !state.hasValues()) {
             return this;
         }
-        final boolean hasTimerange = state.hasNonNull("timerange");
-        final boolean hasQuery = state.hasNonNull("query");
-        final boolean hasSearchTypes = state.hasNonNull("search_types");
-        final boolean hasKeepSearchTypes = state.hasNonNull("keep_search_types");
-        if (hasTimerange || hasQuery || hasSearchTypes || hasKeepSearchTypes) {
+
+        if (state.timerange().isPresent() || state.query().isPresent() || !state.searchTypes().isEmpty() || !state.keepSearchTypes().isEmpty()) {
             final Builder builder = toBuilder();
 
-            if (hasTimerange || hasQuery) {
+            if (state.timerange().isPresent() || state.query().isPresent()) {
                 final GlobalOverride.Builder globalOverrideBuilder = globalOverride().map(GlobalOverride::toBuilder)
                         .orElseGet(GlobalOverride::builder);
-                if (hasTimerange) {
-                    try {
-                        final Object rawTimerange = state.path("timerange");
-                        final TimeRange newTimeRange = objectMapper.convertValue(rawTimerange, TimeRange.class);
-                        globalOverrideBuilder.timerange(newTimeRange);
-                        builder.timerange(newTimeRange);
-                    } catch (Exception e) {
-                        LOG.error("Unable to deserialize execution state for time range", e);
-                    }
-                }
-                if (hasQuery) {
-                    final Object rawQuery = state.path("query");
-                    final BackendQuery newQuery = objectMapper.convertValue(rawQuery, BackendQuery.class);
-                    globalOverrideBuilder.query(newQuery);
-                    builder.query(newQuery);
-                }
+                state.timerange().ifPresent(timeRange -> {
+                    globalOverrideBuilder.timerange(timeRange);
+                    builder.timerange(timeRange);
+                });
+
+                state.query().ifPresent(query -> {
+                    globalOverrideBuilder.query(query);
+                    builder.query(query);
+                });
+
                 builder.globalOverride(globalOverrideBuilder.build());
             }
 
-            if (hasSearchTypes || hasKeepSearchTypes) {
-                final Set<SearchType> searchTypesToKeep = hasKeepSearchTypes
+            if (!state.searchTypes().isEmpty() || !state.keepSearchTypes().isEmpty()) {
+                final Set<SearchType> searchTypesToKeep = !state.keepSearchTypes().isEmpty()
                         ? filterForWhiteListFromState(searchTypes(), state)
                         : searchTypes();
 
-                final Set<SearchType> searchTypesWithOverrides = applyAvailableOverrides(objectMapper, state, searchTypesToKeep);
+                final Set<SearchType> searchTypesWithOverrides = applyAvailableOverrides(state, searchTypesToKeep);
 
                 builder.searchTypes(ImmutableSet.copyOf(searchTypesWithOverrides));
             }
@@ -146,31 +145,17 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         return this;
     }
 
-    private Set<SearchType> filterForWhiteListFromState(Set<SearchType> previousSearchTypes, JsonNode state) {
-        final Set<String> whitelist = parseSearchTypesWhitelistFrom(state);
-
+    private Set<SearchType> filterForWhiteListFromState(Set<SearchType> previousSearchTypes, ExecutionStateGlobalOverride state) {
         return previousSearchTypes.stream()
-                .filter(st -> whitelist.contains(st.id()))
+                .filter(st -> state.keepSearchTypes().contains(st.id()))
                 .collect(toSet());
     }
 
-    private Set<String> parseSearchTypesWhitelistFrom(JsonNode state) {
-        final String key = "keep_search_types";
-        final Set<String> results = new HashSet<>();
-        if (state.has(key) && state.get(key).isArray()) {
-            for (JsonNode n : state.get(key)) {
-                results.add(n.asText());
-            }
-        }
-        return results;
-    }
-
-    private Set<SearchType> applyAvailableOverrides(ObjectMapper objectMapper, JsonNode state, Set<SearchType> searchTypes) {
-        final JsonNode searchTypesState = state.path("search_types");
-
+    private Set<SearchType> applyAvailableOverrides(ExecutionStateGlobalOverride state, Set<SearchType> searchTypes) {
         return searchTypes.stream().map(st -> {
-            if (searchTypesState.has(st.id())) {
-                return st.applyExecutionContext(objectMapper, searchTypesState.path(st.id()));
+            if (state.searchTypes().containsKey(st.id())) {
+                final SearchTypeExecutionState executionState = state.searchTypes().get(st.id());
+                return st.applyExecutionContext(executionState);
             } else {
                 return st;
             }
@@ -204,7 +189,11 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         return !usedStreamIds().isEmpty();
     }
 
-    Query addStreamsToFilter(ImmutableSet<String> streamIds) {
+    public boolean hasReferencedStreamFilters() {
+        return filters() != null && filters().stream().anyMatch(f -> f instanceof ReferencedSearchFilter);
+    }
+
+    Query addStreamsToFilter(Set<String> streamIds) {
         final Filter newFilter = addStreamsTo(filter(), streamIds);
         return toBuilder().filter(newFilter).build();
     }
@@ -238,6 +227,9 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         public abstract Builder filter(Filter filter);
 
         @JsonProperty
+        public abstract Builder filters(List<UsedSearchFilter> filters);
+
+        @JsonProperty
         public abstract Builder query(BackendQuery query);
 
         public abstract Builder globalOverride(@Nullable GlobalOverride globalOverride);
@@ -252,6 +244,7 @@ public abstract class Query implements ContentPackable<QueryEntity> {
             try {
                 return new AutoValue_Query.Builder()
                         .searchTypes(of())
+                        .filters(Collections.emptyList())
                         .query(ElasticsearchQueryString.empty())
                         .timerange(RelativeRange.create(300));
             } catch (InvalidRangeParametersException e) {
@@ -293,6 +286,7 @@ public abstract class Query implements ContentPackable<QueryEntity> {
                 .searchTypes(searchTypes().stream().map(s -> s.toContentPackEntity(entityDescriptorIds))
                         .collect(Collectors.toSet()))
                 .filter(shallowMappedFilter(entityDescriptorIds))
+                .filters(filters())
                 .query(query())
                 .id(id())
                 .globalOverride(globalOverride().orElse(null))

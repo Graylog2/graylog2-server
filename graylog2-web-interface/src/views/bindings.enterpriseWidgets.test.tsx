@@ -16,17 +16,12 @@
  */
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';
-
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import Widget from 'views/logic/widgets/Widget';
+import type Widget from 'views/logic/widgets/Widget';
 import DataTable from 'views/components/datatable/DataTable';
 
 import bindings from './bindings';
-
-jest.mock('views/stores/FieldTypesStore', () => ({
-  FieldTypesStore: MockStore(['getInitialState', () => ({ all: {}, queryFields: {} })]),
-}));
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(),

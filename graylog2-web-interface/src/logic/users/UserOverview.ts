@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 import * as Immutable from 'immutable';
 
 export type AccountStatus = 'enabled' | 'disabled' | 'deleted';

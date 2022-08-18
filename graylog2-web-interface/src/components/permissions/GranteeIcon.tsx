@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 import styled, { css } from 'styled-components';
 
-import Grantee from 'logic/permissions/Grantee';
+import type Grantee from 'logic/permissions/Grantee';
 import { Icon } from 'components/common';
 
 const Container = styled.div(({ theme }) => css`

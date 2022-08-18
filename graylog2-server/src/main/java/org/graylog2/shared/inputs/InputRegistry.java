@@ -40,8 +40,9 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
 
     public IOState<MessageInput> getInputState(String inputId) {
         for (IOState<MessageInput> inputState : this) {
-            if (inputState.getStoppable().getPersistId().equals(inputId))
+            if (inputState.getStoppable().getPersistId().equals(inputId)) {
                 return inputState;
+            }
         }
 
         return null;
@@ -50,8 +51,9 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
     public Set<IOState<MessageInput>> getRunningInputs() {
         ImmutableSet.Builder<IOState<MessageInput>> runningInputs = ImmutableSet.builder();
         for (IOState<MessageInput> inputState : this) {
-            if (inputState.getState() == IOState.Type.RUNNING)
+            if (inputState.getState() == IOState.Type.RUNNING) {
                 runningInputs.add(inputState);
+            }
         }
         return runningInputs.build();
     }
@@ -72,8 +74,9 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
 
     public MessageInput getRunningInput(String inputId) {
         for (IOState<MessageInput> inputState : this) {
-            if (inputState.getStoppable().getId().equals(inputId))
+            if (inputState.getStoppable().getId().equals(inputId)) {
                 return inputState.getStoppable();
+            }
         }
 
         return null;
@@ -81,8 +84,9 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
 
     public IOState<MessageInput> getRunningInputState(String inputStateId) {
         for (IOState<MessageInput> inputState : this) {
-            if (inputState.getStoppable().getId().equals(inputStateId))
+            if (inputState.getStoppable().getId().equals(inputStateId)) {
                 return inputState;
+            }
         }
 
         return null;
@@ -91,8 +95,9 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
     public boolean remove(MessageInput input) {
         final IOState<MessageInput> inputState = this.stop(input);
         input.terminate();
-        if (inputState != null)
+        if (inputState != null) {
             inputState.setState(IOState.Type.TERMINATED);
+        }
 
         return super.remove(inputState);
     }
@@ -117,4 +122,5 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
 
         return inputState;
     }
+
 }

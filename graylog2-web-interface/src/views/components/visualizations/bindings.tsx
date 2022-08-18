@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { VisualizationType } from 'views/types';
-
 import dataTable from 'views/components/datatable/bindings';
 
 import areaChart from './area/bindings';
@@ -27,7 +26,7 @@ import pieChart from './pie/bindings';
 import scatterChart from './scatter/bindings';
 import worldMap from './worldmap/bindings';
 
-const visualizationBindings: Array<VisualizationType> = [
+const visualizationBindings: Array<VisualizationType<any>> = [
   areaChart,
   barChart,
   dataTable,

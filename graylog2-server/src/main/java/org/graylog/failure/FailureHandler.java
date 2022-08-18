@@ -37,7 +37,7 @@ public interface FailureHandler {
     void handle(FailureBatch failureBatch);
 
     /**
-     * Guides the master failure handling service, when deciding
+     * Guides the main failure handling service, when deciding
      * whether this handler is suitable for a certain batch of failures
      *
      * @param failureBatch a batch of failures to test
@@ -46,7 +46,7 @@ public interface FailureHandler {
     boolean supports(FailureBatch failureBatch);
 
     /**
-     * Guides the master failure handling service, when deciding
+     * Guides the main failure handling service, when deciding
      * whether this handler is available for processing.
      *
      * @return true if this handler can accept failure batches

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 
 import type { Store } from 'stores/StoreTypes';
 import { QueriesActions, QueriesStore } from 'views/stores/QueriesStore';
@@ -22,9 +22,9 @@ import { ViewStore } from 'views/stores/ViewStore';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
 
-import Query from '../queries/Query';
+import type Query from '../queries/Query';
 import View from '../views/View';
-import GlobalOverride from '../search/GlobalOverride';
+import type GlobalOverride from '../search/GlobalOverride';
 import type { ElasticsearchQueryString, QueryId } from '../queries/Query';
 
 function connectToStore<State>(store: Store<State>, updateFn: (state: State) => unknown): void {

@@ -80,7 +80,7 @@ describe('<TokenList />', () => {
   it('show include token last access time', () => {
     const wrapper = mount(<TokenList tokens={tokens} />);
 
-    expect(wrapper.find(`time[dateTime="${tokens[0].last_access}"]`)).toHaveLength(1);
+    expect(wrapper.find('time[dateTime="2020-12-08T16:46:00.000+00:00"]')).toHaveLength(1);
     expect(wrapper.find('div[children="Never used"]')).toHaveLength(1);
 
     expect(wrapper).toExist();

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
-import FieldType from 'views/logic/fieldtypes/FieldType';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
 
 export default (fieldName: string, type: FieldType) => {
   switch (type.type) {

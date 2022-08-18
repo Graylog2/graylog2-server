@@ -28,6 +28,7 @@ const EmailNotificationDetails = ({ notification }) => (
     <ReadOnlyFormGroup label="Subject" value={notification.config.subject} />
     <ReadOnlyFormGroup label="User recipients" value={notification.config.user_recipients.join(', ') || 'No users will receive this notification.'} />
     <ReadOnlyFormGroup label="Email recipients" value={notification.config.email_recipients.join(', ') || 'No email addresses are configured to receive this notification.'} />
+    <ReadOnlyFormGroup label="Time zone" value={notification.config.time_zone} />
     <ReadOnlyFormGroup label="Email Body"
                        value={(
                          <Well bsSize="small" className={styles.bodyPreview}>

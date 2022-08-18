@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import { DocumentTitle } from 'components/common';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
-import { WizardFormValues } from 'components/authentication/directoryServices/BackendWizard/BackendWizardContext';
+import type { WizardFormValues } from 'components/authentication/directoryServices/BackendWizard/BackendWizardContext';
 
 import WizardPageHeader from './WizardPageHeader';
 

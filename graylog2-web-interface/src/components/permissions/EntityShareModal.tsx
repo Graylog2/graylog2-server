@@ -16,17 +16,17 @@
  */
 import * as React from 'react';
 import { useRef, useEffect, useState } from 'react';
-import { FormikProps } from 'formik';
+import type { FormikProps } from 'formik';
 import PropTypes from 'prop-types';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import { createGRN } from 'logic/permissions/GRN';
 import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
 import { EntityShareStore } from 'stores/permissions/EntityShareStore';
-import { EntitySharePayload } from 'actions/permissions/EntityShareActions';
-import SharedEntity from 'logic/permissions/SharedEntity';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import type SharedEntity from 'logic/permissions/SharedEntity';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 
 import type { FormValues as GranteesSelectFormValues } from './GranteesSelector';
@@ -39,9 +39,10 @@ type Props = {
   entityType: $PropertyType<SharedEntity, 'type'>,
   entityTypeTitle: string | null | undefined,
   onClose: () => void,
+  showShareableEntityURL?: boolean
 };
 
-const EntityShareModal = ({ description, entityId, entityType, entityTitle, entityTypeTitle, onClose }: Props) => {
+const EntityShareModal = ({ description, entityId, entityType, entityTitle, entityTypeTitle, onClose, showShareableEntityURL }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResults?.failed);
   const entityGRN = createGRN(entityType, entityId);
@@ -83,19 +84,19 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, enti
                            onModalClose={onClose}
                            showModal
                            title={<>Sharing {entityTypeTitle ?? entityType}: <i>{entityTitle}</i></>}>
-      <>
-        {(entityShareState && entityShareState.entity === entityGRN) ? (
-          <EntityShareSettings description={description}
-                               entityGRN={entityGRN}
-                               entityType={entityType}
-                               entityTitle={entityTitle}
-                               entityShareState={entityShareState}
-                               granteesSelectFormRef={granteesSelectFormRef}
-                               setDisableSubmit={setDisableSubmit} />
-        ) : (
-          <Spinner />
-        )}
-      </>
+      {(entityShareState && entityShareState.entity === entityGRN) ? (
+        <EntityShareSettings description={description}
+                             entityGRN={entityGRN}
+                             entityType={entityType}
+                             entityTypeTitle={entityTypeTitle}
+                             entityTitle={entityTitle}
+                             entityShareState={entityShareState}
+                             granteesSelectFormRef={granteesSelectFormRef}
+                             setDisableSubmit={setDisableSubmit}
+                             showShareableEntityURL={showShareableEntityURL} />
+      ) : (
+        <Spinner />
+      )}
     </BootstrapModalConfirm>
   );
 };
@@ -107,10 +108,12 @@ EntityShareModal.propTypes = {
   entityType: PropTypes.string.isRequired,
   entityTypeTitle: PropTypes.string,
   onClose: PropTypes.func.isRequired,
+  showShareableEntityURL: PropTypes.bool,
 };
 
 EntityShareModal.defaultProps = {
   entityTypeTitle: undefined,
+  showShareableEntityURL: true,
 };
 
 export default EntityShareModal;

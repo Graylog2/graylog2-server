@@ -16,7 +16,6 @@
  */
 import asMock from 'helpers/mocking/AsMock';
 import { userList as userOverviewList, admin } from 'fixtures/userOverviews';
-
 import { UsersActions } from 'stores/users/UsersStore';
 import fetch from 'logic/rest/FetchProvider';
 

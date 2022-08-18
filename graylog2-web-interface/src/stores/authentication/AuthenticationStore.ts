@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
-import { $PropertyType } from 'utility-types/dist/utility-types';
+import type { $PropertyType } from 'utility-types/dist/utility-types';
 
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import { qualifyUrl } from 'util/URLUtils';
@@ -24,11 +24,11 @@ import fetch, { Builder } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import PaginationURL from 'util/PaginationURL';
 import type { PaginatedUsers } from 'stores/users/UsersStore';
-import type { PaginatedResponseType, Pagination } from 'stores/PaginationTypes';
+import type { PaginatedResponseType, Pagination, PaginatedList } from 'stores/PaginationTypes';
 import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import ApiRoutes from 'routing/ApiRoutes';
-import UserOverview, { UserOverviewJSON } from 'logic/users/UserOverview';
-import { PaginatedList } from 'stores/PaginationTypes';
+import type { UserOverviewJSON } from 'logic/users/UserOverview';
+import UserOverview from 'logic/users/UserOverview';
 
 export type AuthenticationBackendCreate = {
   title: $PropertyType<AuthenticationBackendJSON, 'title'>,

@@ -26,7 +26,8 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.storage.ElasticsearchVersion;
+import org.graylog2.storage.DetectedSearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,14 +41,14 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEvents extends Migratio
 
     private static final Version MINIMUM_ELASTICSEARCH_VERSION = Version.from(7, 0, 0);
 
-    private final Version elasticsearchVersion;
+    private final SearchVersion elasticsearchVersion;
     private final ClusterConfigService clusterConfigService;
     private final ElasticsearchAdapter elasticsearch;
     private final ElasticsearchConfiguration elasticsearchConfig;
 
     @Inject
     public V20200730000000_AddGl2MessageIdFieldAliasForEvents(
-            @ElasticsearchVersion Version elasticsearchVersion,
+            @DetectedSearchVersion SearchVersion elasticsearchVersion,
             ClusterConfigService clusterConfigService,
             ElasticsearchAdapter elasticsearch,
             ElasticsearchConfiguration elasticsearchConfig) {
@@ -78,7 +79,7 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEvents extends Migratio
     }
 
     private boolean shouldSkip() {
-        if (!elasticsearchVersion.sameOrHigher(MINIMUM_ELASTICSEARCH_VERSION)) {
+        if (!new Version(elasticsearchVersion.version()).sameOrHigher(MINIMUM_ELASTICSEARCH_VERSION)) {
             LOG.debug("Skipping migration, because Elasticsearch major version of {} " +
                             "is lower than the required minimum version of {}.",
                     elasticsearchVersion, MINIMUM_ELASTICSEARCH_VERSION);

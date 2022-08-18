@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import { $PropertyType } from 'utility-types';
+import type * as Immutable from 'immutable';
+import type { $PropertyType } from 'utility-types';
 
-import { Step, StepKey } from 'components/common/Wizard';
+import type { Step, StepKey } from 'components/common/Wizard';
 import { singleton } from 'logic/singleton';
 
 export type WizardFormValues = {

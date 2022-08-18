@@ -14,17 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import * as Immutable from 'immutable';
+import * as React from 'react';
+import { useMemo } from 'react';
+import type * as Immutable from 'immutable';
 import { flatten, get } from 'lodash';
-import styled, { css, DefaultTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Value from 'views/components/Value';
-import FieldType from 'views/logic/fieldtypes/FieldType';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
-import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
-import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type Series from 'views/logic/aggregationbuilder/Series';
+import { parseSeries } from 'views/logic/aggregationbuilder/Series';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 
 import type { CurrentViewType } from '../CustomPropTypes';
@@ -53,15 +56,28 @@ type Props = {
 
 const _c = (field, value, path, source) => ({ field, value, path, source });
 
-const _column = (field: string, value: any, selectedQuery: string, idx: number, type: FieldType, valuePath: ValuePath, source: string | undefined | null) => (
-  <StyledTd isNumeric={type.isNumeric()} key={`${selectedQuery}-${field}=${value}-${idx}`}>
-    <AdditionalContext.Provider value={{ valuePath }}>
-      <CustomHighlighting field={source ?? field} value={value}>
-        {value !== null && value !== undefined ? <Value field={source ?? field} type={type} value={value} queryId={selectedQuery} render={DecoratedValue} /> : null}
-      </CustomHighlighting>
-    </AdditionalContext.Provider>
-  </StyledTd>
-);
+type ColumnProps = { field: string, value: any, selectedQuery: string, type: FieldType, valuePath: ValuePath, source: string | undefined | null };
+
+const Column = ({ field, value, selectedQuery, type, valuePath, source }: ColumnProps) => {
+  const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
+
+  return (
+    <StyledTd isNumeric={type.isNumeric()}>
+      <AdditionalContext.Provider value={additionalContextValue}>
+        <CustomHighlighting field={source ?? field} value={value}>
+          {value !== null && value !== undefined
+            ? (
+              <Value field={source ?? field}
+                     type={type}
+                     value={value}
+                     queryId={selectedQuery}
+                     render={DecoratedValue} />
+            ) : null}
+        </CustomHighlighting>
+      </AdditionalContext.Provider>
+    </StyledTd>
+  );
+};
 
 const fullValuePathForField = (fieldName, valuePath) => {
   const currentSeries = parseSeries(fieldName);
@@ -103,7 +119,16 @@ const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivot
   return (
     <tbody className={classes}>
       <tr className="fields-row">
-        {columns.map(({ field, value, path, source }, idx) => _column(field, value, activeQuery, idx, fieldTypeFor(columnNameToField(field, series), types), path.slice(), source))}
+        {columns.map(({ field, value, path, source }, idx) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <Column key={`${activeQuery}-${field}=${value}-${idx}`}
+                  field={field}
+                  value={value}
+                  selectedQuery={activeQuery}
+                  type={fieldTypeFor(columnNameToField(field, series), types)}
+                  valuePath={path.slice()}
+                  source={source} />
+        ))}
       </tr>
     </tbody>
   );

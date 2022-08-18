@@ -19,7 +19,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Alert, Button } from 'components/bootstrap';
-import { Timestamp, Icon } from 'components/common';
+import { RelativeTime, Icon } from 'components/common';
 import NotificationsFactory from 'logic/notifications/NotificationsFactory';
 import { NotificationsActions } from 'stores/notifications/NotificationsStore';
 
@@ -77,7 +77,7 @@ class Notification extends React.Component {
           {notificationView.title}{' '}
 
           <NotificationTimestamp>
-            (triggered <Timestamp dateTime={notification.timestamp} relative />)
+            (triggered <RelativeTime dateTime={notification.timestamp} />)
           </NotificationTimestamp>
         </NotificationHead>
         <div className="notification-description">

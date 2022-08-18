@@ -20,7 +20,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
-import { SearchesConfig } from 'components/search/SearchConfig';
+import type { SearchesConfig } from 'components/search/SearchConfig';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 type ConfigurationsActionsType = {
@@ -29,6 +29,7 @@ type ConfigurationsActionsType = {
   listMessageProcessorsConfig: (configType: any) => Promise<unknown>,
   listEventsClusterConfig: () => Promise<unknown>,
   listWhiteListConfig: (configType: any) => Promise<unknown>,
+  listPermissionsConfig: (configType: string) => Promise<unknown>,
   update: (configType: any, config: any) => Promise<void>,
   updateWhitelist: (configType: any, config: any) => Promise<void>,
   updateMessageProcessorsConfig: (configType: any, config: any) => Promise<void>,
@@ -41,6 +42,7 @@ export const ConfigurationsActions = singletonActions(
     listMessageProcessorsConfig: { asyncResult: true },
     listEventsClusterConfig: { asyncResult: true },
     listWhiteListConfig: { asyncResult: true },
+    listPermissionsConfig: { asyncResult: true },
     update: { asyncResult: true },
     updateWhitelist: { asyncResult: true },
     updateMessageProcessorsConfig: { asyncResult: true },
@@ -59,7 +61,10 @@ export type WhiteListConfig = {
   entries: Array<Url>,
   disabled: boolean,
 };
-
+export type PermissionsConfigType = {
+  allow_sharing_with_everyone: boolean,
+  allow_sharing_with_users: boolean,
+}
 export type ConfigurationsStoreState = {
   configuration: Record<string, any>,
   searchesClusterConfig: SearchesConfig,
@@ -138,6 +143,25 @@ export const ConfigurationsStore = singletonStore(
       });
 
       ConfigurationsActions.listWhiteListConfig.promise(promise);
+    },
+
+    listPermissionsConfig(configType) {
+      const promise = fetch('GET', this._url(`/${configType}`)).then((response: PermissionsConfigType) => {
+        this.configuration = {
+          ...this.configuration,
+          // default values bellow should be the same in backend.
+          [configType]: response || {
+            allow_sharing_with_everyone: true,
+            allow_sharing_with_users: true,
+          },
+        };
+
+        this.propagateChanges();
+
+        return response;
+      });
+
+      ConfigurationsActions.listPermissionsConfig.promise(promise);
     },
 
     listEventsClusterConfig() {

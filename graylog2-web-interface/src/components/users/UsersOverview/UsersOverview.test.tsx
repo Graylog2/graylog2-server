@@ -17,11 +17,11 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+
 import { adminUser as currentUser } from 'fixtures/users';
 import { paginatedUsers, alice, bob, admin as adminOverview } from 'fixtures/userOverviews';
 import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
-
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { UsersActions } from 'stores/users/UsersStore';
 
@@ -37,8 +37,8 @@ const mockLoadUsersPaginatedPromise = Promise.resolve(paginatedUsers);
 jest.mock('stores/users/UsersStore', () => ({
   UsersActions: {
     loadUsersPaginated: jest.fn(() => mockLoadUsersPaginatedPromise),
-    delete: mockAction(jest.fn(() => Promise.resolve())),
-    setStatus: mockAction(jest.fn(() => Promise.resolve())),
+    delete: mockAction(),
+    setStatus: mockAction(),
   },
 }));
 

@@ -1,0 +1,20 @@
+{
+  "queries": [
+    {
+      "id": "f1446410-a082-4871-b3bf-d69aa42d0c96",
+      "query": {
+        "type": "elasticsearch",
+        "query_string": "action:$action$"
+      },
+      "timerange": {
+        "type": "relative",
+        "from": 300
+      },
+      "search_types": [
+        {
+          "type": "messages"
+        }
+      ]
+    }
+  ]
+}

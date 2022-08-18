@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -32,6 +33,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,6 +45,7 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity> {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_FILTER = "filter";
+    public static final String FIELD_SEARCH_FILTERS = "filters";
     public static final String FIELD_CONFIG = "config";
     public static final String FIELD_TIMERANGE = "timerange";
     public static final String FIELD_QUERY = "query";
@@ -58,6 +61,9 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity> {
     @Nullable
     public abstract String filter();
 
+    @JsonProperty(FIELD_SEARCH_FILTERS)
+    public abstract List<UsedSearchFilter> filters();
+
     @JsonProperty(FIELD_TIMERANGE)
     public abstract Optional<TimeRange> timerange();
 
@@ -72,7 +78,7 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity> {
 
     public static Builder builder() {
         return Builder.builder();
-    };
+    }
 
     @AutoValue.Builder
     public static abstract class Builder {
@@ -84,6 +90,9 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity> {
 
         @JsonProperty(FIELD_FILTER)
         public abstract Builder filter(@Nullable String filter);
+
+        @JsonProperty(FIELD_SEARCH_FILTERS)
+        public abstract Builder filters(List<UsedSearchFilter> filters);
 
         @JsonProperty(FIELD_TIMERANGE)
         public abstract Builder timerange(@Nullable TimeRange timerange);
@@ -107,7 +116,9 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity> {
 
         @JsonCreator
         static Builder builder() {
-            return new AutoValue_WidgetDTO.Builder().streams(Collections.emptySet());
+            return new AutoValue_WidgetDTO.Builder()
+                    .streams(Collections.emptySet())
+                    .filters(Collections.emptyList());
         }
     }
 
@@ -122,6 +133,7 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity> {
                 .id(this.id())
                 .config(this.config())
                 .filter(this.filter())
+                .filters(this.filters())
                 .streams(mappedStreams)
                 .type(this.type());
         if (this.query().isPresent()) {

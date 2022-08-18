@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { DefaultTheme, withTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import { withTheme } from 'styled-components';
 import { merge } from 'lodash';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
 
@@ -24,7 +25,7 @@ import { Popover } from 'components/bootstrap';
 import ColorPicker from 'components/common/ColorPicker';
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 import { colors as defaultColors } from 'views/components/visualizations/Colors';
-import ColorMapper from 'views/components/visualizations/ColorMapper';
+import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 
 import ChartColorContext from './ChartColorContext';
@@ -215,7 +216,7 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
         {({ colors, setColor }) => {
           plotLayout.shapes = plotLayout.shapes.map((shape) => ({
             ...shape,
-            line: { color: colors.get(eventsDisplayName, EVENT_COLOR) },
+            line: { color: shape?.line?.color || colors.get(eventsDisplayName, EVENT_COLOR) },
           }));
 
           const newChartData = chartData.map((chart) => {

@@ -20,7 +20,7 @@ import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import Role from 'logic/roles/Role';
+import type Role from 'logic/roles/Role';
 import { TextOverflowEllipsis } from 'components/common';
 import type { UserContext } from 'actions/roles/AuthzRolesActions';
 

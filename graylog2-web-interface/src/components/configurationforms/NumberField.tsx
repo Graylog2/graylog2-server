@@ -40,7 +40,7 @@ const NumberField = ({ autoFocus, field, onChange, title, typeName, value }: Pro
   const _mapValidationAttribute = (attribute) => {
     const { min, max } = _getDefaultValidationSpecs();
 
-    switch (attribute.toLocaleUpperCase()) {
+    switch (attribute.toUpperCase()) {
       case 'ONLY_NEGATIVE': return { min: min, max: -1 };
       case 'ONLY_POSITIVE': return { min: 0, max: max };
       case 'IS_PORT_NUMBER': return { min: 0, max: 65535 };

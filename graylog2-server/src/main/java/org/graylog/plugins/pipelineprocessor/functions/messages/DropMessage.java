@@ -52,7 +52,7 @@ public class DropMessage extends AbstractFunction<Void> {
                 .params(ImmutableList.of(
                         messageParam
                 ))
-                .description("Discards a message from further processing")
+                .description("Discards a message from further processing, after completing the current stage")
                 .build();
     }
 }

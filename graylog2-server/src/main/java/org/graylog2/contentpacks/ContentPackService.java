@@ -35,6 +35,7 @@ import org.graylog2.contentpacks.exceptions.InvalidParametersException;
 import org.graylog2.contentpacks.exceptions.MissingParametersException;
 import org.graylog2.contentpacks.exceptions.UnexpectedEntitiesException;
 import org.graylog2.contentpacks.facades.EntityFacade;
+import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.facades.UnsupportedEntityFacade;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
@@ -80,12 +81,12 @@ public class ContentPackService {
 
     private final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService;
     private final Set<ConstraintChecker> constraintCheckers;
-    private final Map<ModelType, EntityFacade<?>> entityFacades;
+    private final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades;
 
     @Inject
     public ContentPackService(ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
                               Set<ConstraintChecker> constraintCheckers,
-                              Map<ModelType, EntityFacade<?>> entityFacades) {
+                              Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades) {
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.constraintCheckers = constraintCheckers;
         this.entityFacades = entityFacades;
@@ -127,7 +128,7 @@ public class ContentPackService {
                 }
 
                 final EntityDescriptor entityDescriptor = entity.toEntityDescriptor();
-                final EntityFacade facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
+                final EntityWithExcerptFacade facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
                 @SuppressWarnings({"rawtypes", "unchecked"}) final Optional<NativeEntity> existingEntity = facade.findExisting(entity, parameters);
                 if (existingEntity.isPresent()) {
                     LOG.trace("Found existing entity for {}", entityDescriptor);
@@ -178,7 +179,7 @@ public class ContentPackService {
         for (Map.Entry<EntityDescriptor, Object> entry : entries.reverse()) {
             final EntityDescriptor entityDescriptor = entry.getKey();
             final Object entity = entry.getValue();
-            final EntityFacade facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
+            final EntityWithExcerptFacade facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
 
             LOG.debug("Removing entity {}", entityDescriptor);
             facade.delete(entity);
@@ -261,7 +262,7 @@ public class ContentPackService {
                         .filter(descriptor -> entity.id().equals(descriptor.contentPackEntityId()))
                         .findFirst();
 
-                final EntityFacade facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
+                final EntityWithExcerptFacade facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
 
                 if (nativeEntityDescriptorOptional.isPresent()) {
                     final NativeEntityDescriptor nativeEntityDescriptor = nativeEntityDescriptorOptional.get();
@@ -339,7 +340,7 @@ public class ContentPackService {
                 continue;
             }
 
-            final EntityFacade<?> facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
+            final EntityWithExcerptFacade<?, ?> facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
             final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(entityDescriptor);
             LOG.trace("Dependencies of entity {}: {}", entityDescriptor, graph);
 
@@ -364,7 +365,7 @@ public class ContentPackService {
             if (EntityDescriptorIds.isSystemStreamDescriptor(entityDescriptor)) {
                 continue;
             }
-            final EntityFacade<?> facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
+            final EntityWithExcerptFacade<?, ?> facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
 
             facade.exportEntity(entityDescriptor, entityDescriptorIds).ifPresent(entities::add);
         }
@@ -387,7 +388,7 @@ public class ContentPackService {
             final EntityDescriptor entityDescriptor = entry.getKey();
             final Entity entity = entry.getValue();
 
-            final EntityFacade<?> facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
+            final EntityWithExcerptFacade<?, ?> facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
             final Graph<Entity> entityGraph = facade.resolveForInstallation(entity, parameters, entityDescriptorMap);
             LOG.trace("Dependencies of entity {}: {}", entityDescriptor, entityGraph);
 

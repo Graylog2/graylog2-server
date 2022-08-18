@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import StringUtils from 'util/StringUtils';
-import { MissingDependencies, GranteesList } from 'logic/permissions/EntityShareState';
+import type { MissingDependencies, GranteesList } from 'logic/permissions/EntityShareState';
 import { Alert } from 'components/bootstrap';
 
 type Props = {

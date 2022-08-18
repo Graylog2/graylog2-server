@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
-import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import type HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
 const HighlightingRules = React.createContext<Array<HighlightingRule> | undefined>(undefined);
 

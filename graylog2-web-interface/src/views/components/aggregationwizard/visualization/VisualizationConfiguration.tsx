@@ -22,8 +22,8 @@ import styled from 'styled-components';
 import { Input, Checkbox } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import usePluginEntities from 'views/logic/usePluginEntities';
-import { defaultCompare } from 'views/logic/DefaultCompare';
-import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import { defaultCompare } from 'logic/DefaultCompare';
+import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { TIMESTAMP_FIELD } from 'views/Constants';
 
 import VisualizationConfigurationOptions from './VisualizationConfigurationOptions';

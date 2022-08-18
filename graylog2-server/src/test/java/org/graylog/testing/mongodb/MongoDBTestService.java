@@ -19,6 +19,7 @@ package org.graylog.testing.mongodb;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionImpl;
@@ -37,7 +38,6 @@ public class MongoDBTestService implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBTestService.class);
 
     private static final String DEFAULT_DATABASE_NAME = "graylog";
-    public static final String DEFAULT_VERSION = MongoDBContainer.DEFAULT_VERSION;
 
     private final MongoDBContainer container;
     private MongoConnectionImpl mongoConnection;
@@ -56,7 +56,7 @@ public class MongoDBTestService implements AutoCloseable {
      *
      * @return the service instance
      */
-    public static MongoDBTestService create(String version) {
+    public static MongoDBTestService create(MongodbServer version) {
         return new MongoDBTestService(MongoDBContainer.create(version));
     }
 
@@ -74,7 +74,7 @@ public class MongoDBTestService implements AutoCloseable {
      *
      * @return the service instance
      */
-    public static MongoDBTestService create(String version, Network network) {
+    public static MongoDBTestService create(MongodbServer version, Network network) {
         return new MongoDBTestService(MongoDBContainer.create(version, network));
     }
 
@@ -178,7 +178,7 @@ public class MongoDBTestService implements AutoCloseable {
         return uriWithHostAndPort(MongoDBContainer.NETWORK_ALIAS, MongoDBContainer.MONGODB_PORT);
     }
 
-    private String uri() {
+    public String uri() {
         return uriWithHostAndPort(ipAddress(), port());
     }
 

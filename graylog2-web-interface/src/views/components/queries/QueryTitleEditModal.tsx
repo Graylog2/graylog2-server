@@ -56,7 +56,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     });
 
     this.modal.open();
-  }
+  };
 
   _onDraftSave = () => {
     const { titleDraft } = this.state;

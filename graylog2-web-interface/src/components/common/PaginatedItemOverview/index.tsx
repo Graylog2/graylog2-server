@@ -14,15 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PaginatedItemOverview, {
-  DEFAULT_PAGINATION,
+import type {
   PaginatedListType,
   DescriptiveItem,
+  ResultsWrapperComponentProps,
+  OverrideItemComponentProps,
+} from './PaginatedItemOverview';
+import PaginatedItemOverview, {
+  DEFAULT_PAGINATION,
 } from './PaginatedItemOverview';
 
 export type {
   PaginatedListType,
   DescriptiveItem,
+  ResultsWrapperComponentProps,
+  OverrideItemComponentProps,
 };
 
 export { DEFAULT_PAGINATION };

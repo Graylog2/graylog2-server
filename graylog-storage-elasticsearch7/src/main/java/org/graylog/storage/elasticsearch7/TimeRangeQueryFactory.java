@@ -33,6 +33,6 @@ public class TimeRangeQueryFactory {
 
         return QueryBuilders.rangeQuery(Message.FIELD_TIMESTAMP)
                 .gte(Tools.buildElasticSearchTimeFormat(range.getFrom()))
-                .lte(Tools.buildElasticSearchTimeFormat(range.getTo()));
+                .lt(Tools.buildElasticSearchTimeFormat(range.getTo()));
     }
 }

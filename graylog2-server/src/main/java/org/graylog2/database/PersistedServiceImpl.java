@@ -183,11 +183,11 @@ public class PersistedServiceImpl implements PersistedService {
         // Do field transformations
         fieldTransformations(doc);
 
-		/*
+        /*
          * We are running an upsert. This means that the existing
-		 * document will be updated if the ID already exists and
-		 * a new document will be created if it doesn't.
-		 */
+         * document will be updated if the ID already exists and
+         * a new document will be created if it doesn't.
+         */
         BasicDBObject q = new BasicDBObject("_id", new ObjectId(model.getId()));
         collection(model).update(q, doc, true, false);
 

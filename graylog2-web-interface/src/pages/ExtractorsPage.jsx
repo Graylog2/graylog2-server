@@ -55,7 +55,7 @@ const ExtractorsPage = createReactClass({
 
   onNodesChange(nodes) {
     const { params } = this.props;
-    const newNode = params.nodeId ? nodes.nodes[params.nodeId] : Object.values(nodes.nodes).filter((node) => node.is_master);
+    const newNode = params.nodeId ? nodes.nodes[params.nodeId] : Object.values(nodes.nodes).filter((node) => node.is_leader);
 
     const { node } = this.state;
 

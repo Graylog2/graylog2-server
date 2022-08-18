@@ -236,6 +236,13 @@ public class Version implements Comparable<Version> {
             final int minor = version.getMinorVersion();
             final int patch = version.getPatchVersion();
             final String qualifier = version.getPreReleaseVersion();
+            final String buildMetadata = version.getBuildMetadata();
+
+            // If the version property already contains build metadata we want to use that instead of replacing it
+            // with the Git commit ID
+            if (!isNullOrEmpty(buildMetadata)) {
+                return from(major, minor, patch, qualifier, buildMetadata);
+            }
 
             String commitSha = null;
             try {
@@ -253,7 +260,7 @@ public class Version implements Comparable<Version> {
 
             return from(major, minor, patch, qualifier, commitSha);
         } catch (Exception e) {
-            LOG.error("Unable to read " + path + ", this build has no version number.", e);
+            LOG.error("Unable to read " + path + ", this build has no version number. <{}>", e.toString());
         }
         return defaultVersion;
     }

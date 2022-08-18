@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 
-import Widget from 'views/logic/widgets/Widget';
+import type Widget from 'views/logic/widgets/Widget';
 import { widgetDefinition } from 'views/logic/Widgets';
 
 type Props = {

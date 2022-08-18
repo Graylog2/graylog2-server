@@ -17,11 +17,12 @@
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
-import MockStore from 'helpers/mocking/StoreMock';
 
+import MockStore from 'helpers/mocking/StoreMock';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import Widget from 'views/logic/widgets/Widget';
+import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
 import EditWidgetFrame from './EditWidgetFrame';
 
@@ -35,8 +36,9 @@ jest.mock('views/stores/WidgetStore', () => ({
 }));
 
 jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
   SearchActions: {
-    refresh: jest.fn(),
+    refresh: jest.fn(() => Promise.resolve()),
   },
 }));
 
@@ -72,41 +74,46 @@ describe('EditWidgetFrame', () => {
     const widget = Widget.builder()
       .id('deadbeef')
       .type('dummy')
+      .query(createElasticsearchQueryString())
+      .timerange({ type: 'relative', from: 300 })
       .config({})
       .build();
     const renderSUT = () => render((
       <ViewTypeContext.Provider value="DASHBOARD">
         <WidgetContext.Provider value={widget}>
           <EditWidgetFrame onCancel={() => {}} onFinish={() => {}}>
-            <>Hello World!</>
-            <>These are some buttons!</>
+            Hello World!
+            These are some buttons!
           </EditWidgetFrame>
         </WidgetContext.Provider>
       </ViewTypeContext.Provider>
     ));
 
-    it('performs search when clicking on search button', async () => {
+    it('refreshes search after clicking on search button, when there are no changes', async () => {
       renderSUT();
-      const searchButton = screen.getByTitle(/Perform search/);
+      const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
+      await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
       fireEvent.click(searchButton);
 
       await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
     });
 
     it('changes the widget\'s streams when using stream filter', async () => {
-      const { getByTitle, getByTestId } = renderSUT();
-      const streamFilter = getByTestId('streams-filter');
+      renderSUT();
+      const streamFilter = await screen.findByTestId('streams-filter');
       const reactSelect = streamFilter.querySelector('div');
 
       expect(reactSelect).not.toBeNull();
 
-      // Flow is not parsing the jest assertion before
       if (reactSelect) {
         await selectEvent.select(reactSelect, 'PFLog');
       }
 
-      const searchButton = getByTitle(/Perform search/);
+      const searchButton = screen.getByRole('button', {
+        name: /perform search \(changes were made after last search execution\)/i,
+      });
+      await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
 
       fireEvent.click(searchButton);
 

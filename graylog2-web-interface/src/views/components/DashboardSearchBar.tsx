@@ -15,40 +15,50 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
-import PropTypes from 'prop-types';
+import { useMemo, useCallback } from 'react';
 import { Field } from 'formik';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
 
-import connect from 'stores/connect';
-import DocumentationLink from 'components/support/DocumentationLink';
-import DocsHelper from 'util/DocsHelper';
+import { useStore } from 'stores/connect';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
-import { FlatContentRow, Icon, Spinner } from 'components/common';
+import { FlatContentRow, Spinner } from 'components/common';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import SearchButton from 'views/components/searchbar/SearchButton';
-import QueryInput from 'views/components/searchbar/AsyncQueryInput';
+import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
 import ViewActionsMenu from 'views/components/ViewActionsMenu';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
-import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import BottomRow from 'views/components/searchbar/BottomRow';
 import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
-import { SearchesConfig } from 'components/search/SearchConfig';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
+import FormWarningsContext from 'contexts/FormWarningsContext';
+import FormWarningsProvider from 'contexts/FormWarningsProvider';
+import useParameters from 'views/hooks/useParameters';
+import debounceWithPromise from 'views/logic/debounceWithPromise';
+import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
+import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
+import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
+import { SearchActions } from 'views/stores/SearchStore';
+import {
+  executeSearchSubmitHandler as executePluggableSubmitHandler,
+  useInitialSearchValues as usePluggableInitialValues,
+  pluggableValidationPayload,
+} from 'views/logic/searchbar/pluggableSearchBarControlsHandler';
+import type { SearchBarControl } from 'views/types';
+import usePluginEntities from 'views/logic/usePluginEntities';
+import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import useUserDateTime from 'hooks/useUserDateTime';
 
-import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeInput from './searchbar/TimeRangeInput';
+import type { DashboardFormValues } from './DashboardSearchBarForm';
+import DashboardSearchForm from './DashboardSearchBarForm';
+import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
 
-type Props = {
-  config: SearchesConfig,
-  globalOverride: {
-    timerange: TimeRange,
-    query: QueryString,
-  },
-  disableSearch?: boolean,
-  onExecute: () => Promise<void>,
-};
+const Container = styled.div`
+  display: grid;
+  row-gap: 10px;
+`;
 
 const TopRow = styled.div(({ theme }) => css`
   display: flex;
@@ -83,21 +93,49 @@ const RefreshControlsWrapper = styled.div(({ theme }) => css`
 const SearchButtonAndQuery = styled.div`
   flex: 1;
   display: flex;
+  align-items: flex-start;
 `;
 
-const StyledQueryInput = styled(QueryInput)`
-  flex: 1;
-`;
+const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
-const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onExecute: performSearch }: Props) => {
-  const submitForm = useCallback(({ timerange, queryString }) => GlobalOverrideActions.set(timerange, queryString)
-    .then(() => performSearch()), [performSearch]);
+const _validateQueryString = (values: DashboardFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, userTimezone: string) => {
+  const request = {
+    timeRange: isNoTimeRangeOverride(values?.timerange) ? undefined : values?.timerange,
+    queryString: values?.queryString,
+    ...pluggableValidationPayload(values, pluggableSearchBarControls),
+  };
+
+  return debouncedValidateQuery(request, userTimezone);
+};
+
+const useInitialFormValues = (timerange, queryString) => {
+  const initialValuesFromPlugins = usePluggableInitialValues();
+
+  return useMemo(() => {
+    return { timerange, queryString, ...initialValuesFromPlugins };
+  }, [queryString, timerange, initialValuesFromPlugins]);
+};
+
+const DashboardSearchBar = () => {
+  const { userTimezone } = useUserDateTime();
+  const { searchesClusterConfig: config } = useStore(SearchConfigStore);
+  const { timerange, query: { query_string: queryString = '' } = {} } = useStore(GlobalOverrideStore) ?? {};
+  const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
+
+  const submitForm = useCallback(async (values) => {
+    const { timerange: newTimerange, queryString: newQueryString } = values;
+    await executePluggableSubmitHandler(values, pluggableSearchBarControls);
+
+    return GlobalOverrideActions.set(newTimerange, newQueryString).then(() => SearchActions.refresh());
+  }, [pluggableSearchBarControls]);
+
+  const { parameters } = useParameters();
+  const initialValues = useInitialFormValues(timerange, queryString);
 
   if (!config) {
     return <Spinner />;
   }
 
-  const { timerange, query: { query_string: queryString = '' } = {} } = globalOverride || {};
   const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
 
   return (
@@ -105,56 +143,70 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
       {({ focusedWidget: { editing } = { editing: false } }) => (
         <ScrollToHint value={queryString}>
           <FlatContentRow>
-            <DashboardSearchForm initialValues={{ timerange, queryString }}
-                                 limitDuration={limitDuration}
-                                 onSubmit={submitForm}>
-              {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
-                <>
-                  <TopRow>
-                    <StyledTimeRangeInput disabled={disableSearch}
-                                          onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                          value={values?.timerange}
-                                          hasErrorOnMount={!isValid}
-                                          noOverride />
-                    <RefreshControlsWrapper>
-                      <RefreshControls />
-                    </RefreshControlsWrapper>
-                  </TopRow>
+            <FormWarningsProvider>
+              <DashboardSearchForm initialValues={initialValues}
+                                   limitDuration={limitDuration}
+                                   onSubmit={submitForm}
+                                   validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls, userTimezone)}>
+                {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
+                  const disableSearchSubmit = isSubmitting || isValidating || !isValid;
 
-                  <BottomRow>
-                    <SearchButtonAndQuery>
-                      <SearchButton disabled={disableSearch || isSubmitting || !isValid}
-                                    glyph="filter"
-                                    dirty={dirty} />
+                  return (
+                    <Container>
+                      <ValidateOnParameterChange parameters={parameters} />
+                      <TopRow>
+                        <StyledTimeRangeInput onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                              value={values?.timerange}
+                                              limitDuration={limitDuration}
+                                              hasErrorOnMount={!!errors.timerange}
+                                              noOverride />
+                        <RefreshControlsWrapper>
+                          <RefreshControls />
+                        </RefreshControlsWrapper>
+                      </TopRow>
 
-                      <Field name="queryString">
-                        {({ field: { name, value, onChange } }) => (
-                          <StyledQueryInput value={value}
-                                            placeholder="Apply filter to all widgets"
-                                            onChange={(newQuery) => {
-                                              onChange({ target: { value: newQuery, name } });
+                      <BottomRow>
+                        <SearchButtonAndQuery>
+                          <SearchButton disabled={disableSearchSubmit}
+                                        glyph="filter"
+                                        displaySpinner={isSubmitting}
+                                        dirty={dirty} />
 
-                                              return Promise.resolve(newQuery);
-                                            }}
-                                            onExecute={handleSubmit as () => void} />
+                          <Field name="queryString">
+                            {({ field: { name, value, onChange }, meta: { error } }) => (
+                              <FormWarningsContext.Consumer>
+                                {({ warnings }) => (
+                                  <QueryInput value={value}
+                                              timeRange={values?.timerange}
+                                              placeholder="Apply filter to all widgets"
+                                              name={name}
+                                              onChange={onChange}
+                                              disableExecution={disableSearchSubmit}
+                                              error={error}
+                                              isValidating={isValidating}
+                                              validate={validateForm}
+                                              warning={warnings.queryString}
+                                              onExecute={handleSubmit as () => void} />
+                                )}
+                              </FormWarningsContext.Consumer>
+                            )}
+                          </Field>
+
+                          <QueryValidation />
+                        </SearchButtonAndQuery>
+
+                        {!editing && (
+                          <ViewActionsWrapper>
+                            <ViewActionsMenu />
+                          </ViewActionsWrapper>
                         )}
-                      </Field>
-                      <div className="search-help">
-                        <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                           title="Search query syntax documentation"
-                                           text={<Icon name="lightbulb" />} />
-                      </div>
-                    </SearchButtonAndQuery>
-
-                    {!editing && (
-                      <ViewActionsWrapper>
-                        <ViewActionsMenu />
-                      </ViewActionsWrapper>
-                    )}
-                  </BottomRow>
-                </>
-              )}
-            </DashboardSearchForm>
+                      </BottomRow>
+                      <PluggableSearchBarControls showLeftControls={false} />
+                    </Container>
+                  );
+                }}
+              </DashboardSearchForm>
+            </FormWarningsProvider>
           </FlatContentRow>
         </ScrollToHint>
       )}
@@ -162,18 +214,4 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
   );
 };
 
-DashboardSearchBar.propTypes = {
-  disableSearch: PropTypes.bool,
-  onExecute: PropTypes.func.isRequired,
-};
-
-DashboardSearchBar.defaultProps = {
-  disableSearch: false,
-};
-
-export default connect(
-  DashboardSearchBar,
-  {
-    globalOverride: GlobalOverrideStore,
-  },
-);
+export default DashboardSearchBar;

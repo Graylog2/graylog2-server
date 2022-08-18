@@ -18,7 +18,8 @@ package org.graylog.storage.elasticsearch6.views.export;
 
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -26,10 +27,10 @@ import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 
 public class ElasticsearchExportBackendSearchAfterIT extends ElasticsearchExportBackendITBase {
     @Rule
-    public final ElasticsearchInstance elasticsearch = ElasticsearchInstanceES6.create();
+    public final TestableSearchServerInstance elasticsearch = ElasticsearchInstanceES6.create();
 
     @Override
-    protected ElasticsearchInstance elasticsearch() {
+    protected SearchServerInstance elasticsearch() {
         return this.elasticsearch;
     }
 
@@ -46,7 +47,7 @@ public class ElasticsearchExportBackendSearchAfterIT extends ElasticsearchExport
 
         runWithExpectedResult(command, "timestamp,source,message",
                 "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha",
-                "graylog_1, 2015-01-01T02:00:00.000Z, source-2, He",
+                "graylog_1, 2015-01-01T01:59:59.999Z, source-2, He",
                 "graylog_0, 2015-01-01T03:00:00.000Z, source-1, Hi",
                 "graylog_0, 2015-01-01T04:00:00.000Z, source-2, Ho");
     }

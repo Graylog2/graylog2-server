@@ -52,58 +52,58 @@ const StyledMetricDetail = styled.div`
 `;
 
 class MetricDetails extends React.Component {
- static propTypes = {
-   metrics: PropTypes.object,
-   metric: PropTypes.object.isRequired,
-   nodeId: PropTypes.string.isRequired,
- };
+  static propTypes = {
+    metrics: PropTypes.object,
+    metric: PropTypes.object.isRequired,
+    nodeId: PropTypes.string.isRequired,
+  };
 
- static defaultProps = {
-   metrics: undefined,
- }
+  static defaultProps = {
+    metrics: undefined,
+  };
 
- componentDidMount() {
-   const { nodeId, metric: { full_name: fullName } } = this.props;
-   MetricsActions.add(nodeId, fullName);
- }
+  componentDidMount() {
+    const { nodeId, metric: { full_name: fullName } } = this.props;
+    MetricsActions.add(nodeId, fullName);
+  }
 
- componentWillUnmount() {
-   const { nodeId, metric: { full_name: fullName } } = this.props;
-   MetricsActions.remove(nodeId, fullName);
- }
+  componentWillUnmount() {
+    const { nodeId, metric: { full_name: fullName } } = this.props;
+    MetricsActions.remove(nodeId, fullName);
+  }
 
- _formatDetailsForType = (type, metric) => {
-   switch (type) {
-     case 'Counter':
-       return <CounterDetails metric={metric} />;
-     case 'Gauge':
-       return <GaugeDetails metric={metric} />;
-     case 'Histogram':
-       return <HistogramDetails metric={metric} />;
-     case 'Meter':
-       return <MeterDetails metric={metric} />;
-     case 'Timer':
-       return <TimerDetails metric={metric} />;
-     default:
-       return <i>Invalid metric type: {type}</i>;
-   }
- }
+  _formatDetailsForType = (type, metric) => {
+    switch (type) {
+      case 'Counter':
+        return <CounterDetails metric={metric} />;
+      case 'Gauge':
+        return <GaugeDetails metric={metric} />;
+      case 'Histogram':
+        return <HistogramDetails metric={metric} />;
+      case 'Meter':
+        return <MeterDetails metric={metric} />;
+      case 'Timer':
+        return <TimerDetails metric={metric} />;
+      default:
+        return <i>Invalid metric type: {type}</i>;
+    }
+  };
 
- render() {
-   const { nodeId, metric, metric: { full_name: metricName }, metrics } = this.props;
-   const currentMetric = metrics?.[nodeId]?.[metricName] ?? metric;
-   const type = lodash.capitalize(currentMetric.type);
-   const details = this._formatDetailsForType(type, currentMetric);
+  render() {
+    const { nodeId, metric, metric: { full_name: metricName }, metrics } = this.props;
+    const currentMetric = metrics?.[nodeId]?.[metricName] ?? metric;
+    const type = lodash.capitalize(currentMetric.type);
+    const details = this._formatDetailsForType(type, currentMetric);
 
-   return (
-     <div className="metric">
-       <h3>{type}</h3>
-       <StyledMetricDetail>
-         {details}
-       </StyledMetricDetail>
-     </div>
-   );
- }
+    return (
+      <div className="metric">
+        <h3>{type}</h3>
+        <StyledMetricDetail>
+          {details}
+        </StyledMetricDetail>
+      </div>
+    );
+  }
 }
 
 export default connect(

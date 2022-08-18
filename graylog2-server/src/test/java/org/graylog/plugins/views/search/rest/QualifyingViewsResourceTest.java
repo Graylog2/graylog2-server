@@ -16,122 +16,97 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import com.google.common.collect.ImmutableList;
-import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.QualifyingViewsService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewParameterSummaryDTO;
-import org.graylog2.plugin.database.users.User;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.Test;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class QualifyingViewsResourceTest {
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
-
-    @Mock
-    private QualifyingViewsService qualifyingViewsService;
-
-    @Mock
-    private Subject subject;
-
-    @Mock
-    private User currentUser;
-
-    class QualifyingViewsTestResource extends QualifyingViewsResource {
-        private final Subject subject;
-
-        QualifyingViewsTestResource(QualifyingViewsService qualifyingViewsService, Subject subject) {
-            super(qualifyingViewsService);
-            this.subject = subject;
-        }
-
-        @Override
-        protected Subject getSubject() {
-            return this.subject;
-        }
-
-        @Nullable
-        @Override
-        protected User getCurrentUser() {
-            return currentUser;
-        }
-    }
-
-    private QualifyingViewsResource qualifyingViewsResource;
-
-    @Before
-    public void setUp() throws Exception {
-        this.qualifyingViewsResource = new QualifyingViewsTestResource(qualifyingViewsService, subject);
-    }
 
     @Test
     public void returnsNoViewsIfNoneArePresent() {
-        when(qualifyingViewsService.forValue()).thenReturn(Collections.emptyList());
+        final SearchUser searchUser = TestSearchUser.builder().build();
 
-        final Collection<ViewParameterSummaryDTO> result = this.qualifyingViewsResource.forParameter();
+        QualifyingViewsService service = mockViewsService();
+        final QualifyingViewsResource resource = new QualifyingViewsResource(service);
 
+        final Collection<ViewParameterSummaryDTO> result = resource.forParameter(searchUser);
         assertThat(result).isEmpty();
     }
 
     @Test
     public void returnsNoViewsIfNoneArePermitted() {
-        final ViewParameterSummaryDTO view1 = mock(ViewParameterSummaryDTO.class);
-        when(view1.id()).thenReturn("view1");
-        when(view1.type()).thenReturn(ViewDTO.Type.SEARCH);
-        when(subject.isPermitted(ViewsRestPermissions.VIEW_READ + ":view1")).thenReturn(false);
-        final ViewParameterSummaryDTO view2 = mock(ViewParameterSummaryDTO.class);
-        when(view2.id()).thenReturn("view2");
-        when(view2.type()).thenReturn(ViewDTO.Type.SEARCH);
-        when(subject.isPermitted(ViewsRestPermissions.VIEW_READ + ":view2")).thenReturn(false);
-        when(qualifyingViewsService.forValue()).thenReturn(ImmutableList.of(view1, view2));
+        final SearchUser searchUser = TestSearchUser.builder()
+                .denyView("view1")
+                .denyView("view2")
+                .build();
 
-        final Collection<ViewParameterSummaryDTO> result = this.qualifyingViewsResource.forParameter();
+        final QualifyingViewsService service = mockViewsService("view1", "view2");
+        final QualifyingViewsResource resource = new QualifyingViewsResource(service);
+        final Collection<ViewParameterSummaryDTO> result = resource.forParameter(searchUser);
 
         assertThat(result).isEmpty();
     }
 
     @Test
     public void returnsSomeViewsIfSomeArePermitted() {
-        final ViewParameterSummaryDTO view1 = mock(ViewParameterSummaryDTO.class);
-        when(view1.id()).thenReturn("view1");
-        when(view1.type()).thenReturn(ViewDTO.Type.SEARCH);
-        when(subject.isPermitted(ViewsRestPermissions.VIEW_READ + ":view1")).thenReturn(false);
-        final ViewParameterSummaryDTO view2 = mock(ViewParameterSummaryDTO.class);
-        when(view2.id()).thenReturn("view2");
-        when(view2.type()).thenReturn(ViewDTO.Type.SEARCH);
-        when(subject.isPermitted(ViewsRestPermissions.VIEW_READ + ":view2")).thenReturn(true);
-        when(qualifyingViewsService.forValue()).thenReturn(ImmutableList.of(view1, view2));
 
-        final Collection<ViewParameterSummaryDTO> result = this.qualifyingViewsResource.forParameter();
+        final SearchUser searchUser = TestSearchUser.builder()
+                .denyView("view1")
+                .allowView("view2")
+                .build();
 
-        assertThat(result).containsExactly(view2);
+        final QualifyingViewsService service = mockViewsService("view1", "view2");
+
+        final QualifyingViewsResource resource = new QualifyingViewsResource(service);
+        final Collection<ViewParameterSummaryDTO> result = resource.forParameter(searchUser);
+
+        assertThat(result)
+                .hasSize(1)
+                .extracting(ViewParameterSummaryDTO::id)
+                .containsOnly("view2");
     }
 
     @Test
     public void returnsAllViewsIfAllArePermitted() {
-        final ViewParameterSummaryDTO view1 = mock(ViewParameterSummaryDTO.class);
-        when(view1.id()).thenReturn("view1");
-        when(subject.isPermitted(ViewsRestPermissions.VIEW_READ + ":view1")).thenReturn(true);
-        final ViewParameterSummaryDTO view2 = mock(ViewParameterSummaryDTO.class);
-        when(view2.id()).thenReturn("view2");
-        when(subject.isPermitted(ViewsRestPermissions.VIEW_READ + ":view2")).thenReturn(true);
-        when(qualifyingViewsService.forValue()).thenReturn(ImmutableList.of(view1, view2));
 
-        final Collection<ViewParameterSummaryDTO> result = this.qualifyingViewsResource.forParameter();
+        final SearchUser searchUser = TestSearchUser.builder()
+                .allowView("view1")
+                .allowView("view2")
+                .build();
 
-        assertThat(result).contains(view1, view2);
+        final QualifyingViewsService service = mockViewsService("view1", "view2");
+
+        final QualifyingViewsResource resource = new QualifyingViewsResource(service);
+        final Collection<ViewParameterSummaryDTO> result = resource.forParameter(searchUser);
+
+        assertThat(result)
+                .hasSize(2)
+                .extracting(ViewParameterSummaryDTO::id)
+                .containsOnly("view1", "view2");
+    }
+
+    private QualifyingViewsService mockViewsService(String... viewIDs) {
+        final QualifyingViewsService service = mock(QualifyingViewsService.class);
+        final List<ViewParameterSummaryDTO> views = Stream.of(viewIDs).map(this::mockView).collect(Collectors.toList());
+        when(service.forValue()).thenReturn(views);
+        return service;
+    }
+
+    private ViewParameterSummaryDTO mockView(String id) {
+        final ViewParameterSummaryDTO view = mock(ViewParameterSummaryDTO.class);
+        when(view.id()).thenReturn(id);
+        when(view.type()).thenReturn(ViewDTO.Type.SEARCH);
+        return view;
     }
 }

@@ -196,8 +196,7 @@ export default connect(EventDefinitionFormContainer, {
   entityTypes: AvailableEventDefinitionTypesStore,
   notifications: EventNotificationsStore,
   currentUser: CurrentUserStore,
-},
-({ currentUser, ...otherProps }) => ({
+}, ({ currentUser, ...otherProps }) => ({
   ...otherProps,
   currentUser: currentUser.currentUser,
 }));

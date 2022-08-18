@@ -16,12 +16,12 @@
  */
 import * as React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore } from 'helpers/mocking';
 
+import { StoreMock as MockStore } from 'helpers/mocking';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
 import QueryResult from 'views/logic/QueryResult';
-import { ViewMetaData } from 'views/stores/ViewMetadataStore';
+import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 
 import Sidebar from './Sidebar';
 
@@ -47,7 +47,11 @@ describe('<Sidebar />', () => {
     summary: 'query summary',
     title: 'Query Title',
   };
-  const effectiveTimerange = { type: 'absolute', from: '2018-08-28T14:34:26.192Z', to: '2018-08-28T14:39:26.192Z' } as const;
+  const effectiveTimerange = {
+    type: 'absolute',
+    from: '2018-08-28T14:34:26.192Z',
+    to: '2018-08-28T14:39:26.192Z',
+  } as const;
   const duration = 64;
   const timestamp = '2018-08-28T14:39:26.127Z';
   const query = {
@@ -89,7 +93,7 @@ describe('<Sidebar />', () => {
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
-    await screen.findAllByText((content, node) => (node.textContent === 'Query executed in 64ms at 2018-08-28 09:39:26.'));
+    await screen.findAllByText((_content, node) => (node.textContent === 'Query executed in 64ms at 2018-08-28 16:39:26.'));
   });
 
   const emptyViewMetaData = {

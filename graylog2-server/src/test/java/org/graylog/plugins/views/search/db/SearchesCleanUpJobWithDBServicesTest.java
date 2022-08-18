@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.db;
 
 import org.graylog.plugins.views.search.SearchRequirements;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.testing.inject.TestPasswordSecretModule;
 import org.graylog.testing.mongodb.MongoDBFixtures;
@@ -38,6 +39,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 
 import java.util.Collections;
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -74,10 +76,12 @@ public class SearchesCleanUpJobWithDBServicesTest {
                 new SearchDbService(
                         mongodb.mongoConnection(),
                         mapperProvider,
-                        dto -> new SearchRequirements(Collections.emptySet(), dto)
+                        dto -> new SearchRequirements(Collections.emptySet(), dto),
+                        new IgnoreSearchFilters()
                 )
         );
-        this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4));
+        this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4),
+                new HashMap<>());
     }
 
     @After
@@ -113,5 +117,4 @@ public class SearchesCleanUpJobWithDBServicesTest {
 
         assertThat(idCaptor.getAllValues()).containsExactly("5b3b44ca77196aa4679e4da1", "5b3b44ca77196aa4679e4da2");
     }
-
 }

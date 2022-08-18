@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.apache.logging.log4j.util.Strings;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
@@ -57,6 +58,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Min;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.elasticsearch7.blocks.BlockSettingsParser;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
@@ -66,6 +68,7 @@ import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.Message;
@@ -350,6 +353,22 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
+    public IndicesBlockStatus getIndicesBlocksStatus(final List<String> indices) {
+        if (indices == null || indices.isEmpty()) {
+            throw new IllegalArgumentException("Expecting list of indices with at least one index present.");
+        }
+        final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
+                .indices(indices.toArray(new String[]{}))
+                .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
+                .names(Strings.EMPTY_ARRAY);
+
+        return client.execute((c, requestOptions) -> {
+            final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
+            return BlockSettingsParser.parseBlockSettings(settingsResponse);
+        });
+    }
+
+    @Override
     public boolean exists(String index) {
         final GetSettingsResponse result = settingsFor(index);
         return result.getIndexToSettings().size() == 1 && result.getIndexToSettings().containsKey(index);
@@ -402,9 +421,9 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     @Override
     public void removeAliases(Set<String> indices, String alias) {
         final IndicesAliasesRequest indicesAliasesRequest = new IndicesAliasesRequest();
-        final IndicesAliasesRequest.AliasActions aliasAction = new IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.REMOVE_INDEX)
-                .indices(indices.toArray(new String[0]))
-                .alias(alias);
+        final IndicesAliasesRequest.AliasActions aliasAction = IndicesAliasesRequest.AliasActions.remove()
+                .alias(alias)
+                .indices(indices.toArray(new String[0]));
         indicesAliasesRequest.addAliasAction(aliasAction);
 
         client.execute((c, requestOptions) -> c.indices().updateAliases(indicesAliasesRequest, requestOptions),
@@ -509,11 +528,22 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
         static State parse(String state) {
             switch (state.toLowerCase(Locale.ENGLISH)) {
-                case "open": return Open;
-                case "close": return Closed;
+                case "open":
+                    return Open;
+                case "close":
+                    return Closed;
             }
 
             throw new IllegalStateException("Unable to parse invalid index state: " + state);
         }
+    }
+
+    @Override
+    public String getIndexId(String index) {
+        final GetSettingsRequest request = new GetSettingsRequest().indices(index)
+                .indicesOptions(IndicesOptions.fromOptions(true, true, true, true));
+        final GetSettingsResponse response = client.execute((c, requestOptions) -> c.indices().getSettings(request, requestOptions),
+                "Unable to retrieve settings for index/alias " + index);
+        return response.getSetting(index, "index.uuid");
     }
 }

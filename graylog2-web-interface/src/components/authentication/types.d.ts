@@ -14,18 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import type * as React from 'react';
 
-import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
-import {
+import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import type {
   DirectoryServiceBackend,
   DirectoryServiceBackendConfig,
   DirectoryServiceBackendConfigJson,
   WizardSubmitPayload,
 } from 'logic/authentication/directoryServices/types';
-import { OktaBackend, OktaBackendConfig, OktaBackendConfigJson } from 'logic/authentication/okta/types';
-import Role from 'logic/roles/Role';
-import { WizardFormValues } from 'components/authentication/directoryServices/BackendWizard/BackendWizardContext';
+import type { OktaBackend, OktaBackendConfig, OktaBackendConfigJson } from 'logic/authentication/okta/types';
+import type Role from 'logic/roles/Role';
+import type { WizardFormValues } from 'components/authentication/directoryServices/BackendWizard/BackendWizardContext';
 
 export interface DirectoryServiceAuthenticationService {
   name: string;

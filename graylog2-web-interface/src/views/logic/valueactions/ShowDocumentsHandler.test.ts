@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import asMock from 'helpers/mocking/AsMock';
-
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { TitlesActions } from 'views/stores/TitlesStore';
 import TitleTypes from 'views/stores/TitleTypes';
 import { WidgetActions } from 'views/stores/WidgetStore';
+import { MISSING_BUCKET_NAME } from 'views/Constants';
 
 import ShowDocumentsHandler from './ShowDocumentsHandler';
 
@@ -125,6 +125,16 @@ describe('ShowDocumentsHandler', () => {
 
         expect(newWidget.config.fields).toEqual(['timestamp', 'source', 'hello']);
       });
+  });
+
+  it('creates correct widget query for missing bucket field value', async () => {
+    await ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget, valuePath: [{ foo: MISSING_BUCKET_NAME }] } });
+
+    expect(WidgetActions.create).toHaveBeenCalled();
+
+    const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
+
+    expect(newWidget.query).toEqual(createElasticsearchQueryString('NOT _exists_:foo'));
   });
 
   describe('on dashboard', () => {

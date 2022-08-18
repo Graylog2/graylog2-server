@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -51,7 +52,7 @@ class V20200730000000_AddGl2MessageIdFieldAliasForEventsTest {
     }
 
     private V20200730000000_AddGl2MessageIdFieldAliasForEvents buildSut(int major) {
-        return new V20200730000000_AddGl2MessageIdFieldAliasForEvents(Version.from(major, 0, 0), clusterConfigService, elasticsearchAdapter, elasticsearchConfig);
+        return new V20200730000000_AddGl2MessageIdFieldAliasForEvents(SearchVersion.elasticsearch(major, 0, 0), clusterConfigService, elasticsearchAdapter, elasticsearchConfig);
     }
 
     @Test

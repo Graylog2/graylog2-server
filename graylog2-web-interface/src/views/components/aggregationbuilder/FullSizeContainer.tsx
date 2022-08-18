@@ -15,8 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
+import { useRef } from 'react';
 import styled from 'styled-components';
+
+import useElementDimensions from 'hooks/useElementDimensions';
 
 const Wrapper = styled.div`
   height: 100%;
@@ -29,61 +31,20 @@ const Wrapper = styled.div`
 `;
 
 type Dimensions = { height: number; width: number; };
+
 type Props = {
-  children: (dimentions: Dimensions) => React.ReactElement,
-};
-type State = {
-  height: number,
-  width: number,
+  children: (dimensions: Dimensions) => React.ReactElement,
 };
 
-class FullSizeContainer extends React.Component<Props, State> {
-  private wrapper: HTMLDivElement | undefined | null;
+const FullSizeContainer = ({ children }: Props) => {
+  const element = useRef<HTMLDivElement>(null);
+  const { width, height } = useElementDimensions(element);
 
-  static propTypes = {
-    children: PropTypes.func.isRequired,
-  };
-
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      height: 0,
-      width: 0,
-    };
-  }
-
-  componentDidMount() {
-    this._updateDimensions();
-  }
-
-  componentDidUpdate() {
-    this._updateDimensions();
-  }
-
-  _updateDimensions() {
-    if (this.wrapper) {
-      const height = this.wrapper.offsetHeight;
-      const width = this.wrapper.offsetWidth;
-      const { height: currentHeight, width: currentWidth } = this.state;
-
-      if (height !== currentHeight || width !== currentWidth) {
-        // eslint-disable-next-line react/no-did-update-set-state
-        this.setState({ height, width });
-      }
-    }
-  }
-
-  render() {
-    const { children } = this.props;
-    const { height, width } = this.state;
-
-    return (
-      <Wrapper ref={(elem) => { this.wrapper = elem; }}>
-        {children({ height, width })}
-      </Wrapper>
-    );
-  }
-}
+  return (
+    <Wrapper ref={element}>
+      {children({ height, width })}
+    </Wrapper>
+  );
+};
 
 export default FullSizeContainer;

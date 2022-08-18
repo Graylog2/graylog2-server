@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
+
 import mockAction from 'helpers/mocking/MockAction';
 import { MockStore } from 'helpers/mocking';
-
 import ViewState from 'views/logic/views/ViewState';
 import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';

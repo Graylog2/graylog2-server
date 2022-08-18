@@ -16,13 +16,13 @@
  */
 import { List, Map } from 'immutable';
 
-import Widget from 'views/logic/widgets/Widget';
+import type Widget from 'views/logic/widgets/Widget';
 import type { QueryId } from 'views/logic/queries/Query';
-import Query from 'views/logic/queries/Query';
+import type Query from 'views/logic/queries/Query';
 
 import type { ViewStateMap } from './View';
 import View from './View';
-import ViewState from './ViewState';
+import type ViewState from './ViewState';
 
 const ViewTransformer = (searchView: View): View => {
   const queryMap: Map<QueryId, Query> = Map(searchView.search.queries.map((q) => [q.id, q]));

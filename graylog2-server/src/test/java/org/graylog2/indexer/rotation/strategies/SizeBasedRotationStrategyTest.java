@@ -17,6 +17,7 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
@@ -54,6 +55,8 @@ public class SizeBasedRotationStrategyTest {
     @Mock
     private AuditEventSender auditEventSender;
 
+    private ElasticsearchConfiguration configuration = new ElasticsearchConfiguration();
+
     @Test
     public void testRotate() throws Exception {
         when(indices.getStoreSizeInBytes("name")).thenReturn(Optional.of(1000L));
@@ -61,7 +64,7 @@ public class SizeBasedRotationStrategyTest {
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(SizeBasedRotationStrategyConfig.create(100L));
 
-        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, nodeId, auditEventSender);
+        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, nodeId, auditEventSender, configuration);
 
         strategy.rotate(indexSet);
         verify(indexSet, times(1)).cycle();
@@ -76,7 +79,7 @@ public class SizeBasedRotationStrategyTest {
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(SizeBasedRotationStrategyConfig.create(100000L));
 
-        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, nodeId, auditEventSender);
+        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, nodeId, auditEventSender, configuration);
 
         strategy.rotate(indexSet);
         verify(indexSet, never()).cycle();
@@ -91,7 +94,7 @@ public class SizeBasedRotationStrategyTest {
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(SizeBasedRotationStrategyConfig.create(100L));
 
-        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, nodeId, auditEventSender);
+        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, nodeId, auditEventSender, configuration);
 
         strategy.rotate(indexSet);
         verify(indexSet, never()).cycle();

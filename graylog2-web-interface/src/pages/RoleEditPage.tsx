@@ -27,7 +27,7 @@ import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import DocsHelper from 'util/DocsHelper';
 import { PageHeader, DocumentTitle } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
-import Role from 'logic/roles/Role';
+import type Role from 'logic/roles/Role';
 
 type Props = {
   params: {

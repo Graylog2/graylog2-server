@@ -63,7 +63,7 @@ const DashboardsStore: Store<DashboardsStoreState> = singletonStore(
       perPage: 10,
     },
 
-    getInitialState() {
+    getInitialState(): DashboardsStoreState {
       return {
         pagination: this.pagination,
         list: this.dashboards,
@@ -72,7 +72,7 @@ const DashboardsStore: Store<DashboardsStoreState> = singletonStore(
     search(query = '', page = 1, perPage = 10, sortBy = 'title', order = 'asc') {
       const promise = fetch('GET', `${dashboardsUrl}?query=${query}&page=${page}&per_page=${perPage}&sort=${sortBy}&order=${order}`)
         .then((response) => {
-          this.dashboards = response.views;
+          this.dashboards = response.views.map((item) => View.fromJSON(item));
 
           this.pagination = {
             total: response.total,

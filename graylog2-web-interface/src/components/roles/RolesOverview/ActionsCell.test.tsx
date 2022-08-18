@@ -16,11 +16,11 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import asMock from 'helpers/mocking/AsMock';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+
+import asMock from 'helpers/mocking/AsMock';
 import { paginatedUsers } from 'fixtures/userOverviews';
 import { alice as currentUser } from 'fixtures/users';
-
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 

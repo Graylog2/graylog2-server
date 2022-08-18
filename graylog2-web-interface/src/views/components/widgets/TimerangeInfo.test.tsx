@@ -17,24 +17,22 @@
 import React from 'react';
 import Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
+
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
-
 import Search from 'views/logic/search/Search';
 import Widget from 'views/logic/widgets/Widget';
-import TimeLocalizeContext from 'contexts/TimeLocalizeContext';
-import { GlobalOverrideStore, GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
+import type { GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
+import { GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import { SearchStore, SearchStoreState } from 'views/stores/SearchStore';
+import type { SearchStoreState } from 'views/stores/SearchStore';
+import { SearchStore } from 'views/stores/SearchStore';
+import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
 
 import TimerangeInfo from './TimerangeInfo';
 
 jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideStore: MockStore(
-    ['listen', () => jest.fn()],
-    'get',
-    ['getInitialState', jest.fn()],
-  ),
+  GlobalOverrideStore: MockStore('get'),
 }));
 
 const mockSearchStoreState = (storeState: {} = {}): {} => ({
@@ -45,7 +43,7 @@ const mockSearchStoreState = (storeState: {} = {}): {} => ({
           'search-type-id': {
             type: 'pivot',
             effective_timerange: {
-              type: 'absolute', from: '2021-03-27T14:32:31.894Z', to: '2021-04-26T14:32:48.000Z',
+              type: 'absolute', from: '2021-04-26T12:32:48.000Z', to: '2021-04-26T14:32:48.000Z',
             },
           },
         },
@@ -60,7 +58,6 @@ const mockSearchStoreState = (storeState: {} = {}): {} => ({
 
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
-    ['listen', () => jest.fn()],
     'get',
     ['getInitialState', jest.fn(() => mockSearchStoreState())],
   ),
@@ -69,58 +66,52 @@ jest.mock('views/stores/SearchStore', () => ({
 describe('TimerangeInfo', () => {
   const widget = Widget.empty();
 
-  const SUT = (props) => (
-    <TimeLocalizeContext.Provider value={{ localizeTime: (str) => str }}>
-      <TimerangeInfo {...props} />
-    </TimeLocalizeContext.Provider>
-  );
-
   beforeEach(() => {
     asMock(GlobalOverrideStore.getInitialState).mockReturnValue(GlobalOverride.empty());
   });
 
   it('should display the effective timerange as title', () => {
     const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 3000 }).build();
-    render(<SUT widget={relativeWidget} activeQuery="active-query-id" widgetId="widget-id" />);
+    render(<TimerangeInfo widget={relativeWidget} activeQuery="active-query-id" widgetId="widget-id" />);
 
-    expect(screen.getByTitle('2021-03-27T14:32:31.894Z - 2021-04-26T14:32:48.000Z')).toBeInTheDocument();
+    expect(screen.getByTitle('2021-04-26T14:32:48.000+02:00 - 2021-04-26T16:32:48.000+02:00')).toBeInTheDocument();
   });
 
   it('should display a relative timerange', () => {
     const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 3000 }).build();
-    render(<SUT widget={relativeWidget} />);
+    render(<TimerangeInfo widget={relativeWidget} />);
 
     expect(screen.getByText('50 minutes ago - Now')).toBeInTheDocument();
   });
 
   it('should display a relative timerange with from and to', () => {
     const relativeWidget = widget.toBuilder().timerange({ type: 'relative', from: 3000, to: 2000 }).build();
-    render(<SUT widget={relativeWidget} />);
+    render(<TimerangeInfo widget={relativeWidget} />);
 
     expect(screen.getByText('50 minutes ago - 33 minutes 20 seconds ago')).toBeInTheDocument();
   });
 
   it('should display a All Time', () => {
-    const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 0 }).build();
-    render(<SUT widget={relativeWidget} />);
+    const relativeWidget = widget.toBuilder().timerange(ALL_MESSAGES_TIMERANGE).build();
+    render(<TimerangeInfo widget={relativeWidget} />);
 
     expect(screen.getByText('All Time')).toBeInTheDocument();
   });
 
-  it('should display a absolute timerange', () => {
+  it('should display an absolute timerange', () => {
     const absoluteWidget = widget.toBuilder()
       .timerange({ type: 'absolute', from: '2021-03-27T14:32:31.894Z', to: '2021-04-26T14:32:48.000Z' })
       .build();
-    render(<SUT widget={absoluteWidget} />);
+    render(<TimerangeInfo widget={absoluteWidget} />);
 
-    expect(screen.getByText('2021-03-27T14:32:31.894Z - 2021-04-26T14:32:48.000Z')).toBeInTheDocument();
+    expect(screen.getByText('2021-03-27 15:32:31.894 - 2021-04-26 16:32:48.000')).toBeInTheDocument();
   });
 
   it('should display a keyword timerange', () => {
     const keywordWidget = widget.toBuilder()
       .timerange({ type: 'keyword', keyword: '5 minutes ago' })
       .build();
-    render(<SUT widget={keywordWidget} />);
+    render(<TimerangeInfo widget={keywordWidget} />);
 
     expect(screen.getByText('5 minutes ago')).toBeInTheDocument();
   });
@@ -133,7 +124,7 @@ describe('TimerangeInfo', () => {
       .timerange({ type: 'keyword', keyword: '5 minutes ago' })
       .build();
 
-    render(<SUT widget={keywordWidget} />);
+    render(<TimerangeInfo widget={keywordWidget} />);
 
     expect(screen.getByText('Global Override: 50 minutes ago - Now')).toBeInTheDocument();
   });
@@ -151,7 +142,7 @@ describe('TimerangeInfo', () => {
       },
     }) as SearchStoreState);
 
-    render(<SUT widget={relativeWidget} activeQuery="active-query-id" widgetId="widget-id" />);
+    render(<TimerangeInfo widget={relativeWidget} activeQuery="active-query-id" widgetId="widget-id" />);
 
     expect(screen.getByText('50 minutes ago - Now')).toBeInTheDocument();
   });
@@ -161,7 +152,7 @@ describe('TimerangeInfo', () => {
       widgetMapping: Immutable.Map(),
     }) as SearchStoreState);
 
-    render(<SUT widget={widget} activeQuery="active-query-id" widgetId="widget-id" />);
+    render(<TimerangeInfo widget={widget} activeQuery="active-query-id" widgetId="widget-id" />);
 
     expect(screen.getByText('5 minutes ago - Now')).toBeInTheDocument();
   });

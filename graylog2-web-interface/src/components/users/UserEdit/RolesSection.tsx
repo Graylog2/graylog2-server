@@ -22,10 +22,10 @@ import styled from 'styled-components';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import { ErrorAlert } from 'components/common';
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
+import type { DescriptiveItem } from 'components/common/PaginatedItemOverview';
 import PaginatedItemOverview, {
   DEFAULT_PAGINATION,
-  DescriptiveItem,
 } from 'components/common/PaginatedItemOverview';
 import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import SectionComponent from 'components/common/Section/SectionComponent';

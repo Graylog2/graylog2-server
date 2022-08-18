@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import { Row, Col, Alert } from 'components/bootstrap';
 import { EntityList, Pluralize } from 'components/common';
 import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
-import { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'stores/streams/StreamsStore';
 import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
 
 import Stage from './Stage';
@@ -94,7 +94,6 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
   }, [pipeline, onStagesChange]);
 
   const _formatConnectedStreams = (connectedStreams: Stream[]) => {
-    // eslint-disable-next-line react/destructuring-assignment
     const formattedStreams = connectedStreams.map((s) => `"${s.title}"`);
     const streamList = formattedStreams.length > 1 ? [formattedStreams.slice(0, -1).join(', '), formattedStreams.slice(-1)].join(' and ') : formattedStreams[0];
 

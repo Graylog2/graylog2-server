@@ -17,16 +17,17 @@
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
+
 import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
-
 import history from 'util/History';
-import { ViewStore, ViewStoreState } from 'views/stores/ViewStore';
+import type { ViewStoreState } from 'views/stores/ViewStore';
+import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import { QueriesActions } from 'views/actions/QueriesActions';
-import Query, { createElasticsearchQueryString, filtersForQuery, RelativeTimeRange } from 'views/logic/queries/Query';
+import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
-import type { TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
 
 import { syncWithQueryParameters, useSyncWithQueryParameters } from './SyncWithQueryParameters';
 
@@ -34,6 +35,8 @@ jest.mock('views/actions/QueriesActions', () => ({
   QueriesActions: {
     update: mockAction(),
     query: mockAction(),
+    timerange: mockAction(),
+    forceUpdate: mockAction(),
   },
 }));
 
@@ -198,6 +201,8 @@ describe('SyncWithQueryParameters', () => {
 
       expect(QueriesActions.update.completed.listen).toHaveBeenCalled();
       expect(QueriesActions.query.completed.listen).toHaveBeenCalled();
+      expect(QueriesActions.timerange.completed.listen).toHaveBeenCalled();
+      expect(QueriesActions.forceUpdate.completed.listen).toHaveBeenCalled();
     });
   });
 });

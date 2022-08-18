@@ -83,6 +83,44 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "  logs: /var/lib/graylog-sidecar/collectors/filebeat/log"
         );
         ensureCollector(
+                "filebeat",
+                "exec",
+                "darwin",
+                "/usr/share/filebeat/bin/filebeat",
+                "-c  %s",
+                "test config -c %s",
+                beatsPreambel +
+                        "filebeat.inputs:\n" +
+                        "- input_type: log\n" +
+                        "  paths:\n" +
+                        "    - /var/log/*.log\n" +
+                        "  type: log\n" +
+                        "output.logstash:\n" +
+                        "   hosts: [\"192.168.1.1:5044\"]\n" +
+                        "path:\n" +
+                        "  data: /var/lib/graylog-sidecar/collectors/filebeat/data\n" +
+                        "  logs: /var/lib/graylog-sidecar/collectors/filebeat/log"
+        );
+        ensureCollector(
+                "filebeat",
+                "exec",
+                "freebsd",
+                "/usr/share/filebeat/bin/filebeat",
+                "-c  %s",
+                "test config -c %s",
+                beatsPreambel +
+                        "filebeat.inputs:\n" +
+                        "- input_type: log\n" +
+                        "  paths:\n" +
+                        "    - /var/log/*.log\n" +
+                        "  type: log\n" +
+                        "output.logstash:\n" +
+                        "   hosts: [\"192.168.1.1:5044\"]\n" +
+                        "path:\n" +
+                        "  data: /var/lib/graylog-sidecar/collectors/filebeat/data\n" +
+                        "  logs: /var/lib/graylog-sidecar/collectors/filebeat/log"
+        );
+        ensureCollector(
                 "winlogbeat",
                 "svc",
                 "windows",

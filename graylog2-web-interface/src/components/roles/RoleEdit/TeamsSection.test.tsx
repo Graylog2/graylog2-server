@@ -16,8 +16,9 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { manager as exampleRole } from 'fixtures/roles';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+
+import { manager as exampleRole } from 'fixtures/roles';
 
 import TeamsSection from './TeamsSection';
 

@@ -28,7 +28,6 @@ import org.apache.shiro.session.ExpiredSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionManager;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
@@ -75,7 +74,6 @@ public class UserSessionTerminationService extends AbstractIdleService {
     private final DefaultSecurityManager securityManager;
     private final ClusterConfigService clusterConfigService;
     private final UserService userService;
-    private final ServerStatus serverStatus;
     private final EventBus eventBus;
 
     @Inject
@@ -84,14 +82,12 @@ public class UserSessionTerminationService extends AbstractIdleService {
                                          DefaultSecurityManager securityManager,
                                          ClusterConfigService clusterConfigService,
                                          UserService userService,
-                                         ServerStatus serverStatus,
                                          EventBus eventBus) {
         this.sessionDao = sessionDao;
         this.securityManager = securityManager;
         this.clusterConfigService = clusterConfigService;
         this.sessionService = sessionService;
         this.userService = userService;
-        this.serverStatus = serverStatus;
         this.eventBus = eventBus;
     }
 
@@ -109,12 +105,6 @@ public class UserSessionTerminationService extends AbstractIdleService {
 
     @Override
     protected void startUp() throws Exception {
-        try {
-            runGlobalSessionTermination();
-        } catch (Exception e) {
-            LOG.error("Couldn't run global session termination", e);
-        }
-
         eventBus.register(this);
     }
 
@@ -123,17 +113,13 @@ public class UserSessionTerminationService extends AbstractIdleService {
         eventBus.unregister(this);
     }
 
-    private boolean isNotPrimaryNode() {
-        return !serverStatus.hasCapability(ServerStatus.Capability.MASTER);
-    }
-
-    // Terminates all active user sessions when the TERMINATION_REVISION has been bumped.
-    private void runGlobalSessionTermination() {
-        if (isNotPrimaryNode()) {
-            LOG.debug("Only run on the primary node to avoid concurrent session termination");
-            return;
-        }
-
+    /**
+     * Terminate all user sessions, if the revision is outdated.
+     * <p>
+     * To make sure that we don't terminate user sessions concurrently, this method should be called on the primary
+     * node only.
+     */
+    public void runGlobalSessionTermination() {
         final GlobalTerminationRevisionConfig globalTerminationRevisionConfig = clusterConfigService.getOrDefault(
                 GlobalTerminationRevisionConfig.class,
                 GlobalTerminationRevisionConfig.initial()

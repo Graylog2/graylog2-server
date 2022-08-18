@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import NavItem from './NavItem';
-import { SidebarSection } from './sidebarSections';
+import type { SidebarSection } from './sidebarSections';
 
 type Props = {
   activeSection: SidebarSection | undefined | null,

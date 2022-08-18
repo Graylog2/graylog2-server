@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import FetchError from 'logic/errors/FetchError';
+import type FetchError from 'logic/errors/FetchError';
 
 import UnauthorizedErrorPage from './UnauthorizedErrorPage';
 

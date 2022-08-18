@@ -91,13 +91,13 @@ public class SearchRequestFactory {
 
         applySortingIfPresent(searchSourceBuilder, searchCommand);
 
-        applyHighlighting(searchSourceBuilder);
+        applyHighlighting(searchSourceBuilder, searchCommand);
 
         return searchSourceBuilder;
     }
 
-    private void applyHighlighting(SearchSourceBuilder searchSourceBuilder) {
-        if (allowHighlighting) {
+    private void applyHighlighting(SearchSourceBuilder searchSourceBuilder, SearchCommand searchCommand) {
+        if (allowHighlighting && searchCommand.highlight()) {
             final HighlightBuilder highlightBuilder = new HighlightBuilder()
                     .requireFieldMatch(false)
                     .field("*")

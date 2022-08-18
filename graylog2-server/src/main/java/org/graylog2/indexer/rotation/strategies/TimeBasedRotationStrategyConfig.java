@@ -19,34 +19,58 @@ package org.graylog2.indexer.rotation.strategies;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.joda.time.Period;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
+@JsonDeserialize(builder = TimeBasedRotationStrategyConfig.Builder.class)
 public abstract class TimeBasedRotationStrategyConfig implements RotationStrategyConfig {
     private static final Period DEFAULT_DAYS = Period.days(1);
 
     @JsonProperty("rotation_period")
     public abstract Period rotationPeriod();
 
-    @JsonCreator
-    public static TimeBasedRotationStrategyConfig create(@JsonProperty(TYPE_FIELD) String type,
-                                                         @JsonProperty("rotation_period") @NotNull Period maxTimePerIndex) {
-        return new AutoValue_TimeBasedRotationStrategyConfig(type, maxTimePerIndex);
+    @JsonProperty("max_rotation_period")
+    @Nullable
+    public abstract Period maxRotationPeriod();
+
+    @JsonProperty("rotate_empty_index_set")
+    public abstract boolean rotateEmptyIndexSet();
+
+    public static Builder builder() {
+        return Builder.create();
     }
 
-    @JsonCreator
-    public static TimeBasedRotationStrategyConfig create(@JsonProperty("rotation_period") @NotNull Period maxTimePerIndex) {
-        return create(TimeBasedRotationStrategyConfig.class.getCanonicalName(), maxTimePerIndex);
-    }
+    @AutoValue.Builder
+    public abstract static class Builder {
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_TimeBasedRotationStrategyConfig.Builder()
+                    .type(TimeBasedRotationStrategyConfig.class.getCanonicalName())
+                    .rotationPeriod(DEFAULT_DAYS)
+                    .rotateEmptyIndexSet(false);
+        }
 
-    public static TimeBasedRotationStrategyConfig createDefault() {
-        return create(DEFAULT_DAYS);
+        @JsonProperty(TYPE_FIELD)
+        public abstract Builder type(String type);
+
+        @JsonProperty("rotation_period")
+        public abstract Builder rotationPeriod(@NotNull Period rotationPeriod);
+
+        @JsonProperty("max_rotation_period")
+        public abstract Builder maxRotationPeriod(@Nullable Period maxRotationPeriod);
+
+        @JsonProperty("rotate_empty_index_set")
+        public abstract Builder rotateEmptyIndexSet(boolean rotateEmptyIndexSet);
+
+        public abstract TimeBasedRotationStrategyConfig build();
     }
 }

@@ -19,16 +19,18 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 
 import TimeRangeDropdownButton from './TimeRangeDropdownButton';
-import TimeRangeDropdown, { TimeRangeType } from './date-time-picker/TimeRangeDropdown';
+import type { TimeRangeType } from './date-time-picker/TimeRangeDropdown';
+import TimeRangeDropdown from './date-time-picker/TimeRangeDropdown';
 import TimeRangeDisplay from './TimeRangeDisplay';
 
 type Props = {
   className?: string,
   disabled?: boolean,
   hasErrorOnMount?: boolean,
+  limitDuration: number,
   noOverride?: boolean,
   onChange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
   position?: 'bottom'|'right',
@@ -43,7 +45,18 @@ const FlexContainer = styled.span`
   justify-content: space-between;
 `;
 
-const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value = {}, onChange, validTypes, position, className, showPresetDropdown = true }: Props) => {
+const TimeRangeInput = ({
+  disabled,
+  hasErrorOnMount,
+  noOverride,
+  value = {},
+  onChange,
+  validTypes,
+  position,
+  className,
+  showPresetDropdown = true,
+  limitDuration,
+}: Props) => {
   const [show, setShow] = useState(false);
 
   if (validTypes && value && 'type' in value && !validTypes.includes(value?.type)) {
@@ -63,6 +76,7 @@ const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value = {}, onC
                                showPresetDropdown={showPresetDropdown}
                                hasErrorOnMount={hasErrorOnMount}>
         <TimeRangeDropdown currentTimeRange={value}
+                           limitDuration={limitDuration}
                            noOverride={noOverride}
                            setCurrentTimeRange={onChange}
                            toggleDropdownShow={toggleShow}

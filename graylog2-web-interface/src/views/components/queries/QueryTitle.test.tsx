@@ -16,9 +16,10 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { mount } from 'wrappedEnzyme';
-import mockAction from 'helpers/mocking/MockAction';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
+import mockAction from 'helpers/mocking/MockAction';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { ViewActions } from 'views/stores/ViewStore';
 
@@ -33,69 +34,62 @@ describe('QueryTitle', () => {
     ViewActions.selectQuery = mockAction(jest.fn((queryId) => Promise.resolve(queryId)));
   });
 
-  const findAction = (wrapper, name) => {
-    const openMenuTrigger = wrapper.find('svg[data-testid="query-action-dropdown"]');
+  const clickQueryAction = async (name: string) => {
+    const openMenuTrigger = await screen.findByTestId('query-action-dropdown');
 
-    openMenuTrigger.simulate('click');
+    userEvent.click(openMenuTrigger);
 
-    wrapper.update();
-    const { onSelect } = wrapper.find(`MenuItem[children="${name}"]`).props();
+    const menuItem = await screen.findByText(name);
 
-    return () => new Promise<void>((resolve) => {
-      onSelect(undefined, { preventDefault: jest.fn(), stopPropagation: jest.fn() });
-
-      resolve();
-    });
+    userEvent.click(menuItem);
   };
 
   describe('duplicate action', () => {
-    it('triggers duplication of query', () => {
-      const wrapper = mount(
+    it('triggers duplication of query', async () => {
+      render(
         <QueryTitle active
                     id="deadbeef"
                     openEditModal={() => {}}
                     onClose={() => Promise.resolve()}
                     title="Foo" />,
       );
-      const duplicate = findAction(wrapper, 'Duplicate');
 
-      return duplicate().then(() => {
-        expect(QueriesActions.duplicate).toHaveBeenCalled();
-      });
+      await clickQueryAction('Duplicate');
+
+      await waitFor(() => expect(QueriesActions.duplicate).toHaveBeenCalled());
     });
 
-    it('does not explicitly select new query after duplicating it', () => {
+    it('does not explicitly select new query after duplicating it', async () => {
       // Selecting the new query after duplication has become unnecessary, as `ViewStore#createQuery` does it already
-      const wrapper = mount(
+      render(
         <QueryTitle active
                     id="deadbeef"
                     openEditModal={() => {}}
                     onClose={() => Promise.resolve()}
                     title="Foo" />,
       );
-      const duplicate = findAction(wrapper, 'Duplicate');
 
-      return duplicate().then(() => {
-        expect(ViewActions.selectQuery).not.toHaveBeenCalled();
-      });
+      await clickQueryAction('Duplicate');
+
+      expect(ViewActions.selectQuery).not.toHaveBeenCalled();
     });
   });
 
   describe('edit title action', () => {
-    it('opens edit modal', () => {
+    it('opens edit modal', async () => {
       const openEditModalFn = jest.fn();
-      const wrapper = mount(
+
+      render(
         <QueryTitle active
                     id="deadbeef"
                     openEditModal={openEditModalFn}
                     onClose={() => Promise.resolve()}
                     title="Foo" />,
       );
-      const clickOnEditOption = findAction(wrapper, 'Edit Title');
 
-      return clickOnEditOption().then(() => {
-        expect(openEditModalFn).toHaveBeenCalledTimes(1);
-      });
+      await clickQueryAction('Edit Title');
+
+      await waitFor(() => expect(openEditModalFn).toHaveBeenCalledTimes(1));
     });
   });
 });

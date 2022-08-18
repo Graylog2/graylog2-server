@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import { Field, getIn, useFormikContext } from 'formik';
-import { ConfigurationField } from 'views/types';
 import styled from 'styled-components';
 
-import { VisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import type { ConfigurationField } from 'views/types';
+import type { VisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { HoverForHelp } from 'components/common';
 
 import BooleanField from './configurationFields/BooleanField';

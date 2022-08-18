@@ -21,17 +21,18 @@ import { Button } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import { DecoratorsActions } from 'stores/decorators/DecoratorsStore';
-import { StreamsActions, Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'stores/streams/StreamsStore';
+import { StreamsActions } from 'stores/streams/StreamsStore';
 import UserNotification from 'util/UserNotification';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
-import { Decorator } from 'views/components/messagelist/decorators/Types';
+import type { Decorator } from 'views/components/messagelist/decorators/Types';
 
 import DecoratorsConfigUpdate from './decorators/DecoratorsConfigUpdate';
 import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './decorators/StreamSelect';
 import DecoratorsUpdater from './decorators/DecoratorsUpdater';
 import formatDecorator from './decorators/FormatDecorator';
 
-import BootstrapModalWrapper from '../bootstrap/BootstrapModalWrapper';
+import type BootstrapModalWrapper from '../bootstrap/BootstrapModalWrapper';
 
 const DecoratorsConfig = () => {
   const [streams, setStreams] = useState<Array<Stream> | undefined>();

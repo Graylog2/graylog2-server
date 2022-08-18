@@ -17,9 +17,9 @@
 import React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
+
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';
-
 import { RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from 'views/components/searchbar/date-time-picker/RelativeTimeRangeClassifiedHelper';
 
 import TabRelativeTimeRange from './TabRelativeTimeRange';

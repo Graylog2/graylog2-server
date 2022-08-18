@@ -19,6 +19,7 @@ import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
 
@@ -31,7 +32,7 @@ const buildFilterFields = (messageFields, searchConfig) => {
   return surroundingFilterFields.reduce((prev, cur) => ({ ...prev, [cur]: messageFields[cur] }), {});
 };
 
-const buildSearchLink = (id, from, to, fields, filterFields, streams) => SearchLink.builder()
+const buildSearchLink = (id, from, to, filterFields, streams) => SearchLink.builder()
   .timerange({ type: 'absolute', from, to })
   .streams(streams)
   .filterFields(filterFields)
@@ -45,7 +46,7 @@ const searchLink = (range, timestamp, id, messageFields, searchConfig, streams) 
   const toTime = moment(timestamp).add(rangeSeconds, 'seconds').toISOString();
   const filterFields = buildFilterFields(messageFields, searchConfig);
 
-  return buildSearchLink(id, fromTime, toTime, [], filterFields, streams);
+  return buildSearchLink(id, fromTime, toTime, filterFields, streams);
 };
 
 type Props = {
@@ -60,7 +61,10 @@ const SurroundingSearchButton = ({ searchConfig, timestamp, id, messageFields }:
   const { surrounding_timerange_options: surroundingTimerangeOptions } = searchConfig;
   const menuItems = Object.keys(surroundingTimerangeOptions)
     .map((range) => (
-      <MenuItem key={range} href={searchLink(range, timestamp, id, messageFields, searchConfig, streams)} target="_blank" rel="noopener noreferrer">
+      <MenuItem key={range}
+                href={searchLink(range, timestamp, id, messageFields, searchConfig, streams)}
+                target="_blank"
+                rel="noopener noreferrer">
         {surroundingTimerangeOptions[range]}
       </MenuItem>
     ));

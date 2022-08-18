@@ -751,7 +751,7 @@ public class MessageTest {
 
         // then
         assertThat(esObject.get(Message.FIELD_GL2_PROCESSING_ERROR))
-                .isEqualTo("Failure Details #1, Failure Details #2");
+                .isEqualTo("Failure Message #1 - Failure Details #1, Failure Message #2 - Failure Details #2");
     }
 
     @Test
@@ -762,7 +762,7 @@ public class MessageTest {
         final Message message = new Message("message", "source", Tools.nowUTC().minusMinutes(2));
         final DateTime previousTimestamp = message.getTimestamp();
 
-        message.addField(Message.FIELD_TIMESTAMP, 1234);
+        message.addField(Message.FIELD_TIMESTAMP, "1234");
 
         assertThat(message.getTimestamp()).isInstanceOf(DateTime.class);
         // got replaced by a current timestamp
@@ -772,12 +772,12 @@ public class MessageTest {
             assertThat(e).hasSize(1);
             assertThat(e.get(0).getCause()).isEqualTo(ProcessingFailureCause.InvalidTimestampException);
             assertThat(e.get(0).getMessage()).startsWith("Replaced invalid timestamp value in message <");
-            assertThat(e.get(0).getDetails()).startsWith("Value <1234> caused exception: Value of invalid type <Integer> provided");
+            assertThat(e.get(0).getDetails()).startsWith("Value <1234> caused exception: Invalid format: \"1234\" is too short");
         });
     }
 
     @Test
-    public void testTimestampConversionWithNullDate() {
+    public void testTimestampNoConversionWithNullDate() {
         // Do not use fixed time from setUp() in this test
         DateTimeUtils.setCurrentMillisSystem();
 
@@ -786,9 +786,16 @@ public class MessageTest {
 
         message.addField(Message.FIELD_TIMESTAMP, null);
 
+        // null does not replace existing timestamp
         assertThat(message.getTimestamp()).isInstanceOf(DateTime.class);
-        // got replaced by a current timestamp
-        assertThat(message.getTimestamp()).isNotEqualTo(previousTimestamp);
+        assertThat(message.getTimestamp()).isEqualTo(previousTimestamp);
+    }
+
+    @Test
+    public void testNullDateGetsReplacesWithCurrentDate() {
+        final Message message = new Message("message", "source", null);
+
+        assertThat(message.getTimestamp()).isInstanceOf(DateTime.class);
 
         assertThat(message.processingErrors()).satisfies(e -> {
             assertThat(e).hasSize(1);

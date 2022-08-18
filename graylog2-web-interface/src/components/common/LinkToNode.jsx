@@ -29,7 +29,7 @@ import Spinner from './Spinner';
 
 /**
  * Component that creates a link to a Graylog node. The information in the link includes:
- *  - Marker indicating whether the Graylog node is master or not
+ *  - Marker indicating whether the Graylog node is leader or not
  *  - Short Graylog node ID
  *  - Graylog node hostname
  *
@@ -53,9 +53,9 @@ const LinkToNode = createReactClass({
     const node = this.state.nodes[this.props.nodeId];
 
     if (node) {
-      const iconName = node.is_master ? 'star' : 'code-branch';
-      const iconClass = node.is_master ? 'master-node' : '';
-      const iconTitle = node.is_master ? 'This is the master node in the cluster' : '';
+      const iconName = node.is_leader ? 'star' : 'code-branch';
+      const iconClass = node.is_leader ? 'leader-node' : '';
+      const iconTitle = node.is_leader ? 'This is the leader node in the cluster' : '';
 
       const content = (
         <>

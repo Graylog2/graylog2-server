@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css, withTheme, DefaultTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import styled, { css, withTheme } from 'styled-components';
 
 import { themePropTypes } from 'theme';
 import { Label } from 'components/bootstrap';

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { SyntheticEvent } from 'react';
+import type { SyntheticEvent } from 'react';
 
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';

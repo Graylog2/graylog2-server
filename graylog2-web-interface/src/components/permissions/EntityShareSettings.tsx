@@ -18,16 +18,17 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { $PropertyType } from 'utility-types';
-import { FormikProps } from 'formik';
+import type { $PropertyType } from 'utility-types';
+import type { FormikProps } from 'formik';
 
 import type { GRN } from 'logic/permissions/types';
-import EntityShareState from 'logic/permissions/EntityShareState';
-import SharedEntity from 'logic/permissions/SharedEntity';
+import type EntityShareState from 'logic/permissions/EntityShareState';
+import type SharedEntity from 'logic/permissions/SharedEntity';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
-import { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
-import GranteesSelector, { SelectionRequest, FormValues as GranteesSelectFormValues } from './GranteesSelector';
+import type { SelectionRequest, FormValues as GranteesSelectFormValues } from './GranteesSelector';
+import GranteesSelector from './GranteesSelector';
 import GranteesList from './GranteesList';
 import DependenciesWarning from './DependenciesWarning';
 import ValidationError from './ValidationError';
@@ -41,6 +42,8 @@ type Props = {
   entityShareState: EntityShareState,
   setDisableSubmit: (boolean) => void,
   granteesSelectFormRef: React.Ref<FormikProps<GranteesSelectFormValues>>,
+  showShareableEntityURL?: boolean,
+  entityTypeTitle?: string | null | undefined,
 };
 
 const Section = styled.div`
@@ -77,6 +80,8 @@ const EntityShareSettings = ({
   entityTitle,
   setDisableSubmit,
   granteesSelectFormRef,
+  showShareableEntityURL,
+  entityTypeTitle,
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
 
@@ -126,6 +131,7 @@ const EntityShareSettings = ({
         <GranteesList activeShares={activeShares}
                       availableCapabilities={availableCapabilities}
                       entityType={entityType}
+                      entityTypeTitle={entityTypeTitle}
                       onDelete={_handleDeletion}
                       onCapabilityChange={_handleSelection}
                       selectedGrantees={selectedGrantees}
@@ -143,9 +149,11 @@ const EntityShareSettings = ({
                                availableGrantees={availableGrantees} />
         </Section>
       )}
+      {showShareableEntityURL && (
       <Section>
         <ShareableEntityURL entityGRN={entityGRN} />
       </Section>
+      )}
     </>
   );
 };
@@ -155,6 +163,13 @@ EntityShareSettings.propTypes = {
   entityGRN: PropTypes.string.isRequired,
   entityShareState: PropTypes.object.isRequired,
   setDisableSubmit: PropTypes.func.isRequired,
+  showShareableEntityURL: PropTypes.bool,
+  entityTypeTitle: PropTypes.string,
+};
+
+EntityShareSettings.defaultProps = {
+  showShareableEntityURL: true,
+  entityTypeTitle: undefined,
 };
 
 export default EntityShareSettings;

@@ -23,6 +23,8 @@ import com.google.common.graph.Graph;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.plugins.views.search.views.ViewSummaryDTO;
+import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog2.contentpacks.facades.ViewFacade;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -51,8 +53,9 @@ public class DashboardV1Facade extends ViewFacade {
                              SearchDbService searchDbService,
                              EntityConverter entityConverter,
                              ViewService viewService,
+                             ViewSummaryService viewSummaryService,
                              UserService userService) {
-        super(objectMapper, searchDbService, viewService, userService);
+        super(objectMapper, searchDbService, viewService, viewSummaryService, userService);
         this.objectMapper = objectMapper;
         this.entityConverter = entityConverter;
     }
@@ -68,9 +71,9 @@ public class DashboardV1Facade extends ViewFacade {
     }
 
     @Override
-    protected Stream<ViewDTO> getNativeViews() {
+    protected Stream<ViewSummaryDTO> getNativeViews() {
         /* There are no old dashboards in the system */
-        return ImmutableSet.<ViewDTO>of().stream();
+        return ImmutableSet.<ViewSummaryDTO>of().stream();
     }
 
     @Override

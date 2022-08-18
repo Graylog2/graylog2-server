@@ -17,10 +17,11 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
+import Spinner from 'components/common/Spinner';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import { MenuItem } from 'components/bootstrap';
 import ActionMenuItem from 'views/components/actions/ActionMenuItem';
-import { ActionDefinition, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
+import type { ActionDefinition, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 
 const DropdownHeader = styled.span`
   padding-left: 10px;
@@ -35,7 +36,7 @@ const StyledListItem = styled.li`
   list-style: none;
 `;
 
-const filterVisibleActions = (actions: Array<ActionDefinition> | undefined = [], handlerArgs: Props['handlerArgs']) => {
+const filterVisibleActions = (handlerArgs: Props['handlerArgs'], actions: Array<ActionDefinition> | undefined = []) => {
   return actions.filter((action: ActionDefinition) => {
     const { isHidden = () => false } = action;
 
@@ -48,24 +49,32 @@ const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs
   const fieldActions = usePluginEntities('fieldActions');
 
   if (type === 'value') {
-    return filterVisibleActions(valueActions, handlerArgs);
+    return filterVisibleActions(handlerArgs, valueActions);
   }
 
   if (type === 'field') {
-    return filterVisibleActions(fieldActions, handlerArgs);
+    return filterVisibleActions(handlerArgs, fieldActions);
   }
 
   return [];
 };
 
 const useExternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
-  const valueActions = usePluginEntities('externalValueActions');
+  const usePluginExternalActions = usePluginEntities('useExternalActions');
 
-  if (type !== 'value') {
-    return [];
+  if (usePluginExternalActions && typeof usePluginExternalActions[0] === 'function') {
+    const { isLoading, isError, externalValueActions } = usePluginExternalActions[0]();
+
+    if (type !== 'value') {
+      return { isLoading, isError, externalValueActions: [] };
+    }
+
+    const externalActions = filterVisibleActions(handlerArgs, externalValueActions);
+
+    return { isLoading, isError, externalActions };
   }
 
-  return filterVisibleActions(valueActions, handlerArgs);
+  return { isLoading: false, isError: false, externalValueActions: [] };
 };
 
 type Props = {
@@ -86,7 +95,7 @@ const ActionDropdown = ({
   onMenuToggle,
 }: Props) => {
   const internalActions = useInternalActions(type, handlerArgs);
-  const externalActions = useExternalActions(type, handlerArgs);
+  const { isLoading, externalActions } = useExternalActions(type, handlerArgs);
 
   return (
     <>
@@ -107,8 +116,8 @@ const ActionDropdown = ({
                         type={type}
                         onMenuToggle={onMenuToggle} />
       ))}
-
-      {(externalActions && externalActions.length !== 0) && (
+      {isLoading && (<><MenuItem divider /><MenuItem disabled><Spinner text="Loading" /></MenuItem></>)}
+      {(!isLoading && externalActions && externalActions.length !== 0) && (
         <>
           <MenuItem divider />
           {externalActions.map((action) => (

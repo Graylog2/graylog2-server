@@ -17,8 +17,10 @@
 package org.graylog2.inputs;
 
 import com.google.common.eventbus.EventBus;
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.IOState;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
@@ -26,6 +28,7 @@ import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.inputs.PersistedInputs;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,11 +57,17 @@ public class InputEventListenerTest {
     @Mock
     private NodeId nodeId;
     private InputEventListener listener;
+    @Mock
+    private LeaderElectionService leaderElectionService;
+    @Mock
+    private PersistedInputs persistedInputs;
+    @Mock
+    private ServerStatus serverStatus;
 
     @Before
     public void setUp() throws Exception {
         final EventBus eventBus = new EventBus(this.getClass().getSimpleName());
-        listener = new InputEventListener(eventBus, inputLauncher, inputRegistry, inputService, nodeId);
+        listener = new InputEventListener(eventBus, inputLauncher, inputRegistry, inputService, nodeId, leaderElectionService, persistedInputs, serverStatus);
     }
 
     @Test

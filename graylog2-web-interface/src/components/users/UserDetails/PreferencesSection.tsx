@@ -19,7 +19,7 @@ import * as React from 'react';
 import { PREFERENCES_THEME_MODE } from 'theme/constants';
 import { ReadOnlyFormGroup } from 'components/common';
 import Store from 'logic/local-storage/Store';
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 type Props = {

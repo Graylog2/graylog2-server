@@ -16,43 +16,112 @@
  */
 import { sortBy, uniqBy } from 'lodash';
 
-import type { Editor, ResultsCallback, Session, Position, CompletionResult, AutoCompleter, Token } from './ace-types';
+import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+
+import type {
+  Editor,
+  ResultsCallback,
+  Session,
+  Position,
+  CompletionResult,
+  AutoCompleter,
+  Token,
+  Line,
+} from './queryinput/ace-types';
+
+export type FieldTypes = { all: FieldIndex, query: FieldIndex };
+type FieldIndex = { [fieldName: string]: FieldTypeMapping };
+
+export type CompleterContext = Readonly<{
+  currentToken: Token | undefined | null,
+  lastToken: Token | undefined | null,
+  prefix: string,
+  tokens: Array<Token>,
+  currentTokenIdx: number,
+  timeRange?: TimeRange | NoTimeRangeOverride,
+  streams?: Array<string>,
+  fieldTypes?: FieldTypes,
+  userTimezone: string,
+}>;
 
 export interface Completer {
-  getCompletions(currentToken: Token | undefined | null, lastToken: Token | undefined | null, prefix: string, tokens: Array<Token>, currentTokenIdx: number): Array<CompletionResult>;
+  getCompletions(context: CompleterContext): Array<CompletionResult> | Promise<Array<CompletionResult>>;
+  shouldShowCompletions?: (currentLine: number, lines: Array<Array<Line>>) => boolean;
+  identifierRegexps?: RegExp[];
 }
 
-export default class SearchBarAutoCompletions implements AutoCompleter {
-  completers: Array<Completer>;
+const onCompleterError = (error: Error) => {
+  // eslint-disable-next-line no-console
+  console.warn('Exception thrown in completer: ', error);
+};
 
-  constructor(completers: Array<Completer> = []) {
+export default class SearchBarAutoCompletions implements AutoCompleter {
+  private readonly completers: Array<Completer>;
+
+  private readonly timeRange: TimeRange | NoTimeRangeOverride | undefined;
+
+  private readonly streams: Array<string>;
+
+  private readonly fieldTypes: FieldTypes;
+
+  private readonly userTimezone: string;
+
+  constructor(completers: Array<Completer>, timeRange: TimeRange | NoTimeRangeOverride | undefined, streams: Array<string>, fieldTypes: FieldTypes, userTimezone: string) {
     this.completers = completers;
+    this.timeRange = timeRange;
+    this.streams = streams;
+    this.fieldTypes = fieldTypes;
+    this.userTimezone = userTimezone;
   }
 
-  getCompletions = (editor: Editor, session: Session, pos: Position, prefix: string, callback: ResultsCallback) => {
-    // eslint-disable-next-line no-param-reassign
-    editor.completer.autoSelect = false;
+  getCompletions = async (editor: Editor, _session: Session, pos: Position, prefix: string, callback: ResultsCallback) => {
     const tokens = editor.session.getTokens(pos.row);
     const currentToken = editor.session.getTokenAt(pos.row, pos.column);
     const currentTokenIdx = tokens.findIndex((t) => (t === currentToken));
 
     const lastToken: Token | undefined | null = currentTokenIdx > 0 ? tokens[currentTokenIdx - 1] : null;
 
-    const results = this.completers
-      .map((completer) => {
-        try {
-          return completer.getCompletions(currentToken, lastToken, prefix, tokens, currentTokenIdx);
-        } catch (e) {
-          // eslint-disable-next-line no-console
-          console.warn('Exception thrown in completer: ', e);
-        }
+    const results = await Promise.all(
+      this.completers
+        .map(async (completer) => {
+          try {
+            return await completer.getCompletions({
+              currentToken,
+              lastToken,
+              prefix,
+              tokens,
+              currentTokenIdx,
+              timeRange: this.timeRange,
+              streams: this.streams,
+              fieldTypes: this.fieldTypes,
+              userTimezone: this.userTimezone,
+            });
+          } catch (e) {
+            onCompleterError(e);
+          }
 
-        return [];
-      })
-      .reduce((acc, cur) => [...acc, ...cur], []);
-
-    const uniqResults = uniqBy(sortBy(results, ['score', 'name']), 'name');
+          return [];
+        }),
+    );
+    const uniqResults = uniqBy(sortBy(results.flat(), ['score', 'name']), 'name');
 
     callback(null, uniqResults);
-  }
+  };
+
+  shouldShowCompletions = (currentLine: number, lines: Array<Array<Line>>) => {
+    return this.completers.some((completer) => {
+      if (typeof completer.shouldShowCompletions === 'function') {
+        try {
+          return completer.shouldShowCompletions(currentLine, lines);
+        } catch (e) {
+          onCompleterError(e);
+        }
+      }
+
+      return false;
+    });
+  };
+
+  get identifierRegexps() { return this.completers.map((completer) => completer.identifierRegexps ?? []).flat(); }
 }

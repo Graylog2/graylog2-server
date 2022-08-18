@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
+
 import asMock from 'helpers/mocking/AsMock';
 import { MockStore } from 'helpers/mocking';
-
 import StreamsContext from 'contexts/StreamsContext';
 import { processHooks } from 'views/logic/views/ViewLoader';
 import { ViewActions } from 'views/stores/ViewStore';
@@ -65,7 +65,7 @@ jest.mock('views/stores/ViewManagementStore', () => ({
 }));
 
 jest.mock('views/logic/views/ViewLoader', () => ({
-  processHooks: jest.fn((promise, loadHooks, executeHooks, query, onSuccess) => Promise.resolve().then(onSuccess)),
+  processHooks: jest.fn((_promise, _loadHooks, _executeHooks, _query, onSuccess) => Promise.resolve().then(onSuccess)),
 }));
 
 jest.mock('views/hooks/SyncWithQueryParameters');
@@ -114,24 +114,28 @@ describe('StreamSearchPage', () => {
 
   it('should create view with streamId passed from props', async () => {
     render(<SimpleStreamSearchPage />);
-    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1'));
+    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1', undefined, undefined));
   });
 
   it('should recreate view when streamId passed from props changes', async () => {
     const { rerender } = render(<SimpleStreamSearchPage />);
 
-    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1'));
+    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1', undefined, undefined));
 
     rerender(<SimpleStreamSearchPage params={{ streamId: 'stream-id-2' }} />);
 
-    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-2'));
+    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-2', undefined, undefined));
   });
 
   describe('loading another view', () => {
     it('should be possible with specific view id', async () => {
       asMock(SearchComponent as React.FunctionComponent).mockImplementationOnce(() => (
         <ViewLoaderContext.Consumer>
-          {(_loadView) => <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>Load view</button>}
+          {(_loadView) => (
+            <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>Load
+              view
+            </button>
+          )}
         </ViewLoaderContext.Consumer>
       ));
 

@@ -23,7 +23,8 @@ import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
-import FieldTypesContext, { FieldTypes } from 'views/components/contexts/FieldTypesContext';
+import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
 
@@ -42,6 +43,13 @@ const rule = HighlightingRule.builder()
   .value('noob')
   .build();
 
+const ruleWithValueFalse = rule.toBuilder()
+  .value(false)
+  .build();
+const ruleWithValueZero = rule.toBuilder()
+  .value(0)
+  .build();
+
 describe('HighlightForm', () => {
   const fieldTypes: FieldTypes = {
     all: Immutable.List([FieldTypeMapping.create('foob', FieldType.create('long', [Properties.Numeric]))]),
@@ -53,14 +61,19 @@ describe('HighlightForm', () => {
     </FieldTypesContext.Provider>
   );
 
+  const triggerSaveButtonClick = async () => {
+    const elem = await screen.findByText('Save');
+    fireEvent.click(elem);
+  };
+
   it('should render for edit', async () => {
-    const { findByText, findByDisplayValue } = render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
+    const { findByText } = render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
 
     const form = await findByText('Edit Highlighting Rule');
-    const value = await findByDisplayValue(rule.value);
+    const input = await screen.findByLabelText('Value');
 
+    expect(input).toHaveValue(String(rule.value));
     expect(form).toBeInTheDocument();
-    expect(value).toBeInTheDocument();
   });
 
   it('should render for new', async () => {
@@ -83,11 +96,9 @@ describe('HighlightForm', () => {
   });
 
   it('should fire remove action when saving a existing rule', async () => {
-    const { findByText } = render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
+    render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
 
-    const elem = await findByText('Save');
-
-    fireEvent.click(elem);
+    await triggerSaveButtonClick();
 
     await waitFor(() => expect(HighlightingRulesActions.update)
       .toBeCalledWith(rule, { field: rule.field, value: rule.value, condition: rule.condition, color: rule.color }));
@@ -121,5 +132,23 @@ describe('HighlightForm', () => {
       .toBeCalledWith(rule, expect.objectContaining({
         color: expect.objectContaining({ gradient: 'Viridis' }),
       })));
+  });
+
+  it('should be able to click submit when has value 0 with type number', async () => {
+    render(<HighlightFormWithContext onClose={() => {}} rule={ruleWithValueZero} />);
+
+    await triggerSaveButtonClick();
+
+    await waitFor(() => expect(HighlightingRulesActions.update)
+      .toBeCalledWith(ruleWithValueZero, { field: ruleWithValueZero.field, value: '0', condition: ruleWithValueZero.condition, color: ruleWithValueZero.color }));
+  });
+
+  it('should be able to click submit when has value false  with type boolean', async () => {
+    render(<HighlightFormWithContext onClose={() => {}} rule={ruleWithValueFalse} />);
+
+    await triggerSaveButtonClick();
+
+    await waitFor(() => expect(HighlightingRulesActions.update)
+      .toBeCalledWith(ruleWithValueFalse, { field: ruleWithValueFalse.field, value: 'false', condition: ruleWithValueFalse.condition, color: ruleWithValueFalse.color }));
   });
 });

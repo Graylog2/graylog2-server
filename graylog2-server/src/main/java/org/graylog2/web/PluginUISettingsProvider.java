@@ -16,8 +16,6 @@
  */
 package org.graylog2.web;
 
-import java.util.Map;
-
 /**
  * Some plugins may have dynamic data that needs to be made available to the UI at server startup.  This interface
  * provides a mechanism for providing that data via the generated config.js file's pluginUISettings map.  When an
@@ -28,7 +26,7 @@ import java.util.Map;
  * providerKey value.  To help guarantee uniqueness, we recommend following Java package naming standards.  As an
  * example, a new Graylog plugin might use the key: "org.graylog.newuiplugin".
  */
-public interface PluginUISettingsProvider {
+public interface PluginUISettingsProvider<T> {
 
     /**
      * This method returns the UI settings data for your plugin as a Map which will be converted to JSON and
@@ -36,5 +34,5 @@ public interface PluginUISettingsProvider {
      *
      * @return The settings data to be included in config.js
      */
-    Map<String,Object> pluginSettings();
+    T pluginSettings();
 }

@@ -11,6 +11,9 @@ The following environment variables can be set to configure local execution:
 
   Setting this to "true" (ignoring case) will allow debugging the code under test running inside a container.
 
+- GRAYLOG_TEST_WITH_RUNNING_ES_AND_MONGODB
+    `true`|`false` if you want to start the test against your current dev instance of graylog&mongodb&elasticsearch. 
+
 # Local Execution
 
 Running `mvn verify` locally should execute the tests in the same way as on a CI server. 

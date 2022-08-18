@@ -17,18 +17,27 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
+import org.graylog2.configuration.validators.RotationStrategyValidator;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.joda.time.Period;
 
+import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 public class ElasticsearchConfiguration {
     public static final String DEFAULT_EVENTS_INDEX_PREFIX = "default_events_index_prefix";
     public static final String DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX = "default_system_events_index_prefix";
+    public static final String MAX_INDEX_RETENTION_PERIOD = "max_index_retention_period";
 
     @Parameter(value = "elasticsearch_disable_version_check")
     private boolean disableVersionCheck = false;
@@ -53,6 +62,9 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_max_time_per_index", required = true)
     private Period maxTimePerIndex = Period.days(1);
 
+    @Parameter(value = "elasticsearch_max_write_index_age")
+    private Period maxWriteIndexAge = null;
+
     @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "elasticsearch_shards", validator = PositiveIntegerValidator.class, required = true)
     private int shards = 4;
@@ -76,9 +88,30 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "retention_strategy", required = true)
     private String retentionStrategy = "delete";
 
+    @Parameter(value = "enabled_index_rotation_strategies", converter = StringListConverter.class, validators = RotationStrategyValidator.class)
+    private List<String> enabledRotationStrategies = Arrays.asList(TimeBasedRotationStrategy.NAME, MessageCountRotationStrategy.NAME, SizeBasedRotationStrategy.NAME);
+
+    /**
+     * Provides a hard upper limit for the retention period of any index set at configuration time.
+     * <p>
+     * This setting is used to validate the value a user chooses for {@code max_number_of_indices} when configuring
+     * an index set. However, it is only in effect, when a <em>time-based rotation strategy</em> is chosen, because
+     * otherwise it would be hard to calculate the effective retention period at configuration time.
+     * <p>
+     * If a rotation strategy other than time-based is selected and/or no value is provided for this setting, no upper
+     * limit for index retention will be enforced.
+     */
+    @Parameter(value = MAX_INDEX_RETENTION_PERIOD)
+    private Period maxIndexRetentionPeriod = null;
+
+    @Nullable
+    public Period getMaxIndexRetentionPeriod() {
+        return maxIndexRetentionPeriod;
+    }
+
     @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "rotation_strategy")
-    private String rotationStrategy = "count";
+    private String rotationStrategy = MessageCountRotationStrategy.NAME;
 
     @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "disable_index_optimization")
@@ -94,8 +127,8 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_index_optimization_jobs", validator = PositiveIntegerValidator.class)
     private int indexOptimizationJobs = 20;
 
-    @Parameter(value = "index_field_type_periodical_interval", validator = PositiveDurationValidator.class)
-    private Duration indexFieldTypePeriodicalInterval = Duration.hours(1L);
+    @Parameter(value = "index_field_type_periodical_full_refresh_interval", validators = {PositiveDurationValidator.class})
+    private Duration indexFieldTypePeriodicalFullRefreshInterval = Duration.minutes(5);
 
     @Parameter(value = DEFAULT_EVENTS_INDEX_PREFIX, validators = StringNotBlankValidator.class)
     private String defaultEventsIndexPrefix = "gl-events";
@@ -132,6 +165,10 @@ public class ElasticsearchConfiguration {
         return maxTimePerIndex;
     }
 
+    public Period getMaxWriteIndexAge() {
+        return maxWriteIndexAge;
+    }
+
     @Deprecated // Should be removed in Graylog 3.0
     public int getShards() {
         return shards;
@@ -150,6 +187,10 @@ public class ElasticsearchConfiguration {
     @Deprecated // Should be removed in Graylog 3.0
     public String getTemplateName() {
         return templateName;
+    }
+
+    public List<String> getEnabledRotationStrategies() {
+        return enabledRotationStrategies;
     }
 
     @Deprecated // Should be removed in Graylog 3.0
@@ -182,10 +223,6 @@ public class ElasticsearchConfiguration {
 
     public int getIndexOptimizationJobs() {
         return indexOptimizationJobs;
-    }
-
-    public Duration getIndexFieldTypePeriodicalInterval() {
-        return indexFieldTypePeriodicalInterval;
     }
 
     public String getDefaultEventsIndexPrefix() {

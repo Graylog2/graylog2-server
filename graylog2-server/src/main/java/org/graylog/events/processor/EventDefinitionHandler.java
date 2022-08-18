@@ -16,18 +16,21 @@
  */
 package org.graylog.events.processor;
 
+import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.plugin.database.users.User;
+import org.mongojack.DBQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
@@ -133,6 +136,23 @@ public class EventDefinitionHandler {
      * @return true if the event definition got deleted, false otherwise
      */
     public boolean delete(String eventDefinitionId) {
+        return doDelete(eventDefinitionId,
+                () -> eventDefinitionService.deleteUnregister(eventDefinitionId) > 0);
+    }
+
+    /**
+     * Deletes an existing immutable event definition and its corresponding scheduler job definition and trigger.
+     * Do not call this method for API requests. Only call from <link>{@link org.graylog.events.contentpack.facade.EventDefinitionFacade}</link>.
+     *
+     * @param eventDefinitionId the event definition to delete
+     * @return true if the event definition got deleted, false otherwise
+     */
+    public boolean deleteImmutable(String eventDefinitionId) {
+        return doDelete(eventDefinitionId,
+                () -> eventDefinitionService.deleteUnregisterImmutable(eventDefinitionId) > 0);
+    }
+
+    private boolean doDelete(String eventDefinitionId, Supplier<Boolean> deleteSupplier) {
         final Optional<EventDefinitionDto> optionalEventDefinition = eventDefinitionService.get(eventDefinitionId);
         if (!optionalEventDefinition.isPresent()) {
             return false;
@@ -144,7 +164,7 @@ public class EventDefinitionHandler {
                 .ifPresent(jobDefinition -> deleteJobDefinitionAndTrigger(jobDefinition, eventDefinition));
 
         LOG.debug("Deleting event definition <{}/{}>", eventDefinition.id(), eventDefinition.title());
-        return eventDefinitionService.delete(eventDefinitionId) > 0;
+        return deleteSupplier.get();
     }
 
     /**
@@ -170,6 +190,18 @@ public class EventDefinitionHandler {
                 .ifPresent(jobDefinition -> deleteJobDefinitionAndTrigger(jobDefinition, eventDefinition));
     }
 
+    /**
+     * Deletes notification triggers for this event.
+     * <p>
+     * This mostly serves as a safety net, when a misconfiguration has lead to a high number of outstanding
+     * notifications.
+     * <p>
+     * Processing these notifications would unnecessarily block the job scheduler and in some cases consume a lot of
+     * resources.
+     */
+    public void deleteNotificationJobTriggers(String eventDefinitionId) {
+        deleteNotificationJobTriggers(getEventDefinitionOrThrowIAE(eventDefinitionId));
+    }
 
     private EventDefinitionDto createEventDefinition(EventDefinitionDto unsavedEventDefinition, Optional<User> user) {
         EventDefinitionDto eventDefinition;
@@ -287,11 +319,26 @@ public class EventDefinitionHandler {
 
     private void deleteJobDefinitionAndTrigger(JobDefinitionDto jobDefinition, EventDefinitionDto eventDefinition) {
         deleteJobTrigger(jobDefinition, eventDefinition);
+        deleteNotificationJobTriggers(eventDefinition);
         deleteJobDefinition(jobDefinition, eventDefinition);
+    }
+
+    private void deleteNotificationJobTriggers(EventDefinitionDto eventDefinition) {
+        final DBQuery.Query query = DBQuery.and(
+                DBQuery.is("data.type", EventNotificationExecutionJob.TYPE_NAME),
+                DBQuery.is("data.event_dto.event_definition_id", eventDefinition.id()));
+
+        final int numberOfDeletedTriggers = jobTriggerService.deleteByQuery(query);
+
+        if (numberOfDeletedTriggers > 0) {
+            LOG.info("Deleted {} notification triggers for event definition <{}/{}>.",
+                    numberOfDeletedTriggers, eventDefinition.id(), eventDefinition.title());
+        }
     }
 
     private JobTriggerDto newJobTrigger(JobDefinitionDto jobDefinition, EventProcessorSchedulerConfig schedulerConfig) {
         return JobTriggerDto.builderWithClock(clock)
+                .jobDefinitionType(EventProcessorExecutionJob.TYPE_NAME)
                 .jobDefinitionId(requireNonNull(jobDefinition.id(), "Job definition ID cannot be null"))
                 .nextTime(clock.nowUTC())
                 .schedule(schedulerConfig.schedule())
@@ -305,17 +352,11 @@ public class EventDefinitionHandler {
     }
 
     private Optional<JobTriggerDto> getJobTrigger(JobDefinitionDto jobDefinition) {
-        final List<JobTriggerDto> jobTriggers = jobTriggerService.getForJob(jobDefinition.id());
-
-        if (jobTriggers.isEmpty()) {
-            return Optional.empty();
-        }
-
-        // DBJobTriggerService#getForJob currently returns only one trigger. (raises an exception otherwise)
+        // DBJobTriggerService#getOneForJob currently returns only one trigger. (raises an exception otherwise)
         // Once we allow multiple triggers per job definition, this code will fail. We need some kind of label
         // to figure out which trigger was created automatically. (e.g. event processor)
         // TODO: Fix this code for multiple triggers per job definition
-        return Optional.ofNullable(jobTriggers.get(0));
+        return jobTriggerService.getOneForJob(jobDefinition.id());
     }
 
     private void updateJobTrigger(EventDefinitionDto eventDefinition,

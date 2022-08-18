@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 
 import { Link, LinkContainer } from 'components/common/router';
 import { Button, ButtonToolbar } from 'components/bootstrap';
-import { Timestamp } from 'components/common';
+import { RelativeTime, Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
 import StatusIndicator from 'components/sidecars/common/StatusIndicator';
@@ -90,7 +90,9 @@ class SidecarRow extends React.Component {
           {sidecar.node_details.operating_system}
         </td>
         <td>
-          <Timestamp dateTime={sidecar.last_seen} relative={showRelativeTime} />
+          {showRelativeTime
+            ? <RelativeTime dateTime={sidecar.last_seen} />
+            : <Timestamp dateTime={sidecar.last_seen} />}
         </td>
         <td>
           {sidecar.node_id}

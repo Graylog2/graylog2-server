@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.db;
 
+import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -26,6 +27,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,14 +38,17 @@ public class SearchesCleanUpJob extends Periodical {
     private final ViewSummaryService viewSummaryService;
     private final SearchDbService searchDbService;
     private final Instant mustNotBeOlderThan;
+    private final Map<String, ViewResolver> viewResolvers;
 
     @Inject
     public SearchesCleanUpJob(ViewSummaryService viewSummaryService,
                               SearchDbService searchDbService,
-                              @Named("views_maximum_search_age") Duration maximumSearchAge) {
+                              @Named("views_maximum_search_age") Duration maximumSearchAge,
+                              Map<String, ViewResolver> viewResolvers) {
         this.viewSummaryService = viewSummaryService;
         this.searchDbService = searchDbService;
         this.mustNotBeOlderThan = Instant.now().minus(maximumSearchAge);
+        this.viewResolvers = viewResolvers;
     }
 
     @Override
@@ -56,7 +62,7 @@ public class SearchesCleanUpJob extends Periodical {
     }
 
     @Override
-    public boolean masterOnly() {
+    public boolean leaderOnly() {
         return true;
     }
 
@@ -87,7 +93,15 @@ public class SearchesCleanUpJob extends Periodical {
 
     @Override
     public void doRun() {
-        final Set<String> requiredIds = viewSummaryService.streamAll().map(ViewSummaryDTO::searchId).collect(Collectors.toSet());
-        searchDbService.getExpiredSearches(requiredIds, mustNotBeOlderThan).forEach(id -> searchDbService.delete(id));
+        searchDbService.getExpiredSearches(findReferencedSearchIds(),
+                mustNotBeOlderThan).forEach(searchDbService::delete);
+    }
+
+    private Set<String> findReferencedSearchIds() {
+        final HashSet<String> toKeepViewIds = new HashSet<>();
+        toKeepViewIds.addAll(viewSummaryService.streamAll().map(ViewSummaryDTO::searchId).collect(Collectors.toSet()));
+        toKeepViewIds.addAll(viewResolvers
+                .values().stream().flatMap(vr -> vr.getSearchIds().stream()).collect(Collectors.toSet()));
+        return toKeepViewIds;
     }
 }

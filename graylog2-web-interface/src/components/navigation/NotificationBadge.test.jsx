@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
+
 import { MockStore } from 'helpers/mocking';
 
 import NotificationBadge from './NotificationBadge';

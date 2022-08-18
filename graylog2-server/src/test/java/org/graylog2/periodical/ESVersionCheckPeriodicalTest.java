@@ -21,6 +21,7 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.versionprobe.VersionProbe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ class ESVersionCheckPeriodicalTest {
 
     @Test
     void doesNotRunIfVersionOverrideIsSet() {
-        createPeriodical(Version.from(8, 0, 0), Version.from(7, 0, 0)).doRun();
+        createPeriodical(SearchVersion.elasticsearch(8, 0, 0), SearchVersion.elasticsearch(7, 0, 0)).doRun();
 
         verifyNoInteractions(notificationService);
     }
@@ -60,35 +61,33 @@ class ESVersionCheckPeriodicalTest {
     @Test
     void doesNotDoAnythingIfVersionWasNotProbed() {
         returnProbedVersion(null);
-
-        createPeriodical(Version.from(8, 0, 0)).doRun();
-
+        createPeriodical(SearchVersion.elasticsearch(8, 0, 0)).doRun();
         verifyNoInteractions(notificationService);
     }
 
     @Test
     void createsNotificationIfCurrentVersionIsIncompatibleWithInitialOne() {
-        returnProbedVersion(Version.from(9, 2, 3));
+        returnProbedVersion(com.github.zafarkhaja.semver.Version.forIntegers(9, 2, 3));
 
-        createPeriodical(Version.from(8, 1, 2)).doRun();
+        createPeriodical(SearchVersion.elasticsearch(8, 1, 2)).doRun();
 
         assertNotificationWasRaised();
     }
 
     @Test
     void createsNotificationIfCurrentVersionIncompatiblyOlderThanInitialOne() {
-        returnProbedVersion(Version.from(6, 8, 1));
+        returnProbedVersion(com.github.zafarkhaja.semver.Version.forIntegers(6, 8, 1));
 
-        createPeriodical(Version.from(8, 1, 2)).doRun();
+        createPeriodical(SearchVersion.elasticsearch(8, 1, 2)).doRun();
 
         assertNotificationWasRaised();
     }
 
     @Test
     void fixesNotificationIfCurrentVersionIsIncompatibleWithInitialOne() {
-        returnProbedVersion(Version.from(8, 2, 3));
+        returnProbedVersion(com.github.zafarkhaja.semver.Version.forIntegers(8, 2, 3));
 
-        createPeriodical(Version.from(8, 1, 2)).doRun();
+        createPeriodical(SearchVersion.elasticsearch(8, 1, 2)).doRun();
 
         assertNotificationWasFixed();
     }
@@ -107,15 +106,15 @@ class ESVersionCheckPeriodicalTest {
         assertThat(captor.getValue().getType()).isEqualTo(Notification.Type.ES_VERSION_MISMATCH);
     }
 
-    private void returnProbedVersion(@Nullable Version probedVersion) {
-        when(versionProbe.probe(anyCollection())).thenReturn(Optional.ofNullable(probedVersion));
+    private void returnProbedVersion(@Nullable com.github.zafarkhaja.semver.Version probedVersion) {
+        when(versionProbe.probe(anyCollection())).thenReturn(Optional.ofNullable(probedVersion).map(SearchVersion::elasticsearch));
     }
 
-    private Periodical createPeriodical(Version initialVersion) {
+    private Periodical createPeriodical(SearchVersion initialVersion) {
         return new ESVersionCheckPeriodical(initialVersion, null, Collections.emptyList(), versionProbe, notificationService);
     }
 
-    private Periodical createPeriodical(Version initialVersion, @Nullable Version versionOverride) {
+    private Periodical createPeriodical(SearchVersion initialVersion, @Nullable SearchVersion versionOverride) {
         return new ESVersionCheckPeriodical(initialVersion, versionOverride, Collections.emptyList(), versionProbe, notificationService);
     }
 }

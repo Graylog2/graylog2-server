@@ -17,15 +17,19 @@
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import WrappingContainer from 'WrappingContainer';
-import MockStore from 'helpers/mocking/StoreMock';
 
+import MockStore from 'helpers/mocking/StoreMock';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
-import SearchActions from 'views/actions/SearchActions';
-import GlobalOverride from 'views/logic/search/GlobalOverride';
+import { SearchActions } from 'views/stores/SearchStore';
+import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import Widget from 'views/logic/widgets/Widget';
+import mockComponent from 'helpers/mocking/MockComponent';
 
 import WidgetQueryControls from './WidgetQueryControls';
 import WidgetContext from './contexts/WidgetContext';
+
+jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
+jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
@@ -40,8 +44,13 @@ jest.mock('views/stores/GlobalOverrideStore', () => ({
   },
 }));
 
-jest.mock('views/actions/SearchActions', () => ({
-  refresh: jest.fn(() => Promise.resolve()),
+jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(
+    ['getInitialState', () => ({ search: { parameters: [] } })],
+  ),
+  SearchActions: {
+    refresh: jest.fn(() => Promise.resolve()),
+  },
 }));
 
 jest.mock('stores/connect', () => {
@@ -60,7 +69,9 @@ jest.mock('moment', () => {
   return Object.assign(() => mockMoment('2019-10-10T12:26:31.146Z'), mockMoment);
 });
 
-jest.mock('views/components/searchbar/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
+jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
+jest.mock('views/components/searchbar/queryinput/BasicQueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
+jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {
@@ -121,7 +132,7 @@ describe('WidgetQueryControls', () => {
   describe('displays if global override is set', () => {
     const resetTimeRangeButtonTitle = /reset global override/i;
     const resetQueryButtonTitle = /reset global filter/i;
-    const timeRangeOverrideInfo = '2020-01-01T10:00:00.850Z - 2020-01-02T10:00:00.000Z';
+    const timeRangeOverrideInfo = '2019-10-10 14:26:31.146 - 2019-10-10 14:26:31.146';
     const queryOverrideInfo = globalOverrideWithQuery.query.query_string;
 
     it('shows preview of global override time range', async () => {
@@ -153,7 +164,7 @@ describe('WidgetQueryControls', () => {
       expect(GlobalOverrideActions.resetTimeRange).toHaveBeenCalled();
     });
 
-    it('triggers resetting global override when reset query filter button is clicked', async () => {
+    it('triggers resetting global override and query validation when reset query filter button is clicked', async () => {
       renderSUT({ globalOverride: globalOverrideWithQuery });
       const resetQueryFilterButton = await screen.findByRole('button', { name: resetQueryButtonTitle });
       fireEvent.click(resetQueryFilterButton);

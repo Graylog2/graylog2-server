@@ -19,9 +19,11 @@ import Immutable from 'immutable';
 import { isEqual } from 'lodash';
 
 import { singletonActions, singletonStore } from 'logic/singleton';
-import Query, { filtersForQuery, FilterType, QueryId } from 'views/logic/queries/Query';
-import { RefluxActions } from 'stores/StoreTypes';
-import { QueriesList } from 'views/actions/QueriesActions';
+import type { FilterType, QueryId } from 'views/logic/queries/Query';
+import type Query from 'views/logic/queries/Query';
+import { filtersForQuery } from 'views/logic/queries/Query';
+import type { RefluxActions } from 'stores/StoreTypes';
+import type { QueriesList } from 'views/actions/QueriesActions';
 
 import { QueriesActions, QueriesStore } from './QueriesStore';
 

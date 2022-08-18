@@ -23,14 +23,14 @@ import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 import ViewGenerator from 'views/logic/views/ViewGenerator';
 import { QueriesActions } from 'views/actions/QueriesActions';
 import type { Properties, ViewType, ViewStateMap } from 'views/logic/views/View';
-import View from 'views/logic/views/View';
+import type View from 'views/logic/views/View';
 import type { QuerySet } from 'views/logic/search/Search';
-import Search from 'views/logic/search/Search';
-import ViewState from 'views/logic/views/ViewState';
-import Query from 'views/logic/queries/Query';
+import type Search from 'views/logic/search/Search';
+import type ViewState from 'views/logic/views/ViewState';
+import type Query from 'views/logic/queries/Query';
 import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'logic/singleton';
-import type { QueryId } from 'views/logic/queries/Query';
+import type { QueryId, TimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
 
 import { ViewManagementActions } from './ViewManagementStore';
 import isEqualForSearch from './isEqualForSearch';
@@ -43,7 +43,12 @@ export type ViewStoreState = {
 };
 
 type ViewActionsType = RefluxActions<{
-  create: (type: ViewType, streamId?: string) => Promise<ViewStoreState>,
+  create: (
+    type: ViewType,
+    streamId?: string,
+    timeRange?: TimeRange,
+    queryString?: ElasticsearchQueryString,
+  ) => Promise<ViewStoreState>,
   load: (view: View, isNew?: boolean, queryId?: string) => Promise<ViewStoreState>,
   properties: (properties: Properties) => Promise<void>,
   search: (search: Search) => Promise<View>,
@@ -101,8 +106,13 @@ export const ViewStore: ViewStoreType = singletonStore(
       return this._state();
     },
 
-    create(type: ViewType, streamId: string = null) {
-      return ViewGenerator(type, streamId)
+    create(
+      type: ViewType,
+      streamId: string = null,
+      timeRange?: TimeRange,
+      queryString?: ElasticsearchQueryString,
+    ) {
+      return ViewGenerator(type, streamId, timeRange, queryString)
         .then((newView) => {
           const [view] = this._updateSearch(newView);
 

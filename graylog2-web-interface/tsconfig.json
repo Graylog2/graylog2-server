@@ -19,6 +19,7 @@
     "noImplicitThis": true,
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
+    "noUnusedParameters": true,
 
     "forceConsistentCasingInFileNames": true,
     "module": "esnext",
@@ -29,11 +30,17 @@
     "jsx": "react",
     "baseUrl": ".",
     "paths": {
-      "*": ["*", "./src/*", "./test/*"]
+      "*": ["*", "./src/*", "./test/*"],
+      "@graylog/server-api": ["./target/api"]
     }
   },
   "include": [
     "src",
     "test"
-  ]
+  ],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  }
 }

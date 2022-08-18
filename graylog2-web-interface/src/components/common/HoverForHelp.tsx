@@ -17,6 +17,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
+import type { SizeProp } from '@fortawesome/fontawesome-svg-core';
 
 import { OverlayTrigger } from 'components/common';
 import { Popover } from 'components/bootstrap';
@@ -40,26 +41,40 @@ const StyledPopover = styled(Popover)(({ theme }) => css`
   }
 `);
 
+const StyledIcon = styled(Icon)<{ $type: Type }>(({ theme, $type }) => css`
+  color: ${$type === 'error' ? theme.colors.variant.danger : 'inherit'};
+`);
+
+const iconName = (type: Type) => {
+  switch (type) {
+    case 'error':
+      return 'circle-exclamation';
+    case 'info':
+    default:
+      return 'question-circle';
+  }
+};
+
+type Type = 'info' | 'error';
+
 type Props = {
   children: React.ReactNode,
   className?: string,
   id?: string,
   placement?: 'top' | 'right' | 'bottom' | 'left',
+  iconSize?: SizeProp
   pullRight?: boolean,
-  title: string,
+  title?: string,
   testId?: string,
+  type?: 'info' | 'error',
 };
 
-const HoverForHelp = ({ children, className, title, id, pullRight, placement, testId }: Props) => (
+const HoverForHelp = ({ children, className, title, id, pullRight, placement, testId, type, iconSize }: Props) => (
   <OverlayTrigger trigger={['hover', 'focus']}
                   placement={placement}
-                  overlay={(
-                    <StyledPopover title={title} id={id}>
-                      {children}
-                    </StyledPopover>
-                  )}
+                  overlay={<StyledPopover title={title} id={id}>{children}</StyledPopover>}
                   testId={testId}>
-    <Icon className={`${className} ${pullRight ? 'pull-right' : ''}`} name="question-circle" />
+    <StyledIcon className={`${className} ${pullRight ? 'pull-right' : ''}`} name={iconName(type)} $type={type} size={iconSize} />
   </OverlayTrigger>
 );
 
@@ -69,7 +84,7 @@ HoverForHelp.propTypes = {
   id: PropTypes.string,
   placement: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
   pullRight: PropTypes.bool,
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
   testId: PropTypes.string,
 };
 
@@ -79,6 +94,9 @@ HoverForHelp.defaultProps = {
   pullRight: true,
   placement: 'bottom',
   testId: undefined,
+  title: undefined,
+  type: 'info',
+  iconSize: undefined,
 };
 
 /** @component */

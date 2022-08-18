@@ -19,8 +19,8 @@ import styled from 'styled-components';
 import { capitalize } from 'lodash';
 
 import { Alert } from 'components/bootstrap';
-import { GranteesList } from 'logic/permissions/EntityShareState';
-import ValidationResult from 'logic/permissions/ValidationResult';
+import type { GranteesList } from 'logic/permissions/EntityShareState';
+import type ValidationResult from 'logic/permissions/ValidationResult';
 
 const Container = styled(Alert)`
   margin-top: 20px;

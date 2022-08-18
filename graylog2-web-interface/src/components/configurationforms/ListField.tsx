@@ -18,7 +18,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { ListField as ListFieldType } from 'components/configurationforms/types';
+import type { ListField as ListFieldType } from 'components/configurationforms/types';
 import { MultiSelect } from 'components/common';
 import { Input } from 'components/bootstrap';
 import { optionalMarker } from 'components/configurationforms/FieldHelpers';

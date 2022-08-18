@@ -17,8 +17,12 @@
 package org.graylog2.plugin.periodical;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
 
 public abstract class Periodical implements Runnable {
+    private static final Logger LOG = LoggerFactory.getLogger(Periodical.class);
 
     /**
      * Defines if this thread should be called periodically or only once
@@ -37,14 +41,29 @@ public abstract class Periodical implements Runnable {
     public abstract boolean stopOnGracefulShutdown();
 
     /**
-     * Only start this thread on master nodes?
+     * Only start this thread on leader nodes?
      *
-     * @return
+     * @deprecated Use {@link #leaderOnly()} instead.
      */
-    public abstract boolean masterOnly();
+    @Deprecated
+    public boolean masterOnly() {
+        return false;
+    }
+
+    /**
+     * Determines if this periodical should run only on the leader node.
+     *
+     * @return {@code false} (default) if this periodical may run on every node. {@code true} if it may run only on the
+     * leader node
+     */
+    public boolean leaderOnly() {
+        // Defaulting to the now deprecated original method to not break existing implementations.
+        return masterOnly();
+    }
 
     /**
      * Start on this node? Useful to decide if to start the periodical based on local configuration.
+     *
      * @return
      */
     public abstract boolean startOnThisNode();
@@ -57,13 +76,11 @@ public abstract class Periodical implements Runnable {
     public abstract boolean isDaemon();
 
     /**
-     *
      * @return Seconds to wait before starting the thread. 0 for runsForever() threads.
      */
     public abstract int getInitialDelaySeconds();
 
     /**
-     *
      * @return How long to wait between each execution of the thread. 0 for runsForever() threads.
      */
     public abstract int getPeriodSeconds();
@@ -76,10 +93,16 @@ public abstract class Periodical implements Runnable {
         try {
             doRun();
         } catch (RuntimeException e) {
-            getLogger().error("Uncaught exception in periodical", e);
+            final Logger logger = getLogger();
+            if (logger != null) {
+                logger.error("Uncaught exception in Periodical", e);
+            } else {
+                LOG.error("Uncaught exception in Periodical", e);
+            }
         }
     }
 
+    @Nonnull
     protected abstract Logger getLogger();
 
     public abstract void doRun();

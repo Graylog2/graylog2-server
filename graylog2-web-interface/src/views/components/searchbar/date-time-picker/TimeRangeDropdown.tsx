@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Form, Formik } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
@@ -23,13 +23,21 @@ import moment from 'moment';
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/bootstrap';
 import { Icon, KeyCapture } from 'components/common';
 import { availableTimeRangeTypes } from 'views/Constants';
-import DateTime from 'logic/datetimes/DateTime';
-import type { AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
+import type {
+  AbsoluteTimeRange,
+  KeywordTimeRange,
+  NoTimeRangeOverride,
+  TimeRange,
+  RelativeTimeRange,
+} from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelative } from 'views/typeGuards/timeRange';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
-import { RelativeTimeRangeClassified } from 'views/components/searchbar/date-time-picker/types';
+import type { RelativeTimeRangeClassified } from 'views/components/searchbar/date-time-picker/types';
 import validateTimeRange from 'views/components/TimeRangeValidation';
+import type { DateTimeFormats, DateTime } from 'util/DateTime';
+import { toDateObject } from 'util/DateTime';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import migrateTimeRangeToNewType from './migrateTimeRangeToNewType';
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
@@ -37,7 +45,6 @@ import TabKeywordTimeRange from './TabKeywordTimeRange';
 import TabRelativeTimeRange from './TabRelativeTimeRange';
 import TabDisabledTimeRange from './TabDisabledTimeRange';
 import TimeRangeLivePreview from './TimeRangeLivePreview';
-import { DateTimeContext } from './DateTimeProvider';
 import { classifyRelativeTimeRange, normalizeIfClassifiedRelativeTimeRange, RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from './RelativeTimeRangeClassifiedHelper';
 
 export type TimeRangeDropDownFormValues = {
@@ -46,6 +53,7 @@ export type TimeRangeDropDownFormValues = {
 
 export type TimeRangeDropdownProps = {
   currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
+  limitDuration: number,
   noOverride?: boolean,
   position: 'bottom'|'right',
   setCurrentTimeRange: (nextTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
@@ -62,11 +70,11 @@ type TimeRangeTabsArguments = {
   tabs: Array<TimeRangeType>,
 }
 
-const DEFAULT_RANGES = {
+const createDefaultRanges = (formatTime: (time: DateTime, format: DateTimeFormats) => string) => ({
   absolute: {
     type: 'absolute',
-    from: DateTime.now().subtract(300, 'seconds').format(DateTime.Formats.TIMESTAMP),
-    to: DateTime.now().format(DateTime.Formats.TIMESTAMP),
+    from: formatTime(toDateObject(new Date()).subtract(300, 'seconds'), 'complete'),
+    to: formatTime(toDateObject(new Date()), 'complete'),
   },
   relative: {
     type: 'relative',
@@ -82,7 +90,7 @@ const DEFAULT_RANGES = {
     keyword: 'Last five minutes',
   },
   disabled: undefined,
-};
+});
 
 const timeRangeTypes = {
   absolute: TabAbsoluteTimeRange,
@@ -157,10 +165,10 @@ const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword, tab
     );
   });
 
-const dateTimeValidate = (nextTimeRange, limitDuration) => {
+const dateTimeValidate = (nextTimeRange, limitDuration, formatTime: (dateTime: DateTime, format: string) => string) => {
   let errors = {};
   const timeRange = normalizeIfClassifiedRelativeTimeRange(nextTimeRange);
-  const timeRangeErrors = validateTimeRange(timeRange, limitDuration);
+  const timeRangeErrors = validateTimeRange(timeRange, limitDuration, formatTime);
 
   if (Object.keys(timeRangeErrors).length !== 0) {
     errors = { ...errors, nextTimeRange: timeRangeErrors };
@@ -184,12 +192,14 @@ const TimeRangeDropdown = ({
   setCurrentTimeRange,
   validTypes = allTimeRangeTypes,
   position,
+  limitDuration,
 }: TimeRangeDropdownProps) => {
-  const { limitDuration } = useContext(DateTimeContext);
+  const { formatTime, userTimezone } = useUserDateTime();
   const [validatingKeyword, setValidatingKeyword] = useState(false);
   const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
 
   const positionIsBottom = position === 'bottom';
+  const defaultRanges = createDefaultRanges(formatTime);
 
   const handleNoOverride = () => {
     setCurrentTimeRange({});
@@ -228,15 +238,15 @@ const TimeRangeDropdown = ({
                    arrowOffsetLeft={positionIsBottom ? 34 : -11}
                    title={title}>
       <Formik<TimeRangeDropDownFormValues> initialValues={{ nextTimeRange: onInitializingNextTimeRange(currentTimeRange) }}
-                                           validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
+                                           validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration, formatTime)}
                                            onSubmit={handleSubmit}
                                            validateOnMount>
         {(({ values: { nextTimeRange }, isValid, setFieldValue, submitForm }) => {
-          const handleActiveTab = (nextTab) => {
+          const handleActiveTab = (nextTab: AbsoluteTimeRange['type'] | RelativeTimeRange['type'] | KeywordTimeRange['type']) => {
             if ('type' in nextTimeRange) {
-              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab));
+              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab, formatTime));
             } else {
-              setFieldValue('nextTimeRange', DEFAULT_RANGES[nextTab]);
+              setFieldValue('nextTimeRange', defaultRanges[nextTab]);
             }
 
             setActiveTab(nextTab);
@@ -269,7 +279,7 @@ const TimeRangeDropdown = ({
 
                 <Row className="row-sm">
                   <Col md={6}>
-                    <Timezone>All timezones using: <b>{DateTime.getUserTimezone()}</b></Timezone>
+                    <Timezone>All timezones using: <b>{userTimezone}</b></Timezone>
                   </Col>
                   <Col md={6}>
                     <div className="pull-right">

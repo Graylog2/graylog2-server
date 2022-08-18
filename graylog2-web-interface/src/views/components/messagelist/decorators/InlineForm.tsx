@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 
-import { validate } from 'legacy/validations';
 import { Button } from 'components/bootstrap';
 
 type Props = {
@@ -33,13 +32,6 @@ const InlineForm = (submitTitle: string = 'Create'): React.ComponentType<Props> 
       const { target: formDOMNode } = event;
 
       if ((typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity())) {
-        event.preventDefault();
-
-        return;
-      }
-
-      // Check custom validation for plugin fields
-      if (!validate(formDOMNode)) {
         event.preventDefault();
 
         return;

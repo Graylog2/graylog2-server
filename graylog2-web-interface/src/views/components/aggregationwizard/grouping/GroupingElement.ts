@@ -15,10 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { isEmpty } from 'lodash';
-import uuid from 'uuid/v4';
 
-import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import Pivot, { TimeConfigType, ValuesConfigType } from 'views/logic/aggregationbuilder/Pivot';
+import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { TimeConfigType, ValuesConfigType } from 'views/logic/aggregationbuilder/Pivot';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import generateId from 'logic/generateId';
 
 import GroupingsConfiguration from './GroupingsConfiguration';
 
@@ -86,7 +88,7 @@ const validateValuesGrouping = (grouping: ValuesGrouping): GroupByError => {
   return groupByError;
 };
 
-const hasErrors = <T extends {}>(errors: Array<T>): boolean => {
+const hasErrors = <T extends {}> (errors: Array<T>): boolean => {
   return errors.filter((error) => Object.keys(error).length > 0).length > 0;
 };
 
@@ -111,9 +113,9 @@ const validateGroupBy = (values: WidgetConfigFormValues) => {
   return hasErrors(groupByErrors) ? { groupBy: { groupings: groupByErrors } } : emptyErrors;
 };
 
-const addRandomId = <GroupingType extends BaseGrouping>(baseGrouping: Omit<GroupingType, 'id'>) => ({
+const addRandomId = <GroupingType extends BaseGrouping> (baseGrouping: Omit<GroupingType, 'id'>) => ({
   ...baseGrouping,
-  id: uuid(),
+  id: generateId(),
 });
 
 const datePivotToGrouping = (pivot: Pivot, direction: GroupingDirection): DateGrouping => {
@@ -202,7 +204,7 @@ const GroupByElement: AggregationElement = {
   }),
   onRemove: ((index, formValues) => {
     const newFormValues = { ...formValues };
-    const newGroupings = formValues.groupBy?.groupings.filter((value, i) => (index !== i));
+    const newGroupings = formValues.groupBy?.groupings.filter((_value, i) => (index !== i));
 
     return ({
       ...newFormValues,

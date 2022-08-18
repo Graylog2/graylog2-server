@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 
 const validData: { [key: string]: Rows } = {
   chart: [

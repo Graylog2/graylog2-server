@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { isEqual } from 'lodash';
 
-import {
+import type {
   TimeRange,
   NoTimeRangeOverride,
   RelativeTimeRangeStartOnly,
@@ -43,4 +44,8 @@ export const isTypeRelativeWithEnd = (timeRange: TimeRange | NoTimeRangeOverride
 
 export const isTypeKeyword = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is KeywordTimeRange => {
   return 'type' in timeRange && timeRange.type === 'keyword';
+};
+
+export const isNoTimeRangeOverride = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is NoTimeRangeOverride => {
+  return timeRange !== undefined && isEqual(timeRange, {});
 };

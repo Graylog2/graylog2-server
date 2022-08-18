@@ -20,7 +20,8 @@ import * as Immutable from 'immutable';
 
 import history from 'util/History';
 import Routes from 'routing/Routes';
-import View, { ViewStateMap } from 'views/logic/views/View';
+import type { ViewStateMap } from 'views/logic/views/View';
+import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import Query from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';

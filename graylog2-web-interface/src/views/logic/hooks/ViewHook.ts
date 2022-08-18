@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import View from 'views/logic/views/View';
+import type View from 'views/logic/views/View';
 
 export type ViewHookArguments = {
   view: View,

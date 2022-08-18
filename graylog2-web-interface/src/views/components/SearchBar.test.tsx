@@ -16,19 +16,29 @@
  */
 import * as React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore } from 'helpers/mocking';
-import mockAction from 'helpers/mocking/MockAction';
 
+import { StoreMock as MockStore, asMock } from 'helpers/mocking';
+import mockAction from 'helpers/mocking/MockAction';
 import { SearchActions } from 'views/stores/SearchStore';
-// eslint-disable-next-line import/no-named-default
-import { default as MockQuery } from 'views/logic/queries/Query';
-import WidgetFocusContext, {
-  WidgetEditingState, WidgetFocusingState,
-} from 'views/components/contexts/WidgetFocusContext';
+import MockQuery from 'views/logic/queries/Query';
+import type { WidgetEditingState, WidgetFocusingState } from 'views/components/contexts/WidgetFocusContext';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
+import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
+import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 
 import SearchBar from './SearchBar';
 
 const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
+
+jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(
+    ['getInitialState', () => ({ search: { parameters: [] } })],
+  ),
+  SearchActions: {
+    refresh: jest.fn(),
+  },
+}));
 
 jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(
@@ -38,20 +48,20 @@ jest.mock('stores/users/CurrentUserStore', () => ({
 }));
 
 jest.mock('stores/streams/StreamsStore', () => MockStore(
-  'listen',
   ['listStreams', () => ({ then: jest.fn() })],
   'availableStreams',
 ));
 
 jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigStore: MockStore(['getInitialState', () => ({})]),
+  SearchConfigStore: MockStore(),
   SearchConfigActions: {
     refresh: jest.fn(() => Promise.resolve()),
   },
 }));
 
-jest.mock('views/components/searchbar/QueryInput', () => 'query-input');
-jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => jest.fn(() => <div>Saved Search Controls</div>));
+jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => jest.fn(() => (
+  <div>Saved Search Controls</div>
+)));
 
 jest.mock('views/stores/CurrentQueryStore', () => ({
   CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder()
@@ -61,28 +71,28 @@ jest.mock('views/stores/CurrentQueryStore', () => ({
     .build()]),
 }));
 
-describe('SearchBar', () => {
-  const config = {
-    analysis_disabled_fields: ['full_message', 'message'],
-    query_time_range_limit: 'PT0S',
-    relative_timerange_options: { PT0S: 'Search in all messages', P1D: 'Search in last day' },
-    surrounding_filter_fields: ['file', 'source', 'gl2_source_input', 'source_file'],
-    surrounding_timerange_options: { PT1S: 'One second', PT2S: 'Two seconds' },
-  };
+jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest.fn(() => Promise.resolve({
+  status: 'OK',
+  explanations: [],
+})));
 
+jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
+
+describe('SearchBar', () => {
   beforeEach(() => {
-    SearchActions.refresh = mockAction(jest.fn());
+    SearchActions.refresh = mockAction();
+    SearchConfigStore.getInitialState = jest.fn(() => ({ searchesClusterConfig: mockSearchesClusterConfig }));
   });
 
   it('should render the SearchBar', async () => {
-    render(<SearchBar config={config} />);
+    render(<SearchBar />);
 
     const timeRangeButton = await screen.findByLabelText('Open Time Range Selector');
-    const timeRangeDisplay = screen.getByLabelText('Search Time Range, Opens Time Range Selector On Click');
-    const streamsFilter = screen.getByTestId('streams-filter');
-    const liveUpdate = screen.getByLabelText('Refresh Search Controls');
-    const searchButton = screen.getByTitle('Perform search');
-    const metaButtons = screen.getByText('Saved Search Controls');
+    const timeRangeDisplay = await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
+    const streamsFilter = await screen.findByTestId('streams-filter');
+    const liveUpdate = await screen.findByLabelText('Refresh Search Controls');
+    const searchButton = await screen.findByRole('button', { name: /perform search/i });
+    const metaButtons = await screen.findByText('Saved Search Controls');
 
     expect(timeRangeButton).not.toBeNull();
     expect(timeRangeDisplay).not.toBeNull();
@@ -92,10 +102,12 @@ describe('SearchBar', () => {
     expect(metaButtons).not.toBeNull();
   });
 
-  it('should update query when search is performed', async () => {
-    render(<SearchBar config={config} />);
+  it('should refresh search, when search is performed and there are no changes.', async () => {
+    render(<SearchBar />);
 
-    const searchButton = await screen.findByTitle('Perform search');
+    const searchButton = await screen.findByRole('button', { name: /perform search/i });
+
+    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
 
     fireEvent.click(searchButton);
 
@@ -103,15 +115,14 @@ describe('SearchBar', () => {
   });
 
   it('date exceeding limitDuration should render with error Icon & search button disabled', async () => {
-    render(<SearchBar config={{ ...config, query_time_range_limit: 'PT1M' }} />);
+    asMock(SearchConfigStore.getInitialState).mockReturnValue({ searchesClusterConfig: { ...mockSearchesClusterConfig, query_time_range_limit: 'PT1M' } });
+    render(<SearchBar />);
 
-    const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
-    const searchButton = screen.getByTitle('Perform search');
+    const timeRangeButton = await screen.findByLabelText('Open Time Range Selector');
+    const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
-    await waitFor(() => {
-      expect(searchButton).toHaveAttribute('disabled');
-      expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle');
-    });
+    await waitFor(() => expect(searchButton.classList).toContain('disabled'));
+    await waitFor(() => expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle'));
   });
 
   it('should hide the save load controls if editing the widget', async () => {
@@ -126,11 +137,11 @@ describe('SearchBar', () => {
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <SearchBar config={config} />
+        <SearchBar />
       </WidgetFocusContext.Provider>,
     );
 
-    await screen.findByTitle('Perform search');
+    await screen.findByRole('button', { name: /perform search/i });
     const saveBtn = screen.queryByText('Saved Search Controls');
 
     expect(saveBtn).toBeNull();
@@ -148,12 +159,18 @@ describe('SearchBar', () => {
 
     render(
       <WidgetFocusContext.Provider value={widgetFocusContext}>
-        <SearchBar config={config} />
+        <SearchBar />
       </WidgetFocusContext.Provider>,
     );
 
     const saveBtn = await screen.findByText('Saved Search Controls');
 
     expect(saveBtn).not.toBeNull();
+  });
+
+  it('should validate query on mount', async () => {
+    render(<SearchBar />);
+
+    await waitFor(() => expect(validateQuery).toHaveBeenCalled());
   });
 });

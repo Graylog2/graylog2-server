@@ -96,7 +96,7 @@ class EntityDependencyResolverTest {
             assertThat(descriptor.title()).isEqualTo(TEST_TITLE);
 
             assertThat(descriptor.owners()).hasSize(1);
-            assertThat(descriptor.owners().asList().get(0).id().toString()).isEqualTo("grn::::user:jane");
+            assertThat(descriptor.owners().asList().get(0).grn().toString()).isEqualTo("grn::::user:jane");
         });
     }
 

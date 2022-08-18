@@ -1,0 +1,12 @@
+rule "json"
+when
+  true
+then
+  let flatten = flatten_json(to_string($message.nested_json), "flatten");
+  let json = flatten_json(to_string($message.nested_json), "json");
+  let ignore = flatten_json(to_string($message.nested_json), "ignore");
+
+  set_fields(to_map(flatten));
+  set_fields(to_map(json), "json_");
+  set_fields(to_map(ignore), "ignore_");
+end

@@ -26,7 +26,7 @@ import GroupingConfiguration from './GroupingConfiguration';
 import GroupingElement from './GroupingElement';
 
 import ElementConfigurationContainer from '../ElementConfigurationContainer';
-import { WidgetConfigFormValues } from '../WidgetConfigForm';
+import type { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const RollupColumnsCheckbox = styled(Checkbox)`
   &.checkbox {

@@ -23,6 +23,19 @@ import { Select, Spinner } from 'components/common';
 import { Alert, Button, ButtonToolbar, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 
+const getNotificationPlugin = (type) => {
+  if (type === undefined) {
+    return {};
+  }
+
+  return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
+};
+
+const formattedEventNotificationTypes = () => {
+  return PluginStore.exports('eventNotificationTypes')
+    .map((type) => ({ label: type.displayName, value: type.type }));
+};
+
 class EventNotificationForm extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
@@ -46,6 +59,18 @@ class EventNotificationForm extends React.Component {
     formId: undefined,
   };
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      isSubmitEnabled: true,
+    };
+  }
+
+  setIsSubmitEnabled = (enabled) => {
+    this.setState({ isSubmitEnabled: enabled });
+  };
+
   handleSubmit = (event) => {
     const { notification, onSubmit } = this.props;
 
@@ -67,16 +92,8 @@ class EventNotificationForm extends React.Component {
     onChange('config', nextConfig);
   };
 
-  getNotificationPlugin = (type) => {
-    if (type === undefined) {
-      return {};
-    }
-
-    return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
-  };
-
   handleTypeChange = (nextType) => {
-    const notificationPlugin = this.getNotificationPlugin(nextType);
+    const notificationPlugin = getNotificationPlugin(nextType);
     const defaultConfig = notificationPlugin.defaultConfig || {};
 
     this.handleConfigChange({ ...defaultConfig, type: nextType });
@@ -88,20 +105,17 @@ class EventNotificationForm extends React.Component {
     onTest(notification);
   };
 
-  formattedEventNotificationTypes = () => {
-    return PluginStore.exports('eventNotificationTypes')
-      .map((type) => ({ label: type.displayName, value: type.type }));
-  };
-
   render() {
     const { action, embedded, formId, notification, onCancel, validation, testResult } = this.props;
+    const { isSubmitEnabled } = this.state;
 
-    const notificationPlugin = this.getNotificationPlugin(notification.config.type);
+    const notificationPlugin = getNotificationPlugin(notification.config.type);
     const notificationFormComponent = notificationPlugin.formComponent
       ? React.createElement(notificationPlugin.formComponent, {
         config: notification.config,
         onChange: this.handleConfigChange,
         validation: validation,
+        setIsSubmitEnabled: this.setIsSubmitEnabled,
       })
       : null;
 
@@ -119,7 +133,8 @@ class EventNotificationForm extends React.Component {
                    help={lodash.get(validation, 'errors.title[0]', 'Title to identify this Notification.')}
                    value={notification.title}
                    onChange={this.handleChange}
-                   required />
+                   required
+                   autoFocus />
 
             <Input id="notification-description"
                    name="description"
@@ -133,7 +148,7 @@ class EventNotificationForm extends React.Component {
             <FormGroup controlId="notification-type" validationState={validation.errors.config ? 'error' : null}>
               <ControlLabel>Notification Type</ControlLabel>
               <Select id="notification-type"
-                      options={this.formattedEventNotificationTypes()}
+                      options={formattedEventNotificationTypes()}
                       value={notification.config.type}
                       onChange={this.handleTypeChange}
                       clearable={false}
@@ -170,7 +185,7 @@ class EventNotificationForm extends React.Component {
 
             {!embedded && (
               <ButtonToolbar>
-                <Button bsStyle="primary" type="submit">{action === 'create' ? 'Create' : 'Update'}</Button>
+                <Button bsStyle="primary" type="submit" disabled={!isSubmitEnabled}>{action === 'create' ? 'Create' : 'Update'}</Button>
                 <Button onClick={onCancel}>Cancel</Button>
               </ButtonToolbar>
             )}

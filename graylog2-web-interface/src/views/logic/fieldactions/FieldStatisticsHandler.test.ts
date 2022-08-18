@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import asMock from 'helpers/mocking/AsMock';
-
 import { WidgetActions } from 'views/stores/WidgetStore';
 import Widget from 'views/logic/widgets/Widget';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';

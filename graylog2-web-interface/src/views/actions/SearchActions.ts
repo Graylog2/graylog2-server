@@ -15,19 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 
-import Search from 'views/logic/search/Search';
-import SearchResult from 'views/logic/SearchResult';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import Parameter from 'views/logic/parameters/Parameter';
-import View from 'views/logic/views/View';
+import type Search from 'views/logic/search/Search';
+import type SearchResult from 'views/logic/SearchResult';
+import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type Parameter from 'views/logic/parameters/Parameter';
+import type View from 'views/logic/views/View';
 import type { SearchJson } from 'views/logic/search/Search';
 import { singletonActions } from 'logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
+import type CancellablePromise from 'logic/rest/CancellablePromise';
 
 export type CreateSearchResponse = {
   search: Search,
@@ -48,7 +49,7 @@ type SearchActionsType = RefluxActions<{
   reexecuteSearchTypes: (
     searchTypes: SearchTypeOptions,
     effectiveTimeRange?: TimeRange,
-  ) => Promise<SearchExecutionResult>,
+  ) => CancellablePromise<SearchExecutionResult>,
   executeWithCurrentState: () => Promise<SearchExecutionResult>,
   refresh: () => Promise<void>,
   get: (searchId: SearchId) => Promise<SearchJson>,

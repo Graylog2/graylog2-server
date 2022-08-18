@@ -19,9 +19,6 @@ package org.graylog2.indexer.fieldtypes;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.google.common.primitives.Ints;
-import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.NodeService;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Cluster;
@@ -35,22 +32,20 @@ import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.plugin.system.NodeId;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.Optional;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 /**
  * {@link Periodical} that creates and maintains index field type information in the database.
@@ -65,11 +60,12 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     private final MongoIndexSet.Factory mongoIndexSetFactory;
     private final Cluster cluster;
     private final ServerStatus serverStatus;
-    private final NodeService nodeService;
-    private final NodeId nodeId;
-    private final com.github.joschi.jadconfig.util.Duration periodicalInterval;
+    private final com.github.joschi.jadconfig.util.Duration fullRefreshInterval;
     private final ScheduledExecutorService scheduler;
-    private final ConcurrentMap<String, ScheduledFuture<?>> futures = new ConcurrentHashMap<>();
+
+    private volatile Set<IndexSetConfig> allIndexSetConfigs;
+    private volatile Instant lastFullRefresh = Instant.MIN;
+    private final ConcurrentHashMap<String, Instant> lastPoll = new ConcurrentHashMap<>();
 
     @Inject
     public IndexFieldTypePollerPeriodical(final IndexFieldTypePoller poller,
@@ -81,9 +77,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
                                           final Cluster cluster,
                                           final EventBus eventBus,
                                           final ServerStatus serverStatus,
-                                          final NodeService nodeService,
-                                          final NodeId nodeId,
-                                          @Named("index_field_type_periodical_interval") final com.github.joschi.jadconfig.util.Duration periodicalInterval,
+                                          @Named("index_field_type_periodical_full_refresh_interval") final com.github.joschi.jadconfig.util.Duration fullRefreshInterval,
                                           @Named("daemonScheduler") final ScheduledExecutorService scheduler) {
         this.poller = poller;
         this.dbService = dbService;
@@ -92,9 +86,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.cluster = cluster;
         this.serverStatus = serverStatus;
-        this.nodeService = nodeService;
-        this.nodeId = nodeId;
-        this.periodicalInterval = periodicalInterval;
+        this.fullRefreshInterval = fullRefreshInterval;
         this.scheduler = scheduler;
 
         eventBus.register(this);
@@ -102,15 +94,11 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
 
     private static final Set<Lifecycle> skippedLifecycles = ImmutableSet.of(Lifecycle.STARTING, Lifecycle.HALTING, Lifecycle.PAUSED, Lifecycle.FAILED, Lifecycle.UNINITIALIZED);
 
-    /**
-     * This creates index field type information for each index in each index set and schedules polling jobs to
-     * keep the data for active write indices up to date. It also removes index field type data for indices that
-     * don't exist anymore.
-     * <p>
-     * Since we create polling jobs for the active write indices, this periodical doesn't need to be run very often.
-     */
     @Override
     public void doRun() {
+        if (serverIsNotRunning()) {
+            return;
+        }
         if (!cluster.isConnected()) {
             LOG.info("Cluster not connected yet, delaying index field type initialization until it is reachable.");
             while (true) {
@@ -123,42 +111,103 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
             }
         }
 
-        // We are NOT using IndexSetRegistry#getAll() here because of this: https://github.com/Graylog2/graylog2-server/issues/4625
-        indexSetService.findAll().forEach(indexSetConfig -> {
+        Set<IndexSetConfig> allConfigs = allIndexSetConfigs;
+
+        // We just reset the list of index set configs whenever we experience an event which would affect it
+        if (allConfigs == null) {
+            // We are NOT using IndexSetRegistry#getAll() here because of this: https://github.com/Graylog2/graylog2-server/issues/4625
+            allConfigs = allIndexSetConfigs = new LinkedHashSet<>(indexSetService.findAll());
+
+            // Only maintain the previous polling time for index sets which actually exist
+            lastPoll.keySet().retainAll(allConfigs.stream().map(IndexSetConfig::id).collect(Collectors.toSet()));
+        }
+
+        if (needsFullRefresh()) {
+            try {
+                refreshFieldTypes(allConfigs);
+            } finally {
+                lastFullRefresh = Instant.now();
+            }
+        } else {
+            poll(allConfigs);
+        }
+    }
+
+    private void refreshFieldTypes(Collection<IndexSetConfig> indexSetConfigs) {
+        LOG.debug("Refreshing index field types for {} index sets.", indexSetConfigs.size());
+
+        // this is the first time we run, or the index sets have changed, so we re-initialize the field types
+        indexSetConfigs.forEach(indexSetConfig -> {
             final String indexSetId = indexSetConfig.id();
             final String indexSetTitle = indexSetConfig.title();
-            final Set<IndexFieldTypesDTO> existingIndexTypes = ImmutableSet.copyOf(dbService.findForIndexSet(indexSetId));
 
-            final IndexSet indexSet = mongoIndexSetFactory.create(indexSetConfig);
+            try {
+                final Set<IndexFieldTypesDTO> existingIndexTypes = ImmutableSet.copyOf(dbService.findForIndexSet(indexSetId));
 
-            // On startup we check that we have the field types for all existing indices
-            LOG.debug("Updating index field types for index set <{}/{}>", indexSetTitle, indexSetId);
-            poller.poll(indexSet, existingIndexTypes).forEach(dbService::upsert);
+                final IndexSet indexSet = mongoIndexSetFactory.create(indexSetConfig);
 
-            // Make sure we have a polling job for the index set
-            if (!futures.containsKey(indexSetId)) {
-                schedule(indexSet);
+                // We check that we have the field types for all existing indices
+                LOG.debug("Refreshing index field types for index set <{}/{}>", indexSetTitle, indexSetId);
+                poller.poll(indexSet, existingIndexTypes).forEach(dbService::upsert);
+
+                // Cleanup orphaned field type entries that haven't been removed by the event handler
+                dbService.findForIndexSet(indexSetId).stream()
+                        .filter(types -> !indices.exists(types.indexName()))
+                        .forEach(types -> dbService.delete(types.id()));
+            } finally {
+                lastPoll.put(indexSetId, Instant.now());
             }
-
-            // Cleanup orphaned field type entries that haven't been removed by the event handler
-            dbService.findForIndexSet(indexSetId).stream()
-                    .filter(types -> !indices.exists(types.indexName()))
-                    .forEach(types -> dbService.delete(types.id()));
         });
+    }
+
+    private void poll(Collection<IndexSetConfig> indexSetConfigs) {
+        indexSetConfigs.stream()
+                .filter(config -> !config.fieldTypeRefreshInterval().equals(Duration.ZERO))
+                .filter(IndexSetConfig::isWritable)
+                .filter(config -> {
+                    final Instant previousPoll = lastPoll.getOrDefault(config.id(), Instant.MIN);
+                    final Instant nextPoll = previousPoll.plusSeconds(
+                            config.fieldTypeRefreshInterval().getStandardSeconds());
+                    return !Instant.now().isBefore(nextPoll);
+                })
+                .forEach(this::poll);
+    }
+
+    private void poll(IndexSetConfig indexSetConfig) {
+        final String indexSetTitle = indexSetConfig.title();
+        final String indexSetId = indexSetConfig.id();
+
+        scheduler.submit(() -> {
+            try {
+                final MongoIndexSet indexSet = mongoIndexSetFactory.create(indexSetConfig);
+                // Only check the active write index on a regular basis, the others don't change anymore
+                final String activeWriteIndex = indexSet.getActiveWriteIndex();
+                if (activeWriteIndex != null) {
+                    LOG.debug("Updating index field types for active write index <{}> in index set <{}/{}>",
+                            activeWriteIndex, indexSetTitle, indexSetId);
+                    poller.pollIndex(activeWriteIndex, indexSetId).ifPresent(dbService::upsert);
+                } else {
+                    LOG.warn("Active write index for index set \"{}\" ({}) doesn't exist yet",
+                            indexSetTitle, indexSetId);
+                }
+            } catch (TooManyAliasesException e) {
+                LOG.error("Couldn't get active write index", e);
+            } catch (Exception e) {
+                LOG.error("Couldn't update field types for index set <{}/{}>", indexSetTitle, indexSetId, e);
+            } finally {
+                lastPoll.put(indexSetId, Instant.now());
+            }
+        });
+    }
+
+    private boolean needsFullRefresh() {
+        Instant nextFullRefresh = lastFullRefresh.plusSeconds(fullRefreshInterval.toSeconds());
+        return !Instant.now().isBefore(nextFullRefresh);
     }
 
     private boolean serverIsNotRunning() {
         final Lifecycle currentLifecycle = serverStatus.getLifecycle();
         return skippedLifecycles.contains(currentLifecycle);
-    }
-
-    private boolean isNotLeader() {
-        try {
-            return !nodeService.byNodeId(nodeId).isMaster();
-        } catch (NodeNotFoundException e) {
-            LOG.warn("Couldn't find node for ID <{}>", nodeId);
-            return true;
-        }
     }
 
     /**
@@ -169,19 +218,10 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     @SuppressWarnings("unused")
     @Subscribe
     public void handleIndexSetCreation(final IndexSetCreatedEvent event) {
-        if (isNotLeader()) {
-            LOG.debug("Skipping index set creation event on non-leader node. [event={}]", event);
-            return;
-        }
         final String indexSetId = event.indexSet().id();
-        // We are NOT using IndexSetRegistry#get(String) here because of this: https://github.com/Graylog2/graylog2-server/issues/4625
-        final Optional<IndexSetConfig> optionalIndexSet = indexSetService.get(indexSetId);
 
-        if (optionalIndexSet.isPresent()) {
-            schedule(mongoIndexSetFactory.create(optionalIndexSet.get()));
-        } else {
-            LOG.warn("Couldn't find newly created index set <{}>", indexSetId);
-        }
+        LOG.debug("Resetting field type polling after creation of index set <{}>", indexSetId);
+        allIndexSetConfigs = null;
     }
 
     /**
@@ -191,14 +231,10 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     @SuppressWarnings("unused")
     @Subscribe
     public void handleIndexSetDeletion(final IndexSetDeletedEvent event) {
-        if (isNotLeader()) {
-            LOG.debug("Skipping index set deletion event on non-leader node. [event={}]", event);
-            return;
-        }
         final String indexSetId = event.id();
 
-        LOG.debug("Disable field type updating for index set <{}>", indexSetId);
-        cancel(futures.remove(indexSetId));
+        LOG.debug("Resetting field type polling after deletion of index set <{}>", indexSetId);
+        allIndexSetConfigs = null;
     }
 
     /**
@@ -216,66 +252,6 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         });
     }
 
-    /**
-     * Creates a new polling job for the given index set to keep the active write index information up to date.
-     *
-     * @param indexSet index set
-     */
-    private void schedule(final IndexSet indexSet) {
-        final String indexSetId = indexSet.getConfig().id();
-        final String indexSetTitle = indexSet.getConfig().title();
-        final Duration refreshInterval = indexSet.getConfig().fieldTypeRefreshInterval();
-
-        if (Duration.ZERO.equals(refreshInterval)) {
-            LOG.debug("Skipping index set with ZERO refresh interval <{}/{}>", indexSetTitle, indexSetId);
-            return;
-        }
-        if (!indexSet.getConfig().isWritable()) {
-            LOG.debug("Skipping non-writable index set <{}/{}>", indexSetTitle, indexSetId);
-            return;
-        }
-
-        // Make sure there is no existing polling job running for this index set
-        cancel(futures.get(indexSetId));
-
-        LOG.debug("Schedule index field type updating for index set <{}/{}> every {} ms", indexSetId, indexSetTitle,
-                refreshInterval.getMillis());
-        final ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> {
-            if (serverIsNotRunning()) {
-                return;
-            }
-            try {
-                // Only check the active write index on a regular basis, the others don't change anymore
-                final String activeWriteIndex = indexSet.getActiveWriteIndex();
-                if (activeWriteIndex != null) {
-                    LOG.debug("Updating index field types for active write index <{}> in index set <{}/{}>", activeWriteIndex,
-                            indexSetTitle, indexSetId);
-                    poller.pollIndex(activeWriteIndex, indexSetId).ifPresent(dbService::upsert);
-                } else {
-                    LOG.warn("Active write index for index set \"{}\" ({}) doesn't exist yet", indexSetTitle, indexSetId);
-                }
-            } catch (TooManyAliasesException e) {
-                LOG.error("Couldn't get active write index", e);
-            } catch (Exception e) {
-                LOG.error("Couldn't update field types for index set <{}/{}>", indexSetTitle, indexSetId, e);
-            }
-        }, 0, refreshInterval.getMillis(), TimeUnit.MILLISECONDS);
-
-        futures.put(indexSetId, future);
-    }
-
-    /**
-     * Cancel the polling job for the given {@link ScheduledFuture}.
-     * @param future polling job future
-     */
-    private void cancel(@Nullable ScheduledFuture<?> future) {
-        if (future != null && !future.isCancelled()) {
-            if (!future.cancel(true)) {
-                LOG.warn("Couldn't cancel field type update job");
-            }
-        }
-    }
-
     @Override
     public boolean runsForever() {
         return false;
@@ -287,8 +263,8 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     }
 
     @Override
-    public boolean masterOnly() {
-        // Only needs to run on the master node because results are stored in the database
+    public boolean leaderOnly() {
+        // Only needs to run on the leader node because results are stored in the database
         return true;
     }
 
@@ -309,8 +285,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
 
     @Override
     public int getPeriodSeconds() {
-        // This doesn't need to run very often because it's only running some maintenance tasks
-        return Ints.saturatedCast(periodicalInterval.toSeconds());
+        return 1;
     }
 
     @Override

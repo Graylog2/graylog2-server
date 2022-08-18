@@ -19,10 +19,13 @@ import { useRef } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
+import type { Moment } from 'moment';
 
 import { Icon } from 'components/common';
 import { Button, FormGroup, InputGroup, FormControl } from 'components/bootstrap';
-import DateTime from 'logic/datetimes/DateTime';
+import type { IconName } from 'components/common/Icon';
+import { DATE_TIME_FORMATS } from 'util/DateTime';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 const TIME_ICON_BOD = 'hourglass-start';
 const TIME_ICON_MID = 'hourglass-half';
@@ -130,7 +133,7 @@ const _onFocusSelect = (event) => {
 
 const zeroPad = (data, pad = 2) => String(data).padStart(pad, '0');
 
-const parseTimeValue = (value, type) => {
+const parseTimeValue = (value: string, type: string) => {
   const isNotNumeric = value.match(/[^0-9]/g);
 
   const timeValue = Number(isNotNumeric ? 0 : value);
@@ -146,7 +149,7 @@ const parseTimeValue = (value, type) => {
   return timeValue;
 };
 
-const fieldUpdate = (value) => {
+const fieldUpdate = (value: string, toUserTimezone: (date: Date) => Moment) => {
   const initialDateTime = moment(value).toObject();
 
   TIME_TYPES.forEach((type) => {
@@ -162,18 +165,18 @@ const fieldUpdate = (value) => {
       [timeType]: timeValue,
     });
 
-    return newTime.format(DateTime.Formats.DATETIME);
+    return newTime.format(DATE_TIME_FORMATS.default);
   };
 
   const handleClickTimeNow = () => {
-    const newTime = DateTime.now().toObject();
+    const newTime = toUserTimezone(new Date()).toObject();
 
     return moment({
       ...initialDateTime,
       hours: newTime.hours,
       minutes: newTime.minutes,
       seconds: newTime.seconds,
-    }).format(DateTime.Formats.DATETIME);
+    }).format(DATE_TIME_FORMATS.default);
   };
 
   const handleTimeToggle = (eod = false) => {
@@ -182,7 +185,7 @@ const fieldUpdate = (value) => {
       hours: eod ? 23 : 0,
       minutes: eod ? 59 : 0,
       seconds: eod ? 59 : 0,
-    }).format(DateTime.Formats.DATETIME);
+    }).format(DATE_TIME_FORMATS.default);
   };
 
   return {
@@ -194,14 +197,15 @@ const fieldUpdate = (value) => {
 };
 
 const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
-  const hourIcon = useRef(TIME_ICON_MID);
+  const hourIcon = useRef<IconName>(TIME_ICON_MID);
+  const { toUserTimezone } = useUserDateTime();
 
   const {
     initialDateTime,
     handleChangeSetTime,
     handleClickTimeNow,
     handleTimeToggle,
-  } = fieldUpdate(dateTime);
+  } = fieldUpdate(dateTime, toUserTimezone);
 
   const _onChangeSetTime = (event) => {
     hourIcon.current = TIME_ICON_MID;

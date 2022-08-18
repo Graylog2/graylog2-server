@@ -23,28 +23,43 @@ import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+
 import static io.restassured.RestAssured.given;
 
 public final class GelfInputUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(GelfInputUtils.class);
 
-    private GelfInputUtils() { }
+    private GelfInputUtils() {
+    }
 
     public static void createGelfHttpInput(int mappedPort, int gelfHttpPort, RequestSpecification requestSpecification) {
-        InputCreateRequest request = InputCreateRequest.create(
-                "KILL ME",
-                GELFHttpInput.class.getName(),
-                true,
-                ImmutableMap.of("bind_address", "0.0.0.0", "port", gelfHttpPort),
-                null);
 
-        given()
+        final ArrayList<Integer> inputs = given()
                 .spec(requestSpecification)
-                .body(request)
-                .expect().response().statusCode(201)
+                .expect()
+                .response()
+                .statusCode(200)
                 .when()
-                .post("/system/inputs");
+                .get("/system/inputstates")
+                .body().jsonPath().get("states.message_input.attributes.port");
+
+        if (!inputs.contains(gelfHttpPort)) {
+            InputCreateRequest request = InputCreateRequest.create(
+                    "Integration test GELF input",
+                    GELFHttpInput.class.getName(),
+                    true,
+                    ImmutableMap.of("bind_address", "0.0.0.0", "port", gelfHttpPort),
+                    null);
+
+            given()
+                    .spec(requestSpecification)
+                    .body(request)
+                    .expect().response().statusCode(201)
+                    .when()
+                    .post("/system/inputs");
+        }
 
         waitForGelfInputOnPort(mappedPort, requestSpecification);
     }

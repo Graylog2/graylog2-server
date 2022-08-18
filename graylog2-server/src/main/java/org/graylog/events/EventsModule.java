@@ -53,11 +53,8 @@ import org.graylog.events.rest.AvailableEntityTypesResource;
 import org.graylog.events.rest.EventDefinitionsResource;
 import org.graylog.events.rest.EventNotificationsResource;
 import org.graylog.events.rest.EventsResource;
-import org.graylog.scheduler.JobExecutionEngine;
-import org.graylog.scheduler.JobTriggerUpdates;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
-import org.graylog.scheduler.worker.JobWorkerPool;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
@@ -81,10 +78,6 @@ public class EventsModule extends PluginModule {
         bind(EventProcessorExecutionMetrics.class).asEagerSingleton();
         bind(EventNotificationExecutionMetrics.class).asEagerSingleton();
 
-        install(new FactoryModuleBuilder().build(JobExecutionEngine.Factory.class));
-        install(new FactoryModuleBuilder().build(JobWorkerPool.Factory.class));
-        install(new FactoryModuleBuilder().build(JobTriggerUpdates.Factory.class));
-
         addSystemRestResource(AvailableEntityTypesResource.class);
         addSystemRestResource(EventDefinitionsResource.class);
         addSystemRestResource(EventNotificationsResource.class);
@@ -100,12 +93,6 @@ public class EventsModule extends PluginModule {
 
         registerJacksonSubtype(AggregationEventProcessorConfigEntity.class,
             AggregationEventProcessorConfigEntity.TYPE_NAME);
-        registerJacksonSubtype(HttpEventNotificationConfigEntity.class,
-            HttpEventNotificationConfigEntity.TYPE_NAME);
-        registerJacksonSubtype(EmailEventNotificationConfigEntity.class,
-            EmailEventNotificationConfigEntity.TYPE_NAME);
-        registerJacksonSubtype(LegacyAlarmCallbackEventNotificationConfigEntity.class,
-            LegacyAlarmCallbackEventNotificationConfigEntity.TYPE_NAME);
 
         addEventProcessor(AggregationEventProcessorConfig.TYPE_NAME,
                 AggregationEventProcessor.class,
@@ -141,15 +128,21 @@ public class EventsModule extends PluginModule {
         addNotificationType(EmailEventNotificationConfig.TYPE_NAME,
                 EmailEventNotificationConfig.class,
                 EmailEventNotification.class,
-                EmailEventNotification.Factory.class);
+                EmailEventNotification.Factory.class,
+                EmailEventNotificationConfigEntity.TYPE_NAME,
+                EmailEventNotificationConfigEntity.class);
         addNotificationType(HTTPEventNotificationConfig.TYPE_NAME,
                 HTTPEventNotificationConfig.class,
                 HTTPEventNotification.class,
-                HTTPEventNotification.Factory.class);
+                HTTPEventNotification.Factory.class,
+                HttpEventNotificationConfigEntity.TYPE_NAME,
+                HttpEventNotificationConfigEntity.class);
         addNotificationType(LegacyAlarmCallbackEventNotificationConfig.TYPE_NAME,
                 LegacyAlarmCallbackEventNotificationConfig.class,
                 LegacyAlarmCallbackEventNotification.class,
-                LegacyAlarmCallbackEventNotification.Factory.class);
+                LegacyAlarmCallbackEventNotification.Factory.class,
+                LegacyAlarmCallbackEventNotificationConfigEntity.TYPE_NAME,
+                LegacyAlarmCallbackEventNotificationConfigEntity.class);
 
         addJobSchedulerSchedule(IntervalJobSchedule.TYPE_NAME, IntervalJobSchedule.class);
         addJobSchedulerSchedule(OnceJobSchedule.TYPE_NAME, OnceJobSchedule.class);

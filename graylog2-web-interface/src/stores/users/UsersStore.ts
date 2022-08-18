@@ -16,16 +16,19 @@
  */
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
-import { $PropertyType, $Shape } from 'utility-types';
+import type { $PropertyType, $Shape } from 'utility-types';
+import URI from 'urijs';
 
-import UserOverview, { UserOverviewJSON, AccountStatus } from 'logic/users/UserOverview';
+import type { UserOverviewJSON, AccountStatus } from 'logic/users/UserOverview';
+import UserOverview from 'logic/users/UserOverview';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
-import User, { UserJSON } from 'logic/users/User';
-import { PaginatedListJSON, Pagination, PaginatedList } from 'stores/PaginationTypes';
+import type { UserJSON } from 'logic/users/User';
+import User from 'logic/users/User';
+import type { PaginatedListJSON, Pagination, PaginatedList } from 'stores/PaginationTypes';
 
 export type PaginatedUsersResponse = PaginatedListJSON & {
   users: Array<UserOverviewJSON>;
@@ -73,6 +76,11 @@ export type PaginatedUsers = PaginatedList<UserOverview> & {
   adminUser: UserOverview | null | undefined,
 };
 
+export type Query = {
+  include_permissions?: boolean;
+  include_sessions?: boolean;
+};
+
 export type ActionsType = {
   create: (user: UserCreate) => Promise<void>;
   load: (userId: string) => Promise<User>;
@@ -83,9 +91,17 @@ export type ActionsType = {
   createToken: (userId: string, tokenName: string) => Promise<Token>;
   loadTokens: (userId: string) => Promise<TokenSummary[]>;
   deleteToken: (userId: string, tokenId: string, tokenName: string) => Promise<void>;
-  loadUsers: () => Promise<Immutable.List<User>>;
+  loadUsers: (query?: Query) => Promise<Immutable.List<User>>;
   loadUsersPaginated: (pagination: Pagination) => Promise<PaginatedUsers>;
   setStatus: (userId: string, newStatus: AccountStatus) => Promise<void>;
+};
+
+const usersUrl = ({ url = '', query = {} }) => {
+  const uri = new URI(url);
+
+  uri.query(query);
+
+  return qualifyUrl(uri.resource());
 };
 
 export const UsersActions = singletonActions(
@@ -184,8 +200,8 @@ export const UsersStore = singletonStore('core.Users', () => Reflux.createStore(
     return promise;
   },
 
-  loadUsers(): Promise<Immutable.List<User>> {
-    const url = qualifyUrl(ApiRoutes.UsersApiController.list().url);
+  loadUsers(query: Query = {}): Promise<Immutable.List<User>> {
+    const url = usersUrl({ url: ApiRoutes.UsersApiController.list().url, query });
     const promise = fetch('GET', url).then(({
       users,
     }) => Immutable.List(users.map((user) => UserOverview.fromJSON(user))));

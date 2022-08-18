@@ -67,6 +67,8 @@ public interface IndexSetService {
      */
     List<IndexSetConfig> findByIds(Set<String> ids);
 
+    List<IndexSetConfig> findMany(DBQuery.Query query);
+
     /**
      * Retrieve a paginated set of index set.
      *

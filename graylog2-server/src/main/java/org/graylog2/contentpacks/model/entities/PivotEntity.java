@@ -26,6 +26,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -61,6 +62,7 @@ public abstract class PivotEntity implements SearchTypeEntity {
     @JsonProperty
     public abstract String id();
 
+    @Override
     @JsonProperty
     public abstract Optional<String> name();
 
@@ -83,6 +85,10 @@ public abstract class PivotEntity implements SearchTypeEntity {
     @Override
     public abstract Filter filter();
 
+    @Override
+    @JsonProperty(FIELD_SEARCH_FILTERS)
+    public abstract List<UsedSearchFilter> filters();
+
     public abstract Builder toBuilder();
 
     @Override
@@ -95,6 +101,7 @@ public abstract class PivotEntity implements SearchTypeEntity {
                 .type(NAME)
                 .rowGroups(of())
                 .columnGroups(of())
+                .filters(Collections.emptyList())
                 .sort(of())
                 .streams(Collections.emptySet());
     }
@@ -104,6 +111,7 @@ public abstract class PivotEntity implements SearchTypeEntity {
         @JsonCreator
         public static Builder createDefault() {
             return builder()
+                    .filters(Collections.emptyList())
                     .sort(Collections.emptyList())
                     .streams(Collections.emptySet());
         }
@@ -136,6 +144,9 @@ public abstract class PivotEntity implements SearchTypeEntity {
         public abstract Builder filter(@Nullable Filter filter);
 
         @JsonProperty
+        public abstract Builder filters(List<UsedSearchFilter> filters);
+
+        @JsonProperty
         @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
         @JsonSubTypes({
                 @JsonSubTypes.Type(name = AbsoluteRange.ABSOLUTE, value = AbsoluteRange.class),
@@ -151,9 +162,11 @@ public abstract class PivotEntity implements SearchTypeEntity {
         @JsonProperty
         public abstract Builder query(@Nullable BackendQuery query);
 
+        @Override
         @JsonProperty
         public abstract Builder streams(Set<String> streams);
 
+        @Override
         public abstract PivotEntity build();
     }
 
@@ -170,6 +183,7 @@ public abstract class PivotEntity implements SearchTypeEntity {
                 .rollup(rollup())
                 .query(query().orElse(null))
                 .filter(filter())
+                .filters(filters())
                 .type(type())
                 .id(id())
                 .build();

@@ -16,7 +16,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 import styled from 'styled-components';
 
 import { Row, Col, Input } from 'components/bootstrap';
@@ -122,8 +122,7 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
     }
 
     setLoading(true);
-    const promise = UniversalSearchStore.search('relative', `gl2_source_input:${inputId} OR gl2_source_radio_input:${inputId}`,
-      { range: 3600 }, undefined, 1, undefined, undefined, undefined, false);
+    const promise = UniversalSearchStore.search('relative', `gl2_source_input:${inputId} OR gl2_source_radio_input:${inputId}`, { range: 3600 }, undefined, 1, undefined, undefined, undefined, false);
 
     promise.then((response) => {
       if (response.total_results > 0) {

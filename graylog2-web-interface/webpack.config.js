@@ -33,14 +33,6 @@ const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json'
 const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
 
-const BABELRC = path.resolve(ROOT_PATH, 'babel.config.js');
-const BABELOPTIONS = {
-  cacheDirectory: 'target/web/cache',
-  extends: BABELRC,
-};
-
-const BABELLOADER = { loader: 'babel-loader', options: BABELOPTIONS };
-
 // eslint-disable-next-line import/no-dynamic-require
 const BOOTSTRAPVARS = require(path.resolve(ROOT_PATH, 'public', 'stylesheets', 'bootstrap-config.json')).vars;
 
@@ -92,19 +84,34 @@ const webpackConfig = {
   },
   output: {
     path: BUILD_PATH,
-    filename: '[name].[hash].js',
+    filename: '[name].[chunkhash].js',
   },
   module: {
     rules: [
-      { test: /\.[jt]s(x)?$/, use: BABELLOADER, exclude: /node_modules|\.node_cache/ },
-      { test: /\.(svg)(\?.+)?$/, loader: 'file-loader' },
+      {
+        test: /\.[jt]s(x)?$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: 'target/web/cache',
+            // eslint-disable-next-line global-require
+            presets: [require('babel-preset-graylog')],
+          },
+        },
+        exclude: /node_modules|\.node_cache/,
+      },
+      {
+        test: /\.(svg)(\?.+)?$/,
+        type: 'asset/resource',
+      },
       {
         test: /\.(woff(2)?|ttf|eot)(\?.+)?$/,
-        use: [{
-          loader: 'file-loader', options: { esModule: false },
-        }],
+        type: 'asset/resource',
       },
-      { test: /\.(png|gif|jpg)(\?.+)?$/, use: 'url-loader' },
+      {
+        test: /\.(png|gif|jpg)(\?.+)?$/,
+        type: 'asset',
+      },
       {
         test: /bootstrap\.less$/,
         use: [
@@ -171,13 +178,17 @@ const webpackConfig = {
     modules: [APP_PATH, 'node_modules', path.resolve(ROOT_PATH, 'public')],
     alias: {
       theme: path.resolve(APP_PATH, 'theme'),
+      '@graylog/server-api': path.resolve(ROOT_PATH, 'target', 'api'),
     },
   },
-  resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')], moduleExtensions: ['-loader'] },
+  resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')] },
   devtool: 'source-map',
   plugins: [
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
     new UniqueChunkIdPlugin(),
-    new webpack.HashedModuleIdsPlugin({
+    new webpack.ids.HashedModuleIdsPlugin({
       hashFunction: 'sha256',
       hashDigestLength: 8,
     }),
@@ -188,7 +199,9 @@ const webpackConfig = {
       filename: 'index.html',
       inject: false,
       template: path.resolve(ROOT_PATH, 'templates/index.html.template'),
-      vendorModule: () => JSON.parse(fs.readFileSync(path.resolve(BUILD_PATH, 'vendor-module.json'), 'utf8')),
+      templateParameters: {
+        vendorModule: () => JSON.parse(fs.readFileSync(path.resolve(BUILD_PATH, 'vendor-module.json'), 'utf8')),
+      },
       chunksSortMode,
     }),
     new HtmlWebpackPlugin({
@@ -219,8 +232,6 @@ if (TARGET === 'start') {
     plugins: [
       new webpack.DefinePlugin({
         DEVELOPMENT: true,
-        // Keep old env to avoid breaking developer setups
-        GRAYLOG_API_URL: JSON.stringify(process.env.GRAYLOG_API_URL || process.env.GRAYLOG_HTTP_PUBLISH_URI),
         IS_CLOUD: process.env.IS_CLOUD,
       }),
       new CopyWebpackPlugin({ patterns: [{ from: 'config.js' }] }),
@@ -237,8 +248,8 @@ if (TARGET.startsWith('build')) {
   module.exports = merge(webpackConfig, {
     mode: 'production',
     optimization: {
+      moduleIds: 'deterministic',
       minimizer: [new TerserPlugin({
-        sourceMap: true,
         terserOptions: {
           compress: {
             warnings: false,

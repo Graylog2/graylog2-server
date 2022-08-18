@@ -16,32 +16,30 @@
  */
 package org.graylog.plugins.views.search.elasticsearch;
 
+import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.QueryResult;
-import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 
 import javax.inject.Inject;
-import java.util.Collections;
-import java.util.Set;
+import java.util.Optional;
 
-public class QueryStringDecorators implements QueryStringDecorator {
-    private final Set<QueryStringDecorator> queryDecorators;
-
-    public static class Fake extends QueryStringDecorators {
-        public Fake() {
-            super(Collections.emptySet());
-        }
-    }
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+public class QueryStringDecorators {
+    private final Optional<QueryStringDecorator> decorator;
 
     @Inject
-    public QueryStringDecorators(Set<QueryStringDecorator> queryDecorators) {
-        this.queryDecorators = queryDecorators;
+    public QueryStringDecorators(Optional<QueryStringDecorator> queryDecorators) {
+        this.decorator = queryDecorators;
     }
 
-    @Override
-    public String decorate(String queryString, SearchJob job, Query query, Set<QueryResult> results) {
-        return this.queryDecorators.isEmpty() ? queryString : this.queryDecorators.stream()
-                .reduce(queryString, (prev, decorator) -> decorator.decorate(prev, job, query, results), String::concat);
+    public String decorate(String queryString, ParameterProvider job, Query query) {
+        return decorateWithPositions(queryString, job, query).getInterpolatedQuery();
+    }
+
+    public PositionTrackingQuery decorateWithPositions(String queryString, ParameterProvider job, Query query) {
+        return this.decorator
+                .map(decorator -> decorator.decorate(queryString, job, query))
+                .orElseGet(() -> PositionTrackingQuery.of(queryString));
     }
 }

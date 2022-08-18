@@ -14,8 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 const WidgetWrap = styled.div(({ theme }) => css`
@@ -24,6 +23,7 @@ const WidgetWrap = styled.div(({ theme }) => css`
   padding: 7px 9px 6px 9px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 
   .widget-top {
     position: relative;
@@ -123,75 +123,15 @@ const WidgetWrap = styled.div(({ theme }) => css`
   }
 `);
 
-type Dimensions = {
-  height: number,
-  width: number,
-}
-
 type Props = {
-  onSizeChange: (widgetId: string, dimensions: Dimensions) => void,
-  widgetId: string,
-};
-export default class extends React.Component<Props, Dimensions> {
-  WIDGET_HEADER_HEIGHT = 25;
-
-  WIDGET_FOOTER_HEIGHT = 40;
-
-  static propTypes = {
-    widgetId: PropTypes.string.isRequired,
-    children: PropTypes.node.isRequired,
-    onSizeChange: PropTypes.func.isRequired,
-  };
-
-  private _widgetNode: HTMLElement;
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      height: 0,
-      width: 0,
-    };
-  }
-
-  componentDidMount() {
-    this._updateWidgetDimensionsIfChanged();
-  }
-
-  componentDidUpdate() {
-    this._updateWidgetDimensionsIfChanged();
-  }
-
-  _calculateWidgetSize = () => {
-    const widgetNode = this._widgetNode;
-    // subtracting header, footer and padding from height & width.
-    const height = widgetNode.clientHeight - (this.WIDGET_HEADER_HEIGHT + this.WIDGET_FOOTER_HEIGHT);
-    const width = widgetNode.clientWidth - 20;
-
-    return { height: height, width: width };
-  };
-
-  _updateWidgetDimensionsIfChanged() {
-    const { onSizeChange, widgetId } = this.props;
-    const { width: currentWidth, height: currentHeight } = this.state;
-    const { height, width } = this._calculateWidgetSize();
-
-    if (height !== currentHeight || width !== currentWidth) {
-      const dimensions = { height, width };
-      this.setState(dimensions);
-      onSizeChange(widgetId, dimensions);
-    }
-  }
-
-  render() {
-    const { children, widgetId } = this.props;
-
-    return (
-      <WidgetWrap ref={(elem) => { this._widgetNode = elem; }}
-                  style={{ overflow: 'hidden' }}
-                  data-widget-id={widgetId}>
-        {children}
-      </WidgetWrap>
-    );
-  }
+  children: React.ReactNode,
+  widgetId: string
 }
+
+const WidgetFrame = ({ children, widgetId }: Props) => (
+  <WidgetWrap data-widget-id={widgetId}>
+    {children}
+  </WidgetWrap>
+);
+
+export default WidgetFrame;

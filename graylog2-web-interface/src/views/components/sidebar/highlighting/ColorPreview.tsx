@@ -18,7 +18,8 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import HighlightingColor, { GradientColor, StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import type { GradientColor, StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import type HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import scaleForGradient from 'views/components/sidebar/highlighting/Scale';
 
 const ColorPreviewBase = styled.div`
@@ -52,7 +53,7 @@ type ColorPreviewProps = {
 
 const ColorPreview = React.forwardRef<HTMLDivElement, ColorPreviewProps>(({ color, onClick = () => {} }, ref) => {
   if (color.type === 'static') {
-    return <StaticColorPreview ref={ref} onClick={onClick} color={(color as StaticColor).color} />;
+    return <StaticColorPreview ref={ref} data-testid="static-color-preview" onClick={onClick} color={(color as StaticColor).color} />;
   }
 
   if (color.type === 'gradient') {

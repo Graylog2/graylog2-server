@@ -15,15 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import naturalSort from 'javascript-natural-sort';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
-import { Pagination, PaginatedListJSON, ListPagination } from 'stores/PaginationTypes';
+import type { Pagination, PaginatedListJSON, ListPagination } from 'stores/PaginationTypes';
 
 export type RuleType = {
   id?: string,
@@ -37,18 +37,29 @@ export type RuleType = {
 export type MetricsConfigType = {
   metrics_enabled: boolean,
 };
-
+export type PipelineSummary = {
+  id: string,
+  title: string,
+};
+export type RulesContext = {
+  used_in_pipelines: {
+    [id: string]: Array<PipelineSummary>,
+  }
+};
 export type PaginatedRulesResponse = PaginatedListJSON & {
   rules: Array<RuleType>,
+  context: RulesContext,
 };
 
 export type PaginatedRules = {
   list: Array<RuleType>,
+  context: RulesContext,
   pagination: ListPagination,
 };
 
 export type RulesStoreState = {
   rules: Array<RuleType>,
+  rulesContext: RulesContext,
   functionDescriptors: any,
   metricsConfig: MetricsConfigType | undefined,
 };
@@ -57,9 +68,9 @@ type RulesActionsType = {
   delete: (rule: RuleType) => Promise<unknown>,
   list: () => Promise<unknown>,
   get: () => Promise<unknown>,
-  save: () => Promise<unknown>,
-  update: () => Promise<unknown>,
-  parse: () => Promise<unknown>,
+  save: (rule: RuleType) => Promise<unknown>,
+  update: (rule: RuleType) => Promise<unknown>,
+  parse: (rule: RuleType, callback: () => void) => Promise<unknown>,
   multiple: () => Promise<unknown>,
   loadFunctions: () => Promise<unknown>,
   loadMetricsConfig: () => Promise<unknown>,
@@ -89,12 +100,14 @@ export const RulesStore = singletonStore(
   () => Reflux.createStore<{ rules: RuleType[] }>({
     listenables: [RulesActions],
     rules: undefined,
+    rulesContext: undefined,
     functionDescriptors: undefined,
     metricsConfig: undefined,
 
     getInitialState() {
       return {
         rules: this.rules,
+        rulesContext: this.rulesContext,
         functionDescriptors: this.functionDescriptors,
         metricsConfig: this.metricsConfig,
       };
@@ -143,6 +156,7 @@ export const RulesStore = singletonStore(
       const promise = fetch('GET', qualifyUrl(url))
         .then((response: PaginatedRulesResponse) => ({
           list: response.rules,
+          context: response.context,
           pagination: {
             count: response.count,
             total: response.total,

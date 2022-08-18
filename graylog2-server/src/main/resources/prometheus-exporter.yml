@@ -194,49 +194,40 @@ metric_mappings:
       type: "correlation"
 
   - metric_name: "input_empty_messages"
-    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.emptyMessages"
-    wildcard_extract_labels:
-      - "input"
+    type: "input_metric"
+    input_metric_name: "emptyMessages"
 
   - metric_name: "input_incoming_messages"
-    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.incomingMessages"
-    wildcard_extract_labels:
-      - "input"
+    type: "input_metric"
+    input_metric_name: "incomingMessages"
 
   - metric_name: "input_open_connections"
-    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.open_connections"
-    wildcard_extract_labels:
-      - "input"
+    type: "input_metric"
+    input_metric_name: "open_connections"
 
   - metric_name: "input_raw_size"
-    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.rawSize"
-    wildcard_extract_labels:
-      - "input"
+    type: "input_metric"
+    input_metric_name: "rawSize"
 
   - metric_name: "input_read_bytes_one_sec"
-    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.read_bytes_1sec"
-    wildcard_extract_labels:
-      - "input"
+    type: "input_metric"
+    input_metric_name: "read_bytes_1sec"
 
   - metric_name: "input_read_bytes_total"
-    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.read_bytes_total"
-    wildcard_extract_labels:
-      - "input"
+    type: "input_metric"
+    input_metric_name: "read_bytes_total"
 
   - metric_name: "input_total_connections"
-    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.total_connections"
-    wildcard_extract_labels:
-      - "input"
+    type: "input_metric"
+    input_metric_name: "total_connections"
 
   - metric_name: "input_written_bytes_one_sec"
-    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.written_bytes_1sec"
-    wildcard_extract_labels:
-      - "input"
+    type: "input_metric"
+    input_metric_name: "written_bytes_1sec"
 
   - metric_name: "input_written_bytes_total"
-    match_pattern: "org.graylog2.inputs.gelf.http.GELFHttpInput.*.written_bytes_total"
-    wildcard_extract_labels:
-      - "input"
+    type: "input_metric"
+    input_metric_name: "written_bytes_total"
 
   - metric_name: "pipeline"
     match_pattern: "org.graylog.plugins.pipelineprocessor.ast.Pipeline.*.*"

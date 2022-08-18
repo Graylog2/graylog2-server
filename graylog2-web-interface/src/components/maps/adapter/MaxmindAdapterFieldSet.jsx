@@ -68,7 +68,7 @@ class MaxmindAdapterFieldSet extends React.Component {
                autoFocus
                required
                onChange={this.props.handleFormEvent}
-               help={this.props.validationMessage('path', 'The path to the Maxmind\u2122 database file.')}
+               help={this.props.validationMessage('path', 'The path to the database file.')}
                bsStyle={this.props.validationState('path')}
                value={config.path}
                labelClassName="col-sm-3"
@@ -88,7 +88,7 @@ class MaxmindAdapterFieldSet extends React.Component {
                   value={config.database_type} />
         </Input>
         <TimeUnitInput label="Refresh file"
-                       help={'If enabled, the MaxMind\u2122 database file is checked for modifications and refreshed when it changed on disk.'}
+                       help="If enabled, the database file is checked for modifications and refreshed when it changed on disk."
                        update={this.updateCheckInterval}
                        value={config.check_interval}
                        unit={config.check_interval_unit || 'MINUTES'}

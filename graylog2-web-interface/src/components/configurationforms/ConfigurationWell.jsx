@@ -31,7 +31,7 @@ class ConfigurationWell extends React.Component {
   static defaultProps = {
     configuration: undefined,
     typeDefinition: {},
-  }
+  };
 
   _formatRegularField = (value, key) => {
     const { id } = this.props;

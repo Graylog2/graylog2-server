@@ -15,19 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import uuid from 'uuid/v4';
 
 import type { QueryId } from 'views/logic/queries/Query';
 import type { WidgetId } from 'views/logic/views/types';
 import type { TitlesMap } from 'views/stores/TitleTypes';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 import View from './View';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 import GenerateNextPosition from './GenerateNextPosition';
 
-import Widget from '../widgets/Widget';
+import type Widget from '../widgets/Widget';
 
 const _removeWidgetTitle = (titlesMap: TitlesMap, widgetId: WidgetId): TitlesMap => {
   const widgetTitles = titlesMap.get('widget');
@@ -75,7 +74,7 @@ const _setWidgetTitle = (titlesMap: TitlesMap, widgetID: WidgetId, newTitle: str
 
 const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View, widgetTitle: string | undefined | null, oldPosition: WidgetPosition): View => {
   const viewState = dashboard.state.get(targetQueryId);
-  const newWidget = widget.toBuilder().id(uuid()).build();
+  const newWidget = widget?.id ? widget : widget.toBuilder().newId().build();
   const newWidgets = viewState.widgets.push(newWidget);
   const { widgetPositions } = viewState;
   const widgetPositionsMap = oldPosition ? {

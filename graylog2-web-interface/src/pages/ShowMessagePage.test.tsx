@@ -16,9 +16,8 @@
  */
 import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 
-import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
+import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 
 import ShowMessagePage from './ShowMessagePage';
@@ -31,11 +30,12 @@ const mockLoadMessage = jest.fn();
 const mockGetInput = jest.fn();
 const mockListNodes = jest.fn();
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const mockListStreams = jest.fn((...args) => Promise.resolve([]));
+const mockListStreams = jest.fn((..._args) => Promise.resolve([]));
+const mockPluginStoreExports = jest.fn();
 
 jest.mock('stores/nodes/NodesStore', () => ({
   NodesActions: { list: (...args) => mockListNodes(...args) },
-  NodesStore: MockStore(['listen', () => () => {}], ['getInitialState', () => ({ nodes: {} })]),
+  NodesStore: MockStore(['getInitialState', () => ({ nodes: {} })]),
 }));
 
 jest.mock('stores/messages/MessagesStore', () => ({
@@ -54,20 +54,25 @@ jest.mock('stores/streams/StreamsStore', () => ({ listStreams: (...args) => mock
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('routing/withParams', () => (x) => x);
 
+jest.mock('graylog-web-plugin/plugin', () => ({
+  PluginStore: {
+    exports: jest.fn((...args) => mockPluginStoreExports(...args)),
+  },
+}));
+
 type SimpleShowMessagePageProps = {
   index: string,
   messageId: string,
 };
 
 const SimpleShowMessagePage = ({ index, messageId }: SimpleShowMessagePageProps) => (
-  <DefaultQueryClientProvider>
-    {/* @ts-expect-error */}
-    <ShowMessagePage params={{ index, messageId }} />
-  </DefaultQueryClientProvider>
+  // @ts-expect-error
+  <ShowMessagePage params={{ index, messageId }} />
 );
 
 describe('ShowMessagePage', () => {
   beforeEach(() => {
+    jest.clearAllMocks();
     asMock(useFieldTypes).mockReturnValue({ data: [] });
   });
 
@@ -84,21 +89,56 @@ describe('ShowMessagePage', () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(message));
     mockGetInput.mockImplementation(() => Promise.resolve(input));
 
-    const { container } = render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+    const { container } = render(<SimpleShowMessagePage index="graylog_5"
+                                                        messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
 
     await screen.findByText(/Deprecated field/);
 
     expect(container).toMatchSnapshot();
   });
 
+  it('retrieves field types only for user-accessible streams', async () => {
+    const messageWithMultipleStreams = { ...message };
+    messageWithMultipleStreams.fields.streams = ['000000000000000000000001', 'deadbeef'];
+    mockLoadMessage.mockImplementation(() => Promise.resolve(messageWithMultipleStreams));
+    mockListStreams.mockImplementation(() => Promise.resolve([{ id: 'deadbeef' }]));
+    mockGetInput.mockImplementation(() => Promise.resolve(input));
+
+    render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+
+    await screen.findByText(/Deprecated field/);
+
+    expect(useFieldTypes).toHaveBeenCalledWith(['deadbeef'], {
+      from: '2019-07-17T11:20:33.000Z',
+      to: '2019-07-17T11:20:33.000Z',
+      type: 'absolute',
+    });
+  });
+
   it('renders for generic event', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(event));
     mockGetInput.mockImplementation(() => Promise.resolve());
+    mockListStreams.mockImplementation(() => Promise.resolve([]));
 
     const { container } = render(<SimpleShowMessagePage index="gl-events_0" messageId="01DFZQ64CMGV30NT7DW2P7HQX2" />);
 
     await screen.findByText(/SSH Brute Force/);
 
     expect(container).toMatchSnapshot();
+  });
+
+  it('does not fetch input when opening message from forwarder', async () => {
+    mockPluginStoreExports.mockReturnValue([{
+      isLocalNode: jest.fn(() => false),
+    }]);
+
+    mockLoadMessage.mockImplementation(() => Promise.resolve(message));
+    mockGetInput.mockImplementation(() => Promise.resolve());
+    mockListStreams.mockImplementation(() => Promise.resolve([]));
+
+    render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+    await screen.findByText(/Deprecated field/);
+
+    expect(mockGetInput).not.toHaveBeenCalled();
   });
 });

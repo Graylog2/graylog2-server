@@ -17,6 +17,7 @@
 package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import javax.inject.Singleton;
 import java.util.Optional;
@@ -27,6 +28,7 @@ import static org.graylog2.indexer.fieldtypes.FieldTypes.Type.createType;
 /**
  * Maps Elasticsearch field types to Graylog types.
  * <p>
+ *
  * @see <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html">Elasticsearch mapping types</a>
  */
 @Singleton
@@ -72,10 +74,14 @@ public class FieldTypeMapper {
 
     /**
      * Map the given Elasticsearch field type to a Graylog type.
-     * @param typeName Elasticsearch type name
+     *
+     * @param type Elasticsearch type name
      * @return the Graylog type object
      */
-    public Optional<FieldTypes.Type> mapType(String typeName) {
-        return Optional.ofNullable(TYPE_MAP.get(typeName));
+    public Optional<FieldTypes.Type> mapType(FieldTypeDTO type) {
+        return Optional.ofNullable(TYPE_MAP.get(type.physicalType()))
+                .map(mappedType -> type.properties().contains(FieldTypeDTO.Properties.FIELDDATA)
+                        ? mappedType.toBuilder().properties(new ImmutableSet.Builder<String>().addAll(mappedType.properties()).add(PROP_ENUMERABLE).build()).build()
+                        : mappedType);
     }
 }

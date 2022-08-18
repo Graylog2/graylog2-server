@@ -30,10 +30,12 @@ export const EventDefinitionsActions = singletonActions(
     listPaginated: { asyncResult: true },
     get: { asyncResult: true },
     create: { asyncResult: true },
+    copy: { asyncResult: true },
     update: { asyncResult: true },
     delete: { asyncResult: true },
     enable: { asyncResult: true },
     disable: { asyncResult: true },
+    clearNotificationQueue: { asyncResult: true },
   }),
 );
 
@@ -135,6 +137,9 @@ export const EventDefinitionsStore = singletonStore(
         this.propagateChanges();
 
         return response;
+      }).catch((error) => {
+        UserNotification.error(`Fetching event definitions failed with status: ${error}`,
+          'Could not retrieve event definitions');
       });
 
       EventDefinitionsActions.listPaginated.promise(promise);
@@ -194,10 +199,40 @@ export const EventDefinitionsStore = singletonStore(
       EventDefinitionsActions.create.promise(promise);
     },
 
+    copy(eventDefinitionToCopy) {
+      const { eventDefinition } = this.extractSchedulerInfo(eventDefinitionToCopy);
+      // Remove the id from the event definition to create a new copy
+      delete eventDefinition.id;
+      // Modify the title to indicate a copy
+      eventDefinition.title = `COPY-${eventDefinition.title}`;
+      // Set the scope to DEFAULT
+      eventDefinition._scope = 'DEFAULT';
+
+      const promise = fetch('POST', this.eventDefinitionsUrl({ query: { schedule: false } }), this.setAlertFlag(eventDefinition));
+
+      promise.then(
+        (response) => {
+          UserNotification.success('Event Definition copied successfully',
+            `Event Definition "${eventDefinition.title}" was created successfully.`);
+
+          this.refresh();
+
+          return response;
+        },
+        (error) => {
+          if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
+            UserNotification.error(`Creating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
+              'Could not save Event Definition');
+          }
+        },
+      );
+
+      EventDefinitionsActions.copy.promise(promise);
+    },
+
     update(eventDefinitionId, updatedEventDefinition) {
       const { eventDefinition, isScheduled } = this.extractSchedulerInfo(updatedEventDefinition);
-      const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinitionId], query: { schedule: isScheduled } }),
-        this.setAlertFlag(eventDefinition));
+      const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinitionId], query: { schedule: isScheduled } }), this.setAlertFlag(eventDefinition));
 
       promise.then(
         (response) => {
@@ -282,6 +317,29 @@ export const EventDefinitionsStore = singletonStore(
       );
 
       EventDefinitionsActions.disable.promise(promise);
+    },
+
+    clearNotificationQueue(eventDefinition) {
+      const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinition.id, 'clear-notification-queue'] }));
+
+      promise.then(
+        (response) => {
+          UserNotification.success('Queued notifications cleared.',
+            'Queued notifications were successfully cleared.');
+
+          this.refresh();
+
+          return response;
+        },
+        (error) => {
+          if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
+            UserNotification.error(`Clearing queued notifications failed with status: ${error}`,
+              'Could not clear queued notifications');
+          }
+        },
+      );
+
+      EventDefinitionsActions.clearNotificationQueue.promise(promise);
     },
   }),
 );

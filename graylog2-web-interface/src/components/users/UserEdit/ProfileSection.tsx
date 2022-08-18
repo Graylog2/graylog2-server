@@ -16,12 +16,12 @@
  */
 import * as React from 'react';
 import { Formik, Form } from 'formik';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 import styled from 'styled-components';
 
 import { Button, Col, Row } from 'components/bootstrap';
 import { ReadOnlyFormGroup } from 'components/common';
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import AppConfig from 'util/AppConfig';
 
@@ -62,9 +62,7 @@ const ProfileSection = ({
     }
 
     return (
-      <>
-        <ReadOnlyFormGroup label="Username" value={username} />
-      </>
+      <ReadOnlyFormGroup label="Username" value={username} />
     );
   };
 
@@ -74,9 +72,7 @@ const ProfileSection = ({
     }
 
     return (
-      <>
-        <EmailFormGroup />
-      </>
+      <EmailFormGroup />
     );
   };
 

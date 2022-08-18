@@ -21,10 +21,10 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -35,6 +35,7 @@ import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -56,6 +57,7 @@ import java.util.stream.Collectors;
 @JsonAutoDetect
 public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportable {
     String TYPE_FIELD = "type";
+    String FIELD_SEARCH_FILTERS = "filters";
 
     @JsonProperty(TYPE_FIELD)
     String type();
@@ -70,6 +72,9 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
     @JsonProperty("filter")
     Filter filter();
 
+    @JsonProperty(FIELD_SEARCH_FILTERS)
+    List<UsedSearchFilter> filters();
+
     @JsonProperty
     Optional<DerivedTimeRange> timerange();
 
@@ -79,11 +84,17 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
     @JsonProperty
     Set<String> streams();
 
-    SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state);
+    SearchType applyExecutionContext(SearchTypeExecutionState executionState);
+
+    SearchType withQuery(BackendQuery query);
+
+    SearchType withFilter(Filter filter);
 
     default Set<String> effectiveStreams() {
         return streams();
     }
+
+    SearchType withFilters(List<UsedSearchFilter> filters);
 
     /**
      * Each search type should declare an implementation of its result conforming to this interface.
@@ -123,6 +134,10 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
         private Filter filter;
 
         @Nullable
+        @JsonProperty(FIELD_SEARCH_FILTERS)
+        private List<UsedSearchFilter> filters;
+
+        @Nullable
         @JsonProperty
         private DerivedTimeRange timeRange;
 
@@ -154,6 +169,11 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
         }
 
         @Override
+        public List<UsedSearchFilter> filters() {
+            return filters;
+        }
+
+        @Override
         public Optional<DerivedTimeRange> timerange() {
             return Optional.ofNullable(this.timeRange);
         }
@@ -169,9 +189,22 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
         }
 
         @Override
-        public SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state) {
+        public SearchType applyExecutionContext(SearchTypeExecutionState state) {
             return this;
         }
+
+        @Override
+        public SearchType withQuery(BackendQuery query) {
+            return this;
+        }
+
+        @Override
+        public SearchType withFilter(Filter filter) {
+            return this;
+        }
+
+        @Override
+        public SearchType withFilters(List<UsedSearchFilter> filters) { return this; }
 
         @JsonAnySetter
         public void setProperties(String key, Object value) {

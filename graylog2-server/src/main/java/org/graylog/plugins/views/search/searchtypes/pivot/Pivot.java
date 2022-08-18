@@ -21,20 +21,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
+import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.PivotEntity;
 import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
-import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
@@ -61,6 +61,7 @@ public abstract class Pivot implements SearchType {
     @JsonProperty
     public abstract String id();
 
+    @Override
     @JsonProperty
     public abstract Optional<String> name();
 
@@ -83,11 +84,30 @@ public abstract class Pivot implements SearchType {
     @Override
     public abstract Filter filter();
 
+    @Override
+    @JsonProperty(FIELD_SEARCH_FILTERS)
+    public abstract List<UsedSearchFilter> filters();
+
     public abstract Builder toBuilder();
 
     @Override
-    public SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state) {
+    public SearchType applyExecutionContext(SearchTypeExecutionState state) {
         return this;
+    }
+
+    @Override
+    public SearchType withQuery(BackendQuery query) {
+        return toBuilder().query(query).build();
+    }
+
+    @Override
+    public SearchType withFilter(Filter filter) {
+        return toBuilder().filter(filter).build();
+    }
+
+    @Override
+    public SearchType withFilters(List<UsedSearchFilter> filters) {
+        return toBuilder().filters(filters).build();
     }
 
     public static Builder builder() {
@@ -96,6 +116,7 @@ public abstract class Pivot implements SearchType {
                 .rowGroups(of())
                 .columnGroups(of())
                 .sort(of())
+                .filters(of())
                 .streams(Collections.emptySet());
     }
 
@@ -105,6 +126,7 @@ public abstract class Pivot implements SearchType {
         public static Builder createDefault() {
             return builder()
                     .sort(Collections.emptyList())
+                    .filters(Collections.emptyList())
                     .streams(Collections.emptySet());
         }
 
@@ -136,6 +158,9 @@ public abstract class Pivot implements SearchType {
 
         @JsonProperty
         public abstract Builder filter(@Nullable Filter filter);
+
+        @JsonProperty(FIELD_SEARCH_FILTERS)
+        public abstract Builder filters(List<UsedSearchFilter> filters);
 
         @JsonProperty
         @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
@@ -175,6 +200,7 @@ public abstract class Pivot implements SearchType {
                 .columnGroups(columnGroups())
                 .rowGroups(rowGroups())
                 .filter(filter())
+                .filters(filters())
                 .query(query().orElse(null))
                 .id(id())
                 .name(name().orElse(null))

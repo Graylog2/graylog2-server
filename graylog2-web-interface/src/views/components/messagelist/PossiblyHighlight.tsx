@@ -17,12 +17,13 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { last, sortBy } from 'lodash';
-import { withTheme, DefaultTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import { withTheme } from 'styled-components';
 
 import StringUtils from 'util/StringUtils';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
-import HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import type HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import formatNumber from './FormatNumber';
 import isNumeric from './IsNumeric';
@@ -94,7 +95,7 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
   const highlights = ranges
     .filter(({ start }) => (start >= 0))
     .filter(({ length }) => (length >= 0))
-    .reduce<[HighlightRange[], number]>(([acc, i], cur, idx) => [
+    .reduce<[Array<HighlightRange | string | JSX.Element>, number]>(([acc, i], cur, idx) => [
       [...acc,
         subst(i, Math.max(0, cur.start - i)), // non-highlighted string before this range
         highlight(subst(Math.max(cur.start, i), Math.max(0, cur.length - Math.max(0, i - cur.start))), idx, style), // highlighted string in range
@@ -106,7 +107,7 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
 
   highlights.push(rest(lastRange.start + lastRange.length));
 
-  return <>{highlights}</>;
+  return <div>{highlights}</div>;
 };
 
 PossiblyHighlight.propTypes = {

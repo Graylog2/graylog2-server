@@ -17,12 +17,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
-import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import { render } from 'wrappedTestingLibrary';
+
+import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import asMock from 'helpers/mocking/AsMock';
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';
-
 import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 import SearchResult from 'views/components/SearchResult';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
@@ -78,7 +78,7 @@ describe('SearchResult', () => {
   const initialFieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('aQueryId') };
   const SimpleSearchResult = ({ fieldTypes }) => (
     <FieldTypesContext.Provider value={fieldTypes}>
-      <SearchResult hasErrors={false} />
+      <SearchResult />
     </FieldTypesContext.Provider>
   );
 
@@ -92,7 +92,7 @@ describe('SearchResult', () => {
 
   it('should show spinner with undefined fields', () => {
     const { getByText } = render(
-      <SearchResult hasErrors={false} />,
+      <SearchResult />,
     );
 
     act(() => { jest.advanceTimersByTime(200); });

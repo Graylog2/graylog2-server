@@ -16,9 +16,9 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+
 import suppressConsole from 'helpers/suppressConsole';
 import mockComponent from 'helpers/mocking/MockComponent';
-
 import FetchError from 'logic/errors/FetchError';
 
 import StreamPermissionErrorPage from './StreamPermissionErrorPage';

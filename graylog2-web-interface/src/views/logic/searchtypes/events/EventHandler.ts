@@ -14,11 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import moment from 'moment-timezone';
 import { groupBy } from 'lodash';
 
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 export type Event = {
   id: string,
@@ -50,25 +48,19 @@ export type Shapes = Array<Shape>;
 
 export const eventsDisplayName = 'Alerts';
 
-const formatTimestamp = (timestamp, tz = 'UTC'): string => {
-  // the `true` parameter prevents returning the iso string in UTC (http://momentjs.com/docs/#/displaying/as-iso-string/)
-  return moment(timestamp).tz(tz ?? 'UTC').toISOString(true);
-};
+type TimeFormatter = (timestamp: string) => string;
 
 export default {
   convert(events: Array<Event>) {
     return events;
   },
 
-  toVisualizationData(events: Events = []): { eventChartData: ChartDefinition, shapes: Shapes } {
-    const currentUser = CurrentUserStore.get();
-    const tz = currentUser ? currentUser.timezone : 'UTC';
-
+  toVisualizationData(events: Events, formatTime: TimeFormatter): { eventChartData: ChartDefinition, shapes: Shapes } {
     const groupedEvents: GroupedEvents = groupBy(events, (e) => e.timestamp);
 
     return {
-      eventChartData: this.toChartData(groupedEvents, tz),
-      shapes: this.toShapeData(Object.keys(groupedEvents), tz),
+      eventChartData: this.toChartData(groupedEvents, formatTime),
+      shapes: this.toShapeData(Object.keys(groupedEvents), formatTime),
     };
   },
 
@@ -86,9 +78,9 @@ export default {
     });
   },
 
-  toChartData(events: GroupedEvents, tz: string): ChartDefinition {
+  toChartData(events: GroupedEvents, formatTimestamp: TimeFormatter): ChartDefinition {
     const values = this.transformGroupedEvents(events);
-    const xValues: Array<string> = values.map((v) => formatTimestamp(v[0], tz));
+    const xValues: Array<string> = values.map((v) => formatTimestamp(v[0]));
     const textValues: Array<string> = values.map((e) => {
       if (typeof e[1] !== 'number' && 'message' in e[1]) {
         return e[1].message;
@@ -110,9 +102,9 @@ export default {
     };
   },
 
-  toShapeData(timestamps: Array<string>, tz: string): Shapes {
+  toShapeData(timestamps: Array<string>, formatTimestamp: TimeFormatter): Shapes {
     return timestamps.map((timestamp) => {
-      const formattedTimestamp = formatTimestamp(timestamp, tz);
+      const formattedTimestamp = formatTimestamp(timestamp);
 
       return {
         layer: 'below',

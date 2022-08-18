@@ -25,7 +25,8 @@ import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Index;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.messages.MessagesIT;
@@ -43,12 +44,12 @@ import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 
 public class MessagesES6IT extends MessagesIT {
     @Rule
-    public final ElasticsearchInstance elasticsearch = ElasticsearchInstanceES6.create();
+    public final TestableSearchServerInstance elasticsearch = ElasticsearchInstanceES6.create();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     @Override
-    protected ElasticsearchInstance elasticsearch() {
+    protected SearchServerInstance elasticsearch() {
         return this.elasticsearch;
     }
 

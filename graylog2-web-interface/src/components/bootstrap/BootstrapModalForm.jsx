@@ -18,8 +18,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import $ from 'jquery';
 
-import { validate } from 'legacy/validations.js';
-
 import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
 import Button from './Button';
@@ -48,7 +46,7 @@ class BootstrapModalForm extends React.Component {
     /* Text to use in the cancel button. "Cancel" is the default */
     cancelButtonText: PropTypes.string,
     /* Text to use in the submit button. "Submit" is the default */
-    submitButtonText: PropTypes.string,
+    submitButtonText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     submitButtonDisabled: PropTypes.bool,
     show: PropTypes.bool,
   };
@@ -74,6 +72,7 @@ class BootstrapModalForm extends React.Component {
     this.close();
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => this.modal.open();
 
   close = () => this.modal.close();
@@ -89,13 +88,6 @@ class BootstrapModalForm extends React.Component {
       return;
     }
 
-    // Check custom validation for plugin fields
-    if (!validate(formDOMNode)) {
-      event.preventDefault();
-
-      return;
-    }
-
     // If function is not given, let the browser continue propagating the submit event
     const { onSubmitForm } = this.props;
 
@@ -106,7 +98,19 @@ class BootstrapModalForm extends React.Component {
   };
 
   render() {
-    const { backdrop, submitButtonDisabled, formProps, bsSize, onModalClose, cancelButtonText, show, submitButtonText, onModalOpen, title, children } = this.props;
+    const {
+      backdrop,
+      submitButtonDisabled,
+      formProps,
+      bsSize,
+      onModalClose,
+      cancelButtonText,
+      show,
+      submitButtonText,
+      onModalOpen,
+      title,
+      children,
+    } = this.props;
     const body = (
       <div className="container-fluid">
         {children}
@@ -124,7 +128,10 @@ class BootstrapModalForm extends React.Component {
         <Modal.Header closeButton>
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
-        <form ref={(c) => { this.form = c; }} onSubmit={this.submit} {...formProps} data-testid="modal-form">
+        <form ref={(c) => { this.form = c; }}
+              onSubmit={this.submit}
+              {...formProps}
+              data-testid="modal-form">
           <Modal.Body>
             {body}
           </Modal.Body>

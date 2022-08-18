@@ -17,9 +17,9 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import FieldType from 'views/logic/fieldtypes/FieldType';
-import { Message } from 'views/components/messagelist/Types';
+import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
+import type { Message } from 'views/components/messagelist/Types';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import MessageFieldRow from 'views/components/messagelist/MessageFieldRow';
 

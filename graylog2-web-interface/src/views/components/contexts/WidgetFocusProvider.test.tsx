@@ -18,8 +18,8 @@ import * as React from 'react';
 import { Map } from 'immutable';
 import { render } from 'wrappedTestingLibrary';
 import { useLocation } from 'react-router-dom';
-import { asMock } from 'helpers/mocking';
 
+import { asMock } from 'helpers/mocking';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';

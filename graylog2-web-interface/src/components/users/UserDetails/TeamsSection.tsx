@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 import { EnterprisePluginNotFound } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 

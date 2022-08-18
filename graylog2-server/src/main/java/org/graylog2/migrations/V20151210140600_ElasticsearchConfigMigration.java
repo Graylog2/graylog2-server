@@ -74,7 +74,11 @@ public class V20151210140600_ElasticsearchConfigMigration extends Migration {
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_size_per_index", sizeConfig);
         }
         if (timeBasedRotationStrategyConfig == null) {
-            final TimeBasedRotationStrategyConfig timeConfig = TimeBasedRotationStrategyConfig.create(elasticsearchConfiguration.getMaxTimePerIndex());
+            final TimeBasedRotationStrategyConfig timeConfig =
+                    TimeBasedRotationStrategyConfig.builder()
+                            .rotationPeriod(elasticsearchConfiguration.getMaxTimePerIndex())
+                            .maxRotationPeriod(elasticsearchConfiguration.getMaxWriteIndexAge())
+                            .build();
             clusterConfigService.write(timeConfig);
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_time_per_index", timeConfig);
         }

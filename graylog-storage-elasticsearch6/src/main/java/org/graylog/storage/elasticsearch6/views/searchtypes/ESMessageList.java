@@ -20,22 +20,20 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.name.Named;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.MetricAggregation;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryStringQueryBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.sort.FieldSortBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.sort.SortBuilders;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.sort.SortOrder;
+import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryStringQueryBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.sort.FieldSortBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.sort.SortBuilders;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.sort.SortOrder;
+import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -54,22 +52,19 @@ import java.util.stream.Collectors;
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class ESMessageList implements ESSearchTypeHandler<MessageList> {
-    private final QueryStringDecorators esQueryDecorators;
     private final LegacyDecoratorProcessor decoratorProcessor;
     private final boolean allowHighlighting;
 
     @Inject
-    public ESMessageList(QueryStringDecorators esQueryDecorators,
-                         LegacyDecoratorProcessor decoratorProcessor,
+    public ESMessageList(LegacyDecoratorProcessor decoratorProcessor,
                          @Named("allow_highlighting") boolean allowHighlighting) {
-        this.esQueryDecorators = esQueryDecorators;
         this.decoratorProcessor = decoratorProcessor;
         this.allowHighlighting = allowHighlighting;
     }
 
     @VisibleForTesting
-    public ESMessageList(QueryStringDecorators esQueryDecorators) {
-        this(esQueryDecorators, new LegacyDecoratorProcessor.Fake(), false);
+    public ESMessageList() {
+        this(new LegacyDecoratorProcessor.Fake(), false);
     }
 
     @Override
@@ -81,9 +76,11 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
 
         applyHighlightingIfActivated(searchSourceBuilder, job, query);
 
-        final Set<String> effectiveStreamIds = messageList.effectiveStreams().isEmpty()
-                ? query.usedStreamIds()
-                : messageList.effectiveStreams();
+        final Set<String> effectiveStreamIds = query.effectiveStreams(messageList);
+
+        if (!messageList.fields().isEmpty()) {
+            searchSourceBuilder.fetchSource(messageList.fields().toArray(new String[0]), new String[0]);
+        }
 
         final List<Sort> sorts = firstNonNull(messageList.sort(), Collections.singletonList(Sort.create(Message.FIELD_TIMESTAMP, Sort.Order.DESC)));
         sorts.forEach(sort -> {
@@ -102,8 +99,9 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
         }
     }
     private void applyHighlightingIfActivated(SearchSourceBuilder searchSourceBuilder, SearchJob job, Query query) {
-        if (!allowHighlighting)
+        if (!allowHighlighting) {
             return;
+        }
 
         final QueryStringQueryBuilder highlightQuery = decoratedHighlightQuery(job, query);
 
@@ -115,11 +113,9 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     }
 
     private QueryStringQueryBuilder decoratedHighlightQuery(SearchJob job, Query query) {
-        final String raw = ((ElasticsearchQueryString) query.query()).queryString();
+        final String queryString = query.query().queryString();
 
-        final String decorated = this.esQueryDecorators.decorate(raw, job, query, Collections.emptySet());
-
-        return QueryBuilders.queryStringQuery(decorated);
+        return QueryBuilders.queryStringQuery(queryString);
     }
 
     @Override
@@ -130,14 +126,13 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
                 .map((resultMessage) -> ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex()))
                 .collect(Collectors.toList());
 
-        final String undecoratedQueryString = ((ElasticsearchQueryString)query.query()).queryString();
-        final String queryString = this.esQueryDecorators.decorate(undecoratedQueryString, job, query, Collections.emptySet());
+        final String queryString = query.query().queryString();
 
         final DateTime from = query.effectiveTimeRange(searchType).getFrom();
         final DateTime to = query.effectiveTimeRange(searchType).getTo();
 
         final SearchResponse searchResponse = SearchResponse.create(
-                undecoratedQueryString,
+                queryString,
                 queryString,
                 Collections.emptySet(),
                 messages,

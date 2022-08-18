@@ -18,9 +18,9 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import { getAuthServicePlugin } from 'util/AuthenticationService';
-import { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
+import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
-import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import { Spinner } from 'components/common';
 import SectionGrid from 'components/common/Section/SectionGrid';
 

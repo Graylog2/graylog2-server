@@ -20,8 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
@@ -29,6 +27,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.graylog.plugins.views.search.rest.ExecutionState;
+import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -39,12 +39,12 @@ import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -55,13 +55,10 @@ import static java.util.stream.Collectors.toSet;
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = Search.Builder.class)
-public abstract class Search implements ContentPackable<SearchEntity> {
+public abstract class Search implements ContentPackable<SearchEntity>, ParameterProvider {
     public static final String FIELD_REQUIRES = "requires";
     static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_OWNER = "owner";
-
-    // generated during build to help quickly find a query by id.
-    private ImmutableMap<String, Query> queryIndex;
 
     // generated during build to help quickly find a parameter by name.
     private ImmutableMap<String, Parameter> parameterIndex;
@@ -84,52 +81,54 @@ public abstract class Search implements ContentPackable<SearchEntity> {
     @JsonProperty(FIELD_OWNER)
     public abstract Optional<String> owner();
 
+    public Search withOwner(@Nonnull String owner) {
+        return toBuilder().owner(owner).build();
+    }
+
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();
-
-    @JsonIgnore
-    public Optional<Query> getQuery(String sourceQueryId) {
-        return Optional.ofNullable(queryIndex.get(sourceQueryId));
-    }
 
     @JsonIgnore
     public Optional<Parameter> getParameter(String parameterName) {
         return Optional.ofNullable(parameterIndex.get(parameterName));
     }
 
-    public Search applyExecutionState(ObjectMapper objectMapper, Map<String, Object> executionState) {
+    public Search applyExecutionState(ExecutionState executionState) {
         final Builder builder = toBuilder();
 
-        final JsonNode state = objectMapper.convertValue(executionState, JsonNode.class);
-
-        if (state.hasNonNull("parameter_bindings")) {
+        if (!executionState.parameterBindings().isEmpty()) {
             final ImmutableSet<Parameter> parameters = parameters().stream()
-                    .map(param -> param.applyExecutionState(objectMapper, state.path("parameter_bindings")))
+                    .map(param -> param.applyBindings(executionState.parameterBindings()))
                     .collect(toImmutableSet());
             builder.parameters(parameters);
         }
-        if (state.hasNonNull("queries") || state.hasNonNull("global_override")) {
+
+        if (executionState.queries() != null || executionState.globalOverride() != null) {
             final ImmutableSet<Query> queries = queries().stream()
-                    .map(query -> {
-                        final JsonNode queryOverride = state.hasNonNull("global_override")
-                                ? state.path("global_override")
-                                : state.path("queries").path(query.id());
-                        return query.applyExecutionState(objectMapper, queryOverride);
-                    })
+                    .map(query -> applyStateToQuery(executionState, query))
                     .collect(toImmutableSet());
             builder.queries(queries);
         }
         return builder.build();
     }
 
-    public Search addStreamsToQueriesWithoutStreams(Supplier<ImmutableSet<String>> defaultStreamsSupplier) {
+    private Query applyStateToQuery(ExecutionState executionState, Query query) {
+        if (executionState.globalOverride().hasValues()) {
+            return query.applyExecutionState(executionState.globalOverride());
+        } else {
+            final ExecutionStateGlobalOverride queryOverride = executionState.queries().get(query.id());
+            return query.applyExecutionState(queryOverride);
+        }
+    }
+
+    public Search addStreamsToQueriesWithoutStreams(Supplier<Set<String>> defaultStreamsSupplier) {
         if (!hasQueriesWithoutStreams()) {
             return this;
         }
         final Set<Query> withStreams = queries().stream().filter(Query::hasStreams).collect(toSet());
         final Set<Query> withoutStreams = Sets.difference(queries(), withStreams);
 
-        final ImmutableSet<String> defaultStreams = defaultStreamsSupplier.get();
+        final Set<String> defaultStreams = defaultStreamsSupplier.get();
 
         if (defaultStreams.isEmpty()) {
             throw new MissingStreamPermissionException("User doesn't have access to any streams",
@@ -226,7 +225,6 @@ public abstract class Search implements ContentPackable<SearchEntity> {
             }
 
             final Search search = autoBuild();
-            search.queryIndex = Maps.uniqueIndex(search.queries(), Query::id);
             search.parameterIndex = Maps.uniqueIndex(search.parameters(), Parameter::name);
             return search;
         }

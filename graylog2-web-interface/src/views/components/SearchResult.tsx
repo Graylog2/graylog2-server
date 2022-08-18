@@ -30,6 +30,7 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 const StyledRow = styled(Row)(({ $hasFocusedWidget }: { $hasFocusedWidget: boolean }) => css`
   height: ${$hasFocusedWidget ? '100%' : 'auto'};
   overflow: ${$hasFocusedWidget ? 'auto' : 'visible'};
+  position: relative;
 `);
 
 const StyledCol = styled(Col)`
@@ -42,26 +43,19 @@ const SearchLoadingIndicator = () => {
   return (searchLoadingState.isLoading && <LoadingIndicator text="Updating search results..." />);
 };
 
-type Props = {
-  hasErrors: boolean,
-};
-
-const SearchResult = React.memo(({ hasErrors }: Props) => {
+const SearchResult = React.memo(() => {
   const fieldTypes = useContext(FieldTypesContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
+  const hasFocusedWidget = !!focusedWidget?.id;
 
   if (!fieldTypes) {
     return <Spinner />;
   }
 
-  const hasFocusedWidget = !!focusedWidget?.id;
-
-  const content = hasErrors ? null : <Query />;
-
   return (
     <StyledRow $hasFocusedWidget={hasFocusedWidget}>
       <StyledCol>
-        {content}
+        <Query />
         <SearchLoadingIndicator />
       </StyledCol>
     </StyledRow>

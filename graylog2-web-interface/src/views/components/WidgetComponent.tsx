@@ -14,15 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext } from 'react';
+import * as React from 'react';
+import { useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import * as Immutable from 'immutable';
-import { BackendWidgetPosition } from 'views/types';
+import type * as Immutable from 'immutable';
 
+import type { BackendWidgetPosition } from 'views/types';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import WidgetContext from 'views/components/contexts/WidgetContext';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import type TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import ExportSettingsContextProvider from 'views/components/ExportSettingsContextProvider';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
@@ -41,43 +42,37 @@ type Props = {
   editing: boolean,
   fields: Immutable.List<TFieldTypeMapping>,
   onPositionsChange: (position: BackendWidgetPosition) => void,
-  onWidgetSizeChange: (widgetId?: string, dimensions?: { height: number, width: number }) => void,
   position: WidgetPosition,
   widgetId: string,
-  widgetDimension: { height: number | null | undefined, width: number | null | undefined },
 };
 
 const WidgetComponent = ({
   editing,
   fields,
   onPositionsChange = () => undefined,
-  onWidgetSizeChange = () => {},
   position,
   widgetId,
-  widgetDimension: { height, width },
 }: Props) => {
   const widget = useStore(WidgetStore, (state) => state.get(widgetId));
   const viewType = useContext(ViewTypeContext);
   const title = useStore(TitlesStore, (titles) => titles?.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string);
+  const additionalContext = useMemo(() => ({ widget }), [widget]);
 
   const WidgetFieldTypesIfDashboard = viewType === View.Type.Dashboard ? WidgetFieldTypesContextProvider : React.Fragment;
 
   return (
     <DrilldownContextProvider widget={widget}>
       <WidgetContext.Provider value={widget}>
-        <AdditionalContext.Provider value={{ widget }}>
+        <AdditionalContext.Provider value={additionalContext}>
           <ExportSettingsContextProvider>
             <WidgetFieldTypesIfDashboard>
               <Widget editing={editing}
                       fields={fields}
-                      height={height}
                       id={widget.id}
                       onPositionsChange={onPositionsChange}
-                      onSizeChange={onWidgetSizeChange}
                       position={position}
                       title={title}
-                      widget={widget}
-                      width={width} />
+                      widget={widget} />
             </WidgetFieldTypesIfDashboard>
           </ExportSettingsContextProvider>
         </AdditionalContext.Provider>
@@ -90,14 +85,11 @@ WidgetComponent.propTypes = {
   editing: PropTypes.bool.isRequired,
   fields: PropTypes.object.isRequired,
   onPositionsChange: PropTypes.func,
-  onWidgetSizeChange: PropTypes.func,
   position: PropTypes.shape(Position).isRequired,
-  widgetDimension: PropTypes.object.isRequired,
 };
 
 WidgetComponent.defaultProps = {
   onPositionsChange: () => {},
-  onWidgetSizeChange: () => {},
 };
 
 export default WidgetComponent;

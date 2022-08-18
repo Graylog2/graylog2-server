@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch6.views;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.views.search.Query;
@@ -26,38 +27,49 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
+import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
+import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.ReferencedQueryStringSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.inject.Provider;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 public class ElasticsearchBackendTest {
 
-    private static ElasticsearchBackend backend;
+    private ElasticsearchBackend backend;
+    private UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
 
-    @BeforeClass
-    public static void setup() {
+    @Before
+    public void setup() {
         Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
-        handlers.put(MessageList.NAME, () -> new ESMessageList(new QueryStringDecorators.Fake()));
+        handlers.put(MessageList.NAME, ESMessageList::new);
 
+        usedSearchFiltersToQueryStringsMapper = mock(UsedSearchFiltersToQueryStringsMapper.class);
+        doReturn(Collections.emptySet()).when(usedSearchFiltersToQueryStringsMapper).map(any());
         final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
-        final QueryStringParser queryStringParser = new QueryStringParser();
         backend = new ElasticsearchBackend(handlers,
                 null,
                 mock(IndexLookup.class),
-                new QueryStringDecorators.Fake(),
-                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
+                usedSearchFiltersToQueryStringsMapper,
                 false);
     }
 
@@ -86,11 +98,51 @@ public class ElasticsearchBackendTest {
 
         final ESGeneratedQueryContext queryContext = mock(ESGeneratedQueryContext.class);
 
-        final QueryResult queryResult = backend.doRun(job, query, queryContext, Collections.emptySet());
+        final QueryResult queryResult = backend.doRun(job, query, queryContext);
 
         assertThat(queryResult).isNotNull();
         assertThat(queryResult.searchTypes()).isEmpty();
         assertThat(queryResult.executionStats()).isNotNull();
         assertThat(queryResult.errors()).isEmpty();
+    }
+
+    @Test
+    public void generatedContextHasQueryThatIncludesSearchFilters() {
+        final ImmutableList<UsedSearchFilter> usedSearchFilters = ImmutableList.of(
+                InlineQueryStringSearchFilter.builder().title("").description("").queryString("method:GET").build(),
+                ReferencedQueryStringSearchFilter.create("12345")
+        );
+        doReturn(ImmutableSet.of("method:GET", "method:POST")).when(usedSearchFiltersToQueryStringsMapper).map(usedSearchFilters);
+
+        final Query query = Query.builder()
+                .id("queryWithSearchFilters")
+                .query(ElasticsearchQueryString.of(""))
+                .filters(usedSearchFilters)
+                .timerange(RelativeRange.create(300))
+                .build();
+        final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
+        final SearchJob job = new SearchJob("deadbeef", search, "admin");
+
+        final ESGeneratedQueryContext queryContext = backend.generate(job, query, Collections.emptySet());
+        final QueryBuilder esQuery = queryContext.searchSourceBuilder(new SearchType.Fallback()).query();
+        assertThat(esQuery)
+                .isNotNull()
+                .isInstanceOf(BoolQueryBuilder.class);
+
+        final List<QueryBuilder> filters = ((BoolQueryBuilder) esQuery).filter();
+
+        //filter for empty ES query
+        assertThat(filters)
+                .anyMatch(queryBuilder -> queryBuilder instanceof MatchAllQueryBuilder);
+
+        //2 filters from search filters
+        assertThat(filters)
+                .filteredOn(queryBuilder -> queryBuilder instanceof QueryStringQueryBuilder)
+                .extracting(queryBuilder -> (QueryStringQueryBuilder) queryBuilder)
+                .extracting(QueryStringQueryBuilder::queryString)
+                .contains("method:POST")
+                .contains("method:GET");
+
+
     }
 }

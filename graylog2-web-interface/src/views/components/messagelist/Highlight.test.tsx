@@ -18,13 +18,13 @@ import React from 'react';
 import { render } from 'wrappedTestingLibrary';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
-import { Message } from 'views/components/messagelist/Types';
+import type { Message } from 'views/components/messagelist/Types';
 
 import Highlight from './Highlight';
 
 const messageFor = (ranges) => ({ highlight_ranges: ranges } as Message);
 
-const hasBrokenUpText = (text) => (content, node) => {
+const hasBrokenUpText = (text) => (_content, node) => {
   const hasText = (currentNode) => currentNode.textContent === text;
   const nodeHasText = hasText(node);
   const childrenDontHaveText = Array.from(node.children).every(

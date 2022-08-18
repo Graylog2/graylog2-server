@@ -22,9 +22,9 @@ import { compact } from 'lodash';
 import * as Immutable from 'immutable';
 
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
-import Role from 'logic/roles/Role';
-import { PaginatedListType } from 'components/common/PaginatedItemOverview';
-import UserOverview from 'logic/users/UserOverview';
+import type Role from 'logic/roles/Role';
+import type { PaginatedListType } from 'components/common/PaginatedItemOverview';
+import type UserOverview from 'logic/users/UserOverview';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { Button } from 'components/bootstrap';
 import { Select, ErrorAlert } from 'components/common';

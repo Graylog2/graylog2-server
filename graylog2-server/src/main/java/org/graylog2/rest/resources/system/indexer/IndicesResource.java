@@ -64,8 +64,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @RequiresAuthentication
-@Api(value = "Indexer/Indices", description = "Index information")
+@Api(value = "Indexer/Indices", description = "Index information", tags={CLOUD_VISIBLE})
 @Path("/system/indexer/indices")
 public class IndicesResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesResource.class);

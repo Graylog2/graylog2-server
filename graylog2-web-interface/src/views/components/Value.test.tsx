@@ -46,10 +46,10 @@ describe('Value', () => {
                         render={({ value }) => `The date ${value}`}
                         type={new FieldType('date', [], [])} />);
 
-      openActionsMenu('The date 2018-10-02 09:45:40.000');
+      openActionsMenu('The date 2018-10-02 16:45:40.000');
       const title = await screen.findByTestId('value-actions-title');
 
-      expect(title).toHaveTextContent('foo = 2018-10-02 09:45:40.000');
+      expect(title).toHaveTextContent('foo = 2018-10-02 16:45:40.000');
     });
 
     it('renders numeric timestamps with a custom component', async () => {
@@ -118,12 +118,12 @@ describe('Value', () => {
   it.each`
      interactive | value                     | type                                                         | result
      ${true}     | ${42}                     | ${undefined}                                                 | ${'42'}
-     ${true}     | ${'2018-10-02T14:45:40Z'} | ${new FieldType('date', [], [])}    | ${'2018-10-02 09:45:40.000'}
+     ${true}     | ${'2018-10-02T14:45:40Z'} | ${new FieldType('date', [], [])}    | ${'2018-10-02 16:45:40.000'}
      ${true}     | ${false}                  | ${new FieldType('boolean', [], [])} | ${'false'}
      ${true}     | ${[23, 'foo']}            | ${FieldType.Unknown}                                         | ${'[23,"foo"]'}                
      ${true}     | ${{ foo: 23 }}            | ${FieldType.Unknown}                                         | ${'{"foo":23}'}
      ${false}    | ${42}                     | ${undefined}                                                 | ${'42'}
-     ${false}    | ${'2018-10-02T14:45:40Z'} | ${new FieldType('date', [], [])}    | ${'2018-10-02 09:45:40.000'}
+     ${false}    | ${'2018-10-02T14:45:40Z'} | ${new FieldType('date', [], [])}    | ${'2018-10-02 16:45:40.000'}
      ${false}    | ${false}                  | ${new FieldType('boolean', [], [])} | ${'false'}
      ${false}    | ${[23, 'foo']}            | ${FieldType.Unknown}                                         | ${'[23,"foo"]'}
      ${false}    | ${{ foo: 23 }}            | ${FieldType.Unknown}                                         | ${'{"foo":23}'}

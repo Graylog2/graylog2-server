@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { createPortal } from 'react-dom';
 import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
+
+import { Portal } from 'components/common';
 
 import ListItem from './ListItem';
 import type { ListItemType, CustomContentRender, CustomListItemRender } from './ListItem';
@@ -62,7 +63,7 @@ const SortableListItem = <ItemType extends ListItemType>({
       );
 
       return (displayOverlayInPortal && isDragging)
-        ? createPortal(listItem, document.body)
+        ? <Portal>{listItem}</Portal>
         : listItem;
     }}
   </Draggable>

@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen } from '@testing-library/react';
-import { asMock } from 'helpers/mocking';
 
+import { asMock } from 'helpers/mocking';
 import useQuery from 'routing/useQuery';
 
 import _HighlightMessageInQuery from './HighlightMessageInQuery';

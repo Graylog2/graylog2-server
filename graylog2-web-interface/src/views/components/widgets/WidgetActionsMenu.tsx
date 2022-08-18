@@ -17,25 +17,29 @@
 import * as React from 'react';
 import { useState, useContext, useCallback } from 'react';
 import styled from 'styled-components';
-import { BackendWidgetPosition } from 'views/types';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import type { BackendWidgetPosition } from 'views/types';
 import ExportModal from 'views/components/export/ExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import { loadDashboard } from 'views/logic/views/Actions';
 import { IconButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
+import type { ViewStoreState } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import SearchActions from 'views/actions/SearchActions';
+import type { SearchJson } from 'views/logic/search/Search';
 import Search from 'views/logic/search/Search';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
-import type { ViewStoreState } from 'views/stores/ViewStore';
 import IfSearch from 'views/components/search/IfSearch';
 import { MenuItem } from 'components/bootstrap';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { useStore } from 'stores/connect';
+import type Widget from 'views/logic/widgets/Widget';
+import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -73,7 +77,7 @@ const _onCopyToDashboard = (
     return;
   }
 
-  const addWidgetToDashboard = (dashboard: View) => (searchJson) => {
+  const addWidgetToDashboard = (dashboard: View) => (searchJson: SearchJson) => {
     const search = Search.fromJSON(searchJson);
     const newDashboard = CopyWidgetToDashboard(widgetId, activeView, dashboard.toBuilder().search(search).build());
 
@@ -91,7 +95,13 @@ const _onCopyToDashboard = (
   setShowCopyToDashboard(false);
 };
 
-const _onMoveWidgetToTab = (view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy) => {
+const _onMoveWidgetToTab = (
+  view: ViewStoreState,
+  setShowMoveWidgetToTab: (show: boolean) => void,
+  widgetId: string,
+  queryId: string,
+  keepCopy: boolean,
+) => {
   const { view: activeView } = view;
 
   if (!queryId) {
@@ -101,31 +111,36 @@ const _onMoveWidgetToTab = (view, setShowMoveWidgetToTab, widgetId, queryId, kee
   const newDashboard = MoveWidgetToTab(widgetId, queryId, activeView, keepCopy);
 
   if (newDashboard) {
-    SearchActions.create(newDashboard.search).then((searchResponse) => {
-      const updatedDashboard = newDashboard.toBuilder().search(searchResponse.search).build();
+    SearchActions.create(newDashboard.search)
+      .then((searchResponse) => {
+        const updatedDashboard = newDashboard.toBuilder().search(searchResponse.search).build();
 
-      ViewActions.update(updatedDashboard).then(() => {
+        return ViewActions.update(updatedDashboard);
+      })
+      .then(() => {
         setShowMoveWidgetToTab(false);
 
-        ViewActions.selectQuery(queryId).then(() => {
-          SearchActions.executeWithCurrentState();
-        });
-      });
-    });
+        return ViewActions.selectQuery(queryId);
+      })
+      .then(() => SearchActions.executeWithCurrentState());
   }
 };
 
-const _onDelete = (widgetId, title) => {
-  // eslint-disable-next-line no-alert
-  if (window.confirm(`Are you sure you want to remove the widget "${title}"?`)) {
-    WidgetActions.remove(widgetId);
-  }
+// eslint-disable-next-line no-alert
+const defaultOnDeleteWidget = async (_widget: Widget, _view: View, title: string) => window.confirm(`Are you sure you want to remove the widget "${title}"?`);
+
+const _onDelete = async (widget: Widget, view: View, title: string) => {
+  const pluggableWidgetDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingWidget');
+
+  const result = await iterateConfirmationHooks([...pluggableWidgetDeletionHooks, defaultOnDeleteWidget], widget, view, title);
+
+  return result === true ? WidgetActions.remove(widget.id) : Promise.resolve();
 };
 
-const _onDuplicate = (widgetId, setFocusWidget, title) => {
+const _onDuplicate = (widgetId: string, unsetWidgetFocusing: () => void, title: string) => {
   WidgetActions.duplicate(widgetId).then((newWidget) => {
     TitlesActions.set(TitleTypes.Widget, newWidget.id, `${title} (copy)`).then(() => {
-      setFocusWidget(undefined);
+      unsetWidgetFocusing();
     });
   });
 };
@@ -152,9 +167,11 @@ const WidgetActionsMenu = ({
   const [showExport, setShowExport] = useState(false);
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
 
-  const onDuplicate = () => _onDuplicate(widget.id, setWidgetFocusing, title);
-  const onCopyToDashboard = useCallback((widgetId, dashboardId) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
-  const onMoveWidgetToTab = useCallback((widgetId, queryId, keepCopy) => _onMoveWidgetToTab(view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [view]);
+  const onDuplicate = useCallback(() => _onDuplicate(widget.id, unsetWidgetFocusing, title), [unsetWidgetFocusing, title, widget.id]);
+  const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
+  const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToTab(view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [view]);
+  const onDelete = useCallback(() => _onDelete(widget, view?.view, title), [title, view?.view, widget]);
+  const focusWidget = useCallback(() => setWidgetFocusing(widget.id), [setWidgetFocusing, widget.id]);
 
   return (
     <Container>
@@ -165,7 +182,7 @@ const WidgetActionsMenu = ({
         {isFocused && (
           <IconButton name="compress-arrows-alt"
                       title="Un-focus widget"
-                      onClick={() => unsetWidgetFocusing()} />
+                      onClick={unsetWidgetFocusing} />
         )}
         {!isFocused && (
           <>
@@ -175,7 +192,7 @@ const WidgetActionsMenu = ({
                                      position={position} />
             <IconButton name="expand-arrows-alt"
                         title="Focus this widget"
-                        onClick={() => setWidgetFocusing(widget.id)} />
+                        onClick={focusWidget} />
           </>
         )}
 
@@ -200,7 +217,7 @@ const WidgetActionsMenu = ({
           </IfDashboard>
           <ExtraWidgetActions widget={widget} onSelect={() => {}} />
           <MenuItem divider />
-          <MenuItem onSelect={() => _onDelete(widget.id, title)}>
+          <MenuItem onSelect={onDelete}>
             Delete
           </MenuItem>
         </WidgetActionDropdown>

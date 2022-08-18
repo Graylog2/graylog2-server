@@ -28,32 +28,51 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNull;
 
 public class TimeBasedRotationStrategyConfigTest {
     @Test
     public void testCreate() throws Exception {
-        final TimeBasedRotationStrategyConfig config = TimeBasedRotationStrategyConfig.create(Period.days(1));
+        final TimeBasedRotationStrategyConfig config = TimeBasedRotationStrategyConfig.builder().build();
         assertThat(config.rotationPeriod()).isEqualTo(Period.days(1));
+        assertNull(config.maxRotationPeriod());
+
+        final TimeBasedRotationStrategyConfig configWithMaxAge = TimeBasedRotationStrategyConfig.builder().maxRotationPeriod(Period.days(99)).build();
+        assertThat(configWithMaxAge.rotationPeriod()).isEqualTo(Period.days(1));
+        assertThat(configWithMaxAge.maxRotationPeriod()).isEqualTo(Period.days(99));
     }
 
     @Test
     public void testSerialization() throws JsonProcessingException {
-        final RotationStrategyConfig config = TimeBasedRotationStrategyConfig.create(Period.days(1));
+        final RotationStrategyConfig config = TimeBasedRotationStrategyConfig.builder().maxRotationPeriod(Period.days(99)).build();
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final String json = objectMapper.writeValueAsString(config);
 
         final Object document = Configuration.defaultConfiguration().jsonProvider().parse(json);
         assertThat((String) JsonPath.read(document, "$.type")).isEqualTo("org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig");
         assertThat((String) JsonPath.read(document, "$.rotation_period")).isEqualTo("P1D");
+        assertThat((String) JsonPath.read(document, "$.max_rotation_period")).isEqualTo("P99D");
     }
 
     @Test
     public void testDeserialization() throws IOException {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        final String json = "{ \"type\": \"org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig\", \"rotation_period\": \"P1D\" }";
+        final String json = "{ \"type\": \"org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig\", \"rotation_period\": \"P1D\", \"max_rotation_period\": \"P99D\" }";
         final RotationStrategyConfig config = objectMapper.readValue(json, RotationStrategyConfig.class);
 
         assertThat(config).isInstanceOf(TimeBasedRotationStrategyConfig.class);
         assertThat(((TimeBasedRotationStrategyConfig) config).rotationPeriod()).isEqualTo(Period.days(1));
+        assertThat(((TimeBasedRotationStrategyConfig) config).maxRotationPeriod()).isEqualTo(Period.days(99));
+    }
+
+    @Test
+    public void testDeserializationWithMissingProperty() throws IOException {
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        final String json = "{ \"type\": \"org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig\", \"rotation_period\": \"P1D\"}";
+        final RotationStrategyConfig config = objectMapper.readValue(json, RotationStrategyConfig.class);
+
+        assertThat(config).isInstanceOf(TimeBasedRotationStrategyConfig.class);
+        assertThat(((TimeBasedRotationStrategyConfig) config).rotationPeriod()).isEqualTo(Period.days(1));
+        assertNull(((TimeBasedRotationStrategyConfig) config).maxRotationPeriod());
     }
 }

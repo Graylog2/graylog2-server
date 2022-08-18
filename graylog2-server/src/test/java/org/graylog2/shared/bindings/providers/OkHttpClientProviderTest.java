@@ -30,10 +30,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -278,6 +281,33 @@ public class OkHttpClientProviderTest {
         assertThat(authenticatedRequest.getHeader(HttpHeaders.PROXY_AUTHORIZATION)).isEqualTo(Credentials.basic("", ""));
 
         assertThat(response.code()).isEqualTo(401);
+    }
+
+    @Test
+    public void testDynamicProxy() throws URISyntaxException {
+        final String TEST_PROXY = "http://proxy.dummy.org";
+        final InetSocketAddress testProxyAddress = new InetSocketAddress(TEST_PROXY, 59001);
+        final Proxy testProxy = new Proxy(Proxy.Type.HTTP, testProxyAddress);
+        final OkHttpClientProvider provider = new OkHttpClientProvider(
+                Duration.milliseconds(100L),
+                Duration.milliseconds(100L),
+                Duration.milliseconds(100L),
+                server.url("/").uri(),
+                null);
+
+        OkHttpClientProvider spyClientProvider = Mockito.spy(provider);
+
+        final OkHttpClient client = spyClientProvider.get();
+        assertThat(client.proxySelector().select(URI.create("http://www.example.com/")))
+                .hasSize(1)
+                .first()
+                .matches(proxy -> proxy.equals(server.toProxyAddress()));
+
+        Mockito.doReturn(testProxyAddress).when(spyClientProvider).getProxyAddress();
+        assertThat(client.proxySelector().select(URI.create("http://www.example.com/")))
+                .hasSize(1)
+                .first()
+                .matches(proxy -> proxy.equals(testProxy));
     }
 
     private MockResponse successfulMockResponse() {

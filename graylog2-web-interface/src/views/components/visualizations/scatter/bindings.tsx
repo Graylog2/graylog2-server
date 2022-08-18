@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { VisualizationType } from 'views/types';
-
 import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
 
 const validate = hasAtLeastOneMetric('Scatter plot');
 
-const scatterChart: VisualizationType = {
+const scatterChart: VisualizationType<typeof ScatterVisualization.type> = {
   type: ScatterVisualization.type,
   displayName: 'Scatter Plot',
   component: ScatterVisualization,

@@ -18,10 +18,11 @@ import React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import { Map } from 'immutable';
+import { PluginStore } from 'graylog-web-plugin/plugin';
+
 import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
 import { MockStore } from 'helpers/mocking';
-
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
@@ -37,14 +38,15 @@ import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import ViewState from 'views/logic/views/ViewState';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import { loadDashboard } from 'views/logic/views/Actions';
-import { TitlesMap } from 'views/stores/TitleTypes';
+import type { TitlesMap } from 'views/stores/TitleTypes';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { ViewStore } from 'views/stores/ViewStore';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
 import WidgetContext from '../contexts/WidgetContext';
-import WidgetFocusContext, { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
+import type { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
+import WidgetFocusContext from '../contexts/WidgetFocusContext';
 
 jest.mock('views/components/search/IfSearch', () => jest.fn(({ children }) => children));
 
@@ -65,7 +67,9 @@ jest.mock('views/stores/ViewStore', () => ({
 }));
 
 jest.mock('views/stores/WidgetStore', () => ({
-  WidgetActions: {},
+  WidgetActions: {
+    remove: jest.fn(),
+  },
 }));
 
 jest.mock('views/stores/CurrentQueryStore', () => ({
@@ -74,7 +78,14 @@ jest.mock('views/stores/CurrentQueryStore', () => ({
 
 jest.mock('views/stores/CurrentViewStateStore', () => ({ CurrentViewStateStore: MockStore(['getInitialState', () => ({})]) }));
 
-describe('<Widget />', () => {
+const openActionDropdown = async () => {
+  const actionToggle = await screen.findByTestId('widgetActionDropDown');
+
+  fireEvent.click(actionToggle);
+  await screen.findByRole('heading', { name: 'Actions' });
+};
+
+describe('<WidgetActionsMenu />', () => {
   const widget = WidgetModel.builder().newId()
     .type('dummy')
     .id('widget-id')
@@ -182,9 +193,8 @@ describe('<Widget />', () => {
   it('copies title when duplicating widget', async () => {
     render(<DummyWidget title="Dummy Widget" />);
 
-    const actionToggle = screen.getByTestId('widgetActionDropDown');
+    await openActionDropdown();
 
-    fireEvent.click(actionToggle);
     const duplicateBtn = screen.getByText('Duplicate');
 
     WidgetActions.duplicate = mockAction(jest.fn().mockResolvedValue(WidgetModel.builder().id('duplicatedWidgetId').build()));
@@ -197,22 +207,20 @@ describe('<Widget />', () => {
     await waitFor(() => expect(TitlesActions.set).toHaveBeenCalledWith(TitleTypes.Widget, 'duplicatedWidgetId', 'Dummy Widget (copy)'));
   });
 
-  it('does not display export action if widget is not a message table', () => {
+  it('does not display export action if widget is not a message table', async () => {
     const dummyWidget = WidgetModel.builder()
       .id('widgetId')
       .type('dummy')
       .config({})
       .build();
-    const { getByTestId, queryByText } = render(<DummyWidget title="Dummy Widget" widget={dummyWidget} />);
+    const { queryByText } = render(<DummyWidget title="Dummy Widget" widget={dummyWidget} />);
 
-    const actionToggle = getByTestId('widgetActionDropDown');
-
-    fireEvent.click(actionToggle);
+    await openActionDropdown();
 
     expect(queryByText('Export')).toBeNull();
   });
 
-  it('allows export for message tables', () => {
+  it('allows export for message tables', async () => {
     const messagesWidget = MessagesWidget.builder()
       .id('widgetId')
       .config({})
@@ -220,9 +228,7 @@ describe('<Widget />', () => {
 
     render(<DummyWidget title="Dummy Widget" widget={messagesWidget} />);
 
-    const actionToggle = screen.getByTestId('widgetActionDropDown');
-
-    fireEvent.click(actionToggle);
+    await openActionDropdown();
 
     const exportButton = screen.getByText('Export');
 
@@ -246,11 +252,11 @@ describe('<Widget />', () => {
         .build());
     });
 
-    const renderAndClick = () => {
+    const renderAndClick = async () => {
       render(<DummyWidget />);
-      const actionToggle = screen.getByTestId('widgetActionDropDown');
 
-      fireEvent.click(actionToggle);
+      await openActionDropdown();
+
       const copyToDashboard = screen.getByText('Copy to Dashboard');
 
       fireEvent.click(copyToDashboard);
@@ -263,21 +269,21 @@ describe('<Widget />', () => {
     };
 
     it('should get dashboard from backend', async () => {
-      renderAndClick();
+      await renderAndClick();
       await waitFor(() => expect(ViewManagementActions.get).toHaveBeenCalledTimes(1));
 
       expect(ViewManagementActions.get).toHaveBeenCalledWith('view-1');
     });
 
     it('should get corresponding search to dashboard', async () => {
-      renderAndClick();
+      await renderAndClick();
       await waitFor(() => expect(SearchActions.get).toHaveBeenCalledTimes(1));
 
       expect(SearchActions.get).toHaveBeenCalledWith('search-1');
     });
 
     it('should create new search for dashboard', async () => {
-      renderAndClick();
+      await renderAndClick();
       await waitFor(() => expect(SearchActions.create).toHaveBeenCalledTimes(1));
 
       expect(SearchActions.create).toHaveBeenCalledWith(Search.builder().id('search-id').parameters([]).queries([])
@@ -285,7 +291,7 @@ describe('<Widget />', () => {
     });
 
     it('should update dashboard with new search and widget', async () => {
-      renderAndClick();
+      await renderAndClick();
       await waitFor(() => expect(ViewManagementActions.update).toHaveBeenCalledTimes(1));
 
       expect(ViewManagementActions.update).toHaveBeenCalledWith(
@@ -297,10 +303,124 @@ describe('<Widget />', () => {
     });
 
     it('should redirect to updated dashboard', async () => {
-      renderAndClick();
+      await renderAndClick();
       await waitFor(() => expect(loadDashboard).toHaveBeenCalled());
 
       expect(loadDashboard).toHaveBeenCalledWith('view-1');
+    });
+  });
+
+  describe('delete action', () => {
+    let oldWindowConfirm;
+
+    beforeEach(() => {
+      asMock(WidgetActions.remove).mockClear();
+      oldWindowConfirm = window.confirm;
+      window.confirm = jest.fn();
+    });
+
+    afterEach(() => {
+      window.confirm = oldWindowConfirm;
+    });
+
+    it('should delete widget when no deletion hook is installed and prompt is confirmed', async () => {
+      asMock(window.confirm).mockReturnValue(true);
+
+      render(<DummyWidget />);
+
+      await openActionDropdown();
+
+      fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+
+      await waitFor(() => expect(WidgetActions.remove).toHaveBeenCalledWith('widget-id'));
+    });
+
+    it('should not delete widget when no deletion hook is installed and prompt is cancelled', async () => {
+      asMock(window.confirm).mockReturnValue(false);
+
+      render(<DummyWidget />);
+
+      await openActionDropdown();
+
+      fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+
+      await waitFor(() => expect(window.confirm).toHaveBeenCalled());
+
+      expect(WidgetActions.remove).not.toHaveBeenCalled();
+    });
+
+    describe('with custom deletion hook', () => {
+      const deletingWidgetHook = jest.fn();
+      const plugin = {
+        exports: {
+          'views.hooks.confirmDeletingWidget': [deletingWidgetHook],
+        },
+      };
+
+      beforeEach(() => {
+        PluginStore.register(plugin);
+      });
+
+      afterEach(() => {
+        PluginStore.unregister(plugin);
+        asMock(deletingWidgetHook).mockClear();
+      });
+
+      it('should delete widget when deletion hook is installed that returns true', async () => {
+        asMock(deletingWidgetHook).mockResolvedValue(true);
+        asMock(window.confirm).mockReturnValue(null);
+
+        render(<DummyWidget />);
+
+        await openActionDropdown();
+
+        fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+
+        await waitFor(() => expect(WidgetActions.remove).toHaveBeenCalledWith('widget-id'));
+
+        expect(deletingWidgetHook).toHaveBeenCalled();
+      });
+
+      it('should not delete widget when deletion hook is installed that returns false', async () => {
+        asMock(deletingWidgetHook).mockResolvedValue(false);
+        asMock(window.confirm).mockReturnValue(null);
+
+        render(<DummyWidget />);
+
+        await openActionDropdown();
+
+        fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+
+        expect(WidgetActions.remove).not.toHaveBeenCalledWith('widget-id');
+
+        expect(deletingWidgetHook).toHaveBeenCalled();
+      });
+
+      it('should skip custom deletion hook if it throws exception', async () => {
+        const e = new Error('Boom!');
+        asMock(deletingWidgetHook).mockRejectedValue(e);
+        asMock(window.confirm).mockReturnValue(true);
+
+        render(<DummyWidget />);
+
+        await openActionDropdown();
+
+        fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+
+        /* eslint-disable no-console */
+        const oldConsoleTrace = console.trace;
+        console.trace = jest.fn();
+
+        await waitFor(() => expect(WidgetActions.remove).toHaveBeenCalledWith('widget-id'));
+
+        expect(console.trace).toHaveBeenCalledWith('Exception occurred in deletion confirmation hook: ', e);
+
+        expect(deletingWidgetHook).toHaveBeenCalled();
+        expect(window.confirm).toHaveBeenCalled();
+
+        console.trace = oldConsoleTrace;
+        /* eslint-enable no-console */
+      });
     });
   });
 });

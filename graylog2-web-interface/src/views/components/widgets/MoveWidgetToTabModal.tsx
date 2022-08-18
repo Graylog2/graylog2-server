@@ -23,7 +23,7 @@ import { useStore } from 'stores/connect';
 import QueryTitle from 'views/logic/queries/QueryTitle';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { QueryIdsStore } from 'views/stores/QueryIdsStore';
-import View from 'views/logic/views/View';
+import type View from 'views/logic/views/View';
 
 type Props = {
   view: View,

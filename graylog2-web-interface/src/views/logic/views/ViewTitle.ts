@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { ViewType } from 'views/logic/views/View';
+import type { ViewType } from 'views/logic/views/View';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 
 export default (title: string, type: ViewType) => title ?? `Unsaved ${ViewTypeLabel({ type, capitalize: true })}`;

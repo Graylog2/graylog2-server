@@ -23,7 +23,7 @@ import type { Store } from 'stores/StoreTypes';
 import Search from 'views/logic/search/Search';
 import { QueriesActions } from 'views/actions/QueriesActions';
 import type { QueryId, TimeRange, TimeRangeTypes } from 'views/logic/queries/Query';
-import Query from 'views/logic/queries/Query';
+import type Query from 'views/logic/queries/Query';
 import { singletonStore } from 'logic/singleton';
 
 import { ViewActions, ViewStore } from './ViewStore';
@@ -93,6 +93,17 @@ export const QueriesStore: QueriesStoreType = singletonStore(
 
       return promise;
     },
+
+    // Similar to the update action, but it is skipping the equality check.
+    forceUpdate(queryId: QueryId, query: Query) {
+      const newQueries = this.queries.set(queryId, query);
+      const promise: Promise<QueriesList> = this._propagateQueryChange(newQueries).then(() => newQueries);
+
+      QueriesActions.forceUpdate.promise(promise);
+
+      return promise;
+    },
+
     update(queryId: QueryId, query: Query) {
       const newQueries = this.queries.set(queryId, query);
       const promise: Promise<QueriesList> = this.queries.get(queryId).equals(query)

@@ -18,9 +18,9 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import selectEvent from 'react-select-event';
 import { render, fireEvent, waitFor, screen, act } from 'wrappedTestingLibrary';
+
 import { alice } from 'fixtures/users';
 import { manager as assignedRole1, reader as assignedRole2, reportCreator as notAssignedRole } from 'fixtures/roles';
-
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 
 import RolesSection from './RolesSection';
@@ -28,8 +28,14 @@ import RolesSection from './RolesSection';
 const exampleUser = alice.toBuilder()
   .roles(Immutable.Set([assignedRole1.name]))
   .build();
-const mockRolesForUserPromise = Promise.resolve({ list: Immutable.List([assignedRole1]), pagination: { page: 1, perPage: 10, total: 1 } });
-const mockLoadRolesPromise = Promise.resolve({ list: Immutable.List([notAssignedRole]), pagination: { page: 1, perPage: 10, total: 1 } });
+const mockRolesForUserPromise = Promise.resolve({
+  list: Immutable.List([assignedRole1]),
+  pagination: { page: 1, perPage: 10, total: 1 },
+});
+const mockLoadRolesPromise = Promise.resolve({
+  list: Immutable.List([notAssignedRole]),
+  pagination: { page: 1, perPage: 10, total: 1 },
+});
 
 jest.mock('stores/roles/AuthzRolesStore', () => ({
   AuthzRolesActions: {
@@ -45,7 +51,7 @@ describe('<RolesSection />', () => {
 
   it('should assigning a role', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const onSubmitStub = jest.fn((data: { roles: string[]}) => Promise.resolve());
+    const onSubmitStub = jest.fn((_data: { roles: string[] }) => Promise.resolve());
     render(<RolesSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
     await act(() => mockRolesForUserPromise.then());
     await act(() => mockLoadRolesPromise.then());
@@ -63,7 +69,7 @@ describe('<RolesSection />', () => {
 
   it('should filter assigned roles', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const onSubmitStub = jest.fn((data: { roles: string[]}) => Promise.resolve());
+    const onSubmitStub = jest.fn((_data: { roles: string[] }) => Promise.resolve());
     render(<RolesSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
     await act(() => mockRolesForUserPromise.then());
     await act(() => mockLoadRolesPromise.then());
@@ -76,7 +82,11 @@ describe('<RolesSection />', () => {
 
     await waitFor(() => expect(AuthzRolesActions.loadRolesForUser).toHaveBeenCalledTimes(2));
 
-    expect(AuthzRolesActions.loadRolesForUser).toHaveBeenCalledWith(exampleUser.username, { page: 1, perPage: 5, query: 'name of an assigned role' });
+    expect(AuthzRolesActions.loadRolesForUser).toHaveBeenCalledWith(exampleUser.username, {
+      page: 1,
+      perPage: 5,
+      query: 'name of an assigned role',
+    });
   });
 
   it('should unassign a role', async () => {
@@ -84,7 +94,7 @@ describe('<RolesSection />', () => {
       .roles(Immutable.Set([assignedRole1.name, assignedRole2.name]))
       .build();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const onSubmitStub = jest.fn((data: { roles: string[]}) => Promise.resolve());
+    const onSubmitStub = jest.fn((_data: { roles: string[] }) => Promise.resolve());
     render(<RolesSection user={newExampleUser} onSubmit={(data) => onSubmitStub(data)} />);
     await act(() => mockRolesForUserPromise.then());
     await act(() => mockLoadRolesPromise.then());

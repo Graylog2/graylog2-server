@@ -17,7 +17,8 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 
-import withLocation, { Location } from 'routing/withLocation';
+import type { Location } from 'routing/withLocation';
+import withLocation from 'routing/withLocation';
 import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
 import { ViewStore } from 'views/stores/ViewStore';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';

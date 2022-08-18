@@ -21,10 +21,10 @@ import { AggregationType, AggregationResult } from 'views/components/aggregation
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
+import useChartData from 'views/components/visualizations/useChartData';
 
-import type { ChartDefinition, ExtractedSeries } from '../ChartData';
+import type { ChartDefinition, ExtractedSeries, ValuesBySeries } from '../ChartData';
 import GenericPlot from '../GenericPlot';
-import { chartData, ValuesBySeries } from '../ChartData';
 
 const _generateSeriesTitles = (config, x, y) => {
   const seriesTitles = config.series.map((s) => s.function);
@@ -39,7 +39,7 @@ const _generateSeriesTitles = (config, x, y) => {
   return y.map(() => columnSeriesTitles);
 };
 
-const _heatmapGenerateSeries = (type, name, x, y, z, idx, total, config, visualizationConfig): ChartDefinition => {
+const _heatmapGenerateSeries = (type, name, x, y, z, idx, _total, config, visualizationConfig): ChartDefinition => {
   const xAxisTitle = get(config, ['rowPivots', idx, 'field']);
   const yAxisTitle = get(config, ['columnPivots', idx, 'field']);
   const zSeriesTitles = _generateSeriesTitles(config, y, x);
@@ -73,14 +73,23 @@ const _fillUpMatrix = (z: Array<Array<any>>, xLabels: Array<any>, defaultValue =
 };
 
 const _transposeMatrix = (z: Array<Array<any>> = []) => {
-  if (!z[0]) { return z; }
+  if (!z[0]) {
+    return z;
+  }
 
-  return z[0].map((_, c) => { return z.map((r) => { return r[c]; }); });
+  return z[0].map((_, c) => {
+    return z.map((r) => {
+      return r[c];
+    });
+  });
 };
 
 const _findSmallestValue = (valuesFound: Array<Array<number>>) => valuesFound.reduce((result, valueArray) => valueArray.reduce((acc, value) => (acc > value ? value : acc), result), (valuesFound[0] || [])[0]);
 
-const _formatSeries = (visualizationConfig) => ({ valuesBySeries, xLabels }: {valuesBySeries: ValuesBySeries, xLabels: Array<any>}): ExtractedSeries => {
+const _formatSeries = (visualizationConfig) => ({
+  valuesBySeries,
+  xLabels,
+}: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }): ExtractedSeries => {
   const valuesFoundBySeries = values(valuesBySeries);
   // When using the hovertemplate, we need to provie a value for empty z values.
   // Otherwise plotly would throw errors when hovering over a field.
@@ -131,7 +140,13 @@ const _leafSourceMatcher = ({ source }) => source.endsWith('leaf') && source !==
 const HeatmapVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || HeatmapVisualizationConfig.empty()) as HeatmapVisualizationConfig;
   const rows = retrieveChartData(data);
-  const heatmapData = chartData(config, rows, 'heatmap', _generateSeries(visualizationConfig), _formatSeries(visualizationConfig), _leafSourceMatcher);
+  const heatmapData = useChartData(rows, {
+    widgetConfig: config,
+    chartType: 'heatmap',
+    generator: _generateSeries(visualizationConfig),
+    seriesFormatter: _formatSeries(visualizationConfig),
+    leafValueMatcher: _leafSourceMatcher,
+  });
   const layout = _chartLayout(heatmapData);
 
   return (

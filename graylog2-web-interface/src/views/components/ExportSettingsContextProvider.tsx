@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
-import ExportSettingsContext, { ExportSettings } from 'views/components/ExportSettingsContext';
+import type { ExportSettings } from 'views/components/ExportSettingsContext';
+import ExportSettingsContext from 'views/components/ExportSettingsContext';
 
 type Props = {
   children: React.ReactNode,
@@ -26,8 +27,12 @@ type Props = {
 const ExportSettingsContextProvider = ({ children }: Props) => {
   const [exportSettings, setExportSettings] = useState<ExportSettings>();
 
+  const exportSettingsContextValue = useMemo(() => ({
+    settings: exportSettings, setSettings: setExportSettings,
+  }), [exportSettings]);
+
   return (
-    <ExportSettingsContext.Provider value={{ settings: exportSettings, setSettings: setExportSettings }}>
+    <ExportSettingsContext.Provider value={exportSettingsContextValue}>
       {children}
     </ExportSettingsContext.Provider>
   );

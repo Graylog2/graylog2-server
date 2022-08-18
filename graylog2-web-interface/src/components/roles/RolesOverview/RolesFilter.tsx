@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
 import { SearchForm } from 'components/common';
 import type { Pagination } from 'stores/PaginationTypes';

@@ -18,8 +18,8 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as PropTypes from 'prop-types';
 
-import { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
-import Role from 'logic/roles/Role';
+import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
+import type Role from 'logic/roles/Role';
 import { ReadOnlyFormGroup } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 

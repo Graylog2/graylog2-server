@@ -24,7 +24,7 @@ import { UsersActions } from 'stores/users/UsersStore';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
-import UserOverview from 'logic/users/UserOverview';
+import type UserOverview from 'logic/users/UserOverview';
 
 import UserOverviewItem from './UserOverviewItem';
 import UsersFilter from './UsersFilter';
@@ -62,7 +62,7 @@ const StyledPaginatedList = styled(PaginatedList)`
 `;
 
 const _headerCellFormatter = (header) => {
-  switch (header.toLocaleLowerCase()) {
+  switch (header.toLowerCase()) {
     case 'client address':
       return <ClientAddressHead title={header} />;
     case 'actions':

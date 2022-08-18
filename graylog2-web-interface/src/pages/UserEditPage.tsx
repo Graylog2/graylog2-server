@@ -26,7 +26,7 @@ import UserEdit from 'components/users/UserEdit';
 import DocumentationLink from 'components/support/DocumentationLink';
 import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 
 type Props = {
   params: {

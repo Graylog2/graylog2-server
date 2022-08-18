@@ -46,9 +46,9 @@ public class NodeImpl extends PersistedImpl implements Node {
     }
 
     @Override
-    @JsonProperty("is_master")
-    public boolean isMaster() {
-        return (Boolean) fields.get("is_master");
+    @JsonProperty("is_leader")
+    public boolean isLeader() {
+        return (boolean) fields.get("is_leader");
     }
 
     @Override
@@ -91,5 +91,4 @@ public class NodeImpl extends PersistedImpl implements Node {
     public Map<String, Validator> getEmbeddedValidations(String key) {
         return Collections.emptyMap();
     }
-
 }

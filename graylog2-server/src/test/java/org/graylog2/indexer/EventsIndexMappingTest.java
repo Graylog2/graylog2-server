@@ -21,6 +21,7 @@ import com.github.zafarkhaja.semver.Version;
 import com.revinate.assertj.json.JsonPathAssert;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.storage.SearchVersion;
 import org.graylog2.utilities.AssertJsonPath;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -43,7 +44,7 @@ public class EventsIndexMappingTest {
             "7.0.0"
     })
     void createsValidMappingTemplates(String versionString) throws Exception {
-        final Version version = Version.valueOf(versionString);
+        final SearchVersion version = SearchVersion.elasticsearch(versionString);
         final IndexMappingTemplate mapping = new EventIndexTemplateProvider().create(version, null);
 
         assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*"), at -> {
@@ -63,7 +64,7 @@ public class EventsIndexMappingTest {
         AssertJsonPath.assertJsonPath(objectMapper.writeValueAsString(map), consumer);
     }
 
-    private void assertStandardMappingValues(JsonPathAssert at, Version version) {
+    private void assertStandardMappingValues(JsonPathAssert at, SearchVersion version) {
         at.jsonPathAsString("$.settings['index.refresh_interval']").isEqualTo("1s");
 
         at.jsonPathAsBoolean(keyFor("_source.enabled", version)).isTrue();
@@ -102,16 +103,16 @@ public class EventsIndexMappingTest {
         at.jsonPathAsString(keyFor("properties.triggered_jobs.type", version)).isEqualTo("keyword");
     }
 
-    private String dateFormat(Version version) {
-        if (version.greaterThanOrEqualTo(Version.valueOf("7.0.0"))) {
+    private String dateFormat(SearchVersion version) {
+        if (version.version().greaterThanOrEqualTo(Version.valueOf("7.0.0"))) {
             return "uuuu-MM-dd HH:mm:ss.SSS";
         }
 
         return "8yyyy-MM-dd HH:mm:ss.SSS";
     }
 
-    private String keyFor(String keySuffix, Version version) {
-        if (version.greaterThanOrEqualTo(Version.valueOf("7.0.0"))) {
+    private String keyFor(String keySuffix, SearchVersion version) {
+        if (version.version().greaterThanOrEqualTo(Version.valueOf("7.0.0"))) {
             return "$.mappings." + keySuffix;
         }
         return "$.mappings.message." + keySuffix;

@@ -19,7 +19,7 @@ import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
 import { FormikFormGroup } from 'components/common';
-import { WidgetConfigFormValues } from 'views/components/aggregationwizard';
+import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 
 import Direction from './configuration/Direction';
 import FieldComponent from './configuration/FieldComponent';

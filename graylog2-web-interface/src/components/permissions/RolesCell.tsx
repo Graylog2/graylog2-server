@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 
 import { Label } from 'components/bootstrap';
 

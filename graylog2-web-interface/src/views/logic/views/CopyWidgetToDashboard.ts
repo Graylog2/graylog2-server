@@ -17,19 +17,17 @@
 import { List, Map } from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import Widget from 'views/logic/widgets/Widget';
+import type Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
-import Query from 'views/logic/queries/Query';
+import type Query from 'views/logic/queries/Query';
 import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import TitleTypes from 'views/stores/TitleTypes';
 
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 
 type QueryId = string;
-
-export type CopyWidgetToDashboardHook = (widgetId: string, search: View, dashboard: View) => View;
 
 const _newPositionsMap = (oldPosition, widgetPositions, widget, widgets) => {
   const widgetPositionsMap = oldPosition ? {
@@ -85,7 +83,7 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
 
   if (match) {
     const [widget, queryId] = match;
-    const { timerange, query, filter = Map() } = queryMap.get(queryId);
+    const { timerange, query, filter = Map(), filters } = queryMap.get(queryId);
     const { widgetPositions } = search.state.get(queryId);
     const oldPositions = widgetPositions[widgetId];
     const title = search.state.get(queryId).titles.get(TitleTypes.Widget).get(widgetId);
@@ -101,6 +99,7 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
       .timerange(timerange)
       .query(query)
       .streams(streams)
+      .filters(filters)
       .build();
 
     const updatedView = UpdateSearchForWidgets(_addWidgetToDashboard(dashboardWidget, dashboard, oldPositions, title));

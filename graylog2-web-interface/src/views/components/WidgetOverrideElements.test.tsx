@@ -16,6 +16,7 @@
  */
 import React, { useEffect } from 'react';
 import { render } from 'wrappedTestingLibrary';
+
 import suppressConsole from 'helpers/suppressConsole';
 
 import WidgetOverrideElements from './WidgetOverrideElements';

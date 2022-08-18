@@ -17,8 +17,8 @@
 import * as Immutable from 'immutable';
 
 import highlightConditionFunctions from 'views/logic/views/formatting/highlighting/highlightConditionFunctions';
+import type { HighlightingColorJson } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import HighlightingColor, {
-  HighlightingColorJson,
   StaticColor,
 } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
@@ -36,7 +36,7 @@ export const ConditionLabelMap = {
   greater: '>',
 };
 
-export type Value = string;
+export type Value = string | number | boolean;
 export type Color = HighlightingColor;
 export type Condition = keyof typeof ConditionLabelMap;
 

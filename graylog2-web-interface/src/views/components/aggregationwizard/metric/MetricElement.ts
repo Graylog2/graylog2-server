@@ -14,14 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 
 import MetricsConfiguration from './MetricsConfiguration';
 
 import type { AggregationElement } from '../AggregationElementType';
-import { WidgetConfigFormValues, MetricFormValues } from '../WidgetConfigForm';
+import type { WidgetConfigFormValues, MetricFormValues } from '../WidgetConfigForm';
 
 type MetricError = {
   function?: string,
@@ -29,7 +30,7 @@ type MetricError = {
   percentile?: string,
 };
 
-const hasErrors = <T extends {}>(errors: Array<T>): boolean => {
+const hasErrors = <T extends {}> (errors: Array<T>): boolean => {
   return errors.filter((error) => Object.keys(error).length > 0).length > 0;
 };
 
@@ -103,7 +104,7 @@ const MetricElement: AggregationElement = {
     .series(metricsToSeries(formValues.metrics)),
   onRemove: ((index, formValues) => ({
     ...formValues,
-    metrics: formValues.metrics.filter((value, i) => index !== i),
+    metrics: formValues.metrics.filter((_value, i) => index !== i),
   })),
   component: MetricsConfiguration,
   validate: validateMetrics,

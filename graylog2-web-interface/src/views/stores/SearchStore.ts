@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 import Bluebird from 'bluebird';
 import { debounce, get, isEqual } from 'lodash';
 
-import { Store } from 'stores/StoreTypes';
+import type { Store } from 'stores/StoreTypes';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -26,18 +26,19 @@ import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { runSearchJob, searchJobStatus } from 'views/stores/SearchJobs';
 import { ViewStore, ViewActions } from 'views/stores/ViewStore';
 import SearchResult from 'views/logic/SearchResult';
-import SearchActions, { WidgetsToSearch } from 'views/actions/SearchActions';
+import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
-import type { CreateSearchResponse, SearchId, SearchExecutionResult } from 'views/actions/SearchActions';
+import type { CreateSearchResponse, SearchId, SearchExecutionResult, WidgetsToSearch } from 'views/actions/SearchActions';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import View from 'views/logic/views/View';
-import Parameter from 'views/logic/parameters/Parameter';
+import type View from 'views/logic/views/View';
+import type Parameter from 'views/logic/parameters/Parameter';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { singletonStore } from 'logic/singleton';
-import { SearchErrorResponse } from 'views/logic/SearchError';
+import type { SearchErrorResponse } from 'views/logic/SearchError';
+import type CancellablePromise from 'logic/rest/CancellablePromise';
 
 const createSearchUrl = qualifyUrl('/views/search');
 
@@ -104,6 +105,7 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
         this._trigger();
       }
     },
+
     onSearchExecutionStateUpdate(executionState: SearchExecutionState) {
       this.executionState = executionState;
     },
@@ -138,6 +140,13 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
       return promise;
     },
 
+    refresh() {
+      const promise = Promise.resolve();
+      SearchActions.refresh.promise(promise);
+
+      return promise;
+    },
+
     trackJobStatus(job: SearchJobResult, search: Search) {
       return new Bluebird((resolve) => {
         if (job && job.execution.done) {
@@ -161,7 +170,7 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
       return this._executePromise(executionState, startActionPromise, handleSearchResult);
     },
 
-    reexecuteSearchTypes(searchTypes: SearchTypeOptions, effectiveTimerange?: TimeRange): Promise<SearchExecutionResult> {
+    reexecuteSearchTypes(searchTypes: SearchTypeOptions, effectiveTimerange?: TimeRange): CancellablePromise<SearchExecutionResult> {
       const { parameterBindings, globalOverride } = this.executionState;
       const searchTypeIds = Object.keys(searchTypes);
       const globalQuery = globalOverride && globalOverride.query ? globalOverride.query : undefined;

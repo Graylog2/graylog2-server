@@ -16,6 +16,19 @@
  */
 package org.graylog.plugins.map;
 
+import com.google.inject.Scopes;
+import com.google.inject.TypeLiteral;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.name.Names;
+import org.graylog.plugins.map.geoip.GeoAsnInformation;
+import org.graylog.plugins.map.geoip.GeoIpDbFileChangeMonitorService;
+import org.graylog.plugins.map.geoip.GeoIpResolver;
+import org.graylog.plugins.map.geoip.GeoIpResolverFactory;
+import org.graylog.plugins.map.geoip.GeoLocationInformation;
+import org.graylog.plugins.map.geoip.IpInfoIpAsnResolver;
+import org.graylog.plugins.map.geoip.IpInfoLocationResolver;
+import org.graylog.plugins.map.geoip.MaxMindIpAsnResolver;
+import org.graylog.plugins.map.geoip.MaxMindIpLocationResolver;
 import org.graylog.plugins.map.geoip.MaxmindDataAdapter;
 import org.graylog.plugins.map.geoip.processor.GeoIpProcessor;
 import org.graylog2.plugin.PluginModule;
@@ -28,5 +41,20 @@ public class MapWidgetModule extends PluginModule {
                 MaxmindDataAdapter.class,
                 MaxmindDataAdapter.Factory.class,
                 MaxmindDataAdapter.Config.class);
+
+        //Create TypeLiterals to specify method type parameters
+        TypeLiteral<GeoIpResolver<GeoLocationInformation>> mmCityTl = new TypeLiteral<GeoIpResolver<GeoLocationInformation>>() {};
+        TypeLiteral<GeoIpResolver<GeoAsnInformation>> mmAsnTl = new TypeLiteral<GeoIpResolver<GeoAsnInformation>>() {};
+        TypeLiteral<GeoIpResolver<GeoLocationInformation>> ipinfoCityTl = new TypeLiteral<GeoIpResolver<GeoLocationInformation>>() {};
+        TypeLiteral<GeoIpResolver<GeoAsnInformation>> ipInfoAsnTl = new TypeLiteral<GeoIpResolver<GeoAsnInformation>>() {};
+
+        install(new FactoryModuleBuilder()
+                .implement(mmCityTl, Names.named("MAXMIND_CITY"), MaxMindIpLocationResolver.class)
+                .implement(mmAsnTl, Names.named("MAXMIND_ASN"), MaxMindIpAsnResolver.class)
+                .implement(ipinfoCityTl, Names.named("IPINFO_CITY"), IpInfoLocationResolver.class)
+                .implement(ipInfoAsnTl, Names.named("IPINFO_ASN"), IpInfoIpAsnResolver.class)
+                .build(GeoIpResolverFactory.class));
+
+        serviceBinder().addBinding().to(GeoIpDbFileChangeMonitorService.class).in(Scopes.SINGLETON);
     }
 }

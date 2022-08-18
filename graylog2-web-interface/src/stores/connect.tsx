@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { isFunction } from 'lodash';
-import { Optional } from 'utility-types';
+import type { Optional } from 'utility-types';
 
 import isDeepEqual from './isDeepEqual';
 
@@ -30,14 +30,16 @@ export type ExtractStoreState<Store> = Store extends StoreType<infer V> ? V : ne
 
 export type ResultType<Stores> = { [K in keyof Stores]: ExtractStoreState<Stores[K]> };
 
-type PropsWithDefaults<C extends React.ComponentType> = JSX.LibraryManagedAttributes<C, React.ComponentProps<C>>;
+type ReplaceUnknownWithEmptyObject<T> = T;
+
+type PropsWithDefaults<C extends React.ComponentType> = JSX.LibraryManagedAttributes<C, ReplaceUnknownWithEmptyObject<React.ComponentProps<C>>>;
 
 type PropsMapper<V, R> = (props: V) => R;
 
-const id = <V, >(x: V): V => x;
+const id = <V, > (x: V): V => x;
 
-export function useStore<U>(store: StoreType<U>): U;
-export function useStore<U, M extends (props: U) => any>(store: StoreType<U>, propsMapper: M): ReturnType<M>;
+export function useStore<U> (store: StoreType<U>): U;
+export function useStore<U, M extends (props: U) => any> (store: StoreType<U>, propsMapper: M): ReturnType<M>;
 
 export function useStore(store, propsMapper = id) {
   const [storeState, setStoreState] = useState(() => store.getInitialState());
@@ -59,6 +61,11 @@ export function useStore(store, propsMapper = id) {
 
   return mappedStoreState;
 }
+
+// @ts-expect-error
+type ConnectedProps<C, NewProps> = Optional<PropsWithDefaults<C>, keyof NewProps>;
+
+type ConnectedComponent<C, NewProps> = React.ComponentType<ConnectedProps<C, NewProps>>;
 
 /**
  * Generating a higher order component wrapping an ES6 React component class, connecting it to the supplied stores.
@@ -86,29 +93,28 @@ export function useStore(store, propsMapper = id) {
  *
  */
 
-function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores extends object>(
+function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores extends object> (
   Component: C,
-  stores: Stores
-): React.ComponentType<Optional<PropsWithDefaults<C>, keyof Stores>>;
+  stores: Stores,
+): ConnectedComponent<C, Stores>;
 
-function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores extends object, MappedProps extends object>(
-    Component: C,
-    stores: Stores,
-    mapProps: PropsMapper<ResultType<Stores>, MappedProps>
-): React.ComponentType<Optional<PropsWithDefaults<C>, keyof MappedProps>>;
+function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores extends object, MappedProps extends object> (
+  Component: C,
+  stores: Stores,
+  mapProps: PropsMapper<ResultType<Stores>, MappedProps>,
+): ConnectedComponent<C, MappedProps>;
 
-function connect<
-    C extends React.ComponentType<React.ComponentProps<C>>,
-    Stores,
-    MappedProps extends object,
-    >(
+function connect<C extends React.ComponentType<React.ComponentProps<C>>,
+  Stores,
+  MappedProps extends object,
+  >(
   Component: C,
   stores: Stores,
   mapProps: PropsMapper<ResultType<Stores>, MappedProps> = (props: ResultType<Stores>) => props as MappedProps,
-): React.ComponentType<Optional<PropsWithDefaults<C>, keyof MappedProps>> {
+): ConnectedComponent<C, MappedProps> {
   const wrappedComponentName = Component.displayName || Component.name || 'Unknown/Anonymous';
 
-  class ConnectStoresWrapper extends React.Component<Optional<PropsWithDefaults<C>, keyof MappedProps>> {
+  class ConnectStoresWrapper extends React.Component<ConnectedProps<C, MappedProps>> {
     // eslint-disable-next-line react/state-in-constructor
     state: ResultType<Stores>;
 

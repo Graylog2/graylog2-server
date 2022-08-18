@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
-import UserOverview from 'logic/users/UserOverview';
+import type UserOverview from 'logic/users/UserOverview';
 import { OverlayTrigger, Icon } from 'components/common';
 import { Popover } from 'components/bootstrap';
 

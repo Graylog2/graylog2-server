@@ -28,11 +28,11 @@ import io.searchbox.core.search.aggregation.FilterAggregation;
 import io.searchbox.core.search.aggregation.HistogramAggregation;
 import io.searchbox.core.search.aggregation.TermsAggregation;
 import io.searchbox.params.Parameters;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.BoolQueryBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
+import org.graylog.shaded.elasticsearch6.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
@@ -48,10 +48,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.existsQuery;
-import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.termsQuery;
+import static org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders.existsQuery;
+import static org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.graylog.shaded.elasticsearch6.org.elasticsearch.index.query.QueryBuilders.termsQuery;
 
 public class IndexToolsAdapterES6 implements IndexToolsAdapter {
     private static final String AGG_DATE_HISTOGRAM = "source_date_histogram";

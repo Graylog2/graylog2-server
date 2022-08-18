@@ -17,8 +17,9 @@
 
 import React from 'react';
 import { screen, render, waitFor } from 'wrappedTestingLibrary';
-import { dropdownField, requiredDropdownField } from 'fixtures/configurationforms';
 import userEvent from '@testing-library/user-event';
+
+import { dropdownField, requiredDropdownField } from 'fixtures/configurationforms';
 
 import DropdownField from './DropdownField';
 

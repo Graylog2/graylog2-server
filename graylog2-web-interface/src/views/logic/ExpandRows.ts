@@ -16,7 +16,7 @@
  */
 import { flatten, setWith } from 'lodash';
 
-import { ColLeaf, Leaf, NonLeaf, RowInner, RowLeaf } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type { ColLeaf, Leaf, NonLeaf, RowInner, RowLeaf } from 'views/logic/searchtypes/pivot/PivotHandler';
 
 type ResultEntry = Result | string | number;
 

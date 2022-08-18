@@ -47,11 +47,14 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
     const { field } = this.props;
 
     this.extractorRoutes = ExtractorUtils.getNewExtractorRoutes(gl2_source_node,
-      gl2_source_input, field, message.index, message.id);
+      gl2_source_input,
+      field,
+      message.index,
+      message.id);
   }
 
   /* eslint-disable-next-line react/no-unused-prop-types */
-  _renderOption = ({ label }: { label: string }) => <><strong>{label}</strong></>;
+  _renderOption = ({ label }: { label: string }) => <strong>{label}</strong>;
 
   _onSubmit = () => {
     const { onClose } = this.props;

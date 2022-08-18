@@ -24,7 +24,8 @@ import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import Rule, { ConditionLabelMap } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { ColorPickerPopover, IconButton } from 'components/common';
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
-import HighlightingColor, { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import type HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import ColorPreview from './ColorPreview';
 
@@ -68,7 +69,7 @@ const updateColor = (rule: Rule, newColor: HighlightingColor, hidePopover: () =>
   return HighlightingRulesActions.update(rule, { color: newColor }).then(hidePopover);
 };
 
-const onDelete = (rule) => {
+const onDelete = (rule: Rule) => {
   // eslint-disable-next-line no-alert
   if (window.confirm('Do you really want to remove this highlighting?')) {
     HighlightingRulesActions.remove(rule);
@@ -81,7 +82,7 @@ type RuleColorPreviewProps = {
 };
 
 const RuleColorPreview = ({ color, onChange }: RuleColorPreviewProps) => {
-  const _onChange = useCallback((newColor, ignored, hidePopover) => onChange(StaticColor.create(newColor), hidePopover), [onChange]);
+  const _onChange = useCallback((newColor: string, _ignored: React.ChangeEvent<HTMLInputElement>, hidePopover: () => void) => onChange(StaticColor.create(newColor), hidePopover), [onChange]);
 
   if (color.isStatic()) {
     return (

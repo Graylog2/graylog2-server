@@ -20,11 +20,11 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import type { RefluxActions } from 'stores/StoreTypes';
-import View from 'views/logic/views/View';
-import Parameter from 'views/logic/parameters/Parameter';
+import type View from 'views/logic/views/View';
+import type Parameter from 'views/logic/parameters/Parameter';
 import type { ViewJson } from 'views/logic/views/View';
 import { singletonActions, singletonStore } from 'logic/singleton';
-import { Pagination } from 'stores/PaginationTypes';
+import type { Pagination } from 'stores/PaginationTypes';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 export type SortOrder = 'asc' | 'desc';

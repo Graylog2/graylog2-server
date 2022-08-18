@@ -22,22 +22,20 @@ import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 
 import CurrentUserPreferencesProvider from './CurrentUserPreferencesProvider';
 import CurrentUserProvider from './CurrentUserProvider';
-import TimeLocalizeProvider from './TimeLocalizeProvider';
+import UserDateTimeProvider from './UserDateTimeProvider';
 
-const ThemeAndUserProvider = ({ children }) => {
-  return (
-    <CurrentUserProvider>
-      <TimeLocalizeProvider>
-        <CurrentUserPreferencesProvider>
-          <GraylogThemeProvider>
-            <GlobalThemeStyles />
-            {children}
-          </GraylogThemeProvider>
-        </CurrentUserPreferencesProvider>
-      </TimeLocalizeProvider>
-    </CurrentUserProvider>
-  );
-};
+const ThemeAndUserProvider = ({ children }) => (
+  <CurrentUserProvider>
+    <UserDateTimeProvider>
+      <CurrentUserPreferencesProvider>
+        <GraylogThemeProvider>
+          <GlobalThemeStyles />
+          {children}
+        </GraylogThemeProvider>
+      </CurrentUserPreferencesProvider>
+    </UserDateTimeProvider>
+  </CurrentUserProvider>
+);
 
 ThemeAndUserProvider.propTypes = {
   children: PropTypes.any.isRequired,

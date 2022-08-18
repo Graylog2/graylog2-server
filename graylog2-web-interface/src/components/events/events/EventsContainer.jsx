@@ -161,8 +161,7 @@ export default connect(EventsContainer, {
   events: EventsStore,
   eventDefinitions: EventDefinitionsStore,
   currentUser: CurrentUserStore,
-},
-({ currentUser, ...otherProps }) => ({
+}, ({ currentUser, ...otherProps }) => ({
   ...otherProps,
   currentUser: currentUser.currentUser,
 }));

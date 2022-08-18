@@ -16,7 +16,7 @@
  */
 import type { QueryId } from './Query';
 
-import View from '../views/View';
+import type View from '../views/View';
 import ViewState from '../views/ViewState';
 
 const queryTitle = (view: View, queryId: QueryId): string | undefined | null => (view && view.search && view.search.queries

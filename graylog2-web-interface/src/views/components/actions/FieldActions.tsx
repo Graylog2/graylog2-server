@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
-import FieldType from 'views/logic/fieldtypes/FieldType';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
 import Action from 'views/components/actions/Action';

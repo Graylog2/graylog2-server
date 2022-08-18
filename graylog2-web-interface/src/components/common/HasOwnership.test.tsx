@@ -17,9 +17,9 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render } from 'wrappedTestingLibrary';
-import { alice as currentUser } from 'fixtures/users';
 
-import User from 'logic/users/User';
+import { alice as currentUser } from 'fixtures/users';
+import type User from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { createGRN } from 'logic/permissions/GRN';
 

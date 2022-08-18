@@ -16,10 +16,11 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
+import { AdditionalContext } from 'views/logic/ActionContext';
 import { Link } from 'components/common/router';
 import { Col, Label, Row } from 'components/bootstrap';
 import StreamLink from 'components/streams/StreamLink';
@@ -27,14 +28,15 @@ import { MessageFields } from 'views/components/messagelist';
 import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 import { Icon, Spinner, Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
-import { Message } from 'views/components/messagelist/Types';
-import { Input } from 'components/messageloaders/Types';
-import { Stream } from 'views/stores/StreamsStore';
+import type { Message } from 'views/components/messagelist/Types';
+import type { Input } from 'components/messageloaders/Types';
+import type { Stream } from 'views/stores/StreamsStore';
 import CustomPropTypes from 'views/components/CustomPropTypes';
-import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import { useStore } from 'stores/connect';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import FormatReceivedBy from 'views/components/messagelist/FormatReceivedBy';
+import useIsLocalNode from 'views/hooks/useIsLocalNode';
 
 import MessageDetailProviders from './MessageDetailProviders';
 import MessageActions from './MessageActions';
@@ -59,7 +61,7 @@ type Props = {
   expandAllRenderAsync?: boolean,
   fields: FieldTypeMappingsList,
   inputs?: Immutable.Map<string, Input>,
-  message?: Message,
+  message: Message,
   showTimestamp?: boolean,
   streams?: Immutable.Map<string, Stream>,
 };
@@ -78,12 +80,14 @@ const MessageDetail = ({
 }: Props) => {
   const { searchesClusterConfig } = useStore(SearchConfigStore);
   const [showOriginal, setShowOriginal] = useState(false);
+  const { fields, index, id, decoration_stats: decorationStats } = message;
+  const { gl2_source_node, gl2_source_input } = fields;
+  const { isLocalNode } = useIsLocalNode(gl2_source_node);
+  const additionalContext = useMemo(() => ({ isLocalNode }), [isLocalNode]);
 
   const _toggleShowOriginal = () => {
     setShowOriginal(!showOriginal);
   };
-
-  const { fields, index, id, decoration_stats: decorationStats } = message;
 
   // Short circuit when all messages are being expanded at the same time
   if (expandAllRenderAsync) {
@@ -98,7 +102,6 @@ const MessageDetail = ({
 
   const streamIds = Immutable.Set(fields.streams as Array<string>);
   const streamsListItems = streamIds.map((streamId) => {
-    // eslint-disable-next-line react/destructuring-assignment
     const stream = streams.get(streamId);
 
     if (stream !== undefined) {
@@ -115,51 +118,56 @@ const MessageDetail = ({
     const rawTimestamp = fields.timestamp;
 
     timestamp.push(<dt key={`dt-${rawTimestamp}`}>Timestamp</dt>);
-    timestamp.push(<dd key={`dd-${rawTimestamp}`}><Timestamp dateTime={rawTimestamp} /></dd>);
+    timestamp.push(<dd key={`dd-${rawTimestamp}`}><Timestamp dateTime={rawTimestamp} format="complete" /></dd>);
   }
-
-  const { gl2_source_node, gl2_source_input } = fields;
 
   const messageTitle = _formatMessageTitle(index, id);
 
   return (
-    <MessageDetailProviders message={message}>
-      <>
-        <Row className="row-sm">
-          <Col md={12}>
-            <MessageActions index={index}
-                            id={id}
-                            fields={fields}
-                            decorationStats={decorationStats}
-                            disabled={disableMessageActions}
-                            disableSurroundingSearch={disableSurroundingSearch}
-                            disableTestAgainstStream={disableTestAgainstStream}
-                            showOriginal={showOriginal}
-                            toggleShowOriginal={_toggleShowOriginal}
-                            searchConfig={searchesClusterConfig}
-                            streams={allStreams} />
-            <MessageDetailsTitle>
-              <Icon name="envelope" />
-              &nbsp;
-              {messageTitle}
-            </MessageDetailsTitle>
-          </Col>
-        </Row>
-        <Row id={`sticky-augmentations-boundary-${message.id}`}>
-          <Col md={3}>
-            <MessageMetadata timestamp={timestamp}
-                             index={index}
-                             receivedBy={<FormatReceivedBy inputs={inputs} sourceNodeId={gl2_source_node} sourceInputId={gl2_source_input} />}
-                             streams={streamsListItems} />
-            <MessageAugmentations message={message} />
-          </Col>
-          <Col md={9}>
-            <MessageFields message={message}
-                           fields={messageFields} />
-          </Col>
-        </Row>
-      </>
-    </MessageDetailProviders>
+    <AdditionalContext.Provider value={additionalContext}>
+      <MessageDetailProviders message={message}>
+        <>
+          <Row className="row-sm">
+            <Col md={12}>
+              <MessageActions index={index}
+                              id={id}
+                              fields={fields}
+                              decorationStats={decorationStats}
+                              disabled={disableMessageActions}
+                              disableSurroundingSearch={disableSurroundingSearch}
+                              disableTestAgainstStream={disableTestAgainstStream}
+                              showOriginal={showOriginal}
+                              toggleShowOriginal={_toggleShowOriginal}
+                              searchConfig={searchesClusterConfig}
+                              streams={allStreams} />
+              <MessageDetailsTitle>
+                <Icon name="envelope" />
+                &nbsp;
+                {messageTitle}
+              </MessageDetailsTitle>
+            </Col>
+          </Row>
+          <Row id={`sticky-augmentations-boundary-${message.id}`}>
+            <Col md={3}>
+              <MessageMetadata timestamp={timestamp}
+                               index={index}
+                               receivedBy={(
+                                 <FormatReceivedBy isLocalNode={isLocalNode}
+                                                   inputs={inputs}
+                                                   sourceNodeId={gl2_source_node}
+                                                   sourceInputId={gl2_source_input} />
+                               )}
+                               streams={streamsListItems} />
+              <MessageAugmentations message={message} />
+            </Col>
+            <Col md={9}>
+              <MessageFields message={message}
+                             fields={messageFields} />
+            </Col>
+          </Row>
+        </>
+      </MessageDetailProviders>
+    </AdditionalContext.Provider>
   );
 };
 
@@ -171,7 +179,7 @@ MessageDetail.propTypes = {
   expandAllRenderAsync: PropTypes.bool,
   fields: ImmutablePropTypes.list,
   inputs: ImmutablePropTypes.map,
-  message: CustomPropTypes.Message,
+  message: CustomPropTypes.Message.isRequired,
   showTimestamp: PropTypes.bool,
   streams: ImmutablePropTypes.map,
 };
@@ -184,7 +192,6 @@ MessageDetail.defaultProps = {
   expandAllRenderAsync: false,
   fields: Immutable.List(),
   inputs: Immutable.Map(),
-  message: {} as Message,
   showTimestamp: true,
   streams: Immutable.Map(),
 };

@@ -17,10 +17,10 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
+
 import suppressConsole from 'helpers/suppressConsole';
 import { MockStore } from 'helpers/mocking';
 import MockAction from 'helpers/mocking/MockAction';
-
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';

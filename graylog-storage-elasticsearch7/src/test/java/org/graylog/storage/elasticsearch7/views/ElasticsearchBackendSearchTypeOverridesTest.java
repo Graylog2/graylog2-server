@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
@@ -72,6 +73,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
                             .series(Collections.singletonList(Average.builder().field("field1").build()))
                             .rollup(true)
                             .timerange(DerivedTimeRange.of(AbsoluteRange.create("2019-09-11T10:31:52.819Z", "2019-09-11T10:36:52.823Z")))
+                            .filters(Collections.singletonList(InlineQueryStringSearchFilter.builder().title("Pivot1 local filter").description("Pivot1 local filter").queryString("local:filter").build()))
                             .build()
             );
             add(
@@ -88,6 +90,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
                 .searchTypes(searchTypes)
                 .query(ElasticsearchQueryString.of("production:true"))
                 .filter(StreamFilter.ofId("stream1"))
+                .filters(Collections.singletonList(InlineQueryStringSearchFilter.builder().title("Global filter").description("Global filter").queryString("global:filter").build()))
                 .timerange(timeRangeForTest())
                 .build();
 
@@ -107,12 +110,12 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
         final DocumentContext pivot1 = parse(generatedRequest.get(0).source().toString());
         final DocumentContext pivot2 = parse(generatedRequest.get(1).source().toString());
 
-        assertThat(queryStrings(pivot1)).containsExactly("production:true");
+        assertThat(queryStrings(pivot1)).containsExactly("production:true", "global:filter", "local:filter");
         assertThat(timerangeFrom(pivot1)).containsExactly("2019-09-11 10:31:52.819");
         assertThat(timerangeTo(pivot1)).containsExactly("2019-09-11 10:36:52.823");
         assertThat(streams(pivot1)).containsExactly(Collections.singletonList("stream1"));
 
-        assertThat(queryStrings(pivot2)).containsExactly("production:true", "source:babbage");
+        assertThat(queryStrings(pivot2)).containsExactly("production:true", "global:filter", "source:babbage");
         assertThat(timerangeFrom(pivot2)).containsExactly("2018-08-23 08:02:00.247");
         assertThat(timerangeTo(pivot2)).containsExactly("2018-08-23 08:07:00.252");
         assertThat(streams(pivot2)).containsExactly(Collections.singletonList("stream1"));

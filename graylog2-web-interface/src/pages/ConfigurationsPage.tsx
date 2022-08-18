@@ -26,8 +26,9 @@ import MessageProcessorsConfig from 'components/configurations/MessageProcessors
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
+import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import 'components/maps/configurations';
-import { Store } from 'stores/StoreTypes';
+import type { Store } from 'stores/StoreTypes';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
@@ -43,6 +44,7 @@ const MESSAGE_PROCESSORS_CONFIG = 'org.graylog2.messageprocessors.MessageProcess
 const SIDECAR_CONFIG = 'org.graylog.plugins.sidecar.system.SidecarConfiguration';
 const EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration';
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
+const PERMISSIONS_CONFIG = 'org.graylog2.users.UserAndTeamsConfig';
 
 const _getConfig = (configType, configuration) => configuration?.[configType] ?? null;
 
@@ -71,6 +73,7 @@ const ConfigurationsPage = () => {
       ConfigurationsActions.listMessageProcessorsConfig(MESSAGE_PROCESSORS_CONFIG),
       ConfigurationsActions.list(SIDECAR_CONFIG),
       ConfigurationsActions.list(EVENTS_CONFIG),
+      ConfigurationsActions.listPermissionsConfig(PERMISSIONS_CONFIG),
     ];
 
     if (isPermitted(permissions, ['urlwhitelist:read'])) {
@@ -95,6 +98,7 @@ const ConfigurationsPage = () => {
     const sidecarConfig = _getConfig(SIDECAR_CONFIG, configuration);
     const eventsConfig = _getConfig(EVENTS_CONFIG, configuration);
     const urlWhiteListConfig = _getConfig(URL_WHITELIST_CONFIG, configuration);
+    const permissionsConfig = _getConfig(PERMISSIONS_CONFIG, configuration);
 
     Output = (
       <>
@@ -131,6 +135,12 @@ const ConfigurationsPage = () => {
         <ConfigletContainer title="Decorators Configuration">
           <DecoratorsConfig />
         </ConfigletContainer>
+        {permissionsConfig && (
+          <ConfigletContainer title="Permissions Configuration">
+            <PermissionsConfig config={permissionsConfig}
+                               updateConfig={_onUpdate(PERMISSIONS_CONFIG)} />
+          </ConfigletContainer>
+        )}
       </>
     );
   }

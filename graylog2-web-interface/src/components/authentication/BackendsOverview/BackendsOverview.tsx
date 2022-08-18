@@ -18,8 +18,9 @@ import * as React from 'react';
 import { useEffect, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
-import { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
-import { AuthenticationActions, PaginatedBackends } from 'stores/authentication/AuthenticationStore';
+import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
+import type { PaginatedBackends } from 'stores/authentication/AuthenticationStore';
+import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import { DataTable, PaginatedList, Spinner } from 'components/common';
@@ -47,7 +48,7 @@ const LoadingSpinner = styled(Spinner)(({ theme }) => css`
 `);
 
 const _headerCellFormatter = (header) => {
-  switch (header.toLocaleLowerCase()) {
+  switch (header.toLowerCase()) {
     case 'actions':
       return <th className="actions text-right">{header}</th>;
     default:

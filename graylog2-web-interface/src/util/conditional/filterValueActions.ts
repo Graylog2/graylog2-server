@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { ActionDefinition } from 'views/components/actions/ActionHandler';
+import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 
 import AppConfig from '../AppConfig';
 

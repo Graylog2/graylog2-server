@@ -16,7 +16,7 @@
  */
 import Qs from 'qs';
 
-import { TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 
 type SearchQueryString = {
   query: string,
@@ -40,17 +40,6 @@ const ApiRoutes = {
   },
   AlarmCallbackHistoryApiController: {
     list: (streamId: string, alertId: string) => { return { url: `/streams/${streamId}/alerts/${alertId}/history` }; },
-  },
-  AlertsApiController: {
-    get: (alertId: string) => { return { url: `/streams/alerts/${alertId}` }; },
-    list: (streamId: string, since) => { return { url: `/streams/${streamId}/alerts?since=${since}` }; },
-    listPaginated: (streamId: string, skip, limit, state) => { return { url: `/streams/${streamId}/alerts/paginated?skip=${skip}&limit=${limit}&state=${state}` }; },
-    listAllPaginated: (skip, limit, state) => { return { url: `/streams/alerts/paginated?skip=${skip}&limit=${limit}&state=${state}` }; },
-    listAllStreams: (since) => { return { url: `/streams/alerts?since=${since}` }; },
-  },
-  AlertConditionsApiController: {
-    available: () => { return { url: '/alerts/conditions/types' }; },
-    list: () => { return { url: '/alerts/conditions' }; },
   },
   AuthenticationController: {
     create: () => ({ url: '/system/authentication/services/backends' }),
@@ -141,6 +130,9 @@ const ApiRoutes = {
     update: (entityGRN: string) => { return { url: `/authz/shares/entities/${entityGRN}` }; },
     userSharesPaginated: (username: string) => { return { url: `/authz/shares/user/${username}` }; },
   },
+  EntityScopeController: {
+    getScope: () => ({ url: '/entity_scopes' }),
+  },
   HTTPHeaderAuthConfigController: {
     load: () => ({ url: '/system/authentication/http-header-auth-config' }),
     update: () => ({ url: '/system/authentication/http-header-auth-config' }),
@@ -200,6 +192,7 @@ const ApiRoutes = {
   },
   MessageFieldsApiController: {
     list: () => { return { url: '/system/fields' }; },
+    types: () => ({ url: 'views/fields' }),
   },
   MetricsApiController: {
     multiple: () => { return { url: '/system/metrics/multiple' }; },
@@ -237,15 +230,6 @@ const ApiRoutes = {
   SessionsApiController: {
     validate: () => { return { url: '/system/sessions' }; },
   },
-  StreamAlertsApiController: {
-    create: (streamId: string) => { return { url: `/streams/${streamId}/alerts/conditions` }; },
-    delete: (streamId: string, alertConditionId: string) => { return { url: `/streams/${streamId}/alerts/conditions/${alertConditionId}` }; },
-    get: (streamId: string, conditionId: string) => { return { url: `/streams/${streamId}/alerts/conditions/${conditionId}` }; },
-    list: (streamId: string) => { return { url: `/streams/${streamId}/alerts/conditions` }; },
-    update: (streamId: string, alertConditionId: string) => { return { url: `/streams/${streamId}/alerts/conditions/${alertConditionId}` }; },
-    sendDummyAlert: (streamId: string) => { return { url: `/streams/${streamId}/alerts/sendDummyAlert` }; },
-    test: (streamId: string, conditionId: string) => { return { url: `/streams/${streamId}/alerts/conditions/${conditionId}/test` }; },
-  },
   StreamsApiController: {
     index: () => { return { url: '/streams' }; },
     paginated: () => { return { url: '/streams/paginated' }; },
@@ -277,10 +261,16 @@ const ApiRoutes = {
   SystemJobsApiController: {
     list: () => { return { url: '/cluster/jobs' }; },
     getJob: (jobId: string) => { return { url: `/cluster/jobs/${jobId}` }; },
+    acknowledgeJob: (jobId: string) => { return { url: `/system/jobs/acknowledge/${jobId}` }; },
     cancelJob: (jobId: string) => { return { url: `/cluster/jobs/${jobId}` }; },
   },
   SystemMessagesApiController: {
     all: (page: number) => { return { url: `/system/messages?page=${page}` }; },
+  },
+  SystemSearchVersionApiController: {
+    satisfiesVersion: (distribution: 'opensearch' | 'elasticsearch', version?: string) => {
+      return { url: `/system/searchVersion/satisfiesVersion/${distribution}${version ? `?version=${version}` : ''}` };
+    },
   },
   ToolsApiController: {
     grokTest: () => { return { url: '/tools/grok_tester' }; },

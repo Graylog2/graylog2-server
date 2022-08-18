@@ -19,11 +19,12 @@ import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Formik, Form, Field } from 'formik';
+import isNil from 'lodash/isNil';
 
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 import { Input, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Select from 'components/common/Select';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import HighlightingRule, {
@@ -32,10 +33,11 @@ import HighlightingRule, {
 } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import HighlightingColorForm, { createNewColor } from 'views/components/sidebar/highlighting/HighlightingColorForm';
 import type { StaticColorObject, GradientColorObject } from 'views/components/sidebar/highlighting/HighlightingColorForm';
-import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import Series, { isFunction } from 'views/logic/aggregationbuilder/Series';
 import inferTypeForSeries from 'views/logic/fieldtypes/InferTypeForSeries';
-import HighlightingColor, {
+import type HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import {
   GradientColor,
   StaticColor,
 } from 'views/logic/views/formatting/highlighting/HighlightingColor';
@@ -45,8 +47,8 @@ type Props = {
   rule: HighlightingRule | null | undefined,
 };
 
-const _isRequired = (field) => (value) => {
-  if (!value || value === '') {
+const _isRequired = (field) => (value: string) => {
+  if (['', null, undefined].includes(value)) {
     return `${field} is required`;
   }
 
@@ -128,7 +130,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
             validateOnMount
             initialValues={{
               field: rule?.field,
-              value: rule?.value,
+              value: isNil(rule?.value) ? '' : String(rule?.value),
               condition: rule?.condition ?? 'equal',
               color: colorToObject(rule?.color),
             }}>

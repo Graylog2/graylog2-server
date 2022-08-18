@@ -20,21 +20,23 @@ import chroma from 'chroma-js';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
-import QueryResult from 'views/logic/QueryResult';
-import SearchPageLayoutContext, { SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
+import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
+import type QueryResult from 'views/logic/QueryResult';
+import type { SearchPreferencesLayout } from 'views/components/contexts/SearchPagePreferencesContext';
+import SearchPagePreferencesContext from 'views/components/contexts/SearchPagePreferencesContext';
 
 import SidebarNavigation from './SidebarNavigation';
 import ContentColumn from './ContentColumn';
-import sidebarSections, { SidebarSection } from './sidebarSections';
+import type { SidebarSection } from './sidebarSections';
+import sidebarSections from './sidebarSections';
 
 import CustomPropTypes from '../CustomPropTypes';
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactElement,
   queryId: string,
   results: QueryResult,
-  searchPageLayout?: SearchPageLayout,
+  searchPageLayout?: SearchPreferencesLayout,
   sections?: Array<SidebarSection>,
   viewMetadata: ViewMetadata,
 };
@@ -131,10 +133,10 @@ Sidebar.defaultProps = {
   searchPageLayout: undefined,
 };
 
-const SidebarWithContext = (props: React.ComponentProps<typeof Sidebar>) => (
-  <SearchPageLayoutContext.Consumer>
-    {(searchPageLayout) => <Sidebar {...props} searchPageLayout={searchPageLayout} />}
-  </SearchPageLayoutContext.Consumer>
+const SidebarWithContext = ({ children, ...props }: React.ComponentProps<typeof Sidebar>) => (
+  <SearchPagePreferencesContext.Consumer>
+    {(searchPageLayout) => <Sidebar {...props} searchPageLayout={searchPageLayout}>{children}</Sidebar>}
+  </SearchPagePreferencesContext.Consumer>
 );
 
 export default SidebarWithContext;

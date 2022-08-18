@@ -16,13 +16,15 @@
  */
 // Workaround for IE11, see #7670
 const createEvent = (type: string) => {
+  const options = { bubbles: true, cancelable: true };
+
   if (typeof (Event) === 'function') {
-    return new Event(type);
+    return new Event(type, options);
   }
 
   const event = document.createEvent('Event');
 
-  event.initEvent(type, true, true);
+  event.initEvent(type, options.bubbles, options.cancelable);
 
   return event;
 };

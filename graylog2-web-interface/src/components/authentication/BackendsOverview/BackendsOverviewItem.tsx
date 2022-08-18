@@ -16,15 +16,15 @@
  */
 /* eslint-disable no-alert */
 import * as React from 'react';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 import styled from 'styled-components';
 
 import { LinkContainer, Link } from 'components/common/router';
 import StringUtils from 'util/StringUtils';
 import Routes from 'routing/Routes';
-import Role from 'logic/roles/Role';
+import type Role from 'logic/roles/Role';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import { TextOverflowEllipsis } from 'components/common';
 import { Button, ButtonToolbar } from 'components/bootstrap';
 

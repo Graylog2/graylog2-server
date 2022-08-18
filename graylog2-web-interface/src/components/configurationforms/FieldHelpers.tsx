@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { ConfigurationField } from 'components/configurationforms/types';
+import type { ConfigurationField } from 'components/configurationforms/types';
 
 export const hasAttribute = (array: Array<string>, attribute: string): boolean => {
   return array.find((e) => e.toLowerCase() === attribute.toLowerCase()) !== undefined;

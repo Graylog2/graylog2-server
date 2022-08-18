@@ -19,15 +19,21 @@ package org.graylog.plugins.views.search;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.engine.SearchConfig;
+import org.graylog.plugins.views.search.errors.IllegalTimeRangeException;
 import org.graylog.plugins.views.search.errors.MissingCapabilitiesException;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
+import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
+import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,6 +49,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.graylog.plugins.views.search.TestData.requirementsMap;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SearchExecutionGuardTest {
     private SearchExecutionGuard sut;
@@ -50,17 +57,14 @@ public class SearchExecutionGuardTest {
 
     @Before
     public void setUp() throws Exception {
-        GuiceInjectorHolder.createInjector(Collections.emptyList());
-
         providedCapabilities = new HashMap<>();
         providedCapabilities.put("my only capability", mock(PluginMetaData.class));
-
         sut = new SearchExecutionGuard(providedCapabilities);
     }
 
     @Test
     public void failsForNonPermittedStreams() {
-        final Search search = searchWithStreamIds("ok", "not-ok");
+        final Search search = searchWithStreamIds(RelativeRange.create(300), "ok", "not-ok");
 
         assertThatExceptionOfType(MissingStreamPermissionException.class)
                 .isThrownBy(() -> sut.check(search, id -> id.equals("ok")))
@@ -69,14 +73,14 @@ public class SearchExecutionGuardTest {
 
     @Test
     public void succeedsIfAllStreamsArePermitted() {
-        final Search search = searchWithStreamIds("ok", "ok-too", "this is fine...");
+        final Search search = searchWithStreamIds(RelativeRange.create(300), "ok", "ok-too", "this is fine...");
 
         assertSucceeds(search, id -> true);
     }
 
     @Test
     public void allowsSearchesWithNoStreams() {
-        final Search search = searchWithStreamIds();
+        final Search search = searchWithStreamIds(RelativeRange.create(300));
 
         assertSucceeds(search, id -> true);
     }
@@ -103,19 +107,19 @@ public class SearchExecutionGuardTest {
     }
 
     private Search searchWithCapabilityRequirements(String... requirementNames) {
-        final Search search = searchWithStreamIds("streamId");
+        final Search search = searchWithStreamIds(RelativeRange.create(300), "streamId");
 
         final Map<String, PluginMetadataSummary> requirements = requirementsMap(requirementNames);
 
         return search.toBuilder().requires(requirements).build();
     }
 
-    private Search searchWithStreamIds(String... streamIds) {
+    private Search searchWithStreamIds(RelativeRange timeRange, String... streamIds) {
         final StreamFilter[] filters = Arrays.stream(streamIds).map(StreamFilter::ofId).toArray(StreamFilter[]::new);
 
         final Query query = Query.builder()
                 .id("")
-                .timerange(mock(TimeRange.class))
+                .timerange(timeRange)
                 .searchTypes(
                         ImmutableSet.of(
                                 EventList.builder()

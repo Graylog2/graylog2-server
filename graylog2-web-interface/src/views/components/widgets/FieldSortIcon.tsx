@@ -22,7 +22,8 @@ import MessagesWidgetConfig, { defaultSortDirection } from 'views/logic/widgets/
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import CustomPropTypes from 'views/components/CustomPropTypes';
-import { Icon } from 'components/common';
+import type { IconName } from 'components/common/Icon';
+import Icon from 'components/common/Icon';
 
 type Props = {
   config: MessagesWidgetConfig,
@@ -33,7 +34,7 @@ type Props = {
 
 type DirectionStrategy = {
   handleSortChange: (changeSort: (direction: Direction) => void) => void,
-  icon: string,
+  icon: IconName,
   sortActive: boolean,
   tooltip: (fieldName: string) => string,
 };
@@ -54,7 +55,7 @@ const _tooltip = (fieldName: string, newDirection: Direction) => {
   return `Sort ${fieldName} ${newDirection.direction}`;
 };
 
-const _changeSort = (nextDirection: Direction, config: MessagesWidgetConfig, fieldName: string, onSortChange: (newSortConfig: SortConfig[]) => Promise<void>, setLoadingState: (loading: boolean) => void) => {
+const _changeSort = (nextDirection: Direction, _config: MessagesWidgetConfig, fieldName: string, onSortChange: (newSortConfig: SortConfig[]) => Promise<void>, setLoadingState: (loading: boolean) => void) => {
   const newSort = [new SortConfig(SortConfig.PIVOT_TYPE, fieldName, nextDirection)];
 
   setLoadingState(true);

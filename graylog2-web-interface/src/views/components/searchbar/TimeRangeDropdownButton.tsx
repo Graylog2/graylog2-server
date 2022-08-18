@@ -20,7 +20,7 @@ import { Overlay } from 'react-overlays';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
-import { TimeRange, NoTimeRangeOverride, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
+import type { TimeRange, NoTimeRangeOverride, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 import { ButtonGroup } from 'components/bootstrap';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
 
@@ -60,7 +60,7 @@ const TimeRangeDropdownButton = ({
   showPresetDropdown = true,
   toggleShow,
 }: Props) => {
-  const { submitForm } = useFormikContext();
+  const { submitForm, isValid } = useFormikContext();
   const containerRef = useRef();
 
   const _onClick = (e) => {
@@ -75,7 +75,9 @@ const TimeRangeDropdownButton = ({
     };
     setCurrentTimeRange(normalizeIfAllMessagesRange(nextTimeRange));
 
-    submitForm();
+    if (isValid) {
+      submitForm();
+    }
   };
 
   const _onPresetSelectToggle = (open: boolean) => {

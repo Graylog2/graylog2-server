@@ -16,68 +16,57 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 
 import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
+import connect from 'stores/connect';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
-import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import { IndexSetsActions, IndexSetsStore, IndexSetPropType } from 'stores/indices/IndexSetsStore';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
+import { RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
 
-const IndexSetConfigurationPage = createReactClass({
-  displayName: 'IndexSetConfigurationPage',
+const _saveConfiguration = (indexSet) => {
+  IndexSetsActions.update(indexSet).then(() => {
+    history.push(Routes.SYSTEM.INDICES.LIST);
+  });
+};
 
-  propTypes: {
-    params: PropTypes.object.isRequired,
-    location: PropTypes.object.isRequired,
-  },
-
-  mixins: [Reflux.connect(IndexSetsStore), Reflux.connect(IndicesConfigurationStore)],
-
-  getInitialState() {
-    return {
-      indexSet: undefined,
-    };
-  },
-
+class IndexSetConfigurationPage extends React.Component {
   componentDidMount() {
     IndexSetsActions.get(this.props.params.indexSetId);
     IndicesConfigurationActions.loadRotationStrategies();
     IndicesConfigurationActions.loadRetentionStrategies();
-  },
+  }
 
-  _formCancelLink() {
-    if (this.props.location.query.from === 'details') {
-      return Routes.SYSTEM.INDEX_SETS.SHOW(this.state.indexSet.id);
+  _formCancelLink = () => {
+    const { location: { query: { from } }, indexSet } = this.props;
+
+    if (from === 'details') {
+      return Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id);
     }
 
     return Routes.SYSTEM.INDICES.LIST;
-  },
+  };
 
-  _saveConfiguration(indexSet) {
-    IndexSetsActions.update(indexSet).then(() => {
-      history.push(Routes.SYSTEM.INDICES.LIST);
-    });
-  },
+  _isLoading = () => {
+    const { indexSet, rotationStrategies, retentionStrategies } = this.props;
 
-  _isLoading() {
-    return !this.state.indexSet || !this.state.rotationStrategies || !this.state.retentionStrategies;
-  },
+    return !indexSet || !rotationStrategies || !retentionStrategies;
+  };
 
   render() {
     if (this._isLoading()) {
       return <Spinner />;
     }
 
-    const { indexSet } = this.state;
+    const { indexSet, retentionStrategiesContext, rotationStrategies, retentionStrategies } = this.props;
 
     return (
       <DocumentTitle title="Configure Index Set">
@@ -101,16 +90,49 @@ const IndexSetConfigurationPage = createReactClass({
           <Row className="content">
             <Col md={12}>
               <IndexSetConfigurationForm indexSet={indexSet}
-                                         rotationStrategies={this.state.rotationStrategies}
-                                         retentionStrategies={this.state.retentionStrategies}
+                                         retentionStrategiesContext={retentionStrategiesContext}
+                                         rotationStrategies={rotationStrategies}
+                                         retentionStrategies={retentionStrategies}
                                          cancelLink={this._formCancelLink()}
-                                         onUpdate={this._saveConfiguration} />
+                                         onUpdate={_saveConfiguration} />
             </Col>
           </Row>
         </div>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
-export default withParams(withLocation(IndexSetConfigurationPage));
+IndexSetConfigurationPage.propTypes = {
+  params: PropTypes.object.isRequired,
+  location: PropTypes.object.isRequired,
+  retentionStrategies: PropTypes.arrayOf(RetentionStrategyPropType),
+  rotationStrategies: PropTypes.arrayOf(RotationStrategyPropType),
+  indexSet: IndexSetPropType,
+  retentionStrategiesContext: PropTypes.shape({
+    max_index_retention_period: PropTypes.string,
+  }),
+};
+
+IndexSetConfigurationPage.defaultProps = {
+  retentionStrategies: undefined,
+  rotationStrategies: undefined,
+  indexSet: undefined,
+  retentionStrategiesContext: {
+    max_index_retention_period: undefined,
+  },
+};
+
+export default connect(
+  withParams(withLocation(IndexSetConfigurationPage)),
+  {
+    indexSets: IndexSetsStore,
+    indicesConfigurations: IndicesConfigurationStore,
+  },
+  ({ indexSets, indicesConfigurations }) => ({
+    indexSet: indexSets.indexSet,
+    rotationStrategies: indicesConfigurations.rotationStrategies,
+    retentionStrategies: indicesConfigurations.retentionStrategies,
+    retentionStrategiesContext: indicesConfigurations.retentionStrategiesContext,
+  }),
+);

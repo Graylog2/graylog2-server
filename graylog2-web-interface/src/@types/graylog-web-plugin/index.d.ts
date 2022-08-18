@@ -14,18 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import FetchError from 'logic/errors/FetchError';
+import type FetchError from 'logic/errors/FetchError';
 
 interface PluginRoute {
   path: string;
   component: React.ComponentType;
   parentComponent?: React.ComponentType | null;
-  permissions?: string;
+  permissions?: string | Array<string>;
+  requiredFeatureFlag?: string;
 }
 interface PluginNavigation {
   path: string;
   description: string;
+  requiredFeatureFlag?: string;
+  children?: Array<PluginNavigationDropdownItem>
 }
+
+interface PluginNavigationDropdownItem {
+  description: string,
+  path: string,
+  permissions?: string | Array<string>,
+  requiredFeatureFlag?: string,
+}
+
 interface PluginNavigationItems {
   key: string;
   component: React.ComponentType<{ smallScreen?: boolean }>;

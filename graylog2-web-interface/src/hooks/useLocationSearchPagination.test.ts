@@ -17,8 +17,9 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import { useLocation } from 'react-router-dom';
 import { stringify } from 'qs';
-import { asMock } from 'helpers/mocking';
 import type { Location } from 'history';
+
+import { asMock } from 'helpers/mocking';
 
 import useLocationSearchPagination from './useLocationSearchPagination';
 

@@ -16,14 +16,14 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 
-import Role from 'logic/roles/Role';
-import { PaginatedUsers } from 'stores/users/UsersStore';
+import type Role from 'logic/roles/Role';
+import type { PaginatedUsers } from 'stores/users/UsersStore';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { DataTable, PaginatedList, Spinner, EmptyResult } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
 import SyncedUsersOverviewItem from './SyncedUsersOverviewItem';
 import SyncedUsersFilter from './SyncedUsersFilter';
@@ -36,7 +36,7 @@ const DEFAULT_PAGINATION = {
 };
 
 const _headerCellFormatter = (header) => {
-  switch (header.toLocaleLowerCase()) {
+  switch (header.toLowerCase()) {
     case 'actions':
       return <th className="actions text-right">{header}</th>;
     default:

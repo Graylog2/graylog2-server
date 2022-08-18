@@ -22,7 +22,7 @@ import AuthenticationOverviewLinks from 'components/authentication/Authenticatio
 import DocsHelper from 'util/DocsHelper';
 import withParams from 'routing/withParams';
 import StringUtils from 'util/StringUtils';
-import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import useActiveBackend from 'components/authentication/useActiveBackend';

@@ -45,7 +45,7 @@ class ExtractorExampleMessage extends React.Component {
   static defaultProps = {
     example: '',
     onExampleLoad: () => {},
-  }
+  };
 
   _onExampleLoad = (message) => {
     const { field, onExampleLoad } = this.props;

@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useRef, useCallback } from 'react';
+import { useContext, useRef, useCallback, useMemo } from 'react';
 
 import { WidgetActions } from 'views/stores/WidgetStore';
-import Widget from 'views/logic/widgets/Widget';
+import type Widget from 'views/logic/widgets/Widget';
 import UserNotification from 'util/UserNotification';
+import DisableSubmissionStateContext from 'views/components/contexts/DisableSubmissionStateContext';
 
 import WidgetEditApplyAllChangesContext from './WidgetEditApplyAllChangesContext';
 
@@ -29,7 +30,8 @@ type Props = {
 }
 
 const WidgetEditApplyAllChangesProvider = ({ children, widget }: Props) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { setDisabled } = useContext(DisableSubmissionStateContext);
+  const setDisableWidgetEditSubmit = useCallback((disabled: boolean) => setDisabled('widget-edit-apply-all-changes', disabled), [setDisabled]);
   const applySearchControlsChanges = useRef(null);
   const applyElementConfigurationChanges = useRef(null);
 
@@ -64,25 +66,28 @@ const WidgetEditApplyAllChangesProvider = ({ children, widget }: Props) => {
     }
 
     if (hasChanges) {
-      setIsSubmitting(true);
+      setDisableWidgetEditSubmit(true);
 
       return WidgetActions.update(widget.id, newWidget)
         .catch((error) => {
           UserNotification.error(`Applying widget changes failed with status: ${error}`);
 
           return error;
-        }).finally(() => setIsSubmitting(false));
+        }).finally(() => setDisableWidgetEditSubmit(false));
     }
 
     return Promise.resolve();
-  }, [widget]);
+  }, [widget, setDisableWidgetEditSubmit]);
 
-  const contextValue = {
+  const contextValue = useMemo(() => ({
     applyAllWidgetChanges,
     bindApplyElementConfigurationChanges,
     bindApplySearchControlsChanges,
-    isSubmitting,
-  };
+  }), [
+    applyAllWidgetChanges,
+    bindApplyElementConfigurationChanges,
+    bindApplySearchControlsChanges,
+  ]);
 
   return (
     <WidgetEditApplyAllChangesContext.Provider value={contextValue}>

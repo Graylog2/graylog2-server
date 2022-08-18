@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import type * as React from 'react';
 
-import Role from 'logic/roles/Role';
-import User from 'logic/users/User';
+import type Role from 'logic/roles/Role';
+import type User from 'logic/users/User';
 
 interface RoleTeamsAssignmentProps {
   role: Role;

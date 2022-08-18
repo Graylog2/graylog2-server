@@ -20,6 +20,7 @@ import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -83,7 +84,7 @@ public class IndexMappingFactoryTest {
 
         assertThatThrownBy(() -> sut.createIndexMapping(indexSetConfig))
                 .isInstanceOf(ElasticsearchException.class)
-                .hasMessageStartingWith("Unsupported Elasticsearch version: " + version)
+                .hasMessageContaining("Unsupported Search version: Elasticsearch:" + version)
                 .hasNoCause();
     }
 
@@ -128,6 +129,6 @@ public class IndexMappingFactoryTest {
     }
 
     private void mockNodeVersion(String version) {
-        when(node.getVersion()).thenReturn(Optional.of(Version.valueOf(version)));
+        when(node.getVersion()).thenReturn(Optional.of(SearchVersion.elasticsearch(version)));
     }
 }

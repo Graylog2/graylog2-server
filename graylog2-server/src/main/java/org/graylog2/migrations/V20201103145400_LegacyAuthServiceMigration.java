@@ -58,6 +58,9 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 public class V20201103145400_LegacyAuthServiceMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20201103145400_LegacyAuthServiceMigration.class);
 
+    /**
+     * This migration is pluggable to allow us to modify the outcome from plugins (e.g. Enterprise)
+     */
     public interface MigrationModule {
         void upgrade(Document document, AuthServiceBackendDTO authServiceConfig);
     }

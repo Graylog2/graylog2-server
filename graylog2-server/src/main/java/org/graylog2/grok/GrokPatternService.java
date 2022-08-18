@@ -32,6 +32,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public interface GrokPatternService {
+    enum ImportStrategy {
+        ABORT_ON_CONFLICT, REPLACE_ON_CONFLICT, DROP_ALL_EXISTING
+    }
+
     GrokPattern load(String patternId) throws NotFoundException;
 
     Optional<GrokPattern> loadByName(String name);
@@ -44,7 +48,7 @@ public interface GrokPatternService {
 
     GrokPattern update(GrokPattern pattern) throws ValidationException;
 
-    List<GrokPattern> saveAll(Collection<GrokPattern> patterns, boolean replace) throws ValidationException;
+    List<GrokPattern> saveAll(Collection<GrokPattern> patterns, ImportStrategy importStrategy) throws ValidationException;
 
     Map<String, Object> match(GrokPattern pattern, String sampleData) throws GrokException;
 

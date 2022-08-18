@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import { LinkContainer } from 'components/common/router';
-import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import Routes from 'routing/Routes';
 import { ButtonToolbar, Button } from 'components/bootstrap';
 

@@ -15,111 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import isDeepEqual from 'stores/isDeepEqual';
-import { DEFAULT_RANGE_TYPE } from 'views/Constants';
 import { QueriesActions } from 'views/stores/QueriesStore';
-import { ViewHook } from 'views/logic/hooks/ViewHook';
+import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import View from 'views/logic/views/View';
-import {
-  AbsoluteTimeRange,
-  createElasticsearchQueryString,
-  filtersForQuery, KeywordTimeRange,
-} from 'views/logic/queries/Query';
+import type { RawQuery } from 'views/logic/NormalizeSearchURLQueryParams';
+import normalizeSearchURLQueryParams from 'views/logic/NormalizeSearchURLQueryParams';
 
-type RawRelativeRange = {
-  rangetype: 'relative';
-  relative?: string;
-};
-
-type RawAbsoluteRange = {
-  rangetype: 'absolute';
-  from?: string;
-  to?: string;
-};
-
-type RawKeywordRange = {
-  rangetype: 'keyword';
-  keyword?: string;
-  timezone?: string;
-};
-
-const _getRange = (query): RawAbsoluteRange | RawRelativeRange | RawKeywordRange => {
-  const rangetype = query.rangetype || DEFAULT_RANGE_TYPE;
-
-  return { ...query, rangetype };
-};
-
-const _getRelativeTimeRange = (range) => {
-  const parseRangeValue = (rangeValue: string) => parseInt(rangeValue, 10);
-
-  if (range.rangetype) {
-    if ('relative' in range) {
-      return { type: range.rangetype, range: parseRangeValue(range.relative) };
-    }
-
-    if ('from' in range) {
-      const result = { type: range.rangetype, from: parseRangeValue(range.from) };
-
-      if ('to' in range) {
-        return { ...result, to: parseRangeValue(range.to) };
-      }
-
-      return result;
-    }
-  }
-
-  return undefined;
-};
-
-const _getTimerange = (query = {}) => {
-  const range = _getRange(query);
-
-  switch (range.rangetype) {
-    case 'relative':
-      return _getRelativeTimeRange(range);
-    case 'absolute':
-      return (range.from || range.to)
-        ? {
-          type: range.rangetype,
-          from: range.from,
-          to: range.to,
-        } as AbsoluteTimeRange
-        : undefined;
-    case 'keyword':
-      return range.keyword ? { type: range.rangetype, keyword: range.keyword, timezone: range.timezone } as KeywordTimeRange : undefined;
-    default:
-      // @ts-ignore
-      throw new Error(`Unsupported range type ${range.rangetype}`);
-  }
-};
-
-type StreamsQuery = {
-  streams?: string;
-};
-
-const _getStreams = (query: StreamsQuery = {}): Array<string> => {
-  const rawStreams = query.streams;
-
-  if (rawStreams === undefined || rawStreams === null) {
-    return [];
-  }
-
-  return String(rawStreams).split(',')
-    .map((stream) => stream.trim())
-    .filter((stream) => stream !== '');
-};
-
-type RawQuery = (RawAbsoluteRange | RawRelativeRange | RawKeywordRange) & StreamsQuery;
-
-const bindSearchParamsFromQuery: ViewHook = ({ query, view }) => {
+const bindSearchParamsFromQuery: ViewHook = ({ query, view }: { query: RawQuery, view: View }) => {
   if (view.type !== View.Type.Search) {
     return Promise.resolve(true);
   }
 
-  const { q: queryString } = query;
-  const timerange = _getTimerange(query as RawQuery);
-  const streams = filtersForQuery(_getStreams(query));
+  const { queryString, timeRange, streamsFilter } = normalizeSearchURLQueryParams(query);
 
-  if (!queryString && !timerange && !streams) {
+  if (!queryString && !timeRange && !streamsFilter) {
     return Promise.resolve(true);
   }
 
@@ -132,16 +41,16 @@ const bindSearchParamsFromQuery: ViewHook = ({ query, view }) => {
   const firstQuery = queries.first();
   let queryBuilder = firstQuery.toBuilder();
 
-  if (queryString !== undefined) {
-    queryBuilder = queryBuilder.query(createElasticsearchQueryString(queryString));
+  if (queryString) {
+    queryBuilder = queryBuilder.query(queryString);
   }
 
-  if (timerange) {
-    queryBuilder = queryBuilder.timerange(timerange);
+  if (timeRange) {
+    queryBuilder = queryBuilder.timerange(timeRange);
   }
 
-  if (streams) {
-    queryBuilder = queryBuilder.filter(streams);
+  if (streamsFilter) {
+    queryBuilder = queryBuilder.filter(streamsFilter);
   }
 
   const newQuery = queryBuilder.build();

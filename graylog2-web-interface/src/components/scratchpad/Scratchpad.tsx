@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import styled, { css, DefaultTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 import ClipboardJS from 'clipboard';
 import debounce from 'lodash/debounce';
@@ -88,7 +89,7 @@ const StatusMessage = styled.span(({ theme, $visible }: { theme: DefaultTheme, $
 `);
 
 const Scratchpad = () => {
-  const clipboard = useRef<typeof ClipboardJS>();
+  const clipboard = useRef<ClipboardJS>();
   const textareaRef = useRef<HTMLTextAreaElement>();
   const confirmationModalRef = useRef<typeof BootstrapModalConfirm>();
   const statusTimeout = useRef<ReturnType<typeof setTimeout>>();

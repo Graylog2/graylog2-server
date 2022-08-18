@@ -16,16 +16,17 @@
  */
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
-import naturalSort from 'javascript-natural-sort';
 import Immutable from 'immutable';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { LinkContainer, Link } from 'components/common/router';
 import { Button } from 'components/bootstrap';
 import { DataTable, Spinner, PaginatedList, SearchForm, QueryHelper } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import Routes from 'routing/Routes';
 import { useStore } from 'stores/connect';
-import StreamsStore, { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'stores/streams/StreamsStore';
+import StreamsStore from 'stores/streams/StreamsStore';
 import type { PaginatedPipelines } from 'stores/pipelines/PipelinesStore';
 import { PipelinesActions } from 'stores/pipelines/PipelinesStore';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';

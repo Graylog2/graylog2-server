@@ -24,7 +24,7 @@ import Query from 'views/logic/queries/Query';
 
 import type { ViewStateMap } from './View';
 import View from './View';
-import ViewState from './ViewState';
+import type ViewState from './ViewState';
 import ViewStateGenerator from './ViewStateGenerator';
 import viewTransformer from './ViewTransformer';
 

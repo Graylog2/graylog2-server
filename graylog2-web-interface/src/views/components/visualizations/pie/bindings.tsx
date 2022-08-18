@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { VisualizationType } from 'views/types';
-
 import PieVisualization from 'views/components/visualizations/pie/PieVisualization';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
 
 const validate = hasAtLeastOneMetric('Pie chart');
 
-const pieChart: VisualizationType = {
+const pieChart: VisualizationType<typeof PieVisualization.type> = {
   type: PieVisualization.type,
   displayName: 'Pie Chart',
   component: PieVisualization,

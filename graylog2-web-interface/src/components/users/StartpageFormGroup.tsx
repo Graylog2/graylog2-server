@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 import { useState, useEffect } from 'react';
 import { Field } from 'formik';
 import styled from 'styled-components';
 
 import { getValuesFromGRN } from 'logic/permissions/GRN';
 import { Button, Alert, Input } from 'components/bootstrap';
-import SharedEntity from 'logic/permissions/SharedEntity';
+import type SharedEntity from 'logic/permissions/SharedEntity';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import Spinner from 'components/common/Spinner';
 import Select from 'components/common/Select';
@@ -113,28 +113,26 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
           : null;
 
         return (
-          <>
-            <Input id="startpage"
-                   label="Start page"
-                   help="Select the page the user sees right after log in. Only entities are selectable which the user has permissions for."
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9">
-              <>
-                <Container>
-                  <TypeSelect options={typeOptions}
-                              placeholder="Select type"
-                              onChange={(newType) => onChange({ target: { name, value: { type: newType, id: undefined } } })}
-                              value={value?.type} />
-                  <ValueSelect options={options}
-                               placeholder={`Select ${value?.type ?? 'entity'}`}
-                               onChange={(newId) => onChange({ target: { name, value: { type: type, id: newId } } })}
-                               value={value?.id} />
-                  {resetBtn}
-                </Container>
-                {error}
-              </>
-            </Input>
-          </>
+          <Input id="startpage"
+                 label="Start page"
+                 help="Select the page the user sees right after log in. Only entities are selectable which the user has permissions for."
+                 labelClassName="col-sm-3"
+                 wrapperClassName="col-sm-9">
+            <>
+              <Container>
+                <TypeSelect options={typeOptions}
+                            placeholder="Select type"
+                            onChange={(newType) => onChange({ target: { name, value: { type: newType, id: undefined } } })}
+                            value={value?.type} />
+                <ValueSelect options={options}
+                             placeholder={`Select ${value?.type ?? 'entity'}`}
+                             onChange={(newId) => onChange({ target: { name, value: { type: type, id: newId } } })}
+                             value={value?.id} />
+                {resetBtn}
+              </Container>
+              {error}
+            </>
+          </Input>
         );
       }}
     </Field>

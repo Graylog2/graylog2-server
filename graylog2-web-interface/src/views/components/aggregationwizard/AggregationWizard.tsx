@@ -16,11 +16,12 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { EditWidgetComponentProps } from 'views/types';
 
+import type { EditWidgetComponentProps } from 'views/types';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-import WidgetConfigForm, { WidgetConfigFormValues } from './WidgetConfigForm';
+import type { WidgetConfigFormValues } from './WidgetConfigForm';
+import WidgetConfigForm from './WidgetConfigForm';
 import ElementsConfiguration from './ElementsConfiguration';
 import aggregationElements from './aggregationElementDefinitions';
 import VisualizationContainer from './VisualizationContainer';

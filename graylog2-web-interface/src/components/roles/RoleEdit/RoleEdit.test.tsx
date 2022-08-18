@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, act, screen } from 'wrappedTestingLibrary';
+
 import { alertsManager as exampleRole } from 'fixtures/roles';
 
 import RoleEdit from './RoleEdit';

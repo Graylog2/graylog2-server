@@ -22,6 +22,7 @@ import org.graylog.events.configuration.EventsConfiguration;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorExecutionJob;
+import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobExecutionContext;
 import org.graylog.scheduler.JobExecutionException;
@@ -49,6 +50,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -103,6 +105,7 @@ public class EventProcessorExecutionJobTest {
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .id("trigger-1")
                 .jobDefinitionId(jobDefinition.id())
+                .jobDefinitionType("event-processor-execution-v1")
                 .startTime(now)
                 .nextTime(triggerNextTime)
                 .status(JobTriggerStatus.RUNNABLE)
@@ -115,8 +118,9 @@ public class EventProcessorExecutionJobTest {
         final JobExecutionContext jobExecutionContext = JobExecutionContext.builder()
                 .definition(jobDefinition)
                 .trigger(trigger)
-                .isRunning(new AtomicBoolean(true))
+                .schedulerIsRunning(new AtomicBoolean(true))
                 .jobTriggerUpdates(new JobTriggerUpdates(clock, jobScheduleStrategies, trigger))
+                .jobTriggerService(mock(DBJobTriggerService.class))
                 .build();
 
         final JobTriggerUpdate triggerUpdate = job.execute(jobExecutionContext);
@@ -127,7 +131,7 @@ public class EventProcessorExecutionJobTest {
         assertThat(triggerUpdate.nextTime()).isPresent().get().isEqualTo(triggerNextTime.plusSeconds(scheduleIntervalSeconds));
 
         assertThat(triggerUpdate.data()).isPresent().get().isEqualTo(EventProcessorExecutionJob.Data.builder()
-                .timerangeFrom(to.plusMillis(1))
+                .timerangeFrom(to)
                 .timerangeTo(to.plus(processingWindowSize))
                 .build());
 
@@ -162,6 +166,7 @@ public class EventProcessorExecutionJobTest {
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .id("trigger-1")
                 .jobDefinitionId(jobDefinition.id())
+                .jobDefinitionType("event-processor-execution-v1")
                 .startTime(now)
                 .nextTime(triggerNextTime)
                 .status(JobTriggerStatus.RUNNABLE)
@@ -174,8 +179,9 @@ public class EventProcessorExecutionJobTest {
         final JobExecutionContext jobExecutionContext = JobExecutionContext.builder()
                 .definition(jobDefinition)
                 .trigger(trigger)
-                .isRunning(new AtomicBoolean(true))
+                .schedulerIsRunning(new AtomicBoolean(true))
                 .jobTriggerUpdates(new JobTriggerUpdates(clock, jobScheduleStrategies, trigger))
+                .jobTriggerService(mock(DBJobTriggerService.class))
                 .build();
 
         doAnswer(invocation -> {
@@ -194,7 +200,7 @@ public class EventProcessorExecutionJobTest {
         assertThat(triggerUpdate.nextTime()).isPresent().get().isEqualTo(triggerNextTime.plusSeconds(scheduleIntervalSeconds));
 
         assertThat(triggerUpdate.data()).isPresent().get().isEqualTo(EventProcessorExecutionJob.Data.builder()
-                .timerangeFrom(to.plusMillis(1))
+                .timerangeFrom(to)
                 .timerangeTo(to.plus(processingWindowSize))
                 .build());
 
@@ -231,6 +237,7 @@ public class EventProcessorExecutionJobTest {
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .id("trigger-1")
                 .jobDefinitionId(jobDefinition.id())
+                .jobDefinitionType("event-processor-execution-v1")
                 .startTime(now)
                 .nextTime(triggerNextTime)
                 .status(JobTriggerStatus.RUNNABLE)
@@ -244,8 +251,9 @@ public class EventProcessorExecutionJobTest {
         final JobExecutionContext jobExecutionContext = JobExecutionContext.builder()
                 .definition(jobDefinition)
                 .trigger(trigger)
-                .isRunning(new AtomicBoolean(true))
+                .schedulerIsRunning(new AtomicBoolean(true))
                 .jobTriggerUpdates(new JobTriggerUpdates(clock, jobScheduleStrategies, trigger))
+                .jobTriggerService(mock(DBJobTriggerService.class))
                 .build();
 
         doAnswer(invocation -> {
@@ -264,7 +272,7 @@ public class EventProcessorExecutionJobTest {
 
         // The next timerange in the trigger update also needs to be based on the timerange from the trigger
         assertThat(triggerUpdate.data()).isPresent().get().isEqualTo(EventProcessorExecutionJob.Data.builder()
-                .timerangeFrom(triggerTo.plusMillis(1))
+                .timerangeFrom(triggerTo)
                 .timerangeTo(triggerTo.plus(processingWindowSize))
                 .build());
 
@@ -301,6 +309,7 @@ public class EventProcessorExecutionJobTest {
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .id("trigger-1")
                 .jobDefinitionId(jobDefinition.id())
+                .jobDefinitionType("event-processor-execution-v1")
                 .startTime(now)
                 .nextTime(triggerNextTime)
                 .status(JobTriggerStatus.RUNNABLE)
@@ -313,8 +322,9 @@ public class EventProcessorExecutionJobTest {
         final JobExecutionContext jobExecutionContext = JobExecutionContext.builder()
                 .definition(jobDefinition)
                 .trigger(trigger)
-                .isRunning(new AtomicBoolean(true))
+                .schedulerIsRunning(new AtomicBoolean(true))
                 .jobTriggerUpdates(new JobTriggerUpdates(clock, jobScheduleStrategies, trigger))
+                .jobTriggerService(mock(DBJobTriggerService.class))
                 .build();
 
         assertThatThrownBy(() -> job.execute(jobExecutionContext))
@@ -366,6 +376,7 @@ public class EventProcessorExecutionJobTest {
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .id("trigger-1")
                 .jobDefinitionId(jobDefinition.id())
+                .jobDefinitionType("event-processor-execution-v1")
                 .startTime(now)
                 .nextTime(triggerNextTime)
                 .status(JobTriggerStatus.RUNNABLE)
@@ -378,8 +389,9 @@ public class EventProcessorExecutionJobTest {
         final JobExecutionContext jobExecutionContext = JobExecutionContext.builder()
                 .definition(jobDefinition)
                 .trigger(trigger)
-                .isRunning(new AtomicBoolean(true))
+                .schedulerIsRunning(new AtomicBoolean(true))
                 .jobTriggerUpdates(new JobTriggerUpdates(clock, jobScheduleStrategies, trigger))
+                .jobTriggerService(mock(DBJobTriggerService.class))
                 .build();
 
         final JobTriggerUpdate triggerUpdate = job.execute(jobExecutionContext);
@@ -424,6 +436,7 @@ public class EventProcessorExecutionJobTest {
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .id("trigger-1")
                 .jobDefinitionId(jobDefinition.id())
+                .jobDefinitionType("event-processor-execution-v1")
                 .startTime(now)
                 .nextTime(triggerNextTime)
                 .status(JobTriggerStatus.RUNNABLE)
@@ -433,8 +446,9 @@ public class EventProcessorExecutionJobTest {
         final JobExecutionContext jobExecutionContext = JobExecutionContext.builder()
                 .definition(jobDefinition)
                 .trigger(trigger)
-                .isRunning(new AtomicBoolean(true))
+                .schedulerIsRunning(new AtomicBoolean(true))
                 .jobTriggerUpdates(new JobTriggerUpdates(clock, jobScheduleStrategies, trigger))
+                .jobTriggerService(mock(DBJobTriggerService.class))
                 .build();
 
         final JobTriggerUpdate triggerUpdate = job.execute(jobExecutionContext);
@@ -500,6 +514,7 @@ public class EventProcessorExecutionJobTest {
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .id("trigger-1")
                 .jobDefinitionId(jobDefinition.id())
+                .jobDefinitionType("event-processor-execution-v1")
                 .startTime(now)
                 .nextTime(triggerNextTime)
                 .status(JobTriggerStatus.RUNNABLE)
@@ -512,8 +527,9 @@ public class EventProcessorExecutionJobTest {
         final JobExecutionContext jobExecutionContext = JobExecutionContext.builder()
                 .definition(jobDefinition)
                 .trigger(trigger)
-                .isRunning(new AtomicBoolean(true))
+                .schedulerIsRunning(new AtomicBoolean(true))
                 .jobTriggerUpdates(new JobTriggerUpdates(clock, jobScheduleStrategies, trigger))
+                .jobTriggerService(mock(DBJobTriggerService.class))
                 .build();
 
         doAnswer(invocation -> {
@@ -538,7 +554,7 @@ public class EventProcessorExecutionJobTest {
             // The new nextFrom should ignore the processingHopSize and start 1ms after the last `To` Range
             // The nextTo will be one window of the processingCatchUpWindowSize
             assertThat(triggerUpdate.data()).isPresent().get().isEqualTo(EventProcessorExecutionJob.Data.builder()
-                    .timerangeFrom(to.plus(processingHopSize).minus(processingWindowSize).plusMillis(1))
+                    .timerangeFrom(to.plus(processingHopSize).minus(processingWindowSize))
                     .timerangeTo(to.plus(processingCatchUpWindowSize))
                     .build());
         } else {
@@ -546,7 +562,7 @@ public class EventProcessorExecutionJobTest {
             // With a hopping window the "to" is calculated by adding the hopSize and the "from" is based on the next "to"
             // minus the windowSize + 1 millisecond.
             assertThat(triggerUpdate.data()).isPresent().get().isEqualTo(EventProcessorExecutionJob.Data.builder()
-                    .timerangeFrom(to.plus(processingHopSize).minus(processingWindowSize).plusMillis(1))
+                    .timerangeFrom(to.plus(processingHopSize).minus(processingWindowSize))
                     .timerangeTo(to.plus(processingHopSize))
                     .build());
         }
@@ -585,6 +601,7 @@ public class EventProcessorExecutionJobTest {
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .id("trigger-1")
                 .jobDefinitionId(jobDefinition.id())
+                .jobDefinitionType("event-processor-execution-v1")
                 .startTime(now)
                 .nextTime(triggerNextTime)
                 .status(JobTriggerStatus.RUNNABLE)
@@ -597,8 +614,9 @@ public class EventProcessorExecutionJobTest {
         final JobExecutionContext jobExecutionContext = JobExecutionContext.builder()
                 .definition(jobDefinition)
                 .trigger(trigger)
-                .isRunning(new AtomicBoolean(true))
+                .schedulerIsRunning(new AtomicBoolean(true))
                 .jobTriggerUpdates(new JobTriggerUpdates(clock, jobScheduleStrategies, trigger))
+                .jobTriggerService(mock(DBJobTriggerService.class))
                 .build();
 
         doAnswer(invocation -> {
@@ -619,7 +637,7 @@ public class EventProcessorExecutionJobTest {
         // With a hopping window the "to" is calculated by adding the hopSize and the "from" is based on the next "to"
         // minus the windowSize + 1 millisecond.
         assertThat(triggerUpdate.data()).isPresent().get().isEqualTo(EventProcessorExecutionJob.Data.builder()
-                .timerangeFrom(to.plus(processingHopSize).minus(processingWindowSize).plusMillis(1))
+                .timerangeFrom(to.plus(processingHopSize).minus(processingWindowSize))
                 .timerangeTo(to.plus(processingHopSize))
                 .build());
 

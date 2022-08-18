@@ -17,6 +17,7 @@
 package org.graylog.testing.utils;
 
 import io.restassured.specification.RequestSpecification;
+import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog.testing.backenddriver.SearchDriver;
 
 import java.util.ArrayList;
@@ -25,7 +26,8 @@ import java.util.function.Consumer;
 
 public final class SearchUtils {
 
-    private SearchUtils() {}
+    private SearchUtils() {
+    }
 
     public static List<String> searchForAllMessages(RequestSpecification requestSpecification) {
         List<String> messages = new ArrayList<>();
@@ -33,6 +35,15 @@ public final class SearchUtils {
         WaitUtils.waitFor(() -> captureMessages(messages::addAll, requestSpecification), "Timed out waiting for messages to be present");
 
         return messages;
+    }
+
+    public static boolean waitForMessage(RequestSpecification requestSpecification, String message) {
+        WaitUtils.waitFor(() -> captureMessage(requestSpecification, message), "Timed out waiting for message to be present");
+        return true;
+    }
+
+    private static boolean captureMessage(RequestSpecification requestSpecification, String message) {
+        return SearchDriver.searchAllMessages(requestSpecification).contains(message);
     }
 
     private static boolean captureMessages(Consumer<List<String>> messagesCaptor,
@@ -43,5 +54,13 @@ public final class SearchUtils {
             return true;
         }
         return false;
+    }
+
+    public static MappedFieldTypeDTO waitForFieldTypeDefinition(RequestSpecification requestSpecification, String fieldName) {
+        return WaitUtils.waitForObject(() -> SearchDriver.getFieldTypes(requestSpecification)
+                        .stream()
+                        .filter(t -> t.name().equals(fieldName))
+                        .findFirst()
+                , "Timed out waiting for field definition");
     }
 }

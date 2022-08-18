@@ -17,8 +17,8 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
-import { PublicNotificationsHooks } from 'theme/types';
 
+import type { PublicNotificationsHooks } from 'theme/types';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import Alert from 'components/bootstrap/Alert';
 import Button from 'components/bootstrap/Button';
@@ -89,7 +89,11 @@ const PublicNotifications = ({ readFromConfig }: Props) => {
     };
 
     const notification = allNotification[notificationId];
-    const { variant, hiddenTitle, isDismissible, title, shortMessage, longMessage } = notification;
+    const { variant, hiddenTitle, isActive, isDismissible, title, shortMessage, longMessage } = notification;
+
+    if (!isActive) {
+      return null;
+    }
 
     const _dismiss = () => {
       return onDismissPublicNotification(notificationId);

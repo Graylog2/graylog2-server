@@ -16,13 +16,15 @@
  */
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
-import { Optional } from 'utility-types';
+import type { Optional } from 'utility-types';
 
 import SharedEntity from 'logic/permissions/SharedEntity';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import EntityShareState, { EntityShareStateJson } from 'logic/permissions/EntityShareState';
-import EntityShareActions, { EntitySharePayload, PaginatedEntityShares } from 'actions/permissions/EntityShareActions';
+import type { EntityShareStateJson } from 'logic/permissions/EntityShareState';
+import EntityShareState from 'logic/permissions/EntityShareState';
+import type { EntitySharePayload, PaginatedEntityShares } from 'actions/permissions/EntityShareActions';
+import EntityShareActions from 'actions/permissions/EntityShareActions';
 import { qualifyUrl } from 'util/URLUtils';
 import { singletonStore } from 'logic/singleton';
 import type { Store } from 'stores/StoreTypes';
@@ -73,7 +75,7 @@ const EntityShareStore: EntityShareStoreType = singletonStore(
       return this._state();
     },
 
-    prepare(entityType: string, entityTitle: string, entityGRN: GRN, payload: Optional<EntitySharePayload> = DEFAULT_PREPARE_PAYLOAD): Promise<EntityShareState> {
+    prepare(_entityType: string, _entityTitle: string, entityGRN: GRN, payload: Optional<EntitySharePayload> = DEFAULT_PREPARE_PAYLOAD): Promise<EntityShareState> {
       const url = qualifyUrl(ApiRoutes.EntityShareController.prepare(entityGRN).url);
       const promise = fetch('POST', url, JSON.stringify(payload)).then(this._handleResponse);
 
@@ -82,7 +84,7 @@ const EntityShareStore: EntityShareStoreType = singletonStore(
       return promise;
     },
 
-    update(entityType: string, entityTitle: string, entityGRN: GRN, payload: EntitySharePayload): Promise<EntityShareState> {
+    update(_entityType: string, _entityTitle: string, entityGRN: GRN, payload: EntitySharePayload): Promise<EntityShareState> {
       const url = qualifyUrl(ApiRoutes.EntityShareController.update(entityGRN).url);
       const promise = fetch('POST', url, JSON.stringify(payload)).then(this._handleResponse);
 
@@ -91,7 +93,12 @@ const EntityShareStore: EntityShareStoreType = singletonStore(
       return promise;
     },
 
-    loadUserSharesPaginated(userId: string, { page, perPage, query, additionalQueries }: Pagination): Promise<PaginatedEntityShares> {
+    loadUserSharesPaginated(userId: string, {
+      page,
+      perPage,
+      query,
+      additionalQueries,
+    }: Pagination): Promise<PaginatedEntityShares> {
       const url = PaginationURL(ApiRoutes.EntityShareController.userSharesPaginated(userId).url, page, perPage, query, additionalQueries);
       const promise = fetch('GET', qualifyUrl(url)).then(formatPaginatedSharesResponse);
 

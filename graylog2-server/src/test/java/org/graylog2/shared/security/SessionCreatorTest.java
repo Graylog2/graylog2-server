@@ -113,7 +113,7 @@ public class SessionCreatorTest {
         setUpUserMock();
 
         assertFalse(SecurityUtils.getSubject().isAuthenticated());
-        Optional<Session> session = sessionCreator.create(null, "host", validToken);
+        Optional<Session> session = sessionCreator.login(null, "host", validToken);
         assertTrue(session.isPresent());
         assertEquals(SESSION_TIMEOUT, session.get().getTimeout());
         assertTrue(SecurityUtils.getSubject().isAuthenticated());
@@ -122,7 +122,7 @@ public class SessionCreatorTest {
 
     @Test
     public void invalidAuthToken() {
-        sessionCreator.create(null, "host", invalidToken);
+        sessionCreator.login(null, "host", invalidToken);
         verify(auditEventSender).failure(eq(validToken.getActor()), anyString(), anyMap());
     }
 
@@ -136,7 +136,7 @@ public class SessionCreatorTest {
         String oldSessionId = oldSession.getId().toString();
 
         assertFalse(SecurityUtils.getSubject().isAuthenticated());
-        Optional<Session> session = sessionCreator.create(oldSessionId, "host", validToken);
+        Optional<Session> session = sessionCreator.login(oldSessionId, "host", validToken);
         assertTrue(session.isPresent());
         assertEquals(SESSION_TIMEOUT, session.get().getTimeout());
         assertEquals(oldSessionId, session.get().getId());
@@ -155,7 +155,7 @@ public class SessionCreatorTest {
         String oldSessionId = oldSession.getId().toString();
 
         assertFalse(SecurityUtils.getSubject().isAuthenticated());
-        Optional<Session> session = sessionCreator.create(oldSessionId, "host", validToken);
+        Optional<Session> session = sessionCreator.login(oldSessionId, "host", validToken);
         assertTrue(session.isPresent());
 
         // User will get a new session
@@ -176,7 +176,7 @@ public class SessionCreatorTest {
         realms.add(0, throwingRealm());
         securityManager.setRealms(realms);
 
-        assertThat(sessionCreator.create(null, "host", validToken)).isPresent();
+        assertThat(sessionCreator.login(null, "host", validToken)).isPresent();
         assertThat(SecurityUtils.getSubject().isAuthenticated()).isTrue();
         verify(auditEventSender).success(eq(AuditActor.user("username")), anyString(), anyMap());
     }
@@ -190,7 +190,7 @@ public class SessionCreatorTest {
         // First realm will throw, second realm will be unable to authenticate because user has no account
         securityManager.setRealms(ImmutableList.of(throwingRealm(), new SimpleAccountRealm()));
 
-        assertThatThrownBy(() -> sessionCreator.create(null, "host", validToken)).isInstanceOf(
+        assertThatThrownBy(() -> sessionCreator.login(null, "host", validToken)).isInstanceOf(
                 AuthenticationServiceUnavailableException.class);
         assertThat(SecurityUtils.getSubject().isAuthenticated()).isFalse();
         verify(auditEventSender).failure(eq(AuditActor.user("username")), anyString(),
@@ -222,14 +222,14 @@ public class SessionCreatorTest {
         securityManager.setRealms(ImmutableList.of(switchableRealm, new SimpleAccountRealm()));
 
         // realm will throw an exception on auth attempt
-        assertThatThrownBy(() -> sessionCreator.create(null, "host", validToken)).isInstanceOf(
+        assertThatThrownBy(() -> sessionCreator.login(null, "host", validToken)).isInstanceOf(
                 AuthenticationServiceUnavailableException.class);
         assertThat(SecurityUtils.getSubject().isAuthenticated()).isFalse();
 
         // switch realm to not throw an exception but simply reject the credentials
         doThrow.set(false);
 
-        sessionCreator.create(null, "host", validToken);
+        sessionCreator.login(null, "host", validToken);
         assertThat(SecurityUtils.getSubject().isAuthenticated()).isFalse();
     }
 

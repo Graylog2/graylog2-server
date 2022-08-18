@@ -17,13 +17,13 @@
 import moment from 'moment';
 
 import { RELATIVE_RANGE_TYPES, RELATIVE_ALL_TIME } from 'views/Constants';
-import {
+import type {
   RelativeTimeRange,
   AbsoluteTimeRange,
   KeywordTimeRange,
   NoTimeRangeOverride, TimeRange,
 } from 'views/logic/queries/Query';
-import { RelativeTimeRangeClassified, RangeClassified } from 'views/components/searchbar/date-time-picker/types';
+import type { RelativeTimeRangeClassified, RangeClassified } from 'views/components/searchbar/date-time-picker/types';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 
 const DEFAULT_CLASSIFIED_RANGE: RangeClassified = {

@@ -91,7 +91,7 @@ class CacheForm extends React.Component {
 
   updateState = (cache) => {
     this.setState(this._initialState(cache));
-  }
+  };
 
   _initialState = (c) => {
     const { create } = this.props;
@@ -191,7 +191,7 @@ class CacheForm extends React.Component {
   };
 
   _sanitizeTitle = (title) => {
-    return title.trim().replace(/\W+/g, '-').toLowerCase();
+    return title.trim().replace(/\W+/g, '-').toLocaleLowerCase();
   };
 
   _validationState = (fieldName) => {

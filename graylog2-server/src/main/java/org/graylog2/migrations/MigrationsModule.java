@@ -24,6 +24,11 @@ import org.graylog2.plugin.PluginModule;
 public class MigrationsModule extends PluginModule {
     @Override
     protected void configure() {
+
+        // The LegacyAuthServiceMigration is pluggable. This call ensures that there is always a binder present
+        // even if there are no plugins registered for this migration.
+        Multibinder.newSetBinder(binder(), V20201103145400_LegacyAuthServiceMigration.MigrationModule.class);
+
         addMigration(V20151210140600_ElasticsearchConfigMigration.class);
         addMigration(V20161116172100_DefaultIndexSetMigration.class);
         addMigration(V20161116172200_CreateDefaultStreamMigration.class);
@@ -31,7 +36,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.class);
         addMigration(V20161125142400_EmailAlarmCallbackMigration.class);
         addMigration(V20161125161400_AlertReceiversMigration.class);
-        addMigration(V20161130141500_DefaultStreamRecalcIndexRanges.class);
         addMigration(V20161215163900_MoveIndexSetDefaultConfig.class);
         addMigration(V20161216123500_DefaultIndexSetMigration.class);
         addMigration(V20170110150100_FixAlertConditionsMigration.class);
@@ -51,8 +55,9 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20200722110800_AddBuiltinRoles.class);
         addMigration(GrantsMetaMigration.class);
         addMigration(V20201103145400_LegacyAuthServiceMigration.class);
+        addMigration(V20211221144300_GeoIpResolverConfigMigration.class);
+        addMigration(V20220719130704_ImprovedDefaultProcessingOrderMigration.class);
+        addMigration(V20220623125450_AddJobTypeToJobTrigger.class);
 
-        // Make sure there is always a binder for migration modules
-        Multibinder.newSetBinder(binder(), V20201103145400_LegacyAuthServiceMigration.MigrationModule.class);
     }
 }

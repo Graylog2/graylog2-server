@@ -26,7 +26,6 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -80,10 +79,9 @@ public class ElasticsearchBackendErrorHandlingTest {
                 ),
                 client,
                 indexLookup,
-                new QueryStringDecorators(Collections.emptySet()),
-                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
-                false
-        );
+                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
+                usedSearchFilters -> Collections.emptySet(),
+                false);
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any())).thenReturn(Collections.emptySet());
 
         final SearchType searchType1 = mock(SearchType.class);
@@ -126,7 +124,7 @@ public class ElasticsearchBackendErrorHandlingTest {
                 .collect(Collectors.toList());
         when(client.msearch(any(), any())).thenReturn(items);
 
-        final QueryResult queryResult = this.backend.doRun(searchJob, query, queryContext, Collections.emptySet());
+        final QueryResult queryResult = this.backend.doRun(searchJob, query, queryContext);
 
         final Set<SearchError> errors = queryResult.errors();
 
@@ -144,7 +142,7 @@ public class ElasticsearchBackendErrorHandlingTest {
                 .collect(Collectors.toList());
         when(client.msearch(any(), any())).thenReturn(items);
 
-        final QueryResult queryResult = this.backend.doRun(searchJob, query, queryContext, Collections.emptySet());
+        final QueryResult queryResult = this.backend.doRun(searchJob, query, queryContext);
 
         final Set<SearchError> errors = queryResult.errors();
 

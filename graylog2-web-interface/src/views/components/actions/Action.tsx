@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 
-import { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
+import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 
 import ActionDropdown from './ActionDropdown';
 

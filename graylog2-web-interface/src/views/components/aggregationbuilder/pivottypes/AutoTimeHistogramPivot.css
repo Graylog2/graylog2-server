@@ -1,8 +1,0 @@
-:local(.helpBlock) {
-    display: inline-block !important;
-}
-
-:local(.alignSliderWithLabels) {
-    display: flex;
-    min-width: fit-content;
-}

@@ -26,9 +26,7 @@ import type { DecoratorType, Decorator } from 'views/components/messagelist/deco
 
 import InlineForm from './InlineForm';
 import PopoverHelp from './PopoverHelp';
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import DecoratorStyles from '!style!css!./decoratorStyles.css';
+import DecoratorStyles from './decoratorStyles.css';
 
 const ConfigurationFormContainer = styled.div(({ theme }) => css`
   margin-bottom: 10px;
@@ -128,7 +126,9 @@ class AddDecoratorButton extends React.Component<Props, State> {
     const wrapperComponent = InlineForm();
     const configurationForm = (typeName !== undefined
       ? (
-        <ConfigurationForm ref={(elem) => { this.configurationForm = elem; }}
+        <ConfigurationForm ref={(elem) => {
+          this.configurationForm = elem;
+        }}
                            key="configuration-form-output"
                            configFields={typeDefinition.requested_configuration}
                            title={`Create new ${typeDefinition.name}`}

@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { alice } from 'fixtures/users';
 import { mount } from 'wrappedEnzyme';
 
+import { alice } from 'fixtures/users';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import AppConfig from '../../util/AppConfig';
@@ -86,17 +86,18 @@ describe('SystemMenu', () => {
     permissions                    | count | links
     ${[]}                          | ${2}  | ${['Overview', 'Nodes']}
     ${['clusterconfigentry:read']} | ${3}  | ${['Configurations']}
-    ${['inputs:read']}             | ${4}  | ${['Inputs', 'Grok Patterns']}
+    ${['inputs:read']}             | ${3}  | ${['Inputs']}
+    ${['grok_pattern:read']}       | ${3}  | ${['Grok Patterns']}
     ${['outputs:read']}            | ${3}  | ${['Outputs']}
     ${['indices:read']}            | ${3}  | ${['Indices']}
     ${['loggers:read']}            | ${3}  | ${['Logging']}
     ${['authentication:edit']}     | ${3}  | ${['Authentication']}
     ${['users:list']}              | ${3}  | ${['Users and Teams']}
     ${['roles:read']}              | ${3}  | ${['Roles']}
-    ${['dashboards:create', 'inputs:create', 'streams:create']} | ${4}  | ${['Content Packs']}
-    ${['inputs:edit']}             | ${3}  | ${['Lookup Tables']}
+    ${['contentpack:read']}        | ${3}  | ${['Content Packs']}
+    ${['lookuptables:read']}       | ${3}  | ${['Lookup Tables']}
     ${['sidecars:read']}           | ${3}  | ${['Sidecars']}
-    ${['inputs:create']}           | ${3}  | ${['Pipelines']}
+    ${['pipeline:read', 'pipeline_connection:read']} | ${3}  | ${['Pipelines']}
   `('shows $links for user with $permissions permissions', verifyPermissions);
   });
 

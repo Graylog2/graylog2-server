@@ -18,10 +18,10 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
-import asMock from 'helpers/mocking/AsMock';
-import mockEntityShareState, { failedEntityShareState, john, jane, everyone, security, viewer, owner, manager } from 'fixtures/entityShareState';
 import selectEvent from 'react-select-event';
 
+import asMock from 'helpers/mocking/AsMock';
+import mockEntityShareState, { failedEntityShareState, john, jane, everyone, security, viewer, owner, manager } from 'fixtures/entityShareState';
 import ActiveShare from 'logic/permissions/ActiveShare';
 import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
 

@@ -20,7 +20,7 @@ import styled from 'styled-components';
 
 import { Input, HelpBlock } from 'components/bootstrap';
 
-import { FieldComponentProps } from '../VisualizationConfigurationOptions';
+import type { FieldComponentProps } from '../VisualizationConfigurationOptions';
 
 const StyledField = styled(Field)`
   &&[type="checkbox"] {

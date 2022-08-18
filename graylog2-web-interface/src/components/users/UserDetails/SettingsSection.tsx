@@ -21,7 +21,7 @@ import { upperFirst } from 'lodash';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
 import { ReadOnlyFormGroup } from 'components/common';
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { StreamsActions } from 'stores/streams/StreamsStore';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
@@ -67,12 +67,14 @@ const StartpageValue = ({ type, id }: { type: string | null | undefined, id: str
 const SettingsSection = ({
   user: {
     timezone,
+    serviceAccount,
     sessionTimeout,
     startpage,
   },
 }: Props) => (
   <SectionComponent title="Settings">
     <ReadOnlyFormGroup label="Sessions Timeout" value={_sessionTimeout(sessionTimeout)} />
+    <ReadOnlyFormGroup label="Service Account" value={serviceAccount} />
     <ReadOnlyFormGroup label="Timezone" value={timezone} />
     <ReadOnlyFormGroup label="Startpage" value={<StartpageValue type={startpage?.type} id={startpage?.id} />} />
   </SectionComponent>

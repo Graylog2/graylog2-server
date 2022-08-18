@@ -19,7 +19,7 @@ import Reflux from 'reflux';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
-import { UserJSON } from 'logic/users/User';
+import type { UserJSON } from 'logic/users/User';
 import { singletonStore } from 'logic/singleton';
 import { PreferencesActions } from 'stores/users/PreferencesStore';
 import { SessionActions, SessionStore } from 'stores/sessions/SessionStore';
@@ -50,7 +50,7 @@ export const CurrentUserStore = singletonStore(
     },
 
     sessionUpdate(sessionInfo) {
-      if (sessionInfo.sessionId && sessionInfo.username) {
+      if (sessionInfo.username) {
         const { username } = sessionInfo;
 
         this.update(username);

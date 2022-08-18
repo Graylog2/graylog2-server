@@ -33,9 +33,12 @@ const ConfirmDialog = ({
   btnConfirmDisabled,
   btnCancelText,
   btnConfirmText,
+  hideCancelButton,
 }) => {
+  const onHide = hideCancelButton ? onConfirm : onCancel;
+
   return (
-    <Modal show={show}>
+    <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
@@ -45,7 +48,7 @@ const ConfirmDialog = ({
       </Modal.Body>
 
       <Modal.Footer>
-        <Button type="button" onClick={onCancel} disabled={btnCancelDisabled}>{btnCancelText}</Button>
+        {!hideCancelButton && <Button type="button" onClick={onCancel} disabled={btnCancelDisabled}>{btnCancelText}</Button>}
         <Button type="button" onClick={onConfirm} bsStyle="primary" disabled={btnConfirmDisabled}>{btnConfirmText}</Button>
       </Modal.Footer>
     </Modal>
@@ -55,15 +58,23 @@ const ConfirmDialog = ({
 ConfirmDialog.propTypes = {
   /** Indicates whether the dialog should be shown by default or not. */
   show: PropTypes.bool,
+  /** Indicates whether the dialog should render the cancel button by default or not. */
+  hideCancelButton: PropTypes.bool,
   /** Title to use in the modal. */
   title: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.element,
   ]).isRequired,
   /** Text to use in the cancel button. */
-  btnCancelText: PropTypes.string,
-  /** Text to use in the confirmation button. */
-  btnConfirmText: PropTypes.string,
+  btnCancelText: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.element,
+  ]),
+  /** Text or element to use in the confirmation button. */
+  btnConfirmText: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.element,
+  ]),
   /** Indicates whether the cancel button should be disabled or not. */
   btnCancelDisabled: PropTypes.bool,
   /** Indicates whether the confirm button should be disabled or not. */
@@ -91,6 +102,7 @@ ConfirmDialog.defaultProps = {
   btnConfirmDisabled: false,
   btnCancelDisabled: false,
   show: false,
+  hideCancelButton: false,
   onCancel: () => {},
 };
 

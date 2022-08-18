@@ -21,17 +21,19 @@ import { flow, fromPairs, get, zip, isEmpty } from 'lodash';
 import type Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
+import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
-import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import MapVisualization from './MapVisualization';
 
+import type { ExtractedSeries, ChartData } from '../ChartData';
 import { extractSeries, formatSeries, getLeafsFromRows, getXLabelsFromLeafs } from '../ChartData';
 import transformKeys from '../TransformKeys';
 import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 
-const _arrayToMap = ([name, x, y]) => ({ name, x, y });
+const _arrayToMap = ([name, x, y]: ChartData) => ({ name, x, y });
 const _lastKey = (keys) => keys[keys.length - 1];
 const _mergeObject = (prev, last) => ({ ...prev, ...last });
 
@@ -47,7 +49,7 @@ const _createSeriesWithoutMetric = (rows: Rows) => {
 };
 
 const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
-  return (result) => result.map(({ name, x, y }) => {
+  return (result: Array<ReturnType<typeof _arrayToMap>>) => result.map(({ name, x, y }) => {
     const keys = x.map((k) => k.slice(0, -1)
       .map((key, idx) => ({ [rowPivots[idx].field]: key }))
       .reduce(_mergeObject, {}));
@@ -59,18 +61,26 @@ const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
   });
 };
 
-const WorldMapVisualization = makeVisualization(({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
+const WorldMapVisualization = makeVisualization(({
+  config,
+  data,
+  editing,
+  onChange,
+  width,
+  ...rest
+}: VisualizationComponentProps) => {
   const { rowPivots } = config;
   const onRenderComplete = useContext(RenderCompletionCallback);
   const hasMetric = !isEmpty(config.series);
   const markerRadiusSize = !hasMetric ? 1 : undefined;
   const seriesExtractor = hasMetric ? extractSeries() : _createSeriesWithoutMetric;
+  const { formatTime } = useUserDateTime();
 
   const pipeline = flow([
-    transformKeys(config.rowPivots, config.columnPivots),
+    transformKeys(config.rowPivots, config.columnPivots, formatTime),
     seriesExtractor,
     formatSeries,
-    (results) => results.map(_arrayToMap),
+    (results: ExtractedSeries) => results.map(_arrayToMap),
     _formatSeriesForMap(rowPivots),
   ]);
 

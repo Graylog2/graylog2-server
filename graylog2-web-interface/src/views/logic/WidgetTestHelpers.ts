@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { WidgetExport } from 'views/types';
+import type { WidgetExport } from 'views/types';
 
 // eslint-disable-next-line import/prefer-default-export
 export const createWidget = (type: string): WidgetExport => ({

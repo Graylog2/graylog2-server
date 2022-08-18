@@ -17,18 +17,19 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import { useLocation } from 'react-router-dom';
-import naturalSort from 'javascript-natural-sort';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import type { PluginNavigationDropdownItem, PluginNavigation } from 'graylog-web-plugin';
+import type * as Immutable from 'immutable';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { LinkContainer } from 'components/common/router';
 import { appPrefixed } from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
 import { Navbar, Nav, NavItem, NavDropdown } from 'components/bootstrap';
-import { IfPermitted } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
-import Routes from 'routing/Routes';
+import Routes, { ENTERPRISE_ROUTE_DESCRIPTION, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -45,21 +46,40 @@ const _isActive = (requestPath, prefix) => {
   return requestPath.indexOf(appPrefixed(prefix)) === 0;
 };
 
-const formatSinglePluginRoute = ({ description, path, permissions }, topLevel = false) => {
-  const link = <NavigationLink key={description} description={description} path={appPrefixed(path)} topLevel={topLevel} />;
+/**
+ * Checks if a plugin and its corresponding route is registered to the PluginStore
+ *
+ * @param {string} description
+ */
+function pluginMenuItemExists(description: string): boolean {
+  const pluginExports = PluginStore.exports('navigation');
 
-  if (permissions) {
-    return <IfPermitted key={description} permissions={permissions}>{link}</IfPermitted>;
+  if (!pluginExports) return false;
+
+  return !!pluginExports.find((value) => value.description?.toLowerCase() === description.toLowerCase());
+}
+
+const formatSinglePluginRoute = ({ description, path, permissions, requiredFeatureFlag }: PluginNavigationDropdownItem, currentUserPermissions: Immutable.List<string>, topLevel = false) => {
+  if (permissions && !isPermitted(currentUserPermissions, permissions)) {
+    return null;
   }
 
-  return link;
+  if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
+    return null;
+  }
+
+  return <NavigationLink key={description} description={description} path={appPrefixed(path)} topLevel={topLevel} />;
 };
 
-const formatPluginRoute = (pluginRoute, permissions, pathname) => {
+const formatPluginRoute = (pluginRoute: PluginNavigation, currentUserPermissions: Immutable.List<string>, pathname: string) => {
+  if (pluginRoute.requiredFeatureFlag && !AppConfig.isFeatureEnabled(pluginRoute.requiredFeatureFlag)) {
+    return null;
+  }
+
   if (pluginRoute.children) {
     const activeChild = pluginRoute.children.filter(({ path }) => (path && _isActive(pathname, path)));
     const title = activeChild.length > 0 ? `${pluginRoute.description} / ${activeChild[0].description}` : pluginRoute.description;
-    const isEmpty = !pluginRoute.children.some((child) => isPermitted(permissions, child.permissions));
+    const isEmpty = !pluginRoute.children.some((child) => isPermitted(currentUserPermissions, child.permissions) && (child.requiredFeatureFlag ? AppConfig.isFeatureEnabled(child.requiredFeatureFlag) : true));
 
     if (isEmpty) {
       return null;
@@ -67,12 +87,12 @@ const formatPluginRoute = (pluginRoute, permissions, pathname) => {
 
     return (
       <NavDropdown key={title} title={title} id="enterprise-dropdown">
-        {pluginRoute.children.map((child) => formatSinglePluginRoute(child, false))}
+        {pluginRoute.children.map((child) => formatSinglePluginRoute(child, currentUserPermissions, false))}
       </NavDropdown>
     );
   }
 
-  return formatSinglePluginRoute(pluginRoute, true);
+  return formatSinglePluginRoute(pluginRoute, currentUserPermissions, true);
 };
 
 type Props = {
@@ -85,20 +105,30 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
   const pluginExports = PluginStore.exports('navigation');
 
-  const enterpriseMenuIsMissing = !pluginExports.find((value) => value.description.toLowerCase() === 'enterprise');
-  const isPermittedToEnterprise = isPermitted(permissions, ['licenseinfos:read']);
+  const enterpriseMenuIsMissing = !pluginMenuItemExists(ENTERPRISE_ROUTE_DESCRIPTION);
+  const securityMenuIsMissing = !pluginMenuItemExists(SECURITY_ROUTE_DESCRIPTION);
 
-  if (enterpriseMenuIsMissing && isPermittedToEnterprise) {
+  const isPermittedToEnterpriseOrSecurity = isPermitted(permissions, ['licenseinfos:read']);
+
+  if (enterpriseMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
     // no enterprise plugin menu, so we will add one
     pluginExports.push({
       path: Routes.SYSTEM.ENTERPRISE,
-      description: 'Enterprise',
+      description: ENTERPRISE_ROUTE_DESCRIPTION,
+    });
+  }
+
+  if (securityMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
+    // no security plugin menu, so we will add one
+    pluginExports.push({
+      path: Routes.SECURITY,
+      description: SECURITY_ROUTE_DESCRIPTION,
     });
   }
 
   const pluginNavigations = pluginExports
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
-    .map((pluginRoute) => formatPluginRoute(pluginRoute, permissions, pathname));
+    .map((pluginRoute) => formatPluginRoute(pluginRoute, currentUser.permissions, pathname));
   const pluginItems = PluginStore.exports('navigationItems');
 
   return (

@@ -21,16 +21,18 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
-import View, { ViewStateMap, ViewType } from 'views/logic/views/View';
+import type { ViewStateMap, ViewType } from 'views/logic/views/View';
+import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import Search from 'views/logic/search/Search';
-import { TitleType } from 'views/stores/TitleTypes';
+import type { TitleType } from 'views/stores/TitleTypes';
 
 const searchType = {
   id: 'search-type-id-1',
   type: 'messages',
   streams: [],
   sort: [],
+  filters: [],
   filter: '',
   name: null,
   query: null,

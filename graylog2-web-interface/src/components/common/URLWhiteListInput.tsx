@@ -14,15 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useRef, useState, useEffect, SyntheticEvent } from 'react';
+import type { SyntheticEvent } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import { Input } from 'components/bootstrap';
 import { isValidURL } from 'util/URLUtils';
-import * as FormsUtils from 'util/FormsUtils';
 // Explicit import to fix eslint import/no-cycle
 import URLWhiteListFormModal from 'components/common/URLWhiteListFormModal';
 import ToolsStore from 'stores/tools/ToolsStore';
+import { triggerInput } from 'util/FormsUtils';
 
 type Props = {
   label: string,
@@ -30,12 +31,14 @@ type Props = {
   validationMessage: string,
   validationState: string,
   url: string,
+  onValidationChange?: (validationState: string) => void,
   labelClassName: string,
   wrapperClassName: string,
   urlType: React.ComponentProps<typeof URLWhiteListFormModal>['urlType'],
+  autofocus: boolean,
 };
 
-const URLWhiteListInput = ({ label, onChange, validationMessage, validationState, url, labelClassName, wrapperClassName, urlType }: Props) => {
+const URLWhiteListInput = ({ label, onChange, validationMessage, validationState, url, onValidationChange, labelClassName, wrapperClassName, urlType, autofocus }: Props) => {
   const [isWhitelisted, setIsWhitelisted] = useState(false);
   const [currentValidationState, setCurrentValidationState] = useState(validationState);
   const [ownValidationMessage, setOwnValidationMessage] = useState(validationMessage);
@@ -49,30 +52,32 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
 
   const [suggestedUrl, setSuggestedUrl] = useState(url);
   const isWhitelistError = () => currentValidationState === 'error' && isValidURL(url);
-  const ref = useRef();
+  const urlInputRef = useRef<Input>();
 
-  const checkIsWhitelisted = () => {
+  const checkIsWhitelisted = useCallback(() => {
     if (url) {
       const promise = ToolsStore.urlWhiteListCheck(url);
 
       promise.then((result) => {
         if (!result.is_whitelisted && validationState === null) {
           setCurrentValidationState('error');
+          onValidationChange('error');
           const message = isValidURL(url) ? `URL ${url} is not whitelisted` : `URL ${url} is not a valid URL.`;
 
           setOwnValidationMessage(message);
         } else {
           setOwnValidationMessage(validationMessage);
           setCurrentValidationState(validationState);
+          onValidationChange(validationState);
         }
 
         setIsWhitelisted(result.is_whitelisted);
       });
     }
-  };
+  }, [url, validationMessage, validationState, onValidationChange]);
 
   const onUpdate = () => {
-    FormsUtils.triggerInput(ref.current);
+    triggerInput(urlInputRef.current.getInputDOMNode());
     checkIsWhitelisted();
   };
 
@@ -94,13 +99,13 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
     const timer = setTimeout(() => checkSuggestion(), 250);
 
     return () => clearTimeout(timer);
-  }, [url]);
+  }, [url, urlType]);
 
   useEffect(() => {
     const timer = setTimeout(() => checkIsWhitelisted(), 250);
 
     return () => clearTimeout(timer);
-  }, [url, validationState]);
+  }, [url, validationState, checkIsWhitelisted]);
 
   const addButton = isWhitelistError() && !isWhitelisted ? <URLWhiteListFormModal newUrlEntry={suggestedUrl} onUpdate={onUpdate} urlType={urlType} /> : '';
   const helpMessage = <>{validationState === null ? ownValidationMessage : validationMessage} {addButton}</>;
@@ -111,8 +116,8 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
            id="url"
            name="url"
            label={label}
-           ref={ref}
-           autoFocus
+           ref={urlInputRef}
+           autoFocus={autofocus}
            required
            onChange={onChange}
            help={helpMessage}
@@ -124,6 +129,7 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
 };
 
 URLWhiteListInput.propTypes = {
+  autofocus: PropTypes.bool,
   label: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   validationState: PropTypes.string,
@@ -132,18 +138,21 @@ URLWhiteListInput.propTypes = {
     PropTypes.string,
   ]),
   url: PropTypes.string,
+  onValidationChange: PropTypes.func,
   labelClassName: PropTypes.string,
   wrapperClassName: PropTypes.string,
   urlType: PropTypes.oneOf(['regex', 'literal']),
 };
 
 URLWhiteListInput.defaultProps = {
+  autofocus: true,
   url: '',
   validationState: '',
   validationMessage: '',
   labelClassName: '',
   wrapperClassName: '',
   urlType: 'literal',
+  onValidationChange: () => {},
 };
 
 export default URLWhiteListInput;

@@ -16,27 +16,28 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useMemo, useState } from 'react';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { BackendWidgetPosition, WidgetResults } from 'views/types';
 
+import type { BackendWidgetPosition, WidgetResults } from 'views/types';
 import { useStore } from 'stores/connect';
 import { widgetDefinition } from 'views/logic/Widgets';
-import { WidgetActions, Widgets } from 'views/stores/WidgetStore';
+import type { Widgets } from 'views/stores/WidgetStore';
+import { WidgetActions } from 'views/stores/WidgetStore';
 import { TitlesActions } from 'views/stores/TitlesStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import WidgetModel from 'views/logic/widgets/Widget';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import TimerangeInfo from 'views/components/widgets/TimerangeInfo';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
-import WidgetConfig from 'views/logic/widgets/WidgetConfig';
-import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useWidgetResults from 'views/components/useWidgetResults';
 
 import WidgetFrame from './WidgetFrame';
@@ -55,11 +56,8 @@ export type Props = {
   widget: WidgetModel,
   editing: boolean,
   fields: Immutable.List<FieldTypeMapping>,
-  height?: number,
-  width?: number,
   title: string,
   position: WidgetPosition,
-  onSizeChange: () => void,
   onPositionsChange: (position: BackendWidgetPosition) => void,
 };
 
@@ -83,14 +81,14 @@ const WidgetFooter = styled.div`
   justify-content: flex-end;
 `;
 
-type VisualizationProps = Pick<Props, 'title' | 'id' | 'widget' | 'height' | 'width' | 'fields' | 'editing'> & {
+type VisualizationProps = Pick<Props, 'title' | 'id' | 'widget' | 'fields' | 'editing'> & {
   queryId: string,
   setLoadingState: (loading: boolean) => void,
   onToggleEdit: () => void,
   onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => Promise<Widgets>,
 };
 
-const Visualization = ({ title, id, widget, height, width, fields, queryId, editing, setLoadingState, onToggleEdit, onWidgetConfigChange }: VisualizationProps) => {
+const Visualization = ({ title, id, widget, fields, queryId, editing, setLoadingState, onToggleEdit, onWidgetConfigChange }: VisualizationProps) => {
   const VisComponent = useMemo(() => _visualizationForType(widget.type), [widget.type]);
   const { error: errors, widgetData: data } = useWidgetResults(id);
 
@@ -107,14 +105,12 @@ const Visualization = ({ title, id, widget, height, width, fields, queryId, edit
                     editing={editing}
                     fields={fields}
                     filter={filter}
-                    height={height}
                     queryId={queryId}
                     onConfigChange={onWidgetConfigChange}
                     setLoadingState={setLoadingState}
                     title={title}
                     toggleEdit={onToggleEdit}
                     type={widget.type}
-                    width={width}
                     id={id} />
     );
   }
@@ -123,7 +119,7 @@ const Visualization = ({ title, id, widget, height, width, fields, queryId, edit
 };
 
 type EditWrapperProps = {
-  children: React.ReactNode,
+  children: React.ReactElement,
   config: WidgetConfig,
   editing: boolean,
   fields: FieldTypeMappingsList,
@@ -148,10 +144,10 @@ const EditWrapper = ({ children, config, editing, fields, id, onToggleEdit, onCa
         {children}
       </EditComponent>
     </EditWidgetFrame>
-  ) : <>{children}</>;
+  ) : children;
 };
 
-const Widget = ({ id, editing, height, width, widget, fields, onSizeChange, title, position, onPositionsChange }: Props) => {
+const Widget = ({ id, editing, widget, fields, title, position, onPositionsChange }: Props) => {
   const [loading, setLoading] = useState(false);
   const [oldWidget, setOldWidget] = useState(editing ? widget : undefined);
   const { focusedWidget, setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
@@ -167,7 +163,7 @@ const Widget = ({ id, editing, height, width, widget, fields, onSizeChange, titl
   }, [editing, setWidgetEditing, unsetWidgetEditing, widget]);
   const onCancelEdit = useCallback(() => {
     if (oldWidget) {
-      WidgetActions.update(id, oldWidget);
+      WidgetActions.update(id, oldWidget).then(() => {});
     }
 
     onToggleEdit();
@@ -181,7 +177,7 @@ const Widget = ({ id, editing, height, width, widget, fields, onSizeChange, titl
 
   return (
     <WidgetColorContext id={id}>
-      <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
+      <WidgetFrame widgetId={id}>
         <InteractiveContext.Consumer>
           {(interactive) => (
             <WidgetHeader title={title}
@@ -213,8 +209,6 @@ const Widget = ({ id, editing, height, width, widget, fields, onSizeChange, titl
                            widget={widget}
                            fields={fields}
                            title={title}
-                           height={height}
-                           width={width}
                            setLoadingState={setLoading}
                            onToggleEdit={onToggleEdit}
                            onWidgetConfigChange={onWidgetConfigChange} />
@@ -233,18 +227,13 @@ const Widget = ({ id, editing, height, width, widget, fields, onSizeChange, titl
 Widget.propTypes = {
   editing: PropTypes.bool,
   fields: PropTypes.any.isRequired,
-  height: PropTypes.number,
   id: PropTypes.string.isRequired,
   onPositionsChange: PropTypes.func.isRequired,
-  onSizeChange: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   widget: PropTypes.instanceOf(WidgetModel).isRequired,
-  width: PropTypes.number,
 };
 
 Widget.defaultProps = {
-  height: 1,
-  width: 1,
   editing: false,
 };
 

@@ -24,6 +24,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -41,8 +42,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -55,38 +56,52 @@ public class RotationStrategyResource extends RestResource {
     private final Map<String, Provider<RotationStrategy>> rotationStrategies;
     private final ObjectMapper objectMapper;
     private final ClusterConfigService clusterConfigService;
+    private final ElasticsearchConfiguration elasticsearchConfiguration;
 
     @Inject
     public RotationStrategyResource(Map<String, Provider<RotationStrategy>> rotationStrategies,
                                     ObjectMapper objectMapper,
-                                    ClusterConfigService clusterConfigService) {
+                                    ClusterConfigService clusterConfigService,
+                                    ElasticsearchConfiguration elasticsearchConfiguration) {
         this.rotationStrategies = requireNonNull(rotationStrategies);
         this.objectMapper = objectMapper;
         this.clusterConfigService = requireNonNull(clusterConfigService);
+        this.elasticsearchConfiguration = elasticsearchConfiguration;
     }
 
     @GET
     @Path("strategies")
     @Timed
     @ApiOperation(value = "List available rotation strategies",
-            notes = "This resource returns a list of all available rotation strategies on this Graylog node.")
+                  notes = "This resource returns a list of all available rotation strategies on this Graylog node.")
     public RotationStrategies list() {
-        final Set<RotationStrategyDescription> strategies = rotationStrategies.keySet()
+        final List<RotationStrategyDescription> strategies = rotationStrategies.keySet()
                 .stream()
+                .filter(this::isEnabledRotationStrategy)
                 .map(this::getRotationStrategyDescription)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
-        return RotationStrategies.create(strategies.size(), strategies);
+        return RotationStrategies.create(strategies);
     }
 
     @GET
     @Path("strategies/{strategy}")
     @Timed
     @ApiOperation(value = "Show JSON schema for configuration of given rotation strategies",
-            notes = "This resource returns a JSON schema for the configuration of the given rotation strategy.")
+                  notes = "This resource returns a JSON schema for the configuration of the given rotation strategy.")
     public RotationStrategyDescription configSchema(@ApiParam(name = "strategy", value = "The name of the rotation strategy", required = true)
-                                   @PathParam("strategy") @NotEmpty String strategyName) {
+                                                    @PathParam("strategy") @NotEmpty String strategyName) {
         return getRotationStrategyDescription(strategyName);
+    }
+
+    // Limit available rotation strategies to those specified by configuration parameter enabled_index_rotation_strategies
+    private boolean isEnabledRotationStrategy(String strategyName) {
+        final Provider<RotationStrategy> provider = rotationStrategies.get(strategyName);
+        if (provider == null) {
+            throw new NotFoundException("Couldn't find rotation strategy for given type " + strategyName);
+        }
+        final RotationStrategy rotationStrategy = provider.get();
+        return elasticsearchConfiguration.getEnabledRotationStrategies().contains(rotationStrategy.getStrategyName());
     }
 
     private RotationStrategyDescription getRotationStrategyDescription(String strategyName) {

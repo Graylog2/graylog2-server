@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 @JsonDeserialize(builder = ViewSummaryDTO.Builder.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @WithBeanGetter
-public abstract class ViewSummaryDTO {
+public abstract class ViewSummaryDTO implements ViewLike {
     @ObjectId
     @Id
     @Nullable

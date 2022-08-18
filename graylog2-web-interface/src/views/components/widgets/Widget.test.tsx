@@ -17,30 +17,33 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import type { PluginRegistration } from 'graylog-web-plugin/plugin';
+import { PluginStore } from 'graylog-web-plugin/plugin';
+
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
-import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
 import MockStore from 'helpers/mocking/StoreMock';
 import { createSearch } from 'fixtures/searches';
 import asMock from 'helpers/mocking/AsMock';
-
 import WidgetModel from 'views/logic/widgets/Widget';
-import { WidgetActions, Widgets } from 'views/stores/WidgetStore';
+import type { Widgets } from 'views/stores/WidgetStore';
+import { WidgetActions } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { ViewStore } from 'views/stores/ViewStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
-import { TitlesMap } from 'views/stores/TitleTypes';
+import type { TitlesMap } from 'views/stores/TitleTypes';
 import useWidgetResults from 'views/components/useWidgetResults';
-import SearchError from 'views/logic/SearchError';
+import type SearchError from 'views/logic/SearchError';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
 
 import WidgetContext from '../contexts/WidgetContext';
-import WidgetFocusContext, { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
+import type { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
+import WidgetFocusContext from '../contexts/WidgetFocusContext';
 
-jest.mock('../searchbar/QueryInput', () => mockComponent('QueryInput'));
+jest.mock('../searchbar/queryinput/QueryInput', () => mockComponent('QueryInput'));
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
 jest.mock('views/components/useWidgetResults');
@@ -116,13 +119,13 @@ describe('<Widget />', () => {
     unsetWidgetEditing = () => {},
     ...props
   }: DummyWidgetProps) => (
+    // eslint-disable-next-line react/jsx-no-constructed-context-values
     <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
       <WidgetContext.Provider value={propsWidget}>
         <Widget widget={propsWidget}
                 id="widgetId"
                 fields={Immutable.List([])}
                 onPositionsChange={() => {}}
-                onSizeChange={() => {}}
                 title="Widget Title"
                 position={new WidgetPosition(1, 1, 1, 1)}
                 {...props} />

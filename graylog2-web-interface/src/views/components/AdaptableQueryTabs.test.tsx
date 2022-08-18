@@ -20,10 +20,10 @@ import React from 'react';
 import Immutable, { Map } from 'immutable';
 import userEvent from '@testing-library/user-event';
 
-import { TitlesMap } from 'views/stores/TitleTypes';
+import type { TitlesMap } from 'views/stores/TitleTypes';
 
 import AdaptableQueryTabs from './AdaptableQueryTabs';
-import QueryTitleEditModal from './queries/QueryTitleEditModal';
+import type QueryTitleEditModal from './queries/QueryTitleEditModal';
 
 Object.defineProperties(window.HTMLElement.prototype, {
   offsetWidth: {

@@ -1,0 +1,162 @@
+{
+  "scheduler_triggers": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0000"
+      },
+      "job_definition_id": "54e3deadbeefdeadbeefaff3",
+      "job_definition_type": "event-processor-execution-v1",
+      "start_time": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "next_time": {
+        "$date": "2019-01-01T01:00:00.000Z"
+      },
+      "created_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "updated_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "status": "runnable",
+      "lock": {
+        "owner": null,
+        "clock": 0,
+        "progress": 0
+      },
+      "schedule": {
+        "type": "interval",
+        "interval": 1,
+        "unit": "SECONDS"
+      },
+      "data": null
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "job_definition_id": "54e3deadbeefdeadbeefaff3",
+      "job_definition_type": "event-processor-execution-v1",
+      "start_time": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "end_time": {
+        "$date": "2019-01-31T00:00:00.000Z"
+      },
+      "next_time": {
+        "$date": "2019-01-01T01:00:00.000Z"
+      },
+      "created_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "updated_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "status": "running",
+      "lock": {
+        "owner": "node-1",
+        "last_lock_time": {
+          "$date": "2019-01-01T00:00:00.000Z"
+        },
+        "clock": 0,
+        "progress": 0
+      },
+      "schedule": {
+        "type": "interval",
+        "interval": 1,
+        "unit": "SECONDS"
+      },
+      "data": {
+        "type": "__test_job_trigger_data__",
+        "map": {
+          "hello": "world"
+        }
+      }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "job_definition_id": "54e3deadbeefdeadbeefaff4",
+      "job_definition_type": "event-processor-execution-v1",
+      "start_time": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "next_time": {
+        "$date": "2019-01-01T00:30:00.000Z"
+      },
+      "created_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "updated_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "triggered_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "status": "running",
+      "lock": {
+        "owner": "node-2",
+        "last_lock_time": {
+          "$date": "2019-01-01T00:01:00.000Z"
+        },
+        "clock": 5,
+        "progress": 80
+      },
+      "schedule": {
+        "type": "interval",
+        "interval": 1,
+        "unit": "SECONDS"
+      },
+      "data": {
+        "type": "__test_job_trigger_data__",
+        "map": {
+          "hello": "world"
+        }
+      }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0003"
+      },
+      "job_definition_id": "54e3deadbeefdeadbeefaff4",
+      "job_definition_type": "event-processor-execution-v1",
+      "start_time": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "next_time": {
+        "$date": "2019-01-01T00:20:00.000Z"
+      },
+      "created_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "updated_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "triggered_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "status": "running",
+      "lock": {
+        "owner": "node-2",
+        "last_lock_time": {
+          "$date": "2019-01-01T01:55:01.000Z"
+        },
+        "clock": 5,
+        "progress": 80
+      },
+      "schedule": {
+        "type": "interval",
+        "interval": 1,
+        "unit": "SECONDS"
+      },
+      "data": {
+        "type": "__test_job_trigger_data__",
+        "map": {
+          "hello": "world"
+        }
+      }
+    }
+  ]
+}
+

@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
+
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';
-
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
 import MessageTableEntry from './MessageTableEntry';

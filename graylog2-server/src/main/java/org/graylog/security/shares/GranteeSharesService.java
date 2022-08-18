@@ -23,6 +23,7 @@ import com.google.common.primitives.Ints;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.grn.GRNDescriptorService;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
@@ -76,7 +77,7 @@ public class GranteeSharesService {
 
         final Set<GRN> targets = grants.stream().map(GrantDTO::target).collect(Collectors.toSet());
 
-        final Map<GRN, Set<EntityDescriptor.Owner>> targetOwners = getTargetOwners(targets);
+        final Map<GRN, Set<Grantee>> targetOwners = getTargetOwners(targets);
 
         final Supplier<Stream<EntityDescriptor>> filteredStream = () -> targets.stream()
                 .map(descriptorService::getDescriptor)
@@ -124,7 +125,7 @@ public class GranteeSharesService {
         return SharesResponse.create(paginatedList, granteeCapabilities);
     }
 
-    private Function<GRNDescriptor, EntityDescriptor> toEntityDescriptor(Map<GRN, Set<EntityDescriptor.Owner>> targetOwners) {
+    private Function<GRNDescriptor, EntityDescriptor> toEntityDescriptor(Map<GRN, Set<Grantee>> targetOwners) {
         return grnDescriptor -> EntityDescriptor.create(
                 grnDescriptor.grn(),
                 grnDescriptor.title(),
@@ -132,17 +133,23 @@ public class GranteeSharesService {
         );
     }
 
-    private Map<GRN, Set<EntityDescriptor.Owner>> getTargetOwners(Set<GRN> targets) {
+    private Map<GRN, Set<Grantee>> getTargetOwners(Set<GRN> targets) {
         return grantService.getOwnersForTargets(targets).entrySet()
                 .stream()
                 .map(entry -> Maps.immutableEntry(entry.getKey(), getOwners(entry)))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private Set<EntityDescriptor.Owner> getOwners(Map.Entry<GRN, Set<GRN>> entry) {
+    private Set<Grantee> getOwners(Map.Entry<GRN, Set<GRN>> entry) {
         return descriptorService.getDescriptors(entry.getValue())
                 .stream()
-                .map(descriptor -> EntityDescriptor.Owner.create(descriptor.grn(), descriptor.title()))
+                .map(descriptor -> {
+                            if (descriptor.grn().equals(GRNRegistry.GLOBAL_USER_GRN)) {
+                                return Grantee.createGlobal();
+                            }
+                            return Grantee.create(descriptor.grn(), descriptor.grn().type(), descriptor.title());
+                        }
+                )
                 .collect(Collectors.toSet());
     }
 

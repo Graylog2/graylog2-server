@@ -26,7 +26,7 @@ import org.graylog2.configuration.validators.ElasticsearchVersionValidator;
 import org.graylog2.configuration.validators.HttpOrHttpsSchemeValidator;
 import org.graylog2.configuration.validators.ListOfURIsWithHostAndSchemeValidator;
 import org.graylog2.configuration.validators.NonEmptyListValidator;
-import org.graylog2.plugin.Version;
+import org.graylog2.storage.SearchVersion;
 
 import java.net.URI;
 import java.util.Collections;
@@ -34,7 +34,7 @@ import java.util.List;
 
 public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_version", converter = MajorVersionConverter.class, validators = {ElasticsearchVersionValidator.class})
-    Version elasticsearchVersion;
+    SearchVersion elasticsearchVersion;
 
     @Parameter(value = "elasticsearch_hosts", converter = URIListConverter.class, validators = {NonEmptyListValidator.class, ListOfURIsWithHostAndSchemeValidator.class})
     List<URI> elasticsearchHosts = Collections.singletonList(URI.create("http://127.0.0.1:9200"));

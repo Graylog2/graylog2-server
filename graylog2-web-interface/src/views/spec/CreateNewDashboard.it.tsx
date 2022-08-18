@@ -17,10 +17,10 @@
 import * as React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
-import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
-import mockAction from 'helpers/mocking/MockAction';
 
+import { asMock, StoreMock as MockStore } from 'helpers/mocking';
+import mockAction from 'helpers/mocking/MockAction';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import AppRouter from 'routing/AppRouter';
@@ -35,7 +35,6 @@ jest.mock('views/stores/DashboardsStore', () => ({
     search: jest.fn(() => Promise.resolve()),
   },
   DashboardsStore: MockStore(
-    ['listen', () => jest.fn()],
     ['getInitialState', () => ({
       listen: [],
       pagination: {
@@ -49,7 +48,6 @@ jest.mock('views/stores/DashboardsStore', () => ({
 
 jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(
-    ['listen', () => jest.fn()],
     'get',
     ['getInitialState', () => ({
       currentUser: {
@@ -72,7 +70,7 @@ jest.mock('views/stores/SearchMetadataStore', () => ({
 declare global {
   namespace NodeJS {
     interface Global {
-      api_url: string
+      api_url: string;
     }
   }
 }
@@ -91,11 +89,10 @@ jest.mock('stores/sessions/SessionStore', () => ({
   },
   SessionStore: {
     isLoggedIn: jest.fn(() => true),
-    getSessionId: jest.fn(() => 'foobar'),
   },
 }));
 
-jest.mock('views/components/searchbar/QueryInput', () => () => <span>Query Editor</span>);
+jest.mock('views/components/searchbar/queryinput/QueryInput', () => () => <span>Query Editor</span>);
 
 jest.unmock('logic/rest/FetchProvider');
 

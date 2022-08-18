@@ -22,7 +22,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import type { LookupTable, LookupTableAdapter, LookupTableCache } from 'logic/lookup-tables/types';
-import { PaginatedResponseType } from 'stores/PaginationTypes';
+import type { PaginatedResponseType } from 'stores/PaginationTypes';
 
 type LookupResult = {
   multi_value: string | number | object | boolean | null,
@@ -153,8 +153,7 @@ export const LookupTablesStore = singletonStore(
     },
 
     reloadPage() {
-      const promise = this.searchPaginated(this.pagination.page, this.pagination.per_page,
-        this.pagination.query);
+      const promise = this.searchPaginated(this.pagination.page, this.pagination.per_page, this.pagination.query);
 
       LookupTablesActions.reloadPage.promise(promise);
 
