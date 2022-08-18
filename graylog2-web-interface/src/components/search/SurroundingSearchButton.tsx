@@ -19,7 +19,6 @@ import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
-import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
 
