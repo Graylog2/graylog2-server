@@ -139,6 +139,11 @@
                 <artifactId>mongojack</artifactId>
                 <version>${mongojack.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.graylog.shaded</groupId>
+                <artifactId>mongojack4</artifactId>
+                <version>${mongojack4.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
