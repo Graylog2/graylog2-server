@@ -18,25 +18,26 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import { alice } from 'fixtures/users';
-import type User from 'logic/users/User';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import { adminUser } from 'fixtures/users';
+import { asMock } from 'helpers/mocking';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import IfPermitted from './IfPermitted';
 
 jest.mock('stores/connect', () => (x) => x);
+jest.mock('hooks/useCurrentUser');
 
 describe('IfPermitted', () => {
-  type SUTProps = Partial<React.ComponentProps<typeof IfPermitted>> & {
-    currentUser?: User,
-  }
+  type SUTProps = Partial<React.ComponentProps<typeof IfPermitted>>;
 
   const defaultChildren = <p>Something!</p>;
-  const SimpleIfPermitted = ({ children = defaultChildren, currentUser, permissions, ...rest }: SUTProps) => (
-    <CurrentUserContext.Provider value={currentUser}>
-      <IfPermitted permissions={permissions} {...rest}>{children}</IfPermitted>
-    </CurrentUserContext.Provider>
+  const SimpleIfPermitted = ({ children = defaultChildren, permissions, ...rest }: SUTProps) => (
+    <IfPermitted permissions={permissions} {...rest}>{children}</IfPermitted>
   );
+
+  beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(adminUser);
+  });
 
   describe('renders nothing if', () => {
     const expectToNotRenderChildren = () => {
@@ -44,75 +45,78 @@ describe('IfPermitted', () => {
     };
 
     it('no user is present', () => {
+      asMock(useCurrentUser).mockReturnValue(undefined);
       render(<SimpleIfPermitted permissions={['somepermission']} />);
 
       expectToNotRenderChildren();
     });
 
     it('user does not have permissions', () => {
-      const currentUser = alice.toBuilder()
+      const user = adminUser.toBuilder()
         .permissions(undefined)
         .build();
-
-      render(<SimpleIfPermitted permissions={['somepermission']} currentUser={currentUser} />);
+      asMock(useCurrentUser).mockReturnValue(user);
+      render(<SimpleIfPermitted permissions={['somepermission']} />);
 
       expectToNotRenderChildren();
     });
 
     it('user has empty permissions', () => {
-      const currentUser = alice.toBuilder().permissions(Immutable.List()).build();
-
-      render(<SimpleIfPermitted permissions={['somepermission']} currentUser={currentUser} />);
+      const user = adminUser.toBuilder().permissions(Immutable.List()).build();
+      asMock(useCurrentUser).mockReturnValue(user);
+      render(<SimpleIfPermitted permissions={['somepermission']} />);
 
       expectToNotRenderChildren();
     });
 
     it('user has different permissions', () => {
-      const currentUser = alice.toBuilder()
+      const user = adminUser.toBuilder()
         .permissions(Immutable.List(['someotherpermission']))
         .build();
 
-      render(<SimpleIfPermitted permissions={['somepermission']} currentUser={currentUser} />);
+      asMock(useCurrentUser).mockReturnValue(user);
+      render(<SimpleIfPermitted permissions={['somepermission']} />);
 
       expectToNotRenderChildren();
     });
 
     it('user is missing one permission', () => {
-      const currentUser = alice.toBuilder()
+      const user = adminUser.toBuilder()
         .permissions(Immutable.List(['someotherpermission']))
         .build();
 
-      render(<SimpleIfPermitted permissions={['somepermission', 'someotherpermission']} currentUser={currentUser} />);
+      asMock(useCurrentUser).mockReturnValue(user);
+      render(<SimpleIfPermitted permissions={['somepermission', 'someotherpermission']} />);
 
       expectToNotRenderChildren();
     });
 
     it('user is missing permission for specific id', () => {
-      const currentUser = alice.toBuilder()
+      const user = adminUser.toBuilder()
         .permissions(Immutable.List(['entity:action:otherid']))
         .build();
-
-      render(<SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser} />);
+      asMock(useCurrentUser).mockReturnValue(user);
+      render(<SimpleIfPermitted permissions={['entity:action:id']} />);
 
       expectToNotRenderChildren();
     });
 
     it('user has permission for different action', () => {
-      const currentUser = alice.toBuilder()
+      const user = adminUser.toBuilder()
         .permissions(Immutable.List(['entity:otheraction']))
         .build();
-
-      render(<SimpleIfPermitted permissions={['entity:action']} currentUser={currentUser} />);
+      asMock(useCurrentUser).mockReturnValue(user);
+      render(<SimpleIfPermitted permissions={['entity:action']} />);
 
       expectToNotRenderChildren();
     });
 
     it('user has permission for id only', () => {
-      const currentUser = alice.toBuilder()
+      const user = adminUser.toBuilder()
         .permissions(Immutable.List(['entity:action:id']))
         .build();
-
-      render(<SimpleIfPermitted permissions={['entity:action']} currentUser={currentUser} />);
+      asMock(useCurrentUser).mockReturnValue(user);
+      render(<SimpleIfPermitted permissions={['entity:action']} />);
 
       expectToNotRenderChildren();
     });
@@ -124,11 +128,11 @@ describe('IfPermitted', () => {
     };
 
     it('empty permissions were passed', () => {
-      const currentUser = alice.toBuilder()
+      const user = adminUser.toBuilder()
         .permissions(Immutable.List([]))
         .build();
-
-      render(<SimpleIfPermitted permissions={[]} currentUser={currentUser} />);
+      asMock(useCurrentUser).mockReturnValue(user);
+      render(<SimpleIfPermitted permissions={[]} />);
 
       expectToRenderChildren();
     });
@@ -146,81 +150,81 @@ describe('IfPermitted', () => {
     });
 
     it('user has exact required permissions', () => {
-      const currentUser = alice.toBuilder()
+      const user = adminUser.toBuilder()
         .permissions(Immutable.List(['something']))
         .build();
-
-      render(<SimpleIfPermitted permissions={['something']} currentUser={currentUser} />);
+      asMock(useCurrentUser).mockReturnValue(user);
+      render(<SimpleIfPermitted permissions={['something']} />);
 
       expectToRenderChildren();
     });
 
     it('user has any exact required permission', () => {
-      const currentUser = alice.toBuilder()
+      const user = adminUser.toBuilder()
         .permissions(Immutable.List(['something']))
         .build();
-
-      render(<SimpleIfPermitted permissions={['something', 'someother']} currentUser={currentUser} anyPermissions />);
+      asMock(useCurrentUser).mockReturnValue(user);
+      render(<SimpleIfPermitted permissions={['something', 'someother']} anyPermissions />);
 
       expectToRenderChildren();
     });
 
     it('user has exact required permission for action with entity id', () => {
-      const currentUser = alice.toBuilder()
+      const user = adminUser.toBuilder()
         .permissions(Immutable.List(['entity:action:id']))
         .build();
-
-      render(<SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser} />);
+      asMock(useCurrentUser).mockReturnValue(user);
+      render(<SimpleIfPermitted permissions={['entity:action:id']} />);
 
       expectToRenderChildren();
     });
 
     it('user has wildcard permission', () => {
-      const currentUser = alice.toBuilder()
+      const user = adminUser.toBuilder()
         .permissions(Immutable.List(['*']))
         .build();
-
-      render(<SimpleIfPermitted permissions={['something']} currentUser={currentUser} />);
+      asMock(useCurrentUser).mockReturnValue(user);
+      render(<SimpleIfPermitted permissions={['something']} />);
 
       expectToRenderChildren();
     });
 
     it('user has wildcard permission for action', () => {
-      const currentUser = alice.toBuilder()
+      const user = adminUser.toBuilder()
         .permissions(Immutable.List(['entity:action']))
         .build();
-
-      render(<SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser} />);
+      asMock(useCurrentUser).mockReturnValue(user);
+      render(<SimpleIfPermitted permissions={['entity:action:id']} />);
 
       expectToRenderChildren();
     });
 
     it('user has wildcard permission for id', () => {
-      const currentUser = alice.toBuilder()
+      const user = adminUser.toBuilder()
         .permissions(Immutable.List(['entity:action:*']))
         .build();
-
-      render(<SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser} />);
+      asMock(useCurrentUser).mockReturnValue(user);
+      render(<SimpleIfPermitted permissions={['entity:action:id']} />);
 
       expectToRenderChildren();
     });
 
     it('user has wildcard permission for entity', () => {
-      const currentUser = alice.toBuilder()
+      const user = adminUser.toBuilder()
         .permissions(Immutable.List(['entity:*']))
         .build();
-
-      render(<SimpleIfPermitted permissions={['entity:action']} currentUser={currentUser} />);
+      asMock(useCurrentUser).mockReturnValue(user);
+      render(<SimpleIfPermitted permissions={['entity:action']} />);
 
       expectToRenderChildren();
     });
 
     it('user has wildcard permission for entity when permission for id is required', () => {
-      const currentUser = alice.toBuilder()
+      const user = adminUser.toBuilder()
         .permissions(Immutable.List(['entity:*']))
         .build();
-
-      render(<SimpleIfPermitted permissions={['entity:action:id']} currentUser={currentUser} />);
+      asMock(useCurrentUser).mockReturnValue(user);
+      render(<SimpleIfPermitted permissions={['entity:action:id']} />);
 
       expectToRenderChildren();
     });

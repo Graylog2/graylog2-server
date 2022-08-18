@@ -15,20 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 
+import { asMock } from 'helpers/mocking';
+import useCurrentUser from 'hooks/useCurrentUser';
 import { alice, adminUser } from 'fixtures/users';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import { UsersActions } from 'stores/users/UsersStore';
 
 import PasswordSection from './PasswordSection';
 
 const exampleUser = alice;
-const currentUser = adminUser
-  .toBuilder()
-  .permissions(Immutable.List(['*']))
-  .build();
+
+jest.mock('hooks/useCurrentUser');
 
 jest.mock('stores/users/UsersStore', () => ({
   UsersActions: {
@@ -37,18 +35,16 @@ jest.mock('stores/users/UsersStore', () => ({
 }));
 
 describe('<PasswordSection />', () => {
+  beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(adminUser);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  const SimplePasswordSection = (props) => (
-    <CurrentUserContext.Provider value={currentUser}>
-      <PasswordSection {...props} />
-    </CurrentUserContext.Provider>
-  );
-
   it('should allow password change', async () => {
-    render(<SimplePasswordSection user={exampleUser} />);
+    render(<PasswordSection user={exampleUser} />);
 
     const newPasswordInput = screen.getByLabelText('New Password');
     const newPasswordRepeatInput = screen.getByLabelText('Repeat Password');
@@ -66,8 +62,8 @@ describe('<PasswordSection />', () => {
   });
 
   it('should require current password when current user is changing his password', async () => {
-    const newCurrentUser = currentUser.toBuilder().readOnly(false).build();
-    render(<PasswordSection user={newCurrentUser} />);
+    asMock(useCurrentUser).mockReturnValue(exampleUser);
+    render(<PasswordSection user={exampleUser} />);
 
     const passwordInput = screen.getByLabelText('Old Password');
     const newPasswordInput = screen.getByLabelText('New Password');
@@ -81,7 +77,7 @@ describe('<PasswordSection />', () => {
 
     await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledTimes(1));
 
-    expect(UsersActions.changePassword).toHaveBeenCalledWith(newCurrentUser.id, {
+    expect(UsersActions.changePassword).toHaveBeenCalledWith(exampleUser.id, {
       old_password: 'oldpassword',
       password: 'newpassword',
     });
