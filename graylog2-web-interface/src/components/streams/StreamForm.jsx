@@ -165,11 +165,11 @@ class StreamForm extends React.Component {
         {this._indexSetSelect()}
         <Input id="RemoveFromDefaultStream"
                type="checkbox"
-               label="Remove matches from &lsquo;All messages&rsquo; stream"
+               label="Remove matches from &lsquo;Default Stream&rsquo;"
                name="removeMatchesFromDefaultStream"
                checked={removeMatchesFromDefaultStream}
                onChange={this.handleChange}
-               help={<span>Remove messages that match this stream from the &lsquo;All messages&rsquo; stream which is assigned to every message by default.</span>} />
+               help={<span>Don't assign messages that match this stream to the &lsquo;Default Stream&rsquo;.</span>} />
       </BootstrapModalForm>
     );
   }

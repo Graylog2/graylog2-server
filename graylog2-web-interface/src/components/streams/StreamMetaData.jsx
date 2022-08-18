@@ -35,7 +35,7 @@ const StreamMetaData = ({ isDefaultStream, stream, streamRuleTypes, permissions 
   const toggleText = expanded ? 'Hide' : 'Show';
 
   if (stream.is_default) {
-    return 'The default stream contains all messages.';
+    return 'The default stream cannot have rules.';
   }
 
   if (stream.rules.length === 0) {
