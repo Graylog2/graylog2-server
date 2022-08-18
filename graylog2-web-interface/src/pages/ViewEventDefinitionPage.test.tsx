@@ -28,7 +28,12 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import ViewEventDefinitionPage from './ViewEventDefinitionPage';
 
-jest.mock('routing/withParams', () => (x) => x);
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useParams: jest.fn(() => ({
+    definitionId: mockEventDefinition.id,
+  })),
+}));
 
 jest.mock('stores/event-definitions/EventDefinitionsStore', () => ({
   EventDefinitionsActions: {
@@ -50,8 +55,7 @@ describe('<ViewEventDefinitionPage />', () => {
   ) => {
     const user = alice.toBuilder().permissions(Immutable.List(permissions)).build();
 
-    // @ts-ignore
-    const EventDefintionPageWithParams = <ViewEventDefinitionPage params={{ definitionId: mockEventDefinition.id }} />;
+    const EventDefintionPageWithParams = <ViewEventDefinitionPage />;
 
     return (
       <CurrentUserContext.Provider value={user}>
