@@ -28,6 +28,7 @@ import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
+import { trimObjectFields } from 'logic/ObjectHelper';
 
 import StreamMetaData from './StreamMetaData';
 import StreamControls from './StreamControls';
@@ -113,6 +114,7 @@ class Stream extends React.Component {
     this.setState({ showEntityShareModal: true });
   };
 
+  // eslint-disable-next-line class-methods-use-this
   _onDelete = (stream) => {
     // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to remove this stream?')) {
@@ -133,7 +135,10 @@ class Stream extends React.Component {
       .finally(() => this.setState({ loading: false }));
   };
 
-  _onUpdate = (streamId, stream) => {
+  // eslint-disable-next-line class-methods-use-this
+  _onUpdate = (streamId, _stream) => {
+    const stream = trimObjectFields(_stream, ['title']);
+
     StreamsStore.update(streamId, stream, (response) => {
       UserNotification.success(`Stream '${stream.title}' was updated successfully.`, 'Success');
 
@@ -141,7 +146,10 @@ class Stream extends React.Component {
     });
   };
 
-  _onClone = (streamId, stream) => {
+  // eslint-disable-next-line class-methods-use-this
+  _onClone = (streamId, _stream) => {
+    const stream = trimObjectFields(_stream, ['title']);
+
     StreamsStore.cloneStream(streamId, stream, (response) => {
       UserNotification.success(`Stream was successfully cloned as '${stream.title}'.`, 'Success');
 
