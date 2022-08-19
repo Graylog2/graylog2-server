@@ -16,10 +16,9 @@
  */
 import * as React from 'react';
 import { useState, useEffect, useContext } from 'react';
-import PropTypes from 'prop-types';
+import { useParams } from 'react-router-dom';
 
 import { useStore } from 'stores/connect';
-import withParams from 'routing/withParams';
 import { LinkContainer } from 'components/common/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
@@ -33,13 +32,8 @@ import EventDefinitionSummary from 'components/event-definitions/event-definitio
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 
-type Props = {
-  params: {
-    definitionId?: string,
-  },
-};
-
-const ViewEventDefinitionPage = ({ params }: Props) => {
+const ViewEventDefinitionPage = () => {
+  const params = useParams<{definitionId?: string}>();
   const currentUser = useContext(CurrentUserContext);
   const [eventDefinition, setEventDefinition] = useState<{ title: string } | undefined>();
   const { all: notifications } = useStore(EventNotificationsStore);
@@ -128,10 +122,4 @@ const ViewEventDefinitionPage = ({ params }: Props) => {
   );
 };
 
-ViewEventDefinitionPage.propTypes = {
-  params: PropTypes.exact({
-    definitionId: PropTypes.string,
-  }).isRequired,
-};
-
-export default withParams(ViewEventDefinitionPage);
+export default ViewEventDefinitionPage;
