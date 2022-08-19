@@ -22,12 +22,12 @@ import styled from 'styled-components';
 
 import useElementDimensions from 'hooks/useElementDimensions';
 
-const Container = styled.div`
+const Container = styled.div<{ height: number}>`
   flex: 1 1 auto;
-  height: 100vh;
-  max-height: 300px;
+  height: ${(props) => props.height}px;
 `;
 const REACT_SELECT_MAX_OPTIONS_LENGTH = 1000;
+const MAX_CONTAINER_SIZE = 300;
 
 type RowProps = {
   data: Array<object>,
@@ -56,7 +56,7 @@ export const WindowList = ({ children, listRef, ...rest }: Props.MenuList & { li
   const vListRef = useRef(null);
   const sizeMap = useRef({});
   const containerDimensions = useElementDimensions(containerRef);
-  const { width, height } = containerDimensions;
+  const { width } = containerDimensions;
 
   const setSize = useCallback((index: number, size: number) => {
     sizeMap.current = { ...sizeMap.current, [index]: size };
@@ -64,12 +64,20 @@ export const WindowList = ({ children, listRef, ...rest }: Props.MenuList & { li
     currentRef.current?.resetAfterIndex(index);
   }, [listRef]);
 
+  const totalHeight = Object.entries(children).reduce((sum, [index]) => {
+    if (sizeMap.current[index] && sum < MAX_CONTAINER_SIZE) {
+      return parseInt(sizeMap.current[index], 10) + sum;
+    }
+
+    return sum;
+  }, 0);
+
   const getSize = useCallback((index: number) => sizeMap.current[index] || 36, [sizeMap]);
 
   return (
-    <Container ref={containerRef} data-testid="infinite-loader-container">
+    <Container ref={containerRef} height={totalHeight} data-testid="infinite-loader-container">
       <List ref={listRef || vListRef}
-            height={height}
+            height={totalHeight}
             itemCount={children.length}
             itemSize={getSize}
             itemData={children}
