@@ -18,8 +18,6 @@ package org.graylog2.database;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.mongojack.DBCursor;
@@ -28,7 +26,6 @@ import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
-import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -69,27 +66,6 @@ public abstract class PaginatedDbService<DTO> {
                                  String collectionName,
                                  Class<?> view) {
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(collectionName),
-                dtoClass,
-                ObjectId.class,
-                mapper.get(),
-                view);
-    }
-
-    protected PaginatedDbService(MongoConnection mongoConnection,
-                                 MongoJackObjectMapperProvider mapper,
-                                 Class<DTO> dtoClass,
-                                 String collectionName,
-                                 @Nullable DBObject dbOptions,
-                                 @Nullable Class<?> view) {
-        DBCollection dbCollection;
-        if (!mongoConnection.getDatabase().collectionExists(collectionName)) {
-            dbCollection = mongoConnection.getDatabase().createCollection(collectionName, dbOptions);
-        }
-        else {
-            dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
-        }
-
-        this.db = JacksonDBCollection.wrap(dbCollection,
                 dtoClass,
                 ObjectId.class,
                 mapper.get(),
