@@ -15,16 +15,28 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 /* eslint-disable global-require */
+
+const hooks = [
+  {
+    name: 'useUserDateTime',
+    relatedContext: 'UserDateTimeContext',
+  },
+];
+
 module.exports = (context) => ({
   CallExpression: (node) => {
     const { callee } = node;
 
-    if (callee.name === 'useContext'
-      && callee?.parent?.arguments?.[0].name === 'UserDateTimeContext'
-      && !context.getFilename().endsWith('useUserDateTime.ts')
-    ) {
-      context.report(node, 'Implement useUserDateTime hook instead of consuming UserDateTimeContext.');
-    }
+    hooks.forEach(({ name: hookName, relatedContext }) => {
+      if (relatedContext) {
+        if (callee.name === 'useContext'
+          && callee?.parent?.arguments?.[0].name === relatedContext
+          && !context.getFilename().includes(hookName)
+        ) {
+          context.report(node, `Implement ${hookName} hook instead of consuming ${relatedContext}.`);
+        }
+      }
+    });
   },
 });
 

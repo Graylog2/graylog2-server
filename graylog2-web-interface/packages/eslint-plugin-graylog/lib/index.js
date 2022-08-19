@@ -17,12 +17,12 @@
 /* eslint-disable global-require */
 module.exports = {
   rules: {
-    'user-date-time-injection': require('./rules/user-date-time-injection'),
+    'prefer-hook': require('./rules/prefer-hook'),
   },
   configs: {
     recommended: {
       rules: {
-        'graylog/user-date-time-injection': 'warn',
+        'graylog/prefer-hook': 'warn',
       },
     },
   },
