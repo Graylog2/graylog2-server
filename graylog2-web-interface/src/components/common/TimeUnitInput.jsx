@@ -79,10 +79,10 @@ export const extractDurationAndUnit = (duration, timeUnits) => {
  * value.
  */
 const TimeUnitInput = createReactClass({
-  // eslint-disable-next-line
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'TimeUnitInput',
 
-  // eslint-disable-next-line
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     /**
      * Function that will be called when the input changes, that is,

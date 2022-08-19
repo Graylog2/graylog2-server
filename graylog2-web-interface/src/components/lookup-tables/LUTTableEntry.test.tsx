@@ -16,37 +16,54 @@
  */
 import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
-import { BrowserRouter as Router } from 'react-router-dom';
 
+import {
+  buildLookupTable,
+  buildLookupTableCache,
+  buildLookupTableAdapter,
+} from 'fixtures/lookupTables';
 import { asMock } from 'helpers/mocking';
+import useScopePermissions from 'hooks/useScopePermissions';
+import type { GenericEntityType } from 'logic/lookup-tables/types';
 
-import { TABLE, CACHE, DATA_ADAPTER, mockedUseScopePermissions } from './fixtures';
 import LUTTableEntry from './LUTTableEntry';
 
-jest.mock('hooks/useScopePermissions', () => (mockedUseScopePermissions));
+jest.mock('hooks/useScopePermissions');
 
 const renderedLUT = (scope: string) => {
-  const auxTable = { ...TABLE };
-  auxTable._scope = scope;
+  const table = buildLookupTable(1, { _scope: scope });
+  const cache = buildLookupTableCache();
+  const dataAdapter = buildLookupTableAdapter();
 
-  return render(
-    <Router>
-      <LUTTableEntry table={auxTable} cache={CACHE} dataAdapter={DATA_ADAPTER} />
-    </Router>,
-    {
-      container: document.body.appendChild(document.createElement('table')),
-    },
-  );
+  return render(<table><LUTTableEntry table={table} cache={cache} dataAdapter={dataAdapter} /></table>);
 };
 
 describe('LUTTableEntry', () => {
-  it('should show Loading spinner while loading scope permissions', async () => {
-    asMock(mockedUseScopePermissions).mockReturnValueOnce({
-      loadingScopePermissions: true,
-      scopePermissions: null,
-    });
+  beforeAll(() => {
+    asMock(useScopePermissions).mockImplementation(
+      (entity: GenericEntityType) => {
+        if (!entity._scope) {
+          return {
+            loadingScopePermissions: true,
+            scopePermissions: null,
+          };
+        }
 
-    renderedLUT('DEFAULT');
+        const scopes = {
+          ILLUMINATE: { is_mutable: false },
+          DEFAULT: { is_mutable: true },
+        };
+
+        return {
+          loadingScopePermissions: false,
+          scopePermissions: scopes[entity._scope],
+        };
+      },
+    );
+  });
+
+  it('should show Loading spinner while loading scope permissions', async () => {
+    renderedLUT('');
 
     expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
 
@@ -55,25 +72,25 @@ describe('LUTTableEntry', () => {
     });
   });
 
-  it('should show "edit" button', async () => {
+  it('should show "edit" button', () => {
     renderedLUT('DEFAULT');
 
     expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
   });
 
-  it('should not show "edit" button', async () => {
+  it('should not show "edit" button', () => {
     renderedLUT('ILLUMINATE');
 
     expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
   });
 
-  it('should show "delete" button', async () => {
+  it('should show "delete" button', () => {
     renderedLUT('DEFAULT');
 
     expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
   });
 
-  it('should not show "delete" button', async () => {
+  it('should not show "delete" button', () => {
     renderedLUT('ILLUMINATE');
 
     expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();

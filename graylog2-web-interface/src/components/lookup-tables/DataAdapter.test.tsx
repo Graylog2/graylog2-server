@@ -18,11 +18,15 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
+import { buildLookupTableAdapter } from 'fixtures/lookupTables';
+import { asMock } from 'helpers/mocking';
+import useScopePermissions from 'hooks/useScopePermissions';
+import type { GenericEntityType } from 'logic/lookup-tables/types';
+
 import CSVFileAdapterSummary from './adapters/CSVFileAdapterSummary';
-import { DATA_ADAPTER, mockedUseScopePermissions } from './fixtures';
 import DataAdapter from './DataAdapter';
 
-jest.mock('hooks/useScopePermissions', () => (mockedUseScopePermissions));
+jest.mock('hooks/useScopePermissions');
 
 PluginStore.register(new PluginManifest({}, {
   lookupTableAdapters: [
@@ -35,27 +39,28 @@ PluginStore.register(new PluginManifest({}, {
 }));
 
 const renderedDataAdapter = (scope: string) => {
-  const auxDataAdapter = { ...DATA_ADAPTER };
-  auxDataAdapter._scope = scope;
+  const dataAdapter = buildLookupTableAdapter(1, { _scope: scope });
 
-  auxDataAdapter.config = {
-    type: 'csvfile',
-    path: '/data/node-01/illuminate/csv/ciscoasa/data/cisco_asa_event_codes.csv',
-    override_type: 'mongo',
-    separator: ',',
-    quotechar: '"',
-    key_column: 'cisco_event_code',
-    value_column: 'gim_event_type_code',
-    check_interval: 60,
-    case_insensitive_lookup: false,
-  };
-
-  return render(
-    <DataAdapter dataAdapter={auxDataAdapter} />,
-  );
+  return render(<DataAdapter dataAdapter={dataAdapter} />);
 };
 
 describe('DataAdapter', () => {
+  beforeAll(() => {
+    asMock(useScopePermissions).mockImplementation(
+      (entity: GenericEntityType) => {
+        const scopes = {
+          ILLUMINATE: { is_mutable: false },
+          DEFAULT: { is_mutable: true },
+        };
+
+        return {
+          loadingScopePermissions: false,
+          scopePermissions: scopes[entity._scope],
+        };
+      },
+    );
+  });
+
   it('should show "edit" button', async () => {
     renderedDataAdapter('DEFAULT');
 

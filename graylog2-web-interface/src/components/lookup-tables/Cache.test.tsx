@@ -16,14 +16,17 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { BrowserRouter as Router } from 'react-router-dom';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
+import { asMock } from 'helpers/mocking';
+import { buildLookupTableCache } from 'fixtures/lookupTables';
+import useScopePermissions from 'hooks/useScopePermissions';
+import type { GenericEntityType } from 'logic/lookup-tables/types';
+
 import CaffeineCacheSummary from './caches/CaffeineCacheSummary';
-import { CACHE, mockedUseScopePermissions } from './fixtures';
 import Cache from './Cache';
 
-jest.mock('hooks/useScopePermissions', () => (mockedUseScopePermissions));
+jest.mock('hooks/useScopePermissions');
 
 PluginStore.register(new PluginManifest({}, {
   lookupTableCaches: [
@@ -36,23 +39,28 @@ PluginStore.register(new PluginManifest({}, {
 }));
 
 const renderedCache = (scope: string) => {
-  CACHE._scope = scope;
+  const cache = buildLookupTableCache(1, { _scope: scope });
 
-  CACHE.config = {
-    type: 'guava_cache',
-    max_size: 1000,
-    expire_after_access: 60,
-    expire_after_access_unit: 'SECONDS',
-    expire_after_write: 0,
-    expire_after_write_unit: 'MILLISECONDS',
-  };
-
-  return render(
-    <Router><Cache cache={CACHE} /></Router>,
-  );
+  return render(<Cache cache={cache} />);
 };
 
 describe('Cache', () => {
+  beforeAll(() => {
+    asMock(useScopePermissions).mockImplementation(
+      (entity: GenericEntityType) => {
+        const scopes = {
+          ILLUMINATE: { is_mutable: false },
+          DEFAULT: { is_mutable: true },
+        };
+
+        return {
+          loadingScopePermissions: false,
+          scopePermissions: scopes[entity._scope],
+        };
+      },
+    );
+  });
+
   it('should show "edit" button', async () => {
     renderedCache('DEFAULT');
 

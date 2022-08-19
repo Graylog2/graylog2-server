@@ -16,59 +16,72 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { BrowserRouter as Router } from 'react-router-dom';
 
+import { buildLookupTableCache } from 'fixtures/lookupTables';
 import { asMock } from 'helpers/mocking';
+import useScopePermissions from 'hooks/useScopePermissions';
+import type { GenericEntityType } from 'logic/lookup-tables/types';
 
-import { CACHE, mockedUseScopePermissions } from './fixtures';
 import CacheTableEntry from './CacheTableEntry';
 
-jest.mock('hooks/useScopePermissions', () => (mockedUseScopePermissions));
+jest.mock('hooks/useScopePermissions');
 
 const renderedCTE = (scope: string) => {
-  const auxCache = { ...CACHE };
-  auxCache._scope = scope;
+  const cache = buildLookupTableCache(1, { _scope: scope });
 
-  return render(
-    <Router><CacheTableEntry cache={auxCache} /></Router>,
-    {
-      container: document.body.appendChild(document.createElement('table')),
-    },
-  );
+  return render(<table><CacheTableEntry cache={cache} /></table>);
 };
 
 describe('CacheTableEntry', () => {
-  it('should show Loading spinner while loading scope permissions', async () => {
-    asMock(mockedUseScopePermissions).mockReturnValueOnce({
-      loadingScopePermissions: true,
-      scopePermissions: null,
-    });
+  beforeAll(() => {
+    asMock(useScopePermissions).mockImplementation(
+      (entity: GenericEntityType) => {
+        if (!entity._scope) {
+          return {
+            loadingScopePermissions: true,
+            scopePermissions: null,
+          };
+        }
 
-    renderedCTE('DEFAULT');
+        const scopes = {
+          ILLUMINATE: { is_mutable: false },
+          DEFAULT: { is_mutable: true },
+        };
+
+        return {
+          loadingScopePermissions: false,
+          scopePermissions: scopes[entity._scope],
+        };
+      },
+    );
+  });
+
+  it('should show Loading spinner while loading scope permissions', () => {
+    renderedCTE('');
 
     expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
-  it('should show "edit" button', async () => {
+  it('should show "edit" button', () => {
     renderedCTE('DEFAULT');
 
     expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
   });
 
-  it('should not show "edit" button', async () => {
+  it('should not show "edit" button', () => {
     renderedCTE('ILLUMINATE');
 
     expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
   });
 
-  it('should show "delete" button', async () => {
+  it('should show "delete" button', () => {
     renderedCTE('DEFAULT');
 
     expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
   });
 
-  it('should not show "delete" button', async () => {
+  it('should not show "delete" button', () => {
     renderedCTE('ILLUMINATE');
 
     expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();

@@ -16,32 +16,52 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { BrowserRouter as Router } from 'react-router-dom';
 
-import { TABLE, CACHE, DATA_ADAPTER, mockedUseScopePermissions } from './fixtures';
+import {
+  buildLookupTable,
+  buildLookupTableCache,
+  buildLookupTableAdapter,
+} from 'fixtures/lookupTables';
+import { asMock } from 'helpers/mocking';
+import useScopePermissions from 'hooks/useScopePermissions';
+import type { GenericEntityType } from 'logic/lookup-tables/types';
+
 import LookupTableView from './LookupTableView';
 
-jest.mock('hooks/useScopePermissions', () => (mockedUseScopePermissions));
+jest.mock('hooks/useScopePermissions');
 
 const renderedLUT = (scope: string) => {
-  const table = { ...TABLE };
-  table._scope = scope;
+  const table = buildLookupTable(1, { _scope: scope });
+  const cache = buildLookupTableCache();
+  const dataAdapter = buildLookupTableAdapter();
 
-  return render(
-    <Router>
-      <LookupTableView table={table} cache={CACHE} dataAdapter={DATA_ADAPTER} />
-    </Router>,
-  );
+  return render(<LookupTableView table={table} cache={cache} dataAdapter={dataAdapter} />);
 };
 
 describe('LookupTableView', () => {
-  it('should show "edit" button', async () => {
+  beforeAll(() => {
+    asMock(useScopePermissions).mockImplementation(
+      (entity: GenericEntityType) => {
+        const scopes = {
+          ILLUMINATE: { is_mutable: false },
+          DEFAULT: { is_mutable: true },
+        };
+
+        return {
+          loadingScopePermissions: false,
+          scopePermissions: scopes[entity._scope],
+        };
+      },
+    );
+  });
+
+  it('should show "edit" button', () => {
     renderedLUT('DEFAULT');
 
     expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
   });
 
-  it('should not show "edit" button', async () => {
+  it('should not show "edit" button', () => {
     renderedLUT('ILLUMINATE');
 
     expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();

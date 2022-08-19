@@ -86,7 +86,7 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
 
     if (lookupKey.valid) {
       LookupTablesActions.lookup(table.name, lookupKey.value).then((resp: any) => {
-        setLookupResult(resp);
+        setLookupResult(JSON.stringify(resp, null, 2));
         setLookupKey(INIT_INPUT);
       });
     }
@@ -164,7 +164,7 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
         {lookupResult && (
           <div style={{ marginTop: '16px' }}>
             <h4>Lookup result</h4>
-            <pre>{JSON.stringify(lookupResult, null, 2)}</pre>
+            <pre>{lookupResult}</pre>
           </div>
         )}
       </Col>

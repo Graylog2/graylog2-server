@@ -14,19 +14,64 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type {
+  LookupTable,
+  LookupTableCache,
+  LookupTableAdapter,
+} from 'logic/lookup-tables/types';
 
 // eslint-disable-next-line import/prefer-default-export
-export const createLookupTable = (index = 1, overrides = {}) => ({
-  cache_id: 'cache-id',
+export const buildLookupTable = (index = 1, overrides = {}): LookupTable => ({
+  id: `lookup-table-id-${index}`,
+  title: `Lookup Table Title ${index}`,
+  description: `Description lookup-table-${index}`,
+  name: `lookup-table-name-${index}`,
   content_pack: null,
+  _scope: 'DEFAULT',
+  cache_id: 'cache-id',
   data_adapter_id: 'data-adapter-id',
   default_multi_value: '',
   default_multi_value_type: 'NULL',
   default_single_value: '',
   default_single_value_type: 'NULL',
-  description: `Description lookup-table-${index}`,
+  ...overrides,
+});
+
+export const buildLookupTableCache = (index = 1, overrides = {}): LookupTableCache => ({
   id: `lookup-table-id-${index}`,
-  name: `lookup-table-name-${index}`,
   title: `Lookup Table Title ${index}`,
+  description: `Description lookup-table-${index}`,
+  name: `lookup-table-name-${index}`,
+  content_pack: null,
+  _scope: 'DEFAULT',
+  config: {
+    type: 'guava_cache',
+    max_size: 1000,
+    expire_after_access: 60,
+    expire_after_access_unit: 'SECONDS',
+    expire_after_write: 0,
+    expire_after_write_unit: 'MILLISECONDS',
+  },
+  ...overrides,
+});
+
+export const buildLookupTableAdapter = (index = 1, overrides = {}): LookupTableAdapter => ({
+  id: `lookup-table-id-${index}`,
+  title: `Lookup Table Title ${index}`,
+  description: `Description lookup-table-${index}`,
+  name: `lookup-table-name-${index}`,
+  content_pack: null,
+  _scope: 'DEFAULT',
+  config: {
+    type: 'csvfile',
+    path: '/data/node-01/illuminate/csv/ciscoasa/data/cisco_asa_event_codes.csv',
+    override_type: 'mongo',
+    separator: ',',
+    quotechar: '"',
+    key_column: 'cisco_event_code',
+    value_column: 'gim_event_type_code',
+    check_interval: 60,
+    case_insensitive_lookup: false,
+  },
   ...overrides,
 });

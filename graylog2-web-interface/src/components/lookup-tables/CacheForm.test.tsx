@@ -17,15 +17,18 @@
 import * as React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import { BrowserRouter as Router } from 'react-router-dom';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
-import { CACHE, mockedUseScopePermissions } from './fixtures';
+import { buildLookupTableCache } from 'fixtures/lookupTables';
+import useScopePermissions from 'hooks/useScopePermissions';
+import type { GenericEntityType } from 'logic/lookup-tables/types';
+import { asMock } from 'helpers/mocking';
+
 import CaffeineCacheFieldSet from './caches/CaffeineCacheFieldSet';
 import CacheForm from './CacheForm';
 import NullCacheFieldSet from './caches/NullCacheFieldSet';
 
-jest.mock('hooks/useScopePermissions', () => (mockedUseScopePermissions));
+jest.mock('hooks/useScopePermissions');
 
 PluginStore.register(new PluginManifest({}, {
   lookupTableCaches: [
@@ -43,7 +46,8 @@ PluginStore.register(new PluginManifest({}, {
 }));
 
 const renderedCache = ({
-  scope, inCache = { ...CACHE },
+  scope,
+  inCache = { ...buildLookupTableCache() },
   create = false,
   withConfig = true,
   // eslint-disable-next-line no-console
@@ -52,37 +56,41 @@ const renderedCache = ({
   saved = () => { console.log('saved called'); },
   validationErrors = {},
 }) => {
-  const mockCache = { ...inCache };
+  const mockCache = {
+    ...inCache,
+    _scope: scope,
+  };
 
-  mockCache._scope = scope;
-
-  if (withConfig) {
-    mockCache.config = {
-      type: 'guava_cache',
-      max_size: 1000,
-      expire_after_access: 60,
-      expire_after_access_unit: 'SECONDS',
-      expire_after_write: 0,
-      expire_after_write_unit: 'MILLISECONDS',
-    };
-  } else {
-    mockCache.config = { type: 'none' };
-  }
+  if (!withConfig) mockCache.config = { type: 'none' };
 
   return render(
-    <Router>
-      <CacheForm cache={mockCache}
-                 type={mockCache.config.type}
-                 saved={saved}
-                 title="Data Cache"
-                 create={create}
-                 validate={validate}
-                 validationErrors={validationErrors} />
-    </Router>,
+    <CacheForm cache={mockCache}
+               type={mockCache.config.type}
+               saved={saved}
+               title="Data Cache"
+               create={create}
+               validate={validate}
+               validationErrors={validationErrors} />,
   );
 };
 
 describe('CacheForm', () => {
+  beforeAll(() => {
+    asMock(useScopePermissions).mockImplementation(
+      (entity: GenericEntityType) => {
+        const scopes = {
+          ILLUMINATE: { is_mutable: false },
+          DEFAULT: { is_mutable: true },
+        };
+
+        return {
+          loadingScopePermissions: false,
+          scopePermissions: scopes[entity._scope],
+        };
+      },
+    );
+  });
+
   it('should show "Update Cache" button', async () => {
     renderedCache({ scope: 'DEFAULT' });
 
@@ -100,12 +108,12 @@ describe('CacheForm', () => {
   });
 
   it('should show required error message', async () => {
-    const cache = {
-      ...CACHE,
+    const cache = buildLookupTableCache(1, {
       title: '',
       description: '',
       name: '',
-    };
+    });
+
     renderedCache({ scope: 'DEFAULT', inCache: cache, withConfig: false });
 
     const titleInput = screen.queryByLabelText('* Title');
@@ -116,12 +124,11 @@ describe('CacheForm', () => {
   });
 
   it('should show duplicated name error', async () => {
-    const cache = {
-      ...CACHE,
+    const cache = buildLookupTableCache(1, {
       title: 'A duplicated name',
       description: '',
       name: 'a-duplicated-name',
-    };
+    });
 
     renderedCache({
       scope: 'DEFAULT',
@@ -140,12 +147,11 @@ describe('CacheForm', () => {
   });
 
   it('should not submit invalid form', async () => {
-    const cache = {
-      ...CACHE,
+    const cache = buildLookupTableCache(1, {
       title: 'another-test-cache',
       description: '',
       name: 'another-test-cache',
-    };
+    });
 
     const mockSaved = jest.fn();
 
@@ -170,12 +176,11 @@ describe('CacheForm', () => {
   });
 
   it('should allow user to submit a valid form', async () => {
-    const cache = {
-      ...CACHE,
+    const cache = buildLookupTableCache(1, {
       title: '',
       description: '',
       name: '',
-    };
+    });
 
     const mockSaved = jest.fn();
 
