@@ -39,7 +39,10 @@
         }
         $('pre code').each(function(i, e) {hljs.highlightBlock(e)});
 
-        if ("${showWarning}") {
+        if ("${isCloud}") {
+          $('#api_selector').css('visibility', 'hidden');
+          $('.warning-box').css('visibility', 'hidden');
+        } else if ("${showWarning}") {
           $('.warning-box').css('visibility', '');
         }
       },
