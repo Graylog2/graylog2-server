@@ -58,7 +58,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20211221144300_GeoIpResolverConfigMigration.class);
         addMigration(V20220719130704_ImprovedDefaultProcessingOrderMigration.class);
         addMigration(V20220623125450_AddJobTypeToJobTrigger.class);
-        addMigration(V20220818184438_RenameAllMessagesStreamMigration.class);
 
     }
 }
