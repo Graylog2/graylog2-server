@@ -15,11 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { DEFAULT_RANGE_TYPE } from 'views/Constants';
 import type {
-  AbsoluteTimeRange,
-  KeywordTimeRange,
-  RelativeTimeRange,
   TimeRange,
   FilterType,
   ElasticsearchQueryString,
@@ -28,89 +24,22 @@ import {
   filtersForQuery,
   createElasticsearchQueryString,
 } from 'views/logic/queries/Query';
-
-type RawRelativeRangeStartOnly = {
-  rangetype: 'relative',
-  relative?: string,
-};
-
-type RawRelativeRangeWithEnd = {
-  rangetype: 'relative',
-  from: string,
-  to?: string,
-};
-
-type RawRelativeRange = RawRelativeRangeStartOnly | RawRelativeRangeWithEnd
-
-type RawAbsoluteRange = {
-  rangetype: 'absolute',
-  from?: string,
-  to?: string,
-};
-
-type RawKeywordRange = {
-  rangetype: 'keyword',
-  keyword?: string,
-  timezone?: string,
-};
-
-type RawTimeRange = RawAbsoluteRange | RawRelativeRange | RawKeywordRange;
+import type { TimeRangeQueryParameter } from 'views/logic/TimeRange';
+import { timeRangeFromQueryParameter } from 'views/logic/TimeRange';
+import { DEFAULT_RANGE_TYPE } from 'views/Constants';
 
 type StreamsQuery = {
   streams?: string,
 };
 
-export type RawQuery = Partial<RawTimeRange> & StreamsQuery & { q?: string };
+export type RawQuery = (TimeRangeQueryParameter | { relative?: string }) & StreamsQuery & { q?: string };
 
-const _getRange = (query): RawTimeRange => {
-  const rangetype = query.rangetype || DEFAULT_RANGE_TYPE;
-
-  return { ...query, rangetype };
-};
-
-const normalizeRawRelativeTimeRange = (range: RawRelativeRange): RelativeTimeRange | undefined => {
-  const parseRangeValue = (rangeValue: string) => parseInt(rangeValue, 10);
-
-  if ('relative' in range) {
-    return { type: 'relative', range: parseRangeValue(range.relative) };
-  }
-
-  if ('from' in range) {
-    const result = { type: 'relative' as const, from: parseRangeValue(range.from) };
-
-    if ('to' in range) {
-      return { ...result, to: parseRangeValue(range.to) };
-    }
-
-    return result;
-  }
-
-  return undefined;
-};
-
-const normalizeTimeRange = (query: Partial<RawTimeRange> = {}) => {
-  const range = _getRange(query);
-
-  switch (range.rangetype) {
-    case 'relative':
-      return normalizeRawRelativeTimeRange(range);
-    case 'absolute':
-      return (range.from || range.to) ? {
-        type: range.rangetype,
-        from: range.from,
-        to: range.to,
-      } as AbsoluteTimeRange : undefined;
-    case 'keyword':
-      return range.keyword ? {
-        type: range.rangetype,
-        keyword: range.keyword,
-        timezone: range.timezone,
-      } as KeywordTimeRange : undefined;
-    default:
-      // @ts-expect-error
-      throw new Error(`Unsupported range type ${range.rangetype} in range: ${JSON.stringify(range)}`);
-  }
-};
+// eslint-disable-next-line no-nested-ternary
+const normalizeTimeRange = (query: {} | TimeRangeQueryParameter): TimeRange | undefined => (query && 'rangetype' in query
+  ? timeRangeFromQueryParameter(query)
+  : 'relative' in query
+    ? timeRangeFromQueryParameter({ ...query, rangetype: DEFAULT_RANGE_TYPE })
+    : undefined);
 
 const normalizeStreams = (query: StreamsQuery = {}): Array<string> => {
   const rawStreams = query.streams;

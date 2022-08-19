@@ -23,9 +23,11 @@ import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.EventStorageHandler;
 
+import javax.annotation.Nullable;
 import java.util.Set;
 
 public interface EventDefinition {
+    @Nullable
     String id();
 
     String title();

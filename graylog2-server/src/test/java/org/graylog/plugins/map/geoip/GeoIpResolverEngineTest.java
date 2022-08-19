@@ -156,10 +156,8 @@ public class GeoIpResolverEngineTest {
     @Test
     public void testPublicIpSchemaEnforceOff() {
 
-        // With schema enforcement off, we expect 'source_ip' to be the prefix for ALL Geo data fields.
-        String[] expectedFields = {"source_ip_geo_name", "source_ip_geo_region", "source_ip_geo_city", "source_ip_geo_timezone",
-                "source_ip_geo_country", "source_ip_geo_country_iso", "source_ip_as_organization", "source_ip_geo_coordinates",
-                "source_ip_as_number"};
+        // With schema enforcement off, legacy fields will be added to the message.
+        String[] expectedFields = {"source_ip_geolocation", "source_ip_country_code", "source_ip_city_name"};
 
         testSourceIpGeoDataFieldsWithSchemaEnforcementFlag(false, expectedFields);
     }

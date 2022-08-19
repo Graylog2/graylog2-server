@@ -146,16 +146,16 @@ const SystemMenu = ({ location }) => {
           <NavigationLink path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE} description="Authentication" />
         </IfPermitted>
       </HideOnCloud>
-      <IfPermitted permissions={['dashboards:create', 'inputs:create', 'streams:create']}>
+      <IfPermitted permissions={['contentpack:read']}>
         <NavigationLink path={Routes.SYSTEM.CONTENTPACKS.LIST} description="Content Packs" />
       </IfPermitted>
-      <IfPermitted permissions={['inputs:read']}>
+      <IfPermitted permissions={['grok_pattern:read']}>
         <NavigationLink path={Routes.SYSTEM.GROKPATTERNS} description="Grok Patterns" />
       </IfPermitted>
-      <IfPermitted permissions={['inputs:edit']}>
+      <IfPermitted permissions={['lookuptables:read']}>
         <NavigationLink path={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} description="Lookup Tables" />
       </IfPermitted>
-      <IfPermitted permissions={['inputs:create']}>
+      <IfPermitted permissions={['pipeline:read', 'pipeline_connection:read']}>
         <NavigationLink path={Routes.SYSTEM.PIPELINES.OVERVIEW} description="Pipelines" />
       </IfPermitted>
       <IfPermitted permissions={['sidecars:read']}>

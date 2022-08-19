@@ -1,0 +1,15 @@
+rule "debug"
+when true
+then
+    debug("moo");
+    debug($message.somefield);
+    debug($message);
+
+
+    let messagevar = $message;
+    debug(messagevar);
+
+    debug($message.nullfield);
+
+    debug("message converted with to_string: " + to_string($message));
+end

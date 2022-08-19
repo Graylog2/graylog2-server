@@ -25,7 +25,6 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 import DashboardListItem from './DashboardListItem';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
-jest.mock('hooks/useUserDateTime');
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
 jest.useFakeTimers()
@@ -60,7 +59,7 @@ describe('Render DashboardListItem', () => {
     await screen.findByText('search-title-0');
     await screen.findByText('desc');
     await screen.findByText('sum');
-    await screen.findByText('2020-01-01 00:00:00');
+    await screen.findByText('2020-01-01 01:00:00');
   });
 
   it('should render text "Last saved" if current user the same as an owner', async () => {
