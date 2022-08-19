@@ -169,7 +169,7 @@ class StreamForm extends React.Component {
                name="removeMatchesFromDefaultStream"
                checked={removeMatchesFromDefaultStream}
                onChange={this.handleChange}
-               help={<span>Don't assign messages that match this stream to the &lsquo;Default Stream&rsquo;.</span>} />
+               help={<span>Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.</span>} />
       </BootstrapModalForm>
     );
   }

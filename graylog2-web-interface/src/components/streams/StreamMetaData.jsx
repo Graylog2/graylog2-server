@@ -44,8 +44,8 @@ const StreamMetaData = ({ isDefaultStream, stream, streamRuleTypes, permissions 
 
   switch (stream.matching_type) {
     case 'OR': verbalMatchingType = 'at least one'; break;
-    default:
     case 'AND': verbalMatchingType = 'all'; break;
+    default:
   }
 
   const _onHandleToggle = () => {
