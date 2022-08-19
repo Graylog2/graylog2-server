@@ -278,13 +278,13 @@ public class AggregationEventProcessor implements EventProcessor {
             final String keyString = Strings.join(keyResult.key(), '|');
             final String eventMessage = createEventMessageString(keyString, keyResult);
 
-            // Extract eventTime from the key result or use query time range as fallback
+            // Extract event time and range from the key result or use query time range as fallback.
+            // These can be different, e.g. during catch up processing.
             final DateTime eventTime = keyResult.timestamp().orElse(result.effectiveTimerange().to());
             final Event event = eventFactory.createEvent(eventDefinition, eventTime, eventMessage);
-
-            // TODO: Do we have to set any other event fields here?
-            event.setTimerangeStart(parameters.timerange().getFrom());
+            event.setTimerangeStart(keyResult.from().orElse(parameters.timerange().getFrom()));
             event.setTimerangeEnd(parameters.timerange().getTo());
+
             sourceStreams.forEach(event::addSourceStream);
 
             final Map<String, Object> fields = new HashMap<>();
@@ -335,8 +335,7 @@ public class AggregationEventProcessor implements EventProcessor {
             final Message message = new Message(eventMessage, "", result.effectiveTimerange().to());
             message.addFields(fields);
 
-            LOG.debug("Creating event {}/{} - {} {} ({}) from={} to={}", eventDefinition.title(), eventDefinition.id(), keyResult.key(), seriesString(keyResult), fields,
-                    event.getTimerangeStart(), event.getTimerangeEnd());
+            LOG.debug("Creating event {}/{} - {} {} ({})", eventDefinition.title(), eventDefinition.id(), keyResult.key(), seriesString(keyResult), fields);
             eventsWithContext.add(EventWithContext.create(event, message));
         }
 
