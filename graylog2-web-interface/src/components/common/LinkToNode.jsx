@@ -22,11 +22,11 @@ import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { NodesStore } from 'stores/nodes/NodesStore';
+import connect from 'stores/connect';
 
 import Icon from './Icon';
 import Spinner from './Spinner';
 
-import connect from '../../stores/connect';
 /**
  * Component that creates a link to a Graylog node. The information in the link includes:
  *  - Marker indicating whether the Graylog node is leader or not
@@ -40,11 +40,11 @@ class LinkToNode extends React.PureComponent {
   static propTypes = {
     /** Node ID that will be used to generate the link. */
     nodeId: PropTypes.string.isRequired,
-    nodeStore: PropTypes.object.isRequired,
+    nodes: PropTypes.object.isRequired,
   };
 
   render() {
-    const { nodes } = this.props.nodeStore;
+    const { nodes } = this.props;
 
     if (!nodes) {
       return <Spinner />;
@@ -81,4 +81,5 @@ class LinkToNode extends React.PureComponent {
 export default connect(
   LinkToNode,
   { nodeStore: NodesStore },
+  ({ nodeStore, ...rest }) => ({ ...rest, nodes: nodeStore.nodes }),
 );
