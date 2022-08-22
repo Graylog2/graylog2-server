@@ -22,12 +22,12 @@ import styled from 'styled-components';
 
 import useElementDimensions from 'hooks/useElementDimensions';
 
-const Container = styled.div<{ height: number}>`
-  flex: 1 1 auto;
-  height: ${(props) => props.height}px;
-`;
 const REACT_SELECT_MAX_OPTIONS_LENGTH = 1000;
 const MAX_CONTAINER_SIZE = 300;
+const Container = styled.div<{ height: number}>`
+  flex: 1 1 auto;
+  height: ${(props) => props?.height || MAX_CONTAINER_SIZE}px;
+`;
 
 type RowProps = {
   data: Array<object>,
@@ -77,7 +77,7 @@ export const WindowList = ({ children, listRef, ...rest }: Props.MenuList & { li
   return (
     <Container ref={containerRef} height={totalHeight} data-testid="infinite-loader-container">
       <List ref={listRef || vListRef}
-            height={totalHeight}
+            height={totalHeight || 300}
             itemCount={children.length}
             itemSize={getSize}
             itemData={children}
