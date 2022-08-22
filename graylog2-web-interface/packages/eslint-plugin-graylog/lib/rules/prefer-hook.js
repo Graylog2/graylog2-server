@@ -21,6 +21,10 @@ const hooks = [
     name: 'useUserDateTime',
     relatedContext: 'UserDateTimeContext',
   },
+  {
+    name: 'useCurrentUser',
+    relatedContext: 'CurrentUserContext',
+  },
 ];
 
 module.exports = (context) => ({
