@@ -22,9 +22,11 @@ import styled from 'styled-components';
 import { WindowList } from 'components/common/Select/CustomMenuList';
 
 const StyledDiv = styled.div`
-  width: 100%;
-  text-align: center ;
+  display: flex;
+  align-items: center; 
+  justify-content: center; 
   height: 36px;
+  width: 100%;
 `;
 
 const getNoOptionMessgage = () => {
@@ -39,7 +41,7 @@ const AsyncCustomMenuList = ({ children, selectProps: { loadOptions, total } }: 
   const items = children?.length ? children : [getNoOptionMessgage()];
 
   return (
-    <InfiniteLoader isItemLoaded={(index) => index < children.length}
+    <InfiniteLoader isItemLoaded={(index: number) => index < children.length}
                     itemCount={total}
                     loadMoreItems={loadOptions}>
       {({ onItemsRendered, ref }) => (
