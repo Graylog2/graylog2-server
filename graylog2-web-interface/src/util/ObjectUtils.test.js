@@ -41,4 +41,10 @@ describe('ObjectUtils', () => {
       expect(ObjectUtils.isEmpty({ hello: 'world' })).toEqual(false);
     });
   });
+
+  describe('ObjectUtils#trimObjectFields()', () => {
+    it('should trim object fields', () => {
+      expect(ObjectUtils.trimObjectFields({hello: '  world  ', hello2: '  world2  '}, ['hello', 'hello2'])).toEqual({hello:'world',hello2:'world2'});
+    });
+  });
 });
