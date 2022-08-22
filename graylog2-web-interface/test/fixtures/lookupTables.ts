@@ -20,8 +20,7 @@ import type {
   LookupTableAdapter,
 } from 'logic/lookup-tables/types';
 
-// eslint-disable-next-line import/prefer-default-export
-export const buildLookupTable = (index = 1, overrides = {}): LookupTable => ({
+export const createLookupTable = (index = 1, overrides = {}): LookupTable => ({
   id: `lookup-table-id-${index}`,
   title: `Lookup Table Title ${index}`,
   description: `Description lookup-table-${index}`,
@@ -37,7 +36,7 @@ export const buildLookupTable = (index = 1, overrides = {}): LookupTable => ({
   ...overrides,
 });
 
-export const buildLookupTableCache = (index = 1, overrides = {}): LookupTableCache => ({
+export const createLookupTableCache = (index = 1, overrides = {}): LookupTableCache => ({
   id: `lookup-table-id-${index}`,
   title: `Lookup Table Title ${index}`,
   description: `Description lookup-table-${index}`,
@@ -55,7 +54,7 @@ export const buildLookupTableCache = (index = 1, overrides = {}): LookupTableCac
   ...overrides,
 });
 
-export const buildLookupTableAdapter = (index = 1, overrides = {}): LookupTableAdapter => ({
+export const createLookupTableAdapter = (index = 1, overrides = {}): LookupTableAdapter => ({
   id: `lookup-table-id-${index}`,
   title: `Lookup Table Title ${index}`,
   description: `Description lookup-table-${index}`,

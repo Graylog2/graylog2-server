@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import { buildLookupTableCache } from 'fixtures/lookupTables';
+import { createLookupTableCache } from 'fixtures/lookupTables';
 import { asMock } from 'helpers/mocking';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
@@ -27,7 +27,7 @@ import CacheTableEntry from './CacheTableEntry';
 jest.mock('hooks/useScopePermissions');
 
 const renderedCTE = (scope: string) => {
-  const cache = buildLookupTableCache(1, { _scope: scope });
+  const cache = createLookupTableCache(1, { _scope: scope });
 
   return render(<table><CacheTableEntry cache={cache} /></table>);
 };

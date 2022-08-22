@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import { asMock } from 'helpers/mocking';
-import { buildLookupTableCache } from 'fixtures/lookupTables';
+import { createLookupTableCache } from 'fixtures/lookupTables';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
 
@@ -39,7 +39,7 @@ PluginStore.register(new PluginManifest({}, {
 }));
 
 const renderedCache = (scope: string) => {
-  const cache = buildLookupTableCache(1, { _scope: scope });
+  const cache = createLookupTableCache(1, { _scope: scope });
 
   return render(<Cache cache={cache} />);
 };

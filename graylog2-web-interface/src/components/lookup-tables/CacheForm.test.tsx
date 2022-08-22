@@ -19,7 +19,7 @@ import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
-import { buildLookupTableCache } from 'fixtures/lookupTables';
+import { createLookupTableCache } from 'fixtures/lookupTables';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
 import { asMock } from 'helpers/mocking';
@@ -47,7 +47,7 @@ PluginStore.register(new PluginManifest({}, {
 
 const renderedCache = ({
   scope,
-  inCache = { ...buildLookupTableCache() },
+  inCache = { ...createLookupTableCache() },
   create = false,
   withConfig = true,
   // eslint-disable-next-line no-console
@@ -108,7 +108,7 @@ describe('CacheForm', () => {
   });
 
   it('should show required error message', async () => {
-    const cache = buildLookupTableCache(1, {
+    const cache = createLookupTableCache(1, {
       title: '',
       description: '',
       name: '',
@@ -124,7 +124,7 @@ describe('CacheForm', () => {
   });
 
   it('should show duplicated name error', async () => {
-    const cache = buildLookupTableCache(1, {
+    const cache = createLookupTableCache(1, {
       title: 'A duplicated name',
       description: '',
       name: 'a-duplicated-name',
@@ -147,7 +147,7 @@ describe('CacheForm', () => {
   });
 
   it('should not submit invalid form', async () => {
-    const cache = buildLookupTableCache(1, {
+    const cache = createLookupTableCache(1, {
       title: 'another-test-cache',
       description: '',
       name: 'another-test-cache',
@@ -176,7 +176,7 @@ describe('CacheForm', () => {
   });
 
   it('should allow user to submit a valid form', async () => {
-    const cache = buildLookupTableCache(1, {
+    const cache = createLookupTableCache(1, {
       title: '',
       description: '',
       name: '',

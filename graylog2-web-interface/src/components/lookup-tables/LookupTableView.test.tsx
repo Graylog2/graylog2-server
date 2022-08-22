@@ -18,9 +18,9 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import {
-  buildLookupTable,
-  buildLookupTableCache,
-  buildLookupTableAdapter,
+  createLookupTable,
+  createLookupTableCache,
+  createLookupTableAdapter,
 } from 'fixtures/lookupTables';
 import { asMock } from 'helpers/mocking';
 import useScopePermissions from 'hooks/useScopePermissions';
@@ -31,9 +31,9 @@ import LookupTableView from './LookupTableView';
 jest.mock('hooks/useScopePermissions');
 
 const renderedLUT = (scope: string) => {
-  const table = buildLookupTable(1, { _scope: scope });
-  const cache = buildLookupTableCache();
-  const dataAdapter = buildLookupTableAdapter();
+  const table = createLookupTable(1, { _scope: scope });
+  const cache = createLookupTableCache();
+  const dataAdapter = createLookupTableAdapter();
 
   return render(<LookupTableView table={table} cache={cache} dataAdapter={dataAdapter} />);
 };

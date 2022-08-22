@@ -18,7 +18,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
-import { buildLookupTableAdapter } from 'fixtures/lookupTables';
+import { createLookupTableAdapter } from 'fixtures/lookupTables';
 import { asMock } from 'helpers/mocking';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
@@ -39,7 +39,7 @@ PluginStore.register(new PluginManifest({}, {
 }));
 
 const renderedDataAdapter = (scope: string) => {
-  const dataAdapter = buildLookupTableAdapter(1, { _scope: scope });
+  const dataAdapter = createLookupTableAdapter(1, { _scope: scope });
 
   return render(<DataAdapter dataAdapter={dataAdapter} />);
 };
