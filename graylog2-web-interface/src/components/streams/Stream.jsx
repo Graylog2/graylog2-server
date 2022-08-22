@@ -79,6 +79,37 @@ const ToggleButton = styled(Button)`
   min-width: 8.8em;
 `;
 
+_onDelete = (stream) => {
+  // eslint-disable-next-line no-alert
+  if (window.confirm('Do you really want to remove this stream?')) {
+    StreamsStore.remove(stream.id, (response) => {
+      UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
+
+      return response;
+    });
+  }
+};
+
+_onUpdate = (streamId, _stream) => {
+  const stream = trimObjectFields(_stream, ['title']);
+
+  StreamsStore.update(streamId, stream, (response) => {
+    UserNotification.success(`Stream '${stream.title}' was updated successfully.`, 'Success');
+
+    return response;
+  });
+};
+
+_onClone = (streamId, _stream) => {
+  const stream = trimObjectFields(_stream, ['title']);
+
+  StreamsStore.cloneStream(streamId, stream, (response) => {
+    UserNotification.success(`Stream was successfully cloned as '${stream.title}'.`, 'Success');
+
+    return response;
+  });
+};
+
 class Stream extends React.Component {
   static propTypes = {
     stream: PropTypes.object.isRequired,
@@ -114,18 +145,6 @@ class Stream extends React.Component {
     this.setState({ showEntityShareModal: true });
   };
 
-  // eslint-disable-next-line class-methods-use-this
-  _onDelete = (stream) => {
-    // eslint-disable-next-line no-alert
-    if (window.confirm('Do you really want to remove this stream?')) {
-      StreamsStore.remove(stream.id, (response) => {
-        UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
-
-        return response;
-      });
-    }
-  };
-
   _onResume = () => {
     const { stream } = this.props;
 
@@ -133,28 +152,6 @@ class Stream extends React.Component {
 
     StreamsStore.resume(stream.id, (response) => response)
       .finally(() => this.setState({ loading: false }));
-  };
-
-  // eslint-disable-next-line class-methods-use-this
-  _onUpdate = (streamId, _stream) => {
-    const stream = trimObjectFields(_stream, ['title']);
-
-    StreamsStore.update(streamId, stream, (response) => {
-      UserNotification.success(`Stream '${stream.title}' was updated successfully.`, 'Success');
-
-      return response;
-    });
-  };
-
-  // eslint-disable-next-line class-methods-use-this
-  _onClone = (streamId, _stream) => {
-    const stream = trimObjectFields(_stream, ['title']);
-
-    StreamsStore.cloneStream(streamId, stream, (response) => {
-      UserNotification.success(`Stream was successfully cloned as '${stream.title}'.`, 'Success');
-
-      return response;
-    });
   };
 
   _onPause = () => {
@@ -241,9 +238,9 @@ class Stream extends React.Component {
         <StreamControls stream={stream}
                         permissions={permissions}
                         user={user}
-                        onDelete={this._onDelete}
-                        onUpdate={this._onUpdate}
-                        onClone={this._onClone}
+                        onDelete={_onDelete}
+                        onUpdate={_onUpdate}
+                        onClone={_onClone}
                         onQuickAdd={this._openStreamRuleForm}
                         indexSets={indexSets}
                         isDefaultStream={isDefaultStream}
