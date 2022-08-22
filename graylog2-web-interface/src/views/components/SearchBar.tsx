@@ -50,7 +50,7 @@ import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import { SearchActions } from 'views/stores/SearchStore';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import PluggableSearchBarControls from 'views/components/searchbar/PluggableSearchBarControls';
 import useParameters from 'views/hooks/useParameters';
 import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
