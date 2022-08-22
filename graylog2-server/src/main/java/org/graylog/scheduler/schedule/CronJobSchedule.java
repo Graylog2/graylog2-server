@@ -25,12 +25,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.Null;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -55,7 +58,7 @@ public abstract class CronJobSchedule implements JobSchedule {
     public abstract String cronExpression();
 
     @JsonProperty(value = FIELD_TIMEZONE)
-    public abstract String timezone();
+    abstract Optional<String> timezone();
 
     private static CronParser newCronParser() {
         return new CronParser(CronDefinitionBuilder.instanceDefinitionFor(QUARTZ));
@@ -76,7 +79,7 @@ public abstract class CronJobSchedule implements JobSchedule {
     private ZonedDateTime getZonedDateTime(JobSchedulerClock clock) {
         final DateTime now = clock.nowUTC();
         Instant instant = Instant.ofEpochMilli(now.getMillis());
-        ZoneId zoneId = ZoneId.of(timezone());
+        ZoneId zoneId = ZoneId.of(timezone().orElse(DEFAULT_TIMEZONE));
         return ZonedDateTime.ofInstant(instant, zoneId);
     }
 
@@ -90,7 +93,7 @@ public abstract class CronJobSchedule implements JobSchedule {
         return Optional.of(ImmutableMap.of(
                 fieldPrefix + JobSchedule.TYPE_FIELD, type(),
                 fieldPrefix + FIELD_CRON_EXPRESSION, cronExpression(),
-                fieldPrefix + FIELD_TIMEZONE, timezone()
+                fieldPrefix + FIELD_TIMEZONE, timezone().orElse(DEFAULT_TIMEZONE) // always store a TZ together with the cron expression
         ));
     }
     public static CronJobSchedule.Builder builder() {
@@ -105,15 +108,14 @@ public abstract class CronJobSchedule implements JobSchedule {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_CronJobSchedule.Builder()
-                    .type(TYPE_NAME)
-                    .timezone(DEFAULT_TIMEZONE);
+                    .type(TYPE_NAME);
         }
 
         @JsonProperty(FIELD_CRON_EXPRESSION)
         public abstract Builder cronExpression(String cronExpression);
 
         @JsonProperty(FIELD_TIMEZONE)
-        public abstract Builder timezone(String timezone);
+        public abstract Builder timezone(@Nullable String timezone);
 
         abstract CronJobSchedule autoBuild();
 
@@ -121,9 +123,7 @@ public abstract class CronJobSchedule implements JobSchedule {
             // Make sure the type name is correct!
             type(TYPE_NAME);
             final CronJobSchedule schedule = autoBuild();
-
             validateCronExpression(schedule);
-
             return schedule;
         }
 

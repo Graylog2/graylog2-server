@@ -15,13 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 
 import MockStore from 'helpers/mocking/StoreMock';
-import { alice } from 'fixtures/users';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import RangePresetDropdown from './RangePresetDropdown';
 
@@ -40,19 +37,9 @@ jest.mock('views/stores/SearchConfigStore', () => ({
 }));
 
 describe('RangePresetDropdown', () => {
-  type SUTProps = Partial<React.ComponentProps<typeof RangePresetDropdown>>;
-
-  const currentUser = alice.toBuilder().permissions(Immutable.List(['*'])).build();
-
-  const SUTRangePresetDropdown = (props: SUTProps) => (
-    <CurrentUserContext.Provider value={currentUser}>
-      <RangePresetDropdown {...props} />
-    </CurrentUserContext.Provider>
-  );
-
   it('should not call onChange prop when selecting "Configure Ranges" option.', async () => {
     const onSelectOption = jest.fn();
-    render(<SUTRangePresetDropdown onChange={onSelectOption} />);
+    render(<RangePresetDropdown onChange={onSelectOption} />);
 
     const timeRangeButton = screen.getByLabelText('Open time range preset select');
     fireEvent.click(timeRangeButton);

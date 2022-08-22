@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useContext, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { PaginatedUsers } from 'stores/users/UsersStore';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { UsersActions } from 'stores/users/UsersStore';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import type UserOverview from 'logic/users/UserOverview';
@@ -85,7 +85,7 @@ const _updateListOnUserDelete = (perPage, query, setPagination) => UsersActions.
 const _updateListOnUserSetStatus = (pagination, setLoading, setPaginatedUsers) => UsersActions.setStatus.completed.listen(() => _loadUsers(pagination, setLoading, setPaginatedUsers));
 
 const UsersOverview = () => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const [paginatedUsers, setPaginatedUsers] = useState<PaginatedUsers | undefined>();
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);

@@ -141,7 +141,7 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_TRANSPORT_EMAIL_PORT", "1025")
                 .withEnv("GRAYLOG_TRANSPORT_EMAIL_USE_AUTH", "false")
                 .withEnv("GRAYLOG_TRANSPORT_EMAIL_SUBJECT_PREFIX", "[graylog]")
-                .withEnv("GRAYLOG_TRANSPORT_EMAIL_FROM", "developers@graylog.com")
+                .withEnv("GRAYLOG_TRANSPORT_EMAIL_FROM_EMAIL", "developers@graylog.com")
 
                 .waitingFor(new WaitAllStrategy()
                         .withStrategy(Wait.forLogMessage(".*Graylog server up and running.*", 1))

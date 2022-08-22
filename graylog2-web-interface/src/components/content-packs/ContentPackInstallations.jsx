@@ -87,6 +87,7 @@ class ContentPackInstallations extends React.Component {
     );
   };
 
+  // eslint-disable-next-line class-methods-use-this
   headerFormater = (header) => {
     if (header === 'Action') {
       return (<th className="text-right">{header}</th>);
@@ -108,7 +109,8 @@ class ContentPackInstallations extends React.Component {
       <DataTable id="content-packs-versions"
                  headers={headers}
                  headerCellFormatter={this.headerFormater}
-                 sortByKey="comment"
+                 useNumericSort
+                 sortBy={(c) => c.content_pack_revision.toString()}
                  dataRowFormatter={this.rowFormatter}
                  rows={installations}
                  filterKeys={[]} />

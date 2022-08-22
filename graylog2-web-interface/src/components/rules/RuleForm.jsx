@@ -37,21 +37,31 @@ const RuleForm = ({ create }) => {
   } = useContext(PipelineRulesContext);
 
   const [isDirty, setIsDirty] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleError = (error) => {
+    if (error.responseMessage.includes('duplicate key error')) {
+      const duplicatedTitle = error.responseMessage.match(/title: "(.*)"/i)[1];
+      setErrorMessage(`Rule title "${duplicatedTitle}" already exists!`);
+    }
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
     handleSavePipelineRule(() => {
+      setErrorMessage('');
       setIsDirty(false);
       history.goBack();
-    });
+    }, handleError);
   };
 
   const handleApply = () => {
     handleSavePipelineRule((rule) => {
+      setErrorMessage('');
       setIsDirty(false);
       history.replace(Routes.SYSTEM.PIPELINES.RULE(rule.id));
-    });
+    }, handleError);
   };
 
   const handleDescriptionChange = (event) => {
@@ -60,6 +70,7 @@ const RuleForm = ({ create }) => {
   };
 
   const handleSourceChange = (newSource) => {
+    setErrorMessage('');
     setIsDirty(true);
     onChangeSource(newSource);
   };
@@ -91,7 +102,7 @@ const RuleForm = ({ create }) => {
 
         <PipelinesUsingRule create={create} />
 
-        <Input id="rule-source-editor" label="Rule source" help="Rule source, see quick reference for more information.">
+        <Input id="rule-source-editor" label="Rule source" help="Rule source, see quick reference for more information." error={errorMessage}>
           <SourceCodeEditor id={`source${create ? '-create' : '-edit'}`}
                             mode="pipeline"
                             onLoad={onAceLoaded}

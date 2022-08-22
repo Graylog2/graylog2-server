@@ -20,6 +20,7 @@ import React from 'react';
 import { LinkContainer } from 'components/common/router';
 import { MenuItem, NavDropdown } from 'components/bootstrap';
 import { ExternalLink, Icon } from 'components/common';
+import AppConfig from 'util/AppConfig';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
@@ -37,6 +38,12 @@ const HelpMenu = ({ active }) => (
     <MenuItem href={DocsHelper.versionedDocsHomePage()} target="_blank">
       <ExternalLink>Documentation</ExternalLink>
     </MenuItem>
+
+    {AppConfig.isCloud() && (
+    <MenuItem href={Routes.global_api_browser()} target="_blank">
+      <ExternalLink>Cluster Global API browser</ExternalLink>
+    </MenuItem>
+    )}
   </NavDropdown>
 );
 

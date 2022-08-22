@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState, useContext, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 import type User from 'logic/users/User';
 import withParams from 'routing/withParams';
 import { Row, Col } from 'components/bootstrap';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import { isPermitted } from 'util/PermissionsMixin';
 import DocsHelper from 'util/DocsHelper';
 import UsersDomain from 'domainActions/users/UsersDomain';
@@ -30,6 +29,7 @@ import TokenList from 'components/users/TokenList';
 import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
 import DocumentationLink from 'components/support/DocumentationLink';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 type Props = {
   params: {
@@ -82,7 +82,7 @@ const _createToken = (tokenName, userId, loadTokens, setCreatingToken) => {
 };
 
 const UserEditPage = ({ params }: Props) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const [loadedUser, setLoadedUser] = useState<User | undefined>();
   const [tokens, setTokens] = useState([]);
   const [deletingTokenId, setDeletingTokenId] = useState();

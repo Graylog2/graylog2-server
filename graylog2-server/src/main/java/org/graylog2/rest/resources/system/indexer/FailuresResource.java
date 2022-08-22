@@ -47,8 +47,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @RequiresAuthentication
-@Api(value = "Indexer/Failures", description = "Indexer failures")
+@Api(value = "Indexer/Failures", description = "Indexer failures", tags={CLOUD_VISIBLE})
 @Path("/system/indexer/failures")
 public class FailuresResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(FailuresResource.class);
