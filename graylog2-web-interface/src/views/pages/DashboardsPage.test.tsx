@@ -26,9 +26,6 @@ import Routes from 'routing/Routes';
 import useDashboards from 'views/logic/dashboards/useDashboards';
 import { simpleView } from 'views/test/ViewFixtures';
 import UserDateTimeContext from 'contexts/UserDateTimeContext';
-import CurrentUserContext from 'contexts/CurrentUserContext';
-import { adminUser } from 'fixtures/users';
-import type User from 'logic/users/User';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 
 import DashboardsPage from './DashboardsPage';
@@ -45,21 +42,15 @@ jest.mock('views/stores/ViewManagementStore', () => ({
   },
 }));
 
-const WrappedDashboardsPage = ({ currentUser }: { currentUser?: User }) => (
-  <CurrentUserContext.Provider value={currentUser}>
-    <UserDateTimeContext.Provider value={{
-      formatTime: (dateTime) => dateTime.toString(),
-      toUserTimezone: (time) => moment(time),
-      userTimezone: 'Europe/Paris',
-    }}>
-      <DashboardsPage />
-    </UserDateTimeContext.Provider>
-  </CurrentUserContext.Provider>
+const SUT = () => (
+  <UserDateTimeContext.Provider value={{
+    formatTime: (dateTime) => dateTime.toString(),
+    toUserTimezone: (time) => moment(time),
+    userTimezone: 'Europe/Paris',
+  }}>
+    <DashboardsPage />
+  </UserDateTimeContext.Provider>
 );
-
-WrappedDashboardsPage.defaultProps = {
-  currentUser: adminUser,
-};
 
 const noDashboards: DashboardsStoreState = {
   list: [],
@@ -108,14 +99,14 @@ describe('DashboardsPage', () => {
   it('shows placeholder text if dashboards are empty', async () => {
     mockDashboards(noDashboards);
 
-    render(<WrappedDashboardsPage />);
+    render(<SUT />);
 
     await screen.findByText(/Create a new dashboard here/);
   });
 
   it('shows list of dashboards', async () => {
     mockDashboards(simpleDashboardList);
-    render(<WrappedDashboardsPage />);
+    render(<SUT />);
 
     await screen.findByRole('link', { name: 'Foo' });
   });
@@ -123,7 +114,7 @@ describe('DashboardsPage', () => {
   it('does not delete dashboard when user clicks cancel', async () => {
     asMock(window.confirm).mockReturnValue(false);
 
-    render(<WrappedDashboardsPage />);
+    render(<SUT />);
 
     await clickDashboardAction('foo', 'Delete');
 
@@ -135,7 +126,7 @@ describe('DashboardsPage', () => {
   it('deletes dashboard when user confirms deletion', async () => {
     asMock(window.confirm).mockReturnValue(true);
 
-    render(<WrappedDashboardsPage />);
+    render(<SUT />);
 
     await clickDashboardAction('foo', 'Delete');
 
@@ -165,7 +156,7 @@ describe('DashboardsPage', () => {
     });
 
     it('triggers hook when deleting dashboard', async () => {
-      render(<WrappedDashboardsPage />);
+      render(<SUT />);
 
       await clickDashboardAction('foo', 'Delete');
 
@@ -177,7 +168,7 @@ describe('DashboardsPage', () => {
     it('does not delete dashboard when hook returns false', async () => {
       asMock(deletingDashboard).mockResolvedValue(false);
 
-      render(<WrappedDashboardsPage />);
+      render(<SUT />);
 
       await clickDashboardAction('foo', 'Delete');
 
@@ -190,7 +181,7 @@ describe('DashboardsPage', () => {
       asMock(deletingDashboard).mockReturnValue(null);
       asMock(window.confirm).mockReturnValue(true);
 
-      render(<WrappedDashboardsPage />);
+      render(<SUT />);
 
       await clickDashboardAction('foo', 'Delete');
 
@@ -206,7 +197,7 @@ describe('DashboardsPage', () => {
       asMock(deletingDashboard).mockImplementation(() => { throw error; });
       asMock(window.confirm).mockReturnValue(true);
 
-      render(<WrappedDashboardsPage />);
+      render(<SUT />);
 
       /* eslint-disable no-console */
       const oldConsoleTrace = console.trace;

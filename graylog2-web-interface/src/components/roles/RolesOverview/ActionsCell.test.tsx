@@ -18,11 +18,11 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 
-import asMock from 'helpers/mocking/AsMock';
 import { paginatedUsers } from 'fixtures/userOverviews';
-import { alice as currentUser } from 'fixtures/users';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import { asMock } from 'helpers/mocking';
+import useCurrentUser from 'hooks/useCurrentUser';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
+import { adminUser } from 'fixtures/users';
 
 import ActionsCell from './ActionsCell';
 
@@ -35,6 +35,8 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
   },
 }));
 
+jest.mock('hooks/useCurrentUser');
+
 describe('ActionsCell', () => {
   afterEach(() => {
     jest.clearAllMocks();
@@ -43,21 +45,21 @@ describe('ActionsCell', () => {
   const customRoleName = 'custom-role-name';
   const customRoleId = 'custom-role-id';
 
-  const renderSUT = ({ permissions, readOnly, roleName, roleId }) => {
-    const user = currentUser.toBuilder().permissions(permissions).build();
+  type SUTProps = {
+    readOnly: boolean,
+    roleName: string,
+    roleId: string
+  }
 
-    return (
-      <CurrentUserContext.Provider value={user}>
-        <table>
-          <tbody>
-            <tr>
-              <ActionsCell readOnly={readOnly} roleName={roleName} roleId={roleId} />
-            </tr>
-          </tbody>
-        </table>
-      </CurrentUserContext.Provider>
-    );
-  };
+  const SUT = ({ readOnly, roleName, roleId }: SUTProps) => (
+    <table>
+      <tbody>
+        <tr>
+          <ActionsCell readOnly={readOnly} roleName={roleName} roleId={roleId} />
+        </tr>
+      </tbody>
+    </table>
+  );
 
   describe('role deletion', () => {
     let oldConfirm;
@@ -65,6 +67,7 @@ describe('ActionsCell', () => {
     beforeEach(() => {
       oldConfirm = window.confirm;
       window.confirm = jest.fn(() => true);
+      asMock(useCurrentUser).mockReturnValue(adminUser);
     });
 
     afterEach(() => {
@@ -73,17 +76,17 @@ describe('ActionsCell', () => {
     });
 
     it('should be possible if role is not built in', async () => {
-      const userPermissions = [
-        `roles:edit:${customRoleName}`,
-        `roles:delete:${customRoleName}`,
-      ];
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+        .permissions(Immutable.List([
+          `roles:edit:${customRoleName}`,
+          `roles:delete:${customRoleName}`,
+        ]))
+        .build());
 
-      render(renderSUT({
-        permissions: userPermissions,
-        readOnly: false,
-        roleId: customRoleId,
-        roleName: customRoleName,
-      }));
+      render(<SUT readOnly={false}
+                  roleId={customRoleId}
+                  roleName={customRoleName} />,
+      );
 
       const deleteButton = screen.getByRole('button', { name: `Delete role ${customRoleName}` });
       fireEvent.click(deleteButton);
@@ -97,17 +100,17 @@ describe('ActionsCell', () => {
       const confirmMessage = `Do you really want to delete role "${customRoleName}"?\n\nIt is still assigned to ${paginatedUsers.list.size} users.`;
       const mockLoadManyUsersPromise = Promise.resolve(paginatedUsers);
       asMock(AuthzRolesActions.loadUsersForRole).mockReturnValueOnce(mockLoadManyUsersPromise);
-      const userPermissions = [
-        `roles:edit:${customRoleName}`,
-        `roles:delete:${customRoleName}`,
-      ];
 
-      render(renderSUT({
-        permissions: userPermissions,
-        readOnly: false,
-        roleId: customRoleId,
-        roleName: customRoleName,
-      }));
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+        .permissions(Immutable.List([
+          `roles:edit:${customRoleName}`,
+          `roles:delete:${customRoleName}`,
+        ]))
+        .build());
+
+      render(<SUT readOnly={false}
+                  roleId={customRoleId}
+                  roleName={customRoleName} />);
 
       const deleteButton = screen.getByRole('button', { name: `Delete role ${customRoleName}` });
       fireEvent.click(deleteButton);
@@ -120,30 +123,30 @@ describe('ActionsCell', () => {
     it('should not be possible for built in roles', () => {
       const builtInRoleName = 'built-in-role-name';
       const builtInRoleId = 'built-in-role-id';
-      const userPermissions = [
-        `roles:edit:${builtInRoleName}`,
-        `roles:delete:${builtInRoleName}`,
-      ];
 
-      render(renderSUT({
-        permissions: userPermissions,
-        readOnly: true,
-        roleId: builtInRoleId,
-        roleName: builtInRoleName,
-      }));
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+        .permissions(Immutable.List([
+          `roles:edit:${builtInRoleName}`,
+          `roles:delete:${builtInRoleName}`,
+        ]))
+        .build());
 
-      // Ensure that the component rendered correctly
-      expect(screen.queryByTitle(`Edit role ${builtInRoleName}`)).toBeInTheDocument();
+      render(<SUT readOnly
+                  roleId={builtInRoleId}
+                  roleName={builtInRoleName} />);
+
+      expect(screen.getByTitle(`Edit role ${builtInRoleName}`)).toBeInTheDocument();
       expect(screen.queryByTitle(`Delete role ${builtInRoleName}`)).not.toBeInTheDocument();
     });
 
     it('should not be possible if user does not have correct permissions', () => {
-      render(renderSUT({
-        permissions: [],
-        readOnly: false,
-        roleId: customRoleId,
-        roleName: customRoleName,
-      }));
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+        .permissions(Immutable.List([]))
+        .build());
+
+      render(<SUT readOnly={false}
+                  roleId={customRoleId}
+                  roleName={customRoleName} />);
 
       expect(screen.queryByRole('button', { name: `Edit role ${customRoleName}` })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: `Delete role ${customRoleName}` })).not.toBeInTheDocument();

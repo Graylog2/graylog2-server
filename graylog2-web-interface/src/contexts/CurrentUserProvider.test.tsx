@@ -37,6 +37,7 @@ describe('CurrentUserProvider', () => {
           {consume}
         </CurrentUserContext.Consumer>
       </CurrentUserProvider>,
+      { wrapper: undefined },
     );
 
     return consume;

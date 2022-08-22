@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import PropTypes from 'prop-types';
 
+import useCurrentUser from 'hooks/useCurrentUser';
+
 import UserPreferencesContext from './UserPreferencesContext';
-import CurrentUserContext from './CurrentUserContext';
 
 const CurrentUserPreferencesProvider = ({ children }: { children: React.ReactElement }) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const preferences = currentUser?.preferences;
 
   return preferences

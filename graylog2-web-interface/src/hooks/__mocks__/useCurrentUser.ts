@@ -14,18 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { adminUser } from 'fixtures/users';
 
-import type { DateTime } from 'util/DateTime';
-import { adjustFormat, toDateObject } from 'util/DateTime';
-import type { UserDateTimeContextType } from 'contexts/UserDateTimeContext';
+const useCurrentUser = jest.fn(() => adminUser);
 
-const userTimezone = 'Europe/Berlin';
-const userDateTimeContextValue: UserDateTimeContextType = {
-  formatTime: (dateTime: DateTime) => adjustFormat(dateTime),
-  toUserTimezone: (dateTime: DateTime) => toDateObject(dateTime, undefined, userTimezone),
-  userTimezone,
-};
-
-const useUserDateTimeMock = jest.fn(() => userDateTimeContextValue);
-
-export default useUserDateTimeMock;
+export default useCurrentUser;

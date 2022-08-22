@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import { LinkContainer } from 'components/common/router';
 import { ButtonToolbar, Button } from 'components/bootstrap';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
@@ -37,7 +37,7 @@ import { EventNotificationsActions } from 'stores/event-notifications/EventNotif
 import {} from 'components/event-notifications/event-notification-types';
 
 const ShowEventDefinitionPage = ({ params: { notificationId } }) => {
-  const currentUser = useContext(CurrentUserContext) || {};
+  const currentUser = useCurrentUser();
   const [notification, setNotification] = useState();
 
   useEffect(() => {

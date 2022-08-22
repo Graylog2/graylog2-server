@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useContext, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
@@ -34,7 +34,7 @@ import * as ViewPermissions from 'views/Permissions';
 import useSearchPageLayout from 'hooks/useSearchPageLayout';
 import View from 'views/logic/views/View';
 import type User from 'logic/users/User';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import {
@@ -52,7 +52,7 @@ const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) => i
 const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetadata.undeclared.size > 0;
 
 const ViewActionsMenu = ({ view, isNewView, metadata }) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const {
     viewActions: {
       save: {
