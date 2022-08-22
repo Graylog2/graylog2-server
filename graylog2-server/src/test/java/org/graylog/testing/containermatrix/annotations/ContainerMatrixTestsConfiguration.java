@@ -88,4 +88,6 @@ public @interface ContainerMatrixTestsConfiguration {
      */
     boolean defaultImportLicenses = true;
     boolean importLicenses() default defaultImportLicenses;
+
+    boolean withMailServerEnabled() default false;
 }

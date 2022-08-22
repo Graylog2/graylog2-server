@@ -17,13 +17,15 @@
 
 import type { DateTime } from 'util/DateTime';
 import { adjustFormat, toDateObject } from 'util/DateTime';
+import type { UserDateTimeContextType } from 'contexts/UserDateTimeContext';
 
-const userTimeZone = 'UTC';
-
-const useUserDateTimeMock = () => ({
+const userTimezone = 'Europe/Berlin';
+const userDateTimeContextValue: UserDateTimeContextType = {
   formatTime: (dateTime: DateTime) => adjustFormat(dateTime),
-  toUserTime: (dateTime: DateTime) => toDateObject(dateTime, undefined, userTimeZone),
-  userTimeZone,
-});
+  toUserTimezone: (dateTime: DateTime) => toDateObject(dateTime, undefined, userTimezone),
+  userTimezone,
+};
+
+const useUserDateTimeMock = jest.fn(() => userDateTimeContextValue);
 
 export default useUserDateTimeMock;

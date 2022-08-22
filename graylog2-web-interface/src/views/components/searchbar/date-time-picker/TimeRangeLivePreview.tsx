@@ -24,8 +24,8 @@ import { readableRange } from 'views/logic/queries/TimeRangeToString';
 import { isTypeRelative, isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
-import DateTime from 'logic/datetimes/DateTime';
 import type { SearchBarFormValues } from 'views/Constants';
+import { DATE_TIME_FORMATS } from 'util/DateTime';
 
 import { EMPTY_OUTPUT, EMPTY_RANGE } from '../TimeRangeDisplay';
 
@@ -118,7 +118,7 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
     <PreviewWrapper data-testid="time-range-live-preview">
       <FromWrapper>
         <Title>From</Title>
-        <Date title={`Dates Formatted as [${DateTime.Formats.TIMESTAMP}]`}>{from}</Date>
+        <Date title={`Dates Formatted as [${DATE_TIME_FORMATS.complete}]`}>{from}</Date>
       </FromWrapper>
 
       <MiddleIcon>
@@ -127,7 +127,7 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
 
       <UntilWrapper>
         <Title>Until</Title>
-        <Date title={`Dates Formatted as [${DateTime.Formats.TIMESTAMP}]`}>{until}</Date>
+        <Date title={`Dates Formatted as [${DATE_TIME_FORMATS.complete}]`}>{until}</Date>
       </UntilWrapper>
     </PreviewWrapper>
   );
