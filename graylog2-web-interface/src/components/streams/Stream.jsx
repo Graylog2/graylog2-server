@@ -28,7 +28,7 @@ import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
-import { trimObjectFields } from 'logic/ObjectHelper';
+import ObjectUtils from 'util/ObjectUtils';
 
 import StreamMetaData from './StreamMetaData';
 import StreamControls from './StreamControls';
@@ -91,7 +91,7 @@ const _onDelete = (stream) => {
 };
 
 const _onUpdate = (streamId, _stream) => {
-  const stream = trimObjectFields(_stream, ['title']);
+  const stream = ObjectUtils.trimObjectFields(_stream, ['title']);
 
   StreamsStore.update(streamId, stream, (response) => {
     UserNotification.success(`Stream '${stream.title}' was updated successfully.`, 'Success');
@@ -101,7 +101,7 @@ const _onUpdate = (streamId, _stream) => {
 };
 
 const _onClone = (streamId, _stream) => {
-  const stream = trimObjectFields(_stream, ['title']);
+  const stream = ObjectUtils.trimObjectFields(_stream, ['title']);
 
   StreamsStore.cloneStream(streamId, stream, (response) => {
     UserNotification.success(`Stream was successfully cloned as '${stream.title}'.`, 'Success');
