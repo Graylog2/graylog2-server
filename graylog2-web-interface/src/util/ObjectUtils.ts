@@ -14,17 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line import/prefer-default-export
-export const trimObjectFields = (obj: object, fieldsToTrim: string[]) => {
-  const newObj = { ...obj };
+const ObjectUtils = {
+  clone(object) {
+    return JSON.parse(JSON.stringify(object));
+  },
 
-  if (fieldsToTrim.length > 0) {
-    fieldsToTrim.forEach((field) => {
-      if (field in obj && typeof obj[field] === 'string') {
-        newObj[field] = obj[field].trim();
-      }
-    });
-  }
+  isEmpty(object) {
+    const keys = Object.keys(object);
 
-  return newObj;
+    return keys && keys.length === 0;
+  },
+
+  trimObjectFields(obj: object, fieldsToTrim: string[]) {
+    const newObj = { ...obj };
+
+    if (fieldsToTrim.length > 0) {
+      fieldsToTrim.forEach((field) => {
+        if (field in obj && typeof obj[field] === 'string') {
+          newObj[field] = obj[field].trim();
+        }
+      });
+    }
+
+    return newObj;
+  },
 };
+
+export default ObjectUtils;

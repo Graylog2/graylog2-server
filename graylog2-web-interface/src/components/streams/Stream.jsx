@@ -79,7 +79,7 @@ const ToggleButton = styled(Button)`
   min-width: 8.8em;
 `;
 
-_onDelete = (stream) => {
+const _onDelete = (stream) => {
   // eslint-disable-next-line no-alert
   if (window.confirm('Do you really want to remove this stream?')) {
     StreamsStore.remove(stream.id, (response) => {
@@ -90,7 +90,7 @@ _onDelete = (stream) => {
   }
 };
 
-_onUpdate = (streamId, _stream) => {
+const _onUpdate = (streamId, _stream) => {
   const stream = trimObjectFields(_stream, ['title']);
 
   StreamsStore.update(streamId, stream, (response) => {
@@ -100,7 +100,7 @@ _onUpdate = (streamId, _stream) => {
   });
 };
 
-_onClone = (streamId, _stream) => {
+const _onClone = (streamId, _stream) => {
   const stream = trimObjectFields(_stream, ['title']);
 
   StreamsStore.cloneStream(streamId, stream, (response) => {
