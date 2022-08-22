@@ -52,7 +52,7 @@ import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { RefluxActions } from 'stores/StoreTypes';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
@@ -108,7 +108,7 @@ const _refreshSearch = (executionState: SearchExecutionState) => {
 const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode }) => {
   const { view } = useStore(ViewStore);
   const { searchesClusterConfig } = useStore(SearchConfigStore) ?? {};
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const contextValue = useMemo(() => ({
     view,
     analysisDisabledFields: searchesClusterConfig?.analysis_disabled_fields,

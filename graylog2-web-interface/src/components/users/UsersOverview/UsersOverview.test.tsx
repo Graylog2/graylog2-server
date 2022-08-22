@@ -18,11 +18,9 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 
-import { adminUser as currentUser } from 'fixtures/users';
 import { paginatedUsers, alice, bob, admin as adminOverview } from 'fixtures/userOverviews';
 import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import { UsersActions } from 'stores/users/UsersStore';
 
 import UsersOverview from './UsersOverview';
@@ -106,12 +104,6 @@ describe('UsersOverview', () => {
     const readOnlyUsersList = Immutable.List([readOnlyUser]);
     let oldConfirm;
 
-    const UsersOverviewAsAdmin = () => (
-      <CurrentUserContext.Provider value={currentUser}>
-        <UsersOverview />
-      </CurrentUserContext.Provider>
-    );
-
     beforeEach(() => {
       oldConfirm = window.confirm;
       window.confirm = jest.fn(() => true);
@@ -124,7 +116,7 @@ describe('UsersOverview', () => {
     it('be able to delete a modifiable user', async () => {
       const loadUsersPaginatedPromise = Promise.resolve({ ...paginatedUsers, list: modifiableUsersList });
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(loadUsersPaginatedPromise);
-      render(<UsersOverviewAsAdmin />);
+      render(<UsersOverview />);
 
       const deleteButton = await screen.findByTitle(`Delete user ${modifiableUser.fullName}`);
       fireEvent.click(deleteButton);
@@ -137,14 +129,14 @@ describe('UsersOverview', () => {
 
     it('not be able to delete a "read only" user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
-      render(<UsersOverviewAsAdmin />);
+      render(<UsersOverview />);
 
       await waitFor(() => expect(screen.queryByTitle(`Delete user ${readOnlyUser.fullName}`)).not.toBeInTheDocument());
     });
 
     it('see edit and edit tokens link for a modifiable user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: modifiableUsersList }));
-      render(<UsersOverviewAsAdmin />);
+      render(<UsersOverview />);
 
       await screen.findByTitle(`Edit user ${modifiableUser.fullName}`);
 
@@ -153,14 +145,14 @@ describe('UsersOverview', () => {
 
     it('not see edit link for a "read only" user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
-      render(<UsersOverviewAsAdmin />);
+      render(<UsersOverview />);
 
       await waitFor(() => expect(screen.queryByTitle(`Edit user ${readOnlyUser.fullName}`)).not.toBeInTheDocument());
     });
 
     it('see edit tokens link for a "read only" user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
-      render(<UsersOverviewAsAdmin />);
+      render(<UsersOverview />);
 
       await screen.findByTitle(`Edit tokens of user ${readOnlyUser.fullName}`);
     });

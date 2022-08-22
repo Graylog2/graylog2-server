@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { useStore } from 'stores/connect';
@@ -24,8 +24,8 @@ import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import DocumentationLink from 'components/support/DocumentationLink';
+import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
 import EventDefinitionSummary from 'components/event-definitions/event-definition-form/EventDefinitionSummary';
@@ -34,7 +34,7 @@ import { EventNotificationsActions, EventNotificationsStore } from 'stores/event
 
 const ViewEventDefinitionPage = () => {
   const params = useParams<{definitionId?: string}>();
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const [eventDefinition, setEventDefinition] = useState<{ title: string } | undefined>();
   const { all: notifications } = useStore(EventNotificationsStore);
 

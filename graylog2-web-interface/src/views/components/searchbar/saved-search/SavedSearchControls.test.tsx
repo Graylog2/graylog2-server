@@ -20,7 +20,7 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { asMock, MockStore } from 'helpers/mocking';
-import { adminUser, alice as currentUser } from 'fixtures/users';
+import { adminUser } from 'fixtures/users';
 import mockAction from 'helpers/mocking/MockAction';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
@@ -30,19 +30,19 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type { NewViewLoaderContextType } from 'views/logic/NewViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import * as ViewsPermissions from 'views/Permissions';
-import CurrentUserContext from 'contexts/CurrentUserContext';
-import type User from 'logic/users/User';
 import history from 'util/History';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { ViewStore } from 'views/stores/ViewStore';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import SavedSearchControls from './SavedSearchControls';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: (x) => x }));
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('util/History');
+jest.mock('hooks/useCurrentUser');
 
 jest.mock('bson-objectid', () => jest.fn(() => ({
   toString: jest.fn(() => 'new-search-id'),
@@ -88,22 +88,18 @@ describe('SavedSearchControls', () => {
   type SimpleSavedSearchControlsProps = {
     loadNewView?: NewViewLoaderContextType,
     onLoadView?: ViewLoaderContextType,
-    currentUser?: User,
   };
 
   const SimpleSavedSearchControls = ({
     loadNewView = () => Promise.resolve(),
     onLoadView,
-    currentUser: user,
     ...props
   }: SimpleSavedSearchControlsProps) => (
     <FieldTypesContext.Provider value={fieldTypes}>
       <ViewLoaderContext.Provider value={onLoadView}>
-        <CurrentUserContext.Provider value={user}>
-          <NewViewLoaderContext.Provider value={loadNewView}>
-            <SavedSearchControls {...props} />
-          </NewViewLoaderContext.Provider>
-        </CurrentUserContext.Provider>
+        <NewViewLoaderContext.Provider value={loadNewView}>
+          <SavedSearchControls {...props} />
+        </NewViewLoaderContext.Provider>
       </ViewLoaderContext.Provider>
     </FieldTypesContext.Provider>
   );
@@ -115,22 +111,25 @@ describe('SavedSearchControls', () => {
   SimpleSavedSearchControls.defaultProps = {
     loadNewView: () => Promise.resolve(),
     onLoadView: () => Promise.resolve(),
-    currentUser,
   };
 
   beforeEach(() => {
     asMock(ViewStore.getInitialState).mockReturnValue(defaultViewStoreState);
     asMock(useSaveViewFormControls).mockReturnValue([]);
+    asMock(useCurrentUser).mockReturnValue(adminUser);
   });
 
   describe('Button handling', () => {
     const findTitleInput = () => screen.getByRole('textbox', { name: /title/i });
 
     it('should export current search as dashboard', async () => {
-      const user = currentUser.toBuilder()
-        .permissions(Immutable.List(['dashboards:create']))
-        .build();
-      render(<SimpleSavedSearchControls currentUser={user} />);
+      asMock(useCurrentUser).mockReturnValue(
+        adminUser.toBuilder()
+          .permissions(Immutable.List(['dashboards:create']))
+          .build(),
+      );
+
+      render(<SimpleSavedSearchControls />);
 
       const exportAsDashboardMenuItem = await screen.findByText('Export to dashboard');
       userEvent.click(exportAsDashboardMenuItem);
@@ -143,10 +142,13 @@ describe('SavedSearchControls', () => {
     });
 
     it('should not allow exporting search as dashboard if user does not have required permissions', async () => {
-      const user = currentUser.toBuilder()
-        .permissions(Immutable.List([]))
-        .build();
-      render(<SimpleSavedSearchControls currentUser={user} />);
+      asMock(useCurrentUser).mockReturnValue(
+        adminUser.toBuilder()
+          .permissions(Immutable.List([]))
+          .build(),
+      );
+
+      render(<SimpleSavedSearchControls />);
 
       await screen.findByText('Export');
 
@@ -163,11 +165,14 @@ describe('SavedSearchControls', () => {
     });
 
     it('should open search metadata modal', async () => {
-      const user = currentUser.toBuilder()
-        .permissions(Immutable.List([ViewsPermissions.View.Edit('some-id')]))
-        .build();
+      asMock(useCurrentUser).mockReturnValue(
+        adminUser.toBuilder()
+          .permissions(Immutable.List([ViewsPermissions.View.Edit('some-id')]))
+          .build(),
+      );
+
       asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false, 'some-id'));
-      render(<SimpleSavedSearchControls currentUser={user} />);
+      render(<SimpleSavedSearchControls />);
 
       const exportMenuItem = await screen.findByText('Edit metadata');
       userEvent.click(exportMenuItem);
@@ -201,6 +206,12 @@ describe('SavedSearchControls', () => {
     });
 
     it('should duplicate a saved search', async () => {
+      asMock(useCurrentUser).mockReturnValue(
+        adminUser.toBuilder()
+          .permissions(Immutable.List([]))
+          .build(),
+      );
+
       const viewStoreState = createViewStoreState(false, 'some-id');
       asMock(ViewStore.getInitialState).mockReturnValue(viewStoreState);
       render(<SimpleSavedSearchControls />);
@@ -218,6 +229,12 @@ describe('SavedSearchControls', () => {
     });
 
     it('should extend a saved search with plugin data on duplication', async () => {
+      asMock(useCurrentUser).mockReturnValue(
+        adminUser.toBuilder()
+          .permissions(Immutable.List([]))
+          .build(),
+      );
+
       asMock(useSaveViewFormControls).mockReturnValue([{
         component: () => <div>Pluggable component!</div>,
         id: 'example-plugin-component',
@@ -250,13 +267,16 @@ describe('SavedSearchControls', () => {
       });
 
       it('which should be disabled if current user is neither owner nor permitted to edit search', async () => {
-        const notOwningUser = currentUser.toBuilder()
-          .grnPermissions(Immutable.List())
-          .permissions(Immutable.List())
-          .build();
+        asMock(useCurrentUser).mockReturnValue(
+          adminUser.toBuilder()
+            .grnPermissions(Immutable.List())
+            .permissions(Immutable.List())
+            .build(),
+        );
+
         asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false, 'some-id'));
 
-        render(<SimpleSavedSearchControls currentUser={notOwningUser} />);
+        render(<SimpleSavedSearchControls />);
 
         const shareButton = await findShareButton();
 
@@ -264,13 +284,16 @@ describe('SavedSearchControls', () => {
       });
 
       it('which should be enabled if current user is owner of search', async () => {
-        const owningUser = currentUser.toBuilder()
-          .grnPermissions(Immutable.List([`entity:own:grn::::search:${currentUser.id}`]))
-          .permissions(Immutable.List())
-          .build();
-        asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false, owningUser.id));
+        asMock(useCurrentUser).mockReturnValue(
+          adminUser.toBuilder()
+            .grnPermissions(Immutable.List([`entity:own:grn::::search:${adminUser.id}`]))
+            .permissions(Immutable.List())
+            .build(),
+        );
 
-        render(<SimpleSavedSearchControls currentUser={owningUser} />);
+        asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false, adminUser.id));
+
+        render(<SimpleSavedSearchControls />);
 
         const shareButton = await findShareButton();
 
@@ -278,13 +301,16 @@ describe('SavedSearchControls', () => {
       });
 
       it('which should be enabled if current user is permitted to edit search', async () => {
-        const owningUser = currentUser.toBuilder()
-          .grnPermissions(Immutable.List([`entity:own:grn::::search:${currentUser.id}`]))
-          .permissions(Immutable.List([ViewsPermissions.View.Edit(currentUser.id)]))
-          .build();
-        asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false, owningUser.id));
+        asMock(useCurrentUser).mockReturnValue(
+          adminUser.toBuilder()
+            .grnPermissions(Immutable.List([`entity:own:grn::::search:${adminUser.id}`]))
+            .permissions(Immutable.List([ViewsPermissions.View.Edit(adminUser.id)]))
+            .build(),
+        );
 
-        render(<SimpleSavedSearchControls currentUser={owningUser} />);
+        asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false, adminUser.id));
+
+        render(<SimpleSavedSearchControls />);
 
         const shareButton = await findShareButton();
 
@@ -292,9 +318,10 @@ describe('SavedSearchControls', () => {
       });
 
       it('which should be enabled if current user is admin', async () => {
+        asMock(useCurrentUser).mockReturnValue(adminUser);
         asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false, adminUser.id));
 
-        render(<SimpleSavedSearchControls currentUser={adminUser} />);
+        render(<SimpleSavedSearchControls />);
 
         const shareSearch = await findShareButton();
 
