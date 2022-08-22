@@ -17,7 +17,7 @@
 /* eslint-disable react/no-find-dom-node */
 
 import * as React from 'react';
-import { useState, useEffect, useRef, useContext } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { reduce } from 'lodash';
 import styled, { css } from 'styled-components';
@@ -29,11 +29,11 @@ import NumberUtils from 'util/NumberUtils';
 import { useStore } from 'stores/connect';
 import { Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import { ClusterTrafficActions, ClusterTrafficStore } from 'stores/cluster/ClusterTrafficStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import { formatTrafficData } from 'util/TrafficUtils';
 import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import TrafficGraph from './TrafficGraph';
 
@@ -74,7 +74,7 @@ const GraylogClusterTrafficGraph = () => {
   const eventThrottler = useRef(new EventHandlersThrottler());
   const containerRef = useRef(null);
   const licensePlugin = PluginStore.exports('license');
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
 
   useEffect(() => {
     ClusterTrafficActions.getTraffic();

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext } from 'react';
+import React from 'react';
 import { useQueries } from 'react-query';
 
 import { isPermitted } from 'util/PermissionsMixin';
@@ -27,7 +27,7 @@ import type FetchError from 'logic/errors/FetchError';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import IndexerClusterHealthError from './IndexerClusterHealthError';
 
@@ -70,7 +70,7 @@ const useLoadHealthAndName = (enabled: boolean) => {
 };
 
 const IndexerClusterHealth = ({ minimal }: Props) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const userHasRequiredPermissions = isPermitted(currentUser.permissions, 'indexercluster:read');
   const { health, name, loading, error, isSuccess } = useLoadHealthAndName(userHasRequiredPermissions);
 

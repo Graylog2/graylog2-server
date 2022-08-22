@@ -14,18 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useContext } from 'react';
 
-import type { DateTime } from 'util/DateTime';
-import { adjustFormat, toDateObject } from 'util/DateTime';
-import type { UserDateTimeContextType } from 'contexts/UserDateTimeContext';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 
-const userTimezone = 'Europe/Berlin';
-const userDateTimeContextValue: UserDateTimeContextType = {
-  formatTime: (dateTime: DateTime) => adjustFormat(dateTime),
-  toUserTimezone: (dateTime: DateTime) => toDateObject(dateTime, undefined, userTimezone),
-  userTimezone,
+const useCurrentUser = () => {
+  const currentUser = useContext(CurrentUserContext);
+
+  if (!currentUser) {
+    throw new Error('useCurrentUser hook needs to be used inside CurrentUserContext.Provider');
+  }
+
+  return currentUser;
 };
 
-const useUserDateTimeMock = jest.fn(() => userDateTimeContextValue);
-
-export default useUserDateTimeMock;
+export default useCurrentUser;

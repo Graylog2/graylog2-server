@@ -20,20 +20,20 @@ import { render, screen, within, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { asMock, MockStore } from 'helpers/mocking';
-import { alice } from 'fixtures/users';
-import type User from 'logic/users/User';
+import { adminUser } from 'fixtures/users';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import SearchPageLayoutContext, { SAVE_COPY, BLANK } from 'views/components/contexts/SearchPageLayoutContext';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import ViewActionsMenu from './ViewActionsMenu';
 
 jest.mock('views/hooks/useSaveViewFormControls');
+jest.mock('hooks/useCurrentUser');
 
 jest.mock('bson-objectid', () => jest.fn(() => ({
   toString: jest.fn(() => 'new-dashboard-id'),
@@ -94,21 +94,13 @@ describe('ViewActionsMenu', () => {
     .createdAt(new Date('2019-10-16T14:38:44.681Z'))
     .build();
 
-  const currentUser = alice.toBuilder()
-    .grnPermissions(mockImmutable.List(['entity:own:grn::::dashboard:view-id']))
-    .permissions(mockImmutable.List(['dashboards:edit:view-id', 'view:edit:view-id']))
-    .build();
-
-  const SimpleViewActionMenu = ({ currentUser: user, providerOverrides, ...props }: {currentUser?: User, providerOverrides?: LayoutState}) => (
+  const SimpleViewActionMenu = ({ providerOverrides, ...props }: {providerOverrides?: LayoutState}) => (
     <SearchPageLayoutContext.Provider value={providerOverrides}>
-      <CurrentUserContext.Provider value={user}>
-        <ViewActionsMenu {...props} />
-      </CurrentUserContext.Provider>
+      <ViewActionsMenu {...props} />
     </SearchPageLayoutContext.Provider>
   );
 
   SimpleViewActionMenu.defaultProps = {
-    currentUser,
     providerOverrides: undefined,
   };
 
@@ -130,6 +122,11 @@ describe('ViewActionsMenu', () => {
   };
 
   beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+      .grnPermissions(mockImmutable.List(['entity:own:grn::::dashboard:view-id']))
+      .permissions(mockImmutable.List(['dashboards:edit:view-id', 'view:edit:view-id']))
+      .build());
+
     asMock(ViewStore.getInitialState).mockReturnValue({ isNew: false, view: mockView, activeQuery: undefined, dirty: false });
     asMock(useSaveViewFormControls).mockReturnValue([]);
   });
