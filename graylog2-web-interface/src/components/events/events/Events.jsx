@@ -119,6 +119,7 @@ class Events extends React.Component {
     };
   };
 
+  // eslint-disable-next-line class-methods-use-this
   priorityFormatter = (eventId, priority) => {
     const priorityName = lodash.capitalize(EventDefinitionPriorityEnum.properties[priority].name);
     let icon;
@@ -192,6 +193,7 @@ class Events extends React.Component {
     );
   };
 
+  // eslint-disable-next-line class-methods-use-this
   renderEmptyContent = () => {
     return (
       <Row>
