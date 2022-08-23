@@ -14,16 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
-
-import usePluginEntities from 'hooks/usePluginEntities';
-
-const useSaveViewFormControls = () => {
-  const pluggableSaveViewControlFns = usePluginEntities('views.components.saveViewForm');
-
-  return useMemo(() => {
-    return pluggableSaveViewControlFns.map((controlFn) => controlFn()).filter((control) => !!control);
-  }, [pluggableSaveViewControlFns]);
+/* eslint-disable global-require */
+module.exports = {
+  rules: {
+    'prefer-hook': require('./rules/prefer-hook'),
+  },
+  configs: {
+    recommended: {
+      rules: {
+        'graylog/prefer-hook': 'warn',
+      },
+    },
+  },
 };
-
-export default useSaveViewFormControls;

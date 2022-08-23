@@ -32,6 +32,7 @@ import org.graylog.metrics.prometheus.PrometheusExporterConfiguration;
 import org.graylog.metrics.prometheus.PrometheusMetricsModule;
 import org.graylog.plugins.cef.CEFInputModule;
 import org.graylog.plugins.map.MapWidgetModule;
+import org.graylog.plugins.map.config.GeoIpProcessorConfig;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
 import org.graylog.plugins.pipelineprocessor.PipelineConfig;
 import org.graylog.plugins.sidecar.SidecarModule;
@@ -127,6 +128,7 @@ public class Server extends ServerBootstrap {
     private final JobSchedulerConfiguration jobSchedulerConfiguration = new JobSchedulerConfiguration();
     private final PrometheusExporterConfiguration prometheusExporterConfiguration = new PrometheusExporterConfiguration();
     private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
+    private final GeoIpProcessorConfig geoIpProcessorConfig = new GeoIpProcessorConfig();
 
     public Server() {
         super("server", configuration);
@@ -205,7 +207,8 @@ public class Server extends ServerBootstrap {
                 processingStatusConfig,
                 jobSchedulerConfiguration,
                 prometheusExporterConfiguration,
-                tlsConfiguration);
+                tlsConfiguration,
+                geoIpProcessorConfig);
     }
 
     @Override

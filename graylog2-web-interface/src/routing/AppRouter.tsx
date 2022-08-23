@@ -104,7 +104,7 @@ import {
   ViewEventDefinitionPage,
 } from 'pages';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
   if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
