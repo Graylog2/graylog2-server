@@ -59,7 +59,7 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   },
 }));
 
-jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => jest.fn(() => (
+jest.mock('views/components/searchbar/saved-search/SearchActionsMenu', () => jest.fn(() => (
   <div>Saved Search Controls</div>
 )));
 
