@@ -16,10 +16,13 @@
  */
 package org.graylog.plugins.views.search;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
+import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
@@ -35,6 +38,9 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.graylog.plugins.views.search.TestData.validQueryBuilder;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -126,6 +132,44 @@ public class SearchTest {
         assertThat(searchTypeIdsFrom(after)).containsExactlyInAnyOrder("oans", "gsuffa");
     }
 
+    @Test
+    public void testGetReferencedSearchFiltersIdsReturnsEmptyCollectionOnEmptyQueries() {
+        final Search search = Search.builder().queries(ImmutableSet.of()).build();
+        final Set<String> referencedSearchFiltersIds = search.getReferencedSearchFiltersIds();
+        assertTrue(referencedSearchFiltersIds.isEmpty());
+    }
+
+    @Test
+    public void testGetReferencedSearchFiltersIdsReturnsEmptyCollectionOnQueriesWithoutFilters() {
+        final Query query1 = mock(Query.class);
+        final Query query2 = mock(Query.class);
+        final Search search = Search.builder().queries(ImmutableSet.of(query1, query2)).build();
+        final Set<String> referencedSearchFiltersIds = search.getReferencedSearchFiltersIds();
+        assertTrue(referencedSearchFiltersIds.isEmpty());
+    }
+
+    @Test
+    public void testGetReferencedSearchFiltersIdsDoesNotReturnInlinedSearchFilters() {
+        final Query query = mock(Query.class);
+        doReturn(ImmutableList.of(mock(InlineQueryStringSearchFilter.class), mock(InlineQueryStringSearchFilter.class))).when(query).filters();
+        final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
+        final Set<String> referencedSearchFiltersIds = search.getReferencedSearchFiltersIds();
+        assertTrue(referencedSearchFiltersIds.isEmpty());
+    }
+
+    @Test
+    public void testGetReferencedSearchFiltersIdsReturnsProperIds() {
+        final Query query = mock(Query.class);
+        final ReferencedSearchFilter filter1 = mock(ReferencedSearchFilter.class);
+        doReturn("r_id_1").when(filter1).id();
+        final ReferencedSearchFilter filter2 = mock(ReferencedSearchFilter.class);
+        doReturn("r_id_2").when(filter2).id();
+        doReturn(ImmutableList.of(filter1, filter2)).when(query).filters();
+        final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
+        final Set<String> referencedSearchFiltersIds = search.getReferencedSearchFiltersIds();
+        assertEquals(ImmutableSet.of("r_id_1", "r_id_2"), referencedSearchFiltersIds);
+    }
+
     private Set<String> searchTypeIdsFrom(Search search) {
         return search.queries().stream()
                 .flatMap(q -> q.searchTypes().stream().map(SearchType::id))
@@ -187,8 +231,9 @@ public class SearchTest {
     private Query queryWithStreams(String... streamIds) {
         Query.Builder builder = validQueryBuilder();
 
-        if (streamIds.length > 0)
+        if (streamIds.length > 0) {
             builder = builder.filter(StreamFilter.anyIdOf(streamIds));
+        }
 
         return builder.build();
     }
