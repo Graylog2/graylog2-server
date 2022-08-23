@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useContext, useMemo } from 'react';
 
 import type Widget from 'views/logic/widgets/Widget';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import { MenuItem } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 

@@ -22,7 +22,7 @@ import ErrorPage from 'components/errors/ErrorPage';
 import type View from './View';
 import { processHooks } from './ViewLoader';
 
-import usePluginEntities from '../usePluginEntities';
+import usePluginEntities from '../../../hooks/usePluginEntities';
 
 const LoadViewError = ({ error }: { error: Error }) => (
   <ErrorPage title="Something went wrong"

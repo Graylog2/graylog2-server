@@ -21,9 +21,9 @@ import userEvent from '@testing-library/user-event';
 import asMock from 'helpers/mocking/AsMock';
 import ExtraWidgetActions from 'views/components/widgets/ExtraWidgetActions';
 import Widget from 'views/logic/widgets/Widget';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 
-jest.mock('views/logic/usePluginEntities', () => jest.fn(() => []));
+jest.mock('hooks/usePluginEntities', () => jest.fn(() => []));
 
 describe('ExtraWidgetActions', () => {
   const widget = Widget.empty();

@@ -28,7 +28,7 @@ import { Row, Col } from 'components/bootstrap';
 import BottomRow from 'views/components/searchbar/BottomRow';
 import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
 import SearchButton from 'views/components/searchbar/SearchButton';
-import SavedSearchControls from 'views/components/searchbar/saved-search/SavedSearchControls';
+import SearchActionsMenu from 'views/components/searchbar/saved-search/SearchActionsMenu';
 import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
 import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
@@ -50,7 +50,7 @@ import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import { SearchActions } from 'views/stores/SearchStore';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import PluggableSearchBarControls from 'views/components/searchbar/PluggableSearchBarControls';
 import useParameters from 'views/hooks/useParameters';
 import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
@@ -242,9 +242,9 @@ const SearchBar = ({
                         </SearchButtonAndQuery>
 
                         {!editing && (
-                        <ViewActionsWrapper>
-                          <SavedSearchControls />
-                        </ViewActionsWrapper>
+                          <ViewActionsWrapper>
+                            <SearchActionsMenu />
+                          </ViewActionsWrapper>
                         )}
                       </BottomRow>
                       <PluggableSearchBarControls />
