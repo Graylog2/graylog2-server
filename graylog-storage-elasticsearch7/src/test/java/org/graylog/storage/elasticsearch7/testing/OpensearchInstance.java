@@ -53,7 +53,7 @@ public class OpensearchInstance extends TestableSearchServerInstance {
     private final FixtureImporter fixtureImporter;
 
     protected OpensearchInstance(String image, SearchVersion version, Network network) {
-        super(image, version, network);
+        super(image, version, network, "2g");
         this.restHighLevelClient = buildRestClient();
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
         this.client = new ClientES7(this.elasticsearchClient);
