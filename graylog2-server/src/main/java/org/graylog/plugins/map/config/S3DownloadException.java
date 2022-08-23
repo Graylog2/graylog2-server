@@ -14,16 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
+package org.graylog.plugins.map.config;
 
-import usePluginEntities from 'hooks/usePluginEntities';
-
-const useSaveViewFormControls = () => {
-  const pluggableSaveViewControlFns = usePluginEntities('views.components.saveViewForm');
-
-  return useMemo(() => {
-    return pluggableSaveViewControlFns.map((controlFn) => controlFn()).filter((control) => !!control);
-  }, [pluggableSaveViewControlFns]);
-};
-
-export default useSaveViewFormControls;
+public class S3DownloadException extends Exception {
+    public S3DownloadException(String message) {
+        super(message);
+    }
+}

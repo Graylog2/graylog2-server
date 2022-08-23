@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import { MenuItem } from 'components/bootstrap';
 import ActionMenuItem from 'views/components/actions/ActionMenuItem';
 import type { ActionDefinition, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
