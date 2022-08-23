@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import type { Message } from './Types';
 
