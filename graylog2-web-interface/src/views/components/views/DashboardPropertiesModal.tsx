@@ -19,7 +19,6 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import * as FormsUtils from 'util/FormsUtils';
-import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
 import type View from 'views/logic/views/View';
@@ -33,9 +32,8 @@ type Props = {
   show: boolean
 };
 
-const ViewPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle }: Props) => {
-  const [updatedView, setUpdatedView] = useState(view);
-  const viewType = ViewTypeLabel({ type: updatedView.type });
+const DashboardPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle }: Props) => {
+  const [updatedDashboard, setUpdatedDashboard] = useState(view);
   const pluggableFormComponents = useSaveViewFormControls();
 
   const _onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,20 +47,20 @@ const ViewPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle }:
 
     switch (name) {
       case 'title':
-        setUpdatedView((_updatedView) => _updatedView.toBuilder().title(value).build());
+        setUpdatedDashboard((_updatedDashboard) => _updatedDashboard.toBuilder().title(value).build());
         break;
       case 'summary':
-        setUpdatedView((_updatedView) => _updatedView.toBuilder().summary(value).build());
+        setUpdatedDashboard((_updatedDashboard) => _updatedDashboard.toBuilder().summary(value).build());
         break;
       case 'description':
-        setUpdatedView((_updatedView) => _updatedView.toBuilder().description(value).build());
+        setUpdatedDashboard((_updatedDashboard) => _updatedDashboard.toBuilder().description(value).build());
         break;
       default:
     }
   };
 
   const _onSave = () => {
-    onSave(updatedView);
+    onSave(updatedDashboard);
     onClose();
   };
 
@@ -78,31 +76,31 @@ const ViewPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle }:
                type="text"
                name="title"
                label="Title"
-               help={`The title of the ${viewType}.`}
+               help="The title of the dashboard."
                required
                onChange={_onChange}
-               value={updatedView.title} />
+               value={updatedDashboard.title} />
         <Input id="summary"
                type="text"
                name="summary"
                label="Summary"
-               help={`A helpful summary of the ${viewType}.`}
+               help="A helpful summary of the dashboard."
                onChange={_onChange}
-               value={updatedView.summary} />
+               value={updatedDashboard.summary} />
         <Input id="description"
                type="textarea"
                name="description"
                label="Description"
-               help={`A longer, helpful description of the ${viewType} and its functionality.`}
+               help="A longer, helpful description of the dashboard and its functionality."
                onChange={_onChange}
-               value={updatedView.description} />
+               value={updatedDashboard.description} />
         {pluggableFormComponents?.map(({ component: Component, id }) => (Component && <Component key={id} />))}
       </>
     </BootstrapModalForm>
   );
 };
 
-ViewPropertiesModal.propTypes = {
+DashboardPropertiesModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   show: PropTypes.bool.isRequired,
@@ -110,4 +108,4 @@ ViewPropertiesModal.propTypes = {
   view: PropTypes.object.isRequired,
 };
 
-export default ViewPropertiesModal;
+export default DashboardPropertiesModal;

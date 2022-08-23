@@ -1,0 +1,9 @@
+{
+  "name": "eslint-plugin-graylog",
+  "version": "1.0.0",
+  "description": "Collection of custom ESLint rules.",
+  "main": "./lib/index.js",
+  "exports": "./lib/index.js",
+  "author": "Graylog, Inc. <hello@graylog.com>",
+  "license": "SSPL-1.0"
+}
