@@ -84,6 +84,12 @@ const _loadUsers = (pagination, setLoading, setPaginatedUsers) => {
 const _updateListOnUserDelete = (perPage, query, setPagination) => UsersActions.delete.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
 const _updateListOnUserSetStatus = (pagination, setLoading, setPaginatedUsers) => UsersActions.setStatus.completed.listen(() => _loadUsers(pagination, setLoading, setPaginatedUsers));
 
+const buildUsersOverviewItem = (currentUser: any) => (user: UserOverview) => {
+  const { id: userId } = user;
+
+  return <UserOverviewItem user={user} isActive={(currentUser?.id === userId)} />;
+};
+
 const UsersOverview = () => {
   const currentUser = useCurrentUser();
   const [paginatedUsers, setPaginatedUsers] = useState<PaginatedUsers | undefined>();
@@ -102,17 +108,11 @@ const UsersOverview = () => {
 
   const searchFilter = <UsersFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />;
 
-  const _usersOverviewItem = (user: UserOverview) => {
-    const { id: userId } = user;
-
-    return <UserOverviewItem user={user} isActive={(currentUser?.id === userId)} />;
-  };
-
   return (
     <Container>
       {adminUser && (
         <SystemAdministrator adminUser={adminUser}
-                             dataRowFormatter={_usersOverviewItem}
+                             dataRowFormatter={buildUsersOverviewItem(currentUser)}
                              headerCellFormatter={_headerCellFormatter}
                              headers={TABLE_HEADERS} />
       )}
@@ -137,7 +137,7 @@ const UsersOverview = () => {
                        noDataText={<EmptyResult>No users have been found.</EmptyResult>}
                        rows={users.toJS()}
                        customFilter={searchFilter}
-                       dataRowFormatter={_usersOverviewItem}
+                       dataRowFormatter={buildUsersOverviewItem(currentUser)}
                        filterKeys={[]}
                        filterLabel="Filter Users" />
           </StyledPaginatedList>
