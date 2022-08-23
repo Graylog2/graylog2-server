@@ -18,7 +18,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { Spinner } from 'components/common';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import { EnterpriseActions } from 'stores/enterprise/EnterpriseStore';
 
 import IndexerFailuresComponent from './IndexerFailuresComponent';

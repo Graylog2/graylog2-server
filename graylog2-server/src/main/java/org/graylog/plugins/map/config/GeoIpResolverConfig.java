@@ -51,6 +51,9 @@ public abstract class GeoIpResolverConfig {
     @JsonProperty("asn_db_path")
     public abstract String asnDbPath();
 
+    @JsonProperty("use_s3")
+    public abstract boolean useS3();
+
     @JsonProperty(FIELD_REFRESH_INTERVAL_UNIT)
     @Nullable
     public abstract TimeUnit refreshIntervalUnit();
@@ -72,7 +75,8 @@ public abstract class GeoIpResolverConfig {
                                              @JsonProperty("city_db_path") String cityDbPath,
                                              @JsonProperty("asn_db_path") String asnDbPath,
                                              @JsonProperty(FIELD_REFRESH_INTERVAL_UNIT) TimeUnit refreshIntervalUnit,
-                                             @JsonProperty(FIELD_REFRESH_INTERVAL) Long refreshInterval) {
+                                             @JsonProperty(FIELD_REFRESH_INTERVAL) Long refreshInterval,
+                                             @JsonProperty("use_s3") boolean useS3) {
         return builder()
                 .enabled(cityEnabled)
                 .enforceGraylogSchema(enforceGraylogSchema)
@@ -81,6 +85,7 @@ public abstract class GeoIpResolverConfig {
                 .asnDbPath(asnDbPath)
                 .refreshIntervalUnit(refreshIntervalUnit == null ? DEFAULT_INTERVAL_UNIT : refreshIntervalUnit)
                 .refreshInterval(refreshInterval == null ? DEFAULT_INTERVAL : refreshInterval)
+                .useS3(useS3)
                 .build();
     }
 
@@ -93,6 +98,7 @@ public abstract class GeoIpResolverConfig {
                 .asnDbPath("/etc/graylog/server/GeoLite2-ASN.mmdb")
                 .refreshIntervalUnit(DEFAULT_INTERVAL_UNIT)
                 .refreshInterval(DEFAULT_INTERVAL)
+                .useS3(false)
                 .build();
     }
 
@@ -117,6 +123,8 @@ public abstract class GeoIpResolverConfig {
         public abstract Builder refreshIntervalUnit(TimeUnit unit);
 
         public abstract Builder refreshInterval(Long interval);
+
+        public abstract Builder useS3(boolean useS3);
 
         public abstract GeoIpResolverConfig build();
     }
