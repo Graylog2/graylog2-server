@@ -22,10 +22,6 @@ import styled from 'styled-components';
 
 import Icon from 'components/common/Icon';
 
-const Container = styled.div`
-  display: flex;
-`;
-
 const IconWrapper = styled.div`
   display: inline-flex;
   min-width: 20px;
@@ -38,28 +34,26 @@ type Props = React.ComponentProps<typeof BootstrapMenuItem> & {
   icon?: React.ComponentProps<typeof Icon>['name'],
 }
 
-const MenuItem = ({ className, children, icon, ...props } : Props) => {
-  return (
-    <BootstrapMenuItem bsClass={className} {...props}>
-      {children && (
-        <Container>
-          {icon && <IconWrapper><Icon name={icon} /></IconWrapper>}
-          {children}
-        </Container>
-      )}
-    </BootstrapMenuItem>
-  );
-};
+const CustomMenuItem = ({ className, children, icon, ...props } : Props) => (
+  <BootstrapMenuItem bsClass={className} {...props}>
+    {children && (
+      <>
+        {icon && <IconWrapper><Icon name={icon} /></IconWrapper>}
+        {children}
+      </>
+    )}
+  </BootstrapMenuItem>
+);
 
-MenuItem.propTypes = {
+CustomMenuItem.propTypes = {
   className: PropTypes.string,
   icon: PropTypes.string,
 };
 
-MenuItem.defaultProps = {
+CustomMenuItem.defaultProps = {
   className: undefined,
   icon: undefined,
 };
 
 /** @component */
-export default MenuItem;
+export default CustomMenuItem;
