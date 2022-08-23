@@ -17,7 +17,7 @@
 import * as React from 'react';
 import type { LookupTableCache, validationErrorsType } from 'src/logic/lookup-tables/types';
 
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import { Row, Col, Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';

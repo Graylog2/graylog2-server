@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';

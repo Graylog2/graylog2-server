@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import Routes from 'routing/Routes';
 import { Row, Col, Button } from 'components/bootstrap';
 import useScopePermissions from 'hooks/useScopePermissions';
