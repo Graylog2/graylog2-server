@@ -20,7 +20,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import mockComponent from 'helpers/mocking/MockComponent';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import history from 'util/History';
 import AppConfig from 'util/AppConfig';
 
@@ -35,7 +35,7 @@ jest.mock('stores/nodes/NodesStore', () => ({ NodesStore: MockStore() }));
 jest.mock('components/errors/RouterErrorBoundary', () => mockComponent('RouterErrorBoundary'));
 
 jest.mock('pages/StartPage', () => () => <>This is the start page</>);
-jest.mock('views/logic/usePluginEntities');
+jest.mock('hooks/usePluginEntities');
 
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
