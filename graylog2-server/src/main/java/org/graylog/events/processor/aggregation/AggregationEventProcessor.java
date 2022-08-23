@@ -283,7 +283,8 @@ public class AggregationEventProcessor implements EventProcessor {
             final DateTime eventTime = keyResult.timestamp().orElse(result.effectiveTimerange().to());
             final Event event = eventFactory.createEvent(eventDefinition, eventTime, eventMessage);
             event.setTimerangeStart(keyResult.from().orElse(parameters.timerange().getFrom()));
-            event.setTimerangeEnd(parameters.timerange().getTo());
+            // The keyResult timestamp is set to end of the range
+            event.setTimerangeEnd(keyResult.timestamp().orElse(parameters.timerange().getTo()));
 
             sourceStreams.forEach(event::addSourceStream);
 

@@ -35,6 +35,7 @@ public abstract class AggregationKeyResult {
 
     public abstract ImmutableList<AggregationSeriesValue> seriesValues();
 
+    // timestamp() is set to the end of the date range. that's why we don't need to()
     public abstract Optional<DateTime> from();
 
     public static Builder builder() {
