@@ -14,17 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
-
-class NullCacheSummary extends React.Component {
-  static propTypes = {
-    cache: PropTypes.object.isRequired,
-  };
-
-  render() {
-    return (<p>This cache has no configuration.</p>);
-  }
+export interface CachePluginType {
+  type: string;
+  displayName: string;
+  formComponent?: any,
+  summaryComponent?: any,
+  documentationComponent?: any,
 }
 
-export default NullCacheSummary;
+export interface DataAdapterPluginType {
+  type: string;
+  displayName: string;
+  formComponent?: any,
+  summaryComponent?: any,
+  documentationComponent?: any,
+}
+
+declare module 'graylog-web-plugin/plugin' {
+  interface PluginExports {
+    'lookupTableCaches'?: Array<CachePluginType>;
+    'lookupTableAdapters'?: Array<DataAdapterPluginType>;
+  }
+}

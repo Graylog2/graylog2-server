@@ -14,22 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
-import { kebabCase } from 'lodash';
+import * as React from 'react';
 
-export default (name) => {
-  const MockComponent = ({ children, ...rest }) => React.createElement(kebabCase(name), rest, children);
+const NullCacheFieldSet = () => null;
 
-  MockComponent.propTypes = {
-    children: PropTypes.node,
-  };
-
-  MockComponent.defaultProps = {
-    children: null,
-  };
-
-  MockComponent.displayName = name;
-
-  return MockComponent;
-};
+export default React.forwardRef(NullCacheFieldSet);

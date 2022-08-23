@@ -49,6 +49,7 @@ class LookupTablesOverview extends React.Component {
     LookupTablesActions.searchPaginated(this.props.pagination.page, this.props.pagination.per_page);
   };
 
+  // eslint-disable-next-line
   _lookupName = (id, map) => {
     const empty = { title: 'None' };
 
@@ -73,6 +74,7 @@ class LookupTablesOverview extends React.Component {
     return null;
   };
 
+  // eslint-disable-next-line
   _helpPopover = () => {
     return (
       <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">

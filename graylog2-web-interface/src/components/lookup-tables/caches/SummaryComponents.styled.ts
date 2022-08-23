@@ -14,22 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
-import { kebabCase } from 'lodash';
+import styled from 'styled-components';
 
-export default (name) => {
-  const MockComponent = ({ children, ...rest }) => React.createElement(kebabCase(name), rest, children);
+export const SummaryContainer = styled.div`
+  display: inline-block;
+  margin: 16px 0;
+`;
 
-  MockComponent.propTypes = {
-    children: PropTypes.node,
-  };
+export const SummaryRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+`;
 
-  MockComponent.defaultProps = {
-    children: null,
-  };
+export const Title = styled.span`
+  font-weight: bold;
+  min-width: 180px;
+`;
 
-  MockComponent.displayName = name;
-
-  return MockComponent;
-};
+export const Value = styled.span`
+  padding: 6px 10px;
+  width: 100%;
+  min-width: 130px;
+`;
