@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import AppConfig from 'util/AppConfig';
 import UsersDomain from 'domainActions/users/UsersDomain';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import { Button, Row, Col } from 'components/bootstrap';
 import { FormikFormGroup } from 'components/common';
 import type User from 'logic/users/User';
@@ -61,7 +60,7 @@ const _onSubmit = (formData, userId) => {
 };
 
 const PasswordSection = ({ user: { id } }: Props) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   let requiresOldPassword = true;
 
   if (isPermitted(currentUser?.permissions, 'users:passwordchange:*')) {

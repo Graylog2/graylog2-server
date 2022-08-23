@@ -15,18 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import { Route, MemoryRouter } from 'react-router-dom';
+import { Route, MemoryRouter, useLocation } from 'react-router-dom';
+import Immutable from 'immutable';
+import type { Location } from 'history';
 
 import mockComponent from 'helpers/mocking/MockComponent';
-import { alice as currentUser } from 'fixtures/users';
+import { adminUser } from 'fixtures/users';
 import { asMock } from 'helpers/mocking';
 import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import Navigation from 'components/navigation/Navigation';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 jest.mock('./SystemMenu', () => mockComponent('SystemMenu'));
 jest.mock('./NavigationBrand', () => mockComponent('NavigationBrand'));
@@ -34,6 +35,16 @@ jest.mock('./NavigationLink', () => mockComponent('NavigationLink'));
 jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
 jest.mock('components/throughput/GlobalThroughput', () => mockComponent('GlobalThroughput'));
 jest.mock('components/navigation/NotificationBadge', () => mockComponent('NotificationBadge'));
+jest.mock('hooks/useCurrentUser');
+jest.mock('./DevelopmentHeaderBadge', () => () => <span />);
+jest.mock('routing/withLocation', () => (x) => x);
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useLocation: jest.fn(() => ({
+    pathname: '',
+  })),
+}));
 
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
@@ -43,30 +54,20 @@ jest.mock('util/AppConfig', () => ({
   isCloud: jest.fn(() => false),
 }));
 
-jest.mock('routing/withLocation', () => (x) => x);
-
-const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
-
-jest.mock('./DevelopmentHeaderBadge', () => () => <span />);
-
 describe('Navigation', () => {
-  // We can't use prop types here, they are not compatible with mount and require in this case
-  // eslint-disable-next-line react/prop-types
-  const SimpleNavigation = ({ component: Component, permissions = [], ...props }) => {
-    const user = currentUser.toBuilder().permissions(Immutable.List(permissions)).build();
+  const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
 
-    return (
-      <CurrentUserContext.Provider value={user}>
-        <Component {...props} />
-      </CurrentUserContext.Provider>
-    );
-  };
+  beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(adminUser);
+    asMock(useLocation).mockReturnValue({ pathname: '/' } as Location<{ pathname: string }>);
+  });
 
   describe('has common elements', () => {
     let wrapper;
 
     beforeEach(() => {
-      wrapper = mount(<SimpleNavigation component={Navigation} />);
+      asMock(useCurrentUser).mockReturnValue(adminUser);
+      wrapper = mount(<Navigation />);
     });
 
     it('contains brand icon', () => {
@@ -80,8 +81,8 @@ describe('Navigation', () => {
     it('contains user menu including correct user details', () => {
       const usermenu = wrapper.find('UserMenu');
 
-      expect(usermenu).toHaveProp('userId', currentUser.id);
-      expect(usermenu).toHaveProp('fullName', currentUser.fullName);
+      expect(usermenu).toHaveProp('userId', adminUser.id);
+      expect(usermenu).toHaveProp('fullName', adminUser.fullName);
     });
 
     it('contains help menu', () => {
@@ -139,77 +140,95 @@ describe('Navigation', () => {
     });
 
     it('contains top-level navigation element', () => {
-      const wrapper = mount(<SimpleNavigation component={Navigation} />);
+      const wrapper = mount(<Navigation />);
 
       expect(findLink(wrapper, 'Perpetuum Mobile')).toExist();
     });
 
     it('prefix plugin navigation item paths with app prefix', () => {
       asMock(AppConfig.gl2AppPathPrefix).mockReturnValue('/my/crazy/prefix');
-      const wrapper = mount(<SimpleNavigation component={Navigation} />);
+      const wrapper = mount(<Navigation />);
 
       expect(findLink(wrapper, 'Perpetuum Mobile')).toHaveProp('path', '/my/crazy/prefix/something');
     });
 
     it('does not contain navigation elements from plugins where permissions are missing', () => {
-      const wrapper = mount(<SimpleNavigation component={Navigation} />);
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+        .permissions(Immutable.List([]))
+        .build());
+
+      const wrapper = mount(<Navigation />);
 
       expect(findLink(wrapper, 'Archives')).not.toExist();
     });
 
     it('does not contain navigation elements from plugins when elements require a feature flag to be enabled', () => {
-      const wrapper = mount(<SimpleNavigation component={Navigation} />);
+      const wrapper = mount(<Navigation />);
 
       expect(findLink(wrapper, 'Feature flag test')).not.toExist();
     });
 
     it('contains navigation elements from plugins when elements require a feature flag which is enabled', () => {
       asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
-      const wrapper = mount(<SimpleNavigation component={Navigation} />);
+      const wrapper = mount(<Navigation />);
 
       expect(findLink(wrapper, 'Feature flag test')).toExist();
     });
 
     it('contains restricted navigation elements from plugins if permissions are present', () => {
-      const wrapper = mount(<SimpleNavigation component={Navigation}
-                                              permissions={['archive:read']} />);
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+        .permissions(Immutable.List(['archive:read']))
+        .build());
+
+      const wrapper = mount(<Navigation />);
 
       expect(findLink(wrapper, 'Archives')).toExist();
     });
 
     it('does not render dropdown contributed by plugin if permissions for all elements are missing', () => {
-      const wrapper = mount(<SimpleNavigation component={Navigation} />);
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+        .permissions(Immutable.List([]))
+        .build());
+
+      const wrapper = mount(<Navigation />);
 
       expect(wrapper.find('NavDropdown[title="Neat Stuff"]')).not.toExist();
     });
 
     it('renders dropdown contributed by plugin if permissions are sufficient', () => {
-      const wrapper = mount(<SimpleNavigation component={Navigation}
-                                              permissions={['somethingelse', 'completelydifferent']} />);
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+        .permissions(Immutable.List(['somethingelse', 'completelydifferent']))
+        .build());
+
+      const wrapper = mount(<Navigation />);
 
       expect(wrapper.find('NavDropdown[title="Neat Stuff"]')).toExist();
     });
 
     it('does not render dropdown contributed by plugin if required feature flag is not enabled', () => {
-      const wrapper = mount(<SimpleNavigation component={Navigation} />);
+      const wrapper = mount(<Navigation />);
 
       expect(wrapper.find('NavDropdown[title="Feature flag dropdown test"]')).not.toExist();
     });
 
     it('renders dropdown contributed by plugin if required feature flag is enabled', () => {
       asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
-      const wrapper = mount(<SimpleNavigation component={Navigation} />);
+      const wrapper = mount(<Navigation />);
 
       expect(wrapper.find('NavDropdown[title="Feature flag dropdown test"]')).toExist();
     });
 
     it('sets dropdown title based on match', () => {
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+        .permissions(Immutable.List(['somethingelse', 'completelydifferent']))
+        .build());
+
+      asMock(useLocation).mockReturnValue({ pathname: '/somethingelse' } as Location<{ pathname: string }>);
+
       const wrapper = mount((
         <MemoryRouter initialEntries={['/somethingelse']}>
           <Route path="/somethingelse">
-            <SimpleNavigation component={Navigation}
-                              location={{ pathname: '/somethingelse' }}
-                              permissions={['somethingelse', 'completelydifferent']} />
+            <Navigation />
           </Route>
         </MemoryRouter>
       ));
@@ -219,9 +238,8 @@ describe('Navigation', () => {
   });
 
   describe('uses correct permissions:', () => {
-    const verifyPermissions = ({ permissions, count, links }) => {
-      const wrapper = mount(<SimpleNavigation component={Navigation}
-                                              permissions={permissions} />);
+    const verifyPermissions = ({ count, links }) => {
+      const wrapper = mount(<Navigation />);
       const navigationLinks = wrapper.find('NavItem');
 
       expect(navigationLinks).toHaveLength(count);
@@ -236,15 +254,21 @@ describe('Navigation', () => {
   `('shows $links for user with $permissions permissions', verifyPermissions);
 
     it('should not show `Enterprise` item if user is lacking permissions', () => {
-      const wrapper = mount(<SimpleNavigation component={Navigation}
-                                              permissions={[]} />);
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+        .permissions(Immutable.List())
+        .build());
+
+      const wrapper = mount(<Navigation />);
 
       expect(wrapper.find('NavigationLink[description="Enterprise"]')).not.toExist();
     });
 
     it('should show `Enterprise` item if user has permission to read license', () => {
-      const wrapper = mount(<SimpleNavigation component={Navigation}
-                                              permissions={['licenseinfos:read']} />);
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+        .permissions(Immutable.List(['licenseinfos:read']))
+        .build());
+
+      const wrapper = mount(<Navigation />);
 
       expect(wrapper.find('NavigationLink[description="Enterprise"]')).toExist();
     });

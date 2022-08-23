@@ -27,7 +27,7 @@ import type { SearchBarFormValues } from 'views/Constants';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validate from 'views/components/searchbar/validate';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
 
 type Props = {

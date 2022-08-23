@@ -15,20 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
 
 import { LinkContainer, Link } from 'components/common/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import SidecarListContainer from 'components/sidecars/sidecars/SidecarListContainer';
 import Routes from 'routing/Routes';
 
 const SidecarsPage = () => {
   const [sidecarUser, setSidecarUser] = useState();
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const canCreateSidecarUserTokens = isPermitted(currentUser?.permissions, ['users:tokenlist:graylog-sidecar']);
 
   useEffect(() => {

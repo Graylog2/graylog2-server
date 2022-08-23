@@ -20,20 +20,20 @@ import { render, screen, within, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { asMock, MockStore } from 'helpers/mocking';
-import { alice } from 'fixtures/users';
-import type User from 'logic/users/User';
+import { adminUser } from 'fixtures/users';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import SearchPageLayoutContext, { SAVE_COPY, BLANK } from 'views/components/contexts/SearchPageLayoutContext';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
+import useCurrentUser from 'hooks/useCurrentUser';
 
-import ViewActionsMenu from './ViewActionsMenu';
+import DashboardActionsMenu from './DashboardActionsMenu';
 
 jest.mock('views/hooks/useSaveViewFormControls');
+jest.mock('hooks/useCurrentUser');
 
 jest.mock('bson-objectid', () => jest.fn(() => ({
   toString: jest.fn(() => 'new-dashboard-id'),
@@ -87,28 +87,20 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
   },
 }));
 
-describe('ViewActionsMenu', () => {
+describe('DashboardActionsMenu', () => {
   const mockView = View.create().toBuilder().id('view-id').type(View.Type.Dashboard)
     .search(Search.builder().build())
     .title('View title')
     .createdAt(new Date('2019-10-16T14:38:44.681Z'))
     .build();
 
-  const currentUser = alice.toBuilder()
-    .grnPermissions(mockImmutable.List(['entity:own:grn::::dashboard:view-id']))
-    .permissions(mockImmutable.List(['dashboards:edit:view-id', 'view:edit:view-id']))
-    .build();
-
-  const SimpleViewActionMenu = ({ currentUser: user, providerOverrides, ...props }: {currentUser?: User, providerOverrides?: LayoutState}) => (
+  const SUT = ({ providerOverrides, ...props }: {providerOverrides?: LayoutState}) => (
     <SearchPageLayoutContext.Provider value={providerOverrides}>
-      <CurrentUserContext.Provider value={user}>
-        <ViewActionsMenu {...props} />
-      </CurrentUserContext.Provider>
+      <DashboardActionsMenu {...props} />
     </SearchPageLayoutContext.Provider>
   );
 
-  SimpleViewActionMenu.defaultProps = {
-    currentUser,
+  SUT.defaultProps = {
     providerOverrides: undefined,
   };
 
@@ -130,13 +122,18 @@ describe('ViewActionsMenu', () => {
   };
 
   beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+      .grnPermissions(mockImmutable.List(['entity:own:grn::::dashboard:view-id']))
+      .permissions(mockImmutable.List(['dashboards:edit:view-id', 'view:edit:view-id']))
+      .build());
+
     asMock(ViewStore.getInitialState).mockReturnValue({ isNew: false, view: mockView, activeQuery: undefined, dirty: false });
     asMock(useSaveViewFormControls).mockReturnValue([]);
   });
 
   it('should save a new dashboard', async () => {
     asMock(ViewStore.getInitialState).mockReturnValue({ isNew: false, view: mockView.toBuilder().id(undefined).build(), activeQuery: undefined, dirty: false });
-    render(<SimpleViewActionMenu />);
+    render(<SUT />);
 
     await openDashboardSaveForm();
     await submitDashboardSaveForm();
@@ -154,7 +151,7 @@ describe('ViewActionsMenu', () => {
     }],
     );
 
-    render(<SimpleViewActionMenu />);
+    render(<SUT />);
 
     await openDashboardSaveForm();
     await submitDashboardSaveForm();
@@ -165,7 +162,7 @@ describe('ViewActionsMenu', () => {
   });
 
   it('should open edit dashboard meta information modal', async () => {
-    const { getByText, findByText } = render(<SimpleViewActionMenu />);
+    const { getByText, findByText } = render(<SUT />);
     const editMenuItem = getByText(/Edit metadata/i);
 
     userEvent.click(editMenuItem);
@@ -174,7 +171,7 @@ describe('ViewActionsMenu', () => {
   });
 
   it('should open dashboard share modal', () => {
-    const { getByText } = render(<SimpleViewActionMenu />);
+    const { getByText } = render(<SUT />);
     const openShareButton = getByText(/Share/i);
 
     userEvent.click(openShareButton);
@@ -183,7 +180,7 @@ describe('ViewActionsMenu', () => {
   });
 
   it('should use FULL_MENU layout option by default and render all buttons', async () => {
-    const { findByRole, findByTitle } = render(<SimpleViewActionMenu />);
+    const { findByRole, findByTitle } = render(<SUT />);
 
     await findByTitle(/Save dashboard/);
     await findByTitle(/Save as new dashboard/);
@@ -192,7 +189,7 @@ describe('ViewActionsMenu', () => {
   });
 
   it('should only render "Save As" button in SAVE_COPY layout option', async () => {
-    const { findByTitle, queryByRole, queryByTitle } = render(<SimpleViewActionMenu providerOverrides={{ sidebar: { isShown: false }, viewActions: SAVE_COPY }} />);
+    const { findByTitle, queryByRole, queryByTitle } = render(<SUT providerOverrides={{ sidebar: { isShown: false }, viewActions: SAVE_COPY }} />);
 
     const saveButton = queryByTitle(/Save dashboard/);
     const shareButton = queryByTitle(/Share/);
@@ -206,7 +203,7 @@ describe('ViewActionsMenu', () => {
   });
 
   it('should render no action menu items in BLANK layout option', () => {
-    const { queryByRole, queryByTitle } = render(<SimpleViewActionMenu providerOverrides={{ sidebar: { isShown: false }, viewActions: BLANK }} />);
+    const { queryByRole, queryByTitle } = render(<SUT providerOverrides={{ sidebar: { isShown: false }, viewActions: BLANK }} />);
 
     const saveButton = queryByTitle(/Save dashboard/);
     const saveAsButton = queryByTitle(/Save as new dashboard/);

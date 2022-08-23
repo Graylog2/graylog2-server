@@ -71,11 +71,13 @@ module.exports = {
     'plugin:import/warnings',
     'plugin:import/react',
     'plugin:jest-formatting/strict',
+    'plugin:graylog/recommended',
   ],
   plugins: [
     'import',
     'react-hooks',
     'jest-formatting',
+    'graylog',
   ],
   rules: {
     'arrow-body-style': 'off',

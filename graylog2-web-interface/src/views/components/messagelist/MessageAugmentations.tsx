@@ -20,7 +20,7 @@ import type { DefaultTheme } from 'styled-components';
 import styled, { withTheme } from 'styled-components';
 import { useContext } from 'react';
 
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import type { Message } from 'views/components/messagelist/Types';
 import WindowDimensionsContext from 'contexts/WindowDimensionsContext';
 

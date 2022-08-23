@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 
 import type { PublicNotificationsHooks } from 'theme/types';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import Alert from 'components/bootstrap/Alert';
 import Button from 'components/bootstrap/Button';
 import AppConfig from 'util/AppConfig';
