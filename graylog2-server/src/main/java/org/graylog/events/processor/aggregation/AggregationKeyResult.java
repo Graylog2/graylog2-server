@@ -31,12 +31,10 @@ import java.util.Optional;
 public abstract class AggregationKeyResult {
     public abstract ImmutableList<String> key();
 
+    // timestamp() is set to the end of the date range.
     public abstract Optional<DateTime> timestamp();
 
     public abstract ImmutableList<AggregationSeriesValue> seriesValues();
-
-    // timestamp() is set to the end of the date range. that's why we don't need to()
-    public abstract Optional<DateTime> from();
 
     public static Builder builder() {
         return Builder.create();
@@ -56,8 +54,6 @@ public abstract class AggregationKeyResult {
         public abstract Builder key(List<String> key);
 
         public abstract Builder seriesValues(List<AggregationSeriesValue> seriesValues);
-
-        public abstract Builder from(@Nullable DateTime from);
 
         public abstract AggregationKeyResult build();
     }

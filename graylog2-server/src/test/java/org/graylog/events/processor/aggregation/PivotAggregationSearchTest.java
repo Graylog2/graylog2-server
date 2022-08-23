@@ -120,7 +120,6 @@ public class PivotAggregationSearchTest {
 
         assertThat(results.get(0)).isEqualTo(AggregationKeyResult.builder()
                 .timestamp(timerange.getTo())
-                .from(timerange.getTo().minus(WINDOW_LENGTH))
                 .key(ImmutableList.of("a", "b"))
                 .seriesValues(ImmutableList.of(
                         AggregationSeriesValue.builder()
@@ -139,7 +138,6 @@ public class PivotAggregationSearchTest {
         assertThat(results.get(1)).isEqualTo(AggregationKeyResult.builder()
                 .timestamp(timerange.getTo())
                 .key(ImmutableList.of("a", "c"))
-                .from(timerange.getTo().minus(WINDOW_LENGTH))
                 .seriesValues(ImmutableList.of(
                         AggregationSeriesValue.builder()
                                 .key(ImmutableList.of("a", "c"))
@@ -208,7 +206,6 @@ public class PivotAggregationSearchTest {
         assertThat(results.get(0)).isEqualTo(AggregationKeyResult.builder()
                 .key(ImmutableList.of())
                 .timestamp(timerange.getTo())
-                .from(timerange.getTo().minus(WINDOW_LENGTH))
                 .seriesValues(ImmutableList.of(
                         AggregationSeriesValue.builder()
                                 .key(ImmutableList.of())
@@ -281,7 +278,6 @@ public class PivotAggregationSearchTest {
         assertThat(results.get(0)).isEqualTo(AggregationKeyResult.builder()
                 .key(ImmutableList.of())
                 .timestamp(timerange.getTo())
-                .from(timerange.getTo().minus(WINDOW_LENGTH))
                 .seriesValues(ImmutableList.of(
                         AggregationSeriesValue.builder()
                                 .key(ImmutableList.of())

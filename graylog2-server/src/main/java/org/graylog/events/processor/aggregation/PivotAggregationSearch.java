@@ -324,7 +324,6 @@ public class PivotAggregationSearch implements AggregationSearch {
                     .key(groupKey)
                     .timestamp(resultTimestamp)
                     .seriesValues(values.build())
-                    .from(resultTimestamp.minus(config.searchWithinMs()))
                     .build());
         }
 
