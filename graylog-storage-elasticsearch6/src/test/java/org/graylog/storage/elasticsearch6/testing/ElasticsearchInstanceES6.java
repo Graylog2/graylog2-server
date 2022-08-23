@@ -36,6 +36,7 @@ import java.net.URI;
 public class ElasticsearchInstanceES6 extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(SearchServerInstance.class);
     private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
+    public static final String DEFAULT_HEAP_SIZE = "2g";
 
     private final Client client;
     private final JestClient jestClient;
@@ -68,11 +69,16 @@ public class ElasticsearchInstanceES6 extends TestableSearchServerInstance {
     }
 
     public static TestableSearchServerInstance create() {
-        return create(SearchServer.ES6.getSearchVersion(), Network.newNetwork(), "2g");
+        return create(SearchServer.ES6.getSearchVersion(), Network.newNetwork(), DEFAULT_HEAP_SIZE);
     }
 
     public static TestableSearchServerInstance create(String heapSize) {
         return create(SearchServer.ES6.getSearchVersion(), Network.newNetwork(), heapSize);
+    }
+
+    // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
+    public static TestableSearchServerInstance create(SearchVersion version, Network network) {
+        return create(version, network, DEFAULT_HEAP_SIZE);
     }
 
     private static TestableSearchServerInstance create(SearchVersion version, Network network, String heapSize) {
