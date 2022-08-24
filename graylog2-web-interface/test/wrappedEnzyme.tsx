@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { configure, mount, shallow, ReactWrapper, ShallowWrapper } from 'enzyme';
+import type * as React from 'react';
+import type { ReactWrapper, ShallowWrapper } from 'enzyme';
+import { configure, mount, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import 'jest-styled-components';
 

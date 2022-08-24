@@ -16,12 +16,13 @@
  */
 package org.graylog2.lookup.db;
 
-import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ScopedDbService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.events.DataAdaptersDeleted;
@@ -29,46 +30,41 @@ import org.graylog2.lookup.events.DataAdaptersUpdated;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
-import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DBDataAdapterService {
-    private final JacksonDBCollection<DataAdapterDto, ObjectId> db;
+public class DBDataAdapterService extends ScopedDbService<DataAdapterDto> {
+    public static final String COLLECTION_NAME = "lut_data_adapters";
+
     private final ClusterEventBus clusterEventBus;
 
     @Inject
     public DBDataAdapterService(MongoConnection mongoConnection,
                                 MongoJackObjectMapperProvider mapper,
+                                EntityScopeService entityScopeService,
                                 ClusterEventBus clusterEventBus) {
-        this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("lut_data_adapters"),
-                DataAdapterDto.class,
-                ObjectId.class,
-                mapper.get());
+        super(mongoConnection, mapper, DataAdapterDto.class, COLLECTION_NAME, entityScopeService);
         this.clusterEventBus = clusterEventBus;
 
         db.createIndex(new BasicDBObject("name", 1), new BasicDBObject("unique", true));
     }
 
+    @Override
     public Optional<DataAdapterDto> get(String idOrName) {
-        try {
+        if (ObjectId.isValid(idOrName)) {
             return Optional.ofNullable(db.findOneById(new ObjectId(idOrName)));
-        } catch (IllegalArgumentException e) {
-            // not an ObjectId, try again with name
+        } else {
+            // not an ObjectId, try with name
             return Optional.ofNullable(db.findOne(DBQuery.is("name", idOrName)));
-
         }
     }
 
-    public DataAdapterDto save(DataAdapterDto table) {
-        WriteResult<DataAdapterDto, ObjectId> save = db.save(table);
-        final DataAdapterDto savedDataAdapter = save.getSavedObject();
+    public DataAdapterDto saveAndPostEvent(DataAdapterDto table) {
+        final DataAdapterDto savedDataAdapter = super.save(table);
         clusterEventBus.post(DataAdaptersUpdated.create(savedDataAdapter.id()));
 
         return savedDataAdapter;
@@ -84,16 +80,15 @@ public class DBDataAdapterService {
         }
     }
 
-    private ImmutableList<DataAdapterDto> asImmutableList(Iterator<? extends DataAdapterDto> cursor) {
-        return ImmutableList.copyOf(cursor);
+    public void deleteAndPostEvent(String idOrName) {
+        final Optional<DataAdapterDto> dataAdapterDto = get(idOrName);
+        super.delete(idOrName);
+        dataAdapterDto.ifPresent(dataAdapter -> clusterEventBus.post(DataAdaptersDeleted.create(dataAdapter.id())));
     }
 
-    public void delete(String idOrName) {
+    public void deleteAndPostEventImmutable(String idOrName) {
         final Optional<DataAdapterDto> dataAdapterDto = get(idOrName);
-        dataAdapterDto
-                .map(DataAdapterDto::id)
-                .map(ObjectId::new)
-                .ifPresent(db::removeById);
+        super.deleteImmutable(idOrName);
         dataAdapterDto.ifPresent(dataAdapter -> clusterEventBus.post(DataAdaptersDeleted.create(dataAdapter.id())));
     }
 

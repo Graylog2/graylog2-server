@@ -125,13 +125,14 @@ const ApiRoutes = {
     cycle: (indexSetId: string) => { return { url: `/cluster/deflector/${indexSetId}/cycle` }; },
     list: (indexSetId: string) => { return { url: `/system/deflector/${indexSetId}` }; },
   },
+  EntityScopeController: {
+    getScope: () => { return { url: '/entity_scopes' }; },
+  },
   EntityShareController: {
     prepare: (entityGRN: string) => { return { url: `/authz/shares/entities/${entityGRN}/prepare` }; },
     update: (entityGRN: string) => { return { url: `/authz/shares/entities/${entityGRN}` }; },
     userSharesPaginated: (username: string) => { return { url: `/authz/shares/user/${username}` }; },
-  },
-  EntityScopeController: {
-    getScope: () => ({ url: '/entity_scopes' }),
+    entityScopes: () => { return { url: '/entity_scopes' }; },
   },
   HTTPHeaderAuthConfigController: {
     load: () => ({ url: '/system/authentication/http-header-auth-config' }),

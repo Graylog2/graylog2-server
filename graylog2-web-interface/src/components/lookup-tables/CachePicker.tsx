@@ -17,18 +17,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useField } from 'formik';
+import type { LookupTableCache } from 'src/logic/lookup-tables/types';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
 type Props = {
-  caches: any[],
+  caches: LookupTableCache[],
 }
 
-const CachePicker = ({
-  caches,
-}: Props) => {
+const CachePicker = ({ caches }: Props) => {
   const [, { value, touched, error }, { setTouched, setValue }] = useField('cache_id');
   const sortedCaches = caches.map((cache) => {
     return { value: cache.id, label: `${cache.title} (${cache.name})` };
