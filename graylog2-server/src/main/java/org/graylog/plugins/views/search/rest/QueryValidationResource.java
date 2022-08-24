@@ -48,9 +48,10 @@ import java.util.stream.Collectors;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsLast;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Search/Validation")
+@Api(value = "Search/Validation", tags = {CLOUD_VISIBLE})
 @Path("/search/validate")
 public class QueryValidationResource extends RestResource implements PluginRestResource {
 

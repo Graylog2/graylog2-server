@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Indexer/Indices/Templates", description = "Index Template Management", tags={CLOUD_VISIBLE})
+@Api(value = "Indexer/Indices/Templates", description = "Index Template Management")
 @Path("/system/indexer/indices/templates")
 @Produces(MediaType.APPLICATION_JSON)
 public class IndexTemplatesResource extends RestResource {
