@@ -65,9 +65,9 @@ const _assignRole = (selectedRoleNames, roles, onSubmit, setselectedRoleNames, s
     return;
   }
 
-  const selectedRoleNamess = selectedRoleNames.split(',');
+  const selectedRoleNameList = selectedRoleNames.split(',');
 
-  const selectedRoles = Immutable.Set(compact(selectedRoleNamess.map((selection) => {
+  const selectedRoles = Immutable.Set(compact(selectedRoleNameList.map((selection) => {
     return roles.find((r) => r.name === selection);
   })));
 
@@ -101,10 +101,10 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier, submitOnSelect 
   useEffect(() => _loadRoles(setPaginatedRoles), []);
 
   const onChange = (items) => {
-    const newselectedRoleNamess = items;
+    const newselectedRoleNameList = items;
 
     if (submitOnSelect) {
-      _assignRole(newselectedRoleNamess, paginatedRoles.list, onSubmit, setselectedRoleNames, setIsSubmitting, setError);
+      _assignRole(newselectedRoleNameList, paginatedRoles.list, onSubmit, setselectedRoleNames, setIsSubmitting, setError);
     }
 
     setselectedRoleNames(items);
