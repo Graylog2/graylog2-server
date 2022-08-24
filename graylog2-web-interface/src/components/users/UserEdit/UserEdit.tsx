@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 
 import UsersDomain from 'domainActions/users/UsersDomain';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import { Spinner, IfPermitted } from 'components/common';
 import { Alert } from 'components/bootstrap';
 import SectionComponent from 'components/common/Section/SectionComponent';
@@ -49,7 +48,7 @@ const _updateUser = (data, currentUser, userId, fullName) => {
 };
 
 const UserEdit = ({ user }: Props) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
 
   if (!user) {
     return <Spinner />;

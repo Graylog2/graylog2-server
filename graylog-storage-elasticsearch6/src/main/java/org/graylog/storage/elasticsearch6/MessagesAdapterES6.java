@@ -170,7 +170,10 @@ public class MessagesAdapterES6 implements MessagesAdapter {
             final BulkResult result = bulkIndexChunk(chunk);
 
             if (result.getResponseCode() == 413) {
-                throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully, indexingErrorsFrom(failedItems, messageList));
+                throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully);
+            }
+            if (result.getResponseCode() == 429) {
+                throw new ChunkedBulkIndexer.TooManyRequestsException(indexedSuccessfully);
             }
 
             // Checking `result.isSucceeded()` is always `false` if at least one item fails. Instead, we are checking the response code to

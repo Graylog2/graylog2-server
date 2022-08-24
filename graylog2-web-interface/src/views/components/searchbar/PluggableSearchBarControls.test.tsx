@@ -18,11 +18,11 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import PluggableSearchBarControls from './PluggableSearchBarControls';
 
-jest.mock('views/logic/usePluginEntities');
+jest.mock('hooks/usePluginEntities');
 jest.mock('hooks/useFeature', () => (key) => key === 'search_filter');
 
 describe('PluggableSearchBarControls', () => {

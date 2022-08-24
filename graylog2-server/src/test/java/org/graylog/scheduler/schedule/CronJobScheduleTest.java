@@ -16,7 +16,16 @@
  */
 package org.graylog.scheduler.schedule;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
+import org.assertj.core.data.MapEntry;
+import org.graylog.scheduler.JobTriggerDto;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -36,6 +45,36 @@ class CronJobScheduleTest {
     void testCronExpressionValidationValid() {
         final CronJobSchedule cronJobSchedule = CronJobSchedule.builder().cronExpression("0 0 1 * * ? *").build();
         assertThat(cronJobSchedule.cronExpression()).isNotNull();
-        assertThat(cronJobSchedule.timezone()).isEqualTo("UTC"); // default timezone
+        assertThat(cronJobSchedule.timezone()).isNotPresent();
+    }
+
+    @Test
+    void testNullTimezone() {
+        final CronJobSchedule cronJobSchedule = CronJobSchedule.builder().cronExpression("0 0 1 * * ? *").timezone(null).build();
+        assertThat(cronJobSchedule.timezone()).isNotPresent();
+    }
+
+    @Test
+    void testDeserialize() throws IOException {
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        objectMapper.registerSubtypes(new NamedType(CronJobSchedule.class, CronJobSchedule.TYPE_NAME));
+
+        final CronJobSchedule schedule = objectMapper.readValue("{\"type\":\"cron\",\"cron_expression\":\"0 0 1 * * ? *\",\"timezone\":null}", CronJobSchedule.class);
+        assertThat(schedule.type()).isEqualTo("cron");
+        assertThat(schedule.cronExpression()).isEqualTo("0 0 1 * * ? *");
+        assertThat(schedule.timezone()).isNotPresent();
+    }
+
+    @Test
+    void testToDbUpdate() {
+        final CronJobSchedule cronJobSchedule = CronJobSchedule.builder().cronExpression("0 0 1 * * ? *").build();
+        final Optional<Map<String, Object>> update = cronJobSchedule.toDBUpdate("schedule_");
+        assertThat(update)
+                .isPresent()
+                .hasValueSatisfying(u -> {
+                    assertThat(u).contains(MapEntry.entry("schedule_cron_expression", "0 0 1 * * ? *"));
+                    assertThat(u).contains(MapEntry.entry("schedule_type", "cron"));
+                    assertThat(u).contains(MapEntry.entry("schedule_timezone", "UTC")); // some timezone should always be persisted
+                });
     }
 }

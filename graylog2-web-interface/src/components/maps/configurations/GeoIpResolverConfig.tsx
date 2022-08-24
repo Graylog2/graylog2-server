@@ -33,6 +33,7 @@ export type GeoIpConfigType = {
   asn_db_path: string;
   refresh_interval_unit: TimeUnit;
   refresh_interval: number;
+  use_s3: boolean;
 }
 
 export type OptionType = {
@@ -53,6 +54,7 @@ const defaultConfig: GeoIpConfigType = {
   asn_db_path: '/etc/graylog/server/GeoLite2-ASN.mmdb',
   refresh_interval_unit: 'MINUTES',
   refresh_interval: 10,
+  use_s3: false,
 };
 
 const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) => {
@@ -112,9 +114,11 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
             <dt>City database path:</dt>
             <dd>{config.city_db_path}</dd>
             <dt>ASN database path:</dt>
-            <dd>{config.asn_db_path}</dd>
+            <dd>{config.asn_db_path === '' ? '-' : config.asn_db_path}</dd>
             <dt>Database refresh interval:</dt>
             <dd>{config.refresh_interval} {config.refresh_interval_unit}</dd>
+            <dt>Pull files from S3 bucket:</dt>
+            <dd>{config.use_s3 === true ? 'Yes' : 'No'}</dd>
           </>
         )}
       </dl>
@@ -147,6 +151,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                     <Col sm={6}>
                       <FormikInput id="enforce_graylog_schema"
                                    type="checkbox"
+                                   disabled={!values.enabled}
                                    label="Enforce default Graylog schema"
                                    name="enforce_graylog_schema" />
                     </Col>
@@ -195,6 +200,15 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                                  hideCheckbox
                                  units={['SECONDS', 'MINUTES', 'HOURS', 'DAYS']} />
 
+                  <Row>
+                    <Col sm={6}>
+                      <FormikInput id="use_s3"
+                                   type="checkbox"
+                                   disabled={!values.enabled}
+                                   label="Pull files from S3 bucket"
+                                   name="use_s3" />
+                    </Col>
+                  </Row>
                 </Modal.Body>
                 <Modal.Footer>
                   <Button type="button"

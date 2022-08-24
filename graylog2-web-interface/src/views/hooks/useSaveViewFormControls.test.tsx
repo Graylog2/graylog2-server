@@ -19,11 +19,11 @@ import { renderHook } from '@testing-library/react-hooks';
 import * as React from 'react';
 
 import { asMock } from 'helpers/mocking';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
-jest.mock('views/logic/usePluginEntities');
+jest.mock('hooks/usePluginEntities');
 
 describe('useSaveViewFormControls', () => {
   const queryClient = new QueryClient({

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import moment from 'moment';
@@ -25,6 +26,7 @@ import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { SystemStore } from 'stores/system/SystemStore';
 
 const TimesList = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'TimesList',
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(SystemStore)],
 

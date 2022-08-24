@@ -15,20 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
 
 import { LinkContainer, Link } from 'components/common/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import SidecarListContainer from 'components/sidecars/sidecars/SidecarListContainer';
 import Routes from 'routing/Routes';
 
 const SidecarsPage = () => {
   const [sidecarUser, setSidecarUser] = useState();
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const canCreateSidecarUserTokens = isPermitted(currentUser?.permissions, ['users:tokenlist:graylog-sidecar']);
 
   useEffect(() => {
@@ -44,20 +44,16 @@ const SidecarsPage = () => {
           <span>
             The Graylog sidecars can reliably forward contents of log files or Windows EventLog from your servers.
           </span>
-
           {canCreateSidecarUserTokens && (
-            <>
-              {sidecarUser ? (
-                <span>
-                  Do you need an API token for a sidecar?&ensp;
-                  <Link to={Routes.SYSTEM.USERS.TOKENS.edit(sidecarUser.id)}>
-                    Create or reuse a token for the <em>graylog-sidecar</em> user
-                  </Link>
-                </span>
-              ) : <Spinner />}
-            </>
+            sidecarUser ? (
+              <span>
+                Do you need an API token for a sidecar?&ensp;
+                <Link to={Routes.SYSTEM.USERS.TOKENS.edit(sidecarUser.id)}>
+                  Create or reuse a token for the <em>graylog-sidecar</em> user
+                </Link>
+              </span>
+            ) : <Spinner />
           )}
-
           <ButtonToolbar>
             <LinkContainer to={Routes.SYSTEM.SIDECARS.OVERVIEW}>
               <Button bsStyle="info">Overview</Button>
