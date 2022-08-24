@@ -66,19 +66,6 @@ describe('SystemMenu', () => {
       SystemMenu = require('./SystemMenu').default;
     });
 
-    const verifyPermissions = ({ permissions, count, links }) => {
-      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-        .permissions(Immutable.List(permissions))
-        .build());
-
-      const wrapper = mount(<SystemMenu />);
-      const navigationLinks = wrapper.find('NavigationLink');
-
-      expect(navigationLinks).toHaveLength(count);
-
-      containsAllLinks(navigationLinks, links);
-    };
-
     it.each`
     permissions                    | count | links
     ${[]}                          | ${2}  | ${['Overview', 'Nodes']}
@@ -95,7 +82,18 @@ describe('SystemMenu', () => {
     ${['lookuptables:read']}       | ${3}  | ${['Lookup Tables']}
     ${['sidecars:read']}           | ${3}  | ${['Sidecars']}
     ${['pipeline:read', 'pipeline_connection:read']} | ${3}  | ${['Pipelines']}
-  `('shows $links for user with $permissions permissions', verifyPermissions);
+  `('shows $links for user with $permissions permissions', ({ permissions, count, links }) => {
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+        .permissions(Immutable.List(permissions))
+        .build());
+
+      const wrapper = mount(<SystemMenu />);
+      const navigationLinks = wrapper.find('NavigationLink');
+
+      expect(navigationLinks).toHaveLength(count);
+
+      containsAllLinks(navigationLinks, links);
+    });
   });
 
   describe('uses items from plugins:', () => {
@@ -130,8 +128,8 @@ describe('SystemMenu', () => {
 
       const wrapper = mount(<SystemMenu />);
 
-      containsLink(wrapper, 'Audit Log');
-      containsLink(wrapper, 'Licenses');
+      expect(findLink(wrapper, 'Audit Log')).toHaveLength(1);
+      expect(findLink(wrapper, 'Licenses')).toHaveLength(1);
     });
 
     it('does not include plugin item in system navigation if required permissions are not present', () => {

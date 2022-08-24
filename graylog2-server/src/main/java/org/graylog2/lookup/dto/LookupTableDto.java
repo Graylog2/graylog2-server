@@ -20,28 +20,19 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.lookup.LookupDefaultSingleValue;
-import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 
 @AutoValue
-@WithBeanGetter
 @JsonDeserialize(builder = AutoValue_LookupTableDto.Builder.class)
-public abstract class LookupTableDto {
+public abstract class LookupTableDto extends ScopedEntity {
 
-    public static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_NAME = "name";
-
-    @Id
-    @ObjectId
-    @Nullable
-    @JsonProperty(FIELD_ID)
-    public abstract String id();
 
     @JsonProperty(FIELD_TITLE)
     public abstract String title();
@@ -83,12 +74,7 @@ public abstract class LookupTableDto {
 
     @JsonAutoDetect
     @AutoValue.Builder
-    public abstract static class Builder {
-        @Id
-        @ObjectId
-        @JsonProperty(FIELD_ID)
-        public abstract Builder id(@Nullable String id);
-
+    public abstract static class Builder extends AbstractBuilder<Builder> {
         @JsonProperty(FIELD_TITLE)
         public abstract Builder title(String title);
 

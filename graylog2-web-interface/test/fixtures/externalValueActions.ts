@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { ActionDefinition } from 'views/components/actions/ActionHandler';
+import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 
 // eslint-disable-next-line import/prefer-default-export
 export const createSimpleExternalValueAction = (overrides: Partial<ActionDefinition> = {}): ActionDefinition<{}> => ({

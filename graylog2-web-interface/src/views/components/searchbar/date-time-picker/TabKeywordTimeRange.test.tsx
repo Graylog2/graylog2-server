@@ -58,6 +58,7 @@ describe('TabKeywordTimeRange', () => {
       : null;
   };
 
+  // eslint-disable-next-line testing-library/no-unnecessary-act
   const changeInput = async (input, value) => act(async () => {
     const { name } = asElement(input, HTMLInputElement);
 
@@ -160,6 +161,7 @@ describe('TabKeywordTimeRange', () => {
 
     await changeInput(input, 'invalid');
 
+    // eslint-disable-next-line testing-library/prefer-presence-queries
     expect(queryByText('Unable to parse keyword.')).not.toBeNull();
   });
 });

@@ -21,7 +21,7 @@ import PaginationURL from 'util/PaginationURL';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
-import type { LookupTable, LookupTableAdapter, LookupTableCache } from 'logic/lookup-tables/types';
+import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 import type { PaginatedResponseType } from 'stores/PaginationTypes';
 
 type LookupResult = {
@@ -83,7 +83,7 @@ type LookupTableActionsType = {
   getErrors: (tableNames: Array<string> | undefined, cacheNames: Array<string> | undefined, dataAdapterNames: Array<string> | undefined) => Promise<unknown>,
   lookup: (tableName: string, key: string) => Promise<unknown>,
   purgeKey: (table: LookupTable, key: string) => Promise<unknown>,
-  purgeAll: (table: LookupTable, key: string) => Promise<unknown>,
+  purgeAll: (table: LookupTable) => Promise<unknown>,
   validate: (table: LookupTable) => Promise<unknown>,
 }
 
@@ -314,7 +314,7 @@ export const LookupTablesStore = singletonStore(
       const url = this._url('tables/validate');
       const promise = fetch('POST', url, table);
 
-      promise.then((response) => {
+      promise.then((response: any) => {
         this.validationErrors = response.errors;
         this.propagateChanges();
       }, this._errorHandler('Lookup table validation failed', `Could not validate lookup table "${table.name}"`));

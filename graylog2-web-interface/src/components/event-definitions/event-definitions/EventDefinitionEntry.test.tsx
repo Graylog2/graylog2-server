@@ -36,14 +36,21 @@ type entityScope = {
 };
 
 type getPermissionsByScopeReturnType = {
-  isLoading: boolean;
-  data: entityScope;
+  loadingScopePermissions: boolean;
+  scopePermissions: entityScope;
+};
+
+const exampleEntityScopeMutable: getPermissionsByScopeReturnType = {
+  loadingScopePermissions: false,
+  scopePermissions: { is_mutable: true },
+};
+
+const exampleEntityScopeImmutable: getPermissionsByScopeReturnType = {
+  loadingScopePermissions: false,
+  scopePermissions: { is_mutable: false },
 };
 
 const currentUser = adminUser.toBuilder().permissions(Immutable.List([])).build();
-
-const exampleEntityScopeMutable: getPermissionsByScopeReturnType = { isLoading: false, data: { is_mutable: true } };
-const exampleEntityScopeImmutable: getPermissionsByScopeReturnType = { isLoading: false, data: { is_mutable: false } };
 
 jest.mock('components/permissions/EntityShareModal', () => () => <div>EntityShareModal content</div>);
 jest.mock('hooks/useScopePermissions', () => jest.fn());

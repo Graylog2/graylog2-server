@@ -59,6 +59,36 @@ const _onSubmit = (formData, userId) => {
   return UsersDomain.changePassword(userId, data);
 };
 
+const PasswordGroup = () => {
+  if (isCloud && oktaUserForm) {
+    const { fields: { password: CloudPasswordFormGroup } } = oktaUserForm;
+
+    return <CloudPasswordFormGroup />;
+  }
+
+  return (
+    <>
+      <FormikFormGroup label="New Password"
+                       name="password"
+                       type="password"
+                       help="Passwords must be at least 6 characters long. We recommend using a strong password."
+                       maxLength={100}
+                       minLength={6}
+                       labelClassName="col-sm-3"
+                       wrapperClassName="col-sm-9"
+                       required />
+      <FormikFormGroup label="Repeat Password"
+                       name="password_repeat"
+                       type="password"
+                       minLength={6}
+                       maxLength={100}
+                       required
+                       labelClassName="col-sm-3"
+                       wrapperClassName="col-sm-9" />
+    </>
+  );
+};
+
 const PasswordSection = ({ user: { id } }: Props) => {
   const currentUser = useCurrentUser();
   let requiresOldPassword = true;
@@ -67,36 +97,6 @@ const PasswordSection = ({ user: { id } }: Props) => {
     // Ask for old password if user is editing their own account
     requiresOldPassword = id === currentUser?.id;
   }
-
-  const _getPasswordGroup = () => {
-    if (isCloud && oktaUserForm) {
-      const { fields: { password: CloudPasswordFormGroup } } = oktaUserForm;
-
-      return <CloudPasswordFormGroup />;
-    }
-
-    return (
-      <>
-        <FormikFormGroup label="New Password"
-                         name="password"
-                         type="password"
-                         help="Passwords must be at least 6 characters long. We recommend using a strong password."
-                         maxLength={100}
-                         minLength={6}
-                         labelClassName="col-sm-3"
-                         wrapperClassName="col-sm-9"
-                         required />
-        <FormikFormGroup label="Repeat Password"
-                         name="password_repeat"
-                         type="password"
-                         minLength={6}
-                         maxLength={100}
-                         required
-                         labelClassName="col-sm-3"
-                         wrapperClassName="col-sm-9" />
-      </>
-    );
-  };
 
   return (
     <SectionComponent title="Password">
@@ -114,7 +114,7 @@ const PasswordSection = ({ user: { id } }: Props) => {
                                labelClassName="col-sm-3"
                                wrapperClassName="col-sm-9" />
             )}
-            {_getPasswordGroup()}
+            <PasswordGroup />
             <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
