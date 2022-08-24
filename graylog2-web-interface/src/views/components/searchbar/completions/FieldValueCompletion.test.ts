@@ -47,8 +47,6 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
   ),
 }));
 
-jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore('get') }));
-
 jest.mock('@graylog/server-api', () => ({
   SearchSuggestions: {
     suggestFieldValue: jest.fn(),

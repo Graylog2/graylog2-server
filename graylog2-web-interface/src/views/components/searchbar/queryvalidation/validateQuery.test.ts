@@ -24,7 +24,6 @@ import type { ValidationQuery } from './validateQuery';
 import validateQuery from './validateQuery';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
-jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore('get') }));
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
