@@ -173,16 +173,20 @@ const SearchActionsMenu = () => {
                    onClick={toggleShareSearch}
                    bsStyle="default"
                    disabledInfo={!view.id && 'Only saved searches can be shared.'} />
-      <DropdownButton title={<Icon name="ellipsis-h" />} aria-label="Open search actions dropdown" id="search-actions-dropdown" pullRight noCaret>
-        <MenuItem onSelect={toggleMetadataEdit} disabled={!isAllowedToEdit}>
-          <Icon name="edit" /> Edit metadata
+      <DropdownButton title={<Icon name="ellipsis-h" />}
+                      aria-label="Open search actions dropdown"
+                      id="search-actions-dropdown"
+                      pullRight
+                      noCaret>
+        <MenuItem onSelect={toggleMetadataEdit} disabled={!isAllowedToEdit} icon="edit">
+          Edit metadata
         </MenuItem>
         <IfPermitted permissions="dashboards:create">
-          <MenuItem onSelect={_loadAsDashboard}><Icon name="tachometer-alt" /> Export to dashboard</MenuItem>
+          <MenuItem onSelect={_loadAsDashboard} icon="tachometer-alt">Export to dashboard</MenuItem>
         </IfPermitted>
-        <MenuItem onSelect={toggleExport}><Icon name="cloud-download-alt" /> Export</MenuItem>
-        <MenuItem disabled={disableReset} onSelect={() => loadNewView()}>
-          <Icon name="eraser" /> Reset search
+        <MenuItem onSelect={toggleExport} icon="cloud-download-alt">Export</MenuItem>
+        <MenuItem disabled={disableReset} onSelect={() => loadNewView()} icon="eraser">
+          Reset search
         </MenuItem>
         <MenuItem divider />
       </DropdownButton>
