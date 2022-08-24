@@ -199,7 +199,6 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
     public Set<String> getReferencedSearchFiltersIds() {
         return this.queries()
                 .stream()
-                .filter(Objects::nonNull)
                 .map(Query::filters)
                 .filter(Objects::nonNull)
                 .flatMap(Collection::stream)
