@@ -17,21 +17,12 @@
 import * as React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
 import QueryResult from 'views/logic/QueryResult';
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 
 import Sidebar from './Sidebar';
-
-const mockCurrentUser = { timezone: 'UTC' };
-
-jest.mock('stores/users/CurrentUserStore', () => ({
-  CurrentUserStore: MockStore(['get', () => mockCurrentUser], ['getInitialState', () => ({ mockCurrentUser })]),
-}));
-
-jest.mock('stores/sessions/SessionStore', () => ({ SessionStore: MockStore('isLoggedIn') }));
 
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),

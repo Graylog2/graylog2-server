@@ -1,6 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`BigDisplayModeConfiguration generates markup that matches snapshot 1`] = `
+.c0 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  min-width: 20px;
+  margin-right: 5px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
 <div>
   <li
     class=""
@@ -11,7 +28,10 @@ exports[`BigDisplayModeConfiguration generates markup that matches snapshot 1`] 
       role="menuitem"
       tabindex="-1"
     >
-       Full Screen
+      <div
+        class="c0"
+      />
+      Full Screen
     </a>
   </li>
 </div>

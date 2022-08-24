@@ -66,6 +66,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -74,6 +75,7 @@ import static org.mockito.Mockito.when;
 @MockitoSettings(strictness = Strictness.WARN)
 public class ViewsResourceTest {
     public static final String VIEW_ID = "test-view";
+    public static final String SEARCH_ID = "6141d457d3a6b9d73c8ac55a";
 
     @Mock
     private Subject subject;
@@ -99,6 +101,8 @@ public class ViewsResourceTest {
     @Mock
     private SearchDomain searchDomain;
 
+    private Search search;
+
     @Mock
     private SearchFilterVisibilityChecker searchFilterVisibilityChecker;
 
@@ -108,9 +112,10 @@ public class ViewsResourceTest {
     public void setUp() {
         this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain);
         when(searchUser.canCreateDashboards()).thenReturn(true);
-        final Search search = mock(Search.class, RETURNS_DEEP_STUBS);
+        this.search = mock(Search.class, RETURNS_DEEP_STUBS);
+        doReturn(SEARCH_ID).when(search).id();
         when(search.queries()).thenReturn(ImmutableSet.of());
-        when(searchDomain.getForUser(eq("6141d457d3a6b9d73c8ac55a"), eq(searchUser))).thenReturn(Optional.of(search));
+        when(searchDomain.getForUser(eq(SEARCH_ID), eq(searchUser))).thenReturn(Optional.of(search));
         when(searchFilterVisibilityChecker.checkSearchFilterVisibility(any(), any())).thenReturn(new SearchFilterVisibilityCheckStatus());
     }
 
@@ -138,7 +143,7 @@ public class ViewsResourceTest {
 
     @Test
     public void creatingViewAddsCurrentUserAsOwner() throws Exception {
-        final ViewDTO.Builder builder = mockView(ViewDTO.Type.DASHBOARD);
+        final ViewDTO.Builder builder = mockView(ViewDTO.Type.DASHBOARD, view);
         final UserContext userContext = mockUser();
         this.viewsResource.create(view, userContext, searchUser);
 
@@ -149,7 +154,7 @@ public class ViewsResourceTest {
 
     @Test
     public void throwsExceptionWhenCreatingSearchWithFilterThatUserIsNotAllowedToSee() throws Exception {
-        mockView(ViewDTO.Type.SEARCH);
+        mockView(ViewDTO.Type.SEARCH, view);
         final UserContext userContext = mockUser();
         doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<You cannot see this filter>>")))
                 .when(searchFilterVisibilityChecker)
@@ -160,7 +165,7 @@ public class ViewsResourceTest {
 
     @Test
     public void throwsExceptionWhenCreatingDashboardWithFilterThatUserIsNotAllowedToSee() throws Exception {
-        mockView(ViewDTO.Type.DASHBOARD);
+        mockView(ViewDTO.Type.DASHBOARD, view);
         final UserContext userContext = mockUser();
         doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<You cannot see this filter>>")))
                 .when(searchFilterVisibilityChecker)
@@ -171,24 +176,63 @@ public class ViewsResourceTest {
 
     @Test
     public void throwsExceptionWhenUpdatingSearchWithFilterThatUserIsNotAllowedToSee() throws Exception {
-        final ViewDTO.Builder builder = mockView(ViewDTO.Type.SEARCH);
-        mockUser();
+        prepareUpdate(ViewDTO.Type.SEARCH);
+        doReturn(Collections.emptySet()).when(search).getReferencedSearchFiltersIds();
         doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<You cannot see this filter>>")))
                 .when(searchFilterVisibilityChecker)
                 .checkSearchFilterVisibility(any(), any());
 
-        Assert.assertThrows(BadRequestException.class, () -> this.viewsResource.update(view.id(), builder.build(), searchUser));
+        Assert.assertThrows(BadRequestException.class, () -> this.viewsResource.update(VIEW_ID, view, searchUser));
+    }
+
+    @Test
+    public void updatesSearchSuccessfullyIfInvisibleFilterWasPresentBefore() throws Exception {
+        prepareUpdate(ViewDTO.Type.SEARCH);
+        doReturn(Collections.singleton("<<Hidden filter, but not added by this update>>")).when(search).getReferencedSearchFiltersIds();
+        doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<Hidden filter, but not added by this update>>")))
+                .when(searchFilterVisibilityChecker)
+                .checkSearchFilterVisibility(any(), any());
+
+        this.viewsResource.update(VIEW_ID, view, searchUser);
+        verify(viewService).update(view);
     }
 
     @Test
     public void throwsExceptionWhenUpdatingDashboardWithFilterThatUserIsNotAllowedToSee() throws Exception {
-        final ViewDTO.Builder builder = mockView(ViewDTO.Type.DASHBOARD);
-        mockUser();
+        prepareUpdate(ViewDTO.Type.DASHBOARD);
+        doReturn(Collections.emptySet()).when(search).getReferencedSearchFiltersIds();
         doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<You cannot see this filter>>")))
                 .when(searchFilterVisibilityChecker)
                 .checkSearchFilterVisibility(any(), any());
 
-        Assert.assertThrows(BadRequestException.class, () -> this.viewsResource.update(view.id(), builder.build(), searchUser));
+        Assert.assertThrows(BadRequestException.class, () -> this.viewsResource.update(VIEW_ID, view, searchUser));
+    }
+
+    @Test
+    public void updatesDashboardSuccessfullyIfInvisibleFilterWasPresentBefore() throws Exception {
+        prepareUpdate(ViewDTO.Type.DASHBOARD);
+        doReturn(Collections.singleton("<<Hidden filter, but not added by this update>>")).when(search).getReferencedSearchFiltersIds();
+        doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<Hidden filter, but not added by this update>>")))
+                .when(searchFilterVisibilityChecker)
+                .checkSearchFilterVisibility(any(), any());
+
+        this.viewsResource.update(VIEW_ID, view, searchUser);
+        verify(viewService).update(view);
+    }
+
+    private void prepareUpdate(final ViewDTO.Type viewType) {
+        this.viewsResource = spy(new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain));
+
+        ViewDTO originalView = mock(ViewDTO.class);
+        final ViewDTO.Builder originalViewBuilder = mockView(viewType, originalView);
+        originalViewBuilder.id(VIEW_ID);
+        when(originalView.id()).thenReturn(VIEW_ID);
+        doReturn(originalView).when(viewsResource).resolveView(VIEW_ID);
+
+        final ViewDTO.Builder builder = mockView(viewType, view);
+        builder.id(VIEW_ID);
+        when(view.id()).thenReturn(VIEW_ID);
+        mockUser();
     }
 
     private UserContext mockUser() {
@@ -201,12 +245,12 @@ public class ViewsResourceTest {
         return userContext;
     }
 
-    private ViewDTO.Builder mockView(final ViewDTO.Type type) {
+    private ViewDTO.Builder mockView(final ViewDTO.Type type, final ViewDTO view) {
         final ViewDTO.Builder builder = mock(ViewDTO.Builder.class);
 
         when(view.toBuilder()).thenReturn(builder);
         when(view.type()).thenReturn(type);
-        when(view.searchId()).thenReturn("6141d457d3a6b9d73c8ac55a");
+        when(view.searchId()).thenReturn(SEARCH_ID);
         when(builder.owner(any())).thenReturn(builder);
         when(builder.id(any())).thenReturn(builder);
         when(builder.build()).thenReturn(view);

@@ -42,6 +42,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternRegistry;
@@ -461,6 +462,7 @@ public class InputFacadeTest {
                 .data(objectMapper.convertValue(inputEntity, JsonNode.class))
                 .build();
         final LookupTableEntity whoIsEntity = LookupTableEntity.create(
+                ValueReference.of(DefaultEntityScope.NAME),
                 ValueReference.of("whois"),
                 ValueReference.of("title"),
                 ValueReference.of("description"),
@@ -473,6 +475,7 @@ public class InputFacadeTest {
         );
 
         final LookupTableEntity torNodeEntity = LookupTableEntity.create(
+                ValueReference.of(DefaultEntityScope.NAME),
                 ValueReference.of("tor-exit-node-list"),
                 ValueReference.of("title"),
                 ValueReference.of("description"),

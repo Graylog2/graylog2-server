@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { EntityListItem } from 'components/common';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import Timestamp from 'components/common/Timestamp';
 import withPluginEntities from 'views/logic/withPluginEntities';
 
@@ -29,7 +29,7 @@ const formatTitle = (title, id, disabled = false) => (disabled
   : <Link to={Routes.pluginRoute('DASHBOARDS_VIEWID')(id)}>{title}</Link>);
 
 const OwnerTag = ({ owner }) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
 
   if (!owner || owner === currentUser?.username) {
     return <span>Last saved</span>;
