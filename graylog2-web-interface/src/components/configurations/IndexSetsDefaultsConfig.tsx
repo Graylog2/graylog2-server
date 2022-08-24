@@ -32,10 +32,10 @@ export type IndexConfig = {
   index_optimization_max_num_segments: number,
   index_optimization_disabled: boolean,
   field_type_refresh_interval: number,
-  field_type_refresh_interval_unit: string,
+  field_type_refresh_interval_unit: "seconds" | "minutes",
 }
 
-const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
+const TIME_UNITS = ['seconds', 'minutes'];
 
 type Props = {
   config: IndexConfig,

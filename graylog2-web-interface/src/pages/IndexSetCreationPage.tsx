@@ -14,24 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
 
-import { LinkContainer } from 'components/common/router';
-import { Row, Col, Button } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { IndexSetConfigurationForm } from 'components/indices';
-import { DocumentationLink } from 'components/support';
+import {LinkContainer} from 'components/common/router';
+import {Row, Col, Button} from 'components/bootstrap';
+import {DocumentTitle, PageHeader, Spinner} from 'components/common';
+import {IndexSetConfigurationForm} from 'components/indices';
+import {DocumentationLink} from 'components/support';
 import DateTime from 'logic/datetimes/DateTime';
 import history from 'util/History';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import connect from 'stores/connect';
-import { IndexSetPropType, IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
-import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
-import { RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
-import type { RetentionStrategy, RotationStrategy, RetentionStrategyContext } from 'components/indices/Types';
+import type {IndexSet} from 'stores/indices/IndexSetsStore';
+import {IndexSetsActions, IndexSetsStore} from 'stores/indices/IndexSetsStore';
+import moment from 'moment';
+import {IndicesConfigurationActions, IndicesConfigurationStore} from 'stores/indices/IndicesConfigurationStore';
+import type {RetentionStrategy, RotationStrategy, RetentionStrategyContext} from 'components/indices/Types';
+import {RetentionStrategyPropType, RotationStrategyPropType} from 'components/indices/Types';
 import useIndexDefaults from 'pages/useIndexDefaults';
 import {IndexConfig} from 'components/configurations/IndexSetsDefaultsConfig';
 
@@ -42,19 +43,40 @@ type Props = {
   retentionStrategiesContext?: RetentionStrategyContext | null | undefined,
 }
 
-const fallbackDefaults : IndexConfig =  {
-  index_prefix: '',
-  index_analyzer: 'standard',
-  shards: 4,
-  replicas: 0,
-  index_optimization_max_num_segments: 1,
-  index_optimization_disabled: false,
-  field_type_refresh_interval: 5,
-  field_type_refresh_interval_unit: "SECONDS" }
+const IndexSetCreationPage = ({retentionStrategies, rotationStrategies, retentionStrategiesContext}: Props) => {
 
-const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retentionStrategiesContext, indexSet }: Props) => {
+  const fallbackDefaults: IndexConfig = {
+    index_prefix: '',
+    index_analyzer: 'standard',
+    shards: 4,
+    replicas: 0,
+    index_optimization_max_num_segments: 1,
+    index_optimization_disabled: false,
+    field_type_refresh_interval: 5,
+    field_type_refresh_interval_unit: 'seconds',
+  };
+  const {config} = useIndexDefaults(fallbackDefaults);
 
-  const { isLoading, config } = useIndexDefaults(fallbackDefaults);
+  const indexSet: IndexSet = {
+    title: '',
+    description: '',
+    index_prefix: config.index_prefix,
+    writable: true,
+    can_be_default: true,
+    shards: config.shards,
+    replicas: config.replicas,
+    retention_strategy_class: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy',
+    retention_strategy: {
+      max_number_of_indices: 20,
+      type: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig',
+    },
+    rotation_strategy: undefined,
+    rotation_strategy_class: '',
+    index_analyzer: config.index_analyzer,
+    index_optimization_max_num_segments: config.index_optimization_max_num_segments,
+    index_optimization_disabled: config.index_optimization_disabled,
+    field_type_refresh_interval: moment.duration(config.field_type_refresh_interval,config.field_type_refresh_interval_unit ).asMilliseconds(),
+  };
 
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies();
@@ -123,7 +145,6 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
 IndexSetCreationPage.propTypes = {
   retentionStrategies: PropTypes.arrayOf(RetentionStrategyPropType),
   rotationStrategies: PropTypes.arrayOf(RotationStrategyPropType),
-  indexSet: IndexSetPropType,
   retentionStrategiesContext: PropTypes.shape({
     max_index_retention_period: PropTypes.string,
   }),
@@ -132,24 +153,6 @@ IndexSetCreationPage.propTypes = {
 IndexSetCreationPage.defaultProps = {
   retentionStrategies: undefined,
   rotationStrategies: undefined,
-  indexSet: {
-    title: '',
-    description: '',
-    index_prefix: '',
-    writable: true,
-    can_be_default: true,
-    shards: 4,
-    replicas: 0,
-    retention_strategy_class: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy',
-    retention_strategy: {
-      max_number_of_indices: 20,
-      type: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig',
-    },
-    index_analyzer: 'standard',
-    index_optimization_max_num_segments: 1,
-    index_optimization_disabled: false,
-    field_type_refresh_interval: 5 * 1000, // 5 seconds
-  },
   retentionStrategiesContext: {
     max_index_retention_period: undefined,
   },
@@ -161,7 +164,7 @@ export default connect(
     indexSets: IndexSetsStore,
     indicesConfigurations: IndicesConfigurationStore,
   },
-  ({ indexSets, indicesConfigurations }) => ({
+  ({indexSets, indicesConfigurations}) => ({
     indexSet: indexSets.indexSet,
     rotationStrategies: indicesConfigurations.rotationStrategies,
     retentionStrategies: indicesConfigurations.retentionStrategies,

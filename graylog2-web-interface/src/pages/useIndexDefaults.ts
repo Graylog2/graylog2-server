@@ -42,10 +42,8 @@ const useIndexDefaults = (fallbackDefaults: IndexConfig) => {
   const config: IndexConfig = isLoading ? fallbackDefaults : data;
 
   return {
-    config,
-    isLoading,
+    config
   };
 };
 
 export default useIndexDefaults;
-N
