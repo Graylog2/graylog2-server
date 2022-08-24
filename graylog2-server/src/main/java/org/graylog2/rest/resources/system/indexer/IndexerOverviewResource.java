@@ -54,8 +54,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @RequiresAuthentication
-@Api(value = "Indexer/Overview", description = "Indexing overview")
+@Api(value = "Indexer/Overview", description = "Indexing overview", tags={CLOUD_VISIBLE})
 @Path("/system/indexer/overview")
 public class IndexerOverviewResource extends RestResource {
     private final DeflectorResource deflectorResource;

@@ -95,6 +95,7 @@
         <apache-httpcore.version>4.4.14</apache-httpcore.version>
         <auto-value.version>1.7.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
+        <aws-java-sdk-2.version>2.17.77</aws-java-sdk-2.version>
         <bouncycastle.version>1.69</bouncycastle.version>
         <caffeine.version>2.8.1</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
@@ -108,7 +109,7 @@
         <gelfclient.version>1.5.0</gelfclient.version>
         <geoip2.version>2.12.0</geoip2.version>
         <grok.version>0.1.9-graylog-2</grok.version>
-        <grpc.version>1.41.0</grpc.version>
+        <grpc.version>1.48.1</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>31.0.1-jre</guava.version>
         <guice.version>5.0.1</guice.version>

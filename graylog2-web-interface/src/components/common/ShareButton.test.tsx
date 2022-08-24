@@ -18,32 +18,34 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen, fireEvent } from 'wrappedTestingLibrary';
 
-import { alice } from 'fixtures/users';
 import { createGRN } from 'logic/permissions/GRN';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import { asMock } from 'helpers/mocking';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { adminUser } from 'fixtures/users';
 
 import ShareButton from './ShareButton';
 
-const entityType = 'dashboard';
-const entityId = 'dashboard-id';
-const entityGRN = createGRN(entityType, entityId);
-
-const SimpleShareButton = ({ onClick, grnPermissions, ...rest }: { onClick: () => void, grnPermissions: Array<string>, disabledInfo?: string | undefined }) => {
-  const currentUser = alice.toBuilder().grnPermissions(Immutable.List(grnPermissions)).build();
-
-  return (
-    <CurrentUserContext.Provider value={currentUser}>
-      <ShareButton {...rest} onClick={onClick} entityType={entityType} entityId={entityId} />
-    </CurrentUserContext.Provider>
-  );
-};
-
-SimpleShareButton.defaultProps = { disabledInfo: undefined };
+jest.mock('hooks/useCurrentUser');
 
 describe('<ShareButton />', () => {
+  const entityType = 'dashboard';
+  const entityId = 'dashboard-id';
+  const entityGRN = createGRN(entityType, entityId);
+  const currentUser = adminUser.toBuilder()
+    .permissions(Immutable.List([]))
+    .grnPermissions(Immutable.List([`entity:own:${entityGRN}`]))
+    .build();
+
+  const SimpleShareButton = ({ onClick, ...rest }: { onClick: () => void, disabledInfo?: string | undefined }) => (
+    <ShareButton {...rest} onClick={onClick} entityType={entityType} entityId={entityId} />
+  );
+
+  SimpleShareButton.defaultProps = { disabledInfo: undefined };
+
   it('should be clickable if user has correct permissions', async () => {
     const onClickStub = jest.fn();
-    render(<SimpleShareButton onClick={onClickStub} grnPermissions={[`entity:own:${entityGRN}`]} />);
+    asMock(useCurrentUser).mockReturnValue(currentUser.toBuilder().grnPermissions(Immutable.List([`entity:own:${entityGRN}`])).build());
+    render(<SimpleShareButton onClick={onClickStub} />);
 
     const button = screen.getByRole('button', { name: /Share/ });
     fireEvent.click(button);
@@ -53,7 +55,8 @@ describe('<ShareButton />', () => {
 
   it('should not be clickable if user has incorrect permissions', async () => {
     const onClickStub = jest.fn();
-    render(<SimpleShareButton onClick={onClickStub} grnPermissions={[]} />);
+    asMock(useCurrentUser).mockReturnValue(currentUser.toBuilder().grnPermissions(Immutable.List([])).build());
+    render(<SimpleShareButton onClick={onClickStub} />);
 
     const button = screen.getByRole('button', { name: /Share/ });
     fireEvent.click(button);
@@ -63,7 +66,8 @@ describe('<ShareButton />', () => {
 
   it('should not be clickable if disabledInfo is provided', async () => {
     const onClickStub = jest.fn();
-    render(<SimpleShareButton onClick={onClickStub} grnPermissions={[`entity:own:${entityGRN}`]} disabledInfo="Only saved entities can be shared" />);
+    asMock(useCurrentUser).mockReturnValue(currentUser.toBuilder().grnPermissions(Immutable.List([`entity:own:${entityGRN}`])).build());
+    render(<SimpleShareButton onClick={onClickStub} disabledInfo="Only saved entities can be shared" />);
 
     const button = screen.getByRole('button', { name: /Share/ });
     fireEvent.click(button);

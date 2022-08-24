@@ -25,13 +25,7 @@ import joptsimple.internal.Strings;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.TestIndexSet;
-import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
-import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
-import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
-import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
@@ -41,8 +35,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,24 +59,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     protected Messages messages;
 
-    private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
-            .id("index-set-1")
-            .title("Index set 1")
-            .description("For testing")
-            .indexPrefix("messages_it")
-            .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
-            .shards(1)
-            .replicas(0)
-            .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
-            .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
-            .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
-            .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
-            .indexAnalyzer("standard")
-            .indexTemplateName("template-1")
-            .indexOptimizationMaxNumSegments(1)
-            .indexOptimizationDisabled(false)
-            .build();
-    private static final IndexSet indexSet = new TestIndexSet(indexSetConfig);
+    protected static final IndexSet indexSet = new MessagesTestIndexSet();
 
     protected abstract MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry);
 

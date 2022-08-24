@@ -20,7 +20,7 @@ import type * as Immutable from 'immutable';
 import { Spinner } from 'components/common';
 import NodeName from 'views/components/messagelist/NodeName';
 import type { Input } from 'components/messageloaders/Types';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 type Inputs = Immutable.Map<string, Input>;
 

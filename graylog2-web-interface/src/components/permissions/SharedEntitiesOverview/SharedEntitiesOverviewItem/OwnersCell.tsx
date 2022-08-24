@@ -16,14 +16,13 @@
  */
 
 import * as React from 'react';
-import { useContext } from 'react';
 import type { List } from 'immutable';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import type Grantee from 'logic/permissions/Grantee';
 import { Link } from 'components/common/router';
 import { defaultCompare } from 'logic/DefaultCompare';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
 import { getShowRouteFromGRN } from 'logic/permissions/GRN';
 
@@ -55,7 +54,7 @@ const _getOwnerTitle = ({ type, id, title }: Grantee, userPermissions: List<stri
 };
 
 const OwnersCell = ({ owners }: Props) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const sortedOwners = owners.sort((o1, o2) => defaultCompare(o1.type, o2.type) || defaultCompare(o1.title, o2.title));
 
   return (

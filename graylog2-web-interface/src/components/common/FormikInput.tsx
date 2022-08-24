@@ -39,8 +39,9 @@ type BaseProps = {
   placeholder?: string,
   required?: boolean,
   type?: string,
-  validate?: (string) => string | undefined | null,
+  validate?: (arg: string) => string | undefined | null,
   wrapperClassName?: string,
+  autoFocus?: boolean,
 };
 
 type TextareaProps = BaseProps & {
@@ -110,6 +111,7 @@ FormikInput.propTypes = {
   type: PropTypes.string,
   validate: PropTypes.func,
   wrapperClassName: PropTypes.string,
+  autoFocus: PropTypes.bool,
 };
 
 FormikInput.defaultProps = {
@@ -130,6 +132,7 @@ FormikInput.defaultProps = {
   type: 'text',
   validate: () => undefined,
   wrapperClassName: undefined,
+  autoFocus: false,
 };
 
 export default FormikInput;
