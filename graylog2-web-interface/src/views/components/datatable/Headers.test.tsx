@@ -131,10 +131,12 @@ describe('Headers', () => {
         seriesWithName('avg(foo)', 'Average Foness'),
       ];
 
-      mount((
+      const wrapper = mount((
         <RenderHeaders series={series}
                        fields={null} />
       ));
+
+      expect(wrapper).toExist();
     });
   });
 });

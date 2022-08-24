@@ -23,4 +23,3 @@
 jest.mock('react-dom', () => ({
   findDOMNode: () => ({}),
 }));
-

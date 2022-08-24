@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { readerPermissions } from 'fixtures/permissions';
 
+import { readerPermissions } from 'fixtures/permissions';
 import User from 'logic/users/User';
 
 export const alice = User.builder()

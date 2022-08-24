@@ -16,13 +16,14 @@
  */
 import { useQuery } from 'react-query';
 
-import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
+import UserNotification from 'util/UserNotification';
+import type { GenericEntityType } from 'logic/lookup-tables/types';
 
-interface ScopeParams {
-  is_mutable: boolean;
+type ScopeParams = {
+  is_mutable: boolean,
 }
 
 type ScopeName = 'DEFAULT' | 'ILLUMINATE';
@@ -33,30 +34,28 @@ type EntityScopeType = {
   entity_scopes: EntityScopeRecord,
 };
 
-const fetchScopePermissions: () => Promise<EntityScopeType> = () => {
+function fetchScopePermissions() {
   return fetch('GET', qualifyUrl(ApiRoutes.EntityScopeController.getScope().url));
-};
+}
 
-const useGetPermissionsByScope = (inScope: string) => {
-  const { data, isLoading } = useQuery(
+const useGetPermissionsByScope = (entity: Partial<GenericEntityType>) => {
+  const { data, isLoading, error } = useQuery<EntityScopeType, Error>(
     ['scope-permissions'],
     fetchScopePermissions,
     {
-      onError: (fetchError: Error) => {
-        UserNotification.error(`Error fetching entity scope permissions: ${fetchError.message}`);
-      },
+      onError: () => UserNotification.error(error.message),
       retry: 1,
       cacheTime: 1000 * 60 * 60 * 3, // cache for 3 hours
       staleTime: 1000 * 60 * 60 * 3, // data is valid for 3 hours
     },
   );
 
-  const scope = inScope ? inScope.toUpperCase() : 'DEFAULT';
+  const scope = entity._scope ? entity._scope.toUpperCase() : 'DEFAULT';
   const permissions: ScopeParams = isLoading ? { is_mutable: false } : data.entity_scopes[scope];
 
   return {
-    isLoading,
-    data: permissions,
+    loadingScopePermissions: isLoading,
+    scopePermissions: permissions,
   };
 };
 

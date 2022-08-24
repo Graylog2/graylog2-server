@@ -14,41 +14,33 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
 
 import { OverlayTrigger, Icon } from 'components/common';
 import { Popover } from 'components/bootstrap';
 
 import Styles from './ErrorPopover.css';
 
-class ErrorPopover extends React.Component {
-  static propTypes = {
-    errorText: PropTypes.string.isRequired,
-    title: PropTypes.string,
-    placement: PropTypes.string,
-  };
+type Props = {
+  errorText: string,
+  title: string,
+  placement: 'bottom' | 'top' | 'right' | 'left',
+};
 
-  static defaultProps = {
-    title: 'Error',
-    placement: 'bottom',
-  };
+const ErrorPopover = ({ errorText, title = 'Error', placement = 'bottom' }: Props) => {
+  const overlay = (
+    <Popover id="error-popover" title={title} className={Styles.overlay}>
+      {errorText}
+    </Popover>
+  );
 
-  render() {
-    const overlay = (
-      <Popover id="error-popover" title={this.props.title} className={Styles.overlay}>
-        {this.props.errorText}
-      </Popover>
-    );
-
-    return (
-      <OverlayTrigger trigger={['hover', 'focus']} placement={this.props.placement} overlay={overlay}>
-        <span className={Styles.trigger}>
-          <Icon name="exclamation-triangle" className="text-danger" />
-        </span>
-      </OverlayTrigger>
-    );
-  }
-}
+  return (
+    <OverlayTrigger trigger={['hover', 'focus']} placement={placement} overlay={overlay}>
+      <span className={Styles.trigger}>
+        <Icon name="exclamation-triangle" className="text-danger" />
+      </span>
+    </OverlayTrigger>
+  );
+};
 
 export default ErrorPopover;
