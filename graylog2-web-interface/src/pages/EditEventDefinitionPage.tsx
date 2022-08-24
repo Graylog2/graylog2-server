@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import useGetPermissionsByScope from 'src/hooks/useScopePermissions';
 
+import useScopePermissions from 'hooks/useScopePermissions';
 import { LinkContainer } from 'components/common/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
@@ -68,6 +68,8 @@ const EditEventDefinitionPage = ({ params, currentUser }: Props) => {
     }
   }, [params, currentUser]);
 
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(eventDefinition);
+
   const streamsWithMissingPermissions = () => {
     const streams = eventDefinition?.config?.streams || [];
 
@@ -84,7 +86,7 @@ const EditEventDefinitionPage = ({ params, currentUser }: Props) => {
     return <StreamPermissionErrorPage error={null} missingStreamIds={missingStreams} />;
   }
 
-  if (!eventDefinition) {
+  if (!eventDefinition || loadingScopePermissions) {
     return (
       <DocumentTitle title="Edit Event Definition">
         <span>
@@ -126,12 +128,25 @@ const EditEventDefinitionPage = ({ params, currentUser }: Props) => {
             </IfPermitted>
           </ButtonToolbar>
         </PageHeader>
-
-        <Row className="content">
-          <Col md={12}>
-            <EventDefinitionFormContainer action="edit" eventDefinition={eventDefinition} />
-          </Col>
-        </Row>
+        {scopePermissions.is_mutable ? (
+          <Row className="content">
+            <Col md={12}>
+              <EventDefinitionFormContainer action="edit" eventDefinition={eventDefinition} />
+            </Col>
+          </Row>
+        ) : (
+          <Row className="content">
+            <Col md={12}>
+              <Row>
+                <Col md={6} mdOffset={3} lg={4} lgOffset={4}>
+                  <div style={{ textAlign: 'center' }}>
+                    <p>This particular Event Definition has been marked as immutable when it was created, therefore it cannot be edited.</p>
+                  </div>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        )}
       </span>
     </DocumentTitle>
   );
