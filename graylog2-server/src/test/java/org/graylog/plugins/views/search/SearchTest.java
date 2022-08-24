@@ -22,6 +22,7 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.ReferencedQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -40,7 +41,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.graylog.plugins.views.search.TestData.validQueryBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -141,8 +141,8 @@ public class SearchTest {
 
     @Test
     public void testGetReferencedSearchFiltersIdsReturnsEmptyCollectionOnQueriesWithoutFilters() {
-        final Query query1 = mock(Query.class);
-        final Query query2 = mock(Query.class);
+        final Query query1 = TestData.validQueryBuilder().build();
+        final Query query2 = TestData.validQueryBuilder().build();
         final Search search = Search.builder().queries(ImmutableSet.of(query1, query2)).build();
         final Set<String> referencedSearchFiltersIds = search.getReferencedSearchFiltersIds();
         assertTrue(referencedSearchFiltersIds.isEmpty());
@@ -150,8 +150,13 @@ public class SearchTest {
 
     @Test
     public void testGetReferencedSearchFiltersIdsDoesNotReturnInlinedSearchFilters() {
-        final Query query = mock(Query.class);
-        doReturn(ImmutableList.of(mock(InlineQueryStringSearchFilter.class), mock(InlineQueryStringSearchFilter.class))).when(query).filters();
+        final Query query = TestData.validQueryBuilder()
+                .filters(ImmutableList.of(
+                        InlineQueryStringSearchFilter.builder().queryString("nvmd").build(),
+                        InlineQueryStringSearchFilter.builder().queryString("nvmd2").build())
+                )
+                .build();
+
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
         final Set<String> referencedSearchFiltersIds = search.getReferencedSearchFiltersIds();
         assertTrue(referencedSearchFiltersIds.isEmpty());
@@ -159,12 +164,11 @@ public class SearchTest {
 
     @Test
     public void testGetReferencedSearchFiltersIdsReturnsProperIds() {
-        final Query query = mock(Query.class);
-        final ReferencedSearchFilter filter1 = mock(ReferencedSearchFilter.class);
-        doReturn("r_id_1").when(filter1).id();
-        final ReferencedSearchFilter filter2 = mock(ReferencedSearchFilter.class);
-        doReturn("r_id_2").when(filter2).id();
-        doReturn(ImmutableList.of(filter1, filter2)).when(query).filters();
+        final ReferencedSearchFilter filter1 = ReferencedQueryStringSearchFilter.builder().id("r_id_1").build();
+        final ReferencedSearchFilter filter2 = ReferencedQueryStringSearchFilter.builder().id("r_id_2").build();
+        final Query query = TestData.validQueryBuilder()
+                .filters(ImmutableList.of(filter1, filter2))
+                .build();
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
         final Set<String> referencedSearchFiltersIds = search.getReferencedSearchFiltersIds();
         assertEquals(ImmutableSet.of("r_id_1", "r_id_2"), referencedSearchFiltersIds);
