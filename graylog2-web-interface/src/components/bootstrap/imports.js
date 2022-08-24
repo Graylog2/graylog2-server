@@ -27,7 +27,6 @@ export {
   Dropdown,
   Form,
   Grid,
-  MenuItem,
   NavItem,
   Pager,
   PanelGroup,

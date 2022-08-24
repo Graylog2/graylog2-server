@@ -23,7 +23,6 @@ import { Link, LinkContainer } from 'components/common/router';
 import { OverlayTrigger, EmptyEntity, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
 import { Alert, Col, Label, Row, Table, Tooltip, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import DateTime from 'logic/datetimes/DateTime';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import { isPermitted } from 'util/PermissionsMixin';
 
@@ -120,6 +119,7 @@ class Events extends React.Component {
     };
   };
 
+  // eslint-disable-next-line class-methods-use-this
   priorityFormatter = (eventId, priority) => {
     const priorityName = lodash.capitalize(EventDefinitionPriorityEnum.properties[priority].name);
     let icon;
@@ -193,6 +193,7 @@ class Events extends React.Component {
     );
   };
 
+  // eslint-disable-next-line class-methods-use-this
   renderEmptyContent = () => {
     return (
       <Row>

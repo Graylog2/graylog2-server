@@ -65,6 +65,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class AggregationEventProcessorTest {
+    public static final int SEARCH_WINDOW_MS = 30000;
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -88,12 +89,12 @@ public class AggregationEventProcessorTest {
     @Test
     public void testEventsFromAggregationResult() {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.plusHours(1));
+        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
 
         // We expect to get the end of the aggregation timerange as event time
         final TestEvent event1 = new TestEvent(timerange.to());
         final TestEvent event2 = new TestEvent(timerange.to());
-        when(eventFactory.createEvent(any(EventDefinition.class), eq(now), anyString()))
+        when(eventFactory.createEvent(any(EventDefinition.class), any(DateTime.class), anyString()))
                 .thenReturn(event1)  // first invocation return value
                 .thenReturn(event2); // second invocation return value
 
@@ -112,7 +113,7 @@ public class AggregationEventProcessorTest {
                 .keyResults(ImmutableList.of(
                         AggregationKeyResult.builder()
                                 .key(ImmutableList.of("one", "two"))
-                                .timestamp(now)
+                                .timestamp(timerange.to())
                                 .seriesValues(ImmutableList.of(
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
@@ -179,12 +180,12 @@ public class AggregationEventProcessorTest {
     @Test
     public void testEventsFromAggregationResultWithConditions() {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.plusHours(1));
+        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
 
         // We expect to get the end of the aggregation timerange as event time
         final TestEvent event1 = new TestEvent(timerange.to());
         final TestEvent event2 = new TestEvent(timerange.to());
-        when(eventFactory.createEvent(any(EventDefinition.class), eq(now), anyString()))
+        when(eventFactory.createEvent(any(EventDefinition.class), any(DateTime.class), anyString()))
                 .thenReturn(event1)  // first invocation return value
                 .thenReturn(event2); // second invocation return value
 
@@ -211,7 +212,7 @@ public class AggregationEventProcessorTest {
                 .keyResults(ImmutableList.of(
                         AggregationKeyResult.builder()
                                 .key(ImmutableList.of("one", "two"))
-                                .timestamp(now)
+                                .timestamp(timerange.to())
                                 .seriesValues(ImmutableList.of(
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
@@ -293,7 +294,7 @@ public class AggregationEventProcessorTest {
         when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(any(DateTime.class))).thenReturn(true);
 
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.plusHours(1));
+        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
 
         final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
                 .query("aQueryString")
@@ -301,8 +302,8 @@ public class AggregationEventProcessorTest {
                 .groupBy(ImmutableList.of())
                 .series(ImmutableList.of())
                 .conditions(null)
-                .searchWithinMs(30000)
-                .executeEveryMs(30000)
+                .searchWithinMs(SEARCH_WINDOW_MS)
+                .executeEveryMs(SEARCH_WINDOW_MS)
                 .build();
         final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), ImmutableList.of(), null);
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
@@ -387,12 +388,12 @@ public class AggregationEventProcessorTest {
     @Test
     public void testEventsFromAggregationResultWithEmptyResultUsesEventDefinitionStreamAsSourceStreams() {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.plusHours(1));
+        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
 
         // We expect to get the end of the aggregation timerange as event time
         final TestEvent event1 = new TestEvent(timerange.to());
         final TestEvent event2 = new TestEvent(timerange.to());
-        when(eventFactory.createEvent(any(EventDefinition.class), eq(now), anyString()))
+        when(eventFactory.createEvent(any(EventDefinition.class), any(DateTime.class), anyString()))
                 .thenReturn(event1)  // first invocation return value
                 .thenReturn(event2); // second invocation return value
 
@@ -402,7 +403,7 @@ public class AggregationEventProcessorTest {
                 .build();
 
         final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch, streamService, messages);
-        final AggregationResult result = buildAggregationResult(timerange, now, ImmutableList.of("one", "two"));
+        final AggregationResult result = buildAggregationResult(timerange, timerange.to(), ImmutableList.of("one", "two"));
         final ImmutableList<EventWithContext> eventsWithContext = eventProcessor.eventsFromAggregationResult(eventFactory, parameters, result);
 
         assertThat(eventsWithContext).hasSize(1);
@@ -431,12 +432,12 @@ public class AggregationEventProcessorTest {
     @Test
     public void testEventsFromAggregationResultWithEmptyResultAndNoConfiguredStreamsUsesAllStreamsAsSourceStreams() {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.plusHours(1));
+        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
 
         // We expect to get the end of the aggregation timerange as event time
         final TestEvent event1 = new TestEvent(timerange.to());
         final TestEvent event2 = new TestEvent(timerange.to());
-        when(eventFactory.createEvent(any(EventDefinition.class), eq(now), anyString()))
+        when(eventFactory.createEvent(any(EventDefinition.class), any(DateTime.class), anyString()))
                 .thenReturn(event1)  // first invocation return value
                 .thenReturn(event2); // second invocation return value
 
@@ -455,7 +456,7 @@ public class AggregationEventProcessorTest {
                 .build();
 
         final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch, streamService, messages);
-        final AggregationResult result = buildAggregationResult(timerange, now, ImmutableList.of("one", "two"));
+        final AggregationResult result = buildAggregationResult(timerange, timerange.to(), ImmutableList.of("one", "two"));
         final ImmutableList<EventWithContext> eventsWithContext = eventProcessor.eventsFromAggregationResult(eventFactory, parameters, result);
 
         assertThat(eventsWithContext).hasSize(1);
@@ -592,8 +593,8 @@ public class AggregationEventProcessorTest {
                         .groupBy(ImmutableList.of("group_field_one", "group_field_two"))
                         .series(testSeries)
                         .conditions(testConditions)
-                        .searchWithinMs(30000)
-                        .executeEveryMs(30000)
+                        .searchWithinMs(SEARCH_WINDOW_MS)
+                        .executeEveryMs(SEARCH_WINDOW_MS)
                         .build())
                 .keySpec(ImmutableList.of())
                 .build();

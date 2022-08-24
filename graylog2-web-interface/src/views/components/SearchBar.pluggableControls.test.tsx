@@ -65,7 +65,7 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   },
 }));
 
-jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => jest.fn(() => (
+jest.mock('views/components/searchbar/saved-search/SearchActionsMenu', () => jest.fn(() => (
   <div>Saved Search Controls</div>
 )));
 
@@ -186,6 +186,6 @@ describe('SearchBar pluggable controls', () => {
       queryString: '*',
       streams: [],
       timeRange: { from: 300, type: 'relative' },
-    }));
+    }, 'Europe/Berlin'));
   });
 });

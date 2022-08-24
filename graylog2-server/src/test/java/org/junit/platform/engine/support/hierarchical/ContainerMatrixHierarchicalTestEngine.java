@@ -75,9 +75,10 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                 List<String> enabledFeatureFlags = containerMatrixTestsDescriptor.getEnabledFeatureFlags();
                 PluginJarsProvider pluginJarsProvider = instantiateFactory(containerMatrixTestsDescriptor.getPluginJarsProvider());
                 MavenProjectDirProvider mavenProjectDirProvider = instantiateFactory(containerMatrixTestsDescriptor.getMavenProjectDirProvider());
+                boolean withEnabledMailServer = containerMatrixTestsDescriptor.withEnabledMailServer();
 
                 if (Lifecycle.VM.equals(containerMatrixTestsDescriptor.getLifecycle())) {
-                    try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(esVersion, mongoVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, ContainerMatrixTestsConfiguration.defaultImportLicenses)) {
+                    try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(esVersion, mongoVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, ContainerMatrixTestsConfiguration.defaultImportLicenses, withEnabledMailServer)) {
                         RequestSpecification specification = requestSpec(backend);
                         this.execute(request, ((ContainerMatrixTestsDescriptor) descriptor).getChildren(), backend, specification);
                     } catch (Exception exception) {
@@ -91,7 +92,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                             fixtures = ((ContainerMatrixTestClassDescriptor) td).getMongoFixtures();
                             preImportLicense = ((ContainerMatrixTestClassDescriptor) td).isPreImportLicense();
                         }
-                        try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(esVersion, mongoVersion, extraPorts, fixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense)) {
+                        try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(esVersion, mongoVersion, extraPorts, fixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, withEnabledMailServer)) {
                             RequestSpecification specification = requestSpec(backend);
                             this.execute(request, Collections.singleton(td), backend, specification);
                         } catch (Exception exception) {

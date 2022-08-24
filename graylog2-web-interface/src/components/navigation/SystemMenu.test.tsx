@@ -17,9 +17,12 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
+import { useLocation } from 'react-router-dom';
+import type { Location } from 'history';
 
-import { alice } from 'fixtures/users';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import { asMock } from 'helpers/mocking';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { adminUser } from 'fixtures/users';
 
 import AppConfig from '../../util/AppConfig';
 
@@ -34,7 +37,12 @@ jest.mock('util/AppConfig', () => ({
   isCloud: jest.fn(() => false),
 }));
 
-jest.mock('routing/withLocation', () => (x) => x);
+jest.mock('hooks/useCurrentUser');
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useLocation: jest.fn(),
+}));
 
 describe('SystemMenu', () => {
   let exports;
@@ -46,24 +54,9 @@ describe('SystemMenu', () => {
 
     jest.doMock('graylog-web-plugin/plugin', () => ({ PluginStore }));
     AppConfig.gl2AppPathPrefix = jest.fn(() => '');
+    asMock(useLocation).mockReturnValue({ pathname: '/' } as Location<{ pathname: string }>);
+    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
   });
-
-  const SimpleSystemMenu = ({ permissions, component: Component, location }: { permissions?: Array<string>, component: any, location?: { pathname: string }}) => {
-    const currentUser = alice.toBuilder()
-      .permissions(Immutable.List(permissions ?? []))
-      .build();
-
-    return (
-      <CurrentUserContext.Provider value={currentUser}>
-        <Component location={location} />
-      </CurrentUserContext.Provider>
-    );
-  };
-
-  SimpleSystemMenu.defaultProps = {
-    permissions: [],
-    location: { pathname: '/' },
-  };
 
   describe('uses correct permissions:', () => {
     let SystemMenu;
@@ -73,31 +66,34 @@ describe('SystemMenu', () => {
       SystemMenu = require('./SystemMenu').default;
     });
 
-    const verifyPermissions = ({ permissions, count, links }) => {
-      const wrapper = mount(<SimpleSystemMenu component={SystemMenu} permissions={permissions} />);
-      const navigationLinks = wrapper.find('NavigationLink');
-
-      expect(navigationLinks).toHaveLength(count);
-
-      containsAllLinks(navigationLinks, links);
-    };
-
     it.each`
     permissions                    | count | links
     ${[]}                          | ${2}  | ${['Overview', 'Nodes']}
     ${['clusterconfigentry:read']} | ${3}  | ${['Configurations']}
-    ${['inputs:read']}             | ${4}  | ${['Inputs', 'Grok Patterns']}
+    ${['inputs:read']}             | ${3}  | ${['Inputs']}
+    ${['grok_pattern:read']}       | ${3}  | ${['Grok Patterns']}
     ${['outputs:read']}            | ${3}  | ${['Outputs']}
     ${['indices:read']}            | ${3}  | ${['Indices']}
     ${['loggers:read']}            | ${3}  | ${['Logging']}
     ${['authentication:edit']}     | ${3}  | ${['Authentication']}
     ${['users:list']}              | ${3}  | ${['Users and Teams']}
     ${['roles:read']}              | ${3}  | ${['Roles']}
-    ${['dashboards:create', 'inputs:create', 'streams:create']} | ${4}  | ${['Content Packs']}
-    ${['inputs:edit']}             | ${3}  | ${['Lookup Tables']}
+    ${['contentpack:read']}        | ${3}  | ${['Content Packs']}
+    ${['lookuptables:read']}       | ${3}  | ${['Lookup Tables']}
     ${['sidecars:read']}           | ${3}  | ${['Sidecars']}
-    ${['inputs:create']}           | ${3}  | ${['Pipelines']}
-  `('shows $links for user with $permissions permissions', verifyPermissions);
+    ${['pipeline:read', 'pipeline_connection:read']} | ${3}  | ${['Pipelines']}
+  `('shows $links for user with $permissions permissions', ({ permissions, count, links }) => {
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+        .permissions(Immutable.List(permissions))
+        .build());
+
+      const wrapper = mount(<SystemMenu />);
+      const navigationLinks = wrapper.find('NavigationLink');
+
+      expect(navigationLinks).toHaveLength(count);
+
+      containsAllLinks(navigationLinks, links);
+    });
   });
 
   describe('uses items from plugins:', () => {
@@ -118,7 +114,7 @@ describe('SystemMenu', () => {
     });
 
     it('includes plugin item in system navigation', () => {
-      const wrapper = mount(<SimpleSystemMenu component={SystemMenu} />);
+      const wrapper = mount(<SystemMenu />);
       containsLink(wrapper, 'Audit Log');
 
       expect(findLink(wrapper, 'Audit Log')).toHaveProp('path', '/system/auditlog');
@@ -126,21 +122,29 @@ describe('SystemMenu', () => {
     });
 
     it('includes plugin item in system navigation if required permissions are present', () => {
-      const wrapper = mount(<SimpleSystemMenu component={SystemMenu} permissions={['inputs:create']} />);
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+        .permissions(Immutable.List(['inputs:create']))
+        .build());
 
-      containsLink(wrapper, 'Audit Log');
-      containsLink(wrapper, 'Licenses');
+      const wrapper = mount(<SystemMenu />);
+
+      expect(findLink(wrapper, 'Audit Log')).toHaveLength(1);
+      expect(findLink(wrapper, 'Licenses')).toHaveLength(1);
     });
 
     it('does not include plugin item in system navigation if required permissions are not present', () => {
-      const wrapper = mount(<SimpleSystemMenu component={SystemMenu} permissions={[]} />);
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+        .permissions(Immutable.List([]))
+        .build());
+
+      const wrapper = mount(<SystemMenu />);
 
       expect(findLink(wrapper, 'Licenses')).not.toExist();
     });
 
     it('prefixes plugin path with current application path prefix', () => {
       AppConfig.gl2AppPathPrefix = jest.fn(() => '/my/fancy/prefix');
-      const wrapper = mount(<SimpleSystemMenu component={SystemMenu} />);
+      const wrapper = mount(<SystemMenu />);
 
       expect(findLink(wrapper, 'Audit Log')).toHaveProp('path', '/my/fancy/prefix/system/auditlog');
     });
@@ -164,19 +168,21 @@ describe('SystemMenu', () => {
     });
 
     it('uses a default title if location is not matched', () => {
-      const wrapper = mount(<SimpleSystemMenu component={SystemMenu} />);
+      const wrapper = mount(<SystemMenu />);
 
       expect(wrapper.find('NavDropdown').at(1)).toHaveProp('title', 'System');
     });
 
     it('uses a custom title if location is matched', () => {
-      const wrapper = mount(<SimpleSystemMenu component={SystemMenu} location={{ pathname: '/system/overview' }} />);
+      asMock(useLocation).mockReturnValue({ pathname: '/system/overview' } as Location<{ pathname: string }>);
+      const wrapper = mount(<SystemMenu />);
 
       expect(wrapper.find('NavDropdown').at(1)).toHaveProp('title', 'System / Overview');
     });
 
     it('uses a custom title for a plugin route if location is matched', () => {
-      const wrapper = mount(<SimpleSystemMenu component={SystemMenu} location={{ pathname: '/system/licenses' }} />);
+      asMock(useLocation).mockReturnValue({ pathname: '/system/licenses' } as Location<{ pathname: string }>);
+      const wrapper = mount(<SystemMenu />);
 
       expect(wrapper.find('NavDropdown').at(1)).toHaveProp('title', 'System / Licenses');
     });

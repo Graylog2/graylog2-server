@@ -30,7 +30,7 @@ import IndexSetsDefaultsConfig from 'components/configurations/IndexSetsDefaults
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import 'components/maps/configurations';
 import type { Store } from 'stores/StoreTypes';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';

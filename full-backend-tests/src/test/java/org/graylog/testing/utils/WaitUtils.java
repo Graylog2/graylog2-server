@@ -18,6 +18,8 @@ package org.graylog.testing.utils;
 
 import org.glassfish.jersey.internal.util.Producer;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import static org.junit.Assert.fail;
@@ -35,8 +37,12 @@ public final class WaitUtils {
     }
 
     public static <T> T waitForObject(Producer<Optional<T>> predicate, String timeoutErrorMessage) {
+        return waitForObject(predicate, timeoutErrorMessage, Duration.of(TIMEOUT_MS, ChronoUnit.MILLIS));
+    }
+
+    public static <T> T waitForObject(Producer<Optional<T>> predicate, String timeoutErrorMessage, Duration timeout) {
         int msPassed = 0;
-        while (msPassed <= TIMEOUT_MS) {
+        while (msPassed <= timeout.toMillis()) {
             final Optional<T> result = predicate.call();
             if (result != null && result.isPresent()) {
                 return result.get();

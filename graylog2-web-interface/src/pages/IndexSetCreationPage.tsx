@@ -14,27 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import {LinkContainer} from 'components/common/router';
-import {Row, Col, Button} from 'components/bootstrap';
-import {DocumentTitle, PageHeader, Spinner} from 'components/common';
-import {IndexSetConfigurationForm} from 'components/indices';
-import {DocumentationLink} from 'components/support';
-import DateTime from 'logic/datetimes/DateTime';
+import { LinkContainer } from 'components/common/router';
+import { Row, Col, Button } from 'components/bootstrap';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { IndexSetConfigurationForm } from 'components/indices';
+import { DocumentationLink } from 'components/support';
 import history from 'util/History';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import connect from 'stores/connect';
-import type {IndexSet} from 'stores/indices/IndexSetsStore';
-import {IndexSetsActions, IndexSetsStore} from 'stores/indices/IndexSetsStore';
-import moment from 'moment';
-import {IndicesConfigurationActions, IndicesConfigurationStore} from 'stores/indices/IndicesConfigurationStore';
-import type {RetentionStrategy, RotationStrategy, RetentionStrategyContext} from 'components/indices/Types';
-import {RetentionStrategyPropType, RotationStrategyPropType} from 'components/indices/Types';
-import useIndexDefaults from 'pages/useIndexDefaults';
+import { IndexSetPropType, IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
+import { RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
+import type { RetentionStrategy, RotationStrategy, RetentionStrategyContext } from 'components/indices/Types';
+import { adjustFormat } from 'util/DateTime';
 import {IndexConfig} from 'components/configurations/IndexSetsDefaultsConfig';
+import useIndexDefaults from 'pages/useIndexDefaults';
+import moment from 'moment';
 
 type Props = {
   indexSet: Partial<IndexSet> | null | undefined,
@@ -86,7 +86,7 @@ const IndexSetCreationPage = ({retentionStrategies, rotationStrategies, retentio
   const _saveConfiguration = (indexSetItem: IndexSet) => {
     const copy = indexSetItem;
 
-    copy.creation_date = DateTime.now().toISOString();
+    copy.creation_date = adjustFormat(new Date(), 'internal');
 
     IndexSetsActions.create(copy).then(() => {
       history.push(Routes.SYSTEM.INDICES.LIST);
@@ -164,7 +164,7 @@ export default connect(
     indexSets: IndexSetsStore,
     indicesConfigurations: IndicesConfigurationStore,
   },
-  ({indexSets, indicesConfigurations}) => ({
+  ({ indexSets, indicesConfigurations }) => ({
     indexSet: indexSets.indexSet,
     rotationStrategies: indicesConfigurations.rotationStrategies,
     retentionStrategies: indicesConfigurations.retentionStrategies,

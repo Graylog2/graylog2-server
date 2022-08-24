@@ -24,7 +24,7 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { validationError, validationErrorExplanation } from 'fixtures/queryValidationState';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import asMock from '../../../../../test/helpers/mocking/AsMock';
 
@@ -50,9 +50,8 @@ jest.mock('views/stores/SearchExecutionStateStore', () => ({
   },
 }));
 
-jest.mock('views/logic/usePluginEntities');
+jest.mock('hooks/usePluginEntities');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
-jest.mock('logic/datetimes/DateTime', () => ({}));
 
 type SUTProps = {
   // eslint-disable-next-line react/require-default-props

@@ -35,7 +35,7 @@ export type IndexConfig = {
   field_type_refresh_interval_unit: "seconds" | "minutes",
 }
 
-const TIME_UNITS = ['seconds', 'minutes'];
+const TIME_UNITS = ['SECONDS', 'MINUTES'];
 
 type Props = {
   config: IndexConfig,

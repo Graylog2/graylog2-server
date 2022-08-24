@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { SearchSuggestions } from '@graylog/server-api';
-
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -70,9 +69,7 @@ describe('FieldValueCompletion', () => {
     { name: 'POST', value: 'POST', caption: 'POST', score: 300, meta: '300 hits' },
     { name: 'PUT', value: 'PUT', caption: 'PUT', score: 400, meta: '400 hits' },
   ];
-
   const createCurrentToken = (type: string, value: string, index: number, start: number) => ({ type, value, index, start });
-
   const createKeywordToken = (value: string) => createCurrentToken('keyword', value, 0, 0);
 
   beforeEach(() => {
@@ -90,6 +87,7 @@ describe('FieldValueCompletion', () => {
       timeRange: undefined,
       streams: undefined,
       fieldTypes,
+      userTimezone: 'Europe/Berlin',
     };
 
     it('returns empty list if inputs are empty', () => {

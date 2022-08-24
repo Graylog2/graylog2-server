@@ -27,7 +27,6 @@ import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import Headers from './Headers';
 
 jest.mock('components/common/Timestamp', () => 'Timestamp');
-jest.mock('logic/datetimes/DateTime', () => 'DateTime');
 
 const seriesWithName = (fn, name) => Series.forFunction(fn)
   .toBuilder()
@@ -132,10 +131,12 @@ describe('Headers', () => {
         seriesWithName('avg(foo)', 'Average Foness'),
       ];
 
-      mount((
+      const wrapper = mount((
         <RenderHeaders series={series}
                        fields={null} />
       ));
+
+      expect(wrapper).toExist();
     });
   });
 });

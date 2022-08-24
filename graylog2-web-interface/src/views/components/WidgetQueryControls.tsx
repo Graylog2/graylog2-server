@@ -48,9 +48,10 @@ import {
   executeDashboardWidgetSubmitHandler as executePluggableSubmitHandler,
   useInitialDashboardWidgetValues as usePluggableInitialValues,
   pluggableValidationPayload,
-} from 'views/components/searchbar/pluggableSearchBarControlsHandler';
+} from 'views/logic/searchbar/pluggableSearchBarControlsHandler';
 import type { SearchBarControl } from 'views/types';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
@@ -110,6 +111,7 @@ const _resetQueryOverride = () => GlobalOverrideActions.resetQuery().then(Search
 
 const useBindApplySearchControlsChanges = (formRef) => {
   const { bindApplySearchControlsChanges } = useContext(WidgetEditApplyAllChangesContext);
+  const { userTimezone } = useUserDateTime();
 
   useEffect(() => {
     bindApplySearchControlsChanges((newWidget: Widget) => {
@@ -117,7 +119,7 @@ const useBindApplySearchControlsChanges = (formRef) => {
         const { dirty, values, isValid } = formRef.current;
 
         if (dirty && isValid) {
-          const normalizedFormValues = normalizeSearchBarFormValues(values);
+          const normalizedFormValues = normalizeSearchBarFormValues(values, userTimezone);
 
           return updateWidgetSearchControls(newWidget, normalizedFormValues);
         }
@@ -125,7 +127,7 @@ const useBindApplySearchControlsChanges = (formRef) => {
 
       return undefined;
     });
-  }, [formRef, bindApplySearchControlsChanges]);
+  }, [formRef, bindApplySearchControlsChanges, userTimezone]);
 };
 
 const useInitialFormValues = (widget: Widget) => {
@@ -141,7 +143,7 @@ const useInitialFormValues = (widget: Widget) => {
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
-const _validateQueryString = (values: SearchBarFormValues, globalOverride: GlobalOverride, pluggableSearchBarControls: Array<() => SearchBarControl>) => {
+const _validateQueryString = (values: SearchBarFormValues, globalOverride: GlobalOverride, pluggableSearchBarControls: Array<() => SearchBarControl>, userTimezone: string) => {
   const request = {
     queryString: values?.queryString,
     timeRange: !isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange,
@@ -150,11 +152,12 @@ const _validateQueryString = (values: SearchBarFormValues, globalOverride: Globa
     ...pluggableValidationPayload(values, pluggableSearchBarControls),
   };
 
-  return debouncedValidateQuery(request);
+  return debouncedValidateQuery(request, userTimezone);
 };
 
 const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
   const widget = useContext(WidgetContext);
+  const { userTimezone } = useUserDateTime();
   const config = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
   const isValidatingQuery = !!useIsFetching('validateSearchQuery');
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
@@ -163,7 +166,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
   const hasQueryOverride = globalOverride?.query !== undefined;
   const formRef = useRef(null);
   const { parameters } = useParameters();
-  const validate = (values) => _validateQueryString(values, globalOverride, pluggableSearchBarControls);
+  const validate = (values) => _validateQueryString(values, globalOverride, pluggableSearchBarControls, userTimezone);
   const initialValues = useInitialFormValues(widget);
   const _onSubmit = useCallback((values) => onSubmit(values, pluggableSearchBarControls, widget), [pluggableSearchBarControls, widget]);
 

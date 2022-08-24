@@ -99,7 +99,9 @@ public class SearchJob implements ParameterProvider {
 
     @JsonProperty("execution")
     public ExecutionInfo execution() {
-        return new ExecutionInfo(resultFuture.isDone(), resultFuture.isCancelled(), !errors.isEmpty());
+        final boolean isDone = resultFuture != null && resultFuture.isDone();
+        final boolean isCancelled = resultFuture != null && resultFuture.isCancelled();
+        return new ExecutionInfo(isDone, isCancelled, !errors.isEmpty());
     }
 
     public CompletableFuture<QueryResult> getQueryResultFuture(String queryId) {

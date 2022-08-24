@@ -23,7 +23,13 @@ import moment from 'moment';
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/bootstrap';
 import { Icon, KeyCapture } from 'components/common';
 import { availableTimeRangeTypes } from 'views/Constants';
-import type { AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
+import type {
+  AbsoluteTimeRange,
+  KeywordTimeRange,
+  NoTimeRangeOverride,
+  TimeRange,
+  RelativeTimeRange,
+} from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelative } from 'views/typeGuards/timeRange';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
@@ -159,10 +165,10 @@ const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword, tab
     );
   });
 
-const dateTimeValidate = (nextTimeRange, limitDuration) => {
+const dateTimeValidate = (nextTimeRange, limitDuration, formatTime: (dateTime: DateTime, format: string) => string) => {
   let errors = {};
   const timeRange = normalizeIfClassifiedRelativeTimeRange(nextTimeRange);
-  const timeRangeErrors = validateTimeRange(timeRange, limitDuration);
+  const timeRangeErrors = validateTimeRange(timeRange, limitDuration, formatTime);
 
   if (Object.keys(timeRangeErrors).length !== 0) {
     errors = { ...errors, nextTimeRange: timeRangeErrors };
@@ -232,13 +238,13 @@ const TimeRangeDropdown = ({
                    arrowOffsetLeft={positionIsBottom ? 34 : -11}
                    title={title}>
       <Formik<TimeRangeDropDownFormValues> initialValues={{ nextTimeRange: onInitializingNextTimeRange(currentTimeRange) }}
-                                           validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
+                                           validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration, formatTime)}
                                            onSubmit={handleSubmit}
                                            validateOnMount>
         {(({ values: { nextTimeRange }, isValid, setFieldValue, submitForm }) => {
-          const handleActiveTab = (nextTab) => {
+          const handleActiveTab = (nextTab: AbsoluteTimeRange['type'] | RelativeTimeRange['type'] | KeywordTimeRange['type']) => {
             if ('type' in nextTimeRange) {
-              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab));
+              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab, formatTime));
             } else {
               setFieldValue('nextTimeRange', defaultRanges[nextTab]);
             }

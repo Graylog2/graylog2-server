@@ -18,14 +18,13 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
 import MessagePreview from './MessagePreview';
 
-jest.mock('views/logic/usePluginEntities', () => jest.fn());
-jest.mock('hooks/useUserDateTime');
+jest.mock('hooks/usePluginEntities', () => jest.fn());
 
 describe('MessagePreview', () => {
   afterEach(() => {

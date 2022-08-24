@@ -49,7 +49,7 @@ public class GeneratorTest {
 
     @Test
     public void testGenerateOverview() throws Exception {
-        Generator generator = new Generator(Collections.singleton(HelloWorldResource.class), objectMapper);
+        Generator generator = new Generator(Collections.singleton(HelloWorldResource.class), objectMapper, false);
         Map<String, Object> result = generator.generateOverview();
 
         assertEquals(ServerVersion.VERSION.toString(), result.get("apiVersion"));
@@ -61,7 +61,7 @@ public class GeneratorTest {
 
     @Test
     public void testGenerateForRoute() throws Exception {
-        Generator generator = new Generator(Collections.singleton(HelloWorldResource.class), objectMapper);
+        Generator generator = new Generator(Collections.singleton(HelloWorldResource.class), objectMapper, false);
         Map<String, Object> result = generator.generateForRoute("/system", "http://localhost:12900/");
     }
 

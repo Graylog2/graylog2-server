@@ -48,8 +48,10 @@ describe('validateQuery', () => {
     streams: ['stream-id'],
   };
 
+  const userTimezone = 'Europe/Berlin';
+
   it('calls validate API', async () => {
-    await validateQuery(validationInput);
+    await validateQuery(validationInput, userTimezone);
 
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
 
@@ -60,13 +62,17 @@ describe('validateQuery', () => {
     await validateQuery({
       ...validationInput,
       timeRange: { type: 'absolute', from: '2021-01-01 16:00:00.000', to: '2021-01-01 17:00:00.000' },
-    });
+    }, userTimezone);
 
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
 
     const expectedPayload = {
       ...requestPayload,
-      timerange: { type: 'absolute', from: '2021-01-01T22:00:00.000Z', to: '2021-01-01T23:00:00.000Z' },
+      timerange: {
+        type: 'absolute',
+        from: '2021-01-01T15:00:00.000+00:00',
+        to: '2021-01-01T16:00:00.000+00:00',
+      },
     };
 
     expect(fetch).toHaveBeenCalledWith('POST', expect.any(String), expectedPayload);
@@ -78,7 +84,7 @@ describe('validateQuery', () => {
     const result = await validateQuery({
       ...validationInput,
       timeRange: { type: 'absolute', from: '2021-01-01 16:00:00.000', to: '2021-01-01 17:00:00.000' },
-    });
+    }, userTimezone);
 
     expect(UserNotification.error).toHaveBeenCalledWith('Validating search query failed with status: Error: Unexpected error');
     expect(result).toEqual({ status: 'OK' });
