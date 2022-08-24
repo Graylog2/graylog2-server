@@ -21,16 +21,12 @@ import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EmailEventNotificationConfigEntity;
 import org.graylog.events.contentpack.entities.HttpEventNotificationConfigEntity;
-import org.graylog.events.contentpack.entities.LegacyAlarmCallbackEventNotificationConfigEntity;
 import org.graylog.events.contentpack.facade.EventDefinitionFacade;
 import org.graylog.events.contentpack.facade.NotificationFacade;
 import org.graylog.events.fields.EventFieldSpecEngine;
 import org.graylog.events.fields.providers.LookupTableFieldValueProvider;
 import org.graylog.events.fields.providers.TemplateFieldValueProvider;
 import org.graylog.events.indices.EventIndexer;
-import org.graylog.events.legacy.LegacyAlarmCallbackEventNotification;
-import org.graylog.events.legacy.LegacyAlarmCallbackEventNotificationConfig;
-import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.events.notifications.EventNotificationExecutionMetrics;
 import org.graylog.events.notifications.NotificationGracePeriodService;
@@ -88,7 +84,6 @@ public class EventsModule extends PluginModule {
         addEntityFacade(ModelTypes.EVENT_DEFINITION_V1, EventDefinitionFacade.class);
         addEntityFacade(ModelTypes.NOTIFICATION_V1, NotificationFacade.class);
 
-        addMigration(V20190722150700_LegacyAlertConditionMigration.class);
         addAuditEventTypes(EventsAuditEventTypes.class);
 
         registerJacksonSubtype(AggregationEventProcessorConfigEntity.class,
@@ -137,12 +132,6 @@ public class EventsModule extends PluginModule {
                 HTTPEventNotification.Factory.class,
                 HttpEventNotificationConfigEntity.TYPE_NAME,
                 HttpEventNotificationConfigEntity.class);
-        addNotificationType(LegacyAlarmCallbackEventNotificationConfig.TYPE_NAME,
-                LegacyAlarmCallbackEventNotificationConfig.class,
-                LegacyAlarmCallbackEventNotification.class,
-                LegacyAlarmCallbackEventNotification.Factory.class,
-                LegacyAlarmCallbackEventNotificationConfigEntity.TYPE_NAME,
-                LegacyAlarmCallbackEventNotificationConfigEntity.class);
 
         addJobSchedulerSchedule(IntervalJobSchedule.TYPE_NAME, IntervalJobSchedule.class);
         addJobSchedulerSchedule(OnceJobSchedule.TYPE_NAME, OnceJobSchedule.class);

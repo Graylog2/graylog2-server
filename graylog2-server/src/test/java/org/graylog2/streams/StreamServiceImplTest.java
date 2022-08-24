@@ -76,34 +76,6 @@ public class StreamServiceImplTest {
     }
 
     @Test
-    public void loadAllWithConfiguredAlertConditionsShouldNotFailWhenNoStreamsArePresent() {
-        final List<Stream> alertableStreams = this.streamService.loadAllWithConfiguredAlertConditions();
-
-        assertThat(alertableStreams)
-                .isNotNull()
-                .isEmpty();
-    }
-
-    @Test
-    @MongoDBFixtures("someStreamsWithoutAlertConditions.json")
-    public void loadAllWithConfiguredAlertConditionsShouldReturnNoStreams() {
-        final List<Stream> alertableStreams = this.streamService.loadAllWithConfiguredAlertConditions();
-
-        assertThat(alertableStreams)
-                .isEmpty();
-    }
-
-    @Test
-    @MongoDBFixtures({"someStreamsWithoutAlertConditions.json", "someStreamsWithAlertConditions.json"})
-    public void loadAllWithConfiguredAlertConditionsShouldReturnStreams() {
-        final List<Stream> alertableStreams = this.streamService.loadAllWithConfiguredAlertConditions();
-
-        assertThat(alertableStreams)
-                .isNotEmpty()
-                .hasSize(2);
-    }
-
-    @Test
     @MongoDBFixtures("someStreamsWithAlertConditions.json")
     public void loadByIds() {
         assertThat(this.streamService.loadByIds(ImmutableSet.of("565f02223b0c25a537197af2"))).hasSize(1);

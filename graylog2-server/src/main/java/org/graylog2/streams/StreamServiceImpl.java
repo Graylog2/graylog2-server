@@ -283,16 +283,6 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                 .collect(Collectors.toSet());
     }
 
-    @Override
-    public List<Stream> loadAllWithConfiguredAlertConditions() {
-        final DBObject query = QueryBuilder.start().and(
-                QueryBuilder.start(StreamImpl.EMBEDDED_ALERT_CONDITIONS).exists(true).get(),
-                QueryBuilder.start(StreamImpl.EMBEDDED_ALERT_CONDITIONS).not().size(0).get()
-        ).get();
-
-        return loadAll(query);
-    }
-
     protected Set<Output> loadOutputsForRawStream(DBObject stream) {
         List<ObjectId> outputIds = outputIdsForRawStream(stream);
 
@@ -360,83 +350,6 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         stream.setDisabled(false);
         final String streamId = save(stream);
         clusterEventBus.post(StreamsChangedEvent.create(streamId));
-    }
-
-    @Override
-    public List<StreamRule> getStreamRules(Stream stream) throws NotFoundException {
-        return streamRuleService.loadForStream(stream);
-    }
-
-    @Override
-    public List<AlertCondition> getAlertConditions(Stream stream) {
-        List<AlertCondition> conditions = Lists.newArrayList();
-
-        if (stream.getFields().containsKey(StreamImpl.EMBEDDED_ALERT_CONDITIONS)) {
-            @SuppressWarnings("unchecked")
-            final List<BasicDBObject> alertConditions = (List<BasicDBObject>) stream.getFields().get(StreamImpl.EMBEDDED_ALERT_CONDITIONS);
-            for (BasicDBObject conditionFields : alertConditions) {
-                try {
-                    conditions.add(alertService.fromPersisted(conditionFields, stream));
-                } catch (Exception e) {
-                    LOG.error("Skipping alert condition.", e);
-                }
-            }
-        }
-
-        return conditions;
-    }
-
-    @Override
-    public AlertCondition getAlertCondition(Stream stream, String conditionId) throws NotFoundException {
-        if (stream.getFields().containsKey(StreamImpl.EMBEDDED_ALERT_CONDITIONS)) {
-            @SuppressWarnings("unchecked")
-            final List<BasicDBObject> alertConditions = (List<BasicDBObject>) stream.getFields().get(StreamImpl.EMBEDDED_ALERT_CONDITIONS);
-            for (BasicDBObject conditionFields : alertConditions) {
-                try {
-                    if (conditionFields.get("id").equals(conditionId)) {
-                        return alertService.fromPersisted(conditionFields, stream);
-                    }
-                } catch (Exception e) {
-                    LOG.error("Skipping alert condition.", e);
-                }
-            }
-        }
-
-        throw new NotFoundException("Alert condition <" + conditionId + "> for stream <" + stream.getId() + "> not found");
-    }
-
-    @Override
-    public void addAlertCondition(Stream stream, AlertCondition condition) throws ValidationException {
-        embed(stream, StreamImpl.EMBEDDED_ALERT_CONDITIONS, (EmbeddedPersistable) condition);
-    }
-
-    @Override
-    public void updateAlertCondition(Stream stream, AlertCondition condition) throws ValidationException {
-        removeAlertCondition(stream, condition.getId());
-        addAlertCondition(stream, condition);
-    }
-
-    @Override
-    public void removeAlertCondition(Stream stream, String conditionId) {
-        // Before deleting alert condition, resolve all its alerts.
-        final List<Alert> alerts = alertService.listForStreamIds(Collections.singletonList(stream.getId()), Alert.AlertState.UNRESOLVED, 0, 0);
-        alerts.stream()
-                .filter(alert -> alert.getConditionId().equals(conditionId))
-                .forEach(alertService::resolveAlert);
-
-        removeEmbedded(stream, StreamImpl.EMBEDDED_ALERT_CONDITIONS, conditionId);
-    }
-
-    @Override
-    public void addAlertReceiver(Stream stream, String type, String name) {
-        final List<AlarmCallbackConfiguration> streamCallbacks = alarmCallbackConfigurationService.getForStream(stream);
-        updateCallbackConfiguration("add", type, name, streamCallbacks);
-    }
-
-    @Override
-    public void removeAlertReceiver(Stream stream, String type, String name) {
-        final List<AlarmCallbackConfiguration> streamCallbacks = alarmCallbackConfigurationService.getForStream(stream);
-        updateCallbackConfiguration("remove", type, name, streamCallbacks);
     }
 
     // I tried to be sorry, really. https://www.youtube.com/watch?v=3KVyRqloGmk

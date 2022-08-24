@@ -482,19 +482,6 @@ public class StreamResource extends RestResource {
         final String savedStreamId = streamService.saveWithRulesAndOwnership(stream, newStreamRules.build(), userContext.getUser());
         final ObjectId savedStreamObjectId = new ObjectId(savedStreamId);
 
-        for (AlertCondition alertCondition : streamService.getAlertConditions(sourceStream)) {
-            try {
-                final AlertCondition clonedAlertCondition = alertService.fromRequest(
-                    CreateConditionRequest.create(alertCondition.getType(), alertCondition.getTitle(), alertCondition.getParameters()),
-                    stream,
-                    creatorUser
-                );
-                streamService.addAlertCondition(stream, clonedAlertCondition);
-            } catch (ConfigurationException e) {
-                LOG.warn("Unable to clone alert condition <" + alertCondition + "> - skipping: ", e);
-            }
-        }
-
         for (AlarmCallbackConfiguration alarmCallbackConfiguration : alarmCallbackConfigurationService.getForStream(sourceStream)) {
             final CreateAlarmCallbackRequest request = CreateAlarmCallbackRequest.create(alarmCallbackConfiguration);
             final AlarmCallbackConfiguration alarmCallback = alarmCallbackConfigurationService.create(stream.getId(), request, getCurrentUser().getName());
@@ -518,16 +505,6 @@ public class StreamResource extends RestResource {
     private StreamResponse streamToResponse(Stream stream) {
         final List<String> emailAlertReceivers = stream.getAlertReceivers().get("emails");
         final List<String> usersAlertReceivers = stream.getAlertReceivers().get("users");
-        final Collection<AlertConditionSummary> alertConditions = streamService.getAlertConditions(stream)
-            .stream()
-            .map((alertCondition) -> AlertConditionSummary.createWithoutGrace(
-                alertCondition.getId(),
-                alertCondition.getType(),
-                alertCondition.getCreatorUserId(),
-                alertCondition.getCreatedAt().toDate(),
-                alertCondition.getParameters(),
-                alertCondition.getTitle()))
-            .collect(Collectors.toList());
         return StreamResponse.create(
             stream.getId(),
             (String) stream.getFields().get(StreamImpl.FIELD_CREATOR_USER_ID),
@@ -537,7 +514,6 @@ public class StreamResource extends RestResource {
             stream.getFields().get(StreamImpl.FIELD_CREATED_AT).toString(),
             stream.getDisabled(),
             stream.getStreamRules(),
-            alertConditions,
             AlertReceivers.create(emailAlertReceivers, usersAlertReceivers),
             stream.getTitle(),
             stream.getContentPack(),

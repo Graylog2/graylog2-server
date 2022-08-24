@@ -61,9 +61,6 @@ public abstract class StreamResponse {
     @JsonProperty("rules")
     public abstract Collection<StreamRule> rules();
 
-    @JsonProperty("alert_conditions")
-    public abstract Collection<AlertConditionSummary> alertConditions();
-
     @JsonProperty("alert_receivers")
     public abstract AlertReceivers alertReceivers();
 
@@ -96,7 +93,6 @@ public abstract class StreamResponse {
                                         @JsonProperty("created_at") String createdAt,
                                         @JsonProperty("disabled") boolean disabled,
                                         @JsonProperty("rules") Collection<StreamRule> rules,
-                                        @JsonProperty("alert_conditions") Collection<AlertConditionSummary> alertConditions,
                                         @JsonProperty("alert_receivers") AlertReceivers alertReceivers,
                                         @JsonProperty("title") String title,
                                         @JsonProperty("content_pack") @Nullable String contentPack,
@@ -112,7 +108,6 @@ public abstract class StreamResponse {
                 createdAt,
                 disabled,
                 rules,
-                alertConditions,
                 alertReceivers,
                 title,
                 contentPack,

@@ -17,7 +17,6 @@
 package org.graylog.events.notifications;
 
 import com.google.common.collect.Sets;
-import org.graylog.events.legacy.LegacyAlarmCallbackEventNotificationConfig;
 import org.graylog.events.notifications.types.EmailEventNotificationConfig;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -57,17 +56,6 @@ public class NotificationDtoTest {
                         .bodyTemplate("bar")
                         .htmlBodyTemplate("baz")
                         .emailRecipients(Sets.newHashSet("foo@graylog.org"))
-                        .build())
-                .build();
-    }
-
-    private NotificationDto getLegacyNotification() {
-        return NotificationDto.builder()
-                .title("Foobar")
-                .description("")
-                .config(LegacyAlarmCallbackEventNotificationConfig.Builder.create()
-                        .callbackType("foo")
-                        .configuration(new HashMap<>())
                         .build())
                 .build();
     }
@@ -118,17 +106,6 @@ public class NotificationDtoTest {
         assertThat(validationResult.getErrors()).containsOnlyKeys("subject", "body", "recipients");
     }
 
-    @Test
-    public void testValidateLegacyWithEmptyConfigParameters() {
-        final LegacyAlarmCallbackEventNotificationConfig emptyConfig = LegacyAlarmCallbackEventNotificationConfig.Builder.create()
-                .callbackType("")
-                .configuration(new HashMap<>())
-                .build();
-        final NotificationDto emptyNotification = getLegacyNotification().toBuilder().config(emptyConfig).build();
-        final ValidationResult validationResult = emptyNotification.validate();
-        assertThat(validationResult.failed()).isTrue();
-        assertThat(validationResult.getErrors()).containsOnlyKeys("callback_type");
-    }
 
     @Test
     public void testValidHttpNotification() {
@@ -161,15 +138,6 @@ public class NotificationDtoTest {
     @Test
     public void testValidEmailNotification() {
         final NotificationDto validNotification = getEmailNotification();
-
-        final ValidationResult validationResult = validNotification.validate();
-        assertThat(validationResult.failed()).isFalse();
-        assertThat(validationResult.getErrors()).isEmpty();
-    }
-
-    @Test
-    public void testValidLegacyNotification() {
-        final NotificationDto validNotification = getLegacyNotification();
 
         final ValidationResult validationResult = validNotification.validate();
         assertThat(validationResult.failed()).isFalse();

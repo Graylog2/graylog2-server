@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog.events.legacy.LegacyAlarmCallbackEventNotificationConfig;
 import org.graylog.events.notifications.DBNotificationService;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.NotificationDto;
@@ -124,10 +123,6 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
         String url = "";
         if (config instanceof HTTPEventNotificationConfig) {
             url = ((HTTPEventNotificationConfig) config).url();
-        } else if (config instanceof LegacyAlarmCallbackEventNotificationConfig) {
-            url = Objects.toString(((LegacyAlarmCallbackEventNotificationConfig) config).configuration()
-                    .get("url"), "");
-
         }
 
         if (StringUtils.isNotBlank(url)) {

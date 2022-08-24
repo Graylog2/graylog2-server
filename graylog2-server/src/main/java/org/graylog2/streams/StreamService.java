@@ -62,25 +62,6 @@ public interface StreamService extends PersistedService {
 
     void resume(Stream stream) throws ValidationException;
 
-    List<StreamRule> getStreamRules(Stream stream) throws NotFoundException;
-
-    List<Stream> loadAllWithConfiguredAlertConditions();
-
-    List<AlertCondition> getAlertConditions(Stream stream);
-
-    AlertCondition getAlertCondition(Stream stream, String conditionId) throws NotFoundException;
-
-    void addAlertCondition(Stream stream, AlertCondition condition) throws ValidationException;
-
-    void updateAlertCondition(Stream stream, AlertCondition condition) throws ValidationException;
-
-    void removeAlertCondition(Stream stream, String conditionId);
-
-    @Deprecated
-    void addAlertReceiver(Stream stream, String type, String name);
-
-    @Deprecated
-    void removeAlertReceiver(Stream stream, String type, String name);
 
     void addOutput(Stream stream, Output output);
 

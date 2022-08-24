@@ -86,18 +86,15 @@ public class EventNotificationsResource extends RestResource implements PluginRe
             .build();
 
     private final DBNotificationService dbNotificationService;
-    private final Set<AlarmCallback> availableLegacyAlarmCallbacks;
     private final SearchQueryParser searchQueryParser;
     private final NotificationResourceHandler resourceHandler;
     private final EmailConfiguration emailConfiguration;
 
     @Inject
     public EventNotificationsResource(DBNotificationService dbNotificationService,
-                                      Set<AlarmCallback> availableLegacyAlarmCallbacks,
                                       NotificationResourceHandler resourceHandler,
                                       EmailConfiguration emailConfiguration) {
         this.dbNotificationService = dbNotificationService;
-        this.availableLegacyAlarmCallbacks = availableLegacyAlarmCallbacks;
         this.resourceHandler = resourceHandler;
         this.searchQueryParser = new SearchQueryParser(NotificationDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.emailConfiguration = emailConfiguration;
@@ -239,22 +236,6 @@ public class EventNotificationsResource extends RestResource implements PluginRe
         resourceHandler.test(dto, getSubject().getPrincipal().toString());
 
         return Response.ok().build();
-    }
-
-    @GET
-    @Path("/legacy/types")
-    @ApiOperation("List all available legacy alarm callback types")
-    public Response legacyTypes() {
-        final ImmutableMap.Builder<String, Map<String, Object>> typesBuilder = ImmutableMap.builder();
-
-        for (AlarmCallback availableAlarmCallback : availableLegacyAlarmCallbacks) {
-            typesBuilder.put(availableAlarmCallback.getClass().getCanonicalName(), ImmutableMap.of(
-                    "name", availableAlarmCallback.getName(),
-                    "configuration", getConfigurationRequest(availableAlarmCallback).asList()
-            ));
-        }
-
-        return Response.ok(ImmutableMap.of("types", typesBuilder.build())).build();
     }
 
     // This is used to add user auto-completion to EmailAlarmCallback when the current user has permissions to list users
