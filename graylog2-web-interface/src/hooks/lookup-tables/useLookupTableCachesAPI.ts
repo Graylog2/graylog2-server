@@ -43,7 +43,7 @@ export const useGetAllCaches = ({ page, perPage, query }: GetAllCachesType = {})
       count: 0,
       total: 0,
       page: 1,
-      per_page: 10,
+      perPage: 10,
       query: null,
     },
   };
@@ -54,7 +54,7 @@ export const useGetAllCaches = ({ page, perPage, query }: GetAllCachesType = {})
       count: data.count,
       total: data.total,
       page: data.page,
-      per_page: data.per_page,
+      perPage: data.per_page,
       query: data.query,
     },
   };
