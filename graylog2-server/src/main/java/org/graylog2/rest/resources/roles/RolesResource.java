@@ -66,12 +66,13 @@ import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static javax.ws.rs.core.Response.status;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @Path("/roles")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Api(value = "Roles", description = "User roles")
+@Api(value = "Roles", description = "User roles", tags = {CLOUD_VISIBLE})
 public class RolesResource extends RestResource {
     private static final Logger log = LoggerFactory.getLogger(RolesResource.class);
 

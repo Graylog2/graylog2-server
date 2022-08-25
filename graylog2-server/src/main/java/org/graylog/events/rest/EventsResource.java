@@ -35,8 +35,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Events", description = "Events overview and search")
+@Api(value = "Events", description = "Events overview and search", tags = {CLOUD_VISIBLE})
 @Path("/events")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)

@@ -80,6 +80,8 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity> {
         return Builder.builder();
     }
 
+    public abstract Builder toBuilder();
+
     @AutoValue.Builder
     public static abstract class Builder {
         @JsonProperty(FIELD_ID)

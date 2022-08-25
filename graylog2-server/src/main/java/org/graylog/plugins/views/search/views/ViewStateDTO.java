@@ -76,6 +76,8 @@ public abstract class ViewStateDTO implements ContentPackable<ViewStateEntity> {
         return Builder.create();
     }
 
+    public abstract Builder toBuilder();
+
     @JsonIgnore
     public Optional<String> title() {
         return Optional.ofNullable(titles())

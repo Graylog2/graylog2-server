@@ -19,4 +19,6 @@ package org.graylog.plugins.views.search.searchfilters.model;
 public interface ReferencedSearchFilter extends UsedSearchFilter {
 
     String id();
+
+    InlineQueryStringSearchFilter toInlineRepresentation();
 }
