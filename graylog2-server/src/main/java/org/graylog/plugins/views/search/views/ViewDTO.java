@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.views;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -65,12 +66,14 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
 
     public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT);
 
+    @Override
     @ObjectId
     @Id
     @Nullable
     @JsonProperty(FIELD_ID)
     public abstract String id();
 
+    @Override
     @JsonProperty(FIELD_TYPE)
     public abstract Type type();
 
@@ -132,6 +135,15 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
                 .flatMap(q -> q.widgets().stream())
                 .filter(w -> w.id().equals(widgetId))
                 .findFirst();
+    }
+
+    @JsonIgnore
+    public Set<WidgetDTO> getAllWidgets() {
+        return this.state()
+                .values()
+                .stream()
+                .flatMap(q -> q.widgets().stream())
+                .collect(Collectors.toSet());
     }
 
     @AutoValue.Builder
