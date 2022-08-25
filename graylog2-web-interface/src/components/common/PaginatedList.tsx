@@ -16,7 +16,6 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useState, useEffect } from 'react';
 
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 
@@ -52,44 +51,43 @@ const PaginatedList = ({
   hideFirstAndLastPageLinks,
   hidePreviousAndNextPageLinks,
   onChange,
-  pageSize: propsPageSize,
+  pageSize,
   pageSizes,
   showPageSizeSelect,
   totalItems,
 }: Props) => {
-  const initialPage = activePage > 0 ? activePage : INITIAL_PAGE;
-  const [pageSize, setPageSize] = useState(propsPageSize);
-  const [currentPage, setCurrentPage] = useState(initialPage);
-  const numberPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 0;
+  const [{ currentPage, currentPageSize }, setPagination] = React.useState({
+    currentPage: activePage > 0 ? activePage : INITIAL_PAGE,
+    currentPageSize: pageSize,
+  });
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (activePage > 0) {
-      setCurrentPage(activePage);
+      setPagination({ currentPage: activePage, currentPageSize: pageSize });
     }
-  }, [activePage]);
+  }, [activePage, pageSize]);
 
-  useEffect(() => {
-    setPageSize(propsPageSize);
-  }, [propsPageSize]);
+  const numberPages = React.useMemo(() => (
+    currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
+  ), [currentPageSize, totalItems]);
 
   const _onChangePageSize = (event: React.ChangeEvent<HTMLOptionElement>) => {
     event.preventDefault();
     const newPageSize = Number(event.target.value);
 
-    setCurrentPage(INITIAL_PAGE);
-    setPageSize(newPageSize);
+    setPagination({ currentPage: INITIAL_PAGE, currentPageSize: newPageSize });
     onChange(INITIAL_PAGE, newPageSize);
   };
 
   const _onChangePage = (pageNum: number) => {
-    setCurrentPage(pageNum);
-    onChange(pageNum, pageSize);
+    setPagination({ currentPage: pageNum, currentPageSize });
+    onChange(pageNum, currentPageSize);
   };
 
   return (
     <>
       {showPageSizeSelect && (
-        <PageSizeSelect pageSizes={pageSizes} pageSize={pageSize} onChange={_onChangePageSize} />
+        <PageSizeSelect pageSizes={pageSizes} pageSize={currentPageSize} onChange={_onChangePageSize} />
       )}
 
       {children}
