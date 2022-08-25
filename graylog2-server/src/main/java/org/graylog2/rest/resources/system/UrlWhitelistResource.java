@@ -47,8 +47,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @RequiresAuthentication
-@Api(value = "System/UrlWhitelist")
+@Api(value = "System/UrlWhitelist", tags = {CLOUD_VISIBLE})
 @Path("/system/urlwhitelist")
 @Produces(MediaType.APPLICATION_JSON)
 public class UrlWhitelistResource extends RestResource {
