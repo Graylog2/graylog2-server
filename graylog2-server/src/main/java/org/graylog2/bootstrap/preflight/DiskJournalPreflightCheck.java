@@ -42,19 +42,15 @@ public class DiskJournalPreflightCheck implements PreflightCheck {
     private final Path journalDirectory;
     private final Size journalMaxSize;
 
-    private final boolean isFreshInstallation;
-
     @Inject
     public DiskJournalPreflightCheck(Configuration configuration,
                                      FsProbe fsProbe,
                                      @Named("message_journal_dir") Path journalDirectory,
-                                     @Named("message_journal_max_size") Size journalMaxSize,
-                                     @Named("isFreshInstallation") boolean isFreshInstallation) {
+                                     @Named("message_journal_max_size") Size journalMaxSize) {
         this.configuration = configuration;
         this.fsProbe = fsProbe;
         this.journalDirectory = journalDirectory;
         this.journalMaxSize = journalMaxSize;
-        this.isFreshInstallation = isFreshInstallation;
     }
 
     @Override
@@ -85,9 +81,6 @@ public class DiskJournalPreflightCheck implements PreflightCheck {
                         journalDirectory.toAbsolutePath(),
                         journalFs.sysTypeName()
                 );
-                if (isFreshInstallation) {
-                    throw new PreflightCheckException(message);
-                }
                 LOG.warn(message);
             }
         } else {

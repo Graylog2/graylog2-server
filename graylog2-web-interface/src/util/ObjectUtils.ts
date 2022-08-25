@@ -24,6 +24,20 @@ const ObjectUtils = {
 
     return keys && keys.length === 0;
   },
+
+  trimObjectFields(obj: object, fieldsToTrim: string[]) {
+    const newObj = { ...obj };
+
+    if (fieldsToTrim.length > 0) {
+      fieldsToTrim.forEach((field) => {
+        if (field in obj && typeof obj[field] === 'string') {
+          newObj[field] = obj[field].trim();
+        }
+      });
+    }
+
+    return newObj;
+  },
 };
 
 export default ObjectUtils;

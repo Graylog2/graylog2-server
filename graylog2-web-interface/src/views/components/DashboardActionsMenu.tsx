@@ -75,8 +75,8 @@ const DashboardActionsMenu = ({ view, isNewView, metadata }) => {
   const debugOverlay = AppConfig.gl2DevMode() && (
     <>
       <MenuItem divider />
-      <MenuItem onSelect={() => setDebugOpen(true)}>
-        <Icon name="code" /> Debug
+      <MenuItem onSelect={() => setDebugOpen(true)} icon="code">
+        Debug
       </MenuItem>
     </>
   );
@@ -117,15 +117,15 @@ const DashboardActionsMenu = ({ view, isNewView, metadata }) => {
                    disabledInfo={isNewView && 'Only saved dashboards can be shared.'} />
       )}
       {showDropDownButton && (
-      <DropdownButton title={<Icon name="ellipsis-h" />} id="query-tab-actions-dropdown" pullRight noCaret>
-        <MenuItem onSelect={() => setEditDashboardOpen(true)} disabled={isNewView || !allowedToEdit}>
-          <Icon name="edit" /> Edit metadata
-        </MenuItem>
-        <MenuItem onSelect={() => setExportOpen(true)}><Icon name="cloud-download-alt" /> Export</MenuItem>
-        {debugOverlay}
-        <MenuItem divider />
-        <BigDisplayModeConfiguration view={view} disabled={isNewView} />
-      </DropdownButton>
+        <DropdownButton title={<Icon name="ellipsis-h" />} id="query-tab-actions-dropdown" pullRight noCaret>
+          <MenuItem onSelect={() => setEditDashboardOpen(true)} disabled={isNewView || !allowedToEdit} icon="edit">
+            Edit metadata
+          </MenuItem>
+          <MenuItem onSelect={() => setExportOpen(true)} icon="cloud-download-alt">Export</MenuItem>
+          {debugOverlay}
+          <MenuItem divider />
+          <BigDisplayModeConfiguration view={view} disabled={isNewView} />
+        </DropdownButton>
       )}
       {debugOpen && <DebugOverlay show onClose={() => setDebugOpen(false)} />}
       {saveNewDashboardOpen && (

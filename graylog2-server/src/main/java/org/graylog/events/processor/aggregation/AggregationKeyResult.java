@@ -31,6 +31,7 @@ import java.util.Optional;
 public abstract class AggregationKeyResult {
     public abstract ImmutableList<String> key();
 
+    // timestamp() is set to the end of the date range.
     public abstract Optional<DateTime> timestamp();
 
     public abstract ImmutableList<AggregationSeriesValue> seriesValues();
@@ -42,7 +43,7 @@ public abstract class AggregationKeyResult {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public abstract static class Builder {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_AggregationKeyResult.Builder();
