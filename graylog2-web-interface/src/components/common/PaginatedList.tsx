@@ -79,10 +79,14 @@ const PaginatedList = ({
     onChange(INITIAL_PAGE, newPageSize);
   };
 
-  const _onChangePage = (pageNum: number) => {
+  const _onChangePage = React.useCallback((pageNum: number) => {
     setPagination({ currentPage: pageNum, currentPageSize });
     onChange(pageNum, currentPageSize);
-  };
+  }, [onChange, currentPageSize]);
+
+  React.useEffect(() => {
+    if (numberPages > 0 && currentPage > numberPages) _onChangePage(numberPages);
+  }, [currentPage, numberPages, _onChangePage]);
 
   return (
     <>
