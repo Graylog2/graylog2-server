@@ -52,7 +52,7 @@ const CachePicker = ({ caches }: Props) => {
              required
              autoFocus
              bsStyle={errorMessage ? 'error' : undefined}
-             help={errorMessage || 'Search by cache name'}
+             help={errorMessage || 'Select an existing cache'}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9">
         <Select placeholder="Select a cache"
