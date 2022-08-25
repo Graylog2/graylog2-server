@@ -44,8 +44,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
 @RequiresAuthentication
 @Api(value = "Indexer/Indices/Templates", description = "Index Template Management")
 @Path("/system/indexer/indices/templates")
