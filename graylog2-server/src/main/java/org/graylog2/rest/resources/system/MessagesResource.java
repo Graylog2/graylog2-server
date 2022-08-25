@@ -40,8 +40,10 @@ import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Map;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @RequiresAuthentication
-@Api(value = "System/Messages", description = "Internal Graylog messages")
+@Api(value = "System/Messages", description = "Internal Graylog messages", tags = {CLOUD_VISIBLE})
 @Path("/system/messages")
 public class MessagesResource extends RestResource {
     private final SystemMessageService systemMessageService;

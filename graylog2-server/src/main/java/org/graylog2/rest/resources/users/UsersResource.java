@@ -109,6 +109,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.maxBy;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_PERMISSIONSEDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
@@ -120,7 +121,7 @@ import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
 @Path("/users")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Api(value = "Users", description = "User accounts")
+@Api(value = "Users", description = "User accounts", tags = {CLOUD_VISIBLE})
 public class UsersResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(UsersResource.class);
 

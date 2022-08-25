@@ -114,9 +114,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Streams", description = "Manage streams")
+@Api(value = "Streams", description = "Manage streams", tags = {CLOUD_VISIBLE})
 @Path("/streams")
 public class StreamResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(StreamResource.class);
