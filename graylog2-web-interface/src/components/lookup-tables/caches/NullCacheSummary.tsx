@@ -14,16 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const ObjectUtils = {
-  clone(object) {
-    return JSON.parse(JSON.stringify(object));
-  },
+import * as React from 'react';
 
-  isEmpty(object) {
-    const keys = Object.keys(object);
+const NullCacheSummary = () => (<p>This cache has no configuration.</p>);
 
-    return keys && keys.length === 0;
-  },
-};
-
-export default ObjectUtils;
+export default NullCacheSummary;

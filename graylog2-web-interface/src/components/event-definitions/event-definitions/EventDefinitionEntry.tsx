@@ -79,10 +79,10 @@ const EventDefinitionEntry = ({
 }: Props) => {
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const isScheduled = lodash.get(context, `scheduler.${eventDefinition.id}.is_scheduled`, true);
-  const { isLoading, data } = useGetPermissionsByScope(eventDefinition?._scope || 'DEFAULT');
+  const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(eventDefinition);
 
   const showActions = (): boolean => {
-    return data.is_mutable;
+    return scopePermissions?.is_mutable;
   };
 
   const handleCopy = () => {
@@ -144,7 +144,7 @@ const EventDefinitionEntry = ({
 
   const linkTitle = <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{eventDefinition.title}</Link>;
 
-  if (isLoading) {
+  if (loadingScopePermissions) {
     return (
       <Spinner text="Loading Event Definitions" />
     );

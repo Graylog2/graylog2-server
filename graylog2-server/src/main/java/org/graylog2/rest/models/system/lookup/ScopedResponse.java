@@ -14,17 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+package org.graylog2.rest.models.system.lookup;
 
-class NullCacheSummary extends React.Component {
-  static propTypes = {
-    cache: PropTypes.object.isRequired,
-  };
+public interface ScopedResponse {
+    String FIELD_SCOPE = "_scope";
 
-  render() {
-    return (<p>This cache has no configuration.</p>);
-  }
+    String scope();
 }
-
-export default NullCacheSummary;

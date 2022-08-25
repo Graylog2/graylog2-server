@@ -14,23 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+const ObjectUtils = {
+  clone(object) {
+    return JSON.parse(JSON.stringify(object));
+  },
 
-class NullCacheFieldSet extends React.Component {
-  static propTypes = {
-    config: PropTypes.object.isRequired,
-    updateConfig: PropTypes.func.isRequired,
-    handleFormEvent: PropTypes.func.isRequired,
-    // eslint-disable-next-line react/no-unused-prop-types
-    validationState: PropTypes.func.isRequired,
-    // eslint-disable-next-line react/no-unused-prop-types
-    validationMessage: PropTypes.func.isRequired,
-  };
+  isEmpty(object) {
+    const keys = Object.keys(object);
 
-  render() {
-    return null;
-  }
-}
+    return keys && keys.length === 0;
+  },
 
-export default NullCacheFieldSet;
+  trimObjectFields(obj: object, fieldsToTrim: string[]) {
+    const newObj = { ...obj };
+
+    if (fieldsToTrim.length > 0) {
+      fieldsToTrim.forEach((field) => {
+        if (field in obj && typeof obj[field] === 'string') {
+          newObj[field] = obj[field].trim();
+        }
+      });
+    }
+
+    return newObj;
+  },
+};
+
+export default ObjectUtils;

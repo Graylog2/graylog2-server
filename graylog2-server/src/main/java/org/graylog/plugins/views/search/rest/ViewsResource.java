@@ -168,7 +168,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
      *           up in the database.
      * @return An optional view.
      */
-    private ViewDTO resolveView(String id) {
+    ViewDTO resolveView(String id) {
         final ViewResolverDecoder decoder = new ViewResolverDecoder(id);
         if (decoder.isResolverViewId()) {
             final ViewResolver viewResolver = viewResolvers.get(decoder.getResolverName());
@@ -194,13 +194,13 @@ public class ViewsResource extends RestResource implements PluginRestResource {
             throw new ForbiddenException("User is not allowed to create new dashboards.");
         }
 
-        validateIntegrity(dto, searchUser);
+        validateIntegrity(dto, searchUser, true);
 
         final User user = userContext.getUser();
         return dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
     }
 
-    private void validateIntegrity(ViewDTO dto, SearchUser searchUser) {
+    private void validateIntegrity(ViewDTO dto, SearchUser searchUser, boolean newCreation) {
         final Search search = searchDomain.getForUser(dto.searchId(), searchUser)
                 .orElseThrow(() -> new BadRequestException("Search " + dto.searchId() + " not available"));
 
@@ -210,7 +210,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         final Set<String> stateQueries = dto.state().keySet();
 
-        if(!searchQueries.containsAll(stateQueries)) {
+        if (!searchQueries.containsAll(stateQueries)) {
             final Sets.SetView<String> diff = Sets.difference(searchQueries, stateQueries);
             throw new BadRequestException("Search queries do not correspond to view/state queries, missing query IDs: " + diff);
         }
@@ -244,11 +244,28 @@ public class ViewsResource extends RestResource implements PluginRestResource {
             throw new BadRequestException("Widget positions don't correspond to widgets, missing widget possitions: " + diff);
         }
 
-        final SearchFilterVisibilityCheckStatus searchFilterVisibilityCheckStatus = searchFilterVisibilityChecker.checkSearchFilterVisibility(
-                filterID -> isPermitted(RestPermissions.SEARCH_FILTERS_READ, filterID), search);
-        if (!searchFilterVisibilityCheckStatus.allSearchFiltersVisible()) {
-            throw new BadRequestException(searchFilterVisibilityCheckStatus.toMessage());
+
+        if (!newCreation) {
+            final ViewDTO originalView = resolveView(dto.id());
+            final String originalViewSearchId = originalView.searchId();
+            final Search originalSearch = searchDomain.getForUser(originalViewSearchId, searchUser)
+                    .orElseThrow(() -> new BadRequestException("Search " + originalViewSearchId + " not available"));
+
+            final Set<String> originalSearchReferencedFiltersIds = originalSearch.getReferencedSearchFiltersIds();
+
+            final SearchFilterVisibilityCheckStatus searchFilterVisibilityCheckStatus = searchFilterVisibilityChecker.checkSearchFilterVisibility(
+                    filterID -> isPermitted(RestPermissions.SEARCH_FILTERS_READ, filterID), search);
+            if (!searchFilterVisibilityCheckStatus.allSearchFiltersVisible(originalSearchReferencedFiltersIds)) {
+                throw new BadRequestException(searchFilterVisibilityCheckStatus.toMessage(originalSearchReferencedFiltersIds));
+            }
+        } else {
+            final SearchFilterVisibilityCheckStatus searchFilterVisibilityCheckStatus = searchFilterVisibilityChecker.checkSearchFilterVisibility(
+                    filterID -> isPermitted(RestPermissions.SEARCH_FILTERS_READ, filterID), search);
+            if (!searchFilterVisibilityCheckStatus.allSearchFiltersVisible()) {
+                throw new BadRequestException(searchFilterVisibilityCheckStatus.toMessage());
+            }
         }
+
     }
 
     @PUT
@@ -263,7 +280,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
             throw new ForbiddenException("Not allowed to edit " + summarize(updatedDTO) + ".");
         }
 
-        validateIntegrity(updatedDTO, searchUser);
+        validateIntegrity(updatedDTO, searchUser, false);
 
         return dbService.update(updatedDTO);
     }
