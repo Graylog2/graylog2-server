@@ -48,8 +48,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @RequiresAuthentication
-@Api(value = "Search/Decorators", description = "Message search decorators")
+@Api(value = "Search/Decorators", description = "Message search decorators", tags = {CLOUD_VISIBLE})
 @Path("/search/decorators")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)

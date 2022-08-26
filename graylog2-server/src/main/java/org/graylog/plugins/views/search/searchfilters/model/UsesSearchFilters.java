@@ -14,19 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bindings;
+package org.graylog.plugins.views.search.searchfilters.model;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
-import org.graylog2.filters.ExtractorFilter;
-import org.graylog2.filters.StaticFieldFilter;
-import org.graylog2.plugin.filters.MessageFilter;
+import java.util.List;
 
-public class MessageFilterBindings extends AbstractModule {
-    @Override
-    protected void configure() {
-        Multibinder<MessageFilter> messageFilters = Multibinder.newSetBinder(binder(), MessageFilter.class);
-        messageFilters.addBinding().to(StaticFieldFilter.class);
-        messageFilters.addBinding().to(ExtractorFilter.class);
-    }
+public interface UsesSearchFilters {
+
+    List<UsedSearchFilter> filters();
 }

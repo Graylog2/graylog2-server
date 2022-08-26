@@ -39,9 +39,10 @@ import java.util.Map;
 import java.util.Set;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "System/Fields", description = "Get list of message fields that exist.")
+@Api(value = "System/Fields", description = "Get list of message fields that exist.", tags = {CLOUD_VISIBLE})
 @Path("/system/fields")
 public class SystemFieldsResource extends RestResource {
     private final Indices indices;
