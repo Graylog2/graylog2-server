@@ -27,7 +27,7 @@ import type { LookupTableCache } from 'logic/lookup-tables/types';
 import CacheTableEntry from './CacheTableEntry';
 import Styles from './Overview.css';
 
-const HelpPopover = () => {
+const getHelpPopover = () => {
   return (
     <Popover id="search-query-help"
              className={Styles.popoverWide}
@@ -117,7 +117,7 @@ const CachesOverview = () => {
                     style={{ marginLeft: 5 }}>
               Create cache
             </Button>
-            <OverlayTrigger trigger="click" rootClose placement="right" overlay={<HelpPopover />}>
+            <OverlayTrigger trigger="click" rootClose placement="right" overlay={getHelpPopover()}>
               <Button bsStyle="link"
                       className={Styles.searchHelpButton}>
                 <Icon name="question-circle" fixedWidth />
