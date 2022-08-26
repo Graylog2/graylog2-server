@@ -74,7 +74,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -254,28 +253,25 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
 
         if (!newCreation) {
-            final Optional<ViewDTO> originalView = dbService.get(dto.id());
-            if (originalView.isPresent()) {
-                final String originalViewSearchId = originalView.get().searchId();
-                final Search originalSearch = searchDomain.getForUser(originalViewSearchId, searchUser)
-                        .orElseThrow(() -> new BadRequestException("Search " + originalViewSearchId + " not available"));
+            final ViewDTO originalView = dbService.get(dto.id()).orElseThrow(() -> new BadRequestException("Cannot update a view that does not exist : id = " + dto.id()));
+            final String originalViewSearchId = originalView.searchId();
+            final Search originalSearch = searchDomain.getForUser(originalViewSearchId, searchUser)
+                    .orElseThrow(() -> new BadRequestException("Search " + originalViewSearchId + " not available"));
 
-                final Set<UsesSearchFilters> originalSearchFilterOwners = getSearchFiltersOwners(originalView.get(), originalSearch);
-                final Set<String> originalReferencedSearchFiltersIds = referencedSearchFiltersRetriever.getReferencedSearchFiltersIds(originalSearchFilterOwners);
-                final Set<UsesSearchFilters> newSearchFilterOwners = getSearchFiltersOwners(dto, search);
-                final Set<String> newReferencedSearchFiltersIds = referencedSearchFiltersRetriever.getReferencedSearchFiltersIds(newSearchFilterOwners);
+            final Set<UsesSearchFilters> originalSearchFilterUsages = getSearchFiltersUsages(originalView, originalSearch);
+            final Set<String> originalReferencedSearchFiltersIds = referencedSearchFiltersRetriever.getReferencedSearchFiltersIds(originalSearchFilterUsages);
+            final Set<UsesSearchFilters> newSearchFilterUsages = getSearchFiltersUsages(dto, search);
+            final Set<String> newReferencedSearchFiltersIds = referencedSearchFiltersRetriever.getReferencedSearchFiltersIds(newSearchFilterUsages);
 
-                final SearchFilterVisibilityCheckStatus searchFilterVisibilityCheckStatus = searchFilterVisibilityChecker.checkSearchFilterVisibility(
-                        filterID -> isPermitted(RestPermissions.SEARCH_FILTERS_READ, filterID), newReferencedSearchFiltersIds);
-                if (!searchFilterVisibilityCheckStatus.allSearchFiltersVisible(originalReferencedSearchFiltersIds)) {
-                    throw new BadRequestException(searchFilterVisibilityCheckStatus.toMessage(originalReferencedSearchFiltersIds));
-                }
-            } else {
-                throw new BadRequestException("Cannot update a view that does not exist : id = " + dto.id());
+            final SearchFilterVisibilityCheckStatus searchFilterVisibilityCheckStatus = searchFilterVisibilityChecker.checkSearchFilterVisibility(
+                    filterID -> isPermitted(RestPermissions.SEARCH_FILTERS_READ, filterID), newReferencedSearchFiltersIds);
+            if (!searchFilterVisibilityCheckStatus.allSearchFiltersVisible(originalReferencedSearchFiltersIds)) {
+                throw new BadRequestException(searchFilterVisibilityCheckStatus.toMessage(originalReferencedSearchFiltersIds));
             }
+
         } else {
-            final Set<UsesSearchFilters> newSearchFilterOwners = getSearchFiltersOwners(dto, search);
-            final Set<String> newReferencedSearchFiltersIds = referencedSearchFiltersRetriever.getReferencedSearchFiltersIds(newSearchFilterOwners);
+            final Set<UsesSearchFilters> newSearchFilterUsages = getSearchFiltersUsages(dto, search);
+            final Set<String> newReferencedSearchFiltersIds = referencedSearchFiltersRetriever.getReferencedSearchFiltersIds(newSearchFilterUsages);
             final SearchFilterVisibilityCheckStatus searchFilterVisibilityCheckStatus = searchFilterVisibilityChecker.checkSearchFilterVisibility(
                     filterID -> isPermitted(RestPermissions.SEARCH_FILTERS_READ, filterID), newReferencedSearchFiltersIds);
             if (!searchFilterVisibilityCheckStatus.allSearchFiltersVisible()) {
@@ -285,12 +281,12 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
     }
 
-    private Set<UsesSearchFilters> getSearchFiltersOwners(final ViewDTO view, final Search referencedSearch) {
-        final Set<UsesSearchFilters> searchFilterOwners = new HashSet<>(referencedSearch.queries());
+    private Set<UsesSearchFilters> getSearchFiltersUsages(final ViewDTO view, final Search referencedSearch) {
+        final Set<UsesSearchFilters> searchFilterUsages = new HashSet<>(referencedSearch.queries());
         if (view.type() == ViewDTO.Type.DASHBOARD) {
-            searchFilterOwners.addAll(view.getAllWidgets());
+            searchFilterUsages.addAll(view.getAllWidgets());
         }
-        return searchFilterOwners;
+        return searchFilterUsages;
     }
 
     @PUT
