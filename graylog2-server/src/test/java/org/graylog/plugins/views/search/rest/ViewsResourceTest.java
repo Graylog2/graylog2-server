@@ -182,7 +182,6 @@ public class ViewsResourceTest {
     @Test
     public void throwsExceptionWhenUpdatingSearchWithFilterThatUserIsNotAllowedToSee() throws Exception {
         prepareUpdate(ViewDTO.Type.SEARCH);
-        doReturn(Collections.emptySet()).when(referencedSearchFiltersRetriever).getReferencedSearchFiltersIds(any());
         doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<You cannot see this filter>>")))
                 .when(searchFilterVisibilityChecker)
                 .checkSearchFilterVisibility(any(), any());
