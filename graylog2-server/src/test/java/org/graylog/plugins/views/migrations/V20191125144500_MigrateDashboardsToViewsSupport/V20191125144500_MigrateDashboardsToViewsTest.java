@@ -88,7 +88,7 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
 
         @Override
         public String get() {
-            return new ObjectId(date, counter.incrementAndGet()).toHexString();
+            return ObjectId.getSmallestWithDate((new Date(counter.addAndGet(1000)))).toHexString();
         }
     }
 
