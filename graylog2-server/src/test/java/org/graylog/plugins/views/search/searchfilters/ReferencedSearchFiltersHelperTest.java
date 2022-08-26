@@ -34,13 +34,13 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ReferencedSearchFiltersRetrieverTest {
+class ReferencedSearchFiltersHelperTest {
 
-    private ReferencedSearchFiltersRetriever toTest;
+    private ReferencedSearchFiltersHelper toTest;
 
     @BeforeEach
     void setUp() {
-        toTest = new ReferencedSearchFiltersRetriever();
+        toTest = new ReferencedSearchFiltersHelper();
     }
 
     @Test

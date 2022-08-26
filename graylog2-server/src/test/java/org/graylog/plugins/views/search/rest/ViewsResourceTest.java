@@ -22,7 +22,7 @@ import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.plugins.views.search.searchfilters.ReferencedSearchFiltersRetriever;
+import org.graylog.plugins.views.search.searchfilters.ReferencedSearchFiltersHelper;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityCheckStatus;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityChecker;
 import org.graylog.plugins.views.search.views.ViewDTO;
@@ -108,13 +108,13 @@ public class ViewsResourceTest {
     private SearchFilterVisibilityChecker searchFilterVisibilityChecker;
 
     @Mock
-    private ReferencedSearchFiltersRetriever referencedSearchFiltersRetriever;
+    private ReferencedSearchFiltersHelper referencedSearchFiltersHelper;
 
     private ViewsResource viewsResource;
 
     @BeforeEach
     public void setUp() {
-        this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain, referencedSearchFiltersRetriever);
+        this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain, referencedSearchFiltersHelper);
         when(searchUser.canCreateDashboards()).thenReturn(true);
         this.search = mock(Search.class, RETURNS_DEEP_STUBS);
         doReturn(SEARCH_ID).when(search).id();
@@ -125,12 +125,12 @@ public class ViewsResourceTest {
     }
 
     class ViewsTestResource extends ViewsResource {
-        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain, ReferencedSearchFiltersRetriever referencedSearchFiltersRetriever) {
-            this(viewService, clusterEventBus, userService, searchDomain, new HashMap<>(), referencedSearchFiltersRetriever);
+        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain, ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
+            this(viewService, clusterEventBus, userService, searchDomain, new HashMap<>(), referencedSearchFiltersHelper);
         }
 
-        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain, Map<String, ViewResolver> viewResolvers, ReferencedSearchFiltersRetriever referencedSearchFiltersRetriever) {
-            super(viewService, clusterEventBus, searchDomain, viewResolvers, searchFilterVisibilityChecker, referencedSearchFiltersRetriever);
+        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain, Map<String, ViewResolver> viewResolvers, ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
+            super(viewService, clusterEventBus, searchDomain, viewResolvers, searchFilterVisibilityChecker, referencedSearchFiltersHelper);
             this.userService = userService;
         }
 
@@ -192,7 +192,7 @@ public class ViewsResourceTest {
     @Test
     public void updatesSearchSuccessfullyIfInvisibleFilterWasPresentBefore() throws Exception {
         prepareUpdate(ViewDTO.Type.SEARCH);
-        doReturn(Collections.singleton("<<Hidden filter, but not added by this update>>")).when(referencedSearchFiltersRetriever).getReferencedSearchFiltersIds(any());
+        doReturn(Collections.singleton("<<Hidden filter, but not added by this update>>")).when(referencedSearchFiltersHelper).getReferencedSearchFiltersIds(any());
         doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<Hidden filter, but not added by this update>>")))
                 .when(searchFilterVisibilityChecker)
                 .checkSearchFilterVisibility(any(), any());
@@ -204,7 +204,7 @@ public class ViewsResourceTest {
     @Test
     public void throwsExceptionWhenUpdatingDashboardWithFilterThatUserIsNotAllowedToSee() throws Exception {
         prepareUpdate(ViewDTO.Type.DASHBOARD);
-        doReturn(Collections.emptySet()).when(referencedSearchFiltersRetriever).getReferencedSearchFiltersIds(any());
+        doReturn(Collections.emptySet()).when(referencedSearchFiltersHelper).getReferencedSearchFiltersIds(any());
         doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<You cannot see this filter>>")))
                 .when(searchFilterVisibilityChecker)
                 .checkSearchFilterVisibility(any(), any());
@@ -215,7 +215,7 @@ public class ViewsResourceTest {
     @Test
     public void updatesDashboardSuccessfullyIfInvisibleFilterWasPresentBefore() throws Exception {
         prepareUpdate(ViewDTO.Type.DASHBOARD);
-        doReturn(Collections.singleton("<<Hidden filter, but not added by this update>>")).when(referencedSearchFiltersRetriever).getReferencedSearchFiltersIds(any());
+        doReturn(Collections.singleton("<<Hidden filter, but not added by this update>>")).when(referencedSearchFiltersHelper).getReferencedSearchFiltersIds(any());
         doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<Hidden filter, but not added by this update>>")))
                 .when(searchFilterVisibilityChecker)
                 .checkSearchFilterVisibility(any(), any());
@@ -225,7 +225,7 @@ public class ViewsResourceTest {
     }
 
     private void prepareUpdate(final ViewDTO.Type viewType) {
-        this.viewsResource = spy(new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain, referencedSearchFiltersRetriever));
+        this.viewsResource = spy(new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain, referencedSearchFiltersHelper));
 
         ViewDTO originalView = mock(ViewDTO.class);
         final ViewDTO.Builder originalViewBuilder = mockView(viewType, originalView);
@@ -302,7 +302,7 @@ public class ViewsResourceTest {
         final String resolverName = "test-resolver";
         final Map<String, ViewResolver> viewResolvers = new HashMap<>();
         viewResolvers.put(resolverName, new TestViewResolver());
-        final ViewsResource testResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain, viewResolvers, referencedSearchFiltersRetriever);
+        final ViewsResource testResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain, viewResolvers, referencedSearchFiltersHelper);
 
         // Verify that view for valid id is found.
         when(searchUser.canReadView(any())).thenReturn(true);

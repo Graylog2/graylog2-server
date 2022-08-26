@@ -24,7 +24,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ReferencedSearchFiltersRetriever {
+public class ReferencedSearchFiltersHelper {
 
     public Set<String> getReferencedSearchFiltersIds(final Collection<UsesSearchFilters> searchFiltersOwners) {
         return searchFiltersOwners

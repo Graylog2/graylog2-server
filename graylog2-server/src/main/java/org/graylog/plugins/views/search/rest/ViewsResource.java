@@ -28,7 +28,7 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.plugins.views.search.searchfilters.ReferencedSearchFiltersRetriever;
+import org.graylog.plugins.views.search.searchfilters.ReferencedSearchFiltersHelper;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityCheckStatus;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityChecker;
 import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
@@ -97,21 +97,21 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final SearchDomain searchDomain;
     private final Map<String, ViewResolver> viewResolvers;
     private final SearchFilterVisibilityChecker searchFilterVisibilityChecker;
-    private final ReferencedSearchFiltersRetriever referencedSearchFiltersRetriever;
+    private final ReferencedSearchFiltersHelper referencedSearchFiltersHelper;
 
     @Inject
     public ViewsResource(ViewService dbService,
                          ClusterEventBus clusterEventBus, SearchDomain searchDomain,
                          Map<String, ViewResolver> viewResolvers,
                          SearchFilterVisibilityChecker searchFilterVisibilityChecker,
-                         ReferencedSearchFiltersRetriever referencedSearchFiltersRetriever) {
+                         ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
         this.dbService = dbService;
         this.clusterEventBus = clusterEventBus;
         this.searchDomain = searchDomain;
         this.viewResolvers = viewResolvers;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.searchFilterVisibilityChecker = searchFilterVisibilityChecker;
-        this.referencedSearchFiltersRetriever = referencedSearchFiltersRetriever;
+        this.referencedSearchFiltersHelper = referencedSearchFiltersHelper;
     }
 
     @GET
@@ -259,9 +259,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                     .orElseThrow(() -> new BadRequestException("Search " + originalViewSearchId + " not available"));
 
             final Set<UsesSearchFilters> originalSearchFilterUsages = getSearchFiltersUsages(originalView, originalSearch);
-            final Set<String> originalReferencedSearchFiltersIds = referencedSearchFiltersRetriever.getReferencedSearchFiltersIds(originalSearchFilterUsages);
+            final Set<String> originalReferencedSearchFiltersIds = referencedSearchFiltersHelper.getReferencedSearchFiltersIds(originalSearchFilterUsages);
             final Set<UsesSearchFilters> newSearchFilterUsages = getSearchFiltersUsages(dto, search);
-            final Set<String> newReferencedSearchFiltersIds = referencedSearchFiltersRetriever.getReferencedSearchFiltersIds(newSearchFilterUsages);
+            final Set<String> newReferencedSearchFiltersIds = referencedSearchFiltersHelper.getReferencedSearchFiltersIds(newSearchFilterUsages);
 
             final SearchFilterVisibilityCheckStatus searchFilterVisibilityCheckStatus = searchFilterVisibilityChecker.checkSearchFilterVisibility(
                     filterID -> isPermitted(RestPermissions.SEARCH_FILTERS_READ, filterID), newReferencedSearchFiltersIds);
@@ -271,7 +271,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         } else {
             final Set<UsesSearchFilters> newSearchFilterUsages = getSearchFiltersUsages(dto, search);
-            final Set<String> newReferencedSearchFiltersIds = referencedSearchFiltersRetriever.getReferencedSearchFiltersIds(newSearchFilterUsages);
+            final Set<String> newReferencedSearchFiltersIds = referencedSearchFiltersHelper.getReferencedSearchFiltersIds(newSearchFilterUsages);
             final SearchFilterVisibilityCheckStatus searchFilterVisibilityCheckStatus = searchFilterVisibilityChecker.checkSearchFilterVisibility(
                     filterID -> isPermitted(RestPermissions.SEARCH_FILTERS_READ, filterID), newReferencedSearchFiltersIds);
             if (!searchFilterVisibilityCheckStatus.allSearchFiltersVisible()) {
