@@ -146,6 +146,15 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
                 .collect(Collectors.toSet());
     }
 
+    @JsonIgnore
+    public Optional<String> queryIdOfWidget(final String widgetId) {
+        return state().entrySet().stream()
+                .filter(entry -> entry.getValue().widgets().stream().map(WidgetDTO::id).collect(Collectors.toSet()).contains(widgetId))
+                .map(Map.Entry::getKey)
+                .findFirst();
+
+    }
+
     @AutoValue.Builder
     public static abstract class Builder {
         @ObjectId
