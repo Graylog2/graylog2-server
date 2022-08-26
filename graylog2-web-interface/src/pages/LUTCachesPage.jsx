@@ -54,14 +54,17 @@ class LUTCachesPage extends React.Component {
     }
   };
 
+  // eslint-disable-next-line class-methods-use-this
   _saved = () => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
   };
 
+  // eslint-disable-next-line class-methods-use-this
   _isCreating = ({ action }) => {
     return action === 'create';
   };
 
+  // eslint-disable-next-line class-methods-use-this
   _validateCache = (adapter) => {
     LookupTableCachesActions.validate(adapter);
   };
@@ -73,7 +76,6 @@ class LUTCachesPage extends React.Component {
       validationErrors,
       types,
       caches,
-      pagination,
     } = this.props;
     let content;
     const isShowing = action === 'show';
@@ -114,8 +116,7 @@ class LUTCachesPage extends React.Component {
       content = <Spinner text="Loading caches" />;
     } else {
       content = (
-        <CachesOverview caches={caches}
-                        pagination={pagination} />
+        <CachesOverview />
       );
     }
 
@@ -153,7 +154,6 @@ LUTCachesPage.propTypes = {
   types: PropTypes.object,
   caches: PropTypes.array,
   location: PropTypes.object.isRequired,
-  pagination: PropTypes.object.isRequired,
   action: PropTypes.string,
 };
 
