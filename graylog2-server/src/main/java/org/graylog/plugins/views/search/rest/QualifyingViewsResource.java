@@ -35,7 +35,9 @@ import javax.ws.rs.core.MediaType;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-@Api(value = "Views/QualifyingViews")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "Views/QualifyingViews", tags = {CLOUD_VISIBLE})
 @Path("/views/forValue")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication

@@ -54,8 +54,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @RequiresAuthentication
-@Api(value = "Legacy/Search/Relative", description = "Message search")
+@Api(value = "Legacy/Search/Relative", description = "Message search", tags = {CLOUD_VISIBLE})
 @Path("/search/universal/relative")
 public class RelativeSearchResource extends SearchResource {
 

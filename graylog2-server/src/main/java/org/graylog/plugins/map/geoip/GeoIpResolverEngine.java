@@ -22,6 +22,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.InetAddresses;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
+import org.graylog.plugins.map.config.S3GeoIpFileService;
 import org.graylog2.plugin.Message;
 import org.graylog2.utilities.ReservedIpChecker;
 import org.slf4j.Logger;
@@ -74,10 +75,17 @@ public class GeoIpResolverEngine {
     private final boolean enforceGraylogSchema;
 
 
-    public GeoIpResolverEngine(GeoIpVendorResolverService resolverService, GeoIpResolverConfig config, MetricRegistry metricRegistry) {
+    public GeoIpResolverEngine(GeoIpVendorResolverService resolverService, GeoIpResolverConfig config, S3GeoIpFileService s3GeoIpFileService,
+                               MetricRegistry metricRegistry) {
         Timer resolveTime = metricRegistry.timer(name(GeoIpResolverEngine.class, "resolveTime"));
 
         enforceGraylogSchema = config.enforceGraylogSchema();
+        if (config.useS3()) {
+            config = config.toBuilder()
+                    .asnDbPath(s3GeoIpFileService.getActiveAsnFile())
+                    .cityDbPath(s3GeoIpFileService.getActiveCityFile())
+                    .build();
+        }
         ipLocationResolver = resolverService.createCityResolver(config, resolveTime);
         ipAsnResolver = resolverService.createAsnResolver(config, resolveTime);
 

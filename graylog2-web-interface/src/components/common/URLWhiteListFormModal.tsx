@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useContext, useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 
+import useCurrentUser from 'hooks/useCurrentUser';
 import { useStore } from 'stores/connect';
 import { Button } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -26,7 +27,6 @@ import { ConfigurationsActions, ConfigurationsStore } from 'stores/configuration
 // Explicit import to fix eslint import/no-cycle
 import IfPermitted from 'components/common/IfPermitted';
 import { isPermitted } from 'util/PermissionsMixin';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import generateId from 'logic/generateId';
 
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
@@ -47,7 +47,7 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
   const { configuration } = useStore<ConfigurationsStoreState>(ConfigurationsStore);
   const urlWhiteListConfig = configuration[URL_WHITELIST_CONFIG];
 
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
 
   useEffect(() => {
     if (isPermitted(currentUser.permissions, ['urlwhitelist:read'])) {

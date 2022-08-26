@@ -319,9 +319,10 @@ public class PivotAggregationSearch implements AggregationSearch {
                 }
             }
 
+            DateTime resultTimestamp = DateTime.parse(timeKey).withZone(DateTimeZone.UTC);
             results.add(AggregationKeyResult.builder()
                     .key(groupKey)
-                    .timestamp(DateTime.parse(timeKey).withZone(DateTimeZone.UTC))
+                    .timestamp(resultTimestamp)
                     .seriesValues(values.build())
                     .build());
         }

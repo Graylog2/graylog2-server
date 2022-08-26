@@ -21,7 +21,6 @@ import history from 'util/History';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { Checkbox, ControlLabel, FormGroup, HelpBlock, MenuItem } from 'components/bootstrap';
 import Input from 'components/bootstrap/Input';
-import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import type View from 'views/logic/views/View';
 import queryTitle from 'views/logic/queries/QueryTitle';
@@ -157,8 +156,8 @@ const BigDisplayModeConfiguration = ({ disabled, show, view }: Props) => {
                             show
                             view={view} />
       )}
-      <MenuItem disabled={disabled} onSelect={() => setShowConfigurationModal(true)}>
-        <Icon name="desktop" /> Full Screen
+      <MenuItem disabled={disabled} onSelect={() => setShowConfigurationModal(true)} icon="desktop">
+        Full Screen
       </MenuItem>
     </>
   );

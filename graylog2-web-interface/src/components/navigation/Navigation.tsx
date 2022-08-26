@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import { useLocation } from 'react-router-dom';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import type { PluginNavigationDropdownItem, PluginNavigation } from 'graylog-web-plugin';
@@ -27,7 +26,7 @@ import { appPrefixed } from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
 import { Navbar, Nav, NavItem, NavDropdown } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes, { ENTERPRISE_ROUTE_DESCRIPTION, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
 
@@ -100,7 +99,7 @@ type Props = {
 };
 
 const Navigation = React.memo(({ pathname }: Props) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const { permissions, fullName, readOnly, id: userId } = currentUser || {};
 
   const pluginExports = PluginStore.exports('navigation');

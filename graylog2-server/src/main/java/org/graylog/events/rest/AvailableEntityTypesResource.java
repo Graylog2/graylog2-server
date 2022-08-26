@@ -42,7 +42,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Api(value = "Events/EntityTypes", description = "Event entity types")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "Events/EntityTypes", description = "Event entity types", tags = {CLOUD_VISIBLE})
 @Path("/events/entity_types")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
