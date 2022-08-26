@@ -48,7 +48,9 @@ import javax.ws.rs.core.MediaType;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Api(value = "Pipelines/Connections", description = "Stream connections of processing pipelines")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "Pipelines/Connections", description = "Stream connections of processing pipelines", tags = {CLOUD_VISIBLE})
 @Path("/system/pipelines/connections")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)

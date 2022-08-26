@@ -73,7 +73,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Api(value = "Events/Definitions", description = "Event definition management")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "Events/Definitions", description = "Event definition management", tags = {CLOUD_VISIBLE})
 @Path("/events/definitions")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
