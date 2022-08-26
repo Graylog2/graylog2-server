@@ -33,8 +33,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-// TODO: fix test, has been disabled when switching to Java17
-@Ignore
 public class PemKeyStoreTest {
 
     @Before
