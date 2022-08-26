@@ -37,7 +37,7 @@ import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import Query, { filtersForQuery } from 'views/logic/queries/Query';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import Search from './Search';
 
@@ -104,7 +104,7 @@ jest.mock('routing/withLocation', () => (Component) => (props) => (
 
 jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
 jest.mock('views/logic/queries/useCurrentQuery');
-jest.mock('views/logic/usePluginEntities');
+jest.mock('hooks/usePluginEntities');
 
 describe('Search', () => {
   beforeEach(() => {

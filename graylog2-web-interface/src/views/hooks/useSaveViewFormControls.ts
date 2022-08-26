@@ -16,7 +16,7 @@
  */
 import { useMemo } from 'react';
 
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 const useSaveViewFormControls = () => {
   const pluggableSaveViewControlFns = usePluginEntities('views.components.saveViewForm');

@@ -28,7 +28,6 @@ import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
@@ -39,20 +38,24 @@ import java.net.URI;
 
 public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstanceES7.class);
-    private static final String ES_VERSION = "7.10.2";
+    protected static final String ES_VERSION = "7.10.2";
     private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
+    public static final String DEFAULT_HEAP_SIZE = "2g";
 
     private final RestHighLevelClient restHighLevelClient;
     private final ElasticsearchClient elasticsearchClient;
     private final Client client;
     private final FixtureImporter fixtureImporter;
 
-    protected ElasticsearchInstanceES7(String image, SearchVersion version, Network network) {
-        super(image, version, network);
+    protected ElasticsearchInstanceES7(String image, SearchVersion version, Network network, String heapSize) {
+        super(image, version, network, heapSize);
         this.restHighLevelClient = buildRestClient();
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
         this.client = new ClientES7(this.elasticsearchClient);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
+    }
+    protected ElasticsearchInstanceES7(String image, SearchVersion version, Network network) {
+        this(image, version, network, DEFAULT_HEAP_SIZE);
     }
 
     @Override
@@ -81,21 +84,25 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     }
 
     public static ElasticsearchInstanceES7 create() {
-        return create(Network.newNetwork());
+        return create(SearchVersion.elasticsearch(ES_VERSION), Network.newNetwork(), DEFAULT_HEAP_SIZE);
     }
 
-    public static ElasticsearchInstanceES7 create(Network network) {
-        return create(SearchVersion.elasticsearch(ES_VERSION), network);
+    public static ElasticsearchInstanceES7 create(String heapSize) {
+        return create(SearchVersion.elasticsearch(ES_VERSION), Network.newNetwork(), heapSize);
     }
 
+    // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
     public static ElasticsearchInstanceES7 create(SearchVersion searchVersion, Network network) {
+        return create(searchVersion, network, DEFAULT_HEAP_SIZE);
+    }
+
+    private static ElasticsearchInstanceES7 create(SearchVersion searchVersion, Network network, String heapSize) {
         final String image = imageNameFrom(searchVersion.version());
 
         LOG.debug("Creating instance {}", image);
 
-        return new ElasticsearchInstanceES7(image, searchVersion, network);
+        return new ElasticsearchInstanceES7(image, searchVersion, network, heapSize);
     }
-
 
     protected static String imageNameFrom(Version version) {
         return DEFAULT_IMAGE_OSS + ":" + version.toString();

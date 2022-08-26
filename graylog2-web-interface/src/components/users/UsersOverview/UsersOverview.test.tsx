@@ -76,7 +76,12 @@ describe('UsersOverview', () => {
   });
 
   describe('should display user', () => {
-    const displaysUserAttributes = async ({ user }) => {
+    it.each`
+      user     | username
+      ${alice} | ${alice.username}
+      ${bob}   | ${bob.username}
+      ${adminOverview} | ${adminOverview.username}
+    `('$username', async ({ user }) => {
       render(<UsersOverview />);
       const attributes = ['username', 'fullName', 'email', 'clientAddress'];
       // wait until list is displayed
@@ -84,17 +89,11 @@ describe('UsersOverview', () => {
 
       attributes.forEach(async (attribute) => {
         if (user[attribute]) {
+          // eslint-disable-next-line jest/no-conditional-expect
           expect(screen.getByText(user[attribute])).toBeInTheDocument();
         }
       });
-    };
-
-    it.each`
-      user     | username
-      ${alice} | ${alice.username}
-      ${bob}   | ${bob.username}
-      ${adminOverview} | ${adminOverview.username}
-    `('$username', displaysUserAttributes);
+    });
   });
 
   describe('admin should', () => {

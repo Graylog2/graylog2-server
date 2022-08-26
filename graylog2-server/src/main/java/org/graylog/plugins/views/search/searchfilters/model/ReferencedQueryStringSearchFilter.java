@@ -98,4 +98,15 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
 
         public abstract ReferencedQueryStringSearchFilter build();
     }
+
+    @Override
+    public InlineQueryStringSearchFilter toInlineRepresentation() {
+        return InlineQueryStringSearchFilter.builder()
+                .queryString(this.queryString())
+                .description(this.description())
+                .negation(this.negation())
+                .title(this.title())
+                .disabled(this.disabled())
+                .build();
+    }
 }

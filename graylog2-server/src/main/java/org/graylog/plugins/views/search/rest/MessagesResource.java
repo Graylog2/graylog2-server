@@ -66,7 +66,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-@Api(value = "Search/Messages", description = "Simple search returning (matching) messages only, as CSV.")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "Search/Messages", description = "Simple search returning (matching) messages only, as CSV.", tags = {CLOUD_VISIBLE})
 @Path("/views/search/messages")
 @RequiresAuthentication
 public class MessagesResource extends RestResource implements PluginRestResource {

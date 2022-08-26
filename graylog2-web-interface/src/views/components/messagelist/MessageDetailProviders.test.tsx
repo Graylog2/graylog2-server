@@ -20,11 +20,11 @@ import { render, screen } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
 import { simpleMessage as message } from 'fixtures/messages';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import MessageDetailProviders from './MessageDetailProviders';
 
-jest.mock('views/logic/usePluginEntities');
+jest.mock('hooks/usePluginEntities');
 
 const renderProvider = (children, index, throwError = false) => {
   if (throwError) {

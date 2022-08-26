@@ -65,9 +65,10 @@ import java.nio.charset.StandardCharsets;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Messages", description = "Single messages")
+@Api(value = "Messages", description = "Single messages", tags = {CLOUD_VISIBLE})
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/messages")
 public class MessageResource extends RestResource {

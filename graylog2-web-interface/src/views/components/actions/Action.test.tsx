@@ -22,12 +22,12 @@ import { noop } from 'lodash';
 import { createSimpleExternalValueAction } from 'fixtures/externalValueActions';
 import type { ActionContexts } from 'views/types';
 import asMock from 'helpers/mocking/AsMock';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import Action from './Action';
 
-jest.mock('views/logic/usePluginEntities', () => jest.fn(() => []));
+jest.mock('hooks/usePluginEntities', () => jest.fn(() => []));
 
 describe('Action', () => {
   afterEach(() => {

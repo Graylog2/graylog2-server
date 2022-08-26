@@ -46,8 +46,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @RequiresAuthentication
-@Api(value = "Search/Suggestions")
+@Api(value = "Search/Suggestions", tags = {CLOUD_VISIBLE})
 @Path("/search/suggest")
 public class SuggestionsResource extends RestResource implements PluginRestResource {
 

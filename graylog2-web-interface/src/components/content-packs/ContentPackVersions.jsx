@@ -61,6 +61,7 @@ class ContentPackVersions extends React.Component {
     onChange(event.target.value);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   headerFormatter = (header) => {
     if (header === 'Action') {
       return (<th className="text-right">{header}</th>);
@@ -160,6 +161,7 @@ class ContentPackVersions extends React.Component {
       <DataTable id="content-packs-versions"
                  headers={headers}
                  headerCellFormatter={this.headerFormatter}
+                 useNumericSort
                  sortBy={(c) => c.rev.toString()}
                  dataRowFormatter={this.rowFormatter}
                  rows={contentPacks}

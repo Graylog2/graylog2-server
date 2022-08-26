@@ -24,9 +24,11 @@ export default (name) => {
   MockComponent.propTypes = {
     children: PropTypes.node,
   };
+
   MockComponent.defaultProps = {
     children: null,
   };
+
   MockComponent.displayName = name;
 
   return MockComponent;
