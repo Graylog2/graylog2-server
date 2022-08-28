@@ -19,7 +19,6 @@ package org.graylog2.shared.security.tls;
 import com.google.common.io.Resources;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URL;
