@@ -25,7 +25,6 @@ import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.UniformReservoir;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Map;
@@ -38,8 +37,6 @@ import static org.junit.Assert.fail;
 
 public class MetricUtilsTest {
 
-    // TODO: fix test, has been disabled when switching to Java17
-    @Ignore
     @Test
     public void safelyRegister() {
 
@@ -63,7 +60,10 @@ public class MetricUtilsTest {
 
         assertThatExceptionOfType(ClassCastException.class)
                 .describedAs("Registering a metric with a different metric type fails on using it")
-                .isThrownBy(() -> MetricUtils.safelyRegister(metricRegistry, "somename", new Counter()));
+                .isThrownBy(() -> {
+                    // assignment has to be done to raise the exception
+                    Counter c = MetricUtils.safelyRegister(metricRegistry, "somename", new Counter());
+                });
     }
 
     @Test
