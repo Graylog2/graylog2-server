@@ -24,7 +24,7 @@ import { InputStaticFieldsStore } from 'stores/inputs/InputStaticFieldsStore';
 import type { Input } from 'components/messageloaders/Types';
 
 type InputsActionsType = {
-  list: () => Promise<Array<Input>>,
+  list: () => Promise<{ inputs: Array<Input>, total: number }>,
   get: (id: string) => Promise<Input>,
   getOptional: (id: string, showError: boolean) => Promise<Input>,
   create: (input: Input) => Promise<void>,
