@@ -45,11 +45,6 @@ public class ContainerMatrixExtensionContext extends AbstractExtensionContext<Co
     }
 
     @Override
-    public Class<?> getRequiredTestClass() {
-        return super.getRequiredTestClass();
-    }
-
-    @Override
     public Optional<TestInstance.Lifecycle> getTestInstanceLifecycle() {
         return Optional.empty();
     }
@@ -60,18 +55,8 @@ public class ContainerMatrixExtensionContext extends AbstractExtensionContext<Co
     }
 
     @Override
-    public Object getRequiredTestInstance() {
-        return super.getRequiredTestInstance();
-    }
-
-    @Override
     public Optional<TestInstances> getTestInstances() {
         return Optional.empty();
-    }
-
-    @Override
-    public TestInstances getRequiredTestInstances() {
-        return super.getRequiredTestInstances();
     }
 
     @Override
@@ -80,23 +65,8 @@ public class ContainerMatrixExtensionContext extends AbstractExtensionContext<Co
     }
 
     @Override
-    public Method getRequiredTestMethod() {
-        return super.getRequiredTestMethod();
-    }
-
-    @Override
     public Optional<Throwable> getExecutionException() {
         return Optional.empty();
-    }
-
-    @Override
-    public void publishReportEntry(String key, String value) {
-        super.publishReportEntry(key, value);
-    }
-
-    @Override
-    public void publishReportEntry(String value) {
-        super.publishReportEntry(value);
     }
 
     @Override
