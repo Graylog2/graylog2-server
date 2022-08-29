@@ -54,7 +54,7 @@ describe('WidgetOverrideElements', () => {
         <WidgetOverrideElements widgetOverrideElements={[throwElement]}>
           <span>Hello world!</span>
         </WidgetOverrideElements>
-      ))).toThrowError('The dungeon collapses, you die!');
+      ))).toThrow('The dungeon collapses, you die!');
     });
   });
 
