@@ -63,6 +63,6 @@ describe('RemoveFromAllTablesActionHandler', () => {
 
     RemoveFromAllTablesActionHandler({ queryId: 'foo', field: 'author', type: FieldTypes.STRING(), contexts: {} });
 
-    expect(WidgetActions.updateWidgets).toBeCalled();
+    expect(WidgetActions.updateWidgets).toHaveBeenCalled();
   });
 });

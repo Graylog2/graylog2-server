@@ -65,6 +65,6 @@ describe('HTTPJSONPathAdapterFieldSet', () => {
       },
     };
 
-    expect(updateConfig).toBeCalledWith(newConfig);
+    expect(updateConfig).toHaveBeenCalledWith(newConfig);
   });
 });

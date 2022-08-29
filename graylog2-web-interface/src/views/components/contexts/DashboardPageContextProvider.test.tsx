@@ -76,7 +76,7 @@ describe('DashboardPageContextProvider', () => {
 
     contextValue.setDashboardPage('page-id');
 
-    expect(mockHistoryReplace).toBeCalledWith('?page=page-id');
+    expect(mockHistoryReplace).toHaveBeenCalledWith('?page=page-id');
   });
 
   it('should update url on page change', () => {
@@ -95,7 +95,7 @@ describe('DashboardPageContextProvider', () => {
 
     contextValue.setDashboardPage('page-id');
 
-    expect(mockHistoryReplace).toBeCalledWith('?page=page-id');
+    expect(mockHistoryReplace).toHaveBeenCalledWith('?page=page-id');
   });
 
   it('should unset a page from url', () => {
@@ -114,7 +114,7 @@ describe('DashboardPageContextProvider', () => {
 
     contextValue.unsetDashboardPage();
 
-    expect(mockHistoryReplace).toBeCalledWith('');
+    expect(mockHistoryReplace).toHaveBeenCalledWith('');
   });
 
   it('should not set to an unknown page', () => {
@@ -133,6 +133,6 @@ describe('DashboardPageContextProvider', () => {
 
     contextValue.setDashboardPage('new');
 
-    expect(mockHistoryReplace).toBeCalledWith('');
+    expect(mockHistoryReplace).toHaveBeenCalledWith('');
   });
 });
