@@ -40,9 +40,15 @@ type Props = {
 const UsersSelectField = ({ value, onChange }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   const [paginatedUsers, setPaginatedUsers] = useState<PaginatedUsers | undefined>();
+  const [isNextPageLoading, setIsNextPageLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const loadUsersPaginated = useCallback((pagination = DEFAULT_PAGINATION) => {
     if (isPermitted(currentUser.permissions, 'users:list')) {
+      setIsNextPageLoading(true);
+
       return UsersDomain.loadUsersPaginated(pagination).then((newPaginatedUser) => {
+        setIsNextPageLoading(false);
+
         return newPaginatedUser;
       });
     }
@@ -50,10 +56,8 @@ const UsersSelectField = ({ value, onChange }: Props) => {
     return undefined;
   }, [currentUser.permissions]);
 
-  const loadMoreOptions = debounce(() => {
-    const { pagination } = paginatedUsers;
-
-    loadUsersPaginated({ ...pagination, page: pagination.page + 1 }).then((response) => {
+  const loadUsers = (pagination, query = '') => {
+    loadUsersPaginated({ ...pagination, page: pagination.page + 1, query }).then((response) => {
       setPaginatedUsers((prevUsers) => {
         const list = prevUsers.list.concat(response.list);
         const newPagination = { ...prevUsers.pagination, ...response.pagination };
@@ -61,21 +65,35 @@ const UsersSelectField = ({ value, onChange }: Props) => {
         return { ...prevUsers, list, pagination: newPagination } as PaginatedUsers;
       });
     });
-  }, 200);
+  };
+
+  const loadMoreOptions = debounce(() => {
+    const { pagination, pagination: { total }, list } = paginatedUsers;
+
+    if (total > list.count()) {
+      loadUsers(pagination);
+    }
+  }, 400);
 
   useEffect(() => {
-    loadUsersPaginated().then(setPaginatedUsers);
-
+    if (!paginatedUsers) {
+      loadUsersPaginated().then(setPaginatedUsers);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSearch = debounce((newValue, actionMeta) => {
     if ((actionMeta.action === 'input-change')) {
-      loadUsersPaginated({ ...DEFAULT_PAGINATION, query: newValue }).then(setPaginatedUsers);
-    } else {
+      setIsSearching(true);
+
+      loadUsersPaginated({ ...DEFAULT_PAGINATION, query: newValue }).then((results) => {
+        setIsSearching(true);
+        setPaginatedUsers(results);
+      });
+    } else if (actionMeta.action === 'menu-close') {
       loadUsersPaginated().then(setPaginatedUsers);
     }
-  }, 200);
+  }, 400);
 
   if (!paginatedUsers) {
     return <p><Spinner text="Loading User select..." /></p>;
@@ -89,7 +107,7 @@ const UsersSelectField = ({ value, onChange }: Props) => {
                      placeholder="Select user(s)..."
                      options={formatUsers(list.toArray())}
                      onInputChange={handleSearch}
-                     loadOptions={loadMoreOptions}
+                     loadOptions={isNextPageLoading || isSearching ? () => {} : loadMoreOptions}
                      multi
                      total={total}
                      onChange={onChange} />

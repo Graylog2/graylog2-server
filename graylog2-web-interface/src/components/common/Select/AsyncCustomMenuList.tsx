@@ -43,6 +43,8 @@ const AsyncCustomMenuList = ({ children, selectProps: { loadOptions, total } }: 
   return (
     <InfiniteLoader isItemLoaded={(index: number) => index < children.length}
                     itemCount={total}
+                    threshold={30}
+                    minimumBatchSize={50}
                     loadMoreItems={loadOptions}>
       {({ onItemsRendered, ref }) => (
         <WindowList listRef={ref}
