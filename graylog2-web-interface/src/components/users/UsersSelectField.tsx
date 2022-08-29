@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState, useCallback, useContext } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import debounce from 'lodash/debounce';
 import type { PaginatedUsers } from 'src/stores/users/UsersStore';
 
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { isPermitted } from 'util/PermissionsMixin';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import { Spinner } from 'components/common';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import PaginatedSelect from '../common/Select/PaginatedSelect';
 
@@ -38,7 +38,7 @@ type Props = {
 }
 
 const UsersSelectField = ({ value, onChange }: Props) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const [paginatedUsers, setPaginatedUsers] = useState<PaginatedUsers | undefined>();
   const [isNextPageLoading, setIsNextPageLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
