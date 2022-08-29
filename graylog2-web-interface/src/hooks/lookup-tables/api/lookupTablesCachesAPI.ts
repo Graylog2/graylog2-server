@@ -23,7 +23,7 @@ const getURL = (path: string = '') => (URLUtils.qualifyUrl(`/system/lookup${path
 // eslint-disable-next-line import/prefer-default-export
 export const fetchAll = async (page = 1, perPage = 100, query = null) => {
   let url = getURL(`/caches?sort=title&order=asc&page=${page}&per_page=${perPage}`);
-  if (query) url += `&query=${encodeURIComponent(query)}`;
+  if (query) url += `&query=${encodeURI(query)}`;
 
   return fetch('GET', url);
 };

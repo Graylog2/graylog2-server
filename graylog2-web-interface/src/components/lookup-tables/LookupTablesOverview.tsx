@@ -125,22 +125,16 @@ type OverviewProps = {
 const LookupTablesOverview = ({ tables, caches, dataAdapters, pagination, errorStates }: OverviewProps) => {
   const history = useHistory();
 
-  React.useEffect(() => {
-    LookupTablesActions.searchPaginated(pagination.page, pagination.per_page);
-  }, [pagination]);
-
   const onPageChange = (newPage: number, newPerPage: number) => {
     LookupTablesActions.searchPaginated(newPage, newPerPage, pagination.query);
   };
 
-  const onSearch = (query: string, resetLoadingStateCb: () => void) => {
-    LookupTablesActions
-      .searchPaginated(pagination.page, pagination.per_page, query)
-      .then(resetLoadingStateCb);
+  const onSearch = (query: string) => {
+    LookupTablesActions.searchPaginated(1, pagination.per_page, query);
   };
 
   const onReset = () => {
-    LookupTablesActions.searchPaginated(pagination.page, pagination.per_page);
+    LookupTablesActions.searchPaginated(1, pagination.per_page, null);
   };
 
   const goCreateLUT = () => {
@@ -158,7 +152,7 @@ const LookupTablesOverview = ({ tables, caches, dataAdapters, pagination, errorS
                        pageSize={pagination.per_page}
                        onChange={onPageChange}
                        totalItems={pagination.total}>
-          <SearchForm onSearch={onSearch} onReset={onReset} useLoadingState>
+          <SearchForm onSearch={onSearch} onReset={onReset}>
             <Button bsStyle="success"
                     style={{ marginLeft: 5 }}
                     onClick={goCreateLUT}>

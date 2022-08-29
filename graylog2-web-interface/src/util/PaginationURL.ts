@@ -33,7 +33,7 @@ export default (destUrl: string, page: number, perPage: number, query: string, a
   }
 
   if (query) {
-    uri.addSearch('query', encodeURIComponent(query));
+    uri.addSearch('query', encodeURI(query));
   }
 
   return uri.toString();
