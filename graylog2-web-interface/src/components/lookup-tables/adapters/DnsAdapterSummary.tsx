@@ -15,14 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { TimeUnit } from 'components/common';
+import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
-const DnsAdapterSummary = ({ dataAdapter }) => {
+import type { DnsAdapterConfig } from './types';
+
+type Props = {
+  dataAdapter: LookupTableAdapter & { config: DnsAdapterConfig },
+};
+
+const DnsAdapterSummary = ({ dataAdapter }: Props) => {
   const { config } = dataAdapter;
 
-  // Allows enum > display label translation.
   const lookupType = {
     A: 'Resolve hostname to IPv4 address (A)',
     AAAA: 'Resolve hostname to IPv6 address (AAAA)',
@@ -44,19 +49,12 @@ const DnsAdapterSummary = ({ dataAdapter }) => {
 
       <dt>Cache TTL Override</dt>
       <dd>
-        {!config.cache_ttl_override_enabled ? 'n/a' : <TimeUnit value={config.cache_ttl_override} unit={config.cache_ttl_override_unit} />}
+        {!config.cache_ttl_override_enabled ? 'n/a' : (
+          <TimeUnit value={config.cache_ttl_override} unit={config.cache_ttl_override_unit} />
+        )}
       </dd>
     </dl>
   );
-};
-
-DnsAdapterSummary.propTypes = {
-  dataAdapter: PropTypes.shape({
-    config: PropTypes.shape({
-      lookup_type: PropTypes.string.isRequired,
-      request_timeout: PropTypes.number.isRequired,
-    }),
-  }).isRequired,
 };
 
 export default DnsAdapterSummary;

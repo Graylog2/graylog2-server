@@ -22,19 +22,11 @@ import { Input } from 'components/bootstrap';
 import { URLWhiteListInput, KeyValueTable } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 
-type Headers = { [key: string]: string };
-
-type Config = {
-  headers: Headers,
-  url: string,
-  single_value_jsonpath: string,
-  multi_value_jsonpath: string,
-  user_agent: string,
-};
+import type { HTTPJSONPathAdapterConfig } from './types';
 
 type Props = {
-  config: Config,
-  updateConfig: (config: Config) => void,
+  config: HTTPJSONPathAdapterConfig,
+  updateConfig: (config: HTTPJSONPathAdapterConfig) => void,
   handleFormEvent: (event: SyntheticEvent<EventTarget>) => void,
   validationState: (state: string) => string,
   validationMessage: (field: string, message: string) => string,
@@ -49,7 +41,7 @@ class HTTPJSONPathAdapterFieldSet extends React.Component<Props> {
     validationMessage: PropTypes.func.isRequired,
   };
 
-  onHTTPHeaderUpdate = (headers: Headers) => {
+  onHTTPHeaderUpdate = (headers: { [key: string]: string }) => {
     const { config, updateConfig } = this.props;
     const configChange = ObjectUtils.clone(config);
 

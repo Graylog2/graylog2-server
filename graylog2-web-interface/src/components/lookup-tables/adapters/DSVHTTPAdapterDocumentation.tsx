@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 
 import { Alert } from 'components/bootstrap';
 
@@ -47,7 +47,7 @@ const DSVHTTPAdapterDocumentation = () => {
       <h5 style={{ marginBottom: 10 }}>Configuration</h5>
       <p style={{ marginBottom: 10, padding: 0 }}>
         Separator: <code>,</code><br />
-        Quote character: <code>"</code><br />
+        Quote character: <code>&quot;</code><br />
       </p>
 
       <h5 style={{ marginBottom: 10 }}>DSV File</h5>
@@ -58,7 +58,7 @@ const DSVHTTPAdapterDocumentation = () => {
       <h5 style={{ marginBottom: 10 }}>Configuration</h5>
       <p style={{ marginBottom: 10, padding: 0 }}>
         Separator: <code>;</code><br />
-        Quote character: <code>'</code><br />
+        Quote character: <code>&apos;</code><br />
       </p>
 
       <h5 style={{ marginBottom: 10 }}>DSV File</h5>

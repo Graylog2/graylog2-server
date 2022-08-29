@@ -14,23 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 
-const DSVHTTPAdapterSummary = ({ dataAdapter }) => {
+import type { LookupTableAdapter } from 'logic/lookup-tables/types';
+
+type Props = {
+  dataAdapter: LookupTableAdapter
+};
+
+const CSVFileAdapterSummary = ({ dataAdapter }: Props) => {
   const { config } = dataAdapter;
 
   return (
     <dl>
-      <dt>File URL</dt>
-      <dd>{config.url}</dd>
+      <dt>File path</dt>
+      <dd>{config.path}</dd>
       <dt>Separator</dt>
       <dd><code>{config.separator}</code></dd>
-      <dt>Line Separator</dt>
-      <dd><code>{config.line_separator}</code></dd>
       <dt>Quote character</dt>
       <dd><code>{config.quotechar}</code></dd>
-      <dt>Ignore lines starting with</dt>
-      <dd><code>{config.ignorechar}</code></dd>
       <dt>Key column</dt>
       <dd>{config.key_column}</dd>
       <dt>Value column</dt>
@@ -43,4 +45,4 @@ const DSVHTTPAdapterSummary = ({ dataAdapter }) => {
   );
 };
 
-export default DSVHTTPAdapterSummary;
+export default CSVFileAdapterSummary;

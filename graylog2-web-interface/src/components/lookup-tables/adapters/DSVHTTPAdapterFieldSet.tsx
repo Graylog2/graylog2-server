@@ -14,13 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 
 import { Input } from 'components/bootstrap';
 import { URLWhiteListInput } from 'components/common';
 
-const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMessage, config }) => {
+import type { DVSHTTPAdapterConfig } from './types';
+
+type Props = {
+  config: DVSHTTPAdapterConfig,
+  handleFormEvent: (event: React.SyntheticEvent) => void,
+  validationState: (arg: string) => string,
+  validationMessage: (arg1: string, arg2: string) => string,
+};
+
+const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMessage, config }: Props) => {
   return (
     <fieldset>
       <URLWhiteListInput label="File URL"
@@ -118,14 +126,6 @@ const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMe
              wrapperClassName="col-md-offset-3 col-md-9" />
     </fieldset>
   );
-};
-
-DSVHTTPAdapterFieldSet.propTypes = {
-  config: PropTypes.object.isRequired,
-  // eslint-disable-next-line react/no-unused-prop-types
-  handleFormEvent: PropTypes.func.isRequired,
-  validationState: PropTypes.func.isRequired,
-  validationMessage: PropTypes.func.isRequired,
 };
 
 export default DSVHTTPAdapterFieldSet;

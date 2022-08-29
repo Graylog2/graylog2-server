@@ -18,8 +18,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { KeyValueTable } from 'components/common';
+import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
-const HTTPJSONPathAdapterSummary = ({ dataAdapter }) => {
+import type { HTTPJSONPathAdapterConfig } from './types';
+
+type Props = {
+  dataAdapter: LookupTableAdapter & { config: HTTPJSONPathAdapterConfig },
+};
+
+const HTTPJSONPathAdapterSummary = ({ dataAdapter }: Props) => {
   const { config } = dataAdapter;
 
   return (
