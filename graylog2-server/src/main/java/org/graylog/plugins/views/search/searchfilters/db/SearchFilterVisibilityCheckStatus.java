@@ -47,20 +47,20 @@ public class SearchFilterVisibilityCheckStatus {
 
     public String toMessage() {
         if (!allSearchFiltersVisible()) {
-            return "Search cannot be saved, as it contains Search Filters which you are not privileged to view : " + hiddenSearchFiltersIDs.toString();
+            return "View cannot be saved, as it contains Search Filters which you are not privileged to view : " + hiddenSearchFiltersIDs.toString();
         } else {
-            return "Search can be created with provided list of Search Filters";
+            return "View can be created with provided list of Search Filters";
         }
     }
 
     public String toMessage(final Collection<String> allowedHiddenSearchFilters) {
         if (!allSearchFiltersVisible(allowedHiddenSearchFilters)) {
-            return "Search cannot be saved, as it contains Search Filters which you are not privileged to view : " +
+            return "View cannot be saved, as it contains Search Filters which you are not privileged to view : " +
                     hiddenSearchFiltersIDs.stream()
                             .filter(f -> !allowedHiddenSearchFilters.contains(f))
                             .collect(Collectors.toList());
         } else {
-            return "Search can be created with provided list of Search Filters";
+            return "View can be created with provided list of Search Filters";
         }
     }
 }
