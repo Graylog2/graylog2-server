@@ -21,10 +21,24 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import { InputStaticFieldsStore } from 'stores/inputs/InputStaticFieldsStore';
+import type { Input } from 'components/messageloaders/Types';
 
+type InputsActionsType = {
+  list: () => Promise<Array<Input>>,
+  get: (id: string) => Promise<Input>,
+  getOptional: (id: string, showError: boolean) => Promise<Input>,
+  create: (input: Input) => Promise<void>,
+  delete: (input: Input) => Promise<void>,
+  update: (id: string, input: Input) => Promise<void>,
+}
+
+type InputsStoreState = {
+  input?: Input | undefined,
+  inputs: Array<Input> | undefined,
+}
 export const InputsActions = singletonActions(
   'core.Inputs',
-  () => Reflux.createActions({
+  () => Reflux.createActions<InputsActionsType>({
     list: { asyncResult: true },
     get: { asyncResult: true },
     getOptional: { asyncResult: true },
@@ -36,7 +50,7 @@ export const InputsActions = singletonActions(
 
 export const InputsStore = singletonStore(
   'core.Inputs',
-  () => Reflux.createStore({
+  () => Reflux.createStore<InputsStoreState>({
     listenables: [InputsActions],
     sourceUrl: '/system/inputs',
     inputs: undefined,
