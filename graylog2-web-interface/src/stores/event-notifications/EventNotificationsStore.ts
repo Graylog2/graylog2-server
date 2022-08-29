@@ -23,9 +23,32 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
+type EventNotification = {
+  id: string,
+  title: string,
+  description: string,
+  config: {},
+}
+
+type LegacyEventNotification = {
+  name: string,
+  configuration: {}
+}
+
+type EventNotificationsActionsType = {
+  listAll: () => Promise<{ notifications: Array<EventNotification> }>,
+  listAllLegacyTypes: () => Promise<{ types: { [key: string]: LegacyEventNotification } }>,
+  listPaginated: () => Promise<{ notifications: Array<EventNotification> }>,
+  get: (id: string) => Promise<EventNotification>,
+  create: (eventNotification: EventNotification) => Promise<void>,
+  update: (id: string, eventNotification: EventNotification) => Promise<void>,
+  delete: (eventNotification: EventNotification) => Promise<void>,
+  test: (eventNotification: EventNotification) => Promise<void>,
+  testPersisted: (eventNotification: EventNotification) => Promise<void>,
+}
 export const EventNotificationsActions = singletonActions(
   'core.EventNotifications',
-  () => Reflux.createActions({
+  () => Reflux.createActions<EventNotificationsActionsType>({
     listAll: { asyncResult: true },
     listAllLegacyTypes: { asyncResult: true },
     listPaginated: { asyncResult: true },
@@ -38,9 +61,22 @@ export const EventNotificationsActions = singletonActions(
   }),
 );
 
+type EventNotificationsStoreState = {
+  all: Array<EventNotification>,
+  allLegacyTypes: { [key: string]: LegacyEventNotification },
+  notifications: Array<EventNotification>,
+  query: string,
+  pagination: {
+    count: number,
+    page: number,
+    pageSize: number,
+    total: number,
+    grandTotal: number,
+  }
+}
 export const EventNotificationsStore = singletonStore(
   'core.EventNotifications',
-  () => Reflux.createStore({
+  () => Reflux.createStore<EventNotificationsStoreState>({
     listenables: [EventNotificationsActions],
     sourceUrl: '/events/notifications',
     all: undefined,
