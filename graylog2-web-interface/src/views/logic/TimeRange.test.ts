@@ -30,7 +30,7 @@ describe('TimeRange', () => {
       expect(timeRangeToQueryParameter({ type: 'relative', from: 300, to: 150 }))
         .toEqual({ rangetype: 'relative', from: '300', to: '150' });
 
-      expect(() => timeRangeToQueryParameter({ type: 'relative' } as RelativeTimeRange)).toThrowError(/Unexpected time range/);
+      expect(() => timeRangeToQueryParameter({ type: 'relative' } as RelativeTimeRange)).toThrow(/Unexpected time range/);
     });
 
     it('handles absolute time ranges', () => {
@@ -61,7 +61,7 @@ describe('TimeRange', () => {
       expect(timeRangeFromQueryParameter({ rangetype: 'relative', from: '300', to: '150' }))
         .toEqual({ type: 'relative', from: 300, to: 150 });
 
-      expect(() => timeRangeFromQueryParameter({ rangetype: 'relative' } as TimeRangeQueryParameter)).toThrowError(/Invalid relative range specified/);
+      expect(() => timeRangeFromQueryParameter({ rangetype: 'relative' } as TimeRangeQueryParameter)).toThrow(/Invalid relative range specified/);
     });
 
     it('handles absolute time ranges', () => {
