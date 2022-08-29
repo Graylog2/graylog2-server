@@ -28,8 +28,10 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.searchfilters.ReferencedSearchFiltersHelper;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityCheckStatus;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityChecker;
+import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewResolverDecoder;
@@ -69,6 +71,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -94,18 +97,21 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final SearchDomain searchDomain;
     private final Map<String, ViewResolver> viewResolvers;
     private final SearchFilterVisibilityChecker searchFilterVisibilityChecker;
+    private final ReferencedSearchFiltersHelper referencedSearchFiltersHelper;
 
     @Inject
     public ViewsResource(ViewService dbService,
                          ClusterEventBus clusterEventBus, SearchDomain searchDomain,
                          Map<String, ViewResolver> viewResolvers,
-                         SearchFilterVisibilityChecker searchFilterVisibilityChecker) {
+                         SearchFilterVisibilityChecker searchFilterVisibilityChecker,
+                         ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
         this.dbService = dbService;
         this.clusterEventBus = clusterEventBus;
         this.searchDomain = searchDomain;
         this.viewResolvers = viewResolvers;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.searchFilterVisibilityChecker = searchFilterVisibilityChecker;
+        this.referencedSearchFiltersHelper = referencedSearchFiltersHelper;
     }
 
     @GET
@@ -247,26 +253,40 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
 
         if (!newCreation) {
-            final ViewDTO originalView = resolveView(dto.id());
+            final ViewDTO originalView = dbService.get(dto.id()).orElseThrow(() -> new BadRequestException("Cannot update a view that does not exist : id = " + dto.id()));
             final String originalViewSearchId = originalView.searchId();
             final Search originalSearch = searchDomain.getForUser(originalViewSearchId, searchUser)
                     .orElseThrow(() -> new BadRequestException("Search " + originalViewSearchId + " not available"));
 
-            final Set<String> originalSearchReferencedFiltersIds = originalSearch.getReferencedSearchFiltersIds();
+            final Set<UsesSearchFilters> originalSearchFilterUsages = getSearchFiltersUsages(originalView, originalSearch);
+            final Set<String> originalReferencedSearchFiltersIds = referencedSearchFiltersHelper.getReferencedSearchFiltersIds(originalSearchFilterUsages);
+            final Set<UsesSearchFilters> newSearchFilterUsages = getSearchFiltersUsages(dto, search);
+            final Set<String> newReferencedSearchFiltersIds = referencedSearchFiltersHelper.getReferencedSearchFiltersIds(newSearchFilterUsages);
 
             final SearchFilterVisibilityCheckStatus searchFilterVisibilityCheckStatus = searchFilterVisibilityChecker.checkSearchFilterVisibility(
-                    filterID -> isPermitted(RestPermissions.SEARCH_FILTERS_READ, filterID), search);
-            if (!searchFilterVisibilityCheckStatus.allSearchFiltersVisible(originalSearchReferencedFiltersIds)) {
-                throw new BadRequestException(searchFilterVisibilityCheckStatus.toMessage(originalSearchReferencedFiltersIds));
+                    filterID -> isPermitted(RestPermissions.SEARCH_FILTERS_READ, filterID), newReferencedSearchFiltersIds);
+            if (!searchFilterVisibilityCheckStatus.allSearchFiltersVisible(originalReferencedSearchFiltersIds)) {
+                throw new BadRequestException(searchFilterVisibilityCheckStatus.toMessage(originalReferencedSearchFiltersIds));
             }
+
         } else {
+            final Set<UsesSearchFilters> newSearchFilterUsages = getSearchFiltersUsages(dto, search);
+            final Set<String> newReferencedSearchFiltersIds = referencedSearchFiltersHelper.getReferencedSearchFiltersIds(newSearchFilterUsages);
             final SearchFilterVisibilityCheckStatus searchFilterVisibilityCheckStatus = searchFilterVisibilityChecker.checkSearchFilterVisibility(
-                    filterID -> isPermitted(RestPermissions.SEARCH_FILTERS_READ, filterID), search);
+                    filterID -> isPermitted(RestPermissions.SEARCH_FILTERS_READ, filterID), newReferencedSearchFiltersIds);
             if (!searchFilterVisibilityCheckStatus.allSearchFiltersVisible()) {
                 throw new BadRequestException(searchFilterVisibilityCheckStatus.toMessage());
             }
         }
 
+    }
+
+    private Set<UsesSearchFilters> getSearchFiltersUsages(final ViewDTO view, final Search referencedSearch) {
+        final Set<UsesSearchFilters> searchFilterUsages = new HashSet<>(referencedSearch.queries());
+        if (view.type() == ViewDTO.Type.DASHBOARD) {
+            searchFilterUsages.addAll(view.getAllWidgets());
+        }
+        return searchFilterUsages;
     }
 
     @PUT

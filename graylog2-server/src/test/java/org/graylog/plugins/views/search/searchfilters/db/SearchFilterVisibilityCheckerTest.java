@@ -17,11 +17,9 @@
 package org.graylog.plugins.views.search.searchfilters.db;
 
 import com.google.common.collect.ImmutableSet;
-import org.graylog.plugins.views.search.Search;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
@@ -30,13 +28,10 @@ import java.util.function.Predicate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
 class SearchFilterVisibilityCheckerTest {
 
-    @Mock
-    private Search search;
     private SearchFilterVisibilityChecker toTest;
 
     @BeforeEach
@@ -46,26 +41,23 @@ class SearchFilterVisibilityCheckerTest {
 
 
     @Test
-    void testSuccessfulCheckOnSearchWithoutReferencedFilters() {
-        doReturn(ImmutableSet.of()).when(search).getReferencedSearchFiltersIds();
+    void testSuccessfulCheckOnEmptyReferencedFilters() {
         final Predicate<String> alwaysTruePredicate = filterId -> true;
-        final SearchFilterVisibilityCheckStatus result = toTest.checkSearchFilterVisibility(alwaysTruePredicate, search);
+        final SearchFilterVisibilityCheckStatus result = toTest.checkSearchFilterVisibility(alwaysTruePredicate, ImmutableSet.of());
         assertTrue(result.allSearchFiltersVisible());
     }
 
     @Test
-    void testSuccessfulCheckOnSearchWithOnlyVisibleReferencedFilters() {
-        doReturn(ImmutableSet.of("id1", "id2", "id3")).when(search).getReferencedSearchFiltersIds();
+    void testSuccessfulCheckOnOnlyVisibleReferencedFilters() {
         final Predicate<String> alwaysTruePredicate = filterId -> true;
-        final SearchFilterVisibilityCheckStatus result = toTest.checkSearchFilterVisibility(alwaysTruePredicate, search);
+        final SearchFilterVisibilityCheckStatus result = toTest.checkSearchFilterVisibility(alwaysTruePredicate, ImmutableSet.of("id1", "id2", "id3"));
         assertTrue(result.allSearchFiltersVisible());
     }
 
     @Test
     void testSingleInvisibleFilterMakesCheckFail() {
-        doReturn(ImmutableSet.of("id1", "id2", "id3", "hidden")).when(search).getReferencedSearchFiltersIds();
         final Predicate<String> readPermissionPredicate = filterId -> !"hidden".equals(filterId);
-        final SearchFilterVisibilityCheckStatus result = toTest.checkSearchFilterVisibility(readPermissionPredicate, search);
+        final SearchFilterVisibilityCheckStatus result = toTest.checkSearchFilterVisibility(readPermissionPredicate, ImmutableSet.of("id1", "id2", "id3", "hidden"));
         assertFalse(result.allSearchFiltersVisible());
         assertEquals(Collections.singletonList("hidden"), result.getHiddenSearchFiltersIDs());
     }
