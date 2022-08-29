@@ -408,7 +408,7 @@
                                     <version>[3.6.0,)</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>1.8</version>
+                                    <version>[17.0,17.99]</version>
                                 </requireJavaVersion>
                                 <requireOS>
                                     <family>unix</family>
