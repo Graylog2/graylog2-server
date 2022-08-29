@@ -22,10 +22,11 @@ import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.CountExistingBa
 import java.util.Collection;
 import java.util.Set;
 
+//TODO: With plans to remove ES6 support soon, this class will be removed, not implemented
 public class CountExistingBasedFieldTypeFilterES6 implements CountExistingBasedFieldTypeFilterAdapter {
 
     @Override
     public Set<FieldTypeDTO> filterFieldTypes(Set<FieldTypeDTO> fieldTypeDTOs, Set<String> indexNames, Collection<String> streamIds) {
-        return fieldTypeDTOs; //TODO: implement
+        return fieldTypeDTOs;
     }
 }

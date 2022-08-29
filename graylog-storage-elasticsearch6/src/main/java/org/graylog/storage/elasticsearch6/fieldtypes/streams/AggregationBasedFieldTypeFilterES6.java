@@ -22,12 +22,13 @@ import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.AggregationBase
 import java.util.Collection;
 import java.util.Set;
 
+//TODO: With plans to remove ES6 support soon, this class will be removed, not implemented
 public class AggregationBasedFieldTypeFilterES6 implements AggregationBasedFieldTypeFilterAdapter {
 
     @Override
     public Set<FieldTypeDTO> filterFieldTypes(final Set<FieldTypeDTO> fieldTypeDTOs,
                                               final Set<String> indexNames,
                                               final Collection<String> streamIds) {
-        return fieldTypeDTOs; //TODO: implement
+        return fieldTypeDTOs;
     }
 }
