@@ -46,7 +46,7 @@
     "formik": "2.2.9",
     "html-webpack-plugin": "^5.5.0",
     "jest-preset-graylog": "file:../jest-preset-graylog",
-    "jquery": "3.6.0",
+    "jquery": "3.6.1",
     "moment": "2.29.4",
     "moment-timezone": "0.5.34",
     "prop-types": "15.8.1",
