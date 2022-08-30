@@ -31,7 +31,9 @@ public abstract class KeywordRange extends TimeRange {
 
     @JsonProperty
     @Override
-    public abstract String type();
+    public String type() {
+
+    }
 
     @JsonProperty
     public abstract String keyword();
@@ -91,8 +93,6 @@ public abstract class KeywordRange extends TimeRange {
 
     @AutoValue.Builder
     public abstract static class Builder {
-        public abstract Builder type(String type);
-
         public abstract Builder keyword(String keyword);
 
         public abstract Builder timezone(String timezone);
