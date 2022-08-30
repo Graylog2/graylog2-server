@@ -51,15 +51,18 @@ public abstract class AbsoluteRange extends TimeRange {
     public static AbsoluteRange create(@JsonProperty("type") String type,
                                        @JsonProperty("from") DateTime from,
                                        @JsonProperty("to") DateTime to) {
-        return builder().type(type).from(from).to(to).build();
+        return builder()
+                .type(type) // TODO: do we want to allow any other type than ABSOLUTE? What would it mean?
+                .from(from).to(to)
+                .build();
     }
 
     public static AbsoluteRange create(DateTime from, DateTime to) {
-        return builder().type(ABSOLUTE).from(from).to(to).build();
+        return builder().from(from).to(to).build();
     }
 
     public static AbsoluteRange create(String from, String to) throws InvalidRangeParametersException {
-        return builder().type(ABSOLUTE).from(from).to(to).build();
+        return builder().from(from).to(to).build();
     }
 
     @Override
