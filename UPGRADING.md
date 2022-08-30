@@ -1,3 +1,10 @@
+Upgrading to Graylog 5.x.x
+==========================
+
+## Breaking Changes
+Support for Elasticsearch 6.X has been removed! Please use either Elasticsearch 7.10.2 or, preferably, latest OpenSearch.
+
+
 Upgrading to Graylog 4.4.x
 ==========================
 
