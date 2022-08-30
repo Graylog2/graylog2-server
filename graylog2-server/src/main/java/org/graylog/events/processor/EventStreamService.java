@@ -17,6 +17,7 @@
 package org.graylog.events.processor;
 
 import com.google.common.collect.Sets;
+import com.google.inject.Inject;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
@@ -28,7 +29,8 @@ public class EventStreamService {
 
     private final StreamService streamService;
 
-    private EventStreamService(StreamService streamService) {
+    @Inject
+    public EventStreamService(StreamService streamService) {
         this.streamService = streamService;
     }
 
