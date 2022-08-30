@@ -18,8 +18,10 @@ import React from 'react';
 
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
+import type { DVSHTTPAdapterConfig } from './types';
+
 type Props = {
-  dataAdapter: LookupTableAdapter,
+  dataAdapter: LookupTableAdapter & { config: DVSHTTPAdapterConfig },
 };
 
 const DSVHTTPAdapterSummary = ({ dataAdapter }: Props) => {
@@ -27,24 +29,32 @@ const DSVHTTPAdapterSummary = ({ dataAdapter }: Props) => {
 
   return (
     <dl>
-      <dt>File URL</dt>
+      <dt>File URL:</dt>
       <dd>{config.url}</dd>
-      <dt>Separator</dt>
+
+      <dt>Separator:</dt>
       <dd><code>{config.separator}</code></dd>
-      <dt>Line Separator</dt>
+
+      <dt>Line Separator:</dt>
       <dd><code>{config.line_separator}</code></dd>
-      <dt>Quote character</dt>
+
+      <dt>Quote character:</dt>
       <dd><code>{config.quotechar}</code></dd>
-      <dt>Ignore lines starting with</dt>
+
+      <dt>Ignore character:</dt>
       <dd><code>{config.ignorechar}</code></dd>
-      <dt>Key column</dt>
+
+      <dt>Key column:</dt>
       <dd>{config.key_column}</dd>
-      <dt>Value column</dt>
+
+      <dt>Value column:</dt>
       <dd>{config.value_column}</dd>
-      <dt>Check interval</dt>
-      <dd>{config.check_interval} seconds</dd>
-      <dt>Case-insensitive lookup</dt>
-      <dd>{config.case_insensitive_lookup ? 'yes' : 'no'}</dd>
+
+      <dt>Check interval:</dt>
+      <dd>{config.check_interval}</dd>
+
+      <dt>Case-insensitive lookup:</dt>
+      <dd>{config.case_insensitive_lookup ? 'Yes' : 'No'}</dd>
     </dl>
   );
 };

@@ -17,22 +17,32 @@
 import styled from 'styled-components';
 
 const ConfigSummaryDefinitionListWrapper = styled.div`
+  width: 100%;
+
   dl {
     margin-top: 10px;
 
     dt {
       float: left;
       clear: left;
+      min-width: 200px;
+      min-height: 33px;
+      padding: 7px 0;
     }
 
     dd {
-      margin-left: 185px;
+      margin-left: 200px;
       word-wrap: break-word;
+      width: 55%;
+      min-height: 33px;
+      padding: 7px 10px;
 
       :not(:last-child) {
-        border-bottom: 1px solid #ececec;
-        margin-bottom: 5px;
-        padding-bottom: 5px;
+        border-bottom: 1px solid ${(props) => props.theme.colors.terniary};
+      }
+
+      code {
+        margin-left: -3px;
       }
     }
   }
