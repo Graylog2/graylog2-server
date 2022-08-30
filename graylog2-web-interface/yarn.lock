@@ -6074,7 +6074,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.2"
     eslint-plugin-compat "4.0.2"
-    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-7ac18059-c641-4e24-813a-c7437281d8a2-1661861262720/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.0.1"
     eslint-plugin-jest-dom "4.0.2"
@@ -7329,12 +7329,12 @@ grapheme-splitter@^1.0.4:
     "@types/create-react-class" "15.6.3"
     "@types/jquery" "3.5.14"
     "@types/react" "18.0.17"
-    babel-preset-graylog "file:packages/babel-preset-graylog"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-9f616236-d0a2-4c12-9c25-9b8cac0592af-1661861262628/node_modules/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:packages/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-9f616236-d0a2-4c12-9c25-9b8cac0592af-1661861262628/node_modules/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:packages/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-9f616236-d0a2-4c12-9c25-9b8cac0592af-1661861262628/node_modules/jest-preset-graylog"
     jquery "3.6.1"
     moment "2.29.4"
     moment-timezone "0.5.37"
@@ -12743,21 +12743,21 @@ styled-components@5.3.5:
     "@stylelint/postcss-css-in-js" "0.38.0"
     postcss-syntax "0.36.2"
     stylelint "14.11.0"
-    stylelint-config-recommended "8.0.0"
-    stylelint-config-standard "26.0.0"
+    stylelint-config-recommended "9.0.0"
+    stylelint-config-standard "28.0.0"
     stylelint-config-styled-components "0.1.1"
 
-stylelint-config-recommended@8.0.0, stylelint-config-recommended@^8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/stylelint-config-recommended/-/stylelint-config-recommended-8.0.0.tgz#7736be9984246177f017c39ec7b1cd0f19ae9117"
-  integrity sha512-IK6dWvE000+xBv9jbnHOnBq01gt6HGVB2ZTsot+QsMpe82doDQ9hvplxfv4YnpEuUwVGGd9y6nbaAnhrjcxhZQ==
+stylelint-config-recommended@9.0.0, stylelint-config-recommended@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/stylelint-config-recommended/-/stylelint-config-recommended-9.0.0.tgz#1c9e07536a8cd875405f8ecef7314916d94e7e40"
+  integrity sha512-9YQSrJq4NvvRuTbzDsWX3rrFOzOlYBmZP+o513BJN/yfEmGSr0AxdvrWs0P/ilSpVV/wisamAHu5XSk8Rcf4CQ==
 
-stylelint-config-standard@26.0.0:
-  version "26.0.0"
-  resolved "https://registry.yarnpkg.com/stylelint-config-standard/-/stylelint-config-standard-26.0.0.tgz#4701b8d582d34120eec7d260ba779e4c2d953635"
-  integrity sha512-hUuB7LaaqM8abvkOO84wh5oYSkpXgTzHu2Zza6e7mY+aOmpNTjoFBRxSLlzY0uAOMWEFx0OMKzr+reG1BUtcqQ==
+stylelint-config-standard@28.0.0:
+  version "28.0.0"
+  resolved "https://registry.yarnpkg.com/stylelint-config-standard/-/stylelint-config-standard-28.0.0.tgz#7e1926c232631a8445eafee7b186d276d42d7b15"
+  integrity sha512-q/StuowDdDmFCravzGHAwgS9pjX0bdOQUEBBDIkIWsQuYGgYz/xsO8CM6eepmIQ1fc5bKdDVimlJZ6MoOUcJ5Q==
   dependencies:
-    stylelint-config-recommended "^8.0.0"
+    stylelint-config-recommended "^9.0.0"
 
 stylelint-config-styled-components@0.1.1:
   version "0.1.1"
