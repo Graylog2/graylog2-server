@@ -69,13 +69,23 @@ const PaginatedList = ({
     event.preventDefault();
     const newPageSize = Number(event.target.value);
 
-    if (useQueryParameter) setPageSize(newPageSize);
-    if (onChange) onChange(INITIAL_PAGE, newPageSize);
+    if (useQueryParameter) {
+      setPageSize(newPageSize);
+    }
+
+    if (onChange) {
+      onChange(INITIAL_PAGE, newPageSize);
+    }
   };
 
   const _onChangePage = (pageNum: number) => {
-    if (useQueryParameter) setPage(pageNum);
-    if (onChange) onChange(pageNum, pageSize);
+    if (useQueryParameter) {
+      setPage(pageNum);
+    }
+
+    if (onChange) {
+      onChange(pageNum, pageSize);
+    }
   };
 
   return (
@@ -121,7 +131,7 @@ PaginatedList.propTypes = {
   showPageSizeSelect: PropTypes.bool,
   /** Total amount of items in all pages. */
   totalItems: PropTypes.number.isRequired,
-  /** boolean flag to see if we should save and use page and pageSize as query parameters */
+  /** boolean flag that enables saving and using page and pageSize from query parameters. Enabled by default. */
   useQueryParameter: PropTypes.bool,
 };
 
