@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog2.Configuration;
 import org.graylog2.indexer.fieldtypes.streamfiltered.filters.StreamBasedFieldTypeFilter;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamService;
@@ -44,19 +45,21 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
     private final IndexFieldTypesService indexFieldTypesService;
     private final FieldTypeMapper fieldTypeMapper;
     private final IndexLookup indexLookup;
+    private final boolean maintainsStreamBasedFieldLists;
 
     private final StreamBasedFieldTypeFilter adHocSearchEngineStreamBasedFieldTypeFilter;
     private final StreamBasedFieldTypeFilter allowAllStreamBasedFieldTypeFilter;
     private final StreamBasedFieldTypeFilter storedSearchEngineStreamBasedFieldTypeFilter;
 
     @Inject
-    public MappedFieldTypesServiceImpl(StreamService streamService,
-                                       IndexFieldTypesService indexFieldTypesService,
-                                       FieldTypeMapper fieldTypeMapper,
-                                       IndexLookup indexLookup,
-                                       @Named("AdHocFilter") StreamBasedFieldTypeFilter adHocSearchEngineStreamBasedFieldTypeFilter,
-                                       @Named("AllowAllFilter") StreamBasedFieldTypeFilter allowAllStreamBasedFieldTypeFilter,
-                                       @Named("StoredFilter") StreamBasedFieldTypeFilter storedSearchEngineStreamBasedFieldTypeFilter) {
+    public MappedFieldTypesServiceImpl(final Configuration configuration,
+                                       final StreamService streamService,
+                                       final IndexFieldTypesService indexFieldTypesService,
+                                       final FieldTypeMapper fieldTypeMapper,
+                                       final IndexLookup indexLookup,
+                                       @Named("AdHocFilter") final StreamBasedFieldTypeFilter adHocSearchEngineStreamBasedFieldTypeFilter,
+                                       @Named("AllowAllFilter") final StreamBasedFieldTypeFilter allowAllStreamBasedFieldTypeFilter,
+                                       @Named("StoredFilter") final StreamBasedFieldTypeFilter storedSearchEngineStreamBasedFieldTypeFilter) {
         this.streamService = streamService;
         this.indexFieldTypesService = indexFieldTypesService;
         this.fieldTypeMapper = fieldTypeMapper;
@@ -64,6 +67,7 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
         this.adHocSearchEngineStreamBasedFieldTypeFilter = adHocSearchEngineStreamBasedFieldTypeFilter;
         this.allowAllStreamBasedFieldTypeFilter = allowAllStreamBasedFieldTypeFilter;
         this.storedSearchEngineStreamBasedFieldTypeFilter = storedSearchEngineStreamBasedFieldTypeFilter;
+        this.maintainsStreamBasedFieldLists = configuration.maintainsStreamBasedFieldLists();
     }
 
     @Override
@@ -77,7 +81,9 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
                 .collect(Collectors.toSet());
 
         StreamBasedFieldTypeFilter streamBasedFieldTypeFilter;
-        if (fieldTypeDTOs.size() < MAX_FIELDS_TO_FILTER_AD_HOC) {
+        if (!maintainsStreamBasedFieldLists) {
+            streamBasedFieldTypeFilter = allowAllStreamBasedFieldTypeFilter;
+        } else if (fieldTypeDTOs.size() < MAX_FIELDS_TO_FILTER_AD_HOC) {
             streamBasedFieldTypeFilter = adHocSearchEngineStreamBasedFieldTypeFilter;
         } else {
             streamBasedFieldTypeFilter = storedSearchEngineStreamBasedFieldTypeFilter;

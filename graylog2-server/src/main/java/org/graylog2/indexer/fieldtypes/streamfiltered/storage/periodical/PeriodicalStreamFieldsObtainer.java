@@ -18,6 +18,7 @@ package org.graylog2.indexer.fieldtypes.streamfiltered.storage.periodical;
 
 import com.google.common.collect.Iterables;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
+import org.graylog2.Configuration;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.AggregationBasedFieldTypeFilterAdapter;
@@ -53,9 +54,11 @@ public class PeriodicalStreamFieldsObtainer extends Periodical {
     private final StreamService streamService;
     private final IndexFieldTypesService indexFieldTypesService;
     private final IndexLookup indexLookup;
+    private final boolean maintainsStreamBasedFieldLists;
 
     @Inject
-    public PeriodicalStreamFieldsObtainer(final StreamService streamService,
+    public PeriodicalStreamFieldsObtainer(final Configuration configuration,
+                                          final StreamService streamService,
                                           final IndexFieldTypesService indexFieldTypesService,
                                           final IndexLookup indexLookup,
                                           final StoredStreamFieldsService storedStreamFieldsService,
@@ -67,10 +70,14 @@ public class PeriodicalStreamFieldsObtainer extends Periodical {
         this.streamService = streamService;
         this.indexFieldTypesService = indexFieldTypesService;
         this.indexLookup = indexLookup;
+        this.maintainsStreamBasedFieldLists = configuration.maintainsStreamBasedFieldLists();
     }
 
     @Override
     public void doRun() {
+        if (!maintainsStreamBasedFieldLists) {
+            return;
+        }
         final List<Stream> allStreams = streamService.loadAll();
         for (Stream stream : allStreams) {
             try {
@@ -83,7 +90,7 @@ public class PeriodicalStreamFieldsObtainer extends Periodical {
         }
     }
 
-    private Set<FieldTypeDTO> getProperFieldTypesForStream(String streamId) {
+    private Set<FieldTypeDTO> getProperFieldTypesForStream(final String streamId) {
         final Set<String> streamIdSingleton = Collections.singleton(streamId);
         final Set<String> indexNames = this.indexLookup.indexNamesForStreamsInTimeRange(streamIdSingleton,
                 RelativeRange.allTime());
@@ -118,7 +125,7 @@ public class PeriodicalStreamFieldsObtainer extends Periodical {
 
     @Override
     public boolean runsForever() {
-        return true;
+        return maintainsStreamBasedFieldLists;
     }
 
     @Override
@@ -128,7 +135,7 @@ public class PeriodicalStreamFieldsObtainer extends Periodical {
 
     @Override
     public boolean startOnThisNode() {
-        return true;
+        return maintainsStreamBasedFieldLists;
     }
 
     @Override
