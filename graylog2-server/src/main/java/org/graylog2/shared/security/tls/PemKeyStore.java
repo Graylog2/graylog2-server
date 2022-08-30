@@ -121,7 +121,8 @@ public final class PemKeyStore {
             certChain.add(cf.generateCertificate(new ByteArrayInputStream(buf)));
         }
 
-        final KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+        // TODO Keep old JKS Keystore for backwards compat. We should think about using Keystore.getDefaultType() here
+        final KeyStore ks = KeyStore.getInstance("JKS");
         ks.load(null, password);
         ks.setKeyEntry("key", key, password, certChain.toArray(new Certificate[certChain.size()]));
 
