@@ -43,7 +43,8 @@ public abstract class AbsoluteRange extends TimeRange {
     public abstract DateTime to();
 
     public static Builder builder() {
-        return new AutoValue_AbsoluteRange.Builder();
+        return new AutoValue_AbsoluteRange.Builder()
+                .type(ABSOLUTE);
     }
 
     @JsonCreator

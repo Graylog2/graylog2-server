@@ -61,7 +61,8 @@ public abstract class KeywordRange extends TimeRange {
     }
 
     private static Builder builder() {
-        return new AutoValue_KeywordRange.Builder();
+        return new AutoValue_KeywordRange.Builder()
+                .type(KEYWORD);
     }
 
     public String getKeyword() {
