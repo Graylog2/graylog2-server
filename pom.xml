@@ -139,7 +139,6 @@
         <metrics.version>4.1.9</metrics.version>
         <mongodb-driver.version>4.7.1</mongodb-driver.version>
         <mongojack.version>2.10.1.2</mongojack.version>
-        <mongojack4.version>4.7.0-0</mongojack4.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.60.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.36.Final</netty-tcnative-boringssl-static.version>
