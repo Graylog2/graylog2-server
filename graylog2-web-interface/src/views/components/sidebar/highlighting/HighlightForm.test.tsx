@@ -92,7 +92,7 @@ describe('HighlightForm', () => {
 
     fireEvent.click(elem);
 
-    expect(onClose).toBeCalledTimes(1);
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it('should fire remove action when saving a existing rule', async () => {
@@ -101,7 +101,7 @@ describe('HighlightForm', () => {
     await triggerSaveButtonClick();
 
     await waitFor(() => expect(HighlightingRulesActions.update)
-      .toBeCalledWith(rule, { field: rule.field, value: rule.value, condition: rule.condition, color: rule.color }));
+      .toHaveBeenCalledWith(rule, { field: rule.field, value: rule.value, condition: rule.condition, color: rule.color }));
   });
 
   it('assigns a new static color when type is selected', async () => {
@@ -112,7 +112,7 @@ describe('HighlightForm', () => {
     userEvent.click(screen.getByText('Save'));
 
     await waitFor(() => expect(HighlightingRulesActions.update)
-      .toBeCalledWith(rule, expect.objectContaining({
+      .toHaveBeenCalledWith(rule, expect.objectContaining({
         color: expect.objectContaining({ type: 'static', color: expect.any(String) }),
       })));
   });
@@ -129,7 +129,7 @@ describe('HighlightForm', () => {
     userEvent.click(screen.getByText('Save'));
 
     await waitFor(() => expect(HighlightingRulesActions.update)
-      .toBeCalledWith(rule, expect.objectContaining({
+      .toHaveBeenCalledWith(rule, expect.objectContaining({
         color: expect.objectContaining({ gradient: 'Viridis' }),
       })));
   });
@@ -140,7 +140,7 @@ describe('HighlightForm', () => {
     await triggerSaveButtonClick();
 
     await waitFor(() => expect(HighlightingRulesActions.update)
-      .toBeCalledWith(ruleWithValueZero, { field: ruleWithValueZero.field, value: '0', condition: ruleWithValueZero.condition, color: ruleWithValueZero.color }));
+      .toHaveBeenCalledWith(ruleWithValueZero, { field: ruleWithValueZero.field, value: '0', condition: ruleWithValueZero.condition, color: ruleWithValueZero.color }));
   });
 
   it('should be able to click submit when has value false  with type boolean', async () => {
@@ -149,6 +149,6 @@ describe('HighlightForm', () => {
     await triggerSaveButtonClick();
 
     await waitFor(() => expect(HighlightingRulesActions.update)
-      .toBeCalledWith(ruleWithValueFalse, { field: ruleWithValueFalse.field, value: 'false', condition: ruleWithValueFalse.condition, color: ruleWithValueFalse.color }));
+      .toHaveBeenCalledWith(ruleWithValueFalse, { field: ruleWithValueFalse.field, value: 'false', condition: ruleWithValueFalse.condition, color: ruleWithValueFalse.color }));
   });
 });
