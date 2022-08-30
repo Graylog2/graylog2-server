@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useParams } from 'react-router-dom';
 
 import useScopePermissions from 'hooks/useScopePermissions';
 import { LinkContainer } from 'components/common/router';
@@ -23,27 +24,19 @@ import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/comm
 import EventDefinitionFormContainer
   from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
 import DocumentationLink from 'components/support/DocumentationLink';
-import connect from 'stores/connect';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
-import withParams from 'routing/withParams';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import useCurrentUser from 'hooks/useCurrentUser';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
-import type { UserJSON } from 'logic/users/User';
 import type { EventDefinition } from 'logic/alerts/types';
 
 import StreamPermissionErrorPage from './StreamPermissionErrorPage';
 
-type Props = {
-  params: {
-    definitionId: string,
-  },
-  currentUser: UserJSON,
-};
-
-const EditEventDefinitionPage = ({ params, currentUser }: Props) => {
+const EditEventDefinitionPage = () => {
+  const params = useParams<{definitionId?: string}>();
+  const currentUser = useCurrentUser();
   const [eventDefinition, setEventDefinition] = React.useState<EventDefinition>(undefined);
 
   React.useEffect(() => {
@@ -152,6 +145,4 @@ const EditEventDefinitionPage = ({ params, currentUser }: Props) => {
   );
 };
 
-export default connect(withParams(EditEventDefinitionPage), {
-  currentUser: CurrentUserStore,
-}, ({ currentUser }) => ({ currentUser: currentUser.currentUser }));
+export default EditEventDefinitionPage;
