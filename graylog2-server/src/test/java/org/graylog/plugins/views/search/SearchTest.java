@@ -16,14 +16,10 @@
  */
 package org.graylog.plugins.views.search;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
-import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
-import org.graylog.plugins.views.search.searchfilters.model.ReferencedQueryStringSearchFilter;
-import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
@@ -39,8 +35,6 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.graylog.plugins.views.search.TestData.validQueryBuilder;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -130,48 +124,6 @@ public class SearchTest {
         Search after = before.applyExecutionState(executionState);
 
         assertThat(searchTypeIdsFrom(after)).containsExactlyInAnyOrder("oans", "gsuffa");
-    }
-
-    @Test
-    public void testGetReferencedSearchFiltersIdsReturnsEmptyCollectionOnEmptyQueries() {
-        final Search search = Search.builder().queries(ImmutableSet.of()).build();
-        final Set<String> referencedSearchFiltersIds = search.getReferencedSearchFiltersIds();
-        assertTrue(referencedSearchFiltersIds.isEmpty());
-    }
-
-    @Test
-    public void testGetReferencedSearchFiltersIdsReturnsEmptyCollectionOnQueriesWithoutFilters() {
-        final Query query1 = TestData.validQueryBuilder().build();
-        final Query query2 = TestData.validQueryBuilder().build();
-        final Search search = Search.builder().queries(ImmutableSet.of(query1, query2)).build();
-        final Set<String> referencedSearchFiltersIds = search.getReferencedSearchFiltersIds();
-        assertTrue(referencedSearchFiltersIds.isEmpty());
-    }
-
-    @Test
-    public void testGetReferencedSearchFiltersIdsDoesNotReturnInlinedSearchFilters() {
-        final Query query = TestData.validQueryBuilder()
-                .filters(ImmutableList.of(
-                        InlineQueryStringSearchFilter.builder().queryString("nvmd").build(),
-                        InlineQueryStringSearchFilter.builder().queryString("nvmd2").build())
-                )
-                .build();
-
-        final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
-        final Set<String> referencedSearchFiltersIds = search.getReferencedSearchFiltersIds();
-        assertTrue(referencedSearchFiltersIds.isEmpty());
-    }
-
-    @Test
-    public void testGetReferencedSearchFiltersIdsReturnsProperIds() {
-        final ReferencedSearchFilter filter1 = ReferencedQueryStringSearchFilter.builder().id("r_id_1").build();
-        final ReferencedSearchFilter filter2 = ReferencedQueryStringSearchFilter.builder().id("r_id_2").build();
-        final Query query = TestData.validQueryBuilder()
-                .filters(ImmutableList.of(filter1, filter2))
-                .build();
-        final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
-        final Set<String> referencedSearchFiltersIds = search.getReferencedSearchFiltersIds();
-        assertEquals(ImmutableSet.of("r_id_1", "r_id_2"), referencedSearchFiltersIds);
     }
 
     private Set<String> searchTypeIdsFrom(Search search) {

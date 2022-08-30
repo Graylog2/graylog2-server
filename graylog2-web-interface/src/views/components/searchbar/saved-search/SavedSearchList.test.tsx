@@ -99,7 +99,7 @@ describe('SavedSearchList', () => {
 
       fireEvent.click(cancel);
 
-      expect(onToggleModal).toBeCalledTimes(1);
+      expect(onToggleModal).toHaveBeenCalledTimes(1);
     });
 
     it('should call `onDelete` if saved search is deleted', async () => {
@@ -117,9 +117,9 @@ describe('SavedSearchList', () => {
 
       fireEvent.click(deleteBtn);
 
-      expect(window.confirm).toBeCalledTimes(1);
+      expect(window.confirm).toHaveBeenCalledTimes(1);
 
-      await waitFor(() => expect(onDelete).toBeCalledTimes(1));
+      await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(1));
     });
 
     it('should call load function from context', async () => {
@@ -139,7 +139,7 @@ describe('SavedSearchList', () => {
 
       fireEvent.click(listItem);
 
-      expect(onLoad).toBeCalledTimes(1);
+      expect(onLoad).toHaveBeenCalledTimes(1);
     });
   });
 });
