@@ -18,7 +18,7 @@ package org.graylog2.indexer.fieldtypes.streamfiltered.config;
 
 public interface Config {
 
-    int MAX_FIELDS_TO_FILTER_AD_HOC = 5;
+    int MAX_FIELDS_TO_FILTER_AD_HOC = 50;
 
     int MAX_AGGREGATIONS_PER_REQUEST = 100;
     int MAX_SEARCHES_PER_MULTI_SEARCH = 100;
