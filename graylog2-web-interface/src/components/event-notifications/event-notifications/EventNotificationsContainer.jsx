@@ -63,7 +63,8 @@ class EventNotificationsContainer extends React.Component {
   }
 
   componentDidMount() {
-    fetchData({ page: this.props.paginationQueryParameter.page, pageSize: this.props.paginationQueryParameter.pageSize });
+    const { page, pageSize } = this.props.paginationQueryParameter;
+    fetchData({ page, pageSize });
   }
 
   componentWillUnmount() {
