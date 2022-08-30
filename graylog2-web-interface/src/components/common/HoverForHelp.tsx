@@ -87,7 +87,7 @@ HoverForHelp.propTypes = {
   pullRight: PropTypes.bool,
   title: PropTypes.string,
   testId: PropTypes.string,
-  trigger: PropTypes.arrayOf(PropTypes.string),
+  trigger: PropTypes.arrayOf(PropTypes.oneOf(['click', 'focus', 'hover'])) || PropTypes.oneOf(['click', 'focus', 'hover']),
 };
 
 HoverForHelp.defaultProps = {
