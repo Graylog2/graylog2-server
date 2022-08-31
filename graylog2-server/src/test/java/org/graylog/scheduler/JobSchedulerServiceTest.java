@@ -23,11 +23,12 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class JobSchedulerServiceTest {
     @Test
@@ -35,20 +36,23 @@ public class JobSchedulerServiceTest {
         final Semaphore semaphore = spy(new Semaphore(1));
         final InterruptibleSleeper sleeper = new InterruptibleSleeper(semaphore);
 
-        when(semaphore.tryAcquire(1, TimeUnit.SECONDS)).thenReturn(false);
+        doReturn(false).when(semaphore).tryAcquire(1, TimeUnit.SECONDS);
+        doReturn(1).when(semaphore).drainPermits();
         assertThat(sleeper.sleep(1, TimeUnit.SECONDS)).isTrue();
         verify(semaphore, times(1)).drainPermits();
         verify(semaphore, times(1)).tryAcquire(1, TimeUnit.SECONDS);
 
         reset(semaphore);
 
-        when(semaphore.tryAcquire(1, TimeUnit.SECONDS)).thenReturn(true);
+        doReturn(true).when(semaphore).tryAcquire(1, TimeUnit.SECONDS);
+        doReturn(1).when(semaphore).drainPermits();
         assertThat(sleeper.sleep(1, TimeUnit.SECONDS)).isFalse();
         verify(semaphore, times(1)).drainPermits();
         verify(semaphore, times(1)).tryAcquire(1, TimeUnit.SECONDS);
 
         reset(semaphore);
 
+        doNothing().when(semaphore).release();
         sleeper.interrupt();
         verify(semaphore, times(1)).release();
     }

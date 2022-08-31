@@ -67,8 +67,10 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @Path("/system/sessions")
-@Api(value = "System/Sessions")
+@Api(value = "System/Sessions", tags = {CLOUD_VISIBLE})
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class SessionsResource extends RestResource {

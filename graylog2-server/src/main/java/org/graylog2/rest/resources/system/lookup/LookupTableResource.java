@@ -95,12 +95,13 @@ import java.util.stream.Stream;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Collections.singleton;
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @Path("/system/lookup")
 @Produces("application/json")
 @Consumes("application/json")
-@Api(value = "System/Lookup", description = "Lookup tables")
+@Api(value = "System/Lookup", description = "Lookup tables", tags = {CLOUD_VISIBLE})
 public class LookupTableResource extends RestResource {
     private static final ImmutableSet<String> LUT_ALLOWABLE_SORT_FIELDS = ImmutableSet.of(
             LookupTableDto.FIELD_ID,
