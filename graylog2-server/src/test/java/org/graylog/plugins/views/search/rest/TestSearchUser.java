@@ -71,8 +71,20 @@ public class TestSearchUser {
         return this;
     }
 
+
+    public TestSearchUser allowEditView(String id) {
+        this.permissions.put(ViewsRestPermissions.VIEW_EDIT + ":" + id, true);
+        return this;
+    }
+
     public TestSearchUser denyView(String id) {
         this.permissions.put(ViewsRestPermissions.VIEW_READ + ":" + id, false);
+        return this;
+    }
+
+
+    public TestSearchUser denyEditView(String id) {
+        this.permissions.put(ViewsRestPermissions.VIEW_EDIT + ":" + id, false);
         return this;
     }
 

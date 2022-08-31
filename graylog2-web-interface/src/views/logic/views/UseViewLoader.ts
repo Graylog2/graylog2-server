@@ -18,7 +18,7 @@ import type * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 const useViewLoader = (viewId: string, query: { [key: string]: any }, viewLoader: ViewLoaderFn): [boolean, React.ReactElement | undefined] => {
   const loadingViewHooks = usePluginEntities('views.hooks.loadingView');

@@ -18,7 +18,7 @@ import { merge } from 'lodash';
 
 import UserNotification from 'util/UserNotification';
 import type { SearchBarControl, CombinedSearchBarFormValues } from 'views/types';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import type Widget from 'views/logic/widgets/Widget';
 import type Query from 'views/logic/queries/Query';
 

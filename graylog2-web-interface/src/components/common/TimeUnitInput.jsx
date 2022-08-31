@@ -79,8 +79,10 @@ export const extractDurationAndUnit = (duration, timeUnits) => {
  * value.
  */
 const TimeUnitInput = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'TimeUnitInput',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     /**
      * Function that will be called when the input changes, that is,
@@ -117,6 +119,9 @@ const TimeUnitInput = createReactClass({
     pullRight: PropTypes.bool,
     /** Lets the user clear the numeric input. */
     clearable: PropTypes.bool,
+
+    name: PropTypes.string,
+    unitName: PropTypes.string,
   },
 
   getDefaultProps() {
@@ -127,6 +132,8 @@ const TimeUnitInput = createReactClass({
       units: unitValues,
       label: '',
       help: '',
+      name: null,
+      unitName: null,
       required: false,
       enabled: undefined,
       defaultEnabled: false,
@@ -241,9 +248,14 @@ const TimeUnitInput = createReactClass({
         <InputWrapper className={wrapperClassName}>
           <InputGroup>
             {(!required && !hideCheckbox) && checkbox}
-            <FormControl type="number" disabled={!this._isChecked()} onChange={this._onUpdate} value={lodash.defaultTo(this._getEffectiveValue(), '')} />
+            <FormControl type="number"
+                         name={this.props.name}
+                         disabled={!this._isChecked()}
+                         onChange={this._onUpdate}
+                         value={lodash.defaultTo(this._getEffectiveValue(), '')} />
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
+                            name={this.props.unitName}
                             pullRight={pullRight}
                             title={unitOptions.filter((o) => o.value === unit)[0].label}
                             disabled={!this._isChecked()}>

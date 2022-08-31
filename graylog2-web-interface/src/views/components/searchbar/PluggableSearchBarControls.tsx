@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useState, useCallback } from 'react';
 
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import SearchFilterBanner from 'views/components/searchbar/SearchFilterBanner';
 import type { SearchBarControl } from 'views/types';
 import Store from 'logic/local-storage/Store';
@@ -30,6 +30,7 @@ const Container = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  gap: 10px;
 `;
 
 const usePluggableControls = () => {

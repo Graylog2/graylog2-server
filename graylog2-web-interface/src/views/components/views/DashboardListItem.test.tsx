@@ -17,21 +17,28 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import { alice } from 'fixtures/users';
+import { alice, adminUser } from 'fixtures/users';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import { asMock } from 'helpers/mocking';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import DashboardListItem from './DashboardListItem';
 
-jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
 jest.useFakeTimers()
   // @ts-expect-error
   .setSystemTime(mockedUnixTime);
 
+jest.mock('hooks/useCurrentUser');
+jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
+
 describe('Render DashboardListItem', () => {
+  beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(adminUser);
+  });
+
   const dashboard = View.builder()
     .type('DASHBOARD')
     .id('search-id-0')
@@ -63,36 +70,36 @@ describe('Render DashboardListItem', () => {
   });
 
   it('should render text "Last saved" if current user the same as an owner', async () => {
+    asMock(useCurrentUser).mockReturnValue(alice);
+
     render(
-      <CurrentUserContext.Provider value={alice}>
-        <DashboardListItem id={dashboard.id}
-                           createdAt={dashboard.createdAt}
-                           requires={dashboard.requires}
-                           owner={alice.username}
-                           description={dashboard.description}
-                           title={dashboard.title}
-                           summary={dashboard.summary}>
-          <div />
-        </DashboardListItem>
-      </CurrentUserContext.Provider>,
+      <DashboardListItem id={dashboard.id}
+                         createdAt={dashboard.createdAt}
+                         requires={dashboard.requires}
+                         owner={alice.username}
+                         description={dashboard.description}
+                         title={dashboard.title}
+                         summary={dashboard.summary}>
+        <div />
+      </DashboardListItem>,
     );
 
     await screen.findByText('Last saved');
   });
 
   it('should render text "Shared by user" if current user not the same as an owner', async () => {
+    asMock(useCurrentUser).mockReturnValue(alice);
+
     render(
-      <CurrentUserContext.Provider value={alice}>
-        <DashboardListItem id={dashboard.id}
-                           createdAt={dashboard.createdAt}
-                           requires={dashboard.requires}
-                           owner="bob"
-                           description={dashboard.description}
-                           title={dashboard.title}
-                           summary={dashboard.summary}>
-          <div />
-        </DashboardListItem>
-      </CurrentUserContext.Provider>,
+      <DashboardListItem id={dashboard.id}
+                         createdAt={dashboard.createdAt}
+                         requires={dashboard.requires}
+                         owner="bob"
+                         description={dashboard.description}
+                         title={dashboard.title}
+                         summary={dashboard.summary}>
+        <div />
+      </DashboardListItem>,
     );
 
     await screen.findByText('Shared by bob, last saved');

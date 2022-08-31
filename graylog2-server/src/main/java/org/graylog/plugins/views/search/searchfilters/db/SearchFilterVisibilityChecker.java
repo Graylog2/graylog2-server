@@ -16,28 +16,17 @@
  */
 package org.graylog.plugins.views.search.searchfilters.db;
 
-import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
-
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class SearchFilterVisibilityChecker {
 
-    public SearchFilterVisibilityCheckStatus checkSearchFilterVisibility(final Predicate<String> readPermissionPredicate, final Search search) {
-        final List<String> hiddenSearchFiltersIDs = search.queries()
+    public SearchFilterVisibilityCheckStatus checkSearchFilterVisibility(final Predicate<String> readPermissionPredicate,
+                                                                         final Collection<String> referencedSearchFiltersIds) {
+        final List<String> hiddenSearchFiltersIDs = referencedSearchFiltersIds
                 .stream()
-                .filter(Objects::nonNull)
-                .map(Query::filters)
-                .filter(Objects::nonNull)
-                .flatMap(Collection::stream)
-                .filter(usedSearchFilter -> usedSearchFilter instanceof ReferencedSearchFilter)
-                .map(usedSearchFilter -> (ReferencedSearchFilter) usedSearchFilter)
-                .map(ReferencedSearchFilter::id)
                 .filter(id -> !readPermissionPredicate.test(id))
                 .collect(Collectors.toList());
 

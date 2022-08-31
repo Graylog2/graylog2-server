@@ -20,7 +20,7 @@ import styled from 'styled-components';
 import type { $PropertyType } from 'utility-types';
 
 import type { EditWidgetComponentProps } from 'views/types';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import { Row, Col, Checkbox } from 'components/bootstrap';
 import FieldSelect from 'views/components/widgets/FieldSelect';

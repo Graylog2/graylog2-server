@@ -122,6 +122,10 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
         return this.userStreams;
     }
 
+    public User getUser() {
+        return currentUser;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

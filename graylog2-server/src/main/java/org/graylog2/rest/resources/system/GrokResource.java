@@ -70,11 +70,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @RequiresAuthentication
 @Path("/system/grok")
 @Produces("application/json")
 @Consumes("application/json")
-@Api(value = "System/Grok", description = "Manage grok patterns")
+@Api(value = "System/Grok", description = "Manage grok patterns", tags = {CLOUD_VISIBLE})
 public class GrokResource extends RestResource {
     private static final Pattern GROK_LINE_PATTERN = Pattern.compile("^(\\w+)[ \t]+(.*)$");
 

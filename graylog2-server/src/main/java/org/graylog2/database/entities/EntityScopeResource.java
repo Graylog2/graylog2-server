@@ -30,7 +30,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Api(value = "EntityScope", description = "Provide a list of available Entity Scopes")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "EntityScope", description = "Provide a list of available Entity Scopes", tags = {CLOUD_VISIBLE})
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/entity_scopes")
 @RequiresAuthentication

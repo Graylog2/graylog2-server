@@ -88,6 +88,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();
 
+    @Override
     @JsonIgnore
     public Optional<Parameter> getParameter(String parameterName) {
         return Optional.ofNullable(parameterIndex.get(parameterName));
@@ -184,6 +185,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Search " + id() + " doesn't have a query for search type " + searchTypeId));
     }
+
 
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "")

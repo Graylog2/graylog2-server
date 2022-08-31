@@ -176,16 +176,14 @@ describe('Value', () => {
     });
   });
 
-  const verifyReplacementOfEmptyValues = async ({ value }) => {
-    render(<Value type={FieldType.Unknown} field="foo" queryId="someQueryId" value={value} />);
-
-    await screen.findByText(/Empty Value/);
-  };
-
   it.each`
     value
     ${'\u205f'}
     ${''}
     ${' '}
-  `('renders (unicode) spaces as `EmptyValue` component', verifyReplacementOfEmptyValues);
+  `('renders (unicode) spaces as `EmptyValue` component', async ({ value }) => {
+    render(<Value type={FieldType.Unknown} field="foo" queryId="someQueryId" value={value} />);
+
+    await screen.findByText(/Empty Value/);
+  });
 });

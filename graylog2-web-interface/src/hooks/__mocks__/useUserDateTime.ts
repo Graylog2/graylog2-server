@@ -26,6 +26,6 @@ const userDateTimeContextValue: UserDateTimeContextType = {
   userTimezone,
 };
 
-const useUserDateTimeMock = () => userDateTimeContextValue;
+const useUserDateTimeMock = jest.fn(() => userDateTimeContextValue);
 
 export default useUserDateTimeMock;

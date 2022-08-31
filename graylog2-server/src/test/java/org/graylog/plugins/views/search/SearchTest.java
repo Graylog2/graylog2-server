@@ -187,8 +187,9 @@ public class SearchTest {
     private Query queryWithStreams(String... streamIds) {
         Query.Builder builder = validQueryBuilder();
 
-        if (streamIds.length > 0)
+        if (streamIds.length > 0) {
             builder = builder.filter(StreamFilter.anyIdOf(streamIds));
+        }
 
         return builder.build();
     }
