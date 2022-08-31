@@ -90,15 +90,18 @@ class LUTDataAdaptersPage extends React.Component {
     }
   };
 
+  // eslint-disable-next-line class-methods-use-this
   _saved = () => {
     // reset detail state
     history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
   };
 
+  // eslint-disable-next-line class-methods-use-this
   _isCreating = ({ action }) => {
     return action === 'create';
   };
 
+  // eslint-disable-next-line class-methods-use-this
   _validateAdapter = (adapter) => {
     LookupTableDataAdaptersActions.validate(adapter);
   };
@@ -106,12 +109,10 @@ class LUTDataAdaptersPage extends React.Component {
   render() {
     const {
       action,
-      errorStates,
       dataAdapter,
       validationErrors,
       types,
       dataAdapters,
-      pagination,
     } = this.props;
     let content;
     const isShowing = action === 'show';
@@ -152,9 +153,7 @@ class LUTDataAdaptersPage extends React.Component {
       content = <Spinner text="Loading data adapters" />;
     } else {
       content = (
-        <DataAdaptersOverview dataAdapters={dataAdapters}
-                              pagination={pagination}
-                              errorStates={errorStates} />
+        <DataAdaptersOverview />
       );
     }
 
@@ -187,22 +186,18 @@ class LUTDataAdaptersPage extends React.Component {
 }
 
 LUTDataAdaptersPage.propTypes = {
-  errorStates: PropTypes.object,
   dataAdapter: PropTypes.object,
   validationErrors: PropTypes.object,
   types: PropTypes.object,
-  pagination: PropTypes.object,
   dataAdapters: PropTypes.array,
   location: PropTypes.object.isRequired,
   action: PropTypes.string,
 };
 
 LUTDataAdaptersPage.defaultProps = {
-  errorStates: null,
   validationErrors: {},
   dataAdapters: null,
   types: null,
-  pagination: null,
   dataAdapter: null,
   action: undefined,
 };

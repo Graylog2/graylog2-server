@@ -46,7 +46,12 @@ describe('<DataAdapterCreate />', () => {
   it('should render with empty parameters', () => {
     const callback = () => {};
     const types = {};
-    const wrapper = mount(<DataAdapterCreate saved={callback} types={types} />);
+    const wrapper = mount(
+      <DataAdapterCreate saved={callback}
+                         types={types}
+                         validate={() => {}}
+                         validationErrors={{}} />,
+    );
 
     expect(wrapper).toExist();
   });
@@ -56,9 +61,16 @@ describe('<DataAdapterCreate />', () => {
     const types = {
       someType: {
         type: 'someType',
+        config_class: '',
+        default_config: { type: 'none' },
       },
     };
-    const wrapper = mount(<DataAdapterCreate saved={callback} types={types} />);
+    const wrapper = mount(
+      <DataAdapterCreate saved={callback}
+                         types={types}
+                         validate={() => {}}
+                         validationErrors={{}} />,
+    );
 
     expect(wrapper).toExist();
   });
@@ -82,13 +94,21 @@ describe('<DataAdapterCreate />', () => {
       const types = {
         unknownType: {
           type: 'unknownType',
+          config_class: '',
+          default_config: { type: 'none' },
         },
       };
-      const wrapper = mount(<DataAdapterCreate saved={callback} types={types} />);
+
+      const wrapper = mount(
+        <DataAdapterCreate saved={callback}
+                           types={types}
+                           validate={() => {}}
+                           validationErrors={{}} />,
+      );
 
       expect(wrapper).toExist();
       // eslint-disable-next-line no-console
-      expect(console.error.mock.calls.length).toBe(1);
+      expect(console.error).toHaveBeenCalled();
     });
   });
 });

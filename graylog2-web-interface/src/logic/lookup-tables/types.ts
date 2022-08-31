@@ -65,3 +65,13 @@ export type LookupTable = GenericEntityType & {
 }
 
 export type validationErrorsType = { name?: string, message?: string };
+
+export type LUTTypesType = {
+  type: string,
+  config_class: string,
+  default_config: LookupTableCacheConfig | LookupTableDataAdapterConfig,
+}
+
+export type LUTTypesAPIResponse = {
+  [key: string]: LUTTypesType,
+};

@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { LookupTableCache, validationErrorsType } from 'src/logic/lookup-tables/types';
 
+import type { LookupTableCache, validationErrorsType, LUTTypesType } from 'logic/lookup-tables/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Row, Col, Input } from 'components/bootstrap';
 import { Select } from 'components/common';
@@ -37,7 +37,7 @@ type OptionType = { value: string, label: string }
 
 type Props = {
   saved: () => void,
-  types: TypesType[],
+  types: LUTTypesType,
   validate: () => void,
   validationErrors: validationErrorsType,
 };
