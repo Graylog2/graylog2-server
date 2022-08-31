@@ -17,7 +17,7 @@
 import { waitFor } from 'wrappedTestingLibrary';
 
 import fetch from 'logic/rest/FetchProvider';
-import { StoreMock as MockStore, asMock } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import UserNotification from 'util/UserNotification';
 
 import type { ValidationQuery } from './validateQuery';
