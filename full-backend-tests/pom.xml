@@ -54,20 +54,6 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.graylog</groupId>
-            <artifactId>graylog-storage-elasticsearch6</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog</groupId>
-            <artifactId>graylog-storage-elasticsearch6</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>org.graylog</groupId>
             <artifactId>graylog-storage-elasticsearch7</artifactId>
@@ -80,7 +66,6 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-
         <!-- Logging dependencies -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

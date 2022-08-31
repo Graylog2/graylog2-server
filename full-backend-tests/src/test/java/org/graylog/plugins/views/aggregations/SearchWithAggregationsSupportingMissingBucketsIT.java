@@ -28,7 +28,6 @@ import java.io.InputStream;
 
 import static io.restassured.RestAssured.given;
 import static org.graylog.plugins.views.search.aggregations.MissingBucketConstants.MISSING_BUCKET_NAME;
-import static org.graylog.testing.containermatrix.SearchServer.ES6;
 import static org.graylog.testing.containermatrix.SearchServer.ES7;
 import static org.graylog.testing.containermatrix.SearchServer.OS1;
 import static org.hamcrest.Matchers.contains;
@@ -38,7 +37,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {OS1, ES6, ES7})
+@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {OS1, ES7})
 public class SearchWithAggregationsSupportingMissingBucketsIT {
 
     @SuppressWarnings("unused")

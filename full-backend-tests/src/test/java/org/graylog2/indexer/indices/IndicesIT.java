@@ -23,9 +23,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.codec.binary.Base64;
-import org.graylog.storage.elasticsearch6.IndexingHelper;
-import org.graylog.storage.elasticsearch6.IndicesAdapterES6;
-import org.graylog.storage.elasticsearch6.NodeAdapterES6;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.IndicesAdapterES7;
 import org.graylog.storage.elasticsearch7.NodeAdapterES7;
@@ -84,7 +81,6 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
-import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -126,44 +122,27 @@ public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
     }
 
     protected IndicesAdapter indicesAdapter() {
-        if (elasticsearch().searchServer().equals(SearchServer.ES6)) {
-            return new IndicesAdapterES6(jestClient(elasticsearch()),
-                    new ObjectMapperProvider().get(),
-                    new IndexingHelper());
-        } else {
-            final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-            final ElasticsearchClient client = elasticsearchClient();
-            return new IndicesAdapterES7(
-                    client,
-                    new StatsApi(objectMapper, client),
-                    new CatApi(objectMapper, client),
-                    new ClusterStateApi(objectMapper, client)
-            );
-        }
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        final ElasticsearchClient client = elasticsearchClient();
+        return new IndicesAdapterES7(
+                client,
+                new StatsApi(objectMapper, client),
+                new CatApi(objectMapper, client),
+                new ClusterStateApi(objectMapper, client)
+        );
     }
 
     protected NodeAdapter createNodeAdapter() {
-        if (elasticsearch().searchServer().equals(SearchServer.ES6)) {
-            return new NodeAdapterES6(jestClient(elasticsearch()));
-        } else {
-            final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-            return new NodeAdapterES7(elasticsearchClient(), objectMapper);
-        }
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        return new NodeAdapterES7(elasticsearchClient(), objectMapper);
+
     }
 
     protected Map<String, Object> createTemplateFor(String indexWildcard, Map<String, Object> mapping) {
-        if (elasticsearch().searchServer().equals(SearchServer.ES6)) {
-            return ImmutableMap.of(
-                    "template", indexWildcard,
-                    "mappings", ImmutableMap.of(IndexMapping.TYPE_MESSAGE, mapping)
-            );
-        } else {
-            // for ES7 and OS1
-            return ImmutableMap.of(
-                    "template", indexWildcard,
-                    "mappings", mapping
-            );
-        }
+        return ImmutableMap.of(
+                "template", indexWildcard,
+                "mappings", mapping
+        );
     }
 
     @BeforeEach
@@ -521,7 +500,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
         final String index = createRandomIndex("indices_it_");
         String uuid = indices.getIndexId(index);
         assertThat(uuid).isNotEmpty();
-        assert(Base64.isBase64(uuid));
+        assert (Base64.isBase64(uuid));
     }
 
     @ContainerMatrixTest

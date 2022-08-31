@@ -17,11 +17,9 @@
 package org.graylog2.indexer.counts;
 
 import com.google.common.collect.ImmutableMap;
-import org.graylog.storage.elasticsearch6.CountsAdapterES6;
 import org.graylog.storage.elasticsearch7.CountsAdapterES7;
 import org.graylog.testing.ContainerMatrixElasticsearchITBaseTest;
 import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
@@ -47,7 +45,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -73,11 +70,7 @@ public class CountsIT extends ContainerMatrixElasticsearchITBaseTest {
     }
 
     protected CountsAdapter countsAdapter() {
-        if (elasticsearch().searchServer().equals(SearchServer.ES6)) {
-            return new CountsAdapterES6(jestClient(elasticsearch()));
-        } else {
-            return new CountsAdapterES7(elasticsearchClient());
-        }
+        return new CountsAdapterES7(elasticsearchClient());
     }
 
     @BeforeAll
