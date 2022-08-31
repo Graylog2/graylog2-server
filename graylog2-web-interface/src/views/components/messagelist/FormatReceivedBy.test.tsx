@@ -72,7 +72,7 @@ describe('FormatReceivedBy', () => {
         forwarder: [{
           isLocalNode,
           ForwarderReceivedBy,
-          messageLoaders: { ForwarderInputDropdown: () => <></> },
+          messageLoaders: { ForwarderInputDropdown: () => <div /> },
         }],
       },
     };
