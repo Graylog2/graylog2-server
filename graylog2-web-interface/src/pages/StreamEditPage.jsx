@@ -15,9 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import React, { useEffect, useState } from 'react';
 
 import { Alert } from 'components/bootstrap';
 import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
@@ -25,73 +23,62 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import StreamsStore from 'stores/streams/StreamsStore';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import useCurrentUser from 'hooks/useCurrentUser';
 
-const StreamEditPage = createReactClass({
-  displayName: 'StreamEditPage',
+const StreamEditPage = ({ params, location }) => {
+  const currentUser = useCurrentUser();
+  const [stream, setStream] = useState();
 
-  propTypes: {
-    params: PropTypes.object.isRequired,
-    location: PropTypes.object.isRequired,
-  },
-
-  mixins: [Reflux.connect(CurrentUserStore)],
-
-  componentDidMount() {
-    const { params } = this.props;
-
-    StreamsStore.get(params.streamId, (stream) => {
-      this.setState({ stream });
+  useEffect(() => {
+    StreamsStore.get(params.streamId, (newStream) => {
+      setStream(newStream);
     });
-  },
+  }, [params.streamId]);
 
-  _isLoading() {
-    const { currentUser, stream } = this.state;
+  const isLoading = !currentUser || !stream;
 
-    return !currentUser || !stream;
-  },
+  if (isLoading) {
+    return <Spinner />;
+  }
 
-  render() {
-    if (this._isLoading()) {
-      return <Spinner />;
-    }
+  let content = (
+    <StreamRulesEditor currentUser={currentUser}
+                       streamId={params.streamId}
+                       messageId={location.query.message_id}
+                       index={location.query.index} />
+  );
 
-    const { currentUser, stream } = this.state;
-    const { params, location } = this.props;
-    let content = (
-      <StreamRulesEditor currentUser={currentUser}
-                         streamId={params.streamId}
-                         messageId={location.query.message_id}
-                         index={location.query.index} />
-    );
-
-    if (stream.is_default) {
-      content = (
-        <div className="row content">
-          <div className="col-md-12">
-            <Alert bsStyle="danger">
-              The default stream cannot be edited.
-            </Alert>
-          </div>
+  if (stream.is_default) {
+    content = (
+      <div className="row content">
+        <div className="col-md-12">
+          <Alert bsStyle="danger">
+            The default stream cannot be edited.
+          </Alert>
         </div>
-      );
-    }
-
-    return (
-      <DocumentTitle title={`Rules of Stream ${stream.title}`}>
-        <div>
-          <PageHeader title={<span>Rules of Stream &raquo;{stream.title}&raquo;</span>}>
-            <span>
-              This screen is dedicated to an easy and comfortable creation and manipulation of stream rules. You can{' '}
-              see the effect configured stream rules have on message matching here.
-            </span>
-          </PageHeader>
-
-          {content}
-        </div>
-      </DocumentTitle>
+      </div>
     );
-  },
-});
+  }
+
+  return (
+    <DocumentTitle title={`Rules of Stream ${stream.title}`}>
+      <div>
+        <PageHeader title={<span>Rules of Stream &raquo;{stream.title}&raquo;</span>}>
+          <span>
+            This screen is dedicated to an easy and comfortable creation and manipulation of stream rules. You can{' '}
+            see the effect configured stream rules have on message matching here.
+          </span>
+        </PageHeader>
+
+        {content}
+      </div>
+    </DocumentTitle>
+  );
+};
+
+StreamEditPage.propTypes = {
+  params: PropTypes.object.isRequired,
+  location: PropTypes.object.isRequired,
+};
 
 export default withParams(withLocation(StreamEditPage));
