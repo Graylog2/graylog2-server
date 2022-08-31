@@ -50,7 +50,7 @@ const useGetPermissionsByScope = (entity: Partial<GenericEntityType>) => {
     },
   );
 
-  const scope = entity._scope ? entity._scope.toUpperCase() : 'DEFAULT';
+  const scope = entity?._scope.toUpperCase() || 'DEFAULT';
   const permissions: ScopeParams = isLoading ? { is_mutable: false } : data.entity_scopes[scope];
 
   return {

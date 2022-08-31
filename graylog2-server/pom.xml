@@ -601,7 +601,7 @@
         </dependency>
         <dependency>
             <groupId>org.jooq</groupId>
-            <artifactId>jool-java-8</artifactId>
+            <artifactId>jool</artifactId>
         </dependency>
         <dependency>
             <groupId>org.freemarker</groupId>
