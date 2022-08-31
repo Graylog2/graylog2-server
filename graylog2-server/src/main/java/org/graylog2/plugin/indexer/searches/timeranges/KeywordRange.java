@@ -32,7 +32,7 @@ public abstract class KeywordRange extends TimeRange {
     @JsonProperty
     @Override
     public String type() {
-
+        return KEYWORD;
     }
 
     @JsonProperty
@@ -63,8 +63,7 @@ public abstract class KeywordRange extends TimeRange {
     }
 
     private static Builder builder() {
-        return new AutoValue_KeywordRange.Builder()
-                .type(KEYWORD);
+        return new AutoValue_KeywordRange.Builder();
     }
 
     public String getKeyword() {
