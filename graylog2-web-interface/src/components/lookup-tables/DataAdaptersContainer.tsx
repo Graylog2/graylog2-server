@@ -16,24 +16,24 @@
  */
 import * as React from 'react';
 
-import { useGetAllCaches } from 'hooks/lookup-tables/useLookupTableCachesAPI';
+import { useGetAllDataAdapters } from 'hooks/lookup-tables/useLookupTableDataAdaptersAPI';
 import { Spinner } from 'components/common';
 
 type Props = {
   children: React.ReactChild[],
 };
 
-const CachesContainer = ({ children }: Props) => {
-  const { caches, pagination, loadingCaches } = useGetAllCaches({ page: 1, perPage: 10000 });
+const DataAdaptersContainer = ({ children }: Props) => {
+  const { dataAdapters, pagination, loadingDataAdapters } = useGetAllDataAdapters({ page: 1, perPage: 10000 });
 
   return (
-    loadingCaches ? <Spinner /> : (
+    loadingDataAdapters ? <Spinner /> : (
       <div>
         {React.Children.map(
           children,
           (child: React.ReactElement) => React.cloneElement(
             child,
-            { caches, pagination },
+            { dataAdapters, pagination },
           ),
         )}
       </div>
@@ -41,4 +41,4 @@ const CachesContainer = ({ children }: Props) => {
   );
 };
 
-export default CachesContainer;
+export default DataAdaptersContainer;

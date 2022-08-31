@@ -20,7 +20,6 @@ import type { LookupTableCache, validationErrorsType } from 'src/logic/lookup-ta
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Row, Col, Input } from 'components/bootstrap';
 import { Select } from 'components/common';
-import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 
 import CacheForm from './CacheForm';
 import type { CachePluginType } from './types';
@@ -34,7 +33,7 @@ const INIT_CACHE: LookupTableCache = {
 };
 
 type TypesType = { type?: string, lable?: string };
-type cacheTypeOptionsType = { value: string, label: string }
+type OptionType = { value: string, label: string }
 
 type Props = {
   saved: () => void,
@@ -58,7 +57,12 @@ const CacheCreate = ({ saved, types, validate, validationErrors }: Props) => {
   const cacheTypes = React.useMemo(() => (
     Object.values(types)
       .map((inType: TypesType) => ({ value: inType.type, label: plugins[inType.type].displayName }))
-      .sort((a: cacheTypeOptionsType, b: cacheTypeOptionsType) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()))
+      .sort((a: OptionType, b: OptionType) => {
+        if (a.label.toLowerCase() > b.label.toLowerCase()) return 1;
+        if (a.label.toLowerCase() < b.label.toLowerCase()) return -1;
+
+        return 0;
+      })
   ), [types, plugins]);
 
   const cache = React.useMemo(() => {

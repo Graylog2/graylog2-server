@@ -38,21 +38,24 @@ const Actions = styled.div`
 type Props = {
   adapter: LookupTableAdapter,
   error: string,
+  onDelete?: () => void
 };
 
-const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
+const DataAdapterTableEntry = ({ adapter, error = null, onDelete }: Props) => {
   const history = useHistory();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(adapter);
   const { name: adapterName, title: adapterTitle, description: adapterDescription, id: adapterId } = adapter;
 
-  const _onEdit = () => {
+  const handleEdit = () => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName));
   };
 
-  const _onDelete = () => {
+  const handleDelete = () => {
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Are you sure you want to delete data adapter "${adapterTitle}"?`)) {
-      LookupTableDataAdaptersActions.delete(adapter.id).then(() => LookupTableDataAdaptersActions.reloadPage());
+    const shouldDelete = window.confirm(`Are you sure you want to delete data adapter "${adapterTitle}"?`);
+
+    if (shouldDelete) {
+      LookupTableDataAdaptersActions.delete(adapter.id).then(() => onDelete());
     }
   };
 
@@ -75,7 +78,7 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
             <Actions>
               <Button bsSize="xsmall"
                       bsStyle="info"
-                      onClick={_onEdit}
+                      onClick={handleEdit}
                       role="button"
                       name="edit">
                 Edit
@@ -83,7 +86,7 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
               <Button style={{ marginLeft: '6px' }}
                       bsSize="xsmall"
                       bsStyle="primary"
-                      onClick={_onDelete}
+                      onClick={handleDelete}
                       role="button"
                       name="delete">
                 Delete
@@ -94,6 +97,10 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
       </tr>
     </tbody>
   );
+};
+
+DataAdapterTableEntry.defaultProps = {
+  onDelete: () => {},
 };
 
 export default DataAdapterTableEntry;

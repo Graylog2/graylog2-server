@@ -14,13 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { LookupTableCache } from 'logic/lookup-tables/types';
+import type { LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 
-export type LUTCacheAPIResponseType = {
-  caches: LookupTableCache[],
+type paginatedResposeType = {
   count: number,
   total: number,
   page: number,
   per_page: number,
   query?: string,
+};
+
+export type LUTErrorsAPIResponseType = {
+  tables: { [key: string]: string }
+  caches: { [key: string]: string }
+  data_adapters: { [key: string]: string }
+};
+
+export type LUTCacheAPIResponseType = paginatedResposeType & {
+  caches: LookupTableCache[],
+};
+
+export type LUTDataAdapterAPIResponseType = paginatedResposeType & {
+  data_adapters: LookupTableAdapter[],
 };

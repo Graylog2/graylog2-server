@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import { useField } from 'formik';
 
 import type { LookupTableCache } from 'logic/lookup-tables/types';
@@ -25,7 +25,7 @@ type Props = {
   caches: LookupTableCache[],
 };
 
-type OptionsType = {
+type OptionType = {
   label: string,
   value: string,
 };
@@ -34,7 +34,7 @@ const CachePicker = ({ caches }: Props) => {
   const sortedCaches = React.useMemo(() => {
     return caches.map((cache: LookupTableCache) => (
       { value: cache.id, label: `${cache.title} (${cache.name})` }
-    )).sort((a: OptionsType, b: OptionsType) => {
+    )).sort((a: OptionType, b: OptionType) => {
       if (a.label.toLowerCase() > b.label.toLowerCase()) return 1;
       if (a.label.toLowerCase() < b.label.toLowerCase()) return -1;
 
