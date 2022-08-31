@@ -30,11 +30,7 @@ public class MessageIndexTemplateProvider implements IndexTemplateProvider {
 
     @Override
     public IndexMapping create(@Nonnull SearchVersion searchVersion, @Nonnull IndexSetConfig indexSetConfig) {
-        if (searchVersion.satisfies(ELASTICSEARCH, "^5.0.0")) {
-            return new IndexMapping5();
-        } else if (searchVersion.satisfies(ELASTICSEARCH, "^6.0.0")) {
-            return new IndexMapping6();
-        } else if (searchVersion.satisfies(ELASTICSEARCH, "^7.0.0") ||  searchVersion.satisfies(OPENSEARCH, "^1.0.0")) {
+        if (searchVersion.satisfies(ELASTICSEARCH, "^7.0.0") ||  searchVersion.satisfies(OPENSEARCH, "^1.0.0")) {
             return new IndexMapping7();
         } else {
             throw new ElasticsearchException("Unsupported Search version: " + searchVersion);
