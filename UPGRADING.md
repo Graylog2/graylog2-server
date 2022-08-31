@@ -71,6 +71,12 @@ The following Java Code API changes have been made in 4.4.
 | `PaginatedPipelineService.java` | Concrete implementation has been changed to an interface |
 | `PaginatedRuleService.java`     | Concrete implementation has been changed to an interface |
 
+## Configuration File Changes
+
+| Option                                        | Action       | Description                                                     |
+|-----------------------------------------------|--------------|-----------------------------------------------------------------|
+| `mongodb_threads_allowed_to_block_multiplier` | **removed**  | Configuring this is not supported by the official MongoDB driver anymore. |
+
 ## Behaviour Changes
 
 - The Prometheus metrics for Graylog inputs were previously only exposed for
