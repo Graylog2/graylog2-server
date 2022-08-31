@@ -72,7 +72,9 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@Api(value = "Sidecar/Collectors", description = "Manage collectors")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "Sidecar/Collectors", description = "Manage collectors", tags = {CLOUD_VISIBLE})
 @Path("/sidecar/collectors")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)

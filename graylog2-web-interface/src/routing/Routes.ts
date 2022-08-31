@@ -64,6 +64,7 @@ const Routes = {
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
   GETTING_STARTED: '/gettingstarted',
+  GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
   SYSTEM: {
     CONFIGURATIONS: '/system/configurations',
     CONTENTPACKS: {
@@ -252,6 +253,7 @@ const Routes = {
   edit_input_extractor: (nodeId: string, inputId: string, extractorId: string) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
   getting_started: (fromMenu) => `${Routes.GETTING_STARTED}?menu=${fromMenu}`,
   filtered_metrics: (nodeId: string, filter: string) => `${Routes.SYSTEM.METRICS(nodeId)}?filter=${filter}`,
+  global_api_browser: () => Routes.GLOBAL_API_BROWSER_URL,
 } as const;
 
 const qualifyUrls = (routes, appPrefix): typeof routes => {

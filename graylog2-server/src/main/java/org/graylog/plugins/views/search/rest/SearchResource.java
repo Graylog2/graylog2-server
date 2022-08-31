@@ -59,7 +59,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-@Api(value = "Search")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "Search", tags = {CLOUD_VISIBLE})
 @Path("/views/search")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes({MediaType.APPLICATION_JSON})
