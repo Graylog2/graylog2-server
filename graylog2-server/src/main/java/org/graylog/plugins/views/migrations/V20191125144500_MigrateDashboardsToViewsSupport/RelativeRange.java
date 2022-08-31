@@ -29,9 +29,7 @@ public abstract class RelativeRange extends TimeRange {
 
     @JsonProperty
     @Override
-    public String type() {
-        return RELATIVE;
-    }
+    public abstract String type();
 
     @JsonProperty
     public abstract int range();
