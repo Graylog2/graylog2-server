@@ -23,8 +23,9 @@ import mockAction from 'helpers/mocking/MockAction';
 import MockStore from 'helpers/mocking/StoreMock';
 import mockComponent from 'helpers/mocking/MockComponent';
 import { simpleEventDefinition as mockEventDefinition } from 'fixtures/eventDefinition';
-import { alice } from 'fixtures/users';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import { adminUser } from 'fixtures/users';
+import { asMock } from 'helpers/mocking';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import ViewEventDefinitionPage from './ViewEventDefinitionPage';
 
@@ -34,6 +35,8 @@ jest.mock('react-router-dom', () => ({
     definitionId: mockEventDefinition.id,
   })),
 }));
+
+jest.mock('hooks/useCurrentUser');
 
 jest.mock('stores/event-definitions/EventDefinitionsStore', () => ({
   EventDefinitionsActions: {
@@ -51,35 +54,32 @@ jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
 jest.mock('components/event-definitions/event-definition-form/EventDefinitionSummary', () => mockComponent('EventDefinitionSummary'));
 
 describe('<ViewEventDefinitionPage />', () => {
-  const EventDefinitionPageWithPermissions = ({ permissions = [] }: {permissions?: string | Array<string>},
-  ) => {
-    const user = alice.toBuilder().permissions(Immutable.List(permissions)).build();
-
-    const EventDefintionPageWithParams = <ViewEventDefinitionPage />;
-
-    return (
-      <CurrentUserContext.Provider value={user}>
-        {EventDefintionPageWithParams}
-      </CurrentUserContext.Provider>
-    );
-  };
-
-  EventDefinitionPageWithPermissions.defaultProps = { permissions: [] };
+  beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(adminUser);
+  });
 
   it('should display the event definition page', async () => {
-    render(<EventDefinitionPageWithPermissions />);
+    render(<ViewEventDefinitionPage />);
 
     await screen.findByText(/View Event Definition/);
   });
 
   it('should display event details when permitted', async () => {
-    render(<EventDefinitionPageWithPermissions permissions={[`eventdefinitions:read:${mockEventDefinition.id}`]} />);
+    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+      .permissions(Immutable.List([`eventdefinitions:read:${mockEventDefinition.id}`]))
+      .build());
+
+    render(<ViewEventDefinitionPage />);
 
     await screen.findByText(/Event Definition 1/);
   });
 
   it('should display the edit button when allowed', async () => {
-    render(<EventDefinitionPageWithPermissions permissions={[`eventdefinitions:read:${mockEventDefinition.id}`, `eventdefinitions:edit:${mockEventDefinition.id}`]} />);
+    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+      .permissions(Immutable.List([`eventdefinitions:read:${mockEventDefinition.id}`, `eventdefinitions:edit:${mockEventDefinition.id}`]))
+      .build());
+
+    render(<ViewEventDefinitionPage />);
 
     await screen.findAllByRole('link', {
       name: /edit event definition/i,
