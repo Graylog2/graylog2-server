@@ -24,9 +24,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotBucketSpecHandler;
-import org.opensearch.action.search.SearchResponse;
 import org.opensearch.search.aggregations.AggregationBuilder;
 import org.opensearch.search.aggregations.AggregationBuilders;
 import org.opensearch.search.aggregations.BucketOrder;
@@ -42,7 +40,7 @@ import java.util.stream.Stream;
 public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, ParsedDateHistogram> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Time timeSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Time timeSpec, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
         final DateHistogramInterval dateHistogramInterval = new DateHistogramInterval(timeSpec.interval().toDateInterval(query.effectiveTimeRange(pivot)).toString());
         final Optional<BucketOrder> ordering = orderForPivot(pivot, timeSpec, esGeneratedQueryContext);
         final DateHistogramAggregationBuilder builder = AggregationBuilders.dateHistogram(name)

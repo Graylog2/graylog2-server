@@ -16,7 +16,7 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.graylog.storage.opensearch2.testing.ElasticsearchInstanceES7;
+import org.graylog.storage.opensearch2.testing.OpensearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesAdapter;
@@ -25,7 +25,7 @@ import org.junit.Rule;
 
 public class SearchesES7IT extends SearchesIT {
     @Rule
-    public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
+    public final OpensearchInstance elasticsearch = OpensearchInstance.create();
 
     @Override
     protected SearchServerInstance elasticsearch() {

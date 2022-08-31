@@ -25,7 +25,7 @@ import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog.plugins.views.search.export.TestData;
-import org.graylog.storage.opensearch2.testing.ElasticsearchInstanceES7;
+import org.graylog.storage.opensearch2.testing.OpensearchInstance;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.ElasticsearchException;
@@ -52,7 +52,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     private ElasticsearchExportBackend sut;
 
     @Rule
-    public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
+    public final OpensearchInstance elasticsearch = OpensearchInstance.create();
 
     @Override
     protected SearchServerInstance elasticsearch() {

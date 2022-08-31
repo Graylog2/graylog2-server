@@ -19,7 +19,6 @@ package org.graylog.storage.opensearch2.testing;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.opensearch.client.RestHighLevelClient;
 import org.graylog.storage.opensearch2.ElasticsearchClient;
 import org.graylog.storage.opensearch2.RestHighLevelClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
@@ -29,6 +28,7 @@ import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
+import org.opensearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -44,16 +44,18 @@ import static java.util.Objects.isNull;
 public class OpensearchInstance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchInstance.class);
 
+    protected static final String ES_VERSION = "2.0.1";
     private static final int ES_PORT = 9200;
-    private static final String NETWORK_ALIAS = "elasticsearch";
+    private static final String NETWORK_ALIAS = "opensearch";
+    public static final String DEFAULT_HEAP_SIZE = "2g";
 
     private final RestHighLevelClient restHighLevelClient;
     private final ElasticsearchClient elasticsearchClient;
     private final Client client;
     private final FixtureImporter fixtureImporter;
 
-    protected OpensearchInstance(String image, SearchVersion version, Network network) {
-        super(image, version, network);
+    protected OpensearchInstance(String image, SearchVersion version, Network network, String heapSize) {
+        super(image, version, network, heapSize);
         this.restHighLevelClient = buildRestClient();
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
         this.client = new ClientES7(this.elasticsearchClient);
@@ -85,12 +87,25 @@ public class OpensearchInstance extends TestableSearchServerInstance {
                 .get();
     }
 
+    public static OpensearchInstance create() {
+        return create(SearchVersion.opensearch(ES_VERSION), Network.newNetwork(), DEFAULT_HEAP_SIZE);
+    }
+
+    public static OpensearchInstance create(String heapSize) {
+        return create(SearchVersion.opensearch(ES_VERSION), Network.newNetwork(), heapSize);
+    }
+
+    // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
     public static OpensearchInstance create(SearchVersion searchVersion, Network network) {
+        return create(searchVersion, network, DEFAULT_HEAP_SIZE);
+    }
+
+    private static OpensearchInstance create(SearchVersion searchVersion, Network network, String heapSize) {
         final String image = imageNameFrom(searchVersion);
 
         LOG.debug("Creating instance {}", image);
 
-        return new OpensearchInstance(image, searchVersion, network);
+        return new OpensearchInstance(image, searchVersion, network, heapSize);
     }
 
     private static String imageNameFrom(SearchVersion version) {

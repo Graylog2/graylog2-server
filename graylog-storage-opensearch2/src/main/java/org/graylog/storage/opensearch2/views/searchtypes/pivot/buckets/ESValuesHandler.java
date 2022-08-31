@@ -24,9 +24,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotBucketSpecHandler;
-import org.opensearch.action.search.SearchResponse;
 import org.opensearch.search.aggregations.AggregationBuilder;
 import org.opensearch.search.aggregations.AggregationBuilders;
 import org.opensearch.search.aggregations.BucketOrder;
@@ -44,7 +42,7 @@ import java.util.stream.Stream;
 public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, Terms> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Values valuesSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Values valuesSpec, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, valuesSpec, esGeneratedQueryContext);
         final TermsAggregationBuilder builder = AggregationBuilders.terms(name)
                 .minDocCount(1)

@@ -21,6 +21,13 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
+import org.graylog2.indexer.messages.ChunkedBulkIndexer;
+import org.graylog2.indexer.messages.DocumentNotFoundException;
+import org.graylog2.indexer.messages.Indexable;
+import org.graylog2.indexer.messages.IndexingRequest;
+import org.graylog2.indexer.messages.Messages;
+import org.graylog2.indexer.messages.MessagesAdapter;
+import org.graylog2.indexer.results.ResultMessage;
 import org.opensearch.OpenSearchException;
 import org.opensearch.action.bulk.BulkItemResponse;
 import org.opensearch.action.bulk.BulkRequest;
@@ -32,13 +39,6 @@ import org.opensearch.client.indices.AnalyzeRequest;
 import org.opensearch.client.indices.AnalyzeResponse;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.rest.RestStatus;
-import org.graylog2.indexer.messages.ChunkedBulkIndexer;
-import org.graylog2.indexer.messages.DocumentNotFoundException;
-import org.graylog2.indexer.messages.Indexable;
-import org.graylog2.indexer.messages.IndexingRequest;
-import org.graylog2.indexer.messages.Messages;
-import org.graylog2.indexer.messages.MessagesAdapter;
-import org.graylog2.indexer.results.ResultMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,7 +175,7 @@ public class MessagesAdapterES7 implements MessagesAdapter {
         } catch (OpenSearchException e) {
             for (OpenSearchException cause : e.guessRootCauses()) {
                 if (cause.status().equals(RestStatus.REQUEST_ENTITY_TOO_LARGE)) {
-                    throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully, indexingErrorsFrom(chunk));
+                    throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully);
                 }
             }
             throw new org.graylog2.indexer.ElasticsearchException(e);
@@ -229,14 +229,17 @@ public class MessagesAdapterES7 implements MessagesAdapter {
         switch (exception.type()) {
             case MAPPER_PARSING_EXCEPTION: return Messages.IndexingError.ErrorType.MappingError;
             case INDEX_BLOCK_ERROR:
-                if (exception.reason().contains(INDEX_BLOCK_REASON) || exception.reason().contains(FLOOD_STAGE_WATERMARK))
+                if (exception.reason().contains(INDEX_BLOCK_REASON) || exception.reason().contains(FLOOD_STAGE_WATERMARK)) {
                     return Messages.IndexingError.ErrorType.IndexBlocked;
+                }
             case UNAVAILABLE_SHARDS_EXCEPTION:
-                if (exception.reason().contains(PRIMARY_SHARD_NOT_ACTIVE_REASON))
+                if (exception.reason().contains(PRIMARY_SHARD_NOT_ACTIVE_REASON)) {
                     return Messages.IndexingError.ErrorType.IndexBlocked;
+                }
             case ILLEGAL_ARGUMENT_EXCEPTION:
-                if (exception.reason().contains(NO_WRITE_INDEX_DEFINED_FOR_ALIAS))
+                if (exception.reason().contains(NO_WRITE_INDEX_DEFINED_FOR_ALIAS)) {
                     return Messages.IndexingError.ErrorType.IndexBlocked;
+                }
             default: return Messages.IndexingError.ErrorType.Unknown;
         }
     }

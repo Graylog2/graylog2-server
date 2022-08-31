@@ -21,7 +21,7 @@ import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog.storage.opensearch2.cluster.ClusterStateApi;
 import org.graylog.storage.opensearch2.mapping.FieldMappingApi;
 import org.graylog.storage.opensearch2.stats.StatsApi;
-import org.graylog.storage.opensearch2.testing.ElasticsearchInstanceES7;
+import org.graylog.storage.opensearch2.testing.OpensearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerIT;
@@ -31,7 +31,7 @@ import org.junit.Rule;
 
 public class IndexFieldTypePollerES7IT extends IndexFieldTypePollerIT {
     @Rule
-    public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
+    public final OpensearchInstance elasticsearch = OpensearchInstance.create();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 

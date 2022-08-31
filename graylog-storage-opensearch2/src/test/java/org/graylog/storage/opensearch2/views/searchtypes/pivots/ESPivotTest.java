@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.revinate.assertj.json.JsonPathAssert;
+import org.apache.lucene.search.TotalHits;
 import org.assertj.core.api.AbstractCharSequenceAssert;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
@@ -32,17 +33,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
-import org.apache.lucene.search.TotalHits;
-import org.opensearch.action.search.SearchResponse;
-import org.opensearch.index.query.QueryBuilders;
-import org.opensearch.search.SearchHit;
-import org.opensearch.search.SearchHits;
-import org.opensearch.search.aggregations.Aggregation;
-import org.opensearch.search.aggregations.AggregationBuilders;
-import org.opensearch.search.aggregations.Aggregations;
-import org.opensearch.search.aggregations.metrics.Max;
-import org.opensearch.search.aggregations.metrics.Min;
-import org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotBucketSpecHandler;
@@ -64,6 +54,16 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.index.query.QueryBuilders;
+import org.opensearch.search.SearchHit;
+import org.opensearch.search.SearchHits;
+import org.opensearch.search.aggregations.Aggregation;
+import org.opensearch.search.aggregations.AggregationBuilders;
+import org.opensearch.search.aggregations.Aggregations;
+import org.opensearch.search.aggregations.metrics.Max;
+import org.opensearch.search.aggregations.metrics.Min;
+import org.opensearch.search.builder.SearchSourceBuilder;
 
 import java.util.Collections;
 import java.util.Date;
@@ -161,11 +161,11 @@ public class ESPivotTest {
 
         this.esPivot.doGenerateQueryPart(job, query, pivot, queryContext);
 
-        verify(bucketHandler, times(1)).createAggregation(eq("agg-1"), eq(pivot), eq(values), eq(this.esPivot), eq(queryContext), eq(query));
+        verify(bucketHandler, times(1)).createAggregation(eq("agg-1"), eq(pivot), eq(values), eq(queryContext), eq(query));
     }
 
     private void mockBucketSpecGeneratesComparableString(ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> bucketHandler) {
-        when(bucketHandler.createAggregation(any(), any(), any(), any(), any(), any()))
+        when(bucketHandler.createAggregation(any(), any(), any(), any(), any()))
                 .thenAnswer(invocation -> Optional.of(AggregationBuilders.filter(invocation.getArgument(0), QueryBuilders.existsQuery(invocation.getArgument(2).toString()))));
     }
 
@@ -189,8 +189,8 @@ public class ESPivotTest {
 
         this.esPivot.doGenerateQueryPart(job, query, pivot, queryContext);
 
-        verify(valuesBucketHandler, times(1)).createAggregation(eq("values-agg"), eq(pivot), eq(values), eq(this.esPivot), eq(queryContext), eq(query));
-        verify(timeBucketHandler, times(1)).createAggregation(eq("time-agg"), eq(pivot), eq(time), eq(this.esPivot), eq(queryContext), eq(query));
+        verify(valuesBucketHandler, times(1)).createAggregation(eq("values-agg"), eq(pivot), eq(values), eq(queryContext), eq(query));
+        verify(timeBucketHandler, times(1)).createAggregation(eq("time-agg"), eq(pivot), eq(time), eq(queryContext), eq(query));
 
         final DocumentContext context = JsonPath.parse(searchSourceBuilder.toString());
         extractAggregation(context, "values-agg")
@@ -219,8 +219,8 @@ public class ESPivotTest {
 
         this.esPivot.doGenerateQueryPart(job, query, pivot, queryContext);
 
-        verify(valuesBucketHandler, times(1)).createAggregation(eq("values-agg"), eq(pivot), eq(values), eq(this.esPivot), eq(queryContext), eq(query));
-        verify(timeBucketHandler, times(1)).createAggregation(eq("time-agg"), eq(pivot), eq(time), eq(this.esPivot), eq(queryContext), eq(query));
+        verify(valuesBucketHandler, times(1)).createAggregation(eq("values-agg"), eq(pivot), eq(values), eq(queryContext), eq(query));
+        verify(timeBucketHandler, times(1)).createAggregation(eq("time-agg"), eq(pivot), eq(time), eq(queryContext), eq(query));
 
         final DocumentContext context = JsonPath.parse(searchSourceBuilder.toString());
         extractAggregation(context, "time-agg")
@@ -250,8 +250,8 @@ public class ESPivotTest {
 
         this.esPivot.doGenerateQueryPart(job, query, pivot, queryContext);
 
-        verify(valuesBucketHandler, times(1)).createAggregation(eq("values-agg"), eq(pivot), eq(values), eq(this.esPivot), eq(queryContext), eq(query));
-        verify(timeBucketHandler, times(1)).createAggregation(eq("time-agg"), eq(pivot), eq(time), eq(this.esPivot), eq(queryContext), eq(query));
+        verify(valuesBucketHandler, times(1)).createAggregation(eq("values-agg"), eq(pivot), eq(values), eq(queryContext), eq(query));
+        verify(timeBucketHandler, times(1)).createAggregation(eq("time-agg"), eq(pivot), eq(time), eq(queryContext), eq(query));
 
         final DocumentContext context = JsonPath.parse(searchSourceBuilder.toString());
         extractAggregation(context, "time-agg")
@@ -296,10 +296,10 @@ public class ESPivotTest {
 
         this.esPivot.doGenerateQueryPart(job, query, pivot, queryContext);
 
-        verify(timeBucketHandler).createAggregation(eq("rowPivot1"), eq(pivot), eq(rowPivot1), eq(this.esPivot), eq(queryContext), eq(query));
-        verify(valuesBucketHandler).createAggregation(eq("rowPivot2"), eq(pivot), eq(rowPivot2), eq(this.esPivot), eq(queryContext), eq(query));
-        verify(valuesBucketHandler).createAggregation(eq("columnPivot1"), eq(pivot), eq(columnPivot1), eq(this.esPivot), eq(queryContext), eq(query));
-        verify(valuesBucketHandler).createAggregation(eq("columnPivot2"), eq(pivot), eq(columnPivot2), eq(this.esPivot), eq(queryContext), eq(query));
+        verify(timeBucketHandler).createAggregation(eq("rowPivot1"), eq(pivot), eq(rowPivot1), eq(queryContext), eq(query));
+        verify(valuesBucketHandler).createAggregation(eq("rowPivot2"), eq(pivot), eq(rowPivot2), eq(queryContext), eq(query));
+        verify(valuesBucketHandler).createAggregation(eq("columnPivot1"), eq(pivot), eq(columnPivot1), eq(queryContext), eq(query));
+        verify(valuesBucketHandler).createAggregation(eq("columnPivot2"), eq(pivot), eq(columnPivot2), eq(queryContext), eq(query));
 
         final DocumentContext context = JsonPath.parse(searchSourceBuilder.toString());
         extractAggregation(context, "rowPivot1")

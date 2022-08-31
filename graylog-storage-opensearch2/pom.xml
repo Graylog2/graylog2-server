@@ -35,7 +35,7 @@
     <description>Graylog Storage Module for Opensearch 7</description>
 
     <properties>
-        <opensearch.version>2.0.0-rc1</opensearch.version>
+        <opensearch.version>2.0.1</opensearch.version>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 

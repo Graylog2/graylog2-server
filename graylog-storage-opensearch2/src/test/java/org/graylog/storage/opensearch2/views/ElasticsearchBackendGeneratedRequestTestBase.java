@@ -24,14 +24,12 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
-import org.opensearch.action.search.SearchRequest;
-import org.opensearch.search.aggregations.Aggregation;
 import org.graylog.storage.opensearch2.ElasticsearchClient;
 import org.graylog.storage.opensearch2.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
@@ -49,14 +47,16 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.opensearch.action.search.SearchRequest;
+import org.opensearch.search.aggregations.Aggregation;
 
 import javax.inject.Provider;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -94,8 +94,11 @@ public class ElasticsearchBackendGeneratedRequestTestBase {
         this.elasticsearchBackend = new ElasticsearchBackend(elasticSearchTypeHandlers,
                 client,
                 indexLookup,
-                new QueryStringDecorators(Optional.empty()),
-                (elasticsearchBackend, ssb, job, query) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
+                usedSearchFilters -> usedSearchFilters.stream()
+                        .filter(sf -> sf instanceof InlineQueryStringSearchFilter)
+                        .map(inlineSf -> ((InlineQueryStringSearchFilter) inlineSf).queryString())
+                        .collect(Collectors.toSet()),
                 false);
     }
 

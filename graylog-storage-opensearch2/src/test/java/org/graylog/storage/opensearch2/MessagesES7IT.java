@@ -18,25 +18,25 @@ package org.graylog.storage.opensearch2;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.opensearch.action.admin.indices.refresh.RefreshRequest;
-import org.opensearch.action.index.IndexRequest;
-import org.opensearch.action.index.IndexResponse;
-import org.opensearch.client.core.CountRequest;
-import org.opensearch.client.core.CountResponse;
-import org.opensearch.rest.RestStatus;
-import org.graylog.storage.opensearch2.testing.ElasticsearchInstanceES7;
+import org.graylog.storage.opensearch2.testing.OpensearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.messages.MessagesIT;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
+import org.opensearch.action.admin.indices.refresh.RefreshRequest;
+import org.opensearch.action.index.IndexRequest;
+import org.opensearch.action.index.IndexResponse;
+import org.opensearch.client.core.CountRequest;
+import org.opensearch.client.core.CountResponse;
+import org.opensearch.rest.RestStatus;
 
 import java.util.Map;
 
 public class MessagesES7IT extends MessagesIT {
     @Rule
-    public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
+    public final OpensearchInstance elasticsearch = OpensearchInstance.create();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 

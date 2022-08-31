@@ -20,10 +20,8 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
 import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotBucketSpecHandler;
 import org.joda.time.base.AbstractDateTime;
-import org.opensearch.action.search.SearchResponse;
 import org.opensearch.search.aggregations.AggregationBuilder;
 import org.opensearch.search.aggregations.AggregationBuilders;
 import org.opensearch.search.aggregations.bucket.range.DateRangeAggregationBuilder;
@@ -36,7 +34,7 @@ import java.util.stream.Stream;
 public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket, ParsedDateRange> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, DateRangeBucket dateRangeBucket, ESPivot searchTypeHandler, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, DateRangeBucket dateRangeBucket, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
         final DateRangeAggregationBuilder builder = AggregationBuilders.dateRange(name).field(dateRangeBucket.field());
         dateRangeBucket.ranges().forEach(r -> {
             final String from = r.from().map(AbstractDateTime::toString).orElse(null);

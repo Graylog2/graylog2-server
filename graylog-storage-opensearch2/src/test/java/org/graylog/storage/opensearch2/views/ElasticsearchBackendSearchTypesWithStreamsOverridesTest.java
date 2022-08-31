@@ -17,22 +17,19 @@
 package org.graylog.storage.opensearch2.views;
 
 import com.google.common.collect.ImmutableSet;
-import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
-import org.opensearch.action.search.MultiSearchResponse;
-import org.opensearch.action.search.SearchRequest;
 import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
-import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.Test;
+import org.opensearch.action.search.MultiSearchResponse;
+import org.opensearch.action.search.SearchRequest;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -41,9 +38,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.storage.opensearch2.views.ViewsUtils.indicesOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,59 +64,59 @@ public class ElasticsearchBackendSearchTypesWithStreamsOverridesTest extends Ela
     @Test
     public void searchTypeWithEmptyStreamsDefaultsToQueriesStreams() throws IOException {
         final Query query = queryFor(Pivot.builder()
-                                .id("pivot1")
-                                .series(Collections.singletonList(Average.builder().field("field1").build()))
-                                .rollup(true)
-                                .streams(Collections.emptySet())
-                                .build());
+                .id("pivot1")
+                .series(Collections.singletonList(Average.builder().field("field1").build()))
+                .rollup(true)
+                .streams(Collections.emptySet())
+                .build());
 
         final List<SearchRequest> request = run(query);
-        Assertions.assertThat(ViewsUtils.indicesOf(request).get(0)).isEqualTo("index1,index2");
+        assertThat(indicesOf(request).get(0)).isEqualTo("index1,index2");
     }
 
     @Test
     public void searchTypeWithoutStreamsDefaultsToQueriesStreams() throws IOException {
         final Query query = queryFor(Pivot.builder()
-                                .id("pivot1")
-                                .series(Collections.singletonList(Average.builder().field("field1").build()))
-                                .rollup(true)
-                                .build());
+                .id("pivot1")
+                .series(Collections.singletonList(Average.builder().field("field1").build()))
+                .rollup(true)
+                .build());
 
         final List<SearchRequest> request = run(query);
-        Assertions.assertThat(ViewsUtils.indicesOf(request).get(0)).isEqualTo("index1,index2");
+        assertThat(indicesOf(request).get(0)).isEqualTo("index1,index2");
     }
 
     @Test
     public void searchTypeWithStreamsOverridesQueriesStreams() throws IOException {
         final Query query = queryFor(Pivot.builder()
-                                .id("pivot1")
-                                .series(Collections.singletonList(Average.builder().field("field1").build()))
-                                .rollup(true)
-                                .streams(Collections.singleton(stream2Id))
-                                .build());
+                .id("pivot1")
+                .series(Collections.singletonList(Average.builder().field("field1").build()))
+                .rollup(true)
+                .streams(Collections.singleton(stream2Id))
+                .build());
 
         final List<SearchRequest> request = run(query);
-        Assertions.assertThat(ViewsUtils.indicesOf(request).get(0)).isEqualTo("index3");
+        assertThat(indicesOf(request).get(0)).isEqualTo("index3");
     }
 
     @Test
     public void queryWithMixedPresenceOfOverridesIncludesMultipleSetsOfIndices() throws IOException {
         final Query query = queryFor(Pivot.builder()
-                                .id("pivot1")
-                                .series(Collections.singletonList(Average.builder().field("field1").build()))
-                                .rollup(true)
-                                .streams(Collections.singleton(stream2Id))
-                                .build(),
-                        Pivot.builder()
-                                .id("pivot2")
-                                .series(Collections.singletonList(Max.builder().field("field2").build()))
-                                .rollup(true)
-                                .streams(Collections.emptySet())
-                                .build());
+                        .id("pivot1")
+                        .series(Collections.singletonList(Average.builder().field("field1").build()))
+                        .rollup(true)
+                        .streams(Collections.singleton(stream2Id))
+                        .build(),
+                Pivot.builder()
+                        .id("pivot2")
+                        .series(Collections.singletonList(Max.builder().field("field2").build()))
+                        .rollup(true)
+                        .streams(Collections.emptySet())
+                        .build());
 
         final List<SearchRequest> request = run(query);
-        Assertions.assertThat(ViewsUtils.indicesOf(request).get(0)).isEqualTo("index3");
-        Assertions.assertThat(ViewsUtils.indicesOf(request).get(1)).isEqualTo("index1,index2");
+        assertThat(indicesOf(request).get(0)).isEqualTo("index3");
+        assertThat(indicesOf(request).get(1)).isEqualTo("index1,index2");
     }
 
     private Query queryFor(SearchType... searchTypes) {
@@ -134,7 +131,7 @@ public class ElasticsearchBackendSearchTypesWithStreamsOverridesTest extends Ela
 
     private List<SearchRequest> run(Query query) throws IOException {
         final SearchJob job = searchJobForQuery(query);
-        final ESGeneratedQueryContext context = this.elasticsearchBackend.generate(job, query, new SearchConfig(Period.ZERO));
+        final ESGeneratedQueryContext context = this.elasticsearchBackend.generate(job, query, Collections.emptySet());
 
         this.elasticsearchBackend.doRun(job, query, context);
 

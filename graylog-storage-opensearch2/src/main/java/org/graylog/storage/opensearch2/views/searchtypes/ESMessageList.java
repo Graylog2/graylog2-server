@@ -22,7 +22,6 @@ import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
@@ -57,22 +56,19 @@ import java.util.stream.StreamSupport;
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class ESMessageList implements ESSearchTypeHandler<MessageList> {
-    private final QueryStringDecorators esQueryDecorators;
     private final LegacyDecoratorProcessor decoratorProcessor;
     private final boolean allowHighlighting;
 
     @Inject
-    public ESMessageList(QueryStringDecorators esQueryDecorators,
-                         LegacyDecoratorProcessor decoratorProcessor,
+    public ESMessageList(LegacyDecoratorProcessor decoratorProcessor,
                          @Named("allow_highlighting") boolean allowHighlighting) {
-        this.esQueryDecorators = esQueryDecorators;
         this.decoratorProcessor = decoratorProcessor;
         this.allowHighlighting = allowHighlighting;
     }
 
     @VisibleForTesting
-    public ESMessageList(QueryStringDecorators esQueryDecorators) {
-        this(esQueryDecorators, new LegacyDecoratorProcessor.Fake(), false);
+    public ESMessageList() {
+        this(new LegacyDecoratorProcessor.Fake(), false);
     }
 
     private static ResultMessage resultMessageFromSearchHit(SearchHit hit) {
@@ -97,9 +93,7 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
 
         applyHighlightingIfActivated(searchSourceBuilder, job, query);
 
-        final Set<String> effectiveStreamIds = messageList.effectiveStreams().isEmpty()
-                ? query.usedStreamIds()
-                : messageList.effectiveStreams();
+        final Set<String> effectiveStreamIds = query.effectiveStreams(messageList);
 
         if (!messageList.fields().isEmpty()) {
             searchSourceBuilder.fetchSource(messageList.fields().toArray(new String[0]), new String[0]);
@@ -136,11 +130,9 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     }
 
     private QueryStringQueryBuilder decoratedHighlightQuery(SearchJob job, Query query) {
-        final String raw = query.query().queryString();
+        final String queryString = query.query().queryString();
 
-        final String decorated = this.esQueryDecorators.decorate(raw, job, query);
-
-        return QueryBuilders.queryStringQuery(decorated);
+        return QueryBuilders.queryStringQuery(queryString);
     }
 
     @Override
@@ -150,14 +142,13 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
                 .map((resultMessage) -> ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex()))
                 .collect(Collectors.toList());
 
-        final String undecoratedQueryString = query.query().queryString();
-        final String queryString = this.esQueryDecorators.decorate(undecoratedQueryString, job, query);
+        final String queryString = query.query().queryString();
 
         final DateTime from = query.effectiveTimeRange(searchType).getFrom();
         final DateTime to = query.effectiveTimeRange(searchType).getTo();
 
         final SearchResponse searchResponse = SearchResponse.create(
-                undecoratedQueryString,
+                queryString,
                 queryString,
                 Collections.emptySet(),
                 messages,
