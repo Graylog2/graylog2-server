@@ -27,10 +27,10 @@ import useCurrentUser from 'hooks/useCurrentUser';
 
 const StreamEditPage = ({ params, location }) => {
   const currentUser = useCurrentUser();
-  const [stream, setStream] = useState();
+  const [stream, setStream] = useState<{ is_default: boolean, title: string } | undefined>();
 
   useEffect(() => {
-    StreamsStore.get(params.streamId, (newStream) => {
+    StreamsStore.get(params.streamId, (newStream: { is_default: boolean, title: string }) => {
       setStream(newStream);
     });
   }, [params.streamId]);
