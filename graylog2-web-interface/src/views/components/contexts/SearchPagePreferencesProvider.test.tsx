@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
+import { defaultUser } from 'defaultMockValues';
 
 import { adminUser, alice } from 'fixtures/users';
 import asMock from 'helpers/mocking/AsMock';
@@ -56,7 +57,7 @@ jest.mock('views/stores/ViewStore', () => ({
 
 describe('SearchPagePreferencesProvider', () => {
   beforeEach(() => {
-    asMock(useCurrentUser).mockReturnValue(adminUser);
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
   const SimpleProvider = ({ children }: { children: any }) => (

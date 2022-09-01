@@ -18,6 +18,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
+import { defaultUser } from 'defaultMockValues';
 
 import mockAction from 'helpers/mocking/MockAction';
 import MockStore from 'helpers/mocking/StoreMock';
@@ -55,7 +56,7 @@ jest.mock('components/event-definitions/event-definition-form/EventDefinitionSum
 
 describe('<ViewEventDefinitionPage />', () => {
   beforeEach(() => {
-    asMock(useCurrentUser).mockReturnValue(adminUser);
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
   it('should display the event definition page', async () => {

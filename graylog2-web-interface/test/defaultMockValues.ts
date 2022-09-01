@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import { adminUser } from 'fixtures/users';
 
-const useCurrentUser = jest.fn(() => adminUser);
-
-export default useCurrentUser;
+export const defaultTimezone = 'Europe/Berlin';
+export const defaultUser = adminUser;

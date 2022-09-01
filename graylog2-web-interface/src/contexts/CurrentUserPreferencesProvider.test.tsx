@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
+import { defaultUser } from 'defaultMockValues';
 
 import asMock from 'helpers/mocking/AsMock';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -53,7 +54,7 @@ describe('CurrentUserPreferencesProvider', () => {
   };
 
   beforeEach(() => {
-    asMock(useCurrentUser).mockReturnValue(adminUser);
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
   it('provides default user preferences when CurrentUserContext is not provided', () => {

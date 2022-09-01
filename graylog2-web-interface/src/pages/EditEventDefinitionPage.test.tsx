@@ -18,6 +18,7 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
+import { defaultUser } from 'defaultMockValues';
 
 import { asMock } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
@@ -69,7 +70,7 @@ jest.mock('components/event-definitions/event-definition-form/EventDefinitionFor
 
 describe('<EditEventDefinitionPage />', () => {
   beforeEach(() => {
-    asMock(useCurrentUser).mockReturnValue(adminUser);
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
   it('should display the event definition to edit', async () => {
