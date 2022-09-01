@@ -16,25 +16,17 @@
  */
 import React from 'react';
 import { screen, render, waitFor } from 'wrappedTestingLibrary';
-import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 import userEvent from '@testing-library/user-event';
 import { exampleFormDataWithKeySecretAuth } from 'aws/FormData.fixtures';
-import fetch from 'logic/rest/FetchProvider';
 
+import { asMock, StoreMock as MockStore } from 'helpers/mocking';
+import fetch from 'logic/rest/FetchProvider';
 import { FormDataProvider } from 'aws/context/FormData';
 import { ApiContext } from 'aws/context/Api';
 
 import StepReview from './StepReview';
 
-const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
-
-jest.mock('stores/users/CurrentUserStore', () => MockStore(
-  ['get', () => mockCurrentUser],
-  ['getInitialState', () => mockCurrentUser],
-));
-
-jest.mock('stores/sessions/SessionStore', () => ({ SessionStore: MockStore() }));
-jest.mock('stores/nodes/NodesStore', () => ({ NodesStore: MockStore() }));
+jest.mock('stores/sessions/SessionStore', () => ({ SessionStore: MockStore(['isLoggedIn', jest.fn()]) }));
 jest.mock('stores/system/SystemStore', () => ({ SystemStore: MockStore() }));
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());

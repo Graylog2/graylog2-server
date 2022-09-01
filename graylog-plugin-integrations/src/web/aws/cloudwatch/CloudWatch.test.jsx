@@ -16,10 +16,10 @@
  */
 import React from 'react';
 import { screen, render, waitFor } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore } from 'helpers/mocking';
 import userEvent from '@testing-library/user-event';
 import { exampleFormDataWithKeySecretAuth } from 'aws/FormData.fixtures';
 
+import { StoreMock as MockStore } from 'helpers/mocking';
 import history from 'util/History';
 import { FormDataProvider } from 'aws/context/FormData';
 import { ApiContext } from 'aws/context/Api';
@@ -30,11 +30,6 @@ import Routes from 'routing/Routes';
 import CloudWatch from './CloudWatch';
 
 const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
-
-jest.mock('stores/users/CurrentUserStore', () => MockStore(
-  ['get', () => mockCurrentUser],
-  ['getInitialState', () => mockCurrentUser],
-));
 
 jest.mock('util/History');
 
