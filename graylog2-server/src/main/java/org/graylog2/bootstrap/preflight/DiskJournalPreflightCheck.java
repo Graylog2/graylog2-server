@@ -82,8 +82,6 @@ public class DiskJournalPreflightCheck implements PreflightCheck {
                         journalFs.sysTypeName()
                 );
                 LOG.warn(message);
-                // TODO throw an exception on fresh installations
-                // throw new PreflightCheckException(message);
             }
         } else {
             LOG.warn("Could not perform size check on journal directory <{}>", journalDirectory.toAbsolutePath());

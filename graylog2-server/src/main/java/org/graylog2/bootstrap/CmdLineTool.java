@@ -254,8 +254,17 @@ public abstract class CmdLineTool implements CliCommand {
 
     @Override
     public void run() {
+        // Setup logger first to ensure we can log any caught Throwable to the configured log file
         final Level logLevel = setupLogger();
+        try {
+            doRun(logLevel);
+        } catch (Throwable e) {
+            LOG.error("Startup error:", e);
+            throw e;
+        }
+    }
 
+    public void doRun(Level logLevel) {
         if (isDumpDefaultConfig()) {
             dumpDefaultConfigAndExit();
         }

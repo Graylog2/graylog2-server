@@ -28,7 +28,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
 
-@Api(value = "Search/Functions")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "Search/Functions", tags = {CLOUD_VISIBLE})
 @Path("/views/functions")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication

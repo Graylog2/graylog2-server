@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { $PropertyType } from 'utility-types';
+import type { $PropertyType } from 'utility-types';
 
-import User from 'logic/users/User';
+import type User from 'logic/users/User';
 
 // eslint-disable-next-line import/prefer-default-export
 export const readerPermissions = (username: $PropertyType<User, 'username'>) => [

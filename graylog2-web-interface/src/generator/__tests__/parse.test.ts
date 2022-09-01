@@ -28,6 +28,48 @@ describe('parse', () => {
     expect(result).toMatchSnapshot();
   });
 
+  it('parses operation with query parameter', () => {
+    const api = {
+      models: [] as Record<string, any>,
+      apis: [
+        {
+          path: '/system/grok',
+          operations: [
+            {
+              summary: 'Add a list of new patterns',
+              notes: '',
+              method: 'POST' as const,
+              nickname: 'bulkUpdatePatternsFromTextFile',
+              produces: [
+                'application/json' as const,
+              ],
+              type: 'any',
+              parameters: [
+                {
+                  paramType: 'query' as const,
+                  name: 'import-strategy',
+                  description: 'Strategy to apply when importing.',
+                  type: 'string',
+                  required: false,
+                  enum: [
+                    'ABORT_ON_CONFLICT',
+                    'REPLACE_ON_CONFLICT',
+                    'DROP_ALL_EXISTING',
+                  ],
+                },
+              ],
+              responseMessages: [],
+            },
+          ],
+        },
+      ],
+    };
+
+    const result = parseApi('grok', api);
+
+    expect(result).toMatchSnapshot();
+  });
+
   it('parses arrays of referenced types', () => {
     const api = {
       models: {
@@ -46,12 +88,12 @@ describe('parse', () => {
     const result = parseApi('sample', api);
 
     expect(result).toMatchInlineSnapshot(`
-Object {
+{
   "description": undefined,
-  "models": Object {
-    "InputStateSummaryArray": Object {
+  "models": {
+    "InputStateSummaryArray": {
       "id": "InputStateSummaryArray",
-      "items": Object {
+      "items": {
         "name": "InputStateSummary",
         "optional": false,
         "type": "type_reference",
@@ -60,7 +102,45 @@ Object {
     },
   },
   "name": "sample",
-  "routes": Array [],
+  "routes": [],
+}
+`);
+  });
+
+  it('parses additional properties', () => {
+    const api = {
+      apis: [],
+      models: {
+        AvailableOutputSummaryMapMap: {
+          type: 'object',
+          id: 'AvailableOutputSummaryMapMap',
+          properties: {},
+          additional_properties: {
+            $ref: 'AvailableOutputSummaryMap',
+          },
+        },
+      },
+    };
+
+    const result = parseApi('sample', api);
+
+    expect(result).toMatchInlineSnapshot(`
+{
+  "description": undefined,
+  "models": {
+    "AvailableOutputSummaryMapMap": {
+      "additionalProperties": {
+        "name": "AvailableOutputSummaryMap",
+        "optional": false,
+        "type": "type_reference",
+      },
+      "id": "AvailableOutputSummaryMapMap",
+      "properties": {},
+      "type": "type_literal",
+    },
+  },
+  "name": "sample",
+  "routes": [],
 }
 `);
   });

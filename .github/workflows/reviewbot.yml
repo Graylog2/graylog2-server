@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - '**.[jt]sx?'
+    types:
+      - opened
+      - edited
+      - synchronize
 
 jobs:
   linter:
@@ -16,7 +20,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 8
+          java-version: 17
           distribution: temurin
           cache: maven
       - name: Compile with Maven / Install dependencies

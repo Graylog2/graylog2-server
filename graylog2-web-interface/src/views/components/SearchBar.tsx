@@ -28,7 +28,7 @@ import { Row, Col } from 'components/bootstrap';
 import BottomRow from 'views/components/searchbar/BottomRow';
 import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
 import SearchButton from 'views/components/searchbar/SearchButton';
-import SavedSearchControls from 'views/components/searchbar/saved-search/SavedSearchControls';
+import SearchActionsMenu from 'views/components/searchbar/saved-search/SearchActionsMenu';
 import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
 import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
@@ -50,19 +50,21 @@ import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import { SearchActions } from 'views/stores/SearchStore';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import PluggableSearchBarControls from 'views/components/searchbar/PluggableSearchBarControls';
 import useParameters from 'views/hooks/useParameters';
 import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
 import type { SearchBarControl } from 'views/types';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import SearchBarForm from './searchbar/SearchBarForm';
+
 import {
   executeSearchSubmitHandler as executePluggableSubmitHandler,
   useInitialSearchValues as usePluggableInitialValues,
   pluggableValidationPayload,
-} from './searchbar/pluggableSearchBarControlsHandler';
+} from '../logic/searchbar/pluggableSearchBarControlsHandler';
 
 type Props = {
   availableStreams: Array<{ key: string, value: string }>,
@@ -129,7 +131,7 @@ const useInitialFormValues = ({ currentQuery, queryFilters }: { currentQuery: Qu
   return ({ timerange, streams, queryString, ...initialValuesFromPlugins });
 };
 
-const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>) => {
+const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, userTimezone: string) => {
   const request = {
     timeRange: values?.timerange,
     streams: values?.streams,
@@ -137,7 +139,7 @@ const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarCon
     ...pluggableValidationPayload(values, pluggableSearchBarControls),
   };
 
-  return debouncedValidateQuery(request);
+  return debouncedValidateQuery(request, userTimezone);
 };
 
 const SearchBar = ({
@@ -147,6 +149,7 @@ const SearchBar = ({
   onSubmit = defaultProps.onSubmit,
 }: Props) => {
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
+  const { userTimezone } = useUserDateTime();
   const { parameters } = useParameters();
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });
@@ -169,7 +172,7 @@ const SearchBar = ({
               <SearchBarForm initialValues={initialValues}
                              limitDuration={limitDuration}
                              onSubmit={_onSubmit}
-                             validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls)}>
+                             validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls, userTimezone)}>
                 {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
                   const disableSearchSubmit = isSubmitting || isValidating || !isValid;
 
@@ -239,9 +242,9 @@ const SearchBar = ({
                         </SearchButtonAndQuery>
 
                         {!editing && (
-                        <ViewActionsWrapper>
-                          <SavedSearchControls />
-                        </ViewActionsWrapper>
+                          <ViewActionsWrapper>
+                            <SearchActionsMenu />
+                          </ViewActionsWrapper>
                         )}
                       </BottomRow>
                       <PluggableSearchBarControls />

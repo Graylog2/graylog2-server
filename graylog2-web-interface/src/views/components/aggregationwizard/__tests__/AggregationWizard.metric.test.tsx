@@ -59,8 +59,6 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: MockStore(['getInitialState', () => ({ activeQuery: 'queryId' })]),
 }));
 
-jest.mock('hooks/useUserDateTime');
-
 const selectEventConfig = { container: document.body };
 
 const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
@@ -97,6 +95,7 @@ describe('AggregationWizard', () => {
                          type="AGGREGATION"
                          fields={Immutable.List([])}
                          {...props}>
+        {/* eslint-disable-next-line react/jsx-no-useless-fragment */}
         <>The Visualization</>
       </AggregationWizard>
     </FieldTypesContext.Provider>,

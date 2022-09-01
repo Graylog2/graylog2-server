@@ -19,7 +19,6 @@ import React from 'react';
 
 import { Timestamp } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
-import DateTime from 'logic/datetimes/DateTime';
 
 import 'components/content-packs/ContentPackDetails.css';
 import ContentPackInstallEntityList from './ContentPackInstallEntityList';

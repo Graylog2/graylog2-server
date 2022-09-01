@@ -29,8 +29,6 @@ import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 
 import SearchBar from './SearchBar';
 
-const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
-
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
     ['getInitialState', () => ({ search: { parameters: [] } })],
@@ -38,13 +36,6 @@ jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {
     refresh: jest.fn(),
   },
-}));
-
-jest.mock('stores/users/CurrentUserStore', () => ({
-  CurrentUserStore: MockStore(
-    ['get', () => mockCurrentUser],
-    ['getInitialState', () => mockCurrentUser],
-  ),
 }));
 
 jest.mock('stores/streams/StreamsStore', () => MockStore(
@@ -59,7 +50,7 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   },
 }));
 
-jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => jest.fn(() => (
+jest.mock('views/components/searchbar/saved-search/SearchActionsMenu', () => jest.fn(() => (
   <div>Saved Search Controls</div>
 )));
 

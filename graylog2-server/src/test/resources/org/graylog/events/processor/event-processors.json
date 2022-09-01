@@ -69,6 +69,7 @@
         "$oid": "54e3deadbeefdeadbeef0002"
       },
       "job_definition_id": "54e3deadbeefdeadbeef0001",
+      "job_definition_type": "event-processor-execution-v1",
       "start_time": {
         "$date": "2019-01-01T00:00:00.000Z"
       },
@@ -107,6 +108,7 @@
         "$oid": "61fbcca5b2507945cc120001"
       },
       "job_definition_id": "61efd3dffa224c448ec54305",
+      "job_definition_type": "notification-execution-v1",
       "start_time": {
         "$date": "2022-02-03T12:37:57.648Z"
       },
@@ -164,6 +166,7 @@
         "$oid": "61fbcca5b2507945cc120002"
       },
       "job_definition_id": "61efd3dffa224c448ec54305",
+      "job_definition_type": "notification-execution-v1",
       "start_time": {
         "$date": "2022-02-03T12:37:57.648Z"
       },

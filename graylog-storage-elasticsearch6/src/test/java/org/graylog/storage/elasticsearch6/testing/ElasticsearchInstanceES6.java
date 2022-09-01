@@ -36,13 +36,14 @@ import java.net.URI;
 public class ElasticsearchInstanceES6 extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(SearchServerInstance.class);
     private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
+    public static final String DEFAULT_HEAP_SIZE = "2g";
 
     private final Client client;
     private final JestClient jestClient;
     private final FixtureImporter fixtureImporter;
 
-    public ElasticsearchInstanceES6(String image, SearchVersion version, Network network) {
-        super(image, version, network);
+    public ElasticsearchInstanceES6(String image, SearchVersion version, Network network, String heapSize) {
+        super(image, version, network, heapSize);
         this.jestClient = jestClientFrom();
         this.client = new ClientES6(jestClient);
         this.fixtureImporter = new FixtureImporterES6(jestClient);
@@ -68,19 +69,24 @@ public class ElasticsearchInstanceES6 extends TestableSearchServerInstance {
     }
 
     public static TestableSearchServerInstance create() {
-        return create(Network.newNetwork());
+        return create(SearchServer.ES6.getSearchVersion(), Network.newNetwork(), DEFAULT_HEAP_SIZE);
     }
 
-    public static TestableSearchServerInstance create(Network network) {
-        return create(SearchServer.ES6.getSearchVersion(), network);
+    public static TestableSearchServerInstance create(String heapSize) {
+        return create(SearchServer.ES6.getSearchVersion(), Network.newNetwork(), heapSize);
     }
 
+    // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
     public static TestableSearchServerInstance create(SearchVersion version, Network network) {
+        return create(version, network, DEFAULT_HEAP_SIZE);
+    }
+
+    private static TestableSearchServerInstance create(SearchVersion version, Network network, String heapSize) {
         final String image = imageNameFrom(version);
 
         LOG.debug("Creating instance {}", image);
 
-        return new ElasticsearchInstanceES6(image, version, network);
+        return new ElasticsearchInstanceES6(image, version, network, heapSize);
     }
 
     protected static String imageNameFrom(SearchVersion version) {

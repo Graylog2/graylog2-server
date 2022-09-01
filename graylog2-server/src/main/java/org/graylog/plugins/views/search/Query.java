@@ -35,6 +35,7 @@ import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -62,7 +63,7 @@ import static java.util.stream.Collectors.toSet;
 @JsonAutoDetect
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = Query.Builder.class)
-public abstract class Query implements ContentPackable<QueryEntity> {
+public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchFilters {
 
     @Nullable
     @JsonProperty
@@ -76,6 +77,7 @@ public abstract class Query implements ContentPackable<QueryEntity> {
     public abstract Filter filter();
 
     @JsonProperty
+    @Override
     public abstract List<UsedSearchFilter> filters();
 
     @Nonnull
@@ -89,6 +91,12 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         return searchType.timerange()
                 .map(timeRange -> timeRange.effectiveTimeRange(this, searchType))
                 .orElse(this.timerange());
+    }
+
+    public Set<String> effectiveStreams(SearchType searchType) {
+        return searchType.effectiveStreams().isEmpty()
+                ? this.usedStreamIds()
+                : searchType.effectiveStreams();
     }
 
     @Nonnull

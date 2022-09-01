@@ -17,18 +17,23 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import { noop } from 'lodash';
 
 import { createSimpleExternalValueAction } from 'fixtures/externalValueActions';
 import type { ActionContexts } from 'views/types';
 import asMock from 'helpers/mocking/AsMock';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import Action from './Action';
 
-jest.mock('views/logic/usePluginEntities', () => jest.fn(() => []));
+jest.mock('hooks/usePluginEntities', () => jest.fn(() => []));
 
 describe('Action', () => {
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
   const exampleHandlerArgs = {
     queryId: 'query-id',
     field: 'field1',
@@ -39,6 +44,8 @@ describe('Action', () => {
 
   type Props = Partial<React.ComponentProps<typeof Action>>;
 
+  const OpenActionsMenu = () => (<div>Open Actions Menu</div>);
+
   const SimpleAction = ({
     children = 'The dropdown header',
     handlerArgs = exampleHandlerArgs,
@@ -46,7 +53,7 @@ describe('Action', () => {
     type = 'field',
   }: Props) => {
     return (
-      <Action element={() => <div>Open Actions Menu</div>}
+      <Action element={OpenActionsMenu}
               handlerArgs={handlerArgs}
               menuContainer={menuContainer}
               type={type}>
@@ -92,12 +99,28 @@ describe('Action', () => {
     expect(mockActionHandler).toHaveBeenCalledTimes(1);
   });
 
+  it('does not fail when plugin is not present for external actions', async () => {
+    asMock(usePluginEntities).mockImplementation((entityKey) => ({ wrongKey: noop }[entityKey]));
+
+    render(<SimpleAction>The dropdown header</SimpleAction>);
+    await openDropdown('The dropdown header');
+
+    expect(screen.getByText('The dropdown header')).toBeInTheDocument();
+  });
+
   it('should work with external value actions', async () => {
     const linkTarget = ({ field }) => `the-link-to-${field}`;
     const simpleExternalAction = createSimpleExternalValueAction({ title: 'External value action', linkTarget });
     const externalValueActions = [simpleExternalAction];
 
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ externalValueActions }[entityKey]));
+    asMock(usePluginEntities).mockImplementation((entityKey) => ({
+      useExternalActions: [() => ({
+        externalValueActions,
+        isLoading: false,
+        isError: false,
+        error: null,
+      })],
+    }[entityKey]));
 
     render(
       <SimpleAction type="value" />,

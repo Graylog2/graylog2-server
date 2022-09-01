@@ -86,9 +86,15 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
 
     SearchType applyExecutionContext(SearchTypeExecutionState executionState);
 
+    SearchType withQuery(BackendQuery query);
+
+    SearchType withFilter(Filter filter);
+
     default Set<String> effectiveStreams() {
         return streams();
     }
+
+    SearchType withFilters(List<UsedSearchFilter> filters);
 
     /**
      * Each search type should declare an implementation of its result conforming to this interface.
@@ -186,6 +192,19 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
         public SearchType applyExecutionContext(SearchTypeExecutionState state) {
             return this;
         }
+
+        @Override
+        public SearchType withQuery(BackendQuery query) {
+            return this;
+        }
+
+        @Override
+        public SearchType withFilter(Filter filter) {
+            return this;
+        }
+
+        @Override
+        public SearchType withFilters(List<UsedSearchFilter> filters) { return this; }
 
         @JsonAnySetter
         public void setProperties(String key, Object value) {

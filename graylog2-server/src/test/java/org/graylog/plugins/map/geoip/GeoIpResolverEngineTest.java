@@ -24,6 +24,7 @@ import com.google.common.collect.Maps;
 import com.google.common.net.InetAddresses;
 import org.graylog.plugins.map.config.DatabaseVendorType;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
+import org.graylog.plugins.map.config.S3GeoIpFileService;
 import org.graylog2.plugin.Message;
 import org.junit.After;
 import org.junit.Assert;
@@ -64,6 +65,9 @@ public class GeoIpResolverEngineTest {
     @Mock
     GeoIpVendorResolverService geoIpVendorResolverService;
 
+    @Mock
+    S3GeoIpFileService s3GeoIpFileService;
+
     private final GeoLocationInformation maxMindLocationInfo = GeoLocationInformation.create(1, 2, "US", "USA", "Houston", "Texas", "America/Chicago");
     private final GeoLocationInformation ipInfoLocationInfo = GeoLocationInformation.create(1, 2, "US", "N/A", "Houston", "Texas", "America/Chicago");
     private final GeoAsnInformation maxMindAsnInfo = GeoAsnInformation.create("Scamcast", "", "1000");
@@ -83,6 +87,8 @@ public class GeoIpResolverEngineTest {
 
         MockitoAnnotations.openMocks(this).close();
 
+        when(s3GeoIpFileService.getActiveAsnFile()).thenReturn("/etc/graylog/server/asn.mmdb");
+        when(s3GeoIpFileService.getActiveCityFile()).thenReturn("/etc/graylog/server/standard_location.mmdb");
         when(maxMindAsnResolver.isEnabled()).thenReturn(true);
         when(maxMindCityResolver.getGeoIpData(publicIp))
                 .thenReturn(Optional.of(maxMindLocationInfo));
@@ -125,7 +131,7 @@ public class GeoIpResolverEngineTest {
 
     private void testPrivateSourceIpWithSchemaEnforceFlag(boolean enforceSchema, String expectedFieldName) {
         GeoIpResolverConfig conf = config.toBuilder().enforceGraylogSchema(enforceSchema).build();
-        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, conf, metricRegistry);
+        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, conf, s3GeoIpFileService, metricRegistry);
 
         Map<String, Object> fields = new HashMap<>();
         fields.put("_id", java.util.UUID.randomUUID().toString());
@@ -156,17 +162,15 @@ public class GeoIpResolverEngineTest {
     @Test
     public void testPublicIpSchemaEnforceOff() {
 
-        // With schema enforcement off, we expect 'source_ip' to be the prefix for ALL Geo data fields.
-        String[] expectedFields = {"source_ip_geo_name", "source_ip_geo_region", "source_ip_geo_city", "source_ip_geo_timezone",
-                "source_ip_geo_country", "source_ip_geo_country_iso", "source_ip_as_organization", "source_ip_geo_coordinates",
-                "source_ip_as_number"};
+        // With schema enforcement off, legacy fields will be added to the message.
+        String[] expectedFields = {"source_ip_geolocation", "source_ip_country_code", "source_ip_city_name"};
 
         testSourceIpGeoDataFieldsWithSchemaEnforcementFlag(false, expectedFields);
     }
 
     private void testSourceIpGeoDataFieldsWithSchemaEnforcementFlag(boolean enforceSchema, String[] expectedFields) {
         GeoIpResolverConfig conf = config.toBuilder().enforceGraylogSchema(enforceSchema).build();
-        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, conf, metricRegistry);
+        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, conf, s3GeoIpFileService, metricRegistry);
 
         Map<String, Object> fields = new HashMap<>();
         fields.put("_id", java.util.UUID.randomUUID().toString());
@@ -185,7 +189,7 @@ public class GeoIpResolverEngineTest {
     public void testGetIpAddressFieldsEnforceGraylogSchema() {
 
         GeoIpResolverConfig conf = config.toBuilder().enforceGraylogSchema(true).build();
-        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, conf, metricRegistry);
+        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, conf, s3GeoIpFileService, metricRegistry);
 
         Map<String, Object> fields = new HashMap<>();
         fields.put("_id", java.util.UUID.randomUUID().toString());
@@ -210,7 +214,7 @@ public class GeoIpResolverEngineTest {
     public void testGetIpAddressFieldsEnforceGraylogSchemaFalse() {
 
         GeoIpResolverConfig conf = config.toBuilder().enforceGraylogSchema(false).build();
-        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, conf, metricRegistry);
+        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, conf, s3GeoIpFileService, metricRegistry);
 
         Map<String, Object> fields = new HashMap<>();
         fields.put("_id", java.util.UUID.randomUUID().toString());
@@ -232,7 +236,7 @@ public class GeoIpResolverEngineTest {
     @Test
     public void testFilterMaxMind() {
 
-        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, config, metricRegistry);
+        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, config, s3GeoIpFileService, metricRegistry);
 
         Map<String, Object> fields = new HashMap<>();
         fields.put("_id", java.util.UUID.randomUUID().toString());
@@ -269,7 +273,7 @@ public class GeoIpResolverEngineTest {
                 .databaseVendorType(DatabaseVendorType.IPINFO)
                 .build();
 
-        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, conf, metricRegistry);
+        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, conf, s3GeoIpFileService, metricRegistry);
 
         Map<String, Object> fields = new HashMap<>();
         fields.put("_id", java.util.UUID.randomUUID().toString());
@@ -292,7 +296,7 @@ public class GeoIpResolverEngineTest {
     @Test
     public void testFilterWithReservedIpAddress() {
 
-        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, config, metricRegistry);
+        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, config, s3GeoIpFileService, metricRegistry);
 
         Map<String, Object> fields = new HashMap<>();
         fields.put("_id", java.util.UUID.randomUUID().toString());
@@ -313,7 +317,7 @@ public class GeoIpResolverEngineTest {
         when(geoIpVendorResolverService.createAsnResolver(any(GeoIpResolverConfig.class), any(Timer.class)))
                 .thenReturn(maxMindAsnResolver);
 
-        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, config, metricRegistry);
+        final GeoIpResolverEngine engine = new GeoIpResolverEngine(geoIpVendorResolverService, config, s3GeoIpFileService, metricRegistry);
         final String ip = "127.0.0.1";
 
         assertEquals(InetAddresses.forString(ip), engine.getIpFromFieldValue(ip));
@@ -323,7 +327,7 @@ public class GeoIpResolverEngineTest {
 
     @Test
     public void trimFieldValueBeforeLookup() {
-        final GeoIpResolverEngine resolver = new GeoIpResolverEngine(geoIpVendorResolverService, config, metricRegistry);
+        final GeoIpResolverEngine resolver = new GeoIpResolverEngine(geoIpVendorResolverService, config, s3GeoIpFileService, metricRegistry);
         final String ip = "   2001:4860:4860::8888\t\n";
 
         assertNotNull(resolver.getIpFromFieldValue(ip));
@@ -335,7 +339,7 @@ public class GeoIpResolverEngineTest {
         when(maxMindCityResolver.isEnabled()).thenReturn(false);
         when(maxMindAsnResolver.isEnabled()).thenReturn(false);
 
-        final GeoIpResolverEngine resolver = new GeoIpResolverEngine(geoIpVendorResolverService, config.toBuilder().enabled(false).build(), metricRegistry);
+        final GeoIpResolverEngine resolver = new GeoIpResolverEngine(geoIpVendorResolverService, config.toBuilder().enabled(false).build(), s3GeoIpFileService, metricRegistry);
 
         final Map<String, Object> messageFields = Maps.newHashMap();
         messageFields.put("_id", (new UUID()).toString());

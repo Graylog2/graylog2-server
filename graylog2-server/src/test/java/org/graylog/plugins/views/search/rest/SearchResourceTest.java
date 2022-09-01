@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchJobService;
+import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
@@ -130,7 +131,7 @@ public class SearchResourceTest {
         when(search.id()).thenReturn(searchId);
         when(search.parameters()).thenReturn(ImmutableSet.of());
 
-        when(search.applyExecutionState(any(), any())).thenReturn(search);
+        when(search.applyExecutionState(any())).thenReturn(search);
         when(searchDomain.getForUser(eq(search.id()), any())).thenReturn(Optional.of(search));
 
         final SearchJob searchJob = mock(SearchJob.class);

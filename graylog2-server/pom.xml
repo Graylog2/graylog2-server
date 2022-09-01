@@ -65,6 +65,18 @@
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${aws-java-sdk-2.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>com.github.rvesse</groupId>
@@ -373,6 +385,10 @@
             <artifactId>classgraph</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+        </dependency>
 
         <!-- Logging dependencies -->
         <dependency>
@@ -585,7 +601,7 @@
         </dependency>
         <dependency>
             <groupId>org.jooq</groupId>
-            <artifactId>jool-java-8</artifactId>
+            <artifactId>jool</artifactId>
         </dependency>
         <dependency>
             <groupId>org.freemarker</groupId>
@@ -706,7 +722,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
     </dependencies>
 
     <build>

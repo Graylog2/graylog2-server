@@ -30,7 +30,7 @@ import DocsHelper from 'util/DocsHelper';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 const Container = styled.div`
   margin-right: 5px;
@@ -156,13 +156,17 @@ const getErrorDocumentationLink = (errorType: string) => {
   }
 };
 
+type QueryForm = {
+  queryString: QueryValidationState,
+};
+
 const QueryValidation = () => {
   const plugableValidationExplanation = usePluginEntities('views.elements.validationErrorExplanation');
   const [shakingPopover, shake] = useShakeTemporarily();
   const [showExplanation, toggleShow] = useTriggerIfErrorsPersist(shake);
 
   const explanationTriggerRef = useRef(undefined);
-  const { errors: { queryString: queryStringErrors } } = useFormikContext();
+  const { errors: { queryString: queryStringErrors } } = useFormikContext<QueryForm>();
   const { warnings } = useContext(FormWarningsContext);
 
   const validationState = (queryStringErrors ?? warnings?.queryString) as QueryValidationState;

@@ -37,9 +37,10 @@ import java.util.Collection;
 import java.util.Map;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "System/Permissions", description = "Retrieval of system permissions.")
+@Api(value = "System/Permissions", description = "Retrieval of system permissions.", tags = {CLOUD_VISIBLE})
 @Path("/system/permissions")
 @Produces(APPLICATION_JSON)
 public class PermissionsResource extends RestResource {

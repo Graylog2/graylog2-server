@@ -18,7 +18,7 @@ import * as React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import moment from 'moment';
 
-import DateTime from 'logic/datetimes/DateTime';
+import { DATE_TIME_FORMATS } from 'util/DateTime';
 
 import AbsoluteDateInput from './AbsoluteDateInput';
 
@@ -44,7 +44,7 @@ describe('AbsoluteDateInput', () => {
   it('calls onChange upon changing the input', () => {
     const { getByPlaceholderText } = render(<AbsoluteDateInput {...defaultProps} />);
 
-    const input = getByPlaceholderText(DateTime.Formats.DATETIME);
+    const input = getByPlaceholderText(DATE_TIME_FORMATS.default);
 
     fireEvent.change(input, { target: { value: 'something' } });
 
@@ -52,7 +52,7 @@ describe('AbsoluteDateInput', () => {
   });
 
   it('pressing magic wand inserts current date', () => {
-    const output = moment().format(DateTime.Formats.TIMESTAMP);
+    const output = moment().format(DATE_TIME_FORMATS.complete);
     defaultProps.onChange.mockReturnValueOnce(output);
     const { getByTitle } = render(<AbsoluteDateInput {...defaultProps} />);
 

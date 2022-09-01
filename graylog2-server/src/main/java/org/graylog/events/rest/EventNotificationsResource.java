@@ -29,10 +29,12 @@ import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.events.notifications.DBNotificationService;
 import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.notifications.NotificationResourceHandler;
+import org.graylog.events.notifications.types.EmailEventNotificationConfig;
 import org.graylog.security.UserContext;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -46,6 +48,8 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import javax.validation.constraints.NotBlank;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
@@ -65,9 +69,11 @@ import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.Set;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.security.RestPermissions.USERS_LIST;
 
-@Api(value = "Events/Notifications", description = "Manage event notifications")
+@Api(value = "Events/Notifications", description = "Manage event notifications", tags = {CLOUD_VISIBLE})
 @Path("/events/notifications")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -83,15 +89,19 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     private final Set<AlarmCallback> availableLegacyAlarmCallbacks;
     private final SearchQueryParser searchQueryParser;
     private final NotificationResourceHandler resourceHandler;
+    private final EmailConfiguration emailConfiguration;
 
     @Inject
     public EventNotificationsResource(DBNotificationService dbNotificationService,
                                       Set<AlarmCallback> availableLegacyAlarmCallbacks,
-                                      NotificationResourceHandler resourceHandler) {
+                                      NotificationResourceHandler resourceHandler,
+                                      EmailConfiguration emailConfiguration) {
         this.dbNotificationService = dbNotificationService;
         this.availableLegacyAlarmCallbacks = availableLegacyAlarmCallbacks;
         this.resourceHandler = resourceHandler;
         this.searchQueryParser = new SearchQueryParser(NotificationDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        this.emailConfiguration = emailConfiguration;
+
     }
 
     @GET
@@ -121,6 +131,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @RequiresPermissions(RestPermissions.EVENT_NOTIFICATIONS_CREATE)
     public Response create(@ApiParam(name = "JSON Body") NotificationDto dto, @Context UserContext userContext) {
         final ValidationResult validationResult = dto.validate();
+        validateEmailConfiguration(dto, validationResult);
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
@@ -142,11 +153,41 @@ public class EventNotificationsResource extends RestResource implements PluginRe
         }
 
         final ValidationResult validationResult = dto.validate();
+        validateEmailConfiguration(dto, validationResult);
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
 
         return Response.ok().entity(resourceHandler.update(dto)).build();
+    }
+
+    private void validateEmailConfiguration(NotificationDto dto, ValidationResult validationResult) {
+        if (dto.config() instanceof EmailEventNotificationConfig) {
+            EmailEventNotificationConfig emailEventNotificationConfig = (EmailEventNotificationConfig) dto.config();
+            if (!emailConfiguration.isEnabled()) {
+                validationResult.addError("config", "Email transport is not configured in graylog.conf");
+            }
+            if (isNullOrEmpty(emailConfiguration.getFromEmail()) && isNullOrEmpty(emailEventNotificationConfig.sender())) {
+                validationResult.addError("sender", "No default sender specified in graylog.conf. You must specify one here.");
+            } else {
+                if (!isNullOrEmpty(emailEventNotificationConfig.sender())) {
+                    try {
+                        InternetAddress email = new InternetAddress(emailEventNotificationConfig.sender());
+                        email.validate();
+                    } catch (AddressException e) {
+                        validationResult.addError("sender", "Invalid email address.");
+                    }
+                }
+                if (!isNullOrEmpty(emailConfiguration.getFromEmail())) {
+                    try {
+                        InternetAddress email = new InternetAddress(emailConfiguration.getFromEmail());
+                        email.validate();
+                    } catch (AddressException e) {
+                        validationResult.addError("sender", "Invalid default sender email address specified in graylog.conf.");
+                    }
+                }
+            }
+        }
     }
 
     @DELETE

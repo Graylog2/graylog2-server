@@ -21,16 +21,14 @@ import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.errors.IllegalTimeRangeException;
 import org.graylog.plugins.views.search.errors.QueryError;
+import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
-import org.joda.time.Period;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -49,10 +47,9 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      *
      * @param job                currently executing job
      * @param query              the graylog query structure
-     * @param searchConfig       additional cluster-wide search configuration like query time-range limit
      * @return a backend specific generated query
      */
-    T generate(SearchJob job, Query query, SearchConfig searchConfig);
+    T generate(SearchJob job, Query query, Set<SearchError> validationErrors);
 
     default boolean isAllMessages(TimeRange timeRange) {
         return timeRange instanceof RelativeRange && ((RelativeRange)timeRange).isAllMessages();
@@ -109,26 +106,11 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      *
      * @param job                currently executing job
      * @param query              the individual query to run from the current job
-     * @param queryContext       the generated query by {@link #generate(SearchJob, Query, SearchConfig)}
+     * @param queryContext       the generated query by {@link #generate(SearchJob, Query, Set) <SearchError>)}
      * @return the result for the query
      * @throws RuntimeException if the query could not be executed for some reason
      */
     QueryResult doRun(SearchJob job, Query query, T queryContext);
-
-    default Optional<SearchTypeError> validateSearchType(Query query, SearchType searchType, SearchConfig searchConfig) {
-        return searchConfig.getQueryTimeRangeLimit()
-                .flatMap(configuredTimeLimit -> searchType.timerange() // TODO: what if there is no timerange for the type but there is a global limit?
-                        .map(tr -> tr.effectiveTimeRange(query, searchType))
-                        .filter(tr -> isOutOfLimit(tr, configuredTimeLimit))
-                        .map(tr -> new SearchTypeError(query, searchType.id(), "Search type '" + searchType.type() + "' out of allowed time range limit")));
-    }
-
-    default boolean isOutOfLimit(TimeRange timeRange, Period limit) {
-        final DateTime start = timeRange.getFrom();
-        final DateTime end = timeRange.getTo();
-        final DateTime allowedStart = end.minus(limit);
-        return start.isBefore(allowedStart);
-    }
 
     default boolean isSearchTypeWithError(T queryContext, String searchTypeId) {
         return queryContext.errors().stream()
@@ -136,15 +118,5 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
                 .map(q -> (SearchTypeError) q)
                 .map(SearchTypeError::searchTypeId)
                 .anyMatch(id -> Objects.equals(id, searchTypeId));
-    }
-
-    default void validateQueryTimeRange(Query query, SearchConfig config) {
-        config.getQueryTimeRangeLimit()
-                .flatMap(timeRangeLimit -> Optional.ofNullable(query.timerange())
-                        .filter(tr -> tr.getFrom() != null && tr.getTo() != null) // TODO: is this check necessary?
-                        .filter(tr -> isOutOfLimit(tr, timeRangeLimit)))
-                .ifPresent(tr -> {
-                    throw new IllegalTimeRangeException("Search out of allowed time range limit");
-                });
     }
 }

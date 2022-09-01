@@ -17,15 +17,19 @@
 
 import React from 'react';
 import { screen, render } from 'wrappedTestingLibrary';
+import Immutable from 'immutable';
+import { defaultUser } from 'defaultMockValues';
 
-import { adminUser, alice } from 'fixtures/users';
+import { adminUser } from 'fixtures/users';
 import MockAction from 'helpers/mocking/MockAction';
 import MockStore from 'helpers/mocking/StoreMock';
 import { asMock } from 'helpers/mocking';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import { ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import URLWhiteListFormModal from './URLWhiteListFormModal';
+
+jest.mock('hooks/useCurrentUser');
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(['getInitialState', jest.fn(() => ({
@@ -42,13 +46,15 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
 }));
 
 describe('<URLWhiteListFormModal>', () => {
-  const renderSUT = (user = adminUser) => {
+  const renderSUT = () => {
     return render(
-      <CurrentUserContext.Provider value={user}>
-        <URLWhiteListFormModal newUrlEntry="http://graylog.com" urlType="literal" />
-      </CurrentUserContext.Provider>,
+      <URLWhiteListFormModal newUrlEntry="http://graylog.com" urlType="literal" />,
     );
   };
+
+  beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
+  });
 
   it('renders elements to add URL to allow list', async () => {
     renderSUT();
@@ -67,7 +73,8 @@ describe('<URLWhiteListFormModal>', () => {
   });
 
   it('does not render if user has no permissions to add to allow list', () => {
-    renderSUT(alice);
+    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
+    renderSUT();
 
     expect(screen.queryByRole('button', { name: /add to url whitelist/i })).not.toBeInTheDocument();
   });

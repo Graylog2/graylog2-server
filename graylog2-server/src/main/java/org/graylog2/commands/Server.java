@@ -32,6 +32,7 @@ import org.graylog.metrics.prometheus.PrometheusExporterConfiguration;
 import org.graylog.metrics.prometheus.PrometheusMetricsModule;
 import org.graylog.plugins.cef.CEFInputModule;
 import org.graylog.plugins.map.MapWidgetModule;
+import org.graylog.plugins.map.config.GeoIpProcessorConfig;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
 import org.graylog.plugins.pipelineprocessor.PipelineConfig;
 import org.graylog.plugins.sidecar.SidecarModule;
@@ -69,6 +70,7 @@ import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.contentpacks.ContentPacksModule;
+import org.graylog2.database.entities.ScopedEntitiesModule;
 import org.graylog2.decorators.DecoratorBindings;
 import org.graylog2.indexer.IndexerBindings;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
@@ -126,6 +128,7 @@ public class Server extends ServerBootstrap {
     private final JobSchedulerConfiguration jobSchedulerConfiguration = new JobSchedulerConfiguration();
     private final PrometheusExporterConfiguration prometheusExporterConfiguration = new PrometheusExporterConfiguration();
     private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
+    private final GeoIpProcessorConfig geoIpProcessorConfig = new GeoIpProcessorConfig();
 
     public Server() {
         super("server", configuration);
@@ -182,7 +185,8 @@ public class Server extends ServerBootstrap {
                 new PrometheusMetricsModule(),
                 new ClusterConfigValidatorModule(),
                 new MapWidgetModule(),
-                new SearchFiltersModule()
+                new SearchFiltersModule(),
+                new ScopedEntitiesModule()
         );
         return modules.build();
     }
@@ -203,7 +207,8 @@ public class Server extends ServerBootstrap {
                 processingStatusConfig,
                 jobSchedulerConfiguration,
                 prometheusExporterConfiguration,
-                tlsConfiguration);
+                tlsConfiguration,
+                geoIpProcessorConfig);
     }
 
     @Override

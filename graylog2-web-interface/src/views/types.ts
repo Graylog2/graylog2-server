@@ -212,6 +212,13 @@ export type MessagePreviewOption = {
   sort: number,
 }
 
+type ExternalActionsHookData = {
+      error: Error | null;
+      externalValueActions: Array<ActionDefinition> | null;
+      isLoading: boolean;
+      isError: boolean
+}
+
 type MessageAugmentation = {
   id: string,
   component: React.ComponentType<{ message: Message }>,
@@ -246,7 +253,7 @@ export interface SearchBarControl {
   placement: 'left' | 'right';
   useInitialSearchValues?: (currentQuery?: Query) => ({ [key: string]: any }),
   useInitialDashboardWidgetValues?: (currentWidget: Widget) => ({ [key: string]: any }),
-  validationPayload: (values: CombinedSearchBarFormValues) => ({ [key: string]: any }),
+  validationPayload?: (values: CombinedSearchBarFormValues) => ({ [key: string]: any }),
 }
 
 export type SearchFilter = {
@@ -261,11 +268,18 @@ export type SearchFilter = {
 
 export type FiltersType = Immutable.List<SearchFilter>
 
+export type SaveViewControls = {
+  component: React.ComponentType<{ disabledViewCreation?: boolean }>,
+  id: string,
+  onSearchDuplication?: (view: View, userPermissions: Immutable.List<string>) => Promise<View>,
+  onDashboardDuplication?: (view: View, userPermissions: Immutable.List<string>) => Promise<View>,
+}
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
     enterpriseWidgets?: Array<WidgetExport>;
-    externalValueActions?: Array<ActionDefinition>;
+    useExternalActions?: Array<() => ExternalActionsHookData>,
     fieldActions?: Array<ActionDefinition>;
     messageAugmentations?: Array<MessageAugmentation>;
     searchTypes?: Array<SearchType<any, any>>;
@@ -275,7 +289,9 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
     'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<MessageDetailContextProviderProps>>;
+    'views.components.widgets.messageTable.contextProviders'?: Array<React.ComponentType>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
+    'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
     'views.elements.validationErrorExplanation'?: Array<React.ComponentType<{ validationState: QueryValidationState }>>;

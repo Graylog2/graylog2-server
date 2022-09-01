@@ -25,7 +25,9 @@ import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import CurrentUserContext from './CurrentUserContext';
 import CurrentUserProvider from './CurrentUserProvider';
 
-jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore(['getInitialState', jest.fn(() => ({}))]) }));
+jest.mock('stores/users/CurrentUserStore', () => ({
+  CurrentUserStore: MockStore(['getInitialState', jest.fn(() => ({}))]),
+}));
 
 describe('CurrentUserProvider', () => {
   const renderSUT = () => {
@@ -37,6 +39,7 @@ describe('CurrentUserProvider', () => {
           {consume}
         </CurrentUserContext.Consumer>
       </CurrentUserProvider>,
+      { wrapper: undefined },
     );
 
     return consume;

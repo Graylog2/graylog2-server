@@ -178,7 +178,7 @@ public class MongoDBTestService implements AutoCloseable {
         return uriWithHostAndPort(MongoDBContainer.NETWORK_ALIAS, MongoDBContainer.MONGODB_PORT);
     }
 
-    private String uri() {
+    public String uri() {
         return uriWithHostAndPort(ipAddress(), port());
     }
 

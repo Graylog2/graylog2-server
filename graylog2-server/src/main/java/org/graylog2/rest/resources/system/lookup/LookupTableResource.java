@@ -95,12 +95,13 @@ import java.util.stream.Stream;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Collections.singleton;
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @Path("/system/lookup")
 @Produces("application/json")
 @Consumes("application/json")
-@Api(value = "System/Lookup", description = "Lookup tables")
+@Api(value = "System/Lookup", description = "Lookup tables", tags = {CLOUD_VISIBLE})
 public class LookupTableResource extends RestResource {
     private static final ImmutableSet<String> LUT_ALLOWABLE_SORT_FIELDS = ImmutableSet.of(
             LookupTableDto.FIELD_ID,
@@ -326,7 +327,7 @@ public class LookupTableResource extends RestResource {
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_CREATE)
     public LookupTableApi createTable(@ApiParam LookupTableApi lookupTable) {
         try {
-            LookupTableDto saved = dbTableService.save(lookupTable.toDto());
+            LookupTableDto saved = dbTableService.saveAndPostEvent(lookupTable.toDto());
 
             return LookupTableApi.fromDto(saved);
         } catch (DuplicateKeyException e) {
@@ -342,7 +343,7 @@ public class LookupTableResource extends RestResource {
                                       @Valid @ApiParam LookupTableApi toUpdate) {
         checkLookupTableId(idOrName, toUpdate);
         checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
-        LookupTableDto saved = dbTableService.save(toUpdate.toDto());
+        LookupTableDto saved = dbTableService.saveAndPostEvent(toUpdate.toDto());
 
         return LookupTableApi.fromDto(saved);
     }
@@ -358,7 +359,7 @@ public class LookupTableResource extends RestResource {
             throw new NotFoundException();
         }
         checkPermission(RestPermissions.LOOKUP_TABLES_DELETE, lookupTableDto.get().id());
-        dbTableService.delete(idOrName);
+        dbTableService.deleteAndPostEvent(idOrName);
 
         return LookupTableApi.fromDto(lookupTableDto.get());
     }
@@ -546,7 +547,7 @@ public class LookupTableResource extends RestResource {
     public DataAdapterApi createAdapter(@Valid @ApiParam DataAdapterApi newAdapter) {
         try {
             DataAdapterDto dto = newAdapter.toDto();
-            DataAdapterDto saved = dbDataAdapterService.save(dto);
+            DataAdapterDto saved = dbDataAdapterService.saveAndPostEvent(dto);
 
             return DataAdapterApi.fromDto(saved);
         } catch (DuplicateKeyException e) {
@@ -569,7 +570,7 @@ public class LookupTableResource extends RestResource {
         if (!unused) {
             throw new BadRequestException("The adapter is still in use, cannot delete.");
         }
-        dbDataAdapterService.delete(idOrName);
+        dbDataAdapterService.deleteAndPostEvent(idOrName);
 
         return DataAdapterApi.fromDto(dto);
     }
@@ -582,7 +583,7 @@ public class LookupTableResource extends RestResource {
                                         @Valid @ApiParam DataAdapterApi toUpdate) {
         checkLookupAdapterId(idOrName, toUpdate);
         checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
-        DataAdapterDto saved = dbDataAdapterService.save(toUpdate.toDto());
+        DataAdapterDto saved = dbDataAdapterService.saveAndPostEvent(toUpdate.toDto());
 
         return DataAdapterApi.fromDto(saved);
     }
@@ -700,7 +701,7 @@ public class LookupTableResource extends RestResource {
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_CREATE)
     public CacheApi createCache(@ApiParam CacheApi newCache) {
         try {
-            final CacheDto saved = dbCacheService.save(newCache.toDto());
+            final CacheDto saved = dbCacheService.saveAndPostEvent(newCache.toDto());
             return CacheApi.fromDto(saved);
         } catch (DuplicateKeyException e) {
             throw new BadRequestException(e.getMessage());
@@ -722,7 +723,7 @@ public class LookupTableResource extends RestResource {
         if (!unused) {
             throw new BadRequestException("The cache is still in use, cannot delete.");
         }
-        dbCacheService.delete(idOrName);
+        dbCacheService.deleteAndPostEvent(idOrName);
 
         return CacheApi.fromDto(dto);
     }
@@ -735,7 +736,7 @@ public class LookupTableResource extends RestResource {
                                 @ApiParam CacheApi toUpdate) {
         checkLookupCacheId(idOrName, toUpdate);
         checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
-        CacheDto saved = dbCacheService.save(toUpdate.toDto());
+        CacheDto saved = dbCacheService.saveAndPostEvent(toUpdate.toDto());
         return CacheApi.fromDto(saved);
     }
 

@@ -16,24 +16,24 @@
  */
 import * as React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
+import { defaultUser } from 'defaultMockValues';
 
+import { adminUser, alice } from 'fixtures/users';
 import asMock from 'helpers/mocking/AsMock';
 import { MockStore } from 'helpers/mocking';
-import CurrentUserProvider from 'contexts/CurrentUserProvider';
 import CurrentUserPreferencesProvider from 'contexts/CurrentUserPreferencesProvider';
 import Store from 'logic/local-storage/Store';
 import View from 'views/logic/views/View';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-import type { UserJSON } from 'logic/users/User';
+import type { PreferencesMap } from 'stores/users/PreferencesStore';
 import { PreferencesActions } from 'stores/users/PreferencesStore';
+import type User from 'logic/users/User';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import SearchPagePreferencesContext from './SearchPagePreferencesContext';
 import SearchPagePreferencesProvider from './SearchPagePreferencesProvider';
 
-jest.mock('stores/users/CurrentUserStore', () => ({
-  CurrentUserStore: MockStore(),
-}));
+jest.mock('hooks/useCurrentUser');
 
 jest.mock('stores/users/PreferencesStore', () => ({
   PreferencesActions: {
@@ -48,19 +48,28 @@ jest.mock('logic/local-storage/Store', () => ({
   set: jest.fn(),
 }));
 
+jest.mock('views/stores/ViewStore', () => ({
+  ViewStore: {
+    listen: jest.fn(() => () => {}),
+    getInitialState: jest.fn(() => ({})),
+  },
+}));
+
 describe('SearchPagePreferencesProvider', () => {
+  beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
+  });
+
   const SimpleProvider = ({ children }: { children: any }) => (
-    <CurrentUserProvider>
-      <CurrentUserPreferencesProvider>
-        <CurrentViewTypeProvider type={View.Type.Search}>
-          <SearchPagePreferencesProvider>
-            <SearchPagePreferencesContext.Consumer>
-              {children}
-            </SearchPagePreferencesContext.Consumer>
-          </SearchPagePreferencesProvider>
-        </CurrentViewTypeProvider>
-      </CurrentUserPreferencesProvider>
-    </CurrentUserProvider>
+    <CurrentUserPreferencesProvider>
+      <CurrentViewTypeProvider type={View.Type.Search}>
+        <SearchPagePreferencesProvider>
+          <SearchPagePreferencesContext.Consumer>
+            {children}
+          </SearchPagePreferencesContext.Consumer>
+        </SearchPagePreferencesProvider>
+      </CurrentViewTypeProvider>
+    </CurrentUserPreferencesProvider>
   );
 
   const ProviderWithToggleButton = () => (
@@ -93,15 +102,14 @@ describe('SearchPagePreferencesProvider', () => {
   });
 
   it('provides default search page preference state if user does not exists', () => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: {} as UserJSON });
-
+    asMock(useCurrentUser).mockReturnValue({} as User);
     const consume = renderSUT();
 
     expect(consume).toHaveBeenCalledWith(expect.objectContaining({ config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: false }) }) }));
   });
 
   it('provides default search page preference state if user has no preferences', () => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: { preferences: {} } as UserJSON });
+    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().preferences({} as PreferencesMap).build());
 
     const consume = renderSUT();
 
@@ -109,13 +117,9 @@ describe('SearchPagePreferencesProvider', () => {
   });
 
   it('provides search page preferences based on user preferences', () => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({
-      currentUser: {
-        preferences: {
-          searchSidebarIsPinned: true,
-        },
-      } as UserJSON,
-    });
+    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().preferences({
+      searchSidebarIsPinned: true,
+    } as PreferencesMap).build());
 
     const consume = renderSUT();
 
@@ -129,13 +133,7 @@ describe('SearchPagePreferencesProvider', () => {
       return false;
     });
 
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({
-      currentUser: {
-        id: 'local:admin',
-        username: 'admin',
-        read_only: true,
-      } as UserJSON,
-    });
+    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().readOnly(true).build());
 
     const consume = renderSUT();
 
@@ -143,12 +141,7 @@ describe('SearchPagePreferencesProvider', () => {
   });
 
   it('should update user preferences on state change', () => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({
-      currentUser: {
-        username: 'alice',
-      } as UserJSON,
-    });
-
+    asMock(useCurrentUser).mockReturnValue(alice);
     const { getByText } = render(<ProviderWithToggleButton />);
 
     fireEvent.click(getByText('Toggle sidebar pinning'));
@@ -158,11 +151,8 @@ describe('SearchPagePreferencesProvider', () => {
     expect(PreferencesActions.saveUserPreferences).toHaveBeenCalledWith(
       'alice',
       {
-        enableSmartSearch: true,
-        updateUnfocussed: false,
+        ...alice.preferences,
         searchSidebarIsPinned: true,
-        dashboardSidebarIsPinned: false,
-        themeMode: 'teint',
       },
       undefined,
       false,
@@ -170,13 +160,7 @@ describe('SearchPagePreferencesProvider', () => {
   });
 
   it('should update local storage on preference state change for system admin', () => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({
-      currentUser: {
-        id: 'local:admin',
-        username: 'admin',
-        read_only: true,
-      } as UserJSON,
-    });
+    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().readOnly(true).build());
 
     const { getByText } = render(<ProviderWithToggleButton />);
 

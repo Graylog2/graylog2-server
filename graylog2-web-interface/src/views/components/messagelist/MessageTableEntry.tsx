@@ -43,11 +43,11 @@ import HighlightMessageContext from '../contexts/HighlightMessageContext';
 export const TableBody = styled.tbody<{ expanded?: boolean, highlighted?: boolean }>(({ expanded, highlighted, theme }) => `
   && {
     border-top: 0;
-  
+
     ${expanded ? `
       border-left: 7px solid ${theme.colors.variant.light.info};
     ` : ''}
-    
+
     ${highlighted ? `
       border-left: 7px solid ${theme.colors.variant.light.success};
     ` : ''}
@@ -56,7 +56,7 @@ export const TableBody = styled.tbody<{ expanded?: boolean, highlighted?: boolea
 
 const FieldsRow = styled.tr(({ theme }) => `
   cursor: pointer;
-  
+
   td {
     min-width: 50px;
     word-break: break-word;
@@ -76,7 +76,7 @@ const MessageDetailRow = styled.tr`
   .row {
     margin-right: 0;
   }
-  
+
   div[class*="col-"] {
     padding-right: 0;
   }
@@ -129,7 +129,11 @@ const MessageTableEntry = ({
   const inputs = Immutable.Map<string, Input>(inputsList.map((input) => [input.id, input]));
 
   const _toggleDetail = () => {
-    toggleDetail(`${message.index}-${message.id}`);
+    const isSelectingText = !!window.getSelection()?.toString();
+
+    if (!isSelectingText) {
+      toggleDetail(`${message.index}-${message.id}`);
+    }
   };
 
   const colSpanFixup = selectedFields.size + 1;

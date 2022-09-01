@@ -26,7 +26,7 @@ import { FlatContentRow, Spinner } from 'components/common';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
-import ViewActionsMenu from 'views/components/ViewActionsMenu';
+import DashboardActionsMenu from 'views/components/DashboardActionsMenu';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import BottomRow from 'views/components/searchbar/BottomRow';
 import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
@@ -44,10 +44,11 @@ import {
   executeSearchSubmitHandler as executePluggableSubmitHandler,
   useInitialSearchValues as usePluggableInitialValues,
   pluggableValidationPayload,
-} from 'views/components/searchbar/pluggableSearchBarControlsHandler';
+} from 'views/logic/searchbar/pluggableSearchBarControlsHandler';
 import type { SearchBarControl } from 'views/types';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -97,14 +98,14 @@ const SearchButtonAndQuery = styled.div`
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
-const _validateQueryString = (values: DashboardFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>) => {
+const _validateQueryString = (values: DashboardFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, userTimezone: string) => {
   const request = {
     timeRange: isNoTimeRangeOverride(values?.timerange) ? undefined : values?.timerange,
     queryString: values?.queryString,
     ...pluggableValidationPayload(values, pluggableSearchBarControls),
   };
 
-  return debouncedValidateQuery(request);
+  return debouncedValidateQuery(request, userTimezone);
 };
 
 const useInitialFormValues = (timerange, queryString) => {
@@ -116,6 +117,7 @@ const useInitialFormValues = (timerange, queryString) => {
 };
 
 const DashboardSearchBar = () => {
+  const { userTimezone } = useUserDateTime();
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
   const { timerange, query: { query_string: queryString = '' } = {} } = useStore(GlobalOverrideStore) ?? {};
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
@@ -145,7 +147,7 @@ const DashboardSearchBar = () => {
               <DashboardSearchForm initialValues={initialValues}
                                    limitDuration={limitDuration}
                                    onSubmit={submitForm}
-                                   validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls)}>
+                                   validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls, userTimezone)}>
                 {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
                   const disableSearchSubmit = isSubmitting || isValidating || !isValid;
 
@@ -195,7 +197,7 @@ const DashboardSearchBar = () => {
 
                         {!editing && (
                           <ViewActionsWrapper>
-                            <ViewActionsMenu />
+                            <DashboardActionsMenu />
                           </ViewActionsWrapper>
                         )}
                       </BottomRow>

@@ -27,7 +27,8 @@ import type { QueryValidationState } from 'views/components/searchbar/queryvalid
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import type { AutoCompleter, Editor } from './ace-types';
 import type { BaseProps } from './BasicQueryInput';
@@ -134,7 +135,7 @@ const _updateEditorConfiguration = (node, completer, onExecute) => {
   }
 };
 
-const useCompleter = ({ streams, timeRange, completerFactory }: Pick<Props, 'streams' | 'timeRange' | 'completerFactory'>) => {
+const useCompleter = ({ streams, timeRange, completerFactory, userTimezone }: Pick<Props, 'streams' | 'timeRange' | 'completerFactory'> & { userTimezone: string }) => {
   const completers = usePluginEntities('views.completers') ?? [];
   const { data: queryFields } = useFieldTypes(streams, isNoTimeRangeOverride(timeRange) ? DEFAULT_TIMERANGE : timeRange);
   const { data: allFields } = useFieldTypes([], DEFAULT_TIMERANGE);
@@ -146,7 +147,7 @@ const useCompleter = ({ streams, timeRange, completerFactory }: Pick<Props, 'str
   }, [allFields, queryFields]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useMemo(() => completerFactory(completers, timeRange, streams, fieldTypes), [completerFactory, timeRange, streams, fieldTypes]);
+  return useMemo(() => completerFactory(completers, timeRange, streams, fieldTypes, userTimezone), [completerFactory, timeRange, streams, fieldTypes, userTimezone]);
 };
 
 type Props = BaseProps & {
@@ -155,6 +156,7 @@ type Props = BaseProps & {
     timeRange: TimeRange | NoTimeRangeOverride | undefined,
     streams: Array<string>,
     fieldTypes: FieldTypes,
+    userTimezone: string,
   ) => AutoCompleter,
   disableExecution?: boolean,
   isValidating?: boolean,
@@ -188,9 +190,10 @@ const QueryInput = ({
   wrapEnabled,
   name,
 }: Props) => {
+  const { userTimezone } = useUserDateTime();
   const isInitialTokenizerUpdate = useRef(true);
   const { enableSmartSearch } = useContext(UserPreferencesContext);
-  const completer = useCompleter({ streams, timeRange, completerFactory });
+  const completer = useCompleter({ streams, timeRange, completerFactory, userTimezone });
   const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor, isInitialTokenizerUpdate), []);
   const onExecute = useCallback((editor: Editor) => handleExecution({
     editor,

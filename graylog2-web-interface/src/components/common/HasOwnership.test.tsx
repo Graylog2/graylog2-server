@@ -16,44 +16,18 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
-import { alice as currentUser } from 'fixtures/users';
-import type User from 'logic/users/User';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import { alice as currentUser, adminUser } from 'fixtures/users';
 import { createGRN } from 'logic/permissions/GRN';
+import { asMock } from 'helpers/mocking';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import HasOwnership from './HasOwnership';
 
-type Props = {
-  currentUser: User,
-  id: string,
-  type: string,
-  hideChildren?: boolean,
-};
+jest.mock('hooks/useCurrentUser');
 
 describe('HasOwnership', () => {
-  // eslint-disable-next-line react/prop-types
-  const DisabledComponent = ({ disabled }: { disabled: boolean}) => {
-    return disabled
-      ? <span>disabled</span>
-      : <span>enabled</span>;
-  };
-
-  const SimpleHasOwnership = ({ currentUser: user = currentUser, ...props }: Props) => (
-    <CurrentUserContext.Provider value={user}>
-      <HasOwnership {...props}>
-        {({ disabled }) => (
-          <DisabledComponent disabled={disabled} />
-        )}
-      </HasOwnership>
-    </CurrentUserContext.Provider>
-  );
-
-  SimpleHasOwnership.defaultProps = {
-    hideChildren: false,
-  };
-
   const type = 'stream';
   const id = '000000000001';
   const grn = createGRN(type, id);
@@ -64,16 +38,42 @@ describe('HasOwnership', () => {
   const otherGrn = createGRN(otherType, otherId);
   const otherGrnPermission = `entity:own:${otherGrn}`;
 
+  // eslint-disable-next-line react/prop-types
+  const DisabledComponent = ({ disabled }: { disabled: boolean}) => {
+    return disabled
+      ? <span>disabled</span>
+      : <span>enabled</span>;
+  };
+
+  type Props = {
+    id: string,
+    type: string,
+    hideChildren?: boolean,
+  };
+
+  const SimpleHasOwnership = (props: Props) => (
+    <HasOwnership {...props}>
+      {({ disabled }) => (
+        <DisabledComponent disabled={disabled} />
+      )}
+    </HasOwnership>
+  );
+
+  SimpleHasOwnership.defaultProps = {
+    hideChildren: false,
+  };
+
   it('should render children enabled if user has ownership', () => {
-    const user = currentUser.toBuilder()
+    const user = adminUser.toBuilder()
       .grnPermissions(Immutable.List([grnPermission]))
       .permissions(Immutable.List())
       .build();
-    const { getByText: queryByText } = render(
-      <SimpleHasOwnership currentUser={user} id={id} type={type} />,
-    );
 
-    expect(queryByText('enabled')).toBeTruthy();
+    asMock(useCurrentUser).mockReturnValue(user);
+
+    render(<SimpleHasOwnership id={id} type={type} />);
+
+    expect(screen.getByText('enabled')).toBeTruthy();
   });
 
   it('should render children disabled if user has empty ownership and is not admin', () => {
@@ -81,11 +81,10 @@ describe('HasOwnership', () => {
       .grnPermissions(Immutable.List(Immutable.List()))
       .permissions(Immutable.List())
       .build();
-    const { queryByText } = render(
-      <SimpleHasOwnership currentUser={user} id={id} type={type} />,
-    );
+    asMock(useCurrentUser).mockReturnValue(user);
+    render(<SimpleHasOwnership id={id} type={type} />);
 
-    expect(queryByText('disabled')).toBeTruthy();
+    expect(screen.getByText('disabled')).toBeTruthy();
   });
 
   it('should render children disabled if user has wrong ownership and is not admin', () => {
@@ -93,11 +92,11 @@ describe('HasOwnership', () => {
       .grnPermissions(Immutable.List([otherGrnPermission]))
       .permissions(Immutable.List())
       .build();
-    const { queryByText } = render(
-      <SimpleHasOwnership currentUser={user} id={id} type={type} />,
-    );
 
-    expect(queryByText('disabled')).toBeTruthy();
+    asMock(useCurrentUser).mockReturnValue(user);
+    render(<SimpleHasOwnership id={id} type={type} />);
+
+    expect(screen.getByText('disabled')).toBeTruthy();
   });
 
   it('should render children disabled if user has wrong ownership and is reader', () => {
@@ -105,11 +104,10 @@ describe('HasOwnership', () => {
       .grnPermissions(Immutable.List([otherGrnPermission]))
       .permissions(Immutable.List([`streams:read:${id}`]))
       .build();
-    const { queryByText } = render(
-      <SimpleHasOwnership currentUser={user} id={id} type={type} />,
-    );
+    asMock(useCurrentUser).mockReturnValue(user);
+    render(<SimpleHasOwnership id={id} type={type} />);
 
-    expect(queryByText('disabled')).toBeTruthy();
+    expect(screen.getByText('disabled')).toBeTruthy();
   });
 
   it('should render children disabled if user has no ownership and is reader', () => {
@@ -117,11 +115,10 @@ describe('HasOwnership', () => {
       .grnPermissions(Immutable.List([]))
       .permissions(Immutable.List([`streams:read:${id}`]))
       .build();
-    const { queryByText } = render(
-      <SimpleHasOwnership currentUser={user} id={id} type={type} />,
-    );
+    asMock(useCurrentUser).mockReturnValue(user);
+    render(<SimpleHasOwnership id={id} type={type} />);
 
-    expect(queryByText('disabled')).toBeTruthy();
+    expect(screen.getByText('disabled')).toBeTruthy();
   });
 
   it('should render children enabled if user has empty ownership and is admin', () => {
@@ -129,11 +126,10 @@ describe('HasOwnership', () => {
       .grnPermissions(Immutable.List([]))
       .permissions(Immutable.List(['*']))
       .build();
-    const { queryByText } = render(
-      <SimpleHasOwnership currentUser={user} id={id} type={type} />,
-    );
+    asMock(useCurrentUser).mockReturnValue(user);
+    render(<SimpleHasOwnership id={id} type={type} />);
 
-    expect(queryByText('enabled')).toBeTruthy();
+    expect(screen.getByText('enabled')).toBeTruthy();
   });
 
   it('should render children enabled if user has wrong ownership and is admin', () => {
@@ -141,11 +137,10 @@ describe('HasOwnership', () => {
       .grnPermissions(Immutable.List([otherGrnPermission]))
       .permissions(Immutable.List(['*']))
       .build();
-    const { queryByText } = render(
-      <SimpleHasOwnership currentUser={user} id={id} type={type} />,
-    );
+    asMock(useCurrentUser).mockReturnValue(user);
+    render(<SimpleHasOwnership id={id} type={type} />);
 
-    expect(queryByText('enabled')).toBeTruthy();
+    expect(screen.getByText('enabled')).toBeTruthy();
   });
 
   it('should hide children when configured', () => {
@@ -153,11 +148,10 @@ describe('HasOwnership', () => {
       .grnPermissions(Immutable.List([otherGrnPermission]))
       .permissions(Immutable.List([]))
       .build();
-    const { queryByText } = render(
-      <SimpleHasOwnership currentUser={user} id={id} type={type} hideChildren />,
-    );
+    asMock(useCurrentUser).mockReturnValue(user);
+    render(<SimpleHasOwnership id={id} type={type} hideChildren />);
 
-    expect(queryByText('disabled')).toBeFalsy();
-    expect(queryByText('enabled')).toBeFalsy();
+    expect(screen.queryByText('disabled')).not.toBeInTheDocument();
+    expect(screen.queryByText('enabled')).not.toBeInTheDocument();
   });
 });

@@ -39,11 +39,20 @@ const mockLoadRolesPromise = Promise.resolve({
   count: 0,
   total: 0,
 });
+const mockExistingUser = existingUser.username;
 
 jest.mock('stores/users/UsersStore', () => ({
   UsersActions: {
     create: jest.fn(() => Promise.resolve()),
     loadUsers: jest.fn(() => mockLoadUsersPromise),
+    loadByUsername: jest.fn((u) => {
+      if (u === mockExistingUser) {
+        Promise.resolve();
+      } else {
+        // eslint-disable-next-line no-throw-literal
+        throw {};
+      }
+    }),
   },
 }));
 
@@ -66,6 +75,7 @@ describe('<UserCreate />', () => {
     const timeoutAmountInput = await findByPlaceholderText('Timeout amount');
     // const timeoutUnitSelect = getByTestId('Timeout unit');
     const timezoneSelect = await findByLabelText('Time Zone');
+    const roleSelect = await findByText(/search for roles/i);
     const passwordInput = await findByPlaceholderText('Password');
     const passwordRepeatInput = await findByPlaceholderText('Repeat password');
     const submitButton = await findByText('Create User');
@@ -79,6 +89,8 @@ describe('<UserCreate />', () => {
     // await act(async () => { await selectEvent.select(timeoutUnitSelect, 'Seconds'); });
     await selectEvent.openMenu(timezoneSelect);
     await act(async () => { await selectEvent.select(timezoneSelect, 'Berlin'); });
+    await selectEvent.openMenu(roleSelect);
+    await act(async () => { await selectEvent.select(roleSelect, 'Manager'); });
     fireEvent.change(passwordInput, { target: { value: 'thepassword' } });
     fireEvent.change(passwordRepeatInput, { target: { value: 'thepassword' } });
 
@@ -89,7 +101,7 @@ describe('<UserCreate />', () => {
       first_name: 'The first name',
       last_name: 'The last name',
       timezone: 'Europe/Berlin',
-      roles: ['Reader'],
+      roles: ['Reader', 'Manager'],
       email: 'username@example.org',
       permissions: [],
       session_timeout_ms: 144000000,

@@ -14,15 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback, useContext } from 'react';
+import { useCallback } from 'react';
 
 import type { Event } from 'views/logic/searchtypes/events/EventHandler';
 import EventHandler from 'views/logic/searchtypes/events/EventHandler';
-import UserDateTimeContext from 'contexts/UserDateTimeContext';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 const useEvents = (config: AggregationWidgetConfig, events: Event[] | undefined) => {
-  const { formatTime } = useContext(UserDateTimeContext);
+  const { formatTime } = useUserDateTime();
   const formatTimestamp = useCallback((timestamp: string) => formatTime(timestamp, 'internal'), [formatTime]);
 
   return (config.eventAnnotation && events)

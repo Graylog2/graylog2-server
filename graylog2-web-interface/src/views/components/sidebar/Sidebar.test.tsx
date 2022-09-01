@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
 import QueryResult from 'views/logic/QueryResult';
@@ -25,21 +24,11 @@ import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 
 import Sidebar from './Sidebar';
 
-const mockCurrentUser = { timezone: 'UTC' };
-
-jest.mock('stores/users/CurrentUserStore', () => ({
-  CurrentUserStore: MockStore(['get', () => mockCurrentUser], ['getInitialState', () => ({ mockCurrentUser })]),
-}));
-
-jest.mock('stores/sessions/SessionStore', () => ({ SessionStore: MockStore('isLoggedIn') }));
-
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
   rootTimeZone: jest.fn(() => 'America/Chicago'),
   gl2ServerUrl: jest.fn(() => undefined),
 }));
-
-jest.mock('hooks/useUserDateTime');
 
 describe('<Sidebar />', () => {
   const viewMetaData = {
@@ -95,7 +84,7 @@ describe('<Sidebar />', () => {
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
-    await screen.findAllByText((_content, node) => (node.textContent === 'Query executed in 64ms at 2018-08-28 14:39:26.'));
+    await screen.findAllByText((_content, node) => (node.textContent === 'Query executed in 64ms at 2018-08-28 16:39:26.'));
   });
 
   const emptyViewMetaData = {
