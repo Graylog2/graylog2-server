@@ -14,18 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
+
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 import { Alert } from 'components/bootstrap';
 import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import withParams from 'routing/withParams';
-import withLocation from 'routing/withLocation';
 import StreamsStore from 'stores/streams/StreamsStore';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useQuery from 'routing/useQuery';
 
-const StreamEditPage = ({ params, location }) => {
+const StreamEditPage = () => {
+  const params = useParams<{ streamId: string }>();
+  const query = useQuery();
   const currentUser = useCurrentUser();
   const [stream, setStream] = useState<{ is_default: boolean, title: string } | undefined>();
 
@@ -44,8 +46,8 @@ const StreamEditPage = ({ params, location }) => {
   let content = (
     <StreamRulesEditor currentUser={currentUser}
                        streamId={params.streamId}
-                       messageId={location.query.message_id}
-                       index={location.query.index} />
+                       messageId={query.message_id}
+                       index={query.index} />
   );
 
   if (stream.is_default) {
@@ -76,9 +78,4 @@ const StreamEditPage = ({ params, location }) => {
   );
 };
 
-StreamEditPage.propTypes = {
-  params: PropTypes.object.isRequired,
-  location: PropTypes.object.isRequired,
-};
-
-export default withParams(withLocation(StreamEditPage));
+export default StreamEditPage;
