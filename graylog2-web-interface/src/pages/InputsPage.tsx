@@ -14,39 +14,34 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import React, { useEffect } from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import { InputsList } from 'components/inputs';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
+import useCurrentUser from 'hooks/useCurrentUser';
 
-const InputsPage = createReactClass({
-  displayName: 'InputsPage',
-  mixins: [Reflux.connect(CurrentUserStore)],
+const InputsPage = () => {
+  const currentUser = useCurrentUser();
 
-  componentDidMount() {
-    this.interval = setInterval(InputStatesStore.list, 2000);
-  },
+  useEffect(() => {
+    const listInputsInterval = setInterval(InputStatesStore.list, 2000);
 
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  },
+    return () => {
+      clearInterval(listInputsInterval);
+    };
+  }, []);
 
-  render() {
-    return (
-      <DocumentTitle title="Inputs">
-        <div>
-          <PageHeader title="Inputs">
-            <span>Graylog nodes accept data via inputs. Launch or terminate as many inputs as you want here.</span>
-          </PageHeader>
-          <InputsList permissions={this.state.currentUser.permissions} />
-        </div>
-      </DocumentTitle>
-    );
-  },
-});
+  return (
+    <DocumentTitle title="Inputs">
+      <div>
+        <PageHeader title="Inputs">
+          <span>Graylog nodes accept data via inputs. Launch or terminate as many inputs as you want here.</span>
+        </PageHeader>
+        <InputsList permissions={currentUser.permissions} />
+      </div>
+    </DocumentTitle>
+  );
+};
 
 export default InputsPage;
