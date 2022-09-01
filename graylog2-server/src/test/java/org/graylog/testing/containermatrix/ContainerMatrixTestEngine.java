@@ -64,7 +64,10 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
 
     static {
         // Collect all annotated classes once to avoid the class scanning overhead on each #discover() call
-        final ClassGraph classGraph = new ClassGraph().enableAnnotationInfo().acceptPackages("org.graylog", "org.graylog2");
+        final ClassGraph classGraph = new ClassGraph()
+                .ignoreClassVisibility() // JUnit5 test classes might be package-private
+                .enableAnnotationInfo()
+                .acceptPackages("org.graylog", "org.graylog2");
         try (final ScanResult scanResult = classGraph.scan()) {
             annotatedClasses = scanResult.getClassesWithAnnotation(ContainerMatrixTestsConfiguration.class.getCanonicalName()).stream()
                     .map(ClassInfo::loadClass)
