@@ -162,7 +162,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
                                     (errors.name || validationErrors.name)
                                       ? null
                                       : 'The name that is being used to refer to this cache. Must be unique.'
-                                  }
+                                   }
                                    labelClassName="col-sm-3"
                                    wrapperClassName="col-sm-9" />
 
