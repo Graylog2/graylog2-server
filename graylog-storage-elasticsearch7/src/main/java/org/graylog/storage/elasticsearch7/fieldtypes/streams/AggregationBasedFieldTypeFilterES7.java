@@ -18,6 +18,8 @@ package org.graylog.storage.elasticsearch7.fieldtypes.streams;
 
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.TermsQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
@@ -26,8 +28,6 @@ import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.SearchRequestFactory;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.AggregationBasedFieldTypeFilterAdapter;
-import org.graylog2.indexer.searches.SearchesConfig;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -61,14 +61,11 @@ public class AggregationBasedFieldTypeFilterES7 implements AggregationBasedField
             return fieldTypeDTOs;
         }
 
-        final SearchesConfig config = SearchesConfig.builder()
-                .query("")
-                .filter(buildFilterFromStreams(streamIds))
-                .range(RelativeRange.allTime())
-                .limit(0)
-                .offset(0)
-                .build();
-        final SearchSourceBuilder searchSourceBuilder = searchRequestFactory.create(config);
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+                .query(new BoolQueryBuilder()
+                        .filter(new TermsQueryBuilder("streams", streamIds))
+                )
+                .size(0);
 
         addAggregationsToSearch(fieldTypeDTOs, searchSourceBuilder);
 
@@ -98,12 +95,6 @@ public class AggregationBasedFieldTypeFilterES7 implements AggregationBasedField
                     .shardSize(1)
             );
         }
-    }
-
-    private String buildFilterFromStreams(final Collection<String> streamIds) {
-        return streamIds.stream()
-                .map(id -> "streams:" + id)
-                .collect(Collectors.joining(" OR "));
     }
 
 }

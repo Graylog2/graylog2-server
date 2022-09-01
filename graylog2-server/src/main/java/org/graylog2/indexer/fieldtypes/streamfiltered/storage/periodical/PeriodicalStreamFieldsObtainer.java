@@ -25,7 +25,6 @@ import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.AggregationBase
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.CountExistingBasedFieldTypeFilterAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.storage.StoredStreamFieldsService;
 import org.graylog2.indexer.fieldtypes.streamfiltered.storage.model.StoredStreamFields;
-import org.graylog2.indexer.fieldtypes.util.TextFieldTypesSeparator;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.streams.Stream;
@@ -41,7 +40,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog2.indexer.fieldtypes.streamfiltered.config.Config.MAX_AGGREGATIONS_PER_REQUEST;
 import static org.graylog2.indexer.fieldtypes.streamfiltered.config.Config.MAX_SEARCHES_PER_MULTI_SEARCH;
 
 public class PeriodicalStreamFieldsObtainer extends Periodical {
@@ -96,18 +94,10 @@ public class PeriodicalStreamFieldsObtainer extends Periodical {
                 RelativeRange.allTime());
         final Set<FieldTypeDTO> initialFieldTypeDTOs = getInitialFieldTypes(streamId, indexNames);
 
-        final TextFieldTypesSeparator textFieldTypesSeparator = new TextFieldTypesSeparator();
-        textFieldTypesSeparator.separate(initialFieldTypeDTOs);
-
         final Set<FieldTypeDTO> fieldTypeDTOsForStream = new HashSet<>();
-        final Iterable<List<FieldTypeDTO>> textFieldsBatches = Iterables.partition(textFieldTypesSeparator.getTextFields(), MAX_SEARCHES_PER_MULTI_SEARCH);
-        for (List<FieldTypeDTO> batch : textFieldsBatches) {
+        final Iterable<List<FieldTypeDTO>> partitioned = Iterables.partition(initialFieldTypeDTOs, MAX_SEARCHES_PER_MULTI_SEARCH);
+        for (List<FieldTypeDTO> batch : partitioned) {
             final Set<FieldTypeDTO> filteredBatch = countExistingBasedFieldTypeFilterAdapter.filterFieldTypes(new HashSet<>(batch), indexNames, streamIdSingleton);
-            fieldTypeDTOsForStream.addAll(filteredBatch);
-        }
-        final Iterable<List<FieldTypeDTO>> nonTextFieldsBatches = Iterables.partition(textFieldTypesSeparator.getNonTextFields(), MAX_AGGREGATIONS_PER_REQUEST);
-        for (List<FieldTypeDTO> batch : nonTextFieldsBatches) {
-            final Set<FieldTypeDTO> filteredBatch = aggregationBasedFieldTypeFilterAdapter.filterFieldTypes(new HashSet<>(batch), indexNames, streamIdSingleton);
             fieldTypeDTOsForStream.addAll(filteredBatch);
         }
         return fieldTypeDTOsForStream;
