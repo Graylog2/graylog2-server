@@ -43,7 +43,7 @@ const DecoratorValue = ({ field, value, truncate, render, type }: Props) => {
   if (value && value.href && value.type) {
     const formattedValue = _formatValue(field, value.href, truncate, render, type);
 
-    return <a href={value.href}>{formattedValue}</a>;
+    return <a href={value.href} target="_blank">{formattedValue}</a>;
   }
 
   return _formatValue(field, value, truncate, render, type);
