@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.sidecar.services;
 
+import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.StringTemplateLoader;
@@ -34,6 +35,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.search.SearchQuery;
+import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.slf4j.Logger;
@@ -83,6 +85,11 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
 
     public Configuration find(String id) {
         return db.findOne(DBQuery.is("_id", id));
+    }
+    public List<Configuration> findByIds(List<String> ids) {
+        try (final DBCursor<Configuration> dbCursor = db.find(DBQuery.in("_id", ids))) {
+            return ImmutableList.copyOf(dbCursor.iterator());
+        }
     }
 
     public Configuration findByName(String name) {

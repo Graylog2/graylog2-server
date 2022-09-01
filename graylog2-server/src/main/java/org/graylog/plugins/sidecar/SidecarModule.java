@@ -31,6 +31,7 @@ import org.graylog.plugins.sidecar.filter.StatusAdministrationFilter;
 import org.graylog.plugins.sidecar.migrations.V20180212165000_AddDefaultCollectors;
 import org.graylog.plugins.sidecar.migrations.V20180323150000_AddSidecarUser;
 import org.graylog.plugins.sidecar.migrations.V20180601151500_AddDefaultConfiguration;
+import org.graylog.plugins.sidecar.migrations.V20220829190505_SupportMultipleConfigIds;
 import org.graylog.plugins.sidecar.periodical.PurgeExpiredConfigurationUploads;
 import org.graylog.plugins.sidecar.periodical.PurgeExpiredSidecarsThread;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
@@ -90,6 +91,7 @@ public class SidecarModule extends PluginModule {
         binder.addBinding().to(V20180212165000_AddDefaultCollectors.class);
         binder.addBinding().to(V20180323150000_AddSidecarUser.class);
         binder.addBinding().to(V20180601151500_AddDefaultConfiguration.class);
+        binder.addBinding().to(V20220829190505_SupportMultipleConfigIds.class);
 
         serviceBinder().addBinding().to(EtagService.class).in(Scopes.SINGLETON);
     }

@@ -14,27 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.sidecar.rest.requests;
+package org.graylog.plugins.sidecar.rest.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.sidecar.rest.requests.ConfigurationAssignment;
 
 import java.util.List;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class ConfigurationAssignment {
+public abstract class ConfigurationAssignmentResponse {
     @JsonProperty
     public abstract String collectorId();
 
     @JsonProperty
+    // Old sidecars can only handle one configuration per collector
+    public abstract String configurationId();
+
+    @JsonProperty
     public abstract List<String> configurationIds();
 
-    @JsonCreator
-    public static ConfigurationAssignment create(@JsonProperty("collector_id") String collectorId,
-                                                 @JsonProperty("configuration_ids") List<String> configurationIds) {
-        return new AutoValue_ConfigurationAssignment(collectorId, configurationIds);
+    public static ConfigurationAssignmentResponse fromConfigurationAssignment(ConfigurationAssignment assignment) {
+        return new AutoValue_ConfigurationAssignmentResponse(assignment.collectorId(), assignment.configurationIds().stream().findFirst().orElse(null), assignment.configurationIds());
+
     }
 }

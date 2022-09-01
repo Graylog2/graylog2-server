@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SidecarService extends PaginatedDbService<Sidecar> {
-    private static final String COLLECTION_NAME = "sidecars";
+    public static final String COLLECTION_NAME = "sidecars";
     private final CollectorService collectorService;
     private final ConfigurationService configurationService;
 
@@ -211,12 +211,12 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
             if (collector == null) {
                 throw new NotFoundException("Couldn't find collector with ID " + assignment.collectorId());
             }
-            Configuration configuration = configurationService.find(assignment.configurationId());
-            if (configuration == null) {
-                throw new NotFoundException("Couldn't find configuration with ID " + assignment.configurationId());
+            List<Configuration> configurations = configurationService.findByIds(assignment.configurationIds());
+            if (configurations.size() != assignment.configurationIds().size()) {
+                throw new NotFoundException("Couldn't find all configurations for IDs " + assignment.configurationIds());
             }
-            if (!configuration.collectorId().equals(collector.id())) {
-                throw new NotFoundException("Configuration doesn't match collector ID " + assignment.collectorId());
+            if (!configurations.stream().allMatch(c -> c.collectorId().equals(collector.id()))) {
+                throw new NotFoundException("A Configuration doesn't match collector ID " + assignment.collectorId());
             }
         }
 

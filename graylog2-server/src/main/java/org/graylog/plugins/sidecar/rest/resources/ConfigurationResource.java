@@ -402,7 +402,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
 
     private boolean isConfigurationAssignedToSidecar(String configurationId, Sidecar sidecar) {
         final List<ConfigurationAssignment> assignments = firstNonNull(sidecar.assignments(), new ArrayList<>());
-        return assignments.stream().anyMatch(assignment -> assignment.configurationId().equals(configurationId));
+        return assignments.stream().anyMatch(assignment -> assignment.configurationIds().stream().anyMatch(cid -> cid.equals(configurationId)));
     }
 
     private String configurationToEtag(Configuration configuration) {
