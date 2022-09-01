@@ -20,7 +20,6 @@ import { render } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
-import type User from 'logic/users/User';
 import type { PreferencesMap } from 'stores/users/PreferencesStore';
 
 import type { UserPreferences } from './UserPreferencesContext';
@@ -72,7 +71,7 @@ describe('CurrentUserPreferencesProvider', () => {
   });
 
   it('provides default user preferences if the user has none', () => {
-    asMock(useCurrentUser).mockReturnValue({} as User);
+    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().preferences(undefined as PreferencesMap).build());
 
     const consume = renderSUT();
 
