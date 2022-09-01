@@ -125,7 +125,7 @@ public class PeriodicalStreamFieldsObtainer extends Periodical {
 
     @Override
     public boolean runsForever() {
-        return maintainsStreamBasedFieldLists;
+        return false;
     }
 
     @Override
