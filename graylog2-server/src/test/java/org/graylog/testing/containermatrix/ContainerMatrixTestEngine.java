@@ -17,6 +17,9 @@
 package org.graylog.testing.containermatrix;
 
 import com.google.common.io.Resources;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
+import io.github.classgraph.ScanResult;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
@@ -38,7 +41,6 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.hierarchical.ContainerMatrixHierarchicalTestEngine;
 import org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutorService;
 import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
-import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -57,6 +59,18 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEngine<JupiterEngineExecutionContext> {
     private static final String ENGINE_ID = "graylog-container-matrix-tests";
+
+    private static final Set<Class<?>> annotatedClasses;
+
+    static {
+        // Collect all annotated classes once to avoid the class scanning overhead on each #discover() call
+        final ClassGraph classGraph = new ClassGraph().enableAnnotationInfo().acceptPackages("org.graylog", "org.graylog2");
+        try (final ScanResult scanResult = classGraph.scan()) {
+            annotatedClasses = scanResult.getClassesWithAnnotation(ContainerMatrixTestsConfiguration.class.getCanonicalName()).stream()
+                    .map(ClassInfo::loadClass)
+                    .collect(Collectors.toSet());
+        }
+    }
 
     @Override
     public String getId() {
@@ -150,7 +164,8 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
     private <T> T instantiateFactory(Class<? extends T> providerClass) {
         try {
             return providerClass.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
+                 InvocationTargetException e) {
             throw new RuntimeException("Unable to construct instance of " + providerClass.getSimpleName() + ": ", e);
         }
     }
@@ -166,11 +181,9 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                 new DefaultJupiterConfiguration(discoveryRequest.getConfigurationParameters()));
         final ContainerMatrixEngineDescriptor engineDescriptor = new ContainerMatrixEngineDescriptor(uniqueId, "Graylog Container Matrix Tests", configuration);
 
-        Reflections reflections = new Reflections("org.graylog", "org.graylog2");
-        final Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(ContainerMatrixTestsConfiguration.class);
-        final Set<Integer> extraPorts = getExtraPorts(annotated);
-        final List<URL> mongoDBFixtures = getMongoDBFixtures(annotated);
-        final boolean withMailServerEnabled = isMailServerRequired(annotated);
+        final Set<Integer> extraPorts = getExtraPorts(annotatedClasses);
+        final List<URL> mongoDBFixtures = getMongoDBFixtures(annotatedClasses);
+        final boolean withMailServerEnabled = isMailServerRequired(annotatedClasses);
 
         if (testAgainstRunningESMongoDB()) {
             // if you test from inside an IDE against running containers
@@ -182,36 +195,36 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
             engineDescriptor.addChild(testsDescriptor);
         } else {
             // for full tests, create all combinations of tests. First differentiate for maven builds.
-            getMavenProjectDirProvider(annotated)
-                    .forEach(mavenProjectDirProvider -> getPluginJarsProvider(annotated)
+            getMavenProjectDirProvider(annotatedClasses)
+                    .forEach(mavenProjectDirProvider -> getPluginJarsProvider(annotatedClasses)
                             .forEach(pluginJarsProvider -> {
-                                        MavenProjectDirProvider mpdp = instantiateFactory(mavenProjectDirProvider);
-                                        PluginJarsProvider pjp = instantiateFactory(pluginJarsProvider);
-                                        // now add all grouped tests for Lifecycle.VM
-                                        getSearchServerVersions(annotated)
-                                                .stream().map(SearchServer::getSearchVersion)
-                                                .forEach(searchVersion -> getMongoVersions(annotated)
-                                                        .forEach(mongoVersion -> {
-                                                            ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
-                                                                    Lifecycle.VM,
-                                                                    mavenProjectDirProvider,
-                                                                    mpdp.getUniqueId(),
-                                                                    pluginJarsProvider,
-                                                                    pjp.getUniqueId(),
-                                                                    searchVersion,
-                                                                    mongoVersion,
-                                                                    extraPorts,
-                                                                    mongoDBFixtures,
-                                                                    getEnabledFeatureFlags(Lifecycle.VM, annotated),
-                                                                    withMailServerEnabled);
-                                                            new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
-                                                            engineDescriptor.addChild(testsDescriptor);
-                                                        })
-                                                );
-                                        // add separate test classes (Lifecycle.CLASS)
-                                        getSearchServerVersions(annotated)
-                                                .stream().map(SearchServer::getSearchVersion)
-                                                .forEach(esVersion -> getMongoVersions(annotated)
+                                MavenProjectDirProvider mpdp = instantiateFactory(mavenProjectDirProvider);
+                                PluginJarsProvider pjp = instantiateFactory(pluginJarsProvider);
+                                // now add all grouped tests for Lifecycle.VM
+                                getSearchServerVersions(annotatedClasses)
+                                        .stream().map(SearchServer::getSearchVersion)
+                                        .forEach(searchVersion -> getMongoVersions(annotatedClasses)
+                                                .forEach(mongoVersion -> {
+                                                    ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
+                                                            Lifecycle.VM,
+                                                            mavenProjectDirProvider,
+                                                            mpdp.getUniqueId(),
+                                                            pluginJarsProvider,
+                                                            pjp.getUniqueId(),
+                                                            searchVersion,
+                                                            mongoVersion,
+                                                            extraPorts,
+                                                            mongoDBFixtures,
+                                                            getEnabledFeatureFlags(Lifecycle.VM, annotatedClasses),
+                                                            withMailServerEnabled);
+                                                    new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
+                                                    engineDescriptor.addChild(testsDescriptor);
+                                                })
+                                        );
+                                // add separate test classes (Lifecycle.CLASS)
+                                getSearchServerVersions(annotatedClasses)
+                                        .stream().map(SearchServer::getSearchVersion)
+                                        .forEach(esVersion -> getMongoVersions(annotatedClasses)
                                                         .forEach(mongoVersion -> {
                                                             ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
                                                                     Lifecycle.CLASS,
@@ -223,7 +236,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                                                                     mongoVersion,
                                                                     extraPorts,
                                                                     new ArrayList<>(),
-                                                                    getEnabledFeatureFlags(Lifecycle.CLASS, annotated), withMailServerEnabled);
+                                                                    getEnabledFeatureFlags(Lifecycle.CLASS, annotatedClasses), withMailServerEnabled);
                                                             new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
                                                             engineDescriptor.addChild(testsDescriptor);
                                                         })
