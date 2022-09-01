@@ -63,8 +63,8 @@ describe('emit', () => {
     const result = emit([api]);
 
     expect(result).toMatchInlineSnapshot(`
-Array [
-  Object {
+[
+  {
     "grok": "import __request__ from 'routing/request';
 /**
  * Add a list of new patterns
@@ -124,8 +124,8 @@ export function bulkUpdatePatternsFromTextFile(importStrategy?: 'ABORT_ON_CONFLI
     const result = emit([api]);
 
     expect(result).toMatchInlineSnapshot(`
-Array [
-  Object {
+[
+  {
     "sample": "import __request__ from 'routing/request';
 interface AvailableOutputSummaryMapMap {
     readonly [_key: string]: AvailableOutputSummaryMap;

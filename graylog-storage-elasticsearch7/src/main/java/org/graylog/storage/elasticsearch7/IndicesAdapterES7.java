@@ -471,10 +471,10 @@ public class IndicesAdapterES7 implements IndicesAdapter {
         }
 
         final Min minAgg = f.getAggregations().get("ts_min");
-        final long minUnixTime = new Double(minAgg.getValue()).longValue();
+        final long minUnixTime = Double.valueOf(minAgg.getValue()).longValue();
         final DateTime min = new DateTime(minUnixTime, DateTimeZone.UTC);
         final Max maxAgg = f.getAggregations().get("ts_max");
-        final long maxUnixTime = new Double(maxAgg.getValue()).longValue();
+        final long maxUnixTime = Double.valueOf(maxAgg.getValue()).longValue();
         final DateTime max = new DateTime(maxUnixTime, DateTimeZone.UTC);
         // make sure we return an empty list, so we can differentiate between old indices that don't have this information
         // and newer ones that simply have no streams.
