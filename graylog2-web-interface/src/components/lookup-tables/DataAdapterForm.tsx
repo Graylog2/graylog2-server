@@ -16,3 +16,17 @@
  */
 import * as React from 'react';
 
+type Props = {
+  type: string,
+  title: string,
+  create?: boolean,
+};
+
+const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, validationState }) => {
+};
+
+DataAdapterForm.defaultProps = {
+  create: false,
+};
+
+export default DataAdapterForm;
