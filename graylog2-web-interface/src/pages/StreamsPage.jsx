@@ -31,7 +31,7 @@ import { useStore } from 'stores/connect';
 
 const StreamsPage = () => {
   const currentUser = useCurrentUser();
-  const indexSets = useStore(IndexSetsStore);
+  const { indexSets } = useStore(IndexSetsStore);
 
   useEffect(() => {
     IndexSetsActions.list(false);
