@@ -41,15 +41,11 @@ class AdHocSearchEngineStreamBasedFieldTypeFilterTest {
             FieldTypeDTO.create("message", "text"),
             FieldTypeDTO.create("count-filter-out-message", "text"),
             FieldTypeDTO.create("count", "long"),
-            FieldTypeDTO.create("aggr-filter-out-count", "long"),
             FieldTypeDTO.create("host", "keyword")
     );
 
     @BeforeEach
     void setUp() {
-        aggregationBasedFieldTypeFilterAdapter = (fieldTypeDTOs, indexNames, streamIds) -> fieldTypeDTOs.stream()
-                .filter(f -> !f.fieldName().startsWith("aggr-filter-out-"))
-                .collect(Collectors.toSet());
         countExistingBasedFieldTypeFilterAdapter = (fieldTypeDTOs, indexNames, streamIds) -> fieldTypeDTOs.stream()
                 .filter(f -> !f.fieldName().startsWith("count-filter-out-"))
                 .collect(Collectors.toSet());
