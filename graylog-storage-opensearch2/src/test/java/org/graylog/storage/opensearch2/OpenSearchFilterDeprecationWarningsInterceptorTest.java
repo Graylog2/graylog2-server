@@ -78,7 +78,7 @@ public class OpenSearchFilterDeprecationWarningsInterceptorTest {
         HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
         response.addHeader("Test", "This header should not trigger the interceptor.");
         response.addHeader("Warning", "This warning should not trigger the interceptor.");
-        response.addHeader("Warning", "This text contains the trigger: setting was deprecated in Elasticsearch - and should be filtered out");
+        response.addHeader("Warning", "This text contains the trigger: setting was deprecated in OpenSearch - and should be filtered out");
 
         assertThat(response.getAllHeaders())
                 .as("Number of Headers should be 3 before start.")
