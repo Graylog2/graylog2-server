@@ -110,7 +110,7 @@ public class ScrollResultOS2 extends IndexQueryResult implements ScrollResult {
 
         this.scrollId = result.getScrollId();
 
-        return ScrollChunkES7.create(fields, chunkId++, resultMessagesSlice);
+        return ScrollChunkOS2.create(fields, chunkId++, resultMessagesSlice);
     }
 
     private SearchResponse nextSearchResult() throws IOException {
@@ -140,7 +140,7 @@ public class ScrollResultOS2 extends IndexQueryResult implements ScrollResult {
     }
 
     @AutoValue
-    abstract static class ScrollChunkES7 implements ScrollResult.ScrollChunk {
+    abstract static class ScrollChunkOS2 implements ScrollResult.ScrollChunk {
         @Override
         public abstract List<String> getFields();
 
@@ -151,7 +151,7 @@ public class ScrollResultOS2 extends IndexQueryResult implements ScrollResult {
         public abstract List<ResultMessage> getMessages();
 
         static ScrollChunk create(List<String> fields, int chunkNumber, List<ResultMessage> messages) {
-            return new AutoValue_ScrollResultES7_ScrollChunkES7(fields, chunkNumber, messages);
+            return new AutoValue_ScrollResultOS2_ScrollChunkOS2(fields, chunkNumber, messages);
         }
     }
 }
