@@ -28,8 +28,9 @@ public class MessageIndexTemplateProvider implements IndexTemplateProvider {
 
     public static final String MESSAGE_TEMPLATE_TYPE = "messages";
 
+    @Nonnull
     @Override
-    public IndexMapping create(@Nonnull SearchVersion searchVersion, @Nonnull IndexSetConfig indexSetConfig) {
+    public IndexMapping create(@Nonnull final SearchVersion searchVersion, @Nonnull final IndexSetConfig indexSetConfig) {
         if (searchVersion.satisfies(ELASTICSEARCH, "^7.0.0") ||  searchVersion.satisfies(OPENSEARCH, "^1.0.0")) {
             return new IndexMapping7();
         } else {
