@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`MoveWidgetToTab should copy a Widget to a dashboard 1`] = `
-Object {
+{
   "created_at": 2020-05-27T12:32:49.786Z,
   "description": "move widget to tab",
   "id": "5ece5e1b74ff709b0b0dc69b",
@@ -9,12 +9,12 @@ Object {
   "properties": Immutable.List [],
   "search_id": "new-search-id",
   "state": Immutable.Map {
-    "fa247d8f-7afa-45b7-b57e-3cdef4ee53be": Object {
-      "formatting": Object {
-        "highlighting": Array [],
+    "fa247d8f-7afa-45b7-b57e-3cdef4ee53be": {
+      "formatting": {
+        "highlighting": [],
       },
       "positions": Immutable.Map {
-        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": Object {
+        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": {
           "col": 1,
           "height": 4,
           "row": 1,
@@ -33,39 +33,39 @@ Object {
         ],
       },
       "widgets": Immutable.List [
-        Object {
-          "config": Object {
-            "column_pivots": Array [],
+        {
+          "config": {
+            "column_pivots": [],
             "event_annotation": false,
             "rollup": true,
-            "row_pivots": Array [],
-            "series": Array [
-              Object {
-                "config": Object {
+            "row_pivots": [],
+            "series": [
+              {
+                "config": {
                   "name": "Message Count",
                 },
                 "function": "count()",
               },
             ],
-            "sort": Array [],
+            "sort": [],
             "visualization": "numeric",
           },
           "filter": undefined,
           "filters": Immutable.List [],
           "id": "b34c3c6f-c49d-41d3-a65a-f746134f8f3e",
           "query": null,
-          "streams": Array [],
+          "streams": [],
           "timerange": null,
           "type": "aggregation",
         },
       ],
     },
-    "5faea09b-4187-4eda-9d59-7a86d4774c73": Object {
-      "formatting": Object {
-        "highlighting": Array [],
+    "5faea09b-4187-4eda-9d59-7a86d4774c73": {
+      "formatting": {
+        "highlighting": [],
       },
       "positions": Immutable.Map {
-        "dead-beef": Object {
+        "dead-beef": {
           "col": 0,
           "height": 4,
           "row": 1,
@@ -84,28 +84,28 @@ Object {
         ],
       },
       "widgets": Immutable.List [
-        Object {
-          "config": Object {
-            "column_pivots": Array [],
+        {
+          "config": {
+            "column_pivots": [],
             "event_annotation": false,
             "rollup": true,
-            "row_pivots": Array [],
-            "series": Array [
-              Object {
-                "config": Object {
+            "row_pivots": [],
+            "series": [
+              {
+                "config": {
                   "name": "Message Count",
                 },
                 "function": "count()",
               },
             ],
-            "sort": Array [],
+            "sort": [],
             "visualization": "numeric",
           },
           "filter": undefined,
           "filters": Immutable.List [],
           "id": "dead-beef",
           "query": null,
-          "streams": Array [],
+          "streams": [],
           "timerange": null,
           "type": "aggregation",
         },
@@ -119,7 +119,7 @@ Object {
 `;
 
 exports[`MoveWidgetToTab should move a Widget to a dashboard 1`] = `
-Object {
+{
   "created_at": 2020-05-27T12:32:49.786Z,
   "description": "move widget to tab",
   "id": "5ece5e1b74ff709b0b0dc69b",
@@ -127,9 +127,9 @@ Object {
   "properties": Immutable.List [],
   "search_id": "new-search-id",
   "state": Immutable.Map {
-    "fa247d8f-7afa-45b7-b57e-3cdef4ee53be": Object {
-      "formatting": Object {
-        "highlighting": Array [],
+    "fa247d8f-7afa-45b7-b57e-3cdef4ee53be": {
+      "formatting": {
+        "highlighting": [],
       },
       "positions": Immutable.Map {},
       "selected_fields": undefined,
@@ -139,12 +139,12 @@ Object {
       "widget_mapping": Immutable.Map {},
       "widgets": Immutable.List [],
     },
-    "5faea09b-4187-4eda-9d59-7a86d4774c73": Object {
-      "formatting": Object {
-        "highlighting": Array [],
+    "5faea09b-4187-4eda-9d59-7a86d4774c73": {
+      "formatting": {
+        "highlighting": [],
       },
       "positions": Immutable.Map {
-        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": Object {
+        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": {
           "col": 0,
           "height": 4,
           "row": 1,
@@ -163,28 +163,28 @@ Object {
         ],
       },
       "widgets": Immutable.List [
-        Object {
-          "config": Object {
-            "column_pivots": Array [],
+        {
+          "config": {
+            "column_pivots": [],
             "event_annotation": false,
             "rollup": true,
-            "row_pivots": Array [],
-            "series": Array [
-              Object {
-                "config": Object {
+            "row_pivots": [],
+            "series": [
+              {
+                "config": {
                   "name": "Message Count",
                 },
                 "function": "count()",
               },
             ],
-            "sort": Array [],
+            "sort": [],
             "visualization": "numeric",
           },
           "filter": undefined,
           "filters": Immutable.List [],
           "id": "b34c3c6f-c49d-41d3-a65a-f746134f8f3e",
           "query": null,
-          "streams": Array [],
+          "streams": [],
           "timerange": null,
           "type": "aggregation",
         },
@@ -198,7 +198,7 @@ Object {
 `;
 
 exports[`MoveWidgetToTab should provide a default position in case the widgets position cannot be found 1`] = `
-Object {
+{
   "created_at": 2020-05-27T12:32:49.786Z,
   "description": "move widget to tab",
   "id": "5ece5e1b74ff709b0b0dc69b",
@@ -206,9 +206,9 @@ Object {
   "properties": Immutable.List [],
   "search_id": "new-search-id",
   "state": Immutable.Map {
-    "fa247d8f-7afa-45b7-b57e-3cdef4ee53be": Object {
-      "formatting": Object {
-        "highlighting": Array [],
+    "fa247d8f-7afa-45b7-b57e-3cdef4ee53be": {
+      "formatting": {
+        "highlighting": [],
       },
       "positions": Immutable.Map {},
       "selected_fields": undefined,
@@ -218,12 +218,12 @@ Object {
       "widget_mapping": Immutable.Map {},
       "widgets": Immutable.List [],
     },
-    "5faea09b-4187-4eda-9d59-7a86d4774c73": Object {
-      "formatting": Object {
-        "highlighting": Array [],
+    "5faea09b-4187-4eda-9d59-7a86d4774c73": {
+      "formatting": {
+        "highlighting": [],
       },
       "positions": Immutable.Map {
-        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": Object {
+        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": {
           "col": 1,
           "height": 4,
           "row": 1,
@@ -242,28 +242,28 @@ Object {
         ],
       },
       "widgets": Immutable.List [
-        Object {
-          "config": Object {
-            "column_pivots": Array [],
+        {
+          "config": {
+            "column_pivots": [],
             "event_annotation": false,
             "rollup": true,
-            "row_pivots": Array [],
-            "series": Array [
-              Object {
-                "config": Object {
+            "row_pivots": [],
+            "series": [
+              {
+                "config": {
                   "name": "Message Count",
                 },
                 "function": "count()",
               },
             ],
-            "sort": Array [],
+            "sort": [],
             "visualization": "numeric",
           },
           "filter": undefined,
           "filters": Immutable.List [],
           "id": "b34c3c6f-c49d-41d3-a65a-f746134f8f3e",
           "query": null,
-          "streams": Array [],
+          "streams": [],
           "timerange": null,
           "type": "aggregation",
         },
@@ -277,7 +277,7 @@ Object {
 `;
 
 exports[`MoveWidgetToTab should work when titles are empty 1`] = `
-Object {
+{
   "created_at": 2020-05-27T12:32:49.786Z,
   "description": "move widget to tab",
   "id": "5ece5e1b74ff709b0b0dc69b",
@@ -285,9 +285,9 @@ Object {
   "properties": Immutable.List [],
   "search_id": "new-search-id",
   "state": Immutable.Map {
-    "fa247d8f-7afa-45b7-b57e-3cdef4ee53be": Object {
-      "formatting": Object {
-        "highlighting": Array [],
+    "fa247d8f-7afa-45b7-b57e-3cdef4ee53be": {
+      "formatting": {
+        "highlighting": [],
       },
       "positions": Immutable.Map {},
       "selected_fields": undefined,
@@ -295,12 +295,12 @@ Object {
       "widget_mapping": Immutable.Map {},
       "widgets": Immutable.List [],
     },
-    "5faea09b-4187-4eda-9d59-7a86d4774c73": Object {
-      "formatting": Object {
-        "highlighting": Array [],
+    "5faea09b-4187-4eda-9d59-7a86d4774c73": {
+      "formatting": {
+        "highlighting": [],
       },
       "positions": Immutable.Map {
-        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": Object {
+        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": {
           "col": 0,
           "height": 4,
           "row": 1,
@@ -315,28 +315,28 @@ Object {
         ],
       },
       "widgets": Immutable.List [
-        Object {
-          "config": Object {
-            "column_pivots": Array [],
+        {
+          "config": {
+            "column_pivots": [],
             "event_annotation": false,
             "rollup": true,
-            "row_pivots": Array [],
-            "series": Array [
-              Object {
-                "config": Object {
+            "row_pivots": [],
+            "series": [
+              {
+                "config": {
                   "name": "Message Count",
                 },
                 "function": "count()",
               },
             ],
-            "sort": Array [],
+            "sort": [],
             "visualization": "numeric",
           },
           "filter": undefined,
           "filters": Immutable.List [],
           "id": "b34c3c6f-c49d-41d3-a65a-f746134f8f3e",
           "query": null,
-          "streams": Array [],
+          "streams": [],
           "timerange": null,
           "type": "aggregation",
         },

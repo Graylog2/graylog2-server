@@ -156,13 +156,17 @@ const getErrorDocumentationLink = (errorType: string) => {
   }
 };
 
+type QueryForm = {
+  queryString: QueryValidationState,
+};
+
 const QueryValidation = () => {
   const plugableValidationExplanation = usePluginEntities('views.elements.validationErrorExplanation');
   const [shakingPopover, shake] = useShakeTemporarily();
   const [showExplanation, toggleShow] = useTriggerIfErrorsPersist(shake);
 
   const explanationTriggerRef = useRef(undefined);
-  const { errors: { queryString: queryStringErrors } } = useFormikContext();
+  const { errors: { queryString: queryStringErrors } } = useFormikContext<QueryForm>();
   const { warnings } = useContext(FormWarningsContext);
 
   const validationState = (queryStringErrors ?? warnings?.queryString) as QueryValidationState;

@@ -109,7 +109,7 @@ describe('MessageList', () => {
 
   beforeEach(() => {
     asMock(SearchActions.reexecuteSearchTypes).mockReturnValue(CancellablePromise.of(Promise.resolve(mockReexecuteResult)));
-    asMock(InputsStore.getInitialState).mockReturnValue(() => ({ activeQuery: 'somequery', view: { id: 'someview' } }));
+    asMock(InputsStore.getInitialState).mockReturnValue({ inputs: [] });
   });
 
   afterEach(() => {
