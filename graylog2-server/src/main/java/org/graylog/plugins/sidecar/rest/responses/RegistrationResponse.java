@@ -43,14 +43,14 @@ public abstract class RegistrationResponse {
 
     @JsonProperty("assignments")
     @Nullable
-    public abstract List<ConfigurationAssignmentResponse> assignments();
+    public abstract List<ConfigurationAssignment> assignments();
 
     @JsonCreator
     public static RegistrationResponse create(
             @JsonProperty("configuration") SidecarRegistrationConfiguration configuration,
             @JsonProperty("configuration_override") boolean configurationOverride,
             @JsonProperty("actions") @Nullable List<CollectorAction> actions,
-            @JsonProperty("assignments") @Nullable List<ConfigurationAssignmentResponse> assignments) {
+            @JsonProperty("assignments") @Nullable List<ConfigurationAssignment> assignments) {
         return new AutoValue_RegistrationResponse(
                 configuration,
                 configurationOverride,

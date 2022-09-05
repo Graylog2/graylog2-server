@@ -21,8 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
-import java.util.List;
-
 @AutoValue
 @JsonAutoDetect
 public abstract class ConfigurationAssignment {
@@ -30,11 +28,11 @@ public abstract class ConfigurationAssignment {
     public abstract String collectorId();
 
     @JsonProperty
-    public abstract List<String> configurationIds();
+    public abstract String configurationId();
 
     @JsonCreator
     public static ConfigurationAssignment create(@JsonProperty("collector_id") String collectorId,
-                                                 @JsonProperty("configuration_ids") List<String> configurationIds) {
-        return new AutoValue_ConfigurationAssignment(collectorId, configurationIds);
+                                                 @JsonProperty("configuration_id") String configurationId) {
+        return new AutoValue_ConfigurationAssignment(collectorId, configurationId);
     }
 }

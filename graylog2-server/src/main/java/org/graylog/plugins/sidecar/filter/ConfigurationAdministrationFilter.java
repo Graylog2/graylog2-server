@@ -37,6 +37,6 @@ public class ConfigurationAdministrationFilter implements AdministrationFilter {
         if (assignments == null) {
             return false;
         }
-        return assignments.stream().anyMatch(assignment -> assignment.configurationIds().stream().anyMatch(cid -> cid.equals(configurationId)));
+        return assignments.stream().anyMatch(assignment -> assignment.configurationId().equals(configurationId));
     }
 }

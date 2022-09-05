@@ -18,7 +18,6 @@ package org.graylog.plugins.sidecar.rest.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -40,7 +39,6 @@ import org.graylog.plugins.sidecar.rest.models.SidecarSummary;
 import org.graylog.plugins.sidecar.rest.requests.ConfigurationAssignment;
 import org.graylog.plugins.sidecar.rest.requests.NodeConfigurationRequest;
 import org.graylog.plugins.sidecar.rest.requests.RegistrationRequest;
-import org.graylog.plugins.sidecar.rest.responses.ConfigurationAssignmentResponse;
 import org.graylog.plugins.sidecar.rest.responses.RegistrationResponse;
 import org.graylog.plugins.sidecar.rest.responses.SidecarListResponse;
 import org.graylog.plugins.sidecar.services.ActionService;
@@ -59,7 +57,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -229,15 +226,8 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                         this.sidecarConfiguration.sidecarSendStatus()),
                 this.sidecarConfiguration.sidecarConfigurationOverride(),
                 collectorAction,
-                getAssignmentResponses(assignments));
+                assignments);
         return Response.accepted(sidecarRegistrationResponse).build();
-    }
-
-    private List<ConfigurationAssignmentResponse> getAssignmentResponses(@Nullable List<ConfigurationAssignment> assignments) {
-        if (assignments != null) {
-            return assignments.stream().map(ConfigurationAssignmentResponse::fromConfigurationAssignment).collect(Collectors.toList());
-        }
-        return ImmutableList.of();
     }
 
     @PUT
