@@ -168,6 +168,10 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         context.put("nodeName", sidecar.nodeName());
         context.put("sidecarVersion", sidecar.sidecarVersion());
         context.put("operatingSystem", sidecar.nodeDetails().operatingSystem());
+        if (sidecar.nodeDetails().collectorConfigurationDirectory() != null) {
+            String pathDelim = sidecar.nodeDetails().operatingSystem().equalsIgnoreCase("windows") ? "\\" : "/";
+            context.put("spoolDir", sidecar.nodeDetails().collectorConfigurationDirectory() + pathDelim + configuration.id());
+        }
 
         return Configuration.create(
                 configuration.id(),
@@ -184,6 +188,7 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         context.put("nodeName", "<node name>");
         context.put("sidecarVersion", "<version>");
         context.put("operatingSystem", "<operating system>");
+        context.put("spoolDir", "<sidecar spool directory>");
 
         String previewName = UUID.randomUUID().toString();
         stringTemplateLoader.putTemplate(previewName, template);

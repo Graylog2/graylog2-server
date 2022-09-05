@@ -170,7 +170,8 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                                     nodeDetails.metrics(),
                                     nodeDetails.logFileList(),
                                     statusListToSave,
-                                    nodeDetails.tags());
+                                    nodeDetails.tags(),
+                                    nodeDetails.collectorConfigurationDirectory());
 
                             Sidecar toSave = collector.toBuilder()
                                     .nodeDetails(nodeDetailsToSave)
@@ -197,7 +198,8 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                         request.nodeDetails().metrics(),
                         request.nodeDetails().logFileList(),
                         request.nodeDetails().statusList(),
-                        request.nodeDetails().tags()),
+                        request.nodeDetails().tags(),
+                        request.nodeDetails().collectorConfigurationDirectory()),
                 collectorVersion);
     }
 

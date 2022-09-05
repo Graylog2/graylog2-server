@@ -54,13 +54,18 @@ public abstract class NodeDetails {
     @Nullable
     public abstract List<String> tags();
 
+    @JsonProperty("collector_configuration_directory")
+    @Nullable
+    public abstract String collectorConfigurationDirectory();
+
     @JsonCreator
     public static NodeDetails create(@JsonProperty("operating_system") String operatingSystem,
                                      @JsonProperty("ip") @Nullable String ip,
                                      @JsonProperty("metrics") @Nullable NodeMetrics metrics,
                                      @JsonProperty("log_file_list") @Nullable List<NodeLogFile> logFileList,
                                      @JsonProperty("status") @Nullable CollectorStatusList statusList,
-                                     @JsonProperty("tags") @Nullable List<String> tags) {
-        return new AutoValue_NodeDetails(operatingSystem, ip, metrics, logFileList, statusList, tags);
+                                     @JsonProperty("tags") @Nullable List<String> tags,
+                                     @JsonProperty("collector_configuration_directory") @Nullable String configDir) {
+        return new AutoValue_NodeDetails(operatingSystem, ip, metrics, logFileList, statusList, configDir);
     }
 }
