@@ -32,7 +32,7 @@
     <groupId>org.graylog</groupId>
     <artifactId>graylog-storage-opensearch2</artifactId>
     <name>graylog-storage-opensearch2</name>
-    <description>Graylog Storage Module for Opensearch 7</description>
+    <description>Graylog Storage Module for OpenSearch 2</description>
 
     <properties>
         <opensearch.version>2.0.1</opensearch.version>
