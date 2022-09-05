@@ -47,6 +47,8 @@
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@openfonts/roboto-mono_latin": "^1.44.1",
+    "@openfonts/source-sans-pro_latin": "^1.44.2",
+    "@openfonts/barlow-condensed_latin": "^1.44.2",
     "@react-bootstrap/pagination": "^1.0.0",
     "@react-hook/resize-observer": "^1.2.5",
     "ace-builds": "1.10.1",

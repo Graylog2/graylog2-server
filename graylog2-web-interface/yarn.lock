@@ -2154,10 +2154,20 @@
     "@nodelib/fs.scandir" "2.1.3"
     fastq "^1.6.0"
 
+"@openfonts/barlow-condensed_latin@^1.44.2":
+  version "1.44.2"
+  resolved "https://registry.yarnpkg.com/@openfonts/barlow-condensed_latin/-/barlow-condensed_latin-1.44.2.tgz#6f626ca47aed39d1e4d91143dfb4b20c72f956c6"
+  integrity sha512-sG0YHiy2jHtlFg+/DP2hz391+PK9SocvGOBcjIllwueo7oJu2N5zGIM8yhlxfZc3RvMdFWN5/3Djovq8blLSgA==
+
 "@openfonts/roboto-mono_latin@^1.44.1":
   version "1.44.1"
   resolved "https://registry.yarnpkg.com/@openfonts/roboto-mono_latin/-/roboto-mono_latin-1.44.1.tgz#b3d0438f971c7af7b5f2237e0c0023c103b34056"
   integrity sha512-yXKP7yWmo1SM7YAWm0ofE8MwnpR1qViDcdorEr+a/4AkGZxXX+/NzRqAAXnuSQjMpAPaKE/US0ubsdjmowZOgA==
+
+"@openfonts/source-sans-pro_latin@^1.44.2":
+  version "1.44.2"
+  resolved "https://registry.yarnpkg.com/@openfonts/source-sans-pro_latin/-/source-sans-pro_latin-1.44.2.tgz#46f01915dc62545cc3e0596c55cd49b4906b022d"
+  integrity sha512-/NMcdO9K8a1b1+IKjpeD+YC+hTaVnzghcRljHeFnjZtjnYnw01NWRxladEE0TY99w3GnOSz1LaKuupfirJJlOQ==
 
 "@plotly/d3-sankey-circular@0.33.1":
   version "0.33.1"
