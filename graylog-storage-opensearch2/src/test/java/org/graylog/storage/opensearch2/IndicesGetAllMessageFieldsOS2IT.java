@@ -20,23 +20,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog.storage.opensearch2.cluster.ClusterStateApi;
 import org.graylog.storage.opensearch2.stats.StatsApi;
-import org.graylog.storage.opensearch2.testing.OpensearchInstance;
+import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.indices.IndicesGetAllMessageFieldsIT;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
 
-public class IndicesGetAllMessageFieldsES7IT extends IndicesGetAllMessageFieldsIT {
+public class IndicesGetAllMessageFieldsOS2IT extends IndicesGetAllMessageFieldsIT {
     @Rule
-    public final OpensearchInstance elasticsearch = OpensearchInstance.create();
+    public final OpenSearchInstance elasticsearch = OpenSearchInstance.create();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     @Override
     protected IndicesAdapter indicesAdapter() {
         final OpenSearchClient client = elasticsearch.elasticsearchClient();
-        return new IndicesAdapterES7(
+        return new IndicesAdapterOS2(
                 client,
                 new StatsApi(objectMapper, client),
                 new CatApi(objectMapper, client),

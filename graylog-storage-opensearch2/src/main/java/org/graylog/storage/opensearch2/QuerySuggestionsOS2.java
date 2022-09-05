@@ -40,13 +40,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class QuerySuggestionsES7 implements QuerySuggestionsService {
+public class QuerySuggestionsOS2 implements QuerySuggestionsService {
 
     private final OpenSearchClient client;
     private final IndexLookup indexLookup;
 
     @Inject
-    public QuerySuggestionsES7(OpenSearchClient client, IndexLookup indexLookup) {
+    public QuerySuggestionsOS2(OpenSearchClient client, IndexLookup indexLookup) {
         this.client = client;
         this.indexLookup = indexLookup;
     }

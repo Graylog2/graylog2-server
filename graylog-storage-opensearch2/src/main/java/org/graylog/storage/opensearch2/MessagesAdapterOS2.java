@@ -55,8 +55,8 @@ import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
-public class MessagesAdapterES7 implements MessagesAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(MessagesAdapterES7.class);
+public class MessagesAdapterOS2 implements MessagesAdapter {
+    private static final Logger LOG = LoggerFactory.getLogger(MessagesAdapterOS2.class);
     static final String INDEX_BLOCK_ERROR = "cluster_block_exception";
     static final String MAPPER_PARSING_EXCEPTION = "mapper_parsing_exception";
     static final String INDEX_BLOCK_REASON = "blocked by: [TOO_MANY_REQUESTS/12/index read-only / allow delete (api)";
@@ -73,7 +73,7 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     private final ObjectMapper objectMapper;
 
     @Inject
-    public MessagesAdapterES7(OpenSearchClient openSearchClient, MetricRegistry metricRegistry, ChunkedBulkIndexer chunkedBulkIndexer, ObjectMapper objectMapper) {
+    public MessagesAdapterOS2(OpenSearchClient openSearchClient, MetricRegistry metricRegistry, ChunkedBulkIndexer chunkedBulkIndexer, ObjectMapper objectMapper) {
         this.client = openSearchClient;
         this.invalidTimestampMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
         this.chunkedBulkIndexer = chunkedBulkIndexer;

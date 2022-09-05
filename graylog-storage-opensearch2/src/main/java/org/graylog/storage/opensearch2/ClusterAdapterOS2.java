@@ -60,15 +60,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ClusterAdapterES7 implements ClusterAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterAdapterES7.class);
+public class ClusterAdapterOS2 implements ClusterAdapter {
+    private static final Logger LOG = LoggerFactory.getLogger(ClusterAdapterOS2.class);
     private final OpenSearchClient client;
     private final Duration requestTimeout;
     private final CatApi catApi;
     private final PlainJsonApi jsonApi;
 
     @Inject
-    public ClusterAdapterES7(OpenSearchClient client,
+    public ClusterAdapterOS2(OpenSearchClient client,
                              @Named("elasticsearch_socket_timeout") Duration requestTimeout,
                              CatApi catApi,
                              PlainJsonApi jsonApi) {

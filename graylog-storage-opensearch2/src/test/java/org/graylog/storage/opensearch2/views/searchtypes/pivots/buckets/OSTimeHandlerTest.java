@@ -42,7 +42,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class ESTimeHandlerTest {
+class OSTimeHandlerTest {
     private OSTimeHandler esTimeHandler;
 
     private final Pivot pivot = mock(Pivot.class);

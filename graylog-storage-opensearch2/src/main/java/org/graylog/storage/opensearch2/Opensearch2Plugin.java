@@ -36,7 +36,7 @@ public class Opensearch2Plugin implements Plugin {
     public Collection<PluginModule> modules() {
         return ImmutableSet.of(
                 new Opensearch2Module(SUPPORTED_OPENSEARCH_VERSION),
-                new ViewsESBackendModule(SUPPORTED_OPENSEARCH_VERSION)
+                new ViewsOSBackendModule(SUPPORTED_OPENSEARCH_VERSION)
         );
     }
 }

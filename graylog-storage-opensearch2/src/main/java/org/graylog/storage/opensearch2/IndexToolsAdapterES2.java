@@ -51,14 +51,14 @@ import static org.opensearch.index.query.QueryBuilders.existsQuery;
 import static org.opensearch.index.query.QueryBuilders.matchAllQuery;
 import static org.opensearch.index.query.QueryBuilders.termsQuery;
 
-public class IndexToolsAdapterES7 implements IndexToolsAdapter {
+public class IndexToolsAdapterES2 implements IndexToolsAdapter {
     private static final String AGG_DATE_HISTOGRAM = "source_date_histogram";
     private static final String AGG_MESSAGE_FIELD = "message_field";
     private static final String AGG_FILTER = "message_filter";
     private final OpenSearchClient client;
 
     @Inject
-    public IndexToolsAdapterES7(OpenSearchClient client) {
+    public IndexToolsAdapterES2(OpenSearchClient client) {
         this.client = client;
     }
 

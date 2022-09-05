@@ -32,9 +32,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-class NodeAdapterES7Test {
+class NodeAdapterOS2Test {
 
-    private NodeAdapterES7 toTest;
+    private NodeAdapterOS2 toTest;
     private PlainJsonApi jsonApiMock;
     private Request request;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -42,7 +42,7 @@ class NodeAdapterES7Test {
     @BeforeEach
     void setUp() {
         jsonApiMock = mock(PlainJsonApi.class);
-        toTest = new NodeAdapterES7(jsonApiMock);
+        toTest = new NodeAdapterOS2(jsonApiMock);
         request = new Request("GET", "/?filter_path=version.number,version.distribution");
     }
 

@@ -32,12 +32,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class IndexFieldTypePollerAdapterES7 implements IndexFieldTypePollerAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(IndexFieldTypePollerAdapterES7.class);
+public class IndexFieldTypePollerAdapterOS2 implements IndexFieldTypePollerAdapter {
+    private static final Logger LOG = LoggerFactory.getLogger(IndexFieldTypePollerAdapterOS2.class);
     private final FieldMappingApi fieldMappingApi;
 
     @Inject
-    public IndexFieldTypePollerAdapterES7(FieldMappingApi fieldMappingApi) {
+    public IndexFieldTypePollerAdapterOS2(FieldMappingApi fieldMappingApi) {
         this.fieldMappingApi = fieldMappingApi;
     }
 

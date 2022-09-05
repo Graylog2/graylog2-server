@@ -95,15 +95,15 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 import static org.graylog.storage.opensearch2.OpenSearchClient.withTimeout;
 
-public class IndicesAdapterES7 implements IndicesAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterES7.class);
+public class IndicesAdapterOS2 implements IndicesAdapter {
+    private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterOS2.class);
     private final OpenSearchClient client;
     private final StatsApi statsApi;
     private final CatApi catApi;
     private final ClusterStateApi clusterStateApi;
 
     @Inject
-    public IndicesAdapterES7(OpenSearchClient client,
+    public IndicesAdapterOS2(OpenSearchClient client,
                              StatsApi statsApi,
                              CatApi catApi,
                              ClusterStateApi clusterStateApi) {

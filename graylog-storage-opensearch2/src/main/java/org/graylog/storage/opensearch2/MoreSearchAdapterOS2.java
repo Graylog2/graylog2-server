@@ -56,8 +56,8 @@ import static org.opensearch.index.query.QueryBuilders.matchAllQuery;
 import static org.opensearch.index.query.QueryBuilders.queryStringQuery;
 import static org.opensearch.index.query.QueryBuilders.termsQuery;
 
-public class MoreSearchAdapterES7 implements MoreSearchAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterES7.class);
+public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
+    private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterOS2.class);
     public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.fromOptions(false, false, true, false);
     private final OpenSearchClient client;
     private final Boolean allowLeadingWildcard;
@@ -65,7 +65,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     private final Scroll scroll;
 
     @Inject
-    public MoreSearchAdapterES7(OpenSearchClient client,
+    public MoreSearchAdapterOS2(OpenSearchClient client,
                                 @Named("allow_leading_wildcard_searches") Boolean allowLeadingWildcard,
                                 SortOrderMapper sortOrderMapper,
                                 Scroll scroll) {

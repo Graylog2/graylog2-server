@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog.storage.opensearch2.cat.NodeResponse;
-import org.graylog.storage.opensearch2.testing.OpensearchInstance;
+import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.ClusterIT;
@@ -30,22 +30,22 @@ import org.junit.Rule;
 import java.util.List;
 import java.util.Optional;
 
-public class ClusterES7IT extends ClusterIT {
+public class ClusterOS2IT extends ClusterIT {
     @Rule
-    public final OpensearchInstance elasticsearch = OpensearchInstance.create();
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     @Override
     protected SearchServerInstance elasticsearch() {
-        return this.elasticsearch;
+        return this.openSearchInstance;
     }
 
     @Override
     protected ClusterAdapter clusterAdapter(Duration timeout) {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        return new ClusterAdapterES7(elasticsearch.elasticsearchClient(),
+        return new ClusterAdapterOS2(openSearchInstance.elasticsearchClient(),
                 timeout,
-                new CatApi(objectMapper, elasticsearch.elasticsearchClient()),
-                new PlainJsonApi(objectMapper, elasticsearch.elasticsearchClient()));
+                new CatApi(objectMapper, openSearchInstance.elasticsearchClient()),
+                new PlainJsonApi(objectMapper, openSearchInstance.elasticsearchClient()));
     }
 
     @Override
@@ -70,6 +70,6 @@ public class ClusterES7IT extends ClusterIT {
     }
 
     private CatApi catApi() {
-        return new CatApi(new ObjectMapperProvider().get(), elasticsearch.elasticsearchClient());
+        return new CatApi(new ObjectMapperProvider().get(), openSearchInstance.elasticsearchClient());
     }
 }

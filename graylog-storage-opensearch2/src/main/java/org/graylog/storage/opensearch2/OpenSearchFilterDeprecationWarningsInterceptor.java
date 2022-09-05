@@ -28,12 +28,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ElasticsearchFilterDeprecationWarningsInterceptor implements HttpResponseInterceptor {
+// TODO: check, if these messages still need filtering
+public class OpenSearchFilterDeprecationWarningsInterceptor implements HttpResponseInterceptor {
     private String[] messagesToFilter = {
-            "setting was deprecated in Elasticsearch",
+            "setting was deprecated in OpenSearch",
             "but in a future major version, direct access to system indices and their aliases will not be allowed",
             "but in a future major version, direct access to system indices will be prevented by default",
-            "in epoch time formats is deprecated and will not be supported in the next major version of Elasticsearch",
+            "in epoch time formats is deprecated and will not be supported in the next major version of OpenSearch",
             JodaDeprecationPatterns.USE_NEW_FORMAT_SPECIFIERS
     };
 

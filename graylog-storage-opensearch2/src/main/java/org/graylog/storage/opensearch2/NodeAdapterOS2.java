@@ -26,15 +26,15 @@ import javax.inject.Inject;
 import java.util.Locale;
 import java.util.Optional;
 
-public class NodeAdapterES7 implements NodeAdapter {
+public class NodeAdapterOS2 implements NodeAdapter {
     private final PlainJsonApi jsonApi;
 
     @Inject
-    public NodeAdapterES7(OpenSearchClient client, ObjectMapper objectMapper) {
+    public NodeAdapterOS2(OpenSearchClient client, ObjectMapper objectMapper) {
         this.jsonApi = new PlainJsonApi(objectMapper, client);
     }
 
-    NodeAdapterES7(final PlainJsonApi jsonApi) {
+    NodeAdapterOS2(final PlainJsonApi jsonApi) {
         this.jsonApi = jsonApi;
     }
 

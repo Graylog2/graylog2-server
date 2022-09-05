@@ -18,7 +18,7 @@ package org.graylog.storage.opensearch2;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.storage.opensearch2.testing.OpensearchInstance;
+import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
@@ -34,28 +34,28 @@ import org.opensearch.rest.RestStatus;
 
 import java.util.Map;
 
-public class MessagesES7IT extends MessagesIT {
+public class MessagesOS2IT extends MessagesIT {
     @Rule
-    public final OpensearchInstance elasticsearch = OpensearchInstance.create();
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     @Override
     protected SearchServerInstance elasticsearch() {
-        return this.elasticsearch;
+        return this.openSearchInstance;
     }
 
     @Override
     protected MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry) {
-        return new MessagesAdapterES7(this.elasticsearch.elasticsearchClient(), metricRegistry, new ChunkedBulkIndexer(), objectMapper);
+        return new MessagesAdapterOS2(this.openSearchInstance.elasticsearchClient(), metricRegistry, new ChunkedBulkIndexer(), objectMapper);
     }
 
     @Override
     protected long messageCount(String indexName) {
-        this.elasticsearch.elasticsearchClient().execute((c, requestOptions) -> c.indices().refresh(new RefreshRequest(), requestOptions));
+        this.openSearchInstance.elasticsearchClient().execute((c, requestOptions) -> c.indices().refresh(new RefreshRequest(), requestOptions));
 
         final CountRequest countRequest = new CountRequest(indexName);
-        final CountResponse result = this.elasticsearch.elasticsearchClient().execute((c, requestOptions) -> c.count(countRequest, requestOptions));
+        final CountResponse result = this.openSearchInstance.elasticsearchClient().execute((c, requestOptions) -> c.count(countRequest, requestOptions));
 
         return result.getCount();
     }
@@ -66,7 +66,7 @@ public class MessagesES7IT extends MessagesIT {
                 .source(source)
                 .id(id);
 
-        final IndexResponse result = this.elasticsearch.elasticsearchClient().execute((c, requestOptions) -> c.index(indexRequest, requestOptions));
+        final IndexResponse result = this.openSearchInstance.elasticsearchClient().execute((c, requestOptions) -> c.index(indexRequest, requestOptions));
 
         return result.status().equals(RestStatus.CREATED);
     }

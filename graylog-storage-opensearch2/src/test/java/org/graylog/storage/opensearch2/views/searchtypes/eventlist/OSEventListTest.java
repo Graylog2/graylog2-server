@@ -42,7 +42,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-public class ESEventListTest {
+public class OSEventListTest {
 
     @Test
     public void testSortingOfStreamsInDoExtractResult() {

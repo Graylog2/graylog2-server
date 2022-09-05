@@ -74,10 +74,10 @@ import org.graylog.storage.opensearch2.views.export.SearchAfter;
 import org.graylog2.storage.SearchVersion;
 import org.opensearch.search.aggregations.Aggregation;
 
-public class ViewsESBackendModule extends ViewsModule {
+public class ViewsOSBackendModule extends ViewsModule {
     private final SearchVersion supportedSearchVersion;
 
-    public ViewsESBackendModule(SearchVersion supportedSearchVersion) {
+    public ViewsOSBackendModule(SearchVersion supportedSearchVersion) {
         this.supportedSearchVersion = supportedSearchVersion;
     }
 
@@ -88,9 +88,9 @@ public class ViewsESBackendModule extends ViewsModule {
         bindForVersion(supportedSearchVersion, new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {})
                 .to(OpenSearchBackend.class);
 
-        registerESSearchTypeHandler(MessageList.NAME, OSMessageList.class);
-        registerESSearchTypeHandler(EventList.NAME, OSEventList.class);
-        registerESSearchTypeHandler(Pivot.NAME, OSPivot.class).in(Scopes.SINGLETON);
+        registerOSSearchTypeHandler(MessageList.NAME, OSMessageList.class);
+        registerOSSearchTypeHandler(EventList.NAME, OSEventList.class);
+        registerOSSearchTypeHandler(Pivot.NAME, OSPivot.class).in(Scopes.SINGLETON);
 
         registerPivotSeriesHandler(Average.NAME, OSAverageHandler.class);
         registerPivotSeriesHandler(Cardinality.NAME, OSCardinalityHandler.class);
@@ -148,13 +148,13 @@ public class ViewsESBackendModule extends ViewsModule {
         pivotSeriesHandlerBinder().addBinding(name).to(implementation);
     }
 
-    private MapBinder<String, OSSearchTypeHandler<? extends SearchType>> esSearchTypeHandlerBinder() {
+    private MapBinder<String, OSSearchTypeHandler<? extends SearchType>> osSearchTypeHandlerBinder() {
         return MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
                 new TypeLiteral<OSSearchTypeHandler<? extends SearchType>>() {});
     }
 
-    private ScopedBindingBuilder registerESSearchTypeHandler(String name, Class<? extends OSSearchTypeHandler<? extends SearchType>> implementation) {
-        return esSearchTypeHandlerBinder().addBinding(name).to(implementation);
+    private ScopedBindingBuilder registerOSSearchTypeHandler(String name, Class<? extends OSSearchTypeHandler<? extends SearchType>> implementation) {
+        return osSearchTypeHandlerBinder().addBinding(name).to(implementation);
     }
 }

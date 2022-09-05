@@ -16,33 +16,33 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.graylog.storage.opensearch2.testing.OpensearchInstance;
+import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.SearchesIT;
 import org.junit.Rule;
 
-public class SearchesES7IT extends SearchesIT {
+public class SearchesOS2IT extends SearchesIT {
     @Rule
-    public final OpensearchInstance elasticsearch = OpensearchInstance.create();
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     @Override
     protected SearchServerInstance elasticsearch() {
-        return this.elasticsearch;
+        return this.openSearchInstance;
     }
 
     private SearchesAdapter createSearchesAdapter() {
-        final ScrollResultES7.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultES7(
-                elasticsearch.elasticsearchClient(), initialResult, query, scroll, fields, limit
+        final ScrollResultOS2.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultOS2(
+                openSearchInstance.elasticsearchClient(), initialResult, query, scroll, fields, limit
         );
         final SortOrderMapper sortOrderMapper = new SortOrderMapper();
         final boolean allowHighlighting = true;
         final boolean allowLeadingWildcardSearches = true;
 
         final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(sortOrderMapper, allowHighlighting, allowLeadingWildcardSearches);
-        return new SearchesAdapterES7(elasticsearch.elasticsearchClient(),
-                new Scroll(elasticsearch.elasticsearchClient(),
+        return new SearchesAdapterOS2(openSearchInstance.elasticsearchClient(),
+                new Scroll(openSearchInstance.elasticsearchClient(),
                         scrollResultFactory,
                         searchRequestFactory),
                 searchRequestFactory);

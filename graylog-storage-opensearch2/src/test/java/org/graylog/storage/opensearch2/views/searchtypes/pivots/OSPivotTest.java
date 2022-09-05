@@ -80,7 +80,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ESPivotTest {
+public class OSPivotTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
     @Mock

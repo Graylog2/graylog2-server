@@ -25,11 +25,11 @@ import org.opensearch.search.builder.SearchSourceBuilder;
 import javax.inject.Inject;
 import java.util.List;
 
-public class CountsAdapterES7 implements CountsAdapter {
+public class CountsAdapterOS2 implements CountsAdapter {
     private final OpenSearchClient client;
 
     @Inject
-    public CountsAdapterES7(OpenSearchClient client) {
+    public CountsAdapterOS2(OpenSearchClient client) {
         this.client = client;
     }
 

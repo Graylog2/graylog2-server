@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class ScrollResultES7 extends IndexQueryResult implements ScrollResult {
+public class ScrollResultOS2 extends IndexQueryResult implements ScrollResult {
     private static final Logger LOG = LoggerFactory.getLogger(ScrollResult.class);
     private static final TimeValue DEFAULT_SCROLL = TimeValue.timeValueMinutes(1);
 
@@ -53,11 +53,11 @@ public class ScrollResultES7 extends IndexQueryResult implements ScrollResult {
     private int resultCount = 0;
 
     public interface Factory {
-        ScrollResultES7 create(SearchResponse initialResult, @Assisted("query") String query, @Assisted("scroll") String scroll, List<String> fields, int limit);
+        ScrollResultOS2 create(SearchResponse initialResult, @Assisted("query") String query, @Assisted("scroll") String scroll, List<String> fields, int limit);
     }
 
     @AssistedInject
-    public ScrollResultES7(OpenSearchClient client,
+    public ScrollResultOS2(OpenSearchClient client,
                            @Assisted SearchResponse initialResult,
                            @Assisted("query") String query,
                            @Assisted("scroll") String scroll,

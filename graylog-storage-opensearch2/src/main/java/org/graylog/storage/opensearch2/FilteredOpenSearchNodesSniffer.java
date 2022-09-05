@@ -28,12 +28,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class FilteredElasticsearchNodesSniffer implements NodesSniffer {
+class FilteredOpenSearchNodesSniffer implements NodesSniffer {
     private final NodesSniffer nodesSniffer;
     private final String attribute;
     private final String value;
 
-    static FilteredElasticsearchNodesSniffer create(RestClient restClient, long sniffRequestTimeoutMillis, OpenSearchNodesSniffer.Scheme scheme, String filter) {
+    static FilteredOpenSearchNodesSniffer create(RestClient restClient, long sniffRequestTimeoutMillis, OpenSearchNodesSniffer.Scheme scheme, String filter) {
         final String attribute;
         final String value;
         if (!Strings.isNullOrEmpty(filter)) {
@@ -49,11 +49,11 @@ class FilteredElasticsearchNodesSniffer implements NodesSniffer {
         }
         final NodesSniffer nodesSniffer = new OpenSearchNodesSniffer(restClient, sniffRequestTimeoutMillis, scheme);
 
-        return new FilteredElasticsearchNodesSniffer(nodesSniffer, attribute, value);
+        return new FilteredOpenSearchNodesSniffer(nodesSniffer, attribute, value);
     }
 
     @VisibleForTesting
-    FilteredElasticsearchNodesSniffer(NodesSniffer nodesSniffer, String attribute, String value) {
+    FilteredOpenSearchNodesSniffer(NodesSniffer nodesSniffer, String attribute, String value) {
         this.nodesSniffer = nodesSniffer;
         this.attribute = attribute;
         this.value = value;

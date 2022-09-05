@@ -59,7 +59,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             @Named("elasticsearch_discovery_frequency") Duration discoveryFrequency,
             @Named("elasticsearch_discovery_default_scheme") String defaultSchemeForDiscoveredNodes,
             @Named("elasticsearch_use_expect_continue") boolean useExpectContinue,
-            @Named("elasticsearch_mute_deprecation_warnings") boolean muteElasticsearchDeprecationWarnings,
+            @Named("elasticsearch_mute_deprecation_warnings") boolean muteOpenSearchDeprecationWarnings,
             CredentialsProvider credentialsProvider) {
         clientSupplier = Suppliers.memoize(() -> {
             final RestHighLevelClient client = buildClient(hosts,
@@ -68,7 +68,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                     maxTotalConnections,
                     maxTotalConnectionsPerRoute,
                     useExpectContinue,
-                    muteElasticsearchDeprecationWarnings,
+                    muteOpenSearchDeprecationWarnings,
                 credentialsProvider);
 
             if (discoveryEnabled) {
@@ -81,7 +81,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
     }
 
     private Sniffer createNodeDiscoverySniffer(RestClient restClient, Duration discoveryFrequency, String defaultSchemeForDiscoveredNodes, String discoveryFilter) {
-        final NodesSniffer nodesSniffer = FilteredElasticsearchNodesSniffer.create(
+        final NodesSniffer nodesSniffer = FilteredOpenSearchNodesSniffer.create(
                 restClient,
                 TimeUnit.SECONDS.toMillis(5),
                 mapDefaultScheme(defaultSchemeForDiscoveredNodes),
@@ -97,7 +97,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
         switch (defaultSchemeForDiscoveredNodes.toUpperCase(Locale.ENGLISH)) {
             case "HTTP": return OpenSearchNodesSniffer.Scheme.HTTP;
             case "HTTPS": return OpenSearchNodesSniffer.Scheme.HTTPS;
-            default: throw new IllegalArgumentException("Invalid default scheme for discovered ES nodes: " + defaultSchemeForDiscoveredNodes);
+            default: throw new IllegalArgumentException("Invalid default scheme for discovered OS nodes: " + defaultSchemeForDiscoveredNodes);
         }
     }
 
@@ -131,7 +131,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                         .setDefaultCredentialsProvider(credentialsProvider);
 
                     if(muteElasticsearchDeprecationWarnings) {
-                        httpClientConfig.addInterceptorFirst(new ElasticsearchFilterDeprecationWarningsInterceptor());
+                        httpClientConfig.addInterceptorFirst(new OpenSearchFilterDeprecationWarningsInterceptor());
                     }
 
                     return httpClientConfig;

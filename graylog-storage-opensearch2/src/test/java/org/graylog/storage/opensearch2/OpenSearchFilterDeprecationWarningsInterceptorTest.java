@@ -27,10 +27,10 @@ import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ElasticsearchFilterDeprecationWarningsInterceptorTest {
+public class OpenSearchFilterDeprecationWarningsInterceptorTest {
     @Test
     public void testInterceptorNoHeader() throws IOException, HttpException {
-        ElasticsearchFilterDeprecationWarningsInterceptor interceptor = new ElasticsearchFilterDeprecationWarningsInterceptor();
+        OpenSearchFilterDeprecationWarningsInterceptor interceptor = new OpenSearchFilterDeprecationWarningsInterceptor();
 
         HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
         interceptor.process(response, null);
@@ -42,7 +42,7 @@ public class ElasticsearchFilterDeprecationWarningsInterceptorTest {
 
     @Test
     public void testInterceptorSingleHeader() throws IOException, HttpException {
-        ElasticsearchFilterDeprecationWarningsInterceptor interceptor = new ElasticsearchFilterDeprecationWarningsInterceptor();
+        OpenSearchFilterDeprecationWarningsInterceptor interceptor = new OpenSearchFilterDeprecationWarningsInterceptor();
 
         HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
         response.addHeader("Test", "This header should not trigger the interceptor.");
@@ -59,7 +59,7 @@ public class ElasticsearchFilterDeprecationWarningsInterceptorTest {
 
     @Test
     public void testInterceptorMultipleHeaderIgnoredWarning() throws IOException, HttpException {
-        ElasticsearchFilterDeprecationWarningsInterceptor interceptor = new ElasticsearchFilterDeprecationWarningsInterceptor();
+        OpenSearchFilterDeprecationWarningsInterceptor interceptor = new OpenSearchFilterDeprecationWarningsInterceptor();
 
         HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
         response.addHeader("Test", "This header should not trigger the interceptor.");
@@ -73,7 +73,7 @@ public class ElasticsearchFilterDeprecationWarningsInterceptorTest {
 
     @Test
     public void testInterceptorMultipleHeaderFilteredWarning() throws IOException, HttpException {
-        ElasticsearchFilterDeprecationWarningsInterceptor interceptor = new ElasticsearchFilterDeprecationWarningsInterceptor();
+        OpenSearchFilterDeprecationWarningsInterceptor interceptor = new OpenSearchFilterDeprecationWarningsInterceptor();
 
         HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
         response.addHeader("Test", "This header should not trigger the interceptor.");
@@ -93,7 +93,7 @@ public class ElasticsearchFilterDeprecationWarningsInterceptorTest {
 
     @Test
     public void testInterceptorMultipleHeaderFilteredWarning2() throws IOException, HttpException {
-        ElasticsearchFilterDeprecationWarningsInterceptor interceptor = new ElasticsearchFilterDeprecationWarningsInterceptor();
+        OpenSearchFilterDeprecationWarningsInterceptor interceptor = new OpenSearchFilterDeprecationWarningsInterceptor();
 
         HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
         response.addHeader("Test", "This header should not trigger the interceptor.");
@@ -113,7 +113,7 @@ public class ElasticsearchFilterDeprecationWarningsInterceptorTest {
 
     @Test
     public void testInterceptorMultipleHeaderFilteredWarningAndMultipleTriggers() throws IOException, HttpException {
-        ElasticsearchFilterDeprecationWarningsInterceptor interceptor = new ElasticsearchFilterDeprecationWarningsInterceptor();
+        OpenSearchFilterDeprecationWarningsInterceptor interceptor = new OpenSearchFilterDeprecationWarningsInterceptor();
 
         HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
         response.addHeader("Test", "This header should not trigger the interceptor.");

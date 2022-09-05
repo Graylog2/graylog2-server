@@ -21,7 +21,7 @@ import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog.storage.opensearch2.cluster.ClusterStateApi;
 import org.graylog.storage.opensearch2.mapping.FieldMappingApi;
 import org.graylog.storage.opensearch2.stats.StatsApi;
-import org.graylog.storage.opensearch2.testing.OpensearchInstance;
+import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerIT;
@@ -29,16 +29,16 @@ import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
 
-public class IndexFieldTypePollerES7IT extends IndexFieldTypePollerIT {
+public class IndexFieldTypePollerOS2IT extends IndexFieldTypePollerIT {
     @Rule
-    public final OpensearchInstance elasticsearch = OpensearchInstance.create();
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     @Override
     protected IndicesAdapter createIndicesAdapter() {
-        final OpenSearchClient client = elasticsearch.elasticsearchClient();
-        return new IndicesAdapterES7(
+        final OpenSearchClient client = openSearchInstance.elasticsearchClient();
+        return new IndicesAdapterOS2(
                 client,
                 new StatsApi(objectMapper, client),
                 new CatApi(objectMapper, client),
@@ -48,12 +48,12 @@ public class IndexFieldTypePollerES7IT extends IndexFieldTypePollerIT {
 
     @Override
     protected IndexFieldTypePollerAdapter createIndexFieldTypePollerAdapter() {
-        final OpenSearchClient client = elasticsearch.elasticsearchClient();
-        return new IndexFieldTypePollerAdapterES7(new FieldMappingApi(objectMapper, client));
+        final OpenSearchClient client = openSearchInstance.elasticsearchClient();
+        return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(objectMapper, client));
     }
 
     @Override
     protected SearchServerInstance elasticsearch() {
-        return this.elasticsearch;
+        return this.openSearchInstance;
     }
 }

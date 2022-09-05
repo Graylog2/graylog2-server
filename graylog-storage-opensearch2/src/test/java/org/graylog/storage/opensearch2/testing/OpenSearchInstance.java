@@ -41,8 +41,8 @@ import java.util.Locale;
 
 import static java.util.Objects.isNull;
 
-public class OpensearchInstance extends TestableSearchServerInstance {
-    private static final Logger LOG = LoggerFactory.getLogger(OpensearchInstance.class);
+public class OpenSearchInstance extends TestableSearchServerInstance {
+    private static final Logger LOG = LoggerFactory.getLogger(OpenSearchInstance.class);
 
     protected static final String OS_VERSION = "2.0.1";
     private static final int OS_PORT = 9200;
@@ -54,7 +54,7 @@ public class OpensearchInstance extends TestableSearchServerInstance {
     private final Client client;
     private final FixtureImporter fixtureImporter;
 
-    protected OpensearchInstance(String image, SearchVersion version, Network network, String heapSize) {
+    protected OpenSearchInstance(String image, SearchVersion version, Network network, String heapSize) {
         super(image, version, network, heapSize);
         this.restHighLevelClient = buildRestClient();
         this.openSearchClient = new OpenSearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
@@ -87,25 +87,25 @@ public class OpensearchInstance extends TestableSearchServerInstance {
                 .get();
     }
 
-    public static OpensearchInstance create() {
+    public static OpenSearchInstance create() {
         return create(SearchVersion.opensearch(OS_VERSION), Network.newNetwork(), DEFAULT_HEAP_SIZE);
     }
 
-    public static OpensearchInstance create(String heapSize) {
+    public static OpenSearchInstance create(String heapSize) {
         return create(SearchVersion.opensearch(OS_VERSION), Network.newNetwork(), heapSize);
     }
 
     // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
-    public static OpensearchInstance create(SearchVersion searchVersion, Network network) {
+    public static OpenSearchInstance create(SearchVersion searchVersion, Network network) {
         return create(searchVersion, network, DEFAULT_HEAP_SIZE);
     }
 
-    private static OpensearchInstance create(SearchVersion searchVersion, Network network, String heapSize) {
+    private static OpenSearchInstance create(SearchVersion searchVersion, Network network, String heapSize) {
         final String image = imageNameFrom(searchVersion);
 
         LOG.debug("Creating instance {}", image);
 
-        return new OpensearchInstance(image, searchVersion, network, heapSize);
+        return new OpenSearchInstance(image, searchVersion, network, heapSize);
     }
 
     private static String imageNameFrom(SearchVersion version) {
