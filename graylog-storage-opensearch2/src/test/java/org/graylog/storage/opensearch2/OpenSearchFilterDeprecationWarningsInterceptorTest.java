@@ -119,7 +119,7 @@ public class OpenSearchFilterDeprecationWarningsInterceptorTest {
         response.addHeader("Test", "This header should not trigger the interceptor.");
         response.addHeader("Warning", "This warning should not trigger the interceptor.");
         response.addHeader("Warning", "This text contains the trigger: but in a future major version, direct access to system indices and their aliases will not be allowed - and should be filtered out");
-        response.addHeader("Warning", "This text contains the trigger: setting was deprecated in Elasticsearch - and should be filtered out");
+        response.addHeader("Warning", "This text contains the trigger: setting was deprecated in OpenSearch - and should be filtered out");
 
         assertThat(response.getAllHeaders())
                 .as("Number of Headers should be 4 before start.")
