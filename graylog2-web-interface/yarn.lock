@@ -2621,6 +2621,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/geojson@*":
+  version "7946.0.10"
+  resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.10.tgz#6dfbf5ea17142f7f9a043809f1cd4c448cb68249"
+  integrity sha512-Nmh0K3iWQJzniTuPRcJn5hxXkfB1T1pgB89SBig5PlJQU5yocazeu4jATJlaA0GYFKWMqDdvYemoSnF2pXgLVA==
+
 "@types/graceful-fs@^4.1.3":
   version "4.1.5"
   resolved "https://registry.yarnpkg.com/@types/graceful-fs/-/graceful-fs-4.1.5.tgz#21ffba0d98da4350db64891f92a9e5db3cdb4e15"
@@ -2716,6 +2721,13 @@
   version "0.0.29"
   resolved "https://registry.yarnpkg.com/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
   integrity sha1-7ihweulOEdK4J7y+UnC86n8+ce4=
+
+"@types/leaflet@^1.7.11":
+  version "1.7.11"
+  resolved "https://registry.yarnpkg.com/@types/leaflet/-/leaflet-1.7.11.tgz#48b33b7a15b015bbb1e8950399298a112c3220c8"
+  integrity sha512-VwAYom2pfIAf/pLj1VR5aLltd4tOtHyvfaJlNYCoejzP2nu52PrMi1ehsLRMUS+bgafmIIKBV1cMfKeS+uJ0Vg==
+  dependencies:
+    "@types/geojson" "*"
 
 "@types/lodash@^4.14.165":
   version "4.14.184"

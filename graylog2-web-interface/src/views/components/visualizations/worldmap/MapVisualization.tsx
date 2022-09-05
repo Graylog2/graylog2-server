@@ -17,12 +17,12 @@
 /* eslint-env browser */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { CircleMarker, Map, Popup, TileLayer } from 'react-leaflet';
+import { CircleMarker, MapContainer, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import chroma from 'chroma-js';
 import { flatten } from 'lodash';
 import leafletStyles from 'leaflet/dist/leaflet.css';
 
-import type Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
+import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 
 import style from './MapVisualization.css';
 
@@ -48,9 +48,73 @@ type MapVisualizationProps = {
   data: Array<{ keys: any, name: any, values: { [key: string]: number } }>
 };
 
-class MapVisualization extends React.Component<MapVisualizationProps> {
-  _map = undefined;
+const _getBucket = (value: number, bucketCount: number, minValue: number, maxValue: number, increment: number) => {
+  // Calculate bucket size based on min/max value and the number of buckets.
+  const bucketSize = (maxValue - minValue) / bucketCount;
+  // Select bucket for the given value.
+  const bucket = value < maxValue ? Math.ceil((value - minValue) / bucketSize) : bucketCount;
 
+  return bucket + increment;
+};
+
+// Coordinates are given as "lat,long"
+const _formatMarker = (coordinates: string, value: number, min: number, max: number, radiusSize: number, increment: number, color: chroma.Color, name: JSX.Element, keys: { [s: string]: unknown; } | ArrayLike<unknown>) => {
+  // eslint-disable-next-line no-restricted-globals
+  const formattedCoordinates = coordinates.split(',').map((component) => Number(component)).filter((n) => !isNaN(n));
+
+  if (formattedCoordinates.length !== 2) {
+    return null;
+  }
+
+  const radius = _getBucket(value, radiusSize, min, max, increment);
+  const markerKeys = flatten(Object.entries(keys).map(([k, v]) => [<dt key={`dt-${k}-${v}`}>{k}</dt>, <dd key={`dd-${k}-${v}`}>{v}</dd>]));
+
+  return (
+    <CircleMarker key={`${name}-${coordinates}`}
+                  center={formattedCoordinates as [number, number]}
+                  radius={radius}
+                  color={color.hex()}
+                  fillColor={color.hex()}
+                  weight={2}
+                  opacity={0.8}>
+      <Popup>
+        <dl>
+          <dt>Name</dt>
+          <dd>{name}</dd>
+          {markerKeys}
+          <dt>Coordinates:</dt>
+          <dd>{coordinates}</dd>
+          {value
+            && (
+              <>
+                <dt>Value:</dt>
+                <dd>{value}</dd>
+              </>
+            )}
+        </dl>
+      </Popup>
+    </CircleMarker>
+  );
+};
+
+const MapEvents = ({ onViewportChanged }: { onViewportChanged: React.ComponentProps<typeof MapVisualization>['onChange'] }) => {
+  const map = useMap();
+
+  const _onViewportChanged = () => {
+    const { lat, lng } = map.getCenter();
+
+    return onViewportChanged(Viewport.create([lat, lng], map.getZoom()));
+  };
+
+  useMapEvents({
+    dragend: _onViewportChanged,
+    zoomend: _onViewportChanged,
+  });
+
+  return null;
+};
+
+class MapVisualization extends React.Component<MapVisualizationProps> {
   _isMapReady = false;
 
   _areTilesReady = false;
@@ -92,55 +156,6 @@ class MapVisualization extends React.Component<MapVisualizationProps> {
     leafletStyles.unuse();
   }
 
-  // Coordinates are given as "lat,long"
-  _formatMarker = (coordinates, value, min, max, radiusSize, increment, color, name, keys) => {
-    // eslint-disable-next-line no-restricted-globals
-    const formattedCoordinates = coordinates.split(',').map((component) => Number(component)).filter((n) => !isNaN(n));
-
-    if (formattedCoordinates.length !== 2) {
-      return null;
-    }
-
-    const radius = this._getBucket(value, radiusSize, min, max, increment);
-    const markerKeys = flatten(Object.entries(keys).map(([k, v]) => [<dt key={`dt-${k}-${v}`}>{k}</dt>, <dd key={`dd-${k}-${v}`}>{v}</dd>]));
-
-    return (
-      <CircleMarker key={`${name}-${coordinates}`}
-                    center={formattedCoordinates}
-                    radius={radius}
-                    color={color.hex()}
-                    fillColor={color.hex()}
-                    weight={2}
-                    opacity={0.8}>
-        <Popup>
-          <dl>
-            <dt>Name</dt>
-            <dd>{name}</dd>
-            {markerKeys}
-            <dt>Coordinates:</dt>
-            <dd>{coordinates}</dd>
-            {value
-              && (
-              <>
-                <dt>Value:</dt>
-                <dd>{value}</dd>
-              </>
-              )}
-          </dl>
-        </Popup>
-      </CircleMarker>
-    );
-  };
-
-  _getBucket = (value, bucketCount, minValue, maxValue, increment) => {
-    // Calculate bucket size based on min/max value and the number of buckets.
-    const bucketSize = (maxValue - minValue) / bucketCount;
-    // Select bucket for the given value.
-    const bucket = value < maxValue ? Math.ceil((value - minValue) / bucketSize) : bucketCount;
-
-    return bucket + increment;
-  };
-
   _handleRenderComplete = () => {
     if (this._areTilesReady && this._isMapReady) {
       const { onRenderComplete } = this.props;
@@ -174,7 +189,7 @@ class MapVisualization extends React.Component<MapVisualizationProps> {
 
       Object.entries(values)
         .forEach(([coord, value], valueIdx) => markers
-          .push(this._formatMarker(coord, value, min, max, markerRadiusSize, markerRadiusIncrementSize, color, name, keys[valueIdx])));
+          .push(_formatMarker(coord, value, min, max, markerRadiusSize, markerRadiusIncrementSize, color, name, keys[valueIdx])));
     });
 
     return (
@@ -182,22 +197,22 @@ class MapVisualization extends React.Component<MapVisualizationProps> {
         {(interactive) => (
           <div className={locked ? style.mapLocked : ''} style={{ position: 'relative', zIndex: 0 }}>
             {locked && <div className={style.overlay} style={{ height, width }} />}
-            <Map animate={interactive}
-                 className={style.map}
-                 fadeAnimation={interactive}
-                 key={`visualization-${id}-${width}-${height}`}
-                 id={`visualization-${id}`}
-                 markerZoomAnimation={interactive}
-                 onViewportChanged={onChange}
-                 scrollWheelZoom
-                 style={{ height, width }}
-                 viewport={viewport}
-                 whenReady={this._handleMapReady}
-                 zoomAnimation={interactive}
-                 ref={(c) => { this._map = c; }}>
-              <TileLayer url={url} maxZoom={19} attribution={attribution} onLoad={this._handleTilesReady} />
+            <MapContainer center={viewport.center}
+                          boundsOptions={{ maxZoom: 19, animate: interactive }}
+                          zoom={viewport.zoom}
+                          className={style.map}
+                          fadeAnimation={interactive}
+                          key={`visualization-${id}-${width}-${height}`}
+                          id={`visualization-${id}`}
+                          markerZoomAnimation={interactive}
+                          scrollWheelZoom
+                          style={{ height, width }}
+                          whenReady={this._handleMapReady}
+                          zoomAnimation={interactive}>
+              <MapEvents onViewportChanged={onChange} />
+              <TileLayer url={url} attribution={attribution} eventHandlers={{ load: this._handleTilesReady }} />
               {markers}
-            </Map>
+            </MapContainer>
           </div>
         )}
       </InteractiveContext.Consumer>
