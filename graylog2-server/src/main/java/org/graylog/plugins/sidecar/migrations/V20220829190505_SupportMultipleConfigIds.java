@@ -16,9 +16,9 @@
  */
 package org.graylog.plugins.sidecar.migrations;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
@@ -70,14 +70,13 @@ public class V20220829190505_SupportMultipleConfigIds extends Migration {
                     ((List<Document>) assignments).forEach(a -> {
                         final Object configuration_id = a.get("configuration_id");
                         if (configuration_id != null) {
-                            a.put("configuration_ids", ImmutableList.of(configuration_id));
+                            a.put("configuration_ids", List.of(configuration_id));
                             a.remove("configuration_id");
                         }
                     });
 
                     final Document update = new Document();
                     update.put("$set", sidecar);
-                    //sidecars.updateOne(new BasicDBObject("_id", sidecar.getObjectId("_id")), update);
                     sidecars.updateOne(Filters.eq("_id", sidecar.getObjectId("_id")), update);
                     count.getAndIncrement();
                 }
@@ -89,6 +88,7 @@ public class V20220829190505_SupportMultipleConfigIds extends Migration {
     }
 
     @AutoValue
+    @JsonAutoDetect
     public abstract static class MigrationCompleted {
         @JsonCreator
         public static MigrationCompleted create() {
