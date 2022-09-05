@@ -48,8 +48,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "System/Indices/Retention", description = "Index retention strategy settings")
+@Api(value = "System/Indices/Retention", description = "Index retention strategy settings", tags = {CLOUD_VISIBLE})
 @Path("/system/indices/retention")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication

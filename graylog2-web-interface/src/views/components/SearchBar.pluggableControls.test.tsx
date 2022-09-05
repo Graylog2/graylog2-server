@@ -31,8 +31,6 @@ import Query from 'views/logic/queries/Query';
 
 import SearchBar from './SearchBar';
 
-const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
-
 const testTimeout = applyTimeoutMultiplier(30000);
 
 jest.mock('hooks/useFeature', () => (key: string) => key === 'search_filter');
@@ -44,13 +42,6 @@ jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {
     refresh: jest.fn(),
   },
-}));
-
-jest.mock('stores/users/CurrentUserStore', () => ({
-  CurrentUserStore: MockStore(
-    ['get', () => mockCurrentUser],
-    ['getInitialState', () => mockCurrentUser],
-  ),
 }));
 
 jest.mock('stores/streams/StreamsStore', () => MockStore(

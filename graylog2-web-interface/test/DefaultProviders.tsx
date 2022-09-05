@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { ThemeProvider } from 'styled-components';
+import { defaultTimezone, defaultUser } from 'defaultMockValues';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
@@ -23,7 +24,6 @@ import { colors, utils, breakpoints, fonts, spacings } from 'theme';
 import { THEME_MODE_LIGHT } from 'theme/constants';
 import buttonStyles from 'components/bootstrap/styles/buttonStyles';
 import aceEditorStyles from 'components/bootstrap/styles/aceEditorStyles';
-import { adminUser } from 'fixtures/users';
 
 const themeColors = colors[THEME_MODE_LIGHT];
 const formattedUtils = {
@@ -50,9 +50,9 @@ type Props = {
   children: React.ReactNode,
 }
 const DefaultProviders = ({ children }: Props) => (
-  <CurrentUserContext.Provider value={adminUser}>
+  <CurrentUserContext.Provider value={defaultUser}>
     <ThemeProvider theme={theme}>
-      <UserDateTimeProvider tz="Europe/Berlin">
+      <UserDateTimeProvider tz={defaultTimezone}>
         {children}
       </UserDateTimeProvider>
     </ThemeProvider>

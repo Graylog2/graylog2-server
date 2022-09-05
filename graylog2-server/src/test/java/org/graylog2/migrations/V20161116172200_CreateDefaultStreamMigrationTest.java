@@ -74,7 +74,7 @@ public class V20161116172200_CreateDefaultStreamMigrationTest {
         verify(streamService).save(streamArgumentCaptor.capture());
 
         final Stream stream = streamArgumentCaptor.getValue();
-        assertThat(stream.getTitle()).isEqualTo("All messages");
+        assertThat(stream.getTitle()).isEqualTo("Default Stream");
         assertThat(stream.getDisabled()).isFalse();
         assertThat(stream.getMatchingType()).isEqualTo(StreamImpl.MatchingType.DEFAULT);
     }

@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`copyWidgetToDashboard should copy a widget to a dashboard 1`] = `
-Object {
+{
   "created_at": 2019-06-14T09:48:10.550Z,
   "description": "",
   "id": "5d03952f7aafdc6c1cdc014c",
@@ -9,25 +9,25 @@ Object {
   "properties": Immutable.List [],
   "search_id": "new-search-id",
   "state": Immutable.Map {
-    "f0a1f93c-8400-40de-83ac-94149dbf447c": Object {
-      "formatting": Object {
-        "highlighting": Array [],
+    "f0a1f93c-8400-40de-83ac-94149dbf447c": {
+      "formatting": {
+        "highlighting": [],
       },
       "positions": Immutable.Map {
-        "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": Object {
+        "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": {
           "col": 1,
           "height": 4,
           "row": 2,
           "width": "Infinity",
         },
-        "dead-beef": Object {
+        "dead-beef": {
           "col": 0,
           "height": 4,
           "row": 1,
           "width": 4,
         },
       },
-      "selected_fields": Array [
+      "selected_fields": [
         "source",
         "message",
       ],
@@ -48,72 +48,72 @@ Object {
         ],
       },
       "widgets": Immutable.List [
-        Object {
-          "config": Object {
-            "column_pivots": Array [],
-            "formatting_settings": Object {
-              "chart_colors": Object {
+        {
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": {
                 "stddev(files_changed)": "#8bc34a",
               },
             },
             "rollup": true,
-            "row_pivots": Array [
-              Object {
-                "config": Object {
+            "row_pivots": [
+              {
+                "config": {
                   "limit": 15,
                 },
                 "field": "author",
                 "type": "values",
               },
             ],
-            "series": Array [
-              Object {
-                "config": Object {
+            "series": [
+              {
+                "config": {
                   "name": null,
                 },
                 "function": "stddev(files_changed)",
               },
             ],
-            "sort": Array [],
+            "sort": [],
             "visualization": "bar",
             "visualization_config": null,
           },
           "filter": undefined,
           "filters": Immutable.List [],
           "id": "a8058a41-34ea-4846-83d0-1acc2fbc1d7f",
-          "query": Object {
+          "query": {
             "query_string": "",
             "type": "elasticsearch",
           },
-          "streams": Array [],
+          "streams": [],
           "timerange": null,
           "type": "aggregation",
         },
-        Object {
-          "config": Object {
-            "column_pivots": Array [],
+        {
+          "config": {
+            "column_pivots": [],
             "rollup": true,
-            "row_pivots": Array [],
-            "series": Array [
-              Object {
-                "config": Object {
+            "row_pivots": [],
+            "series": [
+              {
+                "config": {
                   "name": "Message Count",
                 },
                 "function": "count()",
               },
             ],
-            "sort": Array [],
+            "sort": [],
             "visualization": "numeric",
           },
           "filter": undefined,
           "filters": Immutable.List [],
           "id": "dead-beef",
-          "query": Object {
+          "query": {
             "query_string": "",
             "type": "elasticsearch",
           },
-          "streams": Array [],
-          "timerange": Object {
+          "streams": [],
+          "timerange": {
             "range": 300,
             "type": "relative",
           },
