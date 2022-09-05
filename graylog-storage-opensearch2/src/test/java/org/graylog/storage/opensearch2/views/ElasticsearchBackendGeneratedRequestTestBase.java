@@ -30,7 +30,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
-import org.graylog.storage.opensearch2.ElasticsearchClient;
+import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotBucketSpecHandler;
@@ -69,7 +69,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase {
     ElasticsearchBackend elasticsearchBackend;
 
     @Mock
-    protected ElasticsearchClient client;
+    protected OpenSearchClient client;
 
     @Mock
     protected IndexLookup indexLookup;

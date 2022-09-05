@@ -22,7 +22,7 @@ import org.apache.http.client.CredentialsProvider;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
-import org.graylog.storage.opensearch2.client.ESCredentialsProvider;
+import org.graylog.storage.opensearch2.client.OSCredentialsProvider;
 import org.graylog.storage.opensearch2.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES7;
 import org.graylog.storage.opensearch2.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEventsES7;
 import org.graylog2.indexer.IndexToolsAdapter;
@@ -66,7 +66,7 @@ public class Opensearch2Module extends VersionAwareModule {
         install(new FactoryModuleBuilder().build(ScrollResultES7.Factory.class));
 
         bind(RestHighLevelClient.class).toProvider(RestHighLevelClientProvider.class);
-        bind(CredentialsProvider.class).toProvider(ESCredentialsProvider.class);
+        bind(CredentialsProvider.class).toProvider(OSCredentialsProvider.class);
     }
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {

@@ -27,7 +27,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.errors.SearchError;
-import org.graylog.storage.opensearch2.ElasticsearchClient;
+import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
 import org.graylog.storage.opensearch2.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -57,7 +57,7 @@ public class ElasticsearchBackendErrorHandlingTest {
     public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
-    private ElasticsearchClient client;
+    private OpenSearchClient client;
 
     @Mock
     protected IndexLookup indexLookup;

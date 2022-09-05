@@ -35,7 +35,7 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
-import org.graylog.storage.opensearch2.ElasticsearchClient;
+import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.TimeRangeQueryFactory;
 import org.graylog.storage.opensearch2.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
@@ -71,7 +71,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchBackend.class);
 
     private final Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers;
-    private final ElasticsearchClient client;
+    private final OpenSearchClient client;
     private final IndexLookup indexLookup;
     private final ESGeneratedQueryContext.Factory queryContextFactory;
     private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
@@ -79,7 +79,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
     @Inject
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
-                                ElasticsearchClient client,
+                                OpenSearchClient client,
                                 IndexLookup indexLookup,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
                                 UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,

@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import org.opensearch.client.Request;
 import org.opensearch.client.Response;
-import org.graylog.storage.opensearch2.ElasticsearchClient;
+import org.graylog.storage.opensearch2.OpenSearchClient;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -31,11 +31,11 @@ import java.util.function.Consumer;
 
 public class StatsApi {
     private final ObjectMapper objectMapper;
-    private final ElasticsearchClient client;
+    private final OpenSearchClient client;
 
     @Inject
     public StatsApi(ObjectMapper objectMapper,
-                    ElasticsearchClient client) {
+                    OpenSearchClient client) {
         this.objectMapper = objectMapper;
         this.client = client;
     }

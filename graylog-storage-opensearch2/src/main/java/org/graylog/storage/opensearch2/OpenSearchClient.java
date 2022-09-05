@@ -46,19 +46,19 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class ElasticsearchClient {
+public class OpenSearchClient {
     private static final Pattern invalidWriteTarget = Pattern.compile("no write index is defined for alias \\[(?<target>[\\w_]+)\\]");
 
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OpenSearchClient.class);
 
     private final RestHighLevelClient client;
     private final boolean compressionEnabled;
     private final ObjectMapper objectMapper;
 
     @Inject
-    public ElasticsearchClient(RestHighLevelClient client,
-                               @Named("elasticsearch_compression_enabled") boolean compressionEnabled,
-                               ObjectMapper objectMapper) {
+    public OpenSearchClient(RestHighLevelClient client,
+                            @Named("elasticsearch_compression_enabled") boolean compressionEnabled,
+                            ObjectMapper objectMapper) {
         this.client = client;
         this.compressionEnabled = compressionEnabled;
         this.objectMapper = objectMapper;
@@ -133,15 +133,15 @@ public class ElasticsearchClient {
 
     private OpenSearchException exceptionFrom(Exception e, String errorMessage) {
         if (e instanceof OpenSearchException) {
-            final OpenSearchException elasticsearchException = (OpenSearchException) e;
-            if (isIndexNotFoundException(elasticsearchException)) {
-                throw IndexNotFoundException.create(errorMessage + elasticsearchException.getResourceId(), elasticsearchException.getIndex().getName());
+            final OpenSearchException openSearchException = (OpenSearchException) e;
+            if (isIndexNotFoundException(openSearchException)) {
+                throw IndexNotFoundException.create(errorMessage + openSearchException.getResourceId(), openSearchException.getIndex().getName());
             }
-            if (isMasterNotDiscoveredException(elasticsearchException)) {
+            if (isMasterNotDiscoveredException(openSearchException)) {
                 throw new MasterNotDiscoveredException();
             }
-            if (isInvalidWriteTargetException(elasticsearchException)) {
-                final Matcher matcher = invalidWriteTarget.matcher(elasticsearchException.getMessage());
+            if (isInvalidWriteTargetException(openSearchException)) {
+                final Matcher matcher = invalidWriteTarget.matcher(openSearchException.getMessage());
                 if (matcher.find()) {
                     final String target = matcher.group("target");
                     throw InvalidWriteTargetException.create(target);
@@ -151,18 +151,18 @@ public class ElasticsearchClient {
         return new OpenSearchException(errorMessage, e);
     }
 
-    private boolean isInvalidWriteTargetException(OpenSearchException elasticsearchException) {
+    private boolean isInvalidWriteTargetException(OpenSearchException openSearchException) {
         try {
-            final ParsedElasticsearchException parsedException = ParsedElasticsearchException.from(elasticsearchException.getMessage());
+            final ParsedOpenSearchException parsedException = ParsedOpenSearchException.from(openSearchException.getMessage());
             return parsedException.reason().startsWith("no write index is defined for alias");
         } catch (Exception e) {
             return false;
         }
     }
 
-    private boolean isMasterNotDiscoveredException(OpenSearchException elasticsearchException) {
+    private boolean isMasterNotDiscoveredException(OpenSearchException openSearchException) {
         try {
-            final ParsedElasticsearchException parsedException = ParsedElasticsearchException.from(elasticsearchException.getMessage());
+            final ParsedOpenSearchException parsedException = ParsedOpenSearchException.from(openSearchException.getMessage());
             return parsedException.type().equals("master_not_discovered_exception")
                     || (parsedException.type().equals("cluster_block_exception") && parsedException.reason().contains("no master"));
         } catch (Exception e) {

@@ -28,7 +28,7 @@ import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
-import org.graylog.storage.opensearch2.ElasticsearchClient;
+import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
 import org.graylog.storage.opensearch2.views.searchtypes.ESMessageList;
 import org.graylog.storage.opensearch2.views.searchtypes.ESSearchTypeHandler;
@@ -74,7 +74,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
     private IndexLookup indexLookup;
 
     @Mock
-    private ElasticsearchClient client;
+    private OpenSearchClient client;
 
     @Captor
     private ArgumentCaptor<List<SearchRequest>> clientRequestCaptor;

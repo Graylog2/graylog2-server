@@ -30,7 +30,7 @@ public class NodeAdapterES7 implements NodeAdapter {
     private final PlainJsonApi jsonApi;
 
     @Inject
-    public NodeAdapterES7(ElasticsearchClient client, ObjectMapper objectMapper) {
+    public NodeAdapterES7(OpenSearchClient client, ObjectMapper objectMapper) {
         this.jsonApi = new PlainJsonApi(objectMapper, client);
     }
 

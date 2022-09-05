@@ -26,10 +26,10 @@ import javax.inject.Inject;
 import java.util.List;
 
 public class CountsAdapterES7 implements CountsAdapter {
-    private final ElasticsearchClient client;
+    private final OpenSearchClient client;
 
     @Inject
-    public CountsAdapterES7(ElasticsearchClient client) {
+    public CountsAdapterES7(OpenSearchClient client) {
         this.client = client;
     }
 

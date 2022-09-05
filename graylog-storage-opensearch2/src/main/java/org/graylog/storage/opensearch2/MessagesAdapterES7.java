@@ -67,14 +67,14 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     static final String ILLEGAL_ARGUMENT_EXCEPTION = "illegal_argument_exception";
     static final String NO_WRITE_INDEX_DEFINED_FOR_ALIAS = "no write index is defined for alias";
 
-    private final ElasticsearchClient client;
+    private final OpenSearchClient client;
     private final Meter invalidTimestampMeter;
     private final ChunkedBulkIndexer chunkedBulkIndexer;
     private final ObjectMapper objectMapper;
 
     @Inject
-    public MessagesAdapterES7(ElasticsearchClient elasticsearchClient, MetricRegistry metricRegistry, ChunkedBulkIndexer chunkedBulkIndexer, ObjectMapper objectMapper) {
-        this.client = elasticsearchClient;
+    public MessagesAdapterES7(OpenSearchClient openSearchClient, MetricRegistry metricRegistry, ChunkedBulkIndexer chunkedBulkIndexer, ObjectMapper objectMapper) {
+        this.client = openSearchClient;
         this.invalidTimestampMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
         this.chunkedBulkIndexer = chunkedBulkIndexer;
         this.objectMapper = objectMapper;
@@ -225,7 +225,7 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     }
 
     private Messages.IndexingError.ErrorType errorTypeFromResponse(BulkItemResponse item) {
-        final ParsedElasticsearchException exception = ParsedElasticsearchException.from(item.getFailureMessage());
+        final ParsedOpenSearchException exception = ParsedOpenSearchException.from(item.getFailureMessage());
         switch (exception.type()) {
             case MAPPER_PARSING_EXCEPTION: return Messages.IndexingError.ErrorType.MappingError;
             case INDEX_BLOCK_ERROR:

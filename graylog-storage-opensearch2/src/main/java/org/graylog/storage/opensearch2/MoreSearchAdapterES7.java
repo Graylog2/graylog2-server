@@ -59,13 +59,13 @@ import static org.opensearch.index.query.QueryBuilders.termsQuery;
 public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterES7.class);
     public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.fromOptions(false, false, true, false);
-    private final ElasticsearchClient client;
+    private final OpenSearchClient client;
     private final Boolean allowLeadingWildcard;
     private final SortOrderMapper sortOrderMapper;
     private final Scroll scroll;
 
     @Inject
-    public MoreSearchAdapterES7(ElasticsearchClient client,
+    public MoreSearchAdapterES7(OpenSearchClient client,
                                 @Named("allow_leading_wildcard_searches") Boolean allowLeadingWildcard,
                                 SortOrderMapper sortOrderMapper,
                                 Scroll scroll) {

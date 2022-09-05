@@ -24,8 +24,8 @@ import com.google.auto.value.AutoValue;
 import java.util.List;
 
 @AutoValue
-@JsonDeserialize(builder = ElasticsearchError.Builder.class)
-public abstract class ElasticsearchError {
+@JsonDeserialize(builder = OpenSearchError.Builder.class)
+public abstract class OpenSearchError {
     public abstract List<Cause> rootCause();
     public abstract String type();
     public abstract String reason();
@@ -47,11 +47,11 @@ public abstract class ElasticsearchError {
         public abstract Builder grouped(final boolean gruped);
         @JsonProperty
         public abstract Builder failedShards(final List<FailedShard> failedShards);
-        public abstract ElasticsearchError build();
+        public abstract OpenSearchError build();
 
         @JsonCreator
-        public static ElasticsearchError.Builder builder() {
-            return new AutoValue_ElasticsearchError.Builder();
+        public static OpenSearchError.Builder builder() {
+            return new AutoValue_OpenSearchError.Builder();
         }
     }
 }

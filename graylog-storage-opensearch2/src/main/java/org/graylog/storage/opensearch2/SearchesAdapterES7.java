@@ -48,12 +48,12 @@ public class SearchesAdapterES7 implements SearchesAdapter {
     private static final String AGG_EXTENDED_STATS = "gl2_extended_stats";
     private static final String AGG_VALUE_COUNT = "gl2_value_count";
 
-    private final ElasticsearchClient client;
+    private final OpenSearchClient client;
     private final Scroll scroll;
     private final SearchRequestFactory searchRequestFactory;
 
     @Inject
-    public SearchesAdapterES7(ElasticsearchClient client,
+    public SearchesAdapterES7(OpenSearchClient client,
                               Scroll scroll,
                               SearchRequestFactory searchRequestFactory) {
         this.client = client;

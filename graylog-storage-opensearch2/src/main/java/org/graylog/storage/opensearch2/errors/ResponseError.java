@@ -24,13 +24,13 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 @JsonDeserialize(builder = ResponseError.Builder.class)
 public abstract class ResponseError {
-    public abstract ElasticsearchError error();
+    public abstract OpenSearchError error();
     public abstract int status();
 
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty
-        public abstract Builder error(final ElasticsearchError error);
+        public abstract Builder error(final OpenSearchError error);
         @JsonProperty
         public abstract Builder status(final int status);
         @JsonProperty

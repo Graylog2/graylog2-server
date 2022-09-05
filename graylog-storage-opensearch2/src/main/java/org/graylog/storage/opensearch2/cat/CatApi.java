@@ -20,7 +20,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
-import org.graylog.storage.opensearch2.ElasticsearchClient;
+import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.opensearch.client.Request;
 import org.opensearch.client.Response;
 
@@ -35,11 +35,11 @@ import java.util.stream.Collectors;
 
 public class CatApi {
     private final ObjectMapper objectMapper;
-    private final ElasticsearchClient client;
+    private final OpenSearchClient client;
 
     @Inject
     public CatApi(ObjectMapper objectMapper,
-                  ElasticsearchClient client) {
+                  OpenSearchClient client) {
         this.objectMapper = objectMapper;
         this.client = client;
     }

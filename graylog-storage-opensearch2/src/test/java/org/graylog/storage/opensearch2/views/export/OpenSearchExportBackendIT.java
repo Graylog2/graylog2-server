@@ -46,7 +46,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
+public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
 
     private IndexLookup indexLookup;
     private ElasticsearchExportBackend sut;

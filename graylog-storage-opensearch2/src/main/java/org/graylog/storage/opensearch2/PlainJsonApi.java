@@ -25,11 +25,11 @@ import javax.inject.Inject;
 
 public class PlainJsonApi {
     private final ObjectMapper objectMapper;
-    private final ElasticsearchClient client;
+    private final OpenSearchClient client;
 
     @Inject
     public PlainJsonApi(ObjectMapper objectMapper,
-                        ElasticsearchClient client) {
+                        OpenSearchClient client) {
         this.objectMapper = objectMapper;
         this.client = client;
     }

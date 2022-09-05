@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ParsedElasticsearchExceptionTest {
+class ParsedOpenSearchExceptionTest {
     @Test
     void parsingMapperParsingException() {
         final String exception = "OpenSearchException[OpenSearch exception [type=mapper_parsing_exception, " +
@@ -28,7 +28,7 @@ class ParsedElasticsearchExceptionTest {
                 "Preview of field's value: 'fourty-two']]; nested: OpenSearchException[OpenSearch exception " +
                 "[type=illegal_argument_exception, reason=For input string: \"fourty-two\"]];";
 
-        final ParsedElasticsearchException parsed = ParsedElasticsearchException.from(exception);
+        final ParsedOpenSearchException parsed = ParsedOpenSearchException.from(exception);
 
         assertThat(parsed).satisfies(p -> {
             assertThat(p.type()).isEqualTo("mapper_parsing_exception");
@@ -43,7 +43,7 @@ class ParsedElasticsearchExceptionTest {
                 "[type=cluster_block_exception, reason=index [messages_it_deflector] blocked by: [TOO_MANY_REQUESTS/12/index " +
                 "read-only / allow delete (api)];]]";
 
-        final ParsedElasticsearchException parsed = ParsedElasticsearchException.from(exception);
+        final ParsedOpenSearchException parsed = ParsedOpenSearchException.from(exception);
 
         assertThat(parsed).satisfies(p -> {
             assertThat(p.type()).isEqualTo("cluster_block_exception");
@@ -57,7 +57,7 @@ class ParsedElasticsearchExceptionTest {
                 "reason=[graylog_0][2] primary shard is not active Timeout: [1m], request: [BulkShardRequest [[graylog_0][2]] containing [125] " +
                 "requests]]]";
 
-        final ParsedElasticsearchException parsed = ParsedElasticsearchException.from(exception);
+        final ParsedOpenSearchException parsed = ParsedOpenSearchException.from(exception);
 
         assertThat(parsed).satisfies(p -> {
             assertThat(p.type()).isEqualTo("unavailable_shards_exception");
@@ -70,7 +70,7 @@ class ParsedElasticsearchExceptionTest {
     void parsingInvalidWriteTargetMessage() {
         final String exception = "OpenSearch exception [type=illegal_argument_exception, reason=no write index is defined for alias [messages_it_deflector]. The write index may be explicitly disabled using is_write_index=false or the alias points to multiple indices without one being designated as a write index]";
 
-        final ParsedElasticsearchException parsed = ParsedElasticsearchException.from(exception);
+        final ParsedOpenSearchException parsed = ParsedOpenSearchException.from(exception);
 
         assertThat(parsed).satisfies(p -> {
             assertThat(p.type()).isEqualTo("illegal_argument_exception");

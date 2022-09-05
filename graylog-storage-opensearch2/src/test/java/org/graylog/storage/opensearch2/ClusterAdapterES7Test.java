@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 class ClusterAdapterES7Test {
     private static final String nodeId = "I-sZn-HKQhCtdf1JYPcx1A";
 
-    private ElasticsearchClient client;
+    private OpenSearchClient client;
     private CatApi catApi;
     private PlainJsonApi jsonApi;
     private ObjectMapper objectMapper = new ObjectMapperProvider().get();
@@ -48,7 +48,7 @@ class ClusterAdapterES7Test {
 
     @BeforeEach
     void setUp() {
-        this.client = mock(ElasticsearchClient.class);
+        this.client = mock(OpenSearchClient.class);
         this.catApi = mock(CatApi.class);
         this.jsonApi = mock(PlainJsonApi.class);
 

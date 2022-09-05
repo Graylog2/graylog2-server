@@ -62,13 +62,13 @@ import java.util.stream.Collectors;
 
 public class ClusterAdapterES7 implements ClusterAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterAdapterES7.class);
-    private final ElasticsearchClient client;
+    private final OpenSearchClient client;
     private final Duration requestTimeout;
     private final CatApi catApi;
     private final PlainJsonApi jsonApi;
 
     @Inject
-    public ClusterAdapterES7(ElasticsearchClient client,
+    public ClusterAdapterES7(OpenSearchClient client,
                              @Named("elasticsearch_socket_timeout") Duration requestTimeout,
                              CatApi catApi,
                              PlainJsonApi jsonApi) {

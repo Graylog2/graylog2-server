@@ -37,7 +37,7 @@ public class IndexFieldTypePollerES7IT extends IndexFieldTypePollerIT {
 
     @Override
     protected IndicesAdapter createIndicesAdapter() {
-        final ElasticsearchClient client = elasticsearch.elasticsearchClient();
+        final OpenSearchClient client = elasticsearch.elasticsearchClient();
         return new IndicesAdapterES7(
                 client,
                 new StatsApi(objectMapper, client),
@@ -48,7 +48,7 @@ public class IndexFieldTypePollerES7IT extends IndexFieldTypePollerIT {
 
     @Override
     protected IndexFieldTypePollerAdapter createIndexFieldTypePollerAdapter() {
-        final ElasticsearchClient client = elasticsearch.elasticsearchClient();
+        final OpenSearchClient client = elasticsearch.elasticsearchClient();
         return new IndexFieldTypePollerAdapterES7(new FieldMappingApi(objectMapper, client));
     }
 

@@ -24,7 +24,7 @@ import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.support.ActiveShardCount;
 import org.opensearch.client.indices.CreateIndexRequest;
 import org.opensearch.client.indices.GetIndexRequest;
-import org.graylog.storage.opensearch2.ElasticsearchClient;
+import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog2.jackson.TypeReferences;
 import org.slf4j.Logger;
@@ -40,12 +40,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class FixtureImporterES7 implements FixtureImporter {
+public class FixtureImporterOS2 implements FixtureImporter {
     private static final Logger LOG = LoggerFactory.getLogger(FixtureImporter.class);
-    private final ElasticsearchClient client;
+    private final OpenSearchClient client;
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public FixtureImporterES7(ElasticsearchClient client) {
+    public FixtureImporterOS2(OpenSearchClient client) {
         this.client = client;
     }
 

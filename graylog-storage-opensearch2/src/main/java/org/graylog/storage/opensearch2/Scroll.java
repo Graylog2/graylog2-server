@@ -27,12 +27,12 @@ import java.util.Set;
 
 public class Scroll {
     private static final String DEFAULT_SCROLLTIME = "1m";
-    private final ElasticsearchClient client;
+    private final OpenSearchClient client;
     private final ScrollResultES7.Factory scrollResultFactory;
     private final SearchRequestFactory searchRequestFactory;
 
     @Inject
-    public Scroll(ElasticsearchClient client,
+    public Scroll(OpenSearchClient client,
                   ScrollResultES7.Factory scrollResultFactory,
                   SearchRequestFactory searchRequestFactory) {
         this.client = client;

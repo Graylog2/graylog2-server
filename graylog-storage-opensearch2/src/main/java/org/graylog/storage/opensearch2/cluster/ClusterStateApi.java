@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
 import org.opensearch.client.Request;
 import org.opensearch.client.Response;
-import org.graylog.storage.opensearch2.ElasticsearchClient;
+import org.graylog.storage.opensearch2.OpenSearchClient;
 
 import javax.inject.Inject;
 import java.util.AbstractMap;
@@ -36,11 +36,11 @@ import static java.util.stream.Collectors.mapping;
 
 public class ClusterStateApi {
     private final ObjectMapper objectMapper;
-    private final ElasticsearchClient client;
+    private final OpenSearchClient client;
 
     @Inject
     public ClusterStateApi(ObjectMapper objectMapper,
-                           ElasticsearchClient client) {
+                           OpenSearchClient client) {
         this.objectMapper = objectMapper;
         this.client = client;
     }

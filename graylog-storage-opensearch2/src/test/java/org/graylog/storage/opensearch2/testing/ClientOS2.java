@@ -45,7 +45,7 @@ import org.opensearch.client.indices.IndexTemplateMetadata;
 import org.opensearch.client.indices.PutIndexTemplateRequest;
 import org.opensearch.cluster.health.ClusterHealthStatus;
 import org.opensearch.common.settings.Settings;
-import org.graylog.storage.opensearch2.ElasticsearchClient;
+import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -59,12 +59,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ClientES7 implements Client {
-    private static final Logger LOG = LoggerFactory.getLogger(ClientES7.class);
-    private final ElasticsearchClient client;
+public class ClientOS2 implements Client {
+    private static final Logger LOG = LoggerFactory.getLogger(ClientOS2.class);
+    private final OpenSearchClient client;
     private final ObjectMapper objectMapper;
 
-    public ClientES7(ElasticsearchClient client) {
+    public ClientOS2(OpenSearchClient client) {
         this.client = client;
         this.objectMapper = new ObjectMapperProvider().get();
     }
@@ -252,7 +252,7 @@ public class ClientES7 implements Client {
         request.persistentSettings(Settings.builder().put(setting, value));
 
         client.execute((c, requestOptions) -> c.cluster().putSettings(request, requestOptions),
-                "Unable to update ES cluster setting: " + setting + "=" + value);
+                "Unable to update OS cluster setting: " + setting + "=" + value);
     }
 
     @Override

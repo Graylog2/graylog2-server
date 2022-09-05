@@ -93,17 +93,17 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
-import static org.graylog.storage.opensearch2.ElasticsearchClient.withTimeout;
+import static org.graylog.storage.opensearch2.OpenSearchClient.withTimeout;
 
 public class IndicesAdapterES7 implements IndicesAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterES7.class);
-    private final ElasticsearchClient client;
+    private final OpenSearchClient client;
     private final StatsApi statsApi;
     private final CatApi catApi;
     private final ClusterStateApi clusterStateApi;
 
     @Inject
-    public IndicesAdapterES7(ElasticsearchClient client,
+    public IndicesAdapterES7(OpenSearchClient client,
                              StatsApi statsApi,
                              CatApi catApi,
                              ClusterStateApi clusterStateApi) {

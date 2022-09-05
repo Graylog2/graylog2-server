@@ -35,7 +35,7 @@ public class IndicesGetAllMessageFieldsES7IT extends IndicesGetAllMessageFieldsI
 
     @Override
     protected IndicesAdapter indicesAdapter() {
-        final ElasticsearchClient client = elasticsearch.elasticsearchClient();
+        final OpenSearchClient client = elasticsearch.elasticsearchClient();
         return new IndicesAdapterES7(
                 client,
                 new StatsApi(objectMapper, client),

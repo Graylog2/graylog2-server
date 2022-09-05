@@ -31,18 +31,18 @@ import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 
-public class ESCredentialsProvider implements Provider<CredentialsProvider> {
-    private final List<URI> elasticsearchHosts;
+public class OSCredentialsProvider implements Provider<CredentialsProvider> {
+    private final List<URI> openSearchHosts;
     private final String defaultUserForDiscoveredNodes;
     private final String defaultPasswordForDiscoveredNodes;
     private final boolean discoveryEnabled;
 
     @Inject
-    public ESCredentialsProvider(@Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
+    public OSCredentialsProvider(@Named("elasticsearch_hosts") List<URI> openSearchHosts,
                                  @Named("elasticsearch_discovery_default_user") @Nullable String defaultUserForDiscoveredNodes,
                                  @Named("elasticsearch_discovery_default_password") @Nullable String defaultPasswordForDiscoveredNodes,
                                  @Named("elasticsearch_discovery_enabled") boolean discoveryEnabled) {
-        this.elasticsearchHosts = elasticsearchHosts;
+        this.openSearchHosts = openSearchHosts;
         this.defaultUserForDiscoveredNodes = defaultUserForDiscoveredNodes;
         this.defaultPasswordForDiscoveredNodes = defaultPasswordForDiscoveredNodes;
         this.discoveryEnabled = discoveryEnabled;
@@ -51,7 +51,7 @@ public class ESCredentialsProvider implements Provider<CredentialsProvider> {
     @Override
     public CredentialsProvider get() {
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        elasticsearchHosts
+        openSearchHosts
                 .forEach(hostUri -> {
                     if (!Strings.isNullOrEmpty(hostUri.getUserInfo())) {
                         final Iterator<String> splittedUserInfo = Splitter.on(":")

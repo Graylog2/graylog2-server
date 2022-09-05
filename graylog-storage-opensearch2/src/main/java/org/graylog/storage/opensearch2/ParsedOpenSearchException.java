@@ -22,18 +22,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @AutoValue
-public abstract class ParsedElasticsearchException {
+public abstract class ParsedOpenSearchException {
     private static final Pattern exceptionPattern = Pattern
             .compile("(OpenSearchException\\[)?OpenSearch exception \\[type=(?<type>[\\w_]+), (?:reason=(?<reason>.+?)(\\]+;|\\]$))");
 
     public abstract String type();
     public abstract String reason();
 
-    public static ParsedElasticsearchException create(String type, String reason) {
-        return new AutoValue_ParsedElasticsearchException(type, reason);
+    public static ParsedOpenSearchException create(String type, String reason) {
+        return new AutoValue_ParsedOpenSearchException(type, reason);
     }
 
-    public static ParsedElasticsearchException from(String s) {
+    public static ParsedOpenSearchException from(String s) {
         final Matcher matcher = exceptionPattern.matcher(s);
         if (matcher.find()) {
             final String type = matcher.group("type");

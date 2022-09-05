@@ -42,11 +42,11 @@ import java.util.stream.Collectors;
 
 public class QuerySuggestionsES7 implements QuerySuggestionsService {
 
-    private final ElasticsearchClient client;
+    private final OpenSearchClient client;
     private final IndexLookup indexLookup;
 
     @Inject
-    public QuerySuggestionsES7(ElasticsearchClient client, IndexLookup indexLookup) {
+    public QuerySuggestionsES7(OpenSearchClient client, IndexLookup indexLookup) {
         this.client = client;
         this.indexLookup = indexLookup;
     }
@@ -92,7 +92,7 @@ public class QuerySuggestionsES7 implements QuerySuggestionsService {
     private SuggestionError parseException(org.opensearch.OpenSearchException exception) {
         final Throwable cause = getCause(exception);
         try {
-            final ParsedElasticsearchException parsed = ParsedElasticsearchException.from(cause.toString());
+            final ParsedOpenSearchException parsed = ParsedOpenSearchException.from(cause.toString());
             return SuggestionError.create(parsed.type(), parsed.reason());
         } catch (final IllegalArgumentException iae) {
             return SuggestionError.create("Aggregation error", cause.getMessage());

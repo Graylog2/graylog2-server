@@ -41,7 +41,7 @@ public class ScrollResultES7 extends IndexQueryResult implements ScrollResult {
     private static final Logger LOG = LoggerFactory.getLogger(ScrollResult.class);
     private static final TimeValue DEFAULT_SCROLL = TimeValue.timeValueMinutes(1);
 
-    private final ElasticsearchClient client;
+    private final OpenSearchClient client;
     private final long totalHits;
     private final int limit;
     private final String scroll;
@@ -57,7 +57,7 @@ public class ScrollResultES7 extends IndexQueryResult implements ScrollResult {
     }
 
     @AssistedInject
-    public ScrollResultES7(ElasticsearchClient client,
+    public ScrollResultES7(OpenSearchClient client,
                            @Assisted SearchResponse initialResult,
                            @Assisted("query") String query,
                            @Assisted("scroll") String scroll,

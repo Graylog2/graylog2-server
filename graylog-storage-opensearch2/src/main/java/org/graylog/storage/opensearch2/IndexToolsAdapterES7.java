@@ -55,10 +55,10 @@ public class IndexToolsAdapterES7 implements IndexToolsAdapter {
     private static final String AGG_DATE_HISTOGRAM = "source_date_histogram";
     private static final String AGG_MESSAGE_FIELD = "message_field";
     private static final String AGG_FILTER = "message_filter";
-    private final ElasticsearchClient client;
+    private final OpenSearchClient client;
 
     @Inject
-    public IndexToolsAdapterES7(ElasticsearchClient client) {
+    public IndexToolsAdapterES7(OpenSearchClient client) {
         this.client = client;
     }
 
