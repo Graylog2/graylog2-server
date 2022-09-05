@@ -18,9 +18,9 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.search.aggregations.AggregationBuilder;
 import org.opensearch.search.aggregations.AggregationBuilders;
@@ -30,10 +30,10 @@ import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ESMaxHandler extends ESPivotSeriesSpecHandler<Max, org.opensearch.search.aggregations.metrics.Max> {
+public class OSMaxHandler extends OSPivotSeriesSpecHandler<Max, org.opensearch.search.aggregations.metrics.Max> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Max maxSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Max maxSpec, OSPivot searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final MaxAggregationBuilder max = AggregationBuilders.max(name).field(maxSpec.field());
         record(queryContext, pivot, maxSpec, name, org.opensearch.search.aggregations.metrics.Max.class);
         return Optional.of(max);
@@ -44,8 +44,8 @@ public class ESMaxHandler extends ESPivotSeriesSpecHandler<Max, org.opensearch.s
                                         Max pivotSpec,
                                         SearchResponse searchResult,
                                         org.opensearch.search.aggregations.metrics.Max maxAggregation,
-                                        ESPivot searchTypeHandler,
-                                        ESGeneratedQueryContext esGeneratedQueryContext) {
-        return Stream.of(ESPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Max.NAME, maxAggregation.getValue()));
+                                        OSPivot searchTypeHandler,
+                                        OSGeneratedQueryContext OSGeneratedQueryContext) {
+        return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Max.NAME, maxAggregation.getValue()));
     }
 }

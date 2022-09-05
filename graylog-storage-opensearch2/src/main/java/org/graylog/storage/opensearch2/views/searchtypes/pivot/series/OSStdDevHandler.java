@@ -18,9 +18,9 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.search.aggregations.AggregationBuilder;
 import org.opensearch.search.aggregations.AggregationBuilders;
@@ -31,10 +31,10 @@ import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ESStdDevHandler extends ESPivotSeriesSpecHandler<StdDev, ExtendedStats> {
+public class OSStdDevHandler extends OSPivotSeriesSpecHandler<StdDev, ExtendedStats> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, StdDev stddevSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, StdDev stddevSpec, OSPivot searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final ExtendedStatsAggregationBuilder stddev = AggregationBuilders.extendedStats(name).field(stddevSpec.field());
         record(queryContext, pivot, stddevSpec, name, ExtendedStats.class);
         return Optional.of(stddev);
@@ -44,8 +44,8 @@ public class ESStdDevHandler extends ESPivotSeriesSpecHandler<StdDev, ExtendedSt
     public Stream<Value> doHandleResult(Pivot pivot, StdDev pivotSpec,
                                         SearchResponse searchResult,
                                         ExtendedStats stddevAggregation,
-                                        ESPivot searchTypeHandler,
-                                        ESGeneratedQueryContext esGeneratedQueryContext) {
-        return Stream.of(ESPivotSeriesSpecHandler.Value.create(pivotSpec.id(), StdDev.NAME, stddevAggregation.getStdDeviation()));
+                                        OSPivot searchTypeHandler,
+                                        OSGeneratedQueryContext OSGeneratedQueryContext) {
+        return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), StdDev.NAME, stddevAggregation.getStdDeviation()));
     }
 }

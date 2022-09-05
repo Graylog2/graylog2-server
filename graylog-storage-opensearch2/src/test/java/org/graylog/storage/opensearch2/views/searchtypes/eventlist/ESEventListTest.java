@@ -26,8 +26,8 @@ import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.search.aggregations.Aggregations;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.ESEventList;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.OSEventList;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -46,12 +46,12 @@ public class ESEventListTest {
 
     @Test
     public void testSortingOfStreamsInDoExtractResult() {
-        final ESEventList esEventList = new TestESEventList();
+        final OSEventList esEventList = new TestOSEventList();
         final SearchJob searchJob = mock(SearchJob.class);
         final Query query = mock(Query.class);
         final SearchResponse searchResult = mock(SearchResponse.class);
         final Aggregations metricAggregation = mock(Aggregations.class);
-        final ESGeneratedQueryContext queryContext = mock(ESGeneratedQueryContext.class);
+        final OSGeneratedQueryContext queryContext = mock(OSGeneratedQueryContext.class);
 
         final EventList eventList = EventList.builder()
                 .id("search-type-id")
@@ -79,7 +79,7 @@ public class ESEventListTest {
                 .build();
     }
 
-    static class TestESEventList extends ESEventList {
+    static class TestOSEventList extends OSEventList {
         private Map<String, Object> hit(String id, ArrayList<String> streams) {
             return ImmutableMap.of(
                     EventDto.FIELD_ID, id,

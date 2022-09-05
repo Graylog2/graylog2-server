@@ -23,8 +23,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotBucketSpecHandler;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.opensearch.search.aggregations.AggregationBuilder;
 import org.opensearch.search.aggregations.AggregationBuilders;
 import org.opensearch.search.aggregations.BucketOrder;
@@ -37,19 +37,19 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, ParsedDateHistogram> {
+public class OSTimeHandler extends OSPivotBucketSpecHandler<Time, ParsedDateHistogram> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Time timeSpec, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Time timeSpec, OSGeneratedQueryContext OSGeneratedQueryContext, Query query) {
         final DateHistogramInterval dateHistogramInterval = new DateHistogramInterval(timeSpec.interval().toDateInterval(query.effectiveTimeRange(pivot)).toString());
-        final Optional<BucketOrder> ordering = orderForPivot(pivot, timeSpec, esGeneratedQueryContext);
+        final Optional<BucketOrder> ordering = orderForPivot(pivot, timeSpec, OSGeneratedQueryContext);
         final DateHistogramAggregationBuilder builder = AggregationBuilders.dateHistogram(name)
                 .field(timeSpec.field())
                 .order(ordering.orElse(BucketOrder.key(true)))
                 .format("date_time");
 
         setInterval(builder, dateHistogramInterval);
-        record(esGeneratedQueryContext, pivot, timeSpec, name, ParsedDateHistogram.class);
+        record(OSGeneratedQueryContext, pivot, timeSpec, name, ParsedDateHistogram.class);
 
         return Optional.of(builder);
     }
@@ -63,7 +63,7 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, ParsedDateHist
     }
 
 
-    private Optional<BucketOrder> orderForPivot(Pivot pivot, Time timeSpec, ESGeneratedQueryContext esGeneratedQueryContext) {
+    private Optional<BucketOrder> orderForPivot(Pivot pivot, Time timeSpec, OSGeneratedQueryContext OSGeneratedQueryContext) {
         return pivot.sort()
                 .stream()
                 .map(sortSpec -> {
@@ -80,7 +80,7 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, ParsedDateHist
                                     if (seriesSpec.literal().equals("count()")) {
                                         return sortSpec.direction().equals(SortSpec.Direction.Ascending) ? BucketOrder.count(true) : BucketOrder.count(false);
                                     }
-                                    return BucketOrder.aggregation(esGeneratedQueryContext.seriesName(seriesSpec, pivot), sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                                    return BucketOrder.aggregation(OSGeneratedQueryContext.seriesName(seriesSpec, pivot), sortSpec.direction().equals(SortSpec.Direction.Ascending));
                                 })
                                 .orElse(null);
                     }

@@ -40,9 +40,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class ESGeneratedQueryContext implements GeneratedQueryContext {
+public class OSGeneratedQueryContext implements GeneratedQueryContext {
 
-    private final ElasticsearchBackend elasticsearchBackend;
+    private final OpenSearchBackend openSearchBackend;
     private final Map<String, SearchSourceBuilder> searchTypeQueries = Maps.newHashMap();
     private final Map<Object, Object> contextMap = Maps.newHashMap();
     private final UniqueNamer uniqueNamer = new UniqueNamer("agg-");
@@ -54,14 +54,14 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
     private final FieldTypesLookup fieldTypes;
 
     @AssistedInject
-    public ESGeneratedQueryContext(
-            @Assisted ElasticsearchBackend elasticsearchBackend,
+    public OSGeneratedQueryContext(
+            @Assisted OpenSearchBackend openSearchBackend,
             @Assisted SearchSourceBuilder ssb,
             @Assisted SearchJob job,
             @Assisted Query query,
             @Assisted Collection<SearchError> validationErrors,
             FieldTypesLookup fieldTypes) {
-        this.elasticsearchBackend = elasticsearchBackend;
+        this.openSearchBackend = openSearchBackend;
         this.ssb = ssb;
         this.job = job;
         this.query = query;
@@ -70,8 +70,8 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
     }
 
     public interface Factory {
-        ESGeneratedQueryContext create(
-                ElasticsearchBackend elasticsearchBackend,
+        OSGeneratedQueryContext create(
+                OpenSearchBackend openSearchBackend,
                 SearchSourceBuilder ssb,
                 SearchJob job,
                 Query query,
@@ -110,7 +110,7 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
     }
 
     private Optional<QueryBuilder> generateFilterClause(Filter filter) {
-        return elasticsearchBackend.generateFilterClause(filter, job, query);
+        return openSearchBackend.generateFilterClause(filter, job, query);
     }
 
     public String seriesName(SeriesSpec seriesSpec, Pivot pivot) {

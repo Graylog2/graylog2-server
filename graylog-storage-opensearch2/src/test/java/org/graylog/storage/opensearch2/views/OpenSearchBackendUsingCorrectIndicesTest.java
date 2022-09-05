@@ -30,8 +30,8 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
-import org.graylog.storage.opensearch2.views.searchtypes.ESMessageList;
-import org.graylog.storage.opensearch2.views.searchtypes.ESSearchTypeHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.OSMessageList;
+import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTimeUtils;
@@ -62,9 +62,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ElasticsearchBackendUsingCorrectIndicesTest {
-    private static Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = ImmutableMap.of(
-            MessageList.NAME, ESMessageList::new
+public class OpenSearchBackendUsingCorrectIndicesTest {
+    private static Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> handlers = ImmutableMap.of(
+            MessageList.NAME, OSMessageList::new
     );
 
     @Rule
@@ -82,7 +82,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
     private SearchJob job;
     private Query query;
 
-    private ElasticsearchBackend backend;
+    private OpenSearchBackend backend;
 
     @Before
     public void setupSUT() throws Exception {
@@ -92,10 +92,10 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
         when(client.msearch(any(), any())).thenReturn(items);
 
         final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
-        this.backend = new ElasticsearchBackend(handlers,
+        this.backend = new OpenSearchBackend(handlers,
                 client,
                 indexLookup,
-                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
                 false);
     }
@@ -123,7 +123,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
 
     @Test
     public void queryDoesNotFallBackToUsingAllIndicesWhenNoIndexRangesAreReturned() throws Exception {
-        final ESGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
+        final OSGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
         backend.doRun(job, query, context);
 
         verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
@@ -138,7 +138,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
         final long datetimeFixture = 1530194810;
         DateTimeUtils.setCurrentMillisFixed(datetimeFixture);
 
-        final ESGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
+        final OSGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
         backend.doRun(job, query, context);
 
         ArgumentCaptor<TimeRange> captor = ArgumentCaptor.forClass(TimeRange.class);
@@ -174,7 +174,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
                 .build();
         final Search search = dummySearch(query);
         final SearchJob job = new SearchJob("job1", search, "admin");
-        final ESGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
+        final OSGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
 
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("streamId"), RelativeRange.create(600)))
                 .thenReturn(ImmutableSet.of("index1", "index2"));
@@ -195,7 +195,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
                 .build();
         final Search search = dummySearch(query);
         final SearchJob job = new SearchJob("job1", search, "admin");
-        final ESGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
+        final OSGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
 
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1", "stream2"), RelativeRange.create(600)))
                 .thenReturn(ImmutableSet.of("index1", "index2"));

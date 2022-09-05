@@ -28,8 +28,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.ESSearchTypeHandler;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -67,11 +67,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ESPivot implements ESSearchTypeHandler<Pivot> {
-    private static final Logger LOG = LoggerFactory.getLogger(ESPivot.class);
+public class OSPivot implements OSSearchTypeHandler<Pivot> {
+    private static final Logger LOG = LoggerFactory.getLogger(OSPivot.class);
 
-    private final Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers;
-    private final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
+    private final Map<String, OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers;
+    private final Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
     private static final TimeRange ALL_MESSAGES_TIMERANGE = allMessagesTimeRange();
 
     private static TimeRange allMessagesTimeRange() {
@@ -84,14 +84,14 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     }
 
     @Inject
-    public ESPivot(Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers,
-                   Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers) {
+    public OSPivot(Map<String, OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers,
+                   Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers) {
         this.bucketHandlers = bucketHandlers;
         this.seriesHandlers = seriesHandlers;
     }
 
     @Override
-    public void doGenerateQueryPart(SearchJob job, Query query, Pivot pivot, ESGeneratedQueryContext queryContext) {
+    public void doGenerateQueryPart(SearchJob job, Query query, Pivot pivot, OSGeneratedQueryContext queryContext) {
         LOG.debug("Generating aggregation for {}", pivot);
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(pivot);
 
@@ -120,7 +120,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
     private List<AggregationBuilder> doGenerateBucketAggregationsTree(Query query,
                                                                       Pivot pivot,
-                                                                      ESGeneratedQueryContext queryContext) {
+                                                                      OSGeneratedQueryContext queryContext) {
 
         //ordered from low-level to high-level aggregations
         Deque<AggregationBuilder> bucketAggregationChain = new LinkedList<>();
@@ -171,11 +171,11 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                                                                            final String reason,
                                                                            final Query query,
                                                                            Pivot pivot,
-                                                                           ESGeneratedQueryContext queryContext
+                                                                           OSGeneratedQueryContext queryContext
     ) {
         final String name = queryContext.nextName();
         LOG.debug("Creating " + reason + " group aggregation '{}' as {}", bucketSpec.type(), name);
-        final ESPivotBucketSpecHandler<? extends PivotSpec, ? extends Aggregation> handler = bucketHandlers.get(bucketSpec.type());
+        final OSPivotBucketSpecHandler<? extends PivotSpec, ? extends Aggregation> handler = bucketHandlers.get(bucketSpec.type());
         if (handler == null) {
             throw new IllegalArgumentException("Unknown " + reason + "_group type " + bucketSpec.type());
         }
@@ -191,16 +191,16 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         return generatedAggregation;
     }
 
-    private Stream<AggregationBuilder> seriesStream(Pivot pivot, ESGeneratedQueryContext queryContext, String reason) {
+    private Stream<AggregationBuilder> seriesStream(Pivot pivot, OSGeneratedQueryContext queryContext, String reason) {
         return EntryStream.of(pivot.series())
                 .mapKeyValue((integer, seriesSpec) -> {
                     final String seriesName = queryContext.seriesName(seriesSpec, pivot);
                     LOG.debug("Adding {} series '{}' with name '{}'", reason, seriesSpec.type(), seriesName);
-                    final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> esPivotSeriesSpecHandler = seriesHandlers.get(seriesSpec.type());
-                    if (esPivotSeriesSpecHandler == null) {
+                    final OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> OSPivotSeriesSpecHandler = seriesHandlers.get(seriesSpec.type());
+                    if (OSPivotSeriesSpecHandler == null) {
                         throw new IllegalArgumentException("No series handler registered for: " + seriesSpec.type());
                     }
-                    return esPivotSeriesSpecHandler.createAggregation(seriesName, pivot, seriesSpec, this, queryContext);
+                    return OSPivotSeriesSpecHandler.createAggregation(seriesName, pivot, seriesSpec, this, queryContext);
                 })
                 .filter(Optional::isPresent)
                 .map(Optional::get);
@@ -240,7 +240,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     }
 
     @Override
-    public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResponse queryResult, Aggregations aggregations, ESGeneratedQueryContext queryContext) {
+    public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResponse queryResult, Aggregations aggregations, OSGeneratedQueryContext queryContext) {
         final AbsoluteRange effectiveTimerange = extractEffectiveTimeRange(queryResult, query, pivot);
 
         final PivotResult.Builder resultBuilder = PivotResult.builder()
@@ -267,7 +267,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         return InitialBucket.create(queryResult);
     }
 
-    private long extractDocumentCount(SearchResponse queryResult, Pivot pivot, ESGeneratedQueryContext queryContext) {
+    private long extractDocumentCount(SearchResponse queryResult, Pivot pivot, OSGeneratedQueryContext queryContext) {
         return queryResult.getHits().getTotalHits().value;
     }
 
@@ -277,7 +277,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
          */
     private void processRows(PivotResult.Builder resultBuilder,
                              SearchResponse searchResult,
-                             ESGeneratedQueryContext queryContext,
+                             OSGeneratedQueryContext queryContext,
                              Pivot pivot,
                              List<BucketSpec> remainingRows,
                              ArrayDeque<String> rowKeys,
@@ -305,9 +305,9 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
             // this handler should never be missing, because we used it above to generate the query
             // if it is missing for some weird reason, it's ok to fail hard here
-            final ESPivotBucketSpecHandler<? extends PivotSpec, ? extends Aggregation> handler = bucketHandlers.get(currentBucket.type());
+            final OSPivotBucketSpecHandler<? extends PivotSpec, ? extends Aggregation> handler = bucketHandlers.get(currentBucket.type());
             final Aggregation aggregationResult = handler.extractAggregationFromResult(pivot, currentBucket, aggregation, queryContext);
-            final Stream<ESPivotBucketSpecHandler.Bucket> bucketStream = handler.handleResult(currentBucket, aggregationResult);
+            final Stream<OSPivotBucketSpecHandler.Bucket> bucketStream = handler.handleResult(currentBucket, aggregationResult);
             // for each bucket, recurse and eventually collect all the row keys. once we reach a leaf, we'll end up in the other if branch above
             bucketStream.forEach(bucket -> {
                 // push the bucket's key and use its aggregation as the new source for sub-aggregations
@@ -334,7 +334,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
     private void processColumns(PivotResult.Row.Builder rowBuilder,
                                 SearchResponse searchResult,
-                                ESGeneratedQueryContext queryContext,
+                                OSGeneratedQueryContext queryContext,
                                 Pivot pivot,
                                 List<BucketSpec> remainingColumns,
                                 ArrayDeque<String> columnKeys,
@@ -355,9 +355,9 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
             // this handler should never be missing, because we used it above to generate the query
             // if it is missing for some weird reason, it's ok to fail hard here
-            final ESPivotBucketSpecHandler<? extends PivotSpec, ? extends Aggregation> handler = bucketHandlers.get(currentBucket.type());
+            final OSPivotBucketSpecHandler<? extends PivotSpec, ? extends Aggregation> handler = bucketHandlers.get(currentBucket.type());
             final Aggregation aggregationResult = handler.extractAggregationFromResult(pivot, currentBucket, aggregation, queryContext);
-            final Stream<ESPivotBucketSpecHandler.Bucket> bucketStream = handler.handleResult(currentBucket, aggregationResult);
+            final Stream<OSPivotBucketSpecHandler.Bucket> bucketStream = handler.handleResult(currentBucket, aggregationResult);
 
             // for each bucket, recurse and eventually collect all the column keys. once we reach a leaf, we'll end up in the other if branch above
             bucketStream.forEach(bucket -> {
@@ -384,14 +384,14 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
     private void processSeries(PivotResult.Row.Builder rowBuilder,
                                SearchResponse searchResult,
-                               ESGeneratedQueryContext queryContext,
+                               OSGeneratedQueryContext queryContext,
                                Pivot pivot,
                                ArrayDeque<String> columnKeys,
                                HasAggregations aggregation,
                                boolean rollup,
                                String source) {
         pivot.series().forEach(seriesSpec -> {
-            final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler = seriesHandlers.get(seriesSpec.type());
+            final OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler = seriesHandlers.get(seriesSpec.type());
             final Aggregation series = seriesHandler.extractAggregationFromResult(pivot, seriesSpec, aggregation, queryContext);
             seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, this, queryContext)
                     .map(value -> {

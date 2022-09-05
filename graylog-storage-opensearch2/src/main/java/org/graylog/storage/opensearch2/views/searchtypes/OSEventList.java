@@ -21,7 +21,7 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.search.SearchHit;
 import org.opensearch.search.aggregations.Aggregations;
@@ -32,10 +32,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class ESEventList implements ESSearchTypeHandler<EventList> {
+public class OSEventList implements OSSearchTypeHandler<EventList> {
     @Override
     public void doGenerateQueryPart(SearchJob job, Query query, EventList eventList,
-                                    ESGeneratedQueryContext queryContext) {
+                                    OSGeneratedQueryContext queryContext) {
         queryContext.searchSourceBuilder(eventList)
                 .size(10000);
     }
@@ -48,7 +48,7 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
 
     @Override
     public SearchType.Result doExtractResult(SearchJob job, Query query, EventList searchType, SearchResponse result,
-                                             Aggregations aggregations, ESGeneratedQueryContext queryContext) {
+                                             Aggregations aggregations, OSGeneratedQueryContext queryContext) {
         final Set<String> effectiveStreams = searchType.streams().isEmpty()
                 ? query.usedStreamIds()
                 : searchType.streams();

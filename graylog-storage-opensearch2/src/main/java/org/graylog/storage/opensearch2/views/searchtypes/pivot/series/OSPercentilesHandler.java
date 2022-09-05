@@ -18,9 +18,9 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.search.aggregations.AggregationBuilder;
 import org.opensearch.search.aggregations.AggregationBuilders;
@@ -31,10 +31,10 @@ import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ESPercentilesHandler extends ESPivotSeriesSpecHandler<Percentile, Percentiles> {
+public class OSPercentilesHandler extends OSPivotSeriesSpecHandler<Percentile, Percentiles> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Percentile percentileSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Percentile percentileSpec, OSPivot searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final PercentilesAggregationBuilder percentiles = AggregationBuilders.percentiles(name).field(percentileSpec.field()).percentiles(percentileSpec.percentile());
         record(queryContext, pivot, percentileSpec, name, Percentiles.class);
         return Optional.of(percentiles);
@@ -45,9 +45,9 @@ public class ESPercentilesHandler extends ESPivotSeriesSpecHandler<Percentile, P
                                         Percentile pivotSpec,
                                         SearchResponse searchResult,
                                         Percentiles percentilesAggregation,
-                                        ESPivot searchTypeHandler,
-                                        ESGeneratedQueryContext queryContext) {
+                                        OSPivot searchTypeHandler,
+                                        OSGeneratedQueryContext queryContext) {
         Double percentile = percentilesAggregation.percentile(pivotSpec.percentile());
-        return Stream.of(ESPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Percentile.NAME, percentile));
+        return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Percentile.NAME, percentile));
     }
 }

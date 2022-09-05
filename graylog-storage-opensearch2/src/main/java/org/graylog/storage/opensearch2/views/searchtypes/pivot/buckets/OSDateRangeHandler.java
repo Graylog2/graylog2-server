@@ -19,8 +19,8 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotBucketSpecHandler;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.joda.time.base.AbstractDateTime;
 import org.opensearch.search.aggregations.AggregationBuilder;
 import org.opensearch.search.aggregations.AggregationBuilders;
@@ -31,10 +31,10 @@ import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket, ParsedDateRange> {
+public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket, ParsedDateRange> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, DateRangeBucket dateRangeBucket, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, DateRangeBucket dateRangeBucket, OSGeneratedQueryContext OSGeneratedQueryContext, Query query) {
         final DateRangeAggregationBuilder builder = AggregationBuilders.dateRange(name).field(dateRangeBucket.field());
         dateRangeBucket.ranges().forEach(r -> {
             final String from = r.from().map(AbstractDateTime::toString).orElse(null);
@@ -49,7 +49,7 @@ public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket
         });
         builder.format("date_time");
         builder.keyed(false);
-        record(esGeneratedQueryContext, pivot, dateRangeBucket, name, ParsedDateRange.class);
+        record(OSGeneratedQueryContext, pivot, dateRangeBucket, name, ParsedDateRange.class);
 
         return Optional.of(builder);
     }

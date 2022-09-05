@@ -18,9 +18,9 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Cardinality;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.search.aggregations.AggregationBuilder;
 import org.opensearch.search.aggregations.AggregationBuilders;
@@ -30,10 +30,10 @@ import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ESCardinalityHandler extends ESPivotSeriesSpecHandler<Cardinality, org.opensearch.search.aggregations.metrics.Cardinality> {
+public class OSCardinalityHandler extends OSPivotSeriesSpecHandler<Cardinality, org.opensearch.search.aggregations.metrics.Cardinality> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Cardinality cardinalitySpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Cardinality cardinalitySpec, OSPivot searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final CardinalityAggregationBuilder card = AggregationBuilders.cardinality(name).field(cardinalitySpec.field());
         record(queryContext, pivot, cardinalitySpec, name, org.opensearch.search.aggregations.metrics.Cardinality.class);
         return Optional.of(card);
@@ -43,8 +43,8 @@ public class ESCardinalityHandler extends ESPivotSeriesSpecHandler<Cardinality, 
     public Stream<Value> doHandleResult(Pivot pivot, Cardinality pivotSpec,
                                         SearchResponse searchResult,
                                         org.opensearch.search.aggregations.metrics.Cardinality cardinalityAggregation,
-                                        ESPivot searchTypeHandler,
-                                        ESGeneratedQueryContext esGeneratedQueryContext) {
-        return Stream.of(ESPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Cardinality.NAME, cardinalityAggregation.getValue()));
+                                        OSPivot searchTypeHandler,
+                                        OSGeneratedQueryContext OSGeneratedQueryContext) {
+        return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Cardinality.NAME, cardinalityAggregation.getValue()));
     }
 }

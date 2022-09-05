@@ -56,15 +56,15 @@ import static org.opensearch.index.query.QueryBuilders.termsQuery;
 import static org.opensearch.index.query.QueryBuilders.boolQuery;
 
 @SuppressWarnings("rawtypes")
-public class ElasticsearchExportBackend implements ExportBackend {
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchExportBackend.class);
+public class OpenSearchExportBackend implements ExportBackend {
+    private static final Logger LOG = LoggerFactory.getLogger(OpenSearchExportBackend.class);
 
     private final IndexLookup indexLookup;
     private final RequestStrategy requestStrategy;
     private final boolean allowLeadingWildcard;
 
     @Inject
-    public ElasticsearchExportBackend(IndexLookup indexLookup, RequestStrategy requestStrategy, @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
+    public OpenSearchExportBackend(IndexLookup indexLookup, RequestStrategy requestStrategy, @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.indexLookup = indexLookup;
         this.requestStrategy = requestStrategy;
         this.allowLeadingWildcard = allowLeadingWildcard;

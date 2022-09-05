@@ -32,8 +32,8 @@ import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSea
 import org.graylog.plugins.views.search.searchfilters.model.ReferencedQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
-import org.graylog.storage.opensearch2.views.searchtypes.ESMessageList;
-import org.graylog.storage.opensearch2.views.searchtypes.ESSearchTypeHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.OSMessageList;
+import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,22 +52,22 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-public class ElasticsearchBackendTest {
-    private ElasticsearchBackend backend;
+public class OpenSearchBackendTest {
+    private OpenSearchBackend backend;
     private UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
 
     @Before
     public void setup() {
-        Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
-        handlers.put(MessageList.NAME, ESMessageList::new);
+        Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
+        handlers.put(MessageList.NAME, OSMessageList::new);
 
         usedSearchFiltersToQueryStringsMapper = mock(UsedSearchFiltersToQueryStringsMapper.class);
         doReturn(Collections.emptySet()).when(usedSearchFiltersToQueryStringsMapper).map(any());
         final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
-        backend = new ElasticsearchBackend(handlers,
+        backend = new OpenSearchBackend(handlers,
                 null,
                 mock(IndexLookup.class),
-                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
                 usedSearchFiltersToQueryStringsMapper,
                 false);
     }
@@ -95,7 +95,7 @@ public class ElasticsearchBackendTest {
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
         final SearchJob job = new SearchJob("deadbeef", search, "admin");
 
-        final ESGeneratedQueryContext queryContext = mock(ESGeneratedQueryContext.class);
+        final OSGeneratedQueryContext queryContext = mock(OSGeneratedQueryContext.class);
 
         final QueryResult queryResult = backend.doRun(job, query, queryContext);
 
@@ -122,7 +122,7 @@ public class ElasticsearchBackendTest {
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
         final SearchJob job = new SearchJob("deadbeef", search, "admin");
 
-        final ESGeneratedQueryContext queryContext = backend.generate(job, query, Collections.emptySet());
+        final OSGeneratedQueryContext queryContext = backend.generate(job, query, Collections.emptySet());
         final QueryBuilder esQuery = queryContext.searchSourceBuilder(new SearchType.Fallback()).query();
         assertThat(esQuery)
                 .isNotNull()

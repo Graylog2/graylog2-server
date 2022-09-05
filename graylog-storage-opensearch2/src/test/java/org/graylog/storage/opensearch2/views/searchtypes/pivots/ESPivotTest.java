@@ -33,13 +33,13 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotBucketSpecHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.ESTimeHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.ESValuesHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.ESCountHandler;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSTimeHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSValuesHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSCountHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -95,17 +95,17 @@ public class ESPivotTest {
     @Mock
     private Aggregations aggregations;
     @Mock
-    private ESGeneratedQueryContext queryContext;
+    private OSGeneratedQueryContext queryContext;
 
-    private ESPivot esPivot;
-    private Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers;
-    private Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
+    private OSPivot esPivot;
+    private Map<String, OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers;
+    private Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
 
     @Before
     public void setUp() throws Exception {
         bucketHandlers = new HashMap<>();
         seriesHandlers = new HashMap<>();
-        this.esPivot = new ESPivot(bucketHandlers, seriesHandlers);
+        this.esPivot = new OSPivot(bucketHandlers, seriesHandlers);
         when(pivot.id()).thenReturn("dummypivot");
     }
 
@@ -150,7 +150,7 @@ public class ESPivotTest {
     @Test
     public void generatesQueryWhenOnlyColumnPivotsArePresent() {
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        final ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> bucketHandler = mock(ESValuesHandler.class);
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> bucketHandler = mock(OSValuesHandler.class);
 
         bucketHandlers.put(Values.NAME, bucketHandler);
 
@@ -164,7 +164,7 @@ public class ESPivotTest {
         verify(bucketHandler, times(1)).createAggregation(eq("agg-1"), eq(pivot), eq(values), eq(queryContext), eq(query));
     }
 
-    private void mockBucketSpecGeneratesComparableString(ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> bucketHandler) {
+    private void mockBucketSpecGeneratesComparableString(OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> bucketHandler) {
         when(bucketHandler.createAggregation(any(), any(), any(), any(), any()))
                 .thenAnswer(invocation -> Optional.of(AggregationBuilders.filter(invocation.getArgument(0), QueryBuilders.existsQuery(invocation.getArgument(2).toString()))));
     }
@@ -172,9 +172,9 @@ public class ESPivotTest {
     @Test
     public void columnPivotsShouldBeNested() {
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        final ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> valuesBucketHandler = mock(ESValuesHandler.class);
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> valuesBucketHandler = mock(OSValuesHandler.class);
         mockBucketSpecGeneratesComparableString(valuesBucketHandler);
-        final ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> timeBucketHandler = mock(ESTimeHandler.class);
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> timeBucketHandler = mock(OSTimeHandler.class);
         mockBucketSpecGeneratesComparableString(timeBucketHandler);
 
         bucketHandlers.put(Values.NAME, valuesBucketHandler);
@@ -202,9 +202,9 @@ public class ESPivotTest {
     @Test
     public void rowPivotsShouldBeNested() {
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        final ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> valuesBucketHandler = mock(ESValuesHandler.class);
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> valuesBucketHandler = mock(OSValuesHandler.class);
         mockBucketSpecGeneratesComparableString(valuesBucketHandler);
-        final ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> timeBucketHandler = mock(ESTimeHandler.class);
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> timeBucketHandler = mock(OSTimeHandler.class);
         mockBucketSpecGeneratesComparableString(timeBucketHandler);
 
         bucketHandlers.put(Values.NAME, valuesBucketHandler);
@@ -232,9 +232,9 @@ public class ESPivotTest {
     @Test
     public void mixedPivotsShouldBeNested() {
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        final ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> valuesBucketHandler = mock(ESValuesHandler.class);
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> valuesBucketHandler = mock(OSValuesHandler.class);
         mockBucketSpecGeneratesComparableString(valuesBucketHandler);
-        final ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> timeBucketHandler = mock(ESTimeHandler.class);
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> timeBucketHandler = mock(OSTimeHandler.class);
         mockBucketSpecGeneratesComparableString(timeBucketHandler);
 
         bucketHandlers.put(Values.NAME, valuesBucketHandler);
@@ -260,7 +260,7 @@ public class ESPivotTest {
                 .isEqualTo("Values{type=values, field=action, limit=10}");
     }
 
-    private void mockSeriesSpecGeneratesComparableString(ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler) {
+    private void mockSeriesSpecGeneratesComparableString(OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler) {
         when(seriesHandler.createAggregation(any(), any(), any(), any(), any()))
                 .thenAnswer(invocation -> Optional.of(AggregationBuilders.filter(invocation.getArgument(0), QueryBuilders.existsQuery(invocation.getArgument(2).toString()))));
     }
@@ -268,11 +268,11 @@ public class ESPivotTest {
     @Test
     public void mixedPivotsAndSeriesShouldBeNested() {
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        final ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> valuesBucketHandler = mock(ESValuesHandler.class);
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> valuesBucketHandler = mock(OSValuesHandler.class);
         mockBucketSpecGeneratesComparableString(valuesBucketHandler);
-        final ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> timeBucketHandler = mock(ESTimeHandler.class);
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> timeBucketHandler = mock(OSTimeHandler.class);
         mockBucketSpecGeneratesComparableString(timeBucketHandler);
-        final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> countHandler = mock(ESCountHandler.class);
+        final OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> countHandler = mock(OSCountHandler.class);
         mockSeriesSpecGeneratesComparableString(countHandler);
 
         bucketHandlers.put(Values.NAME, valuesBucketHandler);
@@ -323,7 +323,7 @@ public class ESPivotTest {
 
     @Test
     public void includesCustomNameinResultIfPresent() throws InvalidRangeParametersException {
-        final ESPivot esPivot = new ESPivot(Collections.emptyMap(), Collections.emptyMap());
+        final OSPivot esPivot = new OSPivot(Collections.emptyMap(), Collections.emptyMap());
         final Pivot pivot = Pivot.builder()
                 .id("somePivotId")
                 .name("customPivot")

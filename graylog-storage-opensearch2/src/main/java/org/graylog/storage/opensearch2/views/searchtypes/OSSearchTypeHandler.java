@@ -20,24 +20,24 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.SearchTypeHandler;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.search.aggregations.Aggregations;
 
 /**
- * Signature of search type handlers the elasticsearch backend takes.
- * All of these take a {@link ESGeneratedQueryContext} as input.
+ * Signature of search type handlers the OpenSearch backend takes.
+ * All of these take a {@link OSGeneratedQueryContext} as input.
  *
  * @param <S> the {@link SearchType SearchType} this handler deals with
  */
-public interface ESSearchTypeHandler<S extends SearchType> extends SearchTypeHandler<S, ESGeneratedQueryContext, SearchResponse> {
+public interface OSSearchTypeHandler<S extends SearchType> extends SearchTypeHandler<S, OSGeneratedQueryContext, SearchResponse> {
     @Override
-    default SearchType.Result doExtractResultImpl(SearchJob job, Query query, S searchType, SearchResponse queryResult, ESGeneratedQueryContext queryContext) {
+    default SearchType.Result doExtractResultImpl(SearchJob job, Query query, S searchType, SearchResponse queryResult, OSGeneratedQueryContext queryContext) {
         // if the search type was filtered, extract the sub-aggregation before passing it to the handler
         // this way we don't have to duplicate this step everywhere
         final Aggregations aggregations = queryResult.getAggregations();
         return doExtractResult(job, query, searchType, queryResult, aggregations, queryContext);
     }
 
-    SearchType.Result doExtractResult(SearchJob job, Query query, S searchType, SearchResponse queryResult, Aggregations aggregations, ESGeneratedQueryContext queryContext);
+    SearchType.Result doExtractResult(SearchJob job, Query query, S searchType, SearchResponse queryResult, Aggregations aggregations, OSGeneratedQueryContext queryContext);
 }

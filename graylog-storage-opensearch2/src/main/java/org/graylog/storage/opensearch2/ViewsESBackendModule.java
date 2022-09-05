@@ -46,30 +46,30 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.ElasticsearchBackend;
-import org.graylog.storage.opensearch2.views.export.ElasticsearchExportBackend;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.OpenSearchBackend;
+import org.graylog.storage.opensearch2.views.export.OpenSearchExportBackend;
 import org.graylog.storage.opensearch2.views.export.RequestStrategy;
-import org.graylog.storage.opensearch2.views.searchtypes.ESEventList;
-import org.graylog.storage.opensearch2.views.searchtypes.ESMessageList;
-import org.graylog.storage.opensearch2.views.searchtypes.ESSearchTypeHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotBucketSpecHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.ESDateRangeHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.ESTimeHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.ESValuesHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.ESAverageHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.ESCardinalityHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.ESCountHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.ESLatestHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.ESMaxHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.ESMinHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.ESPercentilesHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.ESStdDevHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.ESSumHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.ESSumOfSquaresHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.ESVarianceHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.OSEventList;
+import org.graylog.storage.opensearch2.views.searchtypes.OSMessageList;
+import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSDateRangeHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSTimeHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSValuesHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSAverageHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSCardinalityHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSCountHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSLatestHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSMaxHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSMinHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSPercentilesHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSStdDevHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSSumHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSSumOfSquaresHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSVarianceHandler;
 import org.graylog.storage.opensearch2.views.export.SearchAfter;
 import org.graylog2.storage.SearchVersion;
 import org.opensearch.search.aggregations.Aggregation;
@@ -83,32 +83,32 @@ public class ViewsESBackendModule extends ViewsModule {
 
     @Override
     protected void configure() {
-        install(new FactoryModuleBuilder().build(ESGeneratedQueryContext.Factory.class));
+        install(new FactoryModuleBuilder().build(OSGeneratedQueryContext.Factory.class));
 
         bindForVersion(supportedSearchVersion, new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {})
-                .to(ElasticsearchBackend.class);
+                .to(OpenSearchBackend.class);
 
-        registerESSearchTypeHandler(MessageList.NAME, ESMessageList.class);
-        registerESSearchTypeHandler(EventList.NAME, ESEventList.class);
-        registerESSearchTypeHandler(Pivot.NAME, ESPivot.class).in(Scopes.SINGLETON);
+        registerESSearchTypeHandler(MessageList.NAME, OSMessageList.class);
+        registerESSearchTypeHandler(EventList.NAME, OSEventList.class);
+        registerESSearchTypeHandler(Pivot.NAME, OSPivot.class).in(Scopes.SINGLETON);
 
-        registerPivotSeriesHandler(Average.NAME, ESAverageHandler.class);
-        registerPivotSeriesHandler(Cardinality.NAME, ESCardinalityHandler.class);
-        registerPivotSeriesHandler(Count.NAME, ESCountHandler.class);
-        registerPivotSeriesHandler(Max.NAME, ESMaxHandler.class);
-        registerPivotSeriesHandler(Min.NAME, ESMinHandler.class);
-        registerPivotSeriesHandler(StdDev.NAME, ESStdDevHandler.class);
-        registerPivotSeriesHandler(Sum.NAME, ESSumHandler.class);
-        registerPivotSeriesHandler(SumOfSquares.NAME, ESSumOfSquaresHandler.class);
-        registerPivotSeriesHandler(Variance.NAME, ESVarianceHandler.class);
-        registerPivotSeriesHandler(Percentile.NAME, ESPercentilesHandler.class);
-        registerPivotSeriesHandler(Latest.NAME, ESLatestHandler.class);
+        registerPivotSeriesHandler(Average.NAME, OSAverageHandler.class);
+        registerPivotSeriesHandler(Cardinality.NAME, OSCardinalityHandler.class);
+        registerPivotSeriesHandler(Count.NAME, OSCountHandler.class);
+        registerPivotSeriesHandler(Max.NAME, OSMaxHandler.class);
+        registerPivotSeriesHandler(Min.NAME, OSMinHandler.class);
+        registerPivotSeriesHandler(StdDev.NAME, OSStdDevHandler.class);
+        registerPivotSeriesHandler(Sum.NAME, OSSumHandler.class);
+        registerPivotSeriesHandler(SumOfSquares.NAME, OSSumOfSquaresHandler.class);
+        registerPivotSeriesHandler(Variance.NAME, OSVarianceHandler.class);
+        registerPivotSeriesHandler(Percentile.NAME, OSPercentilesHandler.class);
+        registerPivotSeriesHandler(Latest.NAME, OSLatestHandler.class);
 
-        registerPivotBucketHandler(Values.NAME, ESValuesHandler.class);
-        registerPivotBucketHandler(Time.NAME, ESTimeHandler.class);
-        registerPivotBucketHandler(DateRangeBucket.NAME, ESDateRangeHandler.class);
+        registerPivotBucketHandler(Values.NAME, OSValuesHandler.class);
+        registerPivotBucketHandler(Time.NAME, OSTimeHandler.class);
+        registerPivotBucketHandler(DateRangeBucket.NAME, OSDateRangeHandler.class);
 
-        bindExportBackend().to(ElasticsearchExportBackend.class);
+        bindExportBackend().to(OpenSearchExportBackend.class);
         bindRequestStrategy().to(SearchAfter.class);
     }
 
@@ -120,41 +120,41 @@ public class ViewsESBackendModule extends ViewsModule {
         return bindExportBackend(supportedSearchVersion);
     }
 
-    private MapBinder<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> pivotBucketHandlerBinder() {
+    private MapBinder<String, OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> pivotBucketHandlerBinder() {
         return MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
-                new TypeLiteral<ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>>() {});
+                new TypeLiteral<OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>>() {});
 
     }
 
     private void registerPivotBucketHandler(
             String name,
-            Class<? extends ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> implementation
+            Class<? extends OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> implementation
     ) {
         pivotBucketHandlerBinder().addBinding(name).to(implementation);
     }
 
-    protected MapBinder<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> pivotSeriesHandlerBinder() {
+    protected MapBinder<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> pivotSeriesHandlerBinder() {
         return MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
-                new TypeLiteral<ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>>() {});
+                new TypeLiteral<OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>>() {});
 
     }
 
     private void registerPivotSeriesHandler(
             String name,
-            Class<? extends ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> implementation
+            Class<? extends OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> implementation
     ) {
         pivotSeriesHandlerBinder().addBinding(name).to(implementation);
     }
 
-    private MapBinder<String, ESSearchTypeHandler<? extends SearchType>> esSearchTypeHandlerBinder() {
+    private MapBinder<String, OSSearchTypeHandler<? extends SearchType>> esSearchTypeHandlerBinder() {
         return MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
-                new TypeLiteral<ESSearchTypeHandler<? extends SearchType>>() {});
+                new TypeLiteral<OSSearchTypeHandler<? extends SearchType>>() {});
     }
 
-    private ScopedBindingBuilder registerESSearchTypeHandler(String name, Class<? extends ESSearchTypeHandler<? extends SearchType>> implementation) {
+    private ScopedBindingBuilder registerESSearchTypeHandler(String name, Class<? extends OSSearchTypeHandler<? extends SearchType>> implementation) {
         return esSearchTypeHandlerBinder().addBinding(name).to(implementation);
     }
 }

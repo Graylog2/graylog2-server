@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
 public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
 
     private IndexLookup indexLookup;
-    private ElasticsearchExportBackend sut;
+    private OpenSearchExportBackend sut;
 
     @Rule
     public final OpensearchInstance elasticsearch = OpensearchInstance.create();
@@ -63,7 +63,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     public void setUp() {
         indexLookup = mock(IndexLookup.class);
 
-        sut = new ElasticsearchExportBackend(indexLookup, requestStrategy(), false);
+        sut = new OpenSearchExportBackend(indexLookup, requestStrategy(), false);
     }
 
     private RequestStrategy requestStrategy() {

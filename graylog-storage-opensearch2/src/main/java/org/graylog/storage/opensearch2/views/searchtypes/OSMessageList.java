@@ -24,7 +24,7 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -55,26 +55,26 @@ import java.util.stream.StreamSupport;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
-public class ESMessageList implements ESSearchTypeHandler<MessageList> {
+public class OSMessageList implements OSSearchTypeHandler<MessageList> {
     private final LegacyDecoratorProcessor decoratorProcessor;
     private final boolean allowHighlighting;
 
     @Inject
-    public ESMessageList(LegacyDecoratorProcessor decoratorProcessor,
+    public OSMessageList(LegacyDecoratorProcessor decoratorProcessor,
                          @Named("allow_highlighting") boolean allowHighlighting) {
         this.decoratorProcessor = decoratorProcessor;
         this.allowHighlighting = allowHighlighting;
     }
 
     @VisibleForTesting
-    public ESMessageList() {
+    public OSMessageList() {
         this(new LegacyDecoratorProcessor.Fake(), false);
     }
 
     private static ResultMessage resultMessageFromSearchHit(SearchHit hit) {
         final Map<String, List<String>> highlights = hit.getHighlightFields().entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, ESMessageList::highlightsFromFragments));
+                .collect(Collectors.toMap(Map.Entry::getKey, OSMessageList::highlightsFromFragments));
         return ResultMessage.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap(), highlights);
     }
 
@@ -85,7 +85,7 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     }
 
     @Override
-    public void doGenerateQueryPart(SearchJob job, Query query, MessageList messageList, ESGeneratedQueryContext queryContext) {
+    public void doGenerateQueryPart(SearchJob job, Query query, MessageList messageList, OSGeneratedQueryContext queryContext) {
 
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(messageList)
                 .size(messageList.limit())
@@ -136,9 +136,9 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     }
 
     @Override
-    public SearchType.Result doExtractResult(SearchJob job, Query query, MessageList searchType, org.opensearch.action.search.SearchResponse result, Aggregations aggregations, ESGeneratedQueryContext queryContext) {
+    public SearchType.Result doExtractResult(SearchJob job, Query query, MessageList searchType, org.opensearch.action.search.SearchResponse result, Aggregations aggregations, OSGeneratedQueryContext queryContext) {
         final List<ResultMessageSummary> messages = StreamSupport.stream(result.getHits().spliterator(), false)
-                .map(ESMessageList::resultMessageFromSearchHit)
+                .map(OSMessageList::resultMessageFromSearchHit)
                 .map((resultMessage) -> ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex()))
                 .collect(Collectors.toList());
 

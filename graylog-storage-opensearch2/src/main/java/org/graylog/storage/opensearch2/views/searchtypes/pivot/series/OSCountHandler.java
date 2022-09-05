@@ -19,9 +19,9 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.jooq.lambda.tuple.Tuple2;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.common.xcontent.XContentBuilder;
@@ -42,12 +42,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> {
-    private static final Logger LOG = LoggerFactory.getLogger(ESCountHandler.class);
+public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> {
+    private static final Logger LOG = LoggerFactory.getLogger(OSCountHandler.class);
 
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Count count, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Count count, OSPivot searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final String field = count.field();
         if (field == null) {
             // doc_count is always present in elasticsearch's bucket aggregations, no need to add it
@@ -65,8 +65,8 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
                                         Count count,
                                         SearchResponse searchResult,
                                         ValueCount valueCount,
-                                        ESPivot searchTypeHandler,
-                                        ESGeneratedQueryContext esGeneratedQueryContext) {
+                                        OSPivot searchTypeHandler,
+                                        OSGeneratedQueryContext OSGeneratedQueryContext) {
         final Object value;
         if (valueCount == null) {
             LOG.error("Unexpected null aggregation result, returning 0 for the count. This is a bug.");
@@ -82,7 +82,7 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
     }
 
     @Override
-    protected Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, ESGeneratedQueryContext queryContext) {
+    protected Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, OSGeneratedQueryContext queryContext) {
         final Tuple2<String, Class<? extends Aggregation>> objects = aggTypes(queryContext, pivot).getTypes(spec);
         if (objects == null) {
             if (aggregations instanceof MultiBucketsAggregation.Bucket) {

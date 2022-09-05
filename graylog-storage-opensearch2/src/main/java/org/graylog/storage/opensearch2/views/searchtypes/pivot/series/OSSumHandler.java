@@ -18,9 +18,9 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.search.aggregations.AggregationBuilder;
 import org.opensearch.search.aggregations.AggregationBuilders;
@@ -30,10 +30,10 @@ import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ESSumHandler extends ESPivotSeriesSpecHandler<Sum, org.opensearch.search.aggregations.metrics.Sum> {
+public class OSSumHandler extends OSPivotSeriesSpecHandler<Sum, org.opensearch.search.aggregations.metrics.Sum> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Sum sumSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Sum sumSpec, OSPivot searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final SumAggregationBuilder sum = AggregationBuilders.sum(name).field(sumSpec.field());
         record(queryContext, pivot, sumSpec, name, org.opensearch.search.aggregations.metrics.Sum.class);
         return Optional.of(sum);
@@ -43,8 +43,8 @@ public class ESSumHandler extends ESPivotSeriesSpecHandler<Sum, org.opensearch.s
     public Stream<Value> doHandleResult(Pivot pivot, Sum pivotSpec,
                                         SearchResponse searchResult,
                                         org.opensearch.search.aggregations.metrics.Sum sumAggregation,
-                                        ESPivot searchTypeHandler,
-                                        ESGeneratedQueryContext esGeneratedQueryContext) {
+                                        OSPivot searchTypeHandler,
+                                        OSGeneratedQueryContext OSGeneratedQueryContext) {
         return Stream.of(Value.create(pivotSpec.id(), Sum.NAME, sumAggregation.getValue()));
     }
 }

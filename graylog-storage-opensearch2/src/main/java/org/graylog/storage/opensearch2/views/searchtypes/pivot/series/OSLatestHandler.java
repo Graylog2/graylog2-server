@@ -18,9 +18,9 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.search.SearchHit;
 import org.opensearch.search.SearchHits;
@@ -35,10 +35,10 @@ import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ESLatestHandler extends ESPivotSeriesSpecHandler<Latest, TopHits> {
+public class OSLatestHandler extends OSPivotSeriesSpecHandler<Latest, TopHits> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Latest latestSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Latest latestSpec, OSPivot searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final TopHitsAggregationBuilder latest = AggregationBuilders.topHits(name).size(1).sort(SortBuilders.fieldSort("timestamp").order(SortOrder.DESC));
         record(queryContext, pivot, latestSpec, name, TopHits.class);
         return Optional.of(latest);
@@ -49,8 +49,8 @@ public class ESLatestHandler extends ESPivotSeriesSpecHandler<Latest, TopHits> {
                                         Latest pivotSpec,
                                         SearchResponse searchResult,
                                         TopHits latestAggregation,
-                                        ESPivot searchTypeHandler,
-                                        ESGeneratedQueryContext esGeneratedQueryContext) {
+                                        OSPivot searchTypeHandler,
+                                        OSGeneratedQueryContext OSGeneratedQueryContext) {
         final Optional<Value> latestValue = Optional.ofNullable(latestAggregation.getHits())
                 .map(SearchHits::getHits)
                 .map(hits -> hits[0])

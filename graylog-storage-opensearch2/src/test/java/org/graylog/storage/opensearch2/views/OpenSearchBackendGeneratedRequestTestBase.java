@@ -31,12 +31,12 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.graylog.storage.opensearch2.views.searchtypes.ESSearchTypeHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotBucketSpecHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.ESAverageHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.ESMaxHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSAverageHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSMaxHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -62,11 +62,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class ElasticsearchBackendGeneratedRequestTestBase {
+public class OpenSearchBackendGeneratedRequestTestBase {
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
-    ElasticsearchBackend elasticsearchBackend;
+    OpenSearchBackend openSearchBackend;
 
     @Mock
     protected OpenSearchClient client;
@@ -77,7 +77,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase {
     @Mock
     protected FieldTypesLookup fieldTypesLookup;
 
-    protected Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticSearchTypeHandlers;
+    protected Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> elasticSearchTypeHandlers;
 
     @Captor
     protected ArgumentCaptor<List<SearchRequest>> clientRequestCaptor;
@@ -85,16 +85,16 @@ public class ElasticsearchBackendGeneratedRequestTestBase {
     @Before
     public void setUpSUT() {
         this.elasticSearchTypeHandlers = new HashMap<>();
-        final Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers = Collections.emptyMap();
-        final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers = new HashMap<>();
-        seriesHandlers.put(Average.NAME, new ESAverageHandler());
-        seriesHandlers.put(Max.NAME, new ESMaxHandler());
-        elasticSearchTypeHandlers.put(Pivot.NAME, () -> new ESPivot(bucketHandlers, seriesHandlers));
+        final Map<String, OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers = Collections.emptyMap();
+        final Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers = new HashMap<>();
+        seriesHandlers.put(Average.NAME, new OSAverageHandler());
+        seriesHandlers.put(Max.NAME, new OSMaxHandler());
+        elasticSearchTypeHandlers.put(Pivot.NAME, () -> new OSPivot(bucketHandlers, seriesHandlers));
 
-        this.elasticsearchBackend = new ElasticsearchBackend(elasticSearchTypeHandlers,
+        this.openSearchBackend = new OpenSearchBackend(elasticSearchTypeHandlers,
                 client,
                 indexLookup,
-                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
                 usedSearchFilters -> usedSearchFilters.stream()
                         .filter(sf -> sf instanceof InlineQueryStringSearchFilter)
                         .map(inlineSf -> ((InlineQueryStringSearchFilter) inlineSf).queryString())
@@ -118,8 +118,8 @@ public class ElasticsearchBackendGeneratedRequestTestBase {
         return null;
     }
 
-    List<SearchRequest> run(SearchJob searchJob, Query query, ESGeneratedQueryContext queryContext, Set<QueryResult> predecessorResults) {
-        this.elasticsearchBackend.doRun(searchJob, query, queryContext);
+    List<SearchRequest> run(SearchJob searchJob, Query query, OSGeneratedQueryContext queryContext, Set<QueryResult> predecessorResults) {
+        this.openSearchBackend.doRun(searchJob, query, queryContext);
 
         verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
 

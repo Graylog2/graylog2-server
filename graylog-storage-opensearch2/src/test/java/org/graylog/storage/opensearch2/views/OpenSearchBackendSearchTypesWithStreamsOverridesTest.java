@@ -45,7 +45,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ElasticsearchBackendSearchTypesWithStreamsOverridesTest extends ElasticsearchBackendGeneratedRequestTestBase {
+public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSearchBackendGeneratedRequestTestBase {
     private final String stream1Id = "stream1Id";
     private final String stream2Id = "stream2Id";
 
@@ -131,9 +131,9 @@ public class ElasticsearchBackendSearchTypesWithStreamsOverridesTest extends Ela
 
     private List<SearchRequest> run(Query query) throws IOException {
         final SearchJob job = searchJobForQuery(query);
-        final ESGeneratedQueryContext context = this.elasticsearchBackend.generate(job, query, Collections.emptySet());
+        final OSGeneratedQueryContext context = this.openSearchBackend.generate(job, query, Collections.emptySet());
 
-        this.elasticsearchBackend.doRun(job, query, context);
+        this.openSearchBackend.doRun(job, query, context);
 
         verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
 

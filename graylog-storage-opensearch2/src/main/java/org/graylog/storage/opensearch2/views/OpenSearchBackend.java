@@ -37,7 +37,7 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.TimeRangeQueryFactory;
-import org.graylog.storage.opensearch2.views.searchtypes.ESSearchTypeHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.plugin.Message;
@@ -67,23 +67,23 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContext> {
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchBackend.class);
+public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> {
+    private static final Logger LOG = LoggerFactory.getLogger(OpenSearchBackend.class);
 
-    private final Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers;
+    private final Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers;
     private final OpenSearchClient client;
     private final IndexLookup indexLookup;
-    private final ESGeneratedQueryContext.Factory queryContextFactory;
+    private final OSGeneratedQueryContext.Factory queryContextFactory;
     private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
     private final boolean allowLeadingWildcard;
 
     @Inject
-    public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
-                                OpenSearchClient client,
-                                IndexLookup indexLookup,
-                                ESGeneratedQueryContext.Factory queryContextFactory,
-                                UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
-                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
+    public OpenSearchBackend(Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
+                             OpenSearchClient client,
+                             IndexLookup indexLookup,
+                             OSGeneratedQueryContext.Factory queryContextFactory,
+                             UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
+                             @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.client = client;
         this.indexLookup = indexLookup;
@@ -100,7 +100,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     }
 
     @Override
-    public ESGeneratedQueryContext generate(SearchJob job, Query query, Set<SearchError> validationErrors) {
+    public OSGeneratedQueryContext generate(SearchJob job, Query query, Set<SearchError> validationErrors) {
         final BackendQuery backendQuery = query.query();
 
         final Set<SearchType> searchTypes = query.searchTypes();
@@ -124,12 +124,12 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .size(0)
                 .trackTotalHits(true);
 
-        final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, job, query, validationErrors);
+        final OSGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, job, query, validationErrors);
         searchTypes.stream()
                 .filter(searchType -> !isSearchTypeWithError(queryContext, searchType.id()))
                 .forEach(searchType -> {
                     final String type = searchType.type();
-                    final Provider<ESSearchTypeHandler<? extends SearchType>> searchTypeHandler = elasticsearchSearchTypeHandlers.get(type);
+                    final Provider<OSSearchTypeHandler<? extends SearchType>> searchTypeHandler = elasticsearchSearchTypeHandlers.get(type);
                     if (searchTypeHandler == null) {
                         LOG.error("Unknown search type {} for elasticsearch backend, cannot generate query part. Skipping this search type.", type);
                         queryContext.addError(new SearchTypeError(query, searchType.id(), "Unknown search type '" + type + "' for elasticsearch backend, cannot generate query"));
@@ -201,7 +201,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     }
 
     @Override
-    public QueryResult doRun(SearchJob job, Query query, ESGeneratedQueryContext queryContext) {
+    public QueryResult doRun(SearchJob job, Query query, OSGeneratedQueryContext queryContext) {
         if (query.searchTypes().isEmpty()) {
             return QueryResult.builder()
                     .query(query)
@@ -244,7 +244,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         for (SearchType searchType : query.searchTypes()) {
             final String searchTypeId = searchType.id();
-            final Provider<ESSearchTypeHandler<? extends SearchType>> handlerProvider = elasticsearchSearchTypeHandlers.get(searchType.type());
+            final Provider<OSSearchTypeHandler<? extends SearchType>> handlerProvider = elasticsearchSearchTypeHandlers.get(searchType.type());
             if (handlerProvider == null) {
                 LOG.error("Unknown search type '{}', cannot convert query result.", searchType.type());
                 // no need to add another error here, as the query generation code will have added the error about the missing handler already
@@ -259,7 +259,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
             // we create a new instance because some search type handlers might need to track information between generating the query and
             // processing its result, such as aggregations, which depend on the name and type
-            final ESSearchTypeHandler<? extends SearchType> handler = handlerProvider.get();
+            final OSSearchTypeHandler<? extends SearchType> handler = handlerProvider.get();
             final int searchTypeIndex = searchTypeIds.indexOf(searchTypeId);
             final MultiSearchResponse.Item multiSearchResponse = results.get(searchTypeIndex);
             if (multiSearchResponse.isFailure()) {

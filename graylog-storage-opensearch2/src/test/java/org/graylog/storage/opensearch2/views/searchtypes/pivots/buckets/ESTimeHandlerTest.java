@@ -22,9 +22,9 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivot;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.ESTimeHandler;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSTimeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -43,15 +43,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class ESTimeHandlerTest {
-    private ESTimeHandler esTimeHandler;
+    private OSTimeHandler esTimeHandler;
 
     private final Pivot pivot = mock(Pivot.class);
 
     private final Time time = mock(Time.class);
 
-    private final ESPivot esPivot = mock(ESPivot.class);
+    private final OSPivot esPivot = mock(OSPivot.class);
 
-    private final ESGeneratedQueryContext queryContext = mock(ESGeneratedQueryContext.class, RETURNS_DEEP_STUBS);
+    private final OSGeneratedQueryContext queryContext = mock(OSGeneratedQueryContext.class, RETURNS_DEEP_STUBS);
 
     private final Query query = mock(Query.class);
 
@@ -59,10 +59,10 @@ class ESTimeHandlerTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        this.esTimeHandler = new ESTimeHandler();
+        this.esTimeHandler = new OSTimeHandler();
         when(time.interval()).thenReturn(interval);
         when(time.field()).thenReturn("foobar");
-        final ESPivot.AggTypes aggTypes = mock(ESPivot.AggTypes.class);
+        final OSPivot.AggTypes aggTypes = mock(OSPivot.AggTypes.class);
         when(queryContext.contextMap().get(any())).thenReturn(aggTypes);
         when(query.effectiveTimeRange(any())).thenCallRealMethod();
     }

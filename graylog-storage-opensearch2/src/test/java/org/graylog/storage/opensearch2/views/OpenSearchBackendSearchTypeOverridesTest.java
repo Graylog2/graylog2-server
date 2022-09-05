@@ -57,7 +57,7 @@ import static org.graylog.storage.opensearch2.views.ViewsUtils.indicesOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBackendGeneratedRequestTestBase {
+public class OpenSearchBackendSearchTypeOverridesTest extends OpenSearchBackendGeneratedRequestTestBase {
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
@@ -99,7 +99,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
 
     @Test
     public void overridesInSearchTypeAreIncorporatedIntoGeneratedQueries() throws IOException {
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet());
+        final OSGeneratedQueryContext queryContext = this.openSearchBackend.generate(searchJob, query, Collections.emptySet());
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
         final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
                 .collect(Collectors.toList());
@@ -154,7 +154,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1"), tr))
                 .thenReturn(ImmutableSet.of("searchTypeIndex"));
 
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet());
+        final OSGeneratedQueryContext queryContext = this.openSearchBackend.generate(searchJob, query, Collections.emptySet());
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
         final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
                 .collect(Collectors.toList());

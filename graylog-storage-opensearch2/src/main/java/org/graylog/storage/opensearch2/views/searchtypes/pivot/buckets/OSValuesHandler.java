@@ -23,8 +23,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
-import org.graylog.storage.opensearch2.views.ESGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.ESPivotBucketSpecHandler;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.opensearch.search.aggregations.AggregationBuilder;
 import org.opensearch.search.aggregations.AggregationBuilders;
 import org.opensearch.search.aggregations.BucketOrder;
@@ -39,21 +39,21 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, Terms> {
+public class OSValuesHandler extends OSPivotBucketSpecHandler<Values, Terms> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Values valuesSpec, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
-        final List<BucketOrder> ordering = orderListForPivot(pivot, valuesSpec, esGeneratedQueryContext);
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Values valuesSpec, OSGeneratedQueryContext OSGeneratedQueryContext, Query query) {
+        final List<BucketOrder> ordering = orderListForPivot(pivot, valuesSpec, OSGeneratedQueryContext);
         final TermsAggregationBuilder builder = AggregationBuilders.terms(name)
                 .minDocCount(1)
                 .field(valuesSpec.field())
                 .order(ordering.isEmpty() ? Collections.singletonList(BucketOrder.count(false)) : ordering)
                 .size(valuesSpec.limit());
-        record(esGeneratedQueryContext, pivot, valuesSpec, name, Terms.class);
+        record(OSGeneratedQueryContext, pivot, valuesSpec, name, Terms.class);
         return Optional.of(builder);
     }
 
-    private List<BucketOrder> orderListForPivot(Pivot pivot, Values valuesSpec, ESGeneratedQueryContext esGeneratedQueryContext) {
+    private List<BucketOrder> orderListForPivot(Pivot pivot, Values valuesSpec, OSGeneratedQueryContext OSGeneratedQueryContext) {
         return pivot.sort()
                 .stream()
                 .map(sortSpec -> {
@@ -70,7 +70,7 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, Terms> {
                                     if (seriesSpec.literal().equals("count()")) {
                                         return BucketOrder.count(sortSpec.direction().equals(SortSpec.Direction.Ascending));
                                     }
-                                    return BucketOrder.aggregation(esGeneratedQueryContext.seriesName(seriesSpec, pivot), sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                                    return BucketOrder.aggregation(OSGeneratedQueryContext.seriesName(seriesSpec, pivot), sortSpec.direction().equals(SortSpec.Direction.Ascending));
                                 })
                                 .orElse(null);
                     }

@@ -29,7 +29,7 @@ import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
-import org.graylog.storage.opensearch2.views.searchtypes.ESSearchTypeHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Before;
 import org.junit.Rule;
@@ -52,7 +52,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ElasticsearchBackendErrorHandlingTest {
+public class OpenSearchBackendErrorHandlingTest {
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
@@ -62,24 +62,24 @@ public class ElasticsearchBackendErrorHandlingTest {
     @Mock
     protected IndexLookup indexLookup;
 
-    private ElasticsearchBackend backend;
+    private OpenSearchBackend backend;
     private SearchJob searchJob;
     private Query query;
-    private ESGeneratedQueryContext queryContext;
+    private OSGeneratedQueryContext queryContext;
 
-    static abstract class DummyHandler implements ESSearchTypeHandler<SearchType> {
+    static abstract class DummyHandler implements OSSearchTypeHandler<SearchType> {
     }
 
     @Before
     public void setUp() throws Exception {
         final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
-        this.backend = new ElasticsearchBackend(
+        this.backend = new OpenSearchBackend(
                 ImmutableMap.of(
                         "dummy", () -> mock(DummyHandler.class)
                 ),
                 client,
                 indexLookup,
-                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
+                (elasticsearchBackend, ssb, job, query, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
                 false);
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any())).thenReturn(Collections.emptySet());
@@ -105,7 +105,7 @@ public class ElasticsearchBackendErrorHandlingTest {
 
         this.searchJob = new SearchJob("job1", search, "admin");
 
-        this.queryContext = new ESGeneratedQueryContext(
+        this.queryContext = new OSGeneratedQueryContext(
                 this.backend,
                 new SearchSourceBuilder(),
                 searchJob,
