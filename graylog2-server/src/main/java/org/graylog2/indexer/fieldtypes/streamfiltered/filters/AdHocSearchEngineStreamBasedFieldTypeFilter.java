@@ -19,13 +19,11 @@ package org.graylog2.indexer.fieldtypes.streamfiltered.filters;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.AggregationBasedFieldTypeFilterAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.CountExistingBasedFieldTypeFilterAdapter;
-import org.graylog2.indexer.fieldtypes.util.TextFieldTypesSeparator;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -49,13 +47,6 @@ public class AdHocSearchEngineStreamBasedFieldTypeFilter implements StreamBasedF
         if (streamIds == null || streamIds.isEmpty()) {
             return Collections.emptySet();
         }
-
-        final TextFieldTypesSeparator textFieldTypesSeparator = new TextFieldTypesSeparator();
-        textFieldTypesSeparator.separate(fieldTypeDTOs);
-
-        Set<FieldTypeDTO> filtered = new HashSet<>();
-        filtered.addAll(aggregationBasedFieldTypeFilterAdapter.filterFieldTypes(textFieldTypesSeparator.getNonTextFields(), indexNames, streamIds));
-        filtered.addAll(countExistingBasedFieldTypeFilterAdapter.filterFieldTypes(textFieldTypesSeparator.getTextFields(), indexNames, streamIds));
-        return filtered;
+        return countExistingBasedFieldTypeFilterAdapter.filterFieldTypes(fieldTypeDTOs, indexNames, streamIds);
     }
 }

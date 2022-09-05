@@ -25,7 +25,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
-import org.graylog.storage.elasticsearch7.SearchRequestFactory;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.AggregationBasedFieldTypeFilterAdapter;
 
@@ -39,12 +38,10 @@ import java.util.stream.Collectors;
 public class AggregationBasedFieldTypeFilterES7 implements AggregationBasedFieldTypeFilterAdapter {
 
     private final ElasticsearchClient client;
-    private final SearchRequestFactory searchRequestFactory;
 
     @Inject
-    public AggregationBasedFieldTypeFilterES7(final ElasticsearchClient client, final SearchRequestFactory searchRequestFactory) {
+    public AggregationBasedFieldTypeFilterES7(final ElasticsearchClient client) {
         this.client = client;
-        this.searchRequestFactory = searchRequestFactory;
     }
 
     @Override
