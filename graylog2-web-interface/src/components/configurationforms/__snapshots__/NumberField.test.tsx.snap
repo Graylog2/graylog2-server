@@ -2,43 +2,43 @@
 
 exports[`<NumberField> should render an empty field 1`] = `
 .c0 {
-  color: #1f1f1f;
+  color: #3e434c;
   font-weight: bold;
   margin-bottom: 5px;
   display: inline-block;
 }
 
 .c1.form-control:not([type="range"]) {
-  color: #1f1f1f;
+  color: #3e434c;
   background-color: #fff;
-  border-color: #a6a6a6;
+  border-color: #b5bfcd;
 }
 
 .c1.form-control:not([type="range"])::-webkit-input-placeholder {
-  color: #9b9b9b;
+  color: #a9abaf;
 }
 
 .c1.form-control:not([type="range"])::-moz-placeholder {
-  color: #9b9b9b;
+  color: #a9abaf;
 }
 
 .c1.form-control:not([type="range"]):-ms-input-placeholder {
-  color: #9b9b9b;
+  color: #a9abaf;
 }
 
 .c1.form-control:not([type="range"])::placeholder {
-  color: #9b9b9b;
+  color: #a9abaf;
 }
 
 .c1.form-control:not([type="range"]):focus {
-  border-color: #7894ce;
-  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
+  border-color: #8eadd8;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(142,173,216,0.4);
 }
 
 .c1.form-control:not([type="range"])[disabled],.c1.form-control:not([type="range"])[readonly],
 fieldset[disabled] .c1.form-control:not([type="range"]) {
   background-color: #dddddd;
-  color: #9b9b9b;
+  color: #a9abaf;
 }
 
 .c1.form-control:not([type="range"]) ~ .form-control-feedback.glyphicon {
@@ -49,7 +49,7 @@ fieldset[disabled] .c1.form-control:not([type="range"]) {
   display: block;
   margin-top: 5px;
   margin-bottom: 10px;
-  color: #838383;
+  color: #94979c;
 }
 
 .c3 {

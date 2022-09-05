@@ -2,7 +2,7 @@
 
 exports[`<ListField> should render an empty field 1`] = `
 .c0 {
-  color: #1f1f1f;
+  color: #3e434c;
   font-weight: bold;
   margin-bottom: 5px;
   display: inline-block;
@@ -12,7 +12,7 @@ exports[`<ListField> should render an empty field 1`] = `
   display: block;
   margin-top: 5px;
   margin-bottom: 10px;
-  color: #838383;
+  color: #94979c;
 }
 
 .c2 {
@@ -46,18 +46,18 @@ exports[`<ListField> should render an empty field 1`] = `
           class="css-1f43avz-a11yText-A11yText"
         />
         <div
-          class="common-select-control css-9w5mt0-control"
+          class="common-select-control css-1m943k1-control"
         >
           <div
             class=" css-d5r05u-ValueContainer"
           >
             <div
-              class=" css-cv6aql-placeholder"
+              class=" css-pccfp0-placeholder"
             >
               Select list field
             </div>
             <div
-              class="css-200f6w-Input"
+              class="css-15cp3ns-Input"
             >
               <div
                 class=""
@@ -86,7 +86,7 @@ exports[`<ListField> should render an empty field 1`] = `
           >
             <div
               aria-hidden="true"
-              style="color: rgb(166, 166, 166); display: flex; padding: 0px; transition: color 150ms; box-sizing: border-box; font-size: 150%; margin-right: 1rem;"
+              style="color: rgb(181, 191, 205); display: flex; padding: 0px; transition: color 150ms; box-sizing: border-box; font-size: 150%; margin-right: 1rem;"
             />
           </div>
         </div>
