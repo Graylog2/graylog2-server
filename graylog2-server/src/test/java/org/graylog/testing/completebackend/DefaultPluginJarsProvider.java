@@ -33,8 +33,6 @@ public class DefaultPluginJarsProvider implements PluginJarsProvider {
         String projectVersion = getProjectVersion();
 
         return ImmutableList.of(
-                Paths.get(reposDir, "graylog2-server/graylog-storage-elasticsearch6/target",
-                        "graylog-storage-elasticsearch6-" + projectVersion + ".jar"),
                 Paths.get(reposDir, "graylog2-server/graylog-storage-elasticsearch7/target",
                         "graylog-storage-elasticsearch7-" + projectVersion + ".jar"),
                 Paths.get(reposDir, "graylog-plugin-aws/target",

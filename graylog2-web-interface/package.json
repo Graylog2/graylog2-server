@@ -49,7 +49,7 @@
     "@openfonts/roboto-mono_latin": "^1.44.1",
     "@react-bootstrap/pagination": "^1.0.0",
     "@react-hook/resize-observer": "^1.2.5",
-    "ace-builds": "1.8.0",
+    "ace-builds": "1.10.0",
     "bluebird": "^3.4.0",
     "bootstrap": "3.4.1",
     "bson-objectid": "^2.0.3",
