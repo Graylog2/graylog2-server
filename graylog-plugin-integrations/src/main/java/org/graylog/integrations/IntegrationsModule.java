@@ -35,6 +35,7 @@ import org.graylog.integrations.inputs.paloalto9.PaloAlto9xInput;
 import org.graylog.integrations.ipfix.codecs.IpfixCodec;
 import org.graylog.integrations.ipfix.inputs.IpfixUdpInput;
 import org.graylog.integrations.ipfix.transports.IpfixUdpTransport;
+import org.graylog.integrations.migrations.V20220622071600_MigratePagerDutyV1;
 import org.graylog.integrations.notifications.types.SlackEventNotification;
 import org.graylog.integrations.notifications.types.SlackEventNotificationConfig;
 import org.graylog.integrations.notifications.types.SlackEventNotificationConfigEntity;
@@ -176,6 +177,9 @@ public class IntegrationsModule extends PluginModule {
         bind(IamClientBuilder.class).toProvider(IamClient::builder);
         bind(CloudWatchLogsClientBuilder.class).toProvider(CloudWatchLogsClient::builder);
         bind(KinesisClientBuilder.class).toProvider(KinesisClient::builder);
+
+        // PagerDuty notification type fix
+        addMigration(V20220622071600_MigratePagerDutyV1.class);
     }
 
     /**
