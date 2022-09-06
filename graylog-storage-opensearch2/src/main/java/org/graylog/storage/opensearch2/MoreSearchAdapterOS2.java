@@ -22,13 +22,13 @@ import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
-import org.opensearch.action.search.SearchRequest;
-import org.opensearch.action.search.SearchResponse;
-import org.opensearch.action.support.IndicesOptions;
-import org.opensearch.common.xcontent.ToXContent;
-import org.opensearch.index.query.BoolQueryBuilder;
-import org.opensearch.index.query.QueryBuilder;
-import org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
+import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.ToXContent;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.ScrollCommand;
@@ -51,10 +51,10 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
-import static org.opensearch.index.query.QueryBuilders.boolQuery;
-import static org.opensearch.index.query.QueryBuilders.matchAllQuery;
-import static org.opensearch.index.query.QueryBuilders.queryStringQuery;
-import static org.opensearch.index.query.QueryBuilders.termsQuery;
+import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.boolQuery;
+import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.matchAllQuery;
+import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.queryStringQuery;
+import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.termsQuery;
 
 public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterOS2.class);

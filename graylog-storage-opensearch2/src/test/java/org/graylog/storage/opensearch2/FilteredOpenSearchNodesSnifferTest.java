@@ -18,8 +18,8 @@ package org.graylog.storage.opensearch2;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.opensearch.client.Node;
-import org.opensearch.client.sniff.NodesSniffer;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
+import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

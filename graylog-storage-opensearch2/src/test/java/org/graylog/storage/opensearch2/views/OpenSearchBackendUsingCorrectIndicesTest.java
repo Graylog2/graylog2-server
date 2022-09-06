@@ -44,8 +44,8 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.opensearch.action.search.MultiSearchResponse;
-import org.opensearch.action.search.SearchRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 
 import javax.inject.Provider;
 import java.util.Arrays;

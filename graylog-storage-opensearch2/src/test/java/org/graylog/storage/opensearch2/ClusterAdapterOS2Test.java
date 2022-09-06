@@ -19,7 +19,7 @@ package org.graylog.storage.opensearch2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.io.Resources;
-import org.opensearch.OpenSearchException;
+import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;

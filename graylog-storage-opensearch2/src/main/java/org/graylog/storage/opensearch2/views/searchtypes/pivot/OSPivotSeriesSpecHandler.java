@@ -23,10 +23,10 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpecHandler;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.opensearch.action.search.SearchResponse;
-import org.opensearch.search.aggregations.Aggregation;
-import org.opensearch.search.aggregations.AggregationBuilder;
-import org.opensearch.search.aggregations.HasAggregations;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
 
 import java.util.stream.Stream;
 

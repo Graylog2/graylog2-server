@@ -30,9 +30,9 @@ import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.util.UniqueNamer;
-import org.opensearch.index.query.BoolQueryBuilder;
-import org.opensearch.index.query.QueryBuilder;
-import org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 
 import java.util.Collection;
 import java.util.HashSet;

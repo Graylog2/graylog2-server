@@ -72,7 +72,7 @@ import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSSumOfSqu
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSVarianceHandler;
 import org.graylog.storage.opensearch2.views.export.SearchAfter;
 import org.graylog2.storage.SearchVersion;
-import org.opensearch.search.aggregations.Aggregation;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 
 public class ViewsOSBackendModule extends ViewsModule {
     private final SearchVersion supportedSearchVersion;

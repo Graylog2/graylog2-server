@@ -16,9 +16,9 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.opensearch.action.search.SearchRequest;
-import org.opensearch.action.search.SearchResponse;
-import org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.ScrollCommand;
 

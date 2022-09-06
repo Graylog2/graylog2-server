@@ -17,9 +17,9 @@
 package org.graylog.storage.opensearch2.blocks;
 
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
-import org.opensearch.action.admin.indices.settings.get.GetSettingsResponse;
-import org.opensearch.common.collect.ImmutableOpenMap;
-import org.opensearch.common.settings.Settings;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.get.GetSettingsResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.common.collect.ImmutableOpenMap;
+import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 
 import java.util.Set;
 import java.util.stream.Collectors;

@@ -47,8 +47,8 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.opensearch.action.search.SearchRequest;
-import org.opensearch.search.aggregations.Aggregation;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 
 import javax.inject.Provider;
 import java.util.Collections;

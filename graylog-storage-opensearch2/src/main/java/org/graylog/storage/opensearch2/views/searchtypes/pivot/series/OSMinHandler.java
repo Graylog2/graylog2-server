@@ -21,21 +21,21 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
-import org.opensearch.action.search.SearchResponse;
-import org.opensearch.search.aggregations.AggregationBuilder;
-import org.opensearch.search.aggregations.AggregationBuilders;
-import org.opensearch.search.aggregations.metrics.MinAggregationBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MinAggregationBuilder;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class OSMinHandler extends OSPivotSeriesSpecHandler<Min, org.opensearch.search.aggregations.metrics.Min> {
+public class OSMinHandler extends OSPivotSeriesSpecHandler<Min, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min> {
     @Nonnull
     @Override
     public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Min minSpec, OSPivot searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final MinAggregationBuilder min = AggregationBuilders.min(name).field(minSpec.field());
-        record(queryContext, pivot, minSpec, name, org.opensearch.search.aggregations.metrics.Min.class);
+        record(queryContext, pivot, minSpec, name, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min.class);
         return Optional.of(min);
     }
 
@@ -43,7 +43,7 @@ public class OSMinHandler extends OSPivotSeriesSpecHandler<Min, org.opensearch.s
     public Stream<Value> doHandleResult(Pivot pivot,
                                         Min pivotSpec,
                                         SearchResponse searchResult,
-                                        org.opensearch.search.aggregations.metrics.Min minAggregation,
+                                        org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min minAggregation,
                                         OSPivot searchTypeHandler,
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
         return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Min.NAME, minAggregation.getValue()));

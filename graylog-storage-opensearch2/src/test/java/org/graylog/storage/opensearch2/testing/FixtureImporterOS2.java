@@ -18,12 +18,12 @@ package org.graylog.storage.opensearch2.testing;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.opensearch.action.bulk.BulkRequest;
-import org.opensearch.action.bulk.BulkResponse;
-import org.opensearch.action.index.IndexRequest;
-import org.opensearch.action.support.ActiveShardCount;
-import org.opensearch.client.indices.CreateIndexRequest;
-import org.opensearch.client.indices.GetIndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.bulk.BulkRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.bulk.BulkResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.support.ActiveShardCount;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog2.jackson.TypeReferences;

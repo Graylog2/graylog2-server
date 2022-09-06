@@ -27,13 +27,13 @@ import org.graylog.storage.opensearch2.TimeRangeQueryFactory;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.opensearch.action.search.SearchRequest;
-import org.opensearch.action.support.IndicesOptions;
-import org.opensearch.index.query.QueryBuilder;
-import org.opensearch.index.query.TermsQueryBuilder;
-import org.opensearch.search.SearchHit;
-import org.opensearch.search.builder.SearchSourceBuilder;
-import org.opensearch.search.sort.SortOrder;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.TermsQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
+import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,10 +50,10 @@ import java.util.function.Consumer;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
 import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
-import static org.opensearch.index.query.QueryBuilders.matchAllQuery;
-import static org.opensearch.index.query.QueryBuilders.queryStringQuery;
-import static org.opensearch.index.query.QueryBuilders.termsQuery;
-import static org.opensearch.index.query.QueryBuilders.boolQuery;
+import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.matchAllQuery;
+import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.queryStringQuery;
+import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.termsQuery;
+import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.boolQuery;
 
 @SuppressWarnings("rawtypes")
 public class OpenSearchExportBackend implements ExportBackend {

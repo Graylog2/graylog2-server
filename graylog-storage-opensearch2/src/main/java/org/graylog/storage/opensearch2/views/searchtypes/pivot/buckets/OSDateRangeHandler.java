@@ -22,10 +22,10 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucke
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.joda.time.base.AbstractDateTime;
-import org.opensearch.search.aggregations.AggregationBuilder;
-import org.opensearch.search.aggregations.AggregationBuilders;
-import org.opensearch.search.aggregations.bucket.range.DateRangeAggregationBuilder;
-import org.opensearch.search.aggregations.bucket.range.ParsedDateRange;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.range.DateRangeAggregationBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.range.ParsedDateRange;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;

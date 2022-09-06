@@ -18,7 +18,7 @@ package org.graylog.storage.opensearch2;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
-import org.apache.http.client.CredentialsProvider;
+import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.storage.opensearch2.client.OSCredentialsProvider;
@@ -32,7 +32,7 @@ import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.plugin.VersionAwareModule;
 import org.graylog2.storage.SearchVersion;
-import org.opensearch.client.RestHighLevelClient;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 
 public class Opensearch2Module extends VersionAwareModule {
 

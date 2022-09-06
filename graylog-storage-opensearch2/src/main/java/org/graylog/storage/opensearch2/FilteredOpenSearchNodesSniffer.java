@@ -18,10 +18,10 @@ package org.graylog.storage.opensearch2;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-import org.opensearch.client.Node;
-import org.opensearch.client.RestClient;
-import org.opensearch.client.sniff.NodesSniffer;
-import org.opensearch.client.sniff.OpenSearchNodesSniffer;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
+import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer;
+import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
 
 import java.io.IOException;
 import java.util.Collections;

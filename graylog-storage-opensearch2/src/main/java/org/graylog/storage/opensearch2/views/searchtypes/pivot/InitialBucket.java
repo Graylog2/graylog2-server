@@ -16,10 +16,10 @@
  */
 package org.graylog.storage.opensearch2.views.searchtypes.pivot;
 
-import org.opensearch.action.search.SearchResponse;
-import org.opensearch.common.xcontent.XContentBuilder;
-import org.opensearch.search.aggregations.Aggregations;
-import org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 
 import java.io.IOException;
 

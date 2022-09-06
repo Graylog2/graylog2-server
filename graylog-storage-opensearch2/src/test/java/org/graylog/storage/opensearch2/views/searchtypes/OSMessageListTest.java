@@ -30,8 +30,8 @@ import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Test;
-import org.opensearch.search.SearchHits;
-import org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHits;
+import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 
 import java.util.Collections;
 import java.util.Map;
@@ -48,8 +48,8 @@ public class OSMessageListTest {
         final OSMessageList esMessageList = new OSMessageList();
         final MessageList messageList = someMessageList().toBuilder().name("customResult").build();
 
-        final org.opensearch.action.search.SearchResponse result =
-                mock(org.opensearch.action.search.SearchResponse.class);
+        final org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse result =
+                mock(org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse.class);
 
         when(result.getHits()).thenReturn(SearchHits.empty());
 

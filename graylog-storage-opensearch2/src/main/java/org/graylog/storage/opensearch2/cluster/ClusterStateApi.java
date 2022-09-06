@@ -19,8 +19,8 @@ package org.graylog.storage.opensearch2.cluster;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
-import org.opensearch.client.Request;
-import org.opensearch.client.Response;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 
 import javax.inject.Inject;

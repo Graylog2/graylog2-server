@@ -28,8 +28,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
 import org.junit.Before;
 import org.junit.Test;
-import org.opensearch.action.search.MultiSearchResponse;
-import org.opensearch.action.search.SearchRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 
 import java.io.IOException;
 import java.util.Arrays;

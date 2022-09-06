@@ -21,8 +21,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
 import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.opensearch.client.Request;
-import org.opensearch.client.Response;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 
 import javax.inject.Inject;
 import java.io.IOException;

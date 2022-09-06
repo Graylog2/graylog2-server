@@ -19,11 +19,11 @@ package org.graylog.storage.opensearch2.views.export;
 import com.google.common.collect.Streams;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog2.plugin.Message;
-import org.opensearch.action.search.SearchRequest;
-import org.opensearch.action.search.SearchResponse;
-import org.opensearch.search.SearchHit;
-import org.opensearch.search.builder.SearchSourceBuilder;
-import org.opensearch.search.sort.SortOrder;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
+import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
 
 import javax.inject.Inject;
 import java.util.List;

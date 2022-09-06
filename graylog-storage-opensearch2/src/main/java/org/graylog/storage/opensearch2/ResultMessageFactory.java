@@ -16,9 +16,9 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.opensearch.common.text.Text;
-import org.opensearch.search.SearchHit;
-import org.opensearch.search.fetch.subphase.highlight.HighlightField;
+import org.graylog.shaded.opensearch2.org.opensearch.common.text.Text;
+import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
+import org.graylog.shaded.opensearch2.org.opensearch.search.fetch.subphase.highlight.HighlightField;
 import org.graylog2.indexer.results.ResultMessage;
 
 import java.util.Arrays;

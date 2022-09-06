@@ -18,15 +18,15 @@ package org.graylog.storage.opensearch2;
 
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Suppliers;
-import org.apache.http.HttpHost;
-import org.apache.http.client.CredentialsProvider;
-import org.opensearch.client.RestClient;
-import org.opensearch.client.RestClientBuilder;
-import org.opensearch.client.RestHighLevelClient;
+import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
+import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestClientBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.opensearch.client.sniff.NodesSniffer;
-import org.opensearch.client.sniff.OpenSearchNodesSniffer;
-import org.opensearch.client.sniff.Sniffer;
+import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer;
+import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
+import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.Sniffer;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;

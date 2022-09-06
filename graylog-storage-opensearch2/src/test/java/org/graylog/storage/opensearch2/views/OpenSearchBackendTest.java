@@ -37,10 +37,10 @@ import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Before;
 import org.junit.Test;
-import org.opensearch.index.query.BoolQueryBuilder;
-import org.opensearch.index.query.MatchAllQueryBuilder;
-import org.opensearch.index.query.QueryBuilder;
-import org.opensearch.index.query.QueryStringQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.MatchAllQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryStringQueryBuilder;
 
 import javax.inject.Provider;
 import java.util.Collections;

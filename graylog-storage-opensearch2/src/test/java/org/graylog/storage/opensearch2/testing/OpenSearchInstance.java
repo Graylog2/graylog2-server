@@ -18,7 +18,7 @@ package org.graylog.storage.opensearch2.testing;
 
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
-import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.RestHighLevelClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
@@ -28,7 +28,7 @@ import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.opensearch.client.RestHighLevelClient;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;

@@ -35,7 +35,7 @@
     <description>Graylog Storage Module for OpenSearch 2</description>
 
     <properties>
-        <opensearch.version>2.0.1</opensearch.version>
+        <opensearch.version>2.0.1-0</opensearch.version>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
@@ -52,8 +52,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.opensearch.client</groupId>
-            <artifactId>opensearch-rest-high-level-client</artifactId>
+            <groupId>org.graylog.shaded</groupId>
+            <artifactId>opensearch2</artifactId>
             <version>${opensearch.version}</version>
             <exclusions>
                 <exclusion>
@@ -63,8 +63,8 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.opensearch.client</groupId>
-            <artifactId>opensearch-rest-client-sniffer</artifactId>
+            <groupId>org.graylog.shaded</groupId>
+            <artifactId>opensearch-rest-client-sniffer2</artifactId>
             <version>${opensearch.version}</version>
             <exclusions>
                 <exclusion>

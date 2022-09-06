@@ -17,9 +17,9 @@
 package org.graylog.storage.opensearch2.views.export;
 
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
-import org.opensearch.action.search.SearchRequest;
-import org.opensearch.search.SearchHit;
-import org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
+import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 
 import java.util.List;
 

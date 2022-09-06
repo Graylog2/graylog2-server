@@ -19,7 +19,7 @@ package org.graylog.storage.opensearch2;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.zafarkhaja.semver.Version;
-import org.opensearch.client.Request;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
