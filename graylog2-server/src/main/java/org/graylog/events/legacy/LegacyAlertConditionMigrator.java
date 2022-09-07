@@ -20,7 +20,6 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
-import com.mongodb.Block;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -96,7 +95,7 @@ public class LegacyAlertConditionMigrator {
     public MigrationResult run(Set<String> completedAlertConditions, Set<String> completedAlarmCallbacks) {
         final MigrationResult.Builder result = MigrationResult.builder();
 
-        streamsCollection.find().forEach((Block<Document>) stream -> {
+        streamsCollection.find().forEach(stream -> {
             final String streamId = stream.getObjectId("_id").toHexString();
             final String streamTitle = stream.getString("title");
 
