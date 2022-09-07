@@ -14,15 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.validation;
+package org.graylog.plugins.views.search.rest;
 
-public enum ValidationType {
-    UNDECLARED_PARAMETER,
-    EMPTY_PARAMETER,
-    QUERY_PARSING_ERROR,
-    UNKNOWN_FIELD,
-    INVALID_OPERATOR,
-    MISSING_LICENSE,
-    INVALID_VALUE_TYPE,
-    PARAMETER_NOT_ALLOWED,
+public enum ValidationModeDTO {
+    QUERY,
+    SEARCH_FILTER
 }

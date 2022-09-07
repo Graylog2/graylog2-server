@@ -25,6 +25,7 @@ import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.validation.QueryValidationService;
 import org.graylog.plugins.views.search.validation.ValidationMessage;
+import org.graylog.plugins.views.search.validation.ValidationMode;
 import org.graylog.plugins.views.search.validation.ValidationRequest;
 import org.graylog.plugins.views.search.validation.ValidationResponse;
 import org.graylog.plugins.views.search.validation.ValidationStatus;
@@ -58,7 +59,7 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     private final QueryValidationService queryValidationService;
 
     @Inject
-    public QueryValidationResource(QueryValidationService queryValidationService) {
+    public QueryValidationResource(final QueryValidationService queryValidationService) {
         this.queryValidationService = queryValidationService;
     }
 
@@ -67,15 +68,16 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     @ApiOperation("Validate a search query")
     @NoAuditEvent("Only validating query structure, not changing any data")
     public ValidationResponseDTO validateQuery(
-            @ApiParam(name = "validationRequest") ValidationRequestDTO validationRequest,
-            @Context SearchUser searchUser
+            @ApiParam(name = "validationRequest") final ValidationRequestDTO validationRequest,
+            @Context final SearchUser searchUser
     ) {
 
         final ValidationRequest.Builder q = ValidationRequest.Builder.builder()
                 .query(validationRequest.query())
                 .timerange(validationRequest.timerange().orElse(defaultTimeRange()))
                 .streams(searchUser.streams().readableOrAllIfEmpty(validationRequest.streams()))
-                .parameters(resolveParameters(validationRequest));
+                .parameters(resolveParameters(validationRequest))
+                .validationMode(toMode(validationRequest.validationMode()));
 
         validationRequest.filter().ifPresent(q::filter);
 
@@ -83,28 +85,29 @@ public class QueryValidationResource extends RestResource implements PluginRestR
         return ValidationResponseDTO.create(toStatus(response.status()), toExplanations(response));
     }
 
-    private ImmutableSet<Parameter> resolveParameters(ValidationRequestDTO validationRequest) {
+    private ValidationMode toMode(final ValidationModeDTO validationMode) {
+        switch (validationMode) {
+            case QUERY -> {return ValidationMode.QUERY;}
+            case SEARCH_FILTER -> {return ValidationMode.SEARCH_FILTER;}
+            default -> throw new IllegalArgumentException("Unexpected validation mode " + validationMode.name());
+        }
+    }
+
+    private ImmutableSet<Parameter> resolveParameters(final ValidationRequestDTO validationRequest) {
         return validationRequest.parameters().stream()
                 .map(param -> param.applyBindings(validationRequest.parameterBindings()))
                 .collect(toImmutableSet());
     }
 
-    private ValidationStatusDTO toStatus(ValidationStatus status) {
-        final ValidationStatusDTO statusDTO;
-        switch (status) {
-            case WARNING:
-                statusDTO = ValidationStatusDTO.WARNING;
-                break;
-            case ERROR:
-                statusDTO = ValidationStatusDTO.ERROR;
-                break;
-            default:
-                statusDTO = ValidationStatusDTO.OK;
-        }
-        return statusDTO;
+    private ValidationStatusDTO toStatus(final ValidationStatus status) {
+        return switch (status) {
+            case WARNING -> ValidationStatusDTO.WARNING;
+            case ERROR -> ValidationStatusDTO.ERROR;
+            default -> ValidationStatusDTO.OK;
+        };
     }
 
-    private List<ValidationMessageDTO> toExplanations(ValidationResponse response) {
+    private List<ValidationMessageDTO> toExplanations(final ValidationResponse response) {
         return response.explanations().stream()
                 .map(this::toExplanation)
                 .sorted(Comparator.comparing(ValidationMessageDTO::beginLine, nullsLast(naturalOrder()))
@@ -112,7 +115,7 @@ public class QueryValidationResource extends RestResource implements PluginRestR
                 .collect(Collectors.toList());
     }
 
-    private ValidationMessageDTO toExplanation(ValidationMessage message) {
+    private ValidationMessageDTO toExplanation(final ValidationMessage message) {
         final ValidationTypeDTO validationType = convert(message.validationType());
         final ValidationMessageDTO.Builder builder = ValidationMessageDTO.builder(
                 validationType,
@@ -128,15 +131,11 @@ public class QueryValidationResource extends RestResource implements PluginRestR
         return builder.build();
     }
 
-    private ValidationTypeDTO convert(ValidationType validationType) {
+    private ValidationTypeDTO convert(final ValidationType validationType) {
         return ValidationTypeDTO.from(validationType);
     }
 
     private RelativeRange defaultTimeRange() {
-        try {
-            return RelativeRange.create(300);
-        } catch (InvalidRangeParametersException e) {
-            throw new RuntimeException(e);
-        }
+        return RelativeRange.create(300);
     }
 }

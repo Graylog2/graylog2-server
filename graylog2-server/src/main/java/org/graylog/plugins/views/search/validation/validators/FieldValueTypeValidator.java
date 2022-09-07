@@ -30,10 +30,12 @@ import org.graylog.plugins.views.search.validation.ParsedQuery;
 import org.graylog.plugins.views.search.validation.QueryValidator;
 import org.graylog.plugins.views.search.validation.ValidationContext;
 import org.graylog.plugins.views.search.validation.ValidationMessage;
+import org.graylog.plugins.views.search.validation.ValidationMode;
 import org.graylog.plugins.views.search.validation.ValidationRequest;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -63,11 +65,21 @@ public class FieldValueTypeValidator implements QueryValidator {
         } catch (ParseException e) {
             return ValidationErrors.create(e);
         } catch (SearchException e) {
-            return ValidationErrors.create(e);
+            return ignoreForSearchFilters(ValidationErrors.create(e), context);
         } catch (MissingEnterpriseLicenseException e) {
-            return ValidationErrors.create(e);
+            return ignoreForSearchFilters(ValidationErrors.create(e), context);
 
         }
+    }
+
+    /**
+     * TODO: remove this block in the moment when search filters support enterprise parameters
+     */
+    private List<ValidationMessage> ignoreForSearchFilters(final List<ValidationMessage> validationMessages, final ValidationContext context) {
+        if(context.request().validationMode() == ValidationMode.SEARCH_FILTER) {
+            return Collections.emptyList();
+        }
+        return validationMessages;
     }
 
     private PositionTrackingQuery decoratedQuery(ValidationRequest req) {

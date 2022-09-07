@@ -61,6 +61,9 @@ public abstract class ValidationRequest {
     @NotNull
     public abstract ImmutableSet<Parameter> parameters();
 
+    @NotNull
+    public abstract ValidationMode validationMode();
+
     public static Builder builder() {
         return new AutoValue_ValidationRequest.Builder().parameters(ImmutableSet.<Parameter>builder().build());
     }
@@ -91,5 +94,7 @@ public abstract class ValidationRequest {
         public static Builder builder() {
             return new AutoValue_ValidationRequest.Builder();
         }
+
+        public abstract Builder validationMode(ValidationMode validationMode);
     }
 }
