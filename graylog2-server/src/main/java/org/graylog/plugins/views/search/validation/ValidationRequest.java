@@ -65,7 +65,9 @@ public abstract class ValidationRequest {
     public abstract ValidationMode validationMode();
 
     public static Builder builder() {
-        return new AutoValue_ValidationRequest.Builder().parameters(ImmutableSet.<Parameter>builder().build());
+        return new AutoValue_ValidationRequest.Builder()
+                .parameters(ImmutableSet.<Parameter>builder().build())
+                .validationMode(ValidationMode.QUERY);
     }
 
     public boolean isEmptyQuery() {
