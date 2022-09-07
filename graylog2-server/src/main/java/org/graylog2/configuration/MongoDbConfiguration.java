@@ -28,9 +28,6 @@ public class MongoDbConfiguration {
     @Parameter(value = "mongodb_max_connections", validator = PositiveIntegerValidator.class)
     private int maxConnections = 1000;
 
-    @Parameter(value = "mongodb_threads_allowed_to_block_multiplier", validator = PositiveIntegerValidator.class)
-    private int threadsAllowedToBlockMultiplier = 5;
-
     @Parameter(value = "mongodb_uri", required = true, validator = StringNotBlankValidator.class)
     private String uri = "mongodb://localhost/graylog";
 
@@ -39,10 +36,6 @@ public class MongoDbConfiguration {
 
     public int getMaxConnections() {
         return maxConnections;
-    }
-
-    public int getThreadsAllowedToBlockMultiplier() {
-        return threadsAllowedToBlockMultiplier;
     }
 
     public String getUri() {
@@ -55,8 +48,7 @@ public class MongoDbConfiguration {
 
     public MongoClientURI getMongoClientURI() {
         final MongoClientOptions.Builder mongoClientOptionsBuilder = MongoClientOptions.builder()
-                .connectionsPerHost(getMaxConnections())
-                .threadsAllowedToBlockForConnectionMultiplier(getThreadsAllowedToBlockMultiplier());
+                .connectionsPerHost(getMaxConnections());
 
         return new MongoClientURI(uri, mongoClientOptionsBuilder);
     }
