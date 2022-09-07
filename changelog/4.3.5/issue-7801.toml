@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix content pack installation error for alert notifications."
+
+issues = ["7801"]
+pulls = ["13171"]

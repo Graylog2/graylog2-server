@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix close button on some modal UI components."
+
+issues = ["12479"]
+pulls = ["12480"]
