@@ -74,8 +74,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Locale.ENGLISH;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Views")
+@Api(value = "Views", tags = {CLOUD_VISIBLE})
 @Path("/views")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication

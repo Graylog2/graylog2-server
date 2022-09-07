@@ -65,9 +65,10 @@ import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.Set;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.security.RestPermissions.USERS_LIST;
 
-@Api(value = "Events/Notifications", description = "Manage event notifications")
+@Api(value = "Events/Notifications", description = "Manage event notifications", tags = {CLOUD_VISIBLE})
 @Path("/events/notifications")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
