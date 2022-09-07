@@ -77,20 +77,12 @@ public class QueryValidationResource extends RestResource implements PluginRestR
                 .timerange(validationRequest.timerange().orElse(defaultTimeRange()))
                 .streams(searchUser.streams().readableOrAllIfEmpty(validationRequest.streams()))
                 .parameters(resolveParameters(validationRequest))
-                .validationMode(toMode(validationRequest.validationMode()));
+                .validationMode(validationRequest.validationMode().toInternalRepresentation());
 
         validationRequest.filter().ifPresent(q::filter);
 
         final ValidationResponse response = queryValidationService.validate(q.build());
         return ValidationResponseDTO.create(toStatus(response.status()), toExplanations(response));
-    }
-
-    private ValidationMode toMode(final ValidationModeDTO validationMode) {
-        switch (validationMode) {
-            case QUERY -> {return ValidationMode.QUERY;}
-            case SEARCH_FILTER -> {return ValidationMode.SEARCH_FILTER;}
-            default -> throw new IllegalArgumentException("Unexpected validation mode " + validationMode.name());
-        }
     }
 
     private ImmutableSet<Parameter> resolveParameters(final ValidationRequestDTO validationRequest) {

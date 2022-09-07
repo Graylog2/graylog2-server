@@ -16,7 +16,19 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import org.graylog.plugins.views.search.validation.ValidationMode;
+
 public enum ValidationModeDTO {
-    QUERY,
-    SEARCH_FILTER
+    QUERY(ValidationMode.QUERY),
+    SEARCH_FILTER(ValidationMode.SEARCH_FILTER);
+
+    private final ValidationMode internalRepresentation;
+
+    ValidationModeDTO(final ValidationMode internalRepresentation) {
+        this.internalRepresentation = internalRepresentation;
+    }
+
+    public ValidationMode toInternalRepresentation() {
+        return internalRepresentation;
+    }
 }
