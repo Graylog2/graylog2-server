@@ -40,9 +40,6 @@ const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { 
     top: 0;
     z-index: 1` : ''}
   }
-  & th {
-
-  }
   
   thead > tr {
     color: ${theme.colors.global.textAlt};
@@ -82,7 +79,7 @@ const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { 
     border: 0 !important;
   }
 
-  tbody.message-group {
+  tr.message-group {
     border-top: 0;
   }
 

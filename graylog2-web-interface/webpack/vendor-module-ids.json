@@ -542,8 +542,6 @@
       "./node_modules/value-equal/esm/value-equal.js": 5429,
       "./node_modules/warning/browser.js": 670,
       "dll vendor": 338,
-      "javascript/dynamic|./node_modules/@babel/runtime/helpers/extends.js": 434,
-      "javascript/dynamic|./node_modules/@babel/runtime/helpers/interopRequireDefault.js": 836,
       "javascript/dynamic|./node_modules/chroma-js/chroma.js": 947,
       "javascript/esm|./node_modules/@babel/runtime-corejs2/helpers/esm/assertThisInitialized.js": 3710,
       "javascript/esm|./node_modules/@babel/runtime-corejs2/helpers/esm/extends.js": 9055,
