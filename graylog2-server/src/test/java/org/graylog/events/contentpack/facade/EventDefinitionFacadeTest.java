@@ -96,6 +96,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class EventDefinitionFacadeTest {
+    private static final String DEFAULT_STREAM_ID = "000000000000000000000001";
     public static final Set<EntityScope> ENTITY_SCOPES = Collections.singleton(new DefaultEntityScope());
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
@@ -199,7 +200,7 @@ public class EventDefinitionFacadeTest {
                 .build();
         final AggregationEventProcessorConfigEntity aggregationConfig = AggregationEventProcessorConfigEntity.builder()
                 .query(ValueReference.of("author: \"Jane Hopper\""))
-                .streams(ImmutableSet.of())
+                .streams(ImmutableSet.of(DEFAULT_STREAM_ID))
                 .groupBy(ImmutableList.of("project"))
                 .series(ImmutableList.of(serie))
                 .conditions(condition)
@@ -267,6 +268,7 @@ public class EventDefinitionFacadeTest {
         assertThat(eventDefinitionDto.title()).isEqualTo("title");
         assertThat(eventDefinitionDto.description()).isEqualTo("description");
         assertThat(eventDefinitionDto.config().type()).isEqualTo("aggregation-v1");
+        assertThat(((AggregationEventProcessorConfig) eventDefinitionDto.config()).streams().contains(DEFAULT_STREAM_ID));
         // verify that ownership was registered for this entity
         verify(entityOwnershipService, times(1)).registerNewEventDefinition(nativeEntity.entity().id(), kmerzUser);
     }

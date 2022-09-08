@@ -43,6 +43,7 @@ import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
+import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
@@ -67,6 +68,7 @@ import org.graylog2.contentpacks.model.entities.SearchEntity;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
+import org.graylog2.contentpacks.model.entities.WidgetEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -131,6 +133,7 @@ public class ViewFacadeTest {
     private final String newViewId = "5def958063303ae5f68edead";
     private final String newStreamId = "5def958063303ae5f68ebeaf";
     private final String streamId = "5cdab2293d27467fbe9e8a72"; /* stored in database */
+    private final String DEFAULT_STREAM_ID = "000000000000000000000001";
     private UserService userService;
 
 
@@ -252,6 +255,8 @@ public class ViewFacadeTest {
         assertThat(query.filter().filters()).isNotEmpty();
         final StreamFilter streamFilter = (StreamFilter) query.filter().filters().iterator().next();
         assertThat(streamFilter.streamId()).doesNotMatch(newStreamId);
+        final WidgetDTO widget = resultedView.get().getAllWidgets().iterator().next();
+        assertThat(widget.streams().contains(DEFAULT_STREAM_ID));
     }
 
     @Test
@@ -310,10 +315,22 @@ public class ViewFacadeTest {
                 .requires(ImmutableMap.of())
                 .createdAt(DateTime.now(DateTimeZone.UTC))
                 .build();
+        final WidgetEntity widgetEntity = WidgetEntity.builder()
+                .id("widget-id")
+                .type(MessageListConfigDTO.NAME)
+                .filters(Collections.emptyList())
+                .timerange(KeywordRange.create("last 5 minutes", "Etc/UTC"))
+                .query(ElasticsearchQueryString.of("author: Talon Karrde"))
+                .streams(ImmutableSet.of(DEFAULT_STREAM_ID))
+                .config(MessageListConfigDTO.Builder.builder()
+                        .fields(ImmutableSet.of())
+                        .showMessageRow(false)
+                        .build())
+                .build();
         final ViewStateEntity viewStateEntity = ViewStateEntity.builder()
                 .fields(ImmutableSet.of())
                 .titles(Titles.empty())
-                .widgets(ImmutableSet.of())
+                .widgets(ImmutableSet.of(widgetEntity))
                 .widgetMapping(ImmutableMap.of())
                 .widgetPositions(ImmutableMap.of())
                 .formatting(FormattingSettings.builder().highlighting(ImmutableSet.of()).build())
