@@ -39,7 +39,9 @@ public abstract class RelativeRange extends TimeRange {
 
     @JsonProperty
     @Override
-    public abstract String type();
+    public  String type() {
+        return RELATIVE;
+    }
 
     @JsonProperty
     public abstract OptionalInt range();
@@ -102,9 +104,6 @@ public abstract class RelativeRange extends TimeRange {
     public abstract static class Builder {
         abstract RelativeRange autoBuild();
 
-        @JsonProperty("type")
-        public abstract Builder type(String type);
-
         @JsonProperty("range")
         public abstract Builder range(int range);
         abstract OptionalInt range();
@@ -140,7 +139,7 @@ public abstract class RelativeRange extends TimeRange {
 
         @JsonCreator
         public static Builder builder() {
-            return new AutoValue_RelativeRange.Builder().type(RELATIVE);
+            return new AutoValue_RelativeRange.Builder();
         }
     }
 

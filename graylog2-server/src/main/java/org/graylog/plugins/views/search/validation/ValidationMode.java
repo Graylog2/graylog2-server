@@ -16,13 +16,7 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-public enum ValidationType {
-    UNDECLARED_PARAMETER,
-    EMPTY_PARAMETER,
-    QUERY_PARSING_ERROR,
-    UNKNOWN_FIELD,
-    INVALID_OPERATOR,
-    MISSING_LICENSE,
-    INVALID_VALUE_TYPE,
-    PARAMETER_NOT_ALLOWED,
+public enum ValidationMode {
+    QUERY,
+    SEARCH_FILTER
 }

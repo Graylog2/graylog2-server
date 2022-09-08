@@ -27,6 +27,7 @@ export type ValidationQuery = {
   timeRange?: TimeRange | undefined,
   streams?: Array<string>,
   filter?: ElasticsearchQueryString | string,
+  validation_mode?: 'QUERY' | 'SEARCH_FILTER'
 }
 
 const queryExists = (query: string | ElasticsearchQueryString) => {

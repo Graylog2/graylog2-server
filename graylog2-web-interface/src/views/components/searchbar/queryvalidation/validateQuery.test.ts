@@ -17,14 +17,13 @@
 import { waitFor } from 'wrappedTestingLibrary';
 
 import fetch from 'logic/rest/FetchProvider';
-import { StoreMock as MockStore, asMock } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import UserNotification from 'util/UserNotification';
 
 import type { ValidationQuery } from './validateQuery';
 import validateQuery from './validateQuery';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
-jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore('get') }));
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),

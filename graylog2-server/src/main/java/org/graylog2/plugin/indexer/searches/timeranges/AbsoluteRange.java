@@ -34,7 +34,9 @@ public abstract class AbsoluteRange extends TimeRange {
 
     @JsonProperty
     @Override
-    public abstract String type();
+    public String type() {
+        return ABSOLUTE;
+    }
 
     @JsonProperty
     public abstract DateTime from();
@@ -47,18 +49,13 @@ public abstract class AbsoluteRange extends TimeRange {
     }
 
     @JsonCreator
-    public static AbsoluteRange create(@JsonProperty("type") String type,
-                                       @JsonProperty("from") DateTime from,
-                                       @JsonProperty("to") DateTime to) {
-        return builder().type(type).from(from).to(to).build();
+    public static AbsoluteRange create(@JsonProperty("from") final DateTime from,
+                                       @JsonProperty("to") final DateTime to) {
+        return builder().from(from).to(to).build();
     }
 
-    public static AbsoluteRange create(DateTime from, DateTime to) {
-        return builder().type(ABSOLUTE).from(from).to(to).build();
-    }
-
-    public static AbsoluteRange create(String from, String to) throws InvalidRangeParametersException {
-        return builder().type(ABSOLUTE).from(from).to(to).build();
+    public static AbsoluteRange create(final String from, final String to) throws InvalidRangeParametersException {
+        return builder().from(from).to(to).build();
     }
 
     @Override
@@ -75,31 +72,29 @@ public abstract class AbsoluteRange extends TimeRange {
     public abstract static class Builder {
         public abstract AbsoluteRange build();
 
-        public abstract Builder type(String type);
-
         public abstract Builder to(DateTime to);
 
         public abstract Builder from(DateTime to);
 
         // TODO replace with custom build()
-        public Builder to(String to) throws InvalidRangeParametersException {
+        public Builder to(final String to) throws InvalidRangeParametersException {
             try {
                 return to(parseDateTime(to));
-            } catch (IllegalArgumentException e) {
+            } catch (final IllegalArgumentException e) {
                 throw new InvalidRangeParametersException("Invalid end of range: <" + to + ">", e);
             }
         }
 
         // TODO replace with custom build()
-        public Builder from(String from) throws InvalidRangeParametersException {
+        public Builder from(final String from) throws InvalidRangeParametersException {
             try {
                 return from(parseDateTime(from));
-            } catch (IllegalArgumentException e) {
+            } catch (final IllegalArgumentException e) {
                 throw new InvalidRangeParametersException("Invalid start of range: <" + from + ">", e);
             }
         }
 
-        private DateTime parseDateTime(String s) {
+        private DateTime parseDateTime(final String s) {
             if (Strings.isNullOrEmpty(s)) {
                 throw new IllegalArgumentException("Null or empty string");
             }

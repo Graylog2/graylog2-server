@@ -7,7 +7,8 @@ Please make sure to create a MongoDB database backup before starting the upgrade
 
 ## Breaking Changes
 
-Graylog 5 is Java 17 only. We no longer support earlier versions starting with 5.0
+* Graylog 5 is Java 17 only. We no longer support earlier versions starting with 5.0
+* Support for Elasticsearch 6.X has been removed! Please use either Elasticsearch 7.10.2 or, preferably, latest OpenSearch.
 
 ## Disallowing embedding the frontend by default
 
@@ -72,6 +73,12 @@ The following Java Code API changes have been made in 5.0.
 |--------------------------------------------------------------------------------------------------------|----------------------------------------------------------|
 | `PaginatedPipelineService.java` | Concrete implementation has been changed to an interface |
 | `PaginatedRuleService.java`     | Concrete implementation has been changed to an interface |
+
+## Configuration File Changes
+
+| Option                                        | Action       | Description                                                     |
+|-----------------------------------------------|--------------|-----------------------------------------------------------------|
+| `mongodb_threads_allowed_to_block_multiplier` | **removed**  | Configuring this is not supported by the official MongoDB driver anymore. |
 
 ## Behaviour Changes
 
