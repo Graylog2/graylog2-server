@@ -139,6 +139,9 @@ public class IntegrationsModule extends PluginModule {
                     GreyNoiseCommunityIpLookupAdapter.class,
                     GreyNoiseCommunityIpLookupAdapter.Factory.class,
                     GreyNoiseCommunityIpLookupAdapter.Config.class);
+
+            // PagerDuty notification type fix
+            addMigration(V20220622071600_MigratePagerDutyV1.class);
         }
     }
 
@@ -177,9 +180,6 @@ public class IntegrationsModule extends PluginModule {
         bind(IamClientBuilder.class).toProvider(IamClient::builder);
         bind(CloudWatchLogsClientBuilder.class).toProvider(CloudWatchLogsClient::builder);
         bind(KinesisClientBuilder.class).toProvider(KinesisClient::builder);
-
-        // PagerDuty notification type fix
-        addMigration(V20220622071600_MigratePagerDutyV1.class);
     }
 
     /**
