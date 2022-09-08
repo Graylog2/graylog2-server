@@ -127,7 +127,7 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
             LOG.debug("Skipping null message.");
             return;
         }
-        LOG.debug("Processing message <{}> from OutputBuffer.", msg.getId());
+        LOG.trace("Processing message <{}> from OutputBuffer.", msg.getId());
 
         final Set<MessageOutput> messageOutputs = outputRouter.getStreamOutputsForMessage(msg);
         msg.recordCounter(serverStatus, "matched-outputs", messageOutputs.size());

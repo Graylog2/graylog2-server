@@ -190,7 +190,7 @@ public class V20190304102700_MigrateMessageListStructure extends Migration {
         final FindIterable<Document> searches = this.searchCollections.find(dbQuery);
 
         /* There can be only one search with matching id */
-        assert this.searchCollections.count(dbQuery) == 1;
+        assert this.searchCollections.countDocuments(dbQuery) == 1;
         final Document search = searches.first();
 
         final List<String> searchTypeId = new ArrayList<>();
