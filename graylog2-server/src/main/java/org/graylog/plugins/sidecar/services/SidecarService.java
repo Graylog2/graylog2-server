@@ -89,8 +89,9 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
             } else {
                 throw new IllegalArgumentException("Specified object failed validation: " + violations);
             }
-        } else
+        } else {
             throw new IllegalArgumentException("Specified object is not of correct implementation type (" + sidecar.getClass() + ")!");
+        }
     }
 
     public List<Sidecar> all() {
@@ -168,7 +169,8 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                                     nodeDetails.ip(),
                                     nodeDetails.metrics(),
                                     nodeDetails.logFileList(),
-                                    statusListToSave);
+                                    statusListToSave,
+                                    nodeDetails.tags());
 
                             Sidecar toSave = collector.toBuilder()
                                     .nodeDetails(nodeDetailsToSave)
@@ -194,7 +196,8 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                         request.nodeDetails().ip(),
                         request.nodeDetails().metrics(),
                         request.nodeDetails().logFileList(),
-                        request.nodeDetails().statusList()),
+                        request.nodeDetails().statusList(),
+                        request.nodeDetails().tags()),
                 collectorVersion);
     }
 
