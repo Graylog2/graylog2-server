@@ -27,7 +27,6 @@ const Nav = styled(BootstrapNav)(({ theme }) => css`
         transition: background-color 150ms ease-in-out;
         font-family: ${theme.fonts.family.navigation};
         font-size: ${theme.fonts.size.large};
-        text-transform: uppercase;
 
         &:hover,
         &:focus {
