@@ -50,6 +50,10 @@ class TemplatesHelper extends React.Component {
               <td><code>{this._buildVariableName('sidecarVersion')}</code></td>
               <td>Version string of the running sidecar.</td>
             </tr>
+            <tr>
+              <td><code>{this._buildVariableName('spoolDir')}</code></td>
+              <td>A directory that is unique per configuration and can be used to store collector data.</td>
+            </tr>
           </tbody>
         </Table>
       </div>
