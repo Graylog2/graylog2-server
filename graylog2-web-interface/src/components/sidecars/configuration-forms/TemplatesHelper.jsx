@@ -19,7 +19,7 @@ import React from 'react';
 import { Table } from 'components/bootstrap';
 
 class TemplatesHelper extends React.Component {
-  _buildVariableName = (name) => {
+  static _buildVariableName = (name) => {
     return `\${sidecar.${name}}`;
   };
 
@@ -35,23 +35,23 @@ class TemplatesHelper extends React.Component {
           </thead>
           <tbody>
             <tr>
-              <td><code>{this._buildVariableName('operatingSystem')}</code></td>
+              <td><code>{TemplatesHelper._buildVariableName('operatingSystem')}</code></td>
               <td>Name of the operating system the sidecar is running on, e.g. <code>&quot;Linux&quot;, &quot;Windows&quot;</code></td>
             </tr>
             <tr>
-              <td><code>{this._buildVariableName('nodeName')}</code></td>
+              <td><code>{TemplatesHelper._buildVariableName('nodeName')}</code></td>
               <td>The name of the sidecar, defaults to hostname if not set.</td>
             </tr>
             <tr>
-              <td><code>{this._buildVariableName('nodeId')}</code></td>
+              <td><code>{TemplatesHelper._buildVariableName('nodeId')}</code></td>
               <td>UUID of the sidecar.</td>
             </tr>
             <tr>
-              <td><code>{this._buildVariableName('sidecarVersion')}</code></td>
+              <td><code>{TemplatesHelper._buildVariableName('sidecarVersion')}</code></td>
               <td>Version string of the running sidecar.</td>
             </tr>
             <tr>
-              <td><code>{this._buildVariableName('spoolDir')}</code></td>
+              <td><code>{TemplatesHelper._buildVariableName('spoolDir')}</code></td>
               <td>A directory that is unique per configuration and can be used to store collector data.</td>
             </tr>
           </tbody>
