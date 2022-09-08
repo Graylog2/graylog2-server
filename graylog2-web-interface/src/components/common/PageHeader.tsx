@@ -35,6 +35,7 @@ const LifecycleIndicator = styled.span(({ theme }) => css`
 const H1 = styled.h1(({ theme }) => css`
   margin-bottom: 0.2em;
   font-family: ${theme.fonts.family.navigation};
+  font-size: ${theme.fonts.size.huge};
 `);
 
 const ActionsSM = styled.div`
