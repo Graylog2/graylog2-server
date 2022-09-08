@@ -58,7 +58,19 @@ const _getBucket = (value: number, bucketCount: number, minValue: number, maxVal
 };
 
 // Coordinates are given as "lat,long"
-const _formatMarker = (coordinates: string, value: number, min: number, max: number, radiusSize: number, increment: number, color: chroma.Color, name: JSX.Element, keys: { [s: string]: unknown; } | ArrayLike<unknown>) => {
+type MarkerProps = {
+  coordinates: string,
+  value: number,
+  min: number,
+  max: number,
+  radiusSize: number,
+  increment: number,
+  color: chroma.Color,
+  name: JSX.Element,
+  keys: { [s: string]: unknown; } | ArrayLike<unknown>,
+};
+
+const Marker = ({ coordinates, value, min, max, radiusSize, increment, color, name, keys }: MarkerProps) => {
   // eslint-disable-next-line no-restricted-globals
   const formattedCoordinates = coordinates.split(',').map((component) => Number(component)).filter((n) => !isNaN(n));
 
@@ -179,17 +191,26 @@ class MapVisualization extends React.Component<MapVisualizationProps> {
 
     const noOfKeys = data.length;
     const chromaScale = chroma.scale('Spectral');
-    const markers = [];
 
-    data.forEach(({ keys, name, values }, idx) => {
+    const markers = data.flatMap(({ keys, name, values }, idx) => {
       const y = Object.values(values);
       const min = Math.min(...y);
       const max = Math.max(...y);
       const color = chromaScale(idx * (1 / noOfKeys));
 
-      Object.entries(values)
-        .forEach(([coord, value], valueIdx) => markers
-          .push(_formatMarker(coord, value, min, max, markerRadiusSize, markerRadiusIncrementSize, color, name, keys[valueIdx])));
+      return Object.entries(values)
+        .map(([coord, value], valueIdx) => (
+          <Marker key={coord}
+                  coordinates={coord}
+                  value={value}
+                  min={min}
+                  max={max}
+                  radiusSize={markerRadiusSize}
+                  increment={markerRadiusIncrementSize}
+                  color={color}
+                  name={name}
+                  keys={keys[valueIdx]} />
+        ));
     });
 
     return (
