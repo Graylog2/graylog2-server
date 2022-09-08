@@ -50,12 +50,17 @@ public abstract class NodeDetails {
     @Nullable
     public abstract CollectorStatusList statusList();
 
+    @JsonProperty("tags")
+    @Nullable
+    public abstract List<String> tags();
+
     @JsonCreator
     public static NodeDetails create(@JsonProperty("operating_system") String operatingSystem,
                                      @JsonProperty("ip") @Nullable String ip,
                                      @JsonProperty("metrics") @Nullable NodeMetrics metrics,
                                      @JsonProperty("log_file_list") @Nullable List<NodeLogFile> logFileList,
-                                     @JsonProperty("status") @Nullable CollectorStatusList statusList) {
-        return new AutoValue_NodeDetails(operatingSystem, ip, metrics, logFileList, statusList);
+                                     @JsonProperty("status") @Nullable CollectorStatusList statusList,
+                                     @JsonProperty("tags") @Nullable List<String> tags) {
+        return new AutoValue_NodeDetails(operatingSystem, ip, metrics, logFileList, statusList, tags);
     }
 }

@@ -125,6 +125,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
                         null,
                         null,
                         null,
+                        null,
                         null
                 )
         );
@@ -141,6 +142,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
                 "nodeName",
                 NodeDetails.create(
                         "DummyOS 1.0",
+                        null,
                         null,
                         null,
                         null,
@@ -161,6 +163,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
                 "",
                 NodeDetails.create(
                         "DummyOS 1.0",
+                        null,
                         null,
                         null,
                         null,
@@ -195,6 +198,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
                 "nodeName",
                 NodeDetails.create(
                         "",
+                        null,
                         null,
                         null,
                         null,
