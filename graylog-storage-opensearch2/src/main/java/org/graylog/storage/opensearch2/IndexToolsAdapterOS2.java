@@ -51,14 +51,14 @@ import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBui
 import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.matchAllQuery;
 import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.termsQuery;
 
-public class IndexToolsAdapterES2 implements IndexToolsAdapter {
+public class IndexToolsAdapterOS2 implements IndexToolsAdapter {
     private static final String AGG_DATE_HISTOGRAM = "source_date_histogram";
     private static final String AGG_MESSAGE_FIELD = "message_field";
     private static final String AGG_FILTER = "message_filter";
     private final OpenSearchClient client;
 
     @Inject
-    public IndexToolsAdapterES2(OpenSearchClient client) {
+    public IndexToolsAdapterOS2(OpenSearchClient client) {
         this.client = client;
     }
 

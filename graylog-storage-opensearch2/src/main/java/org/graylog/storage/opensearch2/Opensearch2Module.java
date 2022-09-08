@@ -52,7 +52,7 @@ public class Opensearch2Module extends VersionAwareModule {
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterOS2.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterOS2.class);
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterOS2.class);
-        bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterES2.class);
+        bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterOS2.class);
         bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterOS2.class);
         bindForSupportedVersion(MoreSearchAdapter.class).to(MoreSearchAdapterOS2.class);
         bindForSupportedVersion(NodeAdapter.class).to(NodeAdapterOS2.class);
