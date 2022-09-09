@@ -200,7 +200,8 @@ class MapVisualization extends React.Component<MapVisualizationProps> {
 
       return Object.entries(values)
         .map(([coord, value], valueIdx) => (
-          <Marker key={coord}
+          // eslint-disable-next-line react/no-array-index-key
+          <Marker key={`${name}-${coord}-${value}`}
                   coordinates={coord}
                   value={value}
                   min={min}
