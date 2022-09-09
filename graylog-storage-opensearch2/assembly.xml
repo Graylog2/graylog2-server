@@ -16,8 +16,8 @@
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <includes>
                 <include>org.graylog:graylog-storage-opensearch2</include>
-                <include>org.apache.lucene:*</include>
-                <include>org.opensearch:*</include>
+                <include>org.graylog.shaded:opensearch2</include>
+                <include>org.graylog.shaded:opensearch-rest-client-sniffer2</include>
             </includes>
         </dependencySet>
     </dependencySets>

@@ -18,10 +18,11 @@ package org.graylog.storage.opensearch2;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
-import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
-import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
 import org.graylog.events.search.MoreSearchAdapter;
+import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
+import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.storage.opensearch2.client.OSCredentialsProvider;
 import org.graylog.storage.opensearch2.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2;
 import org.graylog.storage.opensearch2.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEventsOS2;
@@ -36,13 +37,12 @@ import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
 import org.graylog2.storage.SearchVersion;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 
-public class Opensearch2Module extends VersionAwareModule {
+public class OpenSearch2Module extends VersionAwareModule {
 
     private final SearchVersion supportedVersion;
 
-    public Opensearch2Module(final SearchVersion supportedVersion) {
+    public OpenSearch2Module(final SearchVersion supportedVersion) {
         this.supportedVersion = supportedVersion;
     }
 

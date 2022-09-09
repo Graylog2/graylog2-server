@@ -24,18 +24,18 @@ import org.graylog2.storage.SearchVersion;
 
 import java.util.Collection;
 
-public class Opensearch2Plugin implements Plugin {
+public class OpenSearch2Plugin implements Plugin {
     public static final SearchVersion SUPPORTED_OPENSEARCH_VERSION = SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, com.github.zafarkhaja.semver.Version.forIntegers(2, 0, 0));
 
     @Override
     public PluginMetaData metadata() {
-        return new Opensearch2Metadata();
+        return new OpenSearch2Metadata();
     }
 
     @Override
     public Collection<PluginModule> modules() {
         return ImmutableSet.of(
-                new Opensearch2Module(SUPPORTED_OPENSEARCH_VERSION),
+                new OpenSearch2Module(SUPPORTED_OPENSEARCH_VERSION),
                 new ViewsOSBackendModule(SUPPORTED_OPENSEARCH_VERSION)
         );
     }
