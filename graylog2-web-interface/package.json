@@ -60,6 +60,7 @@
     "core-js": "3",
     "crossfilter": "1.3.x",
     "dompurify": "^2.0.11",
+    "glob-parent": "6.0.2",
     "graylog-web-plugin": "file:packages/graylog-web-plugin",
     "immutable": "^3.8.1",
     "interactjs": "^1.4.0-rc.13",
@@ -169,8 +170,6 @@
     "yargs": "^17.0.1"
   },
   "resolutions": {
-    "immer": "9.0.6",
-    "nth-check": "2.0.1",
-    "glob-parent": "5.1.2"
+    "nth-check": "2.0.1"
   }
 }
