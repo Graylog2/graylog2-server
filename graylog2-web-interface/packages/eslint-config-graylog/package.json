@@ -22,7 +22,7 @@
     "eslint-plugin-compat": "4.0.2",
     "eslint-plugin-graylog": "file:../eslint-plugin-graylog",
     "eslint-plugin-import": "2.25.3",
-    "eslint-plugin-jest": "27.0.1",
+    "eslint-plugin-jest": "27.0.2",
     "eslint-plugin-jest-dom": "4.0.2",
     "eslint-plugin-jest-formatting": "3.1.0",
     "eslint-plugin-jsx-a11y": "6.6.1",
