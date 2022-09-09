@@ -18,6 +18,7 @@ package org.graylog.plugins.sidecar.rest.models;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
@@ -28,6 +29,7 @@ import java.util.List;
 
 @AutoValue
 @JsonAutoDetect
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class NodeDetails {
     @JsonProperty("operating_system")
     @NotNull
