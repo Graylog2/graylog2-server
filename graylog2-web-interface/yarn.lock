@@ -1339,7 +1339,7 @@
     core-js-pure "^3.0.0"
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.10.2", "@babel/runtime@^7.10.3", "@babel/runtime@^7.12.0", "@babel/runtime@^7.12.1", "@babel/runtime@^7.12.13", "@babel/runtime@^7.12.5", "@babel/runtime@^7.16.3", "@babel/runtime@^7.18.9", "@babel/runtime@^7.2.0", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.2", "@babel/runtime@^7.6.3", "@babel/runtime@^7.7.2", "@babel/runtime@^7.7.6", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.10.2", "@babel/runtime@^7.10.3", "@babel/runtime@^7.12.0", "@babel/runtime@^7.12.1", "@babel/runtime@^7.12.13", "@babel/runtime@^7.12.5", "@babel/runtime@^7.16.3", "@babel/runtime@^7.18.9", "@babel/runtime@^7.2.0", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.2", "@babel/runtime@^7.6.3", "@babel/runtime@^7.7.2", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
   version "7.18.9"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.18.9.tgz#b4fcfce55db3d2e5e080d2490f608a3b9f407f4a"
   integrity sha512-lkqXDcvlFT5rvEjiu6+QYO+1GXrEHRo2LOtS7E4GtX5ESIZOgepqsZBVIj6Pv+a6zqsya9VCgiK1KAK4BvJDAw==
@@ -2231,6 +2231,11 @@
     "@react-hook/latest" "^1.0.2"
     "@react-hook/passive-layout-effect" "^1.2.0"
 
+"@react-leaflet/core@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@react-leaflet/core/-/core-2.0.1.tgz#19d4bb7c83525fab786982e5750a3f53a4bb0168"
+  integrity sha512-XGmx01DovDt0IWsW4tqeuSYifpY19aUn9NYCqTBI3KNtjbCjj0pfiWa7krNsnJ6l2oQbv4Nt0/BabLbIvT4ocA==
+
 "@sinclair/typebox@^0.24.1":
   version "0.24.20"
   resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.24.20.tgz#11a657875de6008622d53f56e063a6347c51a6dd"
@@ -2614,6 +2619,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/geojson@*":
+  version "7946.0.10"
+  resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.10.tgz#6dfbf5ea17142f7f9a043809f1cd4c448cb68249"
+  integrity sha512-Nmh0K3iWQJzniTuPRcJn5hxXkfB1T1pgB89SBig5PlJQU5yocazeu4jATJlaA0GYFKWMqDdvYemoSnF2pXgLVA==
+
 "@types/graceful-fs@^4.1.3":
   version "4.1.5"
   resolved "https://registry.yarnpkg.com/@types/graceful-fs/-/graceful-fs-4.1.5.tgz#21ffba0d98da4350db64891f92a9e5db3cdb4e15"
@@ -2709,6 +2719,13 @@
   version "0.0.29"
   resolved "https://registry.yarnpkg.com/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
   integrity sha1-7ihweulOEdK4J7y+UnC86n8+ce4=
+
+"@types/leaflet@^1.7.11":
+  version "1.7.11"
+  resolved "https://registry.yarnpkg.com/@types/leaflet/-/leaflet-1.7.11.tgz#48b33b7a15b015bbb1e8950399298a112c3220c8"
+  integrity sha512-VwAYom2pfIAf/pLj1VR5aLltd4tOtHyvfaJlNYCoejzP2nu52PrMi1ehsLRMUS+bgafmIIKBV1cMfKeS+uJ0Vg==
+  dependencies:
+    "@types/geojson" "*"
 
 "@types/lodash@^4.14.165":
   version "4.14.184"
@@ -11100,15 +11117,12 @@ react-isolated-scroll@^0.1.1:
     isolated-scroll "^0.1.0"
     prop-types "^15.5.8"
 
-react-leaflet@^2.3.0:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/react-leaflet/-/react-leaflet-2.6.1.tgz#e5d6514d2358c51a28e614b8a0ddf8dca56e7179"
-  integrity sha512-pqXQegdX4EL4R+zL33J92aLUcznp5TksNdW6CerwEwmi5m6CHt5k2YTkvyPVroZPA7pLAPB3ZAjmLLEmZh7yLw==
+react-leaflet@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/react-leaflet/-/react-leaflet-4.0.2.tgz#ffa3d8dde9859459e3dc91436f84ffd56f39ec57"
+  integrity sha512-pDyIf50Ek/LZ0p4Qxw2D9LMOx+LytQs2R+MY3mhTUPGzubrpP4QAgbCv2qc0L9y0qVRgx7dHavWuPFkc/WCJCw==
   dependencies:
-    "@babel/runtime" "^7.7.6"
-    fast-deep-equal "^3.1.1"
-    hoist-non-react-statics "^3.3.1"
-    warning "^4.0.3"
+    "@react-leaflet/core" "^2.0.1"
 
 react-lifecycles-compat@^3.0.4:
   version "3.0.4"
@@ -13650,7 +13664,7 @@ warning@^3.0.0:
   dependencies:
     loose-envify "^1.0.0"
 
-warning@^4.0.0, warning@^4.0.3:
+warning@^4.0.0:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/warning/-/warning-4.0.3.tgz#16e9e077eb8a86d6af7d64aa1e05fd85b4678ca3"
   integrity sha512-rpJyN222KWIvHJ/F53XSZv0Zl/accqHR8et1kpaMTD/fLCRxtV8iX8czMzY7sVZupTI3zcUTg8eycS2kNF9l6w==
