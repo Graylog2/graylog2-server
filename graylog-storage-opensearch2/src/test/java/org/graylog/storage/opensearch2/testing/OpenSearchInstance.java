@@ -19,6 +19,7 @@ package org.graylog.storage.opensearch2.testing;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
 import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.RestHighLevelClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
@@ -28,7 +29,6 @@ import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -46,7 +46,8 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     protected static final String OS_VERSION = "2.0.1";
     private static final int OS_PORT = 9200;
-    private static final String NETWORK_ALIAS = "opensearch";
+    // TODO: alias has to point to "elasticsearch" for now, this should change to maybe "searchServer"?
+    private static final String NETWORK_ALIAS = "elasticsearch";
     public static final String DEFAULT_HEAP_SIZE = "2g";
 
     private final RestHighLevelClient restHighLevelClient;
@@ -64,7 +65,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     @Override
     public SearchServer searchServer() {
-        return SearchServer.OS1;
+        return SearchServer.OS2;
     }
 
     private RestHighLevelClient buildRestClient() {
