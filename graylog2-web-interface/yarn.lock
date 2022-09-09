@@ -3392,10 +3392,10 @@ accepts@~1.3.5, accepts@~1.3.8:
     mime-types "~2.1.34"
     negotiator "0.6.3"
 
-ace-builds@1.10.0, ace-builds@^1.4.14:
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/ace-builds/-/ace-builds-1.10.0.tgz#241e036411e99ee771f0bb7b16fdc63a866c2381"
-  integrity sha512-7BChLsIOOeWiAX6rzddLbOz6pBMLe9uPK0FNPhklZ8XGzbv0ydvP2yE7tZ/1irma/82KDZ6EVH16AYbDxwNA/Q==
+ace-builds@1.10.1, ace-builds@^1.4.14:
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/ace-builds/-/ace-builds-1.10.1.tgz#612b78fabb0f2b6bce2d13ef9e44565d1fe01c6b"
+  integrity sha512-w8Xj6lZUtOYAquVYvdpZhb0GxXrZ+qpVfgj5LP2FwUbXE8fPrCmfu86FjwOiSphx/8PMbXXVldFLD2+RIXayyA==
 
 acorn-globals@^4.1.0:
   version "4.3.4"
@@ -4802,9 +4802,9 @@ core-js-pure@^3.0.0:
   integrity sha512-lacdXOimsiD0QyNf9BC/mxivNJ/ybBGJXQFKzRekp1WTHoVUWsUHEn+2T8GJAzzIhyOuXA+gOxCVN3l+5PLPUA==
 
 core-js@3, core-js@^3.16.2:
-  version "3.25.0"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.25.0.tgz#be71d9e0dd648ffd70c44a7ec2319d039357eceb"
-  integrity sha512-CVU1xvJEfJGhyCpBrzzzU1kjCfgsGUxhEvwUV2e/cOedYWHdmluamx+knDnmhqALddMG16fZvIqvs9aijsHHaA==
+  version "3.25.1"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.25.1.tgz#5818e09de0db8956e16bf10e2a7141e931b7c69c"
+  integrity sha512-sr0FY4lnO1hkQ4gLDr24K0DGnweGO1QwSj5BpfQjpSJPdqWalja4cTps29Y/PJVG/P7FYlPDkH3hO+Tr0CvDgQ==
 
 core-js@^2.6.5:
   version "2.6.11"
@@ -6025,7 +6025,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.2"
     eslint-plugin-compat "4.0.2"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-f9c03878-f508-47a3-90ba-33db55dd4991-1662704738202/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.0.2"
     eslint-plugin-jest-dom "4.0.2"
@@ -7280,12 +7280,12 @@ grapheme-splitter@^1.0.4:
     "@types/create-react-class" "15.6.3"
     "@types/jquery" "3.5.14"
     "@types/react" "18.0.18"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-e7982cde-de65-4c46-80fd-a2507a80991f-1662704737996/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-e7982cde-de65-4c46-80fd-a2507a80991f-1662704737996/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-e7982cde-de65-4c46-80fd-a2507a80991f-1662704737996/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.6.1"
     moment "2.29.4"
     moment-timezone "0.5.37"
@@ -10890,11 +10890,6 @@ quantize@^1.0.2:
   resolved "https://registry.yarnpkg.com/quantize/-/quantize-1.0.2.tgz#d25ac200a77b6d70f40127ca171a10e33c8546de"
   integrity sha1-0lrCAKd7bXD0ASfKFxoQ4zyFRt4=
 
-querystring@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/querystring/-/querystring-0.2.0.tgz#b209849203bb25df820da756e747005878521620"
-  integrity sha1-sgmEkgO7Jd+CDadW50cAWHhSFiA=
-
 quick-lru@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-4.0.1.tgz#5b8878f113a58217848c6482026c73e1ba57727f"
@@ -12529,14 +12524,7 @@ string_decoder@~1.1.1:
   dependencies:
     safe-buffer "~5.1.0"
 
-strip-ansi@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.0.tgz#0b1571dd7669ccd4f3e06e14ef1eed26225ae532"
-  integrity sha512-AuvKTrTfQNYNIctbR1K/YGTR1756GycPsg7b9bdV9Duqur4gv6aKqHXah67Z8ImS7WEz5QVcOtlfW2rZEugt6w==
-  dependencies:
-    ansi-regex "^5.0.0"
-
-strip-ansi@^6.0.1:
+strip-ansi@^6.0.0, strip-ansi@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
@@ -13766,13 +13754,12 @@ webpack-dev-middleware@^5.1.0:
     schema-utils "^4.0.0"
 
 webpack-hot-middleware@^2.25.1:
-  version "2.25.1"
-  resolved "https://registry.yarnpkg.com/webpack-hot-middleware/-/webpack-hot-middleware-2.25.1.tgz#581f59edf0781743f4ca4c200fd32c9266c6cf7c"
-  integrity sha512-Koh0KyU/RPYwel/khxbsDz9ibDivmUbrRuKSSQvW42KSDdO4w23WI3SkHpSUKHE76LrFnnM/L7JCrpBwu8AXYw==
+  version "2.25.2"
+  resolved "https://registry.yarnpkg.com/webpack-hot-middleware/-/webpack-hot-middleware-2.25.2.tgz#f7f936f3871d8c4eb95ecdf23a34e9cefe9806e8"
+  integrity sha512-CVgm3NAQyfdIonRvXisRwPTUYuSbyZ6BY7782tMeUzWOO7RmVI2NaBYuCp41qyD4gYCkJyTneAJdK69A13B0+A==
   dependencies:
     ansi-html-community "0.0.8"
     html-entities "^2.1.0"
-    querystring "^0.2.0"
     strip-ansi "^6.0.0"
 
 webpack-merge@4.2.2, webpack-merge@^4.2.2:
