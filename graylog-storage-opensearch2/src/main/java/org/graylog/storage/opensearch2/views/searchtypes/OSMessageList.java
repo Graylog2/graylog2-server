@@ -24,13 +24,6 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.plugin.Message;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
-import org.graylog2.rest.resources.search.responses.SearchResponse;
-import org.joda.time.DateTime;
 import org.graylog.shaded.opensearch2.org.opensearch.common.text.Text;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryStringQueryBuilder;
@@ -42,6 +35,13 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.fetch.subphase.highl
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
+import org.graylog2.rest.resources.search.responses.SearchResponse;
+import org.joda.time.DateTime;
 
 import javax.inject.Inject;
 import java.util.Arrays;
@@ -85,13 +85,13 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
     }
 
     @Override
-    public void doGenerateQueryPart(SearchJob job, Query query, MessageList messageList, OSGeneratedQueryContext queryContext) {
+    public void doGenerateQueryPart(Query query, MessageList messageList, OSGeneratedQueryContext queryContext) {
 
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(messageList)
                 .size(messageList.limit())
                 .from(messageList.offset());
 
-        applyHighlightingIfActivated(searchSourceBuilder, job, query);
+        applyHighlightingIfActivated(searchSourceBuilder, query);
 
         final Set<String> effectiveStreamIds = query.effectiveStreams(messageList);
 
@@ -110,17 +110,21 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
 
     private SortOrder toSortOrder(Sort.Order sortOrder) {
         switch (sortOrder) {
-            case ASC: return SortOrder.ASC;
-            case DESC: return SortOrder.DESC;
-            default: throw new IllegalStateException("Invalid sort order: " + sortOrder);
+            case ASC:
+                return SortOrder.ASC;
+            case DESC:
+                return SortOrder.DESC;
+            default:
+                throw new IllegalStateException("Invalid sort order: " + sortOrder);
         }
     }
-    private void applyHighlightingIfActivated(SearchSourceBuilder searchSourceBuilder, SearchJob job, Query query) {
+
+    private void applyHighlightingIfActivated(SearchSourceBuilder searchSourceBuilder, Query query) {
         if (!allowHighlighting) {
             return;
         }
 
-        final QueryStringQueryBuilder highlightQuery = decoratedHighlightQuery(job, query);
+        final QueryStringQueryBuilder highlightQuery = decoratedHighlightQuery(query);
 
         searchSourceBuilder.highlighter(new HighlightBuilder().requireFieldMatch(false)
                 .highlightQuery(highlightQuery)
@@ -129,7 +133,7 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
                 .numOfFragments(0));
     }
 
-    private QueryStringQueryBuilder decoratedHighlightQuery(SearchJob job, Query query) {
+    private QueryStringQueryBuilder decoratedHighlightQuery(Query query) {
         final String queryString = query.query().queryString();
 
         return QueryBuilders.queryStringQuery(queryString);

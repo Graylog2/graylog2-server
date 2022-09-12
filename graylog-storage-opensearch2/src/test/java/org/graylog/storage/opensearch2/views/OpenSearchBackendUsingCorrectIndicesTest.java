@@ -28,6 +28,8 @@ import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
 import org.graylog.storage.opensearch2.views.searchtypes.OSMessageList;
@@ -44,8 +46,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 
 import javax.inject.Provider;
 import java.util.Arrays;
@@ -95,7 +95,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
         this.backend = new OpenSearchBackend(handlers,
                 client,
                 indexLookup,
-                (elasticsearchBackend, ssb, job, query, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
+                (elasticsearchBackend, ssb, query, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, query, errors, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
                 false);
     }
@@ -123,7 +123,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
 
     @Test
     public void queryDoesNotFallBackToUsingAllIndicesWhenNoIndexRangesAreReturned() throws Exception {
-        final OSGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
+        final OSGeneratedQueryContext context = backend.generate(query, Collections.emptySet());
         backend.doRun(job, query, context);
 
         verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
@@ -138,7 +138,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
         final long datetimeFixture = 1530194810;
         DateTimeUtils.setCurrentMillisFixed(datetimeFixture);
 
-        final OSGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
+        final OSGeneratedQueryContext context = backend.generate(query, Collections.emptySet());
         backend.doRun(job, query, context);
 
         ArgumentCaptor<TimeRange> captor = ArgumentCaptor.forClass(TimeRange.class);
@@ -174,7 +174,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
                 .build();
         final Search search = dummySearch(query);
         final SearchJob job = new SearchJob("job1", search, "admin");
-        final OSGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
+        final OSGeneratedQueryContext context = backend.generate(query, Collections.emptySet());
 
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("streamId"), RelativeRange.create(600)))
                 .thenReturn(ImmutableSet.of("index1", "index2"));
@@ -195,7 +195,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
                 .build();
         final Search search = dummySearch(query);
         final SearchJob job = new SearchJob("job1", search, "admin");
-        final OSGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
+        final OSGeneratedQueryContext context = backend.generate(query, Collections.emptySet());
 
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1", "stream2"), RelativeRange.create(600)))
                 .thenReturn(ImmutableSet.of("index1", "index2"));

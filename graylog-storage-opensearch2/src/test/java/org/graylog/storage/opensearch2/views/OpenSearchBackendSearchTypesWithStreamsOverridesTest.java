@@ -25,13 +25,12 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
 import org.junit.Before;
 import org.junit.Test;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -62,7 +61,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
     }
 
     @Test
-    public void searchTypeWithEmptyStreamsDefaultsToQueriesStreams() throws IOException {
+    public void searchTypeWithEmptyStreamsDefaultsToQueriesStreams() {
         final Query query = queryFor(Pivot.builder()
                 .id("pivot1")
                 .series(Collections.singletonList(Average.builder().field("field1").build()))
@@ -75,7 +74,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
     }
 
     @Test
-    public void searchTypeWithoutStreamsDefaultsToQueriesStreams() throws IOException {
+    public void searchTypeWithoutStreamsDefaultsToQueriesStreams() {
         final Query query = queryFor(Pivot.builder()
                 .id("pivot1")
                 .series(Collections.singletonList(Average.builder().field("field1").build()))
@@ -87,7 +86,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
     }
 
     @Test
-    public void searchTypeWithStreamsOverridesQueriesStreams() throws IOException {
+    public void searchTypeWithStreamsOverridesQueriesStreams() {
         final Query query = queryFor(Pivot.builder()
                 .id("pivot1")
                 .series(Collections.singletonList(Average.builder().field("field1").build()))
@@ -100,7 +99,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
     }
 
     @Test
-    public void queryWithMixedPresenceOfOverridesIncludesMultipleSetsOfIndices() throws IOException {
+    public void queryWithMixedPresenceOfOverridesIncludesMultipleSetsOfIndices() {
         final Query query = queryFor(Pivot.builder()
                         .id("pivot1")
                         .series(Collections.singletonList(Average.builder().field("field1").build()))
@@ -129,9 +128,9 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
                 .build();
     }
 
-    private List<SearchRequest> run(Query query) throws IOException {
+    private List<SearchRequest> run(Query query) {
         final SearchJob job = searchJobForQuery(query);
-        final OSGeneratedQueryContext context = this.openSearchBackend.generate(job, query, Collections.emptySet());
+        final OSGeneratedQueryContext context = this.openSearchBackend.generate(query, Collections.emptySet());
 
         this.openSearchBackend.doRun(job, query, context);
 

@@ -21,10 +21,10 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
-import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,7 @@ import java.util.stream.StreamSupport;
 
 public class OSEventList implements OSSearchTypeHandler<EventList> {
     @Override
-    public void doGenerateQueryPart(SearchJob job, Query query, EventList eventList,
+    public void doGenerateQueryPart(Query query, EventList eventList,
                                     OSGeneratedQueryContext queryContext) {
         queryContext.searchSourceBuilder(eventList)
                 .size(10000);

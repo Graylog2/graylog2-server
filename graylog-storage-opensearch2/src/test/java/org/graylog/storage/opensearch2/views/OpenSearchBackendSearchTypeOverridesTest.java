@@ -32,6 +32,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -41,8 +43,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -99,7 +99,7 @@ public class OpenSearchBackendSearchTypeOverridesTest extends OpenSearchBackendG
 
     @Test
     public void overridesInSearchTypeAreIncorporatedIntoGeneratedQueries() throws IOException {
-        final OSGeneratedQueryContext queryContext = this.openSearchBackend.generate(searchJob, query, Collections.emptySet());
+        final OSGeneratedQueryContext queryContext = this.openSearchBackend.generate(query, Collections.emptySet());
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
         final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
                 .collect(Collectors.toList());
@@ -154,7 +154,7 @@ public class OpenSearchBackendSearchTypeOverridesTest extends OpenSearchBackendG
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1"), tr))
                 .thenReturn(ImmutableSet.of("searchTypeIndex"));
 
-        final OSGeneratedQueryContext queryContext = this.openSearchBackend.generate(searchJob, query, Collections.emptySet());
+        final OSGeneratedQueryContext queryContext = this.openSearchBackend.generate(query, Collections.emptySet());
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
         final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
                 .collect(Collectors.toList());

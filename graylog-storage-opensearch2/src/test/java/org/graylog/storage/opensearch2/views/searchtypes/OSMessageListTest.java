@@ -21,17 +21,16 @@ import com.jayway.jsonpath.JsonPath;
 import com.revinate.assertj.json.JsonPathAssert;
 import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
+import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHits;
+import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Test;
-import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHits;
-import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 
 import java.util.Collections;
 import java.util.Map;
@@ -166,7 +165,7 @@ public class OSMessageListTest {
                 new LegacyDecoratorProcessor.Fake(),
                 allowHighlighting);
 
-        sut.doGenerateQueryPart(mock(SearchJob.class), someQuery(), messageList, context);
+        sut.doGenerateQueryPart(someQuery(), messageList, context);
 
         return context;
     }

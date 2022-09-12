@@ -32,15 +32,15 @@ import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSea
 import org.graylog.plugins.views.search.searchfilters.model.ReferencedQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.MatchAllQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryStringQueryBuilder;
 import org.graylog.storage.opensearch2.views.searchtypes.OSMessageList;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Before;
 import org.junit.Test;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.MatchAllQueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryStringQueryBuilder;
 
 import javax.inject.Provider;
 import java.util.Collections;
@@ -67,7 +67,7 @@ public class OpenSearchBackendTest {
         backend = new OpenSearchBackend(handlers,
                 null,
                 mock(IndexLookup.class),
-                (elasticsearchBackend, ssb, job, query, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
+                (elasticsearchBackend, ssb, query, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, query, errors, fieldTypesLookup),
                 usedSearchFiltersToQueryStringsMapper,
                 false);
     }
@@ -82,7 +82,7 @@ public class OpenSearchBackendTest {
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
         final SearchJob job = new SearchJob("deadbeef", search, "admin");
 
-        backend.generate(job, query, Collections.emptySet());
+        backend.generate(query, Collections.emptySet());
     }
 
     @Test
@@ -122,7 +122,7 @@ public class OpenSearchBackendTest {
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
         final SearchJob job = new SearchJob("deadbeef", search, "admin");
 
-        final OSGeneratedQueryContext queryContext = backend.generate(job, query, Collections.emptySet());
+        final OSGeneratedQueryContext queryContext = backend.generate(query, Collections.emptySet());
         final QueryBuilder esQuery = queryContext.searchSourceBuilder(new SearchType.Fallback()).query();
         assertThat(esQuery)
                 .isNotNull()

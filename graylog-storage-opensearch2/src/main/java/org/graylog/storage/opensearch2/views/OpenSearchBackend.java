@@ -35,12 +35,6 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
-import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.graylog.storage.opensearch2.TimeRangeQueryFactory;
-import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
-import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.indexer.FieldTypeException;
-import org.graylog2.plugin.Message;
 import org.graylog.shaded.opensearch2.org.opensearch.action.ShardOperationFailedException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
@@ -50,6 +44,12 @@ import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilde
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.opensearch2.OpenSearchClient;
+import org.graylog.storage.opensearch2.TimeRangeQueryFactory;
+import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
+import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.FieldTypeException;
+import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,7 +100,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     }
 
     @Override
-    public OSGeneratedQueryContext generate(SearchJob job, Query query, Set<SearchError> validationErrors) {
+    public OSGeneratedQueryContext generate(Query query, Set<SearchError> validationErrors) {
         final BackendQuery backendQuery = query.query();
 
         final Set<SearchType> searchTypes = query.searchTypes();
@@ -116,7 +116,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                 .forEach(boolQuery::filter);
 
         // add the optional root query filters
-        generateFilterClause(query.filter(), job, query).map(boolQuery::filter);
+        generateFilterClause(query.filter(), query).map(boolQuery::filter);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(boolQuery)
@@ -124,7 +124,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                 .size(0)
                 .trackTotalHits(true);
 
-        final OSGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, job, query, validationErrors);
+        final OSGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, query, validationErrors);
         searchTypes.stream()
                 .filter(searchType -> !isSearchTypeWithError(queryContext, searchType.id()))
                 .forEach(searchType -> {
@@ -164,14 +164,14 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
 
                     searchTypeSourceBuilder.query(searchTypeOverrides);
 
-                    searchTypeHandler.get().generateQueryPart(job, query, searchType, queryContext);
+                    searchTypeHandler.get().generateQueryPart(query, searchType, queryContext);
                 });
 
         return queryContext;
     }
 
     // TODO make pluggable
-    public Optional<QueryBuilder> generateFilterClause(Filter filter, SearchJob job, Query query) {
+    public Optional<QueryBuilder> generateFilterClause(Filter filter, Query query) {
         if (filter == null) {
             return Optional.empty();
         }
@@ -180,7 +180,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
             case AndFilter.NAME:
                 final BoolQueryBuilder andBuilder = QueryBuilders.boolQuery();
                 filter.filters().stream()
-                        .map(filter1 -> generateFilterClause(filter1, job, query))
+                        .map(filter1 -> generateFilterClause(filter1, query))
                         .forEach(optQueryBuilder -> optQueryBuilder.ifPresent(andBuilder::must));
                 return Optional.of(andBuilder);
             case OrFilter.NAME:
@@ -188,7 +188,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                 // TODO for the common case "any of these streams" we can optimize the filter into
                 // a single "termsQuery" instead of "termQuery OR termQuery" if all direct children are "StreamFilter"
                 filter.filters().stream()
-                        .map(filter1 -> generateFilterClause(filter1, job, query))
+                        .map(filter1 -> generateFilterClause(filter1, query))
                         .forEach(optQueryBuilder -> optQueryBuilder.ifPresent(orBuilder::should));
                 return Optional.of(orBuilder);
             case StreamFilter.NAME:
