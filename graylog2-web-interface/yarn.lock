@@ -2174,16 +2174,10 @@
   resolved "https://registry.yarnpkg.com/@openfonts/barlow-condensed_latin/-/barlow-condensed_latin-1.44.2.tgz#6f626ca47aed39d1e4d91143dfb4b20c72f956c6"
   integrity sha512-sG0YHiy2jHtlFg+/DP2hz391+PK9SocvGOBcjIllwueo7oJu2N5zGIM8yhlxfZc3RvMdFWN5/3Djovq8blLSgA==
 
-<<<<<<< HEAD
 "@openfonts/source-code-pro_latin@^1.44.1":
   version "1.44.2"
   resolved "https://registry.yarnpkg.com/@openfonts/source-code-pro_latin/-/source-code-pro_latin-1.44.2.tgz#e7daec6a7eccfc96ff9aff33ac36fc6953e74c8e"
   integrity sha512-RIivG6F3674+6SvXLu2WdkjHZ3gmBvuj7cO8fl5T3v9yph2MmCV/QZWXf+9dkYQYNf8OFKbWVjp2x4KdlioZrg==
-
-"@openfonts/source-sans-pro_latin@^1.44.2":
-  version "1.44.2"
-  resolved "https://registry.yarnpkg.com/@openfonts/source-sans-pro_latin/-/source-sans-pro_latin-1.44.2.tgz#46f01915dc62545cc3e0596c55cd49b4906b022d"
-  integrity sha512-/NMcdO9K8a1b1+IKjpeD+YC+hTaVnzghcRljHeFnjZtjnYnw01NWRxladEE0TY99w3GnOSz1LaKuupfirJJlOQ==
 
 "@openfonts/source-sans-pro_latin@^1.44.2":
   version "1.44.2"
