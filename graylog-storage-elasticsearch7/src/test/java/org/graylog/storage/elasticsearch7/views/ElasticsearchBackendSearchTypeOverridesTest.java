@@ -66,7 +66,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
 
     @Before
     public void setUpFixtures() throws InvalidRangeParametersException {
-        final Set<SearchType> searchTypes = new HashSet<SearchType>() {{
+        final Set<SearchType> searchTypes = new HashSet<>() {{
             add(
                     Pivot.builder()
                             .id("pivot1")
@@ -99,7 +99,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
 
     @Test
     public void overridesInSearchTypeAreIncorporatedIntoGeneratedQueries() throws IOException {
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet());
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(query, Collections.emptySet());
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
         final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
                 .collect(Collectors.toList());
@@ -130,19 +130,19 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
     }
 
     private List<String> queryStrings(DocumentContext pivot) {
-        return pivot.read("$..query_string.query", new TypeRef<List<String>>() {});
+        return pivot.read("$..query_string.query", new TypeRef<>() {});
     }
 
     private List<List<String>> streams(DocumentContext pivot) {
-        return pivot.read("$..terms.streams", new TypeRef<List<List<String>>>() {});
+        return pivot.read("$..terms.streams", new TypeRef<>() {});
     }
 
     private List<String> timerangeFrom(DocumentContext pivot) {
-        return pivot.read("$..timestamp.from", new TypeRef<List<String>>() {});
+        return pivot.read("$..timestamp.from", new TypeRef<>() {});
     }
 
     private List<String> timerangeTo(DocumentContext pivot) {
-        return pivot.read("$..timestamp.to", new TypeRef<List<String>>() {});
+        return pivot.read("$..timestamp.to", new TypeRef<>() {});
     }
 
     @Test
@@ -154,7 +154,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1"), tr))
                 .thenReturn(ImmutableSet.of("searchTypeIndex"));
 
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet());
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(query, Collections.emptySet());
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
         final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
                 .collect(Collectors.toList());
