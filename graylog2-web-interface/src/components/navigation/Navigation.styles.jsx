@@ -116,7 +116,11 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
 
       #scratchpad-toggle,
       .dropdown-toggle {
-        padding: 15px 12px !important;
+        padding: 12px !important;
+        min-height: 50px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
       }
     }
 

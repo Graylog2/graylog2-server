@@ -26,6 +26,16 @@ import { NotificationsActions, NotificationsStore } from 'stores/notifications/N
 
 import InactiveNavItem from './InactiveNavItem';
 
+const StyledNav = styled(Nav)`
+  > li > a {
+    min-height: 50px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+  }
+`;
+
 const StyledInactiveNavItem = styled(InactiveNavItem)`
   a:hover {
     border: 0;
@@ -61,13 +71,13 @@ class NotificationBadge extends React.PureComponent {
     }
 
     return (
-      <Nav navbar>
+      <StyledNav navbar>
         <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
           <StyledInactiveNavItem>
             <Badge bsStyle="danger" id="notification-badge">{total}</Badge>
           </StyledInactiveNavItem>
         </LinkContainer>
-      </Nav>
+      </StyledNav>
     );
   }
 }
