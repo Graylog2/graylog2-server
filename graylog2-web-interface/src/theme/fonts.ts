@@ -78,6 +78,7 @@ const size = {
   large: '1.125rem',
   small: '0.889rem',
   tiny: '0.79rem',
+  navigation: '1.266rem',
   h1: '1.802rem',
   h2: '1.602rem',
   h3: '1.424rem',
