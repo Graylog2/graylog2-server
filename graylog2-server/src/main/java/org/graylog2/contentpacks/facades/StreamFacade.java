@@ -27,7 +27,6 @@ import org.bson.types.ObjectId;
 import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
-import org.graylog2.alerts.AlertService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
@@ -47,8 +46,6 @@ import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.plugin.alarms.AlertCondition;
-import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.streams.Output;
@@ -85,7 +82,6 @@ public class StreamFacade implements EntityFacade<Stream> {
     private final ObjectMapper objectMapper;
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
-    private final AlertService streamAlertService;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration;
     private final IndexSetService indexSetService;
@@ -95,14 +91,12 @@ public class StreamFacade implements EntityFacade<Stream> {
     public StreamFacade(ObjectMapper objectMapper,
                         StreamService streamService,
                         StreamRuleService streamRuleService,
-                        AlertService streamAlertService,
                         AlarmCallbackConfigurationService alarmCallbackConfigurationService,
                         V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration,
                         IndexSetService indexSetService, UserService userService) {
         this.objectMapper = objectMapper;
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
-        this.streamAlertService = streamAlertService;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
         this.legacyAlertsMigration = legacyAlertsMigration;
         this.indexSetService = indexSetService;
@@ -178,17 +172,6 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .map(streamRuleEntity -> createStreamRuleRequest(streamRuleEntity, parameters))
                 .map(request -> streamRuleService.create(DUMMY_STREAM_ID, request))
                 .collect(Collectors.toList());
-        // TODO: The creation of legacy alert conditions should be avoided and a new event definition should be created instead
-        final List<AlertCondition> alertConditions = streamEntity.alertConditions().stream()
-                .map(alertCondition -> createStreamAlertConditionRequest(alertCondition, parameters))
-                .map(request -> {
-                    try {
-                        return streamAlertService.fromRequest(request, stream, user.getName());
-                    } catch (ConfigurationException e) {
-                        throw new ContentPackException("Couldn't create entity " + entity.toEntityDescriptor(), e);
-                    }
-                })
-                .collect(Collectors.toList());
         // TODO: The creation of legacy alarm callback should be avoided and a new event notification should be created instead
         final List<AlarmCallbackConfiguration> alarmCallbacks = streamEntity.alarmCallbacks().stream()
                 .map(alarmCallback -> createStreamAlarmCallbackRequest(alarmCallback, parameters))
@@ -197,10 +180,6 @@ public class StreamFacade implements EntityFacade<Stream> {
         final String savedStreamId;
         try {
             savedStreamId = streamService.saveWithRulesAndOwnership(stream, streamRules, user);
-
-            for (final AlertCondition alertCondition : alertConditions) {
-                streamService.addAlertCondition(stream, alertCondition);
-            }
             for (final AlarmCallbackConfiguration alarmCallback : alarmCallbacks) {
                 alarmCallbackConfigurationService.save(alarmCallback);
             }
@@ -217,16 +196,6 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .map(ObjectId::new)
                 .collect(Collectors.toSet());
         streamService.addOutputs(new ObjectId(savedStreamId), outputIds);
-
-        if (!alertConditions.isEmpty() || !alarmCallbacks.isEmpty()) {
-            // Migrated newly created legacy alert conditions and alarm callbacks to the new events system
-            // TODO: Remove migration call once we updated the above code to directly create event definitions and notifications
-            try {
-                legacyAlertsMigration.upgrade();
-            } catch (Exception e) {
-                LOG.error("Couldn't run migration for newly created legacy alert conditions and/or alarm callbacks", e);
-            }
-        }
 
         return NativeEntity.create(entity.id(), savedStreamId, TYPE_V1, stream.getTitle(), stream);
     }

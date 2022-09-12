@@ -26,7 +26,6 @@ import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
-import org.graylog2.alerts.AlertService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -83,8 +82,6 @@ public class StreamCatalogTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     @Mock
-    private AlertService alertService;
-    @Mock
     private OutputService outputService;
     @Mock
     private IndexSetService indexSetService;
@@ -111,7 +108,6 @@ public class StreamCatalogTest {
         final StreamService streamService = new StreamServiceImpl(
                 mongoConnection,
                 streamRuleService,
-                alertService,
                 outputService,
                 indexSetService,
                 mongoIndexSetFactory,
@@ -123,7 +119,7 @@ public class StreamCatalogTest {
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)
         );
 
-        facade = new StreamFacade(objectMapper, streamService, streamRuleService, alertService, alarmCallbackConfigurationService, legacyAlertConditionMigration, indexSetService, userService);
+        facade = new StreamFacade(objectMapper, streamService, streamRuleService, alarmCallbackConfigurationService, legacyAlertConditionMigration, indexSetService, userService);
     }
 
     @Test

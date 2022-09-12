@@ -22,9 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
-import org.graylog2.alerts.AlertService;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
-import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.facades.GrokPatternFacade;
 import org.graylog2.contentpacks.facades.OutputFacade;
@@ -81,8 +79,6 @@ public class ContentPackServiceTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     @Mock
-    private AlertService alertService;
-    @Mock
     private AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     @Mock
     private StreamService streamService;
@@ -121,7 +117,7 @@ public class ContentPackServiceTest {
         outputFactories2 = new HashMap<>();
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = ImmutableMap.of(
                 ModelTypes.GROK_PATTERN_V1, new GrokPatternFacade(objectMapper, patternService),
-                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, alertService, alarmCallbackConfigurationService, legacyAlertConditionMigration, indexSetService, userService),
+                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, alarmCallbackConfigurationService, legacyAlertConditionMigration, indexSetService, userService),
                 ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories, outputFactories2)
         );
 

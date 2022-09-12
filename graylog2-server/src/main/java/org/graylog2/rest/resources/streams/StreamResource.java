@@ -34,7 +34,6 @@ import org.bson.types.ObjectId;
 import org.graylog.security.UserContext;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
-import org.graylog2.alerts.AlertService;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -44,16 +43,11 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.alarms.AlertCondition;
-import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
-import org.graylog2.rest.models.alarmcallbacks.requests.AlertReceivers;
 import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
-import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
-import org.graylog2.rest.models.streams.alerts.requests.CreateConditionRequest;
 import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
@@ -134,7 +128,6 @@ public class StreamResource extends RestResource {
     private final StreamRouterEngine.Factory streamRouterEngineFactory;
     private final IndexSetRegistry indexSetRegistry;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
-    private final AlertService alertService;
     private final SearchQueryParser searchQueryParser;
 
     @Inject
@@ -143,14 +136,12 @@ public class StreamResource extends RestResource {
                           StreamRuleService streamRuleService,
                           StreamRouterEngine.Factory streamRouterEngineFactory,
                           IndexSetRegistry indexSetRegistry,
-                          AlarmCallbackConfigurationService alarmCallbackConfigurationService,
-                          AlertService alertService) {
+                          AlarmCallbackConfigurationService alarmCallbackConfigurationService) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
         this.indexSetRegistry = indexSetRegistry;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
-        this.alertService = alertService;
         this.paginatedStreamService = paginatedStreamService;
         this.searchQueryParser = new SearchQueryParser(StreamImpl.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
@@ -482,19 +473,6 @@ public class StreamResource extends RestResource {
         final String savedStreamId = streamService.saveWithRulesAndOwnership(stream, newStreamRules.build(), userContext.getUser());
         final ObjectId savedStreamObjectId = new ObjectId(savedStreamId);
 
-        for (AlertCondition alertCondition : streamService.getAlertConditions(sourceStream)) {
-            try {
-                final AlertCondition clonedAlertCondition = alertService.fromRequest(
-                    CreateConditionRequest.create(alertCondition.getType(), alertCondition.getTitle(), alertCondition.getParameters()),
-                    stream,
-                    creatorUser
-                );
-                streamService.addAlertCondition(stream, clonedAlertCondition);
-            } catch (ConfigurationException e) {
-                LOG.warn("Unable to clone alert condition <" + alertCondition + "> - skipping: ", e);
-            }
-        }
-
         for (AlarmCallbackConfiguration alarmCallbackConfiguration : alarmCallbackConfigurationService.getForStream(sourceStream)) {
             final CreateAlarmCallbackRequest request = CreateAlarmCallbackRequest.create(alarmCallbackConfiguration);
             final AlarmCallbackConfiguration alarmCallback = alarmCallbackConfigurationService.create(stream.getId(), request, getCurrentUser().getName());
@@ -516,18 +494,6 @@ public class StreamResource extends RestResource {
     }
 
     private StreamResponse streamToResponse(Stream stream) {
-        final List<String> emailAlertReceivers = stream.getAlertReceivers().get("emails");
-        final List<String> usersAlertReceivers = stream.getAlertReceivers().get("users");
-        final Collection<AlertConditionSummary> alertConditions = streamService.getAlertConditions(stream)
-            .stream()
-            .map((alertCondition) -> AlertConditionSummary.createWithoutGrace(
-                alertCondition.getId(),
-                alertCondition.getType(),
-                alertCondition.getCreatorUserId(),
-                alertCondition.getCreatedAt().toDate(),
-                alertCondition.getParameters(),
-                alertCondition.getTitle()))
-            .collect(Collectors.toList());
         return StreamResponse.create(
             stream.getId(),
             (String) stream.getFields().get(StreamImpl.FIELD_CREATOR_USER_ID),
@@ -537,8 +503,6 @@ public class StreamResource extends RestResource {
             stream.getFields().get(StreamImpl.FIELD_CREATED_AT).toString(),
             stream.getDisabled(),
             stream.getStreamRules(),
-            alertConditions,
-            AlertReceivers.create(emailAlertReceivers, usersAlertReceivers),
             stream.getTitle(),
             stream.getContentPack(),
             stream.isDefaultStream(),
