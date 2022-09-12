@@ -32,6 +32,10 @@ const StyledTh = styled.th(({ isNumeric }: { isNumeric: boolean }) => css`
   ${isNumeric ? 'text-align: right' : ''}
 `);
 
+const CenteredTh = styled.th`
+  text-align: center;
+`;
+
 const _headerField = (activeQuery: string, fields, field: string, prefix: (string | number) = '', span: number = 1, title: string = field) => {
   const type = fieldTypeFor(field, fields);
 
@@ -43,9 +47,9 @@ const _headerField = (activeQuery: string, fields, field: string, prefix: (strin
 };
 
 const _headerFieldForValue = (activeQuery: string, field, value, span = 1, prefix = '') => (
-  <th key={`${prefix}${field}-${value}`} colSpan={span} className={styles.leftAligned}>
+  <CenteredTh key={`${prefix}${field}-${value}`} colSpan={span} className={styles.leftAligned}>
     <Value field={field} value={value} queryId={activeQuery} type={FieldType.Unknown}>{value}</Value>
-  </th>
+  </CenteredTh>
 );
 
 // eslint-disable-next-line jsx-a11y/control-has-associated-label
