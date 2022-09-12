@@ -16,9 +16,8 @@
  */
 package org.graylog.testing;
 
-import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
-import org.graylog.storage.elasticsearch7.testing.OpensearchInstance;
+import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.ContainerMatrixElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 
@@ -27,9 +26,9 @@ public abstract class ContainerMatrixElasticsearchITBaseTest extends ContainerMa
         super(elasticsearch);
     }
 
-    protected ElasticsearchClient elasticsearchClient() {
+    protected Object elasticsearchClient() {
         return elasticsearch() instanceof ElasticsearchInstanceES7
                 ? ((ElasticsearchInstanceES7) elasticsearch()).elasticsearchClient()
-                : ((OpensearchInstance) elasticsearch()).elasticsearchClient();
+                : ((OpenSearchInstance) elasticsearch()).elasticsearchClient();
     }
 }

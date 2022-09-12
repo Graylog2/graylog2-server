@@ -29,6 +29,9 @@ import org.graylog.storage.elasticsearch7.NodeAdapterES7;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
+import org.graylog.storage.opensearch2.IndicesAdapterOS2;
+import org.graylog.storage.opensearch2.NodeAdapterOS2;
+import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.testing.ContainerMatrixElasticsearchITBaseTest;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.MongodbServer;
@@ -38,7 +41,6 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfi
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IgnoreIndexTemplate;
-import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
@@ -124,21 +126,32 @@ public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
     protected IndicesAdapter indicesAdapter() {
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        final ElasticsearchClient client = elasticsearchClient();
-        return new IndicesAdapterES7(
-                client,
-                new StatsApi(objectMapper, client),
-                new CatApi(objectMapper, client),
-                new ClusterStateApi(objectMapper, client)
-        );
-
+        if (elasticsearch().searchServer().equals(SearchServer.OS2)) {
+            final OpenSearchClient client = (OpenSearchClient) elasticsearchClient();
+            return new IndicesAdapterOS2(client,
+                    new org.graylog.storage.opensearch2.stats.StatsApi(objectMapper, client),
+                    new org.graylog.storage.opensearch2.cat.CatApi(objectMapper, client),
+                    new org.graylog.storage.opensearch2.cluster.ClusterStateApi(objectMapper, client)
+            );
+        } else {
+            final ElasticsearchClient client = (ElasticsearchClient) elasticsearchClient();
+            return new IndicesAdapterES7(
+                    client,
+                    new StatsApi(objectMapper, client),
+                    new CatApi(objectMapper, client),
+                    new ClusterStateApi(objectMapper, client)
+            );
+        }
     }
 
     protected NodeAdapter createNodeAdapter() {
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        return new NodeAdapterES7(elasticsearchClient(), objectMapper);
-
+        if (elasticsearch().searchServer().equals(SearchServer.OS2)) {
+            return new NodeAdapterOS2((OpenSearchClient) elasticsearchClient(), objectMapper);
+        } else {
+            return new NodeAdapterES7((ElasticsearchClient) elasticsearchClient(), objectMapper);
+        }
     }
 
     protected Map<String, Object> createTemplateFor(String indexWildcard, Map<String, Object> mapping) {

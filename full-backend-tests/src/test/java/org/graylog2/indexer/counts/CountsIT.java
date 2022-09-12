@@ -18,6 +18,9 @@ package org.graylog2.indexer.counts;
 
 import com.google.common.collect.ImmutableMap;
 import org.graylog.storage.elasticsearch7.CountsAdapterES7;
+import org.graylog.storage.elasticsearch7.ElasticsearchClient;
+import org.graylog.storage.opensearch2.CountsAdapterOS2;
+import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.testing.ContainerMatrixElasticsearchITBaseTest;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
@@ -71,7 +74,11 @@ public class CountsIT extends ContainerMatrixElasticsearchITBaseTest {
     }
 
     protected CountsAdapter countsAdapter() {
-        return new CountsAdapterES7(elasticsearchClient());
+        if (elasticsearch().searchServer().equals(SearchServer.OS2)) {
+            return new CountsAdapterOS2((OpenSearchClient) elasticsearchClient());
+        } else {
+            return new CountsAdapterES7((ElasticsearchClient) elasticsearchClient());
+        }
     }
 
     @BeforeAll
