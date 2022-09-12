@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 
 import { ROOT_FONT_SIZE } from './constants';
 
-import '@openfonts/roboto-mono_latin/index.css';
+import '@openfonts/source-code-pro_latin/index.css';
 import '@openfonts/source-sans-pro_latin/index.css';
 import '@openfonts/barlow-condensed_latin/index.css';
 
@@ -66,8 +66,8 @@ export const fontsPropTypes = PropTypes.shape({
 
 const family = {
   body: '"Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif',
-  monospace: '"Roboto Mono", Menlo, Monaco, Consolas, "Courier New", monospace',
-  navigation: '"Barlow Condensed"',
+  monospace: '"Source Code Pro", Menlo, Monaco, Consolas, "Courier New", monospace',
+  navigation: '"Barlow Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif',
 };
 
 /* Scaled 1.125 Major Second - https://type-scale.com/ */
