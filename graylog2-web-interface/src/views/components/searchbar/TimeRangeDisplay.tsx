@@ -49,7 +49,6 @@ const TimeRangeWrapper = styled.p(({ theme }) => css`
   code {
     color: ${theme.colors.variant.darker.primary};
     background: transparent;
-    font-size: ${theme.fonts.size.body};
   }
 `);
 
