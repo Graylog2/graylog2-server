@@ -32,7 +32,7 @@ const StyledTh = styled.th(({ isNumeric }: { isNumeric: boolean }) => css`
   ${isNumeric ? 'text-align: right' : ''}
 `);
 
-const CentratedTh = styled.th`
+const CenteredTh = styled.th`
   text-align: center;
 `;
 
@@ -47,9 +47,9 @@ const _headerField = (activeQuery: string, fields, field: string, prefix: (strin
 };
 
 const _headerFieldForValue = (activeQuery: string, field, value, span = 1, prefix = '') => (
-  <CentratedTh key={`${prefix}${field}-${value}`} colSpan={span} className={styles.leftAligned}>
+  <CenteredTh key={`${prefix}${field}-${value}`} colSpan={span} className={styles.leftAligned}>
     <Value field={field} value={value} queryId={activeQuery} type={FieldType.Unknown}>{value}</Value>
-  </CentratedTh>
+  </CenteredTh>
 );
 
 // eslint-disable-next-line jsx-a11y/control-has-associated-label
@@ -57,9 +57,7 @@ const _spacer = (idx, span = 1) => <th colSpan={span} key={`spacer-${idx}`} clas
 
 const columnPivotFieldsHeaders = (activeQuery: string, columnPivots: string[], actualColumnPivotValues: any[], series: Series[], offset = 1) => {
   return columnPivots.map((columnPivot, idx) => {
-    const actualValues = actualColumnPivotValues.map((key) => {
-      return ({ path: key.slice(0, idx).join('-'), key: key[idx] || '', count: 1 });
-    });
+    const actualValues = actualColumnPivotValues.map((key) => ({ path: key.slice(0, idx).join('-'), key: key[idx] || '', count: 1 }));
     const actualValuesWithoutDuplicates = actualValues.reduce((prev, cur) => {
       const lastKey = get(last(prev), 'key');
       const lastPath = get(last(prev), 'path');
