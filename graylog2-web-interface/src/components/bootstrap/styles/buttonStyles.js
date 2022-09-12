@@ -17,7 +17,7 @@
 import chroma from 'chroma-js';
 import { css } from 'styled-components';
 
-const buttonStyles = ({ colors, utils }) => {
+const buttonStyles = ({ colors, utils, fonts }) => {
   const variants = {
     danger: colors.variant.danger,
     default: colors.gray[90],
