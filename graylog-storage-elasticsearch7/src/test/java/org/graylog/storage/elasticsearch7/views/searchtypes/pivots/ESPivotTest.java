@@ -159,7 +159,7 @@ public class ESPivotTest {
         final Values values = Values.builder().field("action").limit(10).build();
         when(pivot.columnGroups()).thenReturn(Collections.singletonList(values));
 
-        this.esPivot.doGenerateQueryPart(job, query, pivot, queryContext);
+        this.esPivot.doGenerateQueryPart(query, pivot, queryContext);
 
         verify(bucketHandler, times(1)).createAggregation(eq("agg-1"), eq(pivot), eq(values), eq(queryContext), eq(query));
     }
@@ -187,7 +187,7 @@ public class ESPivotTest {
         final Time time = Time.builder().field("timestamp").interval(AutoInterval.create()).build();
         when(pivot.columnGroups()).thenReturn(ImmutableList.of(values, time));
 
-        this.esPivot.doGenerateQueryPart(job, query, pivot, queryContext);
+        this.esPivot.doGenerateQueryPart(query, pivot, queryContext);
 
         verify(valuesBucketHandler, times(1)).createAggregation(eq("values-agg"), eq(pivot), eq(values), eq(queryContext), eq(query));
         verify(timeBucketHandler, times(1)).createAggregation(eq("time-agg"), eq(pivot), eq(time), eq(queryContext), eq(query));
@@ -217,7 +217,7 @@ public class ESPivotTest {
         final Values values = Values.builder().field("action").limit(10).build();
         when(pivot.rowGroups()).thenReturn(ImmutableList.of(time, values));
 
-        this.esPivot.doGenerateQueryPart(job, query, pivot, queryContext);
+        this.esPivot.doGenerateQueryPart(query, pivot, queryContext);
 
         verify(valuesBucketHandler, times(1)).createAggregation(eq("values-agg"), eq(pivot), eq(values), eq(queryContext), eq(query));
         verify(timeBucketHandler, times(1)).createAggregation(eq("time-agg"), eq(pivot), eq(time), eq(queryContext), eq(query));
@@ -248,7 +248,7 @@ public class ESPivotTest {
         when(pivot.rowGroups()).thenReturn(Collections.singletonList(time));
         when(pivot.columnGroups()).thenReturn(Collections.singletonList(values));
 
-        this.esPivot.doGenerateQueryPart(job, query, pivot, queryContext);
+        this.esPivot.doGenerateQueryPart(query, pivot, queryContext);
 
         verify(valuesBucketHandler, times(1)).createAggregation(eq("values-agg"), eq(pivot), eq(values), eq(queryContext), eq(query));
         verify(timeBucketHandler, times(1)).createAggregation(eq("time-agg"), eq(pivot), eq(time), eq(queryContext), eq(query));
@@ -294,7 +294,7 @@ public class ESPivotTest {
         when(pivot.rollup()).thenReturn(false);
         when(queryContext.seriesName(any(), any())).thenCallRealMethod();
 
-        this.esPivot.doGenerateQueryPart(job, query, pivot, queryContext);
+        this.esPivot.doGenerateQueryPart(query, pivot, queryContext);
 
         verify(timeBucketHandler).createAggregation(eq("rowPivot1"), eq(pivot), eq(rowPivot1), eq(queryContext), eq(query));
         verify(valuesBucketHandler).createAggregation(eq("rowPivot2"), eq(pivot), eq(rowPivot2), eq(queryContext), eq(query));

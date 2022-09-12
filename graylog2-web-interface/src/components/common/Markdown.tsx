@@ -14,15 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.validation;
+import * as React from 'react';
+import { useMemo } from 'react';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
-public enum ValidationType {
-    UNDECLARED_PARAMETER,
-    EMPTY_PARAMETER,
-    QUERY_PARSING_ERROR,
-    UNKNOWN_FIELD,
-    INVALID_OPERATOR,
-    MISSING_LICENSE,
-    INVALID_VALUE_TYPE,
-    PARAMETER_NOT_ALLOWED,
+type Props = {
+  text: string,
 }
+
+const Markdown = ({ text }: Props) => {
+  const markdown = useMemo(() => DOMPurify.sanitize(marked(text ?? '')), [text]);
+
+  // eslint-disable-next-line react/no-danger
+  return <div dangerouslySetInnerHTML={{ __html: markdown }} />;
+};
+
+export default Markdown;
