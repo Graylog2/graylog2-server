@@ -30,7 +30,7 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, searchVersions = {SearchServer.ES6}, mongoVersions = {MongodbServer.MONGO4})
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, mongoVersions = {MongodbServer.MONGO4})
 class MongoDBFixturesWithClassLifecycleIT {
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;

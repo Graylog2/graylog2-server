@@ -60,5 +60,5 @@ module.exports = {
   transform: {
     '^.+\\.[tj]sx?$': 'babel-jest',
   },
-  transformIgnorePatterns: ['node_modules/(?!(@react-hook|uuid)/)'],
+  transformIgnorePatterns: ['node_modules/(?!(@react-hook|uuid|@?react-leaflet)/)'],
 };

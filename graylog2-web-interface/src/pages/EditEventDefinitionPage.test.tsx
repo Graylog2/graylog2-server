@@ -18,15 +18,16 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
+import { defaultUser } from 'defaultMockValues';
 
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import { asMock } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 import mockComponent from 'helpers/mocking/MockComponent';
 import { simpleEventDefinition as mockEventDefinition } from 'fixtures/eventDefinition';
 import { adminUser } from 'fixtures/users';
-import { asMock } from 'helpers/mocking';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import EditEventDefinitionPage from 'pages/EditEventDefinitionPage';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 type entityScope = {
   is_mutable: boolean;
@@ -64,35 +65,29 @@ jest.mock('stores/event-definitions/EventDefinitionsStore', () => ({
 }));
 
 jest.mock('hooks/useScopePermissions', () => jest.fn());
-
+jest.mock('hooks/useCurrentUser');
 jest.mock('components/event-definitions/event-definition-form/EventDefinitionFormContainer', () => mockComponent('EventDefinitionFormContainer'));
 
 describe('<EditEventDefinitionPage />', () => {
-  const EditEventDefinitionPageWithPermissions = ({ permissions = [] }: {permissions?: string | Array<string>},
-  ) => {
-    const currentUser = adminUser.toBuilder().permissions(Immutable.List(permissions)).build();
-
-    const EditEventDefinitionPageWithParams = <EditEventDefinitionPage />;
-
-    return (
-      <CurrentUserContext.Provider value={currentUser}>
-        {EditEventDefinitionPageWithParams}
-      </CurrentUserContext.Provider>
-    );
-  };
-
-  EditEventDefinitionPageWithPermissions.defaultProps = { permissions: [] };
+  beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
+  });
 
   it('should display the event definition to edit', async () => {
     asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeMutable);
-    render(<EditEventDefinitionPageWithPermissions permissions={['eventdefinitions:edit:event-definition-1-id', 'streams:read:stream-id-1']} />);
+
+    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
+      .permissions(Immutable.List(['eventdefinitions:edit:event-definition-1-id', 'streams:read:stream-id-1']))
+      .build());
+
+    render(<EditEventDefinitionPage />);
 
     await screen.findByText(/Event Definition 1/);
   });
 
   it('should display message component', async () => {
     asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeImmutable);
-    render(<EditEventDefinitionPageWithPermissions permissions={['*']} />);
+    render(<EditEventDefinitionPage />);
 
     await screen.findByText(/cannot be edited/);
   });

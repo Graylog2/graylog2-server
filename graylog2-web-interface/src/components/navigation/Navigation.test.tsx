@@ -20,6 +20,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Route, MemoryRouter, useLocation } from 'react-router-dom';
 import Immutable from 'immutable';
 import type { Location } from 'history';
+import { defaultUser } from 'defaultMockValues';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import { adminUser } from 'fixtures/users';
@@ -58,7 +59,7 @@ describe('Navigation', () => {
   const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
 
   beforeEach(() => {
-    asMock(useCurrentUser).mockReturnValue(adminUser);
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
     asMock(useLocation).mockReturnValue({ pathname: '/' } as Location<{ pathname: string }>);
   });
 
@@ -66,7 +67,6 @@ describe('Navigation', () => {
     let wrapper;
 
     beforeEach(() => {
-      asMock(useCurrentUser).mockReturnValue(adminUser);
       wrapper = mount(<Navigation />);
     });
 
