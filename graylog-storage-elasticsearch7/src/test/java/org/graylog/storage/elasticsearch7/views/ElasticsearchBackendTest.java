@@ -68,7 +68,7 @@ public class ElasticsearchBackendTest {
         backend = new ElasticsearchBackend(handlers,
                 null,
                 mock(IndexLookup.class),
-                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
+                (elasticsearchBackend, ssb, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypesLookup),
                 usedSearchFiltersToQueryStringsMapper,
                 false);
     }
@@ -80,10 +80,7 @@ public class ElasticsearchBackendTest {
                 .query(ElasticsearchQueryString.of(""))
                 .timerange(RelativeRange.create(300))
                 .build();
-        final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
-        final SearchJob job = new SearchJob("deadbeef", search, "admin");
-
-        backend.generate(job, query, Collections.emptySet());
+        backend.generate(query, Collections.emptySet());
     }
 
     @Test
@@ -120,10 +117,8 @@ public class ElasticsearchBackendTest {
                 .filters(usedSearchFilters)
                 .timerange(RelativeRange.create(300))
                 .build();
-        final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
-        final SearchJob job = new SearchJob("deadbeef", search, "admin");
 
-        final ESGeneratedQueryContext queryContext = backend.generate(job, query, Collections.emptySet());
+        final ESGeneratedQueryContext queryContext = backend.generate(query, Collections.emptySet());
         final QueryBuilder esQuery = queryContext.searchSourceBuilder(new SearchType.Fallback()).query();
         assertThat(esQuery)
                 .isNotNull()
