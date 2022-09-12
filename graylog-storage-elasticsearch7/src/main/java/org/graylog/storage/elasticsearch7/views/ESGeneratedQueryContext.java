@@ -21,8 +21,6 @@ import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.plugins.views.search.Filter;
-import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
@@ -48,8 +46,6 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
     private final UniqueNamer uniqueNamer = new UniqueNamer("agg-");
     private final Set<SearchError> errors;
     private final SearchSourceBuilder ssb;
-    private final SearchJob job;
-    private final Query query;
 
     private final FieldTypesLookup fieldTypes;
 
@@ -57,14 +53,10 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
     public ESGeneratedQueryContext(
             @Assisted ElasticsearchBackend elasticsearchBackend,
             @Assisted SearchSourceBuilder ssb,
-            @Assisted SearchJob job,
-            @Assisted Query query,
             @Assisted Collection<SearchError> validationErrors,
             FieldTypesLookup fieldTypes) {
         this.elasticsearchBackend = elasticsearchBackend;
         this.ssb = ssb;
-        this.job = job;
-        this.query = query;
         this.fieldTypes = fieldTypes;
         this.errors = new HashSet<>(validationErrors);
     }
@@ -73,8 +65,6 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
         ESGeneratedQueryContext create(
                 ElasticsearchBackend elasticsearchBackend,
                 SearchSourceBuilder ssb,
-                SearchJob job,
-                Query query,
                 Collection<SearchError> validationErrors
         );
     }
@@ -110,7 +100,7 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
     }
 
     private Optional<QueryBuilder> generateFilterClause(Filter filter) {
-        return elasticsearchBackend.generateFilterClause(filter, job, query);
+        return elasticsearchBackend.generateFilterClause(filter);
     }
 
     public String seriesName(SeriesSpec seriesSpec, Pivot pivot) {

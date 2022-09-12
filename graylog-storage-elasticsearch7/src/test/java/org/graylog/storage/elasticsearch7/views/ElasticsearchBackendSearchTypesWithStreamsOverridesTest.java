@@ -131,7 +131,7 @@ public class ElasticsearchBackendSearchTypesWithStreamsOverridesTest extends Ela
 
     private List<SearchRequest> run(Query query) throws IOException {
         final SearchJob job = searchJobForQuery(query);
-        final ESGeneratedQueryContext context = this.elasticsearchBackend.generate(job, query, Collections.emptySet());
+        final ESGeneratedQueryContext context = this.elasticsearchBackend.generate(query, Collections.emptySet());
 
         this.elasticsearchBackend.doRun(job, query, context);
 
