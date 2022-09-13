@@ -70,6 +70,10 @@ public class QueryEngine {
                 .orElse(parsedMetadata);
     }
 
+    public Set<String> getFieldsPresentInSearchResultDocuments(final Search normalizedSearch) {
+        return backend.getFieldsPresentInSearchResultDocuments(normalizedSearch);
+    }
+
     public SearchJob execute(SearchJob searchJob, Set<SearchError> validationErrors) {
         final Set<Query> validQueries = searchJob.getSearch().queries()
                 .stream()

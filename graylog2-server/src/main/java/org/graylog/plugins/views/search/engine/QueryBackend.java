@@ -20,6 +20,7 @@ import com.google.common.base.Stopwatch;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
+import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
@@ -103,13 +104,15 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      * <p>
      * This method is typically being run in an executor and can safely block.
      *
-     * @param job                currently executing job
-     * @param query              the individual query to run from the current job
-     * @param queryContext       the generated query by {@link #generate(SearchJob, Query, Set) <SearchError>)}
+     * @param job          currently executing job
+     * @param query        the individual query to run from the current job
+     * @param queryContext the generated query by {@link #generate(Query, Set) <SearchError>)}
      * @return the result for the query
      * @throws RuntimeException if the query could not be executed for some reason
      */
     QueryResult doRun(SearchJob job, Query query, T queryContext);
+
+    Set<String> getFieldsPresentInSearchResultDocuments(final Search normalizedSearch);
 
     default boolean isSearchTypeWithError(T queryContext, String searchTypeId) {
         return queryContext.errors().stream()

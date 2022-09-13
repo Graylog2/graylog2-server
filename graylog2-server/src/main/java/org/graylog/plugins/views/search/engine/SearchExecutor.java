@@ -65,19 +65,26 @@ public class SearchExecutor {
                 .orElseThrow(() -> new NotFoundException("No search found with id <" + searchId + ">."));
     }
 
+    public Set<String> getFieldsPresentInSearchResultDocuments(final Search search, SearchUser searchUser) {
+        final ExecutionState executionState = ExecutionState.empty();
+        final Search preValidationSearch = searchNormalization.preValidation(search, searchUser, executionState);
+        final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
+        if (hasFatalError(validationErrors)) {
+            return Set.of();
+        }
+        final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
+        return queryEngine.getFieldsPresentInSearchResultDocuments(normalizedSearch);
+    }
+
     public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState) {
         final Search preValidationSearch = searchNormalization.preValidation(search, searchUser, executionState);
-
         final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
-
         if (hasFatalError(validationErrors)) {
             return searchJobWithFatalError(searchJobService.create(preValidationSearch, searchUser.username()), validationErrors);
         }
-
         final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
 
         final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors);
-
         validationErrors.forEach(searchJob::addError);
 
         try {

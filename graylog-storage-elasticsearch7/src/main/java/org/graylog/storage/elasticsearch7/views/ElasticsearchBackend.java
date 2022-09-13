@@ -22,6 +22,7 @@ import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
+import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
@@ -43,6 +44,9 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.Indice
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.TimeRangeQueryFactory;
@@ -66,6 +70,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.graylog2.indexer.fieldtypes.DiscoveredFieldTypeService.ALL_MESSAGE_FIELDS_DOCUMENT_FIELD;
 
 public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchBackend.class);
@@ -162,7 +168,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                             .map(this::translateQueryString)
                             .forEach(searchTypeOverrides::must);
 
-            searchTypeSourceBuilder.query(searchTypeOverrides);
+                    searchTypeSourceBuilder.query(searchTypeOverrides);
 
                     searchTypeHandler.get().generateQueryPart(query, searchType, queryContext);
                 });
@@ -198,6 +204,49 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 return Optional.of(QueryBuilders.queryStringQuery(((QueryStringFilter) filter).query()));
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Set<String> getFieldsPresentInSearchResultDocuments(final Search normalizedSearch) {
+        final Query mainQuery = normalizedSearch.queries().stream().findFirst().orElseThrow(() -> new IllegalArgumentException("No queries in search : " + normalizedSearch.id()));
+        final ESGeneratedQueryContext generatedQueryContext = generate(mainQuery, Set.of());
+        final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(mainQuery.usedStreamIds(), mainQuery.timerange());
+        final SearchSourceBuilder searchSourceBuilder = generatedQueryContext.getSsb().shallowCopy();
+        final QueryBuilder query = searchSourceBuilder.query();
+
+        if (query instanceof BoolQueryBuilder boolQueryBuilder) {
+            boolQueryBuilder.must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, mainQuery.usedStreamIds()))
+                    .must(
+                            Objects.requireNonNull(
+                                    TimeRangeQueryFactory.create(
+                                            mainQuery.timerange()
+                                    ),
+                                    "Timerange for query " + mainQuery.id() + " cannot be found in query or search type."
+                            )
+                    );
+
+        }
+        final String aggregationName = ALL_MESSAGE_FIELDS_DOCUMENT_FIELD + "_aggr";
+        searchSourceBuilder.aggregation(new TermsAggregationBuilder(aggregationName)
+                .field(ALL_MESSAGE_FIELDS_DOCUMENT_FIELD)
+                .size(1000));
+        final SearchResponse res = client.search(new SearchRequest()
+                .source(searchSourceBuilder)
+                .indices(affectedIndices.toArray(new String[0]))
+                .indicesOptions(IndicesOptions.fromOptions(false, false, true, false)), "Unable to retrieve fields used in search result documents");
+
+        final Aggregation aggregationResult = res.getAggregations().get(aggregationName);
+        if (aggregationResult instanceof MultiBucketsAggregation) {
+            final List<? extends MultiBucketsAggregation.Bucket> buckets = ((MultiBucketsAggregation) aggregationResult).getBuckets();
+            if (buckets != null) {
+                return buckets.stream()
+                        .filter(Objects::nonNull)
+                        .map(MultiBucketsAggregation.Bucket::getKeyAsString)
+                        .collect(Collectors.toSet());
+            }
+        }
+
+        return Set.of();
     }
 
     @Override

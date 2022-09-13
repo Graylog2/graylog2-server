@@ -91,6 +91,10 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
                 .toString();
     }
 
+    public SearchSourceBuilder getSsb() {
+        return ssb;
+    }
+
     public Map<Object, Object> contextMap() {
         return contextMap;
     }

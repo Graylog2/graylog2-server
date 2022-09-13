@@ -66,7 +66,7 @@ public class MappedFieldTypesServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        this.mappedFieldTypesService = new MappedFieldTypesServiceImpl(streamService, indexFieldTypesService, new FieldTypeMapper(), indexLookup);
+        this.mappedFieldTypesService = new MappedFieldTypesServiceImpl(streamService, indexFieldTypesService, new FieldTypesMerger(new FieldTypeMapper()), indexLookup);
         when(streamService.indexSetIdsByIds(Collections.singleton("stream1"))).thenReturn(Collections.singleton("indexSetId"));
     }
 

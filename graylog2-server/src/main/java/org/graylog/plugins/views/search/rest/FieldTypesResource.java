@@ -21,8 +21,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.indexer.fieldtypes.DiscoveredFieldTypeService;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -30,13 +33,16 @@ import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -47,10 +53,16 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @RequiresAuthentication
 public class FieldTypesResource extends RestResource implements PluginRestResource {
     private final MappedFieldTypesService mappedFieldTypesService;
+    private final DiscoveredFieldTypeService discoveredFieldTypeService;
+    private final SearchDbService searchDbService;
 
     @Inject
-    public FieldTypesResource(MappedFieldTypesService mappedFieldTypesService) {
+    public FieldTypesResource(final MappedFieldTypesService mappedFieldTypesService,
+                              final DiscoveredFieldTypeService discoveredFieldTypeService,
+                              final SearchDbService searchDbService) {
         this.mappedFieldTypesService = mappedFieldTypesService;
+        this.searchDbService = searchDbService;
+        this.discoveredFieldTypeService = discoveredFieldTypeService;
     }
 
     @GET
@@ -68,5 +80,28 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
                                              @Context SearchUser searchUser) {
         final ImmutableSet<String> streams = searchUser.streams().readableOrAllIfEmpty(request.streams());
         return mappedFieldTypesService.fieldTypesByStreamIds(streams, request.timerange().orElse(RelativeRange.allTime()));
+    }
+
+    @POST
+    @Path("/bySearch/{searchId}")
+    @ApiOperation(value = "Retrieve the field list for a given search")
+    @NoAuditEvent("This is not changing any data")
+    public Set<MappedFieldTypeDTO> bySearch(@ApiParam(name = "searchId", required = true)
+                                            @PathParam(value = "searchId") @NotEmpty final String searchId,
+                                            @ApiParam(name = "JSON body", required = true)
+                                            @Valid @NotNull final FieldTypesForStreamsRequest fallbackRequest,
+                                            @Context SearchUser searchUser) {
+        try {
+            final Optional<Search> search = searchDbService.get(searchId);
+            if (search.isPresent()) {
+                final Set<MappedFieldTypeDTO> mappedFieldTypeDTOS = discoveredFieldTypeService.fieldTypesBySearch(search.get(), searchUser);
+                if (mappedFieldTypeDTOS != null && !mappedFieldTypeDTOS.isEmpty()) {
+                    return mappedFieldTypeDTOS;
+                }
+            }
+            return byStreams(fallbackRequest, searchUser);
+        } catch (Exception ex) {
+            return byStreams(fallbackRequest, searchUser);
+        }
     }
 }

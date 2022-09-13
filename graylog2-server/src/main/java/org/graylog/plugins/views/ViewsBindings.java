@@ -116,6 +116,8 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SeriesSor
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog2.contentpacks.facades.DashboardEntityCreator;
 import org.graylog2.contentpacks.facades.DashboardFacade;
+import org.graylog2.indexer.fieldtypes.DiscoveredFieldTypeService;
+import org.graylog2.indexer.fieldtypes.DiscoveredFieldTypeServiceImpl;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesServiceImpl;
 import org.graylog2.plugin.PluginConfigBean;
@@ -187,6 +189,7 @@ public class ViewsBindings extends ViewsModule {
 
         bind(SearchJobService.class).to(InMemorySearchJobService.class).in(Scopes.SINGLETON);
         bind(MappedFieldTypesService.class).to(MappedFieldTypesServiceImpl.class).in(Scopes.SINGLETON);
+        bind(DiscoveredFieldTypeService.class).to(DiscoveredFieldTypeServiceImpl.class).in(Scopes.SINGLETON);
         bind(FieldTypeValidation.class).to(FieldTypeValidationImpl.class).in(Scopes.SINGLETON);
 
         // The order of injections is significant!

@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.graylog.failure.FailureCause;
 import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.fieldtypes.DiscoveredFieldTypeService;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.utilities.date.DateTimeConverter;
@@ -392,7 +393,7 @@ public class Message implements Messages, Indexable {
 
     @Override
     public Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper, @Nonnull final Meter invalidTimestampMeter) {
-        final Map<String, Object> obj = Maps.newHashMapWithExpectedSize(REQUIRED_FIELDS.size() + fields.size());
+        final Map<String, Object> obj = Maps.newHashMapWithExpectedSize(REQUIRED_FIELDS.size() + fields.size() + 1);
 
         for (Map.Entry<String, Object> entry : fields.entrySet()) {
             final String key = entry.getKey();
@@ -448,6 +449,7 @@ public class Message implements Messages, Indexable {
                             .collect(Collectors.joining(", ")));
         }
 
+        obj.put(DiscoveredFieldTypeService.ALL_MESSAGE_FIELDS_DOCUMENT_FIELD, obj.keySet());
         return obj;
     }
 
