@@ -141,10 +141,10 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         Boolean etagCached = false;
         Response.ResponseBuilder builder = Response.noContent();
 
-        // check if client is up to date with a known valid etag
+        // check if client is up-to-date with a known valid etag
         if (ifNoneMatch != null) {
             EntityTag etag = new EntityTag(ifNoneMatch.replaceAll("\"", ""));
-            if (etagService.isPresent(etag.toString())) {
+            if (etagService.collectorsAreCached(etag.toString())) {
                 etagCached = true;
                 builder = Response.notModified();
                 builder.tag(etag);
@@ -162,7 +162,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
             EntityTag collectorsEtag = new EntityTag(etagString);
             builder = Response.ok(collectorListResponse);
             builder.tag(collectorsEtag);
-            etagService.put(collectorsEtag.toString());
+            etagService.registerCollector(collectorsEtag.toString());
         }
 
         // set cache control
@@ -211,7 +211,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
-        etagService.invalidateAll();
+        etagService.invalidateAllCollectors();
         return Response.ok().entity(collectorService.save(collector)).build();
     }
 
@@ -230,7 +230,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
-        etagService.invalidateAll();
+        etagService.invalidateAllCollectors();
         return Response.ok().entity(collectorService.save(collector)).build();
     }
 
@@ -248,8 +248,8 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
-        etagService.invalidateAll();
         collectorService.save(collector);
+        etagService.invalidateAllCollectors();
         return Response.accepted().build();
     }
 
@@ -272,7 +272,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         if (deleted == 0) {
             return Response.notModified().build();
         }
-        etagService.invalidateAll();
+        etagService.invalidateAllCollectors();
         return Response.accepted().build();
     }
 

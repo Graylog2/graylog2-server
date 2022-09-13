@@ -17,6 +17,8 @@
 package org.graylog.plugins.sidecar.services;
 
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -39,10 +41,22 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class EtagService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(EtagService.class);
 
-    private final Cache<String, Boolean> cache;
-    private MetricRegistry metricRegistry;
-    private EventBus eventBus;
-    private ClusterEventBus clusterEventBus;
+    private final Cache<String, Boolean> collectorCache;
+    private final Cache<String, Boolean> configurationCache;
+    private final Cache<String, Boolean> assignmentsCache;
+    private final MetricRegistry metricRegistry;
+    private final EventBus eventBus;
+    private final ClusterEventBus clusterEventBus;
+
+    @JsonAutoDetect
+    enum CacheContext {
+        @JsonProperty("collector")
+        COLLECTOR,
+        @JsonProperty("configuration")
+        CONFIGURATION,
+        @JsonProperty("assignments")
+        ASSIGNMENTS
+    }
 
     @Inject
     public EtagService(SidecarPluginConfiguration pluginConfiguration,
@@ -53,7 +67,19 @@ public class EtagService extends AbstractIdleService {
         this.eventBus = eventBus;
         this.clusterEventBus = clusterEventBus;
         Duration cacheTime = pluginConfiguration.getCacheTime();
-        cache = CacheBuilder.newBuilder()
+        collectorCache = CacheBuilder.newBuilder()
+                .recordStats()
+                .expireAfterWrite(cacheTime.getQuantity(), cacheTime.getUnit())
+                .maximumSize(pluginConfiguration.getCacheMaxSize())
+                .build();
+
+        configurationCache = CacheBuilder.newBuilder()
+                .recordStats()
+                .expireAfterWrite(cacheTime.getQuantity(), cacheTime.getUnit())
+                .maximumSize(pluginConfiguration.getCacheMaxSize())
+                .build();
+
+        assignmentsCache = CacheBuilder.newBuilder()
                 .recordStats()
                 .expireAfterWrite(cacheTime.getQuantity(), cacheTime.getUnit())
                 .maximumSize(pluginConfiguration.getCacheMaxSize())
@@ -62,41 +88,67 @@ public class EtagService extends AbstractIdleService {
 
     @Subscribe
     public void handleEtagInvalidation(EtagCacheInvalidation event) {
-        if (event.etag().equals("")) {
+        Cache<String, Boolean> cache;
+        switch (event.cacheContext()) {
+            case COLLECTOR -> cache = collectorCache;
+            case CONFIGURATION -> cache = configurationCache;
+            case ASSIGNMENTS -> cache = assignmentsCache;
+            default -> throw new IllegalArgumentException("Unknown cache context");
+        }
+
+        if (event.create().equals("")) {
             LOG.trace("Invalidating all collector configuration etags");
             cache.invalidateAll();
         } else {
-            LOG.trace("Invalidating collector configuration etag {}", event.etag());
-            cache.invalidate(event.etag());
+            LOG.trace("Invalidating collector configuration etag {}", event.create());
+            cache.invalidate(event.create());
         }
     }
 
-    public boolean isPresent(String etag) {
-        return cache.getIfPresent(etag) != null;
+    public boolean collectorsAreCached(String etag) {
+        return collectorCache.getIfPresent(etag) != null;
     }
 
-    public void put(String etag) {
-        cache.put(etag, Boolean.TRUE);
+    public boolean configurationsAreCached(String etag) {
+        return configurationCache.getIfPresent(etag) != null;
     }
 
-    public void invalidate(String etag) {
-        clusterEventBus.post(EtagCacheInvalidation.etag(etag));
+    public void registerCollector(String etag) {
+        collectorCache.put(etag, Boolean.TRUE);
     }
 
-    public void invalidateAll() {
-        cache.invalidateAll();
-        clusterEventBus.post(EtagCacheInvalidation.etag(""));
+    public void registerConfiguration(String etag) {
+        configurationCache.put(etag, Boolean.TRUE);
+    }
+
+    public void registerAssignment(String etag) {
+        assignmentsCache.put(etag, Boolean.TRUE);
+    }
+
+
+    public void invalidateAllConfigurations() {
+        configurationCache.invalidateAll();
+        clusterEventBus.post(EtagCacheInvalidation.create(CacheContext.CONFIGURATION, ""));
+    }
+
+    public void invalidateAllCollectors() {
+        collectorCache.invalidateAll();
+        clusterEventBus.post(EtagCacheInvalidation.create(CacheContext.COLLECTOR, ""));
     }
 
     @Override
     protected void startUp() throws Exception {
         eventBus.register(this);
-        MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(name(ConfigurationService.class, "etag-cache"), cache));
+        MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(name(ConfigurationService.class, "etag-cache"), configurationCache));
+        MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(name(CollectorService.class, "etag-cache"), collectorCache));
+        MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(name(SidecarService.class, "etag-cache"), assignmentsCache));
     }
 
     @Override
     protected void shutDown() throws Exception {
         eventBus.unregister(this);
         metricRegistry.removeMatching((name, metric) -> name.startsWith(name(ConfigurationService.class, "etag-cache")));
+        metricRegistry.removeMatching((name, metric) -> name.startsWith(name(CollectorService.class, "etag-cache")));
+        metricRegistry.removeMatching((name, metric) -> name.startsWith(name(SidecarService.class, "etag-cache")));
     }
 }

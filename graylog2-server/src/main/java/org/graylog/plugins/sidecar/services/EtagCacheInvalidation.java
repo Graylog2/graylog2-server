@@ -23,12 +23,15 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 public abstract class EtagCacheInvalidation {
 
+    @JsonProperty("cache_context")
+    public abstract EtagService.CacheContext cacheContext();
+
     @JsonProperty("etag")
-    public abstract String etag();
+    public abstract String create();
 
     @JsonCreator
-    public static EtagCacheInvalidation etag(@JsonProperty("etag") String etag) {
-        return new AutoValue_EtagCacheInvalidation(etag);
+    public static EtagCacheInvalidation create(@JsonProperty("cache_context") EtagService.CacheContext context, @JsonProperty("etag") String etag) {
+        return new AutoValue_EtagCacheInvalidation(context, etag);
     }
 
 }

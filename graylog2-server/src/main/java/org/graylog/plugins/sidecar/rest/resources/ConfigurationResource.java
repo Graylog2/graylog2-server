@@ -209,13 +209,13 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                         @ApiParam(name = "configurationId", required = true)
                                         @PathParam("configurationId") String configurationId) throws RenderTemplateException {
         String ifNoneMatch = httpHeaders.getHeaderString("If-None-Match");
-        Boolean etagCached = false;
+        boolean etagCached = false;
         Response.ResponseBuilder builder = Response.noContent();
 
-        // check if client is up to date with a known valid etag
+        // check if client is up-to-date with a known valid etag
         if (ifNoneMatch != null) {
             EntityTag etag = new EntityTag(ifNoneMatch.replaceAll("\"", ""));
-            if (etagService.isPresent(etag.toString())) {
+            if (etagService.configurationsAreCached(etag.toString())) {
                 etagCached = true;
                 builder = Response.notModified();
                 builder.tag(etag);
@@ -241,8 +241,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             EntityTag collectorConfigurationEtag = new EntityTag(etagString);
             builder = Response.ok(collectorConfiguration);
             builder.tag(collectorConfigurationEtag);
-            etagService.put(collectorConfigurationEtag.toString());
-
+            etagService.registerConfiguration(collectorConfigurationEtag.toString());
         }
 
         // set cache control
@@ -330,7 +329,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
-        etagService.invalidateAll();
+        etagService.invalidateAllConfigurations();
 
         return Response.ok().entity(configurationService.save(updatedConfiguration)).build();
     }
@@ -351,7 +350,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         if (deleted == 0) {
             return Response.notModified().build();
         }
-        etagService.invalidateAll();
+        etagService.invalidateAllConfigurations();
         return Response.accepted().build();
     }
 
