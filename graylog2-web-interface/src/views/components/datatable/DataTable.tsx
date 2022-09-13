@@ -30,6 +30,7 @@ import type { Leaf, Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { Events } from 'views/logic/searchtypes/events/EventHandler';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import WidgetContext from 'views/components/contexts/WidgetContext';
 
 import DataTableEntry from './DataTableEntry';
 import MessagesTable from './MessagesTable';
@@ -108,16 +109,12 @@ const DataTable = ({
   condensed,
 }: Props) => {
   const onRenderComplete = useContext(RenderCompletionCallback);
-
+  const widget = useContext(WidgetContext);
   useEffect(onRenderComplete, [onRenderComplete]);
 
   const _onSortChange = useCallback((newSort: Array<SortConfig>) => {
-    // console.log({ newSort });
-    // config.toBuilder().sort([]).build();
-    // console.log({ '!!!!!!!!!!': config.toBuilder().sort([config.sort[1]]).build() });
-
-    return WidgetActions.updateConfig('f6e810f4-c3b7-4e75-91c4-f8269f1f71ad', config.toBuilder().sort(newSort).build());
-  }, [config]);
+    return WidgetActions.updateConfig(widget.id, config.toBuilder().sort(newSort).build());
+  }, [config, widget]);
 
   const { columnPivots, rowPivots, series, rollup } = config;
   const rows = retrieveChartData(data) ?? [];
@@ -136,7 +133,6 @@ const DataTable = ({
   const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
     const valuePath = rowFieldNames.map((pivotField) => ({ [pivotField]: expandedRows[idx][pivotField] }));
 
-    // eslint-disable-next-line react/no-array-index-key
     return (
       // eslint-disable-next-line react/no-array-index-key
       <DataTableEntry key={`datatableentry-${idx}`}

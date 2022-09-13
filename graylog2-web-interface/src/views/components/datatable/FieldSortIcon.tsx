@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 import { OrderedMap } from 'immutable';
@@ -35,13 +35,13 @@ type Props = {
 };
 
 type DirectionStrategy = {
-  handleSortChange: (changeSort: (direction: Direction) => void) => void,
+  handleSortChange: (changeSort: (direction: Direction, activeSort: boolean) => void) => void,
   icon: IconName,
   sortActive: boolean,
   tooltip: (fieldName: string) => string,
 };
 
-const SortIcon = styled.button<{ sortActive: boolean, $index: number }>(({ sortActive, $index, theme }) => {
+const SortIcon = styled.button<{ sortActive: boolean, bulbText: string }>(({ sortActive, bulbText, theme }) => {
   const color = sortActive ? theme.colors.gray[20] : theme.colors.gray[70];
 
   return css`
@@ -52,7 +52,7 @@ const SortIcon = styled.button<{ sortActive: boolean, $index: number }>(({ sortA
     cursor: pointer;
     position: relative;
     &:after {
-      content: '${$index}';
+      content: '${bulbText}';
       position: absolute;
       top: 0;
       right: 0;
@@ -75,30 +75,14 @@ const _changeSort = (nextDirection: Direction, sortConfigMap: OrderedMap<string,
     newSortConfigSet = sortConfigMap.delete(fieldName);
   }
 
-  /*
-  const newSort1 = _config.sort.map((sort) => {
-    if (sort.field === fieldName) {
-      return new SortConfig(sort.type, fieldName, nextDirection);
-    }
-
-    return sort;
-  });
-   */
-  // const newSort = [new SortConfig(SortConfig.PIVOT_TYPE, fieldName, nextDirection)];
-
   setLoadingState(true);
-  console.log({ newSort1: newSortConfigSet.toList().toArray() });
 
   onSortChange(newSortConfigSet.toList().toArray()).then(() => {
     setLoadingState(false);
   });
 };
 
-const _isFieldSortActive = (sortConfigMap: OrderedMap<string, SortConfig>, fieldName: string) => {
-  console.log({ sortConfigMap, fieldName, item: sortConfigMap.get(fieldName) });
-
-  return sortConfigMap.get(fieldName);
-};
+const _isFieldSortActive = (sortConfigMap: OrderedMap<string, SortConfig>, fieldName: string) => sortConfigMap.get(fieldName);
 
 const DirectionStrategyAsc: DirectionStrategy = {
   icon: 'sort-amount-down',
@@ -137,6 +121,12 @@ const _directionStrategy = (sortConfigMap: OrderedMap<string, SortConfig>, field
 const FieldSortIcon = ({ fieldName, type, sortConfigMap, onSortChange, setLoadingState }: Props) => {
   const changeSort = (nextDirection: Direction, activeSort: boolean) => _changeSort(nextDirection, sortConfigMap, fieldName, onSortChange, setLoadingState, type, activeSort);
   const { sortActive, tooltip, handleSortChange, icon }: DirectionStrategy = _directionStrategy(sortConfigMap, fieldName);
+  const bulbText = useMemo(() => {
+    if (sortConfigMap.size < 2) return '';
+    const index = sortConfigMap.keySeq().findIndex((k) => k === fieldName) + 1;
+
+    return String(index || '');
+  }, [fieldName, sortConfigMap]);
 
   return (
     <SortIcon sortActive={sortActive}
@@ -145,7 +135,7 @@ const FieldSortIcon = ({ fieldName, type, sortConfigMap, onSortChange, setLoadin
               aria-label={tooltip(fieldName)}
               onClick={() => handleSortChange(changeSort)}
               data-testid="messages-sort-icon"
-              $index={sortConfigMap._map.get(fieldName) !== undefined ? sortConfigMap._map.get(fieldName) + 1 : ''}>
+              bulbText={bulbText}>
       <Icon name={icon} />
     </SortIcon>
   );
