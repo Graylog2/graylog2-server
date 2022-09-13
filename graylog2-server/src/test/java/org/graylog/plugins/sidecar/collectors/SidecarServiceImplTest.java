@@ -36,6 +36,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import javax.validation.Validator;
 import java.util.List;
@@ -50,6 +52,9 @@ import static org.mockito.Mockito.when;
 @UseModules({ObjectMapperModule.class, ValidatorModule.class, TestPasswordSecretModule.class})
 public class SidecarServiceImplTest {
     private static final String collectionName = "sidecars";
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
     @Mock
     private CollectorService collectorService;
 
