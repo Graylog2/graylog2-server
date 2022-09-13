@@ -29,7 +29,7 @@ describe('MapVisualization', () => {
                                             height={1600}
                                             width={900} />);
 
-    expect(wrapper.find('Map')).toExist();
+    expect(wrapper.find('div.map#visualization-somemap')).toExist();
   });
 
   it('does not render circle markers for invalid data', () => {
@@ -39,7 +39,7 @@ describe('MapVisualization', () => {
                                             height={1600}
                                             width={900} />);
 
-    expect(wrapper.find('Map')).toExist();
+    expect(wrapper.find('div.map#visualization-somemap')).toExist();
     expect(wrapper.find('CircleMarker')).not.toExist();
   });
 });

@@ -15,18 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
+import { useRef } from 'react';
 
-import EmailNotificationForm from './EmailNotificationForm';
+import Select from 'components/common/Select';
 
-const EmailNotificationFormContainer = (props) => {
-  return <EmailNotificationForm {...props} />;
+type Props = React.ComponentProps<typeof Select>;
+
+const PaginatedSelect = (props: Props) => {
+  const selectRef = useRef();
+
+  return (
+    <Select ref={selectRef} async {...props} />
+  );
 };
 
-EmailNotificationFormContainer.propTypes = {
-  config: PropTypes.object.isRequired,
-  validation: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-};
+PaginatedSelect.propTypes = Select.propTypes;
 
-export default EmailNotificationFormContainer;
+export default PaginatedSelect;
