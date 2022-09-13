@@ -56,6 +56,8 @@ const SortIcon = styled.button<{ sortActive: boolean, $index: number }>(({ sortA
       position: absolute;
       top: 0;
       right: 0;
+      font-size: 0.75rem;
+      font-weight: 600;
     }
   `;
 });
