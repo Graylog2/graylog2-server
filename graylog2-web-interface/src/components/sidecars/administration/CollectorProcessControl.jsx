@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
@@ -25,6 +26,7 @@ import { Pluralize, SelectPopover } from 'components/common';
 const PROCESS_ACTIONS = ['start', 'restart', 'stop'];
 
 const CollectorProcessControl = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     selectedSidecarCollectorPairs: PropTypes.array.isRequired,
     onProcessAction: PropTypes.func.isRequired,
@@ -37,6 +39,7 @@ const CollectorProcessControl = createReactClass({
     };
   },
 
+  // eslint-disable-next-line react/sort-comp
   resetSelectedAction() {
     this.setState({ selectedAction: undefined });
   },
@@ -133,10 +136,8 @@ const CollectorProcessControl = createReactClass({
         <SelectPopover id="process-management-action"
                        title="Manage collector processes"
                        triggerNode={(
-                         <Button bsSize="small"
-                                 bsStyle="link">Process <span className="caret" />
-                         </Button>
-)}
+                         <Button bsStyle="primary" bsSize="small">Process</Button>
+                       )}
                        items={PROCESS_ACTIONS}
                        itemFormatter={actionFormatter}
                        selectedItems={selectedAction ? [selectedAction] : []}
