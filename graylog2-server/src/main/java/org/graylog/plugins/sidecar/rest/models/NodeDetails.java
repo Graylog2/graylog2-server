@@ -53,7 +53,6 @@ public abstract class NodeDetails {
     public abstract CollectorStatusList statusList();
 
     @JsonProperty("tags")
-    @Nullable
     public abstract List<String> tags();
 
     @JsonCreator
@@ -63,6 +62,6 @@ public abstract class NodeDetails {
                                      @JsonProperty("log_file_list") @Nullable List<NodeLogFile> logFileList,
                                      @JsonProperty("status") @Nullable CollectorStatusList statusList,
                                      @JsonProperty("tags") @Nullable List<String> tags) {
-        return new AutoValue_NodeDetails(operatingSystem, ip, metrics, logFileList, statusList, tags);
+        return new AutoValue_NodeDetails(operatingSystem, ip, metrics, logFileList, statusList, tags == null ? List.of() : tags);
     }
 }

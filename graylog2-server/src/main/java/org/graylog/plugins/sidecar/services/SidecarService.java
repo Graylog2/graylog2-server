@@ -16,8 +16,10 @@
  */
 package org.graylog.plugins.sidecar.services;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
+import org.apache.commons.collections4.CollectionUtils;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.rest.models.CollectorStatus;
 import org.graylog.plugins.sidecar.rest.models.CollectorStatusList;
@@ -42,6 +44,8 @@ import org.mongojack.DBSort;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -75,23 +79,50 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
 
     @Override
     public Sidecar save(Sidecar sidecar) {
-        if (sidecar != null) {
-            final Set<ConstraintViolation<Sidecar>> violations = validator.validate(sidecar);
-            if (violations.isEmpty()) {
-                return db.findAndModify(
-                        DBQuery.is(Sidecar.FIELD_NODE_ID, sidecar.nodeId()),
-                        new BasicDBObject(),
-                        new BasicDBObject(),
-                        false,
-                        sidecar,
-                        true,
-                        true);
-            } else {
-                throw new IllegalArgumentException("Specified object failed validation: " + violations);
-            }
-        } else {
-            throw new IllegalArgumentException("Specified object is not of correct implementation type (" + sidecar.getClass() + ")!");
+        Preconditions.checkNotNull(sidecar, "sidecar was null");
+
+        final Set<ConstraintViolation<Sidecar>> violations = validator.validate(sidecar);
+        if (!violations.isEmpty()) {
+            throw new IllegalArgumentException("Specified object failed validation: " + violations);
         }
+
+        final Sidecar updatedSidecar = updateTaggedConfigurationAssignments(sidecar);
+        return db.findAndModify(
+                DBQuery.is(Sidecar.FIELD_NODE_ID, updatedSidecar.nodeId()),
+                new BasicDBObject(),
+                new BasicDBObject(),
+                false,
+                updatedSidecar,
+                true,
+                true);
+    }
+
+    // Create new assignments based on tags and existing manual assignments'
+    private Sidecar updateTaggedConfigurationAssignments(Sidecar sidecar) {
+        final List<String> sidecarTags = sidecar.nodeDetails().tags();
+
+        // find all configurations that match the tags
+        // TODO filter configs based on collector os
+        final List<Configuration> taggedConfigs = configurationService.findByTags(sidecarTags);
+
+        final List<ConfigurationAssignment> tagAssigned = taggedConfigs.stream().map(c -> {
+            // fill in ConfigurationAssignment.assignedFromTags()
+            // If we only support one tag on a configuration, this can be simplified
+            final Set<String> matchedTags = c.tags().stream().filter(sidecarTags::contains).collect(Collectors.toSet());
+            return ConfigurationAssignment.create(c.collectorId(), c.id(), matchedTags);
+        }).toList();
+
+        final List<ConfigurationAssignment> manuallyAssigned = sidecar.assignments().stream().filter(a -> {
+            // also overwrite manually assigned configs that would now be assigned through tags
+            if (tagAssigned.stream().anyMatch(tagAssignment -> tagAssignment.configurationId().equals(a.configurationId()))) {
+                return false;
+            }
+            return a.assignedFromTags().isEmpty();
+        }).toList();
+
+        // update assignments on the sidecar
+        final Collection<ConfigurationAssignment> union = CollectionUtils.union(manuallyAssigned, tagAssigned);
+        return sidecar.toBuilder().assignments(new ArrayList<>(union)).build();
     }
 
     public List<Sidecar> all() {
