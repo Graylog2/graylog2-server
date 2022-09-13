@@ -19,6 +19,7 @@ import { useCallback, useContext, useEffect, useMemo } from 'react';
 import * as Immutable from 'immutable';
 import { flatten, isEqual, uniqWith } from 'lodash';
 import type { OrderedMap } from 'immutable';
+import { useFormikContext } from 'formik';
 
 import connect from 'stores/connect';
 import expandRows from 'views/logic/ExpandRows';
@@ -107,14 +108,25 @@ const DataTable = ({
   borderedHeader,
   stickyHeader,
   condensed,
+  editing,
 }: Props) => {
+  const formContext = useFormikContext();
   const onRenderComplete = useContext(RenderCompletionCallback);
   const widget = useContext(WidgetContext);
   useEffect(onRenderComplete, [onRenderComplete]);
 
   const _onSortChange = useCallback((newSort: Array<SortConfig>) => {
-    return WidgetActions.updateConfig(widget.id, config.toBuilder().sort(newSort).build());
-  }, [config, widget]);
+    const dirty = formContext?.dirty;
+    const updateWidget = () => WidgetActions.updateConfig(widget.id, config.toBuilder().sort(newSort).build());
+    if (!editing || (editing && !dirty)) return updateWidget();
+
+    // eslint-disable-next-line no-alert
+    if (window.confirm('You have unsaved changes in configuration form. This action will rollback them')) {
+      return updateWidget();
+    }
+
+    return Promise.reject();
+  }, [config, widget, editing, formContext]);
 
   const { columnPivots, rowPivots, series, rollup } = config;
   const rows = retrieveChartData(data) ?? [];
