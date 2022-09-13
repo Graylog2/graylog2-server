@@ -15,36 +15,33 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
 import { ButtonToolbar } from 'components/bootstrap';
 
-import CollectorConfigurationSelector from './CollectorConfigurationSelector';
+import CollectorConfigurationModal from './CollectorConfigurationModal';
 import CollectorProcessControl from './CollectorProcessControl';
 
-const CollectorsAdministrationActions = createReactClass({
-  propTypes: {
-    collectors: PropTypes.array.isRequired,
-    configurations: PropTypes.array.isRequired,
-    selectedSidecarCollectorPairs: PropTypes.array.isRequired,
-    onConfigurationSelectionChange: PropTypes.func.isRequired,
-    onProcessAction: PropTypes.func.isRequired,
-  },
+const CollectorsAdministrationActions = (props) => {
+  const { collectors, configurations, selectedSidecarCollectorPairs, onConfigurationSelectionChange, onProcessAction } = props;
 
-  render() {
-    const { collectors, configurations, selectedSidecarCollectorPairs, onConfigurationSelectionChange, onProcessAction } = this.props;
+  return (
+    <ButtonToolbar>
+      <CollectorConfigurationModal collectors={collectors}
+                                   configurations={configurations}
+                                   selectedSidecarCollectorPairs={selectedSidecarCollectorPairs}
+                                   onConfigurationSelectionChange={onConfigurationSelectionChange} />
+      <CollectorProcessControl selectedSidecarCollectorPairs={selectedSidecarCollectorPairs} onProcessAction={onProcessAction} />
+    </ButtonToolbar>
+  );
+};
 
-    return (
-      <ButtonToolbar>
-        <CollectorConfigurationSelector collectors={collectors}
-                                        configurations={configurations}
-                                        selectedSidecarCollectorPairs={selectedSidecarCollectorPairs}
-                                        onConfigurationSelectionChange={onConfigurationSelectionChange} />
-        <CollectorProcessControl selectedSidecarCollectorPairs={selectedSidecarCollectorPairs} onProcessAction={onProcessAction} />
-      </ButtonToolbar>
-    );
-  },
-});
+CollectorsAdministrationActions.propTypes = {
+  collectors: PropTypes.array.isRequired,
+  configurations: PropTypes.array.isRequired,
+  selectedSidecarCollectorPairs: PropTypes.array.isRequired,
+  onConfigurationSelectionChange: PropTypes.func.isRequired,
+  onProcessAction: PropTypes.func.isRequired,
+};
 
 export default CollectorsAdministrationActions;
