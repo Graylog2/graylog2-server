@@ -45,7 +45,7 @@ const BrandComponent = ({ active, ...props }: Props) => {
 
   return (
     <Link {...props} className="navbar-brand">
-      <svg height="28" width="90" viewBox="0 0 287 92" fill="none" xmlns="http://www.w3.org/2000/svg" aria-labelledby="logoTitleId">
+      <svg height="26" width="90" viewBox="0 0 287 92" fill="none" xmlns="http://www.w3.org/2000/svg" aria-labelledby="logoTitleId">
         <title id="logoTitleId">Graylog Logo</title>
         <path d="M0.479675 45.8302C0.479675 58.7145 8.75571 68.7774 21.8281 68.7774C29.0696 68.7774 35.0885 65.5799 38.098 60.2192V69.4357C38.098 78.182 32.4552 83.8247 23.803 83.8247C16.0913 83.8247 11.0128 79.8748 9.88426 73.1035H1.04395C2.73677 84.7652 11.2949 91.8186 23.803 91.8186C37.9099 91.8186 46.8443 82.6021 46.8443 68.1191V24.0116H38.9444L38.2861 31.8174C35.3707 26.0806 29.6339 22.695 22.2043 22.695C8.84975 22.695 0.479675 32.8519 0.479675 45.8302ZM9.31998 45.6421C9.31998 37.178 14.5865 30.4067 23.4269 30.4067C32.4552 30.4067 37.7218 36.8018 37.7218 45.6421C37.7218 54.6705 32.2672 61.0656 23.3328 61.0656C14.6806 61.0656 9.31998 54.2944 9.31998 45.6421Z"
               fill={theme.colors.variant.darker.default} />
