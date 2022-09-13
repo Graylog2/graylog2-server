@@ -108,7 +108,6 @@ module.exports = {
           components: 'src/components/configurationforms/[A-Z]*.{jsx,tsx}',
           ignore: [
             ...defaultComponentIgnore,
-            'src/components/configurationforms/ListField.tsx',
           ],
         },
       ],
