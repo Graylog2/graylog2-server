@@ -33,9 +33,14 @@ const Link = styled.a(({ theme }) => `
   }
 `);
 
+type Props = {
+  active?: boolean,
+  className?: string,
+}
+
 // Don't pass active prop, since `a` tag doesn't support it.
 // eslint-disable-next-line no-unused-vars
-const BrandComponent = ({ active, ...props }) => {
+const BrandComponent = ({ active, ...props }: Props) => {
   const theme = useTheme();
 
   return (
@@ -69,10 +74,12 @@ const BrandComponent = ({ active, ...props }) => {
 
 BrandComponent.propTypes = {
   active: PropTypes.bool,
+  className: PropTypes.string,
 };
 
 BrandComponent.defaultProps = {
   active: false,
+  className: undefined,
 };
 
 export default BrandComponent;
