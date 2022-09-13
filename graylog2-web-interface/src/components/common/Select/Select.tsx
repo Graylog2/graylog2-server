@@ -170,6 +170,7 @@ const controlFocus = ({ size, theme }) => (base, { isFocused }) => {
     borderWidth,
     boxShadow,
     outline,
+    borderRadius: 0,
     alignItems: 'center',
   };
 };

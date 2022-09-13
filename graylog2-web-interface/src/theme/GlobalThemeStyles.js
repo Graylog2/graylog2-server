@@ -113,6 +113,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     color: ${theme.colors.input.color};
     background-color: ${theme.colors.input.background};
     border-color: ${theme.colors.input.border};
+    border-radius: 0;
     font-family: ${theme.fonts.family.body};
 
     &::placeholder {
