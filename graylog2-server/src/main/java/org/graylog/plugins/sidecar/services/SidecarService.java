@@ -157,7 +157,7 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                                 collectorStatuses.add(CollectorStatus.create(
                                         collectorStatus.collectorId(),
                                         Sidecar.Status.UNKNOWN.getStatusCode(),
-                                        message, ""));
+                                        message, "", collectorStatus.configurationId()));
                             }
                             CollectorStatusList statusListToSave = CollectorStatusList.create(
                                     Sidecar.Status.UNKNOWN.getStatusCode(),
