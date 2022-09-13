@@ -29,13 +29,13 @@ import org.junit.Rule;
 
 public class IndicesGetAllMessageFieldsOS2IT extends IndicesGetAllMessageFieldsIT {
     @Rule
-    public final OpenSearchInstance elasticsearch = OpenSearchInstance.create();
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     @Override
     protected IndicesAdapter indicesAdapter() {
-        final OpenSearchClient client = elasticsearch.elasticsearchClient();
+        final OpenSearchClient client = openSearchInstance.openSearchClient();
         return new IndicesAdapterOS2(
                 client,
                 new StatsApi(objectMapper, client),
@@ -46,6 +46,6 @@ public class IndicesGetAllMessageFieldsOS2IT extends IndicesGetAllMessageFieldsI
 
     @Override
     protected SearchServerInstance elasticsearch() {
-        return elasticsearch;
+        return openSearchInstance;
     }
 }

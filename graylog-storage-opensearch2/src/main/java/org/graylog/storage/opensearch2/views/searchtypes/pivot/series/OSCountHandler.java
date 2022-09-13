@@ -19,10 +19,6 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
-import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
-import org.jooq.lambda.tuple.Tuple2;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
@@ -31,8 +27,13 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggrega
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.missing.Missing;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ValueCount;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ValueCountAggregationBuilder;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
+import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +67,7 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
                                         SearchResponse searchResult,
                                         ValueCount valueCount,
                                         OSPivot searchTypeHandler,
-                                        OSGeneratedQueryContext OSGeneratedQueryContext) {
+                                        OSGeneratedQueryContext esGeneratedQueryContext) {
         final Object value;
         if (valueCount == null) {
             LOG.error("Unexpected null aggregation result, returning 0 for the count. This is a bug.");
@@ -86,7 +87,9 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
         final Tuple2<String, Class<? extends Aggregation>> objects = aggTypes(queryContext, pivot).getTypes(spec);
         if (objects == null) {
             if (aggregations instanceof MultiBucketsAggregation.Bucket) {
-                return createValueCount((MultiBucketsAggregation.Bucket) aggregations);
+                return createValueCount(((MultiBucketsAggregation.Bucket) aggregations).getDocCount());
+            } else if (aggregations instanceof Missing) {
+                return createValueCount(((Missing) aggregations).getDocCount());
             }
         } else {
             // try to saved sub aggregation type. this might fail if we refer to the total result of the entire result instead of a specific
@@ -97,8 +100,7 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
         return null;
     }
 
-    private Aggregation createValueCount(MultiBucketsAggregation.Bucket aggregations) {
-        final Long docCount = aggregations.getDocCount();
+    private Aggregation createValueCount(final Long docCount) {
         return new ValueCount() {
             @Override
             public long getValue() {

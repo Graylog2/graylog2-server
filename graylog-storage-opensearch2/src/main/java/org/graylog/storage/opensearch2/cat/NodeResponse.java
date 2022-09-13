@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch2.cat;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
@@ -37,12 +38,16 @@ public abstract class NodeResponse {
 
     public abstract String ip();
 
+    @Nullable
     public abstract String diskUsed();
 
+    @Nullable
     public abstract String diskTotal();
 
+    @Nullable
     public abstract Double diskUsedPercent();
 
+    @Nullable
     public abstract Long fileDescriptorMax();
 
     @JsonCreator
@@ -51,10 +56,10 @@ public abstract class NodeResponse {
                                       @JsonProperty("role") String role,
                                       @JsonProperty("host") @Nullable String host,
                                       @JsonProperty("ip") String ip,
-                                      @JsonProperty("diskUsed") String diskUsed,
-                                      @JsonProperty("diskTotal") String diskTotal,
-                                      @JsonProperty("diskUsedPercent") Double diskUsedPercent,
-                                      @JsonProperty("fileDescriptorMax") Long fileDescriptorMax) {
+                                      @JsonProperty("diskUsed") @Nullable String diskUsed,
+                                      @JsonProperty("diskTotal") @Nullable String diskTotal,
+                                      @JsonProperty("diskUsedPercent") @Nullable Double diskUsedPercent,
+                                      @JsonProperty("fileDescriptorMax") @Nullable Long fileDescriptorMax) {
         return new AutoValue_NodeResponse(
                 id,
                 name,
@@ -66,5 +71,13 @@ public abstract class NodeResponse {
                 diskUsedPercent,
                 fileDescriptorMax
         );
+    }
+
+    @JsonIgnore
+    public boolean hasDiskStatistics() {
+        return diskUsed() != null &&
+                diskTotal() != null &&
+                diskUsedPercent() != null &&
+                fileDescriptorMax() != null;
     }
 }

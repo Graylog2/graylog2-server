@@ -19,24 +19,19 @@ package org.graylog.storage.opensearch2;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.refresh.RefreshRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.core.CountRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.core.CountResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.rest.RestStatus;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
-import org.graylog2.indexer.messages.MessagesIT;
+import org.graylog2.indexer.messages.MessagesBatchIT;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
 
-import java.util.Map;
-
-public class MessagesOS2IT extends MessagesIT {
+public class MessagesBatchOS2IT extends MessagesBatchIT {
     @Rule
-    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create("256m");
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -44,6 +39,7 @@ public class MessagesOS2IT extends MessagesIT {
     protected SearchServerInstance elasticsearch() {
         return this.openSearchInstance;
     }
+
 
     @Override
     protected MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry) {
@@ -58,16 +54,5 @@ public class MessagesOS2IT extends MessagesIT {
         final CountResponse result = this.openSearchInstance.openSearchClient().execute((c, requestOptions) -> c.count(countRequest, requestOptions));
 
         return result.getCount();
-    }
-
-    @Override
-    protected boolean indexMessage(String index, Map<String, Object> source, String id) {
-        final IndexRequest indexRequest = new IndexRequest(index)
-                .source(source)
-                .id(id);
-
-        final IndexResponse result = this.openSearchInstance.openSearchClient().execute((c, requestOptions) -> c.index(indexRequest, requestOptions));
-
-        return result.status().equals(RestStatus.CREATED);
     }
 }

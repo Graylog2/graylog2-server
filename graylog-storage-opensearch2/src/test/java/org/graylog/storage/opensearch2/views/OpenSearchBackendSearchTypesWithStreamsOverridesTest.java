@@ -31,6 +31,7 @@ import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -61,7 +62,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
     }
 
     @Test
-    public void searchTypeWithEmptyStreamsDefaultsToQueriesStreams() {
+    public void searchTypeWithEmptyStreamsDefaultsToQueriesStreams() throws IOException {
         final Query query = queryFor(Pivot.builder()
                 .id("pivot1")
                 .series(Collections.singletonList(Average.builder().field("field1").build()))
@@ -74,7 +75,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
     }
 
     @Test
-    public void searchTypeWithoutStreamsDefaultsToQueriesStreams() {
+    public void searchTypeWithoutStreamsDefaultsToQueriesStreams() throws IOException {
         final Query query = queryFor(Pivot.builder()
                 .id("pivot1")
                 .series(Collections.singletonList(Average.builder().field("field1").build()))
@@ -86,7 +87,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
     }
 
     @Test
-    public void searchTypeWithStreamsOverridesQueriesStreams() {
+    public void searchTypeWithStreamsOverridesQueriesStreams() throws IOException {
         final Query query = queryFor(Pivot.builder()
                 .id("pivot1")
                 .series(Collections.singletonList(Average.builder().field("field1").build()))
@@ -99,7 +100,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
     }
 
     @Test
-    public void queryWithMixedPresenceOfOverridesIncludesMultipleSetsOfIndices() {
+    public void queryWithMixedPresenceOfOverridesIncludesMultipleSetsOfIndices() throws IOException {
         final Query query = queryFor(Pivot.builder()
                         .id("pivot1")
                         .series(Collections.singletonList(Average.builder().field("field1").build()))
@@ -128,7 +129,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
                 .build();
     }
 
-    private List<SearchRequest> run(Query query) {
+    private List<SearchRequest> run(Query query) throws IOException {
         final SearchJob job = searchJobForQuery(query);
         final OSGeneratedQueryContext context = this.openSearchBackend.generate(query, Collections.emptySet());
 

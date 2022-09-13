@@ -95,7 +95,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
         this.backend = new OpenSearchBackend(handlers,
                 client,
                 indexLookup,
-                (elasticsearchBackend, ssb, query, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, query, errors, fieldTypesLookup),
+                (elasticsearchBackend, ssb, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
                 false);
     }
@@ -134,7 +134,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
     }
 
     @Test
-    public void queryUsesCorrectTimerangeWhenDeterminingIndexRanges() throws Exception {
+    public void queryUsesCorrectTimerangeWhenDeterminingIndexRanges() {
         final long datetimeFixture = 1530194810;
         DateTimeUtils.setCurrentMillisFixed(datetimeFixture);
 
@@ -165,7 +165,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
     }
 
     @Test
-    public void queryUsesOnlyIndicesIncludingTimerangeAndStream() throws Exception {
+    public void queryUsesOnlyIndicesIncludingTimerangeAndStream() {
         final String streamId = "streamId";
 
         final Query query = dummyQuery(RelativeRange.create(600))

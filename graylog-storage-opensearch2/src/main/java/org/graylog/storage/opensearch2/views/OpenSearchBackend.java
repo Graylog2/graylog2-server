@@ -70,7 +70,7 @@ import java.util.stream.Collectors;
 public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchBackend.class);
 
-    private final Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers;
+    private final Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> openSearchSearchTypeHandlers;
     private final OpenSearchClient client;
     private final IndexLookup indexLookup;
     private final OSGeneratedQueryContext.Factory queryContextFactory;
@@ -84,7 +84,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                              OSGeneratedQueryContext.Factory queryContextFactory,
                              UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
                              @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
-        this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
+        this.openSearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.client = client;
         this.indexLookup = indexLookup;
 
@@ -116,7 +116,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                 .forEach(boolQuery::filter);
 
         // add the optional root query filters
-        generateFilterClause(query.filter(), query).map(boolQuery::filter);
+        generateFilterClause(query.filter()).map(boolQuery::filter);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(boolQuery)
@@ -124,12 +124,12 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                 .size(0)
                 .trackTotalHits(true);
 
-        final OSGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, query, validationErrors);
+        final OSGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, validationErrors);
         searchTypes.stream()
                 .filter(searchType -> !isSearchTypeWithError(queryContext, searchType.id()))
                 .forEach(searchType -> {
                     final String type = searchType.type();
-                    final Provider<OSSearchTypeHandler<? extends SearchType>> searchTypeHandler = elasticsearchSearchTypeHandlers.get(type);
+                    final Provider<OSSearchTypeHandler<? extends SearchType>> searchTypeHandler = openSearchSearchTypeHandlers.get(type);
                     if (searchTypeHandler == null) {
                         LOG.error("Unknown search type {} for elasticsearch backend, cannot generate query part. Skipping this search type.", type);
                         queryContext.addError(new SearchTypeError(query, searchType.id(), "Unknown search type '" + type + "' for elasticsearch backend, cannot generate query"));
@@ -171,7 +171,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     }
 
     // TODO make pluggable
-    public Optional<QueryBuilder> generateFilterClause(Filter filter, Query query) {
+    public Optional<QueryBuilder> generateFilterClause(Filter filter) {
         if (filter == null) {
             return Optional.empty();
         }
@@ -180,7 +180,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
             case AndFilter.NAME:
                 final BoolQueryBuilder andBuilder = QueryBuilders.boolQuery();
                 filter.filters().stream()
-                        .map(filter1 -> generateFilterClause(filter1, query))
+                        .map(this::generateFilterClause)
                         .forEach(optQueryBuilder -> optQueryBuilder.ifPresent(andBuilder::must));
                 return Optional.of(andBuilder);
             case OrFilter.NAME:
@@ -188,7 +188,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                 // TODO for the common case "any of these streams" we can optimize the filter into
                 // a single "termsQuery" instead of "termQuery OR termQuery" if all direct children are "StreamFilter"
                 filter.filters().stream()
-                        .map(filter1 -> generateFilterClause(filter1, query))
+                        .map(this::generateFilterClause)
                         .forEach(optQueryBuilder -> optQueryBuilder.ifPresent(orBuilder::should));
                 return Optional.of(orBuilder);
             case StreamFilter.NAME:
@@ -244,7 +244,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
 
         for (SearchType searchType : query.searchTypes()) {
             final String searchTypeId = searchType.id();
-            final Provider<OSSearchTypeHandler<? extends SearchType>> handlerProvider = elasticsearchSearchTypeHandlers.get(searchType.type());
+            final Provider<OSSearchTypeHandler<? extends SearchType>> handlerProvider = openSearchSearchTypeHandlers.get(searchType.type());
             if (handlerProvider == null) {
                 LOG.error("Unknown search type '{}', cannot convert query result.", searchType.type());
                 // no need to add another error here, as the query generation code will have added the error about the missing handler already

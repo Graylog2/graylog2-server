@@ -20,10 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.Streams;
 import org.graylog.shaded.opensearch2.org.apache.http.client.config.RequestConfig;
-import org.graylog.storage.opensearch2.errors.ResponseError;
-import org.graylog2.indexer.IndexNotFoundException;
-import org.graylog2.indexer.InvalidWriteTargetException;
-import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
@@ -32,6 +28,11 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRespons
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.storage.opensearch2.errors.ResponseError;
+import org.graylog2.indexer.BatchSizeTooLargeException;
+import org.graylog2.indexer.IndexNotFoundException;
+import org.graylog2.indexer.InvalidWriteTargetException;
+import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,6 +148,9 @@ public class OpenSearchClient {
                     throw InvalidWriteTargetException.create(target);
                 }
             }
+            if (isBatchSizeTooLargeException(openSearchException)) {
+                throw new BatchSizeTooLargeException(openSearchException.getMessage());
+            }
         }
         return new OpenSearchException(errorMessage, e);
     }
@@ -170,8 +174,21 @@ public class OpenSearchClient {
         }
     }
 
-    private boolean isIndexNotFoundException(OpenSearchException e) {
-        return e.getMessage().contains("index_not_found_exception");
+    private boolean isIndexNotFoundException(OpenSearchException openSearchException) {
+        return openSearchException.getMessage().contains("index_not_found_exception");
+    }
+
+    private boolean isBatchSizeTooLargeException(OpenSearchException openSearchException) {
+        try {
+            final ParsedOpenSearchException parsedException = ParsedOpenSearchException.from(openSearchException.getMessage());
+            if (parsedException.type().equals("search_phase_execution_exception")) {
+                ParsedOpenSearchException parsedCause = ParsedOpenSearchException.from(openSearchException.getRootCause().getMessage());
+                return parsedCause.reason().contains("Batch size is too large");
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
     }
 
     public static RequestOptions withTimeout(RequestOptions requestOptions, Duration timeout) {

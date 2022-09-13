@@ -79,7 +79,7 @@ public class OpenSearchBackendErrorHandlingTest {
                 ),
                 client,
                 indexLookup,
-                (elasticsearchBackend, ssb, query, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, query, errors, fieldTypesLookup),
+                (elasticsearchBackend, ssb, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
                 false);
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any())).thenReturn(Collections.emptySet());
@@ -108,7 +108,6 @@ public class OpenSearchBackendErrorHandlingTest {
         this.queryContext = new OSGeneratedQueryContext(
                 this.backend,
                 new SearchSourceBuilder(),
-                query,
                 Collections.emptySet(),
                 mock(FieldTypesLookup.class)
         );
@@ -131,7 +130,7 @@ public class OpenSearchBackendErrorHandlingTest {
         assertThat(errors).hasSize(1);
         assertThat(errors.stream().map(SearchError::description).collect(Collectors.toList()))
                 .containsExactly("Unable to perform search query: " +
-                        "\n\nOpenSearch exception [type=query_shard_exception, reason=Failed to parse query [[]].");
+                        "\n\nElasticsearch exception [type=query_shard_exception, reason=Failed to parse query [[]].");
     }
 
     @Test
@@ -149,6 +148,6 @@ public class OpenSearchBackendErrorHandlingTest {
         assertThat(errors).hasSize(1);
         assertThat(errors.stream().map(SearchError::description).collect(Collectors.toList()))
                 .containsExactly("Unable to perform search query: " +
-                        "\n\nOpenSearch exception [type=illegal_argument_exception, reason=Expected numeric type on field [facility], but got [keyword]].");
+                        "\n\nElasticsearch exception [type=illegal_argument_exception, reason=Expected numeric type on field [facility], but got [keyword]].");
     }
 }

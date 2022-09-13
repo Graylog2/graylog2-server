@@ -42,10 +42,10 @@ public class ClusterOS2IT extends ClusterIT {
     @Override
     protected ClusterAdapter clusterAdapter(Duration timeout) {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        return new ClusterAdapterOS2(openSearchInstance.elasticsearchClient(),
+        return new ClusterAdapterOS2(openSearchInstance.openSearchClient(),
                 timeout,
-                new CatApi(objectMapper, openSearchInstance.elasticsearchClient()),
-                new PlainJsonApi(objectMapper, openSearchInstance.elasticsearchClient()));
+                new CatApi(objectMapper, openSearchInstance.openSearchClient()),
+                new PlainJsonApi(objectMapper, openSearchInstance.openSearchClient()));
     }
 
     @Override
@@ -70,6 +70,6 @@ public class ClusterOS2IT extends ClusterIT {
     }
 
     private CatApi catApi() {
-        return new CatApi(new ObjectMapperProvider().get(), openSearchInstance.elasticsearchClient());
+        return new CatApi(new ObjectMapperProvider().get(), openSearchInstance.openSearchClient());
     }
 }

@@ -56,7 +56,7 @@ public abstract class ContainerMatrixElasticsearchITBaseTest extends ContainerMa
     }
 
     private OpenSearchClient openSearchClient() {
-        return ((OpenSearchInstance) elasticsearch()).elasticsearchClient();
+        return ((OpenSearchInstance) elasticsearch()).openSearchClient();
     }
 
     protected CountsAdapter countsAdapter() {

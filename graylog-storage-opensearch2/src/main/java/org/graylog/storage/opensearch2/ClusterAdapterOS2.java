@@ -23,6 +23,16 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
+import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
+import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
 import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog.storage.opensearch2.cat.NodeResponse;
 import org.graylog2.indexer.ElasticsearchException;
@@ -38,16 +48,6 @@ import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
 import org.graylog2.system.stats.elasticsearch.NodesStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
-import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
-import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,7 +105,14 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
     }
 
     private List<NodeResponse> nodes() {
-        return catApi.nodes();
+        final List<NodeResponse> allNodes = catApi.nodes();
+        final List<NodeResponse> nodesWithDiskStatistics = allNodes.stream().filter(NodeResponse::hasDiskStatistics).collect(Collectors.toList());
+        if (allNodes.size() != nodesWithDiskStatistics.size()) {
+            final List<NodeResponse> nodesWithMissingDiskStatistics = allNodes.stream().filter(nr -> !nr.hasDiskStatistics()).collect(Collectors.toList());
+            LOG.info("_cat/nodes API has returned " + nodesWithMissingDiskStatistics.size() + " nodes without disk statistics:");
+            nodesWithMissingDiskStatistics.forEach(node -> LOG.info(node.toString()));
+        }
+        return nodesWithDiskStatistics;
     }
 
     @Override

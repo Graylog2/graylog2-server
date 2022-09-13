@@ -21,7 +21,6 @@ import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.plugins.views.search.Filter;
-import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
@@ -40,36 +39,31 @@ import java.util.Optional;
 import java.util.Set;
 
 public class OSGeneratedQueryContext implements GeneratedQueryContext {
-
     private final OpenSearchBackend openSearchBackend;
     private final Map<String, SearchSourceBuilder> searchTypeQueries = Maps.newHashMap();
     private final Map<Object, Object> contextMap = Maps.newHashMap();
     private final UniqueNamer uniqueNamer = new UniqueNamer("agg-");
     private final Set<SearchError> errors;
     private final SearchSourceBuilder ssb;
-    private final Query query;
 
     private final FieldTypesLookup fieldTypes;
 
     @AssistedInject
     public OSGeneratedQueryContext(
-            @Assisted OpenSearchBackend openSearchBackend,
+            @Assisted OpenSearchBackend elasticsearchBackend,
             @Assisted SearchSourceBuilder ssb,
-            @Assisted Query query,
             @Assisted Collection<SearchError> validationErrors,
             FieldTypesLookup fieldTypes) {
-        this.openSearchBackend = openSearchBackend;
+        this.openSearchBackend = elasticsearchBackend;
         this.ssb = ssb;
-        this.query = query;
         this.fieldTypes = fieldTypes;
         this.errors = new HashSet<>(validationErrors);
     }
 
     public interface Factory {
         OSGeneratedQueryContext create(
-                OpenSearchBackend openSearchBackend,
+                OpenSearchBackend elasticsearchBackend,
                 SearchSourceBuilder ssb,
-                Query query,
                 Collection<SearchError> validationErrors
         );
     }
@@ -105,7 +99,7 @@ public class OSGeneratedQueryContext implements GeneratedQueryContext {
     }
 
     private Optional<QueryBuilder> generateFilterClause(Filter filter) {
-        return openSearchBackend.generateFilterClause(filter, query);
+        return openSearchBackend.generateFilterClause(filter);
     }
 
     public String seriesName(SeriesSpec seriesSpec, Pivot pivot) {

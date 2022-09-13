@@ -94,7 +94,7 @@ public class OpenSearchBackendGeneratedRequestTestBase {
         this.openSearchBackend = new OpenSearchBackend(elasticSearchTypeHandlers,
                 client,
                 indexLookup,
-                (elasticsearchBackend, ssb, query, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, query, errors, fieldTypesLookup),
+                (elasticsearchBackend, ssb, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypesLookup),
                 usedSearchFilters -> usedSearchFilters.stream()
                         .filter(sf -> sf instanceof InlineQueryStringSearchFilter)
                         .map(inlineSf -> ((InlineQueryStringSearchFilter) inlineSf).queryString())

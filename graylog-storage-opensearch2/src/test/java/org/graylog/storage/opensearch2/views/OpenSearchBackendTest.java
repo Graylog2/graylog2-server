@@ -67,7 +67,7 @@ public class OpenSearchBackendTest {
         backend = new OpenSearchBackend(handlers,
                 null,
                 mock(IndexLookup.class),
-                (elasticsearchBackend, ssb, query, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, query, errors, fieldTypesLookup),
+                (elasticsearchBackend, ssb, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypesLookup),
                 usedSearchFiltersToQueryStringsMapper,
                 false);
     }
@@ -79,9 +79,6 @@ public class OpenSearchBackendTest {
                 .query(ElasticsearchQueryString.of(""))
                 .timerange(RelativeRange.create(300))
                 .build();
-        final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
-        final SearchJob job = new SearchJob("deadbeef", search, "admin");
-
         backend.generate(query, Collections.emptySet());
     }
 
@@ -119,8 +116,6 @@ public class OpenSearchBackendTest {
                 .filters(usedSearchFilters)
                 .timerange(RelativeRange.create(300))
                 .build();
-        final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
-        final SearchJob job = new SearchJob("deadbeef", search, "admin");
 
         final OSGeneratedQueryContext queryContext = backend.generate(query, Collections.emptySet());
         final QueryBuilder esQuery = queryContext.searchSourceBuilder(new SearchType.Fallback()).query();

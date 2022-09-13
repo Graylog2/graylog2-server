@@ -354,6 +354,9 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
     @Override
     public IndicesBlockStatus getIndicesBlocksStatus(final List<String> indices) {
+        if (indices == null || indices.isEmpty()) {
+            throw new IllegalArgumentException("Expecting list of indices with at least one index present.");
+        }
         final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
                 .indices(indices.toArray(new String[]{}))
                 .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))

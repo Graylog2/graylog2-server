@@ -52,11 +52,11 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     private OpenSearchExportBackend sut;
 
     @Rule
-    public final OpenSearchInstance elasticsearch = OpenSearchInstance.create();
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     @Override
     protected SearchServerInstance elasticsearch() {
-        return this.elasticsearch;
+        return this.openSearchInstance;
     }
 
     @Before
@@ -67,7 +67,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     }
 
     private RequestStrategy requestStrategy() {
-        final ExportClient exportClient = new ExportClient(elasticsearch.elasticsearchClient());
+        final ExportClient exportClient = new ExportClient(openSearchInstance.openSearchClient());
         return new SearchAfter(exportClient);
     }
 

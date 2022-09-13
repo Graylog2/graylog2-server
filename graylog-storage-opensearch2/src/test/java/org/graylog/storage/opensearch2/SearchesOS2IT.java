@@ -34,15 +34,15 @@ public class SearchesOS2IT extends SearchesIT {
 
     private SearchesAdapter createSearchesAdapter() {
         final ScrollResultOS2.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultOS2(
-                openSearchInstance.elasticsearchClient(), initialResult, query, scroll, fields, limit
+                openSearchInstance.openSearchClient(), initialResult, query, scroll, fields, limit
         );
         final SortOrderMapper sortOrderMapper = new SortOrderMapper();
         final boolean allowHighlighting = true;
         final boolean allowLeadingWildcardSearches = true;
 
         final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(sortOrderMapper, allowHighlighting, allowLeadingWildcardSearches);
-        return new SearchesAdapterOS2(openSearchInstance.elasticsearchClient(),
-                new Scroll(openSearchInstance.elasticsearchClient(),
+        return new SearchesAdapterOS2(openSearchInstance.openSearchClient(),
+                new Scroll(openSearchInstance.openSearchClient(),
                         scrollResultFactory,
                         searchRequestFactory),
                 searchRequestFactory);

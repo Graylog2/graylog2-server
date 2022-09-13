@@ -37,7 +37,7 @@ public class IndexFieldTypePollerOS2IT extends IndexFieldTypePollerIT {
 
     @Override
     protected IndicesAdapter createIndicesAdapter() {
-        final OpenSearchClient client = openSearchInstance.elasticsearchClient();
+        final OpenSearchClient client = openSearchInstance.openSearchClient();
         return new IndicesAdapterOS2(
                 client,
                 new StatsApi(objectMapper, client),
@@ -48,7 +48,7 @@ public class IndexFieldTypePollerOS2IT extends IndexFieldTypePollerIT {
 
     @Override
     protected IndexFieldTypePollerAdapter createIndexFieldTypePollerAdapter() {
-        final OpenSearchClient client = openSearchInstance.elasticsearchClient();
+        final OpenSearchClient client = openSearchInstance.openSearchClient();
         return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(objectMapper, client));
     }
 
