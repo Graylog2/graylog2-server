@@ -32,10 +32,15 @@ import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
 import java.util.Locale;
+
+import static java.util.Objects.isNull;
 
 public class OpenSearchInstance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchInstance.class);
@@ -61,7 +66,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     @Override
     public SearchServer searchServer() {
-        return SearchServer.ES7;
+        return SearchServer.OS2;
     }
 
     private RestHighLevelClient buildRestClient() {
@@ -85,11 +90,11 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     }
 
     public static OpenSearchInstance create() {
-        return create(SearchVersion.elasticsearch(OS_VERSION), Network.newNetwork(), DEFAULT_HEAP_SIZE);
+        return create(SearchVersion.opensearch(OS_VERSION), Network.newNetwork(), DEFAULT_HEAP_SIZE);
     }
 
     public static OpenSearchInstance create(String heapSize) {
-        return create(SearchVersion.elasticsearch(OS_VERSION), Network.newNetwork(), heapSize);
+        return create(SearchVersion.opensearch(OS_VERSION), Network.newNetwork(), heapSize);
     }
 
     // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
@@ -125,5 +130,22 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     public RestHighLevelClient restHighLevelClient() {
         return this.restHighLevelClient;
+    }
+
+    @Override
+    public GenericContainer<?> buildContainer(String image, Network network) {
+        return new OpensearchContainer(DockerImageName.parse(image))
+                // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
+                .withReuse(isNull(System.getenv("BUILD_ID")))
+                .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
+                .withEnv("discovery.type", "single-node")
+                .withEnv("action.auto_create_index", "false")
+                .withEnv("plugins.security.ssl.http.enabled", "false")
+                .withEnv("plugins.security.disabled", "true")
+                .withEnv("action.auto_create_index", "false")
+                .withEnv("cluster.info.update.interval", "10s")
+                .withNetwork(network)
+                .withNetworkAliases(NETWORK_ALIAS)
+                .waitingFor(Wait.forHttp("/").forPort(ES_PORT));
     }
 }
