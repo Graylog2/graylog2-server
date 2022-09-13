@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect, useMemo } from 'react';
 import * as Immutable from 'immutable';
 import { flatten, isEqual, uniqWith } from 'lodash';
+import type { OrderedMap } from 'immutable';
 
 import connect from 'stores/connect';
 import expandRows from 'views/logic/ExpandRows';
@@ -27,6 +28,8 @@ import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/Aggrega
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type { Leaf, Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { Events } from 'views/logic/searchtypes/events/EventHandler';
+import { WidgetActions } from 'views/stores/WidgetStore';
+import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 
 import DataTableEntry from './DataTableEntry';
 import MessagesTable from './MessagesTable';
@@ -108,6 +111,14 @@ const DataTable = ({
 
   useEffect(onRenderComplete, [onRenderComplete]);
 
+  const _onSortChange = useCallback((newSort: Array<SortConfig>) => {
+    // console.log({ newSort });
+    // config.toBuilder().sort([]).build();
+    // console.log({ '!!!!!!!!!!': config.toBuilder().sort([config.sort[1]]).build() });
+
+    return WidgetActions.updateConfig('f6e810f4-c3b7-4e75-91c4-f8269f1f71ad', config.toBuilder().sort(newSort).build());
+  }, [config]);
+
   const { columnPivots, rowPivots, series, rollup } = config;
   const rows = retrieveChartData(data) ?? [];
 
@@ -140,6 +151,8 @@ const DataTable = ({
     );
   });
 
+  const sortConfigMap = useMemo<OrderedMap<string, SortConfig>>(() => Immutable.OrderedMap(config.sort.map((sort) => [sort.field, sort])), [config]);
+
   return (
     <div className={styles.container}>
       <div className={styles.scrollContainer}>
@@ -155,7 +168,9 @@ const DataTable = ({
                      fields={fields}
                      rollup={rollup}
                      rowPivots={rowPivots}
-                     series={series} />
+                     series={series}
+                     onSortChange={_onSortChange}
+                     sortConfigMap={sortConfigMap} />
           </thead>
           <tbody>
             {formattedRows}
