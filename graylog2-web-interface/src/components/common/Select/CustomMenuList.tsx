@@ -22,12 +22,12 @@ import styled from 'styled-components';
 
 import useElementDimensions from 'hooks/useElementDimensions';
 
-const Container = styled.div`
-  flex: 1 1 auto;
-  height: 100vh;
-  max-height: 300px;
-`;
 const REACT_SELECT_MAX_OPTIONS_LENGTH = 1000;
+const MAX_CONTAINER_SIZE = 300;
+const Container = styled.div<{ height: number}>`
+  flex: 1 1 auto;
+  height: ${(props) => props?.height || MAX_CONTAINER_SIZE}px;
+`;
 
 type RowProps = {
   data: Array<object>,
@@ -51,28 +51,38 @@ const Row = ({ data, index, setSize, style, containerWidth }: RowProps) => {
   );
 };
 
-const WindowList = ({ children }: Props.MenuList) => {
+export const WindowList = ({ children, listRef, ...rest }: Props.MenuList & { listRef?: any}) => {
   const containerRef = useRef(null);
-  const listRef = useRef(null);
+  const vListRef = useRef(null);
   const sizeMap = useRef({});
   const containerDimensions = useElementDimensions(containerRef);
-  const { width, height } = containerDimensions;
+  const { width } = containerDimensions;
 
   const setSize = useCallback((index: number, size: number) => {
     sizeMap.current = { ...sizeMap.current, [index]: size };
-    listRef.current.resetAfterIndex(index);
-  }, []);
+    const currentRef = listRef || vListRef;
+    currentRef.current?.resetAfterIndex(index);
+  }, [listRef]);
+
+  const totalHeight = Object.entries(children).reduce((sum, [index]) => {
+    if (sizeMap.current[index] && sum < MAX_CONTAINER_SIZE) {
+      return parseInt(sizeMap.current[index], 10) + sum;
+    }
+
+    return sum;
+  }, 0);
 
   const getSize = useCallback((index: number) => sizeMap.current[index] || 36, [sizeMap]);
 
   return (
-    <Container ref={containerRef}>
-      <List ref={listRef}
-            height={height}
+    <Container ref={containerRef} height={totalHeight} data-testid="infinite-loader-container">
+      <List ref={listRef || vListRef}
+            height={totalHeight || 300}
             itemCount={children.length}
             itemSize={getSize}
             itemData={children}
-            width={width}>
+            width={width}
+            {...rest}>
         {({ data, index, style }) => (
           <Row data={data}
                style={style}
@@ -83,6 +93,10 @@ const WindowList = ({ children }: Props.MenuList) => {
       </List>
     </Container>
   );
+};
+
+WindowList.defaultProps = {
+  listRef: undefined,
 };
 
 const CustomMenuList = ({ children, innerProps, ...rest }: Props.MenuList) => {

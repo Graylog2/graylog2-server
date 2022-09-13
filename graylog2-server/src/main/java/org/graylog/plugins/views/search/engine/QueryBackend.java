@@ -45,11 +45,10 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
     /**
      * Generate a backend-specific query out of the logical query structure.
      *
-     * @param job                currently executing job
-     * @param query              the graylog query structure
+     * @param query the graylog query structure
      * @return a backend specific generated query
      */
-    T generate(SearchJob job, Query query, Set<SearchError> validationErrors);
+    T generate(Query query, Set<SearchError> validationErrors);
 
     default boolean isAllMessages(TimeRange timeRange) {
         return timeRange instanceof RelativeRange && ((RelativeRange)timeRange).isAllMessages();

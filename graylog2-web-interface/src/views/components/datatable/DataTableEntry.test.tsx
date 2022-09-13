@@ -65,15 +65,17 @@ const seriesWithName = (fn, name) => Series.forFunction(fn)
 describe('DataTableEntry', () => {
   const SUT = (props) => (
     <table>
-      <DataTableEntry columnPivots={columnPivots}
-                      columnPivotValues={columnPivotValues}
-                      currentView={currentView}
-                      fields={fields}
-                      item={item}
-                      series={series}
-                      types={List([])}
-                      valuePath={valuePath}
-                      {...props} />
+      <tbody>
+        <DataTableEntry columnPivots={columnPivots}
+                        columnPivotValues={columnPivotValues}
+                        currentView={currentView}
+                        fields={fields}
+                        item={item}
+                        series={series}
+                        types={List([])}
+                        valuePath={valuePath}
+                        {...props} />
+      </tbody>
     </table>
   );
 

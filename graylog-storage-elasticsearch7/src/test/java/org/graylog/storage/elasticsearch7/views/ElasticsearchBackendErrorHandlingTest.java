@@ -79,7 +79,7 @@ public class ElasticsearchBackendErrorHandlingTest {
                 ),
                 client,
                 indexLookup,
-                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
+                (elasticsearchBackend, ssb, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
                 false);
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any())).thenReturn(Collections.emptySet());
@@ -108,8 +108,6 @@ public class ElasticsearchBackendErrorHandlingTest {
         this.queryContext = new ESGeneratedQueryContext(
                 this.backend,
                 new SearchSourceBuilder(),
-                searchJob,
-                query,
                 Collections.emptySet(),
                 mock(FieldTypesLookup.class)
         );

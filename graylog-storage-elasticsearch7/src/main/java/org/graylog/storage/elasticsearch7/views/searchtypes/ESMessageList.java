@@ -85,13 +85,13 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     }
 
     @Override
-    public void doGenerateQueryPart(SearchJob job, Query query, MessageList messageList, ESGeneratedQueryContext queryContext) {
+    public void doGenerateQueryPart(Query query, MessageList messageList, ESGeneratedQueryContext queryContext) {
 
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(messageList)
                 .size(messageList.limit())
                 .from(messageList.offset());
 
-        applyHighlightingIfActivated(searchSourceBuilder, job, query);
+        applyHighlightingIfActivated(searchSourceBuilder, query);
 
         final Set<String> effectiveStreamIds = query.effectiveStreams(messageList);
 
@@ -110,17 +110,21 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
 
     private SortOrder toSortOrder(Sort.Order sortOrder) {
         switch (sortOrder) {
-            case ASC: return SortOrder.ASC;
-            case DESC: return SortOrder.DESC;
-            default: throw new IllegalStateException("Invalid sort order: " + sortOrder);
+            case ASC:
+                return SortOrder.ASC;
+            case DESC:
+                return SortOrder.DESC;
+            default:
+                throw new IllegalStateException("Invalid sort order: " + sortOrder);
         }
     }
-    private void applyHighlightingIfActivated(SearchSourceBuilder searchSourceBuilder, SearchJob job, Query query) {
+
+    private void applyHighlightingIfActivated(SearchSourceBuilder searchSourceBuilder, Query query) {
         if (!allowHighlighting) {
             return;
         }
 
-        final QueryStringQueryBuilder highlightQuery = decoratedHighlightQuery(job, query);
+        final QueryStringQueryBuilder highlightQuery = decoratedHighlightQuery(query);
 
         searchSourceBuilder.highlighter(new HighlightBuilder().requireFieldMatch(false)
                 .highlightQuery(highlightQuery)
@@ -129,7 +133,7 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
                 .numOfFragments(0));
     }
 
-    private QueryStringQueryBuilder decoratedHighlightQuery(SearchJob job, Query query) {
+    private QueryStringQueryBuilder decoratedHighlightQuery(Query query) {
         final String queryString = query.query().queryString();
 
         return QueryBuilders.queryStringQuery(queryString);

@@ -100,7 +100,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     }
 
     @Override
-    public ESGeneratedQueryContext generate(SearchJob job, Query query, Set<SearchError> validationErrors) {
+    public ESGeneratedQueryContext generate(Query query, Set<SearchError> validationErrors) {
         final BackendQuery backendQuery = query.query();
 
         final Set<SearchType> searchTypes = query.searchTypes();
@@ -116,7 +116,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .forEach(boolQuery::filter);
 
         // add the optional root query filters
-        generateFilterClause(query.filter(), job, query).map(boolQuery::filter);
+        generateFilterClause(query.filter()).map(boolQuery::filter);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(boolQuery)
@@ -124,7 +124,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .size(0)
                 .trackTotalHits(true);
 
-        final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, job, query, validationErrors);
+        final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, validationErrors);
         searchTypes.stream()
                 .filter(searchType -> !isSearchTypeWithError(queryContext, searchType.id()))
                 .forEach(searchType -> {
@@ -164,14 +164,14 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
             searchTypeSourceBuilder.query(searchTypeOverrides);
 
-                    searchTypeHandler.get().generateQueryPart(job, query, searchType, queryContext);
+                    searchTypeHandler.get().generateQueryPart(query, searchType, queryContext);
                 });
 
         return queryContext;
     }
 
     // TODO make pluggable
-    public Optional<QueryBuilder> generateFilterClause(Filter filter, SearchJob job, Query query) {
+    public Optional<QueryBuilder> generateFilterClause(Filter filter) {
         if (filter == null) {
             return Optional.empty();
         }
@@ -180,7 +180,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
             case AndFilter.NAME:
                 final BoolQueryBuilder andBuilder = QueryBuilders.boolQuery();
                 filter.filters().stream()
-                        .map(filter1 -> generateFilterClause(filter1, job, query))
+                        .map(this::generateFilterClause)
                         .forEach(optQueryBuilder -> optQueryBuilder.ifPresent(andBuilder::must));
                 return Optional.of(andBuilder);
             case OrFilter.NAME:
@@ -188,7 +188,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 // TODO for the common case "any of these streams" we can optimize the filter into
                 // a single "termsQuery" instead of "termQuery OR termQuery" if all direct children are "StreamFilter"
                 filter.filters().stream()
-                        .map(filter1 -> generateFilterClause(filter1, job, query))
+                        .map(this::generateFilterClause)
                         .forEach(optQueryBuilder -> optQueryBuilder.ifPresent(orBuilder::should));
                 return Optional.of(orBuilder);
             case StreamFilter.NAME:
