@@ -43,7 +43,7 @@ public class EtagService extends AbstractIdleService {
 
     private final Cache<String, Boolean> collectorCache;
     private final Cache<String, Boolean> configurationCache;
-    private final Cache<String, String> assignmentsCache;
+    private final Cache<String, String> registrationCache;
     private final MetricRegistry metricRegistry;
     private final EventBus eventBus;
     private final ClusterEventBus clusterEventBus;
@@ -54,8 +54,8 @@ public class EtagService extends AbstractIdleService {
         COLLECTOR,
         @JsonProperty("configuration")
         CONFIGURATION,
-        @JsonProperty("assignments")
-        ASSIGNMENTS
+        @JsonProperty("registration")
+        REGISTRATION
     }
 
     @Inject
@@ -79,7 +79,7 @@ public class EtagService extends AbstractIdleService {
                 .maximumSize(pluginConfiguration.getCacheMaxSize())
                 .build();
 
-        assignmentsCache = CacheBuilder.newBuilder()
+        registrationCache = CacheBuilder.newBuilder()
                 .recordStats()
                 .expireAfterWrite(cacheTime.getQuantity(), cacheTime.getUnit())
                 .maximumSize(pluginConfiguration.getCacheMaxSize())
@@ -93,7 +93,7 @@ public class EtagService extends AbstractIdleService {
         switch (event.cacheContext()) {
             case COLLECTOR -> cache = collectorCache;
             case CONFIGURATION -> cache = configurationCache;
-            case ASSIGNMENTS -> cache = assignmentsCache;
+            case REGISTRATION -> cache = registrationCache;
             default -> throw new IllegalArgumentException("Unknown cache context");
         }
 
@@ -114,8 +114,8 @@ public class EtagService extends AbstractIdleService {
         return configurationCache.getIfPresent(etag) != null;
     }
 
-    public boolean assignmentsAreCached(String sidecarId, String etag) {
-        return etag.equals(assignmentsCache.getIfPresent(sidecarId));
+    public boolean registrationIsCached(String sidecarId, String etag) {
+        return etag.equals(registrationCache.getIfPresent(sidecarId));
     }
 
     public void registerCollector(String etag) {
@@ -126,8 +126,8 @@ public class EtagService extends AbstractIdleService {
         configurationCache.put(etag, Boolean.TRUE);
     }
 
-    public void registerAssignment(String sidecarId, String etag) {
-        assignmentsCache.put(sidecarId, etag);
+    public void addSidecarRegistration(String sidecarId, String etag) {
+        registrationCache.put(sidecarId, etag);
     }
 
 
@@ -141,14 +141,14 @@ public class EtagService extends AbstractIdleService {
         clusterEventBus.post(EtagCacheInvalidation.create(CacheContext.COLLECTOR, ""));
     }
 
-    public void invalidateAllAssignments() {
-        assignmentsCache.invalidateAll();
-        clusterEventBus.post(EtagCacheInvalidation.create(CacheContext.ASSIGNMENTS, ""));
+    public void invalidateAllRegistrations() {
+        registrationCache.invalidateAll();
+        clusterEventBus.post(EtagCacheInvalidation.create(CacheContext.REGISTRATION, ""));
     }
 
-    public void invalidateAssignment(String sidecarId) {
-        assignmentsCache.invalidate(sidecarId);
-        clusterEventBus.post(EtagCacheInvalidation.create(CacheContext.ASSIGNMENTS, sidecarId));
+    public void invalidateRegistration(String sidecarId) {
+        registrationCache.invalidate(sidecarId);
+        clusterEventBus.post(EtagCacheInvalidation.create(CacheContext.REGISTRATION, sidecarId));
     }
 
     @Override
@@ -156,7 +156,7 @@ public class EtagService extends AbstractIdleService {
         eventBus.register(this);
         MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(name(ConfigurationService.class, "etag-cache"), configurationCache));
         MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(name(CollectorService.class, "etag-cache"), collectorCache));
-        MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(name(SidecarService.class, "etag-cache"), assignmentsCache));
+        MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(name(SidecarService.class, "etag-cache"), registrationCache));
     }
 
     @Override
