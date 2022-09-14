@@ -2154,10 +2154,20 @@
     "@nodelib/fs.scandir" "2.1.3"
     fastq "^1.6.0"
 
-"@openfonts/roboto-mono_latin@^1.44.1":
-  version "1.44.1"
-  resolved "https://registry.yarnpkg.com/@openfonts/roboto-mono_latin/-/roboto-mono_latin-1.44.1.tgz#b3d0438f971c7af7b5f2237e0c0023c103b34056"
-  integrity sha512-yXKP7yWmo1SM7YAWm0ofE8MwnpR1qViDcdorEr+a/4AkGZxXX+/NzRqAAXnuSQjMpAPaKE/US0ubsdjmowZOgA==
+"@openfonts/barlow-condensed_latin@^1.44.2":
+  version "1.44.2"
+  resolved "https://registry.yarnpkg.com/@openfonts/barlow-condensed_latin/-/barlow-condensed_latin-1.44.2.tgz#6f626ca47aed39d1e4d91143dfb4b20c72f956c6"
+  integrity sha512-sG0YHiy2jHtlFg+/DP2hz391+PK9SocvGOBcjIllwueo7oJu2N5zGIM8yhlxfZc3RvMdFWN5/3Djovq8blLSgA==
+
+"@openfonts/source-code-pro_latin@^1.44.1":
+  version "1.44.2"
+  resolved "https://registry.yarnpkg.com/@openfonts/source-code-pro_latin/-/source-code-pro_latin-1.44.2.tgz#e7daec6a7eccfc96ff9aff33ac36fc6953e74c8e"
+  integrity sha512-RIivG6F3674+6SvXLu2WdkjHZ3gmBvuj7cO8fl5T3v9yph2MmCV/QZWXf+9dkYQYNf8OFKbWVjp2x4KdlioZrg==
+
+"@openfonts/source-sans-pro_latin@^1.44.2":
+  version "1.44.2"
+  resolved "https://registry.yarnpkg.com/@openfonts/source-sans-pro_latin/-/source-sans-pro_latin-1.44.2.tgz#46f01915dc62545cc3e0596c55cd49b4906b022d"
+  integrity sha512-/NMcdO9K8a1b1+IKjpeD+YC+hTaVnzghcRljHeFnjZtjnYnw01NWRxladEE0TY99w3GnOSz1LaKuupfirJJlOQ==
 
 "@plotly/d3-sankey-circular@0.33.1":
   version "0.33.1"
@@ -6025,7 +6035,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.2"
     eslint-plugin-compat "4.0.2"
-    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-956eacac-0a35-4d65-8f5b-bbd9bf93b99d-1662983423372/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.0.4"
     eslint-plugin-jest-dom "4.0.2"
@@ -7280,12 +7290,12 @@ grapheme-splitter@^1.0.4:
     "@types/create-react-class" "15.6.3"
     "@types/jquery" "3.5.14"
     "@types/react" "18.0.19"
-    babel-preset-graylog "file:packages/babel-preset-graylog"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-79bc66a3-ddfb-4d7f-b17c-775b4fe24471-1662983423122/node_modules/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:packages/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-79bc66a3-ddfb-4d7f-b17c-775b4fe24471-1662983423122/node_modules/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:packages/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-79bc66a3-ddfb-4d7f-b17c-775b4fe24471-1662983423122/node_modules/jest-preset-graylog"
     jquery "3.6.1"
     moment "2.29.4"
     moment-timezone "0.5.37"
@@ -10181,11 +10191,6 @@ opener@^1.5.2:
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/opener/-/opener-1.5.2.tgz#5d37e1f35077b9dcac4301372271afdeb2a13598"
   integrity sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==
-
-opensans-npm-webfont@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/opensans-npm-webfont/-/opensans-npm-webfont-1.0.0.tgz#910c8e525887b47eb8a6795846138a0cbac15a47"
-  integrity sha512-2ehgrX+NpoxLOil30tYGr0cDsDXSJn9gon6PfM1Ki0CxZF6ui9Mi6Dm5DGglKyK2QiX0gMb6Ch7VmRHwfc4M6Q==
 
 optionator@^0.8.1:
   version "0.8.3"

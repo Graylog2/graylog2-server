@@ -165,12 +165,12 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme, $height }) =
       left: 0;
       right: 0;
       padding: 0;
-      margin-top: 6px;
+      margin-top: 8px;
       margin-left: 6px;
       transform: none;
       opacity: 1;
       z-index: auto !important;
-      font-family: inherit !important;
+      font-family: ${$scTheme.fonts.family.monospace} !important;
       font-size: ${$scTheme.fonts.size.body};
       color: ${$scTheme.colors.input.placeholder};
       text-overflow: ellipsis;
