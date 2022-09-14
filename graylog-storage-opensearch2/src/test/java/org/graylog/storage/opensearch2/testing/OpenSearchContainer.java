@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch7.testing;
+package org.graylog.storage.opensearch2.testing;
 
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
@@ -23,17 +23,13 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
 
-public class OpensearchContainer extends GenericContainer<OpensearchContainer> {
-
-    public OpensearchContainer(DockerImageName dockerImageName) {
+public class OpenSearchContainer extends GenericContainer<OpenSearchContainer> {
+    public OpenSearchContainer(DockerImageName dockerImageName) {
         super(dockerImageName);
-        this.logger().info("Starting an opensearch container using [{}]", dockerImageName);
+        this.logger().info("Starting an OpenSearch container using [{}]", dockerImageName);
         this.withNetworkAliases("opensearch-" + Base58.randomString(6));
         this.withEnv("discovery.type", "single-node");
         this.addExposedPorts(9200, 9300);
         this.setWaitStrategy((new HttpWaitStrategy()).forPort(9200).forStatusCodeMatching((response) -> response == 200 || response == 401).withStartupTimeout(Duration.ofMinutes(2L)));
     }
-
-
-
 }
