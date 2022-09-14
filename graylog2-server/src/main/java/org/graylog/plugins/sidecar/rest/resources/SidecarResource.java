@@ -55,12 +55,12 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
