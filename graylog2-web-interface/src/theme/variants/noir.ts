@@ -32,6 +32,7 @@ const brand: $PropertyType<Colors, 'brand'> = {
   primary: '#ff3633',
   secondary: '#888',
   tertiary: '#fff',
+  logo: '#fff',
 };
 
 const globalDefault: $PropertyType<Colors, 'global'> = {
