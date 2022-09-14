@@ -45,6 +45,11 @@ type Props = VisualizationComponentProps & {
   },
   data: { [key: string]: Rows } & { events?: Events },
   fields: FieldTypeMappingsList,
+  striped?: boolean,
+  bordered?: boolean,
+  borderedHeader?: boolean,
+  stickyHeader?: boolean,
+  condensed?: boolean,
 };
 
 const _compareArray = (ary1, ary2) => {
@@ -88,7 +93,17 @@ const _extractColumnPivotValues = (rows): Array<Array<string>> => {
   return Immutable.List<Array<string>>(uniqRows).sort(_compareArray).toArray();
 };
 
-const DataTable = ({ config, currentView, data, fields }: Props) => {
+const DataTable = ({
+  config,
+  currentView,
+  data,
+  fields,
+  striped,
+  bordered,
+  borderedHeader,
+  stickyHeader,
+  condensed,
+}: Props) => {
   const onRenderComplete = useContext(RenderCompletionCallback);
 
   useEffect(onRenderComplete, [onRenderComplete]);
@@ -128,7 +143,11 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
   return (
     <div className={styles.container}>
       <div className={styles.scrollContainer}>
-        <MessagesTable>
+        <MessagesTable striped={striped}
+                       bordered={bordered}
+                       borderedHeader={borderedHeader}
+                       stickyHeader={stickyHeader}
+                       condensed={condensed}>
           <thead>
             <Headers activeQuery={currentView.activeQuery}
                      actualColumnPivotFields={actualColumnPivotFields}
@@ -138,11 +157,21 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
                      rowPivots={rowPivots}
                      series={series} />
           </thead>
-          {formattedRows}
+          <tbody>
+            {formattedRows}
+          </tbody>
         </MessagesTable>
       </div>
     </div>
   );
+};
+
+DataTable.defaultProps = {
+  condensed: true,
+  striped: true,
+  bordered: false,
+  stickyHeader: true,
+  borderedHeader: true,
 };
 
 const ConnectedDataTable = makeVisualization(connect(DataTable, { currentView: ViewStore }), 'table');

@@ -15,18 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
+import { useMemo } from 'react';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
-import EmailNotificationForm from './EmailNotificationForm';
+type Props = {
+  text: string,
+}
 
-const EmailNotificationFormContainer = (props) => {
-  return <EmailNotificationForm {...props} />;
+const Markdown = ({ text }: Props) => {
+  const markdown = useMemo(() => DOMPurify.sanitize(marked(text ?? '')), [text]);
+
+  // eslint-disable-next-line react/no-danger
+  return <div dangerouslySetInnerHTML={{ __html: markdown }} />;
 };
 
-EmailNotificationFormContainer.propTypes = {
-  config: PropTypes.object.isRequired,
-  validation: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-};
-
-export default EmailNotificationFormContainer;
+export default Markdown;

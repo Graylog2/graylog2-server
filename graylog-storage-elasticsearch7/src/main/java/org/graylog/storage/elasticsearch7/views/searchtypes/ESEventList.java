@@ -34,7 +34,7 @@ import java.util.stream.StreamSupport;
 
 public class ESEventList implements ESSearchTypeHandler<EventList> {
     @Override
-    public void doGenerateQueryPart(SearchJob job, Query query, EventList eventList,
+    public void doGenerateQueryPart(Query query, EventList eventList,
                                     ESGeneratedQueryContext queryContext) {
         queryContext.searchSourceBuilder(eventList)
                 .size(10000);
