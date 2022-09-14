@@ -73,12 +73,12 @@ const family = {
 /* Scaled 1.125 Major Second - https://type-scale.com/ */
 const size = {
   root: `${ROOT_FONT_SIZE}px`,
-  body: '1.125rem',
+  body: '1rem',
   huge: '2.027rem',
   large: '1.125rem',
   small: '0.889rem',
   tiny: '0.79rem',
-  navigation: '1.266rem',
+  navigation: '1.125rem',
   h1: '1.802rem',
   h2: '1.602rem',
   h3: '1.424rem',

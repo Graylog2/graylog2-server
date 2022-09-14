@@ -20,7 +20,7 @@ export type ThemeMode = 'teint' | 'noir';
 export type PreferencesThemeMode = 'themeMode';
 
 const PREFERENCES_THEME_MODE: PreferencesThemeMode = 'themeMode';
-const ROOT_FONT_SIZE = 14;
+const ROOT_FONT_SIZE = 16; // This value is also being maintained as @font-size-base in bootstrap-config.js
 const THEME_MODE_LIGHT = 'teint';
 const THEME_MODE_DARK = 'noir';
 const DEFAULT_THEME_MODE: ThemeMode = prefersDarkMode ? THEME_MODE_DARK : THEME_MODE_LIGHT;
