@@ -99,7 +99,7 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
 
     // Create new assignments based on tags and existing manual assignments'
     private Sidecar updateTaggedConfigurationAssignments(Sidecar sidecar) {
-        final List<String> sidecarTags = sidecar.nodeDetails().tags();
+        final Set<String> sidecarTags = sidecar.nodeDetails().tags();
 
         // find all configurations that match the tags
         // TODO filter configs based on collector os

@@ -48,6 +48,7 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -122,7 +123,7 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         return findByQuery(query);
     }
 
-    public List<Configuration> findByTags(List<String> tags) {
+    public List<Configuration> findByTags(Set<String> tags) {
         return findByQuery(DBQuery.in(Configuration.FIELD_TAGS, tags));
     }
 
