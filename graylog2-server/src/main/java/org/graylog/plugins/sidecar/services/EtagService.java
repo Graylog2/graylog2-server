@@ -113,6 +113,10 @@ public class EtagService extends AbstractIdleService {
         return configurationCache.getIfPresent(etag) != null;
     }
 
+    public boolean assignmentsAreCached(String etag) {
+        return assignmentsCache.getIfPresent(etag) != null;
+    }
+
     public void registerCollector(String etag) {
         collectorCache.put(etag, Boolean.TRUE);
     }
@@ -134,6 +138,11 @@ public class EtagService extends AbstractIdleService {
     public void invalidateAllCollectors() {
         collectorCache.invalidateAll();
         clusterEventBus.post(EtagCacheInvalidation.create(CacheContext.COLLECTOR, ""));
+    }
+
+    public void invalidateAllAssignments() {
+        assignmentsCache.invalidateAll();
+        clusterEventBus.post(EtagCacheInvalidation.create(CacheContext.ASSIGNMENTS, ""));
     }
 
     @Override

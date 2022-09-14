@@ -171,7 +171,7 @@ public class AdministrationResource extends RestResource implements PluginRestRe
             final CollectorActions collectorActions = actionService.fromRequest(bulkActionRequest.sidecarId(), actions);
             actionService.saveAction(collectorActions);
         }
-        etagService.invalidateAll();
+        etagService.invalidateAllAssignments();
 
         return Response.accepted().build();
     }
