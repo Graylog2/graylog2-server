@@ -17,40 +17,18 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
+import { FieldTypes } from '@graylog/server-api';
 import type { TimeRange } from 'views/logic/queries/Query';
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
 import type { FieldTypeMappingJSON } from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { adjustFormat, toUTCFromTz } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 
-const fieldTypesUrl = qualifyUrl('/views/fields');
-
 type FieldTypesResponse = Array<FieldTypeMappingJSON>;
-
-type FieldTypesRequest = {
-  streams?: Array<string>,
-  timerange?: TimeRange,
-};
 
 const _deserializeFieldTypes = (response: FieldTypesResponse) => response.map((fieldTypeMapping) => FieldTypeMapping.fromJSON(fieldTypeMapping));
 
-const createFieldTypeRequest = (streams: Array<string>, timerange: TimeRange): FieldTypesRequest => {
-  let request: FieldTypesRequest = {};
-
-  if (streams && streams.length > 0) {
-    request = { streams };
-  }
-
-  if (timerange) {
-    request = { ...request, timerange };
-  }
-
-  return request;
-};
-
-const fetchAllFieldTypes = (streams: Array<string>, timerange: TimeRange): Promise<Array<FieldTypeMapping>> => fetch('POST', fieldTypesUrl, createFieldTypeRequest(streams, timerange))
+const fetchAllFieldTypes = (streams: Array<string>, timerange: TimeRange): Promise<Array<FieldTypeMapping>> => FieldTypes.byStreams({ streams, timerange })
   .then(_deserializeFieldTypes);
 
 const normalizeTimeRange = (timerange: TimeRange, userTz: string): TimeRange => {
@@ -73,6 +51,14 @@ const useFieldTypes = (streams: Array<string>, timerange: TimeRange): { data: Fi
   return useQuery(
     ['fieldTypes', streams, _timerange],
     () => fetchAllFieldTypes(streams, _timerange),
+    { staleTime: 30000, refetchOnWindowFocus: false, cacheTime: 0 },
+  );
+};
+
+export const useFieldTypesForSearch = (searchId: string, streams: Array<string>, timerange: TimeRange): { data: FieldTypeMapping[] } => {
+  return useQuery(
+    ['fieldTypes', 'bySearch', searchId],
+    () => FieldTypes.bySearch(searchId, { streams, timerange }).then(_deserializeFieldTypes),
     { staleTime: 30000, refetchOnWindowFocus: false, cacheTime: 0 },
   );
 };
