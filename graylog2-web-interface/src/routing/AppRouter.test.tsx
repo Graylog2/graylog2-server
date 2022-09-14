@@ -18,7 +18,9 @@ import * as React from 'react';
 import { renderUnwrapped as render, screen } from 'wrappedTestingLibrary';
 import DefaultProviders from 'DefaultProviders';
 import { MemoryRouter } from 'react-router-dom';
+import { defaultUser } from 'defaultMockValues';
 
+import CurrentUserContext from 'contexts/CurrentUserContext';
 import mockComponent from 'helpers/mocking/MockComponent';
 import asMock from 'helpers/mocking/AsMock';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -50,7 +52,7 @@ jest.mock('react-router-dom', () => ({
 
 const AppRouterWithContext = ({ path }: { path?: string }) => (
   <DefaultProviders>
-    <CurrentUserContext.Provider value={currentUser}>
+    <CurrentUserContext.Provider value={defaultUser}>
       <MemoryRouter initialEntries={[path]}>
         <AppRouter />
       </MemoryRouter>
@@ -69,7 +71,7 @@ describe('AppRouter', () => {
   });
 
   it('routes to Getting Started Page for `/` or empty location', async () => {
-    render(<AppRouter />);
+    render(<AppRouterWithContext path={undefined} />);
 
     await screen.findByText('This is the start page');
   });
@@ -89,9 +91,9 @@ describe('AppRouter', () => {
     });
 
     it('renders null-parent component plugin routes without application chrome', async () => {
-      asMock(usePluginEntities).mockReturnValue([{ parentComponent: null, component: () => <span>Hey there!</span>, path: '/' }]);
+      asMock(usePluginEntities).mockReturnValue([{ parentComponent: null, component: () => <span>Hey there!</span>, path: '/without-chrome' }]);
 
-      const { findByText, queryByTitle } = render(<AppRouterWithContext path="/" />);
+      const { findByText, queryByTitle } = render(<AppRouterWithContext path="/without-chrome" />);
 
       await findByText('Hey there!');
 
