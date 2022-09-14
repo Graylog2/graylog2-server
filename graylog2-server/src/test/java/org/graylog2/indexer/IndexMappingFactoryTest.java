@@ -50,7 +50,7 @@ public class IndexMappingFactoryTest {
             "6.0.0",
             "8.0.0",
             "9.0.0",
-            "OpenSearch:2.0.3"
+            "OpenSearch:3.0.0"
     })
     void mappingFailsForUnsupportedElasticsearchVersion(final String version) {
         testForUnsupportedVersion(version);

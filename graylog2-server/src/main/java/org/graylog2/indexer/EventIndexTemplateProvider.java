@@ -30,7 +30,7 @@ public class EventIndexTemplateProvider implements IndexTemplateProvider {
 
     @Override
     public IndexMappingTemplate create(@Nonnull SearchVersion elasticsearchVersion, @Nonnull IndexSetConfig indexSetConfig) {
-        if (elasticsearchVersion.satisfies(ELASTICSEARCH, "^7.0.0") || elasticsearchVersion.satisfies(OPENSEARCH, "^1.0.0")) {
+        if (elasticsearchVersion.satisfies(ELASTICSEARCH, "^7.0.0") || elasticsearchVersion.satisfies(OPENSEARCH, "^1.0.0 | ^2.0.0")) {
             return new EventsIndexMapping7();
         } else {
             throw new ElasticsearchException("Unsupported Search version: " + elasticsearchVersion);

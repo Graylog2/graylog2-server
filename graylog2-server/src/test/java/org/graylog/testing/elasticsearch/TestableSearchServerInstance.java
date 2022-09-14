@@ -47,8 +47,8 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
 
     private static final Map<SearchVersion, GenericContainer<?>> containersByVersion = new HashMap<>();
 
-    private static final int ES_PORT = 9200;
-    private static final String NETWORK_ALIAS = "elasticsearch";
+    protected static final int ES_PORT = 9200;
+    protected static final String NETWORK_ALIAS = "elasticsearch";
 
     private final SearchVersion version;
     private String heapSize;
@@ -93,7 +93,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
                 .waitingFor(Wait.forHttp("/").forPort(ES_PORT));
     }
 
-    private String getEsJavaOpts() {
+    protected String getEsJavaOpts() {
         return StringUtils.f("-Xms%s -Xmx%s -Dlog4j2.formatMsgNoLookups=true", heapSize, heapSize);
     }
 

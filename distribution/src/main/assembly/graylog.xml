@@ -54,5 +54,9 @@
             <source>${project.basedir}/../graylog-storage-elasticsearch7/target/graylog-storage-elasticsearch7-${project.version}.jar</source>
             <outputDirectory>plugin/</outputDirectory>
         </file>
+        <file>
+            <source>${project.basedir}/../graylog-storage-opensearch2/target/graylog-storage-opensearch2-${project.version}.jar</source>
+            <outputDirectory>plugin/</outputDirectory>
+        </file>
     </files>
 </assembly>
