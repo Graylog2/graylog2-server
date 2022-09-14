@@ -491,6 +491,10 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     width: 110px;
   }
 
+  .btn {
+    border-radius: 0;
+  }
+
   .btn-text {
     font-family: ${theme.fonts.family.body};
     font-size: ${theme.fonts.size.small};

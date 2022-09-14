@@ -19,7 +19,6 @@ import styled, { css } from 'styled-components';
 import { Button as BootstrapButton } from 'react-bootstrap';
 
 const Button = styled(BootstrapButton)(({ theme }) => css`
-  border-radius: 0;
   ${theme.components.button}
 `);
 
