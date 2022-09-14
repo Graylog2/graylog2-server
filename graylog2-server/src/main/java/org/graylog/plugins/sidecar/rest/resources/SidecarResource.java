@@ -220,20 +220,18 @@ public class SidecarResource extends RestResource implements PluginRestResource 
             sidecar = sidecarService.fromRequest(nodeId, request, sidecarVersion);
         }
 
-        // check if client is up-to-date with a known valid etag
-        boolean assignmentsAreCached = false;
+        // If the sidecar has the recent registration, return with HTTP 304
         if (ifNoneMatch != null) {
             EntityTag etag = new EntityTag(ifNoneMatch.replaceAll("\"", ""));
-            assignmentsAreCached = etagService.registrationIsCached(sidecar.id(), etag.toString());
+            if (etagService.registrationIsCached(sidecar.id(), etag.toString())) {
+                sidecarService.save(sidecar);
+                return Response.notModified().tag(etag).build();
+            }
         }
-        if (assignmentsAreCached) {
-            sidecarService.save(sidecar);
-            return Response.notModified().build();
-        } else {
-            final Sidecar updated = sidecarService.updateTaggedConfigurationAssignments(sidecar);
-            sidecarService.save(updated);
-            sidecar = updated;
-        }
+
+        final Sidecar updated = sidecarService.updateTaggedConfigurationAssignments(sidecar);
+        sidecarService.save(updated);
+        sidecar = updated;
 
         final CollectorActions collectorActions = actionService.findActionBySidecar(nodeId, true);
         List<CollectorAction> collectorAction = null;
