@@ -60,7 +60,7 @@ describe('Navigation', () => {
 
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
-    asMock(useLocation).mockReturnValue({ pathname: '/' } as Location<{ pathname: string }>);
+    asMock(useLocation).mockReturnValue({ pathname: '/' } as Location);
   });
 
   describe('has common elements', () => {
@@ -223,7 +223,7 @@ describe('Navigation', () => {
         .permissions(Immutable.List(['somethingelse', 'completelydifferent']))
         .build());
 
-      asMock(useLocation).mockReturnValue({ pathname: '/somethingelse' } as Location<{ pathname: string }>);
+      asMock(useLocation).mockReturnValue({ pathname: '/somethingelse' } as Location);
 
       const wrapper = mount((
         <MemoryRouter initialEntries={['/somethingelse']}>
