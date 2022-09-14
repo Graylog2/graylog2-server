@@ -284,11 +284,11 @@ public class SidecarResource extends RestResource implements PluginRestResource 
             try {
                 Sidecar sidecar = sidecarService.assignConfiguration(nodeId, nodeRelations);
                 sidecarService.save(sidecar);
-                etagService.invalidateAllAssignments();
             } catch (org.graylog2.database.NotFoundException e) {
                 throw new NotFoundException(e.getMessage());
             }
         }
+        etagService.invalidateAllAssignments();
 
         return Response.accepted().build();
     }
