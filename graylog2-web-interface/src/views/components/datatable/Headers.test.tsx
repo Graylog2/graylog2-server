@@ -17,17 +17,19 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
+import { OrderedMap } from 'immutable';
 
 import Series from 'views/logic/aggregationbuilder/Series';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
+import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 
 import Headers from './Headers';
 
 jest.mock('components/common/Timestamp', () => 'Timestamp');
-
+const onSortChange = jest.fn();
 const seriesWithName = (fn, name) => Series.forFunction(fn)
   .toBuilder()
   .config(SeriesConfig.empty()
@@ -45,6 +47,7 @@ describe('Headers', () => {
     rollup?: boolean,
     actualColumnPivotFields?: Array<Array<string>>,
     fields?: Array<FieldTypeMapping>,
+    sortConfigMap?: OrderedMap<string, SortConfig>
   };
   /* eslint-enable react/require-default-props */
 
@@ -55,6 +58,7 @@ describe('Headers', () => {
     rollup = true,
     actualColumnPivotFields = [],
     fields = [],
+    sortConfigMap = OrderedMap([]),
   }: RenderHeadersProps) => (
     <table>
       <thead>
@@ -64,7 +68,9 @@ describe('Headers', () => {
                  series={series}
                  rollup={rollup}
                  actualColumnPivotFields={actualColumnPivotFields}
-                 fields={Immutable.List(fields)} />
+                 fields={Immutable.List(fields)}
+                 sortConfigMap={sortConfigMap}
+                 onSortChange={onSortChange} />
       </thead>
     </table>
   );

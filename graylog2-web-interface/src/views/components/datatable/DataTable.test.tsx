@@ -18,6 +18,7 @@ import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
 import 'helpers/mocking/react-dom_mock';
+import { Form, Formik } from 'formik';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
@@ -56,20 +57,24 @@ describe('DataTable', () => {
   const series = new Series('count()');
 
   const SimplifiedDataTable = (props) => (
-    <DataTable config={AggregationWidgetConfig.builder().build()}
-               currentView={currentView}
-               data={{}}
-               fields={Immutable.List([])}
-               effectiveTimerange={{
-                 from: '2020-01-10T13:23:42.000Z',
-                 to: '2020-01-10T14:23:42.000Z',
-                 type: 'absolute',
-               }}
-               toggleEdit={() => {}}
-               onChange={() => {}}
-               height={200}
-               width={300}
-               {...props} />
+    <Formik initialValues={{}} onSubmit={() => {}}>
+      <Form>
+        <DataTable config={AggregationWidgetConfig.builder().build()}
+                   currentView={currentView}
+                   data={{}}
+                   fields={Immutable.List([])}
+                   effectiveTimerange={{
+                     from: '2020-01-10T13:23:42.000Z',
+                     to: '2020-01-10T14:23:42.000Z',
+                     type: 'absolute',
+                   }}
+                   toggleEdit={() => {}}
+                   onChange={() => {}}
+                   height={200}
+                   width={300}
+                   {...props} />
+      </Form>
+    </Formik>
   );
 
   it('should render with empty data', () => {
