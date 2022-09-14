@@ -23,12 +23,13 @@ import { Badge, Nav } from 'components/bootstrap';
 import connect from 'stores/connect';
 import Routes from 'routing/Routes';
 import { NotificationsActions, NotificationsStore } from 'stores/notifications/NotificationsStore';
+import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
 import InactiveNavItem from './InactiveNavItem';
 
 const StyledNav = styled(Nav)`
   > li > a {
-    min-height: 50px;
+    min-height: ${NAV_ITEM_HEIGHT};
     display: inline-flex;
     align-items: center;
     justify-content: center;

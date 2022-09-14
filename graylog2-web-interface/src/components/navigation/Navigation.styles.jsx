@@ -17,6 +17,7 @@
 import styled, { css } from 'styled-components';
 
 import { Navbar } from 'components/bootstrap';
+import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
 const StyledNavbar = styled(Navbar)(({ theme }) => css`
   .dev-badge-wrap > a {
@@ -117,7 +118,7 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
       #scratchpad-toggle,
       .dropdown-toggle {
         padding: 12px !important;
-        min-height: 50px;
+        min-height: ${NAV_ITEM_HEIGHT};
         display: inline-flex;
         align-items: center;
         justify-content: center;

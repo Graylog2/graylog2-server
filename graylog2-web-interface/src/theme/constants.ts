@@ -26,6 +26,7 @@ const THEME_MODE_DARK = 'noir';
 const DEFAULT_THEME_MODE: ThemeMode = prefersDarkMode ? THEME_MODE_DARK : THEME_MODE_LIGHT;
 const THEME_MODES: Array<ThemeMode> = [THEME_MODE_LIGHT, THEME_MODE_DARK];
 const INPUT_BORDER_RADIUS = 0;
+const NAV_ITEM_HEIGHT = '50px';
 
 export {
   DEFAULT_THEME_MODE,
@@ -35,4 +36,5 @@ export {
   THEME_MODE_DARK,
   THEME_MODES,
   INPUT_BORDER_RADIUS,
+  NAV_ITEM_HEIGHT,
 };
