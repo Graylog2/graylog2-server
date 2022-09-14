@@ -27,6 +27,7 @@ const MessageFieldsFilter = {
 
     // Our reserved fields.
     'gl2_accounted_message_size',
+    'gl2_message_fields',
     'gl2_message_id',
     'gl2_source_node',
     'gl2_source_input',
