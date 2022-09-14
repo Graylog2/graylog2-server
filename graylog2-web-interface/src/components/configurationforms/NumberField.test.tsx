@@ -28,16 +28,21 @@ import {
 import NumberField from './NumberField';
 
 describe('<NumberField>', () => {
+  const SUT = (props: Partial<React.ComponentProps<typeof NumberField>>) => (
+    <NumberField field={numberField}
+                 onChange={() => {}}
+                 title="example_number_field"
+                 typeName="number"
+                 {...props} />
+  );
+
   beforeEach(() => {
     jest.resetAllMocks();
   });
 
   it('should render an empty field', () => {
-    const { container } = render(
-      <NumberField field={numberField}
-                   onChange={() => {}}
-                   title="example_number_field"
-                   typeName="number" />,
+    render(
+      <SUT />,
     );
 
     const fieldLabel = screen.getByText(numberField.human_name, { exact: false });
@@ -51,18 +56,10 @@ describe('<NumberField>', () => {
     expect(formField).not.toBeRequired();
     expect(formField).toHaveAttribute('max', String(Number.MAX_SAFE_INTEGER));
     expect(formField).toHaveAttribute('min', String(Number.MIN_SAFE_INTEGER));
-
-    expect(container).toMatchSnapshot();
   });
 
   it('should render a field with a value', () => {
-    render(
-      <NumberField field={numberField}
-                   onChange={() => {}}
-                   title="example_number_field"
-                   typeName="number"
-                   value={numberField.default_value} />,
-    );
+    render(<SUT value={numberField.default_value} />);
 
     const formField = screen.getByLabelText(numberField.human_name, { exact: false });
 
@@ -71,12 +68,7 @@ describe('<NumberField>', () => {
   });
 
   it('should render a required number field', () => {
-    render(
-      <NumberField field={requiredNumberField}
-                   onChange={() => {}}
-                   title="example_number_field"
-                   typeName="number" />,
-    );
+    render(<SUT field={requiredNumberField} />);
 
     const fieldLabel = screen.getByText(requiredNumberField.human_name, { exact: false });
     const optionalMarker = screen.queryByText(/(optional)/);
@@ -91,13 +83,7 @@ describe('<NumberField>', () => {
   it('should call onChange when the value changes', async () => {
     const changeFunction = jest.fn();
 
-    render(
-      <NumberField field={numberField}
-                   onChange={changeFunction}
-                   title="example_number_field"
-                   typeName="number"
-                   value={numberField.default_value} />,
-    );
+    render(<SUT onChange={changeFunction} value={numberField.default_value} />);
 
     const formField = screen.getByLabelText(numberField.human_name, { exact: false });
     fireEvent.change(formField, { target: { value: '123' } });
@@ -106,12 +92,7 @@ describe('<NumberField>', () => {
   });
 
   it('should render negative number field', () => {
-    render(
-      <NumberField field={negativeNumberField}
-                   onChange={() => {}}
-                   title="example_number_field"
-                   typeName="number" />,
-    );
+    render(<SUT field={negativeNumberField} />);
 
     const formField = screen.getByLabelText(negativeNumberField.human_name, { exact: false });
 
@@ -121,12 +102,7 @@ describe('<NumberField>', () => {
   });
 
   it('should render positive number field', () => {
-    render(
-      <NumberField field={positiveNumberField}
-                   onChange={() => {}}
-                   title="example_number_field"
-                   typeName="number" />,
-    );
+    render(<SUT field={positiveNumberField} />);
 
     const formField = screen.getByLabelText(positiveNumberField.human_name, { exact: false });
 
@@ -136,12 +112,7 @@ describe('<NumberField>', () => {
   });
 
   it('should render port number field', () => {
-    render(
-      <NumberField field={portNumberField}
-                   onChange={() => {}}
-                   title="example_number_field"
-                   typeName="number" />,
-    );
+    render(<SUT field={portNumberField} />);
 
     const formField = screen.getByLabelText(portNumberField.human_name, { exact: false });
 
