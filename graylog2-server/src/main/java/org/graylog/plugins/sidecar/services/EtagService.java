@@ -43,7 +43,7 @@ public class EtagService extends AbstractIdleService {
 
     private final Cache<String, Boolean> collectorCache;
     private final Cache<String, Boolean> configurationCache;
-    private final Cache<String, Boolean> assignmentsCache;
+    private final Cache<String, String> assignmentsCache;
     private final MetricRegistry metricRegistry;
     private final EventBus eventBus;
     private final ClusterEventBus clusterEventBus;
@@ -88,7 +88,8 @@ public class EtagService extends AbstractIdleService {
 
     @Subscribe
     public void handleEtagInvalidation(EtagCacheInvalidation event) {
-        Cache<String, Boolean> cache;
+        //noinspection rawtypes
+        Cache cache;
         switch (event.cacheContext()) {
             case COLLECTOR -> cache = collectorCache;
             case CONFIGURATION -> cache = configurationCache;
@@ -96,12 +97,12 @@ public class EtagService extends AbstractIdleService {
             default -> throw new IllegalArgumentException("Unknown cache context");
         }
 
-        if (event.create().equals("")) {
-            LOG.trace("Invalidating all collector configuration etags");
+        if (event.cacheKey().equals("")) {
+            LOG.trace("Invalidating {} cache for all keys", event.cacheContext());
             cache.invalidateAll();
         } else {
-            LOG.trace("Invalidating collector configuration etag {}", event.create());
-            cache.invalidate(event.create());
+            LOG.trace("Invalidating {} cache for cacheKey {}", event.cacheContext(), event.cacheKey());
+            cache.invalidate(event.cacheKey());
         }
     }
 
@@ -113,8 +114,8 @@ public class EtagService extends AbstractIdleService {
         return configurationCache.getIfPresent(etag) != null;
     }
 
-    public boolean assignmentsAreCached(String etag) {
-        return assignmentsCache.getIfPresent(etag) != null;
+    public boolean assignmentsAreCached(String sidecarId, String etag) {
+        return etag.equals(assignmentsCache.getIfPresent(sidecarId));
     }
 
     public void registerCollector(String etag) {
@@ -125,8 +126,8 @@ public class EtagService extends AbstractIdleService {
         configurationCache.put(etag, Boolean.TRUE);
     }
 
-    public void registerAssignment(String etag) {
-        assignmentsCache.put(etag, Boolean.TRUE);
+    public void registerAssignment(String sidecarId, String etag) {
+        assignmentsCache.put(sidecarId, etag);
     }
 
 
@@ -143,6 +144,11 @@ public class EtagService extends AbstractIdleService {
     public void invalidateAllAssignments() {
         assignmentsCache.invalidateAll();
         clusterEventBus.post(EtagCacheInvalidation.create(CacheContext.ASSIGNMENTS, ""));
+    }
+
+    public void invalidateAssignment(String sidecarId) {
+        assignmentsCache.invalidate(sidecarId);
+        clusterEventBus.post(EtagCacheInvalidation.create(CacheContext.ASSIGNMENTS, sidecarId));
     }
 
     @Override

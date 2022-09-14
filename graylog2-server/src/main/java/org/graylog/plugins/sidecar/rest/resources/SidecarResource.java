@@ -201,15 +201,14 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_UPDATE)
     @NoAuditEvent("this is only a ping from Sidecars, and would overflow the audit log")
     public Response register(@ApiParam(name = "sidecarId", value = "The id this Sidecar is registering as.", required = true)
-                             @PathParam("sidecarId") @NotEmpty String sidecarId,
+                             @PathParam("sidecarId") @NotEmpty String nodeId,
                              @ApiParam(name = "JSON body", required = true)
                              @Valid @NotNull RegistrationRequest request,
                              @HeaderParam(value = "If-None-Match") String ifNoneMatch,
                              @HeaderParam(value = "X-Graylog-Sidecar-Version") @NotEmpty String sidecarVersion) {
 
-        boolean etagCached = false;
         final Sidecar newSidecar;
-        final Sidecar oldSidecar = sidecarService.findByNodeId(sidecarId);
+        final Sidecar oldSidecar = sidecarService.findByNodeId(nodeId);
         List<ConfigurationAssignment> assignments = null;
         if (oldSidecar != null) {
             assignments = oldSidecar.assignments();
@@ -220,23 +219,19 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                     .lastSeen(DateTime.now(DateTimeZone.UTC))
                     .build();
         } else {
-            newSidecar = sidecarService.fromRequest(sidecarId, request, sidecarVersion);
+            newSidecar = sidecarService.fromRequest(nodeId, request, sidecarVersion);
         }
         sidecarService.save(newSidecar);
 
-        Response.ResponseBuilder builder = Response.noContent();
         // check if client is up-to-date with a known valid etag
         if (ifNoneMatch != null) {
             EntityTag etag = new EntityTag(ifNoneMatch.replaceAll("\"", ""));
-            if (etagService.assignmentsAreCached(etag.toString())) {
-                etagCached = true;
-                builder = Response.notModified();
-                builder.tag(etag);
-                return builder.build();
+            if (etagService.assignmentsAreCached(newSidecar.id(), etag.toString())) {
+                return Response.notModified().tag(etag).build();
             }
         }
 
-        final CollectorActions collectorActions = actionService.findActionBySidecar(sidecarId, true);
+        final CollectorActions collectorActions = actionService.findActionBySidecar(nodeId, true);
         List<CollectorAction> collectorAction = null;
         if (collectorActions != null) {
             collectorAction = collectorActions.action();
@@ -251,10 +246,9 @@ public class SidecarResource extends RestResource implements PluginRestResource 
         // add new etag to cache
         String etagString = registrationResponseToEtag(sidecarRegistrationResponse);
         EntityTag registrationEtag = new EntityTag(etagString);
-        builder = Response.accepted(sidecarRegistrationResponse);
-        builder.tag(registrationEtag);
-        etagService.registerAssignment(registrationEtag.toString());
-        return builder.build();
+        etagService.registerAssignment(nodeId, registrationEtag.toString());
+
+        return Response.accepted(sidecarRegistrationResponse).tag(registrationEtag).build();
     }
 
     private String registrationResponseToEtag(RegistrationResponse registrationResponse) {
@@ -284,11 +278,11 @@ public class SidecarResource extends RestResource implements PluginRestResource 
             try {
                 Sidecar sidecar = sidecarService.assignConfiguration(nodeId, nodeRelations);
                 sidecarService.save(sidecar);
+                etagService.invalidateAssignment(sidecar.id());
             } catch (org.graylog2.database.NotFoundException e) {
                 throw new NotFoundException(e.getMessage());
             }
         }
-        etagService.invalidateAllAssignments();
 
         return Response.accepted().build();
     }
