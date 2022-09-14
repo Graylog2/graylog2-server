@@ -1,0 +1,89 @@
+{
+  "responses": [
+    {
+      "took": 7,
+      "timed_out": false,
+      "_shards": {
+        "total": 20,
+        "successful": 8,
+        "skipped": 0,
+        "failed": 12,
+        "failures": [
+          {
+            "shard": 0,
+            "index": "dns_0",
+            "node": "Mc1oQWuEQom5uQyCljDEGA",
+            "reason": {
+              "type": "illegal_argument_exception",
+              "reason": "Expected numeric type on field [facility], but got [keyword]"
+            }
+          },
+          {
+            "shard": 0,
+            "index": "graylog_1",
+            "node": "Mc1oQWuEQom5uQyCljDEGA",
+            "reason": {
+              "type": "illegal_argument_exception",
+              "reason": "Expected numeric type on field [facility], but got [keyword]"
+            }
+          },
+          {
+            "shard": 0,
+            "index": "graylog_8",
+            "node": "Mc1oQWuEQom5uQyCljDEGA",
+            "reason": {
+              "type": "illegal_argument_exception",
+              "reason": "Expected numeric type on field [facility], but got [keyword]"
+            }
+          }
+        ]
+      },
+      "hits": {
+        "total": 0,
+        "max_score": 0,
+        "hits": []
+      },
+      "aggregations": {
+        "min#timestamp-min": {
+          "value": null
+        },
+        "max#timestamp-max": {
+          "value": null
+        },
+        "percentiles_bucket#dea2c9df-029a-430e-a9c4-4746b635bb11-series-percentile(facility)": {
+          "values": {
+            "90.0": "NaN"
+          }
+        }
+      },
+      "status": 200
+    },
+    {
+      "took": 7,
+      "timed_out": false,
+      "_shards": {
+        "total": 20,
+        "successful": 20,
+        "skipped": 0,
+        "failed": 0
+      },
+      "hits": {
+        "total": 105,
+        "max_score": 0,
+        "hits": []
+      },
+      "aggregations": {
+        "min#timestamp-min": {
+          "value": 1571735854000,
+          "value_as_string": "2019-10-22 09:17:34.000"
+        },
+        "max#timestamp-max": {
+          "value": 1571736121000,
+          "value_as_string": "2019-10-22 09:22:01.000"
+        }
+      },
+      "status": 200
+    }
+  ],
+  "took": 7
+}
