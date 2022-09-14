@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
@@ -41,12 +41,12 @@ type Props = {
 };
 
 const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(adapter);
   const { name: adapterName, title: adapterTitle, description: adapterDescription, id: adapterId } = adapter;
 
   const _onEdit = React.useCallback(() => {
-    history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName));
+    navigate(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName));
   }, [history, adapterName]);
 
   const _onDelete = React.useCallback(() => {

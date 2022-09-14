@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
@@ -46,7 +46,7 @@ const Actions = styled(ButtonToolbar)`
 `;
 
 const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
 
   const handleDelete = React.useCallback(() => {
@@ -61,7 +61,7 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
   }, [table.id, table.title]);
 
   const handleEdit = React.useCallback(() => {
-    history.push(Routes.SYSTEM.LOOKUPTABLES.edit(table.name));
+    navigate(Routes.SYSTEM.LOOKUPTABLES.edit(table.name));
   }, [history, table.name]);
 
   return (
