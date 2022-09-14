@@ -134,13 +134,13 @@ class LuceneQueryParserTest {
     @Test
     void testMatchingPositions() {
         assertThatThrownBy(() -> parser.parse("foo:"))
-                .hasMessageContaining("Cannot parse 'foo:': Encountered \"<EOF>\" at line 1, column 4.");
+                .hasMessageContaining("Cannot parse 'foo:': Encountered \"<EOF>\" at line 1, column 3.");
     }
 
     @Test
     void testEmptyQueryNewlines() {
         assertThatThrownBy(() -> parser.parse("\n\n\n"))
-                .hasMessageContaining("Cannot parse '\n\n\n': Encountered \"<EOF>\" at line 4, column 0.");
+                .hasMessageContaining("Cannot parse '\n\n\n': Encountered \"<EOF>\" at line 3, column -1.");
     }
 
     @Test

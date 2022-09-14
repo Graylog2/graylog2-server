@@ -16,29 +16,20 @@
  */
 package org.graylog2.indexer.indices;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.codec.binary.Base64;
-import org.graylog.storage.elasticsearch7.ElasticsearchClient;
-import org.graylog.storage.elasticsearch7.IndicesAdapterES7;
-import org.graylog.storage.elasticsearch7.NodeAdapterES7;
-import org.graylog.storage.elasticsearch7.cat.CatApi;
-import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
-import org.graylog.storage.elasticsearch7.stats.StatsApi;
 import org.graylog.testing.ContainerMatrixElasticsearchITBaseTest;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IgnoreIndexTemplate;
-import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
@@ -47,7 +38,6 @@ import org.graylog2.indexer.IndexTemplateNotFoundException;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
-import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
@@ -61,7 +51,6 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConf
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.AfterEach;
@@ -119,26 +108,6 @@ public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
 
     public IndicesIT(SearchServerInstance elasticsearch) {
         super(elasticsearch);
-    }
-
-    protected IndicesAdapter indicesAdapter() {
-
-        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        final ElasticsearchClient client = elasticsearchClient();
-        return new IndicesAdapterES7(
-                client,
-                new StatsApi(objectMapper, client),
-                new CatApi(objectMapper, client),
-                new ClusterStateApi(objectMapper, client)
-        );
-
-    }
-
-    protected NodeAdapter createNodeAdapter() {
-
-        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        return new NodeAdapterES7(elasticsearchClient(), objectMapper);
-
     }
 
     protected Map<String, Object> createTemplateFor(String indexWildcard, Map<String, Object> mapping) {
