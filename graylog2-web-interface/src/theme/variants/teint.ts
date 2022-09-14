@@ -19,7 +19,6 @@ import type { $PropertyType } from 'utility-types';
 import {
   generateTableColors,
   generateGrayScale,
-  lighten,
   generateGlobalColors,
   generateInputColors,
   generateVariantColors,
@@ -31,14 +30,14 @@ import { THEME_MODE_LIGHT } from '../constants';
 const brand: $PropertyType<Colors, 'brand'> = {
   primary: '#ff3633',
   secondary: '#fff',
-  tertiary: '#1f1f1f',
+  tertiary: '#3e434c',
   logo: '#6C7585',
 };
 
 const globalDefault: $PropertyType<Colors, 'global'> = {
-  background: '#e8e8e8',
+  background: '#eeeff2',
   contentBackground: '#fff',
-  link: '#702785',
+  link: '#578dcc',
   textAlt: '',
   textDefault: '',
   linkHover: '',
@@ -47,12 +46,12 @@ const globalDefault: $PropertyType<Colors, 'global'> = {
 };
 
 const variantDefault = {
-  danger: '#ad0707',
-  default: lighten(brand.tertiary, 0.25),
-  info: '#0063be',
-  primary: '#702785',
-  success: '#00ae42',
-  warning: '#ffd200',
+  danger: '#eb5454',
+  default: '#9aa8bd',
+  info: '#578dcc',
+  primary: '#eb9145',
+  success: '#90bd63',
+  warning: '#d9bd47',
 };
 
 const variant: $PropertyType<Colors, 'variant'> = {
