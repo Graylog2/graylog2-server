@@ -86,19 +86,18 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
             throw new IllegalArgumentException("Specified object failed validation: " + violations);
         }
 
-        final Sidecar updatedSidecar = updateTaggedConfigurationAssignments(sidecar);
         return db.findAndModify(
-                DBQuery.is(Sidecar.FIELD_NODE_ID, updatedSidecar.nodeId()),
+                DBQuery.is(Sidecar.FIELD_NODE_ID, sidecar.nodeId()),
                 new BasicDBObject(),
                 new BasicDBObject(),
                 false,
-                updatedSidecar,
+                sidecar,
                 true,
                 true);
     }
 
     // Create new assignments based on tags and existing manual assignments'
-    private Sidecar updateTaggedConfigurationAssignments(Sidecar sidecar) {
+    public Sidecar updateTaggedConfigurationAssignments(Sidecar sidecar) {
         final Set<String> sidecarTags = sidecar.nodeDetails().tags();
 
         // find all configurations that match the tags
@@ -120,7 +119,7 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
             return a.assignedFromTags().isEmpty();
         }).toList();
 
-        // update assignments on the sidecar
+        // return a sidecar with updated assignments
         final Collection<ConfigurationAssignment> union = CollectionUtils.union(manuallyAssigned, tagAssigned);
         return sidecar.toBuilder().assignments(new ArrayList<>(union)).build();
     }

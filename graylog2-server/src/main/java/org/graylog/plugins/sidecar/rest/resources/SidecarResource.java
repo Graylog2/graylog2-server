@@ -207,28 +207,32 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                              @HeaderParam(value = "If-None-Match") String ifNoneMatch,
                              @HeaderParam(value = "X-Graylog-Sidecar-Version") @NotEmpty String sidecarVersion) {
 
-        final Sidecar newSidecar;
+        Sidecar sidecar;
         final Sidecar oldSidecar = sidecarService.findByNodeId(nodeId);
-        List<ConfigurationAssignment> assignments = null;
         if (oldSidecar != null) {
-            assignments = oldSidecar.assignments();
-            newSidecar = oldSidecar.toBuilder()
+            sidecar = oldSidecar.toBuilder()
                     .nodeName(request.nodeName())
                     .nodeDetails(request.nodeDetails())
                     .sidecarVersion(sidecarVersion)
                     .lastSeen(DateTime.now(DateTimeZone.UTC))
                     .build();
         } else {
-            newSidecar = sidecarService.fromRequest(nodeId, request, sidecarVersion);
+            sidecar = sidecarService.fromRequest(nodeId, request, sidecarVersion);
         }
-        sidecarService.save(newSidecar);
 
         // check if client is up-to-date with a known valid etag
+        boolean assignmentsAreCached = false;
         if (ifNoneMatch != null) {
             EntityTag etag = new EntityTag(ifNoneMatch.replaceAll("\"", ""));
-            if (etagService.assignmentsAreCached(newSidecar.id(), etag.toString())) {
-                return Response.notModified().tag(etag).build();
-            }
+            assignmentsAreCached = etagService.assignmentsAreCached(sidecar.id(), etag.toString());
+        }
+        if (assignmentsAreCached) {
+            sidecarService.save(sidecar);
+            return Response.notModified().build();
+        } else {
+            final Sidecar updated = sidecarService.updateTaggedConfigurationAssignments(sidecar);
+            sidecarService.save(updated);
+            sidecar = updated;
         }
 
         final CollectorActions collectorActions = actionService.findActionBySidecar(nodeId, true);
@@ -238,11 +242,11 @@ public class SidecarResource extends RestResource implements PluginRestResource 
         }
         RegistrationResponse sidecarRegistrationResponse = RegistrationResponse.create(
                 SidecarRegistrationConfiguration.create(
-                        this.sidecarConfiguration.sidecarUpdateInterval().toStandardDuration().getStandardSeconds(),
-                        this.sidecarConfiguration.sidecarSendStatus()),
-                this.sidecarConfiguration.sidecarConfigurationOverride(),
+                        sidecarConfiguration.sidecarUpdateInterval().toStandardDuration().getStandardSeconds(),
+                        sidecarConfiguration.sidecarSendStatus()),
+                sidecarConfiguration.sidecarConfigurationOverride(),
                 collectorAction,
-                assignments);
+                sidecar.assignments());
         // add new etag to cache
         String etagString = registrationResponseToEtag(sidecarRegistrationResponse);
         EntityTag registrationEtag = new EntityTag(etagString);
