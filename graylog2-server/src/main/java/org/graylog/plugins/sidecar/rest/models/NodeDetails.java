@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
@@ -52,7 +53,11 @@ public abstract class NodeDetails {
 
     @JsonProperty("tags")
     @Nullable
-    public abstract List<String> tags();
+    public abstract Set<String> tags();
+
+    @JsonProperty("collector_configuration_directory")
+    @Nullable
+    public abstract String collectorConfigurationDirectory();
 
     @JsonCreator
     public static NodeDetails create(@JsonProperty("operating_system") String operatingSystem,
@@ -60,7 +65,8 @@ public abstract class NodeDetails {
                                      @JsonProperty("metrics") @Nullable NodeMetrics metrics,
                                      @JsonProperty("log_file_list") @Nullable List<NodeLogFile> logFileList,
                                      @JsonProperty("status") @Nullable CollectorStatusList statusList,
-                                     @JsonProperty("tags") @Nullable List<String> tags) {
-        return new AutoValue_NodeDetails(operatingSystem, ip, metrics, logFileList, statusList, tags);
+                                     @JsonProperty("tags") @Nullable Set<String> tags,
+                                     @JsonProperty("collector_configuration_directory") @Nullable String configDir) {
+        return new AutoValue_NodeDetails(operatingSystem, ip, metrics, logFileList, statusList, tags, configDir);
     }
 }

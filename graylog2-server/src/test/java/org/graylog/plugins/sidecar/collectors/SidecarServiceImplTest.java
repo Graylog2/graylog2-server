@@ -96,6 +96,7 @@ public class SidecarServiceImplTest {
                         null,
                         null,
                         null,
+                        null,
                         null),
                 version
                 );
