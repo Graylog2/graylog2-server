@@ -57,8 +57,6 @@ const buttonStyles = ({ colors, utils }) => {
     const activeHoverColor = isLink ? colors.global.linkHover : mixColor(activeColor);
 
     return css`
-      border-radius: 0;
-
       &.btn-${variant} {
         background-color: ${defaultBackground};
         border-color: ${defaultBorder};
