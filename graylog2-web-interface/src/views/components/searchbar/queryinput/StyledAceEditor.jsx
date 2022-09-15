@@ -16,6 +16,8 @@
  */
 import styled, { css } from 'styled-components';
 
+import { INPUT_BORDER_RADIUS } from 'theme/constants';
+
 import AceEditor from './ace';
 
 const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme, $height }) => ({
@@ -31,7 +33,7 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme, $height }) =
     background-color: ${$scTheme.colors.input.background};
     color: ${$scTheme.utils.contrastingColor($scTheme.colors.input.background, 'AAA')};
     border: 1px solid ${$scTheme.colors.variant.light.default};
-    border-radius: 4px;
+    border-radius: ${INPUT_BORDER_RADIUS};
 
     &.ace_multiselect .ace_selection.ace_start {
       box-shadow: 0 0 3px 0 ${$scTheme.colors.input.background};
@@ -163,12 +165,12 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme, $height }) =
       left: 0;
       right: 0;
       padding: 0;
-      margin-top: 6px;
+      margin-top: 8px;
       margin-left: 6px;
       transform: none;
       opacity: 1;
       z-index: auto !important;
-      font-family: inherit !important;
+      font-family: ${$scTheme.fonts.family.monospace} !important;
       font-size: ${$scTheme.fonts.size.body};
       color: ${$scTheme.colors.input.placeholder};
       text-overflow: ellipsis;

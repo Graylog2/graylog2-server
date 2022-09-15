@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
 import org.apache.logging.log4j.util.Strings;
@@ -39,6 +38,7 @@ import org.graylog.events.processor.EventProcessorDependencyCheck;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.EventProcessorPreconditionException;
+import org.graylog.events.processor.EventStreamService;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.errors.ParameterExpansionError;
@@ -47,11 +47,8 @@ import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageSummary;
-import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.plugin.streams.Stream;
-import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +81,7 @@ public class AggregationEventProcessor implements EventProcessor {
     private final EventProcessorDependencyCheck dependencyCheck;
     private final DBEventProcessorStateService stateService;
     private final MoreSearch moreSearch;
-    private final StreamService streamService;
+    private final EventStreamService eventStreamService;
     private final Messages messages;
 
     @Inject
@@ -93,7 +90,7 @@ public class AggregationEventProcessor implements EventProcessor {
                                      EventProcessorDependencyCheck dependencyCheck,
                                      DBEventProcessorStateService stateService,
                                      MoreSearch moreSearch,
-                                     StreamService streamService,
+                                     EventStreamService eventStreamService,
                                      Messages messages) {
         this.eventDefinition = eventDefinition;
         this.config = (AggregationEventProcessorConfig) eventDefinition.config();
@@ -101,7 +98,7 @@ public class AggregationEventProcessor implements EventProcessor {
         this.dependencyCheck = dependencyCheck;
         this.stateService = stateService;
         this.moreSearch = moreSearch;
-        this.streamService = streamService;
+        this.eventStreamService = eventStreamService;
         this.messages = messages;
     }
 
@@ -218,7 +215,7 @@ public class AggregationEventProcessor implements EventProcessor {
                 event.setOriginContext(EventOriginContext.elasticsearchMessage(resultMessage.getIndex(), msg.getId()));
 
                 // Ensure the event has values in the "source_streams" field for permission checks to work
-                buildEventSourceStreams(getStreams(parameters), ImmutableSet.copyOf(msg.getStreamIds()))
+                eventStreamService.buildEventSourceStreams(getStreams(parameters), ImmutableSet.copyOf(msg.getStreamIds()))
                         .forEach(event::addSourceStream);
 
                 eventsWithContext.add(EventWithContext.create(event, msg));
@@ -267,7 +264,8 @@ public class AggregationEventProcessor implements EventProcessor {
     @VisibleForTesting
     ImmutableList<EventWithContext> eventsFromAggregationResult(EventFactory eventFactory, AggregationEventProcessorParameters parameters, AggregationResult result) {
         final ImmutableList.Builder<EventWithContext> eventsWithContext = ImmutableList.builder();
-        final Set<String> sourceStreams = buildEventSourceStreams(getStreams(parameters), result.sourceStreams());
+        final Set<String> sourceStreams = eventStreamService.buildEventSourceStreams(getStreams(parameters),
+                result.sourceStreams());
 
         for (final AggregationKeyResult keyResult : result.keyResults()) {
             if (!satisfiesConditions(keyResult)) {
@@ -341,32 +339,6 @@ public class AggregationEventProcessor implements EventProcessor {
         }
 
         return eventsWithContext.build();
-    }
-
-    // Determine event source streams based on given search and result streams
-    private Set<String> buildEventSourceStreams(Set<String> searchStreams, Set<String> resultSourceStreams) {
-        Set<String> sourceStreams;
-        if (searchStreams.isEmpty() && resultSourceStreams.isEmpty()) {
-            // This can happen if the user didn't select any stream in the event definition and an event should be
-            // created based on the absence of a search result. (e.g. count() < 1)
-            // When the source streams field of an event is empty, every user can see it. That's why we need to add
-            // streams to the field. We decided to use all currently existing streams (minus the default event streams)
-            // to make sure only users that have access to all message streams can see the event.
-            sourceStreams = streamService.loadAll().stream()
-                    .map(Persisted::getId)
-                    .filter(streamId -> !Stream.DEFAULT_EVENT_STREAM_IDS.contains(streamId))
-                    .collect(Collectors.toSet());
-        } else if (searchStreams.isEmpty()) {
-            // If the search streams is empty, we search in all streams and so we include all source streams from the result.
-            sourceStreams = resultSourceStreams;
-        } else if (resultSourceStreams.isEmpty()) {
-            // With an empty result we just include all streams from the event definition.
-            sourceStreams = searchStreams;
-        } else {
-            // We don't want source streams in the event which are unrelated to the event definition.
-            sourceStreams = Sets.intersection(searchStreams, resultSourceStreams);
-        }
-        return sourceStreams;
     }
 
     // Build a human readable event message string that contains somewhat useful information
