@@ -25,12 +25,14 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.common.graph.Traverser;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.EmptyTimeRange;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
@@ -107,6 +109,15 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
 
     public static Builder builder() {
         return Query.Builder.createWithDefaults();
+    }
+
+    public Query applyExecutionState(ExecutionState executionState) {
+        if (executionState.globalOverride().hasValues()) {
+            return applyExecutionState(executionState.globalOverride());
+        } else {
+            final ExecutionStateGlobalOverride queryOverride = executionState.queries().get(id());
+            return applyExecutionState(queryOverride);
+        }
     }
 
     Query applyExecutionState(ExecutionStateGlobalOverride state) {
@@ -187,6 +198,14 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
                 .orElse(Collections.emptySet());
     }
 
+    public Set<String> streamIdsForPermissionsCheck() {
+        final Set<String> searchTypeStreamIds = searchTypes().stream()
+                .map(SearchType::streams)
+                .reduce(Collections.emptySet(), Sets::union);
+
+        return Sets.union(usedStreamIds(), searchTypeStreamIds);
+    }
+
     public boolean hasStreams() {
         return !usedStreamIds().isEmpty();
     }
@@ -195,7 +214,7 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
         return filters() != null && filters().stream().anyMatch(f -> f instanceof ReferencedSearchFilter);
     }
 
-    Query addStreamsToFilter(Set<String> streamIds) {
+    public Query addStreamsToFilter(Set<String> streamIds) {
         final Filter newFilter = addStreamsTo(filter(), streamIds);
         return toBuilder().filter(newFilter).build();
     }
