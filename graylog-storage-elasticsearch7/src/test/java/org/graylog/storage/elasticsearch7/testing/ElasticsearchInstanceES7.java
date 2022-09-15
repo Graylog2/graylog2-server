@@ -32,9 +32,15 @@ import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.elasticsearch.ElasticsearchContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
+
+import static java.util.Objects.isNull;
 
 public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstanceES7.class);
@@ -124,5 +130,19 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
 
     public RestHighLevelClient restHighLevelClient() {
         return this.restHighLevelClient;
+    }
+
+    @Override
+    public GenericContainer<?> buildContainer(String image, Network network) {
+        return new ElasticsearchContainer(DockerImageName.parse(image).asCompatibleSubstituteFor("docker.elastic.co/elasticsearch/elasticsearch"))
+                // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
+                .withReuse(isNull(System.getenv("BUILD_ID")))
+                .withEnv("ES_JAVA_OPTS", getEsJavaOpts())
+                .withEnv("discovery.type", "single-node")
+                .withEnv("action.auto_create_index", "false")
+                .withEnv("cluster.info.update.interval", "10s")
+                .withNetwork(network)
+                .withNetworkAliases(NETWORK_ALIAS)
+                .waitingFor(Wait.forHttp("/").forPort(ES_PORT));
     }
 }

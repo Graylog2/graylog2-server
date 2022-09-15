@@ -26,6 +26,7 @@ import CreatableSelect from 'react-select/creatable';
 import { themePropTypes } from 'theme';
 import CustomMenuList from 'components/common/Select/CustomMenuList';
 import Icon from 'components/common/Icon';
+import { INPUT_BORDER_RADIUS } from 'theme/constants';
 
 import AsyncCustomMenuList from './AsyncCustomMenuList';
 
@@ -170,6 +171,7 @@ const controlFocus = ({ size, theme }) => (base, { isFocused }) => {
     borderWidth,
     boxShadow,
     outline,
+    borderRadius: INPUT_BORDER_RADIUS,
     alignItems: 'center',
   };
 };
