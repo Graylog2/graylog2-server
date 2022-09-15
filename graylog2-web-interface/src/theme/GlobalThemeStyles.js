@@ -113,6 +113,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     color: ${theme.colors.input.color};
     background-color: ${theme.colors.input.background};
     border-color: ${theme.colors.input.border};
+    border-radius: 0;
     font-family: ${theme.fonts.family.body};
 
     &::placeholder {
@@ -488,6 +489,10 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   table th.actions,
   table td.actions {
     width: 110px;
+  }
+
+  .btn {
+    border-radius: 0;
   }
 
   .btn-text {
