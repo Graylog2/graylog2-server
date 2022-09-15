@@ -28,6 +28,10 @@ const StyledButton = styled(Button)(({ theme, $dirty }: { theme: DefaultTheme, $
   position: relative;
   margin-right: 12px;
   min-width: 63px;
+  
+  &&&.disabled {
+    color: ${theme.utils.contrastingColor(theme.colors.variant.success)};
+  }
 
   ${$dirty ? css`
     &::after {
