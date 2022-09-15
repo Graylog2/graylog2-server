@@ -41,6 +41,10 @@ const ConfigurationButton = styled(Button)`
   margin-right: 6px
 `;
 
+const ConfigurationSummary = styled.div`
+  word-break: break-all;
+`;
+
 const TableRow = styled.tr`
   cursor: pointer;
   border-bottom: 1px solid lightgray;
@@ -112,7 +116,6 @@ const CollectorConfigurationSelector = (props) => {
   const renderConfigurationSummary = (_previousAssignedConfigurations, _nextAssignedConfigurations, _selectedSidecarCollectorPairs) => {
     const toAdd = lodash.difference(_nextAssignedConfigurations, _previousAssignedConfigurations);
     const toRemove = lodash.difference(_previousAssignedConfigurations, _nextAssignedConfigurations);
-    console.log(toAdd, toRemove);
     const exampleSidecarCollectorPair = _selectedSidecarCollectorPairs[0];
     const collectorIndicator = (
       <em>
@@ -139,11 +142,11 @@ const CollectorConfigurationSelector = (props) => {
                              title="Configuration summary"
                              onConfirm={confirmConfigurationChange}
                              onCancel={cancelConfigurationChange}>
-        <div>
+        <ConfigurationSummary>
           {toAddSummary}
           {toRemoveSummary}
           <p>Are you sure you want to proceed with this action for <b>{formattedSummary}</b>?</p>
-        </div>
+        </ConfigurationSummary>
       </BootstrapModalConfirm>
     );
   };

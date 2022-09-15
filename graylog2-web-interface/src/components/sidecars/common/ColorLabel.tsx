@@ -41,6 +41,7 @@ const ColorLabelWrap = styled.span(({ size, theme }: ColorLabelWrapProps) => {
   const fontSize = size === 'small' ? small : body;
 
   return css`
+    display: flex;
     vertical-align: middle;
     font-size: ${size === 'xsmall' ? tiny : fontSize};
   `;
@@ -56,6 +57,8 @@ const ColorLabel = ({ color, size, text, theme }: ColorLabelProps) => {
         backgroundColor: color,
         border: `1px solid ${borderColor}`,
         color: textColor,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
       }}>
         {text}
       </Label>
