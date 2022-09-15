@@ -92,11 +92,11 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme, $height }) =
     .ace_storage,
     .ace_storage.ace_type,
     .ace_support.ace_type {
-      color: ${$scTheme.colors.variant.primary};
+      color: ${$scTheme.colors.variant.info};
     }
 
     .ace_keyword.ace_operator {
-      color: ${$scTheme.colors.variant.darker.info};
+      color: ${$scTheme.colors.global.textDefault};
     }
 
     .ace_constant.ace_character,
@@ -131,7 +131,7 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme, $height }) =
     .ace_support.ace_function,
     .ace_variable,
     .ace_term {
-      color: ${$scTheme.colors.variant.info};
+      color: ${$scTheme.colors.variant.darker.info};
     }
 
     .ace_support.ace_class,
