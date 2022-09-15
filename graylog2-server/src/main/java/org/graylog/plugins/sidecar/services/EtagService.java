@@ -88,14 +88,11 @@ public class EtagService extends AbstractIdleService {
 
     @Subscribe
     public void handleEtagInvalidation(EtagCacheInvalidation event) {
-        //noinspection rawtypes
-        Cache cache;
-        switch (event.cacheContext()) {
-            case COLLECTOR -> cache = collectorCache;
-            case CONFIGURATION -> cache = configurationCache;
-            case REGISTRATION -> cache = registrationCache;
-            default -> throw new IllegalArgumentException("Unknown cache context");
-        }
+        var cache = switch (event.cacheContext()) {
+            case COLLECTOR -> collectorCache;
+            case CONFIGURATION -> configurationCache;
+            case REGISTRATION -> registrationCache;
+        };
 
         if (event.cacheKey().equals("")) {
             LOG.trace("Invalidating {} cache for all keys", event.cacheContext());
