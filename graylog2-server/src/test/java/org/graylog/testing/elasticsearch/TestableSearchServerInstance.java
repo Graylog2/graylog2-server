@@ -25,9 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.elasticsearch.ElasticsearchContainer;
-import org.testcontainers.utility.DockerImageName;
 
 import java.net.URL;
 import java.nio.file.Paths;
@@ -36,8 +33,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static java.util.Objects.isNull;
 
 /**
  * This rule starts an Elasticsearch instance and provides a configured {@link Client}.
@@ -51,7 +46,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     protected static final String NETWORK_ALIAS = "elasticsearch";
 
     private final SearchVersion version;
-    private String heapSize;
+    protected final String heapSize;
     protected final GenericContainer<?> container;
 
     @Override
@@ -77,24 +72,6 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
             containersByVersion.put(version, container);
         }
         return containersByVersion.get(version);
-    }
-
-    @Override
-    public GenericContainer<?> buildContainer(String image, Network network) {
-        return new ElasticsearchContainer(DockerImageName.parse(image).asCompatibleSubstituteFor("docker.elastic.co/elasticsearch/elasticsearch"))
-                // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
-                .withReuse(isNull(System.getenv("BUILD_ID")))
-                .withEnv("ES_JAVA_OPTS", getEsJavaOpts())
-                .withEnv("discovery.type", "single-node")
-                .withEnv("action.auto_create_index", "false")
-                .withEnv("cluster.info.update.interval", "10s")
-                .withNetwork(network)
-                .withNetworkAliases(NETWORK_ALIAS)
-                .waitingFor(Wait.forHttp("/").forPort(ES_PORT));
-    }
-
-    protected String getEsJavaOpts() {
-        return StringUtils.f("-Xms%s -Xmx%s -Dlog4j2.formatMsgNoLookups=true", heapSize, heapSize);
     }
 
     @Override
@@ -139,6 +116,9 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
         client().refreshNode();
     }
 
+    protected String getEsJavaOpts() {
+        return StringUtils.f("-Xms%s -Xmx%s -Dlog4j2.formatMsgNoLookups=true", heapSize, heapSize);
+    }
 
     @Override
     public String getHttpHostAddress() {
