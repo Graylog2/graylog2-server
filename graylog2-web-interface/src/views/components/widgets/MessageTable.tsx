@@ -31,7 +31,6 @@ import { MessageTableEntry } from 'views/components/messagelist';
 import type { BackendMessage, Message } from 'views/components/messagelist/Types';
 import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
-import { SOURCE_FIELD } from 'views/Constants';
 import MessageTableProviders from 'views/components/messagelist/MessageTableProviders';
 
 import InteractiveContext from '../contexts/InteractiveContext';
@@ -106,10 +105,6 @@ type Props = {
   setLoadingState: (loading: boolean) => void,
 };
 
-const _columnStyle = (fieldName: string) => (fieldName.toLowerCase() === SOURCE_FIELD
-  ? { width: 180 }
-  : {});
-
 const _fieldTypeFor = (fieldName: string, fields: Immutable.List<FieldTypeMapping>) => ((fields
   && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type;
 
@@ -150,8 +145,7 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
             <tr>
               {selectedFields.toSeq().map((selectedFieldName) => {
                 return (
-                  <th key={selectedFieldName}
-                      style={_columnStyle(selectedFieldName)}>
+                  <th key={selectedFieldName}>
                     <Field type={_fieldTypeFor(selectedFieldName, fields)}
                            name={selectedFieldName}
                            queryId={activeQueryId}>
