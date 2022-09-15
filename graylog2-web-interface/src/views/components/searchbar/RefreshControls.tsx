@@ -34,6 +34,16 @@ const FlexibleButtonGroup = styled(ButtonGroup)`
   }
 `;
 
+const _buttonLabel = (refreshConfigEnabled: boolean, naturalInterval: React.ReactNode) => {
+  let buttonText: React.ReactNode = 'Not updating';
+
+  if (refreshConfigEnabled) {
+    buttonText = <>Every {naturalInterval}</>;
+  }
+
+  return buttonText;
+};
+
 type RefreshConfig = {
   interval: number,
   enabled: boolean,
@@ -75,30 +85,21 @@ class RefreshControls extends React.Component<Props> {
     }
   };
 
-  _onChange = (interval: number): void => {
-    RefreshActions.setInterval(interval);
-  };
-
-  _buttonLabel = (refreshConfigEnabled, naturalInterval) => {
-    let buttonText: React.ReactNode = 'Not updating';
-
-    if (refreshConfigEnabled) {
-      buttonText = <>Every {naturalInterval}</>;
-    }
-
-    return buttonText;
-  };
-
   render() {
     const { refreshConfig } = this.props;
+
+    const _onChange = (interval: number) => {
+      RefreshActions.setInterval(interval);
+    };
+
     const intervalOptions = RefreshControls.INTERVAL_OPTIONS.map(([label, interval]: [string, number]) => {
-      return <MenuItem key={`RefreshControls-${label}`} onClick={() => this._onChange(interval)}>{label}</MenuItem>;
+      return <MenuItem key={`RefreshControls-${label}`} onClick={() => _onChange(interval)}>{label}</MenuItem>;
     });
     const intervalDuration = moment.duration(refreshConfig.interval);
     const naturalInterval = intervalDuration.asSeconds() < 60
       ? <span>{intervalDuration.asSeconds()} <Pluralize singular="second" plural="seconds" value={intervalDuration.asSeconds()} /></span>
       : <span>{intervalDuration.asMinutes()} <Pluralize singular="minute" plural="minutes" value={intervalDuration.asMinutes()} /></span>;
-    const buttonLabel = this._buttonLabel(refreshConfig.enabled, naturalInterval);
+    const buttonLabel = _buttonLabel(refreshConfig.enabled, naturalInterval);
 
     return (
       <FlexibleButtonGroup aria-label="Refresh Search Controls">
