@@ -17,6 +17,7 @@
 package org.graylog2.bootstrap.preflight;
 
 import com.github.joschi.jadconfig.util.Size;
+import org.apache.commons.io.FileUtils;
 import org.graylog.shaded.kafka09.utils.FileLock;
 import org.graylog2.Configuration;
 import org.graylog2.shared.messageq.MessageQueueModule;
@@ -67,13 +68,17 @@ public class DiskJournalPreflightCheck implements PreflightCheck {
         final Map<String, FsStats.Filesystem> filesystems = fsProbe.fsStats().filesystems();
         final FsStats.Filesystem journalFs = filesystems.get(journalDirectory.toAbsolutePath().toString());
         if (journalFs != null) {
-            if (journalFs.available() > 0 && journalFs.available() < journalMaxSize.toBytes()) {
-                throw new PreflightCheckException(StringUtils.f(
-                        "Journal directory <%s> has not enough free space (%d MB) to contain 'message_journal_max_size = %d MB' ",
-                        journalDirectory.toAbsolutePath(),
-                        Size.bytes(journalFs.available()).toMegabytes(),
-                        journalMaxSize.toMegabytes()
-                ));
+            final long availableOnFS = journalFs.available();
+            if (availableOnFS > 0) {
+                final long usedByJournal = FileUtils.sizeOfDirectory(journalDirectory.toFile());
+                if (availableOnFS + usedByJournal < journalMaxSize.toBytes()) {
+                    throw new PreflightCheckException(StringUtils.f(
+                            "Journal directory <%s> has not enough free space (%d MB) to contain 'message_journal_max_size = %d MB' ",
+                            journalDirectory.toAbsolutePath(),
+                            Size.bytes(availableOnFS + usedByJournal).toMegabytes(),
+                            journalMaxSize.toMegabytes()
+                    ));
+                }
             }
             if (journalFs.typeName() != null && journalFs.typeName().equals("Network Disk")) {
                 final String message = StringUtils.f(
