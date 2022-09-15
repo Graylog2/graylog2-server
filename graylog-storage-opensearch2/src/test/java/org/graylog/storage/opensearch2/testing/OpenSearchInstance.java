@@ -134,7 +134,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
-        return new OpensearchContainer(DockerImageName.parse(image))
+        return new OpenSearchContainer(DockerImageName.parse(image))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
                 .withReuse(isNull(System.getenv("BUILD_ID")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())

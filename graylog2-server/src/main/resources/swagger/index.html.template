@@ -8,7 +8,7 @@
   <link href='css/highlight.default.css' media='screen' rel='stylesheet' type='text/css'/>
   <link href='css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
   <script src='lib/shred.bundle.js' type='text/javascript'></script>
-  <script src='lib/jquery-1.8.0.min.js' type='text/javascript'></script>
+  <script src='lib/jquery-3.6.1.min.js' type='text/javascript'></script>
   <script src='lib/jquery.slideto.min.js' type='text/javascript'></script>
   <script src='lib/jquery.wiggle.min.js' type='text/javascript'></script>
   <script src='lib/jquery.ba-bbq.min.js' type='text/javascript'></script>
