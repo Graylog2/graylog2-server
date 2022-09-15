@@ -30,6 +30,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     color: ${theme.colors.global.textDefault};
     font-family: ${theme.fonts.family.body};
     font-size: ${theme.fonts.size.body};
+    line-height: normal;
     height: 100vh;
   }
 
@@ -494,6 +495,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .btn {
     border-radius: 0;
+    line-height: inherit;
   }
 
   .btn-text {
