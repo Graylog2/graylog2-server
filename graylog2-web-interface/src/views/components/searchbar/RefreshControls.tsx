@@ -34,14 +34,6 @@ const FlexibleButtonGroup = styled(ButtonGroup)`
   }
 `;
 
-const ButtonLabel = styled.span`
-  display: inline-block;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: calc(100% - 9px);
-  vertical-align: inherit;
-`;
-
 type RefreshConfig = {
   interval: number,
   enabled: boolean,
@@ -94,7 +86,7 @@ class RefreshControls extends React.Component<Props> {
       buttonText = <>Every {naturalInterval}</>;
     }
 
-    return <ButtonLabel>{buttonText}</ButtonLabel>;
+    return buttonText;
   };
 
   render() {
