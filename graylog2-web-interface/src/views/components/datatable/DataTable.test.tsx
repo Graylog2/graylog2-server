@@ -27,8 +27,22 @@ import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DataTable from 'views/components/datatable/DataTable';
+import Widget from 'views/logic/widgets/Widget';
+import WidgetContext from 'views/components/contexts/WidgetContext';
+import { WidgetActions } from 'views/stores/WidgetStore';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import Direction from 'views/logic/aggregationbuilder/Direction';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+
+const mockUpdateWidget = jest.fn();
+
+jest.mock('views/stores/WidgetStore', () => ({
+  WidgetActions: {
+    update: mockUpdateWidget,
+    updateConfig: jest.fn(() => Promise.resolve()),
+  },
+}));
 
 describe('DataTable', () => {
   const currentView = { activeQuery: 'deadbeef-23' };
@@ -50,6 +64,45 @@ describe('DataTable', () => {
   }];
   const data = {
     chart: rows,
+  };
+
+  const dataWithMoreSeries = {
+    chart:
+      [{
+        key: ['2018-10-04T09:43:50.000Z'],
+        source: 'leaf',
+        values: [{
+          key: ['hulud.net', 'count()'],
+          rollup: false,
+          source: 'col-leaf',
+          value: 408,
+        }, {
+          key: ['count()'],
+          rollup: true,
+          source: 'row-leaf',
+          value: 408,
+        }, {
+          key: ['hulud.net', 'avg(bytes)'],
+          rollup: false,
+          source: 'col-leaf',
+          value: 1430,
+        }, {
+          key: ['avg(bytes)'],
+          rollup: true,
+          source: 'row-leaf',
+          value: 927,
+        }, {
+          key: ['hulud.net', 'max(timestamp)'],
+          rollup: false,
+          source: 'col-leaf',
+          value: 1553862602136,
+        }, {
+          key: ['max(timestamp)'],
+          rollup: true,
+          source: 'row-leaf',
+          value: 1553862613857,
+        }],
+      }],
   };
 
   const columnPivot = new Pivot('source', 'values', { limit: 15 });
@@ -168,44 +221,6 @@ describe('DataTable', () => {
   });
 
   it('passes inferred types to fields', () => {
-    const dataWithMoreSeries = {
-      chart:
-        [{
-          key: ['2018-10-04T09:43:50.000Z'],
-          source: 'leaf',
-          values: [{
-            key: ['hulud.net', 'count()'],
-            rollup: false,
-            source: 'col-leaf',
-            value: 408,
-          }, {
-            key: ['count()'],
-            rollup: true,
-            source: 'row-leaf',
-            value: 408,
-          }, {
-            key: ['hulud.net', 'avg(bytes)'],
-            rollup: false,
-            source: 'col-leaf',
-            value: 1430,
-          }, {
-            key: ['avg(bytes)'],
-            rollup: true,
-            source: 'row-leaf',
-            value: 927,
-          }, {
-            key: ['hulud.net', 'max(timestamp)'],
-            rollup: false,
-            source: 'col-leaf',
-            value: 1553862602136,
-          }, {
-            key: ['max(timestamp)'],
-            rollup: true,
-            source: 'row-leaf',
-            value: 1553862613857,
-          }],
-        }],
-    };
     const avgSeries = new Series('avg(bytes)');
     const maxTimestampSeries = new Series('max(timestamp)');
 
@@ -255,5 +270,82 @@ describe('DataTable', () => {
     ));
 
     expect(onRenderComplete).toHaveBeenCalled();
+  });
+
+  describe('trigger updateConfig on sorting', () => {
+    const avgSeries = new Series('avg(bytes)');
+    const maxTimestampSeries = new Series('max(timestamp)');
+    const widget = Widget.builder()
+      .id('deadbeef')
+      .type('dummy')
+      .config({})
+      .build();
+    const getConfig = ({ sort }) => AggregationWidgetConfig.builder()
+      .rowPivots([rowPivot])
+      .columnPivots([columnPivot])
+      .series([series, avgSeries, maxTimestampSeries])
+      .sort(sort)
+      .visualization('table')
+      .rollup(false)
+      .build();
+    const fields = Immutable.List([
+      FieldTypeMapping.create('bytes', FieldTypes.LONG()),
+      FieldTypeMapping.create('timestamp', FieldTypes.DATE()),
+    ]);
+
+    it('from inactive to asc', () => {
+      const config = getConfig({ sort: [] });
+      const wrapper = mount(
+        <WidgetContext.Provider value={widget}>
+          <SimplifiedDataTable config={config}
+                               fields={fields}
+                               data={dataWithMoreSeries} />
+        </WidgetContext.Provider>);
+
+      const sortButton = wrapper
+        .find('FieldSortIcon[fieldName="timestamp"]')
+        .find('button[data-testid="sort-icon-timestamp"]');
+      sortButton.simulate('click');
+
+      expect(WidgetActions.updateConfig)
+        .toHaveBeenCalledWith('deadbeef', config.toBuilder().sort([new SortConfig('pivot', 'timestamp', Direction.Ascending)]).build());
+    });
+
+    it('from asc to dsc', () => {
+      const config = getConfig({ sort: [new SortConfig('pivot', 'timestamp', Direction.Ascending)] });
+      const wrapper = mount(
+        <WidgetContext.Provider value={widget}>
+          <SimplifiedDataTable config={config}
+                               fields={fields}
+                               data={dataWithMoreSeries} />
+        </WidgetContext.Provider>);
+
+      const sortButton = wrapper
+        .find('FieldSortIcon[fieldName="timestamp"]')
+        .find('button[data-testid="sort-icon-timestamp"]');
+      sortButton.simulate('click');
+
+      expect(WidgetActions.updateConfig)
+        .toHaveBeenCalledWith('deadbeef', config.toBuilder().sort([new SortConfig('pivot', 'timestamp', Direction.Descending)]).build());
+    });
+
+    it('from dsc to inactive', () => {
+      const config = getConfig({ sort: [new SortConfig('pivot', 'timestamp', Direction.Descending)] });
+      const wrapper = mount(
+        <WidgetContext.Provider value={widget}>
+          <SimplifiedDataTable config={config}
+                               fields={fields}
+                               data={dataWithMoreSeries} />
+        </WidgetContext.Provider>);
+
+      const sortButton = wrapper
+        .find('FieldSortIcon[fieldName="timestamp"]')
+        .find('button[data-testid="sort-icon-timestamp"]');
+
+      sortButton.simulate('click');
+
+      expect(WidgetActions.updateConfig)
+        .toHaveBeenCalledWith('deadbeef', config.toBuilder().sort([]).build());
+    });
   });
 });

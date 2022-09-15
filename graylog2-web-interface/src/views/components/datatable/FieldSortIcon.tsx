@@ -41,26 +41,27 @@ type DirectionStrategy = {
   tooltip: (fieldName: string) => string,
 };
 
-const SortIcon = styled.button<{ sortActive: boolean, bulbText: string }>(({ sortActive, bulbText, theme }) => {
-  const color = sortActive ? theme.colors.gray[20] : theme.colors.gray[70];
-
+const SortIcon = styled.button(({ theme }) => {
   return css`
     border: 0;
     background: transparent;
-    color: ${color};
     padding: 5px;
     cursor: pointer;
     position: relative;
-    &:after {
-      content: '${bulbText}';
-      position: absolute;
-      top: 0;
-      right: 0;
-      font-size: 0.75rem;
-      font-weight: 600;
+    color: ${theme.colors.gray[70]};
+    &.active {
+      color: ${theme.colors.gray[20]};
     }
   `;
 });
+
+const Bulb = styled.span`
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+`;
 
 const _tooltip = (fieldName: string, newDirection: Direction) => {
   return `Sort ${fieldName} ${newDirection.direction}`;
@@ -129,14 +130,14 @@ const FieldSortIcon = ({ fieldName, type, sortConfigMap, onSortChange, setLoadin
   }, [fieldName, sortConfigMap]);
 
   return (
-    <SortIcon sortActive={sortActive}
+    <SortIcon className={sortActive ? 'active' : ''}
               title={tooltip(fieldName)}
               type="button"
               aria-label={tooltip(fieldName)}
               onClick={() => handleSortChange(changeSort)}
-              data-testid="messages-sort-icon"
-              bulbText={bulbText}>
+              data-testid={`sort-icon-${fieldName}`}>
       <Icon name={icon} />
+      {bulbText && <Bulb>{bulbText}</Bulb>}
     </SortIcon>
   );
 };

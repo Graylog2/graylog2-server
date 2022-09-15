@@ -24,7 +24,8 @@ import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
-import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import Direction from 'views/logic/aggregationbuilder/Direction';
 
 import Headers from './Headers';
 
@@ -143,6 +144,71 @@ describe('Headers', () => {
       ));
 
       expect(wrapper).toExist();
+    });
+  });
+
+  describe('render sort icon', () => {
+    const series = [
+      seriesWithName('foo', 'Total Count'),
+      seriesWithName('avg(foo)', 'Average Foness'),
+      seriesWithName('bar', 'Bar'),
+    ];
+    const mountWrapper = () => mount((
+      <RenderHeaders series={series}
+                     fields={null}
+                     sortConfigMap={OrderedMap({
+                       foo: new SortConfig('pivot', 'foo', Direction.Ascending),
+                       bar: new SortConfig('pivot', 'bar', Direction.Descending),
+                     })} />
+    ));
+
+    it('active ascend', () => {
+      const wrapper = mountWrapper();
+
+      const ascIcon = wrapper
+        .find('FieldSortIcon[fieldName="foo"]')
+        .find('button[data-testid="sort-icon-foo"].active')
+        .find('Icon[name="sort-amount-down"]');
+
+      expect(ascIcon).toExist();
+    });
+
+    it('active descent', () => {
+      const wrapper = mountWrapper();
+
+      const dscIcon = wrapper
+        .find('FieldSortIcon[fieldName="bar"]')
+        .find('button[data-testid="sort-icon-bar"].active')
+        .find('Icon[name="sort-amount-up"]');
+
+      expect(dscIcon).toExist();
+    });
+
+    it('inactive ascend', () => {
+      const wrapper = mountWrapper();
+
+      const inactiveIcon = wrapper
+        .find('FieldSortIcon[fieldName="avg(foo)"]')
+        .find('button[data-testid="sort-icon-avg(foo)"]:not(.active)')
+        .find('Icon[name="sort-amount-down"]');
+
+      expect(inactiveIcon).toExist();
+    });
+
+    it('with sequence numbers', () => {
+      const wrapper = mountWrapper();
+
+      const fooButton = wrapper
+        .find('FieldSortIcon[fieldName="foo"]')
+        .find('button[data-testid="sort-icon-foo"].active')
+        .find('span').text();
+      const barButton = wrapper
+        .find('FieldSortIcon[fieldName="bar"]')
+        .find('button[data-testid="sort-icon-bar"].active')
+        .find('span').text();
+
+      expect(fooButton).toBe('1');
+      expect(barButton).toBe('2');
     });
   });
 });
