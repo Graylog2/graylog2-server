@@ -602,6 +602,13 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     display: inline-block;
     margin: 0;
   }
+  
+  .form-control-feedback {
+    line-height: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
   ul.tag-list,
   ul.pill-list {
