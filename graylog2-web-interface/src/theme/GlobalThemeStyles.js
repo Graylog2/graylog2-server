@@ -30,7 +30,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     color: ${theme.colors.global.textDefault};
     font-family: ${theme.fonts.family.body};
     font-size: ${theme.fonts.size.body};
-    line-height: normal;
+    line-height: 1.25;
     height: 100vh;
   }
 
