@@ -36,20 +36,13 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.HasAggregations;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.missing.Missing;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.missing.MissingAggregationBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.MaxAggregationBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Min;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.MinAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.support.ValuesSourceAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
@@ -72,22 +65,20 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
     private final Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers;
     private final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
-    private static final TimeRange ALL_MESSAGES_TIMERANGE = allMessagesTimeRange();
-
-    private static TimeRange allMessagesTimeRange() {
-        try {
-            return RelativeRange.create(0);
-        } catch (InvalidRangeParametersException e) {
-            LOG.error("Unable to instantiate all messages timerange: ", e);
-        }
-        return null;
-    }
+    private final EffectiveTimeRangeExtractor effectiveTimeRangeExtractor;
 
     @Inject
     public ESPivot(Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers,
-                   Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers) {
+                   Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers,
+                   EffectiveTimeRangeExtractor effectiveTimeRangeExtractor) {
         this.bucketHandlers = bucketHandlers;
         this.seriesHandlers = seriesHandlers;
+        this.effectiveTimeRangeExtractor = effectiveTimeRangeExtractor;
+    }
+
+    public ESPivot(Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers,
+                   Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers) {
+        this(bucketHandlers, seriesHandlers, new EffectiveTimeRangeExtractor());
     }
 
     @Override
@@ -206,47 +197,14 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 .map(Optional::get);
     }
 
-    private boolean isAllMessagesTimeRange(TimeRange timeRange) {
-        return ALL_MESSAGES_TIMERANGE.equals(timeRange);
-    }
-
-    private AbsoluteRange extractEffectiveTimeRange(SearchResponse queryResult, Query query, Pivot pivot) {
-        if (queryResult.getHits().getTotalHits().value != 0) {
-            return getAbsoluteRangeFromAggregations(queryResult, query, pivot);
-        } else {
-            return getAbsoluteRangeFromPivot(query, pivot);
-        }
-    }
-
-    private AbsoluteRange getAbsoluteRangeFromPivot(final Query query, final Pivot pivot) {
-        final TimeRange pivotRange = query.effectiveTimeRange(pivot);
-        return AbsoluteRange.create(pivotRange.getFrom(), pivotRange.getTo());
-    }
-
-    private AbsoluteRange getAbsoluteRangeFromAggregations(final SearchResponse queryResult, final Query query, final Pivot pivot) {
-        final Min min = queryResult.getAggregations().get("timestamp-min");
-        final Double from = min.getValue();
-        final Max max = queryResult.getAggregations().get("timestamp-max");
-        final Double to = max.getValue();
-        final TimeRange pivotRange = query.effectiveTimeRange(pivot);
-        return AbsoluteRange.create(
-                isAllMessagesTimeRange(pivotRange) && from != 0
-                        ? new DateTime(from.longValue(), DateTimeZone.UTC)
-                        : pivotRange.getFrom(),
-                isAllMessagesTimeRange(pivotRange) && to != 0
-                        ? new DateTime(to.longValue(), DateTimeZone.UTC)
-                        : pivotRange.getTo()
-        );
-    }
-
     @Override
     public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResponse queryResult, Aggregations aggregations, ESGeneratedQueryContext queryContext) {
-        final AbsoluteRange effectiveTimerange = extractEffectiveTimeRange(queryResult, query, pivot);
+        final AbsoluteRange effectiveTimerange = this.effectiveTimeRangeExtractor.extract(queryResult, query, pivot);
 
         final PivotResult.Builder resultBuilder = PivotResult.builder()
                 .id(pivot.id())
                 .effectiveTimerange(effectiveTimerange)
-                .total(extractDocumentCount(queryResult, pivot, queryContext));
+                .total(extractDocumentCount(queryResult));
 
         // pivot results are a table where cells can contain multiple "values" and not only scalars:
         // each combination of row and column groups can contain all series (if rollup is true)
@@ -267,7 +225,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         return InitialBucket.create(queryResult);
     }
 
-    private long extractDocumentCount(SearchResponse queryResult, Pivot pivot, ESGeneratedQueryContext queryContext) {
+    private long extractDocumentCount(SearchResponse queryResult) {
         return queryResult.getHits().getTotalHits().value;
     }
 
