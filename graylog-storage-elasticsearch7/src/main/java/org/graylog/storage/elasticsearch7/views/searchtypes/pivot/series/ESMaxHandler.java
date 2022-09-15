@@ -23,6 +23,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.MaxAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
+import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 
@@ -33,7 +34,7 @@ import java.util.stream.Stream;
 public class ESMaxHandler extends ESPivotSeriesSpecHandler<Max, org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Max maxSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Max maxSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
         final MaxAggregationBuilder max = AggregationBuilders.max(name).field(maxSpec.field());
         record(queryContext, pivot, maxSpec, name, org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max.class);
         return Optional.of(max);
@@ -44,7 +45,7 @@ public class ESMaxHandler extends ESPivotSeriesSpecHandler<Max, org.graylog.shad
                                         Max pivotSpec,
                                         SearchResponse searchResult,
                                         org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max maxAggregation,
-                                        ESPivot searchTypeHandler,
+                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
                                         ESGeneratedQueryContext esGeneratedQueryContext) {
         return Stream.of(ESPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Max.NAME, maxAggregation.getValue()));
     }

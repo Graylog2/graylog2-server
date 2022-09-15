@@ -23,6 +23,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
+import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 
@@ -33,7 +34,7 @@ import java.util.stream.Stream;
 public class ESSumHandler extends ESPivotSeriesSpecHandler<Sum, org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Sum> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Sum sumSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Sum sumSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
         final SumAggregationBuilder sum = AggregationBuilders.sum(name).field(sumSpec.field());
         record(queryContext, pivot, sumSpec, name, org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Sum.class);
         return Optional.of(sum);
@@ -43,7 +44,7 @@ public class ESSumHandler extends ESPivotSeriesSpecHandler<Sum, org.graylog.shad
     public Stream<Value> doHandleResult(Pivot pivot, Sum pivotSpec,
                                         SearchResponse searchResult,
                                         org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Sum sumAggregation,
-                                        ESPivot searchTypeHandler,
+                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
                                         ESGeneratedQueryContext esGeneratedQueryContext) {
         return Stream.of(Value.create(pivotSpec.id(), Sum.NAME, sumAggregation.getValue()));
     }
