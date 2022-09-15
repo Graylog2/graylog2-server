@@ -32,7 +32,7 @@ public class OpenSearch2Metadata implements PluginMetaData {
 
     @Override
     public String getName() {
-        return "Opensearch 2 Support";
+        return "OpenSearch 2 Support";
     }
 
     @Override
@@ -52,7 +52,7 @@ public class OpenSearch2Metadata implements PluginMetaData {
 
     @Override
     public String getDescription() {
-        return "Support for Opensearch 2";
+        return "Support for OpenSearch 2";
     }
 
     @Override
