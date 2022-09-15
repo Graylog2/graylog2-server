@@ -76,16 +76,17 @@ public abstract class Configuration {
                 .build();
     }
 
-    public static Configuration create(String collectorId,
-                                       String name,
-                                       String color,
-                                       String template) {
+    public static Configuration createWithoutId(String collectorId,
+                                                String name,
+                                                String color,
+                                                String template,
+                                                Set<String> tags) {
         return create(new org.bson.types.ObjectId().toHexString(),
                 collectorId,
                 name,
                 color,
                 template,
-                Set.of());
+                tags);
     }
 
     public static Builder builder() {

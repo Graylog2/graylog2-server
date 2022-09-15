@@ -282,7 +282,12 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
 
-        return Response.ok().entity(configurationService.save(configuration)).build();
+        final Configuration config = configurationService.save(configuration);
+        if (!config.tags().isEmpty()) {
+            etagService.invalidateAllRegistrations();
+        }
+
+        return Response.ok().entity(config).build();
     }
 
     @POST
@@ -330,6 +335,9 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
         etagService.invalidateAllConfigurations();
+        if (! previousConfiguration.tags().equals(updatedConfiguration.tags())) {
+            etagService.invalidateAllRegistrations();
+        }
 
         return Response.ok().entity(configurationService.save(updatedConfiguration)).build();
     }

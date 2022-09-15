@@ -145,15 +145,17 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
 
     public Configuration copyConfiguration(String id, String name) {
         Configuration configuration = find(id);
-        return Configuration.create(configuration.collectorId(), name, configuration.color(), configuration.template());
+        // Tags are not copied on purpose
+        return Configuration.createWithoutId(configuration.collectorId(), name, configuration.color(), configuration.template(), Set.of());
     }
 
     public Configuration fromRequest(Configuration request) {
-        return Configuration.create(
+        return Configuration.createWithoutId(
                 request.collectorId(),
                 request.name(),
                 request.color(),
-                request.template());
+                request.template(),
+                request.tags());
     }
 
     public Configuration fromRequest(String id, Configuration request) {

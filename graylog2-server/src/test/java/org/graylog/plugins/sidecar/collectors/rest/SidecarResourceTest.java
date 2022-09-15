@@ -46,6 +46,7 @@ import static org.graylog.plugins.sidecar.collectors.rest.assertj.ResponseAssert
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -123,18 +124,23 @@ public class SidecarResourceTest extends RestResourceBaseTest {
 
     @Test
     public void testRegister() throws Exception {
+        final NodeDetails nodeDetails = NodeDetails.create(
+                "DummyOS 1.0",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
         final RegistrationRequest input = RegistrationRequest.create(
                 "nodeName",
-                NodeDetails.create(
-                        "DummyOS 1.0",
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
-                )
+                nodeDetails
         );
+        when(sidecarService.fromRequest(any(), any(RegistrationRequest.class), anyString())).thenReturn(
+                Sidecar.create("nodeId", "name", nodeDetails, "0.0.1")
+        );
+        when(sidecarService.updateTaggedConfigurationAssignments(any(Sidecar.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         final Response response = this.resource.register("sidecarId", input, null, "0.0.1");
 
