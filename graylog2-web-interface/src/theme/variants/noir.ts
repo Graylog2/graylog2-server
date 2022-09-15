@@ -38,7 +38,7 @@ const brand: $PropertyType<Colors, 'brand'> = {
 const globalDefault: $PropertyType<Colors, 'global'> = {
   background: '#222',
   contentBackground: '#303030',
-  link: '#00bc8c',
+  link: '#629de2',
   textAlt: '',
   textDefault: '',
   linkHover: '',
@@ -49,10 +49,10 @@ const globalDefault: $PropertyType<Colors, 'global'> = {
 const variantDefault = {
   danger: '#E74C3C',
   default: '#595959',
-  info: '#3498DB',
-  primary: '#375a7f',
-  success: '#00bc8c',
-  warning: '#F39C12',
+  info: '#578DCC',
+  primary: '#aa6b37',
+  success: '#73994c',
+  warning: '#D9BD47',
 };
 
 const variant: $PropertyType<Colors, 'variant'> = {

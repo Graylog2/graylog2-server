@@ -25,6 +25,8 @@ const Nav = styled(BootstrapNav)(({ theme }) => css`
     > li {
       > a {
         transition: background-color 150ms ease-in-out;
+        font-family: ${theme.fonts.family.navigation};
+        font-size: ${theme.fonts.size.navigation};
 
         &:hover,
         &:focus {
