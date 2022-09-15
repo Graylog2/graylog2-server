@@ -41,6 +41,11 @@ const ConfigurationButton = styled(Button)`
   margin-right: 6px
 `;
 
+const NoConfigurationMessage = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
 const ConfigurationSummary = styled.div`
   word-break: break-all;
 `;
@@ -171,6 +176,8 @@ const CollectorConfigurationSelector = (props) => {
 
       const isSelected = (name: string) => selectedConfigurations.includes(name);
 
+      const isNotDirty = lodash.isEqual(selectedConfigurations, assignedConfigurations);
+
       const options = nonAssignedConfigurations
         .filter((configuration) => (selectedLogCollectors[0].id === configuration.collector_id))
         .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
@@ -209,16 +216,20 @@ const CollectorConfigurationSelector = (props) => {
           <Modal.Body>
             <SearchForm onQueryChange={(q) => setSearchQuery(q)} topMargin={0} queryWidth="100%" />
             <ConfigurationContainer>
-              <ConfigurationTable className="table-condensed table-hover">
-                <tbody>
-                  {rows}
-                </tbody>
-              </ConfigurationTable>
+              {(rows.length === 0) ? (
+                <NoConfigurationMessage>No configurations available for the selected log collector.</NoConfigurationMessage>
+              ) : (
+                <ConfigurationTable className="table-condensed table-hover">
+                  <tbody>
+                    {rows}
+                  </tbody>
+                </ConfigurationTable>
+              )}
             </ConfigurationContainer>
           </Modal.Body>
           <Modal.Footer>
             <Button type="button" onClick={onCancel}>Cancel</Button>
-            <Button type="submit" bsStyle="primary" onClick={() => onSave(selectedConfigurations)}>Save</Button>
+            <Button type="submit" bsStyle="primary" disabled={isNotDirty} onClick={() => onSave(selectedConfigurations)}>Save</Button>
           </Modal.Footer>
         </BootstrapModalWrapper>
       );
@@ -229,33 +240,17 @@ const CollectorConfigurationSelector = (props) => {
 
   return (
     <>
-      <ConfigurationButton bsStyle="primary" bsSize="small" onClick={() => setShow(true)}>Configure</ConfigurationButton>
+      <ConfigurationButton title={(selectedLogCollectors.length > 1) ? `Cannot change configurations of ${selectedLogCollectors.map((c) => c.name).join(', ')} collectors simultaneously` : undefined}
+                           bsStyle="primary"
+                           bsSize="small"
+                           disabled={selectedLogCollectors.length !== 1}
+                           onClick={() => setShow(true)}>
+        Configure
+      </ConfigurationButton>
       {MemoizedModalForm}
       {renderConfigurationSummary(assignedConfigurations, nextAssignedConfigurations, selectedSidecarCollectorPairs)}
     </>
   );
-
-  // if (selectedLogCollectors.length > 1) {
-  //   return (
-  //     <SelectPopover id="status-filter"
-  //                    title="Apply configuration"
-  //                    triggerNode={<Button bsSize="small" bsStyle="link">Configure <span className="caret" /></Button>}
-  //                    items={[`Cannot change configurations of ${selectedLogCollectors.map((collector) => collector.name).join(', ')} collectors simultaneously`]}
-  //                    displayDataFilter={false}
-  //                    disabled />
-  //   );
-  // }
-
-  // if (configurationIds.length === 0) {
-  //   return (
-  //     <SelectPopover id="status-filter"
-  //                    title="Apply configuration"
-  //                    triggerNode={<Button bsSize="small" bsStyle="link">Configure <span className="caret" /></Button>}
-  //                    items={['No configurations available for the selected log collector']}
-  //                    displayDataFilter={false}
-  //                    disabled />
-  //   );
-  // }
 };
 
 CollectorConfigurationSelector.propTypes = {
