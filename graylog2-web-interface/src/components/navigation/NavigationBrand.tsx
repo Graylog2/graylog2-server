@@ -18,13 +18,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { useTheme } from 'styled-components';
 
+import { NAV_ITEM_HEIGHT } from 'theme/constants';
+
 const Link = styled.a(({ theme }) => `
   display: flex;
   color: ${theme.colors.variant.default};
   align-items: center;
   justify-content: center;
   padding: 0 15px;
-  min-height: 50px;
+  min-height: ${NAV_ITEM_HEIGHT};
 
   &:hover,
   &:focus {

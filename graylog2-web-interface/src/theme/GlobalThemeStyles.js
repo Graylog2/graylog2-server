@@ -29,6 +29,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     background-color: ${theme.colors.global.background};
     color: ${theme.colors.global.textDefault};
     font-family: ${theme.fonts.family.body};
+    font-size: ${theme.fonts.size.body};
     height: 100vh;
   }
 
