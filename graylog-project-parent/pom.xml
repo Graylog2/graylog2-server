@@ -732,6 +732,11 @@
                 <artifactId>cron-utils</artifactId>
                 <version>${cron-utils.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.resurface</groupId>
+                <artifactId>resurfaceio-logger</artifactId>
+                <version>RELEASE</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

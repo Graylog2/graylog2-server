@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.resurface.HttpLoggerForJersey;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -41,6 +42,7 @@ import org.graylog2.Configuration;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEventModelProcessor;
 import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.configuration.ResurfaceConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -80,6 +82,7 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
@@ -88,6 +91,7 @@ import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -109,6 +113,7 @@ public class JerseyService extends AbstractIdleService {
     private final Set<Class<?>> systemRestResources;
     private final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources;
 
+    private final ResurfaceConfiguration resurfaceConfiguration;
     private final Set<Class<? extends DynamicFeature>> dynamicFeatures;
     private final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters;
     private final Set<Class<? extends ExceptionMapper>> exceptionMappers;
@@ -124,6 +129,7 @@ public class JerseyService extends AbstractIdleService {
     @Inject
     public JerseyService(final HttpConfiguration configuration,
                          Configuration graylogConfiguration,
+                         ResurfaceConfiguration resurfaceConfiguration,
                          Set<Class<? extends DynamicFeature>> dynamicFeatures,
                          Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                          Set<Class<? extends ExceptionMapper>> exceptionMappers,
@@ -137,6 +143,7 @@ public class JerseyService extends AbstractIdleService {
                          TLSProtocolsConfiguration tlsConfiguration) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.graylogConfiguration = graylogConfiguration;
+        this.resurfaceConfiguration = resurfaceConfiguration;
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
         this.containerResponseFilters = requireNonNull(containerResponseFilters, "containerResponseFilters");
         this.exceptionMappers = requireNonNull(exceptionMappers, "exceptionMappers");
@@ -288,6 +295,11 @@ public class JerseyService extends AbstractIdleService {
 
         if (LOG.isDebugEnabled()) {
             rc.registerClasses(PrintModelProcessor.class);
+        }
+
+        final Optional<URL> resurfaceUrl = resurfaceConfiguration.getResurfaceUrl();
+        if (resurfaceUrl.isPresent()) {
+            rc.register(new HttpLoggerForJersey(resurfaceUrl.get().toString(), "include debug"));
         }
 
         return rc;
