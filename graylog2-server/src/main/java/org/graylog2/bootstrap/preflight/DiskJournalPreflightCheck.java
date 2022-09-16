@@ -72,10 +72,11 @@ public class DiskJournalPreflightCheck implements PreflightCheck {
             if (availableOnFS > 0) {
                 final long usedByJournal = FileUtils.sizeOfDirectory(journalDirectory.toFile());
                 if (availableOnFS + usedByJournal < journalMaxSize.toBytes()) {
-                    throw new PreflightCheckException(StringUtils.f(
-                            "Journal directory <%s> has not enough free space (%d MB) to contain 'message_journal_max_size = %d MB' ",
+                       throw new PreflightCheckException(StringUtils.f(
+                            "Journal directory <%s> has not enough free space (%d MB) available. You need to provide additional %d MB to contain 'message_journal_max_size = %d MB' ",
                             journalDirectory.toAbsolutePath(),
-                            Size.bytes(availableOnFS + usedByJournal).toMegabytes(),
+                            Size.bytes(availableOnFS).toMegabytes(),
+                            Size.bytes(journalMaxSize.toBytes() - usedByJournal - availableOnFS).toMegabytes(),
                             journalMaxSize.toMegabytes()
                     ));
                 }
@@ -100,7 +101,7 @@ public class DiskJournalPreflightCheck implements PreflightCheck {
             try {
                 Files.createDirectories(journalDirectory);
             } catch (IOException e) {
-                throw new PreflightCheckException(StringUtils.f("Cannot create journal directory at <%s>", journalDirectory.toAbsolutePath()));
+                throw new PreflightCheckException(StringUtils.f("Cannot create journal directory at <%s>", journalDirectory.toAbsolutePath()), e);
             }
         }
         if (!Files.isWritable(journalDirectory)) {
