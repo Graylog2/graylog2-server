@@ -29,7 +29,7 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
     margin: 0 10px;
   }
 
-  &.navbar-default .nav > li > a {
+  &.navbar-default .navbar-main > li > a {
     font-family: ${theme.fonts.family.navigation};
     font-size: ${theme.fonts.size.navigation};
   }
