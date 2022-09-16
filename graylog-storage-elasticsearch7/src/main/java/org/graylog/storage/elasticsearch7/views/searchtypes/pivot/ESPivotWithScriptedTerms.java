@@ -168,7 +168,7 @@ public class ESPivotWithScriptedTerms implements ESSearchTypeHandler<Pivot> {
                             .key(keys)
                             .source("leaf");
                     if (pivot.columnGroups().isEmpty() || pivot.rollup()) {
-                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), bucket, false, "row-leaf");
+                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), bucket, true, "row-leaf");
                     }
                     if (!pivot.columnGroups().isEmpty()){
                         final Terms columnsResults = bucket.getAggregations().get(AGG_NAME);
