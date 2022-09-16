@@ -172,16 +172,16 @@ public class ESPivotWithScriptedTerms implements ESSearchTypeHandler<Pivot> {
                         resultBuilder.addRow(rowBuilder.build());
                     } else {
                         final Terms columnsResults = bucket.getAggregations().get(AGG_NAME);
+                        final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder()
+                                .key(keys)
+                                .source("leaf");
                         columnsResults.getBuckets()
                                 .forEach(columnBucket -> {
                                     final ImmutableList<String> columnKeys = splitKeys(columnBucket.getKeyAsString());
 
-                                    final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder()
-                                            .key(keys)
-                                            .source("leaf");
                                     processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
-                                    resultBuilder.addRow(rowBuilder.build());
                                 });
+                        resultBuilder.addRow(rowBuilder.build());
                     }
                 });
 
