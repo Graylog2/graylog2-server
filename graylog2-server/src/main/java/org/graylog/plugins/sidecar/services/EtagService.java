@@ -19,21 +19,27 @@ package org.graylog.plugins.sidecar.services;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.hash.Hashing;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog.plugins.sidecar.common.SidecarPluginConfiguration;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.metrics.CacheStatsSet;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.metrics.MetricUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.ws.rs.core.EntityTag;
+import java.nio.charset.StandardCharsets;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -47,6 +53,7 @@ public class EtagService extends AbstractIdleService {
     private final MetricRegistry metricRegistry;
     private final EventBus eventBus;
     private final ClusterEventBus clusterEventBus;
+    private final ObjectMapper objectMapper;
 
     @JsonAutoDetect
     enum CacheContext {
@@ -62,10 +69,12 @@ public class EtagService extends AbstractIdleService {
     public EtagService(SidecarPluginConfiguration pluginConfiguration,
                        MetricRegistry metricRegistry,
                        EventBus eventBus,
-                       ClusterEventBus clusterEventBus) {
+                       ClusterEventBus clusterEventBus,
+                       ObjectMapperProvider objectMapperProvider) {
         this.metricRegistry = metricRegistry;
         this.eventBus = eventBus;
         this.clusterEventBus = clusterEventBus;
+        this.objectMapper = objectMapperProvider.get();
         Duration cacheTime = pluginConfiguration.getCacheTime();
         collectorCache = CacheBuilder.newBuilder()
                 .recordStats()
@@ -146,6 +155,11 @@ public class EtagService extends AbstractIdleService {
     public void invalidateRegistration(String sidecarId) {
         registrationCache.invalidate(sidecarId);
         clusterEventBus.post(EtagCacheInvalidation.create(CacheContext.REGISTRATION, sidecarId));
+    }
+
+    public EntityTag buildEntityTagForResponse(Object o) throws JsonProcessingException {
+        final String json = objectMapper.writeValueAsString(o);
+        return new EntityTag(Hashing.murmur3_128().hashString(json, StandardCharsets.UTF_8).toString());
     }
 
     @Override

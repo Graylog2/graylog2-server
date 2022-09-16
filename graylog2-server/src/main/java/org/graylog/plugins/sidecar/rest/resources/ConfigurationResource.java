@@ -17,8 +17,8 @@
 package org.graylog.plugins.sidecar.rest.resources;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.hash.Hashing;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -207,7 +207,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                         @ApiParam(name = "sidecarId", required = true)
                                         @PathParam("sidecarId") String sidecarId,
                                         @ApiParam(name = "configurationId", required = true)
-                                        @PathParam("configurationId") String configurationId) throws RenderTemplateException {
+                                        @PathParam("configurationId") String configurationId) throws RenderTemplateException, JsonProcessingException {
         String ifNoneMatch = httpHeaders.getHeaderString("If-None-Match");
         boolean etagCached = false;
         Response.ResponseBuilder builder = Response.noContent();
@@ -236,9 +236,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             Configuration collectorConfiguration = this.configurationService.renderConfigurationForCollector(sidecar, configuration);
 
             // add new etag to cache
-            String etagString = configurationToEtag(collectorConfiguration);
-
-            EntityTag collectorConfigurationEtag = new EntityTag(etagString);
+            EntityTag collectorConfigurationEtag = etagService.buildEntityTagForResponse(collectorConfiguration);
             builder = Response.ok(collectorConfiguration);
             builder.tag(collectorConfigurationEtag);
             etagService.registerConfiguration(collectorConfigurationEtag.toString());
@@ -410,12 +408,6 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     private boolean isConfigurationAssignedToSidecar(String configurationId, Sidecar sidecar) {
         final List<ConfigurationAssignment> assignments = firstNonNull(sidecar.assignments(), new ArrayList<>());
         return assignments.stream().anyMatch(assignment -> assignment.configurationId().equals(configurationId));
-    }
-
-    private String configurationToEtag(Configuration configuration) {
-        return Hashing.md5()
-                .hashInt(configuration.hashCode())  // avoid negative values
-                .toString();
     }
 
     private Configuration configurationFromRequest(String id, Configuration request) {

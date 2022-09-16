@@ -17,9 +17,9 @@
 package org.graylog.plugins.sidecar.rest.resources;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.hash.Hashing;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -205,7 +205,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                              @ApiParam(name = "JSON body", required = true)
                              @Valid @NotNull RegistrationRequest request,
                              @HeaderParam(value = "If-None-Match") String ifNoneMatch,
-                             @HeaderParam(value = "X-Graylog-Sidecar-Version") @NotEmpty String sidecarVersion) {
+                             @HeaderParam(value = "X-Graylog-Sidecar-Version") @NotEmpty String sidecarVersion) throws JsonProcessingException {
 
         Sidecar sidecar;
         final Sidecar oldSidecar = sidecarService.findByNodeId(nodeId);
@@ -246,17 +246,10 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                 collectorAction,
                 sidecar.assignments());
         // add new etag to cache
-        String etagString = registrationResponseToEtag(sidecarRegistrationResponse);
-        EntityTag registrationEtag = new EntityTag(etagString);
-        etagService.addSidecarRegistration(nodeId, registrationEtag.toString());
+        EntityTag registrationEtag = etagService.buildEntityTagForResponse(sidecarRegistrationResponse);
+        etagService.addSidecarRegistration(sidecar.id(), registrationEtag.toString());
 
         return Response.accepted(sidecarRegistrationResponse).tag(registrationEtag).build();
-    }
-
-    private String registrationResponseToEtag(RegistrationResponse registrationResponse) {
-        return Hashing.md5()
-                .hashInt(registrationResponse.hashCode())  // avoid negative values
-                .toString();
     }
 
     @PUT

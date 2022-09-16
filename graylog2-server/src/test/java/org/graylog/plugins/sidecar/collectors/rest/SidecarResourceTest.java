@@ -39,6 +39,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
@@ -79,6 +80,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
         this.sidecars = getDummyCollectorList();
         when(clusterConfigService.getOrDefault(SidecarConfiguration.class, SidecarConfiguration.defaultConfiguration())).thenReturn(sidecarConfiguration);
         when(sidecarConfiguration.sidecarUpdateInterval()).thenReturn(Period.seconds(30));
+        when(etagService.buildEntityTagForResponse(any())).thenReturn(new EntityTag("hash browns"));
         this.resource = new SidecarResource(
                 sidecarService,
                 actionService,
