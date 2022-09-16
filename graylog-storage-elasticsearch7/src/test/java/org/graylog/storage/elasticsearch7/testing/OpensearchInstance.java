@@ -23,6 +23,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelC
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.RestHighLevelClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
+import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
@@ -51,6 +52,7 @@ public class OpensearchInstance extends TestableSearchServerInstance {
     private final ElasticsearchClient elasticsearchClient;
     private final Client client;
     private final FixtureImporter fixtureImporter;
+    private final Adapters adapters;
 
     protected OpensearchInstance(String image, SearchVersion version, Network network) {
         super(image, version, network, "2g");
@@ -58,6 +60,7 @@ public class OpensearchInstance extends TestableSearchServerInstance {
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
         this.client = new ClientES7(this.elasticsearchClient);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
+        this.adapters = new AdaptersES7(elasticsearchClient);
     }
 
     @Override
@@ -130,5 +133,10 @@ public class OpensearchInstance extends TestableSearchServerInstance {
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
                 .waitingFor(Wait.forHttp("/").forPort(ES_PORT));
+    }
+
+    @Override
+    public Adapters adapters() {
+        return this.adapters;
     }
 }

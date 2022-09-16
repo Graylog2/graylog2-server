@@ -24,6 +24,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.RestHighLevelClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
+import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
@@ -52,6 +53,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     private final OpenSearchClient openSearchClient;
     private final Client client;
     private final FixtureImporter fixtureImporter;
+    private final Adapters adapters;
 
     protected OpenSearchInstance(String image, SearchVersion version, Network network, String heapSize) {
         super(image, version, network, heapSize);
@@ -59,6 +61,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         this.openSearchClient = new OpenSearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
         this.client = new ClientOS2(this.openSearchClient);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
+        adapters = new AdaptersOS2(openSearchClient);
     }
     protected OpenSearchInstance(String image, SearchVersion version, Network network) {
         this(image, version, network, DEFAULT_HEAP_SIZE);
@@ -147,5 +150,10 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
                 .waitingFor(Wait.forHttp("/").forPort(ES_PORT));
+    }
+
+    @Override
+    public Adapters adapters() {
+        return this.adapters;
     }
 }
