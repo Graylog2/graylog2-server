@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { useQueries } from 'react-query';
+import { useQueries } from '@tanstack/react-query';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import { Spinner } from 'components/common';
@@ -55,10 +55,12 @@ const useLoadHealthAndName = (enabled: boolean) => {
   const [
     { data: healthData, isFetching: healthIsFetching, error: healthError, isSuccess: healthIsSuccess, isRefetching: healthIsRefetching },
     { data: nameData, isFetching: nameIsFetching, error: nameError, isSuccess: nameIsSuccess, isRefetching: nameIsRefetching },
-  ] = useQueries([
-    { queryKey: GET_INDEXER_CLUSTER_HEALTH, queryFn: getIndexerClusterHealth, ...options },
-    { queryKey: GET_INDEXER_CLUSTER_NAME, queryFn: getIndexerClusterName, ...options },
-  ]);
+  ] = useQueries({
+    queries: [
+      { queryKey: [GET_INDEXER_CLUSTER_HEALTH], queryFn: getIndexerClusterHealth, ...options },
+      { queryKey: [GET_INDEXER_CLUSTER_NAME], queryFn: getIndexerClusterName, ...options },
+    ],
+  });
 
   return ({
     health: healthData,

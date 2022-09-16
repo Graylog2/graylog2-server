@@ -29,6 +29,8 @@ import EditWidgetFrame from './EditWidgetFrame';
 import ViewTypeContext from '../contexts/ViewTypeContext';
 import WidgetContext from '../contexts/WidgetContext';
 
+jest.mock('views/logic/fieldtypes/useFieldTypes');
+
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
     update: jest.fn(),

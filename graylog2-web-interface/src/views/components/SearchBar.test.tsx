@@ -38,6 +38,8 @@ jest.mock('views/stores/SearchStore', () => ({
   },
 }));
 
+jest.mock('views/logic/fieldtypes/useFieldTypes');
+
 jest.mock('stores/streams/StreamsStore', () => MockStore(
   ['listStreams', () => ({ then: jest.fn() })],
   'availableStreams',
