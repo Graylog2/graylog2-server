@@ -271,7 +271,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                     .flatMap(a -> a.assignments().stream())
                     .collect(Collectors.toList());
             try {
-                Sidecar sidecar = sidecarService.assignConfiguration(nodeId, nodeRelations);
+                Sidecar sidecar = sidecarService.applyManualAssignments(nodeId, nodeRelations);
                 sidecarService.save(sidecar);
                 etagService.invalidateRegistration(sidecar.id());
             } catch (org.graylog2.database.NotFoundException e) {

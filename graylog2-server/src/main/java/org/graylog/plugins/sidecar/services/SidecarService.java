@@ -233,7 +233,7 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                 collectorVersion);
     }
 
-    public Sidecar assignConfiguration(String collectorNodeId, List<ConfigurationAssignment> assignments) throws NotFoundException{
+    public Sidecar applyManualAssignments(String collectorNodeId, List<ConfigurationAssignment> assignments) throws NotFoundException{
         Sidecar sidecar = findByNodeId(collectorNodeId);
         if (sidecar == null) {
             throw new NotFoundException("Couldn't find collector with ID " + collectorNodeId);
