@@ -1,0 +1,4 @@
+type = "security"
+message = "Update jQuery version used in the API browser to 3.6.1 to fix security vulnerabilities. (CVE-2012-6708, CVE-2015-9251, CVE-2019-11358, CVE-2020-11022, CVE-2020-11023, CVE-2020-7656)"
+
+pulls = ["13435"]

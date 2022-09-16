@@ -1,0 +1,4 @@
+type = "changed"
+message = "Open hyperlink decorator links in a new widow or tab."
+
+pulls = ["13351"]
