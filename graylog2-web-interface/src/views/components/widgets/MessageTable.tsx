@@ -81,7 +81,9 @@ const TableWrapper = styled.div(({ theme }) => css`
 const TableHead = styled.thead(({ theme }) => css`
   background-color: ${theme.colors.gray[90]};
   color: ${theme.utils.readableColor(theme.colors.gray[90])};
-
+  position: sticky;
+  top: 0;
+  
   && > tr > th {
     min-width: 50px;
     min-height: 28px;
