@@ -34,6 +34,7 @@ import StreamsStore from 'stores/streams/StreamsStore';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import { MessagesActions } from 'stores/messages/MessagesStore';
 import { NodesActions } from 'stores/nodes/NodesStore';
+import { isLocalNode } from 'views/hooks/useIsLocalNode';
 
 type Props = {
   params: {
@@ -65,19 +66,22 @@ const useMessage = (index: string, messageId: string) => {
   const [inputs, setInputs] = useState<Immutable.Map<string, Input>>(Immutable.Map());
 
   useEffect(() => {
-    MessagesActions.loadMessage(index, messageId)
-      .then((_message) => {
-        setMessage(_message);
+    const fetchData = async () => {
+      const _message = await MessagesActions.loadMessage(index, messageId);
+      setMessage(_message);
 
-        return _message.source_input_id ? InputsActions.get(_message.source_input_id) : Promise.resolve();
-      })
-      .then((input) => {
+      if (_message.source_input_id && await isLocalNode(_message.fields.gl2_source_node)) {
+        const input = await InputsActions.get(_message.source_input_id);
+
         if (input) {
           const newInputs = Immutable.Map({ [input.id]: input });
 
           setInputs(newInputs);
         }
-      });
+      }
+    };
+
+    fetchData();
   }, [index, messageId, setMessage, setInputs]);
 
   return { message, inputs };

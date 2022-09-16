@@ -31,7 +31,7 @@ import javax.inject.Inject;
 
 public class JsonPathInput extends MessageInput {
 
-    private static final String NAME = "JSON path from HTTP API";
+    private static final String NAME = "JSON path value from HTTP API";
 
     @AssistedInject
     public JsonPathInput(@Assisted Configuration configuration,
