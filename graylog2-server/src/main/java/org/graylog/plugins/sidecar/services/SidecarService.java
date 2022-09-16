@@ -252,8 +252,16 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
             }
         }
 
+        // Merge manually assigned configurations with tagged ones.
+        // This is called from the API. We only allow modifications of untagged assignments.
+        final List<ConfigurationAssignment> taggedAssignments = sidecar.assignments().stream().filter(a -> !a.assignedFromTags().isEmpty()).toList();
+        final List<String> configIdsAssignedThroughTags = taggedAssignments.stream().map(ConfigurationAssignment::configurationId).toList();
+
+        final List<ConfigurationAssignment> filteredAssignments = assignments.stream().filter(a -> !configIdsAssignedThroughTags.contains(a.configurationId())).toList();
+        final Collection<ConfigurationAssignment> union = CollectionUtils.union(filteredAssignments, taggedAssignments);
+
         Sidecar toSave = sidecar.toBuilder()
-                .assignments(assignments)
+                .assignments(new ArrayList<>(union))
                 .build();
         return save(toSave);
     }
