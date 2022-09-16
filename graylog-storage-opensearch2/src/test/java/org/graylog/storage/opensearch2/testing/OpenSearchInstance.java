@@ -46,10 +46,9 @@ import static java.util.Objects.isNull;
 public class OpenSearchInstance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchInstance.class);
 
-    protected static final String OS_VERSION = "2.0.1";
     public static final String DEFAULT_HEAP_SIZE = "2g";
+    public static final SearchServer OPENSEARCH_VERSION = SearchServer.DEFAULT_OPENSEARCH_VERSION;
 
-    private final RestHighLevelClient restHighLevelClient;
     private final OpenSearchClient openSearchClient;
     private final Client client;
     private final FixtureImporter fixtureImporter;
@@ -57,8 +56,8 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     protected OpenSearchInstance(String image, SearchVersion version, Network network, String heapSize) {
         super(image, version, network, heapSize);
-        this.restHighLevelClient = buildRestClient();
-        this.openSearchClient = new OpenSearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
+        RestHighLevelClient restHighLevelClient = buildRestClient();
+        this.openSearchClient = new OpenSearchClient(restHighLevelClient, false, new ObjectMapperProvider().get());
         this.client = new ClientOS2(this.openSearchClient);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
         adapters = new AdaptersOS2(openSearchClient);
@@ -69,7 +68,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     @Override
     public SearchServer searchServer() {
-        return SearchServer.OS2;
+        return OPENSEARCH_VERSION;
     }
 
     private RestHighLevelClient buildRestClient() {
@@ -93,11 +92,11 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     }
 
     public static OpenSearchInstance create() {
-        return create(SearchVersion.opensearch(OS_VERSION), Network.newNetwork(), DEFAULT_HEAP_SIZE);
+        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), DEFAULT_HEAP_SIZE);
     }
 
     public static OpenSearchInstance create(String heapSize) {
-        return create(SearchVersion.opensearch(OS_VERSION), Network.newNetwork(), heapSize);
+        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), heapSize);
     }
 
     // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
@@ -129,10 +128,6 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     public OpenSearchClient openSearchClient() {
         return this.openSearchClient;
-    }
-
-    public RestHighLevelClient restHighLevelClient() {
-        return this.restHighLevelClient;
     }
 
     @Override

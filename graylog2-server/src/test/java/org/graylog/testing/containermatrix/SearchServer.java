@@ -28,6 +28,7 @@ public enum SearchServer {
     OS2_2(OPENSEARCH, "2.2.1");
 
     public static final SearchServer DEFAULT_VERSION = OS1;
+    public static final SearchServer DEFAULT_OPENSEARCH_VERSION = OS2;
 
     private final SearchVersion searchVersion;
 
