@@ -32,6 +32,8 @@ import { PipelinesActions } from 'stores/pipelines/PipelinesStore';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import useLocationSearchPagination from 'hooks/useLocationSearchPagination';
 import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
 
 import PipelineConnectionsList from './PipelineConnectionsList';
 
@@ -99,6 +101,7 @@ const _loadPipelines = (pagination, setLoading, setPaginatedPipelines) => {
 };
 
 const ProcessingTimelineComponent = () => {
+  const currentUser = useCurrentUser();
   const { connections } = useStore(PipelineConnectionsStore);
   const [streams, setStreams] = useState<Stream[] | undefined>();
   const [paginatedPipelines, setPaginatedPipelines] = useState<PaginatedPipelines|undefined>();
@@ -132,6 +135,7 @@ const ProcessingTimelineComponent = () => {
     </Header>
   );
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   const _headerCellFormatter = (header) => {
     let className;
 
@@ -179,6 +183,7 @@ const ProcessingTimelineComponent = () => {
     };
   };
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   const _pipelineFormatter = (pipeline) => {
     const { id, title, description, stages } = pipeline;
 
@@ -202,10 +207,10 @@ const ProcessingTimelineComponent = () => {
         </StreamListTD>
         <td>{_formatStages(pipeline, stages)}</td>
         <td>
-          <Button bsStyle="primary" bsSize="xsmall" onClick={_deletePipeline(pipeline)}>Delete</Button>
+          <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:delete')} bsStyle="primary" bsSize="xsmall" onClick={_deletePipeline(pipeline)}>Delete</Button>
           &nbsp;
           <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(id)}>
-            <Button bsStyle="info" bsSize="xsmall">Edit</Button>
+            <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')} bsStyle="info" bsSize="xsmall">Edit</Button>
           </LinkContainer>
         </td>
       </tr>
