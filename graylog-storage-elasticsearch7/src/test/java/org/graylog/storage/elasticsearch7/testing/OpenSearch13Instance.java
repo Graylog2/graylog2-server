@@ -42,8 +42,8 @@ import java.util.Locale;
 
 import static java.util.Objects.isNull;
 
-public class OpensearchInstance extends TestableSearchServerInstance {
-    private static final Logger LOG = LoggerFactory.getLogger(OpensearchInstance.class);
+public class OpenSearch13Instance extends TestableSearchServerInstance {
+    private static final Logger LOG = LoggerFactory.getLogger(OpenSearch13Instance.class);
 
     private static final int ES_PORT = 9200;
     private static final String NETWORK_ALIAS = "elasticsearch";
@@ -54,7 +54,7 @@ public class OpensearchInstance extends TestableSearchServerInstance {
     private final FixtureImporter fixtureImporter;
     private final Adapters adapters;
 
-    protected OpensearchInstance(String image, SearchVersion version, Network network) {
+    protected OpenSearch13Instance(String image, SearchVersion version, Network network) {
         super(image, version, network, "2g");
         this.restHighLevelClient = buildRestClient();
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
@@ -88,12 +88,12 @@ public class OpensearchInstance extends TestableSearchServerInstance {
                 .get();
     }
 
-    public static OpensearchInstance create(SearchVersion searchVersion, Network network) {
+    public static OpenSearch13Instance create(SearchVersion searchVersion, Network network) {
         final String image = imageNameFrom(searchVersion);
 
         LOG.debug("Creating instance {}", image);
 
-        return new OpensearchInstance(image, searchVersion, network);
+        return new OpenSearch13Instance(image, searchVersion, network);
     }
 
     private static String imageNameFrom(SearchVersion version) {
@@ -120,7 +120,7 @@ public class OpensearchInstance extends TestableSearchServerInstance {
 
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
-        return new OpensearchContainer(DockerImageName.parse(image))
+        return new OpenSearchContainer(DockerImageName.parse(image))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
                 .withReuse(isNull(System.getenv("BUILD_ID")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", "-Xms2g -Xmx2g -Dlog4j2.formatMsgNoLookups=true")

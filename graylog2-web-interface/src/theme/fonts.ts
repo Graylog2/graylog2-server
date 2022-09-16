@@ -70,19 +70,20 @@ const family = {
   navigation: '"Barlow Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif',
 };
 
-/* Scaled 1.125 Major Second - https://type-scale.com/ */
+/* Scaled 1.067 Minor Second - https://type-scale.com/ */
 const size = {
   root: `${ROOT_FONT_SIZE}px`,
   body: '1rem',
-  huge: '2.027rem',
-  large: '1.125rem',
+  huge: '1.383rem',
+  large: '1.067rem',
   small: '0.889rem',
-  tiny: '0.79rem',
-  h1: '1.802rem',
-  h2: '1.602rem',
-  h3: '1.424rem',
-  h4: '1.266rem',
-  h5: '1.125rem',
+  tiny: '0.823rem',
+  navigation: '1.067rem',
+  h1: '1.575rem',
+  h2: '1.296rem',
+  h3: '1.215rem',
+  h4: '1.138rem',
+  h5: '1.067rem',
   h6: '1rem',
 };
 

@@ -17,6 +17,7 @@
 import React from 'react';
 import { flatten, get, isEqual, last } from 'lodash';
 import styled, { css } from 'styled-components';
+import type { OrderedMap } from 'immutable';
 
 import Field from 'views/components/Field';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -25,6 +26,10 @@ import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type Series from 'views/logic/aggregationbuilder/Series';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
+import FieldSortIcon from 'views/components/datatable/FieldSortIcon';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type { Widgets } from 'views/stores/WidgetStore';
 
 import styles from './DataTable.css';
 
@@ -36,12 +41,33 @@ const CenteredTh = styled.th`
   text-align: center;
 `;
 
-const _headerField = (activeQuery: string, fields, field: string, prefix: (string | number) = '', span: number = 1, title: string = field) => {
+type HeaderFilterProps = {
+  activeQuery: string;
+  fields: (FieldTypeMappingsList | Array<FieldTypeMapping>);
+  field: string;
+  prefix?: (string | number);
+  span?: number;
+  title?: string;
+  onSortChange: (sortConfig: Array<SortConfig>) => Promise<Widgets>;
+  sortConfigMap: OrderedMap<string, SortConfig>;
+  sortable: boolean;
+  sortType?: 'pivot' | 'series' | undefined
+}
+
+const _headerField = ({ activeQuery, fields, field, prefix = '', span = 1, title = field, onSortChange, sortConfigMap, sortable, sortType }: HeaderFilterProps) => {
   const type = fieldTypeFor(field, fields);
 
   return (
     <StyledTh isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned}>
       <Field name={field} queryId={activeQuery} type={type}>{title}</Field>
+      {sortable && sortType && (
+      <FieldSortIcon fieldName={field}
+                     onSortChange={onSortChange}
+                     setLoadingState={() => {
+                     }}
+                     sortConfigMap={sortConfigMap}
+                     type={sortType} />
+      )}
     </StyledTh>
   );
 };
@@ -90,15 +116,28 @@ type Props = {
   rollup: boolean,
   actualColumnPivotFields: Array<Array<string>>,
   fields: FieldTypeMappingsList,
+  onSortChange: (sortConfig: Array<SortConfig>) => Promise<Widgets>;
+  sortConfigMap: OrderedMap<string, SortConfig>;
 };
 
-const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup, actualColumnPivotFields }: Props) => {
+const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup, actualColumnPivotFields, onSortChange, sortConfigMap }: Props) => {
   const rowFieldNames = rowPivots.map((pivot) => pivot.field);
   const columnFieldNames = columnPivots.map((pivot) => pivot.field);
-  const headerField = (field, prefix = '', span: number = 1, title = field) => _headerField(activeQuery, fields, field, prefix, span, title);
-  const rowPivotFields = rowFieldNames.map((fieldName) => headerField(fieldName));
-  const seriesFields = series.map((s) => headerField(s.function, '', 1, s.effectiveName));
-  const columnPivotFields = flatten(actualColumnPivotFields.map((key) => series.map((s) => headerField(s.function, key.join('-'), 1, s.effectiveName))));
+  const headerField = ({ field, prefix = '', span = 1, title = field, sortable = false, sortType = undefined }) => _headerField({
+    activeQuery,
+    fields,
+    field,
+    prefix,
+    span,
+    title,
+    onSortChange,
+    sortConfigMap,
+    sortable,
+    sortType,
+  });
+  const rowPivotFields = rowFieldNames.map((fieldName) => headerField({ field: fieldName, sortable: true, sortType: SortConfig.PIVOT_TYPE }));
+  const seriesFields = series.map((s) => headerField({ field: s.function, prefix: '', span: 1, title: s.effectiveName, sortable: true, sortType: SortConfig.SERIES_TYPE }));
+  const columnPivotFields = flatten(actualColumnPivotFields.map((key) => series.map((s) => headerField({ field: s.function, prefix: key.join('-'), span: 1, title: s.effectiveName, sortable: false }))));
   const offset = rollup ? rowFieldNames.length + series.length : rowFieldNames.length;
 
   return (
