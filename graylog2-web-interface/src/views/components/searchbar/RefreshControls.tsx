@@ -34,14 +34,19 @@ const FlexibleButtonGroup = styled(ButtonGroup)`
   }
 `;
 
-const _buttonLabel = (refreshConfigEnabled: boolean, naturalInterval: React.ReactNode) => {
+const ButtonLabel = ({ refreshConfigEnabled, naturalInterval }: {refreshConfigEnabled: boolean, naturalInterval: React.ReactNode}) => {
   let buttonText: React.ReactNode = 'Not updating';
 
   if (refreshConfigEnabled) {
     buttonText = <>Every {naturalInterval}</>;
   }
 
-  return buttonText;
+  // eslint-disable-next-line react/jsx-no-useless-fragment
+  return <>{buttonText}</>;
+};
+
+const _onChange = (interval: number) => {
+  RefreshActions.setInterval(interval);
 };
 
 type RefreshConfig = {
@@ -88,10 +93,6 @@ class RefreshControls extends React.Component<Props> {
   render() {
     const { refreshConfig } = this.props;
 
-    const _onChange = (interval: number) => {
-      RefreshActions.setInterval(interval);
-    };
-
     const intervalOptions = RefreshControls.INTERVAL_OPTIONS.map(([label, interval]: [string, number]) => {
       return <MenuItem key={`RefreshControls-${label}`} onClick={() => _onChange(interval)}>{label}</MenuItem>;
     });
@@ -99,7 +100,6 @@ class RefreshControls extends React.Component<Props> {
     const naturalInterval = intervalDuration.asSeconds() < 60
       ? <span>{intervalDuration.asSeconds()} <Pluralize singular="second" plural="seconds" value={intervalDuration.asSeconds()} /></span>
       : <span>{intervalDuration.asMinutes()} <Pluralize singular="minute" plural="minutes" value={intervalDuration.asMinutes()} /></span>;
-    const buttonLabel = _buttonLabel(refreshConfig.enabled, naturalInterval);
 
     return (
       <FlexibleButtonGroup aria-label="Refresh Search Controls">
@@ -107,7 +107,7 @@ class RefreshControls extends React.Component<Props> {
           {refreshConfig.enabled ? <Icon name="pause" /> : <Icon name="play" />}
         </Button>
 
-        <DropdownButton title={buttonLabel} id="refresh-options-dropdown">
+        <DropdownButton title={<ButtonLabel refreshConfigEnabled={refreshConfig.enabled} naturalInterval={naturalInterval} />} id="refresh-options-dropdown">
           {intervalOptions}
         </DropdownButton>
       </FlexibleButtonGroup>
