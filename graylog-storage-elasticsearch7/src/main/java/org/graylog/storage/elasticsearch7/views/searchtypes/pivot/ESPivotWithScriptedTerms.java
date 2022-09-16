@@ -7,6 +7,7 @@ import one.util.streamex.EntryStream;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
@@ -15,6 +16,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.script.Script;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.script.ScriptType;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -34,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -72,22 +75,37 @@ public class ESPivotWithScriptedTerms implements ESSearchTypeHandler<Pivot> {
                     .forEach(searchSourceBuilder::aggregation);
         }*/
 
-        final String scriptSource = Joiner.on(KEY_SEPARATOR_PHRASE).join(pivot.rowGroups().stream()
-                .map(bucket -> "doc['" + bucket.field() + "'].value")
-                .collect(Collectors.toList()));
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext);
         final TermsAggregationBuilder termsAggregation = AggregationBuilders.terms(AGG_NAME)
-                .script(new Script(scriptSource))
+                .script(scriptForPivots(pivot.rowGroups()))
                 .size(15)
                 .order(ordering.isEmpty() ? List.of(BucketOrder.count(false)) : ordering);
-        seriesStream(pivot, queryContext, "metrics")
-                .forEach(termsAggregation::subAggregation);
+        if (pivot.columnGroups().isEmpty() || pivot.rollup()) {
+            seriesStream(pivot, queryContext, "metrics")
+                    .forEach(termsAggregation::subAggregation);
+        }
+        if (!pivot.columnGroups().isEmpty()) {
+            final TermsAggregationBuilder columnsAggregation = AggregationBuilders.terms(AGG_NAME)
+                    .script(scriptForPivots(pivot.columnGroups()))
+                    .size(15)
+                    .order(ordering.isEmpty() ? List.of(BucketOrder.count(false)) : ordering);
+            seriesStream(pivot, queryContext, "metrics")
+                    .forEach(columnsAggregation::subAggregation);
+            termsAggregation.subAggregation(columnsAggregation);
+        }
         searchSourceBuilder.aggregation(termsAggregation);
 
         final MinAggregationBuilder startTimestamp = AggregationBuilders.min("timestamp-min").field("timestamp");
         final MaxAggregationBuilder endTimestamp = AggregationBuilders.max("timestamp-max").field("timestamp");
         searchSourceBuilder.aggregation(startTimestamp);
         searchSourceBuilder.aggregation(endTimestamp);
+    }
+
+    private Script scriptForPivots(Collection<BucketSpec> pivots) {
+        final String scriptSource = Joiner.on(KEY_SEPARATOR_PHRASE).join(pivots.stream()
+                .map(bucket -> "doc['" + bucket.field() + "'].value")
+                .collect(Collectors.toList()));
+        return new Script(scriptSource);
     }
 
     private List<BucketOrder> orderListForPivot(Pivot pivot, ESGeneratedQueryContext esGeneratedQueryContext) {
@@ -145,16 +163,34 @@ public class ESPivotWithScriptedTerms implements ESSearchTypeHandler<Pivot> {
         final Terms termsResults = aggregations.get(AGG_NAME);
         termsResults.getBuckets()
                 .forEach(bucket -> {
-                    final ImmutableList<String> keys = ImmutableList.copyOf(Splitter.on(KEY_SEPARATOR_CHARACTER).split(bucket.getKeyAsString()));
-                    final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder()
-                            .key(keys)
-                            .source("leaf");
-                    processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(keys), bucket, false, "row-leaf");
-                    resultBuilder.addRow(rowBuilder.build());
+                    final ImmutableList<String> keys = splitKeys(bucket.getKeyAsString());
+                    if (pivot.columnGroups().isEmpty()) {
+                        final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder()
+                                .key(keys)
+                                .source("leaf");
+                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), bucket, false, "row-leaf");
+                        resultBuilder.addRow(rowBuilder.build());
+                    } else {
+                        final Terms columnsResults = bucket.getAggregations().get(AGG_NAME);
+                        columnsResults.getBuckets()
+                                .forEach(columnBucket -> {
+                                    final ImmutableList<String> columnKeys = splitKeys(columnBucket.getKeyAsString());
+
+                                    final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder()
+                                            .key(keys)
+                                            .source("leaf");
+                                    processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
+                                    resultBuilder.addRow(rowBuilder.build());
+                                });
+                    }
                 });
 
         return resultBuilder.build();
 
+    }
+
+    public ImmutableList<String> splitKeys(String keys) {
+        return ImmutableList.copyOf(Splitter.on(KEY_SEPARATOR_CHARACTER).split(keys));
     }
 
     private void processSeries(PivotResult.Row.Builder rowBuilder,
@@ -171,7 +207,7 @@ public class ESPivotWithScriptedTerms implements ESSearchTypeHandler<Pivot> {
             seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, this, queryContext)
                     .map(value -> {
                         columnKeys.addLast(value.id());
-                        final PivotResult.Value v = PivotResult.Value.create(List.of(value.id()), value.value(), rollup, source);
+                        final PivotResult.Value v = PivotResult.Value.create(columnKeys, value.value(), rollup, source);
                         columnKeys.removeLast();
                         return v;
                     })
