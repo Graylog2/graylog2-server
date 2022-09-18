@@ -16,21 +16,41 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import lodash from 'lodash';
+import styled from 'styled-components';
 
-import { ButtonToolbar } from 'components/bootstrap';
+import { ButtonToolbar, Button } from 'components/bootstrap';
+import { Icon } from 'components/common';
 
 import CollectorConfigurationModal from './CollectorConfigurationModal';
 import CollectorProcessControl from './CollectorProcessControl';
 
+const ConfigurationButton = styled(Button)`
+  margin-right: 6px
+`;
+
 const CollectorsAdministrationActions = (props) => {
+  const [showConfigurationModal, setShowConfigurationModal] = React.useState(false);
+  const onCancelConfigurationModal = React.useCallback(() => setShowConfigurationModal(false), []);
+
   const { collectors, configurations, selectedSidecarCollectorPairs, onConfigurationSelectionChange, onProcessAction } = props;
+  const selectedLogCollectorsNames = lodash.uniq(selectedSidecarCollectorPairs.map(({ collector }) => collector.name));
 
   return (
     <ButtonToolbar>
+      <ConfigurationButton title={(selectedLogCollectorsNames.length > 1) ? `Cannot change configurations of ${selectedLogCollectorsNames.join(', ')} collectors simultaneously` : undefined}
+                           bsStyle="primary"
+                           bsSize="small"
+                           disabled={selectedLogCollectorsNames.length !== 1}
+                           onClick={() => setShowConfigurationModal(true)}>
+        <Icon name="edit" /> Edit Configurations
+      </ConfigurationButton>
       <CollectorConfigurationModal collectors={collectors}
                                    configurations={configurations}
                                    selectedSidecarCollectorPairs={selectedSidecarCollectorPairs}
-                                   onConfigurationSelectionChange={onConfigurationSelectionChange} />
+                                   onConfigurationSelectionChange={onConfigurationSelectionChange}
+                                   show={showConfigurationModal}
+                                   onCancel={onCancelConfigurationModal} />
       <CollectorProcessControl selectedSidecarCollectorPairs={selectedSidecarCollectorPairs} onProcessAction={onProcessAction} />
     </ButtonToolbar>
   );
