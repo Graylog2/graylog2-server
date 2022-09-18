@@ -59,6 +59,9 @@ const ColorLabel = ({ color, size, text, theme }: ColorLabelProps) => {
         color: textColor,
         overflow: 'hidden',
         textOverflow: 'ellipsis',
+        maxWidth: '128px',
+        marginRight: '4px',
+        marginBottom: '4px',
       }}>
         {text}
       </Label>
