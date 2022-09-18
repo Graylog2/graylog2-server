@@ -21,10 +21,11 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import styled, { css } from 'styled-components';
 
+import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { Link } from 'components/common/router';
-import { ControlledTableList, PaginatedList } from 'components/common';
+import { ControlledTableList, PaginatedList, Icon } from 'components/common';
 import Routes from 'routing/Routes';
-import { Col, Row, Input } from 'components/bootstrap';
+import { Col, Row, Input, Button } from 'components/bootstrap';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
 import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';
@@ -33,6 +34,7 @@ import commonStyle from 'components/sidecars/common/CommonSidecarStyles.css';
 
 import CollectorsAdministrationActions from './CollectorsAdministrationActions';
 import CollectorsAdministrationFilters from './CollectorsAdministrationFilters';
+import CollectorConfigurationModal from './CollectorConfigurationModal';
 import FiltersSummary from './FiltersSummary';
 import style from './CollectorsAdministration.css';
 
@@ -72,6 +74,7 @@ const CollectorsAdministration = createReactClass({
     return {
       enabledCollectors: this.getEnabledCollectors(sidecarCollectorPairs),
       selected: [],
+      showConfigurationModal: false,
     };
   },
 
@@ -144,14 +147,10 @@ const CollectorsAdministration = createReactClass({
     onProcessAction(action, selectedCollectors, doneCallback);
   },
 
-  formatHeader() {
-    const { collectors, configurations, sidecarCollectorPairs } = this.props;
+  formatHeader(selectedSidecarCollectorPairs) {
+    const { collectors, configurations } = this.props;
     const { selected, enabledCollectors } = this.state;
     const selectedItems = selected.length;
-
-    const selectedSidecarCollectorPairs = selected.map((selectedSidecarCollectorId) => {
-      return sidecarCollectorPairs.find(({ sidecar, collector }) => this.sidecarCollectorId(sidecar, collector) === selectedSidecarCollectorId);
-    });
 
     let headerMenu;
 
@@ -241,8 +240,8 @@ const CollectorsAdministration = createReactClass({
 
   formatCollector(sidecar, collector, configurations) {
     const sidecarCollectorId = this.sidecarCollectorId(sidecar, collector);
-    const configAssignment = sidecar.assignments.find((assignment) => assignment.collector_id === collector.id) || {};
-    const configuration = configurations.find((config) => config.id === configAssignment.configuration_id);
+    const configAssignmentIDs = sidecar.assignments.filter((assignment) => assignment.collector_id === collector.id).map((assignment) => assignment.configuration_id);
+    const configAssignments = configurations.filter((config) => configAssignmentIDs.includes(config.id)).sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name));
     const { selected } = this.state;
     let collectorStatus = { status: null, message: null, id: null };
 
@@ -262,7 +261,7 @@ const CollectorsAdministration = createReactClass({
 
     return (
       <Row key={sidecarCollectorId}>
-        <Col lg={2} md={4} xs={6}>
+        <Col lg={1} md={2} xs={3}>
           <Input id={`${sidecarCollectorId}-checkbox`}
                  type="checkbox"
                  label={collector.name}
@@ -271,7 +270,7 @@ const CollectorsAdministration = createReactClass({
         </Col>
         <Col lg={1} md={2} xs={3}>
           <span className={style.additionalContent}>
-            {configuration && (
+            {(configAssignments.length > 0) && (
               <StatusIndicator status={collectorStatus.status}
                                message={collectorStatus.message}
                                id={collectorStatus.id}
@@ -279,10 +278,13 @@ const CollectorsAdministration = createReactClass({
             )}
           </span>
         </Col>
-        <Col lg={1} md={2} xs={3}>
+        <Col lg={10} md={8} xs={6}>
           <span className={style.additionalContent}>
-            {configuration && <Link to={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(configuration.id)}><ColorLabel color={configuration.color} text={configuration.name} />  </Link>}
+            {configAssignments.map((configuration) => <Link key={configuration.id} to={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(configuration.id)}><ColorLabel color={configuration.color} text={configuration.name} /></Link>)}
           </span>
+          <Button bsStyle="primary" className="label" onClick={() => this.setState({ selected: [sidecarCollectorId], showConfigurationModal: true })}>
+            <Icon name="edit" size="sm" /> Edit Configurations
+          </Button>
         </Col>
       </Row>
     );
@@ -330,6 +332,11 @@ const CollectorsAdministration = createReactClass({
 
   render() {
     const { configurations, collectors, onPageChange, pagination, query, sidecarCollectorPairs, filters } = this.props;
+    const { selected, showConfigurationModal } = this.state;
+
+    const selectedSidecarCollectorPairs = selected.map((selectedSidecarCollectorId) => {
+      return sidecarCollectorPairs.find(({ sidecar, collector }) => this.sidecarCollectorId(sidecar, collector) === selectedSidecarCollectorId);
+    });
 
     let formattedCollectors;
 
@@ -365,12 +372,18 @@ const CollectorsAdministration = createReactClass({
           <Row>
             <Col md={12}>
               <ControlledTableList>
-                {this.formatHeader()}
+                {this.formatHeader(selectedSidecarCollectorPairs)}
                 {formattedCollectors}
               </ControlledTableList>
             </Col>
           </Row>
         </PaginatedList>
+        <CollectorConfigurationModal collectors={collectors}
+                                     configurations={configurations}
+                                     selectedSidecarCollectorPairs={selectedSidecarCollectorPairs}
+                                     onConfigurationSelectionChange={this.handleConfigurationChange}
+                                     show={showConfigurationModal}
+                                     onCancel={() => this.setState({ selected: [], showConfigurationModal: false })} />
       </div>
     );
   },

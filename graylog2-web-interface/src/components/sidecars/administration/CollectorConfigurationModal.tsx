@@ -22,14 +22,16 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import styled from 'styled-components';
 
+import Routes from 'routing/Routes';
 import { Table, BootstrapModalConfirm, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
 import { SearchForm, Icon } from 'components/common';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
+import { Link } from 'components/common/router';
 
 const ConfigurationContainer = styled.div`
   overflow: auto;
-  height: 300px;
+  height: 360px;
   margin-top: 8px
 `;
 
@@ -37,13 +39,15 @@ const ConfigurationTable = styled(Table)`
   margin-bottom: 0
 `;
 
-const ConfigurationButton = styled(Button)`
-  margin-right: 6px
-`;
-
 const NoConfigurationMessage = styled.div`
   display: flex;
   justify-content: center;
+`;
+
+const AddNewConfiguration = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const ConfigurationSummary = styled.div`
@@ -54,6 +58,12 @@ const TableRow = styled.tr`
   cursor: pointer;
   border-bottom: 1px solid lightgray;
   height: 32px;
+`;
+
+const StickyTableRowFooter = styled.tr`
+  height: 34px;
+  position: sticky;
+  bottom: 0;
 `;
 
 const IconTableCell = styled.td`
@@ -78,12 +88,15 @@ const UnselectTableCell = styled.td`
   text-align: center;
 `;
 
-const CollectorConfigurationSelector = (props) => {
+const ModalTitle = styled(Modal.Title)`
+  font-size: 1.266rem !important;
+  line-height: 1.1;
+`;
+
+const CollectorConfigurationModal = (props) => {
   const [nextAssignedConfigurations, setNextAssignedConfigurations] = React.useState([]);
-  const [show, setShow] = React.useState(false);
 
   const modalConfirm = React.useRef(null);
-  const onCancel = React.useCallback(() => setShow(false), []);
 
   const getAssignedConfigurations = (selectedSidecarCollectorPairs, configurations) => {
     const assignments = selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar).reduce((accumulator, sidecar) => accumulator.concat(sidecar.assignments), []);
@@ -97,7 +110,7 @@ const CollectorConfigurationSelector = (props) => {
   };
 
   const confirmConfigurationChange = (doneCallback) => {
-    const { onConfigurationSelectionChange, configurations } = props;
+    const { onConfigurationSelectionChange, configurations, onCancel } = props;
     const assignedConfigurationsToSave = configurations.filter((c) => nextAssignedConfigurations.includes(c.name));
 
     onConfigurationSelectionChange(assignedConfigurationsToSave, doneCallback);
@@ -122,12 +135,12 @@ const CollectorConfigurationSelector = (props) => {
     const toAdd = lodash.difference(_nextAssignedConfigurations, _previousAssignedConfigurations);
     const toRemove = lodash.difference(_previousAssignedConfigurations, _nextAssignedConfigurations);
     const exampleSidecarCollectorPair = _selectedSidecarCollectorPairs[0];
-    const collectorIndicator = (
+    const collectorIndicator = exampleSidecarCollectorPair ? (
       <em>
         <CollectorIndicator collector={exampleSidecarCollectorPair.collector.name}
                             operatingSystem={exampleSidecarCollectorPair.collector.node_operating_system} />
       </em>
-    );
+    ) : null;
 
     let toAddSummary;
     let toRemoveSummary;
@@ -162,7 +175,7 @@ const CollectorConfigurationSelector = (props) => {
   const selectedLogCollectors = lodash.uniq(selectedSidecarCollectorPairs.map(({ collector }) => collector)) as any[];
 
   const assignedConfigurations = getAssignedConfigurations(selectedSidecarCollectorPairs, configurations)
-    .filter((configuration) => selectedLogCollectors[0].id === configuration.collector_id)
+    .filter((configuration) => selectedLogCollectors[0]?.id === configuration.collector_id)
     .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
     .map((config) => config.name);
 
@@ -179,7 +192,7 @@ const CollectorConfigurationSelector = (props) => {
       const isNotDirty = lodash.isEqual(selectedConfigurations, assignedConfigurations);
 
       const options = nonAssignedConfigurations
-        .filter((configuration) => (selectedLogCollectors[0].id === configuration.collector_id))
+        .filter((configuration) => (selectedLogCollectors[0]?.id === configuration.collector_id))
         .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
         .map((c) => c.name);
 
@@ -209,26 +222,40 @@ const CollectorConfigurationSelector = (props) => {
       });
 
       return (
-        <BootstrapModalWrapper showModal={show}>
+        <BootstrapModalWrapper showModal={props.show}>
           <Modal.Header>
-            <Modal.Title>Configure</Modal.Title>
+            <ModalTitle>
+              Edit <b>{selectedLogCollectors[0]?.name}</b> Configurations
+              <div><small>sidecars: {selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name).join(', ')}</small></div>
+            </ModalTitle>
           </Modal.Header>
           <Modal.Body>
             <SearchForm onQueryChange={(q) => setSearchQuery(q)} topMargin={0} queryWidth="100%" />
             <ConfigurationContainer>
-              {(rows.length === 0) ? (
-                <NoConfigurationMessage>No configurations available for the selected log collector.</NoConfigurationMessage>
-              ) : (
-                <ConfigurationTable className="table-condensed table-hover">
-                  <tbody>
-                    {rows}
-                  </tbody>
-                </ConfigurationTable>
-              )}
+              <ConfigurationTable className="table-condensed table-hover">
+                <tbody>
+                  {(rows.length === 0) ? (
+                    <TableRow>
+                      <td colSpan={5}>
+                        <NoConfigurationMessage>No configurations available for the selected log collector.</NoConfigurationMessage>
+                      </td>
+                    </TableRow>
+                  ) : (
+                    rows
+                  )}
+                  <StickyTableRowFooter>
+                    <td colSpan={5}>
+                      <AddNewConfiguration>
+                        <Link to={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}><Icon name="add" />&nbsp;Add a new configuration</Link>
+                      </AddNewConfiguration>
+                    </td>
+                  </StickyTableRowFooter>
+                </tbody>
+              </ConfigurationTable>
             </ConfigurationContainer>
           </Modal.Body>
           <Modal.Footer>
-            <Button type="button" onClick={onCancel}>Cancel</Button>
+            <Button type="button" onClick={props.onCancel}>Cancel</Button>
             <Button type="submit" bsStyle="primary" disabled={isNotDirty} onClick={() => onSave(selectedConfigurations)}>Save</Button>
           </Modal.Footer>
         </BootstrapModalWrapper>
@@ -236,28 +263,23 @@ const CollectorConfigurationSelector = (props) => {
     };
 
     return <ModalForm />;
-  }, [show, onCancel]);
+  }, [props.show]);
 
   return (
     <>
-      <ConfigurationButton title={(selectedLogCollectors.length > 1) ? `Cannot change configurations of ${selectedLogCollectors.map((c) => c.name).join(', ')} collectors simultaneously` : undefined}
-                           bsStyle="primary"
-                           bsSize="small"
-                           disabled={selectedLogCollectors.length !== 1}
-                           onClick={() => setShow(true)}>
-        Configure
-      </ConfigurationButton>
       {MemoizedModalForm}
       {renderConfigurationSummary(assignedConfigurations, nextAssignedConfigurations, selectedSidecarCollectorPairs)}
     </>
   );
 };
 
-CollectorConfigurationSelector.propTypes = {
+CollectorConfigurationModal.propTypes = {
   collectors: PropTypes.array.isRequired,
   configurations: PropTypes.array.isRequired,
   selectedSidecarCollectorPairs: PropTypes.array.isRequired,
   onConfigurationSelectionChange: PropTypes.func.isRequired,
+  show: PropTypes.bool.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
-export default CollectorConfigurationSelector;
+export default CollectorConfigurationModal;
