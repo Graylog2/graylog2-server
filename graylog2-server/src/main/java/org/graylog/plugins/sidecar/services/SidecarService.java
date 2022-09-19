@@ -101,7 +101,7 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
         final Set<String> sidecarTags = sidecar.nodeDetails().tags();
 
         // find all configurations that match the tags
-        // TODO filter configs based on collector os
+        // TODO only find configs that match the right collector os
         final List<Configuration> taggedConfigs = configurationService.findByTags(sidecarTags);
 
         final List<ConfigurationAssignment> tagAssigned = taggedConfigs.stream().map(c -> {

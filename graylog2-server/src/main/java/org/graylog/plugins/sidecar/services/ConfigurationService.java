@@ -179,6 +179,7 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
             String pathDelim = sidecar.nodeDetails().operatingSystem().equalsIgnoreCase("windows") ? "\\" : "/";
             context.put("spoolDir", sidecar.nodeDetails().collectorConfigurationDirectory() + pathDelim + configuration.id());
         }
+        context.put("tags", sidecar.nodeDetails().tags().stream().collect(Collectors.toMap(t -> t, t -> true)));
 
         return Configuration.create(
                 configuration.id(),
@@ -197,6 +198,7 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         context.put("sidecarVersion", "<version>");
         context.put("operatingSystem", "<operating system>");
         context.put("spoolDir", "<sidecar spool directory>");
+        context.put("tags", Map.of());
 
         String previewName = UUID.randomUUID().toString();
         stringTemplateLoader.putTemplate(previewName, template);

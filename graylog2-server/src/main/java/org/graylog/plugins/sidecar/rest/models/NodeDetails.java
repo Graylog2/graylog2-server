@@ -54,7 +54,6 @@ public abstract class NodeDetails {
     public abstract CollectorStatusList statusList();
 
     @JsonProperty("tags")
-    @Nullable
     public abstract Set<String> tags();
 
     @JsonProperty("collector_configuration_directory")
