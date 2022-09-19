@@ -54,6 +54,7 @@ const DisabledCollector = styled.div(({ theme }) => css`
 export const PAGE_SIZES = [10, 25, 50, 100];
 
 const CollectorsAdministration = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     sidecarCollectorPairs: PropTypes.array.isRequired,
     collectors: PropTypes.array.isRequired,
@@ -122,6 +123,7 @@ const CollectorsAdministration = createReactClass({
     return selected.filter((sidecarCollectorId) => filteredSidecarCollectorIds.includes(sidecarCollectorId));
   },
 
+  // eslint-disable-next-line react/sort-comp
   handleConfigurationChange(selectedConfigurations, doneCallback) {
     const { selected, enabledCollectors } = this.state;
     const { onConfigurationChange } = this.props;
@@ -147,6 +149,7 @@ const CollectorsAdministration = createReactClass({
     onProcessAction(action, selectedCollectors, doneCallback);
   },
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   formatHeader(selectedSidecarCollectorPairs) {
     const { collectors, configurations } = this.props;
     const { selected, enabledCollectors } = this.state;
@@ -214,6 +217,7 @@ const CollectorsAdministration = createReactClass({
     this.setState({ selected: newSelection });
   },
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   formatSidecarNoCollectors(sidecar) {
     return (
       <ControlledTableList.Item key={`sidecar-${sidecar.node_id}`}>
@@ -238,6 +242,7 @@ const CollectorsAdministration = createReactClass({
     );
   },
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   formatCollector(sidecar, collector, configurations) {
     const sidecarCollectorId = this.sidecarCollectorId(sidecar, collector);
     const configAssignmentIDs = sidecar.assignments.filter((assignment) => assignment.collector_id === collector.id).map((assignment) => assignment.configuration_id);
@@ -288,6 +293,7 @@ const CollectorsAdministration = createReactClass({
     );
   },
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   formatSidecar(sidecar, collectors, configurations) {
     if (collectors.length === 0) {
       return this.formatSidecarNoCollectors(sidecar);

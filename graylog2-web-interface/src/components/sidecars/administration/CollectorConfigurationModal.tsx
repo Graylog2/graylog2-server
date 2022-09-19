@@ -15,13 +15,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { naturalSortIgnoreCase } from 'util/SortUtils';
 
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import styled from 'styled-components';
 
+import { naturalSortIgnoreCase } from 'util/SortUtils';
 import Routes from 'routing/Routes';
 import { Table, BootstrapModalConfirm, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
 import { SearchForm, Icon } from 'components/common';
@@ -263,6 +263,7 @@ const CollectorConfigurationModal = (props) => {
     };
 
     return <ModalForm />;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.show]);
 
   return (
