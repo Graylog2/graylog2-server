@@ -212,14 +212,6 @@ public class StreamImpl extends PersistedImpl implements Stream {
     }
 
     @Override
-    public Map<String, List<String>> getAlertReceivers() {
-        @SuppressWarnings("unchecked")
-        final Map<String, List<String>> alertReceivers =
-                (Map<String, List<String>>) fields.getOrDefault(FIELD_ALERT_RECEIVERS, Collections.emptyMap());
-        return alertReceivers;
-    }
-
-    @Override
     public MatchingType getMatchingType() {
         final String matchingTypeString = (String) fields.get(FIELD_MATCHING_TYPE);
 
