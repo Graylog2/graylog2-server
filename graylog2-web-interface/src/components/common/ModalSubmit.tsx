@@ -30,6 +30,7 @@ const ModalSubmit = ({
   onCancel,
   onSubmit,
   submitLoadingText,
+  submitIcon,
   submitButtonText,
 }: Props) => (
   <FormSubmit disableCancel={disableCancel}
@@ -39,6 +40,7 @@ const ModalSubmit = ({
               onCancel={onCancel}
               onSubmit={onSubmit}
               submitButtonText={submitButtonText}
+              submitIcon={submitIcon}
               submitLoadingText={submitLoadingText}
               className={className} />
 );
