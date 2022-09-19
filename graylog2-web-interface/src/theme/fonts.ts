@@ -20,12 +20,13 @@ import { ROOT_FONT_SIZE } from './constants';
 
 import '@openfonts/source-code-pro_latin/index.css';
 import '@openfonts/source-sans-pro_latin/index.css';
-import '@openfonts/barlow-condensed_latin/index.css';
+import '@openfonts/dm-sans_latin/index.css';
 
 export type Fonts = {
   family: {
     body: string,
     monospace: string,
+    navigation: string,
   },
   size: {
     root: string,
@@ -67,7 +68,7 @@ export const fontsPropTypes = PropTypes.shape({
 const family = {
   body: '"Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif',
   monospace: '"Source Code Pro", Menlo, Monaco, Consolas, "Courier New", monospace',
-  navigation: '"Barlow Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  navigation: '"DM Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
 };
 
 /* Scaled 1.067 Minor Second - https://type-scale.com/ */
@@ -78,7 +79,7 @@ const size = {
   large: '1.067rem',
   small: '0.889rem',
   tiny: '0.823rem',
-  navigation: '1.067rem',
+  navigation: '0.938em',
   h1: '1.575rem',
   h2: '1.296rem',
   h3: '1.215rem',

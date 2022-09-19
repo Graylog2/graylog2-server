@@ -163,6 +163,10 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
     public abstract Searches createSearches();
 
+    protected SearchesAdapter createSearchesAdapter() {
+        return searchServer().adapters().searchesAdapter();
+    }
+
     @Test
     public void testCountWithoutFilter() throws Exception {
         importFixture("org/graylog2/indexer/searches/SearchesIT.json");

@@ -144,7 +144,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
       </Navbar.Header>
 
       <Navbar.Collapse>
-        <Nav navbar>
+        <Nav navbar className="navbar-main">
           <LinkContainer to={Routes.SEARCH}>
             <NavItem to="search">Search</NavItem>
           </LinkContainer>

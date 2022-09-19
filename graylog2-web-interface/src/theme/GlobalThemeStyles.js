@@ -30,6 +30,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     color: ${theme.colors.global.textDefault};
     font-family: ${theme.fonts.family.body};
     font-size: ${theme.fonts.size.body};
+    line-height: 1.25;
     height: 100vh;
   }
 
@@ -48,6 +49,10 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   hr {
     border-top: 1px solid ${theme.colors.global.background};
+  }
+
+  h1, h2 {
+    font-family: ${theme.fonts.family.navigation};
   }
 
   h1,
@@ -494,6 +499,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .btn {
     border-radius: 0;
+    line-height: inherit;
   }
 
   .btn-text {
@@ -599,6 +605,13 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   .form-group-inline {
     display: inline-block;
     margin: 0;
+  }
+  
+  .form-control-feedback {
+    line-height: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   ul.tag-list,
