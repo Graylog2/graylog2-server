@@ -23,9 +23,9 @@ import styled, { css } from 'styled-components';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { Link } from 'components/common/router';
-import { ControlledTableList, PaginatedList, Icon } from 'components/common';
+import { ControlledTableList, PaginatedList, IconButton } from 'components/common';
 import Routes from 'routing/Routes';
-import { Col, Row, Input, Button } from 'components/bootstrap';
+import { Col, Row, Input } from 'components/bootstrap';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
 import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';
@@ -280,11 +280,12 @@ const CollectorsAdministration = createReactClass({
         </Col>
         <Col lg={10} md={8} xs={6}>
           <span className={style.additionalContent}>
+            {(configAssignments.length > 0) && <IconButton size="sm" name="edit" onClick={() => this.setState({ selected: [sidecarCollectorId], showConfigurationModal: true })} />}
             {configAssignments.map((configuration) => <Link key={configuration.id} to={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(configuration.id)}><ColorLabel color={configuration.color} text={configuration.name} /></Link>)}
           </span>
-          <Button bsStyle="primary" className="label" onClick={() => this.setState({ selected: [sidecarCollectorId], showConfigurationModal: true })}>
+          {/* <Button bsStyle="primary" className="label" onClick={() => this.setState({ selected: [sidecarCollectorId], showConfigurationModal: true })}>
             <Icon name="edit" size="sm" /> Edit Configurations
-          </Button>
+          </Button> */}
         </Col>
       </Row>
     );
