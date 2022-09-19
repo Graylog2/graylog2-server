@@ -83,6 +83,8 @@ import { AggregationWizard } from 'views/components/aggregationwizard';
 import { filterCloudValueActions } from 'util/conditional/filterValueActions';
 import CopyValueToClipboard from 'views/logic/valueactions/CopyValueToClipboard';
 import CopyFieldToClipboard from 'views/logic/fieldactions/CopyFieldToClipboard';
+import IfDashboard from 'views/components/dashboard/IfDashboard';
+import ViewHeader from 'views/components/views/ViewHeader';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -344,6 +346,8 @@ const exports: PluginExports = {
   ],
   'views.elements.header': [
     () => <IfSearch><MigrateFieldCharts /></IfSearch>,
+    () => <IfDashboard><ViewHeader /></IfDashboard>,
+    () => <IfSearch><ViewHeader /></IfSearch>,
   ],
   'views.export.formats': [
     {
