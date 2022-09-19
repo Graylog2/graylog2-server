@@ -33,6 +33,7 @@ interface ColorLabelProps {
   color: string,
   size?: Size,
   text?: string | React.ReactNode,
+  style?: React.CSSProperties,
   theme: DefaultTheme
 }
 
@@ -41,18 +42,17 @@ const ColorLabelWrap = styled.span(({ size, theme }: ColorLabelWrapProps) => {
   const fontSize = size === 'small' ? small : body;
 
   return css`
-    display: flex;
     vertical-align: middle;
     font-size: ${size === 'xsmall' ? tiny : fontSize};
   `;
 });
 
-const ColorLabel = ({ color, size, text, theme }: ColorLabelProps) => {
+const ColorLabel = ({ color, size, text, theme, style }: ColorLabelProps) => {
   const borderColor = theme.utils.colorLevel(color, 5);
   const textColor = theme.utils.contrastingColor(color);
 
   return (
-    <ColorLabelWrap size={size}>
+    <ColorLabelWrap size={size} style={style}>
       <Label style={{
         backgroundColor: color,
         border: `1px solid ${borderColor}`,
@@ -74,11 +74,13 @@ ColorLabel.propTypes = {
   text: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   size: PropTypes.oneOf(['normal', 'small', 'xsmall']),
   theme: themePropTypes.isRequired,
+  style: PropTypes.object,
 };
 
 ColorLabel.defaultProps = {
   text: <span>&emsp;</span>,
   size: 'normal',
+  style: undefined,
 };
 
 export default withTheme(ColorLabel);
