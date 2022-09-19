@@ -55,7 +55,7 @@ describe('ViewHeader', () => {
   it('Show edit modal on click', async () => {
     render(<ViewHeader />);
 
-    const editButton = await screen.findByRole('button');
+    const editButton = await screen.findByTitle('Edit dashboard Some view metadata');
 
     fireEvent.click(editButton);
     await screen.findByText('Editing saved dashboard', { exact: false });
