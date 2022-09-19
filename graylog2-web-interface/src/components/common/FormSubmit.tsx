@@ -17,16 +17,20 @@
 import * as React from 'react';
 
 import { Button, ButtonToolbar } from 'components/bootstrap';
+import type { IconName } from 'components/common/Icon';
+import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
 
 type Props = {
   className?: string,
   disableCancel?: boolean,
-  disableSubmit?: boolean,
+  disabledSubmit?: boolean,
   isSubmitting?: boolean,
+  leftCol?: React.ReactNode,
   onCancel: () => void,
   onSubmit?: () => void,
   submitButtonText: string,
+  submitIcon?: IconName,
   submitButtonType?: 'submit' | 'button',
   submitLoadingText?: string,
 }
@@ -34,21 +38,25 @@ type Props = {
 const FormSubmit = ({
   className,
   disableCancel,
-  disableSubmit,
+  disabledSubmit,
   isSubmitting,
+  leftCol,
   onCancel,
   onSubmit,
   submitButtonText,
   submitButtonType,
+  submitIcon,
   submitLoadingText,
 }: Props) => (
   <ButtonToolbar className={`${className} pull-right`}>
+    {leftCol}
     <Button type="button" onClick={onCancel} disabled={disableCancel}>Cancel</Button>
     <Button bsStyle="success"
-            disabled={disableSubmit}
+            disabled={disabledSubmit}
             title={submitButtonText}
             type={submitButtonType}
             onClick={onSubmit}>
+      {submitIcon && <><Icon name={submitIcon} /> </>}
       {isSubmitting ? <Spinner text={submitLoadingText} delay={0} /> : submitButtonText}
     </Button>
   </ButtonToolbar>
@@ -57,10 +65,12 @@ const FormSubmit = ({
 FormSubmit.defaultProps = {
   className: undefined,
   disableCancel: false,
-  disableSubmit: false,
+  disabledSubmit: false,
   isSubmitting: false,
+  leftCol: undefined,
   onSubmit: undefined,
   submitButtonType: 'submit',
+  submitIcon: undefined,
   submitLoadingText: undefined,
 };
 

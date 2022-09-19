@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import FormSubmit from 'components/common/FormSubmit';
+import ModalSubmit from 'components/common/ModalSubmit';
 
 import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
@@ -122,12 +122,12 @@ class BootstrapModalConfirm extends React.Component {
         </Modal.Body>
 
         <Modal.Footer>
-          <FormSubmit disabledCancel={cancelButtonDisabled}
-                      disabledSubmit={confirmButtonDisabled}
-                      onCancel={this.onCancel}
-                      onSubmit={this.onConfirm}
-                      submitButtonText={confirmButtonText}
-                      submitButtonType="button" />
+          <ModalSubmit disabledCancel={cancelButtonDisabled}
+                       disabledSubmit={confirmButtonDisabled}
+                       onCancel={this.onCancel}
+                       onSubmit={this.onConfirm}
+                       submitButtonText={confirmButtonText}
+                       submitButtonType="button" />
         </Modal.Footer>
       </BootstrapModalWrapper>
     );

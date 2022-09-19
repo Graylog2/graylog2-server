@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import $ from 'jquery';
 
-import FormSubmit from 'components/common/FormSubmit';
+import ModalSubmit from 'components/common/ModalSubmit';
 
 import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
@@ -133,9 +133,9 @@ class BootstrapModalForm extends React.Component {
             {body}
           </Modal.Body>
           <Modal.Footer>
-            <FormSubmit disabledSubmit={submitButtonDisabled}
-                        onCancel={this.onModalCancel}
-                        submitButtonText={submitButtonText} />
+            <ModalSubmit disabledSubmit={submitButtonDisabled}
+                         onCancel={this.onModalCancel}
+                         submitButtonText={submitButtonText} />
           </Modal.Footer>
         </form>
       </BootstrapModalWrapper>
