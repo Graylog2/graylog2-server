@@ -17,8 +17,9 @@
 import React, { useCallback, useState } from 'react';
 import { cloneDeep } from 'lodash';
 
-import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
-import { IfPermitted } from 'components/common';
+import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+import { Modal } from 'components/bootstrap';
+import { IfPermitted, ModalSubmit } from 'components/common';
 import type { Stream } from 'stores/streams/StreamsStore';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
 import AddDecoratorButton from 'views/components/messagelist/decorators/AddDecoratorButton';
@@ -51,7 +52,7 @@ const _updateOrder = (orderedDecorators, decorators, onChange) => {
   onChange(newDecorators);
 };
 
-const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props, modalRef: React.Ref<BootstrapModalConfirm>) => {
+const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props, modalRef: React.Ref<BootstrapModalWrapper>) => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
   const onCreate = useCallback(
@@ -77,25 +78,30 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
   }, [decorators, onCancel]);
 
   return (
-    <BootstrapModalConfirm ref={modalRef}
+    <BootstrapModalWrapper ref={modalRef}
                            showModal={show}
-                           confirmButtonText="Update configuration"
-                           onConfirm={onSubmit}
-                           onCancel={_onCancel}
-                           title="Update Default Decorators Configuration">
-      <p>Select the stream for which you want to change the set of default decorators.</p>
-      <StreamSelect onChange={setCurrentStream} value={currentStream} streams={streams} />
+                           onHide={_onCancel}>
+      <Modal.Header closeButton>
+        <Modal.Title>Update Default Decorators Configuration</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <p>Select the stream for which you want to change the set of default decorators.</p>
+        <StreamSelect onChange={setCurrentStream} value={currentStream} streams={streams} />
 
-      <IfPermitted permissions="decorators:create">
-        <p>Select the type to create a new decorator for this stream:</p>
-        <AddDecoratorButton stream={currentStream} nextOrder={nextOrder} decoratorTypes={types} onCreate={onCreate} showHelp={false} />
-      </IfPermitted>
+        <IfPermitted permissions="decorators:create">
+          <p>Select the type to create a new decorator for this stream:</p>
+          <AddDecoratorButton stream={currentStream} nextOrder={nextOrder} decoratorTypes={types} onCreate={onCreate} showHelp={false} />
+        </IfPermitted>
 
-      <p>Use drag and drop to change the execution order of the decorators.</p>
+        <p>Use drag and drop to change the execution order of the decorators.</p>
 
-      <DecoratorList decorators={decoratorItems} onReorder={onReorder} />
-    </BootstrapModalConfirm>
+        <DecoratorList decorators={decoratorItems} onReorder={onReorder} />
+      </Modal.Body>
+      <Modal.Footer>
+        <ModalSubmit onSubmit={onSubmit} onCancel={_onCancel} submitButtonText="Update configuration" />
+      </Modal.Footer>
+    </BootstrapModalWrapper>
   );
 };
 
-export default React.forwardRef<BootstrapModalConfirm, Props>(DecoratorsConfigUpdate);
+export default React.forwardRef<BootstrapModalWrapper, Props>(DecoratorsConfigUpdate);
