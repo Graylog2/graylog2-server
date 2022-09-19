@@ -22,7 +22,7 @@ import { Formik, Form, Field } from 'formik';
 import isNil from 'lodash/isNil';
 
 import { defaultCompare } from 'logic/DefaultCompare';
-import { Input, BootstrapModalWrapper, Modal, ModalSubmit } from 'components/bootstrap';
+import { Input, BootstrapModalWrapper, Modal } from 'components/bootstrap';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Select from 'components/common/Select';
@@ -41,6 +41,7 @@ import {
   GradientColor,
   StaticColor,
 } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import { ModalSubmit } from 'components/common';
 
 type Props = {
   onClose: () => void,
@@ -187,7 +188,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
                 <HighlightingColorForm field={selectedFieldType} />
               </Modal.Body>
               <Modal.Footer>
-                <ModalSubmit onCanel={onClose} disabledSubmit={!isValid} submitButtonText={`${submitButtonPrefix} rule`} />
+                <ModalSubmit onCancel={onClose} disabledSubmit={!isValid} submitButtonText={`${submitButtonPrefix} rule`} />
               </Modal.Footer>
             </Form>
           </BootstrapModalWrapper>
