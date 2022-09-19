@@ -2287,23 +2287,23 @@
   dependencies:
     "@babel/core" "^7.17.9"
 
-"@tanstack/query-core@4.3.4":
-  version "4.3.4"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.3.4.tgz#b93da17232fda91ec08ef14d2ca1d8326fc599f2"
-  integrity sha512-NLAe3j5Vk1yYEtoPP5fPGPjRzkZPx67KUM3f14L3InziJZJ0wVecCh7uKfgYkbRKJSeq6PlbND7iuCGdTplN6Q==
+"@tanstack/query-core@4.3.8":
+  version "4.3.8"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.3.8.tgz#d5f07c1d9d4f83f16f0bed7f3b245fa0e557b037"
+  integrity sha512-AEUWtCNBIImFZ9tMt/P8V86kIhMHpfoJqAI1auGOLR8Wzeq7Ymiue789PJG0rKYcyViUicBZeHjggMqyEQVMfQ==
 
-"@tanstack/react-query@4.3.4":
-  version "4.3.4"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.3.4.tgz#91a4232a967de04a0662d63d53b18ecc3e11c7e2"
-  integrity sha512-IiAo+B8bxphEpO7xwLQaCptd2rY4Ef3pW1q9J3pT66G+J/st4QpGQ+cSm9iESp9ccRy1YNUk3klk/hQtWewl6g==
+"@tanstack/react-query@4.3.8":
+  version "4.3.8"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.3.8.tgz#65b75305ad1ec31a23b48b4adf73a8b358b9e2d2"
+  integrity sha512-iR1mzhjD5nNhywW8o7FfT4Q4PjFSnfUQk2CRyOToojNiNygM82e22RcmPfLu1z+O+Pl6cMOD0D8NwdNpPZghnw==
   dependencies:
-    "@tanstack/query-core" "4.3.4"
+    "@tanstack/query-core" "4.3.8"
     use-sync-external-store "^1.2.0"
 
-"@testing-library/dom@8.17.1":
-  version "8.17.1"
-  resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-8.17.1.tgz#2d7af4ff6dad8d837630fecd08835aee08320ad7"
-  integrity sha512-KnH2MnJUzmFNPW6RIKfd+zf2Wue8mEKX0M3cpX6aKl5ZXrJM1/c/Pc8c2xDNYQCnJO48Sm5ITbMXgqTr3h4jxQ==
+"@testing-library/dom@8.18.0":
+  version "8.18.0"
+  resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-8.18.0.tgz#fe5903a456f2c2b64770d91e50237a031c382121"
+  integrity sha512-hP7v7Ifiq104Lb4dTuQzUtlkbX4sgsmxVwOTnVSDOU4ntApvPfp+eFLvasS8GpMP6pVfdbNRXNF/bSK7LTriEg==
   dependencies:
     "@babel/code-frame" "^7.10.4"
     "@babel/runtime" "^7.12.5"
@@ -6031,7 +6031,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.2"
     eslint-plugin-compat "4.0.2"
-    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-ab7e9cb3-d091-4a1d-9cce-d2528693b3d9-1663589402190/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.0.4"
     eslint-plugin-jest-dom "4.0.2"
@@ -6545,6 +6545,17 @@ fast-glob@^3.2.11, fast-glob@^3.2.9:
   version "3.2.11"
   resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.2.11.tgz#a1172ad95ceb8a16e20caa5c5e56480e5129c1d9"
   integrity sha512-xrO3+1bxSo3ZVHAnqzyuewYT6aMFHRAd4Kcs92MAonjwQZLsK9d0SF1IyQ3k5PoirxTW0Oe/RqFgMQ6TcNE5Ew==
+  dependencies:
+    "@nodelib/fs.stat" "^2.0.2"
+    "@nodelib/fs.walk" "^1.2.3"
+    glob-parent "^5.1.2"
+    merge2 "^1.3.0"
+    micromatch "^4.0.4"
+
+fast-glob@^3.2.12:
+  version "3.2.12"
+  resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.2.12.tgz#7f39ec99c2e6ab030337142da9e0c18f37afae80"
+  integrity sha512-DVj4CQIYYow0BlaelwK1pHl5n5cRSJfM60UA0zK891sVInoPri2Ekj7+e1CT3/3qxXenpI+nBBmQAcJPJgaj4w==
   dependencies:
     "@nodelib/fs.stat" "^2.0.2"
     "@nodelib/fs.walk" "^1.2.3"
@@ -7283,16 +7294,16 @@ grapheme-splitter@^1.0.4:
 "graylog-web-plugin@file:packages/graylog-web-plugin":
   version "4.4.0-SNAPSHOT"
   dependencies:
-    "@tanstack/react-query" "4.3.4"
+    "@tanstack/react-query" "4.3.8"
     "@types/create-react-class" "15.6.3"
     "@types/jquery" "3.5.14"
     "@types/react" "18.0.20"
-    babel-preset-graylog "file:packages/babel-preset-graylog"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-92deb693-06ad-48b2-8927-5fd0afca9fac-1663589401937/node_modules/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:packages/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-92deb693-06ad-48b2-8927-5fd0afca9fac-1663589401937/node_modules/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:packages/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.4.0-SNAPSHOT-92deb693-06ad-48b2-8927-5fd0afca9fac-1663589401937/node_modules/jest-preset-graylog"
     jquery "3.6.1"
     moment "2.29.4"
     moment-timezone "0.5.37"
@@ -8586,7 +8597,7 @@ jest-pnp-resolver@^1.2.2:
   version "1.0.0"
   dependencies:
     "@jest/types" "29.0.3"
-    "@testing-library/dom" "8.17.1"
+    "@testing-library/dom" "8.18.0"
     "@testing-library/jest-dom" "5.16.5"
     "@testing-library/react" "12.1.5"
     "@testing-library/react-hooks" "^8.0.0"
@@ -12567,7 +12578,7 @@ styled-components@5.3.5:
   dependencies:
     "@stylelint/postcss-css-in-js" "0.38.0"
     postcss-syntax "0.36.2"
-    stylelint "14.11.0"
+    stylelint "14.12.0"
     stylelint-config-recommended "9.0.0"
     stylelint-config-standard "28.0.0"
     stylelint-config-styled-components "0.1.1"
@@ -12589,10 +12600,10 @@ stylelint-config-styled-components@0.1.1:
   resolved "https://registry.yarnpkg.com/stylelint-config-styled-components/-/stylelint-config-styled-components-0.1.1.tgz#b408388d7c687833ab4be4c4e6522d97d2827ede"
   integrity sha512-z5Xz/9GmvxO6e/DLzBMwkB85zHxEEjN6K7Cj80Bi+o/9vR9eS3GX3E9VuMnX9WLFYulqbqLtTapGGY28JBiy9Q==
 
-stylelint@14.11.0:
-  version "14.11.0"
-  resolved "https://registry.yarnpkg.com/stylelint/-/stylelint-14.11.0.tgz#e2ecb28bbacab05e1fbeb84cbba23883b27499cc"
-  integrity sha512-OTLjLPxpvGtojEfpESWM8Ir64Z01E89xsisaBMUP/ngOx1+4VG2DPRcUyCCiin9Rd3kPXPsh/uwHd9eqnvhsYA==
+stylelint@14.12.0:
+  version "14.12.0"
+  resolved "https://registry.yarnpkg.com/stylelint/-/stylelint-14.12.0.tgz#86d5b60d0f30a6bd0b59e1d4c85a267f0caef97e"
+  integrity sha512-9Sa+IsT31PN9zf9q5ZVZNvhT6jMVu6YhpI38g3Akn7vONipGL0GNd9QCblwtJ3ysaoM80P/+9mOcFB1xnytiQQ==
   dependencies:
     "@csstools/selector-specificity" "^2.0.2"
     balanced-match "^2.0.0"
@@ -12600,7 +12611,7 @@ stylelint@14.11.0:
     cosmiconfig "^7.0.1"
     css-functions-list "^3.1.0"
     debug "^4.3.4"
-    fast-glob "^3.2.11"
+    fast-glob "^3.2.12"
     fastest-levenshtein "^1.0.16"
     file-entry-cache "^6.0.1"
     global-modules "^2.0.0"
@@ -12627,7 +12638,7 @@ stylelint@14.11.0:
     string-width "^4.2.3"
     strip-ansi "^6.0.1"
     style-search "^0.1.0"
-    supports-hyperlinks "^2.2.0"
+    supports-hyperlinks "^2.3.0"
     svg-tags "^1.0.0"
     table "^6.8.0"
     v8-compile-cache "^2.3.0"
@@ -12691,10 +12702,10 @@ supports-hyperlinks@^2.0.0:
     has-flag "^4.0.0"
     supports-color "^7.0.0"
 
-supports-hyperlinks@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/supports-hyperlinks/-/supports-hyperlinks-2.2.0.tgz#4f77b42488765891774b70c79babd87f9bd594bb"
-  integrity sha512-6sXEzV5+I5j8Bmq9/vUphGRM/RJNT9SCURJLjwfOg51heRtguGWDzcaBlgAzKhQa0EVNpPEKzQuBwZ8S8WaCeQ==
+supports-hyperlinks@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/supports-hyperlinks/-/supports-hyperlinks-2.3.0.tgz#3943544347c1ff90b15effb03fc14ae45ec10624"
+  integrity sha512-RpsAZlpWcDwOPQA22aCH4J0t7L8JmAvsCxfOSEwm7cQs3LshN36QaTkwd70DnBOXDWGssw2eUoc8CaRWT0XunA==
   dependencies:
     has-flag "^4.0.0"
     supports-color "^7.0.0"
