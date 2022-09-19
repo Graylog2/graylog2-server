@@ -17,9 +17,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import FormSubmit from 'components/common/FormSubmit';
+
 import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
-import Button from './Button';
 
 /**
  * Component that displays a confirmation dialog box that the user can
@@ -34,8 +35,6 @@ class BootstrapModalConfirm extends React.Component {
       PropTypes.string,
       PropTypes.element,
     ]).isRequired,
-    /** Text to use in the cancel button. */
-    cancelButtonText: PropTypes.string,
     /** Text to use in the confirmation button. */
     confirmButtonText: PropTypes.string,
     /** Indicates whether the cancel button should be disabled or not. */
@@ -65,7 +64,6 @@ class BootstrapModalConfirm extends React.Component {
 
   static defaultProps = {
     showModal: false,
-    cancelButtonText: 'Cancel',
     confirmButtonText: 'Confirm',
     cancelButtonDisabled: false,
     confirmButtonDisabled: false,
@@ -105,7 +103,6 @@ class BootstrapModalConfirm extends React.Component {
       children,
       cancelButtonDisabled,
       confirmButtonDisabled,
-      cancelButtonText,
       confirmButtonText,
     } = this.props;
 
@@ -125,8 +122,12 @@ class BootstrapModalConfirm extends React.Component {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button type="button" onClick={this.onCancel} disabled={cancelButtonDisabled}>{cancelButtonText}</Button>
-          <Button type="button" onClick={this.onConfirm} bsStyle="primary" disabled={confirmButtonDisabled}>{confirmButtonText}</Button>
+          <FormSubmit disabledCancel={cancelButtonDisabled}
+                      disabledSubmit={confirmButtonDisabled}
+                      onCancel={this.onCancel}
+                      onSubmit={this.onConfirm}
+                      submitButtonText={confirmButtonText}
+                      submitButtonType="button" />
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
