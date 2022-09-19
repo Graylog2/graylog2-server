@@ -18,6 +18,7 @@ package org.graylog.plugins.sidecar.rest.models;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
@@ -29,6 +30,7 @@ import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class NodeDetails {
     @JsonProperty("operating_system")
     @NotNull
@@ -52,7 +54,6 @@ public abstract class NodeDetails {
     public abstract CollectorStatusList statusList();
 
     @JsonProperty("tags")
-    @Nullable
     public abstract Set<String> tags();
 
     @JsonProperty("collector_configuration_directory")
@@ -67,6 +68,6 @@ public abstract class NodeDetails {
                                      @JsonProperty("status") @Nullable CollectorStatusList statusList,
                                      @JsonProperty("tags") @Nullable Set<String> tags,
                                      @JsonProperty("collector_configuration_directory") @Nullable String configDir) {
-        return new AutoValue_NodeDetails(operatingSystem, ip, metrics, logFileList, statusList, tags, configDir);
+        return new AutoValue_NodeDetails(operatingSystem, ip, metrics, logFileList, statusList, tags == null ? Set.of() : tags, configDir);
     }
 }

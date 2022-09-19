@@ -33,6 +33,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.Set;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -56,7 +58,7 @@ public class ConfigurationServiceTest {
 
 
     private Configuration buildTestConfig(String template) {
-        return Configuration.create(FILEBEAT_CONF_ID, "collId", "filebeat", "#ffffff", template);
+        return Configuration.create(FILEBEAT_CONF_ID, "collId", "filebeat", "#ffffff", template, Set.of());
     }
 
     @Before

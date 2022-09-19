@@ -91,11 +91,12 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
 
     private NativeEntity<Configuration> decode(EntityV1 entity, Map<String, ValueReference> parameters) {
         final SidecarCollectorConfigurationEntity configurationEntity = objectMapper.convertValue(entity.data(), SidecarCollectorConfigurationEntity.class);
-        final Configuration configuration = Configuration.create(
+        final Configuration configuration = Configuration.createWithoutId(
                 configurationEntity.collectorId().asString(parameters),
                 configurationEntity.title().asString(parameters),
                 configurationEntity.color().asString(parameters),
-                configurationEntity.template().asString(parameters));
+                configurationEntity.template().asString(parameters),
+                Set.of());
 
         final Configuration savedConfiguration = configurationService.save(configuration);
         return NativeEntity.create(entity.id(), savedConfiguration.id(), TYPE_V1, configuration.name(), savedConfiguration);

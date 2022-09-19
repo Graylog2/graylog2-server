@@ -65,6 +65,7 @@ const ConfigurationForm = createReactClass({
         color: configuration.color,
         collector_id: configuration.collector_id,
         template: configuration.template || '',
+        tags: configuration.tags
       },
     };
   },
