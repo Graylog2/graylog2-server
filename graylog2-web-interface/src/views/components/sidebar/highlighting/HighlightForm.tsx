@@ -22,7 +22,7 @@ import { Formik, Form, Field } from 'formik';
 import isNil from 'lodash/isNil';
 
 import { defaultCompare } from 'logic/DefaultCompare';
-import { Input, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
+import { Input, BootstrapModalWrapper, Modal, ModalSubmit } from 'components/bootstrap';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Select from 'components/common/Select';
@@ -123,7 +123,8 @@ const HighlightForm = ({ onClose, rule }: Props) => {
     HighlightingRulesActions.add(HighlightingRule.create(field, value, condition, newColor)).then(onClose);
   };
 
-  const headerTxt = rule ? 'Edit' : 'New';
+  const headerPrefix = rule ? 'Edit' : 'Create';
+  const submitButtonPrefix = rule ? 'Update' : 'Create';
 
   return (
     <Formik onSubmit={onSubmit}
@@ -143,7 +144,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
                                  onClose={onClose}>
             <Form className="form">
               <Modal.Header>
-                <Modal.Title>{headerTxt} Highlighting Rule</Modal.Title>
+                <Modal.Title>{headerPrefix} Highlighting Rule</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Field name="field" validate={_isRequired('Field')}>
@@ -186,8 +187,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
                 <HighlightingColorForm field={selectedFieldType} />
               </Modal.Body>
               <Modal.Footer>
-                <Button type="button" onClick={onClose}>Cancel</Button>
-                <Button type="submit" disabled={!isValid} bsStyle="primary">Save</Button>
+                <ModalSubmit onCanel={onClose} disabledSubmit={!isValid} submitButtonText={`${submitButtonPrefix} rule`} />
               </Modal.Footer>
             </Form>
           </BootstrapModalWrapper>
