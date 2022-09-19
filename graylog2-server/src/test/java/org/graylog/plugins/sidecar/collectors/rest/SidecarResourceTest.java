@@ -26,6 +26,7 @@ import org.graylog.plugins.sidecar.rest.models.SidecarSummary;
 import org.graylog.plugins.sidecar.rest.requests.RegistrationRequest;
 import org.graylog.plugins.sidecar.rest.resources.SidecarResource;
 import org.graylog.plugins.sidecar.services.ActionService;
+import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog.plugins.sidecar.services.SidecarService;
 import org.graylog.plugins.sidecar.system.SidecarConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -38,6 +39,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
@@ -45,6 +47,7 @@ import static org.graylog.plugins.sidecar.collectors.rest.assertj.ResponseAssert
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -67,6 +70,9 @@ public class SidecarResourceTest extends RestResourceBaseTest {
     private ClusterConfigService clusterConfigService;
 
     @Mock
+    private EtagService etagService;
+
+    @Mock
     private SidecarConfiguration sidecarConfiguration;
 
     @Before
@@ -74,11 +80,13 @@ public class SidecarResourceTest extends RestResourceBaseTest {
         this.sidecars = getDummyCollectorList();
         when(clusterConfigService.getOrDefault(SidecarConfiguration.class, SidecarConfiguration.defaultConfiguration())).thenReturn(sidecarConfiguration);
         when(sidecarConfiguration.sidecarUpdateInterval()).thenReturn(Period.seconds(30));
+        when(etagService.buildEntityTagForResponse(any())).thenReturn(new EntityTag("hash browns"));
         this.resource = new SidecarResource(
                 sidecarService,
                 actionService,
                 clusterConfigService,
-                statusMapper);
+                statusMapper,
+                etagService);
     }
 
     @Test(expected = NotFoundException.class)
@@ -118,20 +126,25 @@ public class SidecarResourceTest extends RestResourceBaseTest {
 
     @Test
     public void testRegister() throws Exception {
+        final NodeDetails nodeDetails = NodeDetails.create(
+                "DummyOS 1.0",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
         final RegistrationRequest input = RegistrationRequest.create(
                 "nodeName",
-                NodeDetails.create(
-                        "DummyOS 1.0",
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
-                )
+                nodeDetails
         );
+        when(sidecarService.fromRequest(any(), any(RegistrationRequest.class), anyString())).thenReturn(
+                Sidecar.create("nodeId", "name", nodeDetails, "0.0.1")
+        );
+        when(sidecarService.updateTaggedConfigurationAssignments(any(Sidecar.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        final Response response = this.resource.register("sidecarId", input, "0.0.1");
+        final Response response = this.resource.register("sidecarId", input, null, "0.0.1");
 
         assertThat(response).isSuccess();
     }
@@ -152,7 +165,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
                 )
         );
 
-        final Response response = this.resource.register("", invalid, "0.0.1");
+        final Response response = this.resource.register("", invalid, null, "0.0.1");
 
         assertThat(response).isError();
         assertThat(response).isStatus(Response.Status.BAD_REQUEST);
@@ -174,7 +187,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
                 )
         );
 
-        final Response response = this.resource.register("sidecarId", invalid, "0.0.1");
+        final Response response = this.resource.register("sidecarId", invalid, null, "0.0.1");
 
         assertThat(response).isError();
         assertThat(response).isStatus(Response.Status.BAD_REQUEST);
@@ -188,7 +201,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
                 null
         );
 
-        final Response response = this.resource.register("sidecarId", invalid, "0.0.1");
+        final Response response = this.resource.register("sidecarId", invalid, null, "0.0.1");
 
         assertThat(response).isError();
         assertThat(response).isStatus(Response.Status.BAD_REQUEST);
@@ -210,7 +223,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
                 )
         );
 
-        final Response response = this.resource.register("sidecarId", invalid, "0.0.1");
+        final Response response = this.resource.register("sidecarId", invalid, null, "0.0.1");
 
         assertThat(response).isError();
         assertThat(response).isStatus(Response.Status.BAD_REQUEST);

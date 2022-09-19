@@ -17,6 +17,7 @@
 package org.graylog.plugins.sidecar.services;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.cache.TemplateLoader;
@@ -47,6 +48,7 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -60,7 +62,7 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
     private static final freemarker.template.Configuration templateConfiguration =
             new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_28);
     private static final StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
-    private ConfigurationVariableService configurationVariableService;
+    private final ConfigurationVariableService configurationVariableService;
 
     private static final String COLLECTION_NAME = "sidecar_configurations";
 
@@ -70,6 +72,7 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
                                 ConfigurationVariableService configurationVariableService) {
         super(mongoConnection, mapper, Configuration.class, COLLECTION_NAME);
         MongoDbTemplateLoader mongoDbTemplateLoader = new MongoDbTemplateLoader(db);
+        DBCollection collection = db.getDB().getCollection(COLLECTION_NAME);
         MultiTemplateLoader multiTemplateLoader = new MultiTemplateLoader(new TemplateLoader[] {
                 mongoDbTemplateLoader,
                 stringTemplateLoader });
@@ -79,6 +82,10 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         templateConfiguration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         templateConfiguration.setLogTemplateExceptions(false);
         this.configurationVariableService = configurationVariableService;
+
+        collection.createIndex(new BasicDBObject(Configuration.FIELD_ID, 1));
+        collection.createIndex(new BasicDBObject(Configuration.FIELD_COLLECTOR_ID, 1));
+        collection.createIndex(new BasicDBObject(Configuration.FIELD_TAGS, 1));
     }
 
     public Configuration find(String id) {
@@ -116,6 +123,10 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         return findByQuery(query);
     }
 
+    public List<Configuration> findByTags(Set<String> tags) {
+        return findByQuery(DBQuery.in(Configuration.FIELD_TAGS, tags));
+    }
+
     public void replaceVariableNames(String oldName, String newName) {
         final DBQuery.Query query = DBQuery.regex(Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote(oldName)));
         List<Configuration> configurations = findByQuery(query);
@@ -134,15 +145,17 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
 
     public Configuration copyConfiguration(String id, String name) {
         Configuration configuration = find(id);
-        return Configuration.create(configuration.collectorId(), name, configuration.color(), configuration.template());
+        // Tags are not copied on purpose
+        return Configuration.createWithoutId(configuration.collectorId(), name, configuration.color(), configuration.template(), Set.of());
     }
 
     public Configuration fromRequest(Configuration request) {
-        return Configuration.create(
+        return Configuration.createWithoutId(
                 request.collectorId(),
                 request.name(),
                 request.color(),
-                request.template());
+                request.template(),
+                request.tags());
     }
 
     public Configuration fromRequest(String id, Configuration request) {
@@ -151,7 +164,8 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
                 request.collectorId(),
                 request.name(),
                 request.color(),
-                request.template());
+                request.template(),
+                request.tags());
     }
 
     public Configuration renderConfigurationForCollector(Sidecar sidecar, Configuration configuration) throws RenderTemplateException {
@@ -165,13 +179,15 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
             String pathDelim = sidecar.nodeDetails().operatingSystem().equalsIgnoreCase("windows") ? "\\" : "/";
             context.put("spoolDir", sidecar.nodeDetails().collectorConfigurationDirectory() + pathDelim + configuration.id());
         }
+        context.put("tags", sidecar.nodeDetails().tags().stream().collect(Collectors.toMap(t -> t, t -> true)));
 
         return Configuration.create(
                 configuration.id(),
                 configuration.collectorId(),
                 configuration.name(),
                 configuration.color(),
-                renderTemplate(configuration.id(), context)
+                renderTemplate(configuration.id(), context),
+                configuration.tags()
         );
     }
 
@@ -182,6 +198,7 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         context.put("sidecarVersion", "<version>");
         context.put("operatingSystem", "<operating system>");
         context.put("spoolDir", "<sidecar spool directory>");
+        context.put("tags", Map.of());
 
         String previewName = UUID.randomUUID().toString();
         stringTemplateLoader.putTemplate(previewName, template);
