@@ -32,7 +32,6 @@ type Props = {
   streams: Array<Stream>,
   decorators: Array<Decorator>,
   types: { [key: string]: any },
-  // eslint-disable-next-line react/require-default-props
   show?: boolean,
   onCancel: () => void,
   onSave: (newDecorators: Array<Decorator>) => unknown,
@@ -102,6 +101,10 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
       </Modal.Footer>
     </BootstrapModalWrapper>
   );
+};
+
+DecoratorsConfigUpdate.defaultProps = {
+  show: false,
 };
 
 export default React.forwardRef<BootstrapModalWrapper, Props>(DecoratorsConfigUpdate);

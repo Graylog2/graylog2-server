@@ -86,6 +86,7 @@ class BootstrapModalConfirm extends React.Component {
     onConfirm(this.close);
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => {
     this.modal.open();
   };
