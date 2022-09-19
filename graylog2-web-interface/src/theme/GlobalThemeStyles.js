@@ -51,6 +51,10 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     border-top: 1px solid ${theme.colors.global.background};
   }
 
+  h1, h2 {
+    font-family: ${theme.fonts.family.navigation};
+  }
+
   h1,
   h2,
   h3,

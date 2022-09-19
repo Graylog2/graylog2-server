@@ -26,6 +26,7 @@ export type Fonts = {
   family: {
     body: string,
     monospace: string,
+    navigation: string,
   },
   size: {
     root: string,
