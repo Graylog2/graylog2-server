@@ -28,24 +28,8 @@ public class SearchesOS2IT extends SearchesIT {
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     @Override
-    protected SearchServerInstance elasticsearch() {
+    protected SearchServerInstance searchServer() {
         return this.openSearchInstance;
-    }
-
-    private SearchesAdapter createSearchesAdapter() {
-        final ScrollResultOS2.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultOS2(
-                openSearchInstance.openSearchClient(), initialResult, query, scroll, fields, limit
-        );
-        final SortOrderMapper sortOrderMapper = new SortOrderMapper();
-        final boolean allowHighlighting = true;
-        final boolean allowLeadingWildcardSearches = true;
-
-        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(sortOrderMapper, allowHighlighting, allowLeadingWildcardSearches);
-        return new SearchesAdapterOS2(openSearchInstance.openSearchClient(),
-                new Scroll(openSearchInstance.openSearchClient(),
-                        scrollResultFactory,
-                        searchRequestFactory),
-                searchRequestFactory);
     }
 
     @Override

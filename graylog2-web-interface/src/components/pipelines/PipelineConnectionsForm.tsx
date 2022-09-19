@@ -25,6 +25,8 @@ import Routes from 'routing/Routes';
 import type { PipelineType } from 'stores/pipelines/PipelinesStore';
 import type { Stream } from 'stores/streams/StreamsStore';
 import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 type Props = {
   pipeline: PipelineType,
@@ -45,6 +47,7 @@ const formatStreams = (streams: Stream[]): FormattedStream[] => {
 };
 
 const PipelineConnectionsForm = ({ pipeline, connections, streams, save }: Props) => {
+  const currentUser = useCurrentUser();
   const modalRef = useRef<BootstrapModalForm>();
 
   const initialStreamConnections = useMemo(() => {
@@ -95,7 +98,7 @@ const PipelineConnectionsForm = ({ pipeline, connections, streams, save }: Props
 
   return (
     <span>
-      <Button onClick={_openModal} bsStyle="info">
+      <Button disabled={!isPermitted(currentUser.permissions, 'pipeline_connection:edit')} onClick={_openModal} bsStyle="info">
         <span>Edit connections</span>
       </Button>
       <BootstrapModalForm ref={modalRef}

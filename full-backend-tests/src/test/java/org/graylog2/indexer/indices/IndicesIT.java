@@ -22,11 +22,11 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.codec.binary.Base64;
-import org.graylog.testing.ContainerMatrixElasticsearchITBaseTest;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.elasticsearch.ContainerMatrixElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IgnoreIndexTemplate;
@@ -79,7 +79,7 @@ import static org.mockito.Mockito.when;
 
 // these tests only test the SearchServer, so there is only one MongoDB-version necessary (needed, to launch the tests)
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, mongoVersions = MongodbServer.MONGO4)
-public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
+public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
     private static final String INDEX_NAME = "graylog_0";
     private final Set<String> indicesToCleanUp = new HashSet<>();
 
@@ -122,7 +122,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
     public void setUp() {
         //noinspection UnstableApiUsage
         eventBus = new EventBus("indices-test");
-        final Node node = new Node(createNodeAdapter());
+        final Node node = new Node(searchServer().adapters().nodeAdapter());
         final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(node,
                 ImmutableMap.of(MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider()));
         indices = new Indices(
@@ -130,7 +130,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 eventBus,
-                indicesAdapter()
+                searchServer().adapters().indicesAdapter()
         );
     }
 
@@ -386,7 +386,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 eventBus,
-                indicesAdapter());
+                searchServer().adapters().indicesAdapter());
 
         assertThatCode(() -> indices.ensureIndexTemplate(indexSet)).doesNotThrowAnyException();
 
@@ -418,7 +418,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 eventBus,
-                indicesAdapter());
+                searchServer().adapters().indicesAdapter());
 
         assertThatCode(() -> indices.ensureIndexTemplate(indexSet))
                 .isExactlyInstanceOf(IndexTemplateNotFoundException.class)
