@@ -16,43 +16,17 @@
  */
 package org.graylog.storage.opensearch2;
 
-import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.refresh.RefreshRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.core.CountRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.core.CountResponse;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.indexer.messages.ChunkedBulkIndexer;
-import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.messages.MessagesBatchIT;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
 
 public class MessagesBatchOS2IT extends MessagesBatchIT {
     @Rule
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create("256m");
 
-    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-
     @Override
-    protected SearchServerInstance elasticsearch() {
+    protected SearchServerInstance searchServer() {
         return this.openSearchInstance;
-    }
-
-
-    @Override
-    protected MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry) {
-        return new MessagesAdapterOS2(this.openSearchInstance.openSearchClient(), metricRegistry, new ChunkedBulkIndexer(), objectMapper);
-    }
-
-    @Override
-    protected long messageCount(String indexName) {
-        this.openSearchInstance.openSearchClient().execute((c, requestOptions) -> c.indices().refresh(new RefreshRequest(), requestOptions));
-
-        final CountRequest countRequest = new CountRequest(indexName);
-        final CountResponse result = this.openSearchInstance.openSearchClient().execute((c, requestOptions) -> c.count(countRequest, requestOptions));
-
-        return result.getCount();
     }
 }

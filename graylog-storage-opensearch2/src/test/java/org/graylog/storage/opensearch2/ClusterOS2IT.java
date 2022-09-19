@@ -35,7 +35,7 @@ public class ClusterOS2IT extends ClusterIT {
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     @Override
-    protected SearchServerInstance elasticsearch() {
+    protected SearchServerInstance searchServer() {
         return this.openSearchInstance;
     }
 

@@ -55,7 +55,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     @Override
-    protected SearchServerInstance elasticsearch() {
+    protected SearchServerInstance searchServer() {
         return this.openSearchInstance;
     }
 
