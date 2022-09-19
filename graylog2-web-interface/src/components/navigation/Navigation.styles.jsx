@@ -29,6 +29,11 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
     margin: 0 10px;
   }
 
+  &.navbar-default .navbar-main > li > a {
+    font-family: ${theme.fonts.family.navigation};
+    font-size: ${theme.fonts.size.navigation};
+  }
+
   @media (max-width: 991px) {
     .small-scrn-badge {
       float: right;

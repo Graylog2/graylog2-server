@@ -17,11 +17,11 @@
 package org.graylog2.indexer.counts;
 
 import com.google.common.collect.ImmutableMap;
-import org.graylog.testing.ContainerMatrixElasticsearchITBaseTest;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
+import org.graylog.testing.elasticsearch.ContainerMatrixElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
 // these tests only test the SearchServer, so there is only one MongoDB-version necessary (needed, to launch the tests)
 @ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO4)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class CountsIT extends ContainerMatrixElasticsearchITBaseTest {
+public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
     private static final String INDEX_NAME_1 = "index_set_1_counts_test_0";
     private static final String INDEX_NAME_2 = "index_set_2_counts_test_0";
     private static final String INDEX_NAME_3 = "index_set_3_counts_test_0";
@@ -81,7 +81,7 @@ public class CountsIT extends ContainerMatrixElasticsearchITBaseTest {
         client().createIndex(INDEX_NAME_3, 1, 0);
         client().waitForGreenStatus(INDEX_NAME_1, INDEX_NAME_2, INDEX_NAME_3);
 
-        counts = new Counts(indexSetRegistry, countsAdapter());
+        counts = new Counts(indexSetRegistry, searchServer().adapters().countsAdapter());
 
         indexSetConfig1 = IndexSetConfig.builder()
                 .id("id-1")

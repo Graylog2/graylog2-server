@@ -16,10 +16,19 @@
  */
 package org.graylog.plugins.views.search.engine.normalization;
 
+import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.views.search.ParameterProvider;
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.plugins.views.search.rest.ExecutionState;
 
 public interface SearchNormalizer {
-    Search normalize(Search search, SearchUser searchUser, ExecutionState executionState);
+
+    Query normalizeQuery(final Query query, final ParameterProvider parameterProvider);
+
+    default Search normalize(final Search search) {
+        final ImmutableSet<Query> newQueries = search.queries().stream()
+                .map(query -> normalizeQuery(query, search))
+                .collect(ImmutableSet.toImmutableSet());
+        return search.toBuilder().queries(newQueries).build();
+    }
 }
