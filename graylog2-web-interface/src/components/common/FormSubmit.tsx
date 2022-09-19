@@ -56,7 +56,7 @@ const FormSubmit = ({
             title={submitButtonText}
             type={submitButtonType}
             onClick={onSubmit}>
-      {submitIcon && <><Icon name={submitIcon} /> </>}
+      {(submitIcon && !isSubmitting) && <><Icon name={submitIcon} /> </>}
       {isSubmitting ? <Spinner text={submitLoadingText} delay={0} /> : submitButtonText}
     </Button>
   </ButtonToolbar>
