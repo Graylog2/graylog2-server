@@ -47,12 +47,11 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.elasticsearch7.BoolQueryTools;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
-import org.graylog.storage.elasticsearch7.TimeRangeQueryFactory;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
-import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,16 +124,9 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     final Set<String> effectiveStreamIds = query.effectiveStreams(searchType);
 
                     final BoolQueryBuilder searchTypeOverrides = QueryBuilders.boolQuery()
-                            .must(searchTypeSourceBuilder.query())
-                            .must(
-                                    Objects.requireNonNull(
-                                            TimeRangeQueryFactory.create(
-                                                    query.effectiveTimeRange(searchType)
-                                            ),
-                                            "Timerange for search type " + searchType.id() + " cannot be found in query or search type."
-                                    )
-                            )
-                            .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
+                            .must(searchTypeSourceBuilder.query());
+                    BoolQueryTools.addTimeRange(searchTypeOverrides, query.effectiveTimeRange(searchType), "search type " + searchType.id());
+                    BoolQueryTools.addStreams(searchTypeOverrides, effectiveStreamIds);
 
                     searchType.query().ifPresent(searchTypeQuery -> {
                         final QueryBuilder normalizedSearchTypeQuery = translateQueryString(searchTypeQuery.queryString());
@@ -152,27 +144,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 });
 
         return queryContext;
-    }
-
-    private SearchSourceBuilder createSearchSourceBuilder(final Query query) {
-        final BackendQuery backendQuery = query.query();
-        final QueryBuilder normalizedRootQuery = translateQueryString(backendQuery.queryString());
-        final BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
-                .filter(normalizedRootQuery);
-
-        usedSearchFiltersToQueryStringsMapper.map(query.filters())
-                .stream()
-                .map(this::translateQueryString)
-                .forEach(boolQuery::filter);
-
-        // add the optional root query filters
-        generateFilterClause(query.filter()).map(boolQuery::filter);
-
-        return new SearchSourceBuilder()
-                .query(boolQuery)
-                .from(0)
-                .size(0)
-                .trackTotalHits(true);
     }
 
     // TODO make pluggable
@@ -205,28 +176,41 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         return Optional.empty();
     }
 
+    private SearchSourceBuilder createSearchSourceBuilder(final Query query) {
+        final BackendQuery backendQuery = query.query();
+        final QueryBuilder normalizedRootQuery = translateQueryString(backendQuery.queryString());
+        final BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+                .filter(normalizedRootQuery);
+
+        usedSearchFiltersToQueryStringsMapper.map(query.filters())
+                .stream()
+                .map(this::translateQueryString)
+                .forEach(boolQuery::filter);
+
+        // add the optional root query filters
+        generateFilterClause(query.filter()).map(boolQuery::filter);
+
+        return new SearchSourceBuilder()
+                .query(boolQuery)
+                .from(0)
+                .size(0)
+                .trackTotalHits(true);
+    }
+
     @Override
-    public Set<String> getFieldsPresentInSearchResultDocuments(final Query normalizedQuery) {
+    public Set<String> getFieldsPresentInSearchResultDocuments(final Query normalizedQuery, final int size) {
         final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(normalizedQuery.usedStreamIds(), normalizedQuery.timerange());
         final SearchSourceBuilder searchSourceBuilder = createSearchSourceBuilder(normalizedQuery);
         final QueryBuilder query = searchSourceBuilder.query();
 
         if (query instanceof BoolQueryBuilder boolQueryBuilder) {
-            boolQueryBuilder.must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, normalizedQuery.usedStreamIds()))
-                    .must(
-                            Objects.requireNonNull(
-                                    TimeRangeQueryFactory.create(
-                                            normalizedQuery.timerange()
-                                    ),
-                                    "Timerange for query " + normalizedQuery.id() + " cannot be found in query or search type."
-                            )
-                    );
-
+            BoolQueryTools.addTimeRange(boolQueryBuilder, normalizedQuery.timerange(), "query " + normalizedQuery.id());
+            BoolQueryTools.addStreams(boolQueryBuilder, normalizedQuery.usedStreamIds());
         }
         final String aggregationName = ALL_MESSAGE_FIELDS_DOCUMENT_FIELD + "_aggr";
         searchSourceBuilder.aggregation(new TermsAggregationBuilder(aggregationName)
                 .field(ALL_MESSAGE_FIELDS_DOCUMENT_FIELD)
-                .size(1000));
+                .size(size));
         final SearchResponse res = client.search(new SearchRequest()
                 .source(searchSourceBuilder)
                 .indices(affectedIndices.toArray(new String[0]))

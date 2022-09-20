@@ -44,16 +44,19 @@ public class DiscoveredFieldTypeServiceImpl implements DiscoveredFieldTypeServic
     }
 
     @Override
-    public Set<MappedFieldTypeDTO> fieldTypesBySearch(final Search search, final SearchUser searchUser) {
-        final Set<String> discoveredFields = searchExecutor.getFieldsPresentInSearchResultDocuments(search, searchUser);
+    public Set<MappedFieldTypeDTO> fieldTypesBySearch(final Search search,
+                                                      final SearchUser searchUser,
+                                                      final int size) {
+        final Set<String> discoveredFields = searchExecutor.getFieldsPresentInSearchResultDocuments(search, searchUser, size);
         return fieldNamesToFieldTypeDTOs(discoveredFields);
     }
 
     @Override
     public Set<MappedFieldTypeDTO> fieldTypesByQuery(final Query query,
                                                      final ParameterProvider parameterProvider,
-                                                     final SearchUser searchUser) {
-        final Set<String> discoveredFields = searchExecutor.getFieldsPresentInSearchResultDocuments(query, parameterProvider, searchUser);
+                                                     final SearchUser searchUser,
+                                                     final int size) {
+        final Set<String> discoveredFields = searchExecutor.getFieldsPresentInSearchResultDocuments(query, parameterProvider, searchUser, size);
         return fieldNamesToFieldTypeDTOs(discoveredFields);
     }
 

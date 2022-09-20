@@ -68,7 +68,7 @@ public class SearchExecutor {
     }
 
     @Deprecated
-    public Set<String> getFieldsPresentInSearchResultDocuments(final Search search, SearchUser searchUser) {
+    public Set<String> getFieldsPresentInSearchResultDocuments(final Search search, SearchUser searchUser, final int size) {
         final ExecutionState executionState = ExecutionState.empty();
         final Search preValidationSearch = searchNormalization.preValidation(search, searchUser, executionState);
         final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
@@ -77,12 +77,13 @@ public class SearchExecutor {
         }
         final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
         final Query mainQuery = normalizedSearch.queries().stream().findFirst().orElseThrow(() -> new IllegalArgumentException("No queries in search : " + normalizedSearch.id()));
-        return queryEngine.getFieldsPresentInSearchResultDocuments(mainQuery);
+        return queryEngine.getFieldsPresentInSearchResultDocuments(mainQuery, size);
     }
 
     public Set<String> getFieldsPresentInSearchResultDocuments(final Query query,
                                                                final ParameterProvider parameterProvider,
-                                                               final SearchUser searchUser) {
+                                                               final SearchUser searchUser,
+                                                               final int size) {
         final ExecutionState executionState = ExecutionState.empty();
         final Query preValidationQuery = searchNormalization.preValidation(query, parameterProvider, searchUser, executionState);
         final Set<SearchError> validationErrors = searchValidation.validate(preValidationQuery, searchUser);
@@ -90,7 +91,7 @@ public class SearchExecutor {
             return Set.of();
         }
         final Query normalizedQuery = searchNormalization.postValidation(preValidationQuery, parameterProvider);
-        return queryEngine.getFieldsPresentInSearchResultDocuments(normalizedQuery);
+        return queryEngine.getFieldsPresentInSearchResultDocuments(normalizedQuery, size);
     }
 
     public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState) {

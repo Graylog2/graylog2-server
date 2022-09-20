@@ -35,11 +35,13 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Optional;
@@ -87,14 +89,16 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     @ApiOperation(value = "Retrieve the field list for a given search")
     @NoAuditEvent("This is not changing any data")
     public Set<MappedFieldTypeDTO> bySearch(@ApiParam(name = "searchId", required = true)
-                                            @PathParam(value = "searchId") @NotEmpty final String searchId,
+                                                @PathParam(value = "searchId") @NotEmpty final String searchId,
+                                            @ApiParam(name = "size", defaultValue = "1000")
+                                                @QueryParam(value = "size") @Positive final int size,
                                             @ApiParam(name = "JSON body", required = true)
-                                            @Valid @NotNull final FieldTypesForStreamsRequest fallbackRequest,
+                                                @Valid @NotNull final FieldTypesForStreamsRequest fallbackRequest,
                                             @Context SearchUser searchUser) {
         try {
             final Optional<Search> search = searchDbService.get(searchId);
             if (search.isPresent()) {
-                final Set<MappedFieldTypeDTO> mappedFieldTypeDTOS = discoveredFieldTypeService.fieldTypesBySearch(search.get(), searchUser);
+                final Set<MappedFieldTypeDTO> mappedFieldTypeDTOS = discoveredFieldTypeService.fieldTypesBySearch(search.get(), searchUser, size <= 0 ? 1000 : size);
                 if (mappedFieldTypeDTOS != null && !mappedFieldTypeDTOS.isEmpty()) {
                     return mappedFieldTypeDTOS;
                 }
@@ -109,7 +113,9 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     @Path("/byQuery")
     @ApiOperation(value = "Retrieve the field list for a given query")
     @NoAuditEvent("This is not changing any data")
-    public Set<MappedFieldTypeDTO> byQuery(@ApiParam(name = "JSON body", required = true)
+    public Set<MappedFieldTypeDTO> byQuery(@ApiParam(name = "size", defaultValue = "1000")
+                                           @QueryParam(value = "size") @Positive final int size,
+                                           @ApiParam(name = "JSON body", required = true)
                                            @Valid @NotNull final FieldTypesForQueryRequest request,
                                            @Context SearchUser searchUser) {
         try {
@@ -117,7 +123,8 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
             final Set<MappedFieldTypeDTO> mappedFieldTypeDTOS = discoveredFieldTypeService.fieldTypesByQuery(
                     request.query().toQuery(),
                     name -> request.parameters().stream().filter(p -> p.name().equals(name)).findFirst(),
-                    searchUser);
+                    searchUser,
+                    size <= 0 ? 1000 : size);
             if (mappedFieldTypeDTOS != null && !mappedFieldTypeDTOS.isEmpty()) {
                 return mappedFieldTypeDTOS;
             }

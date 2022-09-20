@@ -28,7 +28,7 @@ public interface DiscoveredFieldTypeService {
 
     String ALL_MESSAGE_FIELDS_DOCUMENT_FIELD = "gl2_message_fields";
 
-    Set<MappedFieldTypeDTO> fieldTypesBySearch(Search search, SearchUser searchUser);
+    Set<MappedFieldTypeDTO> fieldTypesBySearch(Search search, SearchUser searchUser, int size);
 
-    Set<MappedFieldTypeDTO> fieldTypesByQuery(Query query, ParameterProvider parameterProvider, SearchUser searchUser);
+    Set<MappedFieldTypeDTO> fieldTypesByQuery(Query query, ParameterProvider parameterProvider, SearchUser searchUser, int size);
 }

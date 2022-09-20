@@ -47,12 +47,11 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggrega
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.opensearch2.BoolQueryTools;
 import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.graylog.storage.opensearch2.TimeRangeQueryFactory;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
-import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,16 +124,9 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                     final Set<String> effectiveStreamIds = query.effectiveStreams(searchType);
 
                     final BoolQueryBuilder searchTypeOverrides = QueryBuilders.boolQuery()
-                            .must(searchTypeSourceBuilder.query())
-                            .must(
-                                    Objects.requireNonNull(
-                                            TimeRangeQueryFactory.create(
-                                                    query.effectiveTimeRange(searchType)
-                                            ),
-                                            "Timerange for search type " + searchType.id() + " cannot be found in query or search type."
-                                    )
-                            )
-                            .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
+                            .must(searchTypeSourceBuilder.query());
+                    BoolQueryTools.addTimeRange(searchTypeOverrides, query.effectiveTimeRange(searchType), "search type " + searchType.id());
+                    BoolQueryTools.addStreams(searchTypeOverrides, effectiveStreamIds);
 
                     searchType.query().ifPresent(searchTypeQuery -> {
                         final QueryBuilder normalizedSearchTypeQuery = translateQueryString(searchTypeQuery.queryString());
@@ -206,27 +198,19 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     }
 
     @Override
-    public Set<String> getFieldsPresentInSearchResultDocuments(final Query normalizedQuery) {
+    public Set<String> getFieldsPresentInSearchResultDocuments(final Query normalizedQuery, final int size) {
         final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(normalizedQuery.usedStreamIds(), normalizedQuery.timerange());
         final SearchSourceBuilder searchSourceBuilder = createSearchSourceBuilder(normalizedQuery);
         final QueryBuilder query = searchSourceBuilder.query();
 
         if (query instanceof BoolQueryBuilder boolQueryBuilder) {
-            boolQueryBuilder.must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, normalizedQuery.usedStreamIds()))
-                    .must(
-                            Objects.requireNonNull(
-                                    TimeRangeQueryFactory.create(
-                                            normalizedQuery.timerange()
-                                    ),
-                                    "Timerange for query " + normalizedQuery.id() + " cannot be found in query or search type."
-                            )
-                    );
-
+            BoolQueryTools.addTimeRange(boolQueryBuilder, normalizedQuery.timerange(), "query " + normalizedQuery.id());
+            BoolQueryTools.addStreams(boolQueryBuilder, normalizedQuery.usedStreamIds());
         }
         final String aggregationName = ALL_MESSAGE_FIELDS_DOCUMENT_FIELD + "_aggr";
         searchSourceBuilder.aggregation(new TermsAggregationBuilder(aggregationName)
                 .field(ALL_MESSAGE_FIELDS_DOCUMENT_FIELD)
-                .size(1000));
+                .size(size));
         final SearchResponse res = client.search(new SearchRequest()
                 .source(searchSourceBuilder)
                 .indices(affectedIndices.toArray(new String[0]))
