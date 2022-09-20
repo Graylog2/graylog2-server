@@ -17,9 +17,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col, Modal, Button, BootstrapModalWrapper } from 'components/bootstrap';
+import { Row, Col, Modal, BootstrapModalWrapper } from 'components/bootstrap';
 import SortableList from 'components/common/SortableList';
 import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
+import { ModalSubmit } from 'components/common/index';
 
 class ExtractorSortModal extends React.Component {
   static propTypes = {
@@ -35,6 +36,7 @@ class ExtractorSortModal extends React.Component {
     };
   }
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => {
     this.modal.open();
   };
@@ -92,8 +94,7 @@ class ExtractorSortModal extends React.Component {
           </Row>
         </Modal.Body>
         <Modal.Footer>
-          <Button type="button" onClick={this._cancel}>Close</Button>
-          <Button type="button" bsStyle="info" onClick={this._saveSorting}>Save</Button>
+          <ModalSubmit onCancel={this._saveSorting} submitButtonText="Update sort" />
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
