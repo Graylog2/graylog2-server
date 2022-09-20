@@ -93,9 +93,12 @@ describe('EntityShareModal', () => {
 
   it('closes modal on cancel', async () => {
     const onClose = jest.fn();
-    const { getByText } = render(<SimpleEntityShareModal onClose={onClose} />);
+    const { getByRole } = render(<SimpleEntityShareModal onClose={onClose} />);
 
-    const cancelButton = getByText('Discard changes');
+    const cancelButton = getByRole('button', {
+      name: /cancel/i,
+      hidden: true,
+    });
 
     fireEvent.click(cancelButton);
 

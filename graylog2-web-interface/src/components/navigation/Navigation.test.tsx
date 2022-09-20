@@ -240,7 +240,7 @@ describe('Navigation', () => {
   describe('uses correct permissions:', () => {
     const verifyPermissions = ({ count, links }) => {
       const wrapper = mount(<Navigation />);
-      const navigationLinks = wrapper.find('NavItem');
+      const navigationLinks = wrapper.find('NavItem[active=false]');
 
       expect(navigationLinks).toHaveLength(count);
 
