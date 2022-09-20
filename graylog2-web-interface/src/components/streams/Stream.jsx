@@ -282,6 +282,8 @@ class Stream extends React.Component {
         {showStreamRuleForm && (
           <StreamRuleForm onClose={this._closeStreamRuleForm}
                           title="New Stream Rule"
+                          submitButtonText="Create Rule"
+                          submitLoadingText="Creating Rule..."
                           onSubmit={this._onSaveStreamRule}
                           streamRuleTypes={streamRuleTypes} />
         )}
