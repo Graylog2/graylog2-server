@@ -28,62 +28,36 @@ import { appPrefixed } from 'util/URLUtils';
 import NavigationLink from './NavigationLink';
 
 const TITLE_PREFIX = 'System';
+const PATH_PREFIX = '/system';
 
 const _isActive = (requestPath, prefix) => {
   return requestPath.indexOf(appPrefixed(prefix)) === 0;
 };
 
+const titleMap = {
+  '/overview': 'Overview',
+  '/nodes': 'Nodes',
+  '/inputs': 'Inputs',
+  '/outputs': 'Outputs',
+  '/indices': 'Indices',
+  '/logging': 'Logging',
+  '/authentication': 'Authentication',
+  '/contentpacks': 'Content Packs',
+  '/grokpatterns': 'Grok Patterns',
+  '/lookuptables': 'Lookup Tables',
+  '/configurations': 'Configurations',
+  '/pipelines': 'Pipelines',
+  '/sidecars': 'Sidecars',
+  '/users': 'Users',
+  '/teams': 'Teams',
+  '/roles': 'Roles',
+};
+
 const _systemTitle = (pathname) => {
-  if (_isActive(pathname, '/system/overview')) {
-    return `${TITLE_PREFIX} / Overview`;
-  }
+  const pageSpecificTitle = Object.entries(titleMap).find(([route]) => _isActive(pathname, `${PATH_PREFIX}${route}`))?.[1];
 
-  if (_isActive(pathname, '/system/nodes')) {
-    return `${TITLE_PREFIX} / Nodes`;
-  }
-
-  if (_isActive(pathname, '/system/inputs')) {
-    return `${TITLE_PREFIX} / Inputs`;
-  }
-
-  if (_isActive(pathname, '/system/outputs')) {
-    return `${TITLE_PREFIX} / Outputs`;
-  }
-
-  if (_isActive(pathname, '/system/indices')) {
-    return `${TITLE_PREFIX} / Indices`;
-  }
-
-  if (_isActive(pathname, '/system/logging')) {
-    return `${TITLE_PREFIX} / Logging`;
-  }
-
-  if (_isActive(pathname, '/system/authentication')) {
-    return `${TITLE_PREFIX} / Authentication`;
-  }
-
-  if (_isActive(pathname, '/system/contentpacks')) {
-    return `${TITLE_PREFIX} / Content Packs`;
-  }
-
-  if (_isActive(pathname, '/system/grokpatterns')) {
-    return `${TITLE_PREFIX} / Grok Patterns`;
-  }
-
-  if (_isActive(pathname, '/system/lookuptables')) {
-    return `${TITLE_PREFIX} / Lookup Tables`;
-  }
-
-  if (_isActive(pathname, '/system/configurations')) {
-    return `${TITLE_PREFIX} / Configurations`;
-  }
-
-  if (_isActive(pathname, '/system/pipelines')) {
-    return `${TITLE_PREFIX} / Pipelines`;
-  }
-
-  if (_isActive(pathname, '/system/sidecars')) {
-    return `${TITLE_PREFIX} / Sidecars`;
+  if (pageSpecificTitle) {
+    return `${TITLE_PREFIX} / ${pageSpecificTitle}`;
   }
 
   const pluginRoute = PluginStore.exports('systemnavigation').filter((route) => _isActive(pathname, route.path))[0];
@@ -110,10 +84,8 @@ const SystemMenu = () => {
       return <NavigationLink key={description} path={prefixedPath} description={description} />;
     });
 
-  const dropdownTitle = _systemTitle(location.pathname);
-
   return (
-    <NavDropdown title={dropdownTitle} id="system-menu-dropdown" inactiveTitle={TITLE_PREFIX}>
+    <NavDropdown title={_systemTitle(location.pathname)} id="system-menu-dropdown" inactiveTitle={TITLE_PREFIX}>
       <NavigationLink path={Routes.SYSTEM.OVERVIEW} description="Overview" />
       <IfPermitted permissions={['clusterconfigentry:read']}>
         <NavigationLink path={Routes.SYSTEM.CONFIGURATIONS} description="Configurations" />
