@@ -36,6 +36,7 @@ export { default as MenuItem } from './MenuItem';
 export { default as Modal } from './Modal';
 export { default as Nav } from './Nav';
 export { default as NavDropdown } from './NavDropdown';
+export { default as NavItem } from './NavItem';
 export { default as Navbar } from './Navbar';
 export { default as Panel } from './Panel';
 export { default as Popover } from './Popover';

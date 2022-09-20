@@ -14,21 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
+import * as React from 'react';
 // eslint-disable-next-line no-restricted-imports
-export {
-  /* 👇 no custom theme colors needed 👇 */
-  ButtonGroup,
-  ButtonToolbar,
-  Checkbox, // NOTE: do we want custom or keep OS styles
-  Clearfix,
-  Col,
-  Collapse,
-  Dropdown,
-  Form,
-  Grid,
-  Pager,
-  PanelGroup,
-  Radio, // NOTE: do we want custom or keep OS styles
-  /* 👆 no custom theme colors needed 👆 */
-} from 'react-bootstrap';
+import { NavItem as BootstrapNavItem } from 'react-bootstrap';
+
+const NavItem = (props: React.ComponentProps<typeof NavItem>) => <BootstrapNavItem {...props} />;
+
+NavItem.displayName = 'NavItem';
+
+/** @component */
+export default NavItem;
