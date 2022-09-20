@@ -48,7 +48,7 @@ describe('ViewHeader', () => {
   it('Render view type and title', async () => {
     render(<ViewHeader />);
 
-    await screen.findByText('Dashboard:', { exact: false });
+    await screen.findByText('Dashboards', { exact: false });
     await screen.findByText('Some view');
   });
 

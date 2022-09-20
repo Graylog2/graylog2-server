@@ -18,37 +18,43 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
+import { Link } from 'components/common/router';
 import { useStore } from 'stores/connect';
 import { ViewStore } from 'views/stores/ViewStore';
 import { Icon } from 'components/common';
 import { Row } from 'components/bootstrap';
 import ViewPropertiesModal from 'views/components/views/DashboardPropertiesModal';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
+import View from 'views/logic/views/View';
+import Routes from 'routing/Routes';
 
-const StyledList = styled.dl(() => css`
-  display: flex;
-  gap: 8px;
-  margin: 0;
-  flex-wrap: wrap;
-  align-items: center;
-  dd {
-    font-style: italic;
-  }
-  dt {
-    text-transform: capitalize;
-  }
-`);
+const links = {
+  [View.Type.Dashboard]: {
+    link: Routes.DASHBOARDS,
+    label: 'Dashboards',
+  },
+  [View.Type.Search]: {
+    link: Routes.SEARCH,
+    label: 'Search',
+  },
+};
 
 const Content = styled.div(({ theme }) => css`
   display: flex;
-  justify-content: space-between;
   flex-wrap: nowrap;
   align-items: center;
-  padding-bottom: ${theme.spacings.sm}
+  padding-bottom: ${theme.spacings.sm};
+  gap: 4px;
+  margin: 0;
 `);
-const EditButton = styled.div(() => css`
-  width: 25px;
+const EditButton = styled.div(({ theme }) => css`
+  color: ${theme.colors.gray[60]};
+  font-size: 0.80rem;
 `);
+
+const StyledIcon = styled(Icon)`
+font-size: 0.50rem;
+`;
 
 const ViewHeader = () => {
   const { view } = useStore(ViewStore);
@@ -59,10 +65,11 @@ const ViewHeader = () => {
   return isSavedView ? (
     <Row>
       <Content>
-        <StyledList>
-          <dt>{view.type.toLocaleLowerCase()}:</dt>
-          <dd>{view.title}</dd>
-        </StyledList>
+        <Link to={links[view.type].link}>
+          {links[view.type].label}
+        </Link>
+        <StyledIcon name="chevron-right" />
+        <span>{view.title}</span>
         <EditButton onClick={toggleMetadataEdit}
                     role="button"
                     title={`Edit ${view.type.toLocaleLowerCase()} ${view.title} metadata`}
@@ -70,11 +77,11 @@ const ViewHeader = () => {
           <Icon name="pen-to-square" />
         </EditButton>
         {showMetadataEdit && (
-          <ViewPropertiesModal show
-                               view={view}
-                               title={`Editing saved ${view.type.toLocaleLowerCase()}`}
-                               onClose={toggleMetadataEdit}
-                               onSave={onSaveView} />
+        <ViewPropertiesModal show
+                             view={view}
+                             title={`Editing saved ${view.type.toLocaleLowerCase()}`}
+                             onClose={toggleMetadataEdit}
+                             onSave={onSaveView} />
         )}
       </Content>
     </Row>
