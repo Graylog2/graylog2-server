@@ -19,6 +19,7 @@ import * as React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { NavDropdown as BootstrapNavDropdown } from 'react-bootstrap';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import menuItemStyles from './styles/menuItem';
 
@@ -46,10 +47,19 @@ const StyledNavDropdown = styled(BootstrapNavDropdown)`
   ${menuItemStyles}
 `;
 
-const NavDropdown = ({ inactiveTitle, ...props }) => {
-  const isActive = inactiveTitle ? inactiveTitle !== props.title : undefined;
+const NavDropdown = ({ inactiveTitle, title, ...props }) => {
+  const isActive = inactiveTitle ? inactiveTitle !== title : undefined;
 
-  return <StyledNavDropdown {...props} active={isActive} />;
+  return <StyledNavDropdown {...props} title={title} active={isActive} />;
+};
+
+NavDropdown.propTypes = {
+  inactiveTitle: PropTypes.string,
+  title: PropTypes.string.isRequired,
+};
+
+NavDropdown.defaultProps = {
+  inactiveTitle: undefined,
 };
 
 const ModifiedNavDropdown = styled(ModifiedBootstrapNavDropdown)`
