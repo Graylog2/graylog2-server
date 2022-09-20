@@ -26,6 +26,7 @@ import Spinner from 'components/common/Spinner';
 const StyledButtonToolbar = styled(ButtonToolbar)`
   display: flex;
   justify-content: flex-end;
+  align-items: end;
 `;
 
 type WithCancelProps = {
