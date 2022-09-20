@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.engine.validation;
 
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.errors.SearchError;
@@ -36,11 +37,20 @@ public class PluggableSearchValidation implements SearchValidation {
         this.pluggableSearchValidators = pluggableSearchValidators;
     }
 
-    public Set<SearchError> validate(Search search, StreamPermissions streamPermissions) {
+    @Override
+    public Set<SearchError> validate(final Search search, final StreamPermissions streamPermissions) {
         this.executionGuard.check(search, streamPermissions::canReadStream);
 
         return this.pluggableSearchValidators.stream()
-                .flatMap(validator -> validator.validate(search, streamPermissions).stream())
+                .flatMap(validator -> validator.validate(search).stream())
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<SearchError> validate(final Query query, final StreamPermissions streamPermissions) {
+        this.executionGuard.checkUserIsPermittedToSeeStreams(query.streamIdsForPermissionsCheck(), streamPermissions::canReadStream);
+        return this.pluggableSearchValidators.stream()
+                .flatMap(validator -> validator.validate(query).stream())
                 .collect(Collectors.toSet());
     }
 }

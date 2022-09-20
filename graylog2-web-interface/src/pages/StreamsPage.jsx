@@ -14,9 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import React, { useEffect } from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import CreateStreamButton from 'components/streams/CreateStreamButton';
@@ -27,70 +25,61 @@ import { DocumentTitle, IfPermitted, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 import StreamsStore from 'stores/streams/StreamsStore';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { useStore } from 'stores/connect';
 
-const StreamsPage = createReactClass({
-  displayName: 'StreamsPage',
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(IndexSetsStore)],
+const StreamsPage = () => {
+  const currentUser = useCurrentUser();
+  const { indexSets } = useStore(IndexSetsStore);
 
-  getInitialState() {
-    return {
-      indexSets: undefined,
-    };
-  },
-
-  componentDidMount() {
+  useEffect(() => {
     IndexSetsActions.list(false);
-  },
+  });
 
-  _isLoading() {
-    return !this.state.currentUser || !this.state.indexSets;
-  },
+  const isLoading = !currentUser || !indexSets;
 
-  _onSave(_, stream) {
+  const onSave = (_, stream) => {
     StreamsStore.save(stream, () => {
       UserNotification.success('Stream has been successfully created.', 'Success');
     });
-  },
+  };
 
-  render() {
-    if (this._isLoading()) {
-      return <Spinner />;
-    }
+  if (isLoading) {
+    return <Spinner />;
+  }
 
-    return (
-      <DocumentTitle title="Streams">
-        <div>
-          <PageHeader title="Streams">
-            <span>
-              You can route incoming messages into streams by applying rules against them. Messages matching
-              the rules of a stream are routed into it. A message can also be routed into multiple streams.
-            </span>
+  return (
+    <DocumentTitle title="Streams">
+      <div>
+        <PageHeader title="Streams">
+          <span>
+            You can route incoming messages into streams by applying rules against them. Messages matching
+            the rules of a stream are routed into it. A message can also be routed into multiple streams.
+          </span>
 
-            <span>
-              Read more about streams in the <DocumentationLink page={DocsHelper.PAGES.STREAMS} text="documentation" />.
-            </span>
+          <span>
+            Read more about streams in the <DocumentationLink page={DocsHelper.PAGES.STREAMS} text="documentation" />.
+          </span>
 
-            <IfPermitted permissions="streams:create">
-              <CreateStreamButton bsSize="large"
-                                  bsStyle="success"
-                                  onSave={this._onSave}
-                                  indexSets={this.state.indexSets} />
-            </IfPermitted>
-          </PageHeader>
+          <IfPermitted permissions="streams:create">
+            <CreateStreamButton bsSize="large"
+                                bsStyle="success"
+                                onSave={onSave}
+                                indexSets={indexSets} />
+          </IfPermitted>
+        </PageHeader>
 
-          <Row className="content">
-            <Col md={12}>
-              <StreamComponent currentUser={this.state.currentUser}
-                               onStreamSave={this._onSave}
-                               indexSets={this.state.indexSets} />
-            </Col>
-          </Row>
-        </div>
-      </DocumentTitle>
-    );
-  },
-});
+        <Row className="content">
+          <Col md={12}>
+            <StreamComponent currentUser={currentUser}
+                             onStreamSave={onSave}
+                             indexSets={indexSets} />
+          </Col>
+        </Row>
+      </div>
+    </DocumentTitle>
+  );
+};
 
 export default StreamsPage;

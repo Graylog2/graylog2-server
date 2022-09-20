@@ -31,7 +31,9 @@ public abstract class KeywordRange extends TimeRange {
 
     @JsonProperty
     @Override
-    public abstract String type();
+    public String type() {
+        return KEYWORD;
+    }
 
     @JsonProperty
     public abstract String keyword();
@@ -48,16 +50,12 @@ public abstract class KeywordRange extends TimeRange {
     }
 
     @JsonCreator
-    public static KeywordRange create(@JsonProperty("type") final String type, @JsonProperty("keyword") final String keyword, @JsonProperty("timezone") String timezone) throws InvalidRangeParametersException {
+    public static KeywordRange create(@JsonProperty("keyword") final String keyword, @JsonProperty("timezone") String timezone) throws InvalidRangeParametersException {
         // add default if there is no TZ in the db
         if (timezone == null) {
             timezone = "Etc/UTC";
         }
-        return builder().timezone(timezone).type(type).keyword(keyword).build();
-    }
-
-    public static KeywordRange create(String keyword, String timezone) throws InvalidRangeParametersException {
-        return create(KEYWORD, keyword, timezone);
+        return builder().timezone(timezone).keyword(keyword).build();
     }
 
     private static Builder builder() {
@@ -90,8 +88,6 @@ public abstract class KeywordRange extends TimeRange {
 
     @AutoValue.Builder
     public abstract static class Builder {
-        public abstract Builder type(String type);
-
         public abstract Builder keyword(String keyword);
 
         public abstract Builder timezone(String timezone);

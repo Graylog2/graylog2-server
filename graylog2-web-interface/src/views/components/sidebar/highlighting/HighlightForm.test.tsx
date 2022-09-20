@@ -62,7 +62,7 @@ describe('HighlightForm', () => {
   );
 
   const triggerSaveButtonClick = async () => {
-    const elem = await screen.findByText('Save');
+    const elem = await screen.findByText('Update rule');
     fireEvent.click(elem);
   };
 
@@ -79,9 +79,7 @@ describe('HighlightForm', () => {
   it('should render for new', async () => {
     const { findByText } = render(<HighlightFormWithContext onClose={() => {}} />);
 
-    const form = await findByText('New Highlighting Rule');
-
-    expect(form).toBeInTheDocument();
+    await findByText('Create Highlighting Rule');
   });
 
   it('should fire onClose on cancel', async () => {
@@ -109,7 +107,7 @@ describe('HighlightForm', () => {
 
     userEvent.click(screen.getByLabelText('Static Color'));
 
-    userEvent.click(screen.getByText('Save'));
+    await triggerSaveButtonClick();
 
     await waitFor(() => expect(HighlightingRulesActions.update)
       .toHaveBeenCalledWith(rule, expect.objectContaining({
@@ -126,7 +124,7 @@ describe('HighlightForm', () => {
     userEvent.clear(highestValue);
     userEvent.type(highestValue, '100');
 
-    userEvent.click(screen.getByText('Save'));
+    await triggerSaveButtonClick();
 
     await waitFor(() => expect(HighlightingRulesActions.update)
       .toHaveBeenCalledWith(rule, expect.objectContaining({

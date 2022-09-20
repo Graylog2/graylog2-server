@@ -1,11 +1,14 @@
-Upgrading to Graylog 4.4.x
+Upgrading to Graylog 5.0.x
 ==========================
 
 :::(Warning) Warning
-Please make sure to create a MongoDB database backup before starting the upgrade to Graylog 4.4!
+Please make sure to create a MongoDB database backup before starting the upgrade to Graylog 5.0!
 :::
 
 ## Breaking Changes
+
+* Graylog 5 is Java 17 only. We no longer support earlier versions starting with 5.0
+* Support for Elasticsearch 6.X has been removed! Please use either Elasticsearch 7.10.2 or, preferably, latest OpenSearch.
 
 ## Disallowing embedding the frontend by default
 
@@ -31,7 +34,7 @@ Existing setups keep the former default order for backwards compatibility.
 
 ## API Endpoint Deprecations
 
-The following API endpoints are deprecated beginning with 4.4.
+The following API endpoints are deprecated beginning with 5.0.
 
 | Endpoint                                    | Description                 |
 | ------------------------------------------- | --------------------------- |
@@ -39,7 +42,7 @@ The following API endpoints are deprecated beginning with 4.4.
 
 ## API Endpoint Removals
 
-The following API endpoints have been removed in 4.4.
+The following API endpoints have been removed in 5.0.
 
 | Endpoint                                    | Description                 |
 | ------------------------------------------- | --------------------------- |
@@ -54,7 +57,7 @@ The following API endpoints have been removed in 4.4.
 
 ## Java Code API Deprecations
 
-The following Java Code API deprecations have been made in 4.4.
+The following Java Code API deprecations have been made in 5.0.
 
 - The `org.graylog2.plugin.PluginModule.addNotificationType(name, notificationClass, handlerClass, factoryClass)`
   method has been deprecated in favor of a new/preferred version, which also properly registers the notification 
@@ -64,12 +67,18 @@ The following Java Code API deprecations have been made in 4.4.
 
 ## Java Code API Changes
 
-The following Java Code API changes have been made in 4.4.
+The following Java Code API changes have been made in 5.0.
 
 | File                                                                                                   | Description                                              |
 |--------------------------------------------------------------------------------------------------------|----------------------------------------------------------|
 | `PaginatedPipelineService.java` | Concrete implementation has been changed to an interface |
 | `PaginatedRuleService.java`     | Concrete implementation has been changed to an interface |
+
+## Configuration File Changes
+
+| Option                                        | Action       | Description                                                     |
+|-----------------------------------------------|--------------|-----------------------------------------------------------------|
+| `mongodb_threads_allowed_to_block_multiplier` | **removed**  | Configuring this is not supported by the official MongoDB driver anymore. |
 
 ## Behaviour Changes
 

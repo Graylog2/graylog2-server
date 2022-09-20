@@ -1,37 +1,37 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`parse parses an api properly 1`] = `
-Object {
+{
   "description": undefined,
-  "models": Object {
-    "AuthzRoleDTO": Object {
+  "models": {
+    "AuthzRoleDTO": {
       "additionalProperties": undefined,
       "id": "urn:jsonschema:org:graylog:security:authzroles:AuthzRoleDTO",
-      "properties": Object {
-        "description": Object {
+      "properties": {
+        "description": {
           "name": "string",
           "optional": false,
           "type": "type_reference",
         },
-        "id": Object {
+        "id": {
           "name": "string",
           "optional": false,
           "type": "type_reference",
         },
-        "name": Object {
+        "name": {
           "name": "string",
           "optional": false,
           "type": "type_reference",
         },
-        "permissions": Object {
-          "items": Object {
+        "permissions": {
+          "items": {
             "name": "string",
             "optional": false,
             "type": "type_reference",
           },
           "type": "array",
         },
-        "read_only": Object {
+        "read_only": {
           "name": "boolean",
           "optional": false,
           "type": "type_reference",
@@ -39,19 +39,19 @@ Object {
       },
       "type": "type_literal",
     },
-    "PaginatedResponse": Object {
-      "additionalProperties": Object {
+    "PaginatedResponse": {
+      "additionalProperties": {
         "name": "unknown",
         "optional": false,
         "type": "type_reference",
       },
       "id": undefined,
-      "properties": Object {},
+      "properties": {},
       "type": "type_literal",
     },
-    "stringArray": Object {
+    "stringArray": {
       "id": "stringArray",
-      "items": Object {
+      "items": {
         "name": "string",
         "optional": false,
         "type": "type_reference",
@@ -60,74 +60,74 @@ Object {
     },
   },
   "name": "sample",
-  "routes": Array [
-    Object {
-      "operations": Array [
-        Object {
+  "routes": [
+    {
+      "operations": [
+        {
           "method": "GET",
           "nickname": "getList",
-          "parameters": Array [
-            Object {
+          "parameters": [
+            {
               "defaultValue": "1",
               "description": "",
               "name": "page",
               "paramType": "query",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "number",
                 "optional": false,
                 "type": "type_reference",
               },
             },
-            Object {
+            {
               "defaultValue": "50",
               "description": "",
               "name": "per_page",
               "paramType": "query",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "number",
                 "optional": false,
                 "type": "type_reference",
               },
             },
-            Object {
+            {
               "description": "",
               "name": "query",
               "paramType": "query",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "string",
                 "optional": false,
                 "type": "type_reference",
               },
             },
-            Object {
+            {
               "defaultValue": "name",
               "description": "The field to sort the result on",
               "name": "sort",
               "paramType": "query",
               "required": true,
-              "type": Object {
+              "type": {
                 "defaultValue": "name",
                 "name": "string",
-                "options": Array [
+                "options": [
                   "name",
                   "description",
                 ],
                 "type": "enum",
               },
             },
-            Object {
+            {
               "defaultValue": "asc",
               "description": "The sort direction",
               "name": "order",
               "paramType": "query",
               "required": false,
-              "type": Object {
+              "type": {
                 "defaultValue": "asc",
                 "name": "string",
-                "options": Array [
+                "options": [
                   "asc",
                   " desc",
                 ],
@@ -136,11 +136,11 @@ Object {
             },
           ],
           "path": undefined,
-          "produces": Array [
+          "produces": [
             "application/json",
           ],
           "summary": "Get a paginated list of all roles",
-          "type": Object {
+          "type": {
             "name": "PaginatedResponse",
             "optional": false,
             "type": "type_reference",
@@ -149,84 +149,84 @@ Object {
       ],
       "path": "/authz/roles",
     },
-    Object {
-      "operations": Array [
-        Object {
+    {
+      "operations": [
+        {
           "method": "GET",
           "nickname": "getListForUser",
-          "parameters": Array [
-            Object {
+          "parameters": [
+            {
               "description": "",
               "name": "username",
               "paramType": "path",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "string",
                 "optional": false,
                 "type": "type_reference",
               },
             },
-            Object {
+            {
               "defaultValue": "1",
               "description": "",
               "name": "page",
               "paramType": "query",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "number",
                 "optional": false,
                 "type": "type_reference",
               },
             },
-            Object {
+            {
               "defaultValue": "50",
               "description": "",
               "name": "per_page",
               "paramType": "query",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "number",
                 "optional": false,
                 "type": "type_reference",
               },
             },
-            Object {
+            {
               "description": "",
               "name": "query",
               "paramType": "query",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "string",
                 "optional": false,
                 "type": "type_reference",
               },
             },
-            Object {
+            {
               "defaultValue": "name",
               "description": "The field to sort the result on",
               "name": "sort",
               "paramType": "query",
               "required": true,
-              "type": Object {
+              "type": {
                 "defaultValue": "name",
                 "name": "string",
-                "options": Array [
+                "options": [
                   "name",
                   "description",
                 ],
                 "type": "enum",
               },
             },
-            Object {
+            {
               "defaultValue": "asc",
               "description": "The sort direction",
               "name": "order",
               "paramType": "query",
               "required": false,
-              "type": Object {
+              "type": {
                 "defaultValue": "asc",
                 "name": "string",
-                "options": Array [
+                "options": [
                   "asc",
                   " desc",
                 ],
@@ -235,11 +235,11 @@ Object {
             },
           ],
           "path": undefined,
-          "produces": Array [
+          "produces": [
             "application/json",
           ],
           "summary": "Get a paginated list roles for a user",
-          "type": Object {
+          "type": {
             "name": "PaginatedResponse",
             "optional": false,
             "type": "type_reference",
@@ -248,18 +248,18 @@ Object {
       ],
       "path": "/authz/roles/user/{username}",
     },
-    Object {
-      "operations": Array [
-        Object {
+    {
+      "operations": [
+        {
           "method": "GET",
           "nickname": "get",
-          "parameters": Array [
-            Object {
+          "parameters": [
+            {
               "description": "",
               "name": "roleId",
               "paramType": "path",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "string",
                 "optional": false,
                 "type": "type_reference",
@@ -267,11 +267,11 @@ Object {
             },
           ],
           "path": undefined,
-          "produces": Array [
+          "produces": [
             "application/json",
           ],
           "summary": "Get a single role",
-          "type": Object {
+          "type": {
             "name": "AuthzRoleDTO",
             "optional": false,
             "type": "type_reference",
@@ -280,18 +280,18 @@ Object {
       ],
       "path": "/authz/roles/{roleId}",
     },
-    Object {
-      "operations": Array [
-        Object {
+    {
+      "operations": [
+        {
           "method": "DELETE",
           "nickname": "delete",
-          "parameters": Array [
-            Object {
+          "parameters": [
+            {
               "description": "",
               "name": "roleId",
               "paramType": "path",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "string",
                 "optional": false,
                 "type": "type_reference",
@@ -299,11 +299,11 @@ Object {
             },
           ],
           "path": undefined,
-          "produces": Array [
+          "produces": [
             "application/json",
           ],
           "summary": "Delete a role",
-          "type": Object {
+          "type": {
             "name": "void",
             "optional": false,
             "type": "type_reference",
@@ -312,29 +312,29 @@ Object {
       ],
       "path": "/authz/roles/{roleId}",
     },
-    Object {
-      "operations": Array [
-        Object {
+    {
+      "operations": [
+        {
           "method": "DELETE",
           "nickname": "removeUser",
-          "parameters": Array [
-            Object {
+          "parameters": [
+            {
               "description": "",
               "name": "roleId",
               "paramType": "path",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "string",
                 "optional": false,
                 "type": "type_reference",
               },
             },
-            Object {
+            {
               "description": "",
               "name": "username",
               "paramType": "path",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "string",
                 "optional": false,
                 "type": "type_reference",
@@ -342,11 +342,11 @@ Object {
             },
           ],
           "path": undefined,
-          "produces": Array [
+          "produces": [
             "application/json",
           ],
           "summary": "Remove user from role",
-          "type": Object {
+          "type": {
             "name": "void",
             "optional": false,
             "type": "type_reference",
@@ -355,68 +355,68 @@ Object {
       ],
       "path": "/authz/roles/{roleId}/assignee/{username}",
     },
-    Object {
-      "operations": Array [
-        Object {
+    {
+      "operations": [
+        {
           "method": "GET",
           "nickname": "getUsersForRole",
-          "parameters": Array [
-            Object {
+          "parameters": [
+            {
               "description": "",
               "name": "roleId",
               "paramType": "path",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "string",
                 "optional": false,
                 "type": "type_reference",
               },
             },
-            Object {
+            {
               "defaultValue": "1",
               "description": "",
               "name": "page",
               "paramType": "query",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "number",
                 "optional": false,
                 "type": "type_reference",
               },
             },
-            Object {
+            {
               "defaultValue": "50",
               "description": "",
               "name": "per_page",
               "paramType": "query",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "number",
                 "optional": false,
                 "type": "type_reference",
               },
             },
-            Object {
+            {
               "description": "",
               "name": "query",
               "paramType": "query",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "string",
                 "optional": false,
                 "type": "type_reference",
               },
             },
-            Object {
+            {
               "defaultValue": "name",
               "description": "The field to sort the result on",
               "name": "sort",
               "paramType": "query",
               "required": true,
-              "type": Object {
+              "type": {
                 "defaultValue": "name",
                 "name": "string",
-                "options": Array [
+                "options": [
                   "username",
                   "full_name",
                   "email",
@@ -425,16 +425,16 @@ Object {
                 "type": "enum",
               },
             },
-            Object {
+            {
               "defaultValue": "asc",
               "description": "The sort direction",
               "name": "order",
               "paramType": "query",
               "required": false,
-              "type": Object {
+              "type": {
                 "defaultValue": "asc",
                 "name": "string",
-                "options": Array [
+                "options": [
                   "asc",
                   " desc",
                 ],
@@ -443,11 +443,11 @@ Object {
             },
           ],
           "path": undefined,
-          "produces": Array [
+          "produces": [
             "application/json",
           ],
           "summary": "Get a paginated list of users for a role",
-          "type": Object {
+          "type": {
             "name": "PaginatedResponse",
             "optional": false,
             "type": "type_reference",
@@ -456,29 +456,29 @@ Object {
       ],
       "path": "/authz/roles/{roleId}/assignees",
     },
-    Object {
-      "operations": Array [
-        Object {
+    {
+      "operations": [
+        {
           "method": "PUT",
           "nickname": "addUser",
-          "parameters": Array [
-            Object {
+          "parameters": [
+            {
               "description": "",
               "name": "roleId",
               "paramType": "path",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "string",
                 "optional": false,
                 "type": "type_reference",
               },
             },
-            Object {
+            {
               "description": "",
               "name": "usernames",
               "paramType": "body",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "stringArray",
                 "optional": false,
                 "type": "type_reference",
@@ -486,11 +486,11 @@ Object {
             },
           ],
           "path": undefined,
-          "produces": Array [
+          "produces": [
             "application/json",
           ],
           "summary": "Add user to role",
-          "type": Object {
+          "type": {
             "name": "void",
             "optional": false,
             "type": "type_reference",
@@ -504,25 +504,25 @@ Object {
 `;
 
 exports[`parse parses operation with query parameter 1`] = `
-Object {
+{
   "description": undefined,
-  "models": Object {},
+  "models": {},
   "name": "grok",
-  "routes": Array [
-    Object {
-      "operations": Array [
-        Object {
+  "routes": [
+    {
+      "operations": [
+        {
           "method": "POST",
           "nickname": "bulkUpdatePatternsFromTextFile",
-          "parameters": Array [
-            Object {
+          "parameters": [
+            {
               "description": "Strategy to apply when importing.",
               "name": "import-strategy",
               "paramType": "query",
               "required": false,
-              "type": Object {
+              "type": {
                 "name": "string",
-                "options": Array [
+                "options": [
                   "ABORT_ON_CONFLICT",
                   "REPLACE_ON_CONFLICT",
                   "DROP_ALL_EXISTING",
@@ -532,11 +532,11 @@ Object {
             },
           ],
           "path": undefined,
-          "produces": Array [
+          "produces": [
             "application/json",
           ],
           "summary": "Add a list of new patterns",
-          "type": Object {
+          "type": {
             "name": "unknown",
             "optional": false,
             "type": "type_reference",

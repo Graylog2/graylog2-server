@@ -15,9 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
-import { marked } from 'marked';
-import DOMPurify from 'dompurify';
+import * as React from 'react';
 
 import { Col, Row, Well } from 'components/bootstrap';
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
@@ -26,10 +24,10 @@ import ContentPackEntitiesList from 'components/content-packs/ContentPackEntitie
 import ContentPackParameterList from 'components/content-packs/ContentPackParameterList';
 import 'components/content-packs/ContentPackDetails.css';
 import { hasAcceptedProtocol } from 'util/URLUtils';
+import Markdown from 'components/common/Markdown';
 
 const ContentPackDetails = (props) => {
   const { contentPack, offset, verbose, constraints, showConstraints } = props;
-  const markdownDescription = DOMPurify.sanitize(marked(contentPack.description || ''));
   let contentPackAnchor = contentPack.url;
 
   try {
@@ -64,8 +62,7 @@ const ContentPackDetails = (props) => {
             <h2>Description</h2>
             <br />
             <Well>
-              {/* eslint-disable-next-line react/no-danger */}
-              <div dangerouslySetInnerHTML={{ __html: markdownDescription }} />
+              <Markdown text={contentPack.description} />
             </Well>
           </div>
           )}

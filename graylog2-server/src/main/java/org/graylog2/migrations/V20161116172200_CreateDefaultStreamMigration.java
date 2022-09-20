@@ -70,8 +70,8 @@ public class V20161116172200_CreateDefaultStreamMigration extends Migration {
 
         final ObjectId id = new ObjectId(Stream.DEFAULT_STREAM_ID);
         final Map<String, Object> fields = ImmutableMap.<String, Object>builder()
-                .put(StreamImpl.FIELD_TITLE, "All messages")
-                .put(StreamImpl.FIELD_DESCRIPTION, "Stream containing all messages")
+                .put(StreamImpl.FIELD_TITLE, "Default Stream")
+                .put(StreamImpl.FIELD_DESCRIPTION, "Contains messages that are not explicitly routed to other streams")
                 .put(StreamImpl.FIELD_DISABLED, false)
                 .put(StreamImpl.FIELD_CREATED_AT, DateTime.now(DateTimeZone.UTC))
                 .put(StreamImpl.FIELD_CREATOR_USER_ID, "local:admin")

@@ -45,7 +45,9 @@ public abstract class OffsetRange extends TimeRange implements DerivableTimeRang
 
     @JsonProperty
     @Override
-    public abstract String type();
+    public String type() {
+        return OFFSET;
+    }
 
     @JsonProperty
     public abstract String source();
@@ -116,8 +118,6 @@ public abstract class OffsetRange extends TimeRange implements DerivableTimeRang
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty
-        public abstract Builder type(String type);
-        @JsonProperty
         public abstract Builder source(String source);
         @JsonProperty
         public abstract Builder id(@Nullable String id);
@@ -130,7 +130,6 @@ public abstract class OffsetRange extends TimeRange implements DerivableTimeRang
         @JsonCreator
         public static Builder builder() {
             return new AutoValue_OffsetRange.Builder()
-                    .type(OFFSET)
                     .offset("1i");
         }
         public abstract OffsetRange build();

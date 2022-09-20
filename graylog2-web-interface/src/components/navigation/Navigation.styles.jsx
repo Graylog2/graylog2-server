@@ -17,6 +17,7 @@
 import styled, { css } from 'styled-components';
 
 import { Navbar } from 'components/bootstrap';
+import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
 const StyledNavbar = styled(Navbar)(({ theme }) => css`
   .dev-badge-wrap > a {
@@ -26,6 +27,11 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
 
   .dev-badge-wrap .dev-badge {
     margin: 0 10px;
+  }
+
+  &.navbar-default .navbar-main > li > a {
+    font-family: ${theme.fonts.family.navigation};
+    font-size: ${theme.fonts.size.navigation};
   }
 
   @media (max-width: 991px) {
@@ -116,7 +122,11 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
 
       #scratchpad-toggle,
       .dropdown-toggle {
-        padding: 15px 12px !important;
+        padding: 12px !important;
+        min-height: ${NAV_ITEM_HEIGHT};
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
       }
     }
 

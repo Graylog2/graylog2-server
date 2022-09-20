@@ -45,7 +45,9 @@ public abstract class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest
 
     private Indices indices;
 
-    protected abstract IndicesAdapter indicesAdapter();
+    protected IndicesAdapter indicesAdapter() {
+        return searchServer().adapters().indicesAdapter();
+    }
 
     @Before
     public void setUp() throws Exception {

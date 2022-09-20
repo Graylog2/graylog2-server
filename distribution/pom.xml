@@ -75,12 +75,12 @@
     <dependencies>
         <dependency>
             <groupId>org.graylog</groupId>
-            <artifactId>graylog-storage-elasticsearch6</artifactId>
+            <artifactId>graylog-storage-elasticsearch7</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.graylog</groupId>
-            <artifactId>graylog-storage-elasticsearch7</artifactId>
+            <artifactId>graylog-storage-opensearch2</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

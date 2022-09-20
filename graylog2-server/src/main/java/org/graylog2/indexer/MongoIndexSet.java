@@ -65,12 +65,12 @@ public class MongoIndexSet implements IndexSet {
     // TODO: Hardcoded archive suffix. See: https://github.com/Graylog2/graylog2-server/issues/2058
     // TODO 3.0: Remove this in 3.0, only used for pre 2.2 backwards compatibility.
     public static final String RESTORED_ARCHIVE_SUFFIX = "_restored_archive";
-
     public interface Factory {
         MongoIndexSet create(IndexSetConfig config);
     }
 
     private final IndexSetConfig config;
+    private final String writeIndexAlias;
     private final Indices indices;
     private final Pattern indexPattern;
     private final Pattern deflectorIndexPattern;
@@ -93,6 +93,7 @@ public class MongoIndexSet implements IndexSet {
                          final ActivityWriter activityWriter
     ) {
         this.config = requireNonNull(config);
+        this.writeIndexAlias = config.indexPrefix() + SEPARATOR + DEFLECTOR_SUFFIX;
         this.indices = requireNonNull(indices);
         this.nodeId = requireNonNull(nodeId);
         this.indexRangeService = requireNonNull(indexRangeService);
@@ -131,7 +132,7 @@ public class MongoIndexSet implements IndexSet {
 
     @Override
     public String getWriteIndexAlias() {
-        return config.indexPrefix() + SEPARATOR + DEFLECTOR_SUFFIX;
+        return writeIndexAlias;
     }
 
     @Override
@@ -374,8 +375,12 @@ public class MongoIndexSet implements IndexSet {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MongoIndexSet that = (MongoIndexSet) o;
         return Objects.equals(config, that.config);
     }

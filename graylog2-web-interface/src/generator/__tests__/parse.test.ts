@@ -88,12 +88,12 @@ describe('parse', () => {
     const result = parseApi('sample', api);
 
     expect(result).toMatchInlineSnapshot(`
-Object {
+{
   "description": undefined,
-  "models": Object {
-    "InputStateSummaryArray": Object {
+  "models": {
+    "InputStateSummaryArray": {
       "id": "InputStateSummaryArray",
-      "items": Object {
+      "items": {
         "name": "InputStateSummary",
         "optional": false,
         "type": "type_reference",
@@ -102,7 +102,7 @@ Object {
     },
   },
   "name": "sample",
-  "routes": Array [],
+  "routes": [],
 }
 `);
   });
@@ -125,22 +125,22 @@ Object {
     const result = parseApi('sample', api);
 
     expect(result).toMatchInlineSnapshot(`
-Object {
+{
   "description": undefined,
-  "models": Object {
-    "AvailableOutputSummaryMapMap": Object {
-      "additionalProperties": Object {
+  "models": {
+    "AvailableOutputSummaryMapMap": {
+      "additionalProperties": {
         "name": "AvailableOutputSummaryMap",
         "optional": false,
         "type": "type_reference",
       },
       "id": "AvailableOutputSummaryMapMap",
-      "properties": Object {},
+      "properties": {},
       "type": "type_literal",
     },
   },
   "name": "sample",
-  "routes": Array [],
+  "routes": [],
 }
 `);
   });

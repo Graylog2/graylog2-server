@@ -70,9 +70,13 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
             .build();
     private TestIndexSet indexSet;
 
-    protected abstract IndicesAdapter createIndicesAdapter();
+    protected IndicesAdapter createIndicesAdapter() {
+        return searchServer().adapters().indicesAdapter();
+    }
 
-    protected abstract IndexFieldTypePollerAdapter createIndexFieldTypePollerAdapter();
+    protected IndexFieldTypePollerAdapter createIndexFieldTypePollerAdapter() {
+        return searchServer().adapters().indexFieldTypePollerAdapter();
+    }
 
     @Before
     public void setUp() throws Exception {
