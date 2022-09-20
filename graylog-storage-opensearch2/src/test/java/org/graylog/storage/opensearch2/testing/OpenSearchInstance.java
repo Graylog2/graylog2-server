@@ -24,6 +24,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.RestHighLevelClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
+import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
@@ -45,20 +46,21 @@ import static java.util.Objects.isNull;
 public class OpenSearchInstance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchInstance.class);
 
-    protected static final String OS_VERSION = "2.0.1";
     public static final String DEFAULT_HEAP_SIZE = "2g";
+    public static final SearchServer OPENSEARCH_VERSION = SearchServer.DEFAULT_OPENSEARCH_VERSION;
 
-    private final RestHighLevelClient restHighLevelClient;
     private final OpenSearchClient openSearchClient;
     private final Client client;
     private final FixtureImporter fixtureImporter;
+    private final Adapters adapters;
 
     protected OpenSearchInstance(String image, SearchVersion version, Network network, String heapSize) {
         super(image, version, network, heapSize);
-        this.restHighLevelClient = buildRestClient();
-        this.openSearchClient = new OpenSearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
+        RestHighLevelClient restHighLevelClient = buildRestClient();
+        this.openSearchClient = new OpenSearchClient(restHighLevelClient, false, new ObjectMapperProvider().get());
         this.client = new ClientOS2(this.openSearchClient);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
+        adapters = new AdaptersOS2(openSearchClient);
     }
     protected OpenSearchInstance(String image, SearchVersion version, Network network) {
         this(image, version, network, DEFAULT_HEAP_SIZE);
@@ -66,7 +68,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     @Override
     public SearchServer searchServer() {
-        return SearchServer.OS2;
+        return OPENSEARCH_VERSION;
     }
 
     private RestHighLevelClient buildRestClient() {
@@ -90,11 +92,11 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     }
 
     public static OpenSearchInstance create() {
-        return create(SearchVersion.opensearch(OS_VERSION), Network.newNetwork(), DEFAULT_HEAP_SIZE);
+        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), DEFAULT_HEAP_SIZE);
     }
 
     public static OpenSearchInstance create(String heapSize) {
-        return create(SearchVersion.opensearch(OS_VERSION), Network.newNetwork(), heapSize);
+        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), heapSize);
     }
 
     // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
@@ -128,10 +130,6 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         return this.openSearchClient;
     }
 
-    public RestHighLevelClient restHighLevelClient() {
-        return this.restHighLevelClient;
-    }
-
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
         return new OpenSearchContainer(DockerImageName.parse(image))
@@ -147,5 +145,10 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
                 .waitingFor(Wait.forHttp("/").forPort(ES_PORT));
+    }
+
+    @Override
+    public Adapters adapters() {
+        return this.adapters;
     }
 }
