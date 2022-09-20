@@ -218,7 +218,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         final Set<String> stateQueries = dto.state().keySet();
 
         if (!searchQueries.containsAll(stateQueries)) {
-            final Sets.SetView<String> diff = Sets.difference(searchQueries, stateQueries);
+            final Sets.SetView<String> diff = Sets.difference(stateQueries, searchQueries);
             throw new BadRequestException("Search queries do not correspond to view/state queries, missing query IDs: " + diff);
         }
 
@@ -234,7 +234,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                 .collect(Collectors.toSet());
 
         if(!searchTypes.containsAll(stateTypes)) {
-            final Sets.SetView<String> diff = Sets.difference(searchTypes, stateTypes);
+            final Sets.SetView<String> diff = Sets.difference(stateTypes, searchTypes);
             throw new BadRequestException("Search types do not correspond to view/search types, missing searches: " + diff);
         }
 
@@ -247,7 +247,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                 .flatMap(v -> v.widgetPositions().keySet().stream()).collect(Collectors.toSet());
 
         if (!widgetPositions.containsAll(widgetIds)) {
-            final Sets.SetView<String> diff = Sets.difference(widgetPositions, widgetIds);
+            final Sets.SetView<String> diff = Sets.difference(widgetIds, widgetPositions);
             throw new BadRequestException("Widget positions don't correspond to widgets, missing widget possitions: " + diff);
         }
 
