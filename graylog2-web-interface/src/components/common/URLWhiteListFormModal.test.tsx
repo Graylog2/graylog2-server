@@ -18,6 +18,7 @@
 import React from 'react';
 import { screen, render } from 'wrappedTestingLibrary';
 import Immutable from 'immutable';
+import { defaultUser } from 'defaultMockValues';
 
 import { adminUser } from 'fixtures/users';
 import MockAction from 'helpers/mocking/MockAction';
@@ -52,7 +53,7 @@ describe('<URLWhiteListFormModal>', () => {
   };
 
   beforeEach(() => {
-    asMock(useCurrentUser).mockReturnValue(adminUser);
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
   it('renders elements to add URL to allow list', async () => {

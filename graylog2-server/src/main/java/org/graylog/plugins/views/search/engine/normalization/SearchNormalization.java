@@ -16,11 +16,18 @@
  */
 package org.graylog.plugins.views.search.engine.normalization;
 
+import org.graylog.plugins.views.search.ParameterProvider;
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 
 public interface SearchNormalization {
     Search preValidation(Search search, SearchUser searchUser, ExecutionState executionState);
+
     Search postValidation(Search search, SearchUser searchUser, ExecutionState executionState);
+
+    Query preValidation(final Query query, final ParameterProvider parameterProvider, SearchUser searchUser, ExecutionState executionState);
+
+    Query postValidation(final Query query, final ParameterProvider parameterProvider);
 }

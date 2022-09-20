@@ -17,6 +17,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { defaultUser } from 'defaultMockValues';
 
 import { asMock } from 'helpers/mocking';
 import { adminUser } from 'fixtures/users';
@@ -71,7 +72,7 @@ describe('EventDefinitionEntry', () => {
   };
 
   beforeEach(() => {
-    asMock(useCurrentUser).mockReturnValue(adminUser);
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
   it('allows sharing for owners', async () => {

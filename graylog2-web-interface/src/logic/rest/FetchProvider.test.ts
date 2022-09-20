@@ -170,7 +170,7 @@ describe('FetchProvider', () => {
   it('extracts the error message from a failed request', async () => {
     await expect(fetch('POST', `${baseUrl}/errorWithMessage`))
       .rejects
-      .toThrowError('There was an error fetching a resource: Internal Server Error. Additional information: The dungeon collapses. You die!');
+      .toThrow('There was an error fetching a resource: Internal Server Error. Additional information: The dungeon collapses. You die!');
   });
 
   it('handles error properly when endpoint is not reachable', async () => {

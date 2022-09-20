@@ -77,7 +77,10 @@ describe('ExportModal', () => {
   // Prepare expected payload
 
   const triggerFormSubmit = () => {
-    const submitButton = screen.getByTestId('download-button');
+    const submitButton = screen.getByRole('button', {
+      name: /start download/i,
+      hidden: true,
+    });
 
     fireEvent.click(submitButton);
   };

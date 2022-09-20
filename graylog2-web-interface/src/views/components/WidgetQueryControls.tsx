@@ -20,7 +20,7 @@ import { Field } from 'formik';
 import moment from 'moment';
 import styled from 'styled-components';
 import { isEmpty } from 'lodash';
-import { useIsFetching } from 'react-query';
+import { useIsFetching } from '@tanstack/react-query';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import { StreamsStore } from 'views/stores/StreamsStore';
@@ -159,7 +159,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
   const widget = useContext(WidgetContext);
   const { userTimezone } = useUserDateTime();
   const config = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
-  const isValidatingQuery = !!useIsFetching('validateSearchQuery');
+  const isValidatingQuery = !!useIsFetching(['validateSearchQuery']);
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const limitDuration = moment.duration(config?.query_time_range_limit).asSeconds() ?? 0;
   const hasTimeRangeOverride = globalOverride?.timerange !== undefined;

@@ -19,13 +19,19 @@ import * as React from 'react';
 import { LinkContainer } from 'components/common/router';
 import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
 
-const CreatePipelineButton = () => (
-  <div className="pull-right">
-    <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE('new')}>
-      <Button bsStyle="success">Add new pipeline</Button>
-    </LinkContainer>
-  </div>
-);
+const CreatePipelineButton = () => {
+  const currentUser = useCurrentUser();
+
+  return (
+    <div className="pull-right">
+      <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE('new')}>
+        <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:create')} bsStyle="success">Add new pipeline</Button>
+      </LinkContainer>
+    </div>
+  );
+};
 
 export default CreatePipelineButton;

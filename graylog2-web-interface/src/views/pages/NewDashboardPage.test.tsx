@@ -70,7 +70,7 @@ describe('NewDashboardPage', () => {
   it('should create new view with type dashboard on mount', async () => {
     render(<SimpleNewDashboardPage />);
 
-    await waitFor(() => expect(ViewActions.create).toBeCalledTimes(1));
+    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Dashboard));
   });
 

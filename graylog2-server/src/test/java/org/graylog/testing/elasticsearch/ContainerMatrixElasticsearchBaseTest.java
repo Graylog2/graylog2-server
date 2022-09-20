@@ -35,7 +35,7 @@ public abstract class ContainerMatrixElasticsearchBaseTest {
         this.elasticsearch = elasticsearch;
     }
 
-    protected SearchServerInstance elasticsearch() {
+    protected SearchServerInstance searchServer() {
         return this.elasticsearch;
     }
 
@@ -52,7 +52,7 @@ public abstract class ContainerMatrixElasticsearchBaseTest {
     }
 
     private void addGraylogDefaultIndexTemplate() {
-        addIndexTemplates(getGraylogDefaultMessageTemplates(elasticsearch().version()));
+        addIndexTemplates(getGraylogDefaultMessageTemplates(searchServer().version()));
     }
 
     private static Map<String, Map<String, Object>> getGraylogDefaultMessageTemplates(SearchVersion version) {
@@ -66,7 +66,7 @@ public abstract class ContainerMatrixElasticsearchBaseTest {
         for (Map.Entry<String, Map<String, Object>> template : templates.entrySet()) {
             final String templateName = template.getKey();
 
-            elasticsearch().client().putTemplate(templateName, template.getValue());
+            searchServer().client().putTemplate(templateName, template.getValue());
         }
     }
 
@@ -76,7 +76,7 @@ public abstract class ContainerMatrixElasticsearchBaseTest {
      * @return the client
      */
     protected Client client() {
-        return elasticsearch().client();
+        return searchServer().client();
     }
 
     /**
@@ -88,10 +88,10 @@ public abstract class ContainerMatrixElasticsearchBaseTest {
      * @param resourcePath the fixture resource path
      */
     protected void importFixture(String resourcePath) {
-        elasticsearch().importFixtureResource(resourcePath, getClass());
+        searchServer().importFixtureResource(resourcePath, getClass());
     }
 
     protected SearchVersion elasticsearchVersion() {
-        return elasticsearch().version();
+        return searchServer().version();
     }
 }

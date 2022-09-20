@@ -16,8 +16,9 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import { defaultUser } from 'defaultMockValues';
 
-import { alice, adminUser } from 'fixtures/users';
+import { alice } from 'fixtures/users';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import { asMock } from 'helpers/mocking';
@@ -36,7 +37,7 @@ jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
 
 describe('Render DashboardListItem', () => {
   beforeEach(() => {
-    asMock(useCurrentUser).mockReturnValue(adminUser);
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
   const dashboard = View.builder()

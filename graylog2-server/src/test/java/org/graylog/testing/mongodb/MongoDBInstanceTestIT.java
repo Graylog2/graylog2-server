@@ -55,7 +55,7 @@ public class MongoDBInstanceTestIT {
 
         collection1.insertOne(document);
 
-        assertThat(collection1.count()).isEqualTo(1);
+        assertThat(collection1.countDocuments()).isEqualTo(1);
         assertThat(collection1.find(Filters.eq("hello", "world")).first()).isEqualTo(document);
         assertThat(collection1.find(Filters.eq("hello", "world2")).first()).isNull();
     }
@@ -63,14 +63,14 @@ public class MongoDBInstanceTestIT {
     @Test
     @MongoDBFixtures("MongoDBBaseTestIT.json")
     public void fixturesWork() {
-        assertThat(collection1.count()).isEqualTo(2);
+        assertThat(collection1.countDocuments()).isEqualTo(2);
         assertThat(collection1.find(Filters.eq("hello", "world")).first().get("_id"))
                 .isEqualTo(new ObjectId("54e3deadbeefdeadbeefaffe"));
         assertThat(collection1.find(Filters.eq("hello", "world2")).first()).isNull();
         assertThat(collection1.find(Filters.eq("another", "test")).first().get("_id"))
                 .isEqualTo(new ObjectId("54e3deadbeefdeadbeefafff"));
 
-        assertThat(collection2.count()).isEqualTo(1);
+        assertThat(collection2.countDocuments()).isEqualTo(1);
         assertThat(collection2.find(Filters.eq("field_a", "content1")).first().get("_id"))
                 .isEqualTo(new ObjectId("54e3deadbeefdeadbeefaffe"));
         assertThat(collection2.find(Filters.eq("field_a", "missing")).first()).isNull();
@@ -96,7 +96,7 @@ public class MongoDBInstanceTestIT {
     @Test
     @MongoDBFixtures("MongoDBBaseTestIT.json")
     public void globalFixturesWork() {
-        assertThat(collection1.count()).isEqualTo(2);
+        assertThat(collection1.countDocuments()).isEqualTo(2);
         assertThat(collection1.find(Filters.eq("hello", "world")).first().get("_id"))
                 .isEqualTo(new ObjectId("54e3deadbeefdeadbeefaffe"));
         assertThat(collection1.find(Filters.eq("hello", "world2")).first()).isNull();

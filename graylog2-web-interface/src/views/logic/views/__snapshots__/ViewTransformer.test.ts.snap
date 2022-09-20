@@ -1,19 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ViewTransformer transform with all attributes should transform a view with search from a json fixture 1`] = `
-Object {
-  "_value": Object {
+{
+  "_value": {
     "createdAt": 2019-10-14T07:58:06.562Z,
     "description": "",
     "id": Any<String>,
     "owner": "admin",
     "properties": Immutable.List [],
     "requires": undefined,
-    "search": Object {
+    "search": {
       "id": "5da42aa9c6eb193adff63b1b",
-      "parameters": Array [],
-      "queries": Array [
-        Object {
+      "parameters": [],
+      "queries": [
+        {
           "filter": Immutable.Map {
             "type": "or",
             "filters": Immutable.List [
@@ -27,51 +27,51 @@ Object {
           },
           "filters": undefined,
           "id": "d3cf19bd-f933-4f7b-aa4a-e7cd3fc1c18e",
-          "query": Object {
+          "query": {
             "query_string": "",
             "type": "elasticsearch",
           },
-          "search_types": Array [
-            Object {
+          "search_types": [
+            {
               "filter": null,
               "id": "77ce265c-83bf-4ae3-bd05-d882570ac014",
               "limit": 150,
               "offset": 0,
               "query": null,
-              "streams": Array [],
+              "streams": [],
               "timerange": null,
               "type": "messages",
             },
-            Object {
-              "column_groups": Array [],
+            {
+              "column_groups": [],
               "filter": null,
               "id": "d8691141-660e-442c-b77a-609e6649def0",
               "query": null,
               "rollup": true,
-              "row_groups": Array [
-                Object {
+              "row_groups": [
+                {
                   "field": "timestamp",
-                  "interval": Object {
+                  "interval": {
                     "scaling": 1,
                     "type": "auto",
                   },
                   "type": "time",
                 },
               ],
-              "series": Array [
-                Object {
+              "series": [
+                {
                   "field": null,
                   "id": "count()",
                   "type": "count",
                 },
               ],
-              "sort": Array [],
-              "streams": Array [],
+              "sort": [],
+              "streams": [],
               "timerange": null,
               "type": "pivot",
             },
           ],
-          "timerange": Object {
+          "timerange": {
             "range": 2592000,
             "type": "relative",
           },
@@ -79,18 +79,18 @@ Object {
       ],
     },
     "state": Immutable.Map {
-      "d3cf19bd-f933-4f7b-aa4a-e7cd3fc1c18e": Object {
-        "formatting": Object {
-          "highlighting": Array [],
+      "d3cf19bd-f933-4f7b-aa4a-e7cd3fc1c18e": {
+        "formatting": {
+          "highlighting": [],
         },
         "positions": Immutable.Map {
-          "527ed7fe-722d-4cf1-bd42-ed2b29a5a59a": Object {
+          "527ed7fe-722d-4cf1-bd42-ed2b29a5a59a": {
             "col": 1,
             "height": 2,
             "row": 1,
             "width": "Infinity",
           },
-          "8209351b-407a-455b-9942-cefea43b76ae": Object {
+          "8209351b-407a-455b-9942-cefea43b76ae": {
             "col": 1,
             "height": 6,
             "row": 3,
@@ -113,9 +113,9 @@ Object {
           ],
         },
         "widgets": Immutable.List [
-          Object {
-            "config": Object {
-              "fields": Array [
+          {
+            "config": {
+              "fields": [
                 "timestamp",
                 "source",
               ],
@@ -124,27 +124,27 @@ Object {
             "filter": undefined,
             "filters": Immutable.List [],
             "id": "8209351b-407a-455b-9942-cefea43b76ae",
-            "query": Object {
+            "query": {
               "query_string": "",
               "type": "elasticsearch",
             },
-            "streams": Array [
+            "streams": [
               "5cdab2293d27467fbe9e8a72",
             ],
-            "timerange": Object {
+            "timerange": {
               "range": 2592000,
               "type": "relative",
             },
             "type": "messages",
           },
-          Object {
-            "config": Object {
-              "column_pivots": Array [],
+          {
+            "config": {
+              "column_pivots": [],
               "rollup": true,
-              "row_pivots": Array [
-                Object {
-                  "config": Object {
-                    "interval": Object {
+              "row_pivots": [
+                {
+                  "config": {
+                    "interval": {
                       "scaling": null,
                       "type": "auto",
                     },
@@ -153,29 +153,29 @@ Object {
                   "type": "time",
                 },
               ],
-              "series": Array [
-                Object {
-                  "config": Object {
+              "series": [
+                {
+                  "config": {
                     "name": null,
                   },
                   "function": "count()",
                 },
               ],
-              "sort": Array [],
+              "sort": [],
               "visualization": "bar",
               "visualization_config": null,
             },
             "filter": undefined,
             "filters": Immutable.List [],
             "id": "527ed7fe-722d-4cf1-bd42-ed2b29a5a59a",
-            "query": Object {
+            "query": {
               "query_string": "",
               "type": "elasticsearch",
             },
-            "streams": Array [
+            "streams": [
               "5cdab2293d27467fbe9e8a72",
             ],
-            "timerange": Object {
+            "timerange": {
               "range": 2592000,
               "type": "relative",
             },

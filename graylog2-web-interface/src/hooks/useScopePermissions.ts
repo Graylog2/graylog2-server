@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -50,7 +50,7 @@ const useGetPermissionsByScope = (entity: Partial<GenericEntityType>) => {
     },
   );
 
-  const scope = entity._scope ? entity._scope.toUpperCase() : 'DEFAULT';
+  const scope = entity?._scope?.toUpperCase() || 'DEFAULT';
   const permissions: ScopeParams = isLoading ? { is_mutable: false } : data.entity_scopes[scope];
 
   return {

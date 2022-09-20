@@ -73,6 +73,8 @@ export const CurrentUserStore = singletonStore(
         .then((resp) => {
           this.currentUser = resp;
           this.trigger({ currentUser: this.currentUser });
+
+          return resp;
         });
     },
   }),

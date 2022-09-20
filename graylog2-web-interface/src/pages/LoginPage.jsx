@@ -18,7 +18,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled, { createGlobalStyle } from 'styled-components';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import { DocumentTitle, Icon } from 'components/common';
@@ -56,7 +56,7 @@ const useActiveBackend = (isCloud) => {
     return AuthenticationDomain.loadActiveBackendType();
   };
 
-  const { data, isSuccess } = useQuery('activeBackendType', cloudBackendLoader);
+  const { data, isSuccess } = useQuery(['activeBackendType'], cloudBackendLoader);
 
   return [data, isSuccess];
 };
