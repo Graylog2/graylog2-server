@@ -384,11 +384,6 @@ public class Configuration extends BaseConfiguration {
         return alertCheckInterval;
     }
 
-    @Deprecated
-    public boolean isEnableLegacyAlerts() {
-        return enableLegacyAlerts;
-    }
-
     public Duration getGcWarningThreshold() {
         return gcWarningThreshold;
     }
