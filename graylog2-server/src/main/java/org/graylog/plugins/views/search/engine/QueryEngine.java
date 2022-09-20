@@ -70,8 +70,8 @@ public class QueryEngine {
                 .orElse(parsedMetadata);
     }
 
-    public Set<String> getFieldsPresentInSearchResultDocuments(final Search normalizedSearch) {
-        return backend.getFieldsPresentInSearchResultDocuments(normalizedSearch);
+    public Set<String> getFieldsPresentInSearchResultDocuments(final Query normalizedQuery) {
+        return backend.getFieldsPresentInSearchResultDocuments(normalizedQuery);
     }
 
     public SearchJob execute(SearchJob searchJob, Set<SearchError> validationErrors) {

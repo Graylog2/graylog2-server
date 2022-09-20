@@ -16,6 +16,8 @@
  */
 package org.graylog2.indexer.fieldtypes;
 
+import org.graylog.plugins.views.search.ParameterProvider;
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.permissions.SearchUser;
@@ -44,6 +46,18 @@ public class DiscoveredFieldTypeServiceImpl implements DiscoveredFieldTypeServic
     @Override
     public Set<MappedFieldTypeDTO> fieldTypesBySearch(final Search search, final SearchUser searchUser) {
         final Set<String> discoveredFields = searchExecutor.getFieldsPresentInSearchResultDocuments(search, searchUser);
+        return fieldNamesToFieldTypeDTOs(discoveredFields);
+    }
+
+    @Override
+    public Set<MappedFieldTypeDTO> fieldTypesByQuery(final Query query,
+                                                     final ParameterProvider parameterProvider,
+                                                     final SearchUser searchUser) {
+        final Set<String> discoveredFields = searchExecutor.getFieldsPresentInSearchResultDocuments(query, parameterProvider, searchUser);
+        return fieldNamesToFieldTypeDTOs(discoveredFields);
+    }
+
+    private Set<MappedFieldTypeDTO> fieldNamesToFieldTypeDTOs(Set<String> discoveredFields) {
         if (discoveredFields != null && !discoveredFields.isEmpty()) {
             final Collection<IndexFieldTypesDTO> forFieldNames = indexFieldTypesService.findForFieldNames(discoveredFields);
             final Collection<IndexFieldTypesDTO> withOnlyDiscoveredFieldsRetained = forFieldNames.stream()
@@ -61,4 +75,5 @@ public class DiscoveredFieldTypeServiceImpl implements DiscoveredFieldTypeServic
         }
         return Set.of();
     }
+
 }

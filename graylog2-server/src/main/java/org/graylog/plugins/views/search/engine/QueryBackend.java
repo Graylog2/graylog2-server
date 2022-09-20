@@ -20,7 +20,6 @@ import com.google.common.base.Stopwatch;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
-import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
@@ -112,7 +111,7 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      */
     QueryResult doRun(SearchJob job, Query query, T queryContext);
 
-    Set<String> getFieldsPresentInSearchResultDocuments(final Search normalizedSearch);
+    Set<String> getFieldsPresentInSearchResultDocuments(final Query normalizedQuery);
 
     default boolean isSearchTypeWithError(T queryContext, String searchTypeId) {
         return queryContext.errors().stream()

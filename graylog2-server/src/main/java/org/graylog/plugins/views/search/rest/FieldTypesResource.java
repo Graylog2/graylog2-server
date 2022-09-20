@@ -104,4 +104,27 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
             return byStreams(fallbackRequest, searchUser);
         }
     }
+
+    @POST
+    @Path("/byQuery")
+    @ApiOperation(value = "Retrieve the field list for a given query")
+    @NoAuditEvent("This is not changing any data")
+    public Set<MappedFieldTypeDTO> byQuery(@ApiParam(name = "JSON body", required = true)
+                                           @Valid @NotNull final FieldTypesForQueryRequest request,
+                                           @Context SearchUser searchUser) {
+        try {
+
+            final Set<MappedFieldTypeDTO> mappedFieldTypeDTOS = discoveredFieldTypeService.fieldTypesByQuery(
+                    request.query().toQuery(),
+                    name -> request.parameters().stream().filter(p -> p.name().equals(name)).findFirst(),
+                    searchUser);
+            if (mappedFieldTypeDTOS != null && !mappedFieldTypeDTOS.isEmpty()) {
+                return mappedFieldTypeDTOS;
+            }
+
+            return byStreams(request.fallback(), searchUser);
+        } catch (Exception ex) {
+            return byStreams(request.fallback(), searchUser);
+        }
+    }
 }

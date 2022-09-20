@@ -22,7 +22,6 @@ import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
-import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
@@ -207,21 +206,20 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     }
 
     @Override
-    public Set<String> getFieldsPresentInSearchResultDocuments(final Search normalizedSearch) {
-        final Query mainQuery = normalizedSearch.queries().stream().findFirst().orElseThrow(() -> new IllegalArgumentException("No queries in search : " + normalizedSearch.id()));
-        final OSGeneratedQueryContext generatedQueryContext = generate(mainQuery, Set.of());
-        final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(mainQuery.usedStreamIds(), mainQuery.timerange());
+    public Set<String> getFieldsPresentInSearchResultDocuments(final Query normalizedQuery) {
+        final OSGeneratedQueryContext generatedQueryContext = generate(normalizedQuery, Set.of());
+        final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(normalizedQuery.usedStreamIds(), normalizedQuery.timerange());
         final SearchSourceBuilder searchSourceBuilder = generatedQueryContext.getSsb().shallowCopy();
         final QueryBuilder query = searchSourceBuilder.query();
 
         if (query instanceof BoolQueryBuilder boolQueryBuilder) {
-            boolQueryBuilder.must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, mainQuery.usedStreamIds()))
+            boolQueryBuilder.must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, normalizedQuery.usedStreamIds()))
                     .must(
                             Objects.requireNonNull(
                                     TimeRangeQueryFactory.create(
-                                            mainQuery.timerange()
+                                            normalizedQuery.timerange()
                                     ),
-                                    "Timerange for query " + mainQuery.id() + " cannot be found in query or search type."
+                                    "Timerange for query " + normalizedQuery.id() + " cannot be found in query or search type."
                             )
                     );
 
