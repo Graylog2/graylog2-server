@@ -55,7 +55,7 @@ const NavDropdown = ({ inactiveTitle, title, ...props }) => {
 
 NavDropdown.propTypes = {
   inactiveTitle: PropTypes.string,
-  title: PropTypes.string.isRequired,
+  title: PropTypes.node.isRequired,
 };
 
 NavDropdown.defaultProps = {
