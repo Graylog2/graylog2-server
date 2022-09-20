@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(JukitoRunner.class)
 @UseModules({ObjectMapperModule.class, ValidatorModule.class, TestPasswordSecretModule.class})
-public class SidecarServiceImplTest {
+public class SidecarServiceTest {
     private static final String collectionName = "sidecars";
 
     @Rule
