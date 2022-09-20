@@ -14,19 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+import * as React from 'react';
+// eslint-disable-next-line no-restricted-imports
+import { NavItem as BootstrapNavItem } from 'react-bootstrap';
 
-import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerIT;
-import org.junit.Rule;
+const NavItem = (props: React.ComponentProps<typeof NavItem>) => <BootstrapNavItem {...props} />;
 
-public class IndexFieldTypePollerOS2IT extends IndexFieldTypePollerIT {
-    @Rule
-    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
+NavItem.displayName = 'NavItem';
 
-    @Override
-    protected SearchServerInstance searchServer() {
-        return this.openSearchInstance;
-    }
-}
+/** @component */
+export default NavItem;

@@ -21,7 +21,6 @@ import { LinkContainer, Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import {
   Button,
-  ButtonToolbar,
   Col,
   DropdownButton,
   MenuItem,
@@ -30,6 +29,7 @@ import {
 } from 'components/bootstrap';
 import {
   Pagination, PageSizeSelect,
+  ModalSubmit,
 } from 'components/common';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
@@ -94,7 +94,7 @@ class ContentPacksList extends React.Component {
     const modal = (
       <BootstrapModalWrapper ref={(node) => { modalRef = node; }} bsSize="large">
         <Modal.Header closeButton>
-          <Modal.Title>Install</Modal.Title>
+          <Modal.Title>Install Content Pack</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <ContentPackInstall ref={(node) => { installRef = node; }}
@@ -102,12 +102,7 @@ class ContentPacksList extends React.Component {
                               onInstall={onInstallProp} />
         </Modal.Body>
         <Modal.Footer>
-          <div className="pull-right">
-            <ButtonToolbar>
-              <Button bsStyle="primary" onClick={onInstall}>Install</Button>
-              <Button onClick={closeModal}>Close</Button>
-            </ButtonToolbar>
-          </div>
+          <ModalSubmit submitButtonText="Install" onSubmit={onInstall} onCancel={closeModal} />
         </Modal.Footer>
       </BootstrapModalWrapper>
     );

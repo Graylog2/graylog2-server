@@ -31,21 +31,8 @@ public class IndicesGetAllMessageFieldsOS2IT extends IndicesGetAllMessageFieldsI
     @Rule
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
-    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-
     @Override
-    protected IndicesAdapter indicesAdapter() {
-        final OpenSearchClient client = openSearchInstance.openSearchClient();
-        return new IndicesAdapterOS2(
-                client,
-                new StatsApi(objectMapper, client),
-                new CatApi(objectMapper, client),
-                new ClusterStateApi(objectMapper, client)
-        );
-    }
-
-    @Override
-    protected SearchServerInstance elasticsearch() {
+    protected SearchServerInstance searchServer() {
         return openSearchInstance;
     }
 }
