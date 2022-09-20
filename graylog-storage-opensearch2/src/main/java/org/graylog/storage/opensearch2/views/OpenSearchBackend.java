@@ -106,31 +106,10 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
 
     @Override
     public OSGeneratedQueryContext generate(Query query, Set<SearchError> validationErrors) {
-        final BackendQuery backendQuery = query.query();
-
-        final Set<SearchType> searchTypes = query.searchTypes();
-
-        final QueryBuilder normalizedRootQuery = translateQueryString(backendQuery.queryString());
-
-        final BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
-                .filter(normalizedRootQuery);
-
-        usedSearchFiltersToQueryStringsMapper.map(query.filters())
-                .stream()
-                .map(this::translateQueryString)
-                .forEach(boolQuery::filter);
-
-        // add the optional root query filters
-        generateFilterClause(query.filter()).map(boolQuery::filter);
-
-        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-                .query(boolQuery)
-                .from(0)
-                .size(0)
-                .trackTotalHits(true);
+        final SearchSourceBuilder searchSourceBuilder = createSearchSourceBuilder(query);
 
         final OSGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, validationErrors);
-        searchTypes.stream()
+        query.searchTypes().stream()
                 .filter(searchType -> !isSearchTypeWithError(queryContext, searchType.id()))
                 .forEach(searchType -> {
                     final String type = searchType.type();
@@ -175,6 +154,27 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
         return queryContext;
     }
 
+    private SearchSourceBuilder createSearchSourceBuilder(final Query query) {
+        final BackendQuery backendQuery = query.query();
+        final QueryBuilder normalizedRootQuery = translateQueryString(backendQuery.queryString());
+        final BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+                .filter(normalizedRootQuery);
+
+        usedSearchFiltersToQueryStringsMapper.map(query.filters())
+                .stream()
+                .map(this::translateQueryString)
+                .forEach(boolQuery::filter);
+
+        // add the optional root query filters
+        generateFilterClause(query.filter()).map(boolQuery::filter);
+
+        return new SearchSourceBuilder()
+                .query(boolQuery)
+                .from(0)
+                .size(0)
+                .trackTotalHits(true);
+    }
+
     // TODO make pluggable
     public Optional<QueryBuilder> generateFilterClause(Filter filter) {
         if (filter == null) {
@@ -207,9 +207,8 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
 
     @Override
     public Set<String> getFieldsPresentInSearchResultDocuments(final Query normalizedQuery) {
-        final OSGeneratedQueryContext generatedQueryContext = generate(normalizedQuery, Set.of());
         final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(normalizedQuery.usedStreamIds(), normalizedQuery.timerange());
-        final SearchSourceBuilder searchSourceBuilder = generatedQueryContext.getSsb().shallowCopy();
+        final SearchSourceBuilder searchSourceBuilder = createSearchSourceBuilder(normalizedQuery);
         final QueryBuilder query = searchSourceBuilder.query();
 
         if (query instanceof BoolQueryBuilder boolQueryBuilder) {
