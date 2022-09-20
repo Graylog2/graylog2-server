@@ -134,7 +134,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
     <StyledNavbar fluid fixedTop>
       <Navbar.Header>
         <Navbar.Brand>
-          <LinkContainer to={Routes.STARTPAGE}>
+          <LinkContainer relativeActive to={Routes.STARTPAGE}>
             <NavigationBrand />
           </LinkContainer>
         </Navbar.Brand>
@@ -145,19 +145,19 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
       <Navbar.Collapse>
         <Nav navbar className="navbar-main">
-          <LinkContainer to={Routes.SEARCH}>
+          <LinkContainer relativeActive to={Routes.SEARCH}>
             <NavItem to="search">Search</NavItem>
           </LinkContainer>
 
-          <LinkContainer to={Routes.STREAMS}>
+          <LinkContainer relativeActive to={Routes.STREAMS}>
             <NavItem>Streams</NavItem>
           </LinkContainer>
 
-          <LinkContainer to={Routes.ALERTS.LIST}>
+          <LinkContainer relativeActive to={Routes.ALERTS.LIST}>
             <NavItem>Alerts</NavItem>
           </LinkContainer>
 
-          <LinkContainer to={Routes.DASHBOARDS}>
+          <LinkContainer relativeActive to={Routes.DASHBOARDS}>
             <NavItem>Dashboards</NavItem>
           </LinkContainer>
 
