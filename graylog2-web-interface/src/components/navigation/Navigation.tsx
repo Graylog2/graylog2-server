@@ -85,7 +85,7 @@ const formatPluginRoute = (pluginRoute: PluginNavigation, currentUserPermissions
     }
 
     return (
-      <NavDropdown key={title} title={title} id="enterprise-dropdown">
+      <NavDropdown key={title} title={title} id="enterprise-dropdown" inactiveTitle={pluginRoute.description}>
         {pluginRoute.children.map((child) => formatSinglePluginRoute(child, currentUserPermissions, false))}
       </NavDropdown>
     );

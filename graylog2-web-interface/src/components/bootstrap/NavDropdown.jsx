@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import * as React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { NavDropdown as BootstrapNavDropdown } from 'react-bootstrap';
 import styled from 'styled-components';
@@ -41,9 +42,15 @@ class ModifiedBootstrapNavDropdown extends BootstrapNavDropdown {
   }
 }
 
-const NavDropdown = styled(BootstrapNavDropdown)`
+const StyledNavDropdown = styled(BootstrapNavDropdown)`
   ${menuItemStyles}
 `;
+
+const NavDropdown = ({ inactiveTitle, ...props }) => {
+  const isActive = inactiveTitle ? inactiveTitle !== props.title : undefined;
+
+  return <StyledNavDropdown {...props} active={isActive} />;
+};
 
 const ModifiedNavDropdown = styled(ModifiedBootstrapNavDropdown)`
   ${menuItemStyles}
