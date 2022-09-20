@@ -30,6 +30,7 @@ import org.graylog.testing.inject.TestPasswordSecretModule;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.ValidatorModule;
 import org.jukito.JukitoRunner;
@@ -46,13 +47,14 @@ import javax.validation.Validator;
 import java.util.List;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(JukitoRunner.class)
 @UseModules({ObjectMapperModule.class, ValidatorModule.class, TestPasswordSecretModule.class})
@@ -288,6 +290,64 @@ public class SidecarServiceTest {
         assertThat(sidecar.assignments()).satisfies(assignments -> {
             assertThat(assignments.stream().filter(a -> a.assignedFromTags().equals(Set.of("tag1"))).findAny()).isPresent();
         });
+    }
+
+    @Test
+    @MongoDBFixtures("sidecars.json")
+    public void applyManualAssignment() throws NotFoundException {
+        Sidecar sidecar = sidecarService.findByNodeId("node-id");
+
+        final Configuration configuration = getConfiguration();
+        when(configurationService.find(anyString())).thenReturn(configuration);
+        final Collector collector = getCollector();
+        when(collectorService.find(anyString())).thenReturn(collector);
+
+        assertThat(sidecar.assignments()).isEmpty();
+        final ConfigurationAssignment manualAssignment = ConfigurationAssignment.create(collector.id(), configuration.id(), null);
+        sidecar = sidecarService.applyManualAssignments(sidecar.nodeId(), List.of(manualAssignment));
+
+        assertThat(sidecar.assignments()).hasSize(1);
+    }
+
+    @Test
+    @MongoDBFixtures("sidecars.json")
+    public void applyManualAssignmentKeepTagged() throws NotFoundException {
+        Sidecar sidecar = sidecarService.findByNodeId("node-id");
+        final ConfigurationAssignment taggedAssignment = ConfigurationAssignment.create("some-collector", "some-config", Set.of("tag"));
+        sidecar = sidecarService.save(sidecar.toBuilder().assignments(List.of(taggedAssignment)).build());
+
+        final Configuration configuration = getConfiguration();
+        when(configurationService.find(anyString())).thenReturn(configuration);
+        final Collector collector = getCollector();
+        when(collectorService.find(anyString())).thenReturn(collector);
+
+        assertThat(sidecar.assignments()).hasSize(1);
+        final ConfigurationAssignment manualAssignment = ConfigurationAssignment.create(collector.id(), configuration.id(), null);
+        sidecar = sidecarService.applyManualAssignments(sidecar.nodeId(), List.of(manualAssignment));
+
+        assertThat(sidecar.assignments()).hasSize(2);
+    }
+
+    @Test
+    @MongoDBFixtures("sidecars.json")
+    public void ignoreModificationOfTaggedAssignments() throws NotFoundException {
+        Sidecar sidecar = sidecarService.findByNodeId("node-id");
+
+        final Configuration configuration = getConfiguration();
+        when(configurationService.find(anyString())).thenReturn(configuration);
+        final Collector collector = getCollector();
+        when(collectorService.find(anyString())).thenReturn(collector);
+        final ConfigurationAssignment taggedAssignment = ConfigurationAssignment.create(collector.id(), configuration.id(), Set.of("tag"));
+        sidecar = sidecarService.save(sidecar.toBuilder().assignments(List.of(taggedAssignment)).build());
+
+
+        assertThat(sidecar.assignments()).hasSize(1);
+        final ConfigurationAssignment manualAssignment = ConfigurationAssignment.create(collector.id(), configuration.id(), null);
+        sidecar = sidecarService.applyManualAssignments(sidecar.nodeId(), List.of(manualAssignment));
+
+        assertThat(sidecar.assignments()).hasSize(1);
+        // Tagged assignment is kept intact
+        assertThat(sidecar.assignments().get(0).assignedFromTags()).isEqualTo(Set.of("tag"));
     }
 
     private static Configuration getConfiguration() {
