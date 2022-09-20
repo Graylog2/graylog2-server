@@ -182,6 +182,8 @@ class StreamRulesEditor extends React.Component {
                 <StreamRuleForm title="New Stream Rule"
                                 onClose={() => this.setState({ showStreamRuleForm: false })}
                                 streamRuleTypes={streamRuleTypes}
+                                submitButtonText="Create Rule"
+                                submitLoadingText="Creating Rule..."
                                 onSubmit={this._onStreamRuleFormSubmit} />
               )}
             </div>
