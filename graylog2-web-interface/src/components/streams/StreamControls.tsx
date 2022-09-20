@@ -111,11 +111,13 @@ const StreamControls = ({
       <StreamForm ref={streamForm}
                   title="Editing Stream"
                   onSubmit={onUpdate}
+                  submitButtonText="Update stream"
                   stream={stream}
                   indexSets={indexSets} />
       <StreamForm ref={cloneForm}
                   title="Cloning Stream"
                   onSubmit={_onCloneSubmit}
+                  submitButtonText="Clone stream"
                   indexSets={indexSets} />
     </>
   );
