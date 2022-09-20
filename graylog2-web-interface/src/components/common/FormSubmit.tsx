@@ -21,51 +21,63 @@ import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
 
+type WithCancelProps = {
+  displayCancel: true,
+  disableCancel?: boolean,
+  onCancel: () => void,
+}
+
+type WithoutCancelProps = {
+  displayCancel: false
+}
+
 type Props = {
   className?: string,
-  disableCancel?: boolean,
+  displayCancel?: boolean,
   disabledSubmit?: boolean,
   isSubmitting?: boolean,
   leftCol?: React.ReactNode,
-  onCancel: () => void,
   onSubmit?: () => void,
   submitButtonText: string,
   submitIcon?: IconName,
   submitButtonType?: 'submit' | 'button',
   submitLoadingText?: string,
-}
+} & (WithCancelProps | WithoutCancelProps)
 
-const FormSubmit = ({
-  className,
-  disableCancel,
-  disabledSubmit,
-  isSubmitting,
-  leftCol,
-  onCancel,
-  onSubmit,
-  submitButtonText,
-  submitButtonType,
-  submitIcon,
-  submitLoadingText,
-}: Props) => (
-  <ButtonToolbar className={`${className} pull-right`}>
-    {leftCol}
-    <Button type="button" onClick={onCancel} disabled={disableCancel}>Cancel</Button>
-    <Button bsStyle="success"
-            disabled={disabledSubmit}
-            title={submitButtonText}
-            type={submitButtonType}
-            onClick={onSubmit}>
-      {(submitIcon && !isSubmitting) && <><Icon name={submitIcon} /> </>}
-      {isSubmitting ? <Spinner text={submitLoadingText} delay={0} /> : submitButtonText}
-    </Button>
-  </ButtonToolbar>
-);
+const FormSubmit = (props: Props) => {
+  const {
+    className,
+    displayCancel,
+    disabledSubmit,
+    isSubmitting,
+    leftCol,
+    onSubmit,
+    submitButtonText,
+    submitButtonType,
+    submitIcon,
+    submitLoadingText,
+  } = props;
+
+  return (
+    <ButtonToolbar className={`${className} pull-right`}>
+      {leftCol}
+      {displayCancel === true && <Button type="button" onClick={props.onCancel} disabled={props.disableCancel}>Cancel</Button>}
+      <Button bsStyle="success"
+              disabled={disabledSubmit}
+              title={submitButtonText}
+              type={submitButtonType}
+              onClick={onSubmit}>
+        {(submitIcon && !isSubmitting) && <><Icon name={submitIcon} /> </>}
+        {isSubmitting ? <Spinner text={submitLoadingText} delay={0} /> : submitButtonText}
+      </Button>
+    </ButtonToolbar>
+  );
+};
 
 FormSubmit.defaultProps = {
   className: undefined,
-  disableCancel: false,
   disabledSubmit: false,
+  displayCancel: true,
   isSubmitting: false,
   leftCol: undefined,
   onSubmit: undefined,
