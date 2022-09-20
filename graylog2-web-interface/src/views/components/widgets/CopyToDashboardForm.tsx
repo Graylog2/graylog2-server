@@ -16,10 +16,10 @@
  */
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { Modal, Button, ListGroup, ListGroupItem } from 'components/bootstrap';
+import { Modal, ListGroup, ListGroupItem } from 'components/bootstrap';
 import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
 import connect from 'stores/connect';
-import { PaginatedList, SearchForm } from 'components/common';
+import { PaginatedList, SearchForm, ModalSubmit } from 'components/common';
 import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
 
 type Props = {
@@ -87,12 +87,11 @@ const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list = [], pagi
         </PaginatedList>
       </Modal.Body>
       <Modal.Footer>
-        <Button bsStyle="primary"
-                disabled={selectedDashboard === null}
-                onClick={() => onSubmit(widgetId, selectedDashboard)}>
-          Select
-        </Button>
-        <Button onClick={onCancel}>Cancel</Button>
+        <ModalSubmit submitButtonText="Copy widget"
+                     disabledSubmit={selectedDashboard === null}
+                     submitButtonType="button"
+                     onSubmit={() => onSubmit(widgetId, selectedDashboard)}
+                     onCancel={onCancel} />
       </Modal.Footer>
     </Modal>
   );
