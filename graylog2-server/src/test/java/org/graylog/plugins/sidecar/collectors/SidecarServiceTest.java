@@ -18,8 +18,11 @@ package org.graylog.plugins.sidecar.collectors;
 
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.graylog.plugins.sidecar.rest.models.Collector;
+import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.NodeDetails;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
+import org.graylog.plugins.sidecar.rest.requests.ConfigurationAssignment;
 import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.SidecarService;
@@ -41,12 +44,15 @@ import org.mockito.junit.MockitoRule;
 
 import javax.validation.Validator;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(JukitoRunner.class)
 @UseModules({ObjectMapperModule.class, ValidatorModule.class, TestPasswordSecretModule.class})
@@ -165,5 +171,151 @@ public class SidecarServiceTest {
         final int result = this.sidecarService.delete(sidecar.id());
         assertEquals(1, result);
         assertEquals(2, mongodb.mongoConnection().getMongoDatabase().getCollection(collectionName).countDocuments());
+    }
+
+    @Test
+    public void simpleTagAssignment() {
+        final Configuration configuration = getConfiguration();
+        when(configurationService.findByTags(anySet())).thenReturn(List.of(configuration));
+        final Collector collector = getCollector();
+
+        when(collectorService.all()).thenReturn(List.of(collector));
+        Sidecar sidecar = getTestSidecar();
+        sidecar = sidecar.toBuilder().nodeDetails(getNodeDetails("linux", Set.of("tag1"))).build();
+
+        sidecar = sidecarService.updateTaggedConfigurationAssignments(sidecar);
+
+        assertThat(sidecar.assignments()).hasSize(1);
+        assertThat(sidecar.assignments().get(0).assignedFromTags()).isEqualTo(Set.of("tag1"));
+    }
+
+    @Test
+    public void mergeWithManualAssignments() {
+        final Configuration configuration = getConfiguration();
+        when(configurationService.findByTags(anySet())).thenReturn(List.of(configuration));
+        final Collector collector = getCollector();
+
+        when(collectorService.all()).thenReturn(List.of(collector));
+        Sidecar sidecar = getTestSidecar();
+        sidecar = sidecar.toBuilder().nodeDetails(getNodeDetails("linux", Set.of("tag1")))
+                .assignments(List.of(ConfigurationAssignment.create("some collector", "some config", null)))
+                .build();
+
+        sidecar = sidecarService.updateTaggedConfigurationAssignments(sidecar);
+
+        assertThat(sidecar.assignments()).hasSize(2);
+        assertThat(sidecar.assignments()).satisfies(assignments -> {
+            assertThat(assignments.stream().filter(a -> a.assignedFromTags().equals(Set.of())).findAny()).isPresent();
+            assertThat(assignments.stream().filter(a -> a.assignedFromTags().equals(Set.of("tag1"))).findAny()).isPresent();
+        });
+    }
+
+    @Test
+    public void updateExistingAssignment() {
+        final Configuration configuration = getConfiguration();
+        when(configurationService.findByTags(anySet())).thenReturn(List.of(configuration));
+        final Collector collector = getCollector();
+
+        when(collectorService.all()).thenReturn(List.of(collector));
+        Sidecar sidecar = getTestSidecar();
+        final ConfigurationAssignment existingAssignment = ConfigurationAssignment.create(collector.id(), configuration.id(), Set.of("tag1"));
+        sidecar = sidecar.toBuilder().nodeDetails(getNodeDetails("linux", Set.of("tag1")))
+                .assignments(List.of(existingAssignment))
+                .build();
+
+        sidecar = sidecarService.updateTaggedConfigurationAssignments(sidecar);
+
+        assertThat(sidecar.assignments()).hasSize(1);
+        assertThat(sidecar.assignments()).first().isEqualTo(existingAssignment);
+    }
+
+    @Test
+    public void updateExistingAssignments() {
+        final Configuration configuration = getConfiguration();
+        when(configurationService.findByTags(anySet())).thenReturn(List.of(configuration));
+        final Collector collector = getCollector();
+
+        when(collectorService.all()).thenReturn(List.of(collector));
+        Sidecar sidecar = getTestSidecar();
+        final ConfigurationAssignment existingTag3Assignment = ConfigurationAssignment.create(collector.id(), configuration.id(), Set.of("tag3"));
+        final ConfigurationAssignment existingManualAssignment = ConfigurationAssignment.create("some-collector", "some-config", null);
+        sidecar = sidecar.toBuilder().nodeDetails(getNodeDetails("linux", Set.of("tag1")))
+                .assignments(List.of(existingTag3Assignment, existingManualAssignment))
+                .build();
+
+        sidecar = sidecarService.updateTaggedConfigurationAssignments(sidecar);
+
+        assertThat(sidecar.assignments()).hasSize(2);
+        assertThat(sidecar.assignments()).satisfies(assignments -> {
+            assertThat(assignments.stream().filter(a -> a.assignedFromTags().equals(Set.of())).findAny()).isPresent();
+            assertThat(assignments.stream().filter(a -> a.assignedFromTags().equals(Set.of("tag3"))).findAny()).isEmpty();
+            assertThat(assignments.stream().filter(a -> a.assignedFromTags().equals(Set.of("tag1"))).findAny()).isPresent();
+        });
+    }
+
+    @Test
+    public void ignoresTagsWithWrongOS() {
+        final Configuration configuration = getConfiguration();
+        when(configurationService.findByTags(anySet())).thenReturn(List.of(configuration));
+        final Collector collector = getCollector();
+
+        when(collectorService.all()).thenReturn(List.of(collector));
+        Sidecar sidecar = getTestSidecar();
+        sidecar = sidecar.toBuilder().nodeDetails(getNodeDetails("windows", Set.of("tag1"))).build();
+
+        sidecar = sidecarService.updateTaggedConfigurationAssignments(sidecar);
+
+        // The tagged config is linux only
+        assertThat(sidecar.assignments()).hasSize(0);
+    }
+
+    @Test
+    public void replacesManualAssignmentsWithTaggedOnes() {
+        final Configuration configuration = getConfiguration();
+        when(configurationService.findByTags(anySet())).thenReturn(List.of(configuration));
+        final Collector collector = getCollector();
+
+        when(collectorService.all()).thenReturn(List.of(collector));
+        Sidecar sidecar = getTestSidecar();
+        final ConfigurationAssignment manualAssignment = ConfigurationAssignment.create(collector.id(), configuration.id(), null);
+        sidecar = sidecar.toBuilder().nodeDetails(getNodeDetails("linux", Set.of("tag1")))
+                .assignments(List.of(manualAssignment))
+                .build();
+
+        sidecar = sidecarService.updateTaggedConfigurationAssignments(sidecar);
+
+        assertThat(sidecar.assignments()).hasSize(1);
+        assertThat(sidecar.assignments()).satisfies(assignments -> {
+            assertThat(assignments.stream().filter(a -> a.assignedFromTags().equals(Set.of("tag1"))).findAny()).isPresent();
+        });
+    }
+
+    private static Configuration getConfiguration() {
+        return Configuration.create("config-id", "collector-id", "config-name", "color", "template", Set.of("tag1"));
+    }
+
+    private static Collector getCollector() {
+        return Collector.create("collector-id", "collector-name", "service", "linux",
+                "/path", "param", "valid param", "");
+    }
+
+    private Sidecar getTestSidecar() {
+        return Sidecar.create(
+                "node-id",
+                "node-name",
+                getNodeDetails("linux", null),
+                "1.3.0"
+        );
+    }
+
+    private NodeDetails getNodeDetails(String os, Set<String> tags) {
+        return NodeDetails.create(
+                os,
+                null,
+                null,
+                null,
+                null,
+                tags,
+                null);
     }
 }
