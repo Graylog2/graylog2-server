@@ -15,34 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import PropTypes from 'prop-types';
 
 import FormSubmit from 'components/common/FormSubmit';
 
 type Props = React.ComponentProps<typeof FormSubmit>
 
 /* eslint-disable react/prop-types */
-const ModalSubmit = ({
-  className,
-  disabledSubmit,
-  disableCancel,
-  isSubmitting,
-  leftCol,
-  onCancel,
-  onSubmit,
-  submitLoadingText,
-  submitIcon,
-  submitButtonText,
-}: Props) => (
-  <FormSubmit disableCancel={disableCancel}
-              disabledSubmit={disabledSubmit}
-              isSubmitting={isSubmitting}
-              leftCol={leftCol}
-              onCancel={onCancel}
-              onSubmit={onSubmit}
-              submitButtonText={submitButtonText}
-              submitIcon={submitIcon}
-              submitLoadingText={submitLoadingText}
-              className={className} />
-);
+const ModalSubmit = (props: Props) => <FormSubmit {...props} />;
+
+ModalSubmit.defaultProps = {
+  displayCancel: true,
+};
+
+ModalSubmit.propTypes = {
+  displayCancel: PropTypes.bool,
+};
 
 export default ModalSubmit;

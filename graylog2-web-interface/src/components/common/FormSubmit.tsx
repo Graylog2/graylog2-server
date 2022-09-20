@@ -15,11 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
-import { Button, ButtonToolbar } from 'components/bootstrap';
+import Button from 'components/bootstrap/Button';
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
+
+const StyledButtonToolbar = styled(ButtonToolbar)`
+  display: flex;
+  justify-content: flex-end;
+`;
 
 type WithCancelProps = {
   displayCancel: true,
@@ -32,6 +39,7 @@ type WithoutCancelProps = {
 }
 
 type Props = {
+  bsSize?: 'large' | 'small' | 'xsmall',
   className?: string,
   displayCancel?: boolean,
   disabledSubmit?: boolean,
@@ -46,6 +54,7 @@ type Props = {
 
 const FormSubmit = (props: Props) => {
   const {
+    bsSize,
     className,
     displayCancel,
     disabledSubmit,
@@ -59,10 +68,17 @@ const FormSubmit = (props: Props) => {
   } = props;
 
   return (
-    <ButtonToolbar className={`${className} pull-right`}>
+    <StyledButtonToolbar className={className}>
       {leftCol}
-      {displayCancel === true && <Button type="button" onClick={props.onCancel} disabled={props.disableCancel}>Cancel</Button>}
+      {displayCancel === true && (
+        <Button type="button"
+                bsSize={bsSize}
+                onClick={props.onCancel}
+                disabled={props.disableCancel}>Cancel
+        </Button>
+      )}
       <Button bsStyle="success"
+              bsSize={bsSize}
               disabled={disabledSubmit}
               title={submitButtonText}
               type={submitButtonType}
@@ -70,11 +86,12 @@ const FormSubmit = (props: Props) => {
         {(submitIcon && !isSubmitting) && <><Icon name={submitIcon} /> </>}
         {isSubmitting ? <Spinner text={submitLoadingText} delay={0} /> : submitButtonText}
       </Button>
-    </ButtonToolbar>
+    </StyledButtonToolbar>
   );
 };
 
 FormSubmit.defaultProps = {
+  bsSize: undefined,
   className: undefined,
   disabledSubmit: false,
   displayCancel: true,
