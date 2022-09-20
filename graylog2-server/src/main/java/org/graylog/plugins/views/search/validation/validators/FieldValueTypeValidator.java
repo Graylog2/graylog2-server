@@ -93,6 +93,7 @@ public class FieldValueTypeValidator implements QueryValidator {
         final Map<String, MappedFieldTypeDTO> fields = availableFields.stream().collect(Collectors.toMap(MappedFieldTypeDTO::name, Function.identity()));
 
         return parsedQuery.terms().stream()
+                .filter(term -> !term.isExistsField())
                 .map(term -> {
                     final MappedFieldTypeDTO fieldType = fields.get(term.getRealFieldName());
                     final Optional<String> typeName = Optional.ofNullable(fieldType)
