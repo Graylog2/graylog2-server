@@ -132,8 +132,8 @@ public class EtagService extends AbstractIdleService {
         configurationCache.put(etag, Boolean.TRUE);
     }
 
-    public void addSidecarRegistration(String sidecarId, String etag) {
-        registrationCache.put(sidecarId, etag);
+    public void addSidecarRegistration(String sidecarNodeId, String etag) {
+        registrationCache.put(sidecarNodeId, etag);
     }
 
 
@@ -152,9 +152,9 @@ public class EtagService extends AbstractIdleService {
         clusterEventBus.post(EtagCacheInvalidation.create(CacheContext.REGISTRATION, ""));
     }
 
-    public void invalidateRegistration(String sidecarId) {
-        registrationCache.invalidate(sidecarId);
-        clusterEventBus.post(EtagCacheInvalidation.create(CacheContext.REGISTRATION, sidecarId));
+    public void invalidateRegistration(String sidecarNodeId) {
+        registrationCache.invalidate(sidecarNodeId);
+        clusterEventBus.post(EtagCacheInvalidation.create(CacheContext.REGISTRATION, sidecarNodeId));
     }
 
     public EntityTag buildEntityTagForResponse(Object o) throws JsonProcessingException {
