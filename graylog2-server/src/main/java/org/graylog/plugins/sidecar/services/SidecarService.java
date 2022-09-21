@@ -101,10 +101,13 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
         final Set<String> sidecarTags = sidecar.nodeDetails().tags();
 
         // find all configurations that match the tags
-        // TODO only find configs that match the right collector os
         final List<Configuration> taggedConfigs = configurationService.findByTags(sidecarTags);
+        final Set<String> matchingOsCollectorIds = collectorService.all().stream()
+                .filter(c -> c.nodeOperatingSystem().equalsIgnoreCase(sidecar.nodeDetails().operatingSystem()))
+                .map(Collector::id).collect(Collectors.toSet());
 
-        final List<ConfigurationAssignment> tagAssigned = taggedConfigs.stream().map(c -> {
+        final List<ConfigurationAssignment> tagAssigned = taggedConfigs.stream()
+                .filter(c -> matchingOsCollectorIds.contains(c.collectorId())).map(c -> {
             // fill in ConfigurationAssignment.assignedFromTags()
             // If we only support one tag on a configuration, this can be simplified
             final Set<String> matchedTags = c.tags().stream().filter(sidecarTags::contains).collect(Collectors.toSet());
@@ -233,10 +236,10 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                 collectorVersion);
     }
 
-    public Sidecar applyManualAssignments(String collectorNodeId, List<ConfigurationAssignment> assignments) throws NotFoundException{
-        Sidecar sidecar = findByNodeId(collectorNodeId);
+    public Sidecar applyManualAssignments(String sidecarNodeId, List<ConfigurationAssignment> assignments) throws NotFoundException{
+        Sidecar sidecar = findByNodeId(sidecarNodeId);
         if (sidecar == null) {
-            throw new NotFoundException("Couldn't find collector with ID " + collectorNodeId);
+            throw new NotFoundException("Couldn't find sidecar with nodeId " + sidecarNodeId);
         }
         for (ConfigurationAssignment assignment : assignments) {
             Collector collector = collectorService.find(assignment.collectorId());

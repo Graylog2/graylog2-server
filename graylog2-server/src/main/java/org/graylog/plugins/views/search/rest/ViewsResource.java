@@ -211,45 +211,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         final Search search = searchDomain.getForUser(dto.searchId(), searchUser)
                 .orElseThrow(() -> new BadRequestException("Search " + dto.searchId() + " not available"));
 
-        final Set<String> searchQueries = search.queries().stream()
-                .map(Query::id)
-                .collect(Collectors.toSet());
-
-        final Set<String> stateQueries = dto.state().keySet();
-
-        if (!searchQueries.containsAll(stateQueries)) {
-            final Sets.SetView<String> diff = Sets.difference(searchQueries, stateQueries);
-            throw new BadRequestException("Search queries do not correspond to view/state queries, missing query IDs: " + diff);
-        }
-
-        final Set<String> searchTypes = search.queries().stream()
-                .flatMap(q -> q.searchTypes().stream())
-                .map(SearchType::id)
-                .collect(Collectors.toSet());
-
-
-        final Set<String> stateTypes = dto.state().values().stream()
-                .flatMap(v -> v.widgetMapping().values().stream())
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
-
-        if(!searchTypes.containsAll(stateTypes)) {
-            final Sets.SetView<String> diff = Sets.difference(searchTypes, stateTypes);
-            throw new BadRequestException("Search types do not correspond to view/search types, missing searches: " + diff);
-        }
-
-        final Set<String> widgetIds = dto.state().values().stream()
-                .flatMap(v -> v.widgets().stream())
-                .map(WidgetDTO::id)
-                .collect(Collectors.toSet());
-
-        final Set<String> widgetPositions = dto.state().values().stream()
-                .flatMap(v -> v.widgetPositions().keySet().stream()).collect(Collectors.toSet());
-
-        if (!widgetPositions.containsAll(widgetIds)) {
-            final Sets.SetView<String> diff = Sets.difference(widgetPositions, widgetIds);
-            throw new BadRequestException("Widget positions don't correspond to widgets, missing widget possitions: " + diff);
-        }
+        validateSearchProperties(dto, search);
 
 
         if (!newCreation) {
@@ -279,6 +241,58 @@ public class ViewsResource extends RestResource implements PluginRestResource {
             }
         }
 
+    }
+
+    protected void validateSearchProperties(ViewDTO dto, Search search) {
+        final Set<String> searchQueries = search.queries().stream()
+                .map(Query::id)
+                .collect(Collectors.toSet());
+
+        final Set<String> stateQueries = dto.state().keySet();
+
+        if (!searchQueries.containsAll(stateQueries)) {
+            final Sets.SetView<String> diff = Sets.difference(stateQueries, searchQueries);
+            final String message = String.format(Locale.ROOT,
+                    "Search queries do not correspond to view/state queries, missing query IDs: %s; search queries: %s; state queries: %s",
+                    diff, searchQueries, stateQueries);
+            throw new BadRequestException(message);
+        }
+
+        final Set<String> searchTypes = search.queries().stream()
+                .flatMap(q -> q.searchTypes().stream())
+                .map(SearchType::id)
+                .collect(Collectors.toSet());
+
+
+        final Set<String> stateTypes = dto.state().values().stream()
+                .flatMap(v -> v.widgetMapping().values().stream())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+
+        if(!searchTypes.containsAll(stateTypes)) {
+            final Sets.SetView<String> diff = Sets.difference(stateTypes, searchTypes);
+            final String message = String.format(Locale.ROOT,
+                    "Search types do not correspond to view/search types, missing searches %s; search types: %s; state types: %s",
+                    diff, searchTypes, stateTypes);
+            throw new BadRequestException(message);
+        }
+
+        final Set<String> widgetIds = dto.state().values().stream()
+                .flatMap(v -> v.widgets().stream())
+                .map(WidgetDTO::id)
+                .collect(Collectors.toSet());
+
+        final Set<String> widgetPositions = dto.state().values().stream()
+                .flatMap(v -> v.widgetPositions().keySet().stream()).collect(Collectors.toSet());
+
+        if (!widgetPositions.containsAll(widgetIds)) {
+            final Sets.SetView<String> diff = Sets.difference(widgetIds, widgetPositions);
+            final String message = String.format(Locale.ROOT,
+                    "Widget positions don't correspond to widgets, missing widget positions %s; widget IDs: %s; widget positions: %s",
+                    diff, widgetIds, widgetPositions);
+            throw new BadRequestException(message);
+
+        }
     }
 
     private Set<UsesSearchFilters> getSearchFiltersUsages(final ViewDTO view, final Search referencedSearch) {
