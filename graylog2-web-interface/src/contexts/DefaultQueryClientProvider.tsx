@@ -16,13 +16,16 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import type { QueryClientConfig } from '@tanstack/react-query';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { merge } from 'lodash';
 
 type Props = {
   children: React.ReactNode,
+  options?: QueryClientConfig
 };
 
-const options = {
+const defaultOptions = {
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
@@ -30,7 +33,8 @@ const options = {
   },
 };
 
-const DefaultQueryClientProvider = ({ children }: Props) => {
+const DefaultQueryClientProvider = ({ children, options: optionsProp }: Props) => {
+  const options = optionsProp ? merge({}, defaultOptions, optionsProp) : defaultOptions;
   const queryClient = useMemo(() => new QueryClient(options), []);
 
   return (
@@ -38,6 +42,10 @@ const DefaultQueryClientProvider = ({ children }: Props) => {
       {children}
     </QueryClientProvider>
   );
+};
+
+DefaultQueryClientProvider.defaultProps = {
+  options: undefined,
 };
 
 export default DefaultQueryClientProvider;
