@@ -50,6 +50,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     };
   }
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = (activeQueryTitle: string) => {
     this.setState({
       titleDraft: activeQueryTitle,
