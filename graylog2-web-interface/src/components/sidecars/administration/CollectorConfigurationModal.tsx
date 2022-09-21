@@ -93,6 +93,12 @@ const ModalTitle = styled(Modal.Title)`
   line-height: 1.1;
 `;
 
+const ModalSubTitle = styled.div`
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+`;
+
 const CollectorConfigurationModal = (props) => {
   const [nextAssignedConfigurations, setNextAssignedConfigurations] = React.useState([]);
 
@@ -226,7 +232,9 @@ const CollectorConfigurationModal = (props) => {
           <Modal.Header>
             <ModalTitle>
               Edit <b>{selectedLogCollectors[0]?.name}</b> Configurations
-              <div><small>sidecars: {selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name).join(', ')}</small></div>
+              <ModalSubTitle>
+                <small>sidecars: {selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name).join(', ')}</small>
+              </ModalSubTitle>
             </ModalTitle>
           </Modal.Header>
           <Modal.Body>
