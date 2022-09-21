@@ -35,7 +35,7 @@ const defaultOptions = {
 
 const DefaultQueryClientProvider = ({ children, options: optionsProp }: Props) => {
   const options = optionsProp ? merge({}, defaultOptions, optionsProp) : defaultOptions;
-  const queryClient = useMemo(() => new QueryClient(options), []);
+  const queryClient = useMemo(() => new QueryClient(options), [options]);
 
   return (
     <QueryClientProvider client={queryClient}>
