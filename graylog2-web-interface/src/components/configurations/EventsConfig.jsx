@@ -166,14 +166,14 @@ const EventsConfig = createReactClass({
         </dl>
 
         <IfPermitted permissions="clusterconfigentry:edit">
-          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
+          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
         <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                             title="Update Events System Configuration"
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}
-                            submitButtonText="Save">
+                            submitButtonText="Update configuration">
           <fieldset>
             <FormGroup controlId="search-timeout-field">
               <TimeUnitInput label="Search Timeout"

@@ -191,14 +191,14 @@ const MessageProcessorsConfig = createReactClass({
         </Table>
 
         <IfPermitted permissions="clusterconfigentry:edit">
-          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
+          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
         <BootstrapModalForm ref={(configModal) => { this.configModal = configModal; }}
                             title="Update Message Processors Configuration"
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}
-                            submitButtonText="Save">
+                            submitButtonText="Update configuration">
           <h3>Order</h3>
           <p>Use drag and drop to change the execution order of the message processors.</p>
           <SortableList items={this._sortableItems()} onMoveItem={this._updateSorting} displayOverlayInPortal />
