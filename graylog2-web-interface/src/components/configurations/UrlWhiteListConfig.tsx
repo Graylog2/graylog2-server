@@ -129,7 +129,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
           </tbody>
         </Table>
         <IfPermitted permissions="urlwhitelist:write">
-          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
+          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
         <BootstrapModalForm ref={(configModal) => { this.configModal = configModal; }}
                             bsSize="lg"
@@ -137,7 +137,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}
                             submitButtonDisabled={!isValid}
-                            submitButtonText="Save">
+                            submitButtonText="Update configuration">
           <h3>Whitelist URLs</h3>
           <UrlWhiteListForm urls={entries} disabled={disabled} onUpdate={this._update} />
         </BootstrapModalForm>

@@ -132,14 +132,14 @@ const SidecarConfig = createReactClass({
         </dl>
 
         <IfPermitted permissions="clusterconfigentry:edit">
-          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
+          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
         <BootstrapModalForm ref="configModal"
                             title="Update Sidecars System Configuration"
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}
-                            submitButtonText="Save">
+                            submitButtonText="Update configuration">
           <fieldset>
             <ISODurationInput id="inactive-threshold-field"
                               duration={this.state.config.sidecar_inactive_threshold}
