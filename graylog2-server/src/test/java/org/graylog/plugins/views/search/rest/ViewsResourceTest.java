@@ -226,7 +226,7 @@ public class ViewsResourceTest {
     }
 
     @Test(expected = Test.None.class)
-    void testVerifyIntegrity() {
+    public void testVerifyIntegrity() {
         final ViewDTO view = ViewDTO.builder()
                 .searchId("123")
                 .title("my-search")
