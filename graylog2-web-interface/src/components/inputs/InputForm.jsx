@@ -28,6 +28,7 @@ class InputForm extends React.Component {
     titleValue: PropTypes.string,
     submitAction: PropTypes.func.isRequired,
     values: PropTypes.object,
+    submitButtonText: PropTypes.string.isRequired,
   };
 
   state = {

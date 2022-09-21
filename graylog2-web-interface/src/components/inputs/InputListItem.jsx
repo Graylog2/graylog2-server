@@ -163,6 +163,7 @@ const InputListItem = createReactClass({
                    typeName={input.type}
                    includeTitleField
                    submitAction={this._updateInput}
+                   submitButtonText="Update input"
                    values={input.attributes} />
       ) : null;
 
