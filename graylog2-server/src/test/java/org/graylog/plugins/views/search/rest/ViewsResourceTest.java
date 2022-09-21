@@ -65,8 +65,7 @@ import java.util.function.Predicate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -226,7 +225,7 @@ public class ViewsResourceTest {
                 () -> testResource.get(resolverName + ":invalid-view-id", searchUser));
     }
 
-    @Test
+    @Test(expected = Test.None.class)
     void testVerifyIntegrity() {
         final ViewDTO view = ViewDTO.builder()
                 .searchId("123")
@@ -239,7 +238,7 @@ public class ViewsResourceTest {
                 .build();
 
         // empty search, nothing to validate, should succeed
-        assertDoesNotThrow(() -> viewsResource.validateSearchProperties(view, search));
+        viewsResource.validateSearchProperties(view, search);
 
         final Search searchWithQuery = search.toBuilder().queries(ImmutableSet.of(Query.builder().id("Q-111").build())).build();
         final ViewDTO viewWithQuery = view.toBuilder().state(Collections.singletonMap("Q-123", ViewStateDTO.builder()
