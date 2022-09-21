@@ -71,7 +71,9 @@ describe('Headers', () => {
                  actualColumnPivotFields={actualColumnPivotFields}
                  fields={Immutable.List(fields)}
                  sortConfigMap={sortConfigMap}
-                 onSortChange={onSortChange} />
+                 onSortChange={onSortChange}
+                 onSetRowPivotColumnsWidth={() => {}}
+                 togglePin={() => {}} />
       </thead>
     </table>
   );

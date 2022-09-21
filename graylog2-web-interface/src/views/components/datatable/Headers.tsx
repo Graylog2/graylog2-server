@@ -30,6 +30,7 @@ import FieldSortIcon from 'views/components/datatable/FieldSortIcon';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import type { Widgets } from 'views/stores/WidgetStore';
+import { Icon } from 'components/common';
 
 import styles from './DataTable.css';
 
@@ -58,10 +59,26 @@ type HeaderFilterProps = {
   sortConfigMap: OrderedMap<string, SortConfig>;
   sortable: boolean;
   sortType?: 'pivot' | 'series' | undefined
-  _onSetRowPivotColumnsWidth?: ({ field: string, offsetWidth: number }) => void
+  _onSetRowPivotColumnsWidth?: (props: { field: string, offsetWidth: number }) => void
+  stickyLeftMargin?: number | undefined,
+  showPinIcon?: boolean,
+  togglePin: (field: string) => void
 }
+const PinIcon = styled.button(({ theme }) => {
+  return css`
+    border: 0;
+    background: transparent;
+    padding: 5px;
+    cursor: pointer;
+    position: relative;
+    color: ${theme.colors.gray[70]};
+    &.active {
+      color: ${theme.colors.gray[20]};
+    }
+  `;
+});
 
-const _headerField = ({ activeQuery, fields, field, prefix = '', span = 1, title = field, onSortChange, sortConfigMap, sortable, sortType, _onSetRowPivotColumnsWidth, stickyLeftMargin }: HeaderFilterProps) => {
+const _headerField = ({ activeQuery, fields, field, prefix = '', span = 1, title = field, onSortChange, sortConfigMap, sortable, sortType, _onSetRowPivotColumnsWidth, stickyLeftMargin, showPinIcon = false, togglePin }: HeaderFilterProps) => {
   const type = fieldTypeFor(field, fields);
   const thRef = useRef(null);
 
@@ -74,6 +91,7 @@ const _headerField = ({ activeQuery, fields, field, prefix = '', span = 1, title
   return (
     <StyledTh ref={thRef} isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned} stickyLeftMargin={stickyLeftMargin}>
       <Field name={field} queryId={activeQuery} type={type}>{title}</Field>
+      {showPinIcon && <PinIcon onClick={() => togglePin(field)} className={isNumber(stickyLeftMargin) ? 'active' : ''}><Icon name="thumbtack" /></PinIcon>}
       {sortable && sortType && (
       <FieldSortIcon fieldName={field}
                      onSortChange={onSortChange}
@@ -132,13 +150,15 @@ type Props = {
   fields: FieldTypeMappingsList,
   onSortChange: (sortConfig: Array<SortConfig>) => Promise<Widgets>;
   sortConfigMap: OrderedMap<string, SortConfig>;
-  onSetRowPivotColumnsWidth: ({ field: string, offsetWidth: number }) => void
+  onSetRowPivotColumnsWidth: (props: { field: string, offsetWidth: number }) => void,
+  stickyLeftMargins?: { [key: string]: number } | undefined,
+  togglePin: (field: string) => void
 };
 
-const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup, actualColumnPivotFields, onSortChange, sortConfigMap, onSetRowPivotColumnsWidth, stickyLeftMargins }: Props) => {
+const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup, actualColumnPivotFields, onSortChange, sortConfigMap, onSetRowPivotColumnsWidth, stickyLeftMargins, togglePin }: Props) => {
   const rowFieldNames = rowPivots.map((pivot) => pivot.field);
   const columnFieldNames = columnPivots.map((pivot) => pivot.field);
-  const headerField = ({ field, prefix = '', span = 1, title = field, sortable = false, sortType = undefined, _onSetRowPivotColumnsWidth = undefined }) => _headerField({
+  const headerField = ({ field, prefix = '', span = 1, title = field, sortable = false, sortType = undefined, _onSetRowPivotColumnsWidth = undefined, showPinIcon = false }) => _headerField({
     activeQuery,
     fields,
     field,
@@ -151,8 +171,10 @@ const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup,
     sortType,
     _onSetRowPivotColumnsWidth,
     stickyLeftMargin: stickyLeftMargins[field],
+    showPinIcon,
+    togglePin,
   });
-  const rowPivotFields = rowFieldNames.map((fieldName) => headerField({ field: fieldName, sortable: true, sortType: SortConfig.PIVOT_TYPE, _onSetRowPivotColumnsWidth: onSetRowPivotColumnsWidth }));
+  const rowPivotFields = rowFieldNames.map((fieldName) => headerField({ field: fieldName, sortable: true, sortType: SortConfig.PIVOT_TYPE, _onSetRowPivotColumnsWidth: onSetRowPivotColumnsWidth, showPinIcon: true }));
   const seriesFields = series.map((s) => headerField({ field: s.function, prefix: '', span: 1, title: s.effectiveName, sortable: true, sortType: SortConfig.SERIES_TYPE }));
   const columnPivotFields = flatten(actualColumnPivotFields.map((key) => series.map((s) => headerField({ field: s.function, prefix: key.join('-'), span: 1, title: s.effectiveName, sortable: false }))));
   const offset = rollup ? rowFieldNames.length + series.length : rowFieldNames.length;
@@ -167,6 +189,10 @@ const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup,
       </tr>
     </>
   );
+};
+
+Headers.defaultProps = {
+  stickyLeftMargins: undefined,
 };
 
 export default Headers;

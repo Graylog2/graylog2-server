@@ -20,7 +20,6 @@ import * as Immutable from 'immutable';
 import { flatten, isEqual, uniqWith } from 'lodash';
 import type { OrderedMap } from 'immutable';
 import { useFormikContext } from 'formik';
-import { OrderedSet } from 'immutable';
 
 import connect from 'stores/connect';
 import expandRows from 'views/logic/ExpandRows';
@@ -116,7 +115,6 @@ const DataTable = ({
   const widget = useContext(WidgetContext);
   useEffect(onRenderComplete, [onRenderComplete]);
   const [rowPivotColumnsWidth, setRowPivotColumnsWidth] = useState<{ [key: string]: number }>({});
-  console.log({ rowPivotColumnsWidth });
   const onSetRowPivotColumnsWidth = useCallback(({ field, offsetWidth }: { field: string, offsetWidth: number}) => {
     setRowPivotColumnsWidth((cur) => {
       const copy = { ...cur };
@@ -151,21 +149,20 @@ const DataTable = ({
   const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter((r): r is Leaf => r.source === 'leaf'));
 
   const actualColumnPivotFields = _extractColumnPivotValues(rows);
-  const fixedColumns = useMemo(() => new Set(['action', 'source']), []);
+  const [pinnedColumns, setPinnedColumns] = useState(new Set([]));
   const stickyLeftMargins = useMemo(() => {
     let prev = 0;
     const res = {};
 
     rowPivots.forEach((row) => {
-      if (fixedColumns.has(row.field)) {
+      if (pinnedColumns.has(row.field)) {
         res[row.field] = prev;
         prev += rowPivotColumnsWidth[row.field];
       }
     });
 
     return res;
-  }, [rowPivotColumnsWidth, rowPivots, fixedColumns]);
-  console.log({ stickyLeftMargins });
+  }, [rowPivotColumnsWidth, rowPivots, pinnedColumns]);
   const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
     const valuePath = rowFieldNames.map((pivotField) => ({ [pivotField]: expandedRows[idx][pivotField] }));
 
@@ -185,6 +182,19 @@ const DataTable = ({
   });
 
   const sortConfigMap = useMemo<OrderedMap<string, SortConfig>>(() => Immutable.OrderedMap(config.sort.map((sort) => [sort.field, sort])), [config]);
+  const togglePin = useCallback((field) => {
+    setPinnedColumns((cur) => {
+      const copy = new Set(cur);
+
+      if (copy.has(field)) {
+        copy.delete(field);
+      } else {
+        copy.add(field);
+      }
+
+      return copy;
+    });
+  }, [setPinnedColumns]);
 
   return (
     <div className={styles.container}>
@@ -205,7 +215,8 @@ const DataTable = ({
                      onSortChange={_onSortChange}
                      sortConfigMap={sortConfigMap}
                      onSetRowPivotColumnsWidth={onSetRowPivotColumnsWidth}
-                     stickyLeftMargins={stickyLeftMargins} />
+                     stickyLeftMargins={stickyLeftMargins}
+                     togglePin={togglePin} />
           </thead>
           <tbody>
             {formattedRows}

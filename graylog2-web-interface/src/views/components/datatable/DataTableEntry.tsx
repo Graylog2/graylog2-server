@@ -39,7 +39,7 @@ const getStickyStyles = (stickyLeftMargin) => `
   left: ${stickyLeftMargin}px;
   z-index: 1;
 `;
-const StyledTd = styled.td(({ isNumeric, theme, stickyLeftMargin }: { isNumeric: boolean, theme: DefaultTheme }) => css`
+const StyledTd = styled.td(({ isNumeric, theme, stickyLeftMargin }: { isNumeric: boolean, theme: DefaultTheme, stickyLeftMargin: number | undefined }) => css`
   ${isNumeric ? `font-family: ${theme.fonts.family.monospace};` : ''}
   ${isNumeric ? 'text-align: right' : ''}
   ${isNumber(stickyLeftMargin) ? getStickyStyles(stickyLeftMargin) : ''}
@@ -58,15 +58,15 @@ type Props = {
   series: Array<Series>,
   types: FieldTypeMappingsList,
   valuePath: ValuePath,
+  stickyLeftMargins: {[key: string]: number}
 };
 
 const _c = (field, value, path, source) => ({ field, value, path, source });
 
-type ColumnProps = { field: string, value: any, selectedQuery: string, type: FieldType, valuePath: ValuePath, source: string | undefined | null };
+type ColumnProps = { field: string, value: any, selectedQuery: string, type: FieldType, valuePath: ValuePath, source: string | undefined | null, stickyLeftMargin: number | undefined };
 
 const Column = ({ field, value, selectedQuery, type, valuePath, source, stickyLeftMargin }: ColumnProps) => {
   const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
-  console.log({ stickyLeftMargin });
 
   return (
     <StyledTd isNumeric={type.isNumeric()} stickyLeftMargin={stickyLeftMargin}>
