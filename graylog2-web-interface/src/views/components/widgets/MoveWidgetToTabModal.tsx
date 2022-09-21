@@ -48,7 +48,8 @@ const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => 
   const { id: activeQuery } = useStore(CurrentQueryStore);
   const queryIds = useStore(QueryIdsStore);
   const onKeepCopy = useCallback((e) => setKeepCopy(e.target.checked), [setKeepCopy]);
-  const submit = useCallback(() => onSubmit(widgetId, selectedTab, keepCopy), [widgetId, selectedTab, keepCopy]);
+  const submit = useCallback(() => onSubmit(widgetId, selectedTab, keepCopy),
+    [onSubmit, widgetId, selectedTab, keepCopy]);
 
   const list = _tabList(view, queryIds.toArray()).filter(({ id }) => id !== activeQuery);
 

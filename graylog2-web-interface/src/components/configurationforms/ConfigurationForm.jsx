@@ -133,6 +133,7 @@ class ConfigurationForm extends React.Component {
     }
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => {
     if (this.modal && this.modal.open) {
       this.modal.open();

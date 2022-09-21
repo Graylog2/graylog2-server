@@ -26,8 +26,10 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import ObjectUtils from 'util/ObjectUtils';
 
 const MessageProcessorsConfig = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'MessageProcessorsConfig',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     config: PropTypes.object,
     updateConfig: PropTypes.func.isRequired,
@@ -111,18 +113,6 @@ const MessageProcessorsConfig = createReactClass({
     const { config } = this.state;
 
     return config.disabled_processors.length >= config.processor_order.length;
-  },
-
-  _noActiveProcessorWarning() {
-    if (this._hasNoActiveProcessor()) {
-      return (
-        <Alert bsStyle="danger">
-          <strong>ERROR:</strong> No active message processor!
-        </Alert>
-      );
-    }
-
-    return null;
   },
 
   _summary() {
@@ -216,7 +206,11 @@ const MessageProcessorsConfig = createReactClass({
               {this._statusForm()}
             </tbody>
           </Table>
-          {this._noActiveProcessorWarning()}
+          {this._hasNoActiveProcessor() && (
+            <Alert bsStyle="danger">
+              <strong>ERROR:</strong> No active message processor!
+            </Alert>
+          )}
         </BootstrapModalForm>
       </div>
     );

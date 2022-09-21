@@ -31,7 +31,14 @@ class InputForm extends React.Component {
     submitButtonText: PropTypes.string.isRequired,
   };
 
-  state = {
+  static defaultProps = {
+    globalValue: undefined,
+    nodeValue: undefined,
+    titleValue: undefined,
+    values: undefined,
+  };
+
+  static state = {
     global: this.props.globalValue !== undefined ? this.props.globalValue : false,
     node: this.props.nodeValue !== undefined ? this.props.nodeValue : undefined,
   };
@@ -49,15 +56,42 @@ class InputForm extends React.Component {
     this.props.submitAction(newData);
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => {
     this.configurationForm.open();
   };
 
+  getValues = () => {
+    const { values } = this.props;
+
+    if (values) {
+      return values;
+    }
+
+    if (this.configurationForm) {
+      return this.configurationForm.getValue().configuration;
+    }
+
+    return {};
+  };
+
+  getTitleValue = () => {
+    const { titleValue } = this.props;
+
+    if (titleValue) {
+      return titleValue;
+    }
+
+    if (this.configurationForm) {
+      return this.configurationForm.getValue().titleValue;
+    }
+
+    return '';
+  };
+
   render() {
-    const values = this.props.values ? this.props.values
-      : (this.configurationForm ? this.configurationForm.getValue().configuration : {});
-    const titleValue = this.props.titleValue ? this.props.titleValue
-      : (this.configurationForm ? this.configurationForm.getValue().titleValue : '');
+    const values = this.getValues();
+    const titleValue = this.getTitleValue();
 
     return (
       <ConfigurationForm {...this.props}
