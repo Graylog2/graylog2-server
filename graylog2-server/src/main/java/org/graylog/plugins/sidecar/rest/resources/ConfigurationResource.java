@@ -337,7 +337,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
 
         if (! previousConfiguration.tags().equals(updatedConfiguration.tags())) {
             sidecarService.findByTags(Sets.union(previousConfiguration.tags(), updatedConfiguration.tags()))
-                    .map(Sidecar::id)
+                    .map(Sidecar::nodeId)
                     .forEach(etagService::invalidateRegistration);
         }
 
