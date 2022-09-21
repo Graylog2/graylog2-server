@@ -223,7 +223,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
         // If the sidecar has the recent registration, return with HTTP 304
         if (ifNoneMatch != null) {
             EntityTag etag = new EntityTag(ifNoneMatch.replaceAll("\"", ""));
-            if (etagService.registrationIsCached(sidecar.id(), etag.toString())) {
+            if (etagService.registrationIsCached(sidecar.nodeId(), etag.toString())) {
                 sidecarService.save(sidecar);
                 return Response.notModified().tag(etag).build();
             }
@@ -247,7 +247,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                 sidecar.assignments());
         // add new etag to cache
         EntityTag registrationEtag = etagService.buildEntityTagForResponse(sidecarRegistrationResponse);
-        etagService.addSidecarRegistration(sidecar.id(), registrationEtag.toString());
+        etagService.addSidecarRegistration(sidecar.nodeId(), registrationEtag.toString());
 
         return Response.accepted(sidecarRegistrationResponse).tag(registrationEtag).build();
     }
@@ -273,7 +273,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
             try {
                 Sidecar sidecar = sidecarService.applyManualAssignments(nodeId, nodeRelations);
                 sidecarService.save(sidecar);
-                etagService.invalidateRegistration(sidecar.id());
+                etagService.invalidateRegistration(sidecar.nodeId());
             } catch (org.graylog2.database.NotFoundException e) {
                 throw new NotFoundException(e.getMessage());
             }
