@@ -77,7 +77,7 @@ const DecoratorsConfig = () => {
       <StreamSelect streams={streamOptions} onChange={setCurrentStream} value={currentStream} />
       <DecoratorList decorators={readOnlyDecoratorItems} disableDragging />
       <IfPermitted permissions="decorators:edit">
-        <Button bsStyle="info" bsSize="xs" onClick={openModal}>Update</Button>
+        <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>
       </IfPermitted>
       <DecoratorsConfigUpdate ref={configModal}
                               streams={streams}
