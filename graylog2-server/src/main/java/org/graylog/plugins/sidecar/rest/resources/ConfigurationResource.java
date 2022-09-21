@@ -19,6 +19,7 @@ package org.graylog.plugins.sidecar.rest.resources;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -114,7 +115,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         this.sidecarService = sidecarService;
         this.etagService = etagService;
         this.importService = importService;
-        this.searchQueryParser = new SearchQueryParser(Configuration.FIELD_NAME, SEARCH_FIELD_MAPPING);;
+        this.searchQueryParser = new SearchQueryParser(Configuration.FIELD_NAME, SEARCH_FIELD_MAPPING);
     }
 
     @GET
@@ -333,8 +334,11 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
         etagService.invalidateAllConfigurations();
+
         if (! previousConfiguration.tags().equals(updatedConfiguration.tags())) {
-            etagService.invalidateAllRegistrations();
+            sidecarService.findByTags(Sets.union(previousConfiguration.tags(), updatedConfiguration.tags()))
+                    .map(Sidecar::id)
+                    .forEach(etagService::invalidateRegistration);
         }
 
         return Response.ok().entity(configurationService.save(updatedConfiguration)).build();

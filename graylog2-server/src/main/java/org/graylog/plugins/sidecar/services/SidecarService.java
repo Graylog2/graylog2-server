@@ -271,4 +271,8 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                 .map(collector -> collector.toSummary(isActiveFunction))
                 .collect(Collectors.toList());
     }
+
+    public Stream<Sidecar> findByTags(Collection<String> tags) {
+        return streamQuery(DBQuery.in("node_details.tags", tags));
+    }
 }
