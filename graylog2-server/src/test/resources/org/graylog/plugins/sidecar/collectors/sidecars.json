@@ -1,0 +1,16 @@
+{
+  "sidecars": [
+    {
+      "_id": {
+        "$oid": "581b3bff8e4dc4270055dfcb"
+      },
+      "node_id": "node-id",
+      "node_name": "node-name",
+      "sidecar_version": "1.3.0",
+      "node_details": {
+        "operating_system": "linux"
+      },
+      "last_seen": "2015-04-01T11:50:20.195Z"
+    }
+  ]
+}
