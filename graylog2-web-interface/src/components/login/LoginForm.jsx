@@ -33,7 +33,7 @@ const LoginForm = ({ onErrorChange }) => {
         promise.cancel();
       }
     };
-  }, []);
+  }, [promise]);
 
   const onSignInClicked = (event) => {
     event.preventDefault();

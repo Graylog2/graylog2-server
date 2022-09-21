@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import styled from 'styled-components';
@@ -31,6 +32,7 @@ const NewInputRow = styled(Row)`
 `;
 
 const CreateInputControl = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'CreateInputControl',
   mixins: [Reflux.connect(InputTypesStore)],
 

@@ -34,7 +34,7 @@ const StreamAlertHeader = styled(Panel.Heading)`
   font-weight: bold;
 `;
 
-const MatchIcon = styled(({ empty, matches, ...props }) => <Icon {...props} />)(
+const MatchIcon = styled(({ empty: _empty, matches: _matches, ...props }) => <Icon {...props} />)(
   ({ empty, matches, theme }) => {
     const matchColor = matches ? theme.colors.variant.success : theme.colors.variant.danger;
 
@@ -48,6 +48,10 @@ const MatchIcon = styled(({ empty, matches, ...props }) => <Icon {...props} />)(
 const StyledSpinner = styled(Spinner)`
   margin-left: 10px;
 `;
+
+const getListClassName = (matchData) => {
+  return (matchData.matches ? 'success' : 'danger');
+};
 
 class StreamRulesEditor extends React.Component {
   static propTypes = {
@@ -123,10 +127,6 @@ class StreamRulesEditor extends React.Component {
     this.setState({ showStreamRuleForm: true });
   };
 
-  _getListClassName = (matchData) => {
-    return (matchData.matches ? 'success' : 'danger');
-  };
-
   _explainMatchResult = () => {
     const { matchData } = this.state;
 
@@ -156,7 +156,7 @@ class StreamRulesEditor extends React.Component {
   render() {
     const { matchData, stream, streamRuleTypes, showStreamRuleForm } = this.state;
     const { currentUser, messageId, index } = this.props;
-    const styles = (matchData ? this._getListClassName(matchData) : 'info');
+    const styles = (matchData ? getListClassName(matchData) : 'info');
 
     if (stream && streamRuleTypes) {
       return (
