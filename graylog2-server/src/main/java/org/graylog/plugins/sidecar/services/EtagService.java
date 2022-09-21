@@ -120,8 +120,8 @@ public class EtagService extends AbstractIdleService {
         return configurationCache.getIfPresent(etag) != null;
     }
 
-    public boolean registrationIsCached(String sidecarId, String etag) {
-        return etag.equals(registrationCache.getIfPresent(sidecarId));
+    public boolean registrationIsCached(String sidecarNodeId, String etag) {
+        return etag.equals(registrationCache.getIfPresent(sidecarNodeId));
     }
 
     public void registerCollector(String etag) {
