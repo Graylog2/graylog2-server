@@ -44,6 +44,7 @@ type Props = {
   className?: string,
   displayCancel?: boolean,
   disabledSubmit?: boolean,
+  formId?: string,
   isSubmitting?: boolean,
   leftCol?: React.ReactNode,
   onSubmit?: () => void,
@@ -59,6 +60,7 @@ const FormSubmit = (props: Props) => {
     className,
     displayCancel,
     disabledSubmit,
+    formId,
     isSubmitting,
     leftCol,
     onSubmit,
@@ -75,12 +77,14 @@ const FormSubmit = (props: Props) => {
         <Button type="button"
                 bsSize={bsSize}
                 onClick={props.onCancel}
-                disabled={props.disableCancel}>Cancel
+                disabled={props.disableCancel}>
+          Cancel
         </Button>
       )}
       <Button bsStyle="success"
               bsSize={bsSize}
               disabled={disabledSubmit}
+              form={formId}
               title={submitButtonText}
               type={submitButtonType}
               onClick={onSubmit}>
@@ -96,6 +100,7 @@ FormSubmit.defaultProps = {
   className: undefined,
   disabledSubmit: false,
   displayCancel: true,
+  formId: undefined,
   isSubmitting: false,
   leftCol: undefined,
   onSubmit: undefined,
