@@ -107,6 +107,7 @@ const CreateInputControl = createReactClass({
                    key="configuration-form-input"
                    configFields={selectedInputDefinition.requested_configuration}
                    title={<span>Launch new <em>{inputTypeName}</em> input</span>}
+                   submitButtonText="Launch Input"
                    helpBlock="Select a name of your new input that describes it."
                    typeName={selectedInput}
                    submitAction={this._createInput} />
