@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useEffect, useMemo } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as Immutable from 'immutable';
 import { flatten, isEqual, uniqWith } from 'lodash';
 import type { OrderedMap } from 'immutable';
 import { useFormikContext } from 'formik';
+import { OrderedSet } from 'immutable';
 
 import connect from 'stores/connect';
 import expandRows from 'views/logic/ExpandRows';
@@ -114,7 +115,16 @@ const DataTable = ({
   const onRenderComplete = useContext(RenderCompletionCallback);
   const widget = useContext(WidgetContext);
   useEffect(onRenderComplete, [onRenderComplete]);
+  const [rowPivotColumnsWidth, setRowPivotColumnsWidth] = useState<{ [key: string]: number }>({});
+  console.log({ rowPivotColumnsWidth });
+  const onSetRowPivotColumnsWidth = useCallback(({ field, offsetWidth }: { field: string, offsetWidth: number}) => {
+    setRowPivotColumnsWidth((cur) => {
+      const copy = { ...cur };
+      copy[field] = offsetWidth;
 
+      return copy;
+    });
+  }, [setRowPivotColumnsWidth]);
   const _onSortChange = useCallback((newSort: Array<SortConfig>) => {
     const dirty = formContext?.dirty;
     const updateWidget = () => WidgetActions.updateConfig(widget.id, config.toBuilder().sort(newSort).build());
@@ -141,7 +151,21 @@ const DataTable = ({
   const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter((r): r is Leaf => r.source === 'leaf'));
 
   const actualColumnPivotFields = _extractColumnPivotValues(rows);
+  const fixedColumns = useMemo(() => new Set(['action', 'source']), []);
+  const stickyLeftMargins = useMemo(() => {
+    let prev = 0;
+    const res = {};
 
+    rowPivots.forEach((row) => {
+      if (fixedColumns.has(row.field)) {
+        res[row.field] = prev;
+        prev += rowPivotColumnsWidth[row.field];
+      }
+    });
+
+    return res;
+  }, [rowPivotColumnsWidth, rowPivots, fixedColumns]);
+  console.log({ stickyLeftMargins });
   const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
     const valuePath = rowFieldNames.map((pivotField) => ({ [pivotField]: expandedRows[idx][pivotField] }));
 
@@ -155,7 +179,8 @@ const DataTable = ({
                       columnPivots={columnFieldNames}
                       columnPivotValues={actualColumnPivotFields}
                       types={fields}
-                      series={series} />
+                      series={series}
+                      stickyLeftMargins={stickyLeftMargins} />
     );
   });
 
@@ -178,7 +203,9 @@ const DataTable = ({
                      rowPivots={rowPivots}
                      series={series}
                      onSortChange={_onSortChange}
-                     sortConfigMap={sortConfigMap} />
+                     sortConfigMap={sortConfigMap}
+                     onSetRowPivotColumnsWidth={onSetRowPivotColumnsWidth}
+                     stickyLeftMargins={stickyLeftMargins} />
           </thead>
           <tbody>
             {formattedRows}

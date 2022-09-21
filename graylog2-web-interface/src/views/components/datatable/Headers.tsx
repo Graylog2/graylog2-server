@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { flatten, get, isEqual, last } from 'lodash';
+import React, { useEffect, useRef } from 'react';
+import { flatten, get, isEqual, last, isNumber } from 'lodash';
 import styled, { css } from 'styled-components';
 import type { OrderedMap } from 'immutable';
 
@@ -33,8 +33,14 @@ import type { Widgets } from 'views/stores/WidgetStore';
 
 import styles from './DataTable.css';
 
-const StyledTh = styled.th(({ isNumeric }: { isNumeric: boolean }) => css`
+const getStickyStyles = (stickyLeftMargin) => `
+  position: sticky!important;
+  left: ${stickyLeftMargin}px;
+  z-index: 1;
+`;
+const StyledTh = styled.th(({ isNumeric, stickyLeftMargin }: { isNumeric: boolean, stickyLeftMargin: number }) => css`
   ${isNumeric ? 'text-align: right' : ''}
+  ${isNumber(stickyLeftMargin) ? getStickyStyles(stickyLeftMargin) : ''}
 `);
 
 const CenteredTh = styled.th`
@@ -52,13 +58,21 @@ type HeaderFilterProps = {
   sortConfigMap: OrderedMap<string, SortConfig>;
   sortable: boolean;
   sortType?: 'pivot' | 'series' | undefined
+  _onSetRowPivotColumnsWidth?: ({ field: string, offsetWidth: number }) => void
 }
 
-const _headerField = ({ activeQuery, fields, field, prefix = '', span = 1, title = field, onSortChange, sortConfigMap, sortable, sortType }: HeaderFilterProps) => {
+const _headerField = ({ activeQuery, fields, field, prefix = '', span = 1, title = field, onSortChange, sortConfigMap, sortable, sortType, _onSetRowPivotColumnsWidth, stickyLeftMargin }: HeaderFilterProps) => {
   const type = fieldTypeFor(field, fields);
+  const thRef = useRef(null);
+
+  useEffect(() => {
+    if (_onSetRowPivotColumnsWidth && thRef?.current?.offsetWidth) {
+      _onSetRowPivotColumnsWidth({ field, offsetWidth: thRef.current.offsetWidth });
+    }
+  }, [_onSetRowPivotColumnsWidth, field, thRef]);
 
   return (
-    <StyledTh isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned}>
+    <StyledTh ref={thRef} isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned} stickyLeftMargin={stickyLeftMargin}>
       <Field name={field} queryId={activeQuery} type={type}>{title}</Field>
       {sortable && sortType && (
       <FieldSortIcon fieldName={field}
@@ -118,12 +132,13 @@ type Props = {
   fields: FieldTypeMappingsList,
   onSortChange: (sortConfig: Array<SortConfig>) => Promise<Widgets>;
   sortConfigMap: OrderedMap<string, SortConfig>;
+  onSetRowPivotColumnsWidth: ({ field: string, offsetWidth: number }) => void
 };
 
-const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup, actualColumnPivotFields, onSortChange, sortConfigMap }: Props) => {
+const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup, actualColumnPivotFields, onSortChange, sortConfigMap, onSetRowPivotColumnsWidth, stickyLeftMargins }: Props) => {
   const rowFieldNames = rowPivots.map((pivot) => pivot.field);
   const columnFieldNames = columnPivots.map((pivot) => pivot.field);
-  const headerField = ({ field, prefix = '', span = 1, title = field, sortable = false, sortType = undefined }) => _headerField({
+  const headerField = ({ field, prefix = '', span = 1, title = field, sortable = false, sortType = undefined, _onSetRowPivotColumnsWidth = undefined }) => _headerField({
     activeQuery,
     fields,
     field,
@@ -134,8 +149,10 @@ const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup,
     sortConfigMap,
     sortable,
     sortType,
+    _onSetRowPivotColumnsWidth,
+    stickyLeftMargin: stickyLeftMargins[field],
   });
-  const rowPivotFields = rowFieldNames.map((fieldName) => headerField({ field: fieldName, sortable: true, sortType: SortConfig.PIVOT_TYPE }));
+  const rowPivotFields = rowFieldNames.map((fieldName) => headerField({ field: fieldName, sortable: true, sortType: SortConfig.PIVOT_TYPE, _onSetRowPivotColumnsWidth: onSetRowPivotColumnsWidth }));
   const seriesFields = series.map((s) => headerField({ field: s.function, prefix: '', span: 1, title: s.effectiveName, sortable: true, sortType: SortConfig.SERIES_TYPE }));
   const columnPivotFields = flatten(actualColumnPivotFields.map((key) => series.map((s) => headerField({ field: s.function, prefix: key.join('-'), span: 1, title: s.effectiveName, sortable: false }))));
   const offset = rollup ? rowFieldNames.length + series.length : rowFieldNames.length;
