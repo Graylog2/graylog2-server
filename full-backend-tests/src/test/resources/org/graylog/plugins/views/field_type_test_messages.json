@@ -1,0 +1,81 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "0"
+          }
+        },
+        {
+          "data": {
+            "source": "pigeon",
+            "message": "Medieval letter",
+            "medieval_field": "Liege",
+            "timestamp": "2022-01-01 01:00:00.000",
+            "streams": [
+              "000000000000000000000001"
+            ],
+            "gl2_message_fields" : ["source","message","medieval_field","timestamp","streams"]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "1"
+          }
+        },
+        {
+          "data": {
+            "source": "telegram",
+            "message": "Telegram message",
+            "telegram_field": "Lord",
+            "timestamp": "2022-01-01 01:00:00.000",
+            "streams": [
+              "000000000000000000000001"
+            ],
+            "gl2_message_fields" : ["source","message","telegram_field","timestamp","streams"]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "2"
+          }
+        },
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "3"
+          }
+        },
+        {
+          "data": {
+            "source": "e-mail",
+            "message": "Modern message",
+            "modern_field": "CEO",
+            "timestamp": "2022-01-01 01:00:00.000",
+            "streams": [
+              "000000000000000000000001",
+              "000000000000000000000002"
+            ],
+            "gl2_message_fields" : ["source","message","modern_field","timestamp","streams"]
+          }
+        }
+      ]
+    }
+  ]
+}

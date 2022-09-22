@@ -21,8 +21,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Parameter;
+
+import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
@@ -37,7 +38,7 @@ public abstract class FieldTypesForQueryRequest {
     public abstract QueryDTO query();
 
     @JsonProperty(FIELD_PARAMS)
-    public abstract ImmutableSet<Parameter> parameters();
+    public abstract Set<Parameter> parameters();
 
     @JsonProperty(FIELD_FALLBACK)
     public abstract FieldTypesForStreamsRequest fallback();
@@ -49,7 +50,7 @@ public abstract class FieldTypesForQueryRequest {
         public abstract FieldTypesForQueryRequest.Builder query(final QueryDTO queryDTO);
 
         @JsonProperty(FIELD_PARAMS)
-        public abstract FieldTypesForQueryRequest.Builder parameters(final ImmutableSet<Parameter> parameters);
+        public abstract FieldTypesForQueryRequest.Builder parameters(final Set<Parameter> parameters);
 
         @JsonProperty(FIELD_FALLBACK)
         public abstract FieldTypesForQueryRequest.Builder fallback(final FieldTypesForStreamsRequest fallback);
