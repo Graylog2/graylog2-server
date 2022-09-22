@@ -61,10 +61,6 @@ const Blob = styled.span(({ theme }) => css`
 const StyledProgressBar = styled(ProgressBar)`
   height: 25px;
   margin-bottom: 5px;
-
-  ${Bar} {
-    line-height: 25px;
-  }
 `;
 
 const JvmHeapUsage = createReactClass({

@@ -499,7 +499,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .btn {
     border-radius: 0;
-    line-height: inherit;
   }
 
   .btn-text {

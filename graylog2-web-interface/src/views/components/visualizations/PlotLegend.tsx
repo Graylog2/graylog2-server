@@ -71,11 +71,12 @@ const LegendCell = styled.div`
 
 const LegendEntry = styled.div`
   display: flex;
+  align-items: center;
 `;
 
 const ValueContainer = styled.div`
   margin-left: 8px;
-  line-height: 12px;
+  line-height: 1;
 `;
 
 type Props = {

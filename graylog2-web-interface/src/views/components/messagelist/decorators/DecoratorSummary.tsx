@@ -165,7 +165,7 @@ class DecoratorSummary extends React.Component<Props, State> {
     return (
       <span className={DecoratorStyles.fixedWidth}>
         <div className={DecoratorStyles.decoratorBox}>
-          <h6 className={DecoratorStyles.decoratorType}>{decoratorType.name}</h6>
+          <h6>{decoratorType.name}</h6>
           {decoratorActionsMenu}
         </div>
         {content}
