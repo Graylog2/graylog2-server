@@ -20,9 +20,23 @@ import java.util.Locale;
 
 public final class StringUtils {
 
-    private StringUtils() { }
+    private StringUtils() {
+    }
 
     public static String f(String format, Object... args) {
         return String.format(Locale.ENGLISH, format, args);
+    }
+
+    public static boolean containsOnce(final String mainString, final String subString) {
+        if (mainString == null || subString == null) {
+            return false;
+        }
+        final int firstOccurrence = mainString.indexOf(subString);
+        if (firstOccurrence == -1) {
+            return false;
+        }
+        final int lastOccurrence = mainString.lastIndexOf(subString);
+        return firstOccurrence == lastOccurrence;
+
     }
 }
