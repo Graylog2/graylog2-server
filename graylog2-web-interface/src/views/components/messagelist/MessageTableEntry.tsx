@@ -129,7 +129,11 @@ const MessageTableEntry = ({
   const inputs = Immutable.Map<string, Input>(inputsList.map((input) => [input.id, input]));
 
   const _toggleDetail = () => {
-    toggleDetail(`${message.index}-${message.id}`);
+    const isSelectingText = !!window.getSelection()?.toString();
+
+    if (!isSelectingText) {
+      toggleDetail(`${message.index}-${message.id}`);
+    }
   };
 
   const colSpanFixup = selectedFields.size + 1;

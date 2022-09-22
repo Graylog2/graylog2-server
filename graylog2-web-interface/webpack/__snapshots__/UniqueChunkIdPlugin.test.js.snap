@@ -2,15 +2,15 @@
 
 exports[`UniqueChunkIdPlugin adds random identifier as a prefix for any given chunk 1`] = `
 Set {
-  Object {
+  {
     "id": "dead-0",
-    "ids": Array [
+    "ids": [
       "dead-0",
     ],
   },
-  Object {
+  {
     "id": "dead-42",
-    "ids": Array [
+    "ids": [
       "dead-0",
       "dead-42",
     ],
@@ -20,15 +20,15 @@ Set {
 
 exports[`UniqueChunkIdPlugin adds random identifier as a prefix for chunks with string ids 1`] = `
 Set {
-  Object {
+  {
     "id": "dead-foo",
-    "ids": Array [
+    "ids": [
       "dead-foo",
     ],
   },
-  Object {
+  {
     "id": "dead-bar",
-    "ids": Array [
+    "ids": [
       "dead-foo",
       "dead-bar",
     ],
@@ -38,15 +38,15 @@ Set {
 
 exports[`UniqueChunkIdPlugin does not add random identifier if already present 1`] = `
 Set {
-  Object {
+  {
     "id": "dead-0",
-    "ids": Array [
+    "ids": [
       "dead-0",
     ],
   },
-  Object {
+  {
     "id": "dead-42",
-    "ids": Array [
+    "ids": [
       "dead-0",
       "dead-42",
     ],

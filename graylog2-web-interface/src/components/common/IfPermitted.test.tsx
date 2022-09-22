@@ -17,6 +17,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
+import { defaultUser } from 'defaultMockValues';
 
 import { adminUser } from 'fixtures/users';
 import { asMock } from 'helpers/mocking';
@@ -36,7 +37,7 @@ describe('IfPermitted', () => {
   );
 
   beforeEach(() => {
-    asMock(useCurrentUser).mockReturnValue(adminUser);
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
   describe('renders nothing if', () => {

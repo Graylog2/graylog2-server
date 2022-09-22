@@ -91,7 +91,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     }
 
     @Override
-    public void doGenerateQueryPart(SearchJob job, Query query, Pivot pivot, ESGeneratedQueryContext queryContext) {
+    public void doGenerateQueryPart(Query query, Pivot pivot, ESGeneratedQueryContext queryContext) {
         LOG.debug("Generating aggregation for {}", pivot);
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(pivot);
 

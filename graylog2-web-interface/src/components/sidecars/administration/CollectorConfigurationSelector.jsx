@@ -24,6 +24,12 @@ import { naturalSortIgnoreCase } from 'util/SortUtils';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 
+const getAssignedConfigurations = (selectedSidecarCollectorPairs, configurations) => {
+  const assignments = selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar).reduce((accumulator, sidecar) => accumulator.concat(sidecar.assignments), []);
+
+  return assignments.map((assignment) => configurations.find((configuration) => configuration.id === assignment.configuration_id));
+};
+
 class CollectorConfigurationSelector extends React.Component {
   static propTypes = {
     collectors: PropTypes.array.isRequired,
@@ -40,17 +46,11 @@ class CollectorConfigurationSelector extends React.Component {
     };
   }
 
-  getAssignedConfigurations = (selectedSidecarCollectorPairs, configurations) => {
-    const assignments = selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar).reduce((accumulator, sidecar) => accumulator.concat(sidecar.assignments), []);
-
-    return assignments.map((assignment) => configurations.find((configuration) => configuration.id === assignment.configuration_id));
-  };
-
-  handleConfigurationSelect = (configurationIds, hideCallback) => {
+  handleConfigurationSelect = (configurationNames, hideCallback) => {
     const { configurations } = this.props;
 
     hideCallback();
-    const nextAssignedConfigurations = configurations.filter((c) => configurationIds.includes(c.id));
+    const nextAssignedConfigurations = configurations.filter((c) => configurationNames.includes(c.name));
 
     this.setState({ nextAssignedConfigurations }, this.modal.open);
   };
@@ -66,9 +66,9 @@ class CollectorConfigurationSelector extends React.Component {
     this.setState({ nextAssignedConfigurations: [] });
   };
 
-  configurationFormatter = (configurationId) => {
+  configurationFormatter = (configurationName) => {
     const { configurations, collectors } = this.props;
-    const configuration = configurations.find((c) => c.id === configurationId);
+    const configuration = configurations.find((c) => c.name === configurationName);
     const collector = collectors.find((b) => b.id === configuration.collector_id);
 
     return (
@@ -137,12 +137,12 @@ class CollectorConfigurationSelector extends React.Component {
       );
     }
 
-    const configurationIds = configurations
+    const configurationNames = configurations
       .filter((configuration) => selectedLogCollectors[0].id === configuration.collector_id)
       .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
-      .map((c) => c.id);
+      .map((c) => c.name);
 
-    if (configurationIds.length === 0) {
+    if (configurationNames.length === 0) {
       return (
         <SelectPopover id="status-filter"
                        title="Apply configuration"
@@ -153,7 +153,7 @@ class CollectorConfigurationSelector extends React.Component {
       );
     }
 
-    const assignedConfigurations = this.getAssignedConfigurations(selectedSidecarCollectorPairs, configurations)
+    const assignedConfigurations = getAssignedConfigurations(selectedSidecarCollectorPairs, configurations)
       .filter((configuration) => selectedLogCollectors[0].id === configuration.collector_id);
 
     return (
@@ -161,10 +161,10 @@ class CollectorConfigurationSelector extends React.Component {
         <SelectPopover id="apply-configuration-action"
                        title="Apply configuration"
                        triggerNode={<Button bsSize="small" bsStyle="link">Configure <span className="caret" /></Button>}
-                       items={configurationIds}
+                       items={configurationNames}
                        itemFormatter={this.configurationFormatter}
                        onItemSelect={this.handleConfigurationSelect}
-                       selectedItems={assignedConfigurations.map((config) => config.id)}
+                       selectedItems={assignedConfigurations.map((config) => config.name)}
                        filterPlaceholder="Filter by configuration" />
         {this.renderConfigurationSummary(nextAssignedConfigurations, selectedSidecarCollectorPairs)}
       </span>

@@ -54,6 +54,6 @@ public class V20190805115800_RemoveDashboardStateFromViewsTest {
         assertThat(argumentCaptor.getValue().modifiedViewsCount()).isEqualTo(4);
 
         MongoCollection<Document> collection = mongodb.mongoConnection().getMongoDatabase().getCollection("views");
-        assertThat(collection.count()).isEqualTo(4);
+        assertThat(collection.countDocuments()).isEqualTo(4);
     }
 }

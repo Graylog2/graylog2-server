@@ -38,7 +38,7 @@ const TimeRangeWrapper = styled.p(({ theme }) => css`
   margin: 0 0 0 12px;
   display: flex;
   justify-content: space-around;
-  background-color: ${theme.colors.variant.lightest.primary};
+  background-color: ${theme.colors.table.backgroundAlt};
   align-items: center;
   border-radius: 4px;
 
@@ -47,9 +47,8 @@ const TimeRangeWrapper = styled.p(({ theme }) => css`
   }
 
   code {
-    color: ${theme.colors.variant.darker.primary};
+    color: ${theme.colors.global.textDefault};
     background: transparent;
-    font-size: ${theme.fonts.size.body};
   }
 `);
 

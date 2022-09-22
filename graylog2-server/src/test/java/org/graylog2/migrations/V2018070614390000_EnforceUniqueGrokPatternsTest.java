@@ -112,7 +112,7 @@ public class V2018070614390000_EnforceUniqueGrokPatternsTest {
 
         assertThatThrownBy(() -> collection.insertOne(grokPattern("FOO", "[a-z]+")))
                 .isInstanceOf(MongoWriteException.class)
-                .hasMessageMatching("E11000 duplicate key error collection: graylog.grok_patterns index: idx_name_asc_unique dup key: \\{ (name)?: \"FOO\" \\}");
+                .hasMessageMatching(".*E11000 duplicate key error collection: graylog.grok_patterns index: idx_name_asc_unique dup key: \\{ (name)?: \"FOO\" \\}.*");
     }
 
     private Document grokPattern(String name, String pattern) {

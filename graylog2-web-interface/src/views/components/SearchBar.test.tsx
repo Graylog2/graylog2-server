@@ -29,8 +29,6 @@ import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 
 import SearchBar from './SearchBar';
 
-const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
-
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
     ['getInitialState', () => ({ search: { parameters: [] } })],
@@ -40,12 +38,7 @@ jest.mock('views/stores/SearchStore', () => ({
   },
 }));
 
-jest.mock('stores/users/CurrentUserStore', () => ({
-  CurrentUserStore: MockStore(
-    ['get', () => mockCurrentUser],
-    ['getInitialState', () => mockCurrentUser],
-  ),
-}));
+jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 jest.mock('stores/streams/StreamsStore', () => MockStore(
   ['listStreams', () => ({ then: jest.fn() })],
