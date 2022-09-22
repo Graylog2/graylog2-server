@@ -49,6 +49,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -273,5 +274,12 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
         return sidecars.stream()
                 .map(collector -> collector.toSummary(isActiveFunction))
                 .collect(Collectors.toList());
+    }
+
+    public Stream<Sidecar> findByTagsAndOS(Collection<String> tags, String os) {
+        return streamQuery(DBQuery.and(
+                DBQuery.in("node_details.tags", tags),
+                DBQuery.regex("node_details.operating_system", Pattern.compile("^" + Pattern.quote(os) + "$", Pattern.CASE_INSENSITIVE))
+        ));
     }
 }
