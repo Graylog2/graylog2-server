@@ -76,7 +76,7 @@ describe('TimeRangeDropdown', () => {
   it('Clicking apply run handler', async () => {
     render(<TimeRangeDropdown {...defaultProps} />);
 
-    const applyButton = screen.getByRole('button', { name: /apply/i });
+    const applyButton = screen.getByRole('button', { name: /update time range/i });
     fireEvent.click(applyButton);
 
     await waitFor(() => expect(defaultProps.setCurrentTimeRange).toHaveBeenCalled());
