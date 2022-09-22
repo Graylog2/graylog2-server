@@ -65,7 +65,7 @@ const FormSubmit = (props: Props) => {
     <ButtonToolbar className={className}>
       <Button bsStyle="success"
               bsSize={bsSize}
-              disabled={disabledSubmit}
+              disabled={disabledSubmit || isSubmitting}
               form={formId}
               title={submitButtonText}
               type={submitButtonType}
@@ -77,7 +77,7 @@ const FormSubmit = (props: Props) => {
         <Button type="button"
                 bsSize={bsSize}
                 onClick={props.onCancel}
-                disabled={props.disableCancel}>
+                disabled={props.disableCancel || isSubmitting}>
           Cancel
         </Button>
       )}

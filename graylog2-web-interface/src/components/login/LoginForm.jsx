@@ -76,7 +76,7 @@ const LoginForm = ({ onErrorChange }) => {
              required />
 
       <ModalSubmit displayCancel={false}
-                   disabledSubmit={isLoading}
+                   isSubmitting={isLoading}
                    submitLoadingText="Signing in..."
                    submitButtonText="Sign in" />
     </form>

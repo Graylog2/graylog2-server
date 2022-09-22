@@ -77,7 +77,7 @@ const ModalSubmit = (props: Props) => {
         <Button type="button"
                 bsSize={bsSize}
                 onClick={props.onCancel}
-                disabled={props.disableCancel}>
+                disabled={props.disableCancel || isSubmitting}>
           Cancel
         </Button>
       )}
