@@ -125,7 +125,7 @@ public class ElasticsearchConfiguration {
     private Duration indexOptimizationTimeout = Duration.hours(1L);
 
     @Parameter(value = "elasticsearch_index_optimization_jobs", validator = PositiveIntegerValidator.class)
-    private int indexOptimizationJobs = 20;
+    private int indexOptimizationJobs = 10;
 
     @Parameter(value = "index_field_type_periodical_full_refresh_interval", validators = {PositiveDurationValidator.class})
     private Duration indexFieldTypePeriodicalFullRefreshInterval = Duration.minutes(5);
