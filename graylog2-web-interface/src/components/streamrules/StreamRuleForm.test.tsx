@@ -94,7 +94,7 @@ describe('StreamRuleForm', () => {
 
     const ruleTypeSelection = getByTestId('rule-type-selection');
     fireEvent.change(ruleTypeSelection, { target: { name: 'type', value: 8 } });
-    const submitBtn = getByText('Save');
+    const submitBtn = getByText('Update rule');
     fireEvent.click(submitBtn);
 
     expect(submit).toHaveBeenCalledTimes(0);

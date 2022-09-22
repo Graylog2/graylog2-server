@@ -37,31 +37,31 @@ jest.mock('views/stores/SearchConfigStore', () => ({
 
 jest.mock('stores/tools/ToolsStore', () => ({}));
 
-const defaultProps = {
-  currentTimeRange: {
-    type: 'relative',
-    from: 300,
-  },
-  noOverride: false,
-  setCurrentTimeRange: jest.fn(),
-  toggleDropdownShow: jest.fn(),
-  position: 'bottom',
-  limitDuration: 259200,
-} as const;
-
-const TimeRangeDropdown = (allProps: TimeRangeDropdownProps) => (
-  <OriginalTimeRangeDropDown {...allProps} />
-);
-
 describe('TimeRangeDropdown relative time range', () => {
+  const defaultProps = {
+    currentTimeRange: {
+      type: 'relative',
+      from: 300,
+    },
+    noOverride: false,
+    setCurrentTimeRange: jest.fn(),
+    toggleDropdownShow: jest.fn(),
+    position: 'bottom',
+    limitDuration: 259200,
+  } as const;
+
+  const TimeRangeDropdown = (allProps: TimeRangeDropdownProps) => (
+    <OriginalTimeRangeDropDown {...allProps} />
+  );
+
+  const getSubmitButton = () => screen.getByRole('button', { name: /Update time range/i });
+
   it('display warning when emptying from range value input', async () => {
     render(<TimeRangeDropdown {...defaultProps} />);
 
     const fromRangeValueInput = screen.getByTitle('Set the from value');
-    const submitButton = screen.getByRole('button', {
-      name: /apply/i,
-    });
 
+    const submitButton = getSubmitButton();
     userEvent.type(fromRangeValueInput, '{backspace}');
 
     await screen.findByText('Cannot be empty.');
@@ -81,9 +81,7 @@ describe('TimeRangeDropdown relative time range', () => {
     render(<TimeRangeDropdown {...props} />);
 
     const toRangeValueInput = screen.getByTitle('Set the to value');
-    const submitButton = screen.getByRole('button', {
-      name: /apply/i,
-    });
+    const submitButton = getSubmitButton();
 
     userEvent.type(toRangeValueInput, '{backspace}');
 
@@ -107,9 +105,7 @@ describe('TimeRangeDropdown relative time range', () => {
 
     const fromRangeValueInput = screen.getByTitle('Set the from value');
     const toRangeValueInput = screen.getByTitle('Set the to value');
-    const submitButton = screen.getByRole('button', {
-      name: /apply/i,
-    });
+    const submitButton = getSubmitButton();
 
     userEvent.type(fromRangeValueInput, '{backspace}7');
     userEvent.type(toRangeValueInput, '{backspace}6');

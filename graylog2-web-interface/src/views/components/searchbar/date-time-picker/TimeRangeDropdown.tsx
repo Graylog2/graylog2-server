@@ -281,7 +281,7 @@ const TimeRangeDropdown = ({
                     <FormSubmit leftCol={noOverride && <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>}
                                 onCancel={handleCancel}
                                 disabledSubmit={!isValid || validatingKeyword}
-                                submitButtonText="Update search" />
+                                submitButtonText="Update time range" />
                   </Col>
                 </Row>
               </Form>

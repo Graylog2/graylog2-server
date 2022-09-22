@@ -68,7 +68,7 @@ describe('<URLWhiteListFormModal>', () => {
     expect(await screen.findByText('Whitelist URLs')).toBeInTheDocument();
     expect(screen.getByDisplayValue('http://graylog.com')).toBeInTheDocument();
     expect(screen.getByText(/exact match/i)).toBeInTheDocument();
-    expect(screen.getByText(/save/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /update configuration/i, hidden: true })).toBeInTheDocument();
     expect(screen.getByText(/cancel/i)).toBeInTheDocument();
   });
 
