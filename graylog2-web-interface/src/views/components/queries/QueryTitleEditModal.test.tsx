@@ -84,7 +84,7 @@ describe('QueryTitleEditModal', () => {
   it('closes on click on cancel', async () => {
     let modalRef;
     const onTitleChangeFn = jest.fn();
-    const { getByText, queryByText } = render(
+    const { getByText, queryByText, findByText } = render(
       <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
                            onTitleChange={onTitleChangeFn} />,
     );
@@ -92,7 +92,7 @@ describe('QueryTitleEditModal', () => {
     openModal(modalRef);
 
     // Modal should be visible
-    expect(queryByText(modalHeadline)).not.toBeInTheDocument();
+    await findByText(modalHeadline);
 
     // Modal should not be visible after click on cancel
     const cancelButton = getByText('Cancel');
@@ -100,7 +100,7 @@ describe('QueryTitleEditModal', () => {
     fireEvent.click(cancelButton);
 
     await waitFor(() => {
-      expect(queryByText(modalHeadline)).toBeNull();
+      expect(queryByText(modalHeadline)).not.toBeInTheDocument();
     });
   });
 });
