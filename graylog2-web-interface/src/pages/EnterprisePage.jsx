@@ -28,10 +28,6 @@ import EnterpriseProductLink from 'components/enterprise/EnterpriseProductLink';
 import ProductLink from 'components/enterprise/ProductLink';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 
-const BiggerFontSize = styled.div(({ theme }) => css`
-  font-size: ${theme.fonts.size.large};
-`);
-
 const GraylogEnterpriseHeader = styled.h2`
   margin-bottom: 10px;
 `;
@@ -66,31 +62,27 @@ const EnterprisePage = () => {
           <Row className="content">
             <Col md={6}>
               <GraylogEnterpriseHeader>Graylog Operations</GraylogEnterpriseHeader>
-              <BiggerFontSize>
-                <p>
-                  Designed to meet the needs of resource-constrained IT Operations and Software Engineering teams,
-                  Graylog Operations provides numerous productivity enhancements that will save you thousands of
-                  hours per year in collecting and analyzing log data to uncover the root cause of performance,
-                  outage, and error issues.
-                </p>
-                <ProductLinkComponent href="https://go2.graylog.org/request-graylog-operations" clusterId={clusterId}>
-                  Request now
-                </ProductLinkComponent>
-              </BiggerFontSize>
+              <p>
+                Designed to meet the needs of resource-constrained IT Operations and Software Engineering teams,
+                Graylog Operations provides numerous productivity enhancements that will save you thousands of
+                hours per year in collecting and analyzing log data to uncover the root cause of performance,
+                outage, and error issues.
+              </p>
+              <ProductLinkComponent href="https://go2.graylog.org/request-graylog-operations" clusterId={clusterId}>
+                Request now
+              </ProductLinkComponent>
             </Col>
             <Col md={6}>
               <GraylogEnterpriseHeader>Graylog Security</GraylogEnterpriseHeader>
-              <BiggerFontSize>
-                <p>
-                  Extend Graylog Open’s capabilities for detecting, investigating, and responding to cybersecurity
-                  threats with security-specific dashboards and alerts, anomaly detection AI/ML engine,
-                  integrations with other security tools, SOAR capabilities, and numerous compliance reporting
-                  features.
-                </p>
-                <ProductLinkComponent href="https://go2.graylog.org/request-graylog-security" licenseSubject="/license/security" clusterId={clusterId}>
-                  Request now
-                </ProductLinkComponent>
-              </BiggerFontSize>
+              <p>
+                Extend Graylog Open’s capabilities for detecting, investigating, and responding to cybersecurity
+                threats with security-specific dashboards and alerts, anomaly detection AI/ML engine,
+                integrations with other security tools, SOAR capabilities, and numerous compliance reporting
+                features.
+              </p>
+              <ProductLinkComponent href="https://go2.graylog.org/request-graylog-security" licenseSubject="/license/security" clusterId={clusterId}>
+                Request now
+              </ProductLinkComponent>
             </Col>
           </Row>
         </HideOnCloud>
