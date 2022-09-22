@@ -17,7 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import { FormSubmit } from 'components/common';
+import { ModalSubmit } from 'components/common';
 import { Input } from 'components/bootstrap';
 import { SessionActions } from 'stores/sessions/SessionStore';
 
@@ -75,10 +75,10 @@ const LoginForm = ({ onErrorChange }) => {
              placeholder="Password"
              required />
 
-      <FormSubmit displayCancel={false}
-                  disabledSubmit={isLoading}
-                  submitLoadingText="Signing in..."
-                  submitButtonText="Sign in" />
+      <ModalSubmit displayCancel={false}
+                   disabledSubmit={isLoading}
+                   submitLoadingText="Signing in..."
+                   submitButtonText="Sign in" />
     </form>
   );
 };

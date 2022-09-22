@@ -15,19 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
-import Button from 'components/bootstrap/Button';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
+import Button from 'components/bootstrap/Button';
 import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
-
-const StyledButtonToolbar = styled(ButtonToolbar)`
-  display: flex;
-  justify-content: flex-end;
-  align-items: end;
-`;
 
 type WithCancelProps = {
   displayCancel: true,
@@ -46,7 +39,6 @@ type Props = {
   disabledSubmit?: boolean,
   formId?: string,
   isSubmitting?: boolean,
-  leftCol?: React.ReactNode,
   onSubmit?: () => void,
   submitButtonText: string,
   submitIcon?: IconName,
@@ -62,7 +54,6 @@ const FormSubmit = (props: Props) => {
     disabledSubmit,
     formId,
     isSubmitting,
-    leftCol,
     onSubmit,
     submitButtonText,
     submitButtonType,
@@ -71,16 +62,7 @@ const FormSubmit = (props: Props) => {
   } = props;
 
   return (
-    <StyledButtonToolbar className={className}>
-      {leftCol}
-      {displayCancel === true && (
-        <Button type="button"
-                bsSize={bsSize}
-                onClick={props.onCancel}
-                disabled={props.disableCancel}>
-          Cancel
-        </Button>
-      )}
+    <ButtonToolbar className={className}>
       <Button bsStyle="success"
               bsSize={bsSize}
               disabled={disabledSubmit}
@@ -91,7 +73,15 @@ const FormSubmit = (props: Props) => {
         {(submitIcon && !isSubmitting) && <><Icon name={submitIcon} /> </>}
         {isSubmitting ? <Spinner text={submitLoadingText} delay={0} /> : submitButtonText}
       </Button>
-    </StyledButtonToolbar>
+      {displayCancel === true && (
+        <Button type="button"
+                bsSize={bsSize}
+                onClick={props.onCancel}
+                disabled={props.disableCancel}>
+          Cancel
+        </Button>
+      )}
+    </ButtonToolbar>
   );
 };
 
@@ -102,7 +92,6 @@ FormSubmit.defaultProps = {
   displayCancel: true,
   formId: undefined,
   isSubmitting: false,
-  leftCol: undefined,
   onSubmit: undefined,
   submitButtonType: 'submit',
   submitIcon: undefined,
