@@ -38,7 +38,8 @@ class InputForm extends React.Component {
     values: undefined,
   };
 
-  static state = {
+  // eslint-disable-next-line react/state-in-constructor
+  state = {
     global: this.props.globalValue !== undefined ? this.props.globalValue : false,
     node: this.props.nodeValue !== undefined ? this.props.nodeValue : undefined,
   };
