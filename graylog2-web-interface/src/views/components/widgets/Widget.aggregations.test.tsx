@@ -52,6 +52,7 @@ const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
+jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 const MockWidgetStoreState = Immutable.Map();
 
