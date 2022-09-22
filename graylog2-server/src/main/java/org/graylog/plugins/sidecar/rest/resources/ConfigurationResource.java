@@ -289,7 +289,11 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
 
         final Configuration config = configurationService.save(configuration);
         if (!config.tags().isEmpty()) {
-            etagService.invalidateAllRegistrations();
+            final String os = Optional.ofNullable(collectorService.find(request.collectorId()))
+                    .map(Collector::nodeOperatingSystem).orElse("");
+            sidecarService.findByTagsAndOS(config.tags(), os)
+                    .map(Sidecar::nodeId)
+                    .forEach(etagService::invalidateRegistration);
         }
 
         return Response.ok().entity(config).build();
