@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import moment from 'moment';
 
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/bootstrap';
-import { Icon, KeyCapture, FormSubmit } from 'components/common';
+import { Icon, KeyCapture, ModalSubmit } from 'components/common';
 import { availableTimeRangeTypes } from 'views/Constants';
 import type {
   AbsoluteTimeRange,
@@ -278,10 +278,10 @@ const TimeRangeDropdown = ({
                     <Timezone>All timezones using: <b>{userTimezone}</b></Timezone>
                   </Col>
                   <Col md={6}>
-                    <FormSubmit leftCol={noOverride && <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>}
-                                onCancel={handleCancel}
-                                disabledSubmit={!isValid || validatingKeyword}
-                                submitButtonText="Update time range" />
+                    <ModalSubmit leftCol={noOverride && <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>}
+                                 onCancel={handleCancel}
+                                 disabledSubmit={!isValid || validatingKeyword}
+                                 submitButtonText="Update time range" />
                   </Col>
                 </Row>
               </Form>
