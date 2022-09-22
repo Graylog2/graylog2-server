@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 
 import QueryTitleEditModal from './QueryTitleEditModal';
 
@@ -29,7 +29,7 @@ describe('QueryTitleEditModal', () => {
     }
   };
 
-  it('shows after triggering open action', () => {
+  it('shows after triggering open action', async () => {
     let modalRef;
     const { queryByText } = render(
       <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
@@ -42,7 +42,7 @@ describe('QueryTitleEditModal', () => {
     openModal(modalRef);
 
     // Modal should be visible
-    expect(queryByText(modalHeadline)).not.toBeNull();
+    await screen.findByText(modalHeadline);
   });
 
   it('has correct initial input value', () => {
@@ -92,7 +92,7 @@ describe('QueryTitleEditModal', () => {
     openModal(modalRef);
 
     // Modal should be visible
-    expect(queryByText(modalHeadline)).not.toBeNull();
+    expect(queryByText(modalHeadline)).not.toBeInTheDocument();
 
     // Modal should not be visible after click on cancel
     const cancelButton = getByText('Cancel');
