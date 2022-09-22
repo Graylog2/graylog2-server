@@ -216,7 +216,7 @@ const EventsConfig = createReactClass({
                              enabled={eventsCatchupWindow.duration > 0}
                              units={TIME_UNITS} />
               <HelpBlock>If Event processor execution is behind schedule, queries on older data will be run with this window size to speed up processing.
-                (If the &quot;search within the last&quot; setting of an event definiton is greater, this setting will be ignored)
+                (If the &quot;search within the last&quot; setting of an event definition is greater, this setting will be ignored)
               </HelpBlock>
             </FormGroup>
           </fieldset>

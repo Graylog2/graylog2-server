@@ -60,14 +60,14 @@ describe('QueryTitleEditModal', () => {
   it('updates query title and closes', async () => {
     let modalRef;
     const onTitleChangeFn = jest.fn();
-    const { getByDisplayValue, getByText, queryByText } = render(
+    const { getByDisplayValue, getByRole, queryByText } = render(
       <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
                            onTitleChange={onTitleChangeFn} />,
     );
 
     openModal(modalRef);
     const titleInput = getByDisplayValue('CurrentTitle');
-    const saveButton = getByText('Save');
+    const saveButton = getByRole('button', { name: /update title/i, hidden: true });
 
     fireEvent.change(titleInput, { target: { value: 'NewTitle' } });
     fireEvent.click(saveButton);
