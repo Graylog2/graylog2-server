@@ -19,6 +19,7 @@ package org.graylog.plugins.sidecar.rest.resources;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -26,6 +27,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.sidecar.audit.SidecarAuditEventTypes;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
+import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.rest.models.CollectorUpload;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.ConfigurationSummary;
@@ -36,6 +38,7 @@ import org.graylog.plugins.sidecar.rest.responses.CollectorUploadListResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationListResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationPreviewRenderResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationSidecarsResponse;
+import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog.plugins.sidecar.services.ImportService;
@@ -77,6 +80,7 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -98,6 +102,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     private final SidecarService sidecarService;
     private final EtagService etagService;
     private final ImportService importService;
+    private final CollectorService collectorService;
     private final SearchQueryParser searchQueryParser;
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(Configuration.FIELD_ID))
@@ -109,12 +114,14 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     public ConfigurationResource(ConfigurationService configurationService,
                                  SidecarService sidecarService,
                                  EtagService etagService,
-                                 ImportService importService) {
+                                 ImportService importService,
+                                 CollectorService collectorService) {
         this.configurationService = configurationService;
         this.sidecarService = sidecarService;
         this.etagService = etagService;
         this.importService = importService;
-        this.searchQueryParser = new SearchQueryParser(Configuration.FIELD_NAME, SEARCH_FIELD_MAPPING);;
+        this.collectorService = collectorService;
+        this.searchQueryParser = new SearchQueryParser(Configuration.FIELD_NAME, SEARCH_FIELD_MAPPING);
     }
 
     @GET
@@ -282,7 +289,11 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
 
         final Configuration config = configurationService.save(configuration);
         if (!config.tags().isEmpty()) {
-            etagService.invalidateAllRegistrations();
+            final String os = Optional.ofNullable(collectorService.find(request.collectorId()))
+                    .map(Collector::nodeOperatingSystem).orElse("");
+            sidecarService.findByTagsAndOS(config.tags(), os)
+                    .map(Sidecar::nodeId)
+                    .forEach(etagService::invalidateRegistration);
         }
 
         return Response.ok().entity(config).build();
@@ -333,8 +344,14 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
         etagService.invalidateAllConfigurations();
+
         if (! previousConfiguration.tags().equals(updatedConfiguration.tags())) {
-            etagService.invalidateAllRegistrations();
+            final Set<String> tags = Sets.symmetricDifference(previousConfiguration.tags(), updatedConfiguration.tags());
+            final String os = Optional.ofNullable(collectorService.find(request.collectorId()))
+                    .map(Collector::nodeOperatingSystem).orElse("");
+            sidecarService.findByTagsAndOS(tags, os)
+                    .map(Sidecar::nodeId)
+                    .forEach(etagService::invalidateRegistration);
         }
 
         return Response.ok().entity(configurationService.save(updatedConfiguration)).build();
