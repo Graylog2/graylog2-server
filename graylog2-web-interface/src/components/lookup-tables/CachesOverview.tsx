@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import Routes from 'routing/Routes';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
@@ -94,7 +94,7 @@ const CachesOverview = () => {
   };
 
   const onDelete = () => {
-    queryClient.invalidateQueries('all-caches');
+    queryClient.invalidateQueries(['all-caches']);
   };
 
   const toCreateView = () => {
