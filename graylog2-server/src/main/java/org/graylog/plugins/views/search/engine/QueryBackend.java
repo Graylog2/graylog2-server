@@ -111,7 +111,7 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      */
     QueryResult doRun(SearchJob job, Query query, T queryContext);
 
-    Set<String> getFieldsPresentInSearchResultDocuments(final Query normalizedQuery, final int size);
+    Set<String> getFieldsPresentInQueryResultDocuments(final Query normalizedQuery, final int size);
 
     default boolean isSearchTypeWithError(T queryContext, String searchTypeId) {
         return queryContext.errors().stream()

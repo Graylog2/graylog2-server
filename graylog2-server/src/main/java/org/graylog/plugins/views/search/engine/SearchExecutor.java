@@ -77,13 +77,13 @@ public class SearchExecutor {
         }
         final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
         final Query mainQuery = normalizedSearch.queries().stream().findFirst().orElseThrow(() -> new IllegalArgumentException("No queries in search : " + normalizedSearch.id()));
-        return queryEngine.getFieldsPresentInSearchResultDocuments(mainQuery, size);
+        return queryEngine.getFieldsPresentInQueryResultDocuments(mainQuery, size);
     }
 
-    public Set<String> getFieldsPresentInSearchResultDocuments(final Query query,
-                                                               final ParameterProvider parameterProvider,
-                                                               final SearchUser searchUser,
-                                                               final int size) {
+    public Set<String> getFieldsPresentInQueryResultDocuments(final Query query,
+                                                              final ParameterProvider parameterProvider,
+                                                              final SearchUser searchUser,
+                                                              final int size) {
         final ExecutionState executionState = ExecutionState.empty();
         final Query preValidationQuery = searchNormalization.preValidation(query, parameterProvider, searchUser, executionState);
         final Set<SearchError> validationErrors = searchValidation.validate(preValidationQuery, searchUser);
@@ -91,7 +91,7 @@ public class SearchExecutor {
             return Set.of();
         }
         final Query normalizedQuery = searchNormalization.postValidation(preValidationQuery, parameterProvider);
-        return queryEngine.getFieldsPresentInSearchResultDocuments(normalizedQuery, size);
+        return queryEngine.getFieldsPresentInQueryResultDocuments(normalizedQuery, size);
     }
 
     public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState) {

@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.engine;
 
 import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.Condition;
+import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
@@ -31,7 +32,10 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.normalization.DecorateQueryStringsNormalizer;
 import org.graylog.plugins.views.search.engine.normalization.PluggableSearchNormalization;
+import org.graylog.plugins.views.search.engine.normalization.SearchNormalization;
 import org.graylog.plugins.views.search.engine.validation.PluggableSearchValidation;
+import org.graylog.plugins.views.search.engine.validation.SearchValidation;
+import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
@@ -53,6 +57,7 @@ import org.mockito.quality.Strictness;
 import javax.ws.rs.NotFoundException;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,8 +65,11 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class})
@@ -101,7 +109,60 @@ public class SearchExecutorTest {
     }
 
     @Test
-    public void throwsExceptionIfSearchIsNotFound() {
+    void returnsEmptyCollectionForGetFieldsPresentInSearchResultDocumentsIfQueryHasValidationErrors() {
+        final SearchUser searchUser = TestSearchUser.builder().build();
+        SearchNormalization searchNormalization = mock(SearchNormalization.class);
+        SearchValidation searchValidation = mock(SearchValidation.class);
+        ParameterProvider parameterProvider = name -> Optional.empty();
+        Query query = Query.builder().id("initial query").build();
+        Query preValidationQuery = Query.builder().id("preValidationQuery").build();
+        Query normalizedQuery = Query.builder().id("normalizedQuery").build();
+        doReturn(preValidationQuery).when(searchNormalization).preValidation(eq(query), eq(parameterProvider), eq(searchUser), any());
+        doReturn(normalizedQuery).when(searchNormalization).postValidation(eq(preValidationQuery), eq(parameterProvider));
+        doReturn(Set.of(new QueryError(preValidationQuery, "Fatal!", true))).when(searchValidation).validate(eq(preValidationQuery), any());
+
+        this.searchExecutor = new SearchExecutor(searchDomain,
+                new InMemorySearchJobService(),
+                queryEngine,
+                searchValidation,
+                searchNormalization);
+
+
+        final Set<String> result = searchExecutor.getFieldsPresentInQueryResultDocuments(query, parameterProvider, searchUser, 1000);
+
+        verifyNoInteractions(queryEngine);
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void returnsProperFieldsPresentInSearchResultDocuments() {
+        final SearchUser searchUser = TestSearchUser.builder().build();
+        SearchNormalization searchNormalization = mock(SearchNormalization.class);
+        SearchValidation searchValidation = mock(SearchValidation.class);
+        ParameterProvider parameterProvider = name -> Optional.empty();
+        Query query = Query.builder().id("initial query").build();
+        Query preValidationQuery = Query.builder().id("preValidationQuery").build();
+        Query normalizedQuery = Query.builder().id("normalizedQuery").build();
+        doReturn(preValidationQuery).when(searchNormalization).preValidation(eq(query), eq(parameterProvider), eq(searchUser), any());
+        doReturn(normalizedQuery).when(searchNormalization).postValidation(eq(preValidationQuery), eq(parameterProvider));
+        doReturn(Set.of()).when(searchValidation).validate(eq(preValidationQuery), any());
+        doReturn(Set.of("field1", "field2")).when(queryEngine).getFieldsPresentInQueryResultDocuments(normalizedQuery, 1000);
+
+        this.searchExecutor = new SearchExecutor(searchDomain,
+                new InMemorySearchJobService(),
+                queryEngine,
+                searchValidation,
+                searchNormalization);
+
+
+        final Set<String> result = searchExecutor.getFieldsPresentInQueryResultDocuments(query, parameterProvider, searchUser, 1000);
+
+        assertThat(result).containsOnly("field1", "field2");
+    }
+
+
+    @Test
+    void throwsExceptionIfSearchIsNotFound() {
         final SearchUser searchUser = TestSearchUser.builder().build();
 
         when(searchDomain.getForUser(eq("search1"), eq(searchUser))).thenReturn(Optional.empty());
@@ -112,7 +173,7 @@ public class SearchExecutorTest {
     }
 
     @Test
-    public void addsStreamsToSearchWithoutStreams() {
+    void addsStreamsToSearchWithoutStreams() {
         final Search search = Search.builder()
                 .queries(ImmutableSet.of(Query.builder().build()))
                 .build();
@@ -130,7 +191,7 @@ public class SearchExecutorTest {
     }
 
     @Test
-    public void appliesSearchExecutionState() {
+    void appliesSearchExecutionState() {
         final Search search = makeSearch();
 
         final SearchUser searchUser = TestSearchUser.builder()
@@ -154,7 +215,7 @@ public class SearchExecutorTest {
     }
 
     @Test
-    public void checksUserPermissionsForSearch() {
+    void checksUserPermissionsForSearch() {
         final Search search = Search.builder()
                 .queries(ImmutableSet.of(
                         Query.builder()

@@ -56,7 +56,7 @@ public class DiscoveredFieldTypeServiceImpl implements DiscoveredFieldTypeServic
                                                      final ParameterProvider parameterProvider,
                                                      final SearchUser searchUser,
                                                      final int size) {
-        final Set<String> discoveredFields = searchExecutor.getFieldsPresentInSearchResultDocuments(query, parameterProvider, searchUser, size);
+        final Set<String> discoveredFields = searchExecutor.getFieldsPresentInQueryResultDocuments(query, parameterProvider, searchUser, size);
         return fieldNamesToFieldTypeDTOs(discoveredFields);
     }
 
