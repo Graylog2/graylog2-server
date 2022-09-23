@@ -213,8 +213,8 @@ const CollectorConfigurationModal = (props) => {
                              onConfirm={confirmConfigurationChange}
                              onCancel={cancelConfigurationChange}>
         <ConfigurationSummary>
-          {toAddSummary}
-          {toRemoveSummary}
+          {(_selectedSidecarCollectorPairs.length === 1) && toAddSummary}
+          {(_selectedSidecarCollectorPairs.length === 1) && toRemoveSummary}
           <p>Are you sure you want to proceed with this action for <b>{formattedSummary}</b>?</p>
         </ConfigurationSummary>
       </BootstrapModalConfirm>
