@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Link } from 'components/common/router';
@@ -49,8 +49,20 @@ const Content = styled.div(({ theme }) => css`
 `);
 const EditButton = styled.div(({ theme }) => css`
   color: ${theme.colors.gray[60]};
-  font-size: 0.80rem;
+  font-size: ${theme.fonts.size.tiny}
 `);
+const TitleWrapper = styled.span`
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  cursor: pointer;
+  & ${EditButton} {
+    display: none;
+  }
+  &:hover ${EditButton} {
+    display: block;
+  }
+`;
 
 const StyledIcon = styled(Icon)`
 font-size: 0.50rem;
@@ -58,24 +70,28 @@ font-size: 0.50rem;
 
 const ViewHeader = () => {
   const { view } = useStore(ViewStore);
-  const isSavedView = useMemo(() => view?.id && view?.title, [view]);
+  const isSavedView = view?.id && view?.title;
   const [showMetadataEdit, setShowMetadataEdit] = useState<boolean>(false);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);
 
-  return isSavedView ? (
+  if (!isSavedView) return null;
+
+  return (
     <Row>
       <Content>
         <Link to={links[view.type].link}>
           {links[view.type].label}
         </Link>
         <StyledIcon name="chevron-right" />
-        <span>{view.title}</span>
-        <EditButton onClick={toggleMetadataEdit}
-                    role="button"
-                    title={`Edit ${view.type.toLocaleLowerCase()} ${view.title} metadata`}
-                    tabIndex={0}>
-          <Icon name="pen-to-square" />
-        </EditButton>
+        <TitleWrapper>
+          <span>{view.title}</span>
+          <EditButton onClick={toggleMetadataEdit}
+                      role="button"
+                      title={`Edit ${view.type.toLocaleLowerCase()} ${view.title} metadata`}
+                      tabIndex={0}>
+            <Icon name="pen-to-square" />
+          </EditButton>
+        </TitleWrapper>
         {showMetadataEdit && (
         <ViewPropertiesModal show
                              view={view}
@@ -85,7 +101,7 @@ const ViewHeader = () => {
         )}
       </Content>
     </Row>
-  ) : null;
+  );
 };
 
 export default ViewHeader;
