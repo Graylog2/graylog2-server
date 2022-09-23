@@ -20,8 +20,8 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import lodash from 'lodash';
 
-import { ColorPickerPopover, Select, SourceCodeEditor } from 'components/common';
-import { Button, ButtonToolbar, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
+import { ColorPickerPopover, FormSubmit, Select, SourceCodeEditor } from 'components/common';
+import { Button, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
@@ -355,16 +355,9 @@ const ConfigurationForm = createReactClass({
 
           <Row>
             <Col md={12}>
-              <FormGroup>
-                <ButtonToolbar>
-                  <Button type="submit" bsStyle="primary" disabled={this._hasErrors()}>
-                    {action === 'create' ? 'Create' : 'Update'}
-                  </Button>
-                  <Button type="button" onClick={this._onCancel}>
-                    {action === 'create' ? 'Cancel' : 'Back'}
-                  </Button>
-                </ButtonToolbar>
-              </FormGroup>
+              <FormSubmit submitButtonText={`${action === 'create' ? 'Create' : 'Update'} configuration`}
+                          disabledSubmit={this._hasErrors()}
+                          onCancel={this._onCancel} />
             </Col>
           </Row>
         </form>
