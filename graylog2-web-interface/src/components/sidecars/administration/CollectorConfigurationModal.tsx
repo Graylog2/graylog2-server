@@ -225,6 +225,7 @@ const CollectorConfigurationModal = (props) => {
       const onReset = () => {
         setSelectedConfigurations(fullyAssignedConfigurations);
         setPartiallySelectedConfigurations(partiallyAssignedConfigurations);
+        setSearchQuery('');
       };
 
       const isNotDirty = lodash.isEqual(selectedConfigurations, fullyAssignedConfigurations) && lodash.isEqual(partiallySelectedConfigurations, partiallyAssignedConfigurations);
@@ -292,7 +293,7 @@ const CollectorConfigurationModal = (props) => {
             </ModalTitle>
           </Modal.Header>
           <Modal.Body>
-            <SearchForm onQueryChange={(q) => setSearchQuery(q)} topMargin={0} queryWidth="100%" />
+            <SearchForm query={searchQuery} onQueryChange={(q) => setSearchQuery(q)} topMargin={0} queryWidth="100%" />
             <ConfigurationContainer>
               <ConfigurationTable className="table-condensed table-hover">
                 <tbody>
