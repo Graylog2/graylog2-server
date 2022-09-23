@@ -310,10 +310,11 @@ export function parseApi(name: string, api: RawApi) {
 export default function parse(srcDir: string): Array<Api> {
   const apiSummary = JSON.parse(fs.readFileSync(`${srcDir}/${apiFile}`).toString());
 
-  return apiSummary.apis.map(({ path, name: rawName }) => {
+  return apiSummary.apis.map(({ name: rawName }) => {
     const name = rawName.replace(/ /g, '');
-    const apiJson = fs.readFileSync(`${srcDir}${path}.json`).toString();
-    console.log(`Reading ${srcDir}${path}.json`);
+    const filename = `${srcDir}/${rawName}.json`;
+    const apiJson = fs.readFileSync(filename).toString();
+    console.log(`Reading ${filename}`);
     const api = JSON.parse(apiJson) as RawApi;
 
     return parseApi(name, api);
