@@ -35,6 +35,7 @@ type WithoutCancelProps = {
 type Props = {
   bsSize?: 'large' | 'small' | 'xsmall',
   className?: string,
+  centerCol?: React.ReactNode,
   displayCancel?: boolean,
   disabledSubmit?: boolean,
   formId?: string,
@@ -50,6 +51,7 @@ const FormSubmit = (props: Props) => {
   const {
     bsSize,
     className,
+    centerCol,
     displayCancel,
     disabledSubmit,
     formId,
@@ -73,6 +75,7 @@ const FormSubmit = (props: Props) => {
         {(submitIcon && !isSubmitting) && <><Icon name={submitIcon} /> </>}
         {isSubmitting ? <Spinner text={submitLoadingText} delay={0} /> : submitButtonText}
       </Button>
+      {centerCol}
       {displayCancel === true && (
         <Button type="button"
                 bsSize={bsSize}
@@ -87,6 +90,7 @@ const FormSubmit = (props: Props) => {
 
 FormSubmit.defaultProps = {
   bsSize: undefined,
+  centerCol: undefined,
   className: undefined,
   disabledSubmit: false,
   displayCancel: true,
