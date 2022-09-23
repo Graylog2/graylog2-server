@@ -77,6 +77,7 @@ public class GenerateApiDefinition {
         }
         final String targetName = args[0];
         final Path targetPath = Paths.get(targetName);
+        final boolean isCloud = Boolean.parseBoolean(System.getProperty("IS_CLOUD"));
 
         deleteDirectory(targetPath.toFile());
         Files.createDirectories(targetPath);
@@ -87,7 +88,7 @@ public class GenerateApiDefinition {
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-        final Generator generator = new Generator(resourceClasses, Collections.emptyMap(), "/plugins", objectMapper, false);
+        final Generator generator = new Generator(resourceClasses, Collections.emptyMap(), "/plugins", objectMapper, isCloud, false);
 
         final Map<String, Object> overview = generator.generateOverview();
         writeJsonToFile(targetName + "/api.json", overview);
