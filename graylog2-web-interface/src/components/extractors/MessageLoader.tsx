@@ -19,6 +19,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { MessagesActions } from 'stores/messages/MessagesStore';
+import { FormSubmit } from 'components/common';
+import history from 'util/History';
 
 import { Button } from '../bootstrap';
 
@@ -31,11 +33,9 @@ const LoadMessageForm = ({ loadMessage, children, loading }: LoadMessageFormProp
   <div>
     <form className="form-inline message-loader-form" onSubmit={loadMessage}>
       {children}
-      <Button bsStyle="info"
-              disabled={loading}
-              type="submit">
-        {loading ? 'Loading message...' : 'Load message'}
-      </Button>
+      <FormSubmit submitButtonText={loading ? 'Loading message...' : 'Load message'}
+                  isSubmitting={loading}
+                  onCancel={() => history.goBack()} />
     </form>
   </div>
 );
