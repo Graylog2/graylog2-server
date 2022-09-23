@@ -19,11 +19,13 @@ import React from 'react';
 import _ from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { TimeUnitInput } from 'components/common';
-import { Col, Row, Button, Input } from 'components/bootstrap';
+import { TimeUnitInput, FormSubmit } from 'components/common';
+import { Col, Row, Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import { getValueFromInput } from 'util/FormsUtils';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
+import history from 'util/History';
+import Routes from 'routing/Routes';
 
 class DataAdapterForm extends React.Component {
   validationCheckTimer = undefined;
@@ -266,6 +268,7 @@ class DataAdapterForm extends React.Component {
     const adapterPlugins = PluginStore.exports('lookupTableAdapters');
 
     const plugin = adapterPlugins.filter((p) => p.type === type);
+    const onCancel = () => history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
     let configFieldSet = null;
     let documentationComponent = null;
     let pluginDisplayName = dataAdapter.config.type;
@@ -362,9 +365,9 @@ class DataAdapterForm extends React.Component {
               <fieldset>
                 <Row>
                   <Col mdOffset={3} md={9}>
-                    <Button type="submit" bsStyle="success" disabled={isFormDisabled}>{create ? 'Create Adapter'
-                      : 'Update Adapter'}
-                    </Button>
+                    <FormSubmit submitButtonText={create ? 'Create adapter' : 'Update adapter'}
+                                disabledSubmit={isFormDisabled}
+                                onCancel={onCancel} />
                   </Col>
                 </Row>
               </fieldset>
