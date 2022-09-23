@@ -27,8 +27,6 @@ export {
   Dropdown,
   Form,
   Grid,
-  MenuItem,
-  NavItem,
   Pager,
   PanelGroup,
   Radio, // NOTE: do we want custom or keep OS styles

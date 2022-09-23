@@ -22,6 +22,8 @@ import styled from 'styled-components';
 import { Row, Col, Button, BootstrapModalForm, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import type { PipelineType } from 'stores/pipelines/PipelinesStore';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 const SaveButton = styled(Button)`
   margin-right: 10px;
@@ -36,6 +38,7 @@ type Props = {
 };
 
 const PipelineForm = ({ pipeline, create, modal, save, onCancel }: Props) => {
+  const currentUser = useCurrentUser();
   const modalRef = useRef<BootstrapModalForm>();
   const [nextPipeline, setNextPipeline] = useState<PipelineType>(cloneDeep(pipeline));
 
@@ -96,7 +99,8 @@ const PipelineForm = ({ pipeline, create, modal, save, onCancel }: Props) => {
   if (modal) {
     return (
       <span>
-        <Button onClick={_openModal}
+        <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')}
+                onClick={_openModal}
                 bsStyle="success">
           {create ? 'Add new pipeline' : 'Edit pipeline details'}
         </Button>

@@ -16,8 +16,10 @@
  */
 package org.graylog.plugins.views.search.searchfilters.db;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SearchFilterVisibilityCheckStatus {
 
@@ -39,11 +41,26 @@ public class SearchFilterVisibilityCheckStatus {
         return hiddenSearchFiltersIDs.isEmpty();
     }
 
+    public boolean allSearchFiltersVisible(final Collection<String> allowedHiddenSearchFilters) {
+        return hiddenSearchFiltersIDs.isEmpty() || (allowedHiddenSearchFilters != null && allowedHiddenSearchFilters.containsAll(hiddenSearchFiltersIDs));
+    }
+
     public String toMessage() {
         if (!allSearchFiltersVisible()) {
-            return "Search cannot be saved, as it contains Search Filters which you are not privileged to view : " + hiddenSearchFiltersIDs.toString();
+            return "View cannot be saved, as it contains Search Filters which you are not privileged to view : " + hiddenSearchFiltersIDs.toString();
         } else {
-            return "Search can be created with provided list of Search Filters";
+            return "View can be created with provided list of Search Filters";
+        }
+    }
+
+    public String toMessage(final Collection<String> allowedHiddenSearchFilters) {
+        if (!allSearchFiltersVisible(allowedHiddenSearchFilters)) {
+            return "View cannot be saved, as it contains Search Filters which you are not privileged to view : " +
+                    hiddenSearchFiltersIDs.stream()
+                            .filter(f -> !allowedHiddenSearchFilters.contains(f))
+                            .collect(Collectors.toList());
+        } else {
+            return "View can be created with provided list of Search Filters";
         }
     }
 }

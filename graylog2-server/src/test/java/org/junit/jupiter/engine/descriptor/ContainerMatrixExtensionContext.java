@@ -20,6 +20,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.TestInstances;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.platform.engine.EngineExecutionListener;
+import org.junit.platform.engine.support.hierarchical.Node;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
@@ -66,5 +67,10 @@ public class ContainerMatrixExtensionContext extends AbstractExtensionContext<Co
     @Override
     public Optional<Throwable> getExecutionException() {
         return Optional.empty();
+    }
+
+    @Override
+    protected Node.ExecutionMode getPlatformExecutionMode() {
+        return Node.ExecutionMode.SAME_THREAD;
     }
 }

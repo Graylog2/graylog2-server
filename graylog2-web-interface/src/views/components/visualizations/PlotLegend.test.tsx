@@ -87,7 +87,7 @@ describe('PlotLegend', () => {
     const color = screen.getByTitle('#b71c1c');
     fireEvent.click(color);
 
-    await waitFor(() => expect(setColor).toBeCalledWith('name1', '#b71c1c'));
+    await waitFor(() => expect(setColor).toHaveBeenCalledWith('name1', '#b71c1c'));
   });
 
   it('should open the value context menu', async () => {

@@ -28,7 +28,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.graylog.plugins.views.search.rest.ExecutionState;
-import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -88,6 +87,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();
 
+    @Override
     @JsonIgnore
     public Optional<Parameter> getParameter(String parameterName) {
         return Optional.ofNullable(parameterIndex.get(parameterName));
@@ -105,21 +105,13 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
 
         if (executionState.queries() != null || executionState.globalOverride() != null) {
             final ImmutableSet<Query> queries = queries().stream()
-                    .map(query -> applyStateToQuery(executionState, query))
+                    .map(query -> query.applyExecutionState(executionState))
                     .collect(toImmutableSet());
             builder.queries(queries);
         }
         return builder.build();
     }
 
-    private Query applyStateToQuery(ExecutionState executionState, Query query) {
-        if (executionState.globalOverride().hasValues()) {
-            return query.applyExecutionState(executionState.globalOverride());
-        } else {
-            final ExecutionStateGlobalOverride queryOverride = executionState.queries().get(query.id());
-            return query.applyExecutionState(queryOverride);
-        }
-    }
 
     public Search addStreamsToQueriesWithoutStreams(Supplier<Set<String>> defaultStreamsSupplier) {
         if (!hasQueriesWithoutStreams()) {
@@ -167,15 +159,9 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
     }
 
     public Set<String> streamIdsForPermissionsCheck() {
-        final Set<String> queryStreamIds = queries().stream()
-                .map(Query::usedStreamIds)
+        return queries().stream()
+                .map(Query::streamIdsForPermissionsCheck)
                 .reduce(Collections.emptySet(), Sets::union);
-        final Set<String> searchTypeStreamIds = queries().stream()
-                .flatMap(q -> q.searchTypes().stream())
-                .map(SearchType::streams)
-                .reduce(Collections.emptySet(), Sets::union);
-
-        return Sets.union(queryStreamIds, searchTypeStreamIds);
     }
 
     public Query queryForSearchType(String searchTypeId) {
@@ -184,6 +170,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Search " + id() + " doesn't have a query for search type " + searchTypeId));
     }
+
 
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "")

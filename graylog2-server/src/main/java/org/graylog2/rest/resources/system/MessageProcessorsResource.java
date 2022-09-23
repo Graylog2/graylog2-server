@@ -39,8 +39,10 @@ import javax.ws.rs.core.MediaType;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @RequiresAuthentication
-@Api(value = "System/MessageProcessors", description = "Manage message processors")
+@Api(value = "System/MessageProcessors", description = "Manage message processors", tags = {CLOUD_VISIBLE})
 @Path("/system/messageprocessors")
 @Produces(MediaType.APPLICATION_JSON)
 public class MessageProcessorsResource extends RestResource {

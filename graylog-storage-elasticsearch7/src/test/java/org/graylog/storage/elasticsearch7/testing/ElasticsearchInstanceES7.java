@@ -24,6 +24,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelC
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.RestHighLevelClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
+import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
@@ -32,9 +33,15 @@ import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.elasticsearch.ElasticsearchContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
+
+import static java.util.Objects.isNull;
 
 public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstanceES7.class);
@@ -46,6 +53,7 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     private final ElasticsearchClient elasticsearchClient;
     private final Client client;
     private final FixtureImporter fixtureImporter;
+    private Adapters adapters;
 
     protected ElasticsearchInstanceES7(String image, SearchVersion version, Network network, String heapSize) {
         super(image, version, network, heapSize);
@@ -53,6 +61,7 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
         this.client = new ClientES7(this.elasticsearchClient);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
+        this.adapters = new AdaptersES7(elasticsearchClient);
     }
     protected ElasticsearchInstanceES7(String image, SearchVersion version, Network network) {
         this(image, version, network, DEFAULT_HEAP_SIZE);
@@ -118,11 +127,30 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
         return this.fixtureImporter;
     }
 
+    @Override
+    public Adapters adapters() {
+        return this.adapters;
+    }
+
     public ElasticsearchClient elasticsearchClient() {
         return this.elasticsearchClient;
     }
 
     public RestHighLevelClient restHighLevelClient() {
         return this.restHighLevelClient;
+    }
+
+    @Override
+    public GenericContainer<?> buildContainer(String image, Network network) {
+        return new ElasticsearchContainer(DockerImageName.parse(image).asCompatibleSubstituteFor("docker.elastic.co/elasticsearch/elasticsearch"))
+                // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
+                .withReuse(isNull(System.getenv("BUILD_ID")))
+                .withEnv("ES_JAVA_OPTS", getEsJavaOpts())
+                .withEnv("discovery.type", "single-node")
+                .withEnv("action.auto_create_index", "false")
+                .withEnv("cluster.info.update.interval", "10s")
+                .withNetwork(network)
+                .withNetworkAliases(NETWORK_ALIAS)
+                .waitingFor(Wait.forHttp("/").forPort(ES_PORT));
     }
 }

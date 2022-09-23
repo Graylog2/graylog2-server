@@ -51,7 +51,7 @@ jest.mock('stores/inputs/InputsStore', () => ({
 
 jest.mock('stores/streams/StreamsStore', () => ({ listStreams: (...args) => mockListStreams(...args) }));
 
-jest.mock('views/logic/fieldtypes/useFieldTypes');
+jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
 jest.mock('routing/withParams', () => (x) => x);
 
 jest.mock('graylog-web-plugin/plugin', () => ({

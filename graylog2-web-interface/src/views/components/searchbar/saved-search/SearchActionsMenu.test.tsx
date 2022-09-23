@@ -18,6 +18,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import { defaultUser } from 'defaultMockValues';
 
 import { asMock, MockStore } from 'helpers/mocking';
 import { adminUser } from 'fixtures/users';
@@ -116,7 +117,7 @@ describe('SearchActionsMenu', () => {
   beforeEach(() => {
     asMock(ViewStore.getInitialState).mockReturnValue(defaultViewStoreState);
     asMock(useSaveViewFormControls).mockReturnValue([]);
-    asMock(useCurrentUser).mockReturnValue(adminUser);
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
   describe('Button handling', () => {

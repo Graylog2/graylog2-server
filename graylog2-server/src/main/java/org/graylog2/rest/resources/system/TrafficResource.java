@@ -33,7 +33,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-@Api(value = "System/ClusterTraffic", description = "Cluster traffic stats")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "System/ClusterTraffic", description = "Cluster traffic stats", tags = {CLOUD_VISIBLE})
 @RequiresAuthentication
 @Path("/system/cluster/traffic")
 @Produces(MediaType.APPLICATION_JSON)

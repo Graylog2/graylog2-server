@@ -70,9 +70,10 @@ public class V20220719130704_ImprovedDefaultProcessingOrderMigration extends Mig
         }
         LOG.info("Fresh Graylog installation detected. Applying new default Message Processor order.");
 
-
+        final MessageProcessorsConfig config = clusterConfigService.getOrDefault(MessageProcessorsConfig.class,
+                MessageProcessorsConfig.defaultConfig());
         // The former default order was simply based on sorting by class names
-        final List<String> order = MessageProcessorsConfig.defaultConfig().withProcessors(processorClassNames).processorOrder();
+        final List<String> order = config.withProcessors(processorClassNames).processorOrder();
 
         // Keep the former order, only swap the Message Filter with the PipelineProcessor
         final int filterChainIndex = order.indexOf(MessageFilterChainProcessor.class.getCanonicalName());

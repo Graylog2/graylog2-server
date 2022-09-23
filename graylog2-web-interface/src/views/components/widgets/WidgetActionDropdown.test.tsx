@@ -49,8 +49,7 @@ describe('WidgetActionDropdown', () => {
 
     trigger.simulate('click');
 
-    const menuItem = wrapper.find('a[children="Foo"]');
-
+    const menuItem = wrapper.findWhere((node) => node.type() === 'a' && node.text() === 'Foo');
     menuItem.simulate('click');
 
     expect(onSelect).toHaveBeenCalled();

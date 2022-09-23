@@ -67,7 +67,6 @@ describe('ActionsCell', () => {
     beforeEach(() => {
       oldConfirm = window.confirm;
       window.confirm = jest.fn(() => true);
-      asMock(useCurrentUser).mockReturnValue(adminUser);
     });
 
     afterEach(() => {

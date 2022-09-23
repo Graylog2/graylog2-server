@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer.messages;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Maps;
 import joptsimple.internal.Strings;
 import org.graylog.failure.FailureSubmissionService;
@@ -32,10 +31,12 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.in;
 import static org.mockito.Mockito.mock;
 
 public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
@@ -44,7 +45,9 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
     protected static final IndexSet indexSet = new MessagesTestIndexSet();
     protected Messages messages;
 
-    protected abstract MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry);
+    protected MessagesAdapter createMessagesAdapter() {
+        return searchServer().adapters().messagesAdapter();
+    }
 
     @Mock
     private FailureSubmissionService failureSubmissionService;
@@ -54,8 +57,7 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
         client().deleteIndices(INDEX_NAME);
         client().createIndex(INDEX_NAME);
         client().waitForGreenStatus(INDEX_NAME);
-        final MetricRegistry metricRegistry = new MetricRegistry();
-        messages = new Messages(mock(TrafficAccounting.class), createMessagesAdapter(metricRegistry), mock(ProcessingStatusRecorder.class),
+        messages = new Messages(mock(TrafficAccounting.class), createMessagesAdapter(), mock(ProcessingStatusRecorder.class),
                 failureSubmissionService);
     }
 
@@ -79,7 +81,9 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
         assertThat(messageCount(INDEX_NAME)).isEqualTo(MESSAGECOUNT);
     }
 
-    protected abstract long messageCount(String indexName);
+    protected long messageCount(String indexName) {
+        return searchServer().adapters().countsAdapter().totalCount(Collections.singletonList(indexName));
+    }
 
     private DateTime now() {
         return DateTime.now(DateTimeZone.UTC);

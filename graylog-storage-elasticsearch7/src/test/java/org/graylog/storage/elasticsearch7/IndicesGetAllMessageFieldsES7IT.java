@@ -31,21 +31,8 @@ public class IndicesGetAllMessageFieldsES7IT extends IndicesGetAllMessageFieldsI
     @Rule
     public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
 
-    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-
     @Override
-    protected IndicesAdapter indicesAdapter() {
-        final ElasticsearchClient client = elasticsearch.elasticsearchClient();
-        return new IndicesAdapterES7(
-                client,
-                new StatsApi(objectMapper, client),
-                new CatApi(objectMapper, client),
-                new ClusterStateApi(objectMapper, client)
-        );
-    }
-
-    @Override
-    protected SearchServerInstance elasticsearch() {
+    protected SearchServerInstance searchServer() {
         return elasticsearch;
     }
 }

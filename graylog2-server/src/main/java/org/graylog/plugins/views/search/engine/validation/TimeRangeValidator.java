@@ -23,7 +23,6 @@ import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
-import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
@@ -71,11 +70,18 @@ public class TimeRangeValidator implements SearchValidator {
         return start.isBefore(allowedStart);
     }
 
-    public Set<SearchError> validate(Search search, StreamPermissions streamPermissions) {
+    @Override
+    public Set<SearchError> validate(final Search search) {
         final SearchConfig searchConfig = searchConfigProvider.get();
         return search.queries()
                 .stream()
                 .flatMap(query -> validateQueryTimeRange(query, searchConfig))
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<SearchError> validate(final Query query) {
+        final SearchConfig searchConfig = searchConfigProvider.get();
+        return validateQueryTimeRange(query, searchConfig).collect(Collectors.toSet());
     }
 }

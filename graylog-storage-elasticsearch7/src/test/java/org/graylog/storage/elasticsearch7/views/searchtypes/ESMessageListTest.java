@@ -21,7 +21,6 @@ import com.jayway.jsonpath.JsonPath;
 import com.revinate.assertj.json.JsonPathAssert;
 import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
@@ -166,7 +165,7 @@ public class ESMessageListTest {
                 new LegacyDecoratorProcessor.Fake(),
                 allowHighlighting);
 
-        sut.doGenerateQueryPart(mock(SearchJob.class), someQuery(), messageList, context);
+        sut.doGenerateQueryPart(someQuery(), messageList, context);
 
         return context;
     }

@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.views.search.engine.normalization;
 
+import org.graylog.plugins.views.search.ParameterProvider;
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
@@ -41,24 +43,54 @@ public class PluggableSearchNormalization implements SearchNormalization {
         this(pluggableNormalizers, Collections.emptySet());
     }
 
-    private Search normalize(Search search, Set<SearchNormalizer> normalizers, SearchUser searchUser, ExecutionState executionState) {
+    private Search normalize(Search search, Set<SearchNormalizer> normalizers) {
         Search normalizedSearch = search;
         for (SearchNormalizer searchNormalizer : normalizers) {
-            normalizedSearch = searchNormalizer.normalize(normalizedSearch, searchUser, executionState);
+            normalizedSearch = searchNormalizer.normalize(normalizedSearch);
         }
 
         return normalizedSearch;
     }
 
-    public Search preValidation(Search search, SearchUser searchUser, ExecutionState executionState) {
-        final Search searchWithStreams = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadAll());
-
-        Search normalizedSearch = searchWithStreams.applyExecutionState(firstNonNull(executionState, ExecutionState.empty()));
-
-        return normalize(normalizedSearch, pluggableNormalizers, searchUser, executionState);
+    private Query normalize(final Query query,
+                            final ParameterProvider parameterProvider,
+                            final Set<SearchNormalizer> normalizers) {
+        Query normalizedQuery = query;
+        for (SearchNormalizer searchNormalizer : normalizers) {
+            normalizedQuery = searchNormalizer.normalizeQuery(normalizedQuery, parameterProvider);
+        }
+        return normalizedQuery;
     }
 
+    @Override
+    public Search preValidation(Search search, SearchUser searchUser, ExecutionState executionState) {
+        final Search searchWithStreams = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadAll());
+        Search normalizedSearch = searchWithStreams.applyExecutionState(firstNonNull(executionState, ExecutionState.empty()));
+
+        return normalize(normalizedSearch, pluggableNormalizers);
+    }
+
+    @Override
     public Search postValidation(Search search, SearchUser searchUser, ExecutionState executionState) {
-        return normalize(search, postValidationNormalizers, searchUser, executionState);
+        return normalize(search, postValidationNormalizers);
+    }
+
+    @Override
+    public Query preValidation(final Query query, final ParameterProvider parameterProvider, SearchUser searchUser, ExecutionState executionState) {
+        Query normalizedQuery = query;
+        if (!query.hasStreams()) {
+            normalizedQuery = query.addStreamsToFilter(searchUser.streams().loadAll());
+        }
+
+        if (!executionState.equals(ExecutionState.empty())) {
+            normalizedQuery = normalizedQuery.applyExecutionState(executionState);
+        }
+
+        return normalize(normalizedQuery, parameterProvider, pluggableNormalizers);
+    }
+
+    @Override
+    public Query postValidation(final Query query, final ParameterProvider parameterProvider) {
+        return normalize(query, parameterProvider, postValidationNormalizers);
     }
 }

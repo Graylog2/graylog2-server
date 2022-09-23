@@ -18,7 +18,6 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import mockComponent from 'helpers/mocking/MockComponent';
-import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import usePluginEntities from 'hooks/usePluginEntities';
 import history from 'util/History';
@@ -28,8 +27,6 @@ import AppRouter from './AppRouter';
 
 jest.mock('components/throughput/GlobalThroughput', () => mockComponent('GlobalThroughput'));
 jest.mock('components/layout/Footer', () => mockComponent('Footer'));
-
-jest.mock('stores/nodes/NodesStore', () => ({ NodesStore: MockStore() }));
 
 // To prevent exceptions from getting swallowed
 jest.mock('components/errors/RouterErrorBoundary', () => mockComponent('RouterErrorBoundary'));

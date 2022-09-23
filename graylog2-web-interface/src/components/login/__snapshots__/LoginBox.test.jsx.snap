@@ -3,7 +3,7 @@
 exports[`LoginBox renders a button after the input if buttonAfter is passed 1`] = `
 .c1.content {
   background-color: #fff;
-  border: 1px solid #d0d0d0;
+  border: 1px solid #d7dce4;
   margin-bottom: 0.40rem;
   border-radius: 4px;
 }
@@ -40,14 +40,14 @@ exports[`LoginBox renders a button after the input if buttonAfter is passed 1`] 
 .c2 {
   padding: 15px;
   background-color: #fff;
-  border: 1px solid #a6a6a6;
+  border: 1px solid #b5bfcd;
   border-radius: 4px;
-  box-shadow: 0 0 21px rgba(243,243,243,0.5);
+  box-shadow: 0 0 21px rgba(245,246,248,0.5);
 }
 
 .c2 legend {
-  color: #575757;
-  border-color: #737373;
+  color: #67717f;
+  border-color: #8894a7;
 }
 
 <div>

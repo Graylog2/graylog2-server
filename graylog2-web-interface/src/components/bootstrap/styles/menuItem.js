@@ -22,6 +22,7 @@ const menuItemStyles = css(({ theme }) => css`
     box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
     
     > li > a {
+      display: flex;
       color: ${theme.colors.global.textDefault};
 
       :hover,
