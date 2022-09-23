@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useContext, useState } from 'react';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
-import { FormSubmit } from 'components/common';
+import { ModalSubmit } from 'components/common';
 
 type Props = {
   onCancel: () => void,
@@ -42,13 +42,13 @@ const SaveOrCancelButtons = ({ onFinish, onCancel, disableSave = false }: Props)
   };
 
   return (
-    <FormSubmit submitButtonText="Apply changes"
-                submitLoadingText="Applying changes..."
-                onSubmit={_onFinish}
-                submitButtonType="button"
-                disabledSubmit={disableSave}
-                isSubmitting={isSubmitting}
-                onCancel={onCancel} />
+    <ModalSubmit submitButtonText="Apply changes"
+                 submitLoadingText="Applying changes..."
+                 onSubmit={_onFinish}
+                 submitButtonType="button"
+                 disabledSubmit={disableSave}
+                 isSubmitting={isSubmitting}
+                 onCancel={onCancel} />
   );
 };
 
