@@ -21,10 +21,10 @@ import { Formik, Form, Field } from 'formik';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { FormikFormGroup, FormikInput, Spinner, TimeUnitInput } from 'components/common';
+import { FormikFormGroup, FormikInput, FormSubmit, Spinner, TimeUnitInput } from 'components/common';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { LinkContainer } from 'components/common/router';
-import { Col, Row, Button, Input } from 'components/bootstrap';
+import history from 'util/History';
+import { Col, Row, Input } from 'components/bootstrap';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import 'components/indices/rotation';
 import 'components/indices/retention';
@@ -33,13 +33,15 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import type { RetentionStrategyContext } from './Types';
 
 type Props = {
+  cancelLink: string,
+  create: boolean,
   indexSet: IndexSet,
-  rotationStrategies: Array<any>,
+  onUpdate: (indexSet: IndexSet) => void,
   retentionStrategies: Array<any>,
   retentionStrategiesContext: RetentionStrategyContext,
-  create: boolean,
-  onUpdate: (indexSet: IndexSet) => void,
-  cancelLink: string,
+  rotationStrategies: Array<any>,
+  submitButtonText: string,
+  submitLoadingText: string,
 };
 
 type Unit = 'seconds' | 'minutes';
@@ -48,8 +50,8 @@ type State = {
   indexSet: IndexSet,
   fieldTypeRefreshIntervalUnit: Unit,
 };
-const StyledButton = styled(Button)`
-  margin-right:10px;
+const StyledFormSubmit = styled(FormSubmit)`
+  margin-left: 0;
 `;
 
 const _validateIndexPrefix = (value) => {
@@ -87,6 +89,8 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
     create: PropTypes.bool,
     onUpdate: PropTypes.func.isRequired,
     cancelLink: PropTypes.string.isRequired,
+    submitButtonText: PropTypes.string.isRequired,
+    submitLoadingText: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
@@ -106,7 +110,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
   _saveConfiguration = (values) => {
     const { onUpdate } = this.props;
 
-    onUpdate(values);
+    return onUpdate(values);
   };
 
   render() {
@@ -123,6 +127,8 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
         retention_strategy_class: IndexSetRetentionStrategyClass,
       },
       retentionStrategiesContext,
+      submitButtonText,
+      submitLoadingText,
     } = this.props;
     let rotationConfig;
 
@@ -198,12 +204,14 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
       );
     }
 
+    const onCancel = () => history.push(cancelLink);
+
     return (
       <Row>
         <Col md={8}>
           <Formik onSubmit={this._saveConfiguration}
                   initialValues={indexSet}>
-            {({ isValid, setFieldValue }) => (
+            {({ isValid, setFieldValue, isSubmitting }) => (
               <Form>
                 <Row>
                   <Col md={12}>
@@ -285,11 +293,12 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
                 </Row>
 
                 <Row>
-                  <Col md={12}>
-                    <StyledButton type="submit" bsStyle="primary" disabled={!isValid} style={{ marginRight: 10 }}>Save</StyledButton>
-                    <LinkContainer to={cancelLink}>
-                      <Button bsStyle="default">Cancel</Button>
-                    </LinkContainer>
+                  <Col md={9} mdOffset={3}>
+                    <StyledFormSubmit disabledSubmit={!isValid}
+                                      submitButtonText={submitButtonText}
+                                      submitLoadingText={submitLoadingText}
+                                      isSubmitting={isSubmitting}
+                                      onCancel={onCancel} />
                   </Col>
                 </Row>
 
