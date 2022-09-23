@@ -4,7 +4,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/org.graylog2/graylog2-server.svg)](http://mvnrepository.com/artifact/org.graylog2/graylog2-server)
 [![Build](https://github.com/Graylog2/graylog2-server/actions/workflows/build.yml/badge.svg)](https://github.com/Graylog2/graylog2-server/actions/workflows/build.yml)
 
-Welcome! _Graylog_ is an open source log management platform.
+Welcome! _Graylog_ is a source-available log management platform.
 
 You can read more about the project on our [website](https://www.graylog.org/) and check out the [documentation](http://docs.graylog.org/) on the documentation site.
 
@@ -20,7 +20,7 @@ Help us build the future of log management and be part of a project that is used
 
 Follow the [contributors guide](https://www.graylog.org/community) and read [the contributing instructions](CONTRIBUTING.md) to get started.
 
-Do you want to get paid for developing our open source product? Apply for one of our [jobs](https://www.graylog.org/careers)!
+Do you want to get paid for developing our source-available product? Apply for one of our [jobs](https://www.graylog.org/careers)!
 
 ## Staying in Touch
 
