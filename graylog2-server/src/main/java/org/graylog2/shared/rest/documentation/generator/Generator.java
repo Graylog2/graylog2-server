@@ -97,17 +97,24 @@ public class Generator {
     private final String pluginPathPrefix;
     private final ObjectMapper mapper;
     private final boolean isCloud;
-    public Generator(Set<Class<?>> resourceClasses, Map<Class<?>, String> pluginMapping,
-                     String pluginPathPrefix, ObjectMapper mapper, boolean isCloud) {
+    private final boolean prefixPlugins;
+
+    public Generator(Set<Class<?>> resourceClasses,
+                     Map<Class<?>, String> pluginMapping,
+                     String pluginPathPrefix,
+                     ObjectMapper mapper,
+                     boolean isCloud,
+                     boolean prefixPlugins) {
         this.resourceClasses = resourceClasses;
         this.pluginMapping = pluginMapping;
         this.pluginPathPrefix = pluginPathPrefix;
         this.mapper = mapper;
         this.isCloud = isCloud;
+        this.prefixPlugins = prefixPlugins;
     }
 
-    public Generator(Set<Class<?>> resourceClasses, ObjectMapper mapper, boolean isCloud) {
-        this(resourceClasses, ImmutableMap.of(), "", mapper, isCloud);
+    public Generator(Set<Class<?>> resourceClasses, ObjectMapper mapper, boolean isCloud, boolean prefixPlugins) {
+        this(resourceClasses, ImmutableMap.of(), "", mapper, isCloud, prefixPlugins);
     }
 
     private String prefixedPath(Class<?> resourceClass, @Nullable String resourceAnnotationPath) {
@@ -149,7 +156,7 @@ public class Generator {
             }
 
             final Map<String, Object> apiDescription = Maps.newHashMap();
-            apiDescription.put("name", prefixedPath.startsWith(pluginPathPrefix) ? "Plugins/" + info.value() : info.value());
+            apiDescription.put("name", (prefixPlugins && prefixedPath.startsWith(pluginPathPrefix)) ? "Plugins/" + info.value() : info.value());
             apiDescription.put("path", prefixedPath);
             apiDescription.put("description", info.description());
 
