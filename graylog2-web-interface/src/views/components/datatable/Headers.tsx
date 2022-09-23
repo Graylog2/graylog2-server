@@ -34,14 +34,13 @@ import { Icon } from 'components/common';
 
 import styles from './DataTable.css';
 
-const getStickyStyles = (stickyLeftMargin) => `
-  position: sticky!important;
-  left: ${stickyLeftMargin}px;
-  z-index: 1;
-`;
 const StyledTh = styled.th(({ isNumeric, stickyLeftMargin }: { isNumeric: boolean, stickyLeftMargin: number }) => css`
   ${isNumeric ? 'text-align: right' : ''}
-  ${isNumber(stickyLeftMargin) ? getStickyStyles(stickyLeftMargin) : ''}
+  &.pinnedCell {
+    position: sticky!important;
+    left: ${stickyLeftMargin}px;
+    z-index: 1;
+  }
 `);
 
 const CenteredTh = styled.th`
@@ -89,9 +88,9 @@ const HeaderField = ({ activeQuery, fields, field, prefix = '', span = 1, title 
   }, [_onSetRowPivotColumnsWidth, field, thRef]);
 
   return (
-    <StyledTh ref={thRef} isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned} stickyLeftMargin={stickyLeftMargin}>
+    <StyledTh ref={thRef} isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={`${styles.leftAligned} ${isNumber(stickyLeftMargin) ? 'pinnedCell' : ''}`} stickyLeftMargin={stickyLeftMargin}>
       <Field name={field} queryId={activeQuery} type={type}>{title}</Field>
-      {showPinIcon && <PinIcon onClick={() => togglePin(field)} className={isNumber(stickyLeftMargin) ? 'active' : ''}><Icon name="thumbtack" /></PinIcon>}
+      {showPinIcon && <PinIcon type="button" onClick={() => togglePin(field)} className={isNumber(stickyLeftMargin) ? 'active' : ''}><Icon name="thumbtack" /></PinIcon>}
       {sortable && sortType && (
       <FieldSortIcon fieldName={field}
                      onSortChange={onSortChange}
@@ -170,6 +169,7 @@ const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup,
   const columnFieldNames = columnPivots.map((pivot) => pivot.field);
   const headerField = ({ field, prefix = '', span = 1, title = field, sortable = false, sortType = undefined, _onSetRowPivotColumnsWidth = undefined, showPinIcon = false }) => (
     <HeaderField activeQuery={activeQuery}
+                 key={`${prefix}-${field}-${title}`}
                  fields={fields}
                  field={field}
                  prefix={prefix}

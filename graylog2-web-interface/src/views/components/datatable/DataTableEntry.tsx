@@ -34,15 +34,14 @@ import type { CurrentViewType } from '../CustomPropTypes';
 import CustomHighlighting from '../messagelist/CustomHighlighting';
 import DecoratedValue from '../messagelist/decoration/DecoratedValue';
 
-const getStickyStyles = (stickyLeftMargin) => `
-  position: sticky!important;
-  left: ${stickyLeftMargin}px;
-  z-index: 1;
-`;
 const StyledTd = styled.td(({ isNumeric, theme, stickyLeftMargin }: { isNumeric: boolean, theme: DefaultTheme, stickyLeftMargin: number | undefined }) => css`
   ${isNumeric ? `font-family: ${theme.fonts.family.monospace};` : ''}
   ${isNumeric ? 'text-align: right' : ''}
-  ${isNumber(stickyLeftMargin) ? getStickyStyles(stickyLeftMargin) : ''}
+  &.pinnedCell {
+    position: sticky!important;
+    left: ${stickyLeftMargin}px;
+    z-index: 1;
+  }
 `);
 
 type Field = {
@@ -69,7 +68,7 @@ const Column = ({ field, value, selectedQuery, type, valuePath, source, stickyLe
   const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
 
   return (
-    <StyledTd isNumeric={type.isNumeric()} stickyLeftMargin={stickyLeftMargin}>
+    <StyledTd isNumeric={type.isNumeric()} className={isNumber(stickyLeftMargin) ? 'pinnedCell' : ''} stickyLeftMargin={stickyLeftMargin}>
       <AdditionalContext.Provider value={additionalContextValue}>
         <CustomHighlighting field={source ?? field} value={value}>
           {value !== null && value !== undefined
