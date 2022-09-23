@@ -20,8 +20,8 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import lodash from 'lodash';
 
-import { Select, SourceCodeEditor } from 'components/common';
-import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
+import { FormSubmit, Select, SourceCodeEditor } from 'components/common';
+import { Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
@@ -262,16 +262,9 @@ const CollectorForm = createReactClass({
 
           <Row>
             <Col md={12}>
-              <FormGroup>
-                <ButtonToolbar>
-                  <Button type="submit" bsStyle="primary" disabled={this.hasErrors()}>
-                    {action === 'create' ? 'Create' : 'Update'}
-                  </Button>
-                  <Button type="button" onClick={this._onCancel}>
-                    {action === 'create' ? 'Cancel' : 'Back'}
-                  </Button>
-                </ButtonToolbar>
-              </FormGroup>
+              <FormSubmit submitButtonText={`${action === 'create' ? 'Create' : 'Update'} collector`}
+                          disabledSubmit={this.hasErrors()}
+                          onCancel={this._onCancel} />
             </Col>
           </Row>
         </form>

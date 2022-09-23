@@ -85,7 +85,7 @@ export default class RuleMetricsConfig extends React.Component {
                           onSubmitForm={this.saveConfiguration}
                           onModalClose={onClose}
                           show
-                          submitButtonText="Save">
+                          submitButtonText="Update configuration">
         <Alert bsStyle="warning">
           Rule metrics should only be enabled to debug a performance issue because collecting the
           metrics will slow down message processing and increase memory usage.
