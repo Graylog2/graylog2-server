@@ -110,18 +110,25 @@ const ModalSubTitle = styled.div`
 
 const CollectorConfigurationModal = (props) => {
   const [nextAssignedConfigurations, setNextAssignedConfigurations] = React.useState([]);
+  const [nextPartiallyAssignedConfigurations, setNextPartiallyAssignedConfigurations] = React.useState([]);
 
   const modalConfirm = React.useRef(null);
 
-  const getAssignedConfigurations = () => {
-    const { selectedSidecarCollectorPairs, configurations } = props;
-    const assignments = selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar).reduce((accumulator, sidecar) => accumulator.concat(sidecar.assignments), []);
+  const { configurations, selectedSidecarCollectorPairs, onConfigurationSelectionChange, onCancel, collectors } = props;
 
-    return assignments.map((assignment) => configurations.find((configuration) => configuration.id === assignment.configuration_id));
+  // Do not allow configuration changes when more than one log collector type is selected
+  const selectedLogCollectors = lodash.uniq(selectedSidecarCollectorPairs.map(({ collector }) => collector)) as any[];
+
+  const getAssignedConfigurations = (_selectedSidecarCollectorPairs, _selectedLogCollectors) => {
+    const assignments = _selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar).reduce((accumulator, sidecar) => accumulator.concat(sidecar.assignments), []);
+
+    return assignments.map((assignment) => configurations.find((configuration) => configuration.id === assignment.configuration_id))
+      .filter((configuration) => _selectedLogCollectors[0]?.id === configuration.collector_id)
+      .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
+      .map((config) => config.name);
   };
 
   const getFullyAndPartiallyAssignments = (_assignedConfigurations) => {
-    const { selectedSidecarCollectorPairs } = props;
     const occurrences = lodash.countBy(_assignedConfigurations);
 
     return [
@@ -130,16 +137,29 @@ const CollectorConfigurationModal = (props) => {
     ];
   };
 
-  const onSave = (configurationNames: string[]) => {
-    setNextAssignedConfigurations(configurationNames);
+  const onSave = (fullyAssignedConfigs: string[], partiallyAssignedConfigs: string[]) => {
+    setNextAssignedConfigurations(fullyAssignedConfigs);
+    setNextPartiallyAssignedConfigurations(partiallyAssignedConfigs);
     modalConfirm.current.open();
   };
 
   const confirmConfigurationChange = (doneCallback) => {
-    const { onConfigurationSelectionChange, configurations, onCancel } = props;
     const assignedConfigurationsToSave = configurations.filter((c) => nextAssignedConfigurations.includes(c.name));
 
-    onConfigurationSelectionChange(assignedConfigurationsToSave, doneCallback);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const sidecarCollectorPair of selectedSidecarCollectorPairs) {
+      let configs = assignedConfigurationsToSave;
+
+      if (nextPartiallyAssignedConfigurations.length) {
+        const assignments = getAssignedConfigurations([sidecarCollectorPair], selectedLogCollectors);
+        const assignmentsToKeep = lodash.intersection(assignments, nextPartiallyAssignedConfigurations);
+        const assignedConfigurationsToKeep = configurations.filter((c) => assignmentsToKeep.includes(c.name));
+        configs = [...assignedConfigurationsToSave, ...assignedConfigurationsToKeep];
+      }
+
+      onConfigurationSelectionChange([sidecarCollectorPair], configs, doneCallback);
+    }
+
     onCancel();
   };
 
@@ -148,19 +168,19 @@ const CollectorConfigurationModal = (props) => {
   };
 
   const getConfiguration = (name: string) => {
-    return props.configurations.find((c) => c.name === name);
+    return configurations.find((c) => c.name === name);
   };
 
   const getCollector = (name: string) => {
     const configuration = getConfiguration(name);
 
-    return props.collectors.find((b) => b.id === configuration.collector_id);
+    return collectors.find((b) => b.id === configuration.collector_id);
   };
 
   const getSidecars = (name: string) => {
     const configuration = getConfiguration(name);
 
-    return props.selectedSidecarCollectorPairs.filter(({ sidecar }) => sidecar.assignments.map((s) => s.configuration_id).includes(configuration.id)).map((a) => a.sidecar.node_name);
+    return selectedSidecarCollectorPairs.filter(({ sidecar }) => sidecar.assignments.map((s) => s.configuration_id).includes(configuration.id)).map((a) => a.sidecar.node_name);
   };
 
   const renderConfigurationSummary = (_previousAssignedConfigurations, _nextAssignedConfigurations, _selectedSidecarCollectorPairs) => {
@@ -201,15 +221,7 @@ const CollectorConfigurationModal = (props) => {
     );
   };
 
-  const { configurations, selectedSidecarCollectorPairs } = props;
-
-  // Do not allow configuration changes when more than one log collector type is selected
-  const selectedLogCollectors = lodash.uniq(selectedSidecarCollectorPairs.map(({ collector }) => collector)) as any[];
-
-  const assignedConfigurations = getAssignedConfigurations()
-    .filter((configuration) => selectedLogCollectors[0]?.id === configuration.collector_id)
-    .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
-    .map((config) => config.name);
+  const assignedConfigurations = getAssignedConfigurations(selectedSidecarCollectorPairs, selectedLogCollectors);
 
   const [fullyAssignedConfigurations, partiallyAssignedConfigurations] = getFullyAndPartiallyAssignments(assignedConfigurations);
 
@@ -320,7 +332,7 @@ const CollectorConfigurationModal = (props) => {
           <Modal.Footer>
             <Button type="button" onClick={props.onCancel}>Cancel</Button>
             <Button type="button" onClick={onReset}>Reset</Button>
-            <Button type="submit" bsStyle="primary" disabled={isNotDirty} onClick={() => onSave(selectedConfigurations)}>Save</Button>
+            <Button type="submit" bsStyle="primary" disabled={isNotDirty} onClick={() => onSave(selectedConfigurations, partiallySelectedConfigurations)}>Save</Button>
           </Modal.Footer>
         </BootstrapModalWrapper>
       );

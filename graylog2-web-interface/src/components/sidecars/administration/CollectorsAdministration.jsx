@@ -124,13 +124,8 @@ const CollectorsAdministration = createReactClass({
   },
 
   // eslint-disable-next-line react/sort-comp
-  handleConfigurationChange(selectedConfigurations, doneCallback) {
-    const { selected, enabledCollectors } = this.state;
+  handleConfigurationChange(selectedSidecars, selectedConfigurations, doneCallback) {
     const { onConfigurationChange } = this.props;
-
-    const selectedSidecars = enabledCollectors
-      .filter(({ sidecar, collector }) => selected.includes(this.sidecarCollectorId(sidecar, collector)));
-
     onConfigurationChange(selectedSidecars, selectedConfigurations, doneCallback);
   },
 
