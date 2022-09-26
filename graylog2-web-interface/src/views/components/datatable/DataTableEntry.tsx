@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
-import { flatten, get, isNumber } from 'lodash';
+import { flatten, get } from 'lodash';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
@@ -34,14 +34,9 @@ import type { CurrentViewType } from '../CustomPropTypes';
 import CustomHighlighting from '../messagelist/CustomHighlighting';
 import DecoratedValue from '../messagelist/decoration/DecoratedValue';
 
-const StyledTd = styled.td(({ isNumeric, theme, stickyLeftMargin }: { isNumeric: boolean, theme: DefaultTheme, stickyLeftMargin: number | undefined }) => css`
+const StyledTd = styled.td(({ isNumeric, theme }: { isNumeric: boolean, theme: DefaultTheme }) => css`
   ${isNumeric ? `font-family: ${theme.fonts.family.monospace};` : ''}
   ${isNumeric ? 'text-align: right' : ''}
-  &.pinnedCell {
-    position: sticky!important;
-    left: ${stickyLeftMargin}px;
-    z-index: 1;
-  }
 `);
 
 type Field = {
@@ -57,18 +52,17 @@ type Props = {
   series: Array<Series>,
   types: FieldTypeMappingsList,
   valuePath: ValuePath,
-  stickyLeftMargins: {[key: string]: number}
 };
 
 const _c = (field, value, path, source) => ({ field, value, path, source });
 
-type ColumnProps = { field: string, value: any, selectedQuery: string, type: FieldType, valuePath: ValuePath, source: string | undefined | null, stickyLeftMargin: number | undefined };
+type ColumnProps = { field: string, value: any, selectedQuery: string, type: FieldType, valuePath: ValuePath, source: string | undefined | null };
 
-const Column = ({ field, value, selectedQuery, type, valuePath, source, stickyLeftMargin }: ColumnProps) => {
+const Column = ({ field, value, selectedQuery, type, valuePath, source }: ColumnProps) => {
   const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
 
   return (
-    <StyledTd isNumeric={type.isNumeric()} className={isNumber(stickyLeftMargin) ? 'pinnedCell' : ''} stickyLeftMargin={stickyLeftMargin}>
+    <StyledTd isNumeric={type.isNumeric()}>
       <AdditionalContext.Provider value={additionalContextValue}>
         <CustomHighlighting field={source ?? field} value={value}>
           {value !== null && value !== undefined
@@ -97,7 +91,7 @@ const columnNameToField = (column, series = []) => {
   return currentSeries ? currentSeries.function : column;
 };
 
-const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivotValues, valuePath, item, types, stickyLeftMargins }: Props) => {
+const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivotValues, valuePath, item, types }: Props) => {
   const classes = 'message-group';
   const { activeQuery } = currentView;
 
@@ -132,8 +126,7 @@ const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivot
                 selectedQuery={activeQuery}
                 type={fieldTypeFor(columnNameToField(field, series), types)}
                 valuePath={path.slice()}
-                source={source}
-                stickyLeftMargin={stickyLeftMargins[field]} />
+                source={source} />
       ))}
     </tr>
   );

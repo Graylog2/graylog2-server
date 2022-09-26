@@ -19,7 +19,8 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as Immutable from 'immutable';
 import { flatten, isEqual, uniqWith } from 'lodash';
 import type { OrderedMap } from 'immutable';
-import { useFormikContext } from 'formik';
+import { FormikContext } from 'formik';
+import styled, { css } from 'styled-components';
 
 import connect from 'stores/connect';
 import expandRows from 'views/logic/ExpandRows';
@@ -56,6 +57,31 @@ type Props = VisualizationComponentProps & {
   stickyHeader?: boolean,
   condensed?: boolean,
 };
+
+const getStylesForPinnedColumns = (tag: 'th'|'td', stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>) => {
+  return stickyLeftMarginsByColumnIndex.map(({ index, leftMargin }) => `
+    ${tag}:nth-child(${index + 1}) {
+        position: sticky!important;
+        left: ${leftMargin}px;
+        z-index: 1;
+    }
+  `).concat((' ; '));
+};
+
+const THead = styled.thead(({ stickyLeftMarginsByColumnIndex }: {
+  stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
+}) => css`
+  & tr.pivot-header-row {
+    & ${getStylesForPinnedColumns('th', stickyLeftMarginsByColumnIndex)}
+  }
+`);
+const TBody = styled.tbody(({ stickyLeftMarginsByColumnIndex }: {
+  stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
+}) => css`
+  & tr {
+    & ${getStylesForPinnedColumns('td', stickyLeftMarginsByColumnIndex)}
+  }
+`);
 
 const _compareArray = (ary1, ary2) => {
   if (ary1 === undefined) {
@@ -110,12 +136,12 @@ const DataTable = ({
   condensed,
   editing,
 }: Props) => {
-  const formContext = useFormikContext();
+  const formContext = useContext(FormikContext);
   const onRenderComplete = useContext(RenderCompletionCallback);
   const widget = useContext(WidgetContext);
   useEffect(onRenderComplete, [onRenderComplete]);
   const [rowPivotColumnsWidth, setRowPivotColumnsWidth] = useState<{ [key: string]: number }>({});
-  const onSetRowPivotColumnsWidth = useCallback(({ field, offsetWidth }: { field: string, offsetWidth: number}) => {
+  const onSetColumnsWidth = useCallback(({ field, offsetWidth }: { field: string, offsetWidth: number}) => {
     setRowPivotColumnsWidth((cur) => {
       const copy = { ...cur };
       copy[field] = offsetWidth;
@@ -149,7 +175,8 @@ const DataTable = ({
   const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter((r): r is Leaf => r.source === 'leaf'));
 
   const actualColumnPivotFields = _extractColumnPivotValues(rows);
-  const [pinnedColumns, setPinnedColumns] = useState(new Set([]));
+  const [pinnedColumns, setPinnedColumns] = useState<Immutable.Set<string>>(Immutable.Set());
+  /*
   const stickyLeftMargins = useMemo(() => {
     let prev = 0;
     const res = {};
@@ -161,8 +188,38 @@ const DataTable = ({
       }
     });
 
+    series.forEach((row) => {
+      if (pinnedColumns.has(row.function)) {
+        res[row.function] = prev;
+        prev += rowPivotColumnsWidth[row.function];
+      }
+    });
+
     return res;
-  }, [rowPivotColumnsWidth, rowPivots, pinnedColumns]);
+  }, [rowPivotColumnsWidth, rowPivots, pinnedColumns, series]);
+   */
+  const stickyLeftMarginsByColumnIndex = useMemo(() => {
+    let prev = 0;
+    const res = [];
+
+    rowPivots.forEach((row, index) => {
+      if (pinnedColumns.has(row.field)) {
+        const column = row.field;
+        res.push({ index, column, leftMargin: prev });
+        prev += rowPivotColumnsWidth[row.field];
+      }
+    });
+
+    series.forEach((row, index) => {
+      if (pinnedColumns.has(row.function)) {
+        const column = row.function;
+        res.push({ index: index + rowPivots.length, column, leftMargin: prev });
+        prev += rowPivotColumnsWidth[row.function];
+      }
+    });
+
+    return res;
+  }, [rowPivotColumnsWidth, rowPivots, pinnedColumns, series]);
   const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
     const valuePath = rowFieldNames.map((pivotField) => ({ [pivotField]: expandedRows[idx][pivotField] }));
 
@@ -176,23 +233,16 @@ const DataTable = ({
                       columnPivots={columnFieldNames}
                       columnPivotValues={actualColumnPivotFields}
                       types={fields}
-                      series={series}
-                      stickyLeftMargins={stickyLeftMargins} />
+                      series={series} />
     );
   });
 
   const sortConfigMap = useMemo<OrderedMap<string, SortConfig>>(() => Immutable.OrderedMap(config.sort.map((sort) => [sort.field, sort])), [config]);
   const togglePin = useCallback((field) => {
     setPinnedColumns((cur) => {
-      const copy = new Set(cur);
+      if (cur.has(field)) return cur.delete(field);
 
-      if (copy.has(field)) {
-        copy.delete(field);
-      } else {
-        copy.add(field);
-      }
-
-      return copy;
+      return cur.add(field);
     });
   }, [setPinnedColumns]);
 
@@ -204,7 +254,7 @@ const DataTable = ({
                        borderedHeader={borderedHeader}
                        stickyHeader={stickyHeader}
                        condensed={condensed}>
-          <thead>
+          <THead stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
             <Headers activeQuery={currentView.activeQuery}
                      actualColumnPivotFields={actualColumnPivotFields}
                      columnPivots={columnPivots}
@@ -214,13 +264,13 @@ const DataTable = ({
                      series={series}
                      onSortChange={_onSortChange}
                      sortConfigMap={sortConfigMap}
-                     onSetRowPivotColumnsWidth={onSetRowPivotColumnsWidth}
-                     stickyLeftMargins={stickyLeftMargins}
+                     onSetColumnsWidth={onSetColumnsWidth}
+                     pinnedColumns={pinnedColumns}
                      togglePin={togglePin} />
-          </thead>
-          <tbody>
+          </THead>
+          <TBody stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
             {formattedRows}
-          </tbody>
+          </TBody>
         </MessagesTable>
       </div>
     </div>

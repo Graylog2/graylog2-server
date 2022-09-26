@@ -14,10 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useRef } from 'react';
-import { flatten, get, isEqual, last, isNumber } from 'lodash';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { flatten, get, isEqual, last } from 'lodash';
 import styled, { css } from 'styled-components';
 import type { OrderedMap } from 'immutable';
+import type Immutable from 'immutable';
 
 import Field from 'views/components/Field';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -34,13 +35,8 @@ import { Icon } from 'components/common';
 
 import styles from './DataTable.css';
 
-const StyledTh = styled.th(({ isNumeric, stickyLeftMargin }: { isNumeric: boolean, stickyLeftMargin: number }) => css`
-  ${isNumeric ? 'text-align: right' : ''}
-  &.pinnedCell {
-    position: sticky!important;
-    left: ${stickyLeftMargin}px;
-    z-index: 1;
-  }
+const StyledTh = styled.th(({ isNumeric }: { isNumeric: boolean }) => css`
+  ${isNumeric ? 'text-align: right' : ''};
 `);
 
 const CenteredTh = styled.th`
@@ -58,10 +54,10 @@ type HeaderFilterProps = {
   sortConfigMap: OrderedMap<string, SortConfig>;
   sortable: boolean;
   sortType?: 'pivot' | 'series' | undefined
-  _onSetRowPivotColumnsWidth?: (props: { field: string, offsetWidth: number }) => void
-  stickyLeftMargin?: number | undefined,
+  _onSetColumnsWidth?: (props: { field: string, offsetWidth: number }) => void
+  isPinned?: boolean | undefined,
   showPinIcon?: boolean,
-  togglePin: (field: string) => void
+  togglePin: (field: string) => void,
 }
 const PinIcon = styled.button(({ theme }) => {
   return css`
@@ -74,23 +70,27 @@ const PinIcon = styled.button(({ theme }) => {
     &.active {
       color: ${theme.colors.gray[20]};
     }
-  `;
+`;
 });
 
-const HeaderField = ({ activeQuery, fields, field, prefix = '', span = 1, title = field, onSortChange, sortConfigMap, sortable, sortType, _onSetRowPivotColumnsWidth, stickyLeftMargin, showPinIcon = false, togglePin }: HeaderFilterProps) => {
+const HeaderField = ({ activeQuery, fields, field, prefix = '', span = 1, title = field, onSortChange, sortConfigMap, sortable, sortType, _onSetColumnsWidth, isPinned, showPinIcon = false, togglePin }: HeaderFilterProps) => {
   const type = fieldTypeFor(field, fields);
   const thRef = useRef(null);
 
   useEffect(() => {
-    if (_onSetRowPivotColumnsWidth && thRef?.current?.offsetWidth) {
-      _onSetRowPivotColumnsWidth({ field, offsetWidth: thRef.current.offsetWidth });
+    if (_onSetColumnsWidth && thRef?.current?.offsetWidth) {
+      _onSetColumnsWidth({ field: `${prefix}${field}`, offsetWidth: thRef.current.offsetWidth });
     }
-  }, [_onSetRowPivotColumnsWidth, field, thRef]);
+  }, [_onSetColumnsWidth, field, prefix, thRef?.current?.offsetWidth]);
+
+  const _togglePin = useCallback(() => {
+    togglePin(`${prefix}${field}`);
+  }, [togglePin, prefix, field]);
 
   return (
-    <StyledTh ref={thRef} isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={`${styles.leftAligned} ${isNumber(stickyLeftMargin) ? 'pinnedCell' : ''}`} stickyLeftMargin={stickyLeftMargin}>
+    <StyledTh ref={thRef} isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned}>
       <Field name={field} queryId={activeQuery} type={type}>{title}</Field>
-      {showPinIcon && <PinIcon type="button" onClick={() => togglePin(field)} className={isNumber(stickyLeftMargin) ? 'active' : ''}><Icon name="thumbtack" /></PinIcon>}
+      {showPinIcon && <PinIcon type="button" onClick={_togglePin} className={isPinned ? 'active' : ''}><Icon name="thumbtack" /></PinIcon>}
       {sortable && sortType && (
       <FieldSortIcon fieldName={field}
                      onSortChange={onSortChange}
@@ -108,8 +108,8 @@ HeaderField.defaultProps = {
   span: undefined,
   title: undefined,
   sortType: undefined,
-  _onSetRowPivotColumnsWidth: undefined,
-  stickyLeftMargin: undefined,
+  _onSetColumnsWidth: undefined,
+  isPinned: undefined,
   showPinIcon: undefined,
 };
 
@@ -159,40 +159,44 @@ type Props = {
   fields: FieldTypeMappingsList,
   onSortChange: (sortConfig: Array<SortConfig>) => Promise<Widgets>;
   sortConfigMap: OrderedMap<string, SortConfig>;
-  onSetRowPivotColumnsWidth: (props: { field: string, offsetWidth: number }) => void,
-  stickyLeftMargins?: { [key: string]: number } | undefined,
+  onSetColumnsWidth: (props: { field: string, offsetWidth: number }) => void,
+  pinnedColumns?: Immutable.Set<string>
   togglePin: (field: string) => void
 };
 
-const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup, actualColumnPivotFields, onSortChange, sortConfigMap, onSetRowPivotColumnsWidth, stickyLeftMargins, togglePin }: Props) => {
+const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup, actualColumnPivotFields, onSortChange, sortConfigMap, onSetColumnsWidth, pinnedColumns, togglePin }: Props) => {
   const rowFieldNames = rowPivots.map((pivot) => pivot.field);
   const columnFieldNames = columnPivots.map((pivot) => pivot.field);
-  const headerField = ({ field, prefix = '', span = 1, title = field, sortable = false, sortType = undefined, _onSetRowPivotColumnsWidth = undefined, showPinIcon = false }) => (
-    <HeaderField activeQuery={activeQuery}
-                 key={`${prefix}-${field}-${title}`}
-                 fields={fields}
-                 field={field}
-                 prefix={prefix}
-                 span={span}
-                 title={title}
-                 onSortChange={onSortChange}
-                 sortConfigMap={sortConfigMap}
-                 sortable={sortable}
-                 sortType={sortType}
-                 _onSetRowPivotColumnsWidth={_onSetRowPivotColumnsWidth}
-                 stickyLeftMargin={stickyLeftMargins[field]}
-                 showPinIcon={showPinIcon}
-                 togglePin={togglePin} />
-  );
-  const rowPivotFields = rowFieldNames.map((fieldName) => headerField({ field: fieldName, sortable: true, sortType: SortConfig.PIVOT_TYPE, _onSetRowPivotColumnsWidth: onSetRowPivotColumnsWidth, showPinIcon: true }));
-  const seriesFields = series.map((s) => headerField({ field: s.function, prefix: '', span: 1, title: s.effectiveName, sortable: true, sortType: SortConfig.SERIES_TYPE }));
-  const columnPivotFields = flatten(actualColumnPivotFields.map((key) => series.map((s) => headerField({ field: s.function, prefix: key.join('-'), span: 1, title: s.effectiveName, sortable: false }))));
+
+  const headerField = ({ field, prefix = '', span = 1, title = field, sortable = false, sortType = undefined, _onSetColumnsWidth = undefined, showPinIcon = false }) => {
+    return (
+      <HeaderField activeQuery={activeQuery}
+                   key={`${prefix}${field}`}
+                   fields={fields}
+                   field={field}
+                   prefix={prefix}
+                   span={span}
+                   title={title}
+                   onSortChange={onSortChange}
+                   sortConfigMap={sortConfigMap}
+                   sortable={sortable}
+                   sortType={sortType}
+                   _onSetColumnsWidth={_onSetColumnsWidth}
+                   isPinned={pinnedColumns.has(`${prefix}${field}`)}
+                   showPinIcon={showPinIcon}
+                   togglePin={togglePin} />
+    );
+  };
+
+  const rowPivotFields = rowFieldNames.map((fieldName) => headerField({ field: fieldName, sortable: true, sortType: SortConfig.PIVOT_TYPE, _onSetColumnsWidth: onSetColumnsWidth, showPinIcon: true }));
+  const seriesFields = series.map((s) => headerField({ field: s.function, prefix: '', span: 1, title: s.effectiveName, sortable: true, sortType: SortConfig.SERIES_TYPE, _onSetColumnsWidth: onSetColumnsWidth, showPinIcon: true }));
+  const columnPivotFields = flatten(actualColumnPivotFields.map((key) => series.map((s) => headerField({ field: s.function, prefix: key.join('-'), span: 1, title: s.effectiveName, sortable: false, _onSetColumnsWidth: onSetColumnsWidth, showPinIcon: false }))));
   const offset = rollup ? rowFieldNames.length + series.length : rowFieldNames.length;
 
   return (
     <>
       {columnPivotFieldsHeaders(activeQuery, columnFieldNames, actualColumnPivotFields, series, offset)}
-      <tr>
+      <tr className="pivot-header-row">
         {rowPivotFields}
         {rollup && seriesFields}
         {columnPivotFields}
@@ -202,7 +206,7 @@ const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup,
 };
 
 Headers.defaultProps = {
-  stickyLeftMargins: undefined,
+  pinnedColumns: undefined,
 };
 
 export default Headers;
