@@ -18,6 +18,7 @@ package org.graylog.plugins.views.migrations;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -73,7 +74,8 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
     @Mock
     private ClusterConfigService clusterConfigService;
 
-    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get()
+            .setDateFormat(new StdDateFormat().withColonInTimeZone(false));
 
     private Migration migration;
     private MongoCollection<Document> viewsCollection;

@@ -181,8 +181,8 @@
         <dependency>
             <!-- Workaround for https://github.com/FasterXML/jackson-bom/pull/38 -->
             <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-scala_2.13</artifactId>
-            <version>2.9.10</version>
+            <artifactId>jackson-module-scala_3</artifactId>
+            <version>2.13.4</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>

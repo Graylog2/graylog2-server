@@ -18,6 +18,7 @@ package org.graylog2.plugin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
@@ -27,7 +28,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,7 +91,7 @@ public class MessageSummaryTest {
 
     @Test
     public void testJSONSerialization() throws Exception {
-        final ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = new ObjectMapper().registerModule(new JodaModule());
         final MapType valueType = mapper.getTypeFactory().constructMapType(HashMap.class, String.class, Object.class);
 
         final Map<String, Object> map = mapper.readValue(mapper.writeValueAsBytes(messageSummary), valueType);
