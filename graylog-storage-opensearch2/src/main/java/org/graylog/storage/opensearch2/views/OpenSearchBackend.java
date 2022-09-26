@@ -203,7 +203,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     @Override
     public Set<String> getFieldsPresentInQueryResultDocuments(final Query normalizedQuery, final QueryAwareFieldListRetrievalParams params) {
         final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(normalizedQuery.usedStreamIds(), normalizedQuery.timerange());
-        final SearchSourceBuilder searchSourceBuilder = createSearchSourceBuilder(normalizedQuery);
+        final SearchSourceBuilder searchSourceBuilder = createSearchSourceBuilder(normalizedQuery).trackTotalHits(false);
         final QueryBuilder query = searchSourceBuilder.query();
 
         if (query instanceof BoolQueryBuilder boolQueryBuilder) {
