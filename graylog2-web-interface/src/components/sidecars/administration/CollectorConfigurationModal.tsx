@@ -271,7 +271,7 @@ const CollectorConfigurationModal = (props) => {
       });
 
       return (
-        <BootstrapModalWrapper showModal={props.show}>
+        <BootstrapModalWrapper showModal={props.show} onHide={props.onCancel}>
           <Modal.Header>
             <ModalTitle>
               Edit <b>{selectedLogCollectors[0]?.name}</b> Configurations
