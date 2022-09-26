@@ -2559,11 +2559,6 @@
   resolved "https://registry.yarnpkg.com/@types/crossfilter/-/crossfilter-0.0.34.tgz#beee1be2cd63b98be0eb06fccbc0c9b409f06fb0"
   integrity sha512-O5TMGZ3DvbB3cTIHlbp+shNI5y9C3+vuvyIkcQ6vuW3/cCtfi2FYikeG/KAwmmxhOi4mvL9Gw9+OpTtGBFzcIg==
 
-"@types/d3@^3":
-  version "3.5.44"
-  resolved "https://registry.yarnpkg.com/@types/d3/-/d3-3.5.44.tgz#28635f8bb9adf1cef5bbef2b06778174a9d34383"
-  integrity sha512-hFEcf03YGJ2uQoDYEp3nFD5mXWxly5kf6KOstuOQFEs9sUCN7kNlKhcYkpZ3gK6PiHz4XRLkoHa80NVCJNeLBw==
-
 "@types/enzyme-adapter-react-16@^1.0.6":
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@types/enzyme-adapter-react-16/-/enzyme-adapter-react-16-1.0.6.tgz#8aca7ae2fd6c7137d869b6616e696d21bb8b0cec"
@@ -2807,12 +2802,10 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/plotly.js@*", "@types/plotly.js@2.12.3":
-  version "2.12.3"
-  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.12.3.tgz#571d555fb78a0fbba9f396d91babc9fa863e8aa8"
-  integrity sha512-zCz97C+xLDF/SqXcC8ITmiZDnukTg+gwBtXvyiY6tuUexGdK61hYFooec4nfgh+M4L9VkqpxdcITC5ZI/1U2uw==
-  dependencies:
-    "@types/d3" "^3"
+"@types/plotly.js@*", "@types/plotly.js@2.12.4":
+  version "2.12.4"
+  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.12.4.tgz#ea972c5779060bad1c5c2644e0ae9db287c1f16f"
+  integrity sha512-AFxOtfzyLhtgTRl3FElewTvu1fzVcxWaGUHxsWDvdyh10KDpApt1dapH3mSCXKCgYTBrzoLBIcM1qHOpi5qHFQ==
 
 "@types/prettier@^2.1.5":
   version "2.2.3"
