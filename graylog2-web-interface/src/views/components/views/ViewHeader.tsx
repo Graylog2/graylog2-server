@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Link } from 'components/common/router';
@@ -74,7 +74,7 @@ const ViewHeader = () => {
   const [showMetadataEdit, setShowMetadataEdit] = useState<boolean>(false);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);
 
-  if (!isSavedView) return null;
+  const typeText = useMemo<string>(() => view.type.toLocaleLowerCase(), [view]);
 
   return (
     <Row>
@@ -84,18 +84,20 @@ const ViewHeader = () => {
         </Link>
         <StyledIcon name="chevron-right" />
         <TitleWrapper>
-          <span>{view.title}</span>
+          <span>{view.title || <i>{`Unsaved ${typeText}`}</i>}</span>
+          {isSavedView && (
           <EditButton onClick={toggleMetadataEdit}
                       role="button"
-                      title={`Edit ${view.type.toLocaleLowerCase()} ${view.title} metadata`}
+                      title={`Edit ${typeText} ${view.title} metadata`}
                       tabIndex={0}>
             <Icon name="pen-to-square" />
           </EditButton>
+          )}
         </TitleWrapper>
         {showMetadataEdit && (
         <ViewPropertiesModal show
                              view={view}
-                             title={`Editing saved ${view.type.toLocaleLowerCase()}`}
+                             title={`Editing saved ${typeText}`}
                              onClose={toggleMetadataEdit}
                              onSave={onSaveView} />
         )}
