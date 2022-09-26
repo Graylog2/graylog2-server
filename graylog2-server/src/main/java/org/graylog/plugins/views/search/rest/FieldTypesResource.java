@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.db.SearchDbService;
+import org.graylog.plugins.views.search.engine.fieldlist.QueryAwareFieldListRetrievalParams;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.fieldtypes.DiscoveredFieldTypeService;
@@ -92,13 +93,18 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
                                                 @PathParam(value = "searchId") @NotEmpty final String searchId,
                                             @ApiParam(name = "size", defaultValue = "1000")
                                                 @QueryParam(value = "size") @Positive final int size,
+                                            @ApiParam(name = "useSampler", defaultValue = "false")
+                                                @QueryParam(value = "useSampler") final boolean useSampler,
+                                            @ApiParam(name = "sampleSize", defaultValue = "100")
+                                                @QueryParam(value = "sampleSize") @Positive final int sampleSize,
                                             @ApiParam(name = "JSON body", required = true)
                                                 @Valid @NotNull final FieldTypesForStreamsRequest fallbackRequest,
                                             @Context SearchUser searchUser) {
         try {
             final Optional<Search> search = searchDbService.get(searchId);
             if (search.isPresent()) {
-                final Set<MappedFieldTypeDTO> mappedFieldTypeDTOS = discoveredFieldTypeService.fieldTypesBySearch(search.get(), searchUser, size <= 0 ? 1000 : size);
+                final Set<MappedFieldTypeDTO> mappedFieldTypeDTOS = discoveredFieldTypeService.fieldTypesBySearch(search.get(),
+                        new QueryAwareFieldListRetrievalParams(searchUser, size <= 0 ? 1000 : size, useSampler, sampleSize));
                 if (mappedFieldTypeDTOS != null && !mappedFieldTypeDTOS.isEmpty()) {
                     return mappedFieldTypeDTOS;
                 }
@@ -114,17 +120,20 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     @ApiOperation(value = "Retrieve the field list for a given query")
     @NoAuditEvent("This is not changing any data")
     public Set<MappedFieldTypeDTO> byQuery(@ApiParam(name = "size", defaultValue = "1000")
-                                           @QueryParam(value = "size") @Positive final int size,
+                                               @QueryParam(value = "size") @Positive final int size,
+                                           @ApiParam(name = "useSampler", defaultValue = "false")
+                                               @QueryParam(value = "useSampler") final boolean useSampler,
+                                           @ApiParam(name = "sampleSize", defaultValue = "100")
+                                               @QueryParam(value = "sampleSize") @Positive final int sampleSize,
                                            @ApiParam(name = "JSON body", required = true)
-                                           @Valid @NotNull final FieldTypesForQueryRequest request,
+                                               @Valid @NotNull final FieldTypesForQueryRequest request,
                                            @Context SearchUser searchUser) {
         try {
 
             final Set<MappedFieldTypeDTO> mappedFieldTypeDTOS = discoveredFieldTypeService.fieldTypesByQuery(
                     request.query().toQuery(),
                     name -> request.parameters().stream().filter(p -> p.name().equals(name)).findFirst(),
-                    searchUser,
-                    size <= 0 ? 1000 : size);
+                    new QueryAwareFieldListRetrievalParams(searchUser, size <= 0 ? 1000 : size, useSampler, sampleSize));
             if (mappedFieldTypeDTOS != null && !mappedFieldTypeDTOS.isEmpty()) {
                 return mappedFieldTypeDTOS;
             }

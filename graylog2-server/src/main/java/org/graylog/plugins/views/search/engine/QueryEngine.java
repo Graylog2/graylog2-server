@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.QueryMetadataDecorator;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.engine.fieldlist.QueryAwareFieldListRetrievalParams;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchException;
@@ -70,8 +71,9 @@ public class QueryEngine {
                 .orElse(parsedMetadata);
     }
 
-    public Set<String> getFieldsPresentInQueryResultDocuments(final Query normalizedQuery, final int size) {
-        return backend.getFieldsPresentInQueryResultDocuments(normalizedQuery, size);
+    public Set<String> getFieldsPresentInQueryResultDocuments(final Query normalizedQuery,
+                                                              final QueryAwareFieldListRetrievalParams params) {
+        return backend.getFieldsPresentInQueryResultDocuments(normalizedQuery, params);
     }
 
     public SearchJob execute(SearchJob searchJob, Set<SearchError> validationErrors) {

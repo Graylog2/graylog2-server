@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
+import org.graylog.plugins.views.search.engine.fieldlist.QueryAwareFieldListRetrievalParams;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
@@ -44,7 +45,9 @@ import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilde
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.sampler.SamplerAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.opensearch2.BoolQueryTools;
@@ -198,7 +201,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     }
 
     @Override
-    public Set<String> getFieldsPresentInQueryResultDocuments(final Query normalizedQuery, final int size) {
+    public Set<String> getFieldsPresentInQueryResultDocuments(final Query normalizedQuery, final QueryAwareFieldListRetrievalParams params) {
         final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(normalizedQuery.usedStreamIds(), normalizedQuery.timerange());
         final SearchSourceBuilder searchSourceBuilder = createSearchSourceBuilder(normalizedQuery);
         final QueryBuilder query = searchSourceBuilder.query();
@@ -208,22 +211,46 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
             BoolQueryTools.addStreams(boolQueryBuilder, normalizedQuery.usedStreamIds());
         }
         final String aggregationName = ALL_MESSAGE_FIELDS_DOCUMENT_FIELD + "_aggr";
-        searchSourceBuilder.aggregation(new TermsAggregationBuilder(aggregationName)
+        final TermsAggregationBuilder termsAggregationBuilder = new TermsAggregationBuilder(aggregationName)
                 .field(ALL_MESSAGE_FIELDS_DOCUMENT_FIELD)
-                .size(size));
+                .size(params.size());
+        if (params.useSampler()) {
+            searchSourceBuilder.aggregation(new SamplerAggregationBuilder("sampler")
+                    .subAggregation(termsAggregationBuilder)
+                    .shardSize(params.sampleSize()));
+        } else {
+            searchSourceBuilder.aggregation(termsAggregationBuilder);
+        }
         final SearchResponse res = client.search(new SearchRequest()
                 .source(searchSourceBuilder)
                 .indices(affectedIndices.toArray(new String[0]))
                 .indicesOptions(IndicesOptions.fromOptions(false, false, true, false)), "Unable to retrieve fields used in search result documents");
 
-        final Aggregation aggregationResult = res.getAggregations().get(aggregationName);
-        if (aggregationResult instanceof MultiBucketsAggregation) {
-            final List<? extends MultiBucketsAggregation.Bucket> buckets = ((MultiBucketsAggregation) aggregationResult).getBuckets();
-            if (buckets != null) {
-                return buckets.stream()
-                        .filter(Objects::nonNull)
-                        .map(MultiBucketsAggregation.Bucket::getKeyAsString)
-                        .collect(Collectors.toSet());
+        if (params.useSampler()) {
+            final Aggregation samplerAggregationResult = res.getAggregations().get("sampler");
+            if (samplerAggregationResult instanceof HasAggregations samplerAggregation) {
+                final Aggregation aggregationResult = samplerAggregation.getAggregations().get(aggregationName);
+                if (aggregationResult instanceof MultiBucketsAggregation multiBucketsAggregation) {
+                    final List<? extends MultiBucketsAggregation.Bucket> buckets = multiBucketsAggregation.getBuckets();
+                    if (buckets != null) {
+                        return buckets.stream()
+                                .filter(Objects::nonNull)
+                                .map(MultiBucketsAggregation.Bucket::getKeyAsString)
+                                .collect(Collectors.toSet());
+                    }
+                }
+            }
+
+        } else {
+            final Aggregation aggregationResult = res.getAggregations().get(aggregationName);
+            if (aggregationResult instanceof MultiBucketsAggregation multiBucketsAggregation) {
+                final List<? extends MultiBucketsAggregation.Bucket> buckets = multiBucketsAggregation.getBuckets();
+                if (buckets != null) {
+                    return buckets.stream()
+                            .filter(Objects::nonNull)
+                            .map(MultiBucketsAggregation.Bucket::getKeyAsString)
+                            .collect(Collectors.toSet());
+                }
             }
         }
 

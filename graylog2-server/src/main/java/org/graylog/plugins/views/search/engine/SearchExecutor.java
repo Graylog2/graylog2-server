@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchJobService;
+import org.graylog.plugins.views.search.engine.fieldlist.QueryAwareFieldListRetrievalParams;
 import org.graylog.plugins.views.search.engine.normalization.SearchNormalization;
 import org.graylog.plugins.views.search.engine.validation.SearchValidation;
 import org.graylog.plugins.views.search.errors.SearchError;
@@ -68,30 +69,30 @@ public class SearchExecutor {
     }
 
     @Deprecated
-    public Set<String> getFieldsPresentInSearchResultDocuments(final Search search, SearchUser searchUser, final int size) {
+    public Set<String> getFieldsPresentInSearchResultDocuments(final Search search,
+                                                               final QueryAwareFieldListRetrievalParams params) {
         final ExecutionState executionState = ExecutionState.empty();
-        final Search preValidationSearch = searchNormalization.preValidation(search, searchUser, executionState);
-        final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
+        final Search preValidationSearch = searchNormalization.preValidation(search, params.searchUser(), executionState);
+        final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, params.searchUser());
         if (hasFatalError(validationErrors)) {
             return Set.of();
         }
-        final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
+        final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, params.searchUser(), executionState);
         final Query mainQuery = normalizedSearch.queries().stream().findFirst().orElseThrow(() -> new IllegalArgumentException("No queries in search : " + normalizedSearch.id()));
-        return queryEngine.getFieldsPresentInQueryResultDocuments(mainQuery, size);
+        return queryEngine.getFieldsPresentInQueryResultDocuments(mainQuery, params);
     }
 
     public Set<String> getFieldsPresentInQueryResultDocuments(final Query query,
                                                               final ParameterProvider parameterProvider,
-                                                              final SearchUser searchUser,
-                                                              final int size) {
+                                                              final QueryAwareFieldListRetrievalParams params) {
         final ExecutionState executionState = ExecutionState.empty();
-        final Query preValidationQuery = searchNormalization.preValidation(query, parameterProvider, searchUser, executionState);
-        final Set<SearchError> validationErrors = searchValidation.validate(preValidationQuery, searchUser);
+        final Query preValidationQuery = searchNormalization.preValidation(query, parameterProvider, params.searchUser(), executionState);
+        final Set<SearchError> validationErrors = searchValidation.validate(preValidationQuery, params.searchUser());
         if (hasFatalError(validationErrors)) {
             return Set.of();
         }
         final Query normalizedQuery = searchNormalization.postValidation(preValidationQuery, parameterProvider);
-        return queryEngine.getFieldsPresentInQueryResultDocuments(normalizedQuery, size);
+        return queryEngine.getFieldsPresentInQueryResultDocuments(normalizedQuery, params);
     }
 
     public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState) {

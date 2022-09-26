@@ -20,7 +20,7 @@ import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
-import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.engine.fieldlist.QueryAwareFieldListRetrievalParams;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 
 import javax.inject.Inject;
@@ -45,18 +45,16 @@ public class DiscoveredFieldTypeServiceImpl implements DiscoveredFieldTypeServic
 
     @Override
     public Set<MappedFieldTypeDTO> fieldTypesBySearch(final Search search,
-                                                      final SearchUser searchUser,
-                                                      final int size) {
-        final Set<String> discoveredFields = searchExecutor.getFieldsPresentInSearchResultDocuments(search, searchUser, size);
+                                                      final QueryAwareFieldListRetrievalParams params) {
+        final Set<String> discoveredFields = searchExecutor.getFieldsPresentInSearchResultDocuments(search, params);
         return fieldNamesToFieldTypeDTOs(discoveredFields);
     }
 
     @Override
     public Set<MappedFieldTypeDTO> fieldTypesByQuery(final Query query,
                                                      final ParameterProvider parameterProvider,
-                                                     final SearchUser searchUser,
-                                                     final int size) {
-        final Set<String> discoveredFields = searchExecutor.getFieldsPresentInQueryResultDocuments(query, parameterProvider, searchUser, size);
+                                                     final QueryAwareFieldListRetrievalParams params) {
+        final Set<String> discoveredFields = searchExecutor.getFieldsPresentInQueryResultDocuments(query, parameterProvider, params);
         return fieldNamesToFieldTypeDTOs(discoveredFields);
     }
 

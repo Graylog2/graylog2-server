@@ -19,7 +19,7 @@ package org.graylog2.indexer.fieldtypes;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.engine.fieldlist.QueryAwareFieldListRetrievalParams;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 
 import java.util.Set;
@@ -28,7 +28,10 @@ public interface DiscoveredFieldTypeService {
 
     String ALL_MESSAGE_FIELDS_DOCUMENT_FIELD = "gl2_message_fields";
 
-    Set<MappedFieldTypeDTO> fieldTypesBySearch(Search search, SearchUser searchUser, int size);
+    Set<MappedFieldTypeDTO> fieldTypesBySearch(Search search,
+                                               QueryAwareFieldListRetrievalParams params);
 
-    Set<MappedFieldTypeDTO> fieldTypesByQuery(Query query, ParameterProvider parameterProvider, SearchUser searchUser, int size);
+    Set<MappedFieldTypeDTO> fieldTypesByQuery(Query query,
+                                              ParameterProvider parameterProvider,
+                                              QueryAwareFieldListRetrievalParams params);
 }
