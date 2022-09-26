@@ -184,28 +184,9 @@ const CollectorConfigurationModal = (props) => {
   };
 
   const renderConfigurationSummary = (_previousAssignedConfigurations, _nextAssignedConfigurations, _selectedSidecarCollectorPairs) => {
-    const toAdd = lodash.difference(_nextAssignedConfigurations, _previousAssignedConfigurations);
-    const toRemove = lodash.difference(_previousAssignedConfigurations, _nextAssignedConfigurations);
-    const exampleSidecarCollectorPair = _selectedSidecarCollectorPairs[0];
-    const collectorIndicator = exampleSidecarCollectorPair ? (
-      <em>
-        <CollectorIndicator collector={exampleSidecarCollectorPair.collector.name}
-                            operatingSystem={exampleSidecarCollectorPair.collector.node_operating_system} />
-      </em>
-    ) : null;
-
-    let toAddSummary;
-    let toRemoveSummary;
-
-    if (toRemove.length > 0) {
-      toAddSummary = <p><span>You are going to <b>remove</b> the configuration <b>{toRemove.join(', ')}</b> for collector {collectorIndicator}</span></p>;
-    }
-
-    if (toAdd.length > 0) {
-      toRemoveSummary = <p><span>You are going to <b>apply</b> the configuration <b>{toAdd.join(', ')}</b> for collector {collectorIndicator}</span></p>;
-    }
-
-    const formattedSummary = _selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name).join(', ');
+    const sidecarsSummary = _selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name).join(', ');
+    const numberOfSidecarsSummary = `${_selectedSidecarCollectorPairs.length} sidecars`;
+    const summary = _selectedSidecarCollectorPairs.length <= 5 ? sidecarsSummary : numberOfSidecarsSummary;
 
     return (
       <BootstrapModalConfirm ref={modalConfirm}
@@ -213,9 +194,7 @@ const CollectorConfigurationModal = (props) => {
                              onConfirm={confirmConfigurationChange}
                              onCancel={cancelConfigurationChange}>
         <ConfigurationSummary>
-          {(_selectedSidecarCollectorPairs.length === 1) && toAddSummary}
-          {(_selectedSidecarCollectorPairs.length === 1) && toRemoveSummary}
-          <p>Are you sure you want to proceed with this action for <b>{formattedSummary}</b>?</p>
+          <p>Are you sure you want to proceed with this action for <b>{summary}</b>?</p>
         </ConfigurationSummary>
       </BootstrapModalConfirm>
     );
