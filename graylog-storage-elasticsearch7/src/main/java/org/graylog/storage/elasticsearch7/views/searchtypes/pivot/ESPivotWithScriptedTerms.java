@@ -25,8 +25,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.BucketOrder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.HasAggregations;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.MaxAggregationBuilder;
@@ -34,6 +32,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.m
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
+import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESTimeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
@@ -58,12 +57,14 @@ public class ESPivotWithScriptedTerms implements ESSearchTypeHandler<Pivot> {
 
     private final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
     private final EffectiveTimeRangeExtractor effectiveTimeRangeExtractor;
+    private final ESTimeHandler esTimeHandler;
 
     @Inject
     public ESPivotWithScriptedTerms(Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers,
-                                    EffectiveTimeRangeExtractor effectiveTimeRangeExtractor) {
+                                    EffectiveTimeRangeExtractor effectiveTimeRangeExtractor, ESTimeHandler esTimeHandler) {
         this.seriesHandlers = seriesHandlers;
         this.effectiveTimeRangeExtractor = effectiveTimeRangeExtractor;
+        this.esTimeHandler = esTimeHandler;
     }
 
     @Override
@@ -112,7 +113,8 @@ public class ESPivotWithScriptedTerms implements ESSearchTypeHandler<Pivot> {
                     }
                     valueBuckets = new ArrayList<>();
                 }
-                final DateHistogramAggregationBuilder datePivot = createDatePivot(time, query, false, ordering, pivot, queryContext);
+                final AggregationBuilder datePivot = esTimeHandler.doCreateAggregation(AGG_NAME, pivot, time, queryContext, query)
+                        .orElseThrow(() -> new IllegalStateException("Time handler unexpectedly returns no value."));
                 if (aggregationBuilder == null) {
                     aggregationBuilder = datePivot;
                     root = datePivot;
@@ -135,26 +137,6 @@ public class ESPivotWithScriptedTerms implements ESSearchTypeHandler<Pivot> {
         }
 
         return new Tuple2<>(root, aggregationBuilder);
-    }
-
-    private DateHistogramAggregationBuilder createDatePivot(Time timeSpec, Query query, boolean generateMetrics, List<BucketOrder> ordering, Pivot pivot, ESGeneratedQueryContext queryContext) {
-        final DateHistogramInterval dateHistogramInterval = new DateHistogramInterval(timeSpec.interval().toDateInterval(query.effectiveTimeRange(pivot)).toString());
-        final DateHistogramAggregationBuilder builder = AggregationBuilders.dateHistogram(AGG_NAME)
-                .field(timeSpec.field())
-                .order(ordering)
-                .format("date_time");
-
-        setInterval(builder, dateHistogramInterval);
-
-        return builder;
-    }
-
-    private void setInterval(DateHistogramAggregationBuilder builder, DateHistogramInterval interval) {
-        if (DateHistogramAggregationBuilder.DATE_FIELD_UNITS.get(interval.toString()) != null) {
-            builder.calendarInterval(interval);
-        } else {
-            builder.fixedInterval(interval);
-        }
     }
 
     private TermsAggregationBuilder createScriptedTerms(List<? extends BucketSpec> buckets, boolean generateMetrics, List<BucketOrder> ordering, Pivot pivot, ESGeneratedQueryContext queryContext) {
