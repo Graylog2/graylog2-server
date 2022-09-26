@@ -147,7 +147,8 @@ public class SearchExecutorTest {
         doReturn(preValidationQuery).when(searchNormalization).preValidation(eq(query), eq(parameterProvider), eq(searchUser), any());
         doReturn(normalizedQuery).when(searchNormalization).postValidation(eq(preValidationQuery), eq(parameterProvider));
         doReturn(Set.of()).when(searchValidation).validate(eq(preValidationQuery), any());
-        doReturn(Set.of("field1", "field2")).when(queryEngine).getFieldsPresentInQueryResultDocuments(normalizedQuery, new QueryAwareFieldListRetrievalParams(searchUser, 1000, false, 100));
+        final QueryAwareFieldListRetrievalParams params = new QueryAwareFieldListRetrievalParams(searchUser, 1000, false, 100);
+        doReturn(Set.of("field1", "field2")).when(queryEngine).getFieldsPresentInQueryResultDocuments(normalizedQuery, params);
 
         this.searchExecutor = new SearchExecutor(searchDomain,
                 new InMemorySearchJobService(),
@@ -156,7 +157,7 @@ public class SearchExecutorTest {
                 searchNormalization);
 
 
-        final Set<String> result = searchExecutor.getFieldsPresentInQueryResultDocuments(query, parameterProvider, new QueryAwareFieldListRetrievalParams(searchUser, 1000, false, -1));
+        final Set<String> result = searchExecutor.getFieldsPresentInQueryResultDocuments(query, parameterProvider, params);
 
         assertThat(result).containsOnly("field1", "field2");
     }
