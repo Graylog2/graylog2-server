@@ -48,6 +48,7 @@ const ConfirmDialog = ({
 
       <Modal.Footer>
         <ModalSubmit onCancel={onCancel}
+                     onSubmit={onConfirm}
                      submitButtonType="button"
                      disabledSubmit={btnConfirmDisabled}
                      submitButtonText={btnConfirmText}
