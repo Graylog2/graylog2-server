@@ -14,22 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
+import * as React from 'react';
 
-import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
-import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
-import { useStore } from 'stores/connect';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
-export type Dashboards = DashboardsStoreState;
-
-const useDashboards = (searchQuery: string, page: number, pageSize: number): Readonly<Dashboards> => {
-  const dashboards = useStore(DashboardsStore);
-
-  useEffect(() => {
-    DashboardsActions.search(searchQuery, page, pageSize);
-  }, [searchQuery, page, pageSize]);
-
-  return dashboards;
+export type PaginationQueryParameterObject = {
+  pageSizes?: number[];
 };
 
-export default useDashboards;
+function withPaginationQueryParameter(Component: React.ComponentType, obj?: PaginationQueryParameterObject) {
+  return function WrappedComponent(props) {
+    const result = usePaginationQueryParameter(obj?.pageSizes);
+
+    return <Component {...props} paginationQueryParameter={result} />;
+  };
+}
+
+export default withPaginationQueryParameter;

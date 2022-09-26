@@ -25,6 +25,12 @@ import Routes from 'routing/Routes';
 import ConfigurationRow from './ConfigurationRow';
 import style from './ConfigurationList.css';
 
+const _headerCellFormatter = (header) => {
+  const className = (header === 'Actions' ? style.actionsColumn : '');
+
+  return <th className={className}>{header}</th>;
+};
+
 class ConfigurationList extends React.Component {
   static propTypes = {
     collectors: PropTypes.array.isRequired,
@@ -37,12 +43,6 @@ class ConfigurationList extends React.Component {
     onClone: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
     validateConfiguration: PropTypes.func.isRequired,
-  };
-
-  _headerCellFormatter = (header) => {
-    const className = (header === 'Actions' ? style.actionsColumn : '');
-
-    return <th className={className}>{header}</th>;
   };
 
   _collectorConfigurationFormatter = (configuration) => {
@@ -98,12 +98,13 @@ class ConfigurationList extends React.Component {
                            pageSize={pagination.pageSize}
                            pageSizes={[10, 25]}
                            totalItems={pagination.total}
-                           onChange={onPageChange}>
+                           onChange={onPageChange}
+                           useQueryParameter={false}>
               <div className={style.configurationTable}>
                 <DataTable id="collector-configurations-list"
                            className="table-hover"
                            headers={headers}
-                           headerCellFormatter={this._headerCellFormatter}
+                           headerCellFormatter={_headerCellFormatter}
                            rows={configurations}
                            rowClassName="row-sm"
                            dataRowFormatter={this._collectorConfigurationFormatter}

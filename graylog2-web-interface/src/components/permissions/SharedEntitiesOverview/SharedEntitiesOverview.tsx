@@ -83,7 +83,8 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
       </p>
       <StyledPaginatedList activePage={page}
                            totalItems={total}
-                           onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}>
+                           onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}
+                           useQueryParameter={false}>
         <DataTable className="table-hover"
                    customFilter={(
                      <SharedEntitiesFilter onSearch={_handleSearch}

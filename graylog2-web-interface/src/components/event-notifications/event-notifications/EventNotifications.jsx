@@ -37,6 +37,36 @@ import Routes from 'routing/Routes';
 
 import styles from './EventNotifications.css';
 
+export const PAGE_SIZES = [10, 25, 50];
+
+const renderEmptyContent = () => {
+  return (
+    <Row>
+      <Col md={4} mdOffset={4}>
+        <EmptyEntity>
+          <p>
+            Configure Event Notifications that can alert you when an Event occurs. You can also use Notifications
+            to integrate Graylog Alerts with an external alerting system you use.
+          </p>
+          <IfPermitted permissions="eventnotifications:create">
+            <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
+              <Button bsStyle="success">Get Started!</Button>
+            </LinkContainer>
+          </IfPermitted>
+        </EmptyEntity>
+      </Col>
+    </Row>
+  );
+};
+
+const getNotificationPlugin = (type) => {
+  if (type === undefined) {
+    return {};
+  }
+
+  return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
+};
+
 class EventNotifications extends React.Component {
   static propTypes = {
     notifications: PropTypes.array.isRequired,
@@ -62,34 +92,6 @@ class EventNotifications extends React.Component {
     };
   }
 
-  renderEmptyContent = () => {
-    return (
-      <Row>
-        <Col md={4} mdOffset={4}>
-          <EmptyEntity>
-            <p>
-              Configure Event Notifications that can alert you when an Event occurs. You can also use Notifications
-              to integrate Graylog Alerts with an external alerting system you use.
-            </p>
-            <IfPermitted permissions="eventnotifications:create">
-              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
-                <Button bsStyle="success">Get Started!</Button>
-              </LinkContainer>
-            </IfPermitted>
-          </EmptyEntity>
-        </Col>
-      </Row>
-    );
-  };
-
-  getNotificationPlugin = (type) => {
-    if (type === undefined) {
-      return {};
-    }
-
-    return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
-  };
-
   formatNotification = (notifications, setNotificationToShare) => {
     const { testResult } = this.props;
 
@@ -97,7 +99,7 @@ class EventNotifications extends React.Component {
       const isTestLoading = testResult.id === notification.id && testResult.isLoading;
       const actions = this.formatActions(notification, isTestLoading, setNotificationToShare);
 
-      const plugin = this.getNotificationPlugin(notification.config.type);
+      const plugin = getNotificationPlugin(notification.config.type);
       const content = testResult.id === notification.id ? (
         <Col md={12}>
           {testResult.isLoading ? (
@@ -160,7 +162,7 @@ class EventNotifications extends React.Component {
     const setNotificationToShare = (notification) => this.setState({ notificationToShare: notification });
 
     if (pagination.grandTotal === 0) {
-      return this.renderEmptyContent();
+      return renderEmptyContent();
     }
 
     return (
@@ -184,9 +186,7 @@ class EventNotifications extends React.Component {
               </IfPermitted>
             </SearchForm>
 
-            <PaginatedList activePage={pagination.page}
-                           pageSize={pagination.pageSize}
-                           pageSizes={[10, 25, 50]}
+            <PaginatedList pageSizes={PAGE_SIZES}
                            totalItems={pagination.total}
                            onChange={onPageChange}>
               <div className={styles.notificationList}>
