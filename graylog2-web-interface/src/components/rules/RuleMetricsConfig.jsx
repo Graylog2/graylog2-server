@@ -49,6 +49,7 @@ export default class RuleMetricsConfig extends React.Component {
     onChange(nextConfig).then(this.closeModal);
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   openModal = () => {
     this.modal.open();
   };

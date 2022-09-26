@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import lodash from 'lodash';
@@ -32,8 +33,10 @@ import SourceViewModal from './SourceViewModal';
 import ImportsViewModal from './ImportsViewModal';
 
 const ConfigurationForm = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'ConfigurationForm',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     action: PropTypes.oneOf(['create', 'edit']),
     configuration: PropTypes.object,

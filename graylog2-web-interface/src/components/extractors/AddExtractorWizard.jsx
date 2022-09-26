@@ -26,12 +26,20 @@ class AddExtractorWizard extends React.Component {
     inputId: PropTypes.string,
   };
 
-  state = {
-    showExtractorForm: false,
+  static defaultProps = {
+    inputId: undefined,
   };
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showExtractorForm: false,
+    };
+  }
+
   _showAddExtractorForm = () => {
-    this.setState({ showExtractorForm: !this.state.showExtractorForm });
+    this.setState(({ showExtractorForm }) => ({ showExtractorForm: !showExtractorForm }));
   };
 
   render() {
