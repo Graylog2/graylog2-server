@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { waitFor } from 'wrappedTestingLibrary';
+
 import fetch from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
 
