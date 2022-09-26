@@ -158,7 +158,7 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
                     type="button">
               Finish & Save Identity Service
             </Button>
-            <Button bsStyle="primary"
+            <Button bsStyle="success"
                     disabled={isSubmitting}
                     type="submit">
               Next: Group Synchronization

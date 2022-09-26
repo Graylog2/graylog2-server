@@ -17,12 +17,17 @@
 import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { MessagesActions } from 'stores/messages/MessagesStore';
 import { FormSubmit } from 'components/common';
 import history from 'util/History';
 
 import { Button } from '../bootstrap';
+
+const StyledFormSubmit = styled(FormSubmit)`
+  margin-top 10px;
+`;
 
 type LoadMessageFormProps = {
   loadMessage: (e: React.FormEvent) => void,
@@ -33,9 +38,9 @@ const LoadMessageForm = ({ loadMessage, children, loading }: LoadMessageFormProp
   <div>
     <form className="form-inline message-loader-form" onSubmit={loadMessage}>
       {children}
-      <FormSubmit submitButtonText={loading ? 'Loading message...' : 'Load message'}
-                  isSubmitting={loading}
-                  onCancel={() => history.goBack()} />
+      <StyledFormSubmit submitButtonText={loading ? 'Loading message...' : 'Load message'}
+                        isSubmitting={loading}
+                        onCancel={() => history.goBack()} />
     </form>
   </div>
 );

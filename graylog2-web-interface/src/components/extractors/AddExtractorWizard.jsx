@@ -58,8 +58,8 @@ class AddExtractorWizard extends React.Component {
             received by this input, or manually select a message giving its ID.
           </p>
           <p>
-            <Button bsStyle="info" bsSize="small" onClick={this._showAddExtractorForm} disabled={this.state.showExtractorForm}>
-              Get started
+            <Button bsStyle="success" bsSize="small" onClick={this._showAddExtractorForm} disabled={this.state.showExtractorForm}>
+              Create extractor
             </Button>
           </p>
 
