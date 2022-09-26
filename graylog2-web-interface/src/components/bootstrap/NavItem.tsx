@@ -14,15 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { fas } from '@fortawesome/free-solid-svg-icons';
-import { far } from '@fortawesome/free-regular-svg-icons';
-import { faApple, faFreebsd, faGithub, faGithubAlt, faLinux, faWindows } from '@fortawesome/free-brands-svg-icons';
+import * as React from 'react';
+// eslint-disable-next-line no-restricted-imports
+import { NavItem as BootstrapNavItem } from 'react-bootstrap';
 
-library.add(fas, far, faApple, faGithub, faGithubAlt, faLinux, faWindows, faFreebsd);
+const NavItem = (props: React.ComponentProps<typeof NavItem>) => <BootstrapNavItem {...props} />;
 
-const CustomFontAwesomeIcon = (props: React.ComponentProps<typeof FontAwesomeIcon>) => <FontAwesomeIcon {...props} />;
+NavItem.displayName = 'NavItem';
 
-export default CustomFontAwesomeIcon;
+/** @component */
+export default NavItem;

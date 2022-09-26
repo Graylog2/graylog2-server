@@ -18,8 +18,8 @@ import React, { useCallback, useState } from 'react';
 import { cloneDeep } from 'lodash';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import { Button, Modal } from 'components/bootstrap';
-import { IfPermitted } from 'components/common';
+import { Modal } from 'components/bootstrap';
+import { IfPermitted, ModalSubmit } from 'components/common';
 import type { Stream } from 'stores/streams/StreamsStore';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
 import AddDecoratorButton from 'views/components/messagelist/decorators/AddDecoratorButton';
@@ -98,8 +98,7 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
         <DecoratorList decorators={decoratorItems} onReorder={onReorder} />
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button" onClick={_onCancel}>Cancel</Button>
-        <Button bsStyle="primary" onClick={onSubmit}>Save</Button>
+        <ModalSubmit onSubmit={onSubmit} onCancel={_onCancel} submitButtonText="Update configuration" />
       </Modal.Footer>
     </BootstrapModalWrapper>
   );

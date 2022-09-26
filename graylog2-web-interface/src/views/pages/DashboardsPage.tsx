@@ -15,43 +15,46 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import DocsHelper from 'util/DocsHelper';
 import { LinkContainer } from 'components/common/router';
 import { Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';
 import DocumentationLink from 'components/support/DocumentationLink';
-import DocsHelper from 'util/DocsHelper';
 import DashboardList from 'views/components/views/DashboardList';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import useDashboards from 'views/logic/dashboards/useDashboards';
 import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 import type View from '../logic/views/View';
 
 // eslint-disable-next-line no-alert
 const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
 
-const handleDashboardDelete = async (view: View) => {
-  const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingDashboard');
-
-  const result = await iterateConfirmationHooks([...pluginDashboardDeletionHooks, defaultDashboardDeletionHook], view);
-
-  return result === true ? ViewManagementActions.delete(view) : Promise.reject();
-};
-
-type SearchQuery = {
-  query: string,
-  page: number,
-  perPage: number,
-};
-
 const DashboardsPage = () => {
-  const [searchQuery, setSearchQuery] = useState<SearchQuery>({ query: '', page: 1, perPage: 10 });
-  const handleSearch = useCallback((query: string, page: number, perPage: number) => setSearchQuery({ query, page, perPage }), []);
-  const { list, pagination } = useDashboards(searchQuery);
+  const { page, pageSize, resetPage } = usePaginationQueryParameter();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (newQuery = searchQuery) => {
+    resetPage();
+    setSearchQuery(newQuery);
+  };
+
+  const handleDashboardDelete = async (view: View) => {
+    resetPage();
+
+    const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingDashboard');
+
+    const result = await iterateConfirmationHooks([...pluginDashboardDeletionHooks, defaultDashboardDeletionHook], view);
+
+    return result === true ? ViewManagementActions.delete(view) : Promise.reject();
+  };
+
+  const { list, pagination } = useDashboards(searchQuery, page, pageSize);
 
   return (
     <DocumentTitle title="Dashboards">

@@ -14,15 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { fas } from '@fortawesome/free-solid-svg-icons';
-import { far } from '@fortawesome/free-regular-svg-icons';
-import { faApple, faFreebsd, faGithub, faGithubAlt, faLinux, faWindows } from '@fortawesome/free-brands-svg-icons';
+import * as React from 'react';
 
-library.add(fas, far, faApple, faGithub, faGithubAlt, faLinux, faWindows, faFreebsd);
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
-const CustomFontAwesomeIcon = (props: React.ComponentProps<typeof FontAwesomeIcon>) => <FontAwesomeIcon {...props} />;
+export type PaginationQueryParameterObject = {
+  pageSizes?: number[];
+};
 
-export default CustomFontAwesomeIcon;
+function withPaginationQueryParameter(Component: React.ComponentType, obj?: PaginationQueryParameterObject) {
+  return function WrappedComponent(props) {
+    const result = usePaginationQueryParameter(obj?.pageSizes);
+
+    return <Component {...props} paginationQueryParameter={result} />;
+  };
+}
+
+export default withPaginationQueryParameter;
