@@ -64,7 +64,7 @@ const GroupingsConfiguration = () => {
     setValues(GroupingElement.onRemove(index, values));
   }, [setValues, values]);
 
-  const isEmpty = !groupBy?.groupings;
+  const isEmpty = groupBy?.groupings?.length === 0 ?? true;
 
   const hasValuesRowPivots = groupBy?.groupings?.find(({ direction, field }) => (direction === 'row' && field?.type === 'values')) !== undefined;
   const hasValuesColumnPivots = groupBy?.groupings?.find(({ direction, field }) => (direction === 'column' && field?.type === 'values')) !== undefined;
