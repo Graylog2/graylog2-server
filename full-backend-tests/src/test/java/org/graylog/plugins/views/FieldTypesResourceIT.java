@@ -90,6 +90,8 @@ public class FieldTypesResourceIT {
                 .accept(ContentType.JSON)
                 .body(OBJECT_MAPPER.writeValueAsString(request))
                 .queryParam("size", 100)
+                .queryParam("useSampler", false)
+                .queryParam("sampleSize", 100)
                 .post("/views/fields/byQuery");
 
         final ValidatableResponse validatableResponse = response.then()
@@ -116,6 +118,8 @@ public class FieldTypesResourceIT {
                 .accept(ContentType.JSON)
                 .body(OBJECT_MAPPER.writeValueAsString(request))
                 .queryParam("size", 100)
+                .queryParam("useSampler", false)
+                .queryParam("sampleSize", 100)
                 .post("/views/fields/byQuery");
 
         final ValidatableResponse validatableResponse = response.then()
@@ -145,6 +149,8 @@ public class FieldTypesResourceIT {
                 .accept(ContentType.JSON)
                 .body(OBJECT_MAPPER.writeValueAsString(request))
                 .queryParam("size", 100)
+                .queryParam("useSampler", false)
+                .queryParam("sampleSize", 100)
                 .post("/views/fields/byQuery");
 
         final ValidatableResponse validatableResponse = response.then()

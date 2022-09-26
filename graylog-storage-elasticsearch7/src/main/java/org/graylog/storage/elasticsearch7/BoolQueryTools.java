@@ -26,16 +26,33 @@ import java.util.Objects;
 
 public class BoolQueryTools {
 
-    public static void addTimeRange(BoolQueryBuilder boolQueryBuilder, final TimeRange timeRange, final String identifier) {
-        boolQueryBuilder.must(
-                Objects.requireNonNull(
-                        TimeRangeQueryFactory.create(timeRange),
-                        "Timerange for " + identifier + " cannot be found."
-                )
-        );
+    public enum Mode {
+        FILTER, MUST
     }
 
-    public static void addStreams(BoolQueryBuilder boolQueryBuilder, final Collection<String> streamIds) {
-        boolQueryBuilder.must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, streamIds));
+    public static void addTimeRange(BoolQueryBuilder boolQueryBuilder, final TimeRange timeRange, final String identifier, final Mode mode) {
+        if (mode == Mode.MUST) {
+            boolQueryBuilder.must(
+                    Objects.requireNonNull(
+                            TimeRangeQueryFactory.create(timeRange),
+                            "Timerange for " + identifier + " cannot be found."
+                    )
+            );
+        } else {
+            boolQueryBuilder.filter(
+                    Objects.requireNonNull(
+                            TimeRangeQueryFactory.create(timeRange),
+                            "Timerange for " + identifier + " cannot be found."
+                    )
+            );
+        }
+    }
+
+    public static void addStreams(BoolQueryBuilder boolQueryBuilder, final Collection<String> streamIds, final Mode mode) {
+        if (mode == Mode.MUST) {
+            boolQueryBuilder.must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, streamIds));
+        } else {
+            boolQueryBuilder.filter(QueryBuilders.termsQuery(Message.FIELD_STREAMS, streamIds));
+        }
     }
 }

@@ -128,8 +128,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
                     final BoolQueryBuilder searchTypeOverrides = QueryBuilders.boolQuery()
                             .must(searchTypeSourceBuilder.query());
-                    BoolQueryTools.addTimeRange(searchTypeOverrides, query.effectiveTimeRange(searchType), "search type " + searchType.id());
-                    BoolQueryTools.addStreams(searchTypeOverrides, effectiveStreamIds);
+                    BoolQueryTools.addTimeRange(searchTypeOverrides, query.effectiveTimeRange(searchType), "search type " + searchType.id(), BoolQueryTools.Mode.MUST);
+                    BoolQueryTools.addStreams(searchTypeOverrides, effectiveStreamIds, BoolQueryTools.Mode.MUST);
 
                     searchType.query().ifPresent(searchTypeQuery -> {
                         final QueryBuilder normalizedSearchTypeQuery = translateQueryString(searchTypeQuery.queryString());
@@ -207,8 +207,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         final QueryBuilder query = searchSourceBuilder.query();
 
         if (query instanceof BoolQueryBuilder boolQueryBuilder) {
-            BoolQueryTools.addTimeRange(boolQueryBuilder, normalizedQuery.timerange(), "query " + normalizedQuery.id());
-            BoolQueryTools.addStreams(boolQueryBuilder, normalizedQuery.usedStreamIds());
+            BoolQueryTools.addTimeRange(boolQueryBuilder, normalizedQuery.timerange(), "query " + normalizedQuery.id(), BoolQueryTools.Mode.FILTER);
+            BoolQueryTools.addStreams(boolQueryBuilder, normalizedQuery.usedStreamIds(), BoolQueryTools.Mode.FILTER);
         }
 
         final String aggregationName = ALL_MESSAGE_FIELDS_DOCUMENT_FIELD + "_aggr";
