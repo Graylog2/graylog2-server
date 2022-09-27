@@ -14,20 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-// eslint-disable-next-line no-restricted-imports
-export {
-  /* 👇 no custom theme colors needed 👇 */
-  ButtonGroup,
-  Checkbox, // NOTE: do we want custom or keep OS styles
-  Clearfix,
-  Col,
-  Collapse,
-  Dropdown,
-  Form,
-  Grid,
-  Pager,
-  PanelGroup,
-  Radio, // NOTE: do we want custom or keep OS styles
-  /* 👆 no custom theme colors needed 👆 */
-} from 'react-bootstrap';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+
+export type PaginationQueryParameterObject = {
+  pageSizes?: number[];
+};
+
+function withPaginationQueryParameter(Component: React.ComponentType, obj?: PaginationQueryParameterObject) {
+  return function WrappedComponent(props) {
+    const result = usePaginationQueryParameter(obj?.pageSizes);
+
+    return <Component {...props} paginationQueryParameter={result} />;
+  };
+}
+
+export default withPaginationQueryParameter;

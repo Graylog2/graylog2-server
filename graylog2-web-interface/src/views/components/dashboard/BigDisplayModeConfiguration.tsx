@@ -65,7 +65,7 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
     <BootstrapModalForm bsSize="large"
                         onModalClose={onClose}
                         onSubmitForm={_onSave}
-                        submitButtonText="Save"
+                        submitButtonText="Start full screen view"
                         title="Configuring Full Screen"
                         show={show}>
       <Input autoFocus

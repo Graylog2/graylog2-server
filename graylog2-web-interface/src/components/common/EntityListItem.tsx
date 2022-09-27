@@ -26,8 +26,8 @@ const StyledListItem = styled.li(({ theme }) => css`
 
   h2 .label {
     margin-left: 5px;
-    line-height: 2;
-    vertical-align: bottom;
+    line-height: 1;
+    vertical-align: baseline;
   }
 
   .item-description {

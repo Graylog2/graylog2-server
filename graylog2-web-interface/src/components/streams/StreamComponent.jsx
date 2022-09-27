@@ -21,6 +21,7 @@ import { Alert } from 'components/bootstrap';
 import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 
@@ -32,6 +33,7 @@ class StreamComponent extends React.Component {
     currentUser: PropTypes.object.isRequired,
     onStreamSave: PropTypes.func.isRequired,
     indexSets: PropTypes.array.isRequired,
+    paginationQueryParameter: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -39,8 +41,6 @@ class StreamComponent extends React.Component {
 
     this.state = {
       pagination: {
-        page: 1,
-        perPage: 10,
         count: 0,
         total: 0,
         query: '',
@@ -64,9 +64,8 @@ class StreamComponent extends React.Component {
     StreamRulesStore.unregister(this.loadData);
   }
 
-  loadData = (callback) => {
-    const { state } = this;
-    const { page, perPage, query } = state.pagination;
+  loadData = (callback, page = this.props.paginationQueryParameter.page, perPage = this.props.paginationQueryParameter.pageSize) => {
+    const { query } = this.state.pagination;
 
     StreamsStore.searchPaginated(page, perPage, query)
       .then(({ streams, pagination }) => {
@@ -89,26 +88,20 @@ class StreamComponent extends React.Component {
   };
 
   _onPageChange = (newPage, newPerPage) => {
-    const { pagination } = this.state;
-    const newPagination = Object.assign(pagination, {
-      page: newPage,
-      perPage: newPerPage,
-    });
-
-    this.setState({ pagination: newPagination }, this.loadData);
+    this.loadData(null, newPage, newPerPage);
   };
 
   _onSearch = (query, resetLoadingCallback) => {
     const { pagination } = this.state;
-    const newPagination = { ...pagination, query: query, page: 1 };
-
+    const newPagination = { ...pagination, query: query };
+    this.props.paginationQueryParameter.resetPage();
     this.setState({ pagination: newPagination }, () => this.loadData(resetLoadingCallback));
   };
 
   _onReset = () => {
     const { pagination } = this.state;
-    const newPagination = { ...pagination, query: '', page: 1 };
-
+    const newPagination = { ...pagination, query: '' };
+    this.props.paginationQueryParameter.resetPage();
     this.setState({ pagination: newPagination }, this.loadData);
   };
 
@@ -157,7 +150,6 @@ class StreamComponent extends React.Component {
     return (
       <div>
         <PaginatedList onChange={this._onPageChange}
-                       activePage={pagination.page}
                        totalItems={pagination.total}>
           <div style={{ marginBottom: 15 }}>
             <SearchForm onSearch={this._onSearch}
@@ -172,4 +164,4 @@ class StreamComponent extends React.Component {
   }
 }
 
-export default StreamComponent;
+export default withPaginationQueryParameter(StreamComponent);

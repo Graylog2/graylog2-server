@@ -195,6 +195,7 @@ const SearchActionsMenu = () => {
         <ViewPropertiesModal show
                              view={view}
                              title="Editing saved search"
+                             submitButtonText="Update search"
                              onClose={toggleMetadataEdit}
                              onSave={onSaveView} />
       )}

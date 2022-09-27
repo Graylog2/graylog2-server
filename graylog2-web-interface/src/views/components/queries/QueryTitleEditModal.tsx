@@ -50,6 +50,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     };
   }
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = (activeQueryTitle: string) => {
     this.setState({
       titleDraft: activeQueryTitle,
@@ -77,7 +78,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
       <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                           title="Editing dashboard page title"
                           onSubmitForm={this._onDraftSave}
-                          submitButtonText="Save"
+                          submitButtonText="Update title"
                           bsSize="large">
         <Input autoFocus
                help="Enter a helpful dashboard page title. It has a maximum length of 40 characters."

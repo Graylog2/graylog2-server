@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 import numeral from 'numeral';
 import moment from 'moment';
 
@@ -23,22 +24,29 @@ import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, Spinner, PageHeader, PaginatedList } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import { IndexerFailuresList } from 'components/indexers';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { IndexerFailuresStore } from 'stores/indexers/IndexerFailuresStore';
 
 class IndexerFailuresPage extends React.Component {
-  state = {};
+  static propTypes = {
+    paginationQueryParameter: PropTypes.object.isRequired,
+  };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {};
+  }
 
   componentDidMount() {
     IndexerFailuresStore.count(moment().subtract(10, 'years')).then((response) => {
       this.setState({ total: response.count });
     });
 
-    this.loadData(1, this.defaultPageSize);
+    this.loadData();
   }
 
-  defaultPageSize = 50;
-
-  loadData = (page, size) => {
+  loadData = (page = this.props.paginationQueryParameter.page, size = this.props.paginationQueryParameter.pageSize) => {
     IndexerFailuresStore.list(size, (page - 1) * size).then((response) => {
       this.setState({ failures: response.failures });
     });
@@ -81,4 +89,4 @@ class IndexerFailuresPage extends React.Component {
   }
 }
 
-export default IndexerFailuresPage;
+export default withPaginationQueryParameter(IndexerFailuresPage);

@@ -30,7 +30,7 @@
     "@font-size-h4": "ceil((@font-size-base * 1.25))",
     "@font-size-h5": "@font-size-base",
     "@font-size-h6": "ceil((@font-size-base * 0.85))",
-    "@line-height-base": "1.25",
+    "@line-height-base": "1.24",
     "@line-height-computed": "floor((@font-size-base * @line-height-base))",
     "@headings-font-family": "inherit",
     "@headings-font-weight": "500",
