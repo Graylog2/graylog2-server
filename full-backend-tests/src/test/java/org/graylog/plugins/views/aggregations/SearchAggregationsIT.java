@@ -75,7 +75,8 @@ public class SearchAggregationsIT {
                 .then()
                 .log().ifStatusCodeMatches(not(200))
                 .statusCode(200)
-                .body("execution.done", equalTo(true));
+                .body("execution.done", equalTo(true))
+                .body(PIVOT_PATH + ".total", equalTo(1000));
     }
 
     @ContainerMatrixTest
@@ -89,7 +90,6 @@ public class SearchAggregationsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
-                .body("total", equalTo(1000))
                 .body("rows", hasSize(5));
 
         final String searchTypeResult = PIVOT_PATH + ".rows";
@@ -114,7 +114,6 @@ public class SearchAggregationsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
-                .body("total", equalTo(1000))
                 .body("rows", hasSize(5));
 
         final String searchTypeResultPath = PIVOT_PATH + ".rows";
@@ -161,7 +160,7 @@ public class SearchAggregationsIT {
                 .series(List.of(Count.builder().build()))
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot).log().body();
+        final ValidatableResponse validatableResponse = execute(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000))
@@ -190,10 +189,6 @@ public class SearchAggregationsIT {
                 .rootPath(searchTypeResultPath)
                 .body(pathToMetricResult(List.of("PUT", "200"), List.of("count()")), equalTo(42))
                 .body(pathToMetricResult(List.of("PUT", "504"), List.of("count()")), equalTo(1));
-
-        validatableResponse
-                .rootPath(searchTypeResultPath + "." + pathToRow(Collections.emptySet()))
-                .body(pathToValue(List.of("count()")), equalTo(1000));
     }
 
     private String listToGroovy(Collection<String> strings) {
