@@ -118,7 +118,9 @@ const Timezone = styled.p(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
   padding-left: 3px;
   margin: 0;
-  line-height: 34px;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
 `);
 
 const PopoverTitle = styled.span`

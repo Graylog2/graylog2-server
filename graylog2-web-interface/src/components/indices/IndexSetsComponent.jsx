@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
@@ -26,14 +27,19 @@ import Routes from 'routing/Routes';
 import StringUtils from 'util/StringUtils';
 import NumberUtils from 'util/NumberUtils';
 import { IndexSetDeletionForm, IndexSetDetails } from 'components/indices';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 
 const IndexSetsComponent = createReactClass({
-  displayName: 'IndexSetsComponent',
+  // eslint-disable-next-line react/no-unused-class-component-methods
+  propTypes: {
+    paginationQueryParameter: PropTypes.object.isRequired,
+  },
+
   mixins: [Reflux.connect(IndexSetsStore)],
 
   componentDidMount() {
-    this.loadData(1, this.PAGE_SIZE);
+    this.loadData(this.props.paginationQueryParameter.page, this.PAGE_SIZE);
   },
 
   forms: {},
@@ -68,11 +74,13 @@ const IndexSetsComponent = createReactClass({
   },
 
   _deleteIndexSet(indexSet, deleteIndices) {
+    this.props.paginationQueryParameter.resetPage();
+
     IndexSetsActions.delete(indexSet, deleteIndices).then(() => {
       this.loadData(1, this.PAGE_SIZE);
     });
   },
-
+  // eslint-disable-next-line react/no-unstable-nested-components
   _formatIndexSet(indexSet) {
     const { indexSetStats } = this.state;
 
@@ -175,4 +183,4 @@ const IndexSetsComponent = createReactClass({
   },
 });
 
-export default IndexSetsComponent;
+export default withPaginationQueryParameter(IndexSetsComponent);

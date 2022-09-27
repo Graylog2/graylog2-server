@@ -25,17 +25,12 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import type UserOverview from 'logic/users/UserOverview';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 import UserOverviewItem from './UserOverviewItem';
 import UsersFilter from './UsersFilter';
 import ClientAddressHead from './ClientAddressHead';
 import SystemAdministrator from './SystemAdministratorOverview';
-
-const DEFAULT_PAGINATION = {
-  page: 1,
-  perPage: 10,
-  query: '',
-};
 
 const TABLE_HEADERS = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Enabled', 'Role', 'Actions'];
 
@@ -81,7 +76,7 @@ const _loadUsers = (pagination, setLoading, setPaginatedUsers) => {
   });
 };
 
-const _updateListOnUserDelete = (perPage, query, setPagination) => UsersActions.delete.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
+const _updateListOnUserDelete = (callback: () => void) => UsersActions.delete.completed.listen(() => callback());
 const _updateListOnUserSetStatus = (pagination, setLoading, setPaginatedUsers) => UsersActions.setStatus.completed.listen(() => _loadUsers(pagination, setLoading, setPaginatedUsers));
 
 const buildUsersOverviewItem = (currentUser: any) => (user: UserOverview) => {
@@ -91,22 +86,27 @@ const buildUsersOverviewItem = (currentUser: any) => (user: UserOverview) => {
 };
 
 const UsersOverview = () => {
+  const { page, pageSize: perPage, resetPage } = usePaginationQueryParameter();
   const currentUser = useCurrentUser();
   const [paginatedUsers, setPaginatedUsers] = useState<PaginatedUsers | undefined>();
   const [loading, setLoading] = useState(false);
-  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
+  const [query, setQuery] = useState('');
   const { list: users, adminUser, pagination: { total = 0 } = {} } = paginatedUsers || {};
-  const { page, query, perPage } = pagination;
 
-  useEffect(() => _loadUsers(pagination, setLoading, setPaginatedUsers), [pagination]);
-  useEffect(() => _updateListOnUserDelete(perPage, query, setPagination), [perPage, query]);
-  useEffect(() => _updateListOnUserSetStatus(pagination, setLoading, setPaginatedUsers), [pagination]);
+  useEffect(() => _loadUsers({ page, perPage, query }, setLoading, setPaginatedUsers), [page, perPage, query]);
+  useEffect(() => _updateListOnUserDelete(resetPage), [resetPage]);
+  useEffect(() => _updateListOnUserSetStatus({ page, perPage, query }, setLoading, setPaginatedUsers), [page, perPage, query]);
 
   if (!users) {
     return <Spinner />;
   }
 
-  const searchFilter = <UsersFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />;
+  const handleSearch = (newQuery: string) => {
+    resetPage();
+    setQuery(newQuery);
+  };
+
+  const searchFilter = <UsersFilter onSearch={handleSearch} />;
 
   return (
     <Container>
@@ -125,9 +125,7 @@ const UsersOverview = () => {
           <p className="description">
             Found {total} registered users on the system.
           </p>
-          <StyledPaginatedList activePage={page}
-                               totalItems={total}
-                               onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}>
+          <StyledPaginatedList totalItems={total}>
             <DataTable id="users-overview"
                        className="table-hover"
                        rowClassName="no-bm"
