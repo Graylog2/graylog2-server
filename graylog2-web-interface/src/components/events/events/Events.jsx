@@ -22,6 +22,7 @@ import styled, { css } from 'styled-components';
 import { Link, LinkContainer } from 'components/common/router';
 import { OverlayTrigger, EmptyEntity, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
 import { Alert, Col, Label, Row, Table, Tooltip, Button } from 'components/bootstrap';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import Routes from 'routing/Routes';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -81,6 +82,56 @@ const EventsIcon = styled(Icon)(({ theme }) => css`
   vertical-align: top;
 `);
 
+export const PAGE_SIZES = [10, 25, 50, 100];
+
+const priorityFormatter = (eventId, priority) => {
+  const priorityName = lodash.capitalize(EventDefinitionPriorityEnum.properties[priority].name);
+  let icon;
+  let style;
+
+  switch (priority) {
+    case EventDefinitionPriorityEnum.LOW:
+      icon = 'thermometer-empty';
+      style = 'text-muted';
+      break;
+    case EventDefinitionPriorityEnum.HIGH:
+      icon = 'thermometer-full';
+      style = 'text-danger';
+      break;
+    default:
+      icon = 'thermometer-half';
+      style = 'text-info';
+  }
+
+  const tooltip = <Tooltip id={`priority-${eventId}`}>{priorityName} Priority</Tooltip>;
+
+  return (
+    <OverlayTrigger placement="top" trigger={['hover', 'click', 'focus']} overlay={tooltip}>
+      <EventsIcon name={icon} fixedWidth className={style} />
+    </OverlayTrigger>
+  );
+};
+
+const renderEmptyContent = () => {
+  return (
+    <Row>
+      <Col md={6} mdOffset={3} lg={4} lgOffset={4}>
+        <EmptyEntity title="Looks like you didn't define any Events yet">
+          <p>
+            Create Event Definitions that are able to search, aggregate or correlate Messages and other
+            Events, allowing you to record significant Events in Graylog and alert on them.
+          </p>
+          <IfPermitted permissions="eventdefinitions:create">
+            <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
+              <Button bsStyle="success">Get Started!</Button>
+            </LinkContainer>
+          </IfPermitted>
+        </EmptyEntity>
+      </Col>
+    </Row>
+  );
+};
+
 class Events extends React.Component {
   static propTypes = {
     events: PropTypes.array.isRequired,
@@ -94,6 +145,7 @@ class Events extends React.Component {
     onAlertFilterChange: PropTypes.func.isRequired,
     onTimeRangeChange: PropTypes.func.isRequired,
     onSearchReload: PropTypes.func.isRequired,
+    paginationQueryParameter: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -106,7 +158,9 @@ class Events extends React.Component {
 
   handlePageSizeChange = (nextPageSize) => {
     const { onPageChange } = this.props;
+    const { setPageSize } = this.props.paginationQueryParameter;
 
+    setPageSize(nextPageSize);
     onPageChange(1, nextPageSize);
   };
 
@@ -117,35 +171,6 @@ class Events extends React.Component {
 
       this.setState({ expanded: nextExpanded });
     };
-  };
-
-  // eslint-disable-next-line class-methods-use-this
-  priorityFormatter = (eventId, priority) => {
-    const priorityName = lodash.capitalize(EventDefinitionPriorityEnum.properties[priority].name);
-    let icon;
-    let style;
-
-    switch (priority) {
-      case EventDefinitionPriorityEnum.LOW:
-        icon = 'thermometer-empty';
-        style = 'text-muted';
-        break;
-      case EventDefinitionPriorityEnum.HIGH:
-        icon = 'thermometer-full';
-        style = 'text-danger';
-        break;
-      default:
-        icon = 'thermometer-half';
-        style = 'text-info';
-    }
-
-    const tooltip = <Tooltip id={`priority-${eventId}`}>{priorityName} Priority</Tooltip>;
-
-    return (
-      <OverlayTrigger placement="top" trigger={['hover', 'click', 'focus']} overlay={tooltip}>
-        <EventsIcon name={icon} fixedWidth className={style} />
-      </OverlayTrigger>
-    );
   };
 
   renderLinkToEventDefinition = (event, eventDefinitionContext) => {
@@ -171,7 +196,7 @@ class Events extends React.Component {
         <CollapsibleTr className={event.priority === EventDefinitionPriorityEnum.HIGH ? 'bg-danger' : ''}
                        onClick={this.expandRow(event.id)}>
           <td>
-            {this.priorityFormatter(event.id, event.priority)}
+            {priorityFormatter(event.id, event.priority)}
             &nbsp;
             {event.message}
           </td>
@@ -193,27 +218,6 @@ class Events extends React.Component {
     );
   };
 
-  // eslint-disable-next-line class-methods-use-this
-  renderEmptyContent = () => {
-    return (
-      <Row>
-        <Col md={6} mdOffset={3} lg={4} lgOffset={4}>
-          <EmptyEntity title="Looks like you didn't define any Events yet">
-            <p>
-              Create Event Definitions that are able to search, aggregate or correlate Messages and other
-              Events, allowing you to record significant Events in Graylog and alert on them.
-            </p>
-            <IfPermitted permissions="eventdefinitions:create">
-              <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
-                <Button bsStyle="success">Get Started!</Button>
-              </LinkContainer>
-            </IfPermitted>
-          </EmptyEntity>
-        </Col>
-      </Row>
-    );
-  };
-
   render() {
     const {
       events,
@@ -225,12 +229,13 @@ class Events extends React.Component {
       onAlertFilterChange,
       onTimeRangeChange,
       onSearchReload,
+      paginationQueryParameter,
     } = this.props;
 
     const eventList = events.map((e) => e.event);
 
     if (totalEventDefinitions === 0) {
-      return this.renderEmptyContent();
+      return renderEmptyContent();
     }
 
     const filter = parameters.filter.alerts;
@@ -246,11 +251,9 @@ class Events extends React.Component {
                            onTimeRangeChange={onTimeRangeChange}
                            onPageSizeChange={this.handlePageSizeChange}
                            onSearchReload={onSearchReload}
-                           pageSize={parameters.pageSize}
-                           pageSizes={[10, 25, 50, 100]} />
-          <PaginatedList activePage={parameters.page}
-                         pageSize={parameters.pageSize}
-                         showPageSizeSelect={false}
+                           pageSize={paginationQueryParameter.pageSize}
+                           pageSizes={PAGE_SIZES} />
+          <PaginatedList showPageSizeSelect={false}
                          totalItems={totalEvents}
                          onChange={onPageChange}>
             {eventList.length === 0 ? (
@@ -272,4 +275,4 @@ class Events extends React.Component {
   }
 }
 
-export default Events;
+export default withPaginationQueryParameter(Events, { pageSizes: PAGE_SIZES });

@@ -82,7 +82,8 @@ const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list = [], pagi
                        activePage={paginationState.page}
                        totalItems={pagination.total}
                        pageSize={paginationState.perPage}
-                       pageSizes={[5, 10, 15]}>
+                       pageSizes={[5, 10, 15]}
+                       useQueryParameter={false}>
           {renderResult}
         </PaginatedList>
       </Modal.Body>

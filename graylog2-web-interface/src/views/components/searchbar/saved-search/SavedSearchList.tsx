@@ -127,7 +127,8 @@ const SavedSearchList = ({ toggleModal, deleteSavedSearch, activeSavedSearchId }
         <PaginatedList onChange={handlePageSizeChange}
                        activePage={page}
                        totalItems={total}
-                       pageSize={perPage}>
+                       pageSize={perPage}
+                       useQueryParameter={false}>
           <SearchForm focusAfterMount
                       onSearch={handleSearch}
                       queryHelpComponent={<QueryHelper entityName="search" commonFields={['id', 'title']} />}
