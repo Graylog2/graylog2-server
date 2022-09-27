@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import moment from 'moment';
 
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/bootstrap';
-import { Icon, KeyCapture } from 'components/common';
+import { Icon, KeyCapture, ModalSubmit } from 'components/common';
 import { availableTimeRangeTypes } from 'views/Constants';
 import type {
   AbsoluteTimeRange,
@@ -142,10 +142,6 @@ const LimitLabel = styled.span(({ theme }) => css`
     color: ${theme.colors.variant.darkest.warning};
   }
 `);
-
-const CancelButton = styled(Button)`
-  margin-right: 6px;
-`;
 
 const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword, tabs }: TimeRangeTabsArguments) => availableTimeRangeTypes
   .filter(({ type }) => tabs.includes(type))
@@ -282,13 +278,10 @@ const TimeRangeDropdown = ({
                     <Timezone>All timezones using: <b>{userTimezone}</b></Timezone>
                   </Col>
                   <Col md={6}>
-                    <div className="pull-right">
-                      {noOverride && (
-                        <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>
-                      )}
-                      <CancelButton bsStyle="default" onClick={handleCancel}>Cancel</CancelButton>
-                      <Button bsStyle="success" disabled={!isValid || validatingKeyword} type="submit">Apply</Button>
-                    </div>
+                    <ModalSubmit leftCol={noOverride && <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>}
+                                 onCancel={handleCancel}
+                                 disabledSubmit={!isValid || validatingKeyword}
+                                 submitButtonText="Update time range" />
                   </Col>
                 </Row>
               </Form>

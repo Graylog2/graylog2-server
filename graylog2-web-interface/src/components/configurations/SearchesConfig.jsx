@@ -251,14 +251,14 @@ class SearchesConfig extends React.Component {
 
         </Row>
         <IfPermitted permissions="clusterconfigentry:edit">
-          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
+          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
         <BootstrapModalForm ref={this.searchesConfigModal}
                             title="Update Search Configuration"
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}
-                            submitButtonText="Save">
+                            submitButtonText="Update configuration">
           <fieldset>
             <label htmlFor="query-limit-checkbox">Relative Timerange Options</label>
             <Input id="query-limit-checkbox"

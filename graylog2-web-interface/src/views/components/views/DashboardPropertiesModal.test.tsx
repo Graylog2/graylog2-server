@@ -29,13 +29,20 @@ describe('DashboardPropertiesModal', () => {
       .type(View.Type.Dashboard)
       .title('')
       .build();
-    render(<DashboardPropertiesModal onClose={jest.fn()} onSave={onSave} title="Saving new dashboard" view={view} show />);
+
+    render(<DashboardPropertiesModal onClose={jest.fn()}
+                                     onSave={onSave}
+                                     title="Saving new dashboard"
+                                     view={view}
+                                     submitButtonText="Create Dashboard"
+                                     show />);
 
     await screen.findByText('Saving new dashboard');
     const titleInput = await screen.findByRole('textbox', { name: /title/i, hidden: true });
 
     await userEvent.type(titleInput, 'My title');
-    userEvent.click(await screen.findByRole('button', { name: 'Save', hidden: true }));
+
+    userEvent.click(await screen.findByRole('button', { name: /create dashboard/i, hidden: true }));
 
     await waitFor(() => {
       expect(onSave).toHaveBeenCalledWith(expect.objectContaining({

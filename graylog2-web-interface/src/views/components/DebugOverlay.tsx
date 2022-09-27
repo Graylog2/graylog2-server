@@ -42,7 +42,7 @@ const DebugOverlay = ({ currentView, searches, show, onClose }: Props) => (
                 value={JSON.stringify({ currentView, searches }, null, 2)} />
     </Modal.Body>
     <Modal.Footer>
-      <Button type="button" onClick={() => onClose()} bsStyle="primary">Close</Button>
+      <Button type="button" onClick={() => onClose()}>Close</Button>
     </Modal.Footer>
   </BootstrapModalWrapper>
 );

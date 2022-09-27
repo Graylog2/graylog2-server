@@ -28,6 +28,19 @@ import * as FormsUtils from 'util/FormsUtils';
 import type { Store } from 'stores/StoreTypes';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 
+const formatStreamRuleType = (streamRuleType) => (
+  <option key={`streamRuleType${streamRuleType.id}`}
+          value={streamRuleType.id}>
+    {streamRuleType.short_desc}
+  </option>
+);
+
+const formatInputOptions = (input) => (
+  <option key={`input-${input.id}`} value={input.id}>
+    {input.title} ({input.name})
+  </option>
+);
+
 type StreamRule = {
   type: number,
   field: string,
@@ -46,11 +59,13 @@ type StreamRuleType = {
 
 type Props = {
   onSubmit: (streamRuleId: string | undefined | null, currentStreamRule: StreamRule) => void,
-  streamRule: StreamRule,
+  streamRule?: StreamRule,
   streamRuleTypes: Array<StreamRuleType>,
   title: string,
-  inputs: Array<unknown>,
+  inputs?: Array<unknown>,
   onClose: () => void,
+  submitButtonText: string
+  submitLoadingText: string
 };
 
 type State = {
@@ -72,6 +87,8 @@ class StreamRuleForm extends React.Component<Props, State> {
     streamRuleTypes: PropTypes.array.isRequired,
     title: PropTypes.string.isRequired,
     onClose: PropTypes.func,
+    submitButtonText: PropTypes.string.isRequired,
+    submitLoadingText: PropTypes.string.isRequired,
   };
 
   FIELD_PRESENCE_RULE_TYPE = 5;
@@ -135,13 +152,6 @@ class StreamRuleForm extends React.Component<Props, State> {
     onClose();
   };
 
-  _formatStreamRuleType = (streamRuleType) => (
-    <option key={`streamRuleType${streamRuleType.id}`}
-            value={streamRuleType.id}>
-      {streamRuleType.short_desc}
-    </option>
-  );
-
   handleChange = (event) => {
     const { streamRule } = this.state;
     const updatedStreamRule = { ...streamRule };
@@ -154,12 +164,6 @@ class StreamRuleForm extends React.Component<Props, State> {
 
     this.setState({ streamRule: updatedStreamRule });
   };
-
-  _formatInputOptions = (input) => (
-    <option key={`input-${input.id}`} value={input.id}>
-      {input.title} ({input.name})
-    </option>
-  );
 
   valueBox = () => {
     const { streamRule: { value, type }, error } = this.state;
@@ -185,7 +189,7 @@ class StreamRuleForm extends React.Component<Props, State> {
                  data-testid="input-selection"
                  onChange={this.handleChange}>
             <option value={this.PLACEHOLDER_INPUT}>Choose Input</option>
-            {inputs.map(this._formatInputOptions)}
+            {inputs.map(formatInputOptions)}
           </Input>
         );
       }
@@ -210,9 +214,9 @@ class StreamRuleForm extends React.Component<Props, State> {
   render() {
     const { streamRule } = this.state;
     const { type, inverted, description } = streamRule;
-    const { streamRuleTypes: ruleTypes, title, onClose, inputs } = this.props;
+    const { streamRuleTypes: ruleTypes, title, onClose, inputs, submitButtonText, submitLoadingText } = this.props;
 
-    const streamRuleTypes = ruleTypes.map(this._formatStreamRuleType);
+    const streamRuleTypes = ruleTypes.map(formatStreamRuleType);
     const fieldBox = this.fieldBox();
     const valueBox = this.valueBox();
 
@@ -222,7 +226,8 @@ class StreamRuleForm extends React.Component<Props, State> {
                           onCancel={onClose}
                           onModalClose={onClose}
                           onSubmitForm={this._onSubmit}
-                          submitButtonText="Save"
+                          submitButtonText={submitButtonText}
+                          submitLoadingText={submitLoadingText}
                           formProps={{ id: 'StreamRuleForm' }}>
         <div>
           <Col md={8}>
