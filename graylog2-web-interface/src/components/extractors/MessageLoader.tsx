@@ -38,8 +38,10 @@ const LoadMessageForm = ({ loadMessage, children, loading }: LoadMessageFormProp
   <div>
     <form className="form-inline message-loader-form" onSubmit={loadMessage}>
       {children}
-      <StyledFormSubmit submitButtonText={loading ? 'Loading message...' : 'Load message'}
+      <StyledFormSubmit submitButtonText="Load message"
                         isSubmitting={loading}
+                        submitLoadingText="Loading message..."
+                        isAsyncSubmit
                         onCancel={() => history.goBack()} />
     </form>
   </div>

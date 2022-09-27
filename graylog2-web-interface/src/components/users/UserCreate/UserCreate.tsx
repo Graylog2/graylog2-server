@@ -231,8 +231,10 @@ const UserCreate = () => {
               <Row>
                 <Col md={9} mdOffset={3}>
                   <FormSubmit disabledSubmit={!isValid || !hasValidRole}
-                              submitButtonText="Create User"
+                              submitButtonText="Create user"
+                              submitLoadingText="Creating user..."
                               isSubmitting={isSubmitting}
+                              isAsyncSubmit
                               onCancel={_handleCancel} />
                 </Col>
               </Row>

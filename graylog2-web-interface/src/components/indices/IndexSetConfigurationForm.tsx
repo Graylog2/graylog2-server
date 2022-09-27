@@ -298,6 +298,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
                                       submitButtonText={submitButtonText}
                                       submitLoadingText={submitLoadingText}
                                       isSubmitting={isSubmitting}
+                                      isAsyncSubmit
                                       onCancel={onCancel} />
                   </Col>
                 </Row>

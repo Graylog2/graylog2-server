@@ -225,6 +225,7 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
                   <FormSubmit submitButtonText="Create lookup table"
                               submitLoadingText="Creating lookup table..."
                               isSubmitting={isSubmitting}
+                              isAsyncSubmit
                               onCancel={onCancel} />
                 )}
 
@@ -232,6 +233,7 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
                   <FormSubmit submitButtonText="Update lookup table"
                               submitLoadingText="Updating lookup table..."
                               isSubmitting={isSubmitting}
+                              isAsyncSubmit
                               onCancel={onCancel} />
                 )}
               </Col>

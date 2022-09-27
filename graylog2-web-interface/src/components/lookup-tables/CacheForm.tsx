@@ -179,11 +179,13 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
                         <FormSubmit submitButtonText="Create cache"
                                     submitLoadingText="Creating cache..."
                                     isSubmitting={isSubmitting}
+                                    isAsyncSubmit
                                     onCancel={onCancel} />
                       )}
                       {(!create && !loadingScopePermissions && scopePermissions?.is_mutable) && (
                         <FormSubmit submitButtonText="Update cache"
                                     submitLoadingText="Updating cache..."
+                                    isAsyncSubmit
                                     isSubmitting={isSubmitting}
                                     onCancel={onCancel} />
                       )}

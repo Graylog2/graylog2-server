@@ -337,8 +337,10 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
             </Input>
             {codecConfigurationOptions}
           </fieldset>
-          <FormSubmit submitButtonText={loading ? 'Loading message...' : 'Load message'}
+          <FormSubmit submitButtonText="Load message"
+                      submitLoadingText="Loading message..."
                       isSubmitting={loading}
+                      isAsyncSubmit
                       disabledSubmit={_isSubmitDisabled}
                       onCancel={() => history.goBack()} />
         </form>
