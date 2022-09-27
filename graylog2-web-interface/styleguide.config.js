@@ -40,16 +40,8 @@ module.exports = {
       content: 'docs/introduction.md',
     },
     {
-      name: 'Style Guide',
-      content: 'docs/styleguide.md',
-    },
-    {
       name: 'Documentation',
       content: 'docs/documentation.md',
-    },
-    {
-      name: 'Tests',
-      content: 'docs/tests.md',
     },
     {
       name: 'Util Objects',
