@@ -12,7 +12,7 @@ const { fonts } = useTheme();
 
 const FontFamilies = () => (
   <ul>
-    {Object.entries(fonts.size).map(([fontId, fontNames]) => {
+    {Object.entries(fonts.family).map(([fontId, fontNames]) => {
       return <li><b>{fontId}</b>: {fontNames}</li>
     })}
   </ul>
