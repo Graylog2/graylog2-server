@@ -62,14 +62,14 @@ class NodesActions extends React.Component {
     return (
       <div className="item-actions">
         <LinkContainer to={Routes.SYSTEM.NODES.SHOW(node.node_id)}>
-          <Button bsStyle="info">Details</Button>
+          <Button>Details</Button>
         </LinkContainer>
 
         <LinkContainer to={Routes.SYSTEM.METRICS(node.node_id)}>
-          <Button bsStyle="info">Metrics</Button>
+          <Button>Metrics</Button>
         </LinkContainer>
 
-        <ExternalLinkButton bsStyle="info" href={apiBrowserURI}>
+        <ExternalLinkButton href={apiBrowserURI}>
           API browser
         </ExternalLinkButton>
 

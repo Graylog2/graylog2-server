@@ -54,7 +54,7 @@ const EditButton = ({ authenticationBackend }: { authenticationBackend: Authenti
 
   return (
     <LinkContainer to={link}>
-      <Button bsStyle="info" bsSize="xs" type="button">
+      <Button bsSize="xs" type="button">
         Edit
       </Button>
     </LinkContainer>

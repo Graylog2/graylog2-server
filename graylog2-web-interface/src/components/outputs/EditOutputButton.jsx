@@ -80,7 +80,7 @@ class EditOutputButton extends React.Component {
 
     return (
       <span>
-        <Button disabled={disabled} bsStyle="info" onClick={this.handleClick}>
+        <Button disabled={disabled} onClick={this.handleClick}>
           Edit
         </Button>
         {configurationForm}

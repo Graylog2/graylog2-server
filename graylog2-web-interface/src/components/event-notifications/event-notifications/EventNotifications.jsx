@@ -130,7 +130,7 @@ class EventNotifications extends React.Component {
       <>
         <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notification.id)}>
           <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
-            <Button bsStyle="info">
+            <Button>
               <Icon name="edit" /> Edit
             </Button>
           </IfPermitted>

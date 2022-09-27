@@ -188,7 +188,7 @@ class Stream extends React.Component {
       editRulesLink = (
         <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
           <LinkContainer disabled={isDefaultStream || isNotEditable} to={Routes.stream_edit(stream.id)}>
-            <Button bsStyle="info">
+            <Button>
               <Icon name="stream" /> Manage Rules
             </Button>
           </LinkContainer>
@@ -197,7 +197,7 @@ class Stream extends React.Component {
 
       manageAlertsLink = (
         <LinkContainer to={Routes.stream_alerts(stream.id)}>
-          <Button bsStyle="info">
+          <Button>
             <Icon name="bell" /> Manage Alerts
           </Button>
         </LinkContainer>

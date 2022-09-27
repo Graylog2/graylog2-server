@@ -43,7 +43,6 @@ const EditTokensAction = ({
 }) => (
   <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(id)}>
     <WrapperComponent id={`edit-tokens-${id}`}
-                      bsStyle="info"
                       bsSize="xs"
                       title={`Edit tokens of user ${fullName}`}>
       Edit tokens
@@ -94,7 +93,7 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
     <>
       <IfPermitted permissions={[`users:edit:${username}`]}>
         <LinkContainer to={Routes.SYSTEM.USERS.edit(id)}>
-          <Button id={`edit-user-${id}`} bsStyle="info" bsSize="xs" title={`Edit user ${fullName}`}>
+          <Button id={`edit-user-${id}`} bsSize="xs" title={`Edit user ${fullName}`}>
             Edit
           </Button>
         </LinkContainer>
