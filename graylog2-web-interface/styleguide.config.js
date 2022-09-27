@@ -66,6 +66,10 @@ module.exports = {
       ],
     },
     {
+      name: 'UX Patterns',
+      content: 'docs/ux-patterns.md',
+    },
+    {
       name: 'Shared Components',
       sections: [
         {
