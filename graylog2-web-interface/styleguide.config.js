@@ -44,10 +44,6 @@ module.exports = {
       content: 'docs/documentation.md',
     },
     {
-      name: 'Util Objects',
-      content: 'docs/util-objects.md',
-    },
-    {
       name: 'Theming Details',
       content: 'src/theme/docs/Details.md',
       sections: [
