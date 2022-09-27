@@ -38,11 +38,14 @@ class InputForm extends React.Component {
     values: undefined,
   };
 
-  // eslint-disable-next-line react/state-in-constructor
-  state = {
-    global: this.props.globalValue !== undefined ? this.props.globalValue : false,
-    node: this.props.nodeValue !== undefined ? this.props.nodeValue : undefined,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      global: this.props.globalValue !== undefined ? this.props.globalValue : false,
+      node: this.props.nodeValue !== undefined ? this.props.nodeValue : undefined,
+    };
+  }
 
   _handleChange = (field, value) => {
     const state = {};
