@@ -17,11 +17,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Input } from 'components/bootstrap';
 import { Icon } from 'components/common';
-
 import { FormDataContext } from 'aws/context/FormData';
 import { ApiContext } from 'aws/context/Api';
 import useFetch from 'aws/common/hooks/useFetch';
@@ -246,8 +246,7 @@ const ReviewItems = styled.ul`
   padding: 0;
 
   li {
-    line-height: 2;
-    padding: 0 5px;
+    padding: 5px;
 
     :nth-of-type(odd) {
       background-color: rgba(220, 225, 229, 0.4);
