@@ -57,7 +57,6 @@ import org.graylog2.rest.resources.system.IndexRangesResource;
 import org.graylog2.rest.resources.system.JournalResource;
 import org.graylog2.rest.resources.system.MessageProcessorsResource;
 import org.graylog2.rest.resources.system.MessagesResource;
-import org.graylog2.rest.resources.system.MetricsHistoryResource;
 import org.graylog2.rest.resources.system.NotificationsResource;
 import org.graylog2.rest.resources.system.PermissionsResource;
 import org.graylog2.rest.resources.system.SearchVersionResource;
@@ -126,7 +125,6 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(JournalResource.class);
         addSystemRestResource(LoggersResource.class);
         addSystemRestResource(MessagesResource.class);
-        addSystemRestResource(MetricsHistoryResource.class);
         addSystemRestResource(NotificationsResource.class);
         addSystemRestResource(StatsResource.class);
         addSystemRestResource(SystemShutdownResource.class);
