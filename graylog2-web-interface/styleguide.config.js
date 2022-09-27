@@ -40,10 +40,6 @@ module.exports = {
       content: 'docs/introduction.md',
     },
     {
-      name: 'Documentation',
-      content: 'docs/documentation.md',
-    },
-    {
       name: 'Theming Details',
       content: 'src/theme/docs/Details.md',
       sections: [
@@ -72,6 +68,10 @@ module.exports = {
     {
       name: 'Shared Components',
       sections: [
+        {
+          name: 'How to document your components',
+          content: 'docs/documentation.md',
+        },
         {
           name: 'Bootstrap',
           components: 'src/components/bootstrap/[A-Z]*.{jsx,tsx}',
