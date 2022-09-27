@@ -24,6 +24,8 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.plugin.BaseConfiguration;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -35,12 +37,11 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 
-import java.util.stream.Collectors;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.system.processing.DBProcessingStatusService.COLLECTION_NAME;
+import static org.graylog2.system.processing.DBProcessingStatusService.ProcessingNodesState;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -74,7 +75,7 @@ public class DBProcessingStatusServiceTest {
         clock = spy(new JobSchedulerTestClock(DateTime.parse("2019-01-01T00:00:00.000Z")));
         updateThreshold = spy(Duration.minutes(1));
         dbService = new DBProcessingStatusService(mongodb.mongoConnection(), nodeId, clock, updateThreshold, 1, mapperProvider, baseConfiguration);
-        db = JacksonDBCollection.wrap(mongodb.mongoConnection().getDatabase().getCollection(DBProcessingStatusService.COLLECTION_NAME),
+        db = JacksonDBCollection.wrap(mongodb.mongoConnection().getDatabase().getCollection(COLLECTION_NAME),
                 ProcessingStatusDto.class,
                 ObjectId.class,
                 mapperProvider.get());
@@ -218,72 +219,68 @@ public class DBProcessingStatusServiceTest {
     }
 
     @Test
-    @MongoDBFixtures("processing-status.json")
-    public void earliestPostIndexingTimestamp() {
-        when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T02:01:00.000Z"));
-
-        // The exclude threshold is big enough to include all three nodes. So abc-123 has the earliest indexed timestamp
-        when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(4).toMilliseconds());
-        assertThat(dbService.earliestPostIndexingTimestamp()).isPresent().get().isEqualTo(DateTime.parse("2019-01-01T00:01:00.000Z"));
-
-        // The exclude threshold is only including nodes abc-456 and abc-789. So abc-789 has the earliest indexed timestamp
-        when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(2).toMilliseconds());
-        assertThat(dbService.earliestPostIndexingTimestamp()).isPresent().get().isEqualTo(DateTime.parse("2019-01-01T01:01:00.000Z"));
+    @MongoDBFixtures("processing-status-no-nodes.json")
+    public void processingStateNoActiveNodesBecauseNoNodesExists() {
+        TimeRange timeRange = AbsoluteRange.create("2019-01-01T00:00:00.000Z", "2019-01-01T00:00:30.000Z");
+        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.NO_ACTIVE);
     }
 
     @Test
-    @MongoDBFixtures("processing-status.json")
-    public void earliestPostIndexingTimestampWithoutAnyRecentUpdates() {
-        // The exclude threshold is not including any nodes
-        when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-02T00:00:00.000Z"));
-        assertThat(dbService.earliestPostIndexingTimestamp()).isNotPresent();
+    @MongoDBFixtures("processing-status-not-updated-nodes.json")
+    public void processingStateNoActiveNodesBecauseNoNodesAreActive() {
+        when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T04:00:00.000Z"));
+        when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(1).toMilliseconds());
+
+        TimeRange timeRange = AbsoluteRange.create("2019-01-01T00:00:00.000Z", "2019-01-01T00:00:30.000Z");
+        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.NO_ACTIVE);
     }
 
     @Test
-    public void earliestPostIndexingTimestampWithoutData() {
-        assertThat(dbService.earliestPostIndexingTimestamp()).isNotPresent();
+    @MongoDBFixtures("processing-status-all-nodes-up-to-date.json")
+    public void processingStateAllNodesUpToDate() {
+        when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T04:00:00.000Z"));
+        when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(1).toMilliseconds());
+        TimeRange timeRange = AbsoluteRange.create("2019-01-01T02:00:00.000Z", "2019-01-01T03:00:00.000Z");
+        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.ALL_UP_TO_DATE);
     }
 
     @Test
-    @MongoDBFixtures("processing-status-node-selection-test.json")
-    public void selectionQuery() {
-        when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T00:03:00.000Z"));
+    @MongoDBFixtures("processing-status-busy-node.json")
+    public void processingStateBusyNodes() {
+        when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T04:00:00.000Z"));
+        when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(1).toMilliseconds());
 
-        final DBQuery.Query query1 = DBProcessingStatusService.getDataSelectionQuery(clock, Duration.hours(1), 1.0);
-
-        assertThat(db.find(query1).toArray().stream().map(ProcessingStatusDto::nodeId).collect(Collectors.toSet()))
-                .containsOnly("abc-123", "abc-456", "abc-678");
-
-        // With a higher journal write threshold there should only be two node IDs
-        final DBQuery.Query query2 = DBProcessingStatusService.getDataSelectionQuery(clock, Duration.hours(1), 2.0);
-
-        assertThat(db.find(query2).toArray().stream().map(ProcessingStatusDto::nodeId).collect(Collectors.toSet()))
-                .containsOnly("abc-123", "abc-456");
+        TimeRange timeRange = AbsoluteRange.create("2019-01-01T02:00:00.000Z", "2019-01-01T03:00:00.000Z");
+        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.SOME_BUSY);
     }
 
     @Test
-    @MongoDBFixtures("processing-status-single-active-node.json")
-    public void singleNodeStatus() {
-        when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T00:01:00.000Z"));
-        assertThat(dbService.earliestPostIndexingTimestamp()).isPresent();
+    @MongoDBFixtures("processing-status-idle-and-processing-node.json")
+    public void processingStateIdleAndProcessingNode() {
+        when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T04:00:00.000Z"));
+        when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(1).toMilliseconds());
+
+        TimeRange timeRange = AbsoluteRange.create("2019-01-01T02:00:00.000Z", "2019-01-01T03:00:00.000Z");
+        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.ALL_UP_TO_DATE);
     }
 
     @Test
-    public void updateProcessingStatusWithJournalDisabled() {
-        when(baseConfiguration.isMessageJournalEnabled()).thenReturn(false);
-        dbService.save(new InMemoryProcessingStatusRecorder());
-        assertThat(dbService.get()).isPresent();
-        assertThat(dbService.get()).satisfies(dto -> {
-           assertThat(dto.get().inputJournal().journalEnabled()).isFalse();
-        });
+    @MongoDBFixtures("processing-status-idle-nodes.json")
+    public void processingStateIdleNodesWithinTimeRange() {
+        when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T04:00:00.000Z"));
+        when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(1).toMilliseconds());
+
+        TimeRange timeRange = AbsoluteRange.create("2019-01-01T02:00:00.000Z", "2019-01-01T03:00:00.000Z");
+        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.ALL_UP_TO_DATE);
     }
 
     @Test
-    @MongoDBFixtures("processing-status-disabled-journal.json")
-    public void retrieveWithDisabledJournal() {
-        when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T02:01:00.000Z"));
-        when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(4).toMilliseconds());
-        // Entries with disabled journal should be retrieved, regardless of their metrics being all 0
-        assertThat(dbService.earliestPostIndexingTimestamp()).isPresent().get().isEqualTo(DateTime.parse("2019-01-01T00:01:00.000Z"));
+    @MongoDBFixtures("processing-status-idle-nodes.json")
+    public void processingStateIdleNodes() {
+        when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T04:00:00.000Z"));
+        when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(1).toMilliseconds());
+
+        TimeRange timeRange = AbsoluteRange.create("2019-01-01T02:45:00.000Z", "2019-01-01T03:00:00.000Z");
+        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.NO_MESSAGES);
     }
 }

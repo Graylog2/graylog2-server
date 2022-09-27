@@ -17,11 +17,14 @@
 package org.graylog.events.processor;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.system.processing.DBProcessingStatusService;
 import org.joda.time.DateTime;
 
 import javax.inject.Inject;
 import java.util.Set;
+
+import static org.graylog2.system.processing.DBProcessingStatusService.*;
 
 /**
  * This can be used by an event processor to check if required event definitions have already processed a specific
@@ -62,14 +65,10 @@ public class EventProcessorDependencyCheck {
      * Caveat: This only looks at the processing status and doesn't take the Elasticsearch {@code index.refresh_interval}
      * into account!
      *
-     * @param latestTimestamp the timestamp to check
+     * @param timeRange the timestamp to check
      * @return true if messages up to the given latestTimestamp have already been indexed, false otherwise
      */
-    public boolean hasMessagesIndexedUpTo(DateTime latestTimestamp) {
-        // If there is no timestamp returned, there is no node in the cluster that is processing any messages.
-        // In that case we return false because there is nothing to process.
-        return processingStatusService.earliestPostIndexingTimestamp()
-                .map(latestPostIndexTimestamp -> latestPostIndexTimestamp.isAfter(latestTimestamp) || latestPostIndexTimestamp.isEqual(latestTimestamp))
-                .orElse(false);
+    public boolean hasMessagesIndexedUpTo(TimeRange timeRange) {
+        return ProcessingNodesState.ALL_UP_TO_DATE == processingStatusService.calculateProcessingState(timeRange);
     }
 }
