@@ -40,7 +40,7 @@ module.exports = {
       content: 'docs/introduction.md',
     },
     {
-      name: 'Theming Details',
+      name: 'Theming',
       content: 'src/theme/docs/Details.md',
       sections: [
         {
