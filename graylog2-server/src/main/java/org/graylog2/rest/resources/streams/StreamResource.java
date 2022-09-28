@@ -32,8 +32,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
 import org.graylog.security.UserContext;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -47,7 +45,6 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
-import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
 import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
@@ -127,7 +124,6 @@ public class StreamResource extends RestResource {
     private final StreamRuleService streamRuleService;
     private final StreamRouterEngine.Factory streamRouterEngineFactory;
     private final IndexSetRegistry indexSetRegistry;
-    private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final SearchQueryParser searchQueryParser;
 
     @Inject
@@ -135,13 +131,11 @@ public class StreamResource extends RestResource {
                           PaginatedStreamService paginatedStreamService,
                           StreamRuleService streamRuleService,
                           StreamRouterEngine.Factory streamRouterEngineFactory,
-                          IndexSetRegistry indexSetRegistry,
-                          AlarmCallbackConfigurationService alarmCallbackConfigurationService) {
+                          IndexSetRegistry indexSetRegistry) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
         this.indexSetRegistry = indexSetRegistry;
-        this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
         this.paginatedStreamService = paginatedStreamService;
         this.searchQueryParser = new SearchQueryParser(StreamImpl.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
@@ -472,12 +466,6 @@ public class StreamResource extends RestResource {
         final Stream stream = streamService.create(streamData);
         final String savedStreamId = streamService.saveWithRulesAndOwnership(stream, newStreamRules.build(), userContext.getUser());
         final ObjectId savedStreamObjectId = new ObjectId(savedStreamId);
-
-        for (AlarmCallbackConfiguration alarmCallbackConfiguration : alarmCallbackConfigurationService.getForStream(sourceStream)) {
-            final CreateAlarmCallbackRequest request = CreateAlarmCallbackRequest.create(alarmCallbackConfiguration);
-            final AlarmCallbackConfiguration alarmCallback = alarmCallbackConfigurationService.create(stream.getId(), request, getCurrentUser().getName());
-            alarmCallbackConfigurationService.save(alarmCallback);
-        }
 
         final Set<ObjectId> outputIds = sourceStream.getOutputs().stream()
                 .map(Output::getId)

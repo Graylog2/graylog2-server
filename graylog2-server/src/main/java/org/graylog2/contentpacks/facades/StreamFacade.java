@@ -25,8 +25,6 @@ import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import org.bson.types.ObjectId;
 import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
@@ -82,7 +80,6 @@ public class StreamFacade implements EntityFacade<Stream> {
     private final ObjectMapper objectMapper;
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
-    private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration;
     private final IndexSetService indexSetService;
     private final UserService userService;
@@ -91,13 +88,11 @@ public class StreamFacade implements EntityFacade<Stream> {
     public StreamFacade(ObjectMapper objectMapper,
                         StreamService streamService,
                         StreamRuleService streamRuleService,
-                        AlarmCallbackConfigurationService alarmCallbackConfigurationService,
                         V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration,
                         IndexSetService indexSetService, UserService userService) {
         this.objectMapper = objectMapper;
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
-        this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
         this.legacyAlertsMigration = legacyAlertsMigration;
         this.indexSetService = indexSetService;
         this.userService = userService;
@@ -172,17 +167,9 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .map(streamRuleEntity -> createStreamRuleRequest(streamRuleEntity, parameters))
                 .map(request -> streamRuleService.create(DUMMY_STREAM_ID, request))
                 .collect(Collectors.toList());
-        // TODO: The creation of legacy alarm callback should be avoided and a new event notification should be created instead
-        final List<AlarmCallbackConfiguration> alarmCallbacks = streamEntity.alarmCallbacks().stream()
-                .map(alarmCallback -> createStreamAlarmCallbackRequest(alarmCallback, parameters))
-                .map(request -> alarmCallbackConfigurationService.create(stream.getId(), request, user.getName()))
-                .collect(Collectors.toList());
         final String savedStreamId;
         try {
             savedStreamId = streamService.saveWithRulesAndOwnership(stream, streamRules, user);
-            for (final AlarmCallbackConfiguration alarmCallback : alarmCallbacks) {
-                alarmCallbackConfigurationService.save(alarmCallback);
-            }
         } catch (ValidationException e) {
             throw new ContentPackException("Couldn't create entity " + entity.toEntityDescriptor(), e);
         }

@@ -17,7 +17,6 @@
 package org.graylog2.system.stats;
 
 import org.graylog.plugins.views.search.views.DashboardService;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.inputs.InputService;
 import org.graylog2.shared.users.UserService;
@@ -49,7 +48,6 @@ public class ClusterStatsService {
                                StreamService streamService,
                                StreamRuleService streamRuleService,
                                OutputService outputService,
-                               AlarmCallbackConfigurationService alarmCallbackConfigurationService,
                                DashboardService dashboardService,
                                Cluster cluster) {
         this.mongoProbe = mongoProbe;

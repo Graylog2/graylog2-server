@@ -27,7 +27,6 @@ import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityOwnershipService;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
@@ -77,7 +76,6 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     private final NotificationService notificationService;
     private final EntityOwnershipService entityOwnershipService;
     private final ClusterEventBus clusterEventBus;
-    private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
 
     @Inject
     public StreamServiceImpl(MongoConnection mongoConnection,
@@ -87,8 +85,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                              MongoIndexSet.Factory indexSetFactory,
                              NotificationService notificationService,
                              EntityOwnershipService entityOwnershipService,
-                             ClusterEventBus clusterEventBus,
-                             AlarmCallbackConfigurationService alarmCallbackConfigurationService) {
+                             ClusterEventBus clusterEventBus) {
         super(mongoConnection);
         this.streamRuleService = streamRuleService;
         this.outputService = outputService;
@@ -97,7 +94,6 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         this.notificationService = notificationService;
         this.entityOwnershipService = entityOwnershipService;
         this.clusterEventBus = clusterEventBus;
-        this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
     }
 
     @Nullable

@@ -25,7 +25,6 @@ import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -90,8 +89,6 @@ public class StreamCatalogTest {
     @Mock
     private NotificationService notificationService;
     @Mock
-    private AlarmCallbackConfigurationService alarmCallbackConfigurationService;
-    @Mock
     private V20190722150700_LegacyAlertConditionMigration legacyAlertConditionMigration;
     @Mock
     private EntityOwnershipService entityOwnershipService;
@@ -113,13 +110,12 @@ public class StreamCatalogTest {
                 mongoIndexSetFactory,
                 notificationService,
                 entityOwnershipService,
-                clusterEventBus,
-                alarmCallbackConfigurationService);
+                clusterEventBus);
         when(outputService.load("5adf239e4b900a0fdb4e5197")).thenReturn(
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)
         );
 
-        facade = new StreamFacade(objectMapper, streamService, streamRuleService, alarmCallbackConfigurationService, legacyAlertConditionMigration, indexSetService, userService);
+        facade = new StreamFacade(objectMapper, streamService, streamRuleService, legacyAlertConditionMigration, indexSetService, userService);
     }
 
     @Test

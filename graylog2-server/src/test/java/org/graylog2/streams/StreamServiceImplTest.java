@@ -21,7 +21,6 @@ import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
@@ -58,8 +57,6 @@ public class StreamServiceImplTest {
     @Mock
     private NotificationService notificationService;
     @Mock
-    private AlarmCallbackConfigurationService alarmCallbackConfigurationService;
-    @Mock
     private EntityOwnershipService entityOwnershipService;
 
     private StreamService streamService;
@@ -67,7 +64,7 @@ public class StreamServiceImplTest {
     @Before
     public void setUp() throws Exception {
         this.streamService = new StreamServiceImpl(mongodb.mongoConnection(), streamRuleService,
-                outputService, indexSetService, factory, notificationService, entityOwnershipService, new ClusterEventBus(), alarmCallbackConfigurationService);
+                outputService, indexSetService, factory, notificationService, entityOwnershipService, new ClusterEventBus());
     }
 
     @Test
