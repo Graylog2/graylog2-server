@@ -37,7 +37,7 @@
     "extends": "graylog"
   },
   "dependencies": {
-    "@tanstack/react-query": "4.6.1",
+    "@tanstack/react-query": "4.7.1",
     "@types/create-react-class": "15.6.3",
     "@types/jquery": "3.5.14",
     "@types/react": "18.0.21",
