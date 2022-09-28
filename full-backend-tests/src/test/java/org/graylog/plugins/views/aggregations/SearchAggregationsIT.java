@@ -29,12 +29,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
+import static org.graylog.testing.containermatrix.SearchServer.ES7;
 import static org.graylog.testing.containermatrix.SearchServer.OS1;
+import static org.graylog.testing.containermatrix.SearchServer.OS2;
+import static org.graylog.testing.containermatrix.SearchServer.OS2_2;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {OS1})
+@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {ES7, OS1, OS2, OS2_2})
 public class SearchAggregationsIT {
     private static final String PIVOT_NAME = "pivot-aggregation";
     private static final String PIVOT_PATH = "results.query1.search_types." + PIVOT_NAME;
@@ -199,9 +202,11 @@ public class SearchAggregationsIT {
         final String quotedList = Joiner.on(", ").join(quotedStrings);
         return "[" + quotedList + "]";
     }
+
     private String pathToMetricResult(String key, String metric) {
         return pathToMetricResult(List.of(key), List.of(metric));
     }
+
     private String pathToValue(Collection<String> metric) {
         return "values.find { value -> value.key == " + listToGroovy(metric) + " }.value";
     }
