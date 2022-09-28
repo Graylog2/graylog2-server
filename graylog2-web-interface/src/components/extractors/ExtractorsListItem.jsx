@@ -98,7 +98,7 @@ class ExtractorsListItem extends React.Component {
     actions.push(
       <LinkContainer key={`edit-extractor-${extractor.id}`}
                      to={Routes.edit_input_extractor(nodeId, inputId, extractor.id)}>
-        <Button bsStyle="info">Edit</Button>
+        <Button>Edit</Button>
       </LinkContainer>,
     );
 

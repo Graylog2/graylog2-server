@@ -18,6 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 import { LinkContainer, Link } from 'components/common/router';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import {
@@ -129,7 +130,7 @@ class EventNotifications extends React.Component {
     const { onDelete, onTest } = this.props;
 
     return (
-      <>
+      <ButtonToolbar>
         <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notification.id)}>
           <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
             <Button>
@@ -151,7 +152,7 @@ class EventNotifications extends React.Component {
             </IfPermitted>
           </DropdownButton>
         </IfPermitted>
-      </>
+      </ButtonToolbar>
     );
   }
 

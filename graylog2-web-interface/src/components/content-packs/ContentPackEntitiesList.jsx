@@ -175,8 +175,7 @@ class ContentPackEntitiesList extends React.Component {
               Edit
             </Button>
             )}
-            <Button bsStyle="info"
-                    bsSize="xs"
+            <Button bsSize="xs"
                     onClick={() => { openShowModal(); }}>
               Show
             </Button>

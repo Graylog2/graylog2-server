@@ -63,7 +63,7 @@ const CollectorRow = createReactClass({
         <td>
           <ButtonToolbar>
             <LinkContainer to={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(collector.id)}>
-              <Button bsStyle="info" bsSize="xsmall">Edit</Button>
+              <Button bsSize="xsmall">Edit</Button>
             </LinkContainer>
             <DropdownButton id={`more-actions-${collector.id}`} title="More actions" bsSize="xsmall" pullRight>
               <CopyCollectorModal collector={collector}

@@ -18,6 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import URI from 'urijs';
 
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 import { LinkContainer } from 'components/common/router';
 import { DropdownSubmenu, ExternalLinkButton, IfPermitted } from 'components/common';
 import { Button, DropdownButton, MenuItem } from 'components/bootstrap';
@@ -60,7 +61,7 @@ class NodesActions extends React.Component {
     const apiBrowserURI = new URI(`${node.transport_address}/api-browser/`).normalizePathname().toString();
 
     return (
-      <div className="item-actions">
+      <ButtonToolbar>
         <LinkContainer to={Routes.SYSTEM.NODES.SHOW(node.node_id)}>
           <Button>Details</Button>
         </LinkContainer>
@@ -111,7 +112,7 @@ class NodesActions extends React.Component {
             </LinkContainer>
           </IfPermitted>
         </DropdownButton>
-      </div>
+      </ButtonToolbar>
     );
   }
 }

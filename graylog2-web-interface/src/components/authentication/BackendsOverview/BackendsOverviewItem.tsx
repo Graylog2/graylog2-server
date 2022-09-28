@@ -92,17 +92,17 @@ const ActionsCell = ({ isActive, authenticationBackend }: { authenticationBacken
       <StyledButtonToolbar>
         {isActive ? (
           <>
+            <EditButton authenticationBackend={authenticationBackend} />
             <Button onClick={_deactivateBackend} bsStyle="warning" bsSize="xs" type="button">
               Deactivate
             </Button>
-            <EditButton authenticationBackend={authenticationBackend} />
           </>
         ) : (
           <>
+            <EditButton authenticationBackend={authenticationBackend} />
             <Button onClick={_activateBackend} bsStyle="warning" bsSize="xs" type="button">
               Activate
             </Button>
-            <EditButton authenticationBackend={authenticationBackend} />
             <Button onClick={_deleteBackend} bsStyle="danger" bsSize="xs" type="button">
               Delete
             </Button>
