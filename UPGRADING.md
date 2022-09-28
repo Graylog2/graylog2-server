@@ -66,6 +66,12 @@ Content packs that include legacy alerts can still be installed, but the alerts 
 | `DELETE /streams/{streamId}/alerts/receivers`                   | Removed deprecated legacy alert API |
 | `POST /streams/{streamId}/alerts/sendDummyAlert`                | Removed deprecated legacy alert API |
 
+
+| Endpoint                                    | Description                 |
+| ------------------------------------------- | --------------------------- |
+| `GET /system/metrics/{metricName}/history`  | Remove unused and dysfunctional endpoint. (part of [#2443](https://github.com/Graylog2/graylog2-server/pull/2443)) |
+
+
 ## API Endpoint Changes
 
 | Endpoint                                         | Description                                                                                                                                                                       |
