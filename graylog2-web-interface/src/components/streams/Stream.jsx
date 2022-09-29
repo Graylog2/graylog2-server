@@ -245,10 +245,9 @@ class Stream extends React.Component {
     return (
       <StreamListItem>
         <div className="stream-actions pull-right">
+          {toggleStreamLink}{' '}
           {editRulesLink}{' '}
           <ShareButton entityId={stream.id} entityType="stream" onClick={this._openEntityShareModal} />
-          {toggleStreamLink}{' '}
-
           {streamControls}
         </div>
 
