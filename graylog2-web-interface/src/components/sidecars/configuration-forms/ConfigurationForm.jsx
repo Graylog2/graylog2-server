@@ -30,6 +30,7 @@ import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsSt
 
 import SourceViewModal from './SourceViewModal';
 import ImportsViewModal from './ImportsViewModal';
+import ConfigurationTagsSelect from './ConfigurationTagsSelect';
 
 const ConfigurationForm = createReactClass({
   displayName: 'ConfigurationForm',
@@ -65,7 +66,7 @@ const ConfigurationForm = createReactClass({
         color: configuration.color,
         collector_id: configuration.collector_id,
         template: configuration.template || '',
-        tags: configuration.tags
+        tags: configuration.tags || []
       },
     };
   },
@@ -151,6 +152,12 @@ const ConfigurationForm = createReactClass({
     const nextName = event.target.value;
 
     this._formDataUpdate('name')(nextName);
+  },
+
+  _onTagsChange(nextTags) {
+    const nextTagsArray = nextTags.split(',');
+
+    this._formDataUpdate('tags')(nextTagsArray);
   },
 
   _getCollectorDefaultTemplate(collectorId) {
@@ -322,6 +329,19 @@ const ConfigurationForm = createReactClass({
                 </div>
               </div>
               <HelpBlock>Choose a color to use for this configuration.</HelpBlock>
+            </FormGroup>
+
+            <FormGroup controlId="tags">
+              <ControlLabel>Configuration Tags</ControlLabel>
+              <div>
+                <ConfigurationTagsSelect id="tags"
+                                         ref="tags"
+                                         availableTags={formData.tags.map((tag) => ({ name: tag }))}
+                                         tags={formData.tags}
+                                         onChange={this._onTagsChange}
+                                         className="form-control" />
+              </div>
+              <HelpBlock>Choose tags to use for this configuration.</HelpBlock>
             </FormGroup>
 
             <FormGroup controlId="collector_id">
