@@ -182,7 +182,6 @@ class Stream extends React.Component {
       ? <Tooltip id="default-stream-tooltip">Action not available for the default stream</Tooltip> : null;
 
     let editRulesLink;
-    let manageAlertsLink;
 
     if (isPermitted(permissions, [`streams:edit:${stream.id}`])) {
       editRulesLink = (
@@ -193,14 +192,6 @@ class Stream extends React.Component {
             </Button>
           </LinkContainer>
         </OverlayElement>
-      );
-
-      manageAlertsLink = (
-        <LinkContainer to={Routes.stream_alerts(stream.id)}>
-          <Button>
-            <Icon name="bell" /> Manage Alerts
-          </Button>
-        </LinkContainer>
       );
     }
 
@@ -255,7 +246,6 @@ class Stream extends React.Component {
       <StreamListItem>
         <div className="stream-actions pull-right">
           {editRulesLink}{' '}
-          {manageAlertsLink}{' '}
           <ShareButton entityId={stream.id} entityType="stream" onClick={this._openEntityShareModal} />
           {toggleStreamLink}{' '}
 
