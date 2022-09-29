@@ -60,7 +60,6 @@ public class SearchAggregationsIT {
                 .id(PIVOT_NAME)
                 .build();
 
-
         final SearchDTO search = SearchDTO.builder()
                 .queries(QueryDTO.builder()
                         .timerange(RelativeRange.create(0))
