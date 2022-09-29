@@ -31,6 +31,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ValueCount;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ValueCountAggregationBuilder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.jooq.lambda.tuple.Tuple2;
@@ -48,7 +49,7 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
 
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Count count, OSPivot searchTypeHandler, OSGeneratedQueryContext queryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Count count, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final String field = count.field();
         if (field == null) {
             // doc_count is always present in elasticsearch's bucket aggregations, no need to add it
@@ -66,7 +67,7 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
                                         Count count,
                                         SearchResponse searchResult,
                                         ValueCount valueCount,
-                                        OSPivot searchTypeHandler,
+                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
                                         OSGeneratedQueryContext esGeneratedQueryContext) {
         final Object value;
         if (valueCount == null) {

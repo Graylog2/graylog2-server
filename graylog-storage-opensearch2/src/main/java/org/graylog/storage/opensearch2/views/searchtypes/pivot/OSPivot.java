@@ -75,12 +75,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
     private static final TimeRange ALL_MESSAGES_TIMERANGE = allMessagesTimeRange();
 
     private static TimeRange allMessagesTimeRange() {
-        try {
-            return RelativeRange.create(0);
-        } catch (InvalidRangeParametersException e) {
-            LOG.error("Unable to instantiate all messages timerange: ", e);
-        }
-        return null;
+        return RelativeRange.create(0);
     }
 
     @Inject

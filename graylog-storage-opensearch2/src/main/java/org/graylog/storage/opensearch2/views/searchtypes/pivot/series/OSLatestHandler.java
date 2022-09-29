@@ -19,6 +19,7 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
@@ -38,7 +39,7 @@ import java.util.stream.Stream;
 public class OSLatestHandler extends OSPivotSeriesSpecHandler<Latest, TopHits> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Latest latestSpec, OSPivot searchTypeHandler, OSGeneratedQueryContext queryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Latest latestSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final TopHitsAggregationBuilder latest = AggregationBuilders.topHits(name).size(1).sort(SortBuilders.fieldSort("timestamp").order(SortOrder.DESC));
         record(queryContext, pivot, latestSpec, name, TopHits.class);
         return Optional.of(latest);
@@ -49,7 +50,7 @@ public class OSLatestHandler extends OSPivotSeriesSpecHandler<Latest, TopHits> {
                                         Latest pivotSpec,
                                         SearchResponse searchResult,
                                         TopHits latestAggregation,
-                                        OSPivot searchTypeHandler,
+                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
         final Optional<Value> latestValue = Optional.ofNullable(latestAggregation.getHits())
                 .map(SearchHits::getHits)
