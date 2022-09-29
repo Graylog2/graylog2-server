@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
 import styled from 'styled-components';
 
@@ -31,7 +32,7 @@ const StyledButtonToolbar = styled(ButtonToolbar)`
 
 type WithCancelProps = {
   displayCancel: true,
-  disableCancel?: boolean,
+  disabledCancel?: boolean,
   onCancel: () => void,
 }
 
@@ -39,35 +40,44 @@ type WithoutCancelProps = {
   displayCancel: false
 }
 
+type WithAsyncSubmit = {
+  isAsyncSubmit: true,
+  submitLoadingText: string,
+  isSubmitting: boolean,
+}
+
+type WithSyncSubmit = {
+  isAsyncSubmit: false,
+}
+
 type Props = {
   bsSize?: 'large' | 'small' | 'xsmall',
   className?: string,
-  displayCancel?: boolean,
   disabledSubmit?: boolean,
+  displayCancel?: boolean,
   formId?: string,
+  isAsyncSubmit?: boolean,
   isSubmitting?: boolean,
   leftCol?: React.ReactNode,
   onSubmit?: () => void,
   submitButtonText: string,
-  submitIcon?: IconName,
   submitButtonType?: 'submit' | 'button',
-  submitLoadingText?: string,
-} & (WithCancelProps | WithoutCancelProps)
+  submitIcon?: IconName,
+} & (WithCancelProps | WithoutCancelProps) & (WithAsyncSubmit | WithSyncSubmit);
 
 const ModalSubmit = (props: Props) => {
   const {
+    isAsyncSubmit,
     bsSize,
     className,
     displayCancel,
     disabledSubmit,
     formId,
-    isSubmitting,
     leftCol,
     onSubmit,
     submitButtonText,
     submitButtonType,
     submitIcon,
-    submitLoadingText,
   } = props;
 
   return (
@@ -77,19 +87,19 @@ const ModalSubmit = (props: Props) => {
         <Button type="button"
                 bsSize={bsSize}
                 onClick={props.onCancel}
-                disabled={props.disableCancel || isSubmitting}>
+                disabled={props.disabledCancel || (isAsyncSubmit && props.isSubmitting)}>
           Cancel
         </Button>
       )}
       <Button bsStyle="success"
               bsSize={bsSize}
-              disabled={disabledSubmit}
+              disabled={disabledSubmit || (isAsyncSubmit && props.isSubmitting)}
               form={formId}
               title={submitButtonText}
               type={submitButtonType}
               onClick={onSubmit}>
-        {(submitIcon && !isSubmitting) && <><Icon name={submitIcon} /> </>}
-        {isSubmitting ? <Spinner text={submitLoadingText} delay={0} /> : submitButtonText}
+        {(submitIcon && !(isAsyncSubmit && props.isSubmitting)) && <><Icon name={submitIcon} /> </>}
+        {(isAsyncSubmit && props.isSubmitting) ? <Spinner text={props.submitLoadingText} delay={0} /> : submitButtonText}
       </Button>
     </StyledButtonToolbar>
   );
@@ -100,13 +110,13 @@ ModalSubmit.defaultProps = {
   className: undefined,
   disabledSubmit: false,
   displayCancel: true,
+  isAsyncSubmit: false,
   formId: undefined,
   isSubmitting: false,
   leftCol: undefined,
   onSubmit: undefined,
   submitButtonType: 'submit',
   submitIcon: undefined,
-  submitLoadingText: undefined,
 };
 
 export default ModalSubmit;

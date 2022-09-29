@@ -24,7 +24,7 @@ import Spinner from 'components/common/Spinner';
 
 type WithCancelProps = {
   displayCancel: true,
-  disableCancel?: boolean,
+  disabledCancel?: boolean,
   onCancel: () => void,
 }
 
@@ -32,20 +32,29 @@ type WithoutCancelProps = {
   displayCancel: false
 }
 
+type WithAsyncSubmit = {
+  isAsyncSubmit: true,
+  submitLoadingText: string,
+  isSubmitting: boolean,
+}
+
+type WithSyncSubmit = {
+  isAsyncSubmit: false,
+}
+
 type Props = {
   bsSize?: 'large' | 'small' | 'xsmall',
-  className?: string,
   centerCol?: React.ReactNode,
   displayCancel?: boolean,
+  className?: string,
   disabledSubmit?: boolean,
   formId?: string,
-  isSubmitting?: boolean,
+  isAsyncSubmit?: boolean,
   onSubmit?: () => void,
   submitButtonText: string,
-  submitIcon?: IconName,
   submitButtonType?: 'submit' | 'button',
-  submitLoadingText?: string,
-} & (WithCancelProps | WithoutCancelProps)
+  submitIcon?: IconName,
+} & (WithCancelProps | WithoutCancelProps) & (WithAsyncSubmit | WithSyncSubmit);
 
 const FormSubmit = (props: Props) => {
   const {
@@ -55,32 +64,31 @@ const FormSubmit = (props: Props) => {
     displayCancel,
     disabledSubmit,
     formId,
-    isSubmitting,
+    isAsyncSubmit,
     onSubmit,
     submitButtonText,
     submitButtonType,
     submitIcon,
-    submitLoadingText,
   } = props;
 
   return (
     <ButtonToolbar className={className}>
       <Button bsStyle="success"
               bsSize={bsSize}
-              disabled={disabledSubmit || isSubmitting}
+              disabled={disabledSubmit || (isAsyncSubmit && props.isSubmitting)}
               form={formId}
               title={submitButtonText}
               type={submitButtonType}
               onClick={onSubmit}>
-        {(submitIcon && !isSubmitting) && <><Icon name={submitIcon} /> </>}
-        {isSubmitting ? <Spinner text={submitLoadingText} delay={0} /> : submitButtonText}
+        {(submitIcon && !(isAsyncSubmit && props.isSubmitting)) && <><Icon name={submitIcon} /> </>}
+        {(isAsyncSubmit && props.isSubmitting) ? <Spinner text={props.submitLoadingText} delay={0} /> : submitButtonText}
       </Button>
       {centerCol}
       {displayCancel === true && (
         <Button type="button"
                 bsSize={bsSize}
                 onClick={props.onCancel}
-                disabled={props.disableCancel || isSubmitting}>
+                disabled={props.disabledCancel || (isAsyncSubmit && props.isSubmitting)}>
           Cancel
         </Button>
       )}
@@ -95,11 +103,10 @@ FormSubmit.defaultProps = {
   disabledSubmit: false,
   displayCancel: true,
   formId: undefined,
-  isSubmitting: false,
+  isAsyncSubmit: false,
   onSubmit: undefined,
   submitButtonType: 'submit',
   submitIcon: undefined,
-  submitLoadingText: undefined,
 };
 
 export default FormSubmit;
