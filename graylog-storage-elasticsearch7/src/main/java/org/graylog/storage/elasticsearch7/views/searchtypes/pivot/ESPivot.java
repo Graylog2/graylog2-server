@@ -43,8 +43,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.Search
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.jooq.lambda.tuple.Tuple;
-import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +50,6 @@ import javax.inject.Inject;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -367,24 +364,4 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         return list.subList(1, list.size());
     }
 
-    /**
-     * This solely exists to hide the nasty type signature of the aggregation type map from the rest of the code.
-     * It's just ugly and in the way.
-     */
-    public static class AggTypes {
-        final IdentityHashMap<PivotSpec, Tuple2<String, Class<? extends Aggregation>>> aggTypeMap = new IdentityHashMap<>();
-
-        public void record(PivotSpec pivotSpec, String name, Class<? extends Aggregation> aggClass) {
-            aggTypeMap.put(pivotSpec, Tuple.tuple(name, aggClass));
-        }
-
-        public Aggregation getSubAggregation(PivotSpec pivotSpec, HasAggregations currentAggregationOrBucket) {
-            final Tuple2<String, Class<? extends Aggregation>> tuple2 = getTypes(pivotSpec);
-            return currentAggregationOrBucket.getAggregations().get(tuple2.v1);
-        }
-
-        public Tuple2<String, Class<? extends Aggregation>> getTypes(PivotSpec pivotSpec) {
-            return aggTypeMap.get(pivotSpec);
-        }
-    }
 }

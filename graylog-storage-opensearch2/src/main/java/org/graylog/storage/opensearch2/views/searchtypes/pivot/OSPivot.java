@@ -45,13 +45,10 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSource
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.jooq.lambda.tuple.Tuple;
-import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +56,6 @@ import javax.inject.Inject;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -404,24 +400,4 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         return list.subList(1, list.size());
     }
 
-    /**
-     * This solely exists to hide the nasty type signature of the aggregation type map from the rest of the code.
-     * It's just ugly and in the way.
-     */
-    public static class AggTypes {
-        final IdentityHashMap<PivotSpec, Tuple2<String, Class<? extends Aggregation>>> aggTypeMap = new IdentityHashMap<>();
-
-        public void record(PivotSpec pivotSpec, String name, Class<? extends Aggregation> aggClass) {
-            aggTypeMap.put(pivotSpec, Tuple.tuple(name, aggClass));
-        }
-
-        public Aggregation getSubAggregation(PivotSpec pivotSpec, HasAggregations currentAggregationOrBucket) {
-            final Tuple2<String, Class<? extends Aggregation>> tuple2 = getTypes(pivotSpec);
-            return currentAggregationOrBucket.getAggregations().get(tuple2.v1);
-        }
-
-        public Tuple2<String, Class<? extends Aggregation>> getTypes(PivotSpec pivotSpec) {
-            return aggTypeMap.get(pivotSpec);
-        }
-    }
 }

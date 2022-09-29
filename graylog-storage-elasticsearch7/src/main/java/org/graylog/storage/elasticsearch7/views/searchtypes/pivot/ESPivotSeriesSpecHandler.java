@@ -34,8 +34,8 @@ import java.util.stream.Stream;
 public abstract class ESPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_RESULT extends Aggregation>
         implements SeriesSpecHandler<SPEC_TYPE, AggregationBuilder, SearchResponse, AGGREGATION_RESULT, ESSearchTypeHandler<Pivot>, ESGeneratedQueryContext> {
 
-    protected ESPivot.AggTypes aggTypes(ESGeneratedQueryContext queryContext, Pivot pivot) {
-        return (ESPivot.AggTypes) queryContext.contextMap().get(pivot.id());
+    protected AggTypes aggTypes(ESGeneratedQueryContext queryContext, Pivot pivot) {
+        return (AggTypes) queryContext.contextMap().get(pivot.id());
     }
 
     protected void record(ESGeneratedQueryContext queryContext, Pivot pivot, PivotSpec spec, String name, Class<? extends Aggregation> aggregationClass) {

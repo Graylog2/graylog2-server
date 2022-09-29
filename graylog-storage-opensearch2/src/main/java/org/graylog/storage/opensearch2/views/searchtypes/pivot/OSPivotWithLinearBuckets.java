@@ -82,7 +82,7 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(pivot);
 
         final Map<Object, Object> contextMap = queryContext.contextMap();
-        final OSPivot.AggTypes aggTypes = new OSPivot.AggTypes();
+        final AggTypes aggTypes = new AggTypes();
         contextMap.put(pivot.id(), aggTypes);
 
         // add global rollup series if those were requested

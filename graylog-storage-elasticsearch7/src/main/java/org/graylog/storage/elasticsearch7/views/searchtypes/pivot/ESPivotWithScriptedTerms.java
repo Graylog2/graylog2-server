@@ -75,7 +75,7 @@ public class ESPivotWithScriptedTerms implements ESSearchTypeHandler<Pivot> {
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(pivot);
 
         final Map<Object, Object> contextMap = queryContext.contextMap();
-        final ESPivot.AggTypes aggTypes = new ESPivot.AggTypes();
+        final AggTypes aggTypes = new AggTypes();
         contextMap.put(pivot.id(), aggTypes);
 
         // add global rollup series if those were requested
