@@ -25,7 +25,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggrega
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketOrder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.MultiTermsAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.Terms;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MaxAggregationBuilder;
@@ -84,8 +83,14 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
         final OSPivot.AggTypes aggTypes = new OSPivot.AggTypes();
         contextMap.put(pivot.id(), aggTypes);
 
+        // add global rollup series if those were requested
+        if (pivot.rollup()) {
+            seriesStream(pivot, queryContext, "global rollup")
+                    .forEach(searchSourceBuilder::aggregation);
+        }
+
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext);
-        final Tuple2<AggregationBuilder, AggregationBuilder> aggregationTuple = createRowPivots(query, pivot, queryContext, ordering.isEmpty() ? List.of(BucketOrder.count(false)) : ordering);
+        final Tuple2<AggregationBuilder, AggregationBuilder> aggregationTuple = createPivots(query, pivot, pivot.rowGroups(), queryContext, ordering);
         final AggregationBuilder rootAggregation = aggregationTuple.v1();
         final AggregationBuilder leafAggregation = aggregationTuple.v2();
         if (pivot.columnGroups().isEmpty() || pivot.rollup()) {
@@ -94,30 +99,38 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
         }
 
         if (!pivot.columnGroups().isEmpty()) {
-            final TermsAggregationBuilder columnsAggregation = createScriptedTerms(pivot.columnGroups(), true, ordering.isEmpty() ? List.of(BucketOrder.count(false)) : ordering, pivot, queryContext);
-            leafAggregation.subAggregation(columnsAggregation);
+            final Tuple2<AggregationBuilder, AggregationBuilder> columnsAggregationTuple = createPivots(query, pivot, pivot.columnGroups(), queryContext, ordering);
+            final AggregationBuilder columnsRootAggregation = columnsAggregationTuple.v1();
+            final AggregationBuilder columnsLeafAggregation = columnsAggregationTuple.v2();
+            seriesStream(pivot, queryContext, "metrics")
+                    .forEach(columnsLeafAggregation::subAggregation);
+            leafAggregation.subAggregation(columnsRootAggregation);
         }
         searchSourceBuilder.aggregation(rootAggregation);
 
+        addTimeStampAggregations(searchSourceBuilder);
+    }
+
+    private void addTimeStampAggregations(SearchSourceBuilder searchSourceBuilder) {
         final MinAggregationBuilder startTimestamp = AggregationBuilders.min("timestamp-min").field("timestamp");
         final MaxAggregationBuilder endTimestamp = AggregationBuilders.max("timestamp-max").field("timestamp");
         searchSourceBuilder.aggregation(startTimestamp);
         searchSourceBuilder.aggregation(endTimestamp);
     }
 
-    private Tuple2<AggregationBuilder, AggregationBuilder> createRowPivots(Query query, Pivot pivot, OSGeneratedQueryContext queryContext, List<BucketOrder> ordering) {
+    private Tuple2<AggregationBuilder, AggregationBuilder> createPivots(Query query, Pivot pivot, List<BucketSpec> pivots, OSGeneratedQueryContext queryContext, List<BucketOrder> ordering) {
         AggregationBuilder aggregationBuilder = null;
         AggregationBuilder root = null;
         List<Values> valueBuckets = new ArrayList<>();
-        for (BucketSpec bucketSpec : pivot.rowGroups()) {
+        for (BucketSpec bucketSpec : pivots) {
             if (bucketSpec instanceof Time time) {
                 if (!valueBuckets.isEmpty()) {
-                    final AggregationBuilder scriptedTerms = createTerms(valueBuckets, false, ordering, pivot, queryContext) ;
+                    final AggregationBuilder termsAggregation = createTerms(valueBuckets,  ordering, pivot, queryContext) ;
                     if (aggregationBuilder == null) {
-                        aggregationBuilder = scriptedTerms;
-                        root = scriptedTerms;
+                        aggregationBuilder = termsAggregation;
+                        root = termsAggregation;
                     } else {
-                        aggregationBuilder.subAggregation(scriptedTerms);
+                        aggregationBuilder.subAggregation(termsAggregation);
                     }
                     valueBuckets = new ArrayList<>();
                 }
@@ -135,26 +148,35 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
             }
         }
         if (!valueBuckets.isEmpty()) {
-            final AggregationBuilder scriptedTerms = createTerms(valueBuckets, false, ordering, pivot, queryContext);
+            final AggregationBuilder termsAggregation = createTerms(valueBuckets, ordering, pivot, queryContext);
             if (aggregationBuilder == null) {
-                aggregationBuilder = scriptedTerms;
-                root = scriptedTerms;
+                aggregationBuilder = termsAggregation;
+                root = termsAggregation;
             } else {
-                aggregationBuilder.subAggregation(scriptedTerms);
+                aggregationBuilder.subAggregation(termsAggregation);
             }
         }
 
         return new Tuple2<>(root, aggregationBuilder);
     }
 
-    private AggregationBuilder createTerms(List<Values> valueBuckets, boolean generateMetrics, List<BucketOrder> ordering, Pivot pivot, OSGeneratedQueryContext queryContext) {
-        return supportsMultiTerms
-                ? createMultiTerms(valueBuckets, generateMetrics, ordering, pivot, queryContext)
-                : createScriptedTerms(valueBuckets, generateMetrics, ordering, pivot, queryContext);
+    private AggregationBuilder createTerms(List<Values> valueBuckets, List<BucketOrder> ordering, Pivot pivot, OSGeneratedQueryContext queryContext) {
+        return valueBuckets.size() > 1
+                ? supportsMultiTerms
+                    ? createMultiTerms(valueBuckets, ordering, pivot, queryContext)
+                    : createScriptedTerms(valueBuckets, ordering, pivot, queryContext)
+                : createSimpleTerms(valueBuckets.get(0), ordering, pivot, queryContext);
     }
 
-    private AggregationBuilder createMultiTerms(List<Values> valueBuckets, boolean generateMetrics, List<BucketOrder> ordering, Pivot pivot, OSGeneratedQueryContext queryContext) {
-        final MultiTermsAggregationBuilder termsAggregation = AggregationBuilders.multiTerms(AGG_NAME)
+    private AggregationBuilder createSimpleTerms(Values values, List<BucketOrder> ordering, Pivot pivot, OSGeneratedQueryContext queryContext) {
+        return AggregationBuilders.terms(AGG_NAME)
+                .field(values.field())
+                .order(ordering)
+                .size(15);
+    }
+
+    private AggregationBuilder createMultiTerms(List<Values> valueBuckets, List<BucketOrder> ordering, Pivot pivot, OSGeneratedQueryContext queryContext) {
+        return AggregationBuilders.multiTerms(AGG_NAME)
                 .terms(valueBuckets.stream()
                         .map(value -> new MultiTermsValuesSourceConfig.Builder()
                         .setFieldName(value.field())
@@ -162,23 +184,13 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
                         .collect(Collectors.toList()))
                 .order(ordering)
                 .size(15);
-        if (generateMetrics) {
-            seriesStream(pivot, queryContext, "metrics")
-                    .forEach(termsAggregation::subAggregation);
-        }
-        return termsAggregation;
     }
 
-    private TermsAggregationBuilder createScriptedTerms(List<? extends BucketSpec> buckets, boolean generateMetrics, List<BucketOrder> ordering, Pivot pivot, OSGeneratedQueryContext queryContext) {
-        final TermsAggregationBuilder termsAggregation = AggregationBuilders.terms(AGG_NAME)
+    private TermsAggregationBuilder createScriptedTerms(List<? extends BucketSpec> buckets, List<BucketOrder> ordering, Pivot pivot, OSGeneratedQueryContext queryContext) {
+        return AggregationBuilders.terms(AGG_NAME)
                 .script(scriptForPivots(buckets))
                 .size(15)
                 .order(ordering.isEmpty() ? List.of(BucketOrder.count(false)) : ordering);
-        if (generateMetrics) {
-            seriesStream(pivot, queryContext, "metrics")
-                    .forEach(termsAggregation::subAggregation);
-        }
-        return termsAggregation;
     }
 
     private Script scriptForPivots(Collection<? extends BucketSpec> pivots) {
@@ -189,7 +201,7 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
     }
 
     private List<BucketOrder> orderListForPivot(Pivot pivot, OSGeneratedQueryContext esGeneratedQueryContext) {
-        return pivot.sort()
+        final List<BucketOrder> ordering = pivot.sort()
                 .stream()
                 .map(sortSpec -> {
                     if (sortSpec instanceof PivotSort) {
@@ -214,6 +226,7 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+        return ordering.isEmpty() ? List.of(BucketOrder.count(false)) : ordering;
     }
 
     private Stream<AggregationBuilder> seriesStream(Pivot pivot, OSGeneratedQueryContext queryContext, String reason) {
@@ -262,13 +275,33 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
                     resultBuilder.addRow(rowBuilder.build());
                 });
 
+        if (pivot.rollup()) {
+            final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.of());
+            // columnKeys is empty, because this is a rollup per row bucket, thus for all columns in that bucket (IOW it's not a leaf!)
+            processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), createInitialResult(queryResult), true, "row-inner");
+            resultBuilder.addRow(rowBuilder.source("non-leaf").build());
+        }
+
         return resultBuilder.build();
     }
 
+    private HasAggregations createInitialResult(SearchResponse queryResult) {
+        return InitialBucket.create(queryResult);
+    }
+
     private ImmutableList<String> extractMultiTermsKeys(MultiBucketsAggregation.Bucket bucket) {
-        return ((Collection<Object>)bucket.getKey()).stream()
-                .map(String::valueOf)
-                .collect(ImmutableList.toImmutableList());
+        final Object key = bucket.getKey();
+        if (key instanceof Collection) {
+            //noinspection unchecked
+            return ((Collection<Object>) key).stream()
+                        .map(String::valueOf)
+                        .collect(ImmutableList.toImmutableList());
+        }
+        if (key instanceof String) {
+            return ImmutableList.of((String)key);
+        }
+
+        return ImmutableList.of(String.valueOf(key));
     }
     private int measureDepth(List<? extends BucketSpec> pivots) {
         int depth = 0;
