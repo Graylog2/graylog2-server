@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.AggTypes;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSTimeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -62,7 +63,7 @@ class OSTimeHandlerTest {
         this.esTimeHandler = new OSTimeHandler();
         when(time.interval()).thenReturn(interval);
         when(time.field()).thenReturn("foobar");
-        final OSPivot.AggTypes aggTypes = mock(OSPivot.AggTypes.class);
+        final AggTypes aggTypes = mock(AggTypes.class);
         when(queryContext.contextMap().get(any())).thenReturn(aggTypes);
         when(query.effectiveTimeRange(any())).thenCallRealMethod();
     }

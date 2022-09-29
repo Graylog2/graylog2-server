@@ -23,7 +23,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivot;
+import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.AggTypes;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESTimeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -60,7 +60,7 @@ class ESTimeHandlerTest {
         this.esTimeHandler = new ESTimeHandler();
         when(time.interval()).thenReturn(interval);
         when(time.field()).thenReturn("foobar");
-        final ESPivot.AggTypes aggTypes = mock(ESPivot.AggTypes.class);
+        final AggTypes aggTypes = mock(AggTypes.class);
         when(queryContext.contextMap().get(any())).thenReturn(aggTypes);
         when(query.effectiveTimeRange(any())).thenCallRealMethod();
     }
