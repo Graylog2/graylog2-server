@@ -258,7 +258,7 @@ const TimeRangeDropdown = ({
   );
 
   const _validateTimeRange = useCallback(({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration, formatTime), [formatTime, limitDuration]);
-  const initialTimeRange = { nextTimeRange: onInitializingNextTimeRange(currentTimeRange) };
+  const initialTimeRange = useMemo(() => ({ nextTimeRange: onInitializingNextTimeRange(currentTimeRange) }), [currentTimeRange]);
 
   return (
     <StyledPopover id="timerange-type"
