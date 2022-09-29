@@ -17,6 +17,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.script.Script;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
@@ -42,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -266,7 +268,7 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
                 .effectiveTimerange(effectiveTimerange)
                 .total(extractDocumentCount(queryResult));
 
-        retrieveBuckets(pivot.rowGroups(), queryResult.getAggregations())
+        retrieveBuckets(pivot.rowGroups(), queryResult)
                 .forEach(tuple -> {
                     final ImmutableList<String> keys = supportsMultiTerms ? extractMultiTermsKeys(tuple.v2()) : tuple.v1();
                     final MultiBucketsAggregation.Bucket bucket = tuple.v2();
@@ -288,7 +290,7 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
                     resultBuilder.addRow(rowBuilder.build());
                 });
 
-        if (pivot.rollup()) {
+        if (!pivot.rowGroups().isEmpty() && pivot.rollup()) {
             final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.of());
             processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), createInitialResult(queryResult), true, "row-leaf");
             resultBuilder.addRow(rowBuilder.source("leaf").build());
@@ -303,6 +305,9 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
 
     private ImmutableList<String> extractMultiTermsKeys(MultiBucketsAggregation.Bucket bucket) {
         final Object key = bucket.getKey();
+        if (key == null) {
+            return ImmutableList.of();
+        }
         if (key instanceof Collection) {
             //noinspection unchecked
             return ((Collection<Object>) key).stream()
@@ -338,11 +343,13 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
         return depth;
     }
 
-    private Stream<Tuple2<ImmutableList<String>, ? extends MultiBucketsAggregation.Bucket>> retrieveBuckets(List<? extends BucketSpec> pivots, Aggregations aggregations) {
+    private Stream<Tuple2<ImmutableList<String>, ? extends MultiBucketsAggregation.Bucket>> retrieveBuckets(List<? extends BucketSpec> pivots, SearchResponse queryResult) {
+        final Aggregations aggregations = queryResult.getAggregations();
         final int depth = measureDepth(pivots);
 
         if (depth == 0) {
-            return Stream.empty();
+            final MultiBucketsAggregation.Bucket singleBucket = createSingleBucket(queryResult);
+            return Stream.of(new Tuple2<>(ImmutableList.of(), singleBucket));
         }
 
         final MultiBucketsAggregation agg = aggregations.get(AGG_NAME);
@@ -371,7 +378,36 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
         return result;
     }
 
-    public ImmutableList<String> splitKeys(String keys) {
+    private MultiBucketsAggregation.Bucket createSingleBucket(SearchResponse queryResult) {
+        return new MultiBucketsAggregation.Bucket() {
+            @Override
+            public Object getKey() {
+                return null;
+            }
+
+            @Override
+            public String getKeyAsString() {
+                return null;
+            }
+
+            @Override
+            public long getDocCount() {
+                return extractDocumentCount(queryResult);
+            }
+
+            @Override
+            public Aggregations getAggregations() {
+                return queryResult.getAggregations();
+            }
+
+            @Override
+            public XContentBuilder toXContent(XContentBuilder builder, Params params) throws IOException {
+                return null;
+            }
+        };
+    }
+
+    private ImmutableList<String> splitKeys(String keys) {
         return ImmutableList.copyOf(Splitter.on(KEY_SEPARATOR_CHARACTER).split(keys));
     }
 

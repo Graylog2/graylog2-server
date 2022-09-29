@@ -125,6 +125,29 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
+    void testSingleColumnPivot() throws JsonProcessingException {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .columnGroups(List.of(Values.builder().field("http_method").build()))
+                .series(List.of(Count.builder().build()))
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(1));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult(Collections.emptyList(), List.of("GET", "count()")), equalTo(860))
+                .body(pathToMetricResult(Collections.emptyList(), List.of("DELETE", "count()")), equalTo(52))
+                .body(pathToMetricResult(Collections.emptyList(), List.of("POST", "count()")), equalTo(45))
+                .body(pathToMetricResult(Collections.emptyList(), List.of("PUT", "count()")), equalTo(43))
+                .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
+    }
+
+    @ContainerMatrixTest
     void testSingleRowAndColumnPivots() throws JsonProcessingException {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
