@@ -230,7 +230,7 @@ const CollectorConfigurationModal = (props) => {
 
       const filteredOptions = [...fullyAssignedConfigurations, ...partiallyAssignedConfigurations, ...options].filter((configuration) => configuration.match(new RegExp(searchQuery, 'i')));
 
-      const rows = filteredOptions.map((configName) => {
+      const rows = filteredOptions.map((configName, i) => {
         const config = getConfiguration(configName);
         const collector = getCollector(configName);
         const sidecars = getSidecars(configName);
@@ -238,13 +238,19 @@ const CollectorConfigurationModal = (props) => {
         const partiallySelected = !selected && partiallySelectedConfigurations.includes(configName);
         const secondaryText = (selected && allSidecarNames.join(', ')) || (partiallySelected && sidecars.join(', ')) || '';
 
+        const autoAssignedTags = ['tag1', 'tag2'];
+        const isAssignedFromTags = autoAssignedTags.length > 0 && i === 0;
+
         return (
           <TableRow key={configName}
+                    style={isAssignedFromTags ? { backgroundColor: '#E8E8E8', cursor: 'auto' } : undefined}
                     onClick={() => {
-                      if (partiallySelected) {
-                        setPartiallySelectedConfigurations(partiallySelectedConfigurations.filter((c) => c !== configName));
-                      } else {
-                        setSelectedConfigurations(selected ? selectedConfigurations.filter((c) => c !== configName) : [...selectedConfigurations, configName]);
+                      if (!isAssignedFromTags) {
+                        if (partiallySelected) {
+                          setPartiallySelectedConfigurations(partiallySelectedConfigurations.filter((c) => c !== configName));
+                        } else {
+                          setSelectedConfigurations(selected ? selectedConfigurations.filter((c) => c !== configName) : [...selectedConfigurations, configName]);
+                        }
                       }
                     }}>
             <IconTableCell>
@@ -258,6 +264,9 @@ const CollectorConfigurationModal = (props) => {
                 <small>{secondaryText}</small>
               </SecondaryText>
             </ConfigurationTableCell>
+            <IconTableCell>
+              {isAssignedFromTags && <Icon name="lock" title={`Assigned from tags: ${autoAssignedTags.join(', ')}`} />}
+            </IconTableCell>
             <CollectorTableCell>
               <small>
                 {collector
@@ -290,7 +299,7 @@ const CollectorConfigurationModal = (props) => {
                 <tbody>
                   {(rows.length === 0) ? (
                     <TableRow>
-                      <td colSpan={5}>
+                      <td colSpan={6}>
                         <NoConfigurationMessage>No configurations available for the selected log collector.</NoConfigurationMessage>
                       </td>
                     </TableRow>
@@ -298,7 +307,7 @@ const CollectorConfigurationModal = (props) => {
                     rows
                   )}
                   <StickyTableRowFooter>
-                    <td colSpan={5}>
+                    <td colSpan={6}>
                       <AddNewConfiguration>
                         <Link to={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}><Icon name="add" />&nbsp;Add a new configuration</Link>
                       </AddNewConfiguration>
