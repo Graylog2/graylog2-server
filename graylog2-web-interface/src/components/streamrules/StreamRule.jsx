@@ -103,6 +103,8 @@ const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleType
                         onClose={() => setShowStreamRuleForm(false)}
                         streamRuleTypes={streamRuleTypes}
                         title="Edit Stream Rule"
+                        submitButtonText="Update Rule"
+                        submitLoadingText="Updating Rule..."
                         onSubmit={_onSubmit} />
       )}
       {description}

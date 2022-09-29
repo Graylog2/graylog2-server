@@ -47,6 +47,7 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
   ),
 }));
 
+jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('hooks/useElementDimensions', () => () => ({ width: 1024, height: 768 }));
 
 const mockedQueryIds = Immutable.OrderedSet(['query-id-1', 'query-id-2']);

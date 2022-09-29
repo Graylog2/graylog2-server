@@ -52,6 +52,7 @@ const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
+jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 const MockWidgetStoreState = Immutable.Map();
 
@@ -162,6 +163,11 @@ describe('Aggregation Widget', () => {
 
   const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: 'Update Preview' });
 
+  const submitWidgetChanges = () => {
+    const saveButton = screen.getByRole('button', { name: /apply changes/i });
+    fireEvent.click(saveButton);
+  };
+
   describe('on a dashboard', () => {
     it('should apply not submitted widget search controls and aggregation elements changes when clicking on "Apply Changes"', async () => {
       const newSeries = Series.create('count').toBuilder().config(SeriesConfig.empty().toBuilder().name('Metric name').build()).build();
@@ -198,9 +204,7 @@ describe('Aggregation Widget', () => {
         name: /perform search \(changes were made after last search execution\)/i,
       });
 
-      // Submit all changes
-      const saveButton = screen.getByText('Apply Changes');
-      fireEvent.click(saveButton);
+      submitWidgetChanges();
 
       await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledTimes(1));
 
@@ -230,15 +234,14 @@ describe('Aggregation Widget', () => {
       const timeRangeLivePreview = await screen.findByTestId('time-range-live-preview');
       await within(timeRangeLivePreview).findByText('2020-01-01 00:55:00.000');
 
-      const applyTimeRangeChangesButton = await screen.findByRole('button', { name: 'Apply' });
+      const applyTimeRangeChangesButton = await screen.findByRole('button', { name: 'Update time range' });
       userEvent.click(applyTimeRangeChangesButton);
 
       const timeRangeDisplay = await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
       await within(timeRangeDisplay).findByText('2020-01-01 00:55:00.000');
 
       // Submit all changes
-      const saveButton = screen.getByText('Apply Changes');
-      fireEvent.click(saveButton);
+      submitWidgetChanges();
 
       await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledTimes(1));
 
@@ -272,9 +275,7 @@ describe('Aggregation Widget', () => {
 
       await findWidgetConfigSubmitButton();
 
-      // Submit all changes
-      const saveButton = screen.getByText('Apply Changes');
-      fireEvent.click(saveButton);
+      submitWidgetChanges();
 
       await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledTimes(1));
 

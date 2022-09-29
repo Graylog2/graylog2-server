@@ -22,10 +22,8 @@ import { MockStore } from 'helpers/mocking';
 import StreamRuleForm from './StreamRuleForm';
 
 jest.mock('components/common', () => ({
-  // eslint-disable-next-line react/prop-types
-  TypeAheadFieldInput: ({ defaultValue }) => (<div>{defaultValue}</div>),
-  // eslint-disable-next-line react/prop-types
-  Icon: ({ children }) => (<div>{children}</div>),
+  TypeAheadFieldInput: ({ defaultValue }: { defaultValue: React.ReactNode }) => (<div>{defaultValue}</div>),
+  Icon: ({ children }: { children: React.ReactNode }) => (<div>{children}</div>),
 }));
 
 jest.mock('stores/inputs/InputsStore', () => ({
@@ -36,10 +34,6 @@ jest.mock('stores/inputs/InputsStore', () => ({
 }));
 
 describe('StreamRuleForm', () => {
-  afterEach(() => {
-    cleanup();
-  });
-
   const streamRuleTypes = [
     { id: 1, short_desc: 'match exactly', long_desc: 'match exactly', name: 'Stream rule match exactly' },
     { id: 2, short_desc: 'match regular expression', long_desc: 'match regular expression', name: 'Stream rule match regular' },
@@ -50,6 +44,19 @@ describe('StreamRuleForm', () => {
     { id: 7, short_desc: 'always match', long_desc: 'always match', name: 'Stream rule always match' },
     { id: 8, short_desc: 'match input', long_desc: 'match input', name: 'Stream rule match input' },
   ];
+
+  const SUT = (props: Partial<React.ComponentProps<typeof StreamRuleForm>>) => (
+    <StreamRuleForm onSubmit={() => {}}
+                    streamRuleTypes={streamRuleTypes}
+                    submitButtonText="Update rule"
+                    submitLoadingText="Updating rule..."
+                    title="Bach"
+                    {...props} />
+  );
+
+  afterEach(() => {
+    cleanup();
+  });
 
   const getStreamRule = (type = 1) => {
     return {
@@ -63,22 +70,13 @@ describe('StreamRuleForm', () => {
   };
 
   it('should render an empty StreamRuleForm', () => {
-    const container = render(
-      <StreamRuleForm onSubmit={() => {}}
-                      streamRuleTypes={streamRuleTypes}
-                      title="Bach" />,
-    );
+    const container = render(<SUT />);
 
     expect(container).not.toBeNull();
   });
 
   it('should render an simple StreamRuleForm', () => {
-    const container = render(
-      <StreamRuleForm onSubmit={() => {}}
-                      streamRule={getStreamRule()}
-                      streamRuleTypes={streamRuleTypes}
-                      title="Bach" />,
-    );
+    const container = render(<SUT streamRule={getStreamRule()} />);
 
     expect(container).not.toBeNull();
   });
@@ -89,16 +87,14 @@ describe('StreamRuleForm', () => {
       { id: 'my-id', title: 'title', name: 'name' },
     ];
     const { getByTestId, getByText } = render(
-      <StreamRuleForm onSubmit={submit}
-                      streamRule={getStreamRule()}
-                      inputs={inputs}
-                      streamRuleTypes={streamRuleTypes}
-                      title="Bach" />,
+      <SUT onSubmit={submit}
+           streamRule={getStreamRule()}
+           inputs={inputs} />,
     );
 
     const ruleTypeSelection = getByTestId('rule-type-selection');
     fireEvent.change(ruleTypeSelection, { target: { name: 'type', value: 8 } });
-    const submitBtn = getByText('Save');
+    const submitBtn = getByText('Update rule');
     fireEvent.click(submitBtn);
 
     expect(submit).toHaveBeenCalledTimes(0);

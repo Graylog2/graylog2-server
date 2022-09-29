@@ -30,7 +30,7 @@ type ClusterTrafficStoreState = {
   },
 };
 type ClusterTrafficActionsType = {
-  getTraffic: () => Promise<ClusterTrafficStoreState>,
+  getTraffic: (days: number) => Promise<ClusterTrafficStoreState>,
 };
 
 export const ClusterTrafficActions = singletonActions(
@@ -50,8 +50,8 @@ export const ClusterTrafficStore = singletonStore(
       return { traffic: this.traffic };
     },
 
-    getTraffic() {
-      const promise = fetch('GET', URLUtils.qualifyUrl('/system/cluster/traffic'));
+    getTraffic(days: number) {
+      const promise = fetch('GET', URLUtils.qualifyUrl(`/system/cluster/traffic?days=${days}&daily=false`));
 
       promise.then((response) => {
         this.trigger({ traffic: response });
@@ -59,6 +59,5 @@ export const ClusterTrafficStore = singletonStore(
 
       return promise;
     },
-
   }),
 );

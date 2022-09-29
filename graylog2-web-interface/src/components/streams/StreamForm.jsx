@@ -47,6 +47,7 @@ class StreamForm extends React.Component {
     onSubmit: PropTypes.func.isRequired,
     stream: PropTypes.object,
     title: PropTypes.string.isRequired,
+    submitButtonText: PropTypes.string.isRequired,
     indexSets: PropTypes.array.isRequired,
   };
 
@@ -138,14 +139,14 @@ class StreamForm extends React.Component {
   };
 
   render() {
+    const { title: propTitle, submitButtonText } = this.props;
     const { title, description, removeMatchesFromDefaultStream } = this.state;
-    const { title: propTitle } = this.props;
 
     return (
       <BootstrapModalForm ref={(c) => { this.modal = c; }}
                           title={propTitle}
                           onSubmitForm={this._onSubmit}
-                          submitButtonText="Save">
+                          submitButtonText={submitButtonText}>
         <Input id="Title"
                type="text"
                required

@@ -46,7 +46,7 @@ The following API endpoints have been removed in 5.0.
 
 | Endpoint                                    | Description                 |
 | ------------------------------------------- | --------------------------- |
-| `PUT /example/placeholder`                  | TODO placeholder comment    |
+| `GET /system/metrics/{metricName}/history`  | Remove unused and dysfunctional endpoint. (part of [#2443](https://github.com/Graylog2/graylog2-server/pull/2443)) |
 
 
 ## API Endpoint Changes

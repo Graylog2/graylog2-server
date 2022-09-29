@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -25,24 +25,47 @@ const SidecarIcon = styled(Icon)`
   margin-left: 2px;
 `;
 
-const OperatingSystemIcon = ({ operatingSystem }) => {
-  let iconName = 'question-circle';
-  let iconType = 'solid';
+type Props = {
+  operatingSystem: string,
+};
 
-  if (operatingSystem) {
-    const os = operatingSystem.trim().toLowerCase();
-
-    if (os.indexOf('darwin') !== -1 || os.indexOf('mac os') !== -1) {
-      iconName = 'apple';
-      iconType = 'brand';
-    } else if (os.indexOf('linux') !== -1) {
-      iconName = 'linux';
-      iconType = 'brand';
-    } else if (os.indexOf('win') !== -1) {
-      iconName = 'windows';
-      iconType = 'brand';
-    }
+const matchIcon = (os: string) => {
+  if (os.includes('darwin') || os.includes('mac os')) {
+    return {
+      iconName: 'apple',
+      iconType: 'brand',
+    } as const;
   }
+
+  if (os.includes('linux')) {
+    return {
+      iconName: 'linux',
+      iconType: 'brand',
+    } as const;
+  }
+
+  if (os.includes('win')) {
+    return {
+      iconName: 'windows',
+      iconType: 'brand',
+    } as const;
+  }
+
+  if (os.includes('freebsd')) {
+    return {
+      iconName: 'freebsd',
+      iconType: 'brand',
+    } as const;
+  }
+
+  return {
+    iconName: 'question-circle',
+    iconType: 'solid',
+  } as const;
+};
+
+const OperatingSystemIcon = ({ operatingSystem }: Props) => {
+  const { iconName, iconType } = matchIcon(operatingSystem.trim().toLowerCase());
 
   return (
     <SidecarIcon name={iconName} type={iconType} fixedWidth />

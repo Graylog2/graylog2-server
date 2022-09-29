@@ -27,12 +27,13 @@ import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 type Props = {
   onClose: () => void,
   onSave: (view: View) => void,
+  show: boolean
+  submitButtonText: string,
   title: string,
   view: View,
-  show: boolean
 };
 
-const DashboardPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle }: Props) => {
+const DashboardPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle, submitButtonText }: Props) => {
   const [updatedDashboard, setUpdatedDashboard] = useState(view);
   const pluggableFormComponents = useSaveViewFormControls();
 
@@ -69,7 +70,7 @@ const DashboardPropertiesModal = ({ onClose, onSave, show, view, title: modalTit
                         title={modalTitle}
                         onCancel={onClose}
                         onSubmitForm={_onSave}
-                        submitButtonText="Save"
+                        submitButtonText={submitButtonText}
                         bsSize="large">
       <>
         <Input id="title"
@@ -104,6 +105,7 @@ DashboardPropertiesModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   show: PropTypes.bool.isRequired,
+  submitButtonText: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   view: PropTypes.object.isRequired,
 };
