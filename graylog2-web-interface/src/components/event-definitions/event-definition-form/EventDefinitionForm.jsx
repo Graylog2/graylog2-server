@@ -20,7 +20,7 @@ import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Button, Col, Row } from 'components/bootstrap';
-import { FormSubmit, Wizard } from 'components/common';
+import { ModalSubmit, Wizard } from 'components/common';
 
 import EventDetailsForm from './EventDetailsForm';
 import EventConditionForm from './EventConditionForm';

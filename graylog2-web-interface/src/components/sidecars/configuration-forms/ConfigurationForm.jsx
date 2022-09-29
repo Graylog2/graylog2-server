@@ -136,6 +136,7 @@ const ConfigurationForm = createReactClass({
     };
   },
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   replaceConfigurationVariableName(oldname, newname) {
     const { formData } = this.state;
 

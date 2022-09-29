@@ -25,6 +25,119 @@ import ExtractorUtils from 'util/ExtractorUtils';
 import Routes from 'routing/Routes';
 import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
 
+const TimingMetrics = ({ timing }) => (
+  <dl className="metric-def metric-timer">
+    <dt>95th percentile:</dt>
+    <dd>{numeral(timing['95th_percentile']).format('0,0.[00]')}&#956;s</dd>
+
+    <dt>98th percentile:</dt>
+    <dd>{numeral(timing['98th_percentile']).format('0,0.[00]')}&#956;s</dd>
+
+    <dt>99th percentile:</dt>
+    <dd>{numeral(timing['99th_percentile']).format('0,0.[00]')}&#956;s</dd>
+
+    <dt>Standard deviation:</dt>
+    <dd>{numeral(timing.std_dev).format('0,0.[00]')}&#956;s</dd>
+
+    <dt>Mean:</dt>
+    <dd>{numeral(timing.mean).format('0,0.[00]')}&#956;s</dd>
+
+    <dt>Minimum:</dt>
+    <dd>{numeral(timing.min).format('0,0.[00]')}&#956;s</dd>
+
+    <dt>Maximum:</dt>
+    <dd>{numeral(timing.max).format('0,0.[00]')}&#956;s</dd>
+  </dl>
+);
+
+TimingMetrics.propTypes = {
+  timing: PropTypes.object.isRequired,
+};
+
+const Metrics = ({ metrics }) => {
+  let totalRate;
+
+  if (metrics.total.rate) {
+    totalRate = (
+      <div className="meter" style={{ marginBottom: 10 }}>
+        {numeral(metrics.total.rate.total).format('0,0')} total invocations since boot,{' '}
+        averages:{' '}
+        {numeral(metrics.total.rate.one_minute).format('0,0.[00]')},{' '}
+        {numeral(metrics.total.rate.five_minute).format('0,0.[00]')},{' '}
+        {numeral(metrics.total.rate.fifteen_minute).format('0,0.[00]')}.
+      </div>
+    );
+  }
+
+  const conditionCounts = (
+    <div className="meter" style={{ marginBottom: 10 }}>
+      {metrics.condition_hits} hits,{' '}
+      {metrics.condition_misses} misses
+    </div>
+  );
+
+  let totalTime;
+
+  if (metrics.total.time) {
+    totalTime = <TimingMetrics timing={metrics.total.time} />;
+  } else {
+    totalTime = 'No message passed through here yet.';
+  }
+
+  let conditionTime;
+
+  if (metrics.condition.time) {
+    conditionTime = <TimingMetrics timing={metrics.condition.time} />;
+  } else {
+    conditionTime = 'No message passed through here yet.';
+  }
+
+  let executionTime;
+
+  if (metrics.execution.time) {
+    executionTime = <TimingMetrics timing={metrics.execution.time} />;
+  } else {
+    executionTime = 'No message passed through here yet.';
+  }
+
+  let convertersTime;
+
+  if (metrics.converters.time) {
+    convertersTime = <TimingMetrics timing={metrics.converters.time} />;
+  } else {
+    convertersTime = 'No message passed through here yet.';
+  }
+
+  return (
+    <div>
+      {totalRate}
+      {conditionCounts}
+      <Row>
+        <Col md={6}>
+          <h4 style={{ display: 'inline' }}>Total time</h4><br />
+          {totalTime}
+        </Col>
+        <Col md={6}>
+          <h4 style={{ display: 'inline' }}>Condition time</h4><br />
+          {conditionTime}
+        </Col>
+        <Col md={6}>
+          <h4 style={{ display: 'inline' }}>Execution time</h4><br />
+          {executionTime}
+        </Col>
+        <Col md={6}>
+          <h4 style={{ display: 'inline' }}>Converter time</h4><br />
+          {convertersTime}
+        </Col>
+      </Row>
+    </div>
+  );
+};
+
+Metrics.propTypes = {
+  metrics: PropTypes.object.isRequired,
+};
+
 class ExtractorsListItem extends React.Component {
   static propTypes = {
     extractor: PropTypes.object.isRequired,
@@ -32,9 +145,13 @@ class ExtractorsListItem extends React.Component {
     nodeId: PropTypes.string.isRequired,
   };
 
-  state = {
-    showDetails: false,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showDetails: false,
+    };
+  }
 
   _toggleDetails = () => {
     const { showDetails } = this.state;
@@ -161,113 +278,6 @@ class ExtractorsListItem extends React.Component {
     );
   };
 
-  _formatTimingMetrics = (timing) => {
-    return (
-      <dl className="metric-def metric-timer">
-        <dt>95th percentile:</dt>
-        <dd>{numeral(timing['95th_percentile']).format('0,0.[00]')}&#956;s</dd>
-
-        <dt>98th percentile:</dt>
-        <dd>{numeral(timing['98th_percentile']).format('0,0.[00]')}&#956;s</dd>
-
-        <dt>99th percentile:</dt>
-        <dd>{numeral(timing['99th_percentile']).format('0,0.[00]')}&#956;s</dd>
-
-        <dt>Standard deviation:</dt>
-        <dd>{numeral(timing.std_dev).format('0,0.[00]')}&#956;s</dd>
-
-        <dt>Mean:</dt>
-        <dd>{numeral(timing.mean).format('0,0.[00]')}&#956;s</dd>
-
-        <dt>Minimum:</dt>
-        <dd>{numeral(timing.min).format('0,0.[00]')}&#956;s</dd>
-
-        <dt>Maximum:</dt>
-        <dd>{numeral(timing.max).format('0,0.[00]')}&#956;s</dd>
-      </dl>
-    );
-  };
-
-  _formatMetrics = (metrics) => {
-    let totalRate;
-
-    if (metrics.total.rate) {
-      totalRate = (
-        <div className="meter" style={{ marginBottom: 10 }}>
-          {numeral(metrics.total.rate.total).format('0,0')} total invocations since boot,{' '}
-          averages:{' '}
-          {numeral(metrics.total.rate.one_minute).format('0,0.[00]')},{' '}
-          {numeral(metrics.total.rate.five_minute).format('0,0.[00]')},{' '}
-          {numeral(metrics.total.rate.fifteen_minute).format('0,0.[00]')}.
-        </div>
-      );
-    }
-
-    const conditionCounts = (
-      <div className="meter" style={{ marginBottom: 10 }}>
-        {metrics.condition_hits} hits,{' '}
-        {metrics.condition_misses} misses
-      </div>
-    );
-
-    let totalTime;
-
-    if (metrics.total.time) {
-      totalTime = this._formatTimingMetrics(metrics.total.time);
-    } else {
-      totalTime = 'No message passed through here yet.';
-    }
-
-    let conditionTime;
-
-    if (metrics.condition.time) {
-      conditionTime = this._formatTimingMetrics(metrics.condition.time);
-    } else {
-      conditionTime = 'No message passed through here yet.';
-    }
-
-    let executionTime;
-
-    if (metrics.execution.time) {
-      executionTime = this._formatTimingMetrics(metrics.execution.time);
-    } else {
-      executionTime = 'No message passed through here yet.';
-    }
-
-    let convertersTime;
-
-    if (metrics.converters.time) {
-      convertersTime = this._formatTimingMetrics(metrics.converters.time);
-    } else {
-      convertersTime = 'No message passed through here yet.';
-    }
-
-    return (
-      <div>
-        {totalRate}
-        {conditionCounts}
-        <Row>
-          <Col md={6}>
-            <h4 style={{ display: 'inline' }}>Total time</h4><br />
-            {totalTime}
-          </Col>
-          <Col md={6}>
-            <h4 style={{ display: 'inline' }}>Condition time</h4><br />
-            {conditionTime}
-          </Col>
-          <Col md={6}>
-            <h4 style={{ display: 'inline' }}>Execution time</h4><br />
-            {executionTime}
-          </Col>
-          <Col md={6}>
-            <h4 style={{ display: 'inline' }}>Converter time</h4><br />
-            {convertersTime}
-          </Col>
-        </Row>
-      </div>
-    );
-  };
-
   _formatDetails = () => {
     const { extractor } = this.props;
 
@@ -283,7 +293,7 @@ class ExtractorsListItem extends React.Component {
         <Col md={4}>
           <div className="graylog-input-metrics">
             <h3>Metrics</h3>
-            {this._formatMetrics(extractor.metrics)}
+            <Metrics metrics={extractor.metrics} />
           </div>
         </Col>
       </div>
