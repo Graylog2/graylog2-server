@@ -17,7 +17,6 @@
 package org.graylog2.rest.resources;
 
 import org.graylog2.plugin.inject.Graylog2Module;
-import org.graylog2.rest.resources.alarmcallbacks.AlarmCallbackHistoryResource;
 import org.graylog2.rest.resources.cluster.ClusterDeflectorResource;
 import org.graylog2.rest.resources.cluster.ClusterInputStatesResource;
 import org.graylog2.rest.resources.cluster.ClusterJournalResource;
@@ -98,7 +97,6 @@ public class RestResourcesModule extends Graylog2Module {
     @Override
     protected void configure() {
         addAuthResources();
-        addLegacyAlertingResources();
         addClusterResources();
         addContentPackResources();
         addIndexingResources();
@@ -130,10 +128,6 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(PermissionsResource.class);
         addSystemRestResource(SessionsResource.class);
         addSystemRestResource(UsersResource.class);
-    }
-
-    private void addLegacyAlertingResources() {
-        addSystemRestResource(AlarmCallbackHistoryResource.class);
     }
 
     private void addClusterResources() {
