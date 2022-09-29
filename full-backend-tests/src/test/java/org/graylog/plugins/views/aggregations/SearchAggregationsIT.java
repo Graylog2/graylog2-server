@@ -167,7 +167,7 @@ public class SearchAggregationsIT {
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000))
-                .body("rows", hasSize(10));
+                .body("rows", hasSize(11));
 
         final String searchTypeResultPath = PIVOT_PATH + ".rows";
 
@@ -192,6 +192,10 @@ public class SearchAggregationsIT {
                 .rootPath(searchTypeResultPath)
                 .body(pathToMetricResult(List.of("PUT", "200"), List.of("count()")), equalTo(42))
                 .body(pathToMetricResult(List.of("PUT", "504"), List.of("count()")), equalTo(1));
+
+        validatableResponse
+                .rootPath(searchTypeResultPath)
+                .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
     }
 
     private String listToGroovy(Collection<String> strings) {
