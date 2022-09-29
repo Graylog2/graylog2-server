@@ -14,7 +14,7 @@ import java.util.List;
 public abstract class DataTableVisualizationConfigDTO implements VisualizationConfigDTO {
     public static final String NAME = "table";
 
-    private static final String FIELD_PINNED_COLUMNS = "pinnedColumns";
+    private static final String FIELD_PINNED_COLUMNS = "pinned_columns";
 
     @JsonProperty(FIELD_PINNED_COLUMNS)
     public abstract List<String> pinnedColumns();
