@@ -125,7 +125,7 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
         for (BucketSpec bucketSpec : pivots) {
             if (bucketSpec instanceof Time time) {
                 if (!valueBuckets.isEmpty()) {
-                    final AggregationBuilder termsAggregation = createTerms(valueBuckets,  ordering, pivot, queryContext) ;
+                    final AggregationBuilder termsAggregation = createTerms(valueBuckets, ordering) ;
                     if (aggregationBuilder == null) {
                         aggregationBuilder = termsAggregation;
                         root = termsAggregation;
@@ -148,7 +148,7 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
             }
         }
         if (!valueBuckets.isEmpty()) {
-            final AggregationBuilder termsAggregation = createTerms(valueBuckets, ordering, pivot, queryContext);
+            final AggregationBuilder termsAggregation = createTerms(valueBuckets, ordering);
             if (aggregationBuilder == null) {
                 aggregationBuilder = termsAggregation;
                 root = termsAggregation;
@@ -160,22 +160,22 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
         return new Tuple2<>(root, aggregationBuilder);
     }
 
-    private AggregationBuilder createTerms(List<Values> valueBuckets, List<BucketOrder> ordering, Pivot pivot, OSGeneratedQueryContext queryContext) {
+    private AggregationBuilder createTerms(List<Values> valueBuckets, List<BucketOrder> ordering) {
         return valueBuckets.size() > 1
                 ? supportsMultiTerms
-                    ? createMultiTerms(valueBuckets, ordering, pivot, queryContext)
-                    : createScriptedTerms(valueBuckets, ordering, pivot, queryContext)
-                : createSimpleTerms(valueBuckets.get(0), ordering, pivot, queryContext);
+                    ? createMultiTerms(valueBuckets, ordering)
+                    : createScriptedTerms(valueBuckets, ordering)
+                : createSimpleTerms(valueBuckets.get(0), ordering);
     }
 
-    private AggregationBuilder createSimpleTerms(Values values, List<BucketOrder> ordering, Pivot pivot, OSGeneratedQueryContext queryContext) {
+    private AggregationBuilder createSimpleTerms(Values values, List<BucketOrder> ordering) {
         return AggregationBuilders.terms(AGG_NAME)
                 .field(values.field())
                 .order(ordering)
                 .size(15);
     }
 
-    private AggregationBuilder createMultiTerms(List<Values> valueBuckets, List<BucketOrder> ordering, Pivot pivot, OSGeneratedQueryContext queryContext) {
+    private AggregationBuilder createMultiTerms(List<Values> valueBuckets, List<BucketOrder> ordering) {
         return AggregationBuilders.multiTerms(AGG_NAME)
                 .terms(valueBuckets.stream()
                         .map(value -> new MultiTermsValuesSourceConfig.Builder()
@@ -186,7 +186,7 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
                 .size(15);
     }
 
-    private TermsAggregationBuilder createScriptedTerms(List<? extends BucketSpec> buckets, List<BucketOrder> ordering, Pivot pivot, OSGeneratedQueryContext queryContext) {
+    private TermsAggregationBuilder createScriptedTerms(List<? extends BucketSpec> buckets, List<BucketOrder> ordering) {
         return AggregationBuilders.terms(AGG_NAME)
                 .script(scriptForPivots(buckets))
                 .size(15)
