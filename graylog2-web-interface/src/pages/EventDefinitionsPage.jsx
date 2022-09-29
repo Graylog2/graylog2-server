@@ -18,17 +18,26 @@ import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
 import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EventDefinitionsContainer from 'components/event-definitions/event-definitions/EventDefinitionsContainer';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 
+import styles from '../components/event-definitions/event-definitions/EventDefinitions.css';
+
 const EventDefinitionsPage = () => {
   return (
     <DocumentTitle title="Event Definitions">
       <span>
-        <PageHeader title="Event Definitions">
+        <PageHeader title="Event Definitions"
+                    subactions={(
+                      <IfPermitted permissions="eventdefinitions:create">
+                        <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
+                          <Button bsStyle="success">Create event definition</Button>
+                        </LinkContainer>
+                      </IfPermitted>
+                    )}>
           <span>
             Create new Event Definitions that will allow you to search for different Conditions and alert on them.
           </span>

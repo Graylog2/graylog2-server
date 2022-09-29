@@ -170,11 +170,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     }
   }
 
-  .actions-lg .actions-container {
-    margin-top: 10px;
-    padding-left: 50px;
-  }
-
   .content p.description-tooltips {
     margin-top: 10px;
   }

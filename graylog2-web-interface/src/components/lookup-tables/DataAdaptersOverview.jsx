@@ -131,9 +131,6 @@ class DataAdaptersOverview extends React.Component {
             </h2>
             <PaginatedList onChange={this._onPageChange} totalItems={pagination.total}>
               <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}>
-                  <Button bsStyle="success" style={{ marginLeft: 5 }}>Create data adapter</Button>
-                </LinkContainer>
                 <OverlayTrigger trigger="click" rootClose placement="right" overlay={_helpPopover()}>
                   <Button bsStyle="link" className={Styles.searchHelpButton}><Icon name="question-circle" fixedWidth /></Button>
                 </OverlayTrigger>
