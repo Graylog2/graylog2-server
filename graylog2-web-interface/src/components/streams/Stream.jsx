@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import { Link, LinkContainer } from 'components/common/router';
-import { Button, Tooltip } from 'components/bootstrap';
+import { Button, Tooltip, ButtonToolbar } from 'components/bootstrap';
 import { Icon, OverlayElement, ShareButton } from 'components/common';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import { isAnyPermitted, isPermitted } from 'util/PermissionsMixin';
@@ -44,26 +44,6 @@ const StreamListItem = styled.li(({ theme }) => css`
 
   .stream-data {
     margin-top: 8px;
-
-    .stream-actions {
-      position: relative;
-      float: right;
-      right: 0;
-      bottom: 20px;
-
-      form.action-form {
-        display: inline-block;
-      }
-
-      .btn-delete {
-        margin-left: 15px;
-        margin-right: 15px;
-
-        &.last {
-          margin-right: 0;
-        }
-      }
-    }
   }
 
   .stream-description {
@@ -72,6 +52,11 @@ const StreamListItem = styled.li(({ theme }) => css`
     .fa-cube {
       margin-right: 5px;
     }
+  }
+  
+  .overlay-trigger {
+    float: left;
+    margin-left: 5px;
   }
 `);
 
@@ -185,7 +170,7 @@ class Stream extends React.Component {
 
     if (isPermitted(permissions, [`streams:edit:${stream.id}`])) {
       editRulesLink = (
-        <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
+        <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream} className="overlay-trigger">
           <LinkContainer disabled={isDefaultStream || isNotEditable} to={Routes.stream_edit(stream.id)}>
             <Button>
               <Icon name="stream" /> Manage Rules
@@ -200,7 +185,7 @@ class Stream extends React.Component {
     if (isAnyPermitted(permissions, [`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`])) {
       if (stream.disabled) {
         toggleStreamLink = (
-          <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
+          <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream} className="overlay-trigger">
             <ToggleButton bsStyle="success"
                           onClick={this._onResume}
                           disabled={isDefaultStream || loading || isNotEditable}>
@@ -210,7 +195,7 @@ class Stream extends React.Component {
         );
       } else {
         toggleStreamLink = (
-          <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
+          <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream} className="overlay-trigger">
             <ToggleButton bsStyle="primary"
                           onClick={this._onPause}
                           disabled={loading || isNotEditable}>
@@ -225,7 +210,7 @@ class Stream extends React.Component {
       ? <Icon name="cube" title="Created from content pack" /> : null);
 
     const streamControls = (
-      <OverlayElement overlay={defaultStreamTooltip} placement="top">
+      <OverlayElement overlay={defaultStreamTooltip} placement="top" className="overlay-trigger">
         <StreamControls stream={stream}
                         permissions={permissions}
                         user={user}
@@ -244,12 +229,12 @@ class Stream extends React.Component {
 
     return (
       <StreamListItem>
-        <div className="stream-actions pull-right">
+        <ButtonToolbar className="pull-right">
           {toggleStreamLink}{' '}
           {editRulesLink}{' '}
           <ShareButton entityId={stream.id} entityType="stream" onClick={this._openEntityShareModal} />
           {streamControls}
-        </div>
+        </ButtonToolbar>
 
         <h2>
           <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
