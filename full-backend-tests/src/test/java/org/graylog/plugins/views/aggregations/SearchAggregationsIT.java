@@ -75,11 +75,30 @@ public class SearchAggregationsIT {
                 .body(serialize(search))
                 .post("/views/search/sync")
                 .then()
-                .log().ifStatusCodeMatches(not(200))
+                .log().ifError()
+                .log().ifValidationFails()
                 .statusCode(200)
                 .body("execution.done", equalTo(true))
                 .body("execution.completed_exceptionally", equalTo(false))
                 .body(PIVOT_PATH + ".total", equalTo(1000));
+    }
+
+    @ContainerMatrixTest
+    void testZeroPivots() throws JsonProcessingException {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .series(List.of(Count.builder().build()))
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(1));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
     }
 
     @ContainerMatrixTest

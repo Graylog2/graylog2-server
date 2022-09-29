@@ -95,7 +95,13 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
         final AggregationBuilder leafAggregation = aggregationTuple.v2();
         if (pivot.columnGroups().isEmpty() || pivot.rollup()) {
             seriesStream(pivot, queryContext, "metrics")
-                    .forEach(leafAggregation::subAggregation);
+                    .forEach(aggregation -> {
+                        if (leafAggregation != null) {
+                            leafAggregation.subAggregation(aggregation);
+                        } else {
+                            searchSourceBuilder.aggregation(aggregation);
+                        }
+                    });
         }
 
         if (!pivot.columnGroups().isEmpty()) {
@@ -104,9 +110,16 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
             final AggregationBuilder columnsLeafAggregation = columnsAggregationTuple.v2();
             seriesStream(pivot, queryContext, "metrics")
                     .forEach(columnsLeafAggregation::subAggregation);
-            leafAggregation.subAggregation(columnsRootAggregation);
+            if (leafAggregation != null) {
+                leafAggregation.subAggregation(columnsRootAggregation);
+            } else {
+                searchSourceBuilder.aggregation(columnsRootAggregation);
+            }
         }
-        searchSourceBuilder.aggregation(rootAggregation);
+
+        if (rootAggregation != null) {
+            searchSourceBuilder.aggregation(rootAggregation);
+        }
 
         addTimeStampAggregations(searchSourceBuilder);
     }
@@ -277,9 +290,8 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
 
         if (pivot.rollup()) {
             final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.of());
-            // columnKeys is empty, because this is a rollup per row bucket, thus for all columns in that bucket (IOW it's not a leaf!)
-            processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), createInitialResult(queryResult), true, "row-inner");
-            resultBuilder.addRow(rowBuilder.source("non-leaf").build());
+            processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), createInitialResult(queryResult), true, "row-leaf");
+            resultBuilder.addRow(rowBuilder.source("leaf").build());
         }
 
         return resultBuilder.build();
