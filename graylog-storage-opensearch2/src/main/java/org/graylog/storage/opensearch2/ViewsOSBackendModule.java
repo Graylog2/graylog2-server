@@ -55,6 +55,7 @@ import org.graylog.storage.opensearch2.views.searchtypes.OSMessageList;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotFacade;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSDateRangeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSTimeHandler;
@@ -90,7 +91,7 @@ public class ViewsOSBackendModule extends ViewsModule {
 
         registerOSSearchTypeHandler(MessageList.NAME, OSMessageList.class);
         registerOSSearchTypeHandler(EventList.NAME, OSEventList.class);
-        registerOSSearchTypeHandler(Pivot.NAME, OSPivot.class).in(Scopes.SINGLETON);
+        registerOSSearchTypeHandler(Pivot.NAME, OSPivotFacade.class).in(Scopes.SINGLETON);
 
         registerPivotSeriesHandler(Average.NAME, OSAverageHandler.class);
         registerPivotSeriesHandler(Cardinality.NAME, OSCardinalityHandler.class);
