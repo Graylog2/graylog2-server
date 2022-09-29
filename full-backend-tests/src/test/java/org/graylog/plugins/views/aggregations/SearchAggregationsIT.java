@@ -79,6 +79,7 @@ public class SearchAggregationsIT {
                 .log().ifStatusCodeMatches(not(200))
                 .statusCode(200)
                 .body("execution.done", equalTo(true))
+                .body("execution.completed_exceptionally", equalTo(false))
                 .body(PIVOT_PATH + ".total", equalTo(1000));
     }
 
