@@ -31,6 +31,7 @@ const StreamsFilter = ({ disabled, value, streams, onChange }: Props) => {
   const selectedStreams = value.join(',');
   const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
   const options = streams.sort(({ key: key1 }, { key: key2 }) => defaultCompare(key1, key2));
+  console.log('StreamsFilter', { options, selectedStreams });
 
   return (
     <div style={{ position: 'relative' }} data-testid="streams-filter" title={placeholder}>

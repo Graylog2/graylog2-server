@@ -14,13 +14,47 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
+
 import type { VisualizationType } from 'views/types';
 import DataTable from 'views/components/datatable/DataTable';
+import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
+import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 
+type DataTableVisualizationConfigFormValues = {
+  pinned_columns: Array<string>,
+};
 const dataTable: VisualizationType<typeof DataTable.type> = {
   type: DataTable.type,
   displayName: 'Data Table',
   component: DataTable,
+  config: {
+    createConfig: () => ({ pinned_columns: [] }),
+    fromConfig: (config: DataTableVisualizationConfig | undefined) => ({ pinned_columns: config?.pinned_columns.toJS() ?? [] }),
+    toConfig: (formValues: DataTableVisualizationConfigFormValues) => DataTableVisualizationConfig.create(formValues.pinned_columns),
+    fields: [{
+      name: 'pinned_columns',
+      title: 'Pinned Columns',
+      type: 'multi-select',
+      multi: true,
+      options: ({ formValues }: { formValues: WidgetConfigFormValues }) => {
+        const options = formValues?.groupBy?.groupings.reduce((res, cur) => {
+          if (cur.direction === 'row') {
+            res.push(cur.field.field);
+          }
+
+          return res;
+        }, []);
+        formValues.metrics.forEach((metric) => options.push(`${metric.function}(${metric.field})`));
+        console.log({ options });
+
+        return options || [];
+      },
+      required: false,
+    }],
+  },
+
 };
 
 export default dataTable;

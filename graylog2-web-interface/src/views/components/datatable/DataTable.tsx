@@ -139,6 +139,8 @@ const DataTable = ({
   const formContext = useContext(FormikContext);
   const onRenderComplete = useContext(RenderCompletionCallback);
   const widget = useContext(WidgetContext);
+  const widgetConfigPinnedColumns = widget?.config?.visualizationConfig?.pinnedColumns ?? [];
+  console.log({ widgetConfigPinnedColumns });
   useEffect(onRenderComplete, [onRenderComplete]);
   const [rowPivotColumnsWidth, setRowPivotColumnsWidth] = useState<{ [key: string]: number }>({});
   const onSetColumnsWidth = useCallback(({ field, offsetWidth }: { field: string, offsetWidth: number}) => {
@@ -162,6 +164,42 @@ const DataTable = ({
     return Promise.reject();
   }, [config, widget, editing, formContext]);
 
+  const togglePin = useCallback((field) => {
+    const dirty = formContext?.dirty;
+
+    const updateWidget = () => {
+      const curVisualizationConfig = widget.config.visualizationConfig || { pinned_columns: Immutable.Set() };
+      console.log({ field, curVisualizationConfig });
+
+      if (curVisualizationConfig?.pinned_columns?.has(field)) {
+        curVisualizationConfig.pinned_columns = curVisualizationConfig.pinned_columns.delete(field);
+      } else {
+        curVisualizationConfig.pinned_columns = curVisualizationConfig.pinned_columns.add(field);
+      }
+
+      console.log({ field, curVisualizationConfig });
+
+      return WidgetActions.updateConfig(widget.id, config.toBuilder().visualizationConfig({ ...curVisualizationConfig }).build());
+    };
+
+    if (!editing || (editing && !dirty)) return updateWidget();
+
+    // eslint-disable-next-line no-alert
+    if (window.confirm('You have unsaved changes in configuration form. This action will rollback them')) {
+      return updateWidget();
+    }
+
+    return Promise.reject();
+    /*
+    setPinnedColumns((cur) => {
+      if (cur.has(field)) return cur.delete(field);
+
+      return cur.add(field);
+    });
+    /
+     */
+  }, [config, widget, editing, formContext]);
+
   const { columnPivots, rowPivots, series, rollup } = config;
   const rows = retrieveChartData(data) ?? [];
 
@@ -175,7 +213,10 @@ const DataTable = ({
   const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter((r): r is Leaf => r.source === 'leaf'));
 
   const actualColumnPivotFields = _extractColumnPivotValues(rows);
-  const [pinnedColumns, setPinnedColumns] = useState<Immutable.Set<string>>(Immutable.Set());
+  const pinnedColumns = useMemo(() => {
+    return widget.config.visualizationConfig?.pinned_columns || Immutable.Set();
+  }, [widget.config.visualizationConfig?.pinned_columns]);
+  // const [pinnedColumns, setPinnedColumns] = useState<Immutable.Set<string>>(Immutable.Set(widgetConfigPinnedColumns));
   /*
   const stickyLeftMargins = useMemo(() => {
     let prev = 0;
@@ -238,13 +279,8 @@ const DataTable = ({
   });
 
   const sortConfigMap = useMemo<OrderedMap<string, SortConfig>>(() => Immutable.OrderedMap(config.sort.map((sort) => [sort.field, sort])), [config]);
-  const togglePin = useCallback((field) => {
-    setPinnedColumns((cur) => {
-      if (cur.has(field)) return cur.delete(field);
 
-      return cur.add(field);
-    });
-  }, [setPinnedColumns]);
+  console.log({ pinnedColumns, widget, gg: widget.config?.visualizationConfig?.pinned_columns });
 
   return (
     <div className={styles.container}>
