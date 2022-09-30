@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.value.AutoValue;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -35,6 +36,7 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.security.Security;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -48,6 +50,9 @@ class EncryptedValueTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
+        // Ensure the "BC" provider is available in the test environment
+        Security.addProvider(new BouncyCastleProvider());
+
         encryptedValueService = new EncryptedValueService("1234567890abcdef");
         this.objectMapper = new ObjectMapperProvider(
                 ObjectMapperProvider.class.getClassLoader(),
