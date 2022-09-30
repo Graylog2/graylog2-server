@@ -18,25 +18,16 @@ package org.graylog2.security;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.security.SecureRandom;
-import java.security.Security;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class AESToolsTest {
-    @Before
-    public void setUp() throws Exception {
-        // Ensure the "BC" provider is available in the test environment
-        Security.addProvider(new BouncyCastleProvider());
-    }
-
     @Test
     public void testEncryptDecrypt() {
         byte[] iv = new byte[8];
