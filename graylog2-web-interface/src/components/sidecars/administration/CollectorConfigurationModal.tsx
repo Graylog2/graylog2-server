@@ -280,7 +280,7 @@ const CollectorConfigurationModal = (props) => {
                   : <em>Unknown collector</em>}
               </small>
             </CollectorTableCell>
-            <UnselectTableCell>{(selected || partiallySelected) && <Icon name="times" title={`Remove ${configName}`} />}</UnselectTableCell>
+            <UnselectTableCell>{(selected || partiallySelected) && !isAssignedFromTags && <Icon name="times" title={`Remove ${configName}`} />}</UnselectTableCell>
           </TableRow>
         );
       });
