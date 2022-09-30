@@ -20,6 +20,8 @@ import { isEmpty } from 'lodash';
 import styled from 'styled-components';
 
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import StickyBottomActions from 'views/components/widgets/StickyBottomActions';
+import SaveOrCancelButtons from 'views/components/widgets/SaveOrCancelButtons';
 
 import ElementConfigurationSection from './ElementConfigurationSection';
 import ElementsConfigurationActions from './ElementsConfigurationActions';
@@ -59,7 +61,12 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
 
   return (
     <Container>
-      <div>
+      <StickyBottomActions actions={(
+        <>
+          <ElementsConfigurationActions />
+          <SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />
+        </>
+      )}>
         {_sortConfiguredElements(values, aggregationElementsByKey).map(([elementKey, elementFormValues]) => {
           const empty = isEmpty(elementFormValues);
 
@@ -82,8 +89,7 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
             </ElementConfigurationSection>
           );
         })}
-      </div>
-      <ElementsConfigurationActions onSubmit={onSubmit} onCancel={onCancel} />
+      </StickyBottomActions>
     </Container>
   );
 };
