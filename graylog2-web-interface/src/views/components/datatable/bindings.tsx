@@ -37,15 +37,19 @@ const dataTable: VisualizationType<typeof DataTable.type> = {
       type: 'multi-select',
       options: ({ formValues }: { formValues: WidgetConfigFormValues }) => {
         const options = formValues?.groupBy?.groupings.reduce((res, cur) => {
-          if (cur.direction === 'row') {
+          if (cur.direction === 'row' && cur?.field?.field) {
             res.push(cur.field.field);
           }
 
           return res;
-        }, []);
-        formValues.metrics.forEach((metric) => options.push(`${metric.function}(${metric.field})`));
+        }, []) || [];
 
-        return options || [];
+        /*
+        if (formValues?.metrics) {
+          formValues.metrics.forEach((metric) => options.push(`${metric.function}(${metric.field})`));
+        }
+        */
+        return options;
       },
       required: false,
     }],

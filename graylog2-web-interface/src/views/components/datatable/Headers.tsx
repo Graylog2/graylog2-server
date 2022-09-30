@@ -189,7 +189,7 @@ const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup,
   };
 
   const rowPivotFields = rowFieldNames.map((fieldName) => headerField({ field: fieldName, sortable: true, sortType: SortConfig.PIVOT_TYPE, _onSetColumnsWidth: onSetColumnsWidth, showPinIcon: true }));
-  const seriesFields = series.map((s) => headerField({ field: s.function, prefix: '', span: 1, title: s.effectiveName, sortable: true, sortType: SortConfig.SERIES_TYPE, _onSetColumnsWidth: onSetColumnsWidth, showPinIcon: true }));
+  const seriesFields = series.map((s) => headerField({ field: s.function, prefix: '', span: 1, title: s.effectiveName, sortable: true, sortType: SortConfig.SERIES_TYPE, _onSetColumnsWidth: onSetColumnsWidth, showPinIcon: false }));
   const columnPivotFields = flatten(actualColumnPivotFields.map((key) => series.map((s) => headerField({ field: s.function, prefix: key.join('-'), span: 1, title: s.effectiveName, sortable: false, _onSetColumnsWidth: onSetColumnsWidth, showPinIcon: false }))));
   const offset = rollup ? rowFieldNames.length + series.length : rowFieldNames.length;
 
