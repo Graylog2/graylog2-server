@@ -37,6 +37,11 @@ public class AESTools {
 
     private static final SivMode SIV_MODE = new SivMode();
 
+    // We use the Bouncy Castle provider to ensure the availability of the ISO10126 padding on FIPS enabled JVM
+    // environments. See: https://github.com/Graylog2/graylog2-server/issues/13525
+    private static final String CIPHER_PROVIDER = "BC";
+    private static final String CIPHER_TRANSFORMATION = "AES/CBC/ISO10126Padding";
+
     /**
      * Encrypt the given plain text value with the given encryption key and salt using AES CBC.
      * If the supplied encryption key is not of 16, 24 or 32 bytes length, it will be truncated or padded to the next
@@ -54,7 +59,7 @@ public class AESTools {
         checkNotNull(salt, "Salt must not be null.");
         try {
             @SuppressWarnings("CIPHER_INTEGRITY")
-            Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
+            Cipher cipher = Cipher.getInstance(CIPHER_TRANSFORMATION, CIPHER_PROVIDER);
             SecretKeySpec key = new SecretKeySpec(adjustToIdealKeyLength(encryptionKey), "AES");
             cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));
             return Hex.encodeToString(cipher.doFinal(plainText.getBytes("UTF-8")));
@@ -82,7 +87,7 @@ public class AESTools {
         checkNotNull(salt, "Salt must not be null.");
         try {
             @SuppressWarnings("CIPHER_INTEGRITY")
-            Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
+            Cipher cipher = Cipher.getInstance(CIPHER_TRANSFORMATION, CIPHER_PROVIDER);
             SecretKeySpec key = new SecretKeySpec(adjustToIdealKeyLength(encryptionKey), "AES");
             cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));
             return new String(cipher.doFinal(Hex.decode(cipherText)), "UTF-8");

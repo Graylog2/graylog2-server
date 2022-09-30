@@ -18,16 +18,24 @@ package org.graylog2.security;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.security.SecureRandom;
+import java.security.Security;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class AESToolsTest {
+    @Before
+    public void setUp() throws Exception {
+        // Ensure the "BC" provider is available in the test environment
+        Security.addProvider(new BouncyCastleProvider());
+    }
 
     @Test
     public void testEncryptDecrypt() {
@@ -35,6 +43,19 @@ public class AESToolsTest {
         new SecureRandom().nextBytes(iv);
         final String encrypt = AESTools.encrypt("I am secret", "1234567890123456", Hex.encodeHexString(iv));
         final String decrypt = AESTools.decrypt(encrypt, "1234567890123456", Hex.encodeHexString(iv));
+        Assert.assertEquals("I am secret", decrypt);
+    }
+
+    @Test
+    public void testDecryptStaticCipherText() {
+        // The cipherText was encrypted using an AES/CBC/ISO10126Padding transformation.
+        // If this test fails, we changed the transformation. If the change was intentional, this test must
+        // be updated, and we need to create a migration to re-encrypt all existing secrets in the database.
+        // Otherwise, existing secrets cannot be decrypted anymore!
+        final String cipherText = "374219db59516b706234a60dd9a7e1e2";
+        final String salt = "53569ac046df1097";
+
+        final String decrypt = AESTools.decrypt(cipherText, "1234567890123456", salt);
         Assert.assertEquals("I am secret", decrypt);
     }
 
