@@ -13,7 +13,11 @@ const { fonts } = useTheme();
 const FontFamilies = () => (
   <ul>
     {Object.entries(fonts.family).map(([fontId, fontNames]) => {
-      return <li><b>{fontId}</b>: {fontNames}</li>
+      return (
+        <li style={{ fontFamily: fontNames }}>
+          <b>{fontId}</b>: {fontNames}
+        </li>
+      )
     })}
   </ul>
 );
@@ -36,7 +40,7 @@ const FontSizes = () => (
   <ul>
     {Object.entries(fonts.size).map(([sizeId, sizeValue]) => {
       return (
-        <li>
+        <li style={{ fontSize: sizeValue }}>
           <b>{sizeId}</b>: {sizeValue}
           {sizeId !== 'root' && <i> ({sizeValue.replace(/rem|em/i, '') * ROOT_FONT_SIZE}px)</i>}
         </li>
