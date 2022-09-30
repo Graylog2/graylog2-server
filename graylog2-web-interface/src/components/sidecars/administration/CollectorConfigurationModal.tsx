@@ -167,20 +167,28 @@ const CollectorConfigurationModal = (props) => {
     setNextAssignedConfigurations([]);
   };
 
-  const getConfiguration = (name: string) => {
-    return configurations.find((c) => c.name === name);
+  const getConfiguration = (configName: string) => {
+    return configurations.find((c) => c.name === configName);
   };
 
-  const getCollector = (name: string) => {
-    const configuration = getConfiguration(name);
+  const getCollector = (configName: string) => {
+    const configuration = getConfiguration(configName);
 
     return collectors.find((b) => b.id === configuration.collector_id);
   };
 
-  const getSidecars = (name: string) => {
-    const configuration = getConfiguration(name);
+  const getSidecars = (configName: string) => {
+    const configuration = getConfiguration(configName);
 
-    return selectedSidecarCollectorPairs.filter(({ sidecar }) => sidecar.assignments.map((s) => s.configuration_id).includes(configuration.id)).map((a) => a.sidecar.node_name);
+    return selectedSidecarCollectorPairs.filter(({ sidecar }) => sidecar.assignments.map((s) => s.configuration_id).includes(configuration.id)).map((a) => a.sidecar);
+  };
+
+  const getAssignedFromTags = (configId: string, collectorId: string, sidecars) => {
+    if (sidecars.length === 1) {
+      return sidecars[0].assignments.find((a) => (a.collector_id === collectorId) && (a.configuration_id === configId)).assigned_from_tags;
+    }
+
+    return [];
   };
 
   const renderConfigurationSummary = (_previousAssignedConfigurations, _nextAssignedConfigurations, _selectedSidecarCollectorPairs) => {
@@ -230,16 +238,16 @@ const CollectorConfigurationModal = (props) => {
 
       const filteredOptions = [...fullyAssignedConfigurations, ...partiallyAssignedConfigurations, ...options].filter((configuration) => configuration.match(new RegExp(searchQuery, 'i')));
 
-      const rows = filteredOptions.map((configName, i) => {
+      const rows = filteredOptions.map((configName) => {
         const config = getConfiguration(configName);
         const collector = getCollector(configName);
         const sidecars = getSidecars(configName);
+        const autoAssignedTags = getAssignedFromTags(config.id, collector.id, sidecars);
+
         const selected = selectedConfigurations.includes(configName);
         const partiallySelected = !selected && partiallySelectedConfigurations.includes(configName);
-        const secondaryText = (selected && allSidecarNames.join(', ')) || (partiallySelected && sidecars.join(', ')) || '';
-
-        const autoAssignedTags = ['tag1', 'tag2'];
-        const isAssignedFromTags = autoAssignedTags.length > 0 && i === 0;
+        const secondaryText = (selected && allSidecarNames.join(', ')) || (partiallySelected && sidecars.node_name.join(', ')) || '';
+        const isAssignedFromTags = autoAssignedTags.length > 0;
 
         return (
           <TableRow key={configName}
