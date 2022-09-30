@@ -18,7 +18,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { flatten, get, isEqual, last } from 'lodash';
 import styled, { css } from 'styled-components';
 import type { OrderedMap } from 'immutable';
-import type Immutable from 'immutable';
+import Immutable from 'immutable';
 
 import Field from 'views/components/Field';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -206,7 +206,7 @@ const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup,
 };
 
 Headers.defaultProps = {
-  pinnedColumns: undefined,
+  pinnedColumns: Immutable.Set(),
 };
 
 export default Headers;

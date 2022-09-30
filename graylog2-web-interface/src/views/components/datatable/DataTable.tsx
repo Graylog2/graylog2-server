@@ -210,8 +210,8 @@ const DataTable = ({
 
   const actualColumnPivotFields = _extractColumnPivotValues(rows);
   const pinnedColumns = useMemo(() => {
-    return widget.config.visualizationConfig?.pinned_columns || Immutable.Set();
-  }, [widget.config.visualizationConfig?.pinned_columns]);
+    return widget?.config?.visualizationConfig?.pinned_columns || Immutable.Set();
+  }, [widget?.config?.visualizationConfig?.pinned_columns]);
   // const [pinnedColumns, setPinnedColumns] = useState<Immutable.Set<string>>(Immutable.Set(widgetConfigPinnedColumns));
   /*
   const stickyLeftMargins = useMemo(() => {
