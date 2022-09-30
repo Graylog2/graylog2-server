@@ -72,7 +72,7 @@ describe('Headers', () => {
                  fields={Immutable.List(fields)}
                  sortConfigMap={sortConfigMap}
                  onSortChange={onSortChange}
-                 onSetRowPivotColumnsWidth={() => {}}
+                 onSetColumnsWidth={() => {}}
                  togglePin={() => {}} />
       </thead>
     </table>

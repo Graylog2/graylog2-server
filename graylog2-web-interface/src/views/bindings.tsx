@@ -83,6 +83,7 @@ import { AggregationWizard } from 'views/components/aggregationwizard';
 import { filterCloudValueActions } from 'util/conditional/filterValueActions';
 import CopyValueToClipboard from 'views/logic/valueactions/CopyValueToClipboard';
 import CopyFieldToClipboard from 'views/logic/fieldactions/CopyFieldToClipboard';
+import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -103,6 +104,7 @@ VisualizationConfig.registerSubtype(NumberVisualization.type, NumberVisualizatio
 VisualizationConfig.registerSubtype(LineVisualization.type, LineVisualizationConfig);
 VisualizationConfig.registerSubtype(AreaVisualization.type, AreaVisualizationConfig);
 VisualizationConfig.registerSubtype(HeatmapVisualization.type, HeatmapVisualizationConfig);
+VisualizationConfig.registerSubtype(DataTable.type, DataTableVisualizationConfig);
 
 Parameter.registerSubtype(ValueParameter.type, ValueParameter);
 Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);

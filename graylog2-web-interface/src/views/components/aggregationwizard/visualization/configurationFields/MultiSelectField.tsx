@@ -42,13 +42,11 @@ const MultiSelectField = ({ name, field, title, error, value, onChange, values }
     throw new Error('Invalid field type passed!');
   }
 
-  console.log({ field });
   const selectOption = useMemo(() => {
     if (isFunction(field.options)) return makeOptions(field.options({ formValues: values }));
 
     return makeOptions(field.options);
   }, [values, field]);
-  console.log({ selectOption, value });
 
   return (
     <Input id={`${name}-select`}
@@ -62,7 +60,7 @@ const MultiSelectField = ({ name, field, title, error, value, onChange, values }
               value={value.join(',')}
               multi
               menuPortalTarget={document.body}
-              onChange={(newValue) => onChange(createEvent(name, newValue === '' ? [] : newValue.split(',')))}
+              onChange={(newValue: string) => onChange(createEvent(name, newValue === '' ? [] : newValue.split(',')))}
               inputProps={{ 'aria-label': '' }}
               displayKey="key"
               inputId="multi-select-visualization" />

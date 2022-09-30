@@ -139,8 +139,6 @@ const DataTable = ({
   const formContext = useContext(FormikContext);
   const onRenderComplete = useContext(RenderCompletionCallback);
   const widget = useContext(WidgetContext);
-  const widgetConfigPinnedColumns = widget?.config?.visualizationConfig?.pinnedColumns ?? [];
-  console.log({ widgetConfigPinnedColumns });
   useEffect(onRenderComplete, [onRenderComplete]);
   const [rowPivotColumnsWidth, setRowPivotColumnsWidth] = useState<{ [key: string]: number }>({});
   const onSetColumnsWidth = useCallback(({ field, offsetWidth }: { field: string, offsetWidth: number}) => {
@@ -169,17 +167,15 @@ const DataTable = ({
 
     const updateWidget = () => {
       const curVisualizationConfig = widget.config.visualizationConfig || { pinned_columns: Immutable.Set() };
-      console.log({ field, curVisualizationConfig });
+      let pinned_columns;
 
       if (curVisualizationConfig?.pinned_columns?.has(field)) {
-        curVisualizationConfig.pinned_columns = curVisualizationConfig.pinned_columns.delete(field);
+        pinned_columns = curVisualizationConfig.pinned_columns.delete(field);
       } else {
-        curVisualizationConfig.pinned_columns = curVisualizationConfig.pinned_columns.add(field);
+        pinned_columns = curVisualizationConfig.pinned_columns.add(field);
       }
 
-      console.log({ field, curVisualizationConfig });
-
-      return WidgetActions.updateConfig(widget.id, config.toBuilder().visualizationConfig({ ...curVisualizationConfig }).build());
+      return WidgetActions.updateConfig(widget.id, config.toBuilder().visualizationConfig(curVisualizationConfig.toBuilder().pinned_columns(pinned_columns.toJS()).build()).build());
     };
 
     if (!editing || (editing && !dirty)) return updateWidget();
@@ -279,8 +275,6 @@ const DataTable = ({
   });
 
   const sortConfigMap = useMemo<OrderedMap<string, SortConfig>>(() => Immutable.OrderedMap(config.sort.map((sort) => [sort.field, sort])), [config]);
-
-  console.log({ pinnedColumns, widget, gg: widget.config?.visualizationConfig?.pinned_columns });
 
   return (
     <div className={styles.container}>

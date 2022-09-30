@@ -123,6 +123,11 @@ type SelectField = BaseRequiredField & {
   options: ReadonlyArray<string | [string, any]>,
 };
 
+type MultiSelectField = BaseRequiredField & {
+  type: 'multi-select',
+  options: ((props: any) => ReadonlyArray<string | [string, any]>) | ReadonlyArray<string | [string, any]>,
+};
+
 type BooleanField = BaseField & {
   type: 'boolean',
 };
@@ -132,7 +137,7 @@ export type NumericField = BaseRequiredField & {
   step?: string,
 };
 
-export type ConfigurationField = SelectField | BooleanField | NumericField;
+export type ConfigurationField = SelectField | BooleanField | NumericField | MultiSelectField;
 
 export interface VisualizationCapabilities {
   'event-annotations': undefined,

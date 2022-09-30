@@ -14,11 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 
 import type { VisualizationType } from 'views/types';
 import DataTable from 'views/components/datatable/DataTable';
-import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 
@@ -37,7 +35,6 @@ const dataTable: VisualizationType<typeof DataTable.type> = {
       name: 'pinned_columns',
       title: 'Pinned Columns',
       type: 'multi-select',
-      multi: true,
       options: ({ formValues }: { formValues: WidgetConfigFormValues }) => {
         const options = formValues?.groupBy?.groupings.reduce((res, cur) => {
           if (cur.direction === 'row') {
@@ -47,7 +44,6 @@ const dataTable: VisualizationType<typeof DataTable.type> = {
           return res;
         }, []);
         formValues.metrics.forEach((metric) => options.push(`${metric.function}(${metric.field})`));
-        console.log({ options });
 
         return options || [];
       },
