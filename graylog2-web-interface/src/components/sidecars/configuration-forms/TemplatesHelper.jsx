@@ -56,8 +56,8 @@ class TemplatesHelper extends React.Component {
             </tr>
             <tr>
               <td><code>{TemplatesHelper._buildVariableName('tags.<tag>')}</code></td>
-              <td>A map of tags that are set for the sidecar. This can be used to render conditional configuration snippets. e.g.: <br/>
-                <code> &lt;#if sidecar.tags.webserver??&gt;<br/>&nbsp;&nbsp;- /var/log/apache/*.log<br/>&lt;/#if&gt;  </code>
+              <td>A map of tags that are set for the sidecar. This can be used to render conditional configuration snippets. e.g.: <br />
+                <code> &lt;#if sidecar.tags.webserver??&gt;<br />&nbsp;&nbsp;- /var/log/apache/*.log<br />&lt;/#if&gt;  </code>
               </td>
             </tr>
           </tbody>
