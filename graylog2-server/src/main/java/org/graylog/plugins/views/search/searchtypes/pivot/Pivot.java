@@ -42,6 +42,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 
@@ -52,6 +53,8 @@ import static com.google.common.collect.ImmutableList.of;
 @JsonDeserialize(builder = Pivot.Builder.class)
 public abstract class Pivot implements SearchType {
     public static final String NAME = "pivot";
+    private static final String FIELD_ROW_LIMIT = "row_limit";
+    private static final String FIELD_COLUMN_LIMIT = "column_limit";
 
     @Override
     public abstract String type();
@@ -87,6 +90,12 @@ public abstract class Pivot implements SearchType {
     @Override
     @JsonProperty(FIELD_SEARCH_FILTERS)
     public abstract List<UsedSearchFilter> filters();
+
+    @JsonProperty(FIELD_ROW_LIMIT)
+    public abstract OptionalInt rowLimit();
+
+    @JsonProperty(FIELD_COLUMN_LIMIT)
+    public abstract OptionalInt columnLimit();
 
     public abstract Builder toBuilder();
 
@@ -178,6 +187,12 @@ public abstract class Pivot implements SearchType {
         @JsonProperty(FIELD_SEARCH_FILTERS)
         public abstract Builder filters(List<UsedSearchFilter> filters);
 
+        @JsonProperty(FIELD_ROW_LIMIT)
+        public abstract Builder rowLimit(int limit);
+
+        @JsonProperty(FIELD_COLUMN_LIMIT)
+        public abstract Builder columnLimit(int limit);
+
         @JsonProperty
         @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = false)
         @JsonSubTypes({
@@ -209,7 +224,7 @@ public abstract class Pivot implements SearchType {
 
     @Override
     public SearchTypeEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
-        return PivotEntity.builder()
+        PivotEntity.Builder builder = PivotEntity.builder()
                 .sort(sort())
                 .streams(mappedStreams(entityDescriptorIds))
                 .timerange(timerange().orElse(null))
@@ -222,7 +237,9 @@ public abstract class Pivot implements SearchType {
                 .name(name().orElse(null))
                 .rollup(rollup())
                 .series(series())
-                .type(type())
-                .build();
+                .type(type());
+        builder = rowLimit().isPresent() ? builder.rowLimit(rowLimit().getAsInt()) : builder;
+        builder = columnLimit().isPresent() ? builder.columnLimit(columnLimit().getAsInt()) : builder;
+        return builder.build();
     }
 }
