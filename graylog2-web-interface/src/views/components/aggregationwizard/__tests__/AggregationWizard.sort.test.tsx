@@ -62,7 +62,7 @@ const addSortElement = async () => {
 };
 
 const findWidgetConfigFormSubmitButton = async () => {
-  const button = await screen.findByRole('button', { name: 'Update Preview' });
+  const button = await screen.findByRole('button', { name: /update preview/i });
 
   return button;
 };

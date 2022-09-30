@@ -71,7 +71,7 @@ const selectField = async (fieldName) => {
 };
 
 const submitWidgetConfigForm = async () => {
-  const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
+  const applyButton = await screen.findByRole('button', { name: /update preview/i });
   fireEvent.click(applyButton);
 };
 

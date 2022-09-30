@@ -69,7 +69,7 @@ const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
 };
 
 const submitWidgetConfigForm = async () => {
-  const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
+  const applyButton = await screen.findByRole('button', { name: /update preview/i });
   fireEvent.click(applyButton);
 };
 

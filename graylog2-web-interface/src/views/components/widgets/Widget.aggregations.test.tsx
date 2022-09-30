@@ -161,15 +161,15 @@ describe('Aggregation Widget', () => {
     </ViewTypeContext.Provider>
   );
 
-  const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: 'Update Preview' });
+  const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
 
   const submitWidgetChanges = () => {
-    const saveButton = screen.getByRole('button', { name: /apply changes/i });
+    const saveButton = screen.getByRole('button', { name: /update widget/i });
     fireEvent.click(saveButton);
   };
 
   describe('on a dashboard', () => {
-    it('should apply not submitted widget search controls and aggregation elements changes when clicking on "Apply Changes"', async () => {
+    it('should apply not submitted widget search controls and aggregation elements changes when clicking on "Update widget"', async () => {
       const newSeries = Series.create('count').toBuilder().config(SeriesConfig.empty().toBuilder().name('Metric name').build()).build();
       const updatedConfig = dataTableWidget.config
         .toBuilder()
@@ -211,7 +211,7 @@ describe('Aggregation Widget', () => {
       expect(WidgetActions.update).toHaveBeenCalledWith(expect.any(String), updatedWidget);
     }, testTimeout);
 
-    it('should apply not submitted widget time range changes in correct format when clicking on "Apply Changes"', async () => {
+    it('should apply not submitted widget time range changes in correct format when clicking on "Update widget"', async () => {
       // Displayed times are based on time zone defined in moment-timezone mock.
       const updatedWidget = dataTableWidget
         .toBuilder()
@@ -250,7 +250,7 @@ describe('Aggregation Widget', () => {
   });
 
   describe('on a search', () => {
-    it('should apply not submitted aggregation elements changes when clicking on "Apply Changes"', async () => {
+    it('should apply not submitted aggregation elements changes when clicking on "Update widget"', async () => {
       const newSeries = Series.create('count').toBuilder().config(SeriesConfig.empty().toBuilder().name('Metric name').build()).build();
       const updatedConfig = dataTableWidget.config
         .toBuilder()
