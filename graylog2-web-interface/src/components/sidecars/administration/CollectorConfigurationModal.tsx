@@ -246,7 +246,7 @@ const CollectorConfigurationModal = (props) => {
 
         const selected = selectedConfigurations.includes(configName);
         const partiallySelected = !selected && partiallySelectedConfigurations.includes(configName);
-        const secondaryText = (selected && allSidecarNames.join(', ')) || (partiallySelected && sidecars.node_name.join(', ')) || '';
+        const secondaryText = (selected && allSidecarNames.join(', ')) || (partiallySelected && sidecars.map((s) => s.node_name).join(', ')) || '';
         const isAssignedFromTags = autoAssignedTags.length > 0;
 
         return (
