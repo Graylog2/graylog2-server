@@ -139,12 +139,14 @@ const EditWrapper = ({ children, config, editing, fields, id, onToggleEdit, onCa
   const hasOwnSubmitButton = _hasOwnEditSubmitButton(type);
 
   return editing ? (
-    <EditWidgetFrame onFinish={onToggleEdit} onCancel={onCancelEdit} displaySubmitActions={!hasOwnSubmitButton}>
+    <EditWidgetFrame onSubmit={onToggleEdit} onCancel={onCancelEdit} displaySubmitActions={!hasOwnSubmitButton}>
       <EditComponent config={config}
                      fields={fields}
                      editing={editing}
                      id={id}
                      type={type}
+                     onSubmit={onToggleEdit}
+                     onCancel={onCancelEdit}
                      onChange={onWidgetConfigChange}>
         {children}
       </EditComponent>

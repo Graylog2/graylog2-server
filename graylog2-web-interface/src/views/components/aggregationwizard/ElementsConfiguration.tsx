@@ -50,9 +50,11 @@ type Props = {
     values: WidgetConfigFormValues,
     setValues: (formValues: WidgetConfigFormValues) => void,
   ) => void,
+  onSubmit: () => void,
+  onCancel: () => void,
 }
 
-const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChange, onCreate }: Props) => {
+const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChange, onCreate, onSubmit, onCancel }: Props) => {
   const { values, setValues } = useFormikContext<WidgetConfigFormValues>();
 
   return (
@@ -81,7 +83,7 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
           );
         })}
       </div>
-      <ElementsConfigurationActions />
+      <ElementsConfigurationActions onSubmit={onSubmit} onCancel={onCancel} />
     </Container>
   );
 };

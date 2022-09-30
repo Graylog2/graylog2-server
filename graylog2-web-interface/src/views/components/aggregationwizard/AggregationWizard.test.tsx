@@ -47,13 +47,15 @@ describe('AggregationWizard', () => {
   const renderSUT = (props = {}) => render(
     <FieldTypesContext.Provider value={fieldTypes}>
       <AggregationWizard onChange={() => {}}
+                         onSubmit={() => {}}
+                         onCancel={() => {}}
                          config={widgetConfig}
                          editing
                          id="widget-id"
                          type="AGGREGATION"
                          fields={Immutable.List([])}
                          {...props}>
-        <>The Visualization</>
+        <div>The Visualization</div>
       </AggregationWizard>
     </FieldTypesContext.Provider>,
   );
@@ -101,5 +103,21 @@ describe('AggregationWizard', () => {
     await userEvent.click(await screen.findByRole('menuitem', { name: 'Metric' }));
 
     await waitFor(() => within(metricsSection).findByText('Function'));
+  });
+
+  it('should call onSubmit', async () => {
+    const onSubmit = jest.fn();
+    renderSUT({ onSubmit });
+    userEvent.click(await screen.findByRole('button', { name: /update widget/i }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+  });
+
+  it('should call onCancel', async () => {
+    const onCancel = jest.fn();
+    renderSUT({ onCancel });
+    userEvent.click(await screen.findByRole('button', { name: /cancel/i }));
+
+    await waitFor(() => expect(onCancel).toHaveBeenCalledTimes(1));
   });
 });

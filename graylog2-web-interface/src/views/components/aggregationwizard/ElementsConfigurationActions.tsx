@@ -23,6 +23,7 @@ import Button from 'components/bootstrap/Button';
 import { Spinner } from 'components/common';
 import { ButtonToolbar } from 'components/bootstrap';
 import AggregationElementSelect from 'views/components/aggregationwizard/AggregationElementSelect';
+import SaveOrCancelButtons from 'views/components/widgets/SaveOrCancelButtons';
 
 import aggregationElements from './aggregationElementDefinitions';
 import type { WidgetConfigFormValues } from './WidgetConfigForm';
@@ -55,6 +56,10 @@ const ScrolledToBottomIndicator = styled.div`
   bottom: 0;
   height: 5px;
   z-index: 0;
+`;
+
+const StyledButtonToolbar = styled(ButtonToolbar)`
+  margin-bottom: 10px
 `;
 
 const useScrolledToBottom = (): {
@@ -107,26 +112,30 @@ const SelectContainer = styled.div`
   margin-left: 5px;
 `;
 
-const ElementsConfigurationActions = () => {
-  const { dirty, isSubmitting, isValid, values, setValues } = useFormikContext<WidgetConfigFormValues>();
+type Props = {
+  onSubmit: () => void,
+  onCancel: () => void,
+}
+
+const ElementsConfigurationActions = ({ onSubmit, onCancel }: Props) => {
+  const { dirty, isSubmitting: isUpdatingPreview, isValid, values, setValues } = useFormikContext<WidgetConfigFormValues>();
   const { setScrolledToBottomIndicatorRef, scrolledToBottom } = useScrolledToBottom();
 
   return (
     <>
       <ConfigActions scrolledToBottom={scrolledToBottom}>
-        <ButtonToolbar>
+        <StyledButtonToolbar>
           <SelectContainer data-testid="add-element-section" className="pull-left">
             <AggregationElementSelect onSelect={(elementKey) => onCreateElement(elementKey, values, setValues)}
                                       aggregationElements={aggregationElements}
                                       formValues={values} />
           </SelectContainer>
 
-          {dirty && (
-            <Button bsStyle="success" className="pull-right" type="submit" disabled={!isValid || isSubmitting}>
-              {isSubmitting ? <Spinner text="Updating Preview" delay={0} /> : 'Update Preview'}
-            </Button>
-          )}
-        </ButtonToolbar>
+          <Button bsStyle="info" className="pull-right" type="submit" disabled={!isValid || isUpdatingPreview || !dirty}>
+            {isUpdatingPreview ? <Spinner text="Updating preview..." delay={0} /> : 'Update preview'}
+          </Button>
+        </StyledButtonToolbar>
+        <SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />
       </ConfigActions>
       <ScrolledToBottomIndicator ref={setScrolledToBottomIndicatorRef} />
     </>

@@ -89,6 +89,8 @@ describe('AggregationWizard', () => {
   const renderSUT = (props = {}) => render(
     <FieldTypesContext.Provider value={fieldTypes}>
       <AggregationWizard onChange={() => {}}
+                         onSubmit={() => {}}
+                         onCancel={() => {}}
                          config={widgetConfig}
                          editing
                          id="widget-id"

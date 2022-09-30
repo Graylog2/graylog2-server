@@ -50,11 +50,11 @@ const Visualization = styled.div`
 type Props = {
   children: React.ReactNode,
   onCancel: () => void,
-  onFinish: () => void,
+  onSubmit: () => void,
   displaySubmitActions?: boolean,
 };
 
-const EditWidgetFrame = ({ children, onCancel, onFinish, displaySubmitActions }: Props) => {
+const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions }: Props) => {
   const widget = useContext(WidgetContext);
 
   if (!widget) {
@@ -79,7 +79,7 @@ const EditWidgetFrame = ({ children, onCancel, onFinish, displaySubmitActions }:
           </Visualization>
           {displaySubmitActions && (
             <div>
-              <SaveOrCancelButtons onFinish={onFinish} onCancel={onCancel} />
+              <SaveOrCancelButtons onSubmit={onSubmit} onCancel={onCancel} />
             </div>
           )}
         </Container>

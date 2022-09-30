@@ -82,6 +82,8 @@ describe('AggregationWizard', () => {
                          editing
                          id="widget-id"
                          type="AGGREGATION"
+                         onSubmit={() => {}}
+                         onCancel={() => {}}
                          fields={Immutable.List([])}
                          onChange={() => {}}
                          {...props}>
