@@ -20,9 +20,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.security.Security;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,6 +36,9 @@ class EncryptedValueDeserializerTest {
 
     @BeforeEach
     void setUp() {
+        // Ensure the "BC" provider is available in the test environment
+        Security.addProvider(new BouncyCastleProvider());
+
         this.encryptedValueService = new EncryptedValueService("1234567890abcdef");
 
         final EncryptedValueDeserializer deser = new EncryptedValueDeserializer(encryptedValueService);
