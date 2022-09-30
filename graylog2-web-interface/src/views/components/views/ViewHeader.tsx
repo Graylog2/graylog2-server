@@ -102,7 +102,8 @@ const ViewHeader = () => {
                              view={view}
                              title={`Editing saved ${typeText}`}
                              onClose={toggleMetadataEdit}
-                             onSave={onSaveView} />
+                             onSave={onSaveView}
+                             submitButtonText={`Save ${typeText}`} />
         )}
       </Content>
     </Row>
