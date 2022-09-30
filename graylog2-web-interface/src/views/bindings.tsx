@@ -140,6 +140,7 @@ const exports: PluginExports = {
       // TODO: Subtyping needs to be taken into account
       visualizationComponent: MessageList as unknown as React.ComponentType<WidgetComponentProps>,
       editComponent: EditMessageList,
+      hasEditSubmitButton: true,
       needsControlledHeight: () => false,
       searchResultTransformer: (data: Array<unknown>) => data[0],
       searchTypes: MessageConfigGenerator,
@@ -153,6 +154,7 @@ const exports: PluginExports = {
       reportStyle: () => ({ width: 600 }),
       visualizationComponent: AggregationBuilder,
       editComponent: AggregationWizard,
+      hasEditSubmitButton: true,
       needsControlledHeight: (widget: Widget) => {
         const widgetVisualization = get(widget, 'config.visualization');
         const flexibleHeightWidgets = [

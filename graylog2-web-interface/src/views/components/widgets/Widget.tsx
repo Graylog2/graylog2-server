@@ -75,6 +75,10 @@ const _editComponentForType = (type) => {
   return widgetDefinition(type).editComponent;
 };
 
+const _hasOwnEditSubmitButton = (type) => {
+  return widgetDefinition(type).hasEditSubmitButton;
+};
+
 const WidgetFooter = styled.div`
   width: 100%;
   display: flex;
@@ -132,9 +136,10 @@ type EditWrapperProps = {
 
 const EditWrapper = ({ children, config, editing, fields, id, onToggleEdit, onCancelEdit, onWidgetConfigChange, type }: EditWrapperProps) => {
   const EditComponent = useMemo(() => _editComponentForType(type), [type]);
+  const hasOwnSubmitButton = _hasOwnEditSubmitButton(type);
 
   return editing ? (
-    <EditWidgetFrame onFinish={onToggleEdit} onCancel={onCancelEdit}>
+    <EditWidgetFrame onFinish={onToggleEdit} onCancel={onCancelEdit} displaySubmitActions={!hasOwnSubmitButton}>
       <EditComponent config={config}
                      fields={fields}
                      editing={editing}

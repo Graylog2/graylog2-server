@@ -28,7 +28,6 @@ import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
 import WidgetOverrideElements from '../WidgetOverrideElements';
 import DisableSubmissionStateProvider from '../contexts/DisableSubmissionStateProvider';
-import DisableSubmissionStateContext from '../contexts/DisableSubmissionStateContext';
 
 const Container = styled.div`
   display: flex;
@@ -52,9 +51,10 @@ type Props = {
   children: React.ReactNode,
   onCancel: () => void,
   onFinish: () => void,
+  displaySubmitActions?: boolean,
 };
 
-const EditWidgetFrame = ({ children, onCancel, onFinish }: Props) => {
+const EditWidgetFrame = ({ children, onCancel, onFinish, displaySubmitActions }: Props) => {
   const widget = useContext(WidgetContext);
 
   if (!widget) {
@@ -77,17 +77,19 @@ const EditWidgetFrame = ({ children, onCancel, onFinish }: Props) => {
               {children}
             </WidgetOverrideElements>
           </Visualization>
-          <div>
-            <DisableSubmissionStateContext.Consumer>
-              {({ disabled }) => (
-                <SaveOrCancelButtons onFinish={onFinish} onCancel={onCancel} disableSave={disabled} />
-              )}
-            </DisableSubmissionStateContext.Consumer>
-          </div>
+          {displaySubmitActions && (
+            <div>
+              <SaveOrCancelButtons onFinish={onFinish} onCancel={onCancel} />
+            </div>
+          )}
         </Container>
       </DisableSubmissionStateProvider>
     </WidgetEditApplyAllChangesProvider>
   );
+};
+
+EditWidgetFrame.defaultProps = {
+  displaySubmitActions: true,
 };
 
 export default EditWidgetFrame;
