@@ -33,7 +33,6 @@ import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/Con
 const ConfigurationBundles = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.body};
   font-weight: normal;
-  line-height: 20px;
   margin-top: 15px;
 `);
 

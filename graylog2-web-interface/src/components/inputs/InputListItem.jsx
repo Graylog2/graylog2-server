@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
@@ -30,8 +31,10 @@ import { InputsActions } from 'stores/inputs/InputsStore';
 import { InputTypesStore } from 'stores/inputs/InputTypesStore';
 
 const InputListItem = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'InputListItem',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     input: PropTypes.object.isRequired,
     currentNode: PropTypes.object.isRequired,
@@ -41,6 +44,7 @@ const InputListItem = createReactClass({
   mixins: [PermissionsMixin, Reflux.connect(InputTypesStore)],
 
   _deleteInput() {
+    // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete input '${this.props.input.title}'?`)) {
       InputsActions.delete(this.props.input);
     }
@@ -163,6 +167,7 @@ const InputListItem = createReactClass({
                    typeName={input.type}
                    includeTitleField
                    submitAction={this._updateInput}
+                   submitButtonText="Update input"
                    values={input.attributes} />
       ) : null;
 

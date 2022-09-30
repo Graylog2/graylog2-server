@@ -53,7 +53,8 @@ class CreateStreamButton extends React.Component {
           {buttonText}
         </Button>
         <StreamForm ref={(streamForm) => { this.streamForm = streamForm; }}
-                    title="Creating Stream"
+                    title="Create Stream"
+                    submitButtonText="Create stream"
                     indexSets={indexSets}
                     onSubmit={onSave} />
       </span>

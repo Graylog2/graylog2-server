@@ -26,8 +26,10 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import ObjectUtils from 'util/ObjectUtils';
 
 const MessageProcessorsConfig = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'MessageProcessorsConfig',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     config: PropTypes.object,
     updateConfig: PropTypes.func.isRequired,
@@ -113,18 +115,6 @@ const MessageProcessorsConfig = createReactClass({
     return config.disabled_processors.length >= config.processor_order.length;
   },
 
-  _noActiveProcessorWarning() {
-    if (this._hasNoActiveProcessor()) {
-      return (
-        <Alert bsStyle="danger">
-          <strong>ERROR:</strong> No active message processor!
-        </Alert>
-      );
-    }
-
-    return null;
-  },
-
   _summary() {
     const { config } = this.state;
 
@@ -191,14 +181,14 @@ const MessageProcessorsConfig = createReactClass({
         </Table>
 
         <IfPermitted permissions="clusterconfigentry:edit">
-          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
+          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
         <BootstrapModalForm ref={(configModal) => { this.configModal = configModal; }}
                             title="Update Message Processors Configuration"
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}
-                            submitButtonText="Save">
+                            submitButtonText="Update configuration">
           <h3>Order</h3>
           <p>Use drag and drop to change the execution order of the message processors.</p>
           <SortableList items={this._sortableItems()} onMoveItem={this._updateSorting} displayOverlayInPortal />
@@ -216,7 +206,11 @@ const MessageProcessorsConfig = createReactClass({
               {this._statusForm()}
             </tbody>
           </Table>
-          {this._noActiveProcessorWarning()}
+          {this._hasNoActiveProcessor() && (
+            <Alert bsStyle="danger">
+              <strong>ERROR:</strong> No active message processor!
+            </Alert>
+          )}
         </BootstrapModalForm>
       </div>
     );
