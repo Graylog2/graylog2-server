@@ -16,11 +16,8 @@
  */
 package org.graylog2.security.encryption;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.security.Security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,9 +26,6 @@ class EncryptedValueServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Ensure the "BC" provider is available in the test environment
-        Security.addProvider(new BouncyCastleProvider());
-
         this.service = new EncryptedValueService("1234567890abcdef");
     }
 

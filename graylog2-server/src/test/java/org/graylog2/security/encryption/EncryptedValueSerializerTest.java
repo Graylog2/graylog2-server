@@ -19,11 +19,8 @@ package org.graylog2.security.encryption;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.security.Security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,9 +29,6 @@ class EncryptedValueSerializerTest {
 
     @BeforeEach
     void setUp() {
-        // Ensure the "BC" provider is available in the test environment
-        Security.addProvider(new BouncyCastleProvider());
-
         final EncryptedValueSerializer serializer = new EncryptedValueSerializer();
         final SimpleModule module = new SimpleModule("Test").addSerializer(EncryptedValue.class, serializer);
 

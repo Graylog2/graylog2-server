@@ -17,6 +17,7 @@
 package org.graylog2.security;
 
 import org.apache.shiro.codec.Hex;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.cryptomator.siv.SivMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ public class AESTools {
 
     // We use the Bouncy Castle provider to ensure the availability of the ISO10126 padding on FIPS enabled JVM
     // environments. See: https://github.com/Graylog2/graylog2-server/issues/13525
-    private static final String CIPHER_PROVIDER = "BC";
+    private static final BouncyCastleProvider CIPHER_PROVIDER = new BouncyCastleProvider();
     private static final String CIPHER_TRANSFORMATION = "AES/CBC/ISO10126Padding";
 
     /**
