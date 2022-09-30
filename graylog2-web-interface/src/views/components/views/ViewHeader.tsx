@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Link } from 'components/common/router';
@@ -49,18 +49,21 @@ const Content = styled.div(({ theme }) => css`
 `);
 const EditButton = styled.div(({ theme }) => css`
   color: ${theme.colors.gray[60]};
-  font-size: ${theme.fonts.size.tiny}
+  font-size: ${theme.fonts.size.tiny};
+  cursor: pointer;
 `);
 const TitleWrapper = styled.span`
   display: flex;
   gap: 4px;
   align-items: center;
-  cursor: pointer;
   & ${EditButton} {
     display: none;
   }
   &:hover ${EditButton} {
     display: block;
+  }
+  & .unsaved-title {
+    text-transform: capitalize;
   }
 `;
 
@@ -74,7 +77,7 @@ const ViewHeader = () => {
   const [showMetadataEdit, setShowMetadataEdit] = useState<boolean>(false);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);
 
-  const typeText = useMemo<string>(() => view.type.toLocaleLowerCase(), [view]);
+  const typeText = view.type.toLocaleLowerCase();
 
   return (
     <Row>
@@ -84,7 +87,7 @@ const ViewHeader = () => {
         </Link>
         <StyledIcon name="chevron-right" />
         <TitleWrapper>
-          <span>{view.title || <i>{`Unsaved ${typeText}`}</i>}</span>
+          <span>{view.title || <i className="unsaved-title">{`Unsaved ${typeText}`}</i>}</span>
           {isSavedView && (
           <EditButton onClick={toggleMetadataEdit}
                       role="button"
