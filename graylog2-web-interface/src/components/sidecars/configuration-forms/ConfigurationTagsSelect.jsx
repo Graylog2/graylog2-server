@@ -30,18 +30,14 @@ class ConfigurationTagsSelect extends React.Component {
     tags: [],
   };
 
-  getValue = () => {
-    return this.refs.select.getValue().split(',');
-  };
-
   render() {
     const tagsValue = this.props.tags.join(',');
     const tagsOptions = this.props.availableTags.map((tag) => {
       return { value: tag.name, label: tag.name };
     });
+
     return (
-      <MultiSelect ref="select"
-                   options={tagsOptions}
+      <MultiSelect options={tagsOptions}
                    value={tagsValue}
                    onChange={this.props.onChange}
                    placeholder="Choose tags..."

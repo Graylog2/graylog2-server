@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import lodash from 'lodash';
@@ -33,8 +34,9 @@ import ImportsViewModal from './ImportsViewModal';
 import ConfigurationTagsSelect from './ConfigurationTagsSelect';
 
 const ConfigurationForm = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'ConfigurationForm',
-
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     action: PropTypes.oneOf(['create', 'edit']),
     configuration: PropTypes.object,
@@ -66,7 +68,7 @@ const ConfigurationForm = createReactClass({
         color: configuration.color,
         collector_id: configuration.collector_id,
         template: configuration.template || '',
-        tags: configuration.tags || []
+        tags: configuration.tags || [],
       },
     };
   },
@@ -135,6 +137,7 @@ const ConfigurationForm = createReactClass({
     };
   },
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   replaceConfigurationVariableName(oldname, newname) {
     const { formData } = this.state;
 
@@ -164,7 +167,9 @@ const ConfigurationForm = createReactClass({
     const storedTemplate = this.defaultTemplates[collectorId];
 
     if (storedTemplate !== undefined) {
-      return new Promise((resolve) => resolve(storedTemplate));
+      return new Promise((resolve) => {
+        resolve(storedTemplate);
+      });
     }
 
     return CollectorsActions.getCollector(collectorId).then((collector) => {
@@ -248,6 +253,7 @@ const ConfigurationForm = createReactClass({
     return options;
   },
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   _formatValidationMessage(fieldName, defaultText) {
     const { validation_errors: validationErrors } = this.state;
 
@@ -268,6 +274,7 @@ const ConfigurationForm = createReactClass({
     return null;
   },
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   _renderCollectorTypeField(collectorId, collectors, configurationSidecars) {
     const isConfigurationInUse = configurationSidecars.sidecar_ids && configurationSidecars.sidecar_ids.length > 0;
 
@@ -335,7 +342,6 @@ const ConfigurationForm = createReactClass({
               <ControlLabel>Configuration Tags</ControlLabel>
               <div>
                 <ConfigurationTagsSelect id="tags"
-                                         ref="tags"
                                          availableTags={formData.tags.map((tag) => ({ name: tag }))}
                                          tags={formData.tags}
                                          onChange={this._onTagsChange}
