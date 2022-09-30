@@ -146,8 +146,7 @@ const CollectorConfigurationModal = (props) => {
   const confirmConfigurationChange = (doneCallback) => {
     const assignedConfigurationsToSave = configurations.filter((c) => nextAssignedConfigurations.includes(c.name));
 
-    // eslint-disable-next-line no-restricted-syntax
-    for (const sidecarCollectorPair of selectedSidecarCollectorPairs) {
+    selectedSidecarCollectorPairs.forEach((sidecarCollectorPair) => {
       let configs = assignedConfigurationsToSave;
 
       if (nextPartiallyAssignedConfigurations.length) {
@@ -158,7 +157,7 @@ const CollectorConfigurationModal = (props) => {
       }
 
       onConfigurationSelectionChange([sidecarCollectorPair], configs, doneCallback);
-    }
+    });
 
     onCancel();
   };
@@ -210,11 +209,13 @@ const CollectorConfigurationModal = (props) => {
 
   const [fullyAssignedConfigurations, partiallyAssignedConfigurations] = getFullyAndPartiallyAssignments(assignedConfigurations);
 
-  const nonAssignedConfigurations = configurations.filter((c) => !assignedConfigurations.includes(c.name));
+  const nonAssignedConfigurations = configurations.filter((c) => !assignedConfigurations.includes(c.name) && (selectedLogCollectors[0]?.id === c.collector_id))
+    .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
+    .map((c) => c.name);
 
-  const MemoizedModalForm = React.useMemo(() => {
+  const MemoizedConfigurationModal = React.useMemo(() => {
     // eslint-disable-next-line react/no-unstable-nested-components
-    const ModalForm = () => {
+    const ConfigurationModal = () => {
       const [searchQuery, setSearchQuery] = React.useState<string>('');
       const [selectedConfigurations, setSelectedConfigurations] = React.useState<string[]>(fullyAssignedConfigurations);
       const [partiallySelectedConfigurations, setPartiallySelectedConfigurations] = React.useState<string[]>(partiallyAssignedConfigurations);
@@ -229,12 +230,7 @@ const CollectorConfigurationModal = (props) => {
 
       const allSidecarNames = selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name);
 
-      const options = nonAssignedConfigurations
-        .filter((configuration) => (selectedLogCollectors[0]?.id === configuration.collector_id))
-        .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
-        .map((c) => c.name);
-
-      const filteredOptions = [...fullyAssignedConfigurations, ...partiallyAssignedConfigurations, ...options].filter((configuration) => configuration.match(new RegExp(searchQuery, 'i')));
+      const filteredOptions = [...fullyAssignedConfigurations, ...partiallyAssignedConfigurations, ...nonAssignedConfigurations].filter((configuration) => configuration.match(new RegExp(searchQuery, 'i')));
 
       const rows = filteredOptions.map((configName) => {
         const config = getConfiguration(configName);
@@ -332,13 +328,13 @@ const CollectorConfigurationModal = (props) => {
       );
     };
 
-    return <ModalForm />;
+    return <ConfigurationModal />;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.show]);
 
   return (
     <>
-      {MemoizedModalForm}
+      {MemoizedConfigurationModal}
       {renderConfigurationSummary(assignedConfigurations, nextAssignedConfigurations, selectedSidecarCollectorPairs)}
     </>
   );
