@@ -33,6 +33,7 @@ import type { Events } from 'views/logic/searchtypes/events/EventHandler';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import WidgetContext from 'views/components/contexts/WidgetContext';
+import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 
 import DataTableEntry from './DataTableEntry';
 import MessagesTable from './MessagesTable';
@@ -166,7 +167,7 @@ const DataTable = ({
     const dirty = formContext?.dirty;
 
     const updateWidget = () => {
-      const curVisualizationConfig = widget.config.visualizationConfig || { pinned_columns: Immutable.Set() };
+      const curVisualizationConfig = widget.config.visualizationConfig || DataTableVisualizationConfig.create([]).toBuilder().build();
       let pinned_columns;
 
       if (curVisualizationConfig?.pinned_columns?.has(field)) {
@@ -175,7 +176,7 @@ const DataTable = ({
         pinned_columns = curVisualizationConfig.pinned_columns.add(field);
       }
 
-      return WidgetActions.updateConfig(widget.id, config.toBuilder().visualizationConfig(curVisualizationConfig.toBuilder().pinned_columns(pinned_columns.toJS()).build()).build());
+      return WidgetActions.updateConfig(widget.id, widget.config.toBuilder().visualizationConfig(curVisualizationConfig.toBuilder().pinned_columns(pinned_columns.toJS()).build()).build());
     };
 
     if (!editing || (editing && !dirty)) return updateWidget();
@@ -194,7 +195,7 @@ const DataTable = ({
     });
     /
      */
-  }, [config, widget, editing, formContext]);
+  }, [widget, editing, formContext]);
 
   const { columnPivots, rowPivots, series, rollup } = config;
   const rows = retrieveChartData(data) ?? [];

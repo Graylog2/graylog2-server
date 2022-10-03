@@ -32,6 +32,7 @@ import WidgetContext from 'views/components/contexts/WidgetContext';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
+import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
@@ -346,6 +347,63 @@ describe('DataTable', () => {
 
       expect(WidgetActions.updateConfig)
         .toHaveBeenCalledWith('deadbeef', config.toBuilder().sort([]).build());
+    });
+  });
+
+  describe('trigger updateConfig on pinning column', () => {
+    const avgSeries = new Series('avg(bytes)');
+    const maxTimestampSeries = new Series('max(timestamp)');
+    const getWidget = ({ config }) => Widget.builder()
+      .id('deadbeef')
+      .type('dummy')
+      .config(config)
+      .build();
+    const getConfig = ({ sort = [], pinnedColumns = [] }) => AggregationWidgetConfig.builder()
+      .rowPivots([rowPivot])
+      .columnPivots([columnPivot])
+      .series([series, avgSeries, maxTimestampSeries])
+      .sort(sort)
+      .visualization('table')
+      .visualizationConfig(DataTableVisualizationConfig.create(pinnedColumns).toBuilder().build())
+      .rollup(false)
+      .build();
+    const fields = Immutable.List([
+      FieldTypeMapping.create('bytes', FieldTypes.LONG()),
+      FieldTypeMapping.create('timestamp', FieldTypes.DATE()),
+    ]);
+
+    it('from unpinned to pinned', () => {
+      const config = getConfig({ pinnedColumns: [] });
+      const wrapper = mount(
+        <WidgetContext.Provider value={getWidget({ config })}>
+          <SimplifiedDataTable config={config}
+                               fields={fields}
+                               data={dataWithMoreSeries} />
+        </WidgetContext.Provider>);
+
+      const pinnedButton = wrapper
+        .find('button[data-testid="pin-timestamp"]');
+      pinnedButton.simulate('click');
+
+      expect(WidgetActions.updateConfig)
+        .toHaveBeenCalledWith('deadbeef', config.toBuilder().visualizationConfig(DataTableVisualizationConfig.create(['timestamp']).toBuilder().build()).build());
+    });
+
+    it('from pinned to unpinned', () => {
+      const config = getConfig({ pinnedColumns: ['timestamp', 'bytes'] });
+      const wrapper = mount(
+        <WidgetContext.Provider value={getWidget({ config })}>
+          <SimplifiedDataTable config={config}
+                               fields={fields}
+                               data={dataWithMoreSeries} />
+        </WidgetContext.Provider>);
+
+      const pinnedButton = wrapper
+        .find('button[data-testid="pin-timestamp"]');
+      pinnedButton.simulate('click');
+
+      expect(WidgetActions.updateConfig)
+        .toHaveBeenCalledWith('deadbeef', config.toBuilder().visualizationConfig(DataTableVisualizationConfig.create(['bytes']).toBuilder().build()).build());
     });
   });
 });

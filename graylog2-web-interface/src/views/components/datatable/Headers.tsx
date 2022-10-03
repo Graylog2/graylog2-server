@@ -90,7 +90,7 @@ const HeaderField = ({ activeQuery, fields, field, prefix = '', span = 1, title 
   return (
     <StyledTh ref={thRef} isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned}>
       <Field name={field} queryId={activeQuery} type={type}>{title}</Field>
-      {showPinIcon && <PinIcon type="button" onClick={_togglePin} className={isPinned ? 'active' : ''}><Icon name="thumbtack" /></PinIcon>}
+      {showPinIcon && <PinIcon data-testid={`pin-${prefix}${field}`} type="button" onClick={_togglePin} className={isPinned ? 'active' : ''}><Icon name="thumbtack" /></PinIcon>}
       {sortable && sortType && (
       <FieldSortIcon fieldName={field}
                      onSortChange={onSortChange}
