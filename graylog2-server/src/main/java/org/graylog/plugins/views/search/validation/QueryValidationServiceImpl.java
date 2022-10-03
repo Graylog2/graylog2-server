@@ -18,7 +18,6 @@ package org.graylog.plugins.views.search.validation;
 
 import com.google.common.collect.Streams;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.queryparser.classic.ParseException;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.elasticsearch.QueryParam;
@@ -89,7 +88,7 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                     ? ValidationResponse.ok()
                     : ValidationResponse.warning(explanations);
 
-        } catch (ParseException e) {
+        } catch (Exception e) {
             return ValidationResponse.error(toExplanation(e));
         }
     }
@@ -131,8 +130,8 @@ public class QueryValidationServiceImpl implements QueryValidationService {
                 .collect(Collectors.toList());
     }
 
-    private List<ValidationMessage> toExplanation(final ParseException parseException) {
-        return Collections.singletonList(ValidationMessage.fromException(parseException));
+    private List<ValidationMessage> toExplanation(final Exception exception) {
+        return Collections.singletonList(ValidationMessage.fromException(exception));
     }
 
     private List<ValidationMessage> getExplanations(List<ParsedTerm> unknownFields, List<ParsedTerm> invalidOperators) {
