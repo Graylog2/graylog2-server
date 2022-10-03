@@ -31,6 +31,7 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import dataTable from 'views/components/datatable/bindings';
+import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 
 import AggregationWizard from '../AggregationWizard';
 
@@ -43,6 +44,7 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
 const widgetConfig = AggregationWidgetConfig
   .builder()
   .visualization(DataTable.type)
+  .visualizationConfig(DataTableVisualizationConfig.create([]).toBuilder().build())
   .build();
 
 const fieldType = new FieldType('field_type', ['numeric'], []);

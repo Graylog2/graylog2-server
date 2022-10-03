@@ -32,6 +32,7 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import dataTable from 'views/components/datatable/bindings';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 
 import AggregationWizard from '../AggregationWizard';
 
@@ -50,6 +51,7 @@ const widgetConfig = AggregationWidgetConfig
   .builder()
   .visualization(DataTable.type)
   .rowPivots([pivot0, pivot1])
+  .visualizationConfig(DataTableVisualizationConfig.create([]).toBuilder().build())
   .build();
 
 const selectEventConfig = { container: document.body };
