@@ -213,6 +213,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                 <Modal.Footer>
                   <ModalSubmit onCancel={resetConfig}
                                isSubmitting={isSubmitting}
+                               isAsyncSubmit
                                submitButtonText="Update configuration"
                                submitLoadingText="Updating configuration..." />
                 </Modal.Footer>

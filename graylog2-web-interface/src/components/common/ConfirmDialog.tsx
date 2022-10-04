@@ -17,7 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Modal, Button } from 'components/bootstrap';
+import { Modal } from 'components/bootstrap';
+import ModalSubmit from 'components/common/ModalSubmit';
 
 /**
  * Component that displays a confirmation dialog box that the user can
@@ -29,9 +30,7 @@ const ConfirmDialog = ({
   children,
   onCancel,
   onConfirm,
-  btnCancelDisabled,
   btnConfirmDisabled,
-  btnCancelText,
   btnConfirmText,
   hideCancelButton,
 }) => {
@@ -48,8 +47,12 @@ const ConfirmDialog = ({
       </Modal.Body>
 
       <Modal.Footer>
-        {!hideCancelButton && <Button type="button" onClick={onCancel} disabled={btnCancelDisabled}>{btnCancelText}</Button>}
-        <Button type="button" onClick={onConfirm} bsStyle="primary" disabled={btnConfirmDisabled}>{btnConfirmText}</Button>
+        <ModalSubmit onCancel={onCancel}
+                     onSubmit={onConfirm}
+                     submitButtonType="button"
+                     disabledSubmit={btnConfirmDisabled}
+                     submitButtonText={btnConfirmText}
+                     displayCancel={hideCancelButton} />
       </Modal.Footer>
     </Modal>
   );
@@ -65,18 +68,11 @@ ConfirmDialog.propTypes = {
     PropTypes.string,
     PropTypes.element,
   ]).isRequired,
-  /** Text to use in the cancel button. */
-  btnCancelText: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.element,
-  ]),
   /** Text or element to use in the confirmation button. */
   btnConfirmText: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.element,
   ]),
-  /** Indicates whether the cancel button should be disabled or not. */
-  btnCancelDisabled: PropTypes.bool,
   /** Indicates whether the confirm button should be disabled or not. */
   btnConfirmDisabled: PropTypes.bool,
   /** Function to call when the action is not confirmed. The function does not receive any arguments. */
@@ -97,10 +93,8 @@ ConfirmDialog.propTypes = {
 };
 
 ConfirmDialog.defaultProps = {
-  btnCancelText: 'Cancel',
   btnConfirmText: 'Confirm',
   btnConfirmDisabled: false,
-  btnCancelDisabled: false,
   show: false,
   hideCancelButton: false,
   onCancel: () => {},

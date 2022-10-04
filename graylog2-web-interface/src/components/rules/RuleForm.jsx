@@ -18,7 +18,7 @@ import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { Button, Col, ControlLabel, FormControl, FormGroup, Row, Input } from 'components/bootstrap';
-import { ConfirmLeaveDialog, SourceCodeEditor } from 'components/common';
+import { ConfirmLeaveDialog, SourceCodeEditor, FormSubmit } from 'components/common';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 
@@ -114,11 +114,13 @@ const RuleForm = ({ create }) => {
 
       <Row>
         <Col md={12}>
-          <div className="form-group">
-            <Button type="submit" bsStyle="primary" style={{ marginRight: 10 }}>Save &amp; Close</Button>
-            <Button type="button" bsStyle="info" style={{ marginRight: 10 }} onClick={handleApply}>Apply</Button>
-            <Button type="button" onClick={handleCancel}>Cancel</Button>
-          </div>
+          <FormSubmit submitButtonText={`${create ? 'Create rule' : 'Update rule & close'}`}
+                      centerCol={!create && (
+                        <Button type="button" bsStyle="info" onClick={handleApply}>
+                          Update rule
+                        </Button>
+                      )}
+                      onCancel={handleCancel} />
         </Col>
       </Row>
     </form>
