@@ -95,7 +95,7 @@ public class OSPivotWithLinearBuckets implements OSSearchTypeHandler<Pivot> {
         final Tuple2<AggregationBuilder, AggregationBuilder> aggregationTuple = createPivots(query, pivot, pivot.rowGroups(), queryContext, ordering);
         final AggregationBuilder rootAggregation = aggregationTuple.v1();
         final AggregationBuilder leafAggregation = aggregationTuple.v2();
-        if (pivot.columnGroups().isEmpty() || pivot.rollup()) {
+        if (!pivot.rowGroups().isEmpty() && (pivot.columnGroups().isEmpty() || pivot.rollup())) {
             seriesStream(pivot, queryContext, "metrics")
                     .forEach(aggregation -> {
                         if (leafAggregation != null) {
