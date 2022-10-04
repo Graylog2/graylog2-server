@@ -18,8 +18,10 @@ package org.graylog.plugins.views.search.searchtypes.pivot;
 
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
+import org.jooq.lambda.tuple.Tuple2;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -35,18 +37,14 @@ public interface BucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_BUI
 
     @SuppressWarnings("unchecked")
     @Nonnull
-    default Optional<AGGREGATION_BUILDER> createAggregation(String name, Pivot pivot, PivotSpec pivotSpec, GeneratedQueryContext queryContext, Query query) {
-        return doCreateAggregation(name, pivot, (SPEC_TYPE) pivotSpec, (QUERY_CONTEXT) queryContext, query);
+    default Optional<Tuple2<AGGREGATION_BUILDER, AGGREGATION_BUILDER>> createAggregation(String name,
+                                                                                         Pivot pivot,
+                                                                                         List<BucketSpec> pivotSpec,
+                                                                                         GeneratedQueryContext queryContext,
+                                                                                         Query query) {
+        return doCreateAggregation(name, pivot, (List<SPEC_TYPE>) pivotSpec, (QUERY_CONTEXT) queryContext, query);
     }
 
     @Nonnull
-    Optional<AGGREGATION_BUILDER> doCreateAggregation(String name, Pivot pivot, SPEC_TYPE bucketSpec, QUERY_CONTEXT queryContext, Query query);
-
-    @SuppressWarnings("unchecked")
-    default Object handleResult(BucketSpec bucketSpec, Object aggregationResult) {
-        return doHandleResult((SPEC_TYPE) bucketSpec, (AGGREGATION_RESULT) aggregationResult);
-    }
-
-    Object doHandleResult(SPEC_TYPE bucketSpec, AGGREGATION_RESULT result);
-
+    Optional<Tuple2<AGGREGATION_BUILDER, AGGREGATION_BUILDER>> doCreateAggregation(String name, Pivot pivot, List<SPEC_TYPE> bucketSpec, QUERY_CONTEXT queryContext, Query query);
 }

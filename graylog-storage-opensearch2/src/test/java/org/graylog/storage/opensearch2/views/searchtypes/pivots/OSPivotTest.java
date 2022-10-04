@@ -83,7 +83,7 @@ public class OSPivotTest {
 
     @Before
     public void setUp() throws Exception {
-        this.esPivot = new OSPivot(Collections.emptyMap(), new EffectiveTimeRangeExtractor(), new OSTimeHandler(), SearchVersion.opensearch(2, 0, 0));
+        this.esPivot = new OSPivot(Collections.emptyMap(), Collections.emptyMap(), new EffectiveTimeRangeExtractor());
         when(pivot.id()).thenReturn("dummypivot");
     }
 

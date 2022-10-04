@@ -77,7 +77,7 @@ public class ESPivotTest {
 
     @Before
     public void setUp() throws Exception {
-        this.esPivot = new ESPivot(Collections.emptyMap(), new EffectiveTimeRangeExtractor(), new ESTimeHandler());
+        this.esPivot = new ESPivot(Collections.emptyMap(), Collections.emptyMap(), new EffectiveTimeRangeExtractor());
         when(pivot.id()).thenReturn("dummypivot");
     }
 

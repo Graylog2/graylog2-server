@@ -1,7 +1,5 @@
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivot;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import one.util.streamex.EntryStream;
 import org.graylog.plugins.views.search.Query;
@@ -10,63 +8,47 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
-import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
-import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
-import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.script.Script;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.BucketOrder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.HasAggregations;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.MaxAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.MinAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
-import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESTimeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private static final Logger LOG = LoggerFactory.getLogger(ESPivot.class);
-    private static final String KEY_SEPARATOR_CHARACTER = "\u2E31";
-    private static final String KEY_SEPARATOR_PHRASE = " + \"" + KEY_SEPARATOR_CHARACTER + "\" + ";
     private static final String AGG_NAME = "agg";
 
+    private final Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers;
     private final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
     private final EffectiveTimeRangeExtractor effectiveTimeRangeExtractor;
-    private final ESTimeHandler esTimeHandler;
 
     @Inject
-    public ESPivot(Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers,
-                   EffectiveTimeRangeExtractor effectiveTimeRangeExtractor, ESTimeHandler esTimeHandler) {
+    public ESPivot(Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers,
+                   Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers,
+                   EffectiveTimeRangeExtractor effectiveTimeRangeExtractor) {
+        this.bucketHandlers = bucketHandlers;
         this.seriesHandlers = seriesHandlers;
         this.effectiveTimeRangeExtractor = effectiveTimeRangeExtractor;
-        this.esTimeHandler = esTimeHandler;
     }
 
     @Override
@@ -84,8 +66,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                     .forEach(searchSourceBuilder::aggregation);
         }
 
-        final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext);
-        final Tuple2<AggregationBuilder, AggregationBuilder> aggregationTuple = createPivots(query, pivot, pivot.rowGroups(), queryContext, ordering);
+        final Tuple2<AggregationBuilder, AggregationBuilder> aggregationTuple = createPivots(query, pivot, pivot.rowGroups(), queryContext);
         final AggregationBuilder rootAggregation = aggregationTuple.v1();
         final AggregationBuilder leafAggregation = aggregationTuple.v2();
         if (!pivot.rowGroups().isEmpty() && (pivot.columnGroups().isEmpty() || pivot.rollup())) {
@@ -100,7 +81,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         }
 
         if (!pivot.columnGroups().isEmpty()) {
-            final Tuple2<AggregationBuilder, AggregationBuilder> columnsAggregation = createPivots(query, pivot, pivot.columnGroups(), queryContext, ordering);
+            final Tuple2<AggregationBuilder, AggregationBuilder> columnsAggregation = createPivots(query, pivot, pivot.columnGroups(), queryContext);
             final AggregationBuilder columnsRootAggregation = columnsAggregation.v1();
             final AggregationBuilder columnsLeafAggregation = columnsAggregation.v2();
             seriesStream(pivot, queryContext, "metrics")
@@ -126,103 +107,53 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         searchSourceBuilder.aggregation(endTimestamp);
     }
 
-    private Tuple2<AggregationBuilder, AggregationBuilder> createPivots(Query query, Pivot pivot, List<BucketSpec> pivots, ESGeneratedQueryContext queryContext, List<BucketOrder> ordering) {
-        AggregationBuilder aggregationBuilder = null;
-        AggregationBuilder root = null;
-        List<Values> valueBuckets = new ArrayList<>();
+    private List<Tuple2<String, List<BucketSpec>>> groupByConsecutiveType(List<BucketSpec> pivots) {
+        final List<Tuple2<String, List<BucketSpec>>> groups = new ArrayList<>();
+
+        List<BucketSpec> currentBuckets = new ArrayList<>();
+        String currentType = null;
+
         for (BucketSpec bucketSpec : pivots) {
-            if (bucketSpec instanceof Time time) {
-                if (!valueBuckets.isEmpty()) {
-                    final TermsAggregationBuilder termsAggregation = createTerms(valueBuckets, ordering);
-                    if (aggregationBuilder == null) {
-                        aggregationBuilder = termsAggregation;
-                        root = termsAggregation;
-                    } else {
-                        aggregationBuilder.subAggregation(termsAggregation);
-                    }
-                    valueBuckets = new ArrayList<>();
-                }
-                final AggregationBuilder datePivot = esTimeHandler.doCreateAggregation(AGG_NAME, pivot, time, queryContext, query)
-                        .orElseThrow(() -> new IllegalStateException("Time handler unexpectedly returns no value."));
-                if (aggregationBuilder == null) {
-                    aggregationBuilder = datePivot;
-                    root = datePivot;
-                } else {
-                    aggregationBuilder.subAggregation(datePivot);
-                }
-            }
-            if (bucketSpec instanceof Values values) {
-                valueBuckets.add(values);
-            }
-        }
-        if (!valueBuckets.isEmpty()) {
-            final TermsAggregationBuilder termsAggregation = createTerms(valueBuckets, ordering);
-            if (aggregationBuilder == null) {
-                aggregationBuilder = termsAggregation;
-                root = termsAggregation;
+            if (bucketSpec.type().equals(currentType)) {
+                currentBuckets.add(bucketSpec);
             } else {
-                aggregationBuilder.subAggregation(termsAggregation);
+                if (!currentBuckets.isEmpty()) {
+                    groups.add(new Tuple2<>(currentType, currentBuckets));
+                }
+
+                currentBuckets = new ArrayList<>();
+                currentBuckets.add(bucketSpec);
+                currentType = bucketSpec.type();
             }
         }
 
-        return new Tuple2<>(root, aggregationBuilder);
+        if (!currentBuckets.isEmpty()) {
+            groups.add(new Tuple2<>(currentType, currentBuckets));
+        }
+
+        return groups;
     }
 
-    private TermsAggregationBuilder createTerms(List<Values> valueBuckets, List<BucketOrder> ordering) {
-        return valueBuckets.size() > 1
-                ? createScriptedTerms(valueBuckets, ordering)
-                : createSimpleTerms(valueBuckets.get(0), ordering);
+    private Tuple2<AggregationBuilder, AggregationBuilder> createPivots(Query query, Pivot pivot, List<BucketSpec> pivots, ESGeneratedQueryContext queryContext) {
+        AggregationBuilder leaf = null;
+        AggregationBuilder root = null;
+        for (Tuple2<String, List<BucketSpec>> group : groupByConsecutiveType(pivots)) {
+            final ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> bucketHandler = bucketHandlers.get(group.v1());
+            final Optional<Tuple2<AggregationBuilder, AggregationBuilder>> bucketAggregations = bucketHandler.createAggregation(AGG_NAME, pivot, group.v2(), queryContext, query);
+            final AggregationBuilder aggregationRoot = bucketAggregations.map(Tuple2::v1).orElse(null);
+            final AggregationBuilder aggregationLeaf = bucketAggregations.map(Tuple2::v2).orElse(null);
+            if (root == null && leaf == null) {
+                root = aggregationRoot;
+                leaf = aggregationLeaf;
+            } else {
+                leaf.subAggregation(aggregationRoot);
+                leaf = aggregationLeaf;
+            }
+        }
+
+        return new Tuple2<>(root, leaf);
     }
 
-    private TermsAggregationBuilder createSimpleTerms(Values value, List<BucketOrder> ordering) {
-        return AggregationBuilders.terms(AGG_NAME)
-                .field(value.field())
-                .order(ordering)
-                .size(15);
-    }
-
-    private TermsAggregationBuilder createScriptedTerms(List<? extends BucketSpec> buckets, List<BucketOrder> ordering) {
-        return AggregationBuilders.terms(AGG_NAME)
-                .script(scriptForPivots(buckets))
-                .size(15)
-                .order(ordering);
-    }
-
-    private Script scriptForPivots(Collection<? extends BucketSpec> pivots) {
-        final String scriptSource = Joiner.on(KEY_SEPARATOR_PHRASE).join(pivots.stream()
-                .map(bucket -> "doc['" + bucket.field() + "'].value")
-                .collect(Collectors.toList()));
-        return new Script(scriptSource);
-    }
-
-    private List<BucketOrder> orderListForPivot(Pivot pivot, ESGeneratedQueryContext esGeneratedQueryContext) {
-        final List<BucketOrder> ordering = pivot.sort()
-                .stream()
-                .map(sortSpec -> {
-                    if (sortSpec instanceof PivotSort) {
-                        return BucketOrder.key(sortSpec.direction().equals(SortSpec.Direction.Ascending));
-                    }
-                    if (sortSpec instanceof SeriesSort) {
-                        final Optional<SeriesSpec> matchingSeriesSpec = pivot.series()
-                                .stream()
-                                .filter(series -> series.literal().equals(sortSpec.field()))
-                                .findFirst();
-                        return matchingSeriesSpec
-                                .map(seriesSpec -> {
-                                    if (seriesSpec.literal().equals("count()")) {
-                                        return BucketOrder.count(sortSpec.direction().equals(SortSpec.Direction.Ascending));
-                                    }
-                                    return BucketOrder.aggregation(esGeneratedQueryContext.seriesName(seriesSpec, pivot), sortSpec.direction().equals(SortSpec.Direction.Ascending));
-                                })
-                                .orElse(null);
-                    }
-
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        return ordering.isEmpty() ? List.of(BucketOrder.count(false)) : ordering;
-    }
 
     private Stream<AggregationBuilder> seriesStream(Pivot pivot, ESGeneratedQueryContext queryContext, String reason) {
         return EntryStream.of(pivot.series())
@@ -250,7 +181,9 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
         pivot.name().ifPresent(resultBuilder::name);
 
-        retrieveBuckets(pivot.rowGroups(), queryResult)
+        final MultiBucketsAggregation.Bucket initialBucket = createInitialBucket(queryResult);
+
+        retrieveBuckets(pivot.rowGroups(), initialBucket)
                 .forEach(tuple -> {
                     final ImmutableList<String> keys = tuple.v1();
                     final MultiBucketsAggregation.Bucket bucket = tuple.v2();
@@ -261,10 +194,10 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                         processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), bucket, true, "row-leaf");
                     }
                     if (!pivot.columnGroups().isEmpty()){
-                        final Terms columnsResults = bucket.getAggregations().get(AGG_NAME);
-                        columnsResults.getBuckets()
-                                .forEach(columnBucket -> {
-                                    final ImmutableList<String> columnKeys = splitKeys(columnBucket.getKeyAsString());
+                        retrieveBuckets(pivot.columnGroups(), bucket)
+                                .forEach(columnBucketTuple -> {
+                                    final ImmutableList<String> columnKeys = columnBucketTuple.v1();
+                                    final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.v2();
 
                                     processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
                                 });
@@ -274,106 +207,29 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
         if (!pivot.rowGroups().isEmpty() && pivot.rollup()) {
             final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.of());
-            processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), createInitialResult(queryResult), true, "row-leaf");
+            processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), initialBucket, true, "row-leaf");
             resultBuilder.addRow(rowBuilder.source("leaf").build());
         }
 
         return resultBuilder.build();
     }
 
-    private HasAggregations createInitialResult(SearchResponse queryResult) {
-        return InitialBucket.create(queryResult);
-    }
+    private Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> retrieveBuckets(List<BucketSpec> pivots, MultiBucketsAggregation.Bucket initialBucket) {
+        Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> result = Stream.of(new Tuple2<>(ImmutableList.of(), initialBucket));
 
-    private int measureDepth(List<? extends BucketSpec> pivots) {
-        int depth = 0;
-        List<Values> valueBuckets = new ArrayList<>();
-        for (BucketSpec bucketSpec : pivots) {
-            if (bucketSpec instanceof Time) {
-                if (!valueBuckets.isEmpty()) {
-                    depth += 1;
-                    valueBuckets = new ArrayList<>();
-                }
-                depth += 1;
-            }
-            if (bucketSpec instanceof Values values) {
-                valueBuckets.add(values);
-            }
-        }
-
-        if (!valueBuckets.isEmpty()) {
-            depth += 1;
-        }
-
-        return depth;
-    }
-
-    private Stream<Tuple2<ImmutableList<String>, ? extends MultiBucketsAggregation.Bucket>> retrieveBuckets(List<? extends BucketSpec> pivots, SearchResponse queryResult) {
-        final Aggregations aggregations = queryResult.getAggregations();
-        final int depth = measureDepth(pivots);
-
-        if (depth == 0) {
-            final MultiBucketsAggregation.Bucket singleBucket = createSingleBucket(queryResult);
-            return Stream.of(new Tuple2<>(ImmutableList.of(), singleBucket));
-        }
-
-        final MultiBucketsAggregation agg = aggregations.get(AGG_NAME);
-        Stream<Tuple2<ImmutableList<String>, ? extends MultiBucketsAggregation.Bucket>> result = agg.getBuckets()
-                .stream()
-                .map(bucket -> new Tuple2<>(splitKeys(bucket.getKeyAsString()), bucket));
-
-        for (int i = 1; i < depth; i++) {
+        for (Tuple2<String, List<BucketSpec>> group : groupByConsecutiveType(pivots)) {
             result = result.flatMap((tuple) -> {
-                final ImmutableList<String> previousKeys = tuple.v1();
-                final MultiBucketsAggregation.Bucket previousBucket = tuple.v2();
+                final ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> bucketHandler = bucketHandlers.get(group.v1());
 
-                final MultiBucketsAggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
-                return aggregation.getBuckets().stream()
-                        .map(bucket -> {
-                            final ImmutableList<String> keys = ImmutableList.<String>builder()
-                                    .addAll(previousKeys)
-                                    .addAll(splitKeys(bucket.getKeyAsString()))
-                                    .build();
-
-                            return new Tuple2<>(keys, bucket);
-                        });
+                return bucketHandler.extractBuckets(group.v2(), tuple);
             });
         }
 
         return result;
     }
 
-    private MultiBucketsAggregation.Bucket createSingleBucket(SearchResponse queryResult) {
-        return new MultiBucketsAggregation.Bucket() {
-            @Override
-            public Object getKey() {
-                return null;
-            }
-
-            @Override
-            public String getKeyAsString() {
-                return null;
-            }
-
-            @Override
-            public long getDocCount() {
-                return extractDocumentCount(queryResult);
-            }
-
-            @Override
-            public Aggregations getAggregations() {
-                return queryResult.getAggregations();
-            }
-
-            @Override
-            public XContentBuilder toXContent(XContentBuilder builder, Params params) throws IOException {
-                return null;
-            }
-        };
-    }
-
-    private ImmutableList<String> splitKeys(String keys) {
-        return ImmutableList.copyOf(Splitter.on(KEY_SEPARATOR_CHARACTER).split(keys));
+    private MultiBucketsAggregation.Bucket createInitialBucket(SearchResponse queryResult) {
+        return InitialBucket.create(queryResult);
     }
 
     private void processSeries(PivotResult.Row.Builder rowBuilder,
@@ -385,7 +241,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                                boolean rollup,
                                String source) {
         pivot.series().forEach(seriesSpec -> {
-            final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler = seriesHandlers.get(seriesSpec.type());
+            final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler = this.seriesHandlers.get(seriesSpec.type());
             final Aggregation series = seriesHandler.extractAggregationFromResult(pivot, seriesSpec, aggregation, queryContext);
             seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, this, queryContext)
                     .map(value -> {

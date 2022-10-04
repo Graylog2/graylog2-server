@@ -16,54 +16,65 @@
  */
 package org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets;
 
+import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.range.DateRangeAggregationBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.range.ParsedDateRange;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.joda.time.base.AbstractDateTime;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.range.DateRangeAggregationBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.range.ParsedDateRange;
+import org.jooq.lambda.tuple.Tuple2;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket, ParsedDateRange> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, DateRangeBucket dateRangeBucket, OSGeneratedQueryContext OSGeneratedQueryContext, Query query) {
-        final DateRangeAggregationBuilder builder = AggregationBuilders.dateRange(name).field(dateRangeBucket.field());
-        dateRangeBucket.ranges().forEach(r -> {
-            final String from = r.from().map(AbstractDateTime::toString).orElse(null);
-            final String to = r.to().map(AbstractDateTime::toString).orElse(null);
-            if (from != null && to != null) {
-                builder.addRange(from, to);
-            } else if (to != null) {
-                builder.addUnboundedTo(to);
-            } else if (from != null) {
-                builder.addUnboundedFrom(from);
-            }
-        });
-        builder.format("date_time");
-        builder.keyed(false);
-        record(OSGeneratedQueryContext, pivot, dateRangeBucket, name, ParsedDateRange.class);
+    public Optional<Tuple2<AggregationBuilder, AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<DateRangeBucket> bucketSpecs, OSGeneratedQueryContext queryContext, Query query) {
+        AggregationBuilder root = null;
+        AggregationBuilder leaf = null;
+        for (DateRangeBucket dateRangeBucket : bucketSpecs) {
+            final DateRangeAggregationBuilder builder = AggregationBuilders.dateRange(name).field(dateRangeBucket.field());
+            dateRangeBucket.ranges().forEach(r -> {
+                final String from = r.from().map(AbstractDateTime::toString).orElse(null);
+                final String to = r.to().map(AbstractDateTime::toString).orElse(null);
+                if (from != null && to != null) {
+                    builder.addRange(from, to);
+                } else if (to != null) {
+                    builder.addUnboundedTo(to);
+                } else if (from != null) {
+                    builder.addUnboundedFrom(from);
+                }
+            });
+            builder.format("date_time");
+            builder.keyed(false);
 
-        return Optional.of(builder);
+            record(queryContext, pivot, dateRangeBucket, name, ParsedDateRange.class);
+
+            if (root == null && leaf == null) {
+                root = builder;
+                leaf = builder;
+            } else {
+                leaf.subAggregation(builder);
+                leaf = builder;
+            }
+        }
+
+        return Optional.of(new Tuple2<>(root, leaf));
     }
 
     @Override
-    public Stream<Bucket> doHandleResult(
-            DateRangeBucket dateRangeBucket,
-            ParsedDateRange rangeAggregation) {
-        if (dateRangeBucket.bucketKey().equals(DateRangeBucket.BucketKey.TO)) {
-            return rangeAggregation.getBuckets().stream()
-                    .map(range -> Bucket.create(range.getToAsString(), range));
-        } else {
-            return rangeAggregation.getBuckets().stream()
-                    .map(range -> Bucket.create(range.getFromAsString(), range));
-        }
+    public Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> extractBuckets(List<BucketSpec> bucketSpecs,
+                                                                                                Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket> previousBucket) {
+        return null;
     }
 }
