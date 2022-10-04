@@ -32,7 +32,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.m
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ValueCountAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
-import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;

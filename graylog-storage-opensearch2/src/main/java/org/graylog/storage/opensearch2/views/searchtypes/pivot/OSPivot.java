@@ -1,84 +1,79 @@
-/*
- * Copyright (C) 2020 Graylog, Inc.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Server Side Public License, version 1,
- * as published by MongoDB, Inc.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * Server Side Public License for more details.
- *
- * You should have received a copy of the Server Side Public License
- * along with this program. If not, see
- * <http://www.mongodb.com/licensing/server-side-public-license>.
- */
 package org.graylog.storage.opensearch2.views.searchtypes.pivot;
 
-import com.google.common.base.Preconditions;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import one.util.streamex.EntryStream;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
-import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.script.Script;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketOrder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.missing.Missing;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.missing.MissingAggregationBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Max;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.Terms;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MaxAggregationBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MinAggregationBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.support.ValuesSourceAggregationBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.support.MultiTermsValuesSourceConfig;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSTimeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import org.graylog2.storage.DetectedSearchVersion;
+import org.graylog2.storage.SearchVersion;
+import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class OSPivot implements OSSearchTypeHandler<Pivot> {
     private static final Logger LOG = LoggerFactory.getLogger(OSPivot.class);
+    private static final String KEY_SEPARATOR_CHARACTER = "\u2E31";
+    private static final String KEY_SEPARATOR_PHRASE = " + \"" + KEY_SEPARATOR_CHARACTER + "\" + ";
+    private static final String AGG_NAME = "agg";
 
-    private final Map<String, OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers;
     private final Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
-    private static final TimeRange ALL_MESSAGES_TIMERANGE = allMessagesTimeRange();
-
-    private static TimeRange allMessagesTimeRange() {
-        return RelativeRange.create(0);
-    }
+    private final EffectiveTimeRangeExtractor effectiveTimeRangeExtractor;
+    private final OSTimeHandler osTimeHandler;
+    private final boolean supportsMultiTerms;
 
     @Inject
-    public OSPivot(Map<String, OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers,
-                   Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers) {
-        this.bucketHandlers = bucketHandlers;
+    public OSPivot(Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers,
+                   EffectiveTimeRangeExtractor effectiveTimeRangeExtractor,
+                   OSTimeHandler osTimeHandler,
+                   @DetectedSearchVersion SearchVersion version) {
         this.seriesHandlers = seriesHandlers;
+        this.effectiveTimeRangeExtractor = effectiveTimeRangeExtractor;
+        this.osTimeHandler = osTimeHandler;
+        this.supportsMultiTerms = version.satisfies(SearchVersion.Distribution.OPENSEARCH, ">=2.2.0");
     }
 
     @Override
@@ -96,90 +91,157 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                     .forEach(searchSourceBuilder::aggregation);
         }
 
-        final List<AggregationBuilder> rootBucketAggregations = doGenerateBucketAggregationsTree(query, pivot, queryContext);
-        if (!rootBucketAggregations.isEmpty()) {
-            rootBucketAggregations.forEach(searchSourceBuilder::aggregation);
-        } else {
-            LOG.debug("No aggregations generated for {}", pivot);
+        final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext);
+        final Tuple2<AggregationBuilder, AggregationBuilder> aggregationTuple = createPivots(query, pivot, pivot.rowGroups(), queryContext, ordering);
+        final AggregationBuilder rootAggregation = aggregationTuple.v1();
+        final AggregationBuilder leafAggregation = aggregationTuple.v2();
+        if (!pivot.rowGroups().isEmpty() && (pivot.columnGroups().isEmpty() || pivot.rollup())) {
+            seriesStream(pivot, queryContext, "metrics")
+                    .forEach(aggregation -> {
+                        if (leafAggregation != null) {
+                            leafAggregation.subAggregation(aggregation);
+                        } else {
+                            searchSourceBuilder.aggregation(aggregation);
+                        }
+                    });
         }
 
+        if (!pivot.columnGroups().isEmpty()) {
+            final Tuple2<AggregationBuilder, AggregationBuilder> columnsAggregationTuple = createPivots(query, pivot, pivot.columnGroups(), queryContext, ordering);
+            final AggregationBuilder columnsRootAggregation = columnsAggregationTuple.v1();
+            final AggregationBuilder columnsLeafAggregation = columnsAggregationTuple.v2();
+            seriesStream(pivot, queryContext, "metrics")
+                    .forEach(columnsLeafAggregation::subAggregation);
+            if (leafAggregation != null) {
+                leafAggregation.subAggregation(columnsRootAggregation);
+            } else {
+                searchSourceBuilder.aggregation(columnsRootAggregation);
+            }
+        }
+
+        if (rootAggregation != null) {
+            searchSourceBuilder.aggregation(rootAggregation);
+        }
+
+        addTimeStampAggregations(searchSourceBuilder);
+    }
+
+    private void addTimeStampAggregations(SearchSourceBuilder searchSourceBuilder) {
         final MinAggregationBuilder startTimestamp = AggregationBuilders.min("timestamp-min").field("timestamp");
         final MaxAggregationBuilder endTimestamp = AggregationBuilders.max("timestamp-max").field("timestamp");
         searchSourceBuilder.aggregation(startTimestamp);
         searchSourceBuilder.aggregation(endTimestamp);
     }
 
-    private List<AggregationBuilder> doGenerateBucketAggregationsTree(Query query,
-                                                                      Pivot pivot,
-                                                                      OSGeneratedQueryContext queryContext) {
-
-        //ordered from low-level to high-level aggregations
-        Deque<AggregationBuilder> bucketAggregationChain = new LinkedList<>();
-
-        final Iterator<BucketSpec> rowBuckets = pivot.rowGroups().iterator();
-        while (rowBuckets.hasNext()) {
-            final BucketSpec bucketSpec = rowBuckets.next();
-            final boolean isLastRowBucket = !rowBuckets.hasNext();
-            final Optional<AggregationBuilder> generateSingleBucketAggregation = doGenerateSingleBucketAggregation(bucketSpec, isLastRowBucket, "row", query, pivot, queryContext);
-            generateSingleBucketAggregation.ifPresent(bucketAggregationChain::addFirst);
-        }
-
-        final Iterator<BucketSpec> columnBuckets = pivot.columnGroups().iterator();
-        while (columnBuckets.hasNext()) {
-            final BucketSpec bucketSpec = columnBuckets.next();
-            final boolean isLastColumnBucket = !columnBuckets.hasNext();
-            final Optional<AggregationBuilder> generateSingleBucketAggregation = doGenerateSingleBucketAggregation(bucketSpec, isLastColumnBucket, "column", query, pivot, queryContext);
-            generateSingleBucketAggregation.ifPresent(bucketAggregationChain::addFirst);
-        }
-
-        final Optional<AggregationBuilder> aggregationBuilder = bucketAggregationChain.stream()
-                .reduce((aggrLower, aggrHigher) -> {
-                    aggrHigher.subAggregation(aggrLower);
-                    createMissingAggregation(aggrLower).map(aggrHigher::subAggregation);
-                    return aggrHigher;
-                });
-
-        List<AggregationBuilder> result = new ArrayList<>();
-        if (aggregationBuilder.isPresent()) {
-            result.add(aggregationBuilder.get());
-            createMissingAggregation(aggregationBuilder.get()).ifPresent(result::add);
-        }
-        return result;
-    }
-
-    private Optional<MissingAggregationBuilder> createMissingAggregation(final AggregationBuilder aggregation) {
-        if (aggregation instanceof ValuesSourceAggregationBuilder) {
-            final MissingAggregationBuilder missingAggregationBuilder = new MissingAggregationBuilder(MissingBucketConstants.MISSING_AGGREGATION_NAME)
-                    .field(((ValuesSourceAggregationBuilder<?>) aggregation).field());
-            aggregation.getSubAggregations().forEach(missingAggregationBuilder::subAggregation);
-            return Optional.of(missingAggregationBuilder);
-        }
-        return Optional.empty();
-    }
-
-    private Optional<AggregationBuilder> doGenerateSingleBucketAggregation(BucketSpec bucketSpec,
-                                                                           final boolean isLast,
-                                                                           final String reason,
-                                                                           final Query query,
-                                                                           Pivot pivot,
-                                                                           OSGeneratedQueryContext queryContext
-    ) {
-        final String name = queryContext.nextName();
-        LOG.debug("Creating " + reason + " group aggregation '{}' as {}", bucketSpec.type(), name);
-        final OSPivotBucketSpecHandler<? extends PivotSpec, ? extends Aggregation> handler = bucketHandlers.get(bucketSpec.type());
-        if (handler == null) {
-            throw new IllegalArgumentException("Unknown " + reason + "_group type " + bucketSpec.type());
-        }
-        final Optional<AggregationBuilder> generatedAggregation = handler.createAggregation(name, pivot, bucketSpec, queryContext, query);
-        if (generatedAggregation.isPresent()) {
-            final AggregationBuilder aggregationBuilder = generatedAggregation.get();
-            // always insert the series for the final row/column group, or for each one if explicit rollup was requested
-            if (isLast || pivot.rollup()) {
-                seriesStream(pivot, queryContext, isLast ? "leaf " + reason : reason + " rollup")
-                        .forEach(aggregationBuilder::subAggregation);
+    private Tuple2<AggregationBuilder, AggregationBuilder> createPivots(Query query, Pivot pivot, List<BucketSpec> pivots, OSGeneratedQueryContext queryContext, List<BucketOrder> ordering) {
+        AggregationBuilder aggregationBuilder = null;
+        AggregationBuilder root = null;
+        List<Values> valueBuckets = new ArrayList<>();
+        for (BucketSpec bucketSpec : pivots) {
+            if (bucketSpec instanceof Time time) {
+                if (!valueBuckets.isEmpty()) {
+                    final AggregationBuilder termsAggregation = createTerms(valueBuckets, ordering) ;
+                    if (aggregationBuilder == null) {
+                        aggregationBuilder = termsAggregation;
+                        root = termsAggregation;
+                    } else {
+                        aggregationBuilder.subAggregation(termsAggregation);
+                    }
+                    valueBuckets = new ArrayList<>();
+                }
+                final AggregationBuilder datePivot = osTimeHandler.doCreateAggregation(AGG_NAME, pivot, time, queryContext, query)
+                        .orElseThrow(() -> new IllegalStateException("Time handler unexpectedly returns no value."));
+                if (aggregationBuilder == null) {
+                    aggregationBuilder = datePivot;
+                    root = datePivot;
+                } else {
+                    aggregationBuilder.subAggregation(datePivot);
+                }
+            }
+            if (bucketSpec instanceof Values values) {
+                valueBuckets.add(values);
             }
         }
-        return generatedAggregation;
+        if (!valueBuckets.isEmpty()) {
+            final AggregationBuilder termsAggregation = createTerms(valueBuckets, ordering);
+            if (aggregationBuilder == null) {
+                aggregationBuilder = termsAggregation;
+                root = termsAggregation;
+            } else {
+                aggregationBuilder.subAggregation(termsAggregation);
+            }
+        }
+
+        return new Tuple2<>(root, aggregationBuilder);
+    }
+
+    private AggregationBuilder createTerms(List<Values> valueBuckets, List<BucketOrder> ordering) {
+        return valueBuckets.size() > 1
+                ? supportsMultiTerms
+                    ? createMultiTerms(valueBuckets, ordering)
+                    : createScriptedTerms(valueBuckets, ordering)
+                : createSimpleTerms(valueBuckets.get(0), ordering);
+    }
+
+    private AggregationBuilder createSimpleTerms(Values values, List<BucketOrder> ordering) {
+        return AggregationBuilders.terms(AGG_NAME)
+                .field(values.field())
+                .order(ordering)
+                .size(15);
+    }
+
+    private AggregationBuilder createMultiTerms(List<Values> valueBuckets, List<BucketOrder> ordering) {
+        return AggregationBuilders.multiTerms(AGG_NAME)
+                .terms(valueBuckets.stream()
+                        .map(value -> new MultiTermsValuesSourceConfig.Builder()
+                        .setFieldName(value.field())
+                        .build())
+                        .collect(Collectors.toList()))
+                .order(ordering)
+                .size(15);
+    }
+
+    private TermsAggregationBuilder createScriptedTerms(List<? extends BucketSpec> buckets, List<BucketOrder> ordering) {
+        return AggregationBuilders.terms(AGG_NAME)
+                .script(scriptForPivots(buckets))
+                .size(15)
+                .order(ordering.isEmpty() ? List.of(BucketOrder.count(false)) : ordering);
+    }
+
+    private Script scriptForPivots(Collection<? extends BucketSpec> pivots) {
+        final String scriptSource = Joiner.on(KEY_SEPARATOR_PHRASE).join(pivots.stream()
+                .map(bucket -> "doc['" + bucket.field() + "'].value")
+                .collect(Collectors.toList()));
+        return new Script(scriptSource);
+    }
+
+    private List<BucketOrder> orderListForPivot(Pivot pivot, OSGeneratedQueryContext esGeneratedQueryContext) {
+        final List<BucketOrder> ordering = pivot.sort()
+                .stream()
+                .map(sortSpec -> {
+                    if (sortSpec instanceof PivotSort) {
+                        return BucketOrder.key(sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                    }
+                    if (sortSpec instanceof SeriesSort) {
+                        final Optional<SeriesSpec> matchingSeriesSpec = pivot.series()
+                                .stream()
+                                .filter(series -> series.literal().equals(sortSpec.field()))
+                                .findFirst();
+                        return matchingSeriesSpec
+                                .map(seriesSpec -> {
+                                    if (seriesSpec.literal().equals("count()")) {
+                                        return BucketOrder.count(sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                                    }
+                                    return BucketOrder.aggregation(esGeneratedQueryContext.seriesName(seriesSpec, pivot), sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                                })
+                                .orElse(null);
+                    }
+
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        return ordering.isEmpty() ? List.of(BucketOrder.count(false)) : ordering;
     }
 
     private Stream<AggregationBuilder> seriesStream(Pivot pivot, OSGeneratedQueryContext queryContext, String reason) {
@@ -187,190 +249,168 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                 .mapKeyValue((integer, seriesSpec) -> {
                     final String seriesName = queryContext.seriesName(seriesSpec, pivot);
                     LOG.debug("Adding {} series '{}' with name '{}'", reason, seriesSpec.type(), seriesName);
-                    final OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> OSPivotSeriesSpecHandler = seriesHandlers.get(seriesSpec.type());
-                    if (OSPivotSeriesSpecHandler == null) {
+                    final OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> esPivotSeriesSpecHandler = seriesHandlers.get(seriesSpec.type());
+                    if (esPivotSeriesSpecHandler == null) {
                         throw new IllegalArgumentException("No series handler registered for: " + seriesSpec.type());
                     }
-                    return OSPivotSeriesSpecHandler.createAggregation(seriesName, pivot, seriesSpec, this, queryContext);
+                    return esPivotSeriesSpecHandler.createAggregation(seriesName, pivot, seriesSpec, this, queryContext);
                 })
                 .filter(Optional::isPresent)
                 .map(Optional::get);
     }
 
-    private boolean isAllMessagesTimeRange(TimeRange timeRange) {
-        return ALL_MESSAGES_TIMERANGE.equals(timeRange);
-    }
-
-    private AbsoluteRange extractEffectiveTimeRange(SearchResponse queryResult, Query query, Pivot pivot) {
-        if (queryResult.getHits().getTotalHits().value != 0) {
-            return getAbsoluteRangeFromAggregations(queryResult, query, pivot);
-        } else {
-            return getAbsoluteRangeFromPivot(query, pivot);
-        }
-    }
-
-    private AbsoluteRange getAbsoluteRangeFromPivot(final Query query, final Pivot pivot) {
-        final TimeRange pivotRange = query.effectiveTimeRange(pivot);
-        return AbsoluteRange.create(pivotRange.getFrom(), pivotRange.getTo());
-    }
-
-    private AbsoluteRange getAbsoluteRangeFromAggregations(final SearchResponse queryResult, final Query query, final Pivot pivot) {
-        final Min min = queryResult.getAggregations().get("timestamp-min");
-        final Double from = min.getValue();
-        final Max max = queryResult.getAggregations().get("timestamp-max");
-        final Double to = max.getValue();
-        final TimeRange pivotRange = query.effectiveTimeRange(pivot);
-        return AbsoluteRange.create(
-                isAllMessagesTimeRange(pivotRange) && from != 0
-                        ? new DateTime(from.longValue(), DateTimeZone.UTC)
-                        : pivotRange.getFrom(),
-                isAllMessagesTimeRange(pivotRange) && to != 0
-                        ? new DateTime(to.longValue(), DateTimeZone.UTC)
-                        : pivotRange.getTo()
-        );
-    }
-
     @Override
     public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResponse queryResult, Aggregations aggregations, OSGeneratedQueryContext queryContext) {
-        final AbsoluteRange effectiveTimerange = extractEffectiveTimeRange(queryResult, query, pivot);
+        final AbsoluteRange effectiveTimerange = this.effectiveTimeRangeExtractor.extract(queryResult, query, pivot);
 
         final PivotResult.Builder resultBuilder = PivotResult.builder()
                 .id(pivot.id())
                 .effectiveTimerange(effectiveTimerange)
-                .total(extractDocumentCount(queryResult, pivot, queryContext));
+                .total(extractDocumentCount(queryResult));
 
-        // pivot results are a table where cells can contain multiple "values" and not only scalars:
-        // each combination of row and column groups can contain all series (if rollup is true)
-        // if rollup is false, only the "leaf" components contain the series
-        // in the elasticsearch result, rows and columns are simply nested aggregations (first aggregations from rows, then from columns)
-        // with metric aggregations on the corresponding levels.
-        // first we iterate over all row groups (whose values generate a "key array", corresponding to the nesting level)
-        // once we exhaust the row groups, we descend into the columns, which get added as values to their corresponding rows
-        // on each nesting level and combination we have to check for series which we also add as values to the containing row
-        final HasAggregations initialResult = createInitialResult(queryResult);
+        pivot.name().ifPresent(resultBuilder::name);
 
-        processRows(resultBuilder, queryResult, queryContext, pivot, pivot.rowGroups(), new ArrayDeque<>(), initialResult);
+        retrieveBuckets(pivot.rowGroups(), queryResult)
+                .forEach(tuple -> {
+                    final ImmutableList<String> keys = supportsMultiTerms ? extractMultiTermsKeys(tuple.v2()) : tuple.v1();
+                    final MultiBucketsAggregation.Bucket bucket = tuple.v2();
+                    final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder()
+                            .key(keys)
+                            .source("leaf");
+                    if (pivot.columnGroups().isEmpty() || pivot.rollup()) {
+                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), bucket, true, "row-leaf");
+                    }
+                    if (!pivot.columnGroups().isEmpty()){
+                        final Terms columnsResults = bucket.getAggregations().get(AGG_NAME);
+                        columnsResults.getBuckets()
+                                .forEach(columnBucket -> {
+                                    final ImmutableList<String> columnKeys = supportsMultiTerms ? extractMultiTermsKeys(columnBucket) : splitKeys(columnBucket.getKeyAsString());
 
-        return pivot.name().map(resultBuilder::name).orElse(resultBuilder).build();
+                                    processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
+                                });
+                    }
+                    resultBuilder.addRow(rowBuilder.build());
+                });
+
+        if (!pivot.rowGroups().isEmpty() && pivot.rollup()) {
+            final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.of());
+            processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), createInitialResult(queryResult), true, "row-leaf");
+            resultBuilder.addRow(rowBuilder.source("leaf").build());
+        }
+
+        return resultBuilder.build();
     }
 
     private HasAggregations createInitialResult(SearchResponse queryResult) {
         return InitialBucket.create(queryResult);
     }
 
-    private long extractDocumentCount(SearchResponse queryResult, Pivot pivot, OSGeneratedQueryContext queryContext) {
-        return queryResult.getHits().getTotalHits().value;
+    private ImmutableList<String> extractMultiTermsKeys(MultiBucketsAggregation.Bucket bucket) {
+        final Object key = bucket.getKey();
+        if (key == null) {
+            return ImmutableList.of();
+        }
+        if (key instanceof Collection) {
+            //noinspection unchecked
+            return ((Collection<Object>) key).stream()
+                        .map(String::valueOf)
+                        .collect(ImmutableList.toImmutableList());
+        }
+        if (key instanceof String) {
+            return ImmutableList.of((String)key);
+        }
+
+        return ImmutableList.of(String.valueOf(key));
+    }
+    private int measureDepth(List<? extends BucketSpec> pivots) {
+        int depth = 0;
+        List<Values> valueBuckets = new ArrayList<>();
+        for (BucketSpec bucketSpec : pivots) {
+            if (bucketSpec instanceof Time) {
+                if (!valueBuckets.isEmpty()) {
+                    depth += 1;
+                    valueBuckets = new ArrayList<>();
+                }
+                depth += 1;
+            }
+            if (bucketSpec instanceof Values values) {
+                valueBuckets.add(values);
+            }
+        }
+
+        if (!valueBuckets.isEmpty()) {
+            depth += 1;
+        }
+
+        return depth;
     }
 
-    /*
-        results from elasticsearch are nested so we need to recurse into the aggregation tree, but our result is a table, thus we need
-        to keep track of the current row keys manually
-         */
-    private void processRows(PivotResult.Builder resultBuilder,
-                             SearchResponse searchResult,
-                             OSGeneratedQueryContext queryContext,
-                             Pivot pivot,
-                             List<BucketSpec> remainingRows,
-                             ArrayDeque<String> rowKeys,
-                             HasAggregations aggregation) {
-        if (remainingRows.isEmpty()) {
-            // this is the last row group, so we need to fork into the columns if they exist.
-            // being here also means that `rowKeys` contains the maximum number of parts, one for each combination of row bucket keys
-            // we will always add the series for this bucket, because that's the entire point of row groups
+    private Stream<Tuple2<ImmutableList<String>, ? extends MultiBucketsAggregation.Bucket>> retrieveBuckets(List<? extends BucketSpec> pivots, SearchResponse queryResult) {
+        final Aggregations aggregations = queryResult.getAggregations();
+        final int depth = measureDepth(pivots);
 
-            final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.copyOf(rowKeys));
-            // do the same for columns as we did for the rows
-            processColumns(rowBuilder, searchResult, queryContext, pivot, pivot.columnGroups(), new ArrayDeque<>(), aggregation);
-
-            // also add the series for the entire row
-            // columnKeys is empty, because this is a rollup per row bucket, thus for all columns in that bucket (IOW it's not a leaf!)
-            if (pivot.rollup()) {
-                processSeries(rowBuilder, searchResult, queryContext, pivot, new ArrayDeque<>(), aggregation, true, "row-leaf");
-            }
-            resultBuilder.addRow(rowBuilder.source("leaf").build());
-        } else {
-            // this is not a leaf for the rows, so we add its key to the rowKeys and descend into the aggregation tree
-            // afterwards we'll check if we need to add rollup for intermediate buckets. not all clients need them so they can request
-            // to not calculate them
-            final BucketSpec currentBucket = remainingRows.get(0);
-
-            // this handler should never be missing, because we used it above to generate the query
-            // if it is missing for some weird reason, it's ok to fail hard here
-            final OSPivotBucketSpecHandler<? extends PivotSpec, ? extends Aggregation> handler = bucketHandlers.get(currentBucket.type());
-            final Aggregation aggregationResult = handler.extractAggregationFromResult(pivot, currentBucket, aggregation, queryContext);
-            final Stream<OSPivotBucketSpecHandler.Bucket> bucketStream = handler.handleResult(currentBucket, aggregationResult);
-            // for each bucket, recurse and eventually collect all the row keys. once we reach a leaf, we'll end up in the other if branch above
-            bucketStream.forEach(bucket -> {
-                // push the bucket's key and use its aggregation as the new source for sub-aggregations
-                rowKeys.addLast(bucket.key());
-                processRows(resultBuilder, searchResult, queryContext, pivot, tail(remainingRows), rowKeys, bucket.aggregation());
-                rowKeys.removeLast();
-            });
-            final Missing missingAggregation = aggregation.getAggregations().get(MissingBucketConstants.MISSING_AGGREGATION_NAME);
-            if (missingAggregation != null && missingAggregation.getDocCount() > 0) {
-                rowKeys.addLast(MissingBucketConstants.MISSING_BUCKET_NAME);
-                processRows(resultBuilder, searchResult, queryContext, pivot, tail(remainingRows), rowKeys, missingAggregation);
-                rowKeys.removeLast();
-            }
-            // also add the series for this row key if the client wants rollups
-            if (pivot.rollup()) {
-                final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.copyOf(rowKeys));
-                // columnKeys is empty, because this is a rollup per row bucket, thus for all columns in that bucket (IOW it's not a leaf!)
-                processSeries(rowBuilder, searchResult, queryContext, pivot, new ArrayDeque<>(), aggregation, true, "row-inner");
-                resultBuilder.addRow(rowBuilder.source("non-leaf").build());
-            }
-
+        if (depth == 0) {
+            final MultiBucketsAggregation.Bucket singleBucket = createSingleBucket(queryResult);
+            return Stream.of(new Tuple2<>(ImmutableList.of(), singleBucket));
         }
+
+        final MultiBucketsAggregation agg = aggregations.get(AGG_NAME);
+        Stream<Tuple2<ImmutableList<String>, ? extends MultiBucketsAggregation.Bucket>> result = agg.getBuckets()
+                .stream()
+                .map(bucket -> new Tuple2<>(splitKeys(bucket.getKeyAsString()), bucket));
+
+        for (int i = 1; i < depth; i++) {
+            result = result.flatMap((tuple) -> {
+                final ImmutableList<String> previousKeys = tuple.v1();
+                final MultiBucketsAggregation.Bucket previousBucket = tuple.v2();
+
+                final MultiBucketsAggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
+                return aggregation.getBuckets().stream()
+                        .map(bucket -> {
+                            final ImmutableList<String> keys = ImmutableList.<String>builder()
+                                    .addAll(previousKeys)
+                                    .addAll(splitKeys(bucket.getKeyAsString()))
+                                    .build();
+
+                            return new Tuple2<>(keys, bucket);
+                        });
+            });
+        }
+
+        return result;
     }
 
-    private void processColumns(PivotResult.Row.Builder rowBuilder,
-                                SearchResponse searchResult,
-                                OSGeneratedQueryContext queryContext,
-                                Pivot pivot,
-                                List<BucketSpec> remainingColumns,
-                                ArrayDeque<String> columnKeys,
-                                HasAggregations aggregation) {
-        if (remainingColumns.isEmpty()) {
-            // this is the leaf cell of the pivot table, simply add all the series for the complete column key array
-            // in the rollup: false case, this is the only set of series that is going to be added to the result
-            // if we simply don't have any column groups, then don't bother adding the series, this is the special case that
-            // only row grouping was requested, and the rollup for rows is automatically added anyway. otherwise we'll end up
-            // with duplicate data entries
-            if (!columnKeys.isEmpty()) {
-                processSeries(rowBuilder, searchResult, queryContext, pivot, columnKeys, aggregation, false, "col-leaf");
-            }
-        } else {
-            // for a non-leaf column group, we need to recurse further into the aggregation tree
-            // and if rollup was requested we'll add intermediate series according to the column keys
-            final BucketSpec currentBucket = remainingColumns.get(0);
-
-            // this handler should never be missing, because we used it above to generate the query
-            // if it is missing for some weird reason, it's ok to fail hard here
-            final OSPivotBucketSpecHandler<? extends PivotSpec, ? extends Aggregation> handler = bucketHandlers.get(currentBucket.type());
-            final Aggregation aggregationResult = handler.extractAggregationFromResult(pivot, currentBucket, aggregation, queryContext);
-            final Stream<OSPivotBucketSpecHandler.Bucket> bucketStream = handler.handleResult(currentBucket, aggregationResult);
-
-            // for each bucket, recurse and eventually collect all the column keys. once we reach a leaf, we'll end up in the other if branch above
-            bucketStream.forEach(bucket -> {
-                // push the bucket's key and use its aggregation as the new source for sub-aggregations
-                columnKeys.addLast(bucket.key());
-                processColumns(rowBuilder, searchResult, queryContext, pivot, tail(remainingColumns), columnKeys, bucket.aggregation());
-                columnKeys.removeLast();
-            });
-            final Missing missingAggregation = aggregation.getAggregations().get(MissingBucketConstants.MISSING_AGGREGATION_NAME);
-            if (missingAggregation != null && missingAggregation.getDocCount() > 0) {
-                columnKeys.addLast(MissingBucketConstants.MISSING_BUCKET_NAME);
-                processColumns(rowBuilder, searchResult, queryContext, pivot, tail(remainingColumns), columnKeys, missingAggregation);
-                columnKeys.removeLast();
-            }
-            // also add the series for the base column key if the client wants rollups, the complete column key is processed in the leaf branch
-            // don't add the empty column key rollup, because that's not the correct bucket here, it's being done in the row-leaf code
-            if (pivot.rollup() && !columnKeys.isEmpty()) {
-                // columnKeys is not empty, because this is a rollup per column in a row
-                processSeries(rowBuilder, searchResult, queryContext, pivot, columnKeys, aggregation, true, "col-inner");
+    private MultiBucketsAggregation.Bucket createSingleBucket(SearchResponse queryResult) {
+        return new MultiBucketsAggregation.Bucket() {
+            @Override
+            public Object getKey() {
+                return null;
             }
 
-        }
+            @Override
+            public String getKeyAsString() {
+                return null;
+            }
+
+            @Override
+            public long getDocCount() {
+                return extractDocumentCount(queryResult);
+            }
+
+            @Override
+            public Aggregations getAggregations() {
+                return queryResult.getAggregations();
+            }
+
+            @Override
+            public XContentBuilder toXContent(XContentBuilder builder, Params params) throws IOException {
+                return null;
+            }
+        };
+    }
+
+    private ImmutableList<String> splitKeys(String keys) {
+        return ImmutableList.copyOf(Splitter.on(KEY_SEPARATOR_CHARACTER).split(keys));
     }
 
     private void processSeries(PivotResult.Row.Builder rowBuilder,
@@ -395,9 +435,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         });
     }
 
-    private static <T> List<T> tail(List<T> list) {
-        Preconditions.checkArgument(!list.isEmpty(), "List must not be empty!");
-        return list.subList(1, list.size());
+    private long extractDocumentCount(SearchResponse queryResult) {
+        return queryResult.getHits().getTotalHits().value;
     }
-
 }

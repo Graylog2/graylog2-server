@@ -56,7 +56,7 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotBucketSpecHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
-import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotWithScriptedTerms;
+import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESDateRangeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESTimeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESValuesHandler;
@@ -89,7 +89,7 @@ public class ViewsESBackendModule extends ViewsModule {
 
         registerESSearchTypeHandler(MessageList.NAME, ESMessageList.class);
         registerESSearchTypeHandler(EventList.NAME, ESEventList.class);
-        registerESSearchTypeHandler(Pivot.NAME, ESPivotWithScriptedTerms.class).in(Scopes.SINGLETON);
+        registerESSearchTypeHandler(Pivot.NAME, ESPivot.class).in(Scopes.SINGLETON);
 
         registerPivotSeriesHandler(Average.NAME, ESAverageHandler.class);
         registerPivotSeriesHandler(Cardinality.NAME, ESCardinalityHandler.class);
