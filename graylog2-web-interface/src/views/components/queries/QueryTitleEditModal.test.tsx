@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 
 import QueryTitleEditModal from './QueryTitleEditModal';
 
@@ -29,7 +29,7 @@ describe('QueryTitleEditModal', () => {
     }
   };
 
-  it('shows after triggering open action', () => {
+  it('shows after triggering open action', async () => {
     let modalRef;
     const { queryByText } = render(
       <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
@@ -42,7 +42,7 @@ describe('QueryTitleEditModal', () => {
     openModal(modalRef);
 
     // Modal should be visible
-    expect(queryByText(modalHeadline)).not.toBeNull();
+    await screen.findByText(modalHeadline);
   });
 
   it('has correct initial input value', () => {
@@ -60,14 +60,14 @@ describe('QueryTitleEditModal', () => {
   it('updates query title and closes', async () => {
     let modalRef;
     const onTitleChangeFn = jest.fn();
-    const { getByDisplayValue, getByText, queryByText } = render(
+    const { getByDisplayValue, getByRole, queryByText } = render(
       <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
                            onTitleChange={onTitleChangeFn} />,
     );
 
     openModal(modalRef);
     const titleInput = getByDisplayValue('CurrentTitle');
-    const saveButton = getByText('Save');
+    const saveButton = getByRole('button', { name: /update title/i, hidden: true });
 
     fireEvent.change(titleInput, { target: { value: 'NewTitle' } });
     fireEvent.click(saveButton);
@@ -84,7 +84,7 @@ describe('QueryTitleEditModal', () => {
   it('closes on click on cancel', async () => {
     let modalRef;
     const onTitleChangeFn = jest.fn();
-    const { getByText, queryByText } = render(
+    const { getByText, queryByText, findByText } = render(
       <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
                            onTitleChange={onTitleChangeFn} />,
     );
@@ -92,7 +92,7 @@ describe('QueryTitleEditModal', () => {
     openModal(modalRef);
 
     // Modal should be visible
-    expect(queryByText(modalHeadline)).not.toBeNull();
+    await findByText(modalHeadline);
 
     // Modal should not be visible after click on cancel
     const cancelButton = getByText('Cancel');
@@ -100,7 +100,7 @@ describe('QueryTitleEditModal', () => {
     fireEvent.click(cancelButton);
 
     await waitFor(() => {
-      expect(queryByText(modalHeadline)).toBeNull();
+      expect(queryByText(modalHeadline)).not.toBeInTheDocument();
     });
   });
 });

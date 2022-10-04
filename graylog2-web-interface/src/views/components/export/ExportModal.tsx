@@ -157,6 +157,7 @@ const ExportModal = ({ closeModal, view, directExportWidgetId, executionState }:
                              onCancel={closeModal}
                              disabledSubmit={!enableDownload}
                              isSubmitting={loading}
+                             isAsyncSubmit
                              submitLoadingText="Downloading..."
                              submitIcon="cloud-download-alt"
                              submitButtonText="Start Download" />

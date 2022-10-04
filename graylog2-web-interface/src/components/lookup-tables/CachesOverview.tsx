@@ -101,7 +101,7 @@ const CachesOverview = () => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE);
   };
 
-  return loadingCaches ? <Spinner text="Loading caches" /> : (
+  return (
     <Row className="content">
       <Col md={12}>
         <h2>
@@ -136,7 +136,7 @@ const CachesOverview = () => {
                 <th className={Styles.rowActions}>Actions</th>
               </tr>
             </thead>
-            {caches.map((cache: LookupTableCache) => (
+            {loadingCaches ? <Spinner text="Loading caches" /> : caches.map((cache: LookupTableCache) => (
               <CacheTableEntry key={cache.id} cache={cache} onDelete={onDelete} />
             ))}
           </Table>

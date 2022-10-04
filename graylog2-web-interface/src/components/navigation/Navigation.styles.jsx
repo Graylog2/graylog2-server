@@ -46,7 +46,6 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
 
       #scratchpad-toggle {
         padding: 10px 15px;
-        line-height: 20px;
         display: block;
         width: 100%;
         text-align: left;

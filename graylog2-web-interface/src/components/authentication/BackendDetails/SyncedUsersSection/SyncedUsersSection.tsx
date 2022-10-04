@@ -71,6 +71,7 @@ const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
     return <Spinner />;
   }
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   const _userOverviewItem = (user) => <SyncedUsersOverviewItem user={user} roles={roles} />;
 
   return (
@@ -78,7 +79,7 @@ const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
       <p className="description">
         Found {paginatedUsers.pagination.total} synchronized users.
       </p>
-      <PaginatedList activePage={page} totalItems={paginatedUsers.pagination.total} onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}>
+      <PaginatedList activePage={page} totalItems={paginatedUsers.pagination.total} onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })} useQueryParameter={false}>
         <DataTable className="table-hover"
                    customFilter={<SyncedUsersFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />}
                    dataRowFormatter={_userOverviewItem}

@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+/* eslint-disable */
 import React from 'react';
-// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
@@ -48,6 +48,8 @@ const HeaderComponentsWrapper = styled.div(({ theme }) => css`
 const DisabledCollector = styled.div(({ theme }) => css`
   color: ${theme.colors.variant.light.default};
 `);
+
+export const PAGE_SIZES = [10, 25, 50, 100];
 
 const CollectorsAdministration = createReactClass({
   propTypes: {
@@ -352,9 +354,7 @@ const CollectorsAdministration = createReactClass({
 
     return (
       <div className={style.paginatedList}>
-        <PaginatedList activePage={pagination.page}
-                       pageSize={pagination.pageSize}
-                       pageSizes={[10, 25, 50, 100]}
+        <PaginatedList pageSizes={PAGE_SIZES}
                        totalItems={pagination.total}
                        onChange={onPageChange}>
           <SidecarSearchForm query={query} onSearch={this.handleSearch} onReset={this.handleReset} />

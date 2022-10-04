@@ -108,7 +108,7 @@ describe('DashboardActionsMenu', () => {
     const saveDashboardModal = await screen.findByTestId('modal-form');
 
     const saveButton = within(saveDashboardModal).getByRole('button', {
-      name: /save/i,
+      name: /create dashboard/i,
       hidden: true,
     });
 
@@ -171,12 +171,12 @@ describe('DashboardActionsMenu', () => {
   });
 
   it('should open dashboard share modal', () => {
-    const { getByText } = render(<SUT />);
+    const { getByRole, getByText } = render(<SUT />);
     const openShareButton = getByText(/Share/i);
 
     userEvent.click(openShareButton);
 
-    expect(getByText(/Sharing/i)).not.toBeNull();
+    expect(getByRole('button', { name: /update sharing/i, hidden: true })).not.toBeNull();
   });
 
   it('should use FULL_MENU layout option by default and render all buttons', async () => {

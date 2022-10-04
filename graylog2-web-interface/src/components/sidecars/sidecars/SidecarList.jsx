@@ -47,6 +47,8 @@ const SortableTH = styled.th`
   }
 `;
 
+export const PAGE_SIZES = [10, 25, 50, 100];
+
 class SidecarList extends React.Component {
   static propTypes = {
     sidecars: PropTypes.array.isRequired,
@@ -127,9 +129,7 @@ class SidecarList extends React.Component {
           </SidecarSearchForm>
         </div>
 
-        <PaginatedList activePage={pagination.page}
-                       pageSize={pagination.pageSize}
-                       pageSizes={[10, 25, 50, 100]}
+        <PaginatedList pageSizes={PAGE_SIZES}
                        totalItems={pagination.total}
                        onChange={onPageChange}>
           <Row>

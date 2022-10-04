@@ -14,17 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.alarmcallbacks;
+import * as React from 'react';
 
-import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackResult;
-import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackSummary;
-import org.joda.time.DateTime;
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
-public interface AlarmCallbackHistory {
-    String id();
-    AlarmCallbackSummary alarmcallbackConfiguration();
-    String alertId();
-    String alertConditionId();
-    AlarmCallbackResult result();
-    DateTime createdAt();
+export type PaginationQueryParameterObject = {
+  pageSizes?: number[];
+};
+
+function withPaginationQueryParameter(Component: React.ComponentType, obj?: PaginationQueryParameterObject) {
+  return function WrappedComponent(props) {
+    const result = usePaginationQueryParameter(obj?.pageSizes);
+
+    return <Component {...props} paginationQueryParameter={result} />;
+  };
 }
+
+export default withPaginationQueryParameter;

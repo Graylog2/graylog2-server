@@ -20,9 +20,11 @@ import java.util.Locale;
 
 public final class StringUtils {
 
-    private StringUtils() { }
+    private StringUtils() {
+    }
 
     public static String f(String format, Object... args) {
         return String.format(Locale.ENGLISH, format, args);
     }
+
 }

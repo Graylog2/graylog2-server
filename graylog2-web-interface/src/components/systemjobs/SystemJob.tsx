@@ -64,7 +64,6 @@ const StyledProgressBar = styled(ProgressBar)`
 `;
 
 const JobWrap = styled.div`
-  line-height: 1.5;
   margin-bottom: 5px;
 `;
 

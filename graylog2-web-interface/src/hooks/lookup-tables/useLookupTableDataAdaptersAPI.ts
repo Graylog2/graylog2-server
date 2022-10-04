@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from 'react-query';
-import type { LookupTableAdapter } from 'logic/lookup-tables/types';
+import { useQuery } from '@tanstack/react-query';
 
+import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 import UserNotification from 'util/UserNotification';
 
 import { fetchAll, fetchErrors } from './api/dataAdaptersAPI';

@@ -96,25 +96,25 @@ const DashboardActionsMenu = ({ view, isNewView, metadata }) => {
   return (
     <ButtonGroup>
       {showSaveButton && (
-      <Button onClick={() => onSaveView(view)}
-              disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}
-              title="Save dashboard">
-        <Icon name="save" /> Save
-      </Button>
+        <Button onClick={() => onSaveView(view)}
+                disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}
+                title="Save dashboard">
+          <Icon name="save" /> Save
+        </Button>
       )}
       {showSaveNewButton && (
-      <Button onClick={() => setSaveNewDashboardOpen(true)}
-              disabled={hasUndeclaredParameters}
-              title="Save as new dashboard">
-        <Icon name="copy" /> Save as
-      </Button>
+        <Button onClick={() => setSaveNewDashboardOpen(true)}
+                disabled={hasUndeclaredParameters}
+                title="Save as new dashboard">
+          <Icon name="copy" /> Save as
+        </Button>
       )}
       {showShareButton && (
-      <ShareButton entityType="dashboard"
-                   entityId={view.id}
-                   onClick={() => setShareViewOpen(true)}
-                   bsStyle="default"
-                   disabledInfo={isNewView && 'Only saved dashboards can be shared.'} />
+        <ShareButton entityType="dashboard"
+                     entityId={view.id}
+                     onClick={() => setShareViewOpen(true)}
+                     bsStyle="default"
+                     disabledInfo={isNewView && 'Only saved dashboards can be shared.'} />
       )}
       {showDropDownButton && (
         <DropdownButton title={<Icon name="ellipsis-h" />} id="query-tab-actions-dropdown" pullRight noCaret>
@@ -129,18 +129,20 @@ const DashboardActionsMenu = ({ view, isNewView, metadata }) => {
       )}
       {debugOpen && <DebugOverlay show onClose={() => setDebugOpen(false)} />}
       {saveNewDashboardOpen && (
-      <DashboardPropertiesModal show
-                                view={view.toBuilder().newId().build()}
-                                title="Save new dashboard"
-                                onClose={() => setSaveNewDashboardOpen(false)}
-                                onSave={(newDashboard) => _onSaveNewDashboard(newDashboard)} />
+        <DashboardPropertiesModal show
+                                  view={view.toBuilder().newId().build()}
+                                  title="Save new dashboard"
+                                  submitButtonText="Create dashboard"
+                                  onClose={() => setSaveNewDashboardOpen(false)}
+                                  onSave={(newDashboard) => _onSaveNewDashboard(newDashboard)} />
       )}
       {editDashboardOpen && (
-      <DashboardPropertiesModal show
-                                view={view}
-                                title="Editing dashboard"
-                                onClose={() => setEditDashboardOpen(false)}
-                                onSave={onSaveView} />
+        <DashboardPropertiesModal show
+                                  view={view}
+                                  title="Editing dashboard"
+                                  submitButtonText="Update dashboard"
+                                  onClose={() => setEditDashboardOpen(false)}
+                                  onSave={onSaveView} />
       )}
 
       {shareDashboardOpen && (

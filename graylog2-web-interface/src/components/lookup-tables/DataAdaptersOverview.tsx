@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import Routes from 'routing/Routes';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
@@ -93,14 +93,14 @@ const DataAdaptersOverview = () => {
   };
 
   const onDelete = () => {
-    queryClient.invalidateQueries('all-data-adapters');
+    queryClient.invalidateQueries(['all-data-adapters']);
   };
 
   const toCreateView = () => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE);
   };
 
-  return (loadingDataAdapters || loadingDataAdaptersErrors) ? <Spinner text="Loading data adapters" /> : (
+  return (
     <Row className="content">
       <Col md={12}>
         <h2>
@@ -136,7 +136,7 @@ const DataAdaptersOverview = () => {
                 <th className={Styles.rowActions}>Actions</th>
               </tr>
             </thead>
-            {dataAdapters.map((adapter: LookupTableAdapter) => (
+            {(loadingDataAdapters || loadingDataAdaptersErrors) ? <Spinner text="Loading data adapters" /> : dataAdapters.map((adapter: LookupTableAdapter) => (
               <DataAdapterTableEntry key={adapter.id}
                                      adapter={adapter}
                                      error={dataAdapterErrors[adapter.name]}

@@ -20,10 +20,12 @@ import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import type { LookupTableCache, validationErrorsType } from 'src/logic/lookup-tables/types';
 
-import { Button, Col, Row } from 'components/bootstrap';
-import { FormikFormGroup } from 'components/common';
+import { Col, Row } from 'components/bootstrap';
+import { FormikFormGroup, FormSubmit } from 'components/common';
 import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
 import useScopePermissions from 'hooks/useScopePermissions';
+import history from 'util/History';
+import Routes from 'routing/Routes';
 
 type TitleProps = {
   title: string,
@@ -119,8 +121,11 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
       ? LookupTableCachesActions.create(values)
       : LookupTableCachesActions.update(values);
 
-    promise.then(() => { saved(); });
+    return promise.then(() => saved());
   };
+
+  const onCancel = () => history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
+  const updatable = !create && !loadingScopePermissions && scopePermissions?.is_mutable;
 
   return (
     <>
@@ -134,7 +139,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
                   validateOnMount={!create}
                   onSubmit={handleSubmit}
                   enableReinitialize>
-            {({ errors, values, setValues }) => (
+            {({ errors, values, setValues, isSubmitting }) => (
               <Form className="form form-horizontal">
                 <fieldset>
                   <FormikFormGroup type="text"
@@ -171,15 +176,19 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
                 <fieldset>
                   <Row>
                     <Col mdOffset={3} sm={12}>
-                      {create ? (
-                        <Button type="submit" bsStyle="success">Create Cache</Button>
-                      ) : (!loadingScopePermissions && scopePermissions?.is_mutable) && (
-                        <Button type="submit"
-                                bsStyle="success"
-                                role="button"
-                                name="update">
-                          Update Cache
-                        </Button>
+                      {create && (
+                        <FormSubmit submitButtonText="Create cache"
+                                    submitLoadingText="Creating cache..."
+                                    isSubmitting={isSubmitting}
+                                    isAsyncSubmit
+                                    onCancel={onCancel} />
+                      )}
+                      {updatable && (
+                        <FormSubmit submitButtonText="Update cache"
+                                    submitLoadingText="Updating cache..."
+                                    isAsyncSubmit
+                                    isSubmitting={isSubmitting}
+                                    onCancel={onCancel} />
                       )}
                     </Col>
                   </Row>

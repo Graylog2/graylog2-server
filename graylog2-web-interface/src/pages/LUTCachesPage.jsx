@@ -24,9 +24,22 @@ import Routes from 'routing/Routes';
 import history from 'util/History';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { Cache, CacheCreate, CacheForm, CachesOverview } from 'components/lookup-tables';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { LookupTableCachesActions, LookupTableCachesStore } from 'stores/lookup-tables/LookupTableCachesStore';
+
+const _saved = () => {
+  history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
+};
+
+const _isCreating = ({ action }) => {
+  return action === 'create';
+};
+
+const _validateCache = (adapter) => {
+  LookupTableCachesActions.validate(adapter);
+};
 
 class LUTCachesPage extends React.Component {
   componentDidMount() {
@@ -44,29 +57,15 @@ class LUTCachesPage extends React.Component {
 
   _loadData = (props) => {
     const { pagination } = props;
+    const { page, pageSize } = this.props.paginationQueryParameter;
 
     if (props.params && props.params.cacheName) {
       LookupTableCachesActions.get(props.params.cacheName);
-    } else if (this._isCreating(props)) {
+    } else if (_isCreating(props)) {
       LookupTableCachesActions.getTypes();
     } else {
-      LookupTableCachesActions.searchPaginated(pagination.page, pagination.per_page, pagination.query);
+      LookupTableCachesActions.searchPaginated(page, pageSize, pagination.query);
     }
-  };
-
-  // eslint-disable-next-line class-methods-use-this
-  _saved = () => {
-    history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
-  };
-
-  // eslint-disable-next-line class-methods-use-this
-  _isCreating = ({ action }) => {
-    return action === 'create';
-  };
-
-  // eslint-disable-next-line class-methods-use-this
-  _validateCache = (adapter) => {
-    LookupTableCachesActions.validate(adapter);
   };
 
   render() {
@@ -92,8 +91,8 @@ class LUTCachesPage extends React.Component {
                          type={cache.config.type}
                          title="Data Cache"
                          create={false}
-                         saved={this._saved}
-                         validate={this._validateCache}
+                         saved={_saved}
+                         validate={_validateCache}
                          validationErrors={validationErrors} />
             </Col>
           </Row>
@@ -101,23 +100,21 @@ class LUTCachesPage extends React.Component {
       } else {
         content = <Cache cache={cache} />;
       }
-    } else if (this._isCreating(this.props)) {
+    } else if (_isCreating(this.props)) {
       if (!types) {
         content = <Spinner text="Loading data cache types" />;
       } else {
         content = (
           <CacheCreate types={types}
-                       saved={this._saved}
-                       validate={this._validateCache}
+                       saved={_saved}
+                       validate={_validateCache}
                        validationErrors={validationErrors} />
         );
       }
     } else if (!caches) {
       content = <Spinner text="Loading caches" />;
     } else {
-      content = (
-        <CachesOverview />
-      );
+      content = <CachesOverview />;
     }
 
     return (
@@ -140,7 +137,6 @@ class LUTCachesPage extends React.Component {
               </ButtonToolbar>
             </span>
           </PageHeader>
-
           {content}
         </span>
       </DocumentTitle>
@@ -155,6 +151,7 @@ LUTCachesPage.propTypes = {
   caches: PropTypes.array,
   location: PropTypes.object.isRequired,
   action: PropTypes.string,
+  paginationQueryParameter: PropTypes.object.isRequired,
 };
 
 LUTCachesPage.defaultProps = {
@@ -166,7 +163,7 @@ LUTCachesPage.defaultProps = {
 };
 
 export default connect(
-  withParams(withLocation(LUTCachesPage)),
+  withParams(withLocation(withPaginationQueryParameter(LUTCachesPage))),
   { cachesStore: LookupTableCachesStore },
   ({ cachesStore, ...otherProps }) => ({
     ...otherProps,

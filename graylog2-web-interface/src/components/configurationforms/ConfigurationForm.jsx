@@ -34,6 +34,7 @@ class ConfigurationForm extends React.Component {
     // eslint-disable-next-line react/no-unused-prop-types
     values: PropTypes.object,
     wrapperComponent: PropTypes.elementType,
+    submitButtonText: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
@@ -132,6 +133,7 @@ class ConfigurationForm extends React.Component {
     }
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => {
     if (this.modal && this.modal.open) {
       this.modal.open();
@@ -176,7 +178,15 @@ class ConfigurationForm extends React.Component {
   };
 
   render() {
-    const { typeName, title, helpBlock, wrapperComponent: WrapperComponent = BootstrapModalForm, includeTitleField, children } = this.props;
+    const {
+      typeName,
+      title,
+      helpBlock,
+      wrapperComponent: WrapperComponent = BootstrapModalForm,
+      includeTitleField,
+      children,
+      submitButtonText,
+    } = this.props;
 
     let shouldAutoFocus = true;
     let titleElement;
@@ -215,7 +225,7 @@ class ConfigurationForm extends React.Component {
                         title={title}
                         onCancel={this._closeModal}
                         onSubmitForm={this._save}
-                        submitButtonText="Save">
+                        submitButtonText={submitButtonText}>
         <fieldset>
           <input type="hidden" name="type" value={typeName} />
           {children}
