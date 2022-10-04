@@ -11,6 +11,7 @@ import org.graylog.plugins.views.search.rest.SearchDTO;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
@@ -88,6 +89,24 @@ public class SearchAggregationsIT {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
                 .series(List.of(Count.builder().build()))
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(1));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
+    }
+
+    @ContainerMatrixTest
+    void testZeroPivotsWithLatestMetric() throws JsonProcessingException {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .series(List.of(Latest.builder().field("http_method").build()))
                 .build();
 
         final ValidatableResponse validatableResponse = execute(pivot);
