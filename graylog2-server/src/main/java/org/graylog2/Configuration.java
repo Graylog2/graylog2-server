@@ -146,10 +146,6 @@ public class Configuration extends BaseConfiguration {
     @Deprecated
     private int alertCheckInterval = 60;
 
-    @Parameter(value = "enable_legacy_alerts")
-    @Deprecated
-    private boolean enableLegacyAlerts = false;
-
     @Parameter(value = "gc_warning_threshold")
     private Duration gcWarningThreshold = Duration.seconds(1L);
 
@@ -382,11 +378,6 @@ public class Configuration extends BaseConfiguration {
     @Deprecated
     public int getAlertCheckInterval() {
         return alertCheckInterval;
-    }
-
-    @Deprecated
-    public boolean isEnableLegacyAlerts() {
-        return enableLegacyAlerts;
     }
 
     public Duration getGcWarningThreshold() {

@@ -83,6 +83,7 @@ const TableHead = styled.thead(({ theme }) => css`
   color: ${theme.utils.readableColor(theme.colors.gray[90])};
   position: sticky;
   top: 0;
+  z-index: 1;
   
   && > tr > th {
     min-width: 50px;

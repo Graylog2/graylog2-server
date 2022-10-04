@@ -160,11 +160,6 @@ public class StreamMock implements Stream {
     }
 
     @Override
-    public Map<String, List<String>> getAlertReceivers() {
-        return Maps.newHashMap();
-    }
-
-    @Override
     public Map<String, Object> asMap(List<StreamRule> streamRules) {
         return Maps.newHashMap();
     }
@@ -228,8 +223,12 @@ public class StreamMock implements Stream {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         StreamMock that = (StreamMock) o;
         return defaultStream == that.defaultStream &&
                 Objects.equals(id, that.id) &&
