@@ -47,6 +47,9 @@ import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+
 public class AdaptersES7 implements Adapters {
 
     private final ElasticsearchClient client;
@@ -103,6 +106,8 @@ public class AdaptersES7 implements Adapters {
 
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter() {
-        return new IndexFieldTypePollerAdapterES7(new FieldMappingApi(objectMapper, client), new Configuration(), new StreamsWithFieldUsageRetrieverES7(client));
+        final Configuration configuration = spy(new Configuration());
+        doReturn(true).when(configuration).maintainsStreamBasedFieldLists();
+        return new IndexFieldTypePollerAdapterES7(new FieldMappingApi(objectMapper, client), configuration, new StreamsWithFieldUsageRetrieverES7(client));
     }
 }

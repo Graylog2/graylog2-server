@@ -38,7 +38,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,6 +50,7 @@ import static org.mockito.Mockito.mock;
 // JSON data in: src/test/resources/org/graylog2/indexer/fieldtypes/IndexFieldTypePollerIT.json
 public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME = "graylog_0";
+    private final Set<String> expectedStreamCollection = Set.of("000000000000000000000001");
 
     private IndexFieldTypePoller poller;
 
@@ -108,51 +111,65 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
         final Set<IndexFieldTypesDTO> dtosNoExisting = poller.poll(indexSet, Collections.emptySet());
         final Set<IndexFieldTypesDTO> dtos = poller.poll(indexSet, ImmutableSet.of(existingFieldTypes));
 
-        final IndexFieldTypesDTO dto = dtos.stream()
+        assertThat(dtosNoExisting).hasSize(2);
+        assertThat(dtos).hasSize(2);
+
+        IndexFieldTypesDTO dto = dtos.stream()
+                .filter(d -> d.indexName().equals("graylog_0"))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No result polling index set " + indexSetId));
-
-        assertThat(dtosNoExisting).hasSize(2);
-        assertThat(dtos).hasSize(1);
-
         assertThat(dto.indexSetId()).isEqualTo(indexSetId);
-        assertThat(dto.indexName()).isEqualTo(INDEX_NAME);
+        assertThat(dto.indexName()).isEqualTo("graylog_0");
         assertThat(dto.id()).isNull();
-        assertThat(dto.fields()).containsOnly(
-                FieldTypeDTO.create("message", "text"),
-                FieldTypeDTO.create("full_message", "text"),
-                FieldTypeDTO.create("source", "text", Collections.singleton(FieldTypeDTO.Properties.FIELDDATA)),
-                FieldTypeDTO.create("http_status", "keyword"),
-                FieldTypeDTO.create("http_response_time", "long"),
-                FieldTypeDTO.create("timestamp", "date"),
-                FieldTypeDTO.create("gl2_receive_timestamp", "date"),
-                FieldTypeDTO.create("gl2_processing_timestamp", "date"),
-                FieldTypeDTO.create("gl2_accounted_message_size", "long"),
-                FieldTypeDTO.create("streams", "keyword")
-        );
+        //TODO: Add steam/index specific fields
+        assertThat(dto.fields()).containsOnly(getCommonFieldDTOs().toArray(new FieldTypeDTO[0]));
+
+        dto = dtos.stream()
+                .filter(d -> d.indexName().equals("graylog_1"))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No result polling index set " + indexSetId));
+        assertThat(dto.indexSetId()).isEqualTo(indexSetId);
+        assertThat(dto.indexName()).isEqualTo("graylog_1");
+        assertThat(dto.id()).isNull();
+        //TODO: Add steam/index specific fields
+        assertThat(dto.fields()).containsOnly(getCommonFieldDTOs().toArray(new FieldTypeDTO[0]));
     }
 
     @Test
     public void pollIndex() throws Exception {
         final String indexSetId = indexSet.getConfig().id();
 
-        final IndexFieldTypesDTO dto = poller.pollIndex("graylog_0", indexSetId).orElse(null);
+        IndexFieldTypesDTO dto = poller.pollIndex("graylog_0", indexSetId).orElse(null);
 
         assertThat(dto).isNotNull();
         assertThat(dto.indexSetId()).isEqualTo(indexSetId);
-        assertThat(dto.indexName()).isEqualTo(INDEX_NAME);
+        assertThat(dto.indexName()).isEqualTo("graylog_0");
         assertThat(dto.id()).isNull();
-        assertThat(dto.fields()).containsOnly(
-                FieldTypeDTO.create("message", "text"),
-                FieldTypeDTO.create("full_message", "text"),
-                FieldTypeDTO.create("source", "text", Collections.singleton(FieldTypeDTO.Properties.FIELDDATA)),
-                FieldTypeDTO.create("http_status", "keyword"),
-                FieldTypeDTO.create("http_response_time", "long"),
-                FieldTypeDTO.create("timestamp", "date"),
-                FieldTypeDTO.create("gl2_receive_timestamp", "date"),
-                FieldTypeDTO.create("gl2_processing_timestamp", "date"),
-                FieldTypeDTO.create("gl2_accounted_message_size", "long"),
-                FieldTypeDTO.create("streams", "keyword")
-        );
+        //TODO: Add steam/index specific fields
+        assertThat(dto.fields()).containsOnly(getCommonFieldDTOs().toArray(new FieldTypeDTO[0]));
+
+        dto = poller.pollIndex("graylog_1", indexSetId).orElse(null);
+
+        assertThat(dto).isNotNull();
+        assertThat(dto.indexSetId()).isEqualTo(indexSetId);
+        assertThat(dto.indexName()).isEqualTo("graylog_1");
+        assertThat(dto.id()).isNull();
+        //TODO: Add steam/index specific fields
+        assertThat(dto.fields()).containsOnly(getCommonFieldDTOs().toArray(new FieldTypeDTO[0]));
+    }
+
+    private List<FieldTypeDTO> getCommonFieldDTOs() {
+        return new ArrayList<>(List.of(
+                FieldTypeDTO.builder().fieldName("message").physicalType("text").streams(expectedStreamCollection).build(),
+                FieldTypeDTO.builder().fieldName("full_message").physicalType("text").build(),
+                FieldTypeDTO.builder().fieldName("source").physicalType("text").properties(Collections.singleton(FieldTypeDTO.Properties.FIELDDATA)).streams(expectedStreamCollection).build(),
+                FieldTypeDTO.builder().fieldName("http_status").physicalType("keyword").streams(expectedStreamCollection).build(),
+                FieldTypeDTO.builder().fieldName("http_response_time").physicalType("long").streams(expectedStreamCollection).build(),
+                FieldTypeDTO.builder().fieldName("timestamp").physicalType("date").streams(expectedStreamCollection).build(),
+                FieldTypeDTO.builder().fieldName("gl2_receive_timestamp").physicalType("date").build(),
+                FieldTypeDTO.builder().fieldName("gl2_processing_timestamp").physicalType("date").build(),
+                FieldTypeDTO.builder().fieldName("gl2_accounted_message_size").physicalType("long").build(),
+                FieldTypeDTO.builder().fieldName("streams").physicalType("keyword").streams(expectedStreamCollection).build()
+        ));
     }
 }

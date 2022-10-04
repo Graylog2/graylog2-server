@@ -44,6 +44,9 @@ import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+
 public class AdaptersOS2 implements Adapters {
 
     private final OpenSearchClient client;
@@ -102,6 +105,8 @@ public class AdaptersOS2 implements Adapters {
 
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter() {
-        return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(objectMapper, client), new Configuration(), new StreamsWithFieldUsageRetrieverOS2(client));
+        final Configuration configuration = spy(new Configuration());
+        doReturn(true).when(configuration).maintainsStreamBasedFieldLists();
+        return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(objectMapper, client), configuration, new StreamsWithFieldUsageRetrieverOS2(client));
     }
 }
