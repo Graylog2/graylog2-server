@@ -39,6 +39,19 @@ public class AESToolsTest {
     }
 
     @Test
+    public void testDecryptStaticCipherText() {
+        // The cipherText was encrypted using an AES/CBC/ISO10126Padding transformation.
+        // If this test fails, we changed the transformation. If the change was intentional, this test must
+        // be updated, and we need to create a migration to re-encrypt all existing secrets in the database.
+        // Otherwise, existing secrets cannot be decrypted anymore!
+        final String cipherText = "374219db59516b706234a60dd9a7e1e2";
+        final String salt = "53569ac046df1097";
+
+        final String decrypt = AESTools.decrypt(cipherText, "1234567890123456", salt);
+        Assert.assertEquals("I am secret", decrypt);
+    }
+
+    @Test
     public void testEncryptDecryptWithKeyBeingLargerThan32Bytes() {
         byte[] iv = new byte[8];
         new SecureRandom().nextBytes(iv);
