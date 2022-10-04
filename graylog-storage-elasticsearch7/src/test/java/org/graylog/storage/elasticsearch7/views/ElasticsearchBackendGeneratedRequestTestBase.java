@@ -34,10 +34,9 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
-import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotBucketSpecHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
-import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotWithScriptedTerms;
+import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.EffectiveTimeRangeExtractor;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESTimeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESAverageHandler;
@@ -92,7 +91,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase {
         final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers = new HashMap<>();
         seriesHandlers.put(Average.NAME, new ESAverageHandler());
         seriesHandlers.put(Max.NAME, new ESMaxHandler());
-        elasticSearchTypeHandlers.put(Pivot.NAME, () -> new ESPivotWithScriptedTerms(seriesHandlers, new EffectiveTimeRangeExtractor(), new ESTimeHandler()));
+        elasticSearchTypeHandlers.put(Pivot.NAME, () -> new ESPivot(seriesHandlers, new EffectiveTimeRangeExtractor(), new ESTimeHandler()));
 
         this.elasticsearchBackend = new ElasticsearchBackend(elasticSearchTypeHandlers,
                 client,
