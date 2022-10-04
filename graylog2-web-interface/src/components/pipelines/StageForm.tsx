@@ -112,7 +112,7 @@ const StageForm = ({ pipeline, stage, create, save }: Props) => {
       <BootstrapModalForm ref={modalRef}
                           title={`${create ? 'Add new' : 'Edit'} stage ${nextStage.stage}`}
                           onSubmitForm={_handleSave}
-                          submitButtonText="Save">
+                          submitButtonText={create ? 'Add stage' : 'Update stage'}>
         <fieldset>
           <Input type="number"
                  id="stage"

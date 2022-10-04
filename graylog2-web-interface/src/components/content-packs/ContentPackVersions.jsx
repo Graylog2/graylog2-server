@@ -19,7 +19,7 @@ import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { DataTable } from 'components/common';
+import { DataTable, ModalSubmit } from 'components/common';
 import { BootstrapModalWrapper, Button, DropdownButton, ButtonToolbar, MenuItem, Modal } from 'components/bootstrap';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
@@ -140,12 +140,10 @@ class ContentPackVersions extends React.Component {
                               onInstall={onInstallProp} />
         </Modal.Body>
         <Modal.Footer>
-          <div className="pull-right">
-            <ButtonToolbar>
-              <Button bsStyle="primary" onClick={onInstall}>Install</Button>
-              <Button onClick={closeModal}>Close</Button>
-            </ButtonToolbar>
-          </div>
+          <ModalSubmit onSubmit={onInstall}
+                       submitButtonType="button"
+                       onCancel={closeModal}
+                       submitButtonText="Install" />
         </Modal.Footer>
       </BootstrapModalWrapper>
     );

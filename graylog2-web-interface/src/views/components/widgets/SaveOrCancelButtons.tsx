@@ -42,12 +42,14 @@ const SaveOrCancelButtons = ({ onFinish, onCancel, disableSave = false }: Props)
   };
 
   return (
-    <ModalSubmit submitButtonText="Apply changes"
+    <ModalSubmit isAsyncSubmit
+                 submitButtonText="Apply changes"
                  submitLoadingText="Applying changes..."
                  onSubmit={_onFinish}
                  submitButtonType="button"
                  disabledSubmit={disableSave}
                  isSubmitting={isSubmitting}
+                 displayCancel
                  onCancel={onCancel} />
   );
 };
