@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 
 import IfInteractive from 'views/components/dashboard/IfInteractive';
@@ -53,76 +52,41 @@ const PaginatedList = ({
   hideFirstAndLastPageLinks,
   hidePreviousAndNextPageLinks,
   onChange,
-<<<<<<< HEAD
-  pageSize,
-=======
   pageSize: propPageSize,
->>>>>>> c7290c44eed60dc97fe54f090c9151dbcc7edeba
   pageSizes,
   showPageSizeSelect,
   totalItems,
   useQueryParameter,
 }: Props) => {
-<<<<<<< HEAD
-  const [{ currentPage, currentPageSize }, setPagination] = React.useState({
-    currentPage: activePage > 0 ? activePage : INITIAL_PAGE,
-    currentPageSize: pageSize,
-  });
+  const { page, setPage, pageSize: queryParamPageSize, setPageSize } = usePaginationQueryParameter(pageSizes);
 
-  React.useEffect(() => {
-    if (activePage > 0) {
-      setPagination({ currentPage: activePage, currentPageSize: pageSize });
-    }
-  }, [activePage, pageSize]);
+  const [{ currentPage, currentPageSize }, setPagination] = React.useState({
+    currentPage: useQueryParameter ? page : Math.max(activePage, INITIAL_PAGE),
+    currentPageSize: (useQueryParameter && showPageSizeSelect) ? queryParamPageSize : propPageSize,
+  });
 
   const numberPages = React.useMemo(() => (
     currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
   ), [currentPageSize, totalItems]);
-=======
-  const { page, setPage, pageSize: queryParamPageSize, setPageSize } = usePaginationQueryParameter(pageSizes);
-  const currentPage = useQueryParameter ? page : Math.max(activePage, INITIAL_PAGE);
-  const pageSize = (useQueryParameter && showPageSizeSelect) ? queryParamPageSize : propPageSize;
-
-  const numberPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 0;
->>>>>>> c7290c44eed60dc97fe54f090c9151dbcc7edeba
 
   const _onChangePageSize = (event: React.ChangeEvent<HTMLOptionElement>) => {
     event.preventDefault();
     const newPageSize = Number(event.target.value);
 
-<<<<<<< HEAD
     setPagination({ currentPage: INITIAL_PAGE, currentPageSize: newPageSize });
-    onChange(INITIAL_PAGE, newPageSize);
+    if (useQueryParameter) setPageSize(newPageSize);
+    if (onChange) onChange(INITIAL_PAGE, newPageSize);
   };
 
   const _onChangePage = React.useCallback((pageNum: number) => {
     setPagination({ currentPage: pageNum, currentPageSize });
-    onChange(pageNum, currentPageSize);
-  }, [onChange, currentPageSize]);
+    if (useQueryParameter) setPage(pageNum);
+    if (onChange) onChange(pageNum, currentPageSize);
+  }, [useQueryParameter, setPage, onChange, currentPageSize]);
 
   React.useEffect(() => {
     if (numberPages > 0 && currentPage > numberPages) _onChangePage(numberPages);
   }, [currentPage, numberPages, _onChangePage]);
-=======
-    if (useQueryParameter) {
-      setPageSize(newPageSize);
-    }
-
-    if (onChange) {
-      onChange(INITIAL_PAGE, newPageSize);
-    }
-  };
-
-  const _onChangePage = (pageNum: number) => {
-    if (useQueryParameter) {
-      setPage(pageNum);
-    }
-
-    if (onChange) {
-      onChange(pageNum, pageSize);
-    }
-  };
->>>>>>> c7290c44eed60dc97fe54f090c9151dbcc7edeba
 
   return (
     <>
@@ -143,32 +107,6 @@ const PaginatedList = ({
       </IfInteractive>
     </>
   );
-};
-
-PaginatedList.propTypes = {
-  /** The active page number. If not specified the active page number will be tracked internally. */
-  activePage: PropTypes.number,
-  /** React element containing items of the current selected page. */
-  children: PropTypes.node.isRequired,
-  /**
-   * Function that will be called when the page changes.
-   * It receives the current page and the page size as arguments.
-   */
-  onChange: PropTypes.func,
-  /** boolean flag to hide first and last page links */
-  hideFirstAndLastPageLinks: PropTypes.bool,
-  /**  boolean flag to hide previous and next page links */
-  hidePreviousAndNextPageLinks: PropTypes.bool,
-  /** Array of different items per page that are allowed. */
-  pageSizes: PropTypes.arrayOf(PropTypes.number),
-  /** Number of items per page. */
-  pageSize: PropTypes.number,
-  /** Whether to show the page size selector or not. */
-  showPageSizeSelect: PropTypes.bool,
-  /** Total amount of items in all pages. */
-  totalItems: PropTypes.number.isRequired,
-  /** boolean flag that enables saving and using page and pageSize from query parameters. Enabled by default. */
-  useQueryParameter: PropTypes.bool,
 };
 
 PaginatedList.defaultProps = {
