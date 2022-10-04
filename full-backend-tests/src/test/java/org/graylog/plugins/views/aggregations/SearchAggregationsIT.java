@@ -9,7 +9,10 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.rest.QueryDTO;
 import org.graylog.plugins.views.search.rest.SearchDTO;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.TimeUnitInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.testing.completebackend.GraylogBackend;
@@ -25,7 +28,6 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,11 +38,10 @@ import static org.graylog.testing.containermatrix.SearchServer.OS2;
 import static org.graylog.testing.containermatrix.SearchServer.OS2_2;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
 
 @ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {ES7, OS1, OS2, OS2_2})
 public class SearchAggregationsIT {
-    private static final String PIVOT_NAME = "pivot-aggregation";
+    private static final String PIVOT_NAME = "pivotaggregation";
     private static final String PIVOT_PATH = "results.query1.search_types." + PIVOT_NAME;
 
     private final RequestSpecification requestSpec;
@@ -141,6 +142,42 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("POST", "count()"), equalTo(45))
                 .body(pathToMetricResult("PUT", "count()"), equalTo(43))
                 .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
+    }
+
+    @ContainerMatrixTest
+    void testSingleRowPivotWithDateField() throws JsonProcessingException {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .rowGroups(List.of(
+                        Time.builder()
+                                .field("timestamp")
+                                .interval(TimeUnitInterval.Builder.builder().timeunit("10s").build())
+                                .build()
+                ))
+                .series(List.of(
+                        Count.builder().build(),
+                        Average.builder().field("took_ms").build()
+                ))
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(5));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult("2022-09-26T14:12:10.000Z", "count()"), equalTo(1))
+                .body(pathToMetricResult("2022-09-26T14:12:10.000Z", "avg(took_ms)"), equalTo(51.0f))
+                .body(pathToMetricResult("2022-09-26T14:12:20.000Z", "count()"), equalTo(395))
+                .body(pathToMetricResult("2022-09-26T14:12:20.000Z", "avg(took_ms)"), equalTo(59.35443037974684f))
+                .body(pathToMetricResult("2022-09-26T14:12:30.000Z", "count()"), equalTo(394))
+                .body(pathToMetricResult("2022-09-26T14:12:30.000Z", "avg(took_ms)"), equalTo(70.2741116751269f))
+                .body(pathToMetricResult("2022-09-26T14:12:40.000Z", "count()"), equalTo(210))
+                .body(pathToMetricResult("2022-09-26T14:12:40.000Z", "avg(took_ms)"), equalTo(131.21904761904761f))
+                .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000))
+                .body(pathToMetricResult(Collections.emptyList(), List.of("avg(took_ms)")), equalTo(78.74f));
     }
 
     @ContainerMatrixTest
@@ -261,7 +298,7 @@ public class SearchAggregationsIT {
 
     private String listToGroovy(Collection<String> strings) {
         final List<String> quotedStrings = strings.stream()
-                .map(string -> "\"" + string + "\"")
+                .map(string -> "'" + string + "'")
                 .collect(Collectors.toList());
 
         final String quotedList = Joiner.on(", ").join(quotedStrings);
@@ -277,7 +314,7 @@ public class SearchAggregationsIT {
     }
 
     private String pathToRow(Collection<String> keys) {
-        return "find { row -> row.key == " + listToGroovy(keys) + " }";
+        return "find { it.key == " + listToGroovy(keys) + " }";
     }
 
     private String pathToMetricResult(Collection<String> keys, Collection<String> metric) {
