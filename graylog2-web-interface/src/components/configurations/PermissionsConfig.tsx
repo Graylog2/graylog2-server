@@ -124,6 +124,7 @@ const PermissionsConfig = ({ config, updateConfig }: Props) => {
                     <Modal.Footer>
                       <ModalSubmit onCancel={_resetConfig}
                                    isSubmitting={isSubmitting}
+                                   isAsyncSubmit
                                    submitLoadingText="Update configuration"
                                    submitButtonText="Update configuration" />
                     </Modal.Footer>
