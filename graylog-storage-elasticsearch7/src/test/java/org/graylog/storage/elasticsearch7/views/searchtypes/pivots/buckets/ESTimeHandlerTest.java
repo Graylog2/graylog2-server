@@ -34,6 +34,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,7 +72,7 @@ class ESTimeHandlerTest {
         when(interval.toDateInterval(timeRangeCaptor.capture())).thenReturn(DateInterval.days(1));
         when(pivot.timerange()).thenReturn(Optional.of(DerivedTimeRange.of(RelativeRange.create(4242))));
 
-        this.esTimeHandler.doCreateAggregation("foobar", pivot, time, queryContext, query);
+        this.esTimeHandler.doCreateAggregation("foobar", pivot, Collections.singletonList(time), queryContext, query);
 
         final TimeRange argumentTimeRange = timeRangeCaptor.getValue();
         assertThat(argumentTimeRange).isEqualTo(RelativeRange.create(4242));
@@ -84,7 +85,7 @@ class ESTimeHandlerTest {
         when(pivot.timerange()).thenReturn(Optional.empty());
         when(query.timerange()).thenReturn(RelativeRange.create(2323));
 
-        this.esTimeHandler.doCreateAggregation("foobar", pivot, time, queryContext, query);
+        this.esTimeHandler.doCreateAggregation("foobar", pivot, Collections.singletonList(time), queryContext, query);
 
         final TimeRange argumentTimeRange = timeRangeCaptor.getValue();
         assertThat(argumentTimeRange).isEqualTo(RelativeRange.create(2323));
@@ -98,6 +99,6 @@ class ESTimeHandlerTest {
         when(query.timerange()).thenReturn(RelativeRange.create(2323));
         when(interval.toDateInterval(any(TimeRange.class)).toString()).thenReturn(intervalString);
 
-        this.esTimeHandler.doCreateAggregation("foobar", pivot, time, queryContext, query);
+        this.esTimeHandler.doCreateAggregation("foobar", pivot, Collections.singletonList(time), queryContext, query);
     }
 }

@@ -16,13 +16,16 @@
  */
 package org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets;
 
+import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
@@ -31,8 +34,10 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketO
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
+import org.jooq.lambda.tuple.Tuple2;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -40,18 +45,30 @@ import java.util.stream.Stream;
 public class OSTimeHandler extends OSPivotBucketSpecHandler<Time, ParsedDateHistogram> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Time timeSpec, OSGeneratedQueryContext OSGeneratedQueryContext, Query query) {
-        final DateHistogramInterval dateHistogramInterval = new DateHistogramInterval(timeSpec.interval().toDateInterval(query.effectiveTimeRange(pivot)).toString());
-        final Optional<BucketOrder> ordering = orderForPivot(pivot, timeSpec, OSGeneratedQueryContext);
-        final DateHistogramAggregationBuilder builder = AggregationBuilders.dateHistogram(name)
-                .field(timeSpec.field())
-                .order(ordering.orElse(BucketOrder.key(true)))
-                .format("date_time");
+    public Optional<Tuple2<AggregationBuilder, AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<Time> bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
+        AggregationBuilder root = null;
+        AggregationBuilder leaf = null;
 
-        setInterval(builder, dateHistogramInterval);
-        record(OSGeneratedQueryContext, pivot, timeSpec, name, ParsedDateHistogram.class);
+        for (Time timeSpec : bucketSpec) {
+            final DateHistogramInterval dateHistogramInterval = new DateHistogramInterval(timeSpec.interval().toDateInterval(query.effectiveTimeRange(pivot)).toString());
+            final Optional<BucketOrder> ordering = orderForPivot(pivot, timeSpec, queryContext);
+            final DateHistogramAggregationBuilder builder = AggregationBuilders.dateHistogram(name)
+                    .field(timeSpec.field())
+                    .order(ordering.orElse(BucketOrder.key(true)))
+                    .format("date_time");
 
-        return Optional.of(builder);
+            setInterval(builder, dateHistogramInterval);
+
+            if (root == null && leaf == null) {
+                root = builder;
+                leaf = builder;
+            } else {
+                leaf.subAggregation(builder);
+                leaf = builder;
+            }
+        }
+
+        return Optional.of(new Tuple2<>(root, leaf));
     }
 
     private void setInterval(DateHistogramAggregationBuilder builder, DateHistogramInterval interval) {
@@ -61,7 +78,6 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time, ParsedDateHist
             builder.fixedInterval(interval);
         }
     }
-
 
     private Optional<BucketOrder> orderForPivot(Pivot pivot, Time timeSpec, OSGeneratedQueryContext OSGeneratedQueryContext) {
         return pivot.sort()
@@ -92,9 +108,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time, ParsedDateHist
     }
 
     @Override
-    public Stream<Bucket> doHandleResult(Time bucketSpec,
-                                         ParsedDateHistogram dateHistogramAggregation) {
-        return dateHistogramAggregation.getBuckets().stream()
-                .map(dateHistogram -> Bucket.create(dateHistogram.getKeyAsString(), dateHistogram));
+    public Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> extractBuckets(List<BucketSpec> bucketSpecs, Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket> previousBucket) {
+        return null;
     }
 }

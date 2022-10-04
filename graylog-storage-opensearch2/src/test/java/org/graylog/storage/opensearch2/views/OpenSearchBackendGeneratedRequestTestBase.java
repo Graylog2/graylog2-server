@@ -92,7 +92,7 @@ public class OpenSearchBackendGeneratedRequestTestBase {
         final Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers = new HashMap<>();
         seriesHandlers.put(Average.NAME, new OSAverageHandler());
         seriesHandlers.put(Max.NAME, new OSMaxHandler());
-        elasticSearchTypeHandlers.put(Pivot.NAME, () -> new OSPivot(seriesHandlers, new EffectiveTimeRangeExtractor(), new OSTimeHandler(), SearchVersion.opensearch(2, 0, 0)));
+        elasticSearchTypeHandlers.put(Pivot.NAME, () -> new OSPivot(bucketHandlers, seriesHandlers, new EffectiveTimeRangeExtractor()));
 
         this.openSearchBackend = new OpenSearchBackend(elasticSearchTypeHandlers,
                 client,

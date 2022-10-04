@@ -16,17 +16,28 @@
  */
 package org.graylog.storage.opensearch2.views.searchtypes.pivot;
 
+import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketOrder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.jooq.lambda.tuple.Tuple2;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_RESULT extends Aggregation>
@@ -40,18 +51,36 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec, AGG
         aggTypes(queryContext, pivot).record(spec, name, aggregationClass);
     }
 
-    protected Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, OSGeneratedQueryContext queryContext) {
-        return aggTypes(queryContext, pivot).getSubAggregation(spec, aggregations);
+    protected List<BucketOrder> orderListForPivot(Pivot pivot, OSGeneratedQueryContext queryContext) {
+        final List<BucketOrder> ordering = pivot.sort()
+                .stream()
+                .map(sortSpec -> {
+                    if (sortSpec instanceof PivotSort) {
+                        return BucketOrder.key(sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                    }
+                    if (sortSpec instanceof SeriesSort) {
+                        final Optional<SeriesSpec> matchingSeriesSpec = pivot.series()
+                                .stream()
+                                .filter(series -> series.literal().equals(sortSpec.field()))
+                                .findFirst();
+                        return matchingSeriesSpec
+                                .map(seriesSpec -> {
+                                    if (seriesSpec.literal().equals("count()")) {
+                                        return BucketOrder.count(sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                                    }
+                                    return BucketOrder.aggregation(queryContext.seriesName(seriesSpec, pivot), sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                                })
+                                .orElse(null);
+                    }
+
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        return ordering.isEmpty() ? List.of(BucketOrder.count(false)) : ordering;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public Stream<Bucket> handleResult(BucketSpec bucketSpec, Object aggregationResult) {
-        return doHandleResult((SPEC_TYPE) bucketSpec, (AGGREGATION_RESULT) aggregationResult);
-    }
-
-    @Override
-    public abstract Stream<Bucket> doHandleResult(SPEC_TYPE bucketSpec, AGGREGATION_RESULT aggregationResult);
+    public abstract Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> extractBuckets(List<BucketSpec> bucketSpecs, Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket> previousBucket);
 
     public static class Bucket {
 
