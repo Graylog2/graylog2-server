@@ -43,6 +43,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class OSTimeHandler extends OSPivotBucketSpecHandler<Time, ParsedDateHistogram> {
+    private static final String AGG_NAME = "agg";
+
     @Nonnull
     @Override
     public Optional<Tuple2<AggregationBuilder, AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<Time> bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
@@ -108,7 +110,25 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time, ParsedDateHist
     }
 
     @Override
-    public Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> extractBuckets(List<BucketSpec> bucketSpecs, Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket> previousBucket) {
-        return null;
+    public Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> extractBuckets(List<BucketSpec> bucketSpecs, Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket> initialBucket) {
+        if (bucketSpecs.isEmpty()) {
+            return Stream.empty();
+        }
+        final ImmutableList<String> previousKeys = initialBucket.v1();
+        final MultiBucketsAggregation.Bucket previousBucket = initialBucket.v2();
+        final MultiBucketsAggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
+        return aggregation.getBuckets().stream()
+                .flatMap(bucket -> {
+                    final ImmutableList<String> keys = ImmutableList.<String>builder()
+                            .addAll(previousKeys)
+                            .add(bucket.getKeyAsString())
+                            .build();
+
+                    if (bucketSpecs.size() == 1) {
+                        return Stream.of(new Tuple2<>(keys, bucket));
+                    }
+
+                    return extractBuckets(bucketSpecs.subList(0, bucketSpecs.size()), new Tuple2<>(keys, bucket));
+                });
     }
 }

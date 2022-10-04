@@ -33,11 +33,14 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotBucketS
 import org.jooq.lambda.tuple.Tuple2;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, ParsedDateHistogram> {
+    private static final String AGG_NAME = "agg";
+
     @Nonnull
     @Override
     public Optional<Tuple2<AggregationBuilder, AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<Time> bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
@@ -76,6 +79,24 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, ParsedDateHist
 
     @Override
     public Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> extractBuckets(List<BucketSpec> bucketSpecs, Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket> initialBucket) {
-        return null;
+        if (bucketSpecs.isEmpty()) {
+            return Stream.empty();
+        }
+        final ImmutableList<String> previousKeys = initialBucket.v1();
+        final MultiBucketsAggregation.Bucket previousBucket = initialBucket.v2();
+        final MultiBucketsAggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
+        return aggregation.getBuckets().stream()
+                .flatMap(bucket -> {
+                    final ImmutableList<String> keys = ImmutableList.<String>builder()
+                            .addAll(previousKeys)
+                            .add(bucket.getKeyAsString())
+                            .build();
+
+                    if (bucketSpecs.size() == 1) {
+                        return Stream.of(new Tuple2<>(keys, bucket));
+                    }
+
+                    return extractBuckets(bucketSpecs.subList(0, bucketSpecs.size()), new Tuple2<>(keys, bucket));
+                });
     }
 }
