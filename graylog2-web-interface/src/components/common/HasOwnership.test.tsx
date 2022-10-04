@@ -63,10 +63,6 @@ describe('HasOwnership', () => {
     hideChildren: false,
   };
 
-  beforeEach(() => {
-    asMock(useCurrentUser).mockReturnValue(adminUser);
-  });
-
   it('should render children enabled if user has ownership', () => {
     const user = adminUser.toBuilder()
       .grnPermissions(Immutable.List([grnPermission]))

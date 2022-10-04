@@ -18,14 +18,14 @@ package org.graylog2.indexer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.zafarkhaja.semver.Version;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.io.IOException;
@@ -35,7 +35,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Locale;
 import java.util.Map;
 
 import static org.mockito.Mockito.mock;
@@ -54,24 +53,18 @@ class IndexMappingTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "5.0.0",
-            "6.0.0",
-            "7.0.0"
+    @CsvSource({
+            "7.0.0, expected_template7.json",
+            "OpenSearch:1.2.3, expected_template7.json"
     })
-    void createsValidMappingTemplates(String versionString) throws Exception {
-        final SearchVersion version = SearchVersion.elasticsearch(versionString);
-        final IndexMappingTemplate mapping = new MessageIndexTemplateProvider().create(version, null);
+    void createsValidMappingTemplates(final String versionString, final String expectedTemplateFileName) throws Exception {
+        final SearchVersion version = SearchVersion.decode(versionString);
+        final IndexMappingTemplate mapping = new MessageIndexTemplateProvider().create(version, Mockito.mock(IndexSetConfig.class));
 
         final Map<String, Object> template = mapping.toTemplate(indexSetConfig, "sampleIndexTemplate");
-        final String fixture = fixtureFor(version);
+        final String fixture = resourceFile(expectedTemplateFileName);
 
         JSONAssert.assertEquals(json(template), fixture, true);
-    }
-
-    private String fixtureFor(SearchVersion version) {
-        final String fixtureFileName = String.format(Locale.ENGLISH, "expected_template%s.json", version.version().getMajorVersion());
-        return resourceFile(fixtureFileName);
     }
 
     private String json(Object value) throws JsonProcessingException {

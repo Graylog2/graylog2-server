@@ -19,15 +19,22 @@ package org.graylog.plugins.views.search.rest;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.searchfilters.ReferencedSearchFiltersHelper;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityCheckStatus;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityChecker;
+import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog.plugins.views.search.views.Position;
+import org.graylog.plugins.views.search.views.UnknownWidgetConfigDTO;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.plugins.views.search.views.ViewStateDTO;
+import org.graylog.plugins.views.search.views.WidgetDTO;
+import org.graylog.plugins.views.search.views.WidgetPositionDTO;
 import org.graylog.security.UserContext;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.events.ClusterEventBus;
@@ -61,6 +68,7 @@ import java.util.function.Predicate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -222,6 +230,79 @@ public class ViewsResourceTest {
 
         this.viewsResource.update(VIEW_ID, view, searchUser);
         verify(viewService).update(view);
+    }
+
+    @Test
+    void testVerifyIntegrity() {
+        final ViewDTO view = ViewDTO.builder()
+                .searchId("123")
+                .title("my-search")
+                .state(Collections.emptyMap())
+                .build();
+
+        final Search search = Search.builder()
+                .id("123")
+                .build();
+
+        // empty search, nothing to validate, should succeed
+        assertDoesNotThrow(() -> viewsResource.validateSearchProperties(view, search));
+
+        final Search searchWithQuery = search.toBuilder().queries(ImmutableSet.of(Query.builder().id("Q-111").build())).build();
+        final ViewDTO viewWithQuery = view.toBuilder().state(Collections.singletonMap("Q-123", ViewStateDTO.builder()
+                        .widgets(Collections.emptySet())
+                        .widgetMapping(Collections.emptyMap())
+                        .widgetPositions(Collections.emptyMap())
+                        .build()))
+                .build();
+
+        // the query with ID Q-123 is present in the view  state, but the search itself doesn't have it => invalid combination
+        assertThatThrownBy(() -> viewsResource.validateSearchProperties(viewWithQuery, searchWithQuery))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Search queries do not correspond to view/state queries, missing query IDs: [Q-123]; search queries: [Q-111]; state queries: [Q-123]");
+
+        final Search searchWithTypes = search.toBuilder().queries(ImmutableSet.of(Query.builder().id("Q-111")
+                .searchTypes(ImmutableSet.of(MessageList.builder().id("T-111").build()))
+                .build())).build();
+
+        final ViewDTO viewWithWidgets = view.toBuilder().state(Collections.singletonMap("Q-111", ViewStateDTO.builder()
+                .widgetMapping(Collections.singletonMap("W-123", Collections.singleton("T-123")))
+                .widgetPositions(Collections.emptyMap())
+                .widgets(Collections.emptySet())
+                .build())).build();
+
+        // view contains widget mappings for type T-123, but the search knows only a type T-111 => invalid
+        assertThatThrownBy(() -> viewsResource.validateSearchProperties(viewWithWidgets, searchWithTypes))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("missing searches [T-123]; search types: [T-111]; state types: [T-123]");
+
+
+        final Search searchWithValidTypes = search.toBuilder().queries(ImmutableSet.of(Query.builder().id("Q-111")
+                .searchTypes(ImmutableSet.of(MessageList.builder().id("T-123").build()))
+                .build())).build();
+
+        final ViewDTO viewWithWidgetPositions = view.toBuilder()
+                .state(Collections.singletonMap("Q-111", ViewStateDTO.builder()
+                                .widgets(Collections.singleton(WidgetDTO.builder()
+                                        .id("W-123")
+                                                .type("my-type")
+                                                .config(UnknownWidgetConfigDTO.create(Collections.emptyMap()))
+                                        .build()))
+                                .widgetPositions(Collections.singletonMap("W-111",
+                                        WidgetPositionDTO.Builder.create()
+                                                .col(Position.fromInt(1))
+                                                .row(Position.fromInt(1))
+                                                .height(Position.fromInt(100))
+                                                .width(Position.fromInt(100))
+                                                .build()))
+                        .widgetMapping(Collections.singletonMap("W-123", Collections.singleton("T-123")))
+                        .build())).build();
+
+        assertThatThrownBy(() -> viewsResource.validateSearchProperties(viewWithWidgetPositions, searchWithValidTypes))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Widget positions don't correspond to widgets, missing widget positions [W-123]; widget IDs: [W-123]; widget positions: [W-111]");
+
+
+
     }
 
     private void prepareUpdate(final ViewDTO.Type viewType) {

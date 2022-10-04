@@ -10,7 +10,7 @@ exports[`IfDashboard should not render children without context 1`] = `
 `;
 
 exports[`IfDashboard should not render children without dashboard context 1`] = `
-Array [
+[
   <span>
     I must not fear.
   </span>,
@@ -19,7 +19,7 @@ Array [
 `;
 
 exports[`IfDashboard should render children with dashboard context 1`] = `
-Array [
+[
   <span>
     I must not fear.
   </span>,

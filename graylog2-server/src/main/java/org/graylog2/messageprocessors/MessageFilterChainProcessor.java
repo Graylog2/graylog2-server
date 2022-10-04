@@ -99,7 +99,7 @@ public class MessageFilterChainProcessor implements MessageProcessor {
                 final Timer.Context timerContext = timer.time();
 
                 try {
-                    LOG.debug("Applying filter [{}] on message <{}>.", filter.getName(), msg.getId());
+                    LOG.trace("Applying filter [{}] on message <{}>.", filter.getName(), msg.getId());
 
                     if (filter.filter(msg)) {
                         LOG.debug("Filter [{}] marked message <{}> to be discarded. Dropping message.",

@@ -147,6 +147,12 @@ public class QueryValidationResourceIT {
     }
 
     @ContainerMatrixTest
+    void testSuccessfullyValidatesExistsTerms() {
+        verifyQueryIsValidatedSuccessfully("_exists_:timestamp");
+        verifyQueryIsValidatedSuccessfully("_exists_:level");
+    }
+
+    @ContainerMatrixTest
     void testQuotedDefaultField() {
         // if the validation correctly recognizes the quoted text, it should not warn about lowercase or
         verifyQueryIsValidatedSuccessfully("\\\"A or B\\\"");

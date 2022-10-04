@@ -46,4 +46,6 @@ public interface SearchServerInstance extends Closeable {
 
     @Override
     void close();
+
+    Adapters adapters();
 }

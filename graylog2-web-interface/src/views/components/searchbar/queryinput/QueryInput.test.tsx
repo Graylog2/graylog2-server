@@ -23,6 +23,8 @@ import { validationError } from 'fixtures/queryValidationState';
 
 import QueryInput from './QueryInput';
 
+jest.mock('views/logic/fieldtypes/useFieldTypes');
+
 jest.mock('views/actions/QueryValidationActions', () => ({
   displayValidationErrors: jest.fn(),
 }));

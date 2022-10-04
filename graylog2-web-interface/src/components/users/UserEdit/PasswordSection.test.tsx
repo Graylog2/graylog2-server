@@ -16,10 +16,11 @@
  */
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { defaultUser } from 'defaultMockValues';
 
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { alice, adminUser } from 'fixtures/users';
+import { alice } from 'fixtures/users';
 import { UsersActions } from 'stores/users/UsersStore';
 
 import PasswordSection from './PasswordSection';
@@ -36,7 +37,7 @@ jest.mock('stores/users/UsersStore', () => ({
 
 describe('<PasswordSection />', () => {
   beforeEach(() => {
-    asMock(useCurrentUser).mockReturnValue(adminUser);
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
   afterEach(() => {

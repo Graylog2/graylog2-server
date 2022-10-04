@@ -157,6 +157,6 @@ public class SidecarServiceImplTest {
 
         final int result = this.sidecarService.delete(sidecar.id());
         assertEquals(1, result);
-        assertEquals(2, mongodb.mongoConnection().getMongoDatabase().getCollection(collectionName).count());
+        assertEquals(2, mongodb.mongoConnection().getMongoDatabase().getCollection(collectionName).countDocuments());
     }
 }

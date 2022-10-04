@@ -94,7 +94,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase {
         this.elasticsearchBackend = new ElasticsearchBackend(elasticSearchTypeHandlers,
                 client,
                 indexLookup,
-                (elasticsearchBackend, ssb, job, query, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, errors, fieldTypesLookup),
+                (elasticsearchBackend, ssb, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypesLookup),
                 usedSearchFilters -> usedSearchFilters.stream()
                         .filter(sf -> sf instanceof InlineQueryStringSearchFilter)
                         .map(inlineSf -> ((InlineQueryStringSearchFilter) inlineSf).queryString())

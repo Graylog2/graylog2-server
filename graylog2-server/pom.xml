@@ -124,7 +124,7 @@
 
         <dependency>
             <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver</artifactId>
+            <artifactId>mongodb-driver-sync</artifactId>
         </dependency>
 
         <dependency>
@@ -133,7 +133,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mongojack</groupId>
+            <groupId>org.graylog.repackaged.mongojack</groupId>
             <artifactId>mongojack</artifactId>
         </dependency>
 
@@ -377,7 +377,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-common</artifactId>
+            <artifactId>lucene-analysis-common</artifactId>
             <version>${lucene.version}</version>
         </dependency>
         <dependency>
@@ -601,7 +601,7 @@
         </dependency>
         <dependency>
             <groupId>org.jooq</groupId>
-            <artifactId>jool-java-8</artifactId>
+            <artifactId>jool</artifactId>
         </dependency>
         <dependency>
             <groupId>org.freemarker</groupId>
@@ -905,10 +905,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
@@ -1103,36 +1099,6 @@
                                         </resource>
                                     </resources>
                                 </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>integration-tests-elasticsearch</id>
-            <activation>
-                <property>
-                    <name>it.es</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration>
-                            <forkCount>1</forkCount>
-                            <skip>false</skip>
-                            <!-- prevent ForkedBooter from stealing window focus on Mac OS -->
-                            <argLine>-Djava.awt.headless=true</argLine>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>integration-test</goal>
-                                    <goal>verify</goal>
-                                </goals>
                             </execution>
                         </executions>
                     </plugin>
