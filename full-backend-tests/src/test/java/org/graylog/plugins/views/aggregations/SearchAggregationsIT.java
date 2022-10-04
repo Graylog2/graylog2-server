@@ -117,7 +117,7 @@ public class SearchAggregationsIT {
         final String searchTypeResult = PIVOT_PATH + ".rows";
         validatableResponse
                 .rootPath(searchTypeResult)
-                .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
+                .body(pathToMetricResult(Collections.emptyList(), List.of("latest(http_method)")), equalTo("GET"));
     }
 
     @ContainerMatrixTest
