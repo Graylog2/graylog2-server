@@ -254,12 +254,13 @@ public abstract class CmdLineTool implements CliCommand {
     public void run() {
         final Level logLevel = setupLogger();
 
-        if (isDumpDefaultConfig()) {
-            dumpDefaultConfigAndExit();
-        }
         // This is holding all our metrics.
         MetricRegistry metricRegistry = MetricRegistryFactory.create();
         featureFlags = getFeatureFlags(metricRegistry);
+
+        if (isDumpDefaultConfig()) {
+            dumpDefaultConfigAndExit();
+        }
 
         installConfigRepositories();
         installCommandConfig();
