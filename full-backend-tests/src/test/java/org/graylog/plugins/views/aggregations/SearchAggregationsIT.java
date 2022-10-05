@@ -32,14 +32,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.containermatrix.SearchServer.ES7;
 import static org.graylog.testing.containermatrix.SearchServer.OS1;
 import static org.graylog.testing.containermatrix.SearchServer.OS2;
 import static org.graylog.testing.containermatrix.SearchServer.OS2_2;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasLength;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {ES7, OS1, OS2, OS2_2})
+@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {ES7 }) //, OS1, OS2, OS2_2})
 public class SearchAggregationsIT {
     private static final String PIVOT_NAME = "pivotaggregation";
     private static final String PIVOT_PATH = "results.query1.search_types." + PIVOT_NAME;
@@ -89,7 +94,7 @@ public class SearchAggregationsIT {
     void testZeroPivots() throws JsonProcessingException {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
-                .series(List.of(Count.builder().build()))
+                .series(Count.builder().build())
                 .build();
 
         final ValidatableResponse validatableResponse = execute(pivot);
@@ -107,7 +112,7 @@ public class SearchAggregationsIT {
     void testZeroPivotsWithLatestMetric() throws JsonProcessingException {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
-                .series(List.of(Latest.builder().field("http_method").build()))
+                .series(Latest.builder().field("http_method").build())
                 .build();
 
         final ValidatableResponse validatableResponse = execute(pivot);
@@ -125,8 +130,8 @@ public class SearchAggregationsIT {
     void testSingleRowPivot() throws JsonProcessingException {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
-                .rowGroups(List.of(Values.builder().field("http_method").build()))
-                .series(List.of(Count.builder().build()))
+                .rowGroups(Values.builder().field("http_method").build())
+                .series(Count.builder().build())
                 .build();
 
         final ValidatableResponse validatableResponse = execute(pivot);
@@ -148,16 +153,16 @@ public class SearchAggregationsIT {
     void testSingleRowPivotWithDateField() throws JsonProcessingException {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
-                .rowGroups(List.of(
+                .rowGroups(
                         Time.builder()
                                 .field("timestamp")
                                 .interval(TimeUnitInterval.Builder.builder().timeunit("10s").build())
                                 .build()
-                ))
-                .series(List.of(
+                )
+                .series(
                         Count.builder().build(),
                         Average.builder().field("took_ms").build()
-                ))
+                )
                 .build();
 
         final ValidatableResponse validatableResponse = execute(pivot);
@@ -181,11 +186,46 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
+    void testSingleRowPivotWithDateFieldAsColumnPivot() throws JsonProcessingException {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .rowGroups(Values.builder().field("http_method").build())
+                .columnGroups(
+                        Time.builder()
+                                .field("timestamp")
+                                .interval(TimeUnitInterval.Builder.builder().timeunit("10s").build())
+                                .build()
+                )
+                .series(Average.builder().field("took_ms").build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(5));
+
+        final List<List<String>> expectedKeys = List.of(List.of("GET"), List.of("DELETE"), List.of("POST"), List.of("PUT"), List.of());
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+
+        final List<List<String>> actualRowKeys = validatableResponse.extract().path(searchTypeResult + ".key");
+
+        assertThat(actualRowKeys).isEqualTo(expectedKeys);
+
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult(List.of("GET"), List.of("2022-09-26T14:12:10.000Z", "avg(took_ms)")), equalTo(51.0f))
+                .body(pathToMetricResult("DELETE", "avg(took_ms)"), equalTo(73.5576923076923f))
+                .body(pathToMetricResult(List.of("DELETE"), List.of("2022-09-26T14:12:10.000Z", "avg(took_ms)")), is(nullValue()))
+                .body(pathToMetricResult("GET", "avg(took_ms)"), equalTo(63.14883720930233f));
+    }
+
+    @ContainerMatrixTest
     void testSingleColumnPivot() throws JsonProcessingException {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
-                .columnGroups(List.of(Values.builder().field("http_method").build()))
-                .series(List.of(Count.builder().build()))
+                .columnGroups(Values.builder().field("http_method").build())
+                .series(Count.builder().build())
                 .build();
 
         final ValidatableResponse validatableResponse = execute(pivot);
@@ -204,12 +244,35 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
+    void testDoesNotReturnRollupWhenDisabled() throws JsonProcessingException {
+        final Pivot pivot = Pivot.builder()
+                .rollup(false)
+                .columnGroups(Values.builder().field("http_method").build())
+                .series(Count.builder().build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(1));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult(Collections.emptyList(), List.of("GET", "count()")), equalTo(860))
+                .body(pathToMetricResult(Collections.emptyList(), List.of("DELETE", "count()")), equalTo(52))
+                .body(pathToMetricResult(Collections.emptyList(), List.of("POST", "count()")), equalTo(45))
+                .body(pathToMetricResult(Collections.emptyList(), List.of("PUT", "count()")), equalTo(43))
+                .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), is(nullValue()));
+    }
+
+    @ContainerMatrixTest
     void testSingleRowAndColumnPivots() throws JsonProcessingException {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
-                .rowGroups(List.of(Values.builder().field("http_method").build()))
-                .columnGroups(List.of(Values.builder().field("http_response_code").build()))
-                .series(List.of(Count.builder().build()))
+                .rowGroups(Values.builder().field("http_method").build())
+                .columnGroups(Values.builder().field("http_response_code").build())
+                .series(Count.builder().build())
                 .build();
 
         final ValidatableResponse validatableResponse = execute(pivot);
@@ -254,11 +317,11 @@ public class SearchAggregationsIT {
     void testTwoRowPivots() throws JsonProcessingException {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
-                .rowGroups(List.of(
+                .rowGroups(
                         Values.builder().field("http_method").build(),
                         Values.builder().field("http_response_code").build()
-                ))
-                .series(List.of(Count.builder().build()))
+                )
+                .series(Count.builder().build())
                 .build();
 
         final ValidatableResponse validatableResponse = execute(pivot);
