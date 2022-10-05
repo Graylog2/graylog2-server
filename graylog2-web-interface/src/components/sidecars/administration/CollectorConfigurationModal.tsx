@@ -15,15 +15,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import styled from 'styled-components';
 
-import { naturalSortIgnoreCase } from 'util/SortUtils';
 import Routes from 'routing/Routes';
-import { Table, BootstrapModalConfirm, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
+import { Table, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
 import { SearchForm, Icon } from 'components/common';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
@@ -48,10 +46,6 @@ const AddNewConfiguration = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-const ConfigurationSummary = styled.div`
-  word-break: break-all;
 `;
 
 const SecondaryText = styled.div`
@@ -108,245 +102,124 @@ const ModalSubTitle = styled.div`
   text-overflow: ellipsis;
 `;
 
-const CollectorConfigurationModal = (props) => {
-  const [nextAssignedConfigurations, setNextAssignedConfigurations] = React.useState([]);
-  const [nextPartiallyAssignedConfigurations, setNextPartiallyAssignedConfigurations] = React.useState([]);
+const CollectorConfigurationModal = ({ show, onCancel, onSave, selectedCollectorName, selectedSidecarNames, initialAssignedConfigs, initialPartiallyAssignedConfigs, unassignedConfigs, getRowData }) => {
+  const [searchQuery, setSearchQuery] = React.useState<string>('');
+  const [selectedConfigurations, setSelectedConfigurations] = React.useState<string[]>(initialAssignedConfigs);
+  const [partiallySelectedConfigurations, setPartiallySelectedConfigurations] = React.useState<string[]>(initialPartiallyAssignedConfigs);
 
-  const modalConfirm = React.useRef(null);
-
-  const { configurations, selectedSidecarCollectorPairs, onConfigurationSelectionChange, onCancel, collectors } = props;
-
-  // Do not allow configuration changes when more than one log collector type is selected
-  const selectedLogCollectors = lodash.uniq(selectedSidecarCollectorPairs.map(({ collector }) => collector)) as any[];
-
-  const getAssignedConfigurations = (_selectedSidecarCollectorPairs, _selectedLogCollectors) => {
-    const assignments = _selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar).reduce((accumulator, sidecar) => accumulator.concat(sidecar.assignments), []);
-
-    return assignments.map((assignment) => configurations.find((configuration) => configuration.id === assignment.configuration_id))
-      .filter((configuration) => _selectedLogCollectors[0]?.id === configuration.collector_id)
-      .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
-      .map((config) => config.name);
+  const onReset = () => {
+    setSelectedConfigurations(initialAssignedConfigs);
+    setPartiallySelectedConfigurations(initialPartiallyAssignedConfigs);
+    setSearchQuery('');
   };
 
-  const getFullyAndPartiallyAssignments = (_assignedConfigurations) => {
-    const occurrences = lodash.countBy(_assignedConfigurations);
+  const isNotDirty = lodash.isEqual(selectedConfigurations, initialAssignedConfigs) && lodash.isEqual(partiallySelectedConfigurations, initialPartiallyAssignedConfigs);
 
-    return [
-      lodash.uniq(_assignedConfigurations.filter((a) => occurrences[a] === selectedSidecarCollectorPairs.length)) as any[],
-      lodash.uniq(_assignedConfigurations.filter((a) => occurrences[a] < selectedSidecarCollectorPairs.length)) as any[],
-    ];
-  };
+  const filteredOptions = [...initialAssignedConfigs, ...initialPartiallyAssignedConfigs, ...unassignedConfigs].filter((configuration) => configuration.match(new RegExp(searchQuery, 'i')));
 
-  const onSave = (fullyAssignedConfigs: string[], partiallyAssignedConfigs: string[]) => {
-    setNextAssignedConfigurations(fullyAssignedConfigs);
-    setNextPartiallyAssignedConfigurations(partiallyAssignedConfigs);
-    modalConfirm.current.open();
-  };
+  const rows = filteredOptions.map((configName) => {
+    const { configuration, collector, sidecars, autoAssignedTags } = getRowData(configName);
 
-  const confirmConfigurationChange = (doneCallback) => {
-    const assignedConfigurationsToSave = configurations.filter((c) => nextAssignedConfigurations.includes(c.name));
-
-    selectedSidecarCollectorPairs.forEach((sidecarCollectorPair) => {
-      let configs = assignedConfigurationsToSave;
-
-      if (nextPartiallyAssignedConfigurations.length) {
-        const assignments = getAssignedConfigurations([sidecarCollectorPair], selectedLogCollectors);
-        const assignmentsToKeep = lodash.intersection(assignments, nextPartiallyAssignedConfigurations);
-        const assignedConfigurationsToKeep = configurations.filter((c) => assignmentsToKeep.includes(c.name));
-        configs = [...assignedConfigurationsToSave, ...assignedConfigurationsToKeep];
-      }
-
-      onConfigurationSelectionChange([sidecarCollectorPair], configs, doneCallback);
-    });
-
-    onCancel();
-  };
-
-  const cancelConfigurationChange = () => {
-    setNextAssignedConfigurations([]);
-  };
-
-  const getConfiguration = (configName: string) => {
-    return configurations.find((c) => c.name === configName);
-  };
-
-  const getCollector = (configName: string) => {
-    const configuration = getConfiguration(configName);
-
-    return collectors.find((b) => b.id === configuration.collector_id);
-  };
-
-  const getSidecars = (configName: string) => {
-    const configuration = getConfiguration(configName);
-
-    return selectedSidecarCollectorPairs.filter(({ sidecar }) => sidecar.assignments.map((s) => s.configuration_id).includes(configuration.id)).map((a) => a.sidecar);
-  };
-
-  const getAssignedFromTags = (configId: string, collectorId: string, sidecars) => {
-    const assigned_from_tags = sidecars.reduce((accumulator, sidecar) => accumulator.concat(sidecar.assignments.find((a) => (a.collector_id === collectorId) && (a.configuration_id === configId)).assigned_from_tags), []);
-
-    return lodash.uniq(assigned_from_tags);
-  };
-
-  const renderConfigurationSummary = (_previousAssignedConfigurations, _nextAssignedConfigurations, _selectedSidecarCollectorPairs) => {
-    const sidecarsSummary = _selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name).join(', ');
-    const numberOfSidecarsSummary = `${_selectedSidecarCollectorPairs.length} sidecars`;
-    const summary = _selectedSidecarCollectorPairs.length <= 5 ? sidecarsSummary : numberOfSidecarsSummary;
+    const selected = selectedConfigurations.includes(configName);
+    const partiallySelected = !selected && partiallySelectedConfigurations.includes(configName);
+    const secondaryText = (selected && selectedSidecarNames.join(', ')) || (partiallySelected && sidecars.map((s) => s.node_name).join(', ')) || '';
+    const isAssignedFromTags = autoAssignedTags.length > 0;
 
     return (
-      <BootstrapModalConfirm ref={modalConfirm}
-                             title="Configuration summary"
-                             onConfirm={confirmConfigurationChange}
-                             onCancel={cancelConfigurationChange}>
-        <ConfigurationSummary>
-          <p>Are you sure you want to proceed with this action for <b>{summary}</b>?</p>
-        </ConfigurationSummary>
-      </BootstrapModalConfirm>
+      <TableRow key={configName}
+                style={isAssignedFromTags ? { backgroundColor: '#E8E8E8', cursor: 'auto' } : undefined}
+                onClick={() => {
+                  if (!isAssignedFromTags) {
+                    if (partiallySelected) {
+                      setPartiallySelectedConfigurations(partiallySelectedConfigurations.filter((c) => c !== configName));
+                    } else {
+                      setSelectedConfigurations(selected ? selectedConfigurations.filter((c) => c !== configName) : [...selectedConfigurations, configName]);
+                    }
+                  }
+                }}>
+        <IconTableCell>
+          {selected && <Icon name="check" title={`${configName} is selected`} />}
+          {partiallySelected && <Icon type="regular" name="square-minus" title={`${configName} is selected`} />}
+        </IconTableCell>
+        <IconTableCell><ColorLabel color={configuration.color} size="xsmall" /></IconTableCell>
+        <ConfigurationTableCell>
+          {configName}
+          <SecondaryText title={secondaryText}>
+            <small>{secondaryText}</small>
+          </SecondaryText>
+        </ConfigurationTableCell>
+        <IconTableCell>
+          {isAssignedFromTags && <Icon name="lock" title={`Assigned from tags: ${autoAssignedTags.join(', ')}`} />}
+        </IconTableCell>
+        <CollectorTableCell>
+          <small>
+            {collector
+              ? <CollectorIndicator collector={collector.name} operatingSystem={collector.node_operating_system} />
+              : <em>Unknown collector</em>}
+          </small>
+        </CollectorTableCell>
+        <UnselectTableCell>{(selected || partiallySelected) && !isAssignedFromTags && <Icon name="times" title={`Remove ${configName}`} />}</UnselectTableCell>
+      </TableRow>
     );
-  };
-
-  const assignedConfigurations = getAssignedConfigurations(selectedSidecarCollectorPairs, selectedLogCollectors);
-
-  const [fullyAssignedConfigurations, partiallyAssignedConfigurations] = getFullyAndPartiallyAssignments(assignedConfigurations);
-
-  const nonAssignedConfigurations = configurations.filter((c) => !assignedConfigurations.includes(c.name) && (selectedLogCollectors[0]?.id === c.collector_id))
-    .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
-    .map((c) => c.name);
-
-  const MemoizedConfigurationModal = React.useMemo(() => {
-    // eslint-disable-next-line react/no-unstable-nested-components
-    const ConfigurationModal = () => {
-      const [searchQuery, setSearchQuery] = React.useState<string>('');
-      const [selectedConfigurations, setSelectedConfigurations] = React.useState<string[]>(fullyAssignedConfigurations);
-      const [partiallySelectedConfigurations, setPartiallySelectedConfigurations] = React.useState<string[]>(partiallyAssignedConfigurations);
-
-      const onReset = () => {
-        setSelectedConfigurations(fullyAssignedConfigurations);
-        setPartiallySelectedConfigurations(partiallyAssignedConfigurations);
-        setSearchQuery('');
-      };
-
-      const isNotDirty = lodash.isEqual(selectedConfigurations, fullyAssignedConfigurations) && lodash.isEqual(partiallySelectedConfigurations, partiallyAssignedConfigurations);
-
-      const allSidecarNames = selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name);
-
-      const filteredOptions = [...fullyAssignedConfigurations, ...partiallyAssignedConfigurations, ...nonAssignedConfigurations].filter((configuration) => configuration.match(new RegExp(searchQuery, 'i')));
-
-      const rows = filteredOptions.map((configName) => {
-        const config = getConfiguration(configName);
-        const collector = getCollector(configName);
-        const sidecars = getSidecars(configName);
-        const autoAssignedTags = getAssignedFromTags(config.id, collector.id, sidecars);
-
-        const selected = selectedConfigurations.includes(configName);
-        const partiallySelected = !selected && partiallySelectedConfigurations.includes(configName);
-        const secondaryText = (selected && allSidecarNames.join(', ')) || (partiallySelected && sidecars.map((s) => s.node_name).join(', ')) || '';
-        const isAssignedFromTags = autoAssignedTags.length > 0;
-
-        return (
-          <TableRow key={configName}
-                    style={isAssignedFromTags ? { backgroundColor: '#E8E8E8', cursor: 'auto' } : undefined}
-                    onClick={() => {
-                      if (!isAssignedFromTags) {
-                        if (partiallySelected) {
-                          setPartiallySelectedConfigurations(partiallySelectedConfigurations.filter((c) => c !== configName));
-                        } else {
-                          setSelectedConfigurations(selected ? selectedConfigurations.filter((c) => c !== configName) : [...selectedConfigurations, configName]);
-                        }
-                      }
-                    }}>
-            <IconTableCell>
-              {selected && <Icon name="check" title={`${configName} is selected`} />}
-              {partiallySelected && <Icon type="regular" name="square-minus" title={`${configName} is selected`} />}
-            </IconTableCell>
-            <IconTableCell><ColorLabel color={config.color} size="xsmall" /></IconTableCell>
-            <ConfigurationTableCell>
-              {configName}
-              <SecondaryText title={secondaryText}>
-                <small>{secondaryText}</small>
-              </SecondaryText>
-            </ConfigurationTableCell>
-            <IconTableCell>
-              {isAssignedFromTags && <Icon name="lock" title={`Assigned from tags: ${autoAssignedTags.join(', ')}`} />}
-            </IconTableCell>
-            <CollectorTableCell>
-              <small>
-                {collector
-                  ? <CollectorIndicator collector={collector.name} operatingSystem={collector.node_operating_system} />
-                  : <em>Unknown collector</em>}
-              </small>
-            </CollectorTableCell>
-            <UnselectTableCell>{(selected || partiallySelected) && !isAssignedFromTags && <Icon name="times" title={`Remove ${configName}`} />}</UnselectTableCell>
-          </TableRow>
-        );
-      });
-
-      return (
-        <BootstrapModalWrapper showModal={props.show} onHide={props.onCancel}>
-          <Modal.Header>
-            <ModalTitle>
-              Edit <b>{selectedLogCollectors[0]?.name}</b> Configurations
-              <ModalSubTitle>
-                <small>
-                  {`${allSidecarNames.length} sidecar${allSidecarNames.length > 1 ? 's' : ''}: `}
-                  {allSidecarNames.join(', ')}
-                </small>
-              </ModalSubTitle>
-            </ModalTitle>
-          </Modal.Header>
-          <Modal.Body>
-            <SearchForm query={searchQuery} onQueryChange={(q) => setSearchQuery(q)} topMargin={0} queryWidth="100%" />
-            <ConfigurationContainer>
-              <ConfigurationTable className="table-condensed table-hover">
-                <tbody>
-                  {(rows.length === 0) ? (
-                    <TableRow>
-                      <td colSpan={6}>
-                        <NoConfigurationMessage>No configurations available for the selected log collector.</NoConfigurationMessage>
-                      </td>
-                    </TableRow>
-                  ) : (
-                    rows
-                  )}
-                  <StickyTableRowFooter>
-                    <td colSpan={6}>
-                      <AddNewConfiguration>
-                        <Link to={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}><Icon name="add" />&nbsp;Add a new configuration</Link>
-                      </AddNewConfiguration>
-                    </td>
-                  </StickyTableRowFooter>
-                </tbody>
-              </ConfigurationTable>
-            </ConfigurationContainer>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button type="button" onClick={props.onCancel}>Cancel</Button>
-            <Button type="button" onClick={onReset}>Reset</Button>
-            <Button type="submit" bsStyle="primary" disabled={isNotDirty} onClick={() => onSave(selectedConfigurations, partiallySelectedConfigurations)}>Save</Button>
-          </Modal.Footer>
-        </BootstrapModalWrapper>
-      );
-    };
-
-    return <ConfigurationModal />;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.show]);
+  });
 
   return (
-    <>
-      {MemoizedConfigurationModal}
-      {renderConfigurationSummary(assignedConfigurations, nextAssignedConfigurations, selectedSidecarCollectorPairs)}
-    </>
+    <BootstrapModalWrapper showModal={show} onHide={onCancel}>
+      <Modal.Header>
+        <ModalTitle>
+          Edit <b>{selectedCollectorName}</b> Configurations
+          <ModalSubTitle>
+            <small>
+              {`${selectedSidecarNames.length} sidecar${selectedSidecarNames.length > 1 ? 's' : ''}: `}
+              {selectedSidecarNames.join(', ')}
+            </small>
+          </ModalSubTitle>
+        </ModalTitle>
+      </Modal.Header>
+      <Modal.Body>
+        <SearchForm query={searchQuery} onQueryChange={(q) => setSearchQuery(q)} topMargin={0} queryWidth="100%" />
+        <ConfigurationContainer>
+          <ConfigurationTable className="table-condensed table-hover">
+            <tbody>
+              {(rows.length === 0) ? (
+                <TableRow>
+                  <td colSpan={6}>
+                    <NoConfigurationMessage>No configurations available for the selected log collector.</NoConfigurationMessage>
+                  </td>
+                </TableRow>
+              ) : (
+                rows
+              )}
+              <StickyTableRowFooter>
+                <td colSpan={6}>
+                  <AddNewConfiguration>
+                    <Link to={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}><Icon name="add" />&nbsp;Add a new configuration</Link>
+                  </AddNewConfiguration>
+                </td>
+              </StickyTableRowFooter>
+            </tbody>
+          </ConfigurationTable>
+        </ConfigurationContainer>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button type="button" onClick={onCancel}>Cancel</Button>
+        <Button type="button" onClick={onReset}>Reset</Button>
+        <Button type="submit" bsStyle="primary" disabled={isNotDirty} onClick={() => onSave(selectedConfigurations, partiallySelectedConfigurations)}>Save</Button>
+      </Modal.Footer>
+    </BootstrapModalWrapper>
   );
 };
 
 CollectorConfigurationModal.propTypes = {
-  collectors: PropTypes.array.isRequired,
-  configurations: PropTypes.array.isRequired,
-  selectedSidecarCollectorPairs: PropTypes.array.isRequired,
-  onConfigurationSelectionChange: PropTypes.func.isRequired,
   show: PropTypes.bool.isRequired,
+  selectedCollectorName: PropTypes.string.isRequired,
+  selectedSidecarNames: PropTypes.array.isRequired,
+  initialAssignedConfigs: PropTypes.array.isRequired,
+  initialPartiallyAssignedConfigs: PropTypes.array.isRequired,
+  unassignedConfigs: PropTypes.array.isRequired,
   onCancel: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+  getRowData: PropTypes.func.isRequired,
 };
 
 export default CollectorConfigurationModal;

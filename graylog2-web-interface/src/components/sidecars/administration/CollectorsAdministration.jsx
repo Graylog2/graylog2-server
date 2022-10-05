@@ -34,7 +34,7 @@ import commonStyle from 'components/sidecars/common/CommonSidecarStyles.css';
 
 import CollectorsAdministrationActions from './CollectorsAdministrationActions';
 import CollectorsAdministrationFilters from './CollectorsAdministrationFilters';
-import CollectorConfigurationModal from './CollectorConfigurationModal';
+import CollectorConfigurationModalContainer from './CollectorConfigurationModalContainer';
 import FiltersSummary from './FiltersSummary';
 import style from './CollectorsAdministration.css';
 
@@ -377,12 +377,12 @@ const CollectorsAdministration = createReactClass({
             </Col>
           </Row>
         </PaginatedList>
-        <CollectorConfigurationModal collectors={collectors}
-                                     configurations={configurations}
-                                     selectedSidecarCollectorPairs={selectedSidecarCollectorPairs}
-                                     onConfigurationSelectionChange={this.handleConfigurationChange}
-                                     show={showConfigurationModal}
-                                     onCancel={() => this.setState({ selected: [], showConfigurationModal: false })} />
+        <CollectorConfigurationModalContainer collectors={collectors}
+                                              configurations={configurations}
+                                              selectedSidecarCollectorPairs={selectedSidecarCollectorPairs}
+                                              onConfigurationSelectionChange={this.handleConfigurationChange}
+                                              show={showConfigurationModal}
+                                              onCancel={() => this.setState({ selected: [], showConfigurationModal: false })} />
       </div>
     );
   },

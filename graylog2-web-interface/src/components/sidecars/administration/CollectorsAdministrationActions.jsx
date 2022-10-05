@@ -22,7 +22,7 @@ import styled from 'styled-components';
 import { ButtonToolbar, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 
-import CollectorConfigurationModal from './CollectorConfigurationModal';
+import CollectorConfigurationModalContainer from './CollectorConfigurationModalContainer';
 import CollectorProcessControl from './CollectorProcessControl';
 
 const ConfigurationButton = styled(Button)`
@@ -45,12 +45,12 @@ const CollectorsAdministrationActions = (props) => {
                            onClick={() => setShowConfigurationModal(true)}>
         <Icon name="edit" /> Assign Configurations
       </ConfigurationButton>
-      <CollectorConfigurationModal collectors={collectors}
-                                   configurations={configurations}
-                                   selectedSidecarCollectorPairs={selectedSidecarCollectorPairs}
-                                   onConfigurationSelectionChange={onConfigurationSelectionChange}
-                                   show={showConfigurationModal}
-                                   onCancel={onCancelConfigurationModal} />
+      <CollectorConfigurationModalContainer collectors={collectors}
+                                            configurations={configurations}
+                                            selectedSidecarCollectorPairs={selectedSidecarCollectorPairs}
+                                            onConfigurationSelectionChange={onConfigurationSelectionChange}
+                                            show={showConfigurationModal}
+                                            onCancel={onCancelConfigurationModal} />
       <CollectorProcessControl selectedSidecarCollectorPairs={selectedSidecarCollectorPairs} onProcessAction={onProcessAction} />
     </ButtonToolbar>
   );
