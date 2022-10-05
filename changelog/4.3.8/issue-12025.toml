@@ -1,0 +1,5 @@
+type = "c"
+message = "Change the default value for the `elasticsearch_index_optimization_jobs` config option to `10` to fix an issue where index optimization cloud block message ingestion."
+
+issues = ["12025"]
+pulls = ["13521"]

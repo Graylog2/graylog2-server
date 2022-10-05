@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix search query validation with invalid regular expression queries."
+
+issues = ["13594"]
+pulls = ["13595"]

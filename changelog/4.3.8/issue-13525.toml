@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix running Graylog on FIPS-enabled Red Hat Enterprise Linux."
+
+issues = ["13525"]
+pulls = ["13580"]
