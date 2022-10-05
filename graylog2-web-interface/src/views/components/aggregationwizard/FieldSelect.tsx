@@ -34,7 +34,7 @@ type Props = {
   name: string,
   onChange: (changeEvent: { target: { name: string, value: string } }) => void,
   value: string | undefined,
-  selectRef: React.Ref<React.ComponentType>
+  selectRef?: React.Ref<React.ComponentType>
 }
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
@@ -74,6 +74,7 @@ FieldSelect.defaultProps = {
   clearable: false,
   error: undefined,
   ariaLabel: undefined,
+  selectRef: undefined,
 };
 
 export default FieldSelect;
