@@ -163,7 +163,7 @@ const DataTable = ({
     return Promise.reject();
   }, [config, widget, editing, formContext]);
 
-  const togglePin = useCallback((field) => {
+  const togglePin = useCallback((field: string) => {
     const dirty = formContext?.dirty;
 
     const updateWidget = () => {
@@ -187,14 +187,6 @@ const DataTable = ({
     }
 
     return Promise.reject();
-    /*
-    setPinnedColumns((cur) => {
-      if (cur.has(field)) return cur.delete(field);
-
-      return cur.add(field);
-    });
-    /
-     */
   }, [widget, editing, formContext]);
 
   const { columnPivots, rowPivots, series, rollup } = config;
@@ -213,29 +205,7 @@ const DataTable = ({
   const pinnedColumns = useMemo(() => {
     return widget?.config?.visualizationConfig?.pinned_columns || Immutable.Set();
   }, [widget?.config?.visualizationConfig?.pinned_columns]);
-  // const [pinnedColumns, setPinnedColumns] = useState<Immutable.Set<string>>(Immutable.Set(widgetConfigPinnedColumns));
-  /*
-  const stickyLeftMargins = useMemo(() => {
-    let prev = 0;
-    const res = {};
 
-    rowPivots.forEach((row) => {
-      if (pinnedColumns.has(row.field)) {
-        res[row.field] = prev;
-        prev += rowPivotColumnsWidth[row.field];
-      }
-    });
-
-    series.forEach((row) => {
-      if (pinnedColumns.has(row.function)) {
-        res[row.function] = prev;
-        prev += rowPivotColumnsWidth[row.function];
-      }
-    });
-
-    return res;
-  }, [rowPivotColumnsWidth, rowPivots, pinnedColumns, series]);
-   */
   const stickyLeftMarginsByColumnIndex = useMemo(() => {
     let prev = 0;
     const res = [];
