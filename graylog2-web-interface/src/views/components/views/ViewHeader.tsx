@@ -27,6 +27,7 @@ import ViewPropertiesModal from 'views/components/views/DashboardPropertiesModal
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import View from 'views/logic/views/View';
 import Routes from 'routing/Routes';
+import viewTitle from 'views/logic/views/ViewTitle';
 
 const links = {
   [View.Type.Dashboard]: {
@@ -62,9 +63,6 @@ const TitleWrapper = styled.span`
   &:hover ${EditButton} {
     display: block;
   }
-  & .unsaved-title {
-    text-transform: capitalize;
-  }
 `;
 
 const StyledIcon = styled(Icon)`
@@ -78,6 +76,7 @@ const ViewHeader = () => {
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);
 
   const typeText = view.type.toLocaleLowerCase();
+  const title = viewTitle(view.title, view.type);
 
   return (
     <Row>
@@ -87,7 +86,7 @@ const ViewHeader = () => {
         </Link>
         <StyledIcon name="chevron-right" />
         <TitleWrapper>
-          <span>{view.title || <i className="unsaved-title">{`Unsaved ${typeText}`}</i>}</span>
+          <span>{title}</span>
           {isSavedView && (
           <EditButton onClick={toggleMetadataEdit}
                       role="button"
