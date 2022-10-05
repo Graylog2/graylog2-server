@@ -30,7 +30,7 @@ import org.graylog.storage.opensearch2.ScrollResultOS2;
 import org.graylog.storage.opensearch2.SearchRequestFactory;
 import org.graylog.storage.opensearch2.SearchesAdapterOS2;
 import org.graylog.storage.opensearch2.SortOrderMapper;
-import org.graylog.storage.opensearch2.fieldtypes.streams.StreamsWithFieldUsageRetrieverOS2;
+import org.graylog.storage.opensearch2.fieldtypes.streams.StreamsForFieldRetrieverOS2;
 import org.graylog.storage.opensearch2.mapping.FieldMappingApi;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog2.Configuration;
@@ -43,9 +43,6 @@ import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
 
 public class AdaptersOS2 implements Adapters {
 
@@ -105,8 +102,12 @@ public class AdaptersOS2 implements Adapters {
 
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter() {
-        final Configuration configuration = spy(new Configuration());
-        doReturn(true).when(configuration).maintainsStreamBasedFieldLists();
-        return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(objectMapper, client), configuration, new StreamsWithFieldUsageRetrieverOS2(client));
+        return indexFieldTypePollerAdapter(new Configuration());
     }
+
+    @Override
+    public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter(final Configuration configuration) {
+        return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(objectMapper, client), configuration, new StreamsForFieldRetrieverOS2(client));
+    }
+
 }

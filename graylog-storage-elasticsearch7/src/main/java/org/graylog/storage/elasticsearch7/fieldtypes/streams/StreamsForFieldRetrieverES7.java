@@ -26,7 +26,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
-import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsWithFieldUsageRetriever;
+import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.plugin.Message;
 
 import javax.inject.Inject;
@@ -36,12 +36,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class StreamsWithFieldUsageRetrieverES7 implements StreamsWithFieldUsageRetriever {
+public class StreamsForFieldRetrieverES7 implements StreamsForFieldRetriever {
 
     private final ElasticsearchClient client;
 
     @Inject
-    public StreamsWithFieldUsageRetrieverES7(final ElasticsearchClient client) {
+    public StreamsForFieldRetrieverES7(final ElasticsearchClient client) {
         this.client = client;
     }
 

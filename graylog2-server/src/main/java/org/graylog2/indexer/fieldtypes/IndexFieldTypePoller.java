@@ -39,7 +39,9 @@ public class IndexFieldTypePoller {
     private final boolean maintainsStreamBasedFieldLists;
 
     @Inject
-    public IndexFieldTypePoller(final Indices indices, final MetricRegistry metricRegistry, IndexFieldTypePollerAdapter indexFieldTypePollerAdapter) {
+    public IndexFieldTypePoller(final Indices indices,
+                                final MetricRegistry metricRegistry,
+                                final IndexFieldTypePollerAdapter indexFieldTypePollerAdapter) {
         this.indices = indices;
 
         this.pollTimer = metricRegistry.timer(name(getClass(), "indexPollTime"));

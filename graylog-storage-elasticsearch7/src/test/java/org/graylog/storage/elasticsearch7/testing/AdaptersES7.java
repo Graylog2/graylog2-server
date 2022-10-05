@@ -32,7 +32,7 @@ import org.graylog.storage.elasticsearch7.SearchesAdapterES7;
 import org.graylog.storage.elasticsearch7.SortOrderMapper;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
-import org.graylog.storage.elasticsearch7.fieldtypes.streams.StreamsWithFieldUsageRetrieverES7;
+import org.graylog.storage.elasticsearch7.fieldtypes.streams.StreamsForFieldRetrieverES7;
 import org.graylog.storage.elasticsearch7.mapping.FieldMappingApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
 import org.graylog.testing.elasticsearch.Adapters;
@@ -46,9 +46,6 @@ import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
 
 public class AdaptersES7 implements Adapters {
 
@@ -106,8 +103,11 @@ public class AdaptersES7 implements Adapters {
 
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter() {
-        final Configuration configuration = spy(new Configuration());
-        doReturn(true).when(configuration).maintainsStreamBasedFieldLists();
-        return new IndexFieldTypePollerAdapterES7(new FieldMappingApi(objectMapper, client), configuration, new StreamsWithFieldUsageRetrieverES7(client));
+        return indexFieldTypePollerAdapter(new Configuration());
+    }
+
+    @Override
+    public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter(final Configuration configuration) {
+        return new IndexFieldTypePollerAdapterES7(new FieldMappingApi(objectMapper, client), configuration, new StreamsForFieldRetrieverES7(client));
     }
 }

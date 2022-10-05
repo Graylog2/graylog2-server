@@ -20,7 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface StreamsWithFieldUsageRetriever {
+/**
+ * Returns streams that are used in documents where certain field is present/existing.
+ */
+public interface StreamsForFieldRetriever {
 
     Set<String> getStreams(final String fieldName, final String indexName);
 

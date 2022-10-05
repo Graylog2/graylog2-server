@@ -16,7 +16,7 @@
  */
 package org.graylog2.storage.providers;
 
-import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsWithFieldUsageRetriever;
+import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.VersionAwareProvider;
@@ -25,11 +25,11 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.Map;
 
-public class StreamsWithFieldUsageRetrieverProvider extends VersionAwareProvider<StreamsWithFieldUsageRetriever> {
+public class StreamsForFieldRetrieverProvider extends VersionAwareProvider<StreamsForFieldRetriever> {
 
     @Inject
-    public StreamsWithFieldUsageRetrieverProvider(@DetectedSearchVersion SearchVersion version,
-                                                  Map<SearchVersion, Provider<StreamsWithFieldUsageRetriever>> pluginBindings) {
+    public StreamsForFieldRetrieverProvider(@DetectedSearchVersion SearchVersion version,
+                                            Map<SearchVersion, Provider<StreamsForFieldRetriever>> pluginBindings) {
         super(version, pluginBindings);
     }
 }

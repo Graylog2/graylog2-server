@@ -23,7 +23,7 @@ import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
-import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsWithFieldUsageRetriever;
+import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,15 +41,15 @@ public class IndexFieldTypePollerAdapterOS2 implements IndexFieldTypePollerAdapt
     private static final Logger LOG = LoggerFactory.getLogger(IndexFieldTypePollerAdapterOS2.class);
     private final FieldMappingApi fieldMappingApi;
     private final boolean maintainsStreamBasedFieldLists;
-    private final StreamsWithFieldUsageRetriever streamsWithFieldUsageRetriever;
+    private final StreamsForFieldRetriever streamsForFieldRetriever;
 
     @Inject
     public IndexFieldTypePollerAdapterOS2(final FieldMappingApi fieldMappingApi,
                                           final Configuration configuration,
-                                          final StreamsWithFieldUsageRetriever streamsWithFieldUsageRetriever) {
+                                          final StreamsForFieldRetriever streamsForFieldRetriever) {
         this.fieldMappingApi = fieldMappingApi;
         this.maintainsStreamBasedFieldLists = configuration.maintainsStreamBasedFieldLists();
-        this.streamsWithFieldUsageRetriever = streamsWithFieldUsageRetriever;
+        this.streamsForFieldRetriever = streamsForFieldRetriever;
     }
 
     @Override
@@ -84,7 +84,7 @@ public class IndexFieldTypePollerAdapterOS2 implements IndexFieldTypePollerAdapt
             Set<FieldTypeDTO> result = new HashSet<>();
             final Iterable<List<Map.Entry<String, FieldMappingApi.FieldMapping>>> partitioned = Iterables.partition(filteredFieldTypes.entrySet(), MAX_SEARCHES_PER_MULTI_SEARCH);
             for (var batch : partitioned) {
-                final Map<String, Set<String>> streams = streamsWithFieldUsageRetriever.getStreams(batch.stream().map(Map.Entry::getKey).collect(Collectors.toList()), indexName);
+                final Map<String, Set<String>> streams = streamsForFieldRetriever.getStreams(batch.stream().map(Map.Entry::getKey).collect(Collectors.toList()), indexName);
                 batch.stream()
                         .map(entry -> fromFieldNameAndMapping(entry.getKey(), entry.getValue())
                                 .streams(streams.get(entry.getKey()))

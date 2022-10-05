@@ -26,7 +26,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggrega
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsWithFieldUsageRetriever;
+import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.plugin.Message;
 
 import javax.inject.Inject;
@@ -36,12 +36,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class StreamsWithFieldUsageRetrieverOS2 implements StreamsWithFieldUsageRetriever {
+public class StreamsForFieldRetrieverOS2 implements StreamsForFieldRetriever {
 
     private final OpenSearchClient client;
 
     @Inject
-    public StreamsWithFieldUsageRetrieverOS2(final OpenSearchClient client) {
+    public StreamsForFieldRetrieverOS2(final OpenSearchClient client) {
         this.client = client;
     }
 
