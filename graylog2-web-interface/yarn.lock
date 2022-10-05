@@ -2816,10 +2816,10 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/plotly.js@*", "@types/plotly.js@2.12.4":
-  version "2.12.4"
-  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.12.4.tgz#ea972c5779060bad1c5c2644e0ae9db287c1f16f"
-  integrity sha512-AFxOtfzyLhtgTRl3FElewTvu1fzVcxWaGUHxsWDvdyh10KDpApt1dapH3mSCXKCgYTBrzoLBIcM1qHOpi5qHFQ==
+"@types/plotly.js@*", "@types/plotly.js@2.12.5":
+  version "2.12.5"
+  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.12.5.tgz#b3515fc5e0d939324be90742fde28c842ad27bc6"
+  integrity sha512-DZydmPSYTrJw5gVQViJCsYNS0pBfkqQ+nXTxmaMD5q6GhvM0ckKo3rRhskwAcJfO9booBGiX/z0njUNXfrLPxA==
 
 "@types/prettier@^2.1.5":
   version "2.2.3"
