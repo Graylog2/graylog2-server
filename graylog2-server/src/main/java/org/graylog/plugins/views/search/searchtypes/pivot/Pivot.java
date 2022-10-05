@@ -165,6 +165,10 @@ public abstract class Pivot implements SearchType {
         @JsonProperty
         public abstract Builder sort(List<SortSpec> sort);
 
+        public Builder sort(SortSpec... sort) {
+            return sort(List.of(sort));
+        }
+
         @JsonProperty
         public abstract Builder rollup(boolean rollup);
 

@@ -50,28 +50,32 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, Terms> {
     @Override
     public Optional<Tuple2<AggregationBuilder, AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<Values> bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext);
-        final TermsAggregationBuilder builder = createTerms(bucketSpec, ordering);
+        final int limit = bucketSpec.stream()
+                .map(Values::limit)
+                .max(Integer::compare)
+                .orElse(Values.DEFAULT_LIMIT);
+        final TermsAggregationBuilder builder = createTerms(bucketSpec, ordering, limit);
         return Optional.of(new Tuple2<>(builder, builder));
     }
 
 
-    private TermsAggregationBuilder createTerms(List<Values> valueBuckets, List<BucketOrder> ordering) {
+    private TermsAggregationBuilder createTerms(List<Values> valueBuckets, List<BucketOrder> ordering, int limit) {
         return valueBuckets.size() > 1
-                ? createScriptedTerms(valueBuckets, ordering)
-                : createSimpleTerms(valueBuckets.get(0), ordering);
+                ? createScriptedTerms(valueBuckets, ordering, limit)
+                : createSimpleTerms(valueBuckets.get(0), ordering, limit);
     }
 
-    private TermsAggregationBuilder createSimpleTerms(Values value, List<BucketOrder> ordering) {
+    private TermsAggregationBuilder createSimpleTerms(Values value, List<BucketOrder> ordering, int limit) {
         return AggregationBuilders.terms(AGG_NAME)
                 .field(value.field())
                 .order(ordering)
-                .size(15);
+                .size(limit);
     }
 
-    private TermsAggregationBuilder createScriptedTerms(List<? extends BucketSpec> buckets, List<BucketOrder> ordering) {
+    private TermsAggregationBuilder createScriptedTerms(List<? extends BucketSpec> buckets, List<BucketOrder> ordering, int limit) {
         return AggregationBuilders.terms(AGG_NAME)
                 .script(scriptForPivots(buckets))
-                .size(15)
+                .size(limit)
                 .order(ordering);
     }
 

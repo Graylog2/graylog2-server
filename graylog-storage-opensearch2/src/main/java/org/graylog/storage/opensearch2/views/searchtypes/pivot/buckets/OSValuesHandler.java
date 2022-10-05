@@ -60,27 +60,30 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values, Terms> {
     @Override
     public Optional<Tuple2<AggregationBuilder, AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<Values> bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext);
-        final AggregationBuilder builder = createTerms(bucketSpec, ordering);
-        //record(OSGeneratedQueryContext, pivot, valuesSpec, name, Terms.class);
+        final int limit = bucketSpec.stream()
+                .map(Values::limit)
+                .max(Integer::compare)
+                .orElse(Values.DEFAULT_LIMIT);
+        final AggregationBuilder builder = createTerms(bucketSpec, ordering, limit);
         return Optional.of(new Tuple2<>(builder, builder));
     }
 
-    private AggregationBuilder createTerms(List<Values> valueBuckets, List<BucketOrder> ordering) {
+    private AggregationBuilder createTerms(List<Values> valueBuckets, List<BucketOrder> ordering, int limit) {
         return valueBuckets.size() > 1
                 ? supportsMultiTerms
-                ? createMultiTerms(valueBuckets, ordering)
-                : createScriptedTerms(valueBuckets, ordering)
-                : createSimpleTerms(valueBuckets.get(0), ordering);
+                ? createMultiTerms(valueBuckets, ordering, limit)
+                : createScriptedTerms(valueBuckets, ordering, limit)
+                : createSimpleTerms(valueBuckets.get(0), ordering, limit);
     }
 
-    private AggregationBuilder createSimpleTerms(Values values, List<BucketOrder> ordering) {
+    private AggregationBuilder createSimpleTerms(Values values, List<BucketOrder> ordering, int limit) {
         return AggregationBuilders.terms(AGG_NAME)
                 .field(values.field())
                 .order(ordering)
-                .size(15);
+                .size(limit);
     }
 
-    private AggregationBuilder createMultiTerms(List<Values> valueBuckets, List<BucketOrder> ordering) {
+    private AggregationBuilder createMultiTerms(List<Values> valueBuckets, List<BucketOrder> ordering, int limit) {
         return AggregationBuilders.multiTerms(AGG_NAME)
                 .terms(valueBuckets.stream()
                         .map(value -> new MultiTermsValuesSourceConfig.Builder()
@@ -88,13 +91,13 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values, Terms> {
                                 .build())
                         .collect(Collectors.toList()))
                 .order(ordering)
-                .size(15);
+                .size(limit);
     }
 
-    private TermsAggregationBuilder createScriptedTerms(List<? extends BucketSpec> buckets, List<BucketOrder> ordering) {
+    private TermsAggregationBuilder createScriptedTerms(List<? extends BucketSpec> buckets, List<BucketOrder> ordering, int limit) {
         return AggregationBuilders.terms(AGG_NAME)
                 .script(scriptForPivots(buckets))
-                .size(15)
+                .size(limit)
                 .order(ordering.isEmpty() ? List.of(BucketOrder.count(false)) : ordering);
     }
 
