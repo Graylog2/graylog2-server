@@ -120,7 +120,7 @@
     "@types/moment-duration-format": "^2.2.2",
     "@types/mousetrap": "1.6.9",
     "@types/numeral": "^2.0.1",
-    "@types/plotly.js": "2.12.4",
+    "@types/plotly.js": "2.12.5",
     "@types/react-beautiful-dnd": "^13.0.0",
     "@types/react-bootstrap": "^0.32.25",
     "@types/react-color": "^3.0.6",
