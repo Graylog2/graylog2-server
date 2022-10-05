@@ -9,12 +9,15 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.rest.QueryDTO;
 import org.graylog.plugins.views.search.rest.SearchDTO;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
+import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.TimeUnitInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
@@ -38,13 +41,11 @@ import static org.graylog.testing.containermatrix.SearchServer.OS1;
 import static org.graylog.testing.containermatrix.SearchServer.OS2;
 import static org.graylog.testing.containermatrix.SearchServer.OS2_2;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasLength;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {ES7 }) //, OS1, OS2, OS2_2})
+@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {ES7, OS1, OS2, OS2_2})
 public class SearchAggregationsIT {
     private static final String PIVOT_NAME = "pivotaggregation";
     private static final String PIVOT_PATH = "results.query1.search_types." + PIVOT_NAME;
@@ -147,6 +148,46 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("POST", "count()"), equalTo(45))
                 .body(pathToMetricResult("PUT", "count()"), equalTo(43))
                 .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
+    }
+
+    @ContainerMatrixTest
+    void testFindTopPivot() throws JsonProcessingException {
+        final Pivot pivot = Pivot.builder()
+                .rollup(false)
+                .rowGroups(Values.builder().field("http_method").limit(1).build())
+                .sort(SeriesSort.create(SeriesSort.Type, "max(took_ms)", SortSpec.Direction.Descending))
+                .series(Max.builder().field("took_ms").build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(1));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult("GET", "max(took_ms)"), equalTo(5300.0f));
+    }
+
+    @ContainerMatrixTest
+    void testFindBottomPivot() throws JsonProcessingException {
+        final Pivot pivot = Pivot.builder()
+                .rollup(false)
+                .rowGroups(Values.builder().field("http_method").limit(1).build())
+                .sort(SeriesSort.create(SeriesSort.Type, "max(took_ms)", SortSpec.Direction.Ascending))
+                .series(Max.builder().field("took_ms").build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(1));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult("DELETE", "max(took_ms)"), equalTo(104.0f));
     }
 
     @ContainerMatrixTest
@@ -318,8 +359,8 @@ public class SearchAggregationsIT {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
                 .rowGroups(
-                        Values.builder().field("http_method").build(),
-                        Values.builder().field("http_response_code").build()
+                        Values.builder().field("http_method").limit(15).build(),
+                        Values.builder().field("http_response_code").limit(15).build()
                 )
                 .series(Count.builder().build())
                 .build();
