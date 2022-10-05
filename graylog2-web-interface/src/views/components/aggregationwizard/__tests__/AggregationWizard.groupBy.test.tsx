@@ -87,6 +87,7 @@ describe('AggregationWizard', () => {
                          fields={Immutable.List([])}
                          onChange={() => {}}
                          {...props}>
+        {/* eslint-disable-next-line react/jsx-no-useless-fragment */}
         <>The Visualization</>
       </AggregationWizard>,
     </FieldTypesContext.Provider>,
@@ -213,7 +214,7 @@ describe('AggregationWizard', () => {
 
     const configureElementsSection = await screen.findByTestId('configure-elements-section');
 
-    expect(within(configureElementsSection).queryByText('Group By')).toBeInTheDocument();
+    expect(within(configureElementsSection).getByText('Group By')).toBeInTheDocument();
   });
 
   it('should correctly change config', async () => {

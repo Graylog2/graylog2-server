@@ -97,6 +97,7 @@ describe('AggregationWizard', () => {
                          type="AGGREGATION"
                          fields={Immutable.List([])}
                          {...props}>
+        {/* eslint-disable-next-line react/jsx-no-useless-fragment */}
         <>The Visualization</>
       </AggregationWizard>
     </FieldTypesContext.Provider>,
@@ -203,6 +204,7 @@ describe('AggregationWizard', () => {
     const newSortContainer = await screen.findByTestId('sort-element-0');
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Field is required.')).toBeInTheDocument());
+    // eslint-disable-next-line jest/valid-expect
     await waitFor(() => expect(expect(applyButton).toBeDisabled()));
   });
 
@@ -214,6 +216,7 @@ describe('AggregationWizard', () => {
     const newSortContainer = await screen.findByTestId('sort-element-0');
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Direction is required.')).toBeInTheDocument());
+    // eslint-disable-next-line jest/valid-expect
     await waitFor(() => expect(expect(applyButton).toBeDisabled()));
   });
 
