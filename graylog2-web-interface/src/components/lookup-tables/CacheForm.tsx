@@ -168,7 +168,6 @@ const CacheForm = ({ type, title, saved, create, cache, validate, validationErro
                                    }
                                    labelClassName="col-sm-3"
                                    wrapperClassName="col-sm-9" />
-
                 </fieldset>
                 {configFieldSet}
                 <fieldset>

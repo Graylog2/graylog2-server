@@ -17,8 +17,8 @@
 import * as React from 'react';
 import _ from 'lodash';
 import { Formik, Form } from 'formik';
-import usePluginEntities from 'hooks/usePluginEntities';
 
+import usePluginEntities from 'hooks/usePluginEntities';
 import type { LookupTableAdapter, validationErrorsType } from 'logic/lookup-tables/types';
 import { Col, Row } from 'components/bootstrap';
 import { FormikFormGroup, TimeUnitInput, FormSubmit } from 'components/common';
@@ -73,16 +73,6 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
   const pluginName = React.useMemo(() => (plugin.displayName || type), [plugin, type]);
   const DocComponent = React.useMemo(() => (plugin.documentationComponent), [plugin]);
 
-  const configFieldSet = React.useMemo(() => {
-    if (plugin) {
-      return React.createElement(
-        plugin.formComponent, { config: dataAdapter.config, ref: configRef },
-      );
-    }
-
-    return null;
-  }, [plugin, dataAdapter.config]);
-
   const sanitizeName = (inName: string) => {
     return inName.trim().replace(/\W+/g, '-').toLocaleLowerCase();
   };
@@ -102,12 +92,8 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
     const errors: any = {};
 
     if (!values.title) errors.title = 'Required';
-
-    if (!values.name) {
-      errors.name = 'Required';
-    } else {
-      validate(values);
-    }
+    if (!values.name) errors.name = 'Required';
+    if (values.name && values.title) validate(values);
 
     if (values.config.type !== 'none' && configRef.current && typeof configRef.current.validate !== 'undefined') {
       const confErrors = configRef.current?.validate() || {};
@@ -134,6 +120,46 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
     promise.then(() => saved());
   };
 
+  const handleConfigChange = (event: React.BaseSyntheticEvent) => {
+    console.log(event.target);
+    console.log('is required:', event.target.required);
+  };
+
+  const getValidationMessage = React.useCallback((fieldName: string, defaultText: string) => {
+    if (validationErrors[fieldName]) {
+      return (
+        <div>
+          <span>{defaultText}</span><br />
+          <span><b>{validationErrors[fieldName][0]}</b></span>
+        </div>
+      );
+    }
+
+    return <span>{defaultText}</span>;
+  }, [validationErrors]);
+
+  const getValidationState = React.useCallback((fieldName: string) => {
+    return validationErrors[fieldName] ? 'error' : null;
+  }, [validationErrors]);
+
+  const configFieldSet = React.useMemo(() => {
+    if (plugin) {
+      return React.createElement(
+        plugin.formComponent, {
+          ref: configRef,
+          config: dataAdapter.config,
+          handleFormEvent: handleConfigChange,
+          updateConfig: handleConfigChange,
+          validationMessage: getValidationMessage,
+          validationState: getValidationState,
+          setDisableFormSubmission: (isDisabled: boolean) => (isDisabled),
+        },
+      );
+    }
+
+    return null;
+  }, [plugin, dataAdapter.config, getValidationMessage, getValidationState]);
+
   const onCancel = () => history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
   const updatable = !create && !loadingScopePermissions && scopePermissions?.is_mutable;
 
@@ -150,8 +176,8 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
                   onSubmit={handleSubmit}
                   enableReinitialize>
             {({ errors, values, setValues, isSubmitting }) => (
-            <Form className="form form-horizontal">
-              <fieldset>
+              <Form className="form form-horizontal">
+                <fieldset>
                   <FormikFormGroup type="text"
                                    name="title"
                                    label="Title"
@@ -174,9 +200,9 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
                                    error={validationErrors.name ? validationErrors.name[0] : null}
                                    onChange={() => setGenerateName(false)}
                                    help={
-                                    (errors.name || validationErrors.name)
-                                      ? null
-                                      : 'The name that is being used to refer to this data adapter. Must be unique.'
+                                     (errors.name || validationErrors.name)
+                                       ? null
+                                       : 'The name that is being used to refer to this data adapter. Must be unique.'
                                    }
                                    labelClassName="col-sm-3"
                                    wrapperClassName="col-sm-9" />
