@@ -127,7 +127,8 @@ public class CaffeineLookupCache extends LookupCache {
                 return loader.call();
             } catch (Exception e) {
                 LOG.warn("Loading value from data adapter failed for key {}, returning empty result", key, e);
-                return LookupResult.withError(key.toString(), e.getMessage());
+                return LookupResult.withError(
+                        String.format("Loading value from data adapter failed for key <%s>: %s", key.toString(), e.getMessage()));
             }
         };
         try (final Timer.Context ignored = lookupTimer()) {
