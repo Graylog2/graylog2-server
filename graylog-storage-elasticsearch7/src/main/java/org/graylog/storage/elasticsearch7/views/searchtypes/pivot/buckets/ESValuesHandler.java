@@ -20,14 +20,20 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.script.Script;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.BucketOrder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.Filters;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.FiltersAggregationBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.ParsedFilters;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
@@ -45,21 +51,35 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, Terms> {
     private static final String KEY_SEPARATOR_CHARACTER = "\u2E31";
     private static final String KEY_SEPARATOR_PHRASE = " + \"" + KEY_SEPARATOR_CHARACTER + "\" + ";
     private static final String AGG_NAME = "agg";
+    private static final ImmutableList<String> MISSING_BUCKET_KEYS = ImmutableList.of(MissingBucketConstants.MISSING_BUCKET_NAME);
 
     @Nonnull
     @Override
-    public Optional<Tuple2<AggregationBuilder, AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<Values> bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
+    public Optional<CreatedAggregations<AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<Values> bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext);
         final int limit = bucketSpec.stream()
                 .map(Values::limit)
                 .max(Integer::compare)
                 .orElse(Values.DEFAULT_LIMIT);
-        final TermsAggregationBuilder builder = createTerms(bucketSpec, ordering, limit);
-        return Optional.of(new Tuple2<>(builder, builder));
+        final AggregationBuilder termsAggregation = createTerms(bucketSpec, ordering, limit);
+        final FiltersAggregationBuilder filterAggregation = createFilter(name, bucketSpec)
+                .subAggregation(termsAggregation);
+
+        return Optional.of(CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation)));
+    }
+
+    private FiltersAggregationBuilder createFilter(String name, List<Values> bucketSpecs) {
+        final BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
+        bucketSpecs.stream()
+                .map(Values::field)
+                .map(QueryBuilders::existsQuery)
+                .forEach(queryBuilder::must);
+        return AggregationBuilders.filters(name, queryBuilder)
+                .otherBucket(true);
     }
 
 
-    private TermsAggregationBuilder createTerms(List<Values> valueBuckets, List<BucketOrder> ordering, int limit) {
+    private AggregationBuilder createTerms(List<Values> valueBuckets, List<BucketOrder> ordering, int limit) {
         return valueBuckets.size() > 1
                 ? createScriptedTerms(valueBuckets, ordering, limit)
                 : createSimpleTerms(valueBuckets.get(0), ordering, limit);
@@ -91,8 +111,11 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, Terms> {
                                                                                                 Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket> initialBucket) {
         final ImmutableList<String> previousKeys = initialBucket.v1();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.v2();
-        final MultiBucketsAggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
-        return aggregation.getBuckets().stream()
+        final ParsedFilters filterAggregation = previousBucket.getAggregations().get(AGG_NAME);
+        final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
+        final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
+        final Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> bucketStream = termsAggregation.getBuckets()
+                .stream()
                 .map(bucket -> {
                     final ImmutableList<String> keys = ImmutableList.<String>builder()
                             .addAll(previousKeys)
@@ -101,6 +124,10 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, Terms> {
 
                     return new Tuple2<>(keys, bucket);
                 });
+
+        return otherBucket.getDocCount() > 0
+                ? Stream.concat(bucketStream, Stream.of(new Tuple2<>(MISSING_BUCKET_KEYS, otherBucket)))
+                : bucketStream;
     }
 
     private ImmutableList<String> splitKeys(String keys) {
