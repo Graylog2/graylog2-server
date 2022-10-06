@@ -16,15 +16,22 @@
  */
 package org.graylog.plugins.views.aggregations;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.rest.QueryDTO;
+import org.graylog.plugins.views.search.rest.SearchDTO;
+import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.io.InputStream;
+import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 import static org.graylog.plugins.views.search.aggregations.MissingBucketConstants.MISSING_BUCKET_NAME;
@@ -47,7 +54,6 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
     private static final String EXEC_PATH = "/views/search/sync";
     private static final String QUERY_ID = "q1";
     private static final String SEARCH_TYPE_ID = "st1";
-
 
     private final RequestSpecification requestSpec;
     private final GraylogBackend backend;
@@ -75,29 +81,30 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
                 .statusCode(200);
         //General verification
         validatableResponse.body("execution.done", equalTo(true))
-                .body(pivotSearchTypePathInResponse + ".rows", hasSize(5))
-                .body(pivotSearchTypePathInResponse + ".total", equalTo(5))
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == 'Joe' }", notNullValue())
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == 'Jane' }", notNullValue())
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == 'Bob' }", notNullValue())
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", notNullValue())
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == [] }", notNullValue());
+                .rootPath(pivotSearchTypePathInResponse)
+                .body(".rows", hasSize(5))
+                .body(".total", equalTo(5))
+                .body(".rows.find{ it.key[0] == 'Joe' }", notNullValue())
+                .body(".rows.find{ it.key[0] == 'Jane' }", notNullValue())
+                .body(".rows.find{ it.key[0] == 'Bob' }", notNullValue())
+                .body(".rows.find{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", notNullValue())
+                .body(".rows.find{ it.key == [] }", notNullValue());
 
         //Empty bucket verification (should precede the last/total one - index 3)
         //The only message with "empty" first name in a fixture is {(...)"lastName": "Cooper","age": 60(...)}
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[3].key", contains("(Empty Value)"));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[3].values[0].key", contains("count()"));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[3].values[0].value", equalTo(1));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[3].values[1].key", contains("avg(age)"));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[3].values[1].value", equalTo(60.0f));
+        validatableResponse.body(".rows[3].key", contains("(Empty Value)"));
+        validatableResponse.body(".rows[3].values[0].key", contains("count()"));
+        validatableResponse.body(".rows[3].values[0].value", equalTo(1));
+        validatableResponse.body(".rows[3].values[1].key", contains("avg(age)"));
+        validatableResponse.body(".rows[3].values[1].value", equalTo(60.0f));
 
         //Top bucket verification
         //There are 2 "Joes" in a fixture: {(...)"lastName": "Smith","age": 50(...)} and {(...)"lastName": "Biden","age": 80(...)}
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[0].key", contains("Joe"));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[0].values[0].key", contains("count()"));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[0].values[0].value", equalTo(2));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[0].values[1].key", contains("avg(age)"));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[0].values[1].value", equalTo(65.0f));
+        validatableResponse.body(".rows[0].key", contains("Joe"));
+        validatableResponse.body(".rows[0].values[0].key", contains("count()"));
+        validatableResponse.body(".rows[0].values[0].value", equalTo(2));
+        validatableResponse.body(".rows[0].values[1].key", contains("avg(age)"));
+        validatableResponse.body(".rows[0].values[1].value", equalTo(65.0f));
 
     }
 
@@ -115,16 +122,17 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
                 .statusCode(200);
         //General verification
         validatableResponse.body("execution.done", equalTo(true))
-                .body(pivotSearchTypePathInResponse + ".rows", hasSize(5))
-                .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == 'Joe' }", hasSize(2)) // Joe-Biden, Joe-Smith
-                .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == 'Jane' }", hasSize(1)) // Jane-Smith
-                .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", hasSize(1))
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == [] }", notNullValue()) //totals
-                .body(pivotSearchTypePathInResponse + ".total", equalTo(5));
+                .rootPath(pivotSearchTypePathInResponse)
+                .body(".rows", hasSize(5))
+                .body(".rows.findAll{ it.key[0] == 'Joe' }", hasSize(2)) // Joe-Biden, Joe-Smith
+                .body(".rows.findAll{ it.key[0] == 'Jane' }", hasSize(1)) // Jane-Smith
+                .body(".rows.findAll{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", hasSize(1))
+                .body(".rows.find{ it.key == [] }", notNullValue()) //totals
+                .body(".total", equalTo(5));
 
         //Empty buckets verification
         //We have only one entry with missing first name {(...)"lastName": "Cooper","age": 60(...)}, so both empty buckets will have the same values
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", hasItems(2, 60.0f));
+        validatableResponse.body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", hasItems(2, 60.0f));
     }
 
     @ContainerMatrixTest
@@ -141,23 +149,23 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
 
         //General verification
         validatableResponse.body("execution.done", equalTo(true))
-                .body(pivotSearchTypePathInResponse + ".rows", hasSize(5))
-                .body(pivotSearchTypePathInResponse + ".total", equalTo(5))
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '60' }", notNullValue())
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '40' }", notNullValue())
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '50' }", notNullValue())
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '80' }", notNullValue())
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == [] }", notNullValue());
+                .rootPath(pivotSearchTypePathInResponse)
+                .body(".rows", hasSize(5))
+                .body(".total", equalTo(5))
+                .body(".rows.find{ it.key == ['60'] }", notNullValue())
+                .body(".rows.find{ it.key == ['40'] }", notNullValue())
+                .body(".rows.find{ it.key == ['50'] }", notNullValue())
+                .body(".rows.find{ it.key == ['80'] }", notNullValue())
+                .body(".rows.find{ it.key == [] }", notNullValue());
 
         //Empty bucket is not there - in a fixture all the documents have "age" field
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", nullValue());
-
+        validatableResponse.body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }", nullValue());
 
         //Top bucket verification
         //There are 2 guys of age 60
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[0].key", contains("60"));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[0].values[0].key", contains("count()"));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[0].values[0].value", equalTo(2));
+        validatableResponse.body(".rows[0].key", contains("60"));
+        validatableResponse.body(".rows[0].values[0].key", contains("count()"));
+        validatableResponse.body(".rows[0].values[0].value", equalTo(2));
 
     }
 
