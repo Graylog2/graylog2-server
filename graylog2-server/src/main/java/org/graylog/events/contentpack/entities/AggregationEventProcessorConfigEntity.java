@@ -27,7 +27,6 @@ import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationSeries;
-import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -124,15 +123,10 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
         final ImmutableSet<String> streamSet = ImmutableSet.copyOf(
                 streams().stream()
                         .map(id -> EntityDescriptor.create(id, ModelTypes.STREAM_V1))
-                        .map(ed -> {
-                            final Object object = nativeEntities.get(ed);
+                        .map(nativeEntities::get)
+                        .map(object -> {
                             if (object == null) {
-                                if (EntityDescriptorIds.isSystemStreamDescriptor(ed)) {
-                                    // System Streams will not be in Native Entities.
-                                    return ed.id().id();
-                                } else {
-                                    throw new ContentPackException("Missing Stream for event definition");
-                                }
+                                throw new ContentPackException("Missing Stream for event definition");
                             } else if (object instanceof Stream) {
                                 Stream stream = (Stream) object;
                                 return stream.getId();

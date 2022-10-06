@@ -46,7 +46,6 @@ import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
-import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -157,15 +156,10 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
                 .id(this.id())
                 .streams(this.streams().stream()
                         .map(id -> EntityDescriptor.create(id, ModelTypes.STREAM_V1))
-                        .map(ed -> {
-                            final Object object = nativeEntities.get(ed);
+                        .map(nativeEntities::get)
+                        .map(object -> {
                             if (object == null) {
-                                if (EntityDescriptorIds.isSystemStreamDescriptor(ed)) {
-                                    // System Streams will not be in Native Entities.
-                                    return ed.id().id();
-                                } else {
-                                    throw new ContentPackException("Missing Stream for widget entity");
-                                }
+                                throw new ContentPackException("Missing Stream for widget entity");
                             } else if (object instanceof Stream) {
                                 Stream stream = (Stream) object;
                                 return stream.getId();

@@ -118,7 +118,7 @@ public class ContentPackServiceTest {
                 ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories, outputFactories2)
         );
 
-        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades);
+        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, streamService);
 
         Map<String, String> entityData = new HashMap<>(2);
         entityData.put("name", "NAME");

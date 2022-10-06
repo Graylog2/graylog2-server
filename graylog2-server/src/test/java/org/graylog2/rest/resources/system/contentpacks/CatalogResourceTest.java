@@ -74,7 +74,7 @@ public class CatalogResourceTest {
                 mock(ContentPackInstallationPersistenceService.class);
         final Set<ConstraintChecker> constraintCheckers = Collections.emptySet();
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = Collections.singletonMap(ModelType.of("test", "1"), mockEntityFacade);
-        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades);
+        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, streamService);
         catalogResource = new CatalogResource(contentPackService);
     }
 
