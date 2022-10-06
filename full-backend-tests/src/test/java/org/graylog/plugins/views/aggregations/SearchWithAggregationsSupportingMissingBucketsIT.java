@@ -32,6 +32,7 @@ import static org.graylog.testing.containermatrix.SearchServer.ES7;
 import static org.graylog.testing.containermatrix.SearchServer.OS1;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
@@ -110,25 +111,20 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
                 .post(EXEC_PATH)
                 .then()
                 .log().ifStatusCodeMatches(not(200))
+                .log().ifValidationFails()
                 .statusCode(200);
         //General verification
         validatableResponse.body("execution.done", equalTo(true))
-                .body(pivotSearchTypePathInResponse + ".rows", hasSize(10))
-                .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == 'Joe' }", hasSize(3)) //Joe, Joe-Biden, Joe-Smith
-                .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == 'Bob' }", hasSize(2)) //Bob, Bob-empty
-                .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == 'Jane' }", hasSize(2)) //Jane, Jane-Smith
-                .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", hasSize(2)) //empty, empty-Cooper
+                .body(pivotSearchTypePathInResponse + ".rows", hasSize(5))
+                .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == 'Joe' }", hasSize(2)) // Joe-Biden, Joe-Smith
+                .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == 'Jane' }", hasSize(1)) // Jane-Smith
+                .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", hasSize(1))
                 .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == [] }", notNullValue()) //totals
                 .body(pivotSearchTypePathInResponse + ".total", equalTo(5));
 
         //Empty buckets verification
         //We have only one entry with missing first name {(...)"lastName": "Cooper","age": 60(...)}, so both empty buckets will have the same values
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '" + MISSING_BUCKET_NAME + "' && it.key[1] == 'Cooper'}.values[0].value", equalTo(1))
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '" + MISSING_BUCKET_NAME + "' && it.key[1] == 'Cooper'}.values[1].value", equalTo(60.0f))
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "']}.values[0].value", equalTo(1))
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "']}.values[1].value", equalTo(60.0f));
-
-
+        validatableResponse.body(pivotSearchTypePathInResponse + ".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", hasItems(2, 60.0f));
     }
 
     @ContainerMatrixTest
