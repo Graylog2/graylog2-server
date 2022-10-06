@@ -27,7 +27,7 @@ import { DataAdapter, DataAdapterCreate, DataAdapterForm, DataAdaptersOverview }
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
-import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
+import { LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 import { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 
 const _saved = () => {
@@ -43,10 +43,6 @@ const _validateAdapter = (adapter) => {
 };
 
 class LUTDataAdaptersPage extends React.Component {
-  errorStatesTimer = undefined;
-
-  errorStatesInterval = 1000;
-
   componentDidMount() {
     this._loadData(this.props);
   }
@@ -64,35 +60,9 @@ class LUTDataAdaptersPage extends React.Component {
     clearInterval(this.errorStatesTimer);
   }
 
-  _startErrorStatesTimer = () => {
-    this._stopErrorStatesTimer();
-
-    this.errorStatesTimer = setInterval(() => {
-      const { dataAdapters } = this.props;
-      let names = null;
-
-      if (dataAdapters) {
-        names = dataAdapters.map((t) => t.name);
-      }
-
-      if (names) {
-        LookupTablesActions.getErrors(null, null, names || null);
-      }
-    }, this.errorStatesInterval);
-  };
-
-  _stopErrorStatesTimer = () => {
-    if (this.errorStatesTimer) {
-      clearInterval(this.errorStatesTimer);
-      this.errorStatesTimer = undefined;
-    }
-  };
-
   _loadData = (props) => {
     const { pagination } = props;
     const { page, pageSize } = this.props.paginationQueryParameter;
-
-    this._stopErrorStatesTimer();
 
     if (props.params && props.params.adapterName) {
       LookupTableDataAdaptersActions.get(props.params.adapterName);
@@ -100,7 +70,6 @@ class LUTDataAdaptersPage extends React.Component {
       LookupTableDataAdaptersActions.getTypes();
     } else {
       LookupTableDataAdaptersActions.searchPaginated(page, pageSize, pagination.query);
-      this._startErrorStatesTimer();
     }
   };
 
@@ -201,8 +170,12 @@ LUTDataAdaptersPage.defaultProps = {
   action: undefined,
 };
 
-export default connect(withParams(withLocation(withPaginationQueryParameter(LUTDataAdaptersPage))), { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore }, ({ dataAdaptersStore, lookupTableStore, ...otherProps }) => ({
-  ...otherProps,
-  ...dataAdaptersStore,
-  errorStates: lookupTableStore.errorStates,
-}));
+export default connect(
+  withParams(withLocation(withPaginationQueryParameter(LUTDataAdaptersPage))),
+  { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore },
+  ({ dataAdaptersStore, lookupTableStore, ...otherProps }) => ({
+    ...otherProps,
+    ...dataAdaptersStore,
+    errorStates: lookupTableStore.errorStates,
+  }),
+);

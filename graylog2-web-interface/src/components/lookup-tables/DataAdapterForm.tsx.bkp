@@ -17,12 +17,12 @@
 import * as React from 'react';
 import _ from 'lodash';
 import { Formik, Form } from 'formik';
-
 import usePluginEntities from 'hooks/usePluginEntities';
-import type { LookupTableCache, validationErrorsType } from 'logic/lookup-tables/types';
+
+import type { LookupTableAdapter, validationErrorsType } from 'logic/lookup-tables/types';
 import { Col, Row } from 'components/bootstrap';
-import { FormikFormGroup, FormSubmit } from 'components/common';
-import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
+import { FormikFormGroup, TimeUnitInput, FormSubmit } from 'components/common';
+import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import useScopePermissions from 'hooks/useScopePermissions';
 import history from 'util/History';
 import Routes from 'routing/Routes';
@@ -43,11 +43,14 @@ const Title = ({ title, typeName, create }: TitleProps) => {
   );
 };
 
-const INIT_CACHE: LookupTableCache = {
+const INIT_DATA_ADAPTER: LookupTableAdapter = {
   id: undefined,
   title: '',
   description: '',
   name: '',
+  custom_error_ttl_enabled: false,
+  custom_error_ttl: null,
+  custom_error_ttl_unit: null,
   config: { type: 'none' },
 };
 
@@ -56,35 +59,35 @@ type Props = {
   title: string,
   saved: () => void,
   create?: boolean,
-  cache?: LookupTableCache,
-  validate?: (arg: LookupTableCache) => void,
+  dataAdapter?: LookupTableAdapter,
+  validate?: (arg: LookupTableAdapter) => void,
   validationErrors?: validationErrorsType,
 };
 
-const CacheForm = ({ type, title, saved, create, cache, validate, validationErrors }: Props) => {
+const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, validationErrors }: Props) => {
   const configRef = React.useRef(null);
   const [generateName, setGenerateName] = React.useState<boolean>(create);
-  const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(dataAdapter);
 
-  const plugin = usePluginEntities('lookupTableCaches').find((p) => p.type === type);
+  const plugin = usePluginEntities('lookupTableAdapters').find((p) => p.type === type);
   const pluginName = React.useMemo(() => (plugin.displayName || type), [plugin, type]);
   const DocComponent = React.useMemo(() => (plugin.documentationComponent), [plugin]);
 
   const configFieldSet = React.useMemo(() => {
     if (plugin) {
       return React.createElement(
-        plugin.formComponent, { config: cache.config, ref: configRef },
+        plugin.formComponent, { config: dataAdapter.config, ref: configRef },
       );
     }
 
     return null;
-  }, [plugin, cache.config]);
+  }, [plugin, dataAdapter.config]);
 
   const sanitizeName = (inName: string) => {
     return inName.trim().replace(/\W+/g, '-').toLocaleLowerCase();
   };
 
-  const handleTitleChange = (values: LookupTableCache, setValues: any) => (event: React.BaseSyntheticEvent) => {
+  const handleTitleChange = (values: LookupTableAdapter, setValues: any) => (event: React.BaseSyntheticEvent) => {
     if (!generateName) return;
     const safeName = sanitizeName(event.target.value);
 
@@ -95,7 +98,7 @@ const CacheForm = ({ type, title, saved, create, cache, validate, validationErro
     });
   };
 
-  const handleValidation = (values: LookupTableCache) => {
+  const handleValidation = (values: LookupTableAdapter) => {
     const errors: any = {};
 
     if (!values.title) errors.title = 'Required';
@@ -114,23 +117,32 @@ const CacheForm = ({ type, title, saved, create, cache, validate, validationErro
     return errors;
   };
 
-  const handleSubmit = (values: LookupTableCache) => {
+  const handleTTLUpdate = (values: LookupTableAdapter, setValues: any) => (value: number, unit: string, enabled: boolean) => {
+    setValues({
+      ...values,
+      custom_error_ttl: value,
+      custom_error_ttl_unit: unit,
+      custom_error_ttl_enabled: enabled,
+    });
+  };
+
+  const handleSubmit = (values: LookupTableAdapter) => {
     const promise = create
-      ? LookupTableCachesActions.create(values)
-      : LookupTableCachesActions.update(values);
+      ? LookupTableDataAdaptersActions.create(values)
+      : LookupTableDataAdaptersActions.update(values);
 
     promise.then(() => saved());
   };
 
-  const onCancel = () => history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
+  const onCancel = () => history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
   const updatable = !create && !loadingScopePermissions && scopePermissions?.is_mutable;
 
   return (
     <>
       <Title title={title} typeName={pluginName} create={create} />
       <Row>
-        <Col lg={6} style={{ marginTop: 10 }}>
-          <Formik initialValues={{ ...INIT_CACHE, ...cache }}
+        <Col lg={6}>
+          <Formik initialValues={{ ...INIT_DATA_ADAPTER, ...dataAdapter }}
                   validate={handleValidation}
                   validateOnBlur
                   validateOnChange={false}
@@ -138,21 +150,21 @@ const CacheForm = ({ type, title, saved, create, cache, validate, validationErro
                   onSubmit={handleSubmit}
                   enableReinitialize>
             {({ errors, values, setValues, isSubmitting }) => (
-              <Form className="form form-horizontal">
-                <fieldset>
+            <Form className="form form-horizontal">
+              <fieldset>
                   <FormikFormGroup type="text"
                                    name="title"
                                    label="Title"
-                                   required
-                                   help={errors.title ? null : 'A short title for this cache.'}
-                                   onChange={handleTitleChange(values, setValues)}
                                    autoFocus
+                                   required
+                                   help={errors.title ? null : 'A short title for this data adapter.'}
+                                   onChange={handleTitleChange(values, setValues)}
                                    labelClassName="col-sm-3"
                                    wrapperClassName="col-sm-9" />
                   <FormikFormGroup type="text"
                                    name="description"
                                    label="Description"
-                                   help="Cache description."
+                                   help="Data adapter description."
                                    labelClassName="col-sm-3"
                                    wrapperClassName="col-sm-9" />
                   <FormikFormGroup type="text"
@@ -164,26 +176,37 @@ const CacheForm = ({ type, title, saved, create, cache, validate, validationErro
                                    help={
                                     (errors.name || validationErrors.name)
                                       ? null
-                                      : 'The name that is being used to refer to this cache. Must be unique.'
+                                      : 'The name that is being used to refer to this data adapter. Must be unique.'
                                    }
                                    labelClassName="col-sm-3"
                                    wrapperClassName="col-sm-9" />
 
+                  <TimeUnitInput label="Custom Error TTL"
+                                 help="Define a custom TTL for caching erroneous results. Otherwise the default of 5 seconds is used"
+                                 update={handleTTLUpdate(values, setValues)}
+                                 name="custom_error_ttl"
+                                 unitName="custom_error_ttl_unit"
+                                 value={values.custom_error_ttl}
+                                 unit={values.custom_error_ttl_unit || 'MINUTES'}
+                                 units={['MILLISECONDS', 'SECONDS', 'MINUTES', 'HOURS', 'DAYS']}
+                                 enabled={values.custom_error_ttl_enabled}
+                                 labelClassName="col-sm-3"
+                                 wrapperClassName="col-sm-9" />
                 </fieldset>
                 {configFieldSet}
                 <fieldset>
                   <Row>
                     <Col mdOffset={3} sm={12}>
                       {create && (
-                        <FormSubmit submitButtonText="Create cache"
-                                    submitLoadingText="Creating cache..."
+                        <FormSubmit submitButtonText="Create adapter"
+                                    submitLoadingText="Creating adapter..."
                                     isSubmitting={isSubmitting}
                                     isAsyncSubmit
                                     onCancel={onCancel} />
                       )}
                       {updatable && (
-                        <FormSubmit submitButtonText="Update cache"
-                                    submitLoadingText="Updating cache..."
+                        <FormSubmit submitButtonText="Update adapter"
+                                    submitLoadingText="Updating adapter..."
                                     isAsyncSubmit
                                     isSubmitting={isSubmitting}
                                     onCancel={onCancel} />
@@ -201,11 +224,11 @@ const CacheForm = ({ type, title, saved, create, cache, validate, validationErro
   );
 };
 
-CacheForm.defaultProps = {
+DataAdapterForm.defaultProps = {
   create: true,
-  cache: INIT_CACHE,
+  dataAdapter: INIT_DATA_ADAPTER,
   validate: null,
   validationErrors: {},
 };
 
-export default CacheForm;
+export default DataAdapterForm;

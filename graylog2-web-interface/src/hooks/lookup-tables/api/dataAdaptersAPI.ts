@@ -17,7 +17,7 @@
 
 import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
-import type { LookupTableAdapter } from 'src/logic/lookup-tables/types';
+import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
 const getURL = (path: string = '') => (URLUtils.qualifyUrl(`/system/lookup${path}`));
 
@@ -32,5 +32,5 @@ export const fetchAll = async (page = 1, perPage = 100, query = null) => {
 export const fetchErrors = async (dataAdapters: LookupTableAdapter[]) => {
   const dataAdapterNames = dataAdapters.map((adapter: LookupTableAdapter) => adapter.name);
 
-  return fetch('POST', getURL('/errorstates'), { data_adapters : dataAdapterNames });
+  return fetch('POST', getURL('/errorstates'), { data_adapters: dataAdapterNames });
 };
