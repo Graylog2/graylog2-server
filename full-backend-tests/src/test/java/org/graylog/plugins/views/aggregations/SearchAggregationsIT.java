@@ -16,8 +16,6 @@
  */
 package org.graylog.plugins.views.aggregations;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
@@ -39,11 +37,8 @@ import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeAll;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -52,6 +47,7 @@ import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.plugins.views.aggregations.AggregationTestHelpers.serialize;
 import static org.graylog.testing.containermatrix.SearchServer.ES7;
 import static org.graylog.testing.containermatrix.SearchServer.OS1;
 import static org.graylog.testing.containermatrix.SearchServer.OS2;
@@ -79,7 +75,7 @@ public class SearchAggregationsIT {
         backend.importElasticsearchFixture("random-http-logs.json", SearchAggregationsIT.class);
     }
 
-    private ValidatableResponse execute(Pivot pivot) throws JsonProcessingException {
+    private ValidatableResponse execute(Pivot pivot) {
         final Pivot pivotWithId = pivot.toBuilder()
                 .id(PIVOT_NAME)
                 .build();
@@ -108,7 +104,7 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
-    void testZeroPivots() throws JsonProcessingException {
+    void testZeroPivots() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
                 .series(Count.builder().build())
@@ -126,7 +122,7 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
-    void testZeroPivotsWithLatestMetric() throws JsonProcessingException {
+    void testZeroPivotsWithLatestMetric() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
                 .series(Latest.builder().field("http_method").build())
@@ -144,7 +140,7 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
-    void testSingleRowPivot() throws JsonProcessingException {
+    void testSingleRowPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
                 .rowGroups(Values.builder().field("http_method").build())
@@ -167,7 +163,7 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
-    void testFindTopPivot() throws JsonProcessingException {
+    void testFindTopPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
                 .rowGroups(Values.builder().field("http_method").limit(1).build())
@@ -187,7 +183,7 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
-    void testFindBottomPivot() throws JsonProcessingException {
+    void testFindBottomPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
                 .rowGroups(Values.builder().field("http_method").limit(1).build())
@@ -207,7 +203,7 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
-    void testSingleRowPivotWithDateField() throws JsonProcessingException {
+    void testSingleRowPivotWithDateField() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
                 .rowGroups(
@@ -243,7 +239,7 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
-    void testSingleRowPivotWithDateFieldAsColumnPivot() throws JsonProcessingException {
+    void testSingleRowPivotWithDateFieldAsColumnPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
                 .rowGroups(Values.builder().field("http_method").build())
@@ -278,7 +274,7 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
-    void testSingleColumnPivot() throws JsonProcessingException {
+    void testSingleColumnPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
                 .columnGroups(Values.builder().field("http_method").build())
@@ -301,7 +297,7 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
-    void testDoesNotReturnRollupWhenDisabled() throws JsonProcessingException {
+    void testDoesNotReturnRollupWhenDisabled() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
                 .columnGroups(Values.builder().field("http_method").build())
@@ -324,7 +320,7 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
-    void testSingleRowAndColumnPivots() throws JsonProcessingException {
+    void testSingleRowAndColumnPivots() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
                 .rowGroups(Values.builder().field("http_method").build())
@@ -371,7 +367,7 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
-    void testTwoRowPivots() throws JsonProcessingException {
+    void testTwoRowPivots() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
                 .rowGroups(
@@ -439,10 +435,5 @@ public class SearchAggregationsIT {
 
     private String pathToMetricResult(Collection<String> keys, Collection<String> metric) {
         return pathToRow(keys) + "." + pathToValue(metric);
-    }
-
-    private InputStream serialize(Object request) throws JsonProcessingException {
-        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        return new ByteArrayInputStream(objectMapper.writeValueAsBytes(request));
     }
 }
