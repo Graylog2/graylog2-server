@@ -24,12 +24,29 @@ import Store from 'logic/local-storage/Store';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { EventDefinitionsActions, EventDefinitionsStore } from 'stores/event-definitions/EventDefinitionsStore';
 import { EventsActions, EventsStore } from 'stores/events/EventsStore';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 
-import Events from './Events';
+import Events, { PAGE_SIZES } from './Events';
 
 import {} from 'components/event-definitions/event-definition-types';
 
 const LOCAL_STORAGE_ITEM = 'events-last-search';
+
+const fetchEvents = ({ page, pageSize, query, filter, timerange }) => {
+  Store.set(LOCAL_STORAGE_ITEM, { filter: filter, timerange: timerange });
+
+  return EventsActions.search({
+    query: query,
+    page: page,
+    pageSize: pageSize,
+    filter: filter,
+    timerange: timerange,
+  });
+};
+
+const fetchEventDefinitions = () => {
+  return EventDefinitionsActions.listPaginated({});
+};
 
 class EventsContainer extends React.Component {
   static propTypes = {
@@ -37,6 +54,7 @@ class EventsContainer extends React.Component {
     eventDefinitions: PropTypes.object.isRequired,
     currentUser: PropTypes.object.isRequired,
     streamId: PropTypes.string,
+    paginationQueryParameter: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -45,9 +63,10 @@ class EventsContainer extends React.Component {
 
   componentDidMount() {
     const { streamId } = this.props;
+    const { page, pageSize } = this.props.paginationQueryParameter;
     const lastSearch = Store.get(LOCAL_STORAGE_ITEM) || {};
 
-    const params = {};
+    const params = { page, pageSize };
 
     if (streamId) {
       params.query = `source_streams:${streamId}`;
@@ -58,30 +77,14 @@ class EventsContainer extends React.Component {
       params.timerange = lastSearch.timerange;
     }
 
-    this.fetchEvents(params);
-    this.fetchEventDefinitions();
+    fetchEvents(params);
+    fetchEventDefinitions();
   }
-
-  fetchEvents = ({ page, pageSize, query, filter, timerange }) => {
-    Store.set(LOCAL_STORAGE_ITEM, { filter: filter, timerange: timerange });
-
-    return EventsActions.search({
-      query: query,
-      page: page,
-      pageSize: pageSize,
-      filter: filter,
-      timerange: timerange,
-    });
-  };
-
-  fetchEventDefinitions = () => {
-    return EventDefinitionsActions.listPaginated({});
-  };
 
   handlePageChange = (nextPage, nextPageSize) => {
     const { events } = this.props;
 
-    this.fetchEvents({
+    fetchEvents({
       page: nextPage,
       pageSize: nextPageSize,
       query: events.parameters.query,
@@ -92,9 +95,13 @@ class EventsContainer extends React.Component {
 
   handleQueryChange = (nextQuery, callback = () => {}) => {
     const { events } = this.props;
-    const promise = this.fetchEvents({
+    const { resetPage, pageSize } = this.props.paginationQueryParameter;
+
+    resetPage();
+
+    const promise = fetchEvents({
       query: nextQuery,
-      pageSize: events.parameters.pageSize,
+      pageSize,
       filter: events.parameters.filter,
       timerange: events.parameters.timerange,
     });
@@ -105,10 +112,13 @@ class EventsContainer extends React.Component {
   handleAlertFilterChange = (nextAlertFilter) => {
     return () => {
       const { events } = this.props;
+      const { resetPage, pageSize } = this.props.paginationQueryParameter;
 
-      this.fetchEvents({
+      resetPage();
+
+      fetchEvents({
         query: events.parameters.query,
-        pageSize: events.parameters.pageSize,
+        pageSize: pageSize,
         filter: { alerts: nextAlertFilter },
         timerange: events.parameters.timerange,
       });
@@ -117,10 +127,13 @@ class EventsContainer extends React.Component {
 
   handleTimeRangeChange = (timeRangeType, range) => {
     const { events } = this.props;
+    const { resetPage, pageSize } = this.props.paginationQueryParameter;
 
-    this.fetchEvents({
+    resetPage();
+
+    fetchEvents({
       query: events.parameters.query,
-      pageSize: events.parameters.pageSize,
+      pageSize,
       filter: events.parameters.filter,
       timerange: { type: timeRangeType, range: range },
     });
@@ -128,7 +141,16 @@ class EventsContainer extends React.Component {
 
   handleSearchReload = (callback = () => {}) => {
     const { events } = this.props;
-    const promise = this.fetchEvents(events.parameters);
+    const { resetPage, pageSize } = this.props.paginationQueryParameter;
+
+    resetPage();
+
+    const promise = fetchEvents({
+      query: events.parameters.query,
+      pageSize,
+      filter: events.parameters.filter,
+      timerange: events.parameters.timerange,
+    });
 
     promise.finally(callback);
   };
@@ -157,7 +179,7 @@ class EventsContainer extends React.Component {
   }
 }
 
-export default connect(EventsContainer, {
+export default connect(withPaginationQueryParameter(EventsContainer, { pageSizes: PAGE_SIZES }), {
   events: EventsStore,
   eventDefinitions: EventDefinitionsStore,
   currentUser: CurrentUserStore,

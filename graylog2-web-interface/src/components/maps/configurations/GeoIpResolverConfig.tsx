@@ -17,7 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import { Field, Form, Formik } from 'formik';
 
-import { IfPermitted, Select, TimeUnitInput } from 'components/common';
+import { IfPermitted, Select, TimeUnitInput, ModalSubmit } from 'components/common';
 import { Button, Col, Input, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
 import { DocumentationLink } from 'components/support';
@@ -129,7 +129,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                 onClick={() => {
                   setShowModal(true);
                 }}>
-          Update
+          Edit configuration
         </Button>
       </IfPermitted>
       <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
@@ -211,19 +211,11 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                   </Row>
                 </Modal.Body>
                 <Modal.Footer>
-                  <Button type="button"
-                          bsStyle="link"
-                          onClick={resetConfig}
-                          disabled={isSubmitting}
-                          aria-disabled={isSubmitting}>
-                    Close
-                  </Button>
-                  <Button type="submit"
-                          bsStyle="success"
-                          disabled={isSubmitting}
-                          aria-disabled={isSubmitting}>
-                    {isSubmitting ? 'Saving...' : 'Save'}
-                  </Button>
+                  <ModalSubmit onCancel={resetConfig}
+                               isSubmitting={isSubmitting}
+                               isAsyncSubmit
+                               submitButtonText="Update configuration"
+                               submitLoadingText="Updating configuration..." />
                 </Modal.Footer>
               </Form>
             );

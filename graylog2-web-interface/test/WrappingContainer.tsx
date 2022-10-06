@@ -27,8 +27,16 @@ type Props = {
   children: React.ReactNode,
 }
 
+const queryClientOptions = {
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+};
+
 const WrappingContainer = ({ children }: Props) => (
-  <DefaultQueryClientProvider>
+  <DefaultQueryClientProvider options={queryClientOptions}>
     <Router history={history}>
       <DefaultProviders>
         {children}

@@ -18,12 +18,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { ConfirmDialog, Spinner } from 'components/common';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import connect from 'stores/connect';
 import { EventDefinitionsActions, EventDefinitionsStore } from 'stores/event-definitions/EventDefinitionsStore';
 
 import {} from 'components/event-definitions/event-definition-types';
 
-import EventDefinitions from './EventDefinitions';
+import EventDefinitions, { PAGE_SIZES } from './EventDefinitions';
 
 const DIALOG_TYPES = {
   COPY: 'copy',
@@ -54,6 +55,7 @@ const DIALOG_TEXT = {
 class EventDefinitionsContainer extends React.Component {
   static propTypes = {
     eventDefinitions: PropTypes.object.isRequired,
+    paginationQueryParameter: PropTypes.object.isRequired,
   };
 
   static fetchData = ({ page, pageSize, query }) => {
@@ -76,7 +78,8 @@ class EventDefinitionsContainer extends React.Component {
   }
 
   componentDidMount() {
-    EventDefinitionsContainer.fetchData({});
+    const { page, pageSize } = this.props.paginationQueryParameter;
+    EventDefinitionsContainer.fetchData({ page, pageSize });
   }
 
   handlePageChange = (nextPage, nextPageSize) => {
@@ -86,8 +89,11 @@ class EventDefinitionsContainer extends React.Component {
   };
 
   handleQueryChange = (nextQuery, callback = () => {}) => {
-    const { eventDefinitions } = this.props;
-    const promise = EventDefinitionsContainer.fetchData({ query: nextQuery, pageSize: eventDefinitions.pagination.pageSize });
+    const { resetPage, pageSize } = this.props.paginationQueryParameter;
+
+    resetPage();
+
+    const promise = EventDefinitionsContainer.fetchData({ query: nextQuery, pageSize, page: 1 });
 
     promise.finally(callback);
   };
@@ -204,4 +210,4 @@ class EventDefinitionsContainer extends React.Component {
   }
 }
 
-export default connect(EventDefinitionsContainer, { eventDefinitions: EventDefinitionsStore });
+export default connect(withPaginationQueryParameter(EventDefinitionsContainer, { pageSizes: PAGE_SIZES }), { eventDefinitions: EventDefinitionsStore });

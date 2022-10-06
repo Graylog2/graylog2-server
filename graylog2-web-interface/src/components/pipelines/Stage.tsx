@@ -24,6 +24,8 @@ import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 import { useStore } from 'stores/connect';
 import { RulesStore } from 'stores/rules/RulesStore';
 import type { RuleType } from 'stores/rules/RulesStore';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import StageForm from './StageForm';
 import StageRules from './StageRules';
@@ -37,6 +39,7 @@ type Props = {
 };
 
 const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
+  const currentUser = useCurrentUser();
   const { rules: allRules }: { rules: RuleType[] } = useStore(RulesStore);
 
   const suffix = `Contains ${(stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules`)}`;
@@ -48,7 +51,7 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
   );
 
   const actions = [
-    <Button key={`delete-stage-${stage}`} bsStyle="primary" onClick={onDelete}>Delete</Button>,
+    <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')} key={`delete-stage-${stage}`} bsStyle="primary" onClick={onDelete}>Delete</Button>,
     <StageForm key={`edit-stage-${stage}`} pipeline={pipeline} stage={stage} save={onUpdate} />,
   ];
 

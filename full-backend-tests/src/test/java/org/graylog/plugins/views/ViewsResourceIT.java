@@ -93,6 +93,6 @@ public class ViewsResourceIT {
                 .then()
                 .statusCode(400)
                 .assertThat()
-                .body("message", equalTo("Search types do not correspond to view/search types, missing searches: [967d2217-fd99-48a6-b829-5acdab906807]"));
+                .body("message", equalTo("Search types do not correspond to view/search types, missing searches [967d2217-fd99-48a6-b829-5acdab906808]; search types: [967d2217-fd99-48a6-b829-5acdab906807]; state types: [967d2217-fd99-48a6-b829-5acdab906808]"));
     }
 }

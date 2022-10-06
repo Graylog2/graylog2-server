@@ -22,7 +22,6 @@ import org.graylog.scheduler.periodicals.ScheduleTriggerCleanUp;
 import org.graylog2.events.ClusterEventCleanupPeriodical;
 import org.graylog2.events.ClusterEventPeriodical;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerPeriodical;
-import org.graylog2.periodical.AlertScannerThread;
 import org.graylog2.periodical.BatchedElasticSearchOutputFlushThread;
 import org.graylog2.periodical.ClusterHealthCheckThread;
 import org.graylog2.periodical.ClusterIdGeneratorPeriodical;
@@ -45,7 +44,6 @@ public class PeriodicalBindings extends AbstractModule {
     @Override
     protected void configure() {
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
-        periodicalBinder.addBinding().to(AlertScannerThread.class);
         periodicalBinder.addBinding().to(BatchedElasticSearchOutputFlushThread.class);
         periodicalBinder.addBinding().to(ClusterHealthCheckThread.class);
         periodicalBinder.addBinding().to(ContentPackLoaderPeriodical.class);

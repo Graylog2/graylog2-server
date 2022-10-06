@@ -26,6 +26,8 @@ import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
 import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 import { RulesStore } from 'stores/rules/RulesStore';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 type Props = {
   pipeline: PipelineType,
@@ -35,6 +37,7 @@ type Props = {
 };
 
 const StageForm = ({ pipeline, stage, create, save }: Props) => {
+  const currentUser = useCurrentUser();
   const modalRef = useRef<BootstrapModalForm>();
 
   const _initialStageNumber = useMemo(() => (
@@ -101,14 +104,15 @@ const StageForm = ({ pipeline, stage, create, save }: Props) => {
 
   return (
     <span>
-      <Button onClick={openModal}
+      <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')}
+              onClick={openModal}
               bsStyle={create ? 'success' : 'info'}>
         {create ? 'Add new stage' : 'Edit'}
       </Button>
       <BootstrapModalForm ref={modalRef}
                           title={`${create ? 'Add new' : 'Edit'} stage ${nextStage.stage}`}
                           onSubmitForm={_handleSave}
-                          submitButtonText="Save">
+                          submitButtonText={create ? 'Add stage' : 'Update stage'}>
         <fieldset>
           <Input type="number"
                  id="stage"

@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.graylog.plugins</groupId>
         <artifactId>graylog-plugin-parent</artifactId>
-        <version>4.4.0-SNAPSHOT</version>
+        <version>5.0.0-SNAPSHOT</version>
         <relativePath>../graylog-plugin-parent</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -164,22 +164,6 @@
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <configuration>
-                    <forkCount>1</forkCount>
-                    <skip>false</skip>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
                         </goals>
                     </execution>
                 </executions>

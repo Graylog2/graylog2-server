@@ -31,14 +31,13 @@ import { MessageTableEntry } from 'views/components/messagelist';
 import type { BackendMessage, Message } from 'views/components/messagelist/Types';
 import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
-import { SOURCE_FIELD } from 'views/Constants';
 import MessageTableProviders from 'views/components/messagelist/MessageTableProviders';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 
 const Table = styled.table(({ theme }) => css`
   position: relative;
-  font-size: ${theme.fonts.size.small};
+  font-size: ${theme.fonts.size.tiny};
   margin: 0;
   border-collapse: collapse;
   width: 100%;
@@ -82,7 +81,10 @@ const TableWrapper = styled.div(({ theme }) => css`
 const TableHead = styled.thead(({ theme }) => css`
   background-color: ${theme.colors.gray[90]};
   color: ${theme.utils.readableColor(theme.colors.gray[90])};
-
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  
   && > tr > th {
     min-width: 50px;
     min-height: 28px;
@@ -105,10 +107,6 @@ type Props = {
   scrollContainerRef: React.MutableRefObject<HTMLDivElement>,
   setLoadingState: (loading: boolean) => void,
 };
-
-const _columnStyle = (fieldName: string) => (fieldName.toLowerCase() === SOURCE_FIELD
-  ? { width: 180 }
-  : {});
 
 const _fieldTypeFor = (fieldName: string, fields: Immutable.List<FieldTypeMapping>) => ((fields
   && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type;
@@ -150,8 +148,7 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
             <tr>
               {selectedFields.toSeq().map((selectedFieldName) => {
                 return (
-                  <th key={selectedFieldName}
-                      style={_columnStyle(selectedFieldName)}>
+                  <th key={selectedFieldName}>
                     <Field type={_fieldTypeFor(selectedFieldName, fields)}
                            name={selectedFieldName}
                            queryId={activeQueryId}>

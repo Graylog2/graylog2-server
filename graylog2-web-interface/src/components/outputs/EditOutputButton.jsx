@@ -72,6 +72,7 @@ class EditOutputButton extends React.Component {
                            typeName={output.type}
                            helpBlock="Select a name of your new output that describes it."
                            submitAction={this._handleSubmit}
+                           submitButtonText="Update output"
                            values={output.configuration}
                            titleValue={output.title} />
       );

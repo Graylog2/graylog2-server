@@ -43,7 +43,7 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEventsES7IT extends Ela
     public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
 
     @Override
-    protected SearchServerInstance elasticsearch() {
+    protected SearchServerInstance searchServer() {
         return this.elasticsearch;
     }
 

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import {
@@ -29,6 +30,7 @@ import {
 import { Button, Col, Row } from 'components/bootstrap';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { GrokPatternsStore } from 'stores/grok-patterns/GrokPatternsStore';
 
 import GrokPatternQueryHelper from './GrokPatternQueryHelper';
@@ -43,15 +45,38 @@ const GrokPatternsList = styled(DataTable)`
   }
 `;
 
+const testPattern = (pattern, callback, errCallback) => {
+  GrokPatternsStore.testPattern(pattern, callback, errCallback);
+};
+
+const _headerCellFormatter = (header) => {
+  let formattedHeaderCell;
+
+  switch (header.toLocaleLowerCase()) {
+    case 'name':
+      formattedHeaderCell = <th className="name">{header}</th>;
+      break;
+    case 'actions':
+      formattedHeaderCell = <th className="actions">{header}</th>;
+      break;
+    default:
+      formattedHeaderCell = <th>{header}</th>;
+  }
+
+  return formattedHeaderCell;
+};
+
 class GrokPatterns extends React.Component {
+  static propTypes = {
+    paginationQueryParameter: PropTypes.object.isRequired,
+  };
+
   constructor(props) {
     super(props);
 
     this.state = {
       patterns: [],
       pagination: {
-        page: 1,
-        perPage: 10,
         count: 0,
         total: 0,
         query: '',
@@ -69,8 +94,8 @@ class GrokPatterns extends React.Component {
     }
   }
 
-  loadData = (callback) => {
-    const { pagination: { page, perPage, query } } = this.state;
+  loadData = (callback, page = this.props.paginationQueryParameter.page, perPage = this.props.paginationQueryParameter.pageSize) => {
+    const { pagination: { query } } = this.state;
 
     this.loadPromise = GrokPatternsStore.searchPaginated(page, perPage, query)
       .then(({ patterns, pagination }) => {
@@ -78,7 +103,7 @@ class GrokPatterns extends React.Component {
           callback();
         }
 
-        if (!this.loadPromise.isCancelled()) {
+        if (!this.loadPromise?.isCancelled()) {
           this.loadPromise = undefined;
 
           this.setState({ patterns, pagination });
@@ -100,28 +125,21 @@ class GrokPatterns extends React.Component {
     });
   };
 
-  testPattern = (pattern, callback, errCallback) => {
-    GrokPatternsStore.testPattern(pattern, callback, errCallback);
-  };
-
   _onPageChange = (newPage, newPerPage) => {
-    const { pagination } = this.state;
-    const newPagination = Object.assign(pagination, {
-      page: newPage,
-      perPage: newPerPage,
-    });
-    this.setState({ pagination: newPagination }, this.loadData);
+    this.loadData(null, newPage, newPerPage);
   };
 
   _onSearch = (query, resetLoadingCallback) => {
     const { pagination } = this.state;
     const newPagination = Object.assign(pagination, { query: query });
+    this.props.paginationQueryParameter.resetPage();
     this.setState({ pagination: newPagination }, () => this.loadData(resetLoadingCallback));
   };
 
   _onReset = () => {
     const { pagination } = this.state;
     const newPagination = Object.assign(pagination, { query: '' });
+    this.props.paginationQueryParameter.resetPage();
     this.setState({ pagination: newPagination }, this.loadData);
   };
 
@@ -130,23 +148,6 @@ class GrokPatterns extends React.Component {
     if (window.confirm(`Really delete the grok pattern ${pattern.name}?\nIt will be removed from the system and unavailable for any extractor. If it is still in use by extractors those will fail to work.`)) {
       GrokPatternsStore.deletePattern(pattern, this.loadData);
     }
-  };
-
-  _headerCellFormatter = (header) => {
-    let formattedHeaderCell;
-
-    switch (header.toLocaleLowerCase()) {
-      case 'name':
-        formattedHeaderCell = <th className="name">{header}</th>;
-        break;
-      case 'actions':
-        formattedHeaderCell = <th className="actions">{header}</th>;
-        break;
-      default:
-        formattedHeaderCell = <th>{header}</th>;
-    }
-
-    return formattedHeaderCell;
   };
 
   _patternFormatter = (pattern) => {
@@ -168,7 +169,7 @@ class GrokPatterns extends React.Component {
             <EditPatternModal id={pattern.id}
                               name={pattern.name}
                               pattern={pattern.pattern}
-                              testPattern={this.testPattern}
+                              testPattern={testPattern}
                               patterns={patterns}
                               create={false}
                               reload={this.loadData}
@@ -208,7 +209,7 @@ class GrokPatterns extends React.Component {
                                 pattern=""
                                 patterns={patterns}
                                 create
-                                testPattern={this.testPattern}
+                                testPattern={testPattern}
                                 reload={this.loadData}
                                 savePattern={this.savePattern}
                                 validPatternName={this.validPatternName} />
@@ -234,7 +235,7 @@ class GrokPatterns extends React.Component {
                     <GrokPatternsList id="grok-pattern-list"
                                       className="table-striped table-hover"
                                       headers={headers}
-                                      headerCellFormatter={this._headerCellFormatter}
+                                      headerCellFormatter={_headerCellFormatter}
                                       sortByKey="name"
                                       rows={patterns}
                                       dataRowFormatter={this._patternFormatter} />
@@ -249,4 +250,4 @@ class GrokPatterns extends React.Component {
   }
 }
 
-export default GrokPatterns;
+export default withPaginationQueryParameter(GrokPatterns);

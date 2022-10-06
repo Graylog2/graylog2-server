@@ -15,16 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 import { useContext, useState } from 'react';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
-import { Spinner } from 'components/common';
-import { Button, ButtonToolbar } from 'components/bootstrap';
-
-const StyledButtonToolbar = styled(ButtonToolbar)`
-  margin-top: 6px;
-`;
+import { ModalSubmit } from 'components/common';
 
 type Props = {
   onCancel: () => void,
@@ -48,12 +42,15 @@ const SaveOrCancelButtons = ({ onFinish, onCancel, disableSave = false }: Props)
   };
 
   return (
-    <StyledButtonToolbar className="pull-right">
-      <Button onClick={_onFinish} bsStyle="primary" disabled={disableSave}>
-        {isSubmitting ? <Spinner text="Applying Changes" delay={0} /> : 'Apply Changes'}
-      </Button>
-      <Button onClick={onCancel}>Cancel</Button>
-    </StyledButtonToolbar>
+    <ModalSubmit isAsyncSubmit
+                 submitButtonText="Apply changes"
+                 submitLoadingText="Applying changes..."
+                 onSubmit={_onFinish}
+                 submitButtonType="button"
+                 disabledSubmit={disableSave}
+                 isSubmitting={isSubmitting}
+                 displayCancel
+                 onCancel={onCancel} />
   );
 };
 

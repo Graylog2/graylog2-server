@@ -127,7 +127,7 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
                             onSubmitForm={saveConfig}
                             onModalClose={resetConfig}
                             submitButtonDisabled={!isValid}
-                            submitButtonText="Save">
+                            submitButtonText="Update configuration">
           <h3>Whitelist URLs</h3>
           <UrlWhiteListForm key={newUrlEntryId}
                             urls={entries}

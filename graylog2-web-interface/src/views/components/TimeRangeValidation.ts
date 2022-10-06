@@ -78,7 +78,7 @@ const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: 
 };
 
 const validateRelativeTimeRangeWithEnd = (timeRange: RelativeTimeRangeWithEnd, limitDuration: number) => {
-  let errors = {};
+  let errors: { from?: string, to?: string } = {};
 
   if (limitDuration > 0) {
     if (timeRange.from > limitDuration || !timeRange.from) {
@@ -116,21 +116,19 @@ const validateKeywordTimeRange = (timeRange: KeywordTimeRange, limitDuration: nu
 };
 
 const validateTimeRange = (timeRange: TimeRange | NoTimeRangeOverride, limitDuration: number, formatTime: (dateTime: DateTime, format: string) => string) => {
-  let errors = {};
-
   if (isTypeKeyword(timeRange)) {
-    errors = { ...errors, ...validateKeywordTimeRange(timeRange, limitDuration, formatTime) };
+    return validateKeywordTimeRange(timeRange, limitDuration, formatTime);
   }
 
   if (isTypeRelativeWithEnd(timeRange)) {
-    errors = { ...errors, ...validateRelativeTimeRangeWithEnd(timeRange, limitDuration) };
+    return validateRelativeTimeRangeWithEnd(timeRange, limitDuration);
   }
 
   if (isTypeAbsolute(timeRange)) {
-    errors = { ...errors, ...validateAbsoluteTimeRange(timeRange, limitDuration, formatTime) };
+    return validateAbsoluteTimeRange(timeRange, limitDuration, formatTime);
   }
 
-  return errors;
+  return {};
 };
 
 export default validateTimeRange;

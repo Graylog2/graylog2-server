@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect, useMemo } from 'react';
 import * as Immutable from 'immutable';
 import { flatten, isEqual, uniqWith } from 'lodash';
+import type { OrderedMap } from 'immutable';
+import { useFormikContext } from 'formik';
 
 import connect from 'stores/connect';
 import expandRows from 'views/logic/ExpandRows';
@@ -27,6 +29,9 @@ import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/Aggrega
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type { Leaf, Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { Events } from 'views/logic/searchtypes/events/EventHandler';
+import { WidgetActions } from 'views/stores/WidgetStore';
+import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import WidgetContext from 'views/components/contexts/WidgetContext';
 
 import DataTableEntry from './DataTableEntry';
 import MessagesTable from './MessagesTable';
@@ -103,10 +108,25 @@ const DataTable = ({
   borderedHeader,
   stickyHeader,
   condensed,
+  editing,
 }: Props) => {
+  const formContext = useFormikContext();
   const onRenderComplete = useContext(RenderCompletionCallback);
-
+  const widget = useContext(WidgetContext);
   useEffect(onRenderComplete, [onRenderComplete]);
+
+  const _onSortChange = useCallback((newSort: Array<SortConfig>) => {
+    const dirty = formContext?.dirty;
+    const updateWidget = () => WidgetActions.updateConfig(widget.id, config.toBuilder().sort(newSort).build());
+    if (!editing || (editing && !dirty)) return updateWidget();
+
+    // eslint-disable-next-line no-alert
+    if (window.confirm('You have unsaved changes in configuration form. This action will rollback them')) {
+      return updateWidget();
+    }
+
+    return Promise.reject();
+  }, [config, widget, editing, formContext]);
 
   const { columnPivots, rowPivots, series, rollup } = config;
   const rows = retrieveChartData(data) ?? [];
@@ -125,7 +145,6 @@ const DataTable = ({
   const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
     const valuePath = rowFieldNames.map((pivotField) => ({ [pivotField]: expandedRows[idx][pivotField] }));
 
-    // eslint-disable-next-line react/no-array-index-key
     return (
       // eslint-disable-next-line react/no-array-index-key
       <DataTableEntry key={`datatableentry-${idx}`}
@@ -139,6 +158,8 @@ const DataTable = ({
                       series={series} />
     );
   });
+
+  const sortConfigMap = useMemo<OrderedMap<string, SortConfig>>(() => Immutable.OrderedMap(config.sort.map((sort) => [sort.field, sort])), [config]);
 
   return (
     <div className={styles.container}>
@@ -155,7 +176,9 @@ const DataTable = ({
                      fields={fields}
                      rollup={rollup}
                      rowPivots={rowPivots}
-                     series={series} />
+                     series={series}
+                     onSortChange={_onSortChange}
+                     sortConfigMap={sortConfigMap} />
           </thead>
           <tbody>
             {formattedRows}

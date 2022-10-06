@@ -16,14 +16,10 @@
  */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 
-import { Button, FormGroup, Input } from 'components/bootstrap';
+import { ModalSubmit } from 'components/common';
+import { Input } from 'components/bootstrap';
 import { SessionActions } from 'stores/sessions/SessionStore';
-
-const StyledFormGroup = styled(FormGroup)`
-  margin-bottom: 0;
-`;
 
 const LoginForm = ({ onErrorChange }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +33,7 @@ const LoginForm = ({ onErrorChange }) => {
         promise.cancel();
       }
     };
-  }, []);
+  }, [promise]);
 
   const onSignInClicked = (event) => {
     event.preventDefault();
@@ -79,11 +75,11 @@ const LoginForm = ({ onErrorChange }) => {
              placeholder="Password"
              required />
 
-      <StyledFormGroup>
-        <Button type="submit" bsStyle="info" disabled={isLoading}>
-          {isLoading ? 'Signing in...' : 'Sign in'}
-        </Button>
-      </StyledFormGroup>
+      <ModalSubmit displayCancel={false}
+                   isSubmitting={isLoading}
+                   isAsyncSubmit
+                   submitLoadingText="Signing in..."
+                   submitButtonText="Sign in" />
     </form>
   );
 };

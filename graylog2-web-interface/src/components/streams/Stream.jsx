@@ -39,7 +39,7 @@ const StreamListItem = styled.li(({ theme }) => css`
   padding: 15px 0;
 
   &:not(:last-child) {
-    border-bottom: 1px solid ${theme.colors.variant.light.info};
+    border-bottom: 1px solid ${theme.colors.gray[90]};
   }
 
   .stream-data {
@@ -282,6 +282,8 @@ class Stream extends React.Component {
         {showStreamRuleForm && (
           <StreamRuleForm onClose={this._closeStreamRuleForm}
                           title="New Stream Rule"
+                          submitButtonText="Create Rule"
+                          submitLoadingText="Creating Rule..."
                           onSubmit={this._onSaveStreamRule}
                           streamRuleTypes={streamRuleTypes} />
         )}

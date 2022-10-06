@@ -20,8 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 
 import javax.annotation.Nullable;
@@ -39,6 +37,7 @@ import java.util.Objects;
  */
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = Parameter.TYPE_FIELD,
         visible = true,
         defaultImpl = ValueParameter.class)
@@ -106,6 +105,7 @@ public interface Parameter {
 
     @JsonTypeInfo(
             use = JsonTypeInfo.Id.NAME,
+            include = JsonTypeInfo.As.EXISTING_PROPERTY,
             property = Binding.TYPE_FIELD,
             visible = true,
             defaultImpl = Binding.Fallback.class)

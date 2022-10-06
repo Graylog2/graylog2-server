@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+const noUnusedVarsOptions = { argsIgnorePattern: '^_' };
+
 module.exports = {
   parser: '@babel/eslint-parser',
   env: {
@@ -30,7 +32,7 @@ module.exports = {
         'no-use-before-define': 'off',
         '@typescript-eslint/no-use-before-define': ['error'],
         'no-unused-vars': 'off',
-        '@typescript-eslint/no-unused-vars': ['error'],
+        '@typescript-eslint/no-unused-vars': ['error', noUnusedVarsOptions],
         'no-redeclare': 'off',
         '@typescript-eslint/no-redeclare': ['error'],
         'no-shadow': 'off',
@@ -96,6 +98,7 @@ module.exports = {
     'max-len': 'off',
     'new-cap': 'off',
     'no-else-return': 'warn',
+    'no-unused-vars': ['error', noUnusedVarsOptions],
     'no-nested-ternary': 'warn',
     'no-restricted-imports': ['error', {
       paths: [{

@@ -19,7 +19,6 @@ package org.graylog.storage.elasticsearch7;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.SearchesIT;
 import org.junit.Rule;
 
@@ -28,24 +27,8 @@ public class SearchesES7IT extends SearchesIT {
     public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
 
     @Override
-    protected SearchServerInstance elasticsearch() {
+    protected SearchServerInstance searchServer() {
         return this.elasticsearch;
-    }
-
-    private SearchesAdapter createSearchesAdapter() {
-        final ScrollResultES7.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultES7(
-                elasticsearch.elasticsearchClient(), initialResult, query, scroll, fields, limit
-        );
-        final SortOrderMapper sortOrderMapper = new SortOrderMapper();
-        final boolean allowHighlighting = true;
-        final boolean allowLeadingWildcardSearches = true;
-
-        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(sortOrderMapper, allowHighlighting, allowLeadingWildcardSearches);
-        return new SearchesAdapterES7(elasticsearch.elasticsearchClient(),
-                new Scroll(elasticsearch.elasticsearchClient(),
-                        scrollResultFactory,
-                        searchRequestFactory),
-                searchRequestFactory);
     }
 
     @Override

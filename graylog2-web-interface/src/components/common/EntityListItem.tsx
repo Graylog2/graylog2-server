@@ -26,8 +26,8 @@ const StyledListItem = styled.li(({ theme }) => css`
 
   h2 .label {
     margin-left: 5px;
-    line-height: 2;
-    vertical-align: bottom;
+    line-height: 1;
+    vertical-align: baseline;
   }
 
   .item-description {
@@ -43,7 +43,7 @@ const StyledListItem = styled.li(({ theme }) => css`
   }
 
   &:not(:last-child) {
-    border-bottom: 1px solid ${theme.colors.variant.light.info};
+    border-bottom: 1px solid ${theme.colors.gray[90]}
   }
 `);
 

@@ -22,17 +22,20 @@ import { passwordTextField, requiredTextField, textAreaField, textField } from '
 import TextField from './TextField';
 
 describe('<TextField>', () => {
+  const SUT = (props: Partial<React.ComponentProps<typeof TextField>>) => (
+    <TextField field={textField}
+               onChange={() => {}}
+               title="example_text_field"
+               typeName="text"
+               {...props} />
+  );
+
   afterEach(() => {
     jest.resetAllMocks();
   });
 
   it('should render an empty field', () => {
-    const { container } = render(
-      <TextField field={textField}
-                 onChange={() => {}}
-                 title="example_text_field"
-                 typeName="text" />,
-    );
+    render(<SUT />);
 
     const fieldLabel = screen.getByText(textField.human_name, { exact: false });
     const optionalMarker = screen.getByText(/(optional)/);
@@ -44,17 +47,10 @@ describe('<TextField>', () => {
     expect(formField).not.toHaveValue();
     expect(formField).not.toHaveAttribute('required');
     expect(formField).toHaveAttribute('type', 'text');
-    expect(container).toMatchSnapshot();
   });
 
   it('should render a field with a value', () => {
-    render(
-      <TextField field={textField}
-                 onChange={() => {}}
-                 title="example_text_field"
-                 typeName="text"
-                 value={textField.default_value} />,
-    );
+    render(<SUT value={textField.default_value} />);
 
     const formField = screen.getByLabelText(textField.human_name, { exact: false });
 
@@ -63,12 +59,7 @@ describe('<TextField>', () => {
   });
 
   it('should render a required text field', () => {
-    render(
-      <TextField field={requiredTextField}
-                 onChange={() => {}}
-                 title="example_text_field"
-                 typeName="text" />,
-    );
+    render(<SUT field={requiredTextField} />);
 
     const fieldLabel = screen.getByText(textField.human_name, { exact: false });
     const optionalMarker = screen.queryByText(/(optional)/);
@@ -84,13 +75,7 @@ describe('<TextField>', () => {
   it('should call onChange when value changes', async () => {
     const updateFunction = jest.fn();
 
-    render(
-      <TextField field={textField}
-                 onChange={updateFunction}
-                 title="example_text_field"
-                 typeName="text"
-                 value={textField.default_value} />,
-    );
+    render(<SUT onChange={updateFunction} value={textField.default_value} />);
 
     const formField = screen.getByLabelText(textField.human_name, { exact: false });
 
@@ -100,31 +85,19 @@ describe('<TextField>', () => {
   });
 
   it('should render a password field', () => {
-    const { container } = render(
-      <TextField field={passwordTextField}
-                 onChange={() => {}}
-                 title="example_password_field"
-                 typeName="text" />,
-    );
+    render(<SUT field={passwordTextField} title="example_password_field" />);
 
     const formField = screen.getByLabelText(passwordTextField.human_name, { exact: false });
 
     expect(formField).toBeInTheDocument();
     expect(formField).toHaveAttribute('type', 'password');
-    expect(container).toMatchSnapshot();
   });
 
   it('should render a textarea field', () => {
-    const { container } = render(
-      <TextField field={textAreaField}
-                 onChange={() => {}}
-                 title="example_textarea_field"
-                 typeName="text" />,
-    );
+    render(<SUT field={textAreaField} />);
 
     const formField = screen.getByLabelText(textAreaField.human_name, { exact: false });
 
     expect(formField).toBeInTheDocument();
-    expect(container).toMatchSnapshot();
   });
 });
