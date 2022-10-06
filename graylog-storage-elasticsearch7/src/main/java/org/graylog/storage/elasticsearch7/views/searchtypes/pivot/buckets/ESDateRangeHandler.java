@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket, ParsedDateRange> {
     @Nonnull
     @Override
-    public Optional<Tuple2<AggregationBuilder, AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<DateRangeBucket> bucketSpecs, ESGeneratedQueryContext queryContext, Query query) {
+    public Optional<CreatedAggregations<AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<DateRangeBucket> bucketSpecs, ESGeneratedQueryContext queryContext, Query query) {
         AggregationBuilder root = null;
         AggregationBuilder leaf = null;
         for (DateRangeBucket dateRangeBucket : bucketSpecs) {
@@ -69,7 +69,7 @@ public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket
             }
         }
 
-        return Optional.of(new Tuple2<>(root, leaf));
+        return Optional.of(CreatedAggregations.create(root, leaf));
     }
 
     @Override

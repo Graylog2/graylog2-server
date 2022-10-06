@@ -20,14 +20,20 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.script.Script;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketOrder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.Filters;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.FiltersAggregationBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.ParsedFilters;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.Terms;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.support.MultiTermsValuesSourceConfig;
@@ -48,8 +54,9 @@ import java.util.stream.Stream;
 public class OSValuesHandler extends OSPivotBucketSpecHandler<Values, Terms> {
     private static final String KEY_SEPARATOR_CHARACTER = "\u2E31";
     private static final String KEY_SEPARATOR_PHRASE = " + \"" + KEY_SEPARATOR_CHARACTER + "\" + ";
-    private final boolean supportsMultiTerms;
     private static final String AGG_NAME = "agg";
+    private static final ImmutableList<String> MISSING_BUCKET_KEYS = ImmutableList.of(MissingBucketConstants.MISSING_BUCKET_NAME);
+    private final boolean supportsMultiTerms;
 
     @Inject
     public OSValuesHandler(@DetectedSearchVersion SearchVersion version) {
@@ -58,14 +65,26 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values, Terms> {
 
     @Nonnull
     @Override
-    public Optional<Tuple2<AggregationBuilder, AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<Values> bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
+    public Optional<CreatedAggregations<AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<Values> bucketSpecs, OSGeneratedQueryContext queryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext);
-        final int limit = bucketSpec.stream()
+        final int limit = bucketSpecs.stream()
                 .map(Values::limit)
                 .max(Integer::compare)
                 .orElse(Values.DEFAULT_LIMIT);
-        final AggregationBuilder builder = createTerms(bucketSpec, ordering, limit);
-        return Optional.of(new Tuple2<>(builder, builder));
+        final AggregationBuilder termsAggregation = createTerms(bucketSpecs, ordering, limit);
+        final FiltersAggregationBuilder filterAggregation = createFilter(name, bucketSpecs)
+                .subAggregation(termsAggregation);
+        return Optional.of(CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation)));
+    }
+
+    private FiltersAggregationBuilder createFilter(String name, List<Values> bucketSpecs) {
+        final BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
+        bucketSpecs.stream()
+                .map(Values::field)
+                .map(QueryBuilders::existsQuery)
+                .forEach(queryBuilder::must);
+        return AggregationBuilders.filters(name, queryBuilder)
+                .otherBucket(true);
     }
 
     private AggregationBuilder createTerms(List<Values> valueBuckets, List<BucketOrder> ordering, int limit) {
@@ -110,12 +129,13 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values, Terms> {
 
     @Override
     public Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> extractBuckets(List<BucketSpec> bucketSpecs,
-                                                                                                Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket> tuple) {
-        final ImmutableList<String> previousKeys = tuple.v1();
-        final MultiBucketsAggregation.Bucket previousBucket = tuple.v2();
-
-        final MultiBucketsAggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
-        return aggregation.getBuckets().stream()
+                                                                                                Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket> initialBucket) {
+        final ImmutableList<String> previousKeys = initialBucket.v1();
+        final MultiBucketsAggregation.Bucket previousBucket = initialBucket.v2();
+        final ParsedFilters filterAggregation = previousBucket.getAggregations().get(AGG_NAME);
+        final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
+        final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
+        final Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> bucketStream = termsAggregation.getBuckets().stream()
                 .map(bucket -> {
                     final ImmutableList<String> keys = ImmutableList.<String>builder()
                             .addAll(previousKeys)
@@ -125,6 +145,9 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values, Terms> {
                     return new Tuple2<>(keys, bucket);
                 });
 
+        return otherBucket.getDocCount() > 0
+                ? Stream.concat(bucketStream, Stream.of(new Tuple2<>(MISSING_BUCKET_KEYS, otherBucket)))
+                : bucketStream;
     }
 
     private Iterable<String> extractKeys(MultiBucketsAggregation.Bucket bucket) {

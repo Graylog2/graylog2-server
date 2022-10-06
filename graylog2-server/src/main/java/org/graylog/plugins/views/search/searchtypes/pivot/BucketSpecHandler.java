@@ -18,7 +18,6 @@ package org.graylog.plugins.views.search.searchtypes.pivot;
 
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
-import org.jooq.lambda.tuple.Tuple2;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -29,15 +28,13 @@ import java.util.Optional;
  *
  * @param <SPEC_TYPE>           the type of bucket spec this handler deals with
  * @param <AGGREGATION_BUILDER> implementation specific type for building up the aggregation when generating a backend query
- * @param <QUERY_RESULT>        the backend specific type holding the overall result from the backend
- * @param <AGGREGATION_RESULT>  the backend specific type holding the partial result for the generated aggregation
  * @param <QUERY_CONTEXT>       an opaque context object to pass around information between query generation and result handling
  */
 public interface BucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_BUILDER, QUERY_RESULT, AGGREGATION_RESULT, QUERY_CONTEXT> {
 
     @SuppressWarnings("unchecked")
     @Nonnull
-    default Optional<Tuple2<AGGREGATION_BUILDER, AGGREGATION_BUILDER>> createAggregation(String name,
+    default Optional<CreatedAggregations<AGGREGATION_BUILDER>> createAggregation(String name,
                                                                                          Pivot pivot,
                                                                                          List<BucketSpec> pivotSpec,
                                                                                          GeneratedQueryContext queryContext,
@@ -46,5 +43,19 @@ public interface BucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_BUI
     }
 
     @Nonnull
-    Optional<Tuple2<AGGREGATION_BUILDER, AGGREGATION_BUILDER>> doCreateAggregation(String name, Pivot pivot, List<SPEC_TYPE> bucketSpec, QUERY_CONTEXT queryContext, Query query);
+    Optional<CreatedAggregations<AGGREGATION_BUILDER>> doCreateAggregation(String name, Pivot pivot, List<SPEC_TYPE> bucketSpec, QUERY_CONTEXT queryContext, Query query);
+
+    record CreatedAggregations<T>(T root, T leaf, List<T> metrics) {
+        public static <T> CreatedAggregations<T> create(T singleAggregation) {
+            return new CreatedAggregations<>(singleAggregation, singleAggregation, List.of(singleAggregation));
+        }
+
+        public static <T> CreatedAggregations<T> create(T rootAggregation, T leafAggregation) {
+            return new CreatedAggregations<>(rootAggregation, leafAggregation, List.of(leafAggregation));
+        }
+
+        public static <T> CreatedAggregations<T> create(T rootAggregation, T leafAggregation, List<T> metricsAggregations) {
+            return new CreatedAggregations<>(rootAggregation, leafAggregation, metricsAggregations);
+        }
+    }
 }

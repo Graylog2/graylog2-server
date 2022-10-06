@@ -47,7 +47,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time, ParsedDateHist
 
     @Nonnull
     @Override
-    public Optional<Tuple2<AggregationBuilder, AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<Time> bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
+    public Optional<CreatedAggregations<AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<Time> bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
         AggregationBuilder root = null;
         AggregationBuilder leaf = null;
 
@@ -70,7 +70,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time, ParsedDateHist
             }
         }
 
-        return Optional.of(new Tuple2<>(root, leaf));
+        return Optional.of(CreatedAggregations.create(root, leaf));
     }
 
     private void setInterval(DateHistogramAggregationBuilder builder, DateHistogramInterval interval) {

@@ -22,6 +22,7 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -45,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -76,26 +78,21 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final AggTypes aggTypes = new AggTypes();
         contextMap.put(pivot.id(), aggTypes);
 
-        final Tuple2<AggregationBuilder, AggregationBuilder> aggregationTuple = createPivots(query, pivot, pivot.rowGroups(), queryContext);
-        final AggregationBuilder rootAggregation = aggregationTuple.v1();
-        final AggregationBuilder leafAggregation = aggregationTuple.v2();
+        final BucketSpecHandler.CreatedAggregations<AggregationBuilder> createdAggregations = createPivots(query, pivot, pivot.rowGroups(), queryContext);
+        final AggregationBuilder rootAggregation = createdAggregations.root();
+        final AggregationBuilder leafAggregation = createdAggregations.leaf();
+        final List<AggregationBuilder> metrics = createdAggregations.metrics();
         if (pivot.columnGroups().isEmpty() || pivot.rollup()) {
             seriesStream(pivot, queryContext, "metrics")
-                    .forEach(aggregation -> {
-                        if (leafAggregation != null) {
-                            leafAggregation.subAggregation(aggregation);
-                        } else {
-                            searchSourceBuilder.aggregation(aggregation);
-                        }
-                    });
+                    .forEach(aggregation -> metrics.forEach(metric -> metric.subAggregation(aggregation)));
         }
 
         if (!pivot.columnGroups().isEmpty()) {
-            final Tuple2<AggregationBuilder, AggregationBuilder> columnsAggregation = createPivots(query, pivot, pivot.columnGroups(), queryContext);
-            final AggregationBuilder columnsRootAggregation = columnsAggregation.v1();
-            final AggregationBuilder columnsLeafAggregation = columnsAggregation.v2();
+            final BucketSpecHandler.CreatedAggregations<AggregationBuilder> columnsAggregation = createPivots(query, pivot, pivot.columnGroups(), queryContext);
+            final AggregationBuilder columnsRootAggregation = columnsAggregation.root();
+            final List<AggregationBuilder> columnMetrics = columnsAggregation.metrics();
             seriesStream(pivot, queryContext, "metrics")
-                    .forEach(columnsLeafAggregation::subAggregation);
+                    .forEach(aggregation -> columnMetrics.forEach(metric -> metric.subAggregation(aggregation)));
             if (leafAggregation != null) {
                 leafAggregation.subAggregation(columnsRootAggregation);
             } else {
@@ -144,14 +141,18 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         return groups;
     }
 
-    private Tuple2<AggregationBuilder, AggregationBuilder> createPivots(Query query, Pivot pivot, List<BucketSpec> pivots, ESGeneratedQueryContext queryContext) {
+    private BucketSpecHandler.CreatedAggregations<AggregationBuilder> createPivots(Query query, Pivot pivot, List<BucketSpec> pivots, ESGeneratedQueryContext queryContext) {
         AggregationBuilder leaf = null;
         AggregationBuilder root = null;
+        final List<AggregationBuilder> metrics = new ArrayList<>();
         for (Tuple2<String, List<BucketSpec>> group : groupByConsecutiveType(pivots)) {
             final ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> bucketHandler = bucketHandlers.get(group.v1());
-            final Optional<Tuple2<AggregationBuilder, AggregationBuilder>> bucketAggregations = bucketHandler.createAggregation(AGG_NAME, pivot, group.v2(), queryContext, query);
-            final AggregationBuilder aggregationRoot = bucketAggregations.map(Tuple2::v1).orElse(null);
-            final AggregationBuilder aggregationLeaf = bucketAggregations.map(Tuple2::v2).orElse(null);
+            final Optional<BucketSpecHandler.CreatedAggregations<AggregationBuilder>> bucketAggregations = bucketHandler.createAggregation(AGG_NAME, pivot, group.v2(), queryContext, query);
+            final AggregationBuilder aggregationRoot = bucketAggregations.map(BucketSpecHandler.CreatedAggregations::root).orElse(null);
+            final AggregationBuilder aggregationLeaf = bucketAggregations.map(BucketSpecHandler.CreatedAggregations::leaf).orElse(null);
+            final List<AggregationBuilder> aggregationMetrics = bucketAggregations.map(BucketSpecHandler.CreatedAggregations::metrics).orElse(Collections.emptyList());
+
+            metrics.addAll(aggregationMetrics);
             if (root == null && leaf == null) {
                 root = aggregationRoot;
                 leaf = aggregationLeaf;
@@ -161,7 +162,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             }
         }
 
-        return new Tuple2<>(root, leaf);
+        return BucketSpecHandler.CreatedAggregations.create(root, leaf, metrics);
     }
 
 
