@@ -76,16 +76,10 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         final AggTypes aggTypes = new AggTypes();
         contextMap.put(pivot.id(), aggTypes);
 
-        // add global rollup series if those were requested
-        if (pivot.rollup()) {
-            seriesStream(pivot, queryContext, "global rollup")
-                    .forEach(searchSourceBuilder::aggregation);
-        }
-
         final Tuple2<AggregationBuilder, AggregationBuilder> aggregationTuple = createPivots(query, pivot, pivot.rowGroups(), queryContext);
         final AggregationBuilder rootAggregation = aggregationTuple.v1();
         final AggregationBuilder leafAggregation = aggregationTuple.v2();
-        if (!pivot.rowGroups().isEmpty() && (pivot.columnGroups().isEmpty() || pivot.rollup())) {
+        if (pivot.columnGroups().isEmpty() || pivot.rollup()) {
             seriesStream(pivot, queryContext, "metrics")
                     .forEach(aggregation -> {
                         if (leafAggregation != null) {
@@ -219,12 +213,6 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                     }
                     resultBuilder.addRow(rowBuilder.build());
                 });
-
-        if (!pivot.rowGroups().isEmpty() && pivot.rollup()) {
-            final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.of());
-            processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), initialBucket, true, "row-leaf");
-            resultBuilder.addRow(rowBuilder.source("leaf").build());
-        }
 
         return resultBuilder.build();
     }

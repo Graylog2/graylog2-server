@@ -154,7 +154,7 @@ public class SearchAggregationsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
-                .body("rows", hasSize(5));
+                .body("rows", hasSize(4));
 
         final String searchTypeResult = PIVOT_PATH + ".rows";
         validatableResponse
@@ -162,8 +162,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("GET", "count()"), equalTo(860))
                 .body(pathToMetricResult("DELETE", "count()"), equalTo(52))
                 .body(pathToMetricResult("POST", "count()"), equalTo(45))
-                .body(pathToMetricResult("PUT", "count()"), equalTo(43))
-                .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
+                .body(pathToMetricResult("PUT", "count()"), equalTo(43));
     }
 
     @ContainerMatrixTest
@@ -225,7 +224,7 @@ public class SearchAggregationsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
-                .body("rows", hasSize(5));
+                .body("rows", hasSize(4));
 
         final String searchTypeResult = PIVOT_PATH + ".rows";
         validatableResponse
@@ -237,9 +236,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("2022-09-26T14:12:30.000Z", "count()"), equalTo(394))
                 .body(pathToMetricResult("2022-09-26T14:12:30.000Z", "avg(took_ms)"), equalTo(70.2741116751269f))
                 .body(pathToMetricResult("2022-09-26T14:12:40.000Z", "count()"), equalTo(210))
-                .body(pathToMetricResult("2022-09-26T14:12:40.000Z", "avg(took_ms)"), equalTo(131.21904761904761f))
-                .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000))
-                .body(pathToMetricResult(Collections.emptyList(), List.of("avg(took_ms)")), equalTo(78.74f));
+                .body(pathToMetricResult("2022-09-26T14:12:40.000Z", "avg(took_ms)"), equalTo(131.21904761904761f));
     }
 
     @ContainerMatrixTest
@@ -259,9 +256,9 @@ public class SearchAggregationsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
-                .body("rows", hasSize(5));
+                .body("rows", hasSize(4));
 
-        final List<List<String>> expectedKeys = List.of(List.of("GET"), List.of("DELETE"), List.of("POST"), List.of("PUT"), List.of());
+        final List<List<String>> expectedKeys = List.of(List.of("GET"), List.of("DELETE"), List.of("POST"), List.of("PUT"));
 
         final String searchTypeResult = PIVOT_PATH + ".rows";
 
@@ -384,8 +381,7 @@ public class SearchAggregationsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
-                .body("total", equalTo(1000))
-                .body("rows", hasSize(11));
+                .body("rows", hasSize(10));
 
         final String searchTypeResultPath = PIVOT_PATH + ".rows";
 
@@ -410,10 +406,6 @@ public class SearchAggregationsIT {
                 .rootPath(searchTypeResultPath)
                 .body(pathToMetricResult(List.of("PUT", "200"), List.of("count()")), equalTo(42))
                 .body(pathToMetricResult(List.of("PUT", "504"), List.of("count()")), equalTo(1));
-
-        validatableResponse
-                .rootPath(searchTypeResultPath)
-                .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
     }
 
     private String listToGroovy(Collection<String> strings) {
