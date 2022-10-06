@@ -101,7 +101,7 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, Terms> {
 
     private Script scriptForPivots(Collection<? extends BucketSpec> pivots) {
         final String scriptSource = Joiner.on(KEY_SEPARATOR_PHRASE).join(pivots.stream()
-                .map(bucket -> "doc['" + bucket.field() + "'].value")
+                .map(bucket -> "String.valueOf(doc['" + bucket.field() + "'].size() == 0 ? \"N/A\" : doc['" + bucket.field() + "'].value)")
                 .collect(Collectors.toList()));
         return new Script(scriptSource);
     }
