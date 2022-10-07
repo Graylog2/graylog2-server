@@ -35,6 +35,7 @@ import org.graylog2.contentpacks.exceptions.InvalidParametersException;
 import org.graylog2.contentpacks.exceptions.MissingParametersException;
 import org.graylog2.contentpacks.exceptions.UnexpectedEntitiesException;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
+import org.graylog2.contentpacks.facades.StreamFacade;
 import org.graylog2.contentpacks.facades.UnsupportedEntityFacade;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
@@ -56,9 +57,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.contentpacks.model.entities.references.ValueType;
 import org.graylog2.contentpacks.model.parameters.Parameter;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.streams.StreamService;
 import org.graylog2.utilities.Graphs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,17 +84,14 @@ public class ContentPackService {
     private final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService;
     private final Set<ConstraintChecker> constraintCheckers;
     private final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades;
-    private final StreamService streamService;
 
     @Inject
     public ContentPackService(ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
                               Set<ConstraintChecker> constraintCheckers,
-                              Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades,
-                              StreamService streamService) {
+                              Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades) {
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.constraintCheckers = constraintCheckers;
         this.entityFacades = entityFacades;
-        this.streamService = streamService;
     }
 
     public ContentPackInstallation installContentPack(ContentPack contentPack,
@@ -124,7 +120,7 @@ public class ContentPackService {
 
         // Insertion order is important for created entities so we can roll back in order!
         final Map<EntityDescriptor, Object> createdEntities = new LinkedHashMap<>();
-        final Map<EntityDescriptor, Object> allEntities = mapWithSystemStreams();
+        final Map<EntityDescriptor, Object> allEntities = getMapWithSystemStreamEntities();
         final ImmutableSet.Builder<NativeEntityDescriptor> allEntityDescriptors = ImmutableSet.builder();
 
         try {
@@ -153,7 +149,6 @@ public class ContentPackService {
                     allEntities.put(entityDescriptor, nativeEntity.entity());
                 } else {
                     LOG.trace("Creating new entity for {}", entityDescriptor);
-
                     final NativeEntity<?> createdEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, user);
                     allEntityDescriptors.add(createdEntity.descriptor());
                     createdEntities.put(entityDescriptor, createdEntity.entity());
@@ -180,12 +175,17 @@ public class ContentPackService {
         return contentPackInstallationPersistenceService.insert(installation);
     }
 
-    private Map<EntityDescriptor, Object> mapWithSystemStreams() {
+    private Map<EntityDescriptor, Object> getMapWithSystemStreamEntities() {
         Map<EntityDescriptor, Object> entities = new HashMap<>();
         for (String id : Stream.ALL_SYSTEM_STREAM_IDS) {
             try {
-                entities.put(EntityDescriptor.create(id, ModelTypes.STREAM_V1), streamService.load(id));
-            } catch (NotFoundException e) {
+                final EntityDescriptor streamEntityDescriptor = EntityDescriptor.create(id, ModelTypes.STREAM_V1);
+                final StreamFacade streamFacade = (StreamFacade) entityFacades.getOrDefault(ModelTypes.STREAM_V1, UnsupportedEntityFacade.INSTANCE);
+                final Entity streamEntity = streamFacade.exportEntity(streamEntityDescriptor, EntityDescriptorIds.of(streamEntityDescriptor)).get();
+                final NativeEntity<Stream> streamNativeEntity = streamFacade.findExisting(streamEntity, Collections.emptyMap()).get();
+                entities.put(streamEntityDescriptor, streamNativeEntity.entity());
+            } catch (Exception e) {
+                e.printStackTrace();
                 LOG.debug("Failed to load system stream <{}>", id);
             }
         }

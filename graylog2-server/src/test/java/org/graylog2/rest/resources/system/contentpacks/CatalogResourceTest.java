@@ -36,7 +36,6 @@ import org.graylog2.rest.models.system.contentpacks.responses.CatalogIndexRespon
 import org.graylog2.rest.models.system.contentpacks.responses.CatalogResolveRequest;
 import org.graylog2.rest.models.system.contentpacks.responses.CatalogResolveResponse;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -65,8 +64,6 @@ public class CatalogResourceTest {
 
     @Mock
     private EntityFacade<Void> mockEntityFacade;
-    @Mock
-    private StreamService streamService;
 
     private ContentPackService contentPackService;
     private CatalogResource catalogResource;
@@ -77,7 +74,7 @@ public class CatalogResourceTest {
                 mock(ContentPackInstallationPersistenceService.class);
         final Set<ConstraintChecker> constraintCheckers = Collections.emptySet();
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = Collections.singletonMap(ModelType.of("test", "1"), mockEntityFacade);
-        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, streamService);
+        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades);
         catalogResource = new CatalogResource(contentPackService);
     }
 
