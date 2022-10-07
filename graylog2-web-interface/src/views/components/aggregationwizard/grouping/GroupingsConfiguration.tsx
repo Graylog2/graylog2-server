@@ -98,7 +98,7 @@ const GroupingsConfiguration = () => {
             <Field name="groupBy.columnRollup">
               {({ field: { name, onChange, value } }) => (
                 <RollupColumnsCheckbox onChange={() => onChange({ target: { name, value: !groupBy?.columnRollup } })}
-                                       checked={value}
+                                       checked={value ?? false}
                                        disabled={disableColumnRollup}>
                   <RollupColumnsLabel>
                     Rollup Columns
