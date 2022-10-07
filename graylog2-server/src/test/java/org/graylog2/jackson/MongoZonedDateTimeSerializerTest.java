@@ -18,7 +18,6 @@ package org.graylog2.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.util.StdDateFormat;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Test;
 
@@ -28,8 +27,7 @@ import java.time.ZonedDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class MongoZonedDateTimeSerializerTest {
-    private final ObjectMapper objectMapper = new ObjectMapperProvider().get()
-            .setDateFormat(new StdDateFormat().withColonInTimeZone(false));
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     @Test
     public void serializeZonedDateTime() throws Exception {
