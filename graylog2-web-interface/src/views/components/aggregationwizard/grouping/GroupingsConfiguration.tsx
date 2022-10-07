@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useFormikContext, FieldArray, Field } from 'formik';
 import styled from 'styled-components';
 
 import { HoverForHelp, SortableList, FormikFormGroup } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
-import VisualizationElement from 'views/components/aggregationwizard/visualization';
 
 import GroupingConfiguration from './GroupingConfiguration';
 import GroupingElement from './GroupingElement';
