@@ -223,8 +223,8 @@ const GroupByElement: AggregationElement = {
         ...(formValues.groupBy?.groupings ?? []),
         createEmptyGrouping(),
       ],
-      rowLimit: formValues.groupBy.rowLimit ?? (formValues.groupBy.groupings.find((grouping) => (grouping.direction === 'row' && grouping.field?.type === 'values')) ? DEFAULT_PIVOT_LIMIT : undefined),
-      columnLimit: formValues.groupBy.columnLimit ?? (formValues.groupBy.groupings.find((grouping) => (grouping.direction === 'column' && grouping.field?.type === 'values')) ? DEFAULT_PIVOT_LIMIT : undefined),
+      rowLimit: formValues.groupBy?.rowLimit ?? DEFAULT_PIVOT_LIMIT,
+      columnLimit: formValues.groupBy?.columnLimit ?? DEFAULT_PIVOT_LIMIT,
     },
   }),
   onRemove: ((index, formValues) => {
