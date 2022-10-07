@@ -223,6 +223,7 @@ export type Props<OptionValue> = {
   delimiter?: string,
   disabled?: boolean,
   displayKey: string,
+  forwardedRef?: React.Ref<React.ComponentType>,
   id?: string,
   ignoreAccents?: boolean,
   inputId?: string,
@@ -411,6 +412,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     loadOptions: undefined,
     // ref: undefined,
     menuPortalTarget: undefined,
+    forwardedRef: undefined,
   };
 
   constructor(props: Props<OptionValue>) {
@@ -600,10 +602,10 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     };
 
     if (allowCreate) {
-      return <CreatableSelect {...selectProps} />;
+      return <CreatableSelect ref={rest.forwardedRef} {...selectProps} />;
     }
 
-    return <ReactSelect {...selectProps} />;
+    return <ReactSelect ref={rest.forwardedRef} {...selectProps} />;
   }
 }
 
