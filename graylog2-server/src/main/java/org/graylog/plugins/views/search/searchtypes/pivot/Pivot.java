@@ -92,10 +92,10 @@ public abstract class Pivot implements SearchType {
     public abstract List<UsedSearchFilter> filters();
 
     @JsonProperty(FIELD_ROW_LIMIT)
-    public abstract OptionalInt rowLimit();
+    public abstract Optional<Integer> rowLimit();
 
     @JsonProperty(FIELD_COLUMN_LIMIT)
-    public abstract OptionalInt columnLimit();
+    public abstract Optional<Integer> columnLimit();
 
     public abstract Builder toBuilder();
 
@@ -188,10 +188,10 @@ public abstract class Pivot implements SearchType {
         public abstract Builder filters(List<UsedSearchFilter> filters);
 
         @JsonProperty(FIELD_ROW_LIMIT)
-        public abstract Builder rowLimit(int limit);
+        public abstract Builder rowLimit(@Nullable Integer limit);
 
         @JsonProperty(FIELD_COLUMN_LIMIT)
-        public abstract Builder columnLimit(int limit);
+        public abstract Builder columnLimit(@Nullable Integer limit);
 
         @JsonProperty
         @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = false)
@@ -238,8 +238,8 @@ public abstract class Pivot implements SearchType {
                 .rollup(rollup())
                 .series(series())
                 .type(type());
-        builder = rowLimit().isPresent() ? builder.rowLimit(rowLimit().getAsInt()) : builder;
-        builder = columnLimit().isPresent() ? builder.columnLimit(columnLimit().getAsInt()) : builder;
+        builder = rowLimit().map(builder::rowLimit).orElse(builder);
+        builder = columnLimit().map(builder::columnLimit).orElse(builder);
         return builder.build();
     }
 }
