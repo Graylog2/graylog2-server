@@ -114,9 +114,10 @@ describe('AggregationWizard', () => {
     await selectField('took_ms');
     await submitWidgetConfigForm();
 
-    const pivot = Pivot.create('took_ms', 'values', { limit: 15 });
+    const pivot = Pivot.create('took_ms', 'values');
     const updatedConfig = widgetConfig
       .toBuilder()
+      .rowLimit(15)
       .rowPivots([pivot])
       .build();
 
@@ -157,9 +158,10 @@ describe('AggregationWizard', () => {
     await submitWidgetConfigForm();
 
     const pivot0 = Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } });
-    const pivot1 = Pivot.create('took_ms', 'values', { limit: 15 });
+    const pivot1 = Pivot.create('took_ms', 'values');
     const updatedConfig = widgetConfig
       .toBuilder()
+      .rowLimit(15)
       .rowPivots([pivot0, pivot1])
       .build();
 
@@ -170,7 +172,7 @@ describe('AggregationWizard', () => {
 
   it('should display group by with values from config', async () => {
     const pivot0 = Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } });
-    const pivot1 = Pivot.create('took_ms', 'values', { limit: 15 });
+    const pivot1 = Pivot.create('took_ms', 'values');
     const config = widgetConfig
       .toBuilder()
       .rowPivots([pivot0, pivot1])
@@ -220,7 +222,7 @@ describe('AggregationWizard', () => {
 
   it('should correctly change config', async () => {
     const pivot0 = Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } });
-    const pivot1 = Pivot.create('took_ms', 'values', { limit: 15 });
+    const pivot1 = Pivot.create('took_ms', 'values');
     const config = widgetConfig
       .toBuilder()
       .rowPivots([pivot0])
@@ -235,6 +237,7 @@ describe('AggregationWizard', () => {
 
     const updatedConfig = widgetConfig
       .toBuilder()
+      .rowLimit(15)
       .rowPivots([pivot1])
       .build();
 
@@ -245,7 +248,7 @@ describe('AggregationWizard', () => {
 
   it('should correctly update sort of groupings', async () => {
     const pivot0 = Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } });
-    const pivot1 = Pivot.create('took_ms', 'values', { limit: 15 });
+    const pivot1 = Pivot.create('took_ms', 'values');
     const config = widgetConfig
       .toBuilder()
       .rowPivots([pivot0, pivot1])
@@ -268,6 +271,7 @@ describe('AggregationWizard', () => {
 
     const updatedConfig = widgetConfig
       .toBuilder()
+      .rowLimit(15)
       .rowPivots([pivot1, pivot0])
       .build();
 

@@ -130,8 +130,6 @@ const validateGroupings = (values: WidgetConfigFormValues): WidgetConfigValidati
   const { groupings } = values.groupBy;
   const groupingErrors = groupings.map(validateGrouping);
 
-  console.log('Returning errors: ', errors);
-
   return (hasErrors(groupingErrors) || Object.keys(groupByErrors).length > 0) ? { ...errors, groupBy: { ...groupByErrors, groupings: groupingErrors } } : emptyErrors;
 };
 
@@ -201,7 +199,7 @@ const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: Agg
     .columnLimit(columnLimit);
 };
 
-export const createEmptyGrouping: () => Partial<ValuesGrouping> = () => addRandomId<ValuesGrouping>({
+export const createEmptyGrouping = () => addRandomId<ValuesGrouping>({
   direction: 'row',
   field: {
     field: undefined,

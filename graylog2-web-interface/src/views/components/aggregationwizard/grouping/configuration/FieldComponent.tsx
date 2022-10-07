@@ -38,7 +38,7 @@ const FieldComponent = ({ index, fieldType }: Props) => {
   const { setFieldValue, values } = useFormikContext<WidgetConfigFormValues>();
   const grouping = values.groupBy.groupings[index];
 
-  const onChangeField = (e: React.ChangeEvent<HTMLInputElement>, name: string, onChange) => {
+  const onChangeField = (e: { target: { name: string, value: string } }, name: string, onChange) => {
     const fieldName = e.target.value;
     const newField = fieldTypes.all.find((field) => field.name === fieldName);
     const newFieldType = newField?.type.type === 'date' ? 'time' : 'values';

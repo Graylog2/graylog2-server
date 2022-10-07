@@ -99,10 +99,7 @@ const validateForm = (formValues: WidgetConfigFormValues) => {
 
   const elementValidationResults = elementValidations.map((validate) => validate(formValues));
 
-  const result = elementValidationResults.reduce((prev, cur) => ({ ...prev, ...cur }), {});
-  console.log('form validation: ', result);
-
-  return result;
+  return elementValidationResults.reduce((prev, cur) => ({ ...prev, ...cur }), {});
 };
 
 const AggregationWizard = ({ onChange, config, children, onSubmit, onCancel }: EditWidgetComponentProps<AggregationWidgetConfig> & { children: React.ReactElement }) => {

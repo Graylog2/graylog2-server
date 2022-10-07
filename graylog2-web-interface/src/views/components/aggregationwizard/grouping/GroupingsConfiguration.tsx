@@ -109,8 +109,6 @@ const GroupingsConfiguration = () => {
       {hasValuesColumnPivots && (
         <ElementConfigurationContainer elementTitle="Column Limit">
           <FormikFormGroup label="Column Limit"
-                           step="1"
-                           min="1"
                            name="groupBy.columnLimit"
                            type="number"
                            bsSize="small" />
