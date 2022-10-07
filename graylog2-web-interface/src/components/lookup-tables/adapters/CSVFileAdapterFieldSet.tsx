@@ -33,7 +33,6 @@ const CSVFileAdapterFieldSet = ({ config, handleFormEvent, validationState, vali
              id="path"
              name="path"
              label="File path"
-             autoFocus
              required
              onChange={handleFormEvent}
              help={validationMessage('path', 'The path to the CSV file.')}
