@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useFormikContext, FieldArray, Field } from 'formik';
 import styled from 'styled-components';
 
-import { HoverForHelp, SortableList } from 'components/common';
+import { HoverForHelp, SortableList, FormikFormGroup } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
 
 import GroupingConfiguration from './GroupingConfiguration';
@@ -43,7 +43,12 @@ const RollupHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 
-const GroupByConfiguration = () => {
+type GroupingsItemProps = Omit<React.ComponentProps<typeof ElementConfigurationContainer>, 'testIdPrefix' | 'onRemove' | 'elementTitle' | 'children'> & {
+  item: { id: string },
+  index: number,
+};
+
+const GroupingsConfiguration = () => {
   const { values: { groupBy }, values, setValues, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const disableColumnRollup = !groupBy?.groupings?.find(({ direction }) => direction === 'column');
   const removeGrouping = useCallback((index) => () => {
@@ -51,6 +56,22 @@ const GroupByConfiguration = () => {
   }, [setValues, values]);
 
   const isEmpty = !groupBy?.groupings;
+
+  const hasValuesRowPivots = groupBy?.groupings?.find(({ direction, field }) => (direction === 'row' && field.type === 'values')) !== undefined;
+  const hasValuesColumnPivots = groupBy?.groupings?.find(({ direction, field }) => (direction === 'column' && field.type === 'values')) !== undefined;
+
+  const GroupingsItem = useCallback(({ item, index, dragHandleProps, draggableProps, className, ref }: GroupingsItemProps) => (
+    <ElementConfigurationContainer key={`grouping-${item.id}`}
+                                   dragHandleProps={dragHandleProps}
+                                   draggableProps={draggableProps}
+                                   className={className}
+                                   testIdPrefix={`grouping-${index}`}
+                                   onRemove={removeGrouping(index)}
+                                   elementTitle={GroupingElement.title}
+                                   ref={ref}>
+      <GroupingConfiguration index={index} />
+    </ElementConfigurationContainer>
+  ), [removeGrouping]);
 
   return (
     <>
@@ -75,22 +96,22 @@ const GroupByConfiguration = () => {
                   render={() => (
                     <SortableList items={groupBy?.groupings}
                                   onMoveItem={(newGroupings) => setFieldValue('groupBy.groupings', newGroupings)}
-                                  customListItemRender={({ item, index, dragHandleProps, draggableProps, className, ref }) => (
-                                    <ElementConfigurationContainer key={`grouping-${item.id}`}
-                                                                   dragHandleProps={dragHandleProps}
-                                                                   draggableProps={draggableProps}
-                                                                   className={className}
-                                                                   testIdPrefix={`grouping-${index}`}
-                                                                   onRemove={removeGrouping(index)}
-                                                                   elementTitle={GroupingElement.title}
-                                                                   ref={ref}>
-                                      <GroupingConfiguration index={index} />
-                                    </ElementConfigurationContainer>
-                                  )} />
+                                  customListItemRender={GroupingsItem} />
                   )} />
-
+      {hasValuesRowPivots && (
+      <FormikFormGroup label="Row Limit"
+                       name="rowLimit"
+                       type="number"
+                       bsSize="small" />
+      )}
+      {hasValuesColumnPivots && (
+      <FormikFormGroup label="Column Limit"
+                       name="columnLimit"
+                       type="number"
+                       bsSize="small" />
+      )}
     </>
   );
 };
 
-export default GroupByConfiguration;
+export default GroupingsConfiguration;

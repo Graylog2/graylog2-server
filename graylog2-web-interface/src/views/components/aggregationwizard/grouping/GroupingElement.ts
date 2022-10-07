@@ -18,7 +18,7 @@ import { isEmpty } from 'lodash';
 
 import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import type { TimeConfigType, ValuesConfigType } from 'views/logic/aggregationbuilder/Pivot';
+import type { TimeConfigType } from 'views/logic/aggregationbuilder/Pivot';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import generateId from 'logic/generateId';
 
@@ -36,7 +36,6 @@ import type {
 
 type GroupByError = {
   field?: string,
-  limit?: string,
   interval?: string,
 };
 
@@ -77,14 +76,6 @@ const validateValuesGrouping = (grouping: ValuesGrouping): GroupByError => {
     groupByError.field = 'Field is required.';
   }
 
-  if (!grouping.limit) {
-    groupByError.limit = 'Limit is required.';
-  }
-
-  if (grouping.limit && grouping.limit <= 0) {
-    groupByError.limit = 'Must be greater than 0.';
-  }
-
   return groupByError;
 };
 
@@ -100,17 +91,43 @@ const validateGrouping = (grouping: GroupByFormValues): GroupByError => {
   return validateValuesGrouping(grouping);
 };
 
-const validateGroupBy = (values: WidgetConfigFormValues) => {
+const validateGroupings = (values: WidgetConfigFormValues) => {
   const emptyErrors = {};
 
   if (!values.groupBy) {
     return emptyErrors;
   }
 
+  const errors: { rowLimit?: string, columnLimit?: string } = {};
+  const hasValuesRowPivots = values.groupBy?.groupings?.filter((grouping) => (grouping.direction === 'row' && grouping.field.type === 'values')).length > 0;
+  const hasValuesColumnPivots = values.groupBy?.groupings?.filter((grouping) => (grouping.direction === 'column' && grouping.field.type === 'values')).length > 0;
+
+  if (hasValuesRowPivots) {
+    const parsedLimit = Number.parseInt(values.rowLimit, 10);
+
+    if (Number.isNaN(parsedLimit)) {
+      errors.rowLimit = 'Row limit is required.';
+    } else if (parsedLimit <= 0) {
+      errors.rowLimit = 'Must be greater than 0.';
+    }
+  }
+
+  if (hasValuesColumnPivots) {
+    const parsedLimit = Number.parseInt(values.rowLimit, 10);
+
+    if (Number.isNaN(parsedLimit)) {
+      errors.columnLimit = 'Column limit is required.';
+    } else if (parsedLimit <= 0) {
+      errors.columnLimit = 'Must be greater than 0.';
+    }
+  }
+
   const { groupings } = values.groupBy;
   const groupByErrors = groupings.map(validateGrouping);
 
-  return hasErrors(groupByErrors) ? { groupBy: { groupings: groupByErrors } } : emptyErrors;
+  console.log('Returning errors: ', errors);
+
+  return (hasErrors(groupByErrors) || Object.keys(errors)) ? { ...errors, groupBy: { groupings: groupByErrors } } : emptyErrors;
 };
 
 const addRandomId = <GroupingType extends BaseGrouping> (baseGrouping: Omit<GroupingType, 'id'>) => ({
@@ -131,13 +148,11 @@ const datePivotToGrouping = (pivot: Pivot, direction: GroupingDirection): DateGr
 };
 
 const valuesPivotToGrouping = (pivot: Pivot, direction: GroupingDirection): ValuesGrouping => {
-  const { field, config } = pivot;
-  const { limit } = config as ValuesConfigType;
+  const { field } = pivot;
 
   return addRandomId<ValuesGrouping>({
     direction,
     field: { field, type: 'values' },
-    limit,
   });
 };
 
@@ -161,7 +176,7 @@ const pivotsToGrouping = (config: AggregationWidgetConfig) => {
 };
 
 const groupingToPivot = (grouping: GroupByFormValues) => {
-  const pivotConfig = 'interval' in grouping ? { interval: grouping.interval } : { limit: grouping.limit };
+  const pivotConfig = 'interval' in grouping ? { interval: grouping.interval } : {};
 
   return new Pivot(grouping.field.field, grouping.field.type, pivotConfig);
 };
@@ -177,13 +192,11 @@ const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: Agg
     .rollup(columnRollup);
 };
 
-export const createEmptyGrouping: () => ValuesGrouping = () => addRandomId<ValuesGrouping>({
+export const createEmptyGrouping: () => Partial<ValuesGrouping> = () => addRandomId<ValuesGrouping>({
   direction: 'row',
   field: {
     field: undefined,
-    type: 'values',
   },
-  limit: 15,
 });
 
 const GroupByElement: AggregationElement = {
@@ -230,7 +243,7 @@ const GroupByElement: AggregationElement = {
   },
   toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => groupByToConfig(formValues.groupBy, configBuilder),
   component: GroupingsConfiguration,
-  validate: validateGroupBy,
+  validate: validateGroupings,
 };
 
 export default GroupByElement;

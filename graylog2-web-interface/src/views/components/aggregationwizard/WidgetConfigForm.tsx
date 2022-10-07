@@ -60,7 +60,6 @@ export type DateGrouping = BaseGrouping & {
 
 export type ValuesGrouping = BaseGrouping & {
   field: GroupingField<'values'>,
-  limit: number,
 };
 
 export type GroupByFormValues = DateGrouping | ValuesGrouping;
@@ -94,10 +93,12 @@ export interface WidgetConfigFormValues {
   metrics?: Array<MetricFormValues>,
   groupBy?: {
     columnRollup: boolean,
-    groupings: Array<GroupByFormValues>,
+    groupings: Array<Partial<GroupByFormValues>>,
   },
   visualization?: VisualizationFormValues,
   sort?: Array<SortFormValues>,
+  rowLimit?: string,
+  columnLimit?: string,
 }
 
 export interface WidgetConfigValidationErrors {
@@ -105,13 +106,15 @@ export interface WidgetConfigValidationErrors {
   groupBy?: { groupings: Array<{ [key: string]: string }> },
   visualization?: { [key: string]: string | any },
   sort?: Array<{ [key: string]: string }>,
+  rowLimit?: string,
+  columnLimit?: string,
 }
 
 type Props = {
   children: ((props: FormikProps<WidgetConfigFormValues>) => React.ReactNode) | React.ReactNode,
   initialValues: WidgetConfigFormValues,
   onSubmit: (formValues: WidgetConfigFormValues) => void,
-  validate: (formValues: WidgetConfigFormValues) => { [key: string]: string },
+  validate: (formValues: WidgetConfigFormValues) => WidgetConfigValidationErrors,
   config: AggregationWidgetConfig,
 }
 
