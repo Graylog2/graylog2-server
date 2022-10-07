@@ -313,6 +313,8 @@ class Builder {
       visualizationConfig,
       formattingSettings,
       eventAnnotation,
+      rowLimit,
+      columnLimit,
     } = this.value.toObject();
 
     const availableSorts = [].concat(rowPivots, columnPivots, series);
@@ -329,6 +331,8 @@ class Builder {
       visualizationConfig,
       formattingSettings,
       eventAnnotation,
+      rowLimit,
+      columnLimit,
     );
   }
 }

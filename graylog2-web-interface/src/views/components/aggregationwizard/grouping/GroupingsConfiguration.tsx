@@ -21,6 +21,7 @@ import styled from 'styled-components';
 
 import { HoverForHelp, SortableList, FormikFormGroup } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
+import VisualizationElement from 'views/components/aggregationwizard/visualization';
 
 import GroupingConfiguration from './GroupingConfiguration';
 import GroupingElement from './GroupingElement';
@@ -57,8 +58,8 @@ const GroupingsConfiguration = () => {
 
   const isEmpty = !groupBy?.groupings;
 
-  const hasValuesRowPivots = groupBy?.groupings?.find(({ direction, field }) => (direction === 'row' && field.type === 'values')) !== undefined;
-  const hasValuesColumnPivots = groupBy?.groupings?.find(({ direction, field }) => (direction === 'column' && field.type === 'values')) !== undefined;
+  const hasValuesRowPivots = groupBy?.groupings?.find(({ direction, field }) => (direction === 'row' && field?.type === 'values')) !== undefined;
+  const hasValuesColumnPivots = groupBy?.groupings?.find(({ direction, field }) => (direction === 'column' && field?.type === 'values')) !== undefined;
 
   const GroupingsItem = useCallback(({ item, index, dragHandleProps, draggableProps, className, ref }: GroupingsItemProps) => (
     <ElementConfigurationContainer key={`grouping-${item.id}`}
@@ -99,16 +100,22 @@ const GroupingsConfiguration = () => {
                                   customListItemRender={GroupingsItem} />
                   )} />
       {hasValuesRowPivots && (
-      <FormikFormGroup label="Row Limit"
-                       name="rowLimit"
-                       type="number"
-                       bsSize="small" />
+        <ElementConfigurationContainer elementTitle="Row Limit">
+          <FormikFormGroup label="Row Limit"
+                           name="groupBy.rowLimit"
+                           type="number"
+                           bsSize="small" />
+        </ElementConfigurationContainer>
       )}
       {hasValuesColumnPivots && (
-      <FormikFormGroup label="Column Limit"
-                       name="columnLimit"
-                       type="number"
-                       bsSize="small" />
+        <ElementConfigurationContainer elementTitle="Column Limit">
+          <FormikFormGroup label="Column Limit"
+                           step="1"
+                           min="1"
+                           name="groupBy.columnLimit"
+                           type="number"
+                           bsSize="small" />
+        </ElementConfigurationContainer>
       )}
     </>
   );
