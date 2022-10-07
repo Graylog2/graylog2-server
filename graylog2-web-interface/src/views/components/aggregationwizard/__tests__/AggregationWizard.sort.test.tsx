@@ -51,7 +51,7 @@ const widgetConfig = AggregationWidgetConfig
   .builder()
   .visualization(DataTable.type)
   .rowPivots([pivot0, pivot1])
-  .visualizationConfig(DataTableVisualizationConfig.empty().toBuilder().build())
+  .visualizationConfig(DataTableVisualizationConfig.empty())
   .build();
 
 const selectEventConfig = { container: document.body };

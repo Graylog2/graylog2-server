@@ -38,7 +38,7 @@ import AggregationWizard from '../AggregationWizard';
 const widgetConfig = AggregationWidgetConfig
   .builder()
   .visualization(DataTable.type)
-  .visualizationConfig(DataTableVisualizationConfig.empty().toBuilder().build())
+  .visualizationConfig(DataTableVisualizationConfig.empty())
   .build();
 
 const fieldType = new FieldType('field_type', ['numeric'], []);
