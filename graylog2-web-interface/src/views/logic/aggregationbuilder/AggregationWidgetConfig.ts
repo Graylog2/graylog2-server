@@ -43,6 +43,8 @@ type InternalState = {
   visualization: string,
   visualizationConfig: VisualizationConfig | undefined | null,
   eventAnnotation: boolean,
+  rowLimit?: number,
+  columnLimit?: number,
 };
 
 type AggregationWidgetConfigJson = {
@@ -55,6 +57,8 @@ type AggregationWidgetConfigJson = {
   visualization: string,
   visualization_config: VisualizationConfigJson,
   event_annotation: boolean,
+  row_limit?: number,
+  column_limit?: number,
 };
 
 export default class AggregationWidgetConfig extends WidgetConfig {
@@ -68,9 +72,11 @@ export default class AggregationWidgetConfig extends WidgetConfig {
     rollup: boolean,
     visualizationConfig: VisualizationConfig,
     formattingSettings: WidgetFormattingSettings,
-    eventAnnotation: boolean = false) {
+    eventAnnotation: boolean = false,
+    rowLimit: number = undefined,
+    columnLimit: number = undefined) {
     super();
-    this._value = { columnPivots, rowPivots, series, sort, visualization, rollup, visualizationConfig, formattingSettings, eventAnnotation };
+    this._value = { columnPivots, rowPivots, series, sort, visualization, rollup, visualizationConfig, formattingSettings, eventAnnotation, rowLimit, columnLimit };
   }
 
   get rowPivots() {
@@ -117,6 +123,14 @@ export default class AggregationWidgetConfig extends WidgetConfig {
     return this.rowPivots && this.rowPivots.length === 1 && this.rowPivots[0].field === TIMESTAMP_FIELD;
   }
 
+  get columnLimit() {
+    return this._value.columnLimit;
+  }
+
+  get rowLimit() {
+    return this._value.rowLimit;
+  }
+
   get isEmpty(): boolean {
     const empty = (arr) => !arr.length;
 
@@ -140,7 +154,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
 
   toBuilder() {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map(this._value));
+    return new Builder(Immutable.Map<keyof InternalState, any>(this._value));
   }
 
   toJSON() {
@@ -154,6 +168,8 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       visualization,
       visualizationConfig,
       eventAnnotation,
+      rowLimit,
+      columnLimit,
     } = this._value;
 
     return {
@@ -166,6 +182,8 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       visualization,
       visualization_config: visualizationConfig,
       event_annotation: eventAnnotation,
+      row_limit: rowLimit,
+      column_limit: columnLimit,
     };
   }
 
@@ -181,6 +199,8 @@ export default class AggregationWidgetConfig extends WidgetConfig {
         'visualizationConfig',
         'visualization',
         'formattingSettings',
+        'rowLimit',
+        'columnLimit',
       ]
         .every((key) => isDeepEqual(this[key], other[key]));
     }
@@ -190,7 +210,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
 
   equalsForSearch(other: any) {
     if (other instanceof AggregationWidgetConfig) {
-      return ['rowPivots', 'columnPivots', 'series', 'sort', 'rollup', 'eventAnnotation', 'visualizationConfig']
+      return ['rowPivots', 'columnPivots', 'series', 'sort', 'rollup', 'eventAnnotation', 'visualizationConfig', 'rowLimit', 'columnLimit']
         .every((key) => isEqualForSearch(this[key], other[key]));
     }
 
@@ -208,6 +228,8 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       visualization,
       visualization_config,
       event_annotation,
+      row_limit,
+      column_limit,
     } = value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -221,11 +243,13 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       .visualizationConfig(visualization_config !== null ? VisualizationConfig.fromJSON(visualization, visualization_config) : null)
       .formattingSettings(formatting_settings === null ? undefined : WidgetFormattingSettings.fromJSON(formatting_settings))
       .eventAnnotation(event_annotation)
+      .rowLimit(row_limit)
+      .columnLimit(column_limit)
       .build();
   }
 }
 
-type BuilderState = Immutable.Map<string, any>;
+type BuilderState = Immutable.Map<keyof AggregationWidgetConfig, any>;
 
 class Builder {
   value: BuilderState;
@@ -268,6 +292,14 @@ class Builder {
 
   eventAnnotation(value: boolean) {
     return new Builder(this.value.set('eventAnnotation', value));
+  }
+
+  columnLimit(value: number) {
+    return new Builder(this.value.set('columnLimit', value));
+  }
+
+  rowLimit(value: number) {
+    return new Builder(this.value.set('rowLimit', value));
   }
 
   build() {
