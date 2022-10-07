@@ -50,10 +50,11 @@ const DashboardsPage = () => {
 
     const result = await iterateConfirmationHooks([...pluginDashboardDeletionHooks, defaultDashboardDeletionHook], view);
 
-    if (result) await ViewManagementActions.delete(view);
-
-    await DashboardsActions.search(searchQuery, page, pageSize);
-    resetPage();
+    if (result) {
+      await ViewManagementActions.delete(view);
+      await DashboardsActions.search(searchQuery, page, pageSize);
+      resetPage();
+    }
   };
 
   const { list, pagination } = useDashboards(searchQuery, page, pageSize);
