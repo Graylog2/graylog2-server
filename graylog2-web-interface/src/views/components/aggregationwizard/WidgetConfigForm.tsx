@@ -94,6 +94,8 @@ export interface WidgetConfigFormValues {
   groupBy?: {
     columnRollup: boolean,
     groupings: Array<Partial<GroupByFormValues>>,
+    rowLimit: string | number | undefined,
+    columnLimit: string | number | undefined,
   },
   visualization?: VisualizationFormValues,
   sort?: Array<SortFormValues>,
