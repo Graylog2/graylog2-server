@@ -44,12 +44,13 @@ const fieldTypeMapping2 = new FieldTypeMapping('http_method', fieldType);
 const fields = Immutable.List([fieldTypeMapping1, fieldTypeMapping2]);
 const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }) };
 
-const pivot0 = Pivot.create(fieldTypeMapping1.name, 'values', { limit: 15 });
-const pivot1 = Pivot.create(fieldTypeMapping2.name, 'values', { limit: 15 });
+const pivot0 = Pivot.create(fieldTypeMapping1.name, 'values');
+const pivot1 = Pivot.create(fieldTypeMapping2.name, 'values');
 
 const widgetConfig = AggregationWidgetConfig
   .builder()
   .visualization(DataTable.type)
+  .rowLimit(15)
   .rowPivots([pivot0, pivot1])
   .visualizationConfig(DataTableVisualizationConfig.empty())
   .build();

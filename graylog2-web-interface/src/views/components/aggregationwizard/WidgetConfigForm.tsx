@@ -89,11 +89,13 @@ export type SortFormValues = {
   id: string,
 }
 
+type Required<T, K extends keyof T> = Pick<T, K> & Partial<T>;
+
 export interface WidgetConfigFormValues {
   metrics?: Array<MetricFormValues>,
   groupBy?: {
     columnRollup: boolean,
-    groupings: Array<Partial<GroupByFormValues>>,
+    groupings: Array<Required<GroupByFormValues, 'id'>>,
     rowLimit: string | number | undefined,
     columnLimit: string | number | undefined,
   },
