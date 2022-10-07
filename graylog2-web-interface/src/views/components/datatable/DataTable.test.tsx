@@ -33,6 +33,7 @@ import { WidgetActions } from 'views/stores/WidgetStore';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
+import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
@@ -351,9 +352,9 @@ describe('DataTable', () => {
   });
 
   describe('trigger updateConfig on pinning column', () => {
-    const avgSeries = new Series('avg(bytes)');
+    const avgSeries = Series.forFunction('avg(bytes)');
     const maxTimestampSeries = new Series('max(timestamp)');
-    const getWidget = ({ config }) => Widget.builder()
+    const getWidget = ({ config }: { config: WidgetConfig }) => Widget.builder()
       .id('deadbeef')
       .type('dummy')
       .config(config)

@@ -51,7 +51,7 @@ const widgetConfig = AggregationWidgetConfig
   .builder()
   .visualization(DataTable.type)
   .rowPivots([pivot0, pivot1])
-  .visualizationConfig(DataTableVisualizationConfig.create([]).toBuilder().build())
+  .visualizationConfig(DataTableVisualizationConfig.empty().toBuilder().build())
   .build();
 
 const selectEventConfig = { container: document.body };
@@ -204,8 +204,8 @@ describe('AggregationWizard', () => {
     const newSortContainer = await screen.findByTestId('sort-element-0');
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Field is required.')).toBeInTheDocument());
-    // eslint-disable-next-line jest/valid-expect
-    await waitFor(() => expect(expect(applyButton).toBeDisabled()));
+
+    await waitFor(() => expect(applyButton).toBeDisabled());
   });
 
   it('should require direction when creating a sort element', async () => {
@@ -216,8 +216,8 @@ describe('AggregationWizard', () => {
     const newSortContainer = await screen.findByTestId('sort-element-0');
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Direction is required.')).toBeInTheDocument());
-    // eslint-disable-next-line jest/valid-expect
-    await waitFor(() => expect(expect(applyButton).toBeDisabled()));
+
+    await waitFor(() => expect(applyButton).toBeDisabled());
   });
 
   it('should remove all sorts', async () => {

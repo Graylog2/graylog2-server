@@ -21,41 +21,49 @@ import VisualizationConfig from './VisualizationConfig';
 export type PinnedColumns = Array<string>
 
 export type DataTableVisualizationConfigType = {
+  pinnedColumns: PinnedColumns,
+};
+
+export type DataTableVisualizationConfigTypeJSON = {
   pinned_columns: PinnedColumns,
 };
 
 export default class DataTableVisualizationConfig extends VisualizationConfig {
   _value: DataTableVisualizationConfigType;
 
-  constructor(pinned_columns: PinnedColumns) {
+  constructor(pinnedColumns: PinnedColumns) {
     super();
-    this._value = { pinned_columns: pinned_columns || [] };
+    this._value = { pinnedColumns: pinnedColumns || [] };
   }
 
-  get pinned_columns() {
-    return Immutable.Set(this._value.pinned_columns);
+  static empty() {
+    return this.create([]);
+  }
+
+  get pinnedColumns() {
+    return Immutable.Set(this._value.pinnedColumns);
   }
 
   toBuilder() {
-    const { pinned_columns } = this._value;
+    const { pinnedColumns } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({ pinned_columns }));
+    return new Builder(Immutable.Map({ pinnedColumns }));
   }
 
-  static create(pinned_columns: PinnedColumns) {
-    return new DataTableVisualizationConfig(pinned_columns);
+  static create(pinnedColumns: PinnedColumns) {
+    return new DataTableVisualizationConfig(pinnedColumns);
   }
 
   toJSON() {
-    const { pinned_columns } = this._value;
+    const { pinnedColumns } = this._value;
 
     return {
-      pinned_columns,
+      pinned_columns: pinnedColumns,
     };
   }
 
-  static fromJSON(_type: string, value: DataTableVisualizationConfigType) {
+  static fromJSON(_type: string, value: DataTableVisualizationConfigTypeJSON) {
     const { pinned_columns } = value;
 
     return DataTableVisualizationConfig.create(pinned_columns);
@@ -71,13 +79,13 @@ class Builder {
     this.value = value;
   }
 
-  pinned_columns(value: PinnedColumns) {
-    return new Builder(this.value.set('pinned_columns', value));
+  pinnedColumns(value: PinnedColumns) {
+    return new Builder(this.value.set('pinnedColumns', value));
   }
 
   build() {
-    const { pinned_columns } = this.value.toObject();
+    const { pinnedColumns } = this.value.toObject();
 
-    return new DataTableVisualizationConfig(pinned_columns);
+    return new DataTableVisualizationConfig(pinnedColumns);
   }
 }

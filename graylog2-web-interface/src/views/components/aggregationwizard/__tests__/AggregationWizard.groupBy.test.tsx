@@ -44,7 +44,7 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
 const widgetConfig = AggregationWidgetConfig
   .builder()
   .visualization(DataTable.type)
-  .visualizationConfig(DataTableVisualizationConfig.create([]).toBuilder().build())
+  .visualizationConfig(DataTableVisualizationConfig.empty().toBuilder().build())
   .build();
 
 const fieldType = new FieldType('field_type', ['numeric'], []);

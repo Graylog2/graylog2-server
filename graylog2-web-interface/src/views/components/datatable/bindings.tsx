@@ -21,35 +21,28 @@ import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visuali
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 
 type DataTableVisualizationConfigFormValues = {
-  pinned_columns: Array<string>,
+  pinnedColumns: Array<string>,
 };
 const dataTable: VisualizationType<typeof DataTable.type> = {
   type: DataTable.type,
   displayName: 'Data Table',
   component: DataTable,
   config: {
-    createConfig: () => ({ pinned_columns: [] }),
-    fromConfig: (config: DataTableVisualizationConfig | undefined) => ({ pinned_columns: config?.pinned_columns.toJS() ?? [] }),
-    toConfig: (formValues: DataTableVisualizationConfigFormValues) => DataTableVisualizationConfig.create(formValues.pinned_columns),
+    createConfig: () => ({ pinnedColumns: [] }),
+    fromConfig: (config: DataTableVisualizationConfig | undefined) => ({ pinnedColumns: config?.pinnedColumns.toJS() ?? [] }),
+    toConfig: (formValues: DataTableVisualizationConfigFormValues) => DataTableVisualizationConfig.create(formValues.pinnedColumns),
     fields: [{
-      name: 'pinned_columns',
+      name: 'pinnedColumns',
       title: 'Pinned Columns',
       type: 'multi-select',
       options: ({ formValues }: { formValues: WidgetConfigFormValues }) => {
-        const options = formValues?.groupBy?.groupings.reduce((res, cur) => {
-          if (cur.direction === 'row' && cur?.field?.field) {
-            res.push(cur.field.field);
-          }
-
-          return res;
-        }, []) || [];
-
+        return formValues?.groupBy?.groupings.filter((grouping) => (grouping?.direction === 'row' && grouping?.field?.field))
+          .map((grouping) => grouping.field.field) ?? [];
         /*
         if (formValues?.metrics) {
           formValues.metrics.forEach((metric) => options.push(`${metric.function}(${metric.field})`));
         }
         */
-        return options;
       },
       required: false,
     }],

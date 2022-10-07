@@ -153,7 +153,10 @@ const DataTable = ({
   const _onSortChange = useCallback((newSort: Array<SortConfig>) => {
     const dirty = formContext?.dirty;
     const updateWidget = () => WidgetActions.updateConfig(widget.id, config.toBuilder().sort(newSort).build());
-    if (!editing || (editing && !dirty)) return updateWidget();
+
+    if (!editing || (editing && !dirty)) {
+      return updateWidget();
+    }
 
     // eslint-disable-next-line no-alert
     if (window.confirm('You have unsaved changes in configuration form. This action will rollback them')) {
@@ -167,19 +170,27 @@ const DataTable = ({
     const dirty = formContext?.dirty;
 
     const updateWidget = () => {
-      const curVisualizationConfig = widget.config.visualizationConfig || DataTableVisualizationConfig.create([]).toBuilder().build();
-      let pinned_columns;
+      const curVisualizationConfig = widget.config.visualizationConfig ?? DataTableVisualizationConfig.create([]).toBuilder().build();
+      const pinnedColumns = curVisualizationConfig?.pinnedColumns?.has(field)
+        ? curVisualizationConfig.pinnedColumns.delete(field)
+        : curVisualizationConfig.pinnedColumns.add(field);
 
-      if (curVisualizationConfig?.pinned_columns?.has(field)) {
-        pinned_columns = curVisualizationConfig.pinned_columns.delete(field);
-      } else {
-        pinned_columns = curVisualizationConfig.pinned_columns.add(field);
-      }
-
-      return WidgetActions.updateConfig(widget.id, widget.config.toBuilder().visualizationConfig(curVisualizationConfig.toBuilder().pinned_columns(pinned_columns.toJS()).build()).build());
+      return WidgetActions.updateConfig(
+        widget.id,
+        widget
+          .config
+          .toBuilder()
+          .visualizationConfig(
+            curVisualizationConfig
+              .toBuilder()
+              .pinnedColumns(pinnedColumns.toJS())
+              .build())
+          .build());
     };
 
-    if (!editing || (editing && !dirty)) return updateWidget();
+    if (!editing || (editing && !dirty)) {
+      return updateWidget();
+    }
 
     // eslint-disable-next-line no-alert
     if (window.confirm('You have unsaved changes in configuration form. This action will rollback them')) {
@@ -203,8 +214,8 @@ const DataTable = ({
 
   const actualColumnPivotFields = _extractColumnPivotValues(rows);
   const pinnedColumns = useMemo(() => {
-    return widget?.config?.visualizationConfig?.pinned_columns || Immutable.Set();
-  }, [widget?.config?.visualizationConfig?.pinned_columns]);
+    return widget?.config?.visualizationConfig?.pinnedColumns || Immutable.Set();
+  }, [widget?.config?.visualizationConfig?.pinnedColumns]);
 
   const stickyLeftMarginsByColumnIndex = useMemo(() => {
     let prev = 0;
