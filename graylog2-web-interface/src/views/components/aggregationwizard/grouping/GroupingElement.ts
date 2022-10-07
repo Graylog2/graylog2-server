@@ -21,6 +21,7 @@ import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/Aggrega
 import type { TimeConfigType } from 'views/logic/aggregationbuilder/Pivot';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import generateId from 'logic/generateId';
+import parseNumber from 'views/components/aggregationwizard/grouping/parseNumber';
 
 import GroupingsConfiguration from './GroupingsConfiguration';
 
@@ -31,7 +32,7 @@ import type {
   GroupByFormValues,
   GroupingDirection,
   ValuesGrouping,
-  WidgetConfigFormValues,
+  WidgetConfigFormValues, WidgetConfigValidationErrors,
 } from '../WidgetConfigForm';
 
 type GroupByError = {
@@ -93,28 +94,16 @@ const validateGrouping = (grouping: GroupByFormValues): GroupByError => {
 
 const DEFAULT_PIVOT_LIMIT = '15';
 
-const parseNumber = (num: string | number | undefined) => {
-  if (num === undefined) {
-    return num as undefined;
-  }
-
-  if (typeof num === 'number') {
-    return num;
-  }
-
-  const parsedNumber = Number.parseInt(num, 10);
-
-  return Number.isNaN(parsedNumber) ? undefined : parsedNumber;
-};
-
-const validateGroupings = (values: WidgetConfigFormValues) => {
+const validateGroupings = (values: WidgetConfigFormValues): WidgetConfigValidationErrors => {
   const emptyErrors = {};
 
   if (!values.groupBy) {
     return emptyErrors;
   }
 
-  const errors: { rowLimit?: string, columnLimit?: string } = {};
+  const errors = {};
+
+  const groupByErrors: WidgetConfigValidationErrors['groupBy'] = {};
   const hasValuesRowPivots = values.groupBy?.groupings?.filter((grouping) => (grouping.direction === 'row' && grouping.field?.type === 'values')).length > 0;
   const hasValuesColumnPivots = values.groupBy?.groupings?.filter((grouping) => (grouping.direction === 'column' && grouping.field?.type === 'values')).length > 0;
 
@@ -122,28 +111,28 @@ const validateGroupings = (values: WidgetConfigFormValues) => {
     const parsedLimit = parseNumber(values.groupBy.rowLimit);
 
     if (parsedLimit === undefined) {
-      errors.rowLimit = 'Row limit is required.';
+      groupByErrors.rowLimit = 'Row limit is required.';
     } else if (parsedLimit <= 0) {
-      errors.rowLimit = 'Must be greater than 0.';
+      groupByErrors.rowLimit = 'Must be greater than 0.';
     }
   }
 
   if (hasValuesColumnPivots) {
-    const parsedLimit = parseNumber(values.rowLimit);
+    const parsedLimit = parseNumber(values.groupBy.columnLimit);
 
     if (parsedLimit === undefined) {
-      errors.columnLimit = 'Column limit is required.';
+      groupByErrors.columnLimit = 'Column limit is required.';
     } else if (parsedLimit <= 0) {
-      errors.columnLimit = 'Must be greater than 0.';
+      groupByErrors.columnLimit = 'Must be greater than 0.';
     }
   }
 
   const { groupings } = values.groupBy;
-  const groupByErrors = groupings.map(validateGrouping);
+  const groupingErrors = groupings.map(validateGrouping);
 
   console.log('Returning errors: ', errors);
 
-  return (hasErrors(groupByErrors) || Object.keys(errors).length > 0) ? { ...errors, groupBy: { groupings: groupByErrors } } : emptyErrors;
+  return (hasErrors(groupingErrors) || Object.keys(groupByErrors).length > 0) ? { ...errors, groupBy: { ...groupByErrors, groupings: groupingErrors } } : emptyErrors;
 };
 
 const addRandomId = <GroupingType extends BaseGrouping>(baseGrouping: Omit<GroupingType, 'id'>) => ({
@@ -234,8 +223,8 @@ const GroupByElement: AggregationElement = {
         ...(formValues.groupBy?.groupings ?? []),
         createEmptyGrouping(),
       ],
-      rowLimit: formValues.rowLimit ?? (formValues.groupBy.groupings.find((grouping) => (grouping.direction === 'row' && grouping.field?.type === 'values')) ? DEFAULT_PIVOT_LIMIT : undefined),
-      columnLimit: formValues.rowLimit ?? (formValues.groupBy.groupings.find((grouping) => (grouping.direction === 'column' && grouping.field?.type === 'values')) ? DEFAULT_PIVOT_LIMIT : undefined),
+      rowLimit: formValues.groupBy.rowLimit ?? (formValues.groupBy.groupings.find((grouping) => (grouping.direction === 'row' && grouping.field?.type === 'values')) ? DEFAULT_PIVOT_LIMIT : undefined),
+      columnLimit: formValues.groupBy.columnLimit ?? (formValues.groupBy.groupings.find((grouping) => (grouping.direction === 'column' && grouping.field?.type === 'values')) ? DEFAULT_PIVOT_LIMIT : undefined),
     },
   }),
   onRemove: ((index, formValues) => {
