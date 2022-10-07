@@ -24,6 +24,8 @@ import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import { useStore } from 'stores/connect';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import type { Property } from 'views/logic/fieldtypes/FieldType';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 type Props = {
   ariaLabel?: string,
@@ -35,19 +37,28 @@ type Props = {
   onChange: (changeEvent: { target: { name: string, value: string } }) => void,
   value: string | undefined,
   selectRef?: React.Ref<React.ComponentType>
+  properties?: Array<Property>,
 }
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
-const FieldSelect = ({ name, id, error, clearable, value, onChange, label, ariaLabel, selectRef }: Props) => {
+const hasProperty = (fieldType: FieldTypeMapping, properties: Array<Property>) => {
+  const fieldProperties = fieldType?.type?.properties ?? Immutable.Set();
+
+  return properties
+    .map((property) => fieldProperties.contains(property))
+    .find((result) => result === false) === undefined;
+};
+
+const FieldSelect = ({ name, id, error, clearable, value, onChange, label, ariaLabel, selectRef, properties }: Props) => {
   const { activeQuery } = useStore(ViewMetadataStore);
   const fieldTypes = useContext(FieldTypesContext);
   const fieldTypeOptions = useMemo(() => fieldTypes.queryFields
     .get(activeQuery, Immutable.List())
-    .map((fieldType) => ({ label: fieldType.name, value: fieldType.name }))
+    .map((fieldType) => ({ label: fieldType.name, value: fieldType.name, disabled: properties ? !hasProperty(fieldType, properties) : false }))
     .toArray()
     .sort(sortByLabel),
-  [activeQuery, fieldTypes.queryFields]);
+  [activeQuery, fieldTypes.queryFields, properties]);
 
   return (
     <Input id={id}
@@ -75,6 +86,7 @@ FieldSelect.defaultProps = {
   error: undefined,
   ariaLabel: undefined,
   selectRef: undefined,
+  properties: undefined,
 };
 
 export default FieldSelect;
