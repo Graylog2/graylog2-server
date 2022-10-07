@@ -20,6 +20,7 @@ import { useContext } from 'react';
 
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import parseNumber from 'views/components/aggregationwizard/grouping/parseNumber';
 
 import FieldSelect from '../../FieldSelect';
 
@@ -28,7 +29,7 @@ type Props = {
   fieldType: string,
 };
 
-const numberNotSet = (value: any) => Number.isNaN(Number.parseInt(value, 10));
+const numberNotSet = (value: string | number | undefined) => parseNumber(value) === undefined;
 
 const defaultLimit = 15;
 
@@ -53,12 +54,12 @@ const FieldComponent = ({ index, fieldType }: Props) => {
       if (newFieldType === 'values') {
         setFieldValue(`groupBy.groupings.${index}.interval`, undefined, false);
 
-        if (grouping.direction === 'row' && numberNotSet(values.rowLimit)) {
-          setFieldValue('rowLimit', defaultLimit);
+        if (grouping.direction === 'row' && numberNotSet(values.groupBy.rowLimit)) {
+          setFieldValue('groupBy.rowLimit', defaultLimit);
         }
 
-        if (grouping.direction === 'column' && numberNotSet(values.columnLimit)) {
-          setFieldValue('columnLimit', defaultLimit);
+        if (grouping.direction === 'column' && numberNotSet(values.groupBy.columnLimit)) {
+          setFieldValue('groupBy.columnLimit', defaultLimit);
         }
       }
     }

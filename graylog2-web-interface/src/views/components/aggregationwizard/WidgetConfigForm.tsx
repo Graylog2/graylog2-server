@@ -105,11 +105,13 @@ export interface WidgetConfigFormValues {
 
 export interface WidgetConfigValidationErrors {
   metrics?: Array<{ [key: string]: string }>,
-  groupBy?: { groupings: Array<{ [key: string]: string }> },
+  groupBy?: {
+    groupings?: Array<{ [key: string]: string }>,
+    rowLimit?: string,
+    columnLimit?: string,
+  },
   visualization?: { [key: string]: string | any },
   sort?: Array<{ [key: string]: string }>,
-  rowLimit?: string,
-  columnLimit?: string,
 }
 
 type Props = {
