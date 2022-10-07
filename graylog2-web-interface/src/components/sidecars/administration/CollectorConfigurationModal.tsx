@@ -53,7 +53,7 @@ const SecondaryText = styled.div`
   white-space: nowrap;
   text-overflow: ellipsis;
   color: #aaaaaa;
-  margin-top: -6px;
+  margin-top: -4px;
   margin-bottom: -2px;
 `;
 
@@ -66,7 +66,7 @@ const TableRow = styled.tr`
 const StickyTableRowFooter = styled.tr`
   height: 32px;
   position: sticky;
-  bottom: 0;
+  bottom: -1px;
 `;
 
 const IconTableCell = styled.td`
