@@ -67,8 +67,11 @@ const Header = styled.div(({ theme, $isEmpty }: { theme: DefaultTheme, $isEmpty:
   margin-bottom: 1px;
   min-height: 26px;
   font-weight: bold;
-  position: relative;
-
+  background-color: ${theme.colors.global.contentBackground};
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  
   ::before {
     content: ' ';
     top: 50%;
