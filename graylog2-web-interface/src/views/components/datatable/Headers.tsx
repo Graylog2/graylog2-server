@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useLayoutEffect, useRef } from 'react';
-import { flatten, get, isEqual, last } from 'lodash';
+import { get, isEqual, last } from 'lodash';
 import styled, { css } from 'styled-components';
 import type { OrderedMap } from 'immutable';
 import Immutable from 'immutable';
@@ -163,7 +163,8 @@ const ColumnPivotFieldsHeaders = ({ activeQuery, fields, pivots, values, series,
       <tr key={`header-table-row-${columnPivot}`}>
         {offset > 0 && <Spacer span={offset} />}
         {actualValuesWithoutDuplicates.map((value) => (
-          <HeaderFieldForValue activeQuery={activeQuery}
+          <HeaderFieldForValue key={`header-field-value-${value.key}`}
+                               activeQuery={activeQuery}
                                field={columnPivot}
                                value={value.key}
                                span={value.count * series.length}
