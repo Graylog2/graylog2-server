@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import styled from 'styled-components';
@@ -112,9 +112,9 @@ const CollectorConfigurationModal = ({
   unassignedConfigs,
   getRowData,
 }) => {
-  const [searchQuery, setSearchQuery] = React.useState<string>('');
-  const [selectedConfigurations, setSelectedConfigurations] = React.useState<string[]>(initialAssignedConfigs);
-  const [partiallySelectedConfigurations, setPartiallySelectedConfigurations] = React.useState<string[]>(initialPartiallyAssignedConfigs);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedConfigurations, setSelectedConfigurations] = useState<string[]>(initialAssignedConfigs);
+  const [partiallySelectedConfigurations, setPartiallySelectedConfigurations] = useState<string[]>(initialPartiallyAssignedConfigs);
 
   const onReset = () => {
     setSelectedConfigurations(initialAssignedConfigs);

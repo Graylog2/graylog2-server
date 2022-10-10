@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import styled from 'styled-components';
@@ -29,9 +29,9 @@ const ConfigurationSummary = styled.div`
 `;
 
 const CollectorConfigurationModalContainer = (props) => {
-  const [nextAssignedConfigurations, setNextAssignedConfigurations] = React.useState([]);
-  const [nextPartiallyAssignedConfigurations, setNextPartiallyAssignedConfigurations] = React.useState([]);
-  const modalConfirm = React.useRef(null);
+  const [nextAssignedConfigurations, setNextAssignedConfigurations] = useState([]);
+  const [nextPartiallyAssignedConfigurations, setNextPartiallyAssignedConfigurations] = useState([]);
+  const modalConfirm = useRef(null);
 
   const getSelectedLogCollector = () => {
     return (lodash.uniq<any>(props.selectedSidecarCollectorPairs.map(({ collector }) => collector)))[0];
