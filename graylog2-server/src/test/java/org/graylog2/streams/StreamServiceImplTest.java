@@ -21,8 +21,6 @@ import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
-import org.graylog2.alerts.AlertService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
@@ -36,8 +34,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -53,8 +49,6 @@ public class StreamServiceImplTest {
     @Mock
     private StreamRuleService streamRuleService;
     @Mock
-    private AlertService alertService;
-    @Mock
     private OutputService outputService;
     @Mock
     private IndexSetService indexSetService;
@@ -63,44 +57,14 @@ public class StreamServiceImplTest {
     @Mock
     private NotificationService notificationService;
     @Mock
-    private AlarmCallbackConfigurationService alarmCallbackConfigurationService;
-    @Mock
     private EntityOwnershipService entityOwnershipService;
 
     private StreamService streamService;
 
     @Before
     public void setUp() throws Exception {
-        this.streamService = new StreamServiceImpl(mongodb.mongoConnection(), streamRuleService, alertService,
-                outputService, indexSetService, factory, notificationService, entityOwnershipService, new ClusterEventBus(), alarmCallbackConfigurationService);
-    }
-
-    @Test
-    public void loadAllWithConfiguredAlertConditionsShouldNotFailWhenNoStreamsArePresent() {
-        final List<Stream> alertableStreams = this.streamService.loadAllWithConfiguredAlertConditions();
-
-        assertThat(alertableStreams)
-                .isNotNull()
-                .isEmpty();
-    }
-
-    @Test
-    @MongoDBFixtures("someStreamsWithoutAlertConditions.json")
-    public void loadAllWithConfiguredAlertConditionsShouldReturnNoStreams() {
-        final List<Stream> alertableStreams = this.streamService.loadAllWithConfiguredAlertConditions();
-
-        assertThat(alertableStreams)
-                .isEmpty();
-    }
-
-    @Test
-    @MongoDBFixtures({"someStreamsWithoutAlertConditions.json", "someStreamsWithAlertConditions.json"})
-    public void loadAllWithConfiguredAlertConditionsShouldReturnStreams() {
-        final List<Stream> alertableStreams = this.streamService.loadAllWithConfiguredAlertConditions();
-
-        assertThat(alertableStreams)
-                .isNotEmpty()
-                .hasSize(2);
+        this.streamService = new StreamServiceImpl(mongodb.mongoConnection(), streamRuleService,
+                outputService, indexSetService, factory, notificationService, entityOwnershipService, new ClusterEventBus());
     }
 
     @Test

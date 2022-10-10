@@ -16,18 +16,18 @@
  */
 import * as React from 'react';
 
-import withPluginEntities from 'views/logic/withPluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 
-type Props = {
-  headerElements: Array<React.ComponentType<{}>>,
+const HeaderElements = () => {
+  const headerElements = usePluginEntities('views.elements.header');
+
+  return (
+    <>
+      {headerElements
+        // eslint-disable-next-line react/no-array-index-key
+        .map((Component, idx) => <Component key={idx} />)}
+    </>
+  );
 };
 
-const HeaderElements = ({ headerElements = [] }: Props) => (
-  <>
-    {headerElements
-      // eslint-disable-next-line react/no-array-index-key
-      .map((Component, idx) => <Component key={idx} />)}
-  </>
-);
-
-export default withPluginEntities(HeaderElements, { headerElements: 'views.elements.header' });
+export default HeaderElements;

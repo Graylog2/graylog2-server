@@ -37,7 +37,7 @@ import InteractiveContext from '../contexts/InteractiveContext';
 
 const Table = styled.table(({ theme }) => css`
   position: relative;
-  font-size: ${theme.fonts.size.small};
+  font-size: ${theme.fonts.size.tiny};
   margin: 0;
   border-collapse: collapse;
   width: 100%;
@@ -83,6 +83,7 @@ const TableHead = styled.thead(({ theme }) => css`
   color: ${theme.utils.readableColor(theme.colors.gray[90])};
   position: sticky;
   top: 0;
+  z-index: 1;
   
   && > tr > th {
     min-width: 50px;

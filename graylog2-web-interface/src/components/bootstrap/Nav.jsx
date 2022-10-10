@@ -82,7 +82,6 @@ const Nav = styled(BootstrapNav)(({ theme }) => css`
       > li > a {
         padding: 14px 18px;
         font-size: 18px;
-        line-height: 1.3;
       }
     };
 

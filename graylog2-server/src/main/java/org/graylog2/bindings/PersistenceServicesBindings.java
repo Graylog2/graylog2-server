@@ -18,8 +18,6 @@ package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.OptionalBinder;
-import org.graylog2.alerts.AlertService;
-import org.graylog2.alerts.AlertServiceImpl;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.indexer.IndexFailureService;
@@ -51,7 +49,6 @@ public class PersistenceServicesBindings extends AbstractModule {
     @Override
     protected void configure() {
         bind(SystemMessageService.class).to(SystemMessageServiceImpl.class);
-        bind(AlertService.class).to(AlertServiceImpl.class);
         bind(NotificationService.class).to(NotificationServiceImpl.class);
         bind(IndexFailureService.class).to(IndexFailureServiceImpl.class);
         bind(NodeService.class).to(NodeServiceImpl.class);

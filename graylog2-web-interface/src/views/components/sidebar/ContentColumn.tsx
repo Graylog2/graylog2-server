@@ -106,7 +106,6 @@ const Title = styled.h1`
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: pointer;
-  line-height: 1.5;
 `;
 
 const OverlayToggle = styled.div<{ sidebarIsPinned: boolean }>(({ theme, sidebarIsPinned }) => css`

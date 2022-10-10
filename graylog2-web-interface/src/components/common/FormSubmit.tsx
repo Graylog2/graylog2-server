@@ -15,12 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 import Button from 'components/bootstrap/Button';
 import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
+
+const StyledIcon = styled(Icon)`
+  margin-right: 0.2em;
+`;
 
 type WithCancelProps = {
   displayCancel: true,
@@ -80,7 +85,7 @@ const FormSubmit = (props: Props) => {
               title={submitButtonText}
               type={submitButtonType}
               onClick={onSubmit}>
-        {(submitIcon && !(isAsyncSubmit && props.isSubmitting)) && <><Icon name={submitIcon} /> </>}
+        {(submitIcon && !(isAsyncSubmit && props.isSubmitting)) && <StyledIcon name={submitIcon} />}
         {(isAsyncSubmit && props.isSubmitting) ? <Spinner text={props.submitLoadingText} delay={0} /> : submitButtonText}
       </Button>
       {centerCol}

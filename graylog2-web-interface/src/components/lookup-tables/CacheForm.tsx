@@ -125,6 +125,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
   };
 
   const onCancel = () => history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
+  const updatable = !create && !loadingScopePermissions && scopePermissions?.is_mutable;
 
   return (
     <>
@@ -182,7 +183,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
                                     isAsyncSubmit
                                     onCancel={onCancel} />
                       )}
-                      {(!create && !loadingScopePermissions && scopePermissions?.is_mutable) && (
+                      {updatable && (
                         <FormSubmit submitButtonText="Update cache"
                                     submitLoadingText="Updating cache..."
                                     isAsyncSubmit
