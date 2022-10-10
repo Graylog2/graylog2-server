@@ -41,7 +41,7 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time> {
 
     @Nonnull
     @Override
-    public CreatedAggregations<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, List<Time> bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<Time> bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
         AggregationBuilder root = null;
         AggregationBuilder leaf = null;
 

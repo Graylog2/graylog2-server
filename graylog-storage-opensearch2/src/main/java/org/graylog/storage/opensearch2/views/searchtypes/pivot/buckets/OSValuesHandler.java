@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
@@ -34,7 +35,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.Filters;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.FiltersAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.ParsedFilters;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.Terms;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.support.MultiTermsValuesSourceConfig;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
@@ -47,7 +47,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -66,16 +66,20 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
 
     @Nonnull
     @Override
-    public CreatedAggregations<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, List<Values> bucketSpecs, OSGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<Values> bucketSpecs, OSGeneratedQueryContext queryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
-        final int limit = bucketSpecs.stream()
-                .map(Values::limit)
-                .max(Integer::compare)
-                .orElse(Values.DEFAULT_LIMIT);
+        final int limit = extractLimit(direction, pivot).orElse(Values.DEFAULT_LIMIT);
         final AggregationBuilder termsAggregation = createTerms(bucketSpecs, ordering, limit);
         final FiltersAggregationBuilder filterAggregation = createFilter(name, bucketSpecs)
                 .subAggregation(termsAggregation);
         return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
+    }
+
+    private OptionalInt extractLimit(Direction direction, Pivot pivot) {
+        return switch (direction) {
+            case Row -> pivot.rowLimit();
+            case Column -> pivot.columnLimit();
+        };
     }
 
     private FiltersAggregationBuilder createFilter(String name, List<Values> bucketSpecs) {

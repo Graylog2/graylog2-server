@@ -45,7 +45,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
 
     @Nonnull
     @Override
-    public CreatedAggregations<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, List<Time> bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<Time> bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
         AggregationBuilder root = null;
         AggregationBuilder leaf = null;
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);

@@ -39,7 +39,7 @@ public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket
     private static final String AGG_NAME = "agg";
     @Nonnull
     @Override
-    public CreatedAggregations<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, List<DateRangeBucket> bucketSpecs, ESGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<DateRangeBucket> bucketSpecs, ESGeneratedQueryContext queryContext, Query query) {
         AggregationBuilder root = null;
         AggregationBuilder leaf = null;
         for (DateRangeBucket dateRangeBucket : bucketSpecs) {
