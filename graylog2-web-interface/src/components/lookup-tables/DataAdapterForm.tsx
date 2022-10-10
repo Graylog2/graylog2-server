@@ -202,7 +202,6 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
                                    }
                                    labelClassName="col-sm-3"
                                    wrapperClassName="col-sm-9" />
-
                   <TimeUnitInput label="Custom Error TTL"
                                  help="Define a custom TTL for caching erroneous results. Otherwise the default of 5 seconds is used"
                                  update={handleTTLUpdate(values, setValues)}
