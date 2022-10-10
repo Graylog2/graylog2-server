@@ -34,11 +34,12 @@ type Props = {
   name: string,
   onChange: (changeEvent: { target: { name: string, value: string } }) => void,
   value: string | undefined,
+  selectRef?: React.Ref<React.ComponentType>
 }
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
-const FieldSelect = ({ name, id, error, clearable, value, onChange, label, ariaLabel }: Props) => {
+const FieldSelect = ({ name, id, error, clearable, value, onChange, label, ariaLabel, selectRef }: Props) => {
   const { activeQuery } = useStore(ViewMetadataStore);
   const fieldTypes = useContext(FieldTypesContext);
   const fieldTypeOptions = useMemo(() => fieldTypes.queryFields
@@ -55,6 +56,8 @@ const FieldSelect = ({ name, id, error, clearable, value, onChange, label, ariaL
            labelClassName="col-sm-3"
            wrapperClassName="col-sm-9">
       <Select options={fieldTypeOptions}
+              inputId={`select-${id}`}
+              forwardedRef={selectRef}
               clearable={clearable}
               name={name}
               value={value}
@@ -71,6 +74,7 @@ FieldSelect.defaultProps = {
   clearable: false,
   error: undefined,
   ariaLabel: undefined,
+  selectRef: undefined,
 };
 
 export default FieldSelect;

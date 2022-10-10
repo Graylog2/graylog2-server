@@ -1,6 +1,6 @@
 {
   "name": "graylog-web-plugin",
-  "version": "4.4.0-SNAPSHOT",
+  "version": "5.0.0-SNAPSHOT",
   "description": "Helper code for streamlining Graylog web interface plugin development",
   "main": "index.js",
   "scripts": {
@@ -37,7 +37,7 @@
     "extends": "graylog"
   },
   "dependencies": {
-    "@tanstack/react-query": "4.10.1",
+    "@tanstack/react-query": "4.10.3",
     "@types/create-react-class": "15.6.3",
     "@types/jquery": "3.5.14",
     "@types/react": "18.0.21",
