@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
@@ -34,7 +35,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.Filters;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.FiltersAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.ParsedFilters;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotBucketSpecHandler;
@@ -43,7 +43,7 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.PivotBucket;
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -56,17 +56,21 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
 
     @Nonnull
     @Override
-    public CreatedAggregations<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, List<Values> bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<Values> bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
-        final int limit = bucketSpec.stream()
-                .map(Values::limit)
-                .max(Integer::compare)
-                .orElse(Values.DEFAULT_LIMIT);
+        final int limit = extractLimit(direction, pivot).orElse(Values.DEFAULT_LIMIT);
         final AggregationBuilder termsAggregation = createTerms(bucketSpec, ordering, limit);
         final FiltersAggregationBuilder filterAggregation = createFilter(name, bucketSpec)
                 .subAggregation(termsAggregation);
 
         return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
+    }
+
+    private OptionalInt extractLimit(Direction direction, Pivot pivot) {
+        return switch (direction) {
+            case Row -> pivot.rowLimit();
+            case Column -> pivot.columnLimit();
+        };
     }
 
     private FiltersAggregationBuilder createFilter(String name, List<Values> bucketSpecs) {
