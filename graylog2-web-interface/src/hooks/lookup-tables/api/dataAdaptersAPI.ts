@@ -21,7 +21,6 @@ import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
 const getURL = (path: string = '') => (URLUtils.qualifyUrl(`/system/lookup${path}`));
 
-// eslint-disable-next-line import/prefer-default-export
 export const fetchAll = async (page = 1, perPage = 100, query = null) => {
   let url = getURL(`/adapters?sort=title&order=asc&page=${page}&per_page=${perPage}`);
   if (query) url += `&query=${encodeURI(query)}`;

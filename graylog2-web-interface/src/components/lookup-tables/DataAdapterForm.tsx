@@ -18,6 +18,7 @@ import * as React from 'react';
 import _ from 'lodash';
 import { Formik, Form } from 'formik';
 
+import ConfigFieldSet from './adapters/ConfigFieldSet';
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { LookupTableAdapter, LookupTableDataAdapterConfig, validationErrorsType } from 'logic/lookup-tables/types';
 import { Col, Row } from 'components/bootstrap';
@@ -43,19 +44,6 @@ const Title = ({ title, typeName, create }: TitleProps) => {
   );
 };
 
-const ConfigFieldSet = ({ formComponent, config, handleFormEvent, updateConfig, validationMessage, validationState, setDisableFormSubmission }) => {
-  return React.createElement(
-    formComponent, {
-      config,
-      handleFormEvent,
-      updateConfig,
-      validationMessage,
-      validationState,
-      setDisableFormSubmission,
-    },
-  );
-};
-
 const INIT_DATA_ADAPTER: LookupTableAdapter = {
   id: undefined,
   title: '',
@@ -74,11 +62,10 @@ type Props = {
   create?: boolean,
   dataAdapter?: LookupTableAdapter,
   validate?: (arg: LookupTableAdapter) => void,
-  validationErrors?: validationErrorsType[],
+  validationErrors?: validationErrorsType,
 };
 
 const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, validationErrors }: Props) => {
-  const configRef = React.useRef(null);
   const [generateName, setGenerateName] = React.useState<boolean>(create);
 
   const [localDataAdapter, setLocalDataAdapter] = React.useState<LookupTableAdapter>(_.cloneDeep(dataAdapter));
@@ -97,7 +84,10 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
     return inName.trim().replace(/\W+/g, '-').toLocaleLowerCase();
   };
 
-  const handleTitleChange = (values: LookupTableAdapter, setValues: (arg: LookupTableAdapter) => void) => (event: React.BaseSyntheticEvent) => {
+  const handleTitleChange = (
+    values: LookupTableAdapter,
+    setValues: (arg: LookupTableAdapter) => void,
+  ) => (event: React.BaseSyntheticEvent) => {
     if (!generateName) return;
     const safeName = sanitizeName(event.target.value);
 
@@ -109,18 +99,14 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
   };
 
   const handleValidation = (values: LookupTableAdapter) => {
-    const errors: any = {};
+    const errors: validationErrorsType = {};
 
     validate(values);
-    if (!values.title) errors.title = 'Required';
-    if (!values.name) errors.name = 'Required';
+    if (!values.title) errors.title = ['Required'];
+    if (!values.name) errors.name = ['Required'];
 
-    if (values.config.type !== 'none' && configRef.current && typeof configRef.current.validate !== 'undefined') {
-      const confErrors = configRef.current?.validate() || {};
-      if (!_.isEmpty(confErrors)) errors.config = confErrors;
-    }
-
-    return errors;
+    setFormErrors({ ...validationErrors, ...errors });
+    return { ...validationErrors, ...errors };
   };
 
   const handleTTLUpdate = (values: LookupTableAdapter, setValues: any) => (value: number, unit: string, enabled: boolean) => {
@@ -140,15 +126,17 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
     promise.then(() => saved());
   };
 
-  const handleConfigInputChange = (event: React.BaseSyntheticEvent) => {
+  const handleConfigInputChange = (values: LookupTableAdapter, setValues: any) => (event: React.BaseSyntheticEvent) => {
     const auxConf = { ...localDataAdapter.config };
     auxConf[event.target.name] = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+    setValues({ ...values, config: auxConf })
     setLocalDataAdapter({ ...localDataAdapter, config: auxConf });
   };
 
-  const handleTimeUnitInputChange = (newConfig: LookupTableDataAdapterConfig) => {
+  const handleTimeUnitInputChange = (values: LookupTableAdapter, setValues: any) => (newConfig: LookupTableDataAdapterConfig) => {
     const auxAdapter = { ...localDataAdapter };
     auxAdapter.config = { ...newConfig };
+    setValues({ ...values, config: newConfig })
     setLocalDataAdapter(auxAdapter);
   };
 
@@ -183,7 +171,7 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
                   validateOnMount={!create}
                   onSubmit={handleSubmit}
                   enableReinitialize>
-            {({ errors, values, setValues, isSubmitting }) => (
+            {({ values, setValues, isSubmitting }) => (
               <Form className="form form-horizontal">
                 <fieldset>
                   <FormikFormGroup type="text"
@@ -191,7 +179,7 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
                                    label="Title"
                                    autoFocus
                                    required
-                                   help={errors.title ? null : 'A short title for this data adapter.'}
+                                   help={formErrors.title ? null : 'A short title for this data adapter.'}
                                    onChange={handleTitleChange(values, setValues)}
                                    labelClassName="col-sm-3"
                                    wrapperClassName="col-sm-9" />
@@ -205,10 +193,10 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
                                    name="name"
                                    label="Name"
                                    required
-                                   error={validationErrors.name ? validationErrors.name[0] : null}
+                                   error={formErrors.name ? formErrors.name[0] : null}
                                    onChange={() => setGenerateName(false)}
                                    help={
-                                     (errors.name || validationErrors.name)
+                                     (formErrors.name)
                                        ? null
                                        : 'The name that is being used to refer to this data adapter. Must be unique.'
                                    }
@@ -229,8 +217,8 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
                 </fieldset>
                 <ConfigFieldSet formComponent={plugin.formComponent}
                                 config={localDataAdapter.config}
-                                handleFormEvent={handleConfigInputChange}
-                                updateConfig={handleTimeUnitInputChange}
+                                handleFormEvent={handleConfigInputChange(values, setValues)}
+                                updateConfig={handleTimeUnitInputChange(values, setValues)}
                                 validationMessage={getValidationMessage}
                                 validationState={getValidationState}
                                 setDisableFormSubmission={false} />

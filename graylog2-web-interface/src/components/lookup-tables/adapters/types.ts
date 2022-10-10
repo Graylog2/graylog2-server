@@ -40,3 +40,5 @@ export type HTTPJSONPathAdapterConfig = LookupTableDataAdapterConfig & {
   user_agent?: string,
   headers?: { [key: string]: string },
 };
+
+export type ConfigFieldSetType = DVSHTTPAdapterConfig | DnsAdapterConfig | HTTPJSONPathAdapterConfig;
