@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 import { Link, LinkContainer } from 'components/common/router';
 import { Button, Col, DropdownButton, Label, MenuItem } from 'components/bootstrap';
 import { EntityList, EntityListItem, PaginatedList, Spinner } from 'components/common';
@@ -85,11 +86,10 @@ const IndexSetsComponent = createReactClass({
     const { indexSetStats } = this.state;
 
     const actions = (
-      <div>
+      <ButtonToolbar>
         <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id)}>
-          <Button bsStyle="info">Edit</Button>
+          <Button>Edit</Button>
         </LinkContainer>
-        {' '}
         <DropdownButton title="More Actions" id={`index-set-dropdown-${indexSet.id}`} pullRight>
           <MenuItem onSelect={this._onSetDefault(indexSet)}
                     disabled={!indexSet.can_be_default || indexSet.default}>Set as default
@@ -97,7 +97,7 @@ const IndexSetsComponent = createReactClass({
           <MenuItem divider />
           <MenuItem onSelect={this._onDelete(indexSet)}>Delete</MenuItem>
         </DropdownButton>
-      </div>
+      </ButtonToolbar>
     );
 
     const content = (

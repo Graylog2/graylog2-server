@@ -111,7 +111,6 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
       <StyledSearchForm onSearch={updateQuery}
                         onReset={updateQuery}
                         searchButtonLabel="Find"
-                        searchBsStyle="info"
                         label="Filter"
                         useLoadingState={false} />
 
