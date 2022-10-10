@@ -153,10 +153,10 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final List<AggregationBuilder> metrics = new ArrayList<>();
         for (Tuple2<String, List<BucketSpec>> group : groupByConsecutiveType(pivots)) {
             final ESPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(group.v1());
-            final Optional<BucketSpecHandler.CreatedAggregations<AggregationBuilder>> bucketAggregations = bucketHandler.createAggregation(AGG_NAME, pivot, group.v2(), queryContext, query);
-            final AggregationBuilder aggregationRoot = bucketAggregations.map(BucketSpecHandler.CreatedAggregations::root).orElse(null);
-            final AggregationBuilder aggregationLeaf = bucketAggregations.map(BucketSpecHandler.CreatedAggregations::leaf).orElse(null);
-            final List<AggregationBuilder> aggregationMetrics = bucketAggregations.map(BucketSpecHandler.CreatedAggregations::metrics).orElse(Collections.emptyList());
+            final BucketSpecHandler.CreatedAggregations<AggregationBuilder> bucketAggregations = bucketHandler.createAggregation(AGG_NAME, pivot, group.v2(), queryContext, query);
+            final AggregationBuilder aggregationRoot = bucketAggregations.root();
+            final AggregationBuilder aggregationLeaf = bucketAggregations.leaf();
+            final List<AggregationBuilder> aggregationMetrics = bucketAggregations.metrics();
 
             metrics.addAll(aggregationMetrics);
             if (root == null && leaf == null) {

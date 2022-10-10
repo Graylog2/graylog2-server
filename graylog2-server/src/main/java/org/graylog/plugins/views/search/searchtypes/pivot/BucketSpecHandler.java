@@ -20,6 +20,7 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 
 import javax.annotation.Nonnull;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +35,7 @@ public interface BucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_BUI
 
     @SuppressWarnings("unchecked")
     @Nonnull
-    default Optional<CreatedAggregations<AGGREGATION_BUILDER>> createAggregation(String name,
+    default CreatedAggregations<AGGREGATION_BUILDER> createAggregation(String name,
                                                                                          Pivot pivot,
                                                                                          List<BucketSpec> pivotSpec,
                                                                                          GeneratedQueryContext queryContext,
@@ -43,7 +44,7 @@ public interface BucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_BUI
     }
 
     @Nonnull
-    Optional<CreatedAggregations<AGGREGATION_BUILDER>> doCreateAggregation(String name, Pivot pivot, List<SPEC_TYPE> bucketSpec, QUERY_CONTEXT queryContext, Query query);
+    CreatedAggregations<AGGREGATION_BUILDER> doCreateAggregation(String name, Pivot pivot, List<SPEC_TYPE> bucketSpec, QUERY_CONTEXT queryContext, Query query);
 
     record CreatedAggregations<T>(T root, T leaf, List<T> metrics) {
         public static <T> CreatedAggregations<T> create(T singleAggregation) {
@@ -55,7 +56,7 @@ public interface BucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_BUI
         }
 
         public static <T> CreatedAggregations<T> create(T rootAggregation, T leafAggregation, List<T> metricsAggregations) {
-            return new CreatedAggregations<>(rootAggregation, leafAggregation, metricsAggregations);
+            return new CreatedAggregations<>(rootAggregation, leafAggregation, metricsAggregations == null ? Collections.emptyList() : metricsAggregations);
         }
     }
 }

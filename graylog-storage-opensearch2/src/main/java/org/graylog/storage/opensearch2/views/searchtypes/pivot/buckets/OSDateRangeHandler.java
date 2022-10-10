@@ -40,7 +40,7 @@ public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket
     private static final String AGG_NAME = "agg";
     @Nonnull
     @Override
-    public Optional<CreatedAggregations<AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<DateRangeBucket> bucketSpecs, OSGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, List<DateRangeBucket> bucketSpecs, OSGeneratedQueryContext queryContext, Query query) {
         AggregationBuilder root = null;
         AggregationBuilder leaf = null;
         for (DateRangeBucket dateRangeBucket : bucketSpecs) {
@@ -70,7 +70,7 @@ public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket
             }
         }
 
-        return Optional.of(CreatedAggregations.create(root, leaf));
+        return CreatedAggregations.create(root, leaf);
     }
 
     @Override
