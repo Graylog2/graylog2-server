@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
@@ -67,8 +67,15 @@ const _loadBackends = (pagination, setLoading, setPaginatedBackends) => {
   });
 };
 
-const _updateListOnBackendDelete = (refreshOverview) => AuthenticationActions.delete.completed.listen(refreshOverview);
-const _updateListOnBackendActivation = (refreshOverview) => AuthenticationActions.setActiveBackend.completed.listen(refreshOverview);
+const _updateListOnBackendDelete = (pagination, setLoading, setPaginatedBackends, callback: () => void) => AuthenticationActions.delete.completed.listen(() => {
+  _loadBackends(pagination, setLoading, setPaginatedBackends);
+  callback();
+});
+
+const _updateListOnBackendActivation = (pagination, setLoading, setPaginatedBackends, callback: () => void) => AuthenticationActions.setActiveBackend.completed.listen(() => {
+  _loadBackends(pagination, setLoading, setPaginatedBackends);
+  callback();
+});
 
 const _backendsOverviewItem = (authBackend: AuthenticationBackend, context: { activeBackend: AuthenticationBackend }, paginatedRoles: PaginatedRoles) => (
   <BackendsOverviewItem authenticationBackend={authBackend} isActive={authBackend.id === context?.activeBackend?.id} roles={paginatedRoles.list} />
@@ -82,12 +89,10 @@ const BackendsOverview = () => {
   const [query, setQuery] = useState('');
   const { list: backends, context } = paginatedBackends || {};
 
-  const _refreshOverview = useCallback(() => resetPage(), [resetPage]);
-
   useEffect(() => _loadRoles(setPaginatedRoles), []);
   useEffect(() => _loadBackends({ query, page, perPage }, setLoading, setPaginatedBackends), [query, page, perPage]);
-  useEffect(() => _updateListOnBackendDelete(_refreshOverview), [_refreshOverview]);
-  useEffect(() => _updateListOnBackendActivation(_refreshOverview), [_refreshOverview]);
+  useEffect(() => _updateListOnBackendDelete({ query, page, perPage }, setLoading, setPaginatedBackends, resetPage), [query, page, perPage, resetPage]);
+  useEffect(() => _updateListOnBackendActivation({ query, page, perPage }, setLoading, setPaginatedBackends, resetPage), [query, page, perPage, resetPage]);
 
   const onSearch = (newQuery: string) => {
     resetPage();
