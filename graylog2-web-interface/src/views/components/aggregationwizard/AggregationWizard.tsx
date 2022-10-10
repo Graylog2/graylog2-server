@@ -45,6 +45,7 @@ const Controls = styled.div`
 `;
 
 const Section = styled.div`
+  height: 100%;
   margin-bottom: 10px;
 
   :last-child {

@@ -30,6 +30,7 @@ import type { WidgetConfigFormValues } from './WidgetConfigForm';
 
 const Container = styled.div`
   position: relative;
+  height: 100%;
 `;
 
 const _sortConfiguredElements = (
@@ -67,28 +68,30 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
           <SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />
         </>
       )}>
-        {_sortConfiguredElements(values, aggregationElementsByKey).map(([elementKey, elementFormValues]) => {
-          const empty = isEmpty(elementFormValues);
+        <div>
+          {_sortConfiguredElements(values, aggregationElementsByKey).map(([elementKey, elementFormValues]) => {
+            const empty = isEmpty(elementFormValues);
 
-          const aggregationElement = aggregationElementsByKey[elementKey];
+            const aggregationElement = aggregationElementsByKey[elementKey];
 
-          if (!aggregationElement) {
-            throw new Error(`Aggregation element with key ${elementKey} is missing but configured for this widget.`);
-          }
+            if (!aggregationElement) {
+              throw new Error(`Aggregation element with key ${elementKey} is missing but configured for this widget.`);
+            }
 
-          const ConfigurationSection = aggregationElement.component;
+            const ConfigurationSection = aggregationElement.component;
 
-          return (
-            <ElementConfigurationSection allowCreate={aggregationElement.allowCreate(values)}
-                                         isEmpty={empty}
-                                         onCreate={() => onCreate(aggregationElement.key, values, setValues)}
-                                         elementTitle={aggregationElement.title}
-                                         sectionTitle={aggregationElement.sectionTitle}
-                                         key={aggregationElement.key}>
-              <ConfigurationSection config={config} onConfigChange={onConfigChange} />
-            </ElementConfigurationSection>
-          );
-        })}
+            return (
+              <ElementConfigurationSection allowCreate={aggregationElement.allowCreate(values)}
+                                           isEmpty={empty}
+                                           onCreate={() => onCreate(aggregationElement.key, values, setValues)}
+                                           elementTitle={aggregationElement.title}
+                                           sectionTitle={aggregationElement.sectionTitle}
+                                           key={aggregationElement.key}>
+                <ConfigurationSection config={config} onConfigChange={onConfigChange} />
+              </ElementConfigurationSection>
+            );
+          })}
+        </div>
       </StickyBottomActions>
     </Container>
   );

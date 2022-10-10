@@ -19,6 +19,17 @@ import styled, { css } from 'styled-components';
 import { useState, useEffect } from 'react';
 
 const Container = styled.div`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+`;
+
+const ScrollContainer = styled.div`
+  overflow-y: auto;
+`;
+
+const Content = styled.div`
   position: relative;
 `;
 
@@ -26,9 +37,13 @@ const Actions = styled.div<{ $scrolledToBottom: boolean }>(({ theme, $scrolledTo
   position: sticky;
   width: 100%;
   bottom: 0;
-  padding-top: 5px;
   background: ${theme.colors.global.contentBackground};
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
+  padding-top: 5px;
 
   ::before {
     box-shadow: 1px -2px 3px rgb(0 0 0 / 25%);
@@ -79,20 +94,29 @@ const useScrolledToBottom = (): {
 type Props = {
   actions: React.ReactNode,
   children: React.ReactNode,
+  className?: string,
 }
 
-const StickyBottomActions = ({ actions, children }: Props) => {
+const StickyBottomActions = ({ actions, children, className }: Props) => {
   const { setScrolledToBottomIndicatorRef, scrolledToBottom } = useScrolledToBottom();
 
   return (
-    <Container>
-      {children}
-      <Actions $scrolledToBottom={scrolledToBottom}>
+    <Container className={className}>
+      <ScrollContainer>
+        <Content>
+          {children}
+          <ScrolledToBottomIndicator ref={setScrolledToBottomIndicatorRef} />
+        </Content>
+      </ScrollContainer>
+      <Actions $scrolledToBottom={scrolledToBottom} className="actions-container">
         {actions}
       </Actions>
-      <ScrolledToBottomIndicator ref={setScrolledToBottomIndicatorRef} />
     </Container>
   );
+};
+
+StickyBottomActions.defaultProps = {
+  className: undefined,
 };
 
 export default StickyBottomActions;
