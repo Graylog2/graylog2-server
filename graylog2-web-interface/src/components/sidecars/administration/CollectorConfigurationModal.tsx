@@ -131,7 +131,7 @@ const CollectorConfigurationModal = ({
 
     const selected = selectedConfigurations.includes(configName);
     const partiallySelected = !selected && partiallySelectedConfigurations.includes(configName);
-    const secondaryText = (selected && selectedSidecarNames.join(', ')) || (partiallySelected && sidecars.map((s) => s.node_name).join(', ')) || '';
+    const secondaryText = (selected && selectedSidecarNames.join(', ')) || (partiallySelected && sidecars.map((sidecar) => sidecar.node_name).join(', ')) || '';
     const isAssignedFromTags = autoAssignedTags.length > 0;
 
     return (
@@ -140,9 +140,9 @@ const CollectorConfigurationModal = ({
                 onClick={() => {
                   if (!isAssignedFromTags) {
                     if (partiallySelected) {
-                      setPartiallySelectedConfigurations(partiallySelectedConfigurations.filter((c) => c !== configName));
+                      setPartiallySelectedConfigurations(partiallySelectedConfigurations.filter((name) => name !== configName));
                     } else {
-                      setSelectedConfigurations(selected ? selectedConfigurations.filter((c) => c !== configName) : [...selectedConfigurations, configName]);
+                      setSelectedConfigurations(selected ? selectedConfigurations.filter((name) => name !== configName) : [...selectedConfigurations, configName]);
                     }
                   }
                 }}>

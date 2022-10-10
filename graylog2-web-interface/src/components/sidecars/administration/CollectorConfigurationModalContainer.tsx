@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -38,27 +37,32 @@ const CollectorConfigurationModalContainer = (props) => {
     return (lodash.uniq<any>(props.selectedSidecarCollectorPairs.map(({ collector }) => collector)))[0];
   };
 
-  const getAssignedConfigurations = (_selectedSidecarCollectorPairs, selectedCollector) => {
-    const assignments = _selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar).reduce((accumulator, sidecar) => accumulator.concat(sidecar.assignments), []);
-
-    return assignments.map((assignment) => props.configurations.find((configuration) => configuration.id === assignment.configuration_id))
-      .filter((configuration) => selectedCollector?.id === configuration.collector_id)
-      .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
+  const sortConfigurationNames = (configs) => {
+    return configs.sort((config1, config2) => naturalSortIgnoreCase(config1.name, config2.name))
       .map((config) => config.name);
   };
 
+  const getAssignedConfigurations = (_selectedSidecarCollectorPairs, selectedCollector) => {
+    const assignments = _selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar).reduce((accumulator, sidecar) => accumulator.concat(sidecar.assignments), []);
+
+    const filteredAssignments = assignments.map((assignment) => props.configurations.find((configuration) => configuration.id === assignment.configuration_id))
+      .filter((configuration) => selectedCollector?.id === configuration.collector_id);
+
+    return sortConfigurationNames(filteredAssignments);
+  };
+
   const getUnassignedConfigurations = (assignedConfigurations: string[], selectedCollector) => {
-    return props.configurations.filter((c) => !assignedConfigurations.includes(c.name) && (selectedCollector?.id === c.collector_id))
-      .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
-      .map((c) => c.name);
+    const filteredConfigs = props.configurations.filter((config) => !assignedConfigurations.includes(config.name) && (selectedCollector?.id === config.collector_id));
+
+    return sortConfigurationNames(filteredConfigs);
   };
 
   const getFullyAndPartiallyAssignments = (_assignedConfigurations: string[]) => {
     const occurrences = lodash.countBy(_assignedConfigurations);
 
     return [
-      lodash.uniq<any>(_assignedConfigurations.filter((a) => occurrences[a] === props.selectedSidecarCollectorPairs.length)),
-      lodash.uniq<any>(_assignedConfigurations.filter((a) => occurrences[a] < props.selectedSidecarCollectorPairs.length)),
+      lodash.uniq<any>(_assignedConfigurations.filter((config) => occurrences[config] === props.selectedSidecarCollectorPairs.length)),
+      lodash.uniq<any>(_assignedConfigurations.filter((config) => occurrences[config] < props.selectedSidecarCollectorPairs.length)),
     ];
   };
 
@@ -69,7 +73,7 @@ const CollectorConfigurationModalContainer = (props) => {
   };
 
   const confirmConfigurationChange = (doneCallback: () => void) => {
-    const assignedConfigurationsToSave = props.configurations.filter((c) => nextAssignedConfigurations.includes(c.name));
+    const assignedConfigurationsToSave = props.configurations.filter((config) => nextAssignedConfigurations.includes(config.name));
 
     props.selectedSidecarCollectorPairs.forEach((sidecarCollectorPair) => {
       let configs = assignedConfigurationsToSave;
@@ -78,7 +82,7 @@ const CollectorConfigurationModalContainer = (props) => {
         const selectedLogCollector = getSelectedLogCollector();
         const assignments = getAssignedConfigurations([sidecarCollectorPair], selectedLogCollector);
         const assignmentsToKeep = lodash.intersection(assignments, nextPartiallyAssignedConfigurations);
-        const assignedConfigurationsToKeep = props.configurations.filter((c) => assignmentsToKeep.includes(c.name));
+        const assignedConfigurationsToKeep = props.configurations.filter((config) => assignmentsToKeep.includes(config.name));
         configs = [...assignedConfigurationsToSave, ...assignedConfigurationsToKeep];
       }
 
@@ -93,25 +97,25 @@ const CollectorConfigurationModalContainer = (props) => {
   };
 
   const getConfiguration = (configName: string) => {
-    return props.configurations.find((c) => c.name === configName);
+    return props.configurations.find((config) => config.name === configName);
   };
 
   const getCollector = (configName: string) => {
     const configuration = getConfiguration(configName);
 
-    return props.collectors.find((b) => b.id === configuration.collector_id);
+    return props.collectors.find((collector) => collector.id === configuration.collector_id);
   };
 
   const getSidecars = (configName: string) => {
     const configuration = getConfiguration(configName);
 
-    return props.selectedSidecarCollectorPairs.filter(({ sidecar }) => sidecar.assignments.map((s) => s.configuration_id).includes(configuration.id)).map((a) => a.sidecar);
+    return props.selectedSidecarCollectorPairs.filter(({ sidecar }) => sidecar.assignments.map((assignment) => assignment.configuration_id).includes(configuration.id)).map((assignment) => assignment.sidecar);
   };
 
   const getAssignedFromTags = (configId: string, collectorId: string, sidecars) => {
     const assigned_from_tags = sidecars.reduce((accumulator, sidecar) => {
       return accumulator.concat(
-        sidecar.assignments.find((a) => (a.collector_id === collectorId) && (a.configuration_id === configId)).assigned_from_tags,
+        sidecar.assignments.find((assignment) => (assignment.collector_id === collectorId) && (assignment.configuration_id === configId)).assigned_from_tags,
       );
     }, []);
 
