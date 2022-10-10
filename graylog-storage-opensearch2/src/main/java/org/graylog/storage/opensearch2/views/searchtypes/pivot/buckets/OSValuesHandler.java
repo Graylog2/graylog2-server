@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
@@ -47,7 +46,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
-import java.util.OptionalInt;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -75,7 +74,7 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
     }
 
-    private OptionalInt extractLimit(Direction direction, Pivot pivot) {
+    private Optional<Integer> extractLimit(Direction direction, Pivot pivot) {
         return switch (direction) {
             case Row -> pivot.rowLimit();
             case Column -> pivot.columnLimit();
