@@ -56,6 +56,7 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values, Terms> {
     private static final String KEY_SEPARATOR_PHRASE = " + \"" + KEY_SEPARATOR_CHARACTER + "\" + ";
     private static final String AGG_NAME = "agg";
     private static final ImmutableList<String> MISSING_BUCKET_KEYS = ImmutableList.of(MissingBucketConstants.MISSING_BUCKET_NAME);
+    private static final BucketOrder defaultOrder = BucketOrder.count(false);
     private final boolean supportsMultiTerms;
 
     @Inject
@@ -66,7 +67,7 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values, Terms> {
     @Nonnull
     @Override
     public Optional<CreatedAggregations<AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<Values> bucketSpecs, OSGeneratedQueryContext queryContext, Query query) {
-        final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext);
+        final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
         final int limit = bucketSpecs.stream()
                 .map(Values::limit)
                 .max(Integer::compare)

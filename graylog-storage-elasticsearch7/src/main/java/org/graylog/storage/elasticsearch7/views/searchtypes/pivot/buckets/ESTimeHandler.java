@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 
 public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, ParsedDateHistogram> {
     private static final String AGG_NAME = "agg";
+    private static final BucketOrder defaultOrder = BucketOrder.key(true);
 
     @Nonnull
     @Override
@@ -48,7 +49,7 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, ParsedDateHist
 
         for (Time timeSpec : bucketSpec) {
             final DateHistogramInterval dateHistogramInterval = new DateHistogramInterval(timeSpec.interval().toDateInterval(query.effectiveTimeRange(pivot)).toString());
-            final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext);
+            final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
             final DateHistogramAggregationBuilder builder = AggregationBuilders.dateHistogram(name)
                     .field(timeSpec.field())
                     .order(ordering)

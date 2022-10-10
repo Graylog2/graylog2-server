@@ -51,7 +51,7 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec, AGG
         aggTypes(queryContext, pivot).record(spec, name, aggregationClass);
     }
 
-    protected List<BucketOrder> orderListForPivot(Pivot pivot, ESGeneratedQueryContext esGeneratedQueryContext) {
+    protected List<BucketOrder> orderListForPivot(Pivot pivot, ESGeneratedQueryContext esGeneratedQueryContext, BucketOrder defaultOrder) {
         final List<BucketOrder> ordering = pivot.sort()
                 .stream()
                 .map(sortSpec -> {
@@ -77,7 +77,7 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec, AGG
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-        return ordering.isEmpty() ? List.of(BucketOrder.count(false)) : ordering;
+        return ordering.isEmpty() ? List.of(defaultOrder) : ordering;
     }
 
     public abstract Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> extractBuckets(List<BucketSpec> bucketSpecs, Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket> initialBucket);
