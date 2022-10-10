@@ -68,7 +68,7 @@ you want to use (class or a functional component with react hooks). When you don
   - `__tests__/ComponentA.test.jsx`
   - `__tests__/ComponentA.test.case1.json`
   - `__tests__/ComponentA.text.case1.result.json`
-- New tests should import the Testing-Library's render function from `wrappedTestingLibrary`.
+- Testing-Library's tests should import the `render` function from `wrappedTestingLibrary`.
 - Do not use snapshot tests to test the state of a component.
   - Imagine the following case: User clicks on a button and we display an alert. You can test this behavior with a snapshot, but it has many disadvantages. You can also just use the react-testing-library method `getByText()` to check if the alert is being displayed
   - When you create a snapshot you will need to update the snapshot often, for example when the button style changes.
