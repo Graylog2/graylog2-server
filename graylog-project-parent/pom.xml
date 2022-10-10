@@ -206,7 +206,7 @@
 
             <!-- Cmdline and configuration -->
             <dependency>
-                <groupId>com.github.joschi</groupId>
+                <groupId>org.graylog</groupId>
                 <artifactId>jadconfig</artifactId>
                 <version>${jadconfig.version}</version>
             </dependency>
