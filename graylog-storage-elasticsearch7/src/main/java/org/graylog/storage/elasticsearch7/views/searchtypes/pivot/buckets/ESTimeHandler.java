@@ -43,7 +43,7 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time> {
 
     @Nonnull
     @Override
-    public Optional<CreatedAggregations<AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<Time> bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, List<Time> bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
         AggregationBuilder root = null;
         AggregationBuilder leaf = null;
 
@@ -66,7 +66,7 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time> {
             }
     }
 
-        return Optional.of(CreatedAggregations.create(root, leaf));
+        return CreatedAggregations.create(root, leaf);
     }
 
     private void setInterval(DateHistogramAggregationBuilder builder, DateHistogramInterval interval) {

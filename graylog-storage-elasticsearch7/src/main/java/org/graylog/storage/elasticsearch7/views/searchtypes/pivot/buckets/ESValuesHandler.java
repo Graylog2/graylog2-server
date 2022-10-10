@@ -56,7 +56,7 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
 
     @Nonnull
     @Override
-    public Optional<CreatedAggregations<AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<Values> bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, List<Values> bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
         final int limit = bucketSpec.stream()
                 .map(Values::limit)
@@ -66,7 +66,7 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
         final FiltersAggregationBuilder filterAggregation = createFilter(name, bucketSpec)
                 .subAggregation(termsAggregation);
 
-        return Optional.of(CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation)));
+        return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
     }
 
     private FiltersAggregationBuilder createFilter(String name, List<Values> bucketSpecs) {
