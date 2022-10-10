@@ -33,7 +33,6 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotBucketS
 import org.jooq.lambda.tuple.Tuple2;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
