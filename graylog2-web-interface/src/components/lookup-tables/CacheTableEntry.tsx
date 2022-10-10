@@ -27,12 +27,13 @@ import NumberUtils from 'util/NumberUtils';
 import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
 import type { LookupTableCache } from 'logic/lookup-tables/types';
 import useScopePermissions from 'hooks/useScopePermissions';
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
 type Props = {
   cache: LookupTableCache,
 };
 
-const Actions = styled.div`
+const Actions = styled(ButtonToolbar)`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -115,15 +116,13 @@ const CacheTableEntry = ({ cache }: Props) => {
           {loadingScopePermissions ? <Spinner /> : scopePermissions.is_mutable && (
             <Actions>
               <Button bsSize="xsmall"
-                      bsStyle="info"
                       onClick={handleEdit(cache.name)}
                       role="button"
                       name="edit">
                 Edit
               </Button>
-              <Button style={{ marginLeft: '6px' }}
-                      bsSize="xsmall"
-                      bsStyle="primary"
+              <Button bsSize="xsmall"
+                      bsStyle="danger"
                       onClick={handleDelete}
                       role="button"
                       name="delete">

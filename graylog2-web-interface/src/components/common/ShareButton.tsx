@@ -44,7 +44,7 @@ const ShareButton = ({ bsStyle, entityId, entityType, onClick, disabledInfo }: P
 );
 
 ShareButton.defaultProps = {
-  bsStyle: 'info',
+  bsStyle: 'default',
   disabledInfo: undefined,
 };
 
