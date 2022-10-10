@@ -64,11 +64,7 @@ const addSortElement = async () => {
   await userEvent.click(await screen.findByRole('menuitem', { name: 'Sort' }));
 };
 
-const findWidgetConfigFormSubmitButton = async () => {
-  const button = await screen.findByRole('button', { name: /update preview/i });
-
-  return button;
-};
+const findWidgetConfigFormSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
 
 const submitWidgetConfigForm = async () => {
   const applyButton = await findWidgetConfigFormSubmitButton();
@@ -100,7 +96,7 @@ describe('AggregationWizard', () => {
                          type="AGGREGATION"
                          fields={Immutable.List([])}
                          {...props}>
-        <div>The Visualization</div>
+        <span>The Visualization</span>
       </AggregationWizard>
     </FieldTypesContext.Provider>,
   );
