@@ -22,14 +22,14 @@ import { LinkContainer } from 'components/common/router';
 import type UserOverview from 'logic/users/UserOverview';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import Routes from 'routing/Routes';
-import { Button, Tooltip, DropdownButton, MenuItem } from 'components/bootstrap';
+import { Button, Tooltip, DropdownButton, MenuItem, ButtonToolbar } from 'components/bootstrap';
 import { OverlayTrigger, IfPermitted } from 'components/common';
 
 type Props = {
   user: UserOverview,
 };
 
-const ActionsWrapper = styled.div`
+const ActionsWrapper = styled(ButtonToolbar)`
   display: flex;
   justify-content: flex-end;
 `;
@@ -43,7 +43,6 @@ const EditTokensAction = ({
 }) => (
   <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(id)}>
     <WrapperComponent id={`edit-tokens-${id}`}
-                      bsStyle="info"
                       bsSize="xs"
                       title={`Edit tokens of user ${fullName}`}>
       Edit tokens
@@ -59,7 +58,6 @@ const ReadOnlyActions = ({ user }: { user: UserOverview }) => {
       <OverlayTrigger placement="left" overlay={tooltip}>
         <Button bsSize="xs" bsStyle="info" disabled>System user</Button>
       </OverlayTrigger>
-      &nbsp;
       <EditTokensAction user={user} wrapperComponent={Button} />
     </>
   );
@@ -94,12 +92,11 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
     <>
       <IfPermitted permissions={[`users:edit:${username}`]}>
         <LinkContainer to={Routes.SYSTEM.USERS.edit(id)}>
-          <Button id={`edit-user-${id}`} bsStyle="info" bsSize="xs" title={`Edit user ${fullName}`}>
+          <Button id={`edit-user-${id}`} bsSize="xs" title={`Edit user ${fullName}`}>
             Edit
           </Button>
         </LinkContainer>
       </IfPermitted>
-      &nbsp;
       <DropdownButton bsSize="xs" title="More actions" pullRight id={`delete-user-${id}`}>
         <EditTokensAction user={user} wrapperComponent={MenuItem} />
         <IfPermitted permissions={[`users:edit:${username}`]}>

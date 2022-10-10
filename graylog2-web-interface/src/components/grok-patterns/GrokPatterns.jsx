@@ -27,7 +27,7 @@ import {
   SearchForm,
   OverlayTrigger,
 } from 'components/common';
-import { Button, Col, Row } from 'components/bootstrap';
+import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
@@ -159,23 +159,25 @@ class GrokPatterns extends React.Component {
         <td>{pattern.name}</td>
         <td>{pattern.pattern}</td>
         <td>
-          <IfPermitted permissions="inputs:edit">
-            <Button style={{ marginRight: 5 }}
-                    bsStyle="primary"
-                    bsSize="xs"
-                    onClick={() => this.confirmedRemove(pattern)}>
-              Delete
-            </Button>
-            <EditPatternModal id={pattern.id}
-                              name={pattern.name}
-                              pattern={pattern.pattern}
-                              testPattern={testPattern}
-                              patterns={patterns}
-                              create={false}
-                              reload={this.loadData}
-                              savePattern={this.savePattern}
-                              validPatternName={this.validPatternName} />
-          </IfPermitted>
+          <ButtonToolbar>
+            <IfPermitted permissions="inputs:edit">
+              <EditPatternModal id={pattern.id}
+                                name={pattern.name}
+                                pattern={pattern.pattern}
+                                testPattern={testPattern}
+                                patterns={patterns}
+                                create={false}
+                                reload={this.loadData}
+                                savePattern={this.savePattern}
+                                validPatternName={this.validPatternName} />
+              <Button style={{ marginRight: 5 }}
+                      bsStyle="danger"
+                      bsSize="xs"
+                      onClick={() => this.confirmedRemove(pattern)}>
+                Delete
+              </Button>
+            </IfPermitted>
+          </ButtonToolbar>
         </td>
       </tr>
     );

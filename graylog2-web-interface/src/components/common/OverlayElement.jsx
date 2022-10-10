@@ -43,17 +43,30 @@ class OverlayElement extends React.Component {
       PropTypes.arrayOf(PropTypes.element),
       PropTypes.element,
     ]).isRequired,
+    className: PropTypes.string,
+  };
+
+  static defaultProps = {
+    overlay: undefined,
+    placement: undefined,
+    trigger: undefined,
+    useOverlay: undefined,
+    className: undefined,
   };
 
   render() {
-    if (this.props.overlay && this.props.useOverlay) {
+    const { overlay, useOverlay, placement, trigger, className, children } = this.props;
+
+    if (overlay && useOverlay) {
       // We need to wrap the element in a span to be able to display overlays in disabled buttons and links
       // https://github.com/react-bootstrap/react-bootstrap/issues/364
       return (
-        <OverlayTrigger placement={this.props.placement} trigger={this.props.trigger} overlay={this.props.overlay} rootClose>
-          <span>
-            {this.props.children}
-          </span>
+        <OverlayTrigger placement={placement}
+                        trigger={trigger}
+                        overlay={overlay}
+                        rootClose
+                        className={className}>
+          <span>{children}</span>
         </OverlayTrigger>
       );
     }

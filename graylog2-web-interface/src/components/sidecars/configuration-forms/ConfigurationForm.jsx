@@ -167,9 +167,8 @@ const ConfigurationForm = createReactClass({
     const storedTemplate = this.defaultTemplates[collectorId];
 
     if (storedTemplate !== undefined) {
-      return new Promise((resolve) => {
-        resolve(storedTemplate);
-      });
+      // eslint-disable-next-line no-promise-executor-return
+      return new Promise((resolve) => resolve(storedTemplate));
     }
 
     return CollectorsActions.getCollector(collectorId).then((collector) => {

@@ -86,6 +86,13 @@ const StreamControls = ({
             Clone this stream
           </MenuItem>
         </IfPermitted>
+        <IfPermitted permissions={`streams:edit:${stream.id}`}>
+          <LinkContainer to={Routes.stream_alerts(stream.id)}>
+            <MenuItem key={`manageAlerts-${stream.id}`}>
+              Manage Alerts
+            </MenuItem>
+          </LinkContainer>
+        </IfPermitted>
         <HideOnCloud>
           <IfPermitted permissions="stream_outputs:read">
             <LinkContainer to={Routes.stream_outputs(stream.id)}>
