@@ -38,11 +38,6 @@ const dataTable: VisualizationType<typeof DataTable.type> = {
       options: ({ formValues }: { formValues: WidgetConfigFormValues }) => {
         return formValues?.groupBy?.groupings.filter((grouping) => (grouping?.direction === 'row' && grouping?.field?.field))
           .map((grouping) => grouping.field.field) ?? [];
-        /*
-        if (formValues?.metrics) {
-          formValues.metrics.forEach((metric) => options.push(`${metric.function}(${metric.field})`));
-        }
-        */
       },
       required: false,
     }],
