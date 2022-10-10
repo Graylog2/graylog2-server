@@ -11,7 +11,7 @@
     <Loggers>
         <!-- Application Loggers -->
         <Logger name="org.graylog2" level="info"/>
-        <Logger name="com.github.joschi.jadconfig" level="warn"/>
+        <Logger name="org.graylog.jadconfig" level="warn"/>
         <!-- Prevent DEBUG message about Lucene Expressions not found. -->
         <Logger name="org.elasticsearch.script" level="warn"/>
         <!-- Disable messages from the version check -->

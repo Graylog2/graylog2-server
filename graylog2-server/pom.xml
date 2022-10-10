@@ -118,7 +118,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.joschi</groupId>
+            <groupId>org.graylog</groupId>
             <artifactId>jadconfig</artifactId>
         </dependency>
 
