@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -102,7 +101,17 @@ const ModalSubTitle = styled.div`
   text-overflow: ellipsis;
 `;
 
-const CollectorConfigurationModal = ({ show, onCancel, onSave, selectedCollectorName, selectedSidecarNames, initialAssignedConfigs, initialPartiallyAssignedConfigs, unassignedConfigs, getRowData }) => {
+const CollectorConfigurationModal = ({
+  show,
+  onCancel,
+  onSave,
+  selectedCollectorName,
+  selectedSidecarNames,
+  initialAssignedConfigs,
+  initialPartiallyAssignedConfigs,
+  unassignedConfigs,
+  getRowData,
+}) => {
   const [searchQuery, setSearchQuery] = React.useState<string>('');
   const [selectedConfigurations, setSelectedConfigurations] = React.useState<string[]>(initialAssignedConfigs);
   const [partiallySelectedConfigurations, setPartiallySelectedConfigurations] = React.useState<string[]>(initialPartiallyAssignedConfigs);

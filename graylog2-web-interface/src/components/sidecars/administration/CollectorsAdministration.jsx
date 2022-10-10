@@ -280,8 +280,25 @@ const CollectorsAdministration = createReactClass({
         </Col>
         <Col lg={10} md={8} xs={6}>
           <span className={style.additionalContent}>
-            {(configAssignments.length > 0) && <IconButton size="sm" name="edit" onClick={() => this.setState({ selected: [sidecarCollectorId], showConfigurationModal: true })} />}
-            {configAssignments.map((configuration) => <Link key={configuration.id} to={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(configuration.id)}><ColorLabel color={configuration.color} text={configuration.name} style={{ display: 'flex' }} /></Link>)}
+            {(configAssignments.length > 0) && 
+              <IconButton 
+                size="sm"
+                name="edit"
+                onClick={() => this.setState({ selected: [sidecarCollectorId], showConfigurationModal: true })}
+              />
+            }
+            {configAssignments.map((configuration) => 
+              <Link 
+                key={configuration.id} 
+                to={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(configuration.id)}
+              >
+                <ColorLabel 
+                  color={configuration.color} 
+                  text={configuration.name} 
+                  style={{ display: 'flex' }}
+                />
+              </Link>
+            )}
           </span>
         </Col>
       </Row>

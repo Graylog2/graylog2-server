@@ -109,7 +109,11 @@ const CollectorConfigurationModalContainer = (props) => {
   };
 
   const getAssignedFromTags = (configId: string, collectorId: string, sidecars) => {
-    const assigned_from_tags = sidecars.reduce((accumulator, sidecar) => accumulator.concat(sidecar.assignments.find((a) => (a.collector_id === collectorId) && (a.configuration_id === configId)).assigned_from_tags), []);
+    const assigned_from_tags = sidecars.reduce((accumulator, sidecar) => {
+      return accumulator.concat(
+        sidecar.assignments.find((a) => (a.collector_id === collectorId) && (a.configuration_id === configId)).assigned_from_tags,
+      );
+    }, []);
 
     return lodash.uniq(assigned_from_tags);
   };
