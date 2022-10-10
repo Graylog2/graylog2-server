@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import type { LookupTableDataAdapterConfig } from 'logic/lookup-tables/types';
 
-type ConfigFieldSetAttributes = {
+type ConfigFieldsetAttributes = {
   config?: LookupTableDataAdapterConfig,
   handleFormEvent?: (arg: React.BaseSyntheticEvent) => void,
   updateConfig?: (newConfig: LookupTableDataAdapterConfig) => void,
@@ -27,11 +27,11 @@ type ConfigFieldSetAttributes = {
   setDisableFormSubmission?: boolean,
 };
 
-type ConfigFieldSetProps = ConfigFieldSetAttributes & {
+type ConfigFieldsetProps = ConfigFieldsetAttributes & {
   formComponent: React.FC,
 };
 
-const ConfigFieldSet = ({
+const AdapterConfigFieldset = ({
   formComponent,
   config,
   handleFormEvent,
@@ -39,8 +39,8 @@ const ConfigFieldSet = ({
   validationMessage,
   validationState,
   setDisableFormSubmission,
-}: ConfigFieldSetProps) => {
-  return React.createElement<ConfigFieldSetAttributes>(
+}: ConfigFieldsetProps) => {
+  return React.createElement<ConfigFieldsetAttributes>(
     formComponent, {
       config,
       handleFormEvent,
@@ -52,7 +52,7 @@ const ConfigFieldSet = ({
   );
 };
 
-ConfigFieldSet.defaultProps = {
+AdapterConfigFieldset.defaultProps = {
   config: { type: 'none' },
   handleFormEvent: () => {},
   updateConfig: () => {},
@@ -61,4 +61,4 @@ ConfigFieldSet.defaultProps = {
   setDisableFormSubmission: false,
 };
 
-export default ConfigFieldSet;
+export default AdapterConfigFieldset;

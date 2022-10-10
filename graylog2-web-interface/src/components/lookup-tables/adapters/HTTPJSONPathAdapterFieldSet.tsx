@@ -89,7 +89,8 @@ class HTTPJSONPathAdapterFieldSet extends React.Component<Props> {
                label="HTTP User-Agent"
                required
                onChange={handleFormEvent}
-               help="The User-Agent header to use for the HTTP request."
+               help={validationMessage('user_agent', 'The User-Agent header to use for the HTTP request.')}
+               bsStyle={validationState('user_agent')}
                value={config.user_agent}
                labelClassName="col-sm-3"
                wrapperClassName="col-sm-9" />

@@ -44,7 +44,8 @@ const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMe
              label="Refresh interval"
              required
              onChange={handleFormEvent}
-             help="The interval to check if the DSV file needs a reload. (in seconds)"
+             help={validationMessage('refresh_interval', 'The interval to check if the DSV file needs a reload. (in seconds)')}
+             bsStyle={validationState('refresh_interval')}
              value={config.refresh_interval}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />
@@ -54,7 +55,8 @@ const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMe
              label="Separator"
              required
              onChange={handleFormEvent}
-             help="The delimiter to use for separating columns of entries."
+             help={validationMessage('separator', 'The delimiter to use for separating columns of entries.')}
+             bsStyle={validationState('separator')}
              value={config.separator}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />
@@ -64,7 +66,8 @@ const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMe
              label="Line Separator"
              required
              onChange={handleFormEvent}
-             help="The delimiter to use for separating lines."
+             help={validationMessage('line_separator', 'The delimiter to use for separating lines.')}
+             bsStyle={validationState('line_separator')}
              value={config.line_separator}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />
@@ -74,7 +77,8 @@ const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMe
              label="Quote character"
              required
              onChange={handleFormEvent}
-             help="The character to use for quoted elements."
+             help={validationMessage('quotechar', 'The character to use for quoted elements.')}
+             bsStyle={validationState('quotechar')}
              value={config.quotechar}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />
@@ -84,7 +88,8 @@ const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMe
              label="Ignore characters"
              required
              onChange={handleFormEvent}
-             help="Ignore lines starting with these characters."
+             help={validationMessage('ignorechar', 'Ignore lines starting with these characters.')}
+             bsStyle={validationState('ignorechar')}
              value={config.ignorechar}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />
@@ -94,7 +99,8 @@ const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMe
              label="Key column"
              required
              onChange={handleFormEvent}
-             help="The column number that should be used for the key lookup."
+             help={validationMessage('key_column', 'The column number that should be used for the key lookup.')}
+             bsStyle={validationState('key_column')}
              value={config.key_column}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />
@@ -104,7 +110,8 @@ const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMe
              label="Value column"
              required
              onChange={handleFormEvent}
-             help="The column number that should be used as the value for a key."
+             help={validationMessage('value_column', 'The column number that should be used as the value for a key.')}
+             bsStyle={validationState('value_column')}
              value={config.value_column}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />

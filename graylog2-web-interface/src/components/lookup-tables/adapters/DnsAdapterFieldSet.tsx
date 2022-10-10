@@ -82,10 +82,7 @@ const DnsAdapterFieldSet = ({ config, updateConfig, handleFormEvent, validationS
              name="server_ips"
              label="DNS Server IP Address"
              onChange={handleFormEvent}
-             help={validationMessage(
-               'server_ips',
-               'An optional comma-separated list of DNS server IP addresses.',
-             )}
+             help={validationMessage('server_ips', 'An optional comma-separated list of DNS server IP addresses.')}
              bsStyle={validationState('server_ips')}
              value={config.server_ips}
              labelClassName="col-sm-3"
@@ -96,10 +93,7 @@ const DnsAdapterFieldSet = ({ config, updateConfig, handleFormEvent, validationS
              label="DNS Request Timeout"
              required
              onChange={handleFormEvent}
-             help={validationMessage(
-               'request_timeout',
-               'DNS request timeout in milliseconds.',
-             )}
+             help={validationMessage('request_timeout', 'DNS request timeout in milliseconds.')}
              bsStyle={validationState('request_timeout')}
              value={config.request_timeout}
              labelClassName="col-sm-3"

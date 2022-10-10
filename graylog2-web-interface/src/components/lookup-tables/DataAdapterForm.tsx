@@ -18,7 +18,6 @@ import * as React from 'react';
 import _ from 'lodash';
 import { Formik, Form } from 'formik';
 
-import ConfigFieldSet from './adapters/ConfigFieldSet';
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { LookupTableAdapter, LookupTableDataAdapterConfig, validationErrorsType } from 'logic/lookup-tables/types';
 import { Col, Row } from 'components/bootstrap';
@@ -27,6 +26,8 @@ import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTable
 import useScopePermissions from 'hooks/useScopePermissions';
 import history from 'util/History';
 import Routes from 'routing/Routes';
+
+import AdapterConfigFieldset from './adapters/AdapterConfigFieldset';
 
 type TitleProps = {
   title: string,
@@ -68,9 +69,6 @@ type Props = {
 const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, validationErrors }: Props) => {
   const [generateName, setGenerateName] = React.useState<boolean>(create);
 
-  const [localDataAdapter, setLocalDataAdapter] = React.useState<LookupTableAdapter>(_.cloneDeep(dataAdapter));
-  React.useEffect(() => setLocalDataAdapter(_.cloneDeep(dataAdapter)), [dataAdapter]);
-
   const [formErrors, setFormErrors] = React.useState(_.cloneDeep(validationErrors));
   React.useEffect(() => setFormErrors(_.cloneDeep(validationErrors)), [validationErrors]);
 
@@ -98,15 +96,19 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
     });
   };
 
-  const handleValidation = (values: LookupTableAdapter) => {
+  const validateForm = (values: LookupTableAdapter) => {
     const errors: validationErrorsType = {};
+    const requiredFieldNames = [...document.querySelectorAll('input:required')].map((input: HTMLInputElement) => input.name);
 
-    validate(values);
-    if (!values.title) errors.title = ['Required'];
-    if (!values.name) errors.name = ['Required'];
+    requiredFieldNames.forEach((name: string) => {
+      if (name in values && !values[name]) errors[name] = ['Required'];
+      if (name in values.config && !values.config[name]) errors[name] = ['Required'];
+    });
 
-    setFormErrors({ ...validationErrors, ...errors });
-    return { ...validationErrors, ...errors };
+    if (Object.keys(errors).length === 0) validate(values);
+    setFormErrors(errors);
+
+    return errors;
   };
 
   const handleTTLUpdate = (values: LookupTableAdapter, setValues: any) => (value: number, unit: string, enabled: boolean) => {
@@ -127,24 +129,24 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
   };
 
   const handleConfigInputChange = (values: LookupTableAdapter, setValues: any) => (event: React.BaseSyntheticEvent) => {
-    const auxConf = { ...localDataAdapter.config };
-    auxConf[event.target.name] = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
-    setValues({ ...values, config: auxConf })
-    setLocalDataAdapter({ ...localDataAdapter, config: auxConf });
+    const newValues = { ...values };
+    newValues.config[event.target.name] = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+
+    validateForm(newValues);
+    setValues(newValues);
   };
 
   const handleTimeUnitInputChange = (values: LookupTableAdapter, setValues: any) => (newConfig: LookupTableDataAdapterConfig) => {
-    const auxAdapter = { ...localDataAdapter };
-    auxAdapter.config = { ...newConfig };
-    setValues({ ...values, config: newConfig })
-    setLocalDataAdapter(auxAdapter);
+    const newValues = { ...values, config: newConfig };
+    validateForm(newValues);
+    setValues(newValues);
   };
 
   const getValidationMessage = (fieldName: string, defaultText: string) => {
-    if (validationErrors[fieldName]) {
+    if (formErrors[fieldName]) {
       return (
         <div>
-          <span>{defaultText}</span>&nbsp;<span><b>{validationErrors[fieldName][0]}</b></span>
+          <span>{defaultText}</span>&nbsp;<span><b>{formErrors[fieldName][0]}</b></span>
         </div>
       );
     }
@@ -153,7 +155,7 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
   };
 
   const getValidationState = (fieldName: string) => {
-    return validationErrors[fieldName] ? 'error' : null;
+    return formErrors[fieldName] ? 'error' : null;
   };
 
   const onCancel = () => history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
@@ -164,10 +166,8 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
       <Title title={title} typeName={pluginName} create={create} />
       <Row>
         <Col lg={6}>
-          <Formik initialValues={localDataAdapter}
-                  validate={handleValidation}
-                  validateOnBlur
-                  validateOnChange={false}
+          <Formik initialValues={dataAdapter}
+                  validate={validateForm}
                   validateOnMount={!create}
                   onSubmit={handleSubmit}
                   enableReinitialize>
@@ -215,13 +215,13 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
                                  labelClassName="col-sm-3"
                                  wrapperClassName="col-sm-9" />
                 </fieldset>
-                <ConfigFieldSet formComponent={plugin.formComponent}
-                                config={localDataAdapter.config}
-                                handleFormEvent={handleConfigInputChange(values, setValues)}
-                                updateConfig={handleTimeUnitInputChange(values, setValues)}
-                                validationMessage={getValidationMessage}
-                                validationState={getValidationState}
-                                setDisableFormSubmission={false} />
+                <AdapterConfigFieldset formComponent={plugin.formComponent}
+                                       config={values.config}
+                                       handleFormEvent={handleConfigInputChange(values, setValues)}
+                                       updateConfig={handleTimeUnitInputChange(values, setValues)}
+                                       validationMessage={getValidationMessage}
+                                       validationState={getValidationState}
+                                       setDisableFormSubmission={false} />
                 <fieldset>
                   <Row>
                     <Col mdOffset={3} sm={12}>

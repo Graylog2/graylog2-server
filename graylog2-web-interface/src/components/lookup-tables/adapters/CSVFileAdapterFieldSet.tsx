@@ -46,7 +46,8 @@ const CSVFileAdapterFieldSet = ({ config, handleFormEvent, validationState, vali
              label="Check interval"
              required
              onChange={handleFormEvent}
-             help="The interval to check if the CSV file needs a reload. (in seconds)"
+             help={validationMessage('check_interval', 'The interval to check if the CSV file needs a reload. (in seconds)')}
+             bsStyle={validationState('check_interval')}
              value={config.check_interval}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />
@@ -56,7 +57,8 @@ const CSVFileAdapterFieldSet = ({ config, handleFormEvent, validationState, vali
              label="Separator"
              required
              onChange={handleFormEvent}
-             help="The delimiter to use for separating entries."
+             help={validationMessage('separator', 'The delimiter to use for separating entries.')}
+             bsStyle={validationState('separator')}
              value={config.separator}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />
@@ -66,7 +68,8 @@ const CSVFileAdapterFieldSet = ({ config, handleFormEvent, validationState, vali
              label="Quote character"
              required
              onChange={handleFormEvent}
-             help="The character to use for quoted elements."
+             help={validationMessage('quotechar', 'The character to use for quoted elements.')}
+             bsStyle={validationState('quotechar')}
              value={config.quotechar}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />
@@ -76,7 +79,8 @@ const CSVFileAdapterFieldSet = ({ config, handleFormEvent, validationState, vali
              label="Key column"
              required
              onChange={handleFormEvent}
-             help="The column name that should be used for the key lookup."
+             help={validationMessage('key_column', 'The column name that should be used for the key lookup.')}
+             bsStyle={validationState('key_column')}
              value={config.key_column}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />
@@ -86,7 +90,8 @@ const CSVFileAdapterFieldSet = ({ config, handleFormEvent, validationState, vali
              label="Value column"
              required
              onChange={handleFormEvent}
-             help="The column name that should be used as the value for a key."
+             help={validationMessage('value_column', 'The column name that should be used as the value for a key.')}
+             bsStyle={validationState('value_column')}
              value={config.value_column}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />
