@@ -49,7 +49,6 @@ public abstract class SidecarCollectorEntity {
     @JsonProperty("validation_parameters")
     public abstract ValueReference validationParameters();
 
-    @Nullable
     @JsonProperty("default_template")
     public abstract ValueReference defaultTemplate();
 

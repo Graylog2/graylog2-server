@@ -67,7 +67,7 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
                 ValueReference.of(collector.executablePath()),
                 collector.executeParameters() != null ? ValueReference.of(collector.executeParameters()) : null,
                 collector.validationParameters() != null ? ValueReference.of(collector.validationParameters()) : null,
-                collector.defaultTemplate() != null ? ValueReference.of(collector.defaultTemplate()) : null);
+                ValueReference.of(collector.defaultTemplate()));
 
         final JsonNode data = objectMapper.convertValue(collectorEntity, JsonNode.class);
         return EntityV1.builder()
@@ -97,8 +97,8 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
                 .serviceType(collectorEntity.serviceType().asString(parameters))
                 .nodeOperatingSystem(collectorEntity.nodeOperatingSystem().asString(parameters))
                 .executablePath(collectorEntity.executablePath().asString(parameters))
-                .executeParameters(collectorEntity.executeParameters().asString(parameters))
-                .validationParameters(collectorEntity.validationParameters().asString(parameters))
+                .executeParameters(collectorEntity.executeParameters() != null ? collectorEntity.executeParameters().asString(parameters) : null)
+                .validationParameters(collectorEntity.validationParameters() != null ? collectorEntity.validationParameters().asString(parameters) : null)
                 .defaultTemplate(collectorEntity.defaultTemplate().asString(parameters))
                 .build();
 
