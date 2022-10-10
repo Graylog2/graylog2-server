@@ -44,8 +44,10 @@ const RollupHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
 `;
 
 type GroupingsItemProps = Omit<React.ComponentProps<typeof ElementConfigurationContainer>, 'testIdPrefix' | 'onRemove' | 'elementTitle' | 'children'> & {
+  /* eslint-disable react/no-unused-prop-types */
   item: { id: string },
   index: number,
+  /* eslint-enable react/no-unused-prop-types */
 };
 
 const GroupingsConfiguration = () => {
