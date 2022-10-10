@@ -20,43 +20,39 @@ import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
-import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
-import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
-import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketOrder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.jooq.lambda.tuple.Tuple2;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 public class OSTimeHandler extends OSPivotBucketSpecHandler<Time, ParsedDateHistogram> {
     private static final String AGG_NAME = "agg";
+    private static final BucketOrder defaultOrder = BucketOrder.key(true);
 
     @Nonnull
     @Override
     public Optional<CreatedAggregations<AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<Time> bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
         AggregationBuilder root = null;
         AggregationBuilder leaf = null;
+        final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
 
         for (Time timeSpec : bucketSpec) {
             final DateHistogramInterval dateHistogramInterval = new DateHistogramInterval(timeSpec.interval().toDateInterval(query.effectiveTimeRange(pivot)).toString());
-            final Optional<BucketOrder> ordering = orderForPivot(pivot, timeSpec, queryContext);
             final DateHistogramAggregationBuilder builder = AggregationBuilders.dateHistogram(name)
                     .field(timeSpec.field())
-                    .order(ordering.orElse(BucketOrder.key(true)))
+                    .order(ordering)
                     .format("date_time");
 
             setInterval(builder, dateHistogramInterval);
@@ -79,34 +75,6 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time, ParsedDateHist
         } else {
             builder.fixedInterval(interval);
         }
-    }
-
-    private Optional<BucketOrder> orderForPivot(Pivot pivot, Time timeSpec, OSGeneratedQueryContext OSGeneratedQueryContext) {
-        return pivot.sort()
-                .stream()
-                .map(sortSpec -> {
-                    if (sortSpec instanceof PivotSort && timeSpec.field().equals(sortSpec.field())) {
-                        return sortSpec.direction().equals(SortSpec.Direction.Ascending) ? BucketOrder.key(true) : BucketOrder.key(false);
-                    }
-                    if (sortSpec instanceof SeriesSort) {
-                        final Optional<SeriesSpec> matchingSeriesSpec = pivot.series()
-                                .stream()
-                                .filter(series -> series.literal().equals(sortSpec.field()))
-                                .findFirst();
-                        return matchingSeriesSpec
-                                .map(seriesSpec -> {
-                                    if (seriesSpec.literal().equals("count()")) {
-                                        return sortSpec.direction().equals(SortSpec.Direction.Ascending) ? BucketOrder.count(true) : BucketOrder.count(false);
-                                    }
-                                    return BucketOrder.aggregation(OSGeneratedQueryContext.seriesName(seriesSpec, pivot), sortSpec.direction().equals(SortSpec.Direction.Ascending));
-                                })
-                                .orElse(null);
-                    }
-
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .findFirst();
     }
 
     @Override
