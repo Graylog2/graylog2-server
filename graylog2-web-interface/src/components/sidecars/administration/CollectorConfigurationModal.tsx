@@ -29,11 +29,11 @@ import { Link } from 'components/common/router';
 const ConfigurationContainer = styled.div`
   overflow: auto;
   height: 360px;
-  margin-top: 8px
+  margin-top: 8px;
 `;
 
 const ConfigurationTable = styled(Table)`
-  margin-bottom: 0
+  margin-bottom: 0;
 `;
 
 const NoConfigurationMessage = styled.div`
