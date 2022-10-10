@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import { useFormikContext, FieldArray, Field } from 'formik';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { HoverForHelp, SortableList, FormikFormGroup } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
@@ -50,6 +50,13 @@ type GroupingsItemProps = Omit<React.ComponentProps<typeof ElementConfigurationC
   /* eslint-enable react/no-unused-prop-types */
 };
 
+const SettingsSeparator = styled.hr(({ theme }) => css`
+  border-style: dashed;
+  border-color: ${theme.colors.variant.lighter.default};
+  margin-top: 5px;
+  margin-bottom: 5px;
+`);
+
 const GroupingsConfiguration = () => {
   const { values: { groupBy }, values, setValues, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const disableColumnRollup = !groupBy?.groupings?.find(({ direction }) => direction === 'column');
@@ -77,22 +84,6 @@ const GroupingsConfiguration = () => {
 
   return (
     <>
-      {!isEmpty && (
-        <Field name="groupBy.columnRollup">
-          {({ field: { name, onChange, value } }) => (
-            <RollupColumnsCheckbox onChange={() => onChange({ target: { name, value: !groupBy?.columnRollup } })}
-                                   checked={value}
-                                   disabled={disableColumnRollup}>
-              <RollupColumnsLabel>
-                Rollup Columns
-                <RollupHoverForHelp title="Rollup Columns">
-                  When rollup is enabled, an additional trace totalling individual subtraces will be included.
-                </RollupHoverForHelp>
-              </RollupColumnsLabel>
-            </RollupColumnsCheckbox>
-          )}
-        </Field>
-      )}
       <FieldArray name="groupBy.groupings"
                   validateOnChange={false}
                   render={() => (
@@ -100,21 +91,38 @@ const GroupingsConfiguration = () => {
                                   onMoveItem={(newGroupings) => setFieldValue('groupBy.groupings', newGroupings)}
                                   customListItemRender={GroupingsItem} />
                   )} />
-      {hasValuesRowPivots && (
-        <ElementConfigurationContainer elementTitle="Row Limit">
-          <FormikFormGroup label="Row Limit"
-                           name="groupBy.rowLimit"
-                           type="number"
-                           bsSize="small" />
-        </ElementConfigurationContainer>
-      )}
-      {hasValuesColumnPivots && (
-        <ElementConfigurationContainer elementTitle="Column Limit">
-          <FormikFormGroup label="Column Limit"
-                           name="groupBy.columnLimit"
-                           type="number"
-                           bsSize="small" />
-        </ElementConfigurationContainer>
+      {!isEmpty && (
+        <>
+          <SettingsSeparator />
+          <ElementConfigurationContainer elementTitle="Settings">
+            <Field name="groupBy.columnRollup">
+              {({ field: { name, onChange, value } }) => (
+                <RollupColumnsCheckbox onChange={() => onChange({ target: { name, value: !groupBy?.columnRollup } })}
+                                       checked={value}
+                                       disabled={disableColumnRollup}>
+                  <RollupColumnsLabel>
+                    Rollup Columns
+                    <RollupHoverForHelp title="Rollup Columns">
+                      When rollup is enabled, an additional trace totalling individual subtraces will be included.
+                    </RollupHoverForHelp>
+                  </RollupColumnsLabel>
+                </RollupColumnsCheckbox>
+              )}
+            </Field>
+            {hasValuesRowPivots && (
+            <FormikFormGroup label="Row Limit"
+                             name="groupBy.rowLimit"
+                             type="number"
+                             bsSize="small" />
+            )}
+            {hasValuesColumnPivots && (
+            <FormikFormGroup label="Column Limit"
+                             name="groupBy.columnLimit"
+                             type="number"
+                             bsSize="small" />
+            )}
+          </ElementConfigurationContainer>
+        </>
       )}
     </>
   );
