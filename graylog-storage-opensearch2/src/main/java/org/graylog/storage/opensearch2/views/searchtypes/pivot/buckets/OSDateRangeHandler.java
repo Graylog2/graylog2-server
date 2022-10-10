@@ -33,7 +33,6 @@ import org.joda.time.base.AbstractDateTime;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket> {
