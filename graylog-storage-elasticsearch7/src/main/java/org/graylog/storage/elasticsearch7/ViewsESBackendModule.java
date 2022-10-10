@@ -119,16 +119,16 @@ public class ViewsESBackendModule extends ViewsModule {
         return bindExportBackend(supportedSearchVersion);
     }
 
-    private MapBinder<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> pivotBucketHandlerBinder() {
+    private MapBinder<String, ESPivotBucketSpecHandler<? extends BucketSpec>> pivotBucketHandlerBinder() {
         return MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
-                new TypeLiteral<ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>>() {});
+                new TypeLiteral<>() {});
 
     }
 
     private void registerPivotBucketHandler(
             String name,
-            Class<? extends ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> implementation
+            Class<? extends ESPivotBucketSpecHandler<? extends BucketSpec>> implementation
     ) {
         pivotBucketHandlerBinder().addBinding(name).to(implementation);
     }
@@ -136,7 +136,7 @@ public class ViewsESBackendModule extends ViewsModule {
     protected MapBinder<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> pivotSeriesHandlerBinder() {
         return MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
-                new TypeLiteral<ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>>() {});
+                new TypeLiteral<>() {});
 
     }
 

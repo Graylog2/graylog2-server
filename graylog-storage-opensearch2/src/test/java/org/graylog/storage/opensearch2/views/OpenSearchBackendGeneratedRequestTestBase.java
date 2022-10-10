@@ -88,7 +88,7 @@ public class OpenSearchBackendGeneratedRequestTestBase {
     @Before
     public void setUpSUT() {
         this.elasticSearchTypeHandlers = new HashMap<>();
-        final Map<String, OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers = Collections.emptyMap();
+        final Map<String, OSPivotBucketSpecHandler<? extends BucketSpec>> bucketHandlers = Collections.emptyMap();
         final Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers = new HashMap<>();
         seriesHandlers.put(Average.NAME, new OSAverageHandler());
         seriesHandlers.put(Max.NAME, new OSMaxHandler());

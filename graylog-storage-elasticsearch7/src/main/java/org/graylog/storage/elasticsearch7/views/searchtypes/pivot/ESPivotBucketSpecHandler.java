@@ -36,8 +36,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_RESULT extends Aggregation>
-        implements BucketSpecHandler<SPEC_TYPE, AggregationBuilder, SearchResponse, AGGREGATION_RESULT, ESGeneratedQueryContext> {
+public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
+        implements BucketSpecHandler<SPEC_TYPE, AggregationBuilder, ESGeneratedQueryContext> {
 
     protected AggTypes aggTypes(ESGeneratedQueryContext queryContext, Pivot pivot) {
         return (AggTypes) queryContext.contextMap().get(pivot.id());

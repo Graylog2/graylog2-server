@@ -30,7 +30,7 @@ import java.util.Optional;
  * @param <AGGREGATION_BUILDER> implementation specific type for building up the aggregation when generating a backend query
  * @param <QUERY_CONTEXT>       an opaque context object to pass around information between query generation and result handling
  */
-public interface BucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_BUILDER, QUERY_RESULT, AGGREGATION_RESULT, QUERY_CONTEXT> {
+public interface BucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_BUILDER, QUERY_CONTEXT> {
 
     @SuppressWarnings("unchecked")
     @Nonnull
