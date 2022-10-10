@@ -72,7 +72,10 @@ const _loadRoles = (pagination, setLoading, setPaginatedRoles) => {
   });
 };
 
-const _updateListOnRoleDelete = (resetPage) => AuthzRolesActions.delete.completed.listen(() => resetPage());
+const _updateListOnRoleDelete = (pagination, setLoading, setPaginatedRoles, callback: () => void) => AuthzRolesActions.delete.completed.listen(() => {
+  _loadRoles(pagination, setLoading, setPaginatedRoles);
+  callback();
+});
 
 const getUseTeamMembersHook = () => {
   const defaultHook = () => ({ loading: false, users: [] });
@@ -91,7 +94,7 @@ const RolesOverview = () => {
   const teamMembersByRole = useTeamMembersByRole();
 
   useEffect(() => _loadRoles({ page, perPage, query }, setLoading, setPaginatedRoles), [page, perPage, query]);
-  useEffect(() => _updateListOnRoleDelete(resetPage), [resetPage]);
+  useEffect(() => _updateListOnRoleDelete({ page, perPage, query }, setLoading, setPaginatedRoles, resetPage), [page, perPage, query, resetPage]);
 
   const handleSearch = (newQuery) => {
     resetPage();

@@ -25,6 +25,18 @@ import ContentPackApplyParameter from './ContentPackApplyParameter';
 import ContentPackEntityConfig from './ContentPackEntityConfig';
 import ContentPackEntitiesListStyle from './ContentPackEntitiesList.css';
 
+const EntityIcon = ({ entity }) => {
+  if (!entity.fromServer) {
+    return <span><Icon title="Content Pack" name="archive" className={ContentPackEntitiesListStyle.contentPackEntity} /></span>;
+  }
+
+  return <span><Icon title="Server" name="server" /></span>;
+};
+
+EntityIcon.propTypes = {
+  entity: PropTypes.object.isRequired,
+};
+
 class ContentPackEntitiesList extends React.Component {
   static propTypes = {
     contentPack: PropTypes.object.isRequired,
@@ -73,14 +85,6 @@ class ContentPackEntitiesList extends React.Component {
     });
 
     this.setState({ filteredEntities: filteredEntities, filter: filter });
-  };
-
-  _entityIcon = (entity) => {
-    if (!entity.fromServer) {
-      return <span><Icon title="Content Pack" name="archive" className={ContentPackEntitiesListStyle.contentPackEntity} /></span>;
-    }
-
-    return <span><Icon title="Server" name="server" /></span>;
   };
 
   _entityRowFormatter = (entity) => {
@@ -160,7 +164,7 @@ class ContentPackEntitiesList extends React.Component {
         <td className={ContentPackEntitiesListStyle.bigColumns}>{entity.title}</td>
         <td>{entity.type.name}</td>
         <td className={ContentPackEntitiesListStyle.bigColumns}>{entity.description}</td>
-        {!readOnly && <td>{this._entityIcon(entity)}</td>}
+        {!readOnly && <td><EntityIcon entity={entity} /></td>}
         {!readOnly && <td>{appliedParameterCount}</td>}
         <td>
           <ButtonToolbar>
@@ -175,8 +179,7 @@ class ContentPackEntitiesList extends React.Component {
               Edit
             </Button>
             )}
-            <Button bsStyle="info"
-                    bsSize="xs"
+            <Button bsSize="xs"
                     onClick={() => { openShowModal(); }}>
               Show
             </Button>

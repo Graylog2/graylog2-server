@@ -21,14 +21,14 @@ import styled from 'styled-components';
 import { Link } from 'components/common/router';
 import { Spinner } from 'components/common';
 import Routes from 'routing/Routes';
-import { Button } from 'components/bootstrap';
+import { Button, ButtonToolbar } from 'components/bootstrap';
 import { ErrorPopover } from 'components/lookup-tables';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 import useScopePermissions from 'hooks/useScopePermissions';
 
-const Actions = styled.div`
+const Actions = styled(ButtonToolbar)`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -85,7 +85,7 @@ const DataAdapterTableEntry = ({ adapter, error = null, onDelete }: Props) => {
               </Button>
               <Button style={{ marginLeft: '6px' }}
                       bsSize="xsmall"
-                      bsStyle="primary"
+                      bsStyle="danger"
                       onClick={handleDelete}
                       role="button"
                       name="delete">

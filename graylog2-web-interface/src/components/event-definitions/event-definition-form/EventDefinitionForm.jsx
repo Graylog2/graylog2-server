@@ -20,7 +20,7 @@ import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Button, Col, Row } from 'components/bootstrap';
-import { FormSubmit, Wizard } from 'components/common';
+import { ModalSubmit, Wizard } from 'components/common';
 
 import EventDetailsForm from './EventDetailsForm';
 import EventConditionForm from './EventConditionForm';
@@ -83,12 +83,14 @@ class EventDefinitionForm extends React.Component {
     }
   };
 
-  renderButtons = (activeStep) => {
+  renderButtons = (activeStep, eventDefinitionId) => {
     if (activeStep === lodash.last(STEP_KEYS)) {
       const { onCancel } = this.props;
 
       return (
-        <FormSubmit onCancel={onCancel} onSubmit={this.handleSubmit} submitButtonText="Create event definition" />
+        <ModalSubmit onCancel={onCancel}
+                     onSubmit={this.handleSubmit}
+                     submitButtonText={`${eventDefinitionId ? 'Update' : 'Create'} event definition`} />
       );
     }
 
@@ -182,7 +184,7 @@ class EventDefinitionForm extends React.Component {
                   justified
                   containerClassName=""
                   hidePreviousNextButtons />
-          {this.renderButtons(activeStep)}
+          {this.renderButtons(activeStep, eventDefinition?.id)}
         </Col>
       </Row>
     );

@@ -130,7 +130,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
       border-color: ${theme.colors.input.borderFocus};
       box-shadow: ${theme.colors.input.boxShadow};
     }
-    
+
     &[disabled],
     &[readonly],
     fieldset[disabled] & {
@@ -138,7 +138,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
       color: ${theme.colors.input.colorDisabled};
     }
   }
-  
+
   textarea {
     max-width: 100%;
   }
@@ -587,12 +587,12 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     vertical-align: middle;
     width: auto;
   }
-  
+
   .typeahead-wrapper .tt-menu {
     background-color: ${theme.colors.global.contentBackground};
     box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
     color: ${theme.colors.global.textDefault};
-    
+
     .tt-suggestion:hover,
     .tt-suggestion.tt-cursor {
       color: ${theme.colors.variant.darkest.info};
@@ -605,7 +605,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     display: inline-block;
     margin: 0;
   }
-  
+
   .form-control-feedback {
     line-height: inherit;
     display: flex;
@@ -673,6 +673,17 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   .ace_editor.ace_autocomplete.ace-queryinput {
     width: 600px !important;
     margin-top: 6px;
+    background-color: ${theme.colors.input.background};
+    color: ${theme.colors.input.color};
+  }
+
+  .ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {
+    background-color: ${theme.utils.opacify(theme.colors.variant.info, 0.70)};
+    color: ${theme.colors.input.colorDisabled};
+  }
+
+  .ace_editor.ace_autocomplete .ace_text-layer .ace_completion-highlight {
+    color: ${theme.colors.variant.info};
   }
 
   code {
@@ -685,7 +696,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     background-color: ${theme.colors.variant.lightest.default};
     border-color: ${theme.colors.variant.lighter.default};
   }
-  
+
   input[type="range"],
   input[type="range"]:focus {
     box-shadow: none;
