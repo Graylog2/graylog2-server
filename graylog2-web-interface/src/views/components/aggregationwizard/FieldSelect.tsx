@@ -28,6 +28,7 @@ import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import type { Property } from 'views/logic/fieldtypes/FieldType';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypeIcon from 'views/components/sidebar/fields/FieldTypeIcon';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
 
 type Props = {
   ariaLabel?: string,
@@ -59,7 +60,7 @@ const UnqualifiedOption = styled.span(({ theme }) => css`
 type OptionRendererProps = {
   label: string,
   qualified: boolean,
-  type: string,
+  type: FieldType,
 };
 
 const OptionRenderer = ({ label, qualified, type }: OptionRendererProps) => {

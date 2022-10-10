@@ -44,7 +44,11 @@ const iconClass = (type: string) => {
   }
 };
 
-const FieldTypeIcon = ({ type }: { type: string }) => {
+type Props = {
+  type: FieldType,
+};
+
+const FieldTypeIcon = ({ type }: Props) => {
   return <Icon name={iconClass(type.type)} className={styles.fieldTypeIcon} />;
 };
 
