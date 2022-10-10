@@ -26,6 +26,7 @@ import {
   MenuItem,
   Modal,
   Row,
+  ButtonToolbar,
 } from 'components/bootstrap';
 import {
   Pagination, PageSizeSelect,
@@ -139,23 +140,23 @@ class ContentPacksList extends React.Component {
               </h3>
             </Col>
             <Col md={3} className="text-right">
-              {updateButton}
-              &nbsp;
-              <Button bsStyle="info" bsSize="small" onClick={openFunc}>Install</Button>
-              {installModal}
-              &nbsp;
-              <DropdownButton id={`more-actions-${item.id}`} title="More Actions" bsSize="small" pullRight>
-                <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>
-                  <MenuItem>Show</MenuItem>
-                </LinkContainer>
-                <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(item.id), encodeURIComponent(item.rev))}>
-                  <MenuItem>Create New Version</MenuItem>
-                </LinkContainer>
-                <MenuItem onSelect={() => { downloadRef.open(); }}>Download</MenuItem>
-                <MenuItem divider />
-                <MenuItem onSelect={() => { onDeletePack(item.id); }}>Delete All Versions</MenuItem>
-              </DropdownButton>
-              {downloadModal}
+              <ButtonToolbar className="pull-right">
+                {updateButton}
+                <Button bsSize="small" onClick={openFunc}>Install</Button>
+                {installModal}
+                <DropdownButton id={`more-actions-${item.id}`} title="More Actions" bsSize="small" pullRight>
+                  <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>
+                    <MenuItem>Show</MenuItem>
+                  </LinkContainer>
+                  <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(item.id), encodeURIComponent(item.rev))}>
+                    <MenuItem>Create New Version</MenuItem>
+                  </LinkContainer>
+                  <MenuItem onSelect={() => { downloadRef.open(); }}>Download</MenuItem>
+                  <MenuItem divider />
+                  <MenuItem onSelect={() => { onDeletePack(item.id); }}>Delete All Versions</MenuItem>
+                </DropdownButton>
+                {downloadModal}
+              </ButtonToolbar>
             </Col>
           </Row>
           <Row className="row-sm content-packs-summary">

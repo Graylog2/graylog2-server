@@ -34,6 +34,7 @@ import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
 import PipelineConnectionsList from './PipelineConnectionsList';
 
@@ -206,11 +207,12 @@ const ProcessingTimelineComponent = () => {
         </StreamListTD>
         <td>{_formatStages(pipeline, stages)}</td>
         <td>
-          <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:delete')} bsStyle="primary" bsSize="xsmall" onClick={_deletePipeline(pipeline)}>Delete</Button>
-          &nbsp;
-          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(id)}>
-            <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')} bsStyle="info" bsSize="xsmall">Edit</Button>
-          </LinkContainer>
+          <ButtonToolbar>
+            <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(id)}>
+              <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')} bsSize="xsmall">Edit</Button>
+            </LinkContainer>
+            <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:delete')} bsStyle="danger" bsSize="xsmall" onClick={_deletePipeline(pipeline)}>Delete</Button>
+          </ButtonToolbar>
         </td>
       </tr>
     );
