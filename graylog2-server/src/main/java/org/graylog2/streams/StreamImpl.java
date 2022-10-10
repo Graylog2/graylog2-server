@@ -52,7 +52,6 @@ public class StreamImpl extends PersistedImpl implements Stream {
     public static final String FIELD_RULES = "rules";
     public static final String FIELD_OUTPUTS = "outputs";
     public static final String FIELD_CONTENT_PACK = "content_pack";
-    public static final String FIELD_ALERT_RECEIVERS = "alert_receivers";
     public static final String FIELD_DISABLED = "disabled";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_CREATOR_USER_ID = "creator_user_id";
@@ -209,14 +208,6 @@ public class StreamImpl extends PersistedImpl implements Stream {
         }
 
         return Collections.emptyMap();
-    }
-
-    @Override
-    public Map<String, List<String>> getAlertReceivers() {
-        @SuppressWarnings("unchecked")
-        final Map<String, List<String>> alertReceivers =
-                (Map<String, List<String>>) fields.getOrDefault(FIELD_ALERT_RECEIVERS, Collections.emptyMap());
-        return alertReceivers;
     }
 
     @Override

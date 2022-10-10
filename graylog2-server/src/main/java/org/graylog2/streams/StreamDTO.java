@@ -82,10 +82,12 @@ public abstract class StreamDTO {
 
     @JsonProperty(EMBEDDED_ALERT_CONDITIONS)
     @Nullable
+    @Deprecated
     public abstract Collection<AlertConditionSummary> alertConditions();
 
     @JsonProperty(FIELD_ALERT_RECEIVERS)
     @Nullable
+    @Deprecated
     public abstract AlertReceivers alertReceivers();
 
     @JsonProperty(FIELD_TITLE)
@@ -151,12 +153,14 @@ public abstract class StreamDTO {
         public abstract Builder disabled(boolean disabled);
 
         @JsonProperty(EMBEDDED_ALERT_CONDITIONS)
+        @Deprecated
         public abstract Builder alertConditions(Collection<AlertConditionSummary> alertConditions);
 
         @JsonProperty(FIELD_RULES)
         public abstract Builder rules(Collection<StreamRule> rules);
 
         @JsonProperty(FIELD_ALERT_RECEIVERS)
+        @Deprecated
         public abstract Builder alertReceivers(AlertReceivers receivers);
 
         @JsonProperty(FIELD_TITLE)

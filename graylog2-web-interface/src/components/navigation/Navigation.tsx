@@ -131,7 +131,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
   const pluginItems = PluginStore.exports('navigationItems');
 
   return (
-    <StyledNavbar fluid fixedTop>
+    <StyledNavbar fluid fixedTop collapseOnSelect>
       <Navbar.Header>
         <Navbar.Brand>
           <LinkContainer relativeActive to={Routes.STARTPAGE}>
@@ -142,9 +142,8 @@ const Navigation = React.memo(({ pathname }: Props) => {
         <DevelopmentHeaderBadge smallScreen />
         {pluginItems.map(({ key, component: Item }) => <Item key={key} smallScreen />)}
       </Navbar.Header>
-
       <Navbar.Collapse>
-        <Nav navbar className="navbar-main">
+        <Nav className="navbar-main">
           <LinkContainer relativeActive to={Routes.SEARCH}>
             <NavItem to="search">Search</NavItem>
           </LinkContainer>
@@ -168,7 +167,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
         <NotificationBadge />
 
-        <Nav navbar pullRight className="header-meta-nav">
+        <Nav pullRight className="header-meta-nav">
           {AppConfig.isCloud() ? (
             <GlobalThroughput disabled />
           ) : (

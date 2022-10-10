@@ -103,6 +103,7 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
   };
 
   const onCancel = () => history.push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
+  const updatable = !create && !loadingScopePermissions && scopePermissions?.is_mutable;
 
   return (
     <Formik initialValues={initialValues}
@@ -228,8 +229,7 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
                               isAsyncSubmit
                               onCancel={onCancel} />
                 )}
-
-                {(!create && !loadingScopePermissions && scopePermissions?.is_mutable) && (
+                {updatable && (
                   <FormSubmit submitButtonText="Update lookup table"
                               submitLoadingText="Updating lookup table..."
                               isSubmitting={isSubmitting}

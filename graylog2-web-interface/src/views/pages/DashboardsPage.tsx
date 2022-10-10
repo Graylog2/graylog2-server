@@ -31,6 +31,7 @@ import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 import type View from '../logic/views/View';
+import { DashboardsActions } from '../stores/DashboardsStore';
 
 // eslint-disable-next-line no-alert
 const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
@@ -45,13 +46,15 @@ const DashboardsPage = () => {
   };
 
   const handleDashboardDelete = async (view: View) => {
-    resetPage();
-
     const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingDashboard');
 
     const result = await iterateConfirmationHooks([...pluginDashboardDeletionHooks, defaultDashboardDeletionHook], view);
 
-    return result === true ? ViewManagementActions.delete(view) : Promise.reject();
+    if (result) {
+      await ViewManagementActions.delete(view);
+      await DashboardsActions.search(searchQuery, page, pageSize);
+      resetPage();
+    }
   };
 
   const { list, pagination } = useDashboards(searchQuery, page, pageSize);

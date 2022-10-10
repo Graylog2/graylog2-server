@@ -50,9 +50,7 @@ const DashboardList = ({ pagination, handleSearch, handleDashboardDelete, dashbo
   const [dashboardToShare, setDashboardToShare] = useState<ViewClass>();
 
   const onDashboardDelete = (dashboard) => () => {
-    handleDashboardDelete(dashboard).then(() => {
-      handleSearch();
-    }, () => {});
+    handleDashboardDelete(dashboard);
   };
 
   if (!dashboards) {

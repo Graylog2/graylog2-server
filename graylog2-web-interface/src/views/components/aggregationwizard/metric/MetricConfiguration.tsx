@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Field, useFormikContext } from 'formik';
+import { Field, useFormikContext, getIn } from 'formik';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { defaultCompare } from 'logic/DefaultCompare';
 import { Input } from 'components/bootstrap';
@@ -36,22 +37,36 @@ const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { 
 const percentileOptions = [25.0, 50.0, 75.0, 90.0, 95.0, 99.0].map((value) => ({ label: value, value }));
 
 const Metric = ({ index }: Props) => {
+  const metricFieldSelectRef = useRef(null);
   const functions = useStore(AggregationFunctionsStore);
   const functionOptions = Object.values(functions)
     .map(({ type, description }) => ({ label: description, value: type }))
     .sort(sortByLabel);
 
-  const { values: { metrics } } = useFormikContext<WidgetConfigFormValues>();
+  const { values: { metrics }, errors: { metrics: metricsError }, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const currentFunction = metrics[index].function;
 
   const isFieldRequired = currentFunction !== 'count';
 
   const isPercentile = currentFunction === 'percentile';
+  const [functionIsSettled, setFunctionIsSettled] = useState<boolean>(false);
+  const onFunctionChange = useCallback((newValue) => {
+    setFieldValue(`metrics.${index}.function`, newValue);
+    setFunctionIsSettled(true);
+  }, [setFieldValue, index]);
+
+  useEffect(() => {
+    const metricError = getIn(metricsError?.[index], 'field');
+
+    if (metricError && functionIsSettled) {
+      metricFieldSelectRef.current.focus();
+    }
+  }, [functionIsSettled, metricsError, index, metricFieldSelectRef]);
 
   return (
     <>
       <Field name={`metrics.${index}.function`}>
-        {({ field: { name, value, onChange }, meta: { error } }) => (
+        {({ field: { name, value }, meta: { error } }) => (
           <Input id="metric-function-select"
                  label="Function"
                  error={error}
@@ -64,15 +79,14 @@ const Metric = ({ index }: Props) => {
                     aria-label="Select a function"
                     size="small"
                     menuPortalTarget={document.body}
-                    onChange={(newValue) => {
-                      onChange({ target: { name, value: newValue } });
-                    }} />
+                    onChange={onFunctionChange} />
           </Input>
         )}
       </Field>
       <Field name={`metrics.${index}.field`}>
         {({ field: { name, value, onChange }, meta: { error } }) => (
           <FieldSelect id="metric-field-select"
+                       selectRef={metricFieldSelectRef}
                        label="Field"
                        onChange={onChange}
                        error={error}
