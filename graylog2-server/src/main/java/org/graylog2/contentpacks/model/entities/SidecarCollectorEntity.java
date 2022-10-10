@@ -23,6 +23,8 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
+import javax.annotation.Nullable;
+
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
@@ -39,12 +41,15 @@ public abstract class SidecarCollectorEntity {
     @JsonProperty("executable_path")
     public abstract ValueReference executablePath();
 
+    @Nullable
     @JsonProperty("execute_parameters")
     public abstract ValueReference executeParameters();
 
+    @Nullable
     @JsonProperty("validation_parameters")
     public abstract ValueReference validationParameters();
 
+    @Nullable
     @JsonProperty("default_template")
     public abstract ValueReference defaultTemplate();
 
