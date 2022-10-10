@@ -66,7 +66,7 @@ module.exports = {
       ],
     },
     {
-      name: 'UX Patterns',
+      name: 'UX Patterns - Best Practices',
       content: 'docs/ux-patterns.md',
     },
     {

@@ -1,7 +1,5 @@
 ### Form & Modal Submit Buttons
 
-It is a challenge to unify the placement, stying and naming of form submit buttons across the application.
-Please consider the following best practices when implementing or changing a form submit or cancel button:
 - Rely on the shared components `FormSubmit` and `ModalSubmit` to implement the submit and cancel button.
   The `FormSubmit` can be used for all forms on pages. The `ModalSubmit` can be used for modals and similar element like 
   popovers or the login dialog.
