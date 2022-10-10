@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, ParsedDateHistogram> {
+public class ESTimeHandler extends ESPivotBucketSpecHandler<Time> {
     private static final String AGG_NAME = "agg";
     private static final BucketOrder defaultOrder = BucketOrder.key(true);
 

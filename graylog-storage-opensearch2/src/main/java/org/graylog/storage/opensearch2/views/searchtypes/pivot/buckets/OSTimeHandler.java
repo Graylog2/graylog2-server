@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class OSTimeHandler extends OSPivotBucketSpecHandler<Time, ParsedDateHistogram> {
+public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
     private static final String AGG_NAME = "agg";
     private static final BucketOrder defaultOrder = BucketOrder.key(true);
 
