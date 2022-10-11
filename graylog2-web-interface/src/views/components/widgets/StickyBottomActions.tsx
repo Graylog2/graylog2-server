@@ -33,7 +33,7 @@ const Content = styled.div`
   position: relative;
 `;
 
-const Actions = styled.div<{ $scrolledToBottom: boolean }>(({ theme, $scrolledToBottom }) => css`
+const Actions = styled.div<{ $scrolledToBottom: boolean, $alignAtBottom: boolean }>(({ theme, $scrolledToBottom, $alignAtBottom }) => css`
   position: sticky;
   width: 100%;
   bottom: 0;
@@ -42,7 +42,7 @@ const Actions = styled.div<{ $scrolledToBottom: boolean }>(({ theme, $scrolledTo
   display: flex;
   flex-direction: column;
   flex: 1;
-  justify-content: space-between;
+  justify-content: ${$alignAtBottom ? 'flex-end' : 'space-between'};
   padding-top: 5px;
 
   ::before {
@@ -95,9 +95,11 @@ type Props = {
   actions: React.ReactNode,
   children: React.ReactNode,
   className?: string,
+  // Set this to align the actions at the bottom of the free space
+  alignActionsAtBottom?: boolean,
 }
 
-const StickyBottomActions = ({ actions, children, className }: Props) => {
+const StickyBottomActions = ({ actions, children, className, alignActionsAtBottom }: Props) => {
   const { setScrolledToBottomIndicatorRef, scrolledToBottom } = useScrolledToBottom();
 
   return (
@@ -108,7 +110,7 @@ const StickyBottomActions = ({ actions, children, className }: Props) => {
           <ScrolledToBottomIndicator ref={setScrolledToBottomIndicatorRef} />
         </Content>
       </ScrollContainer>
-      <Actions $scrolledToBottom={scrolledToBottom} className="actions-container">
+      <Actions $scrolledToBottom={scrolledToBottom} $alignAtBottom={alignActionsAtBottom}>
         {actions}
       </Actions>
     </Container>
@@ -117,6 +119,7 @@ const StickyBottomActions = ({ actions, children, className }: Props) => {
 
 StickyBottomActions.defaultProps = {
   className: undefined,
+  alignActionsAtBottom: false,
 };
 
 export default StickyBottomActions;

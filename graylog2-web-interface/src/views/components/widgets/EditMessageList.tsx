@@ -54,12 +54,6 @@ const PreviewOptionCheckbox = styled(Checkbox)`
   }
 `;
 
-const StyledStickyBottomActions = styled(StickyBottomActions)`
-  .actions-container {
-    justify-content: flex-end;
-  }
-`;
-
 const _onFieldSelectionChanged = (fields: Array<string>, config: MessagesWidgetConfig, onChange: (newConfig: MessagesWidgetConfig) => void) => {
   const newConfig = config.toBuilder().fields(fields).build();
 
@@ -89,7 +83,8 @@ const EditMessageList = ({ children, config, fields, onChange, onCancel, onSubmi
   return (
     <FullHeightRow>
       <FullHeightCol md={3}>
-        <StyledStickyBottomActions actions={<SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />}>
+        <StickyBottomActions actions={<SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />}
+                                   alignActionsAtBottom>
           <DescriptionBox description="Fields">
             <FieldSelect fields={fields}
                          onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)}
@@ -119,7 +114,7 @@ const EditMessageList = ({ children, config, fields, onChange, onCancel, onSubmi
             <DecoratorSidebar decorators={config.decorators}
                               onChange={onDecoratorsChange} />
           </DescriptionBox>
-        </StyledStickyBottomActions>
+        </StickyBottomActions>
       </FullHeightCol>
       <FullHeightCol md={9}>
         {children}
