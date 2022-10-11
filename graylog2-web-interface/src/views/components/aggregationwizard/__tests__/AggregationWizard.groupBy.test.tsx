@@ -87,7 +87,7 @@ describe('AggregationWizard', () => {
                          fields={Immutable.List([])}
                          onChange={() => {}}
                          {...props}>
-        <>The Visualization</>
+        <div>The Visualization</div>
       </AggregationWizard>,
     </FieldTypesContext.Provider>,
   );
@@ -213,7 +213,7 @@ describe('AggregationWizard', () => {
 
     const configureElementsSection = await screen.findByTestId('configure-elements-section');
 
-    expect(within(configureElementsSection).queryByText('Group By')).toBeInTheDocument();
+    expect(within(configureElementsSection).getByText('Group By')).toBeInTheDocument();
   });
 
   it('should correctly change config', async () => {
