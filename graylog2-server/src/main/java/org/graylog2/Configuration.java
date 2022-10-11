@@ -57,7 +57,7 @@ public class Configuration extends BaseConfiguration {
     private boolean isMaster = true;
 
     @Parameter(value = "maintain_stream_based_field_lists")
-    private boolean maintainStreamBasedFieldLists = false;
+    private boolean maintainStreamBasedFieldLists = true;
 
     /**
      * Used for initializing static leader election. You shouldn't use this for other purposes, but if you must, don't
