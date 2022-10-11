@@ -124,7 +124,9 @@ const CollectorConfigurationModal = ({
 
   const isNotDirty = lodash.isEqual(selectedConfigurations, initialAssignedConfigs) && lodash.isEqual(partiallySelectedConfigurations, initialPartiallyAssignedConfigs);
 
-  const filteredOptions = [...initialAssignedConfigs, ...initialPartiallyAssignedConfigs, ...unassignedConfigs].filter((configuration) => configuration.match(new RegExp(searchQuery, 'i')));
+  const searchQueryRegexPattern = new RegExp(searchQuery, 'i');
+
+  const filteredOptions = [...initialAssignedConfigs, ...initialPartiallyAssignedConfigs, ...unassignedConfigs].filter((configuration) => configuration.match(searchQueryRegexPattern));
 
   const rows = filteredOptions.map((configName) => {
     const { configuration, collector, sidecars, autoAssignedTags } = getRowData(configName);
