@@ -15,9 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
 
-import Routes from 'routing/Routes';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import { OverlayTrigger, PaginatedList, SearchForm, Icon } from 'components/common';
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
@@ -123,8 +121,6 @@ type OverviewProps = {
 };
 
 const LookupTablesOverview = ({ tables, caches, dataAdapters, pagination, errorStates }: OverviewProps) => {
-  const history = useHistory();
-
   const onPageChange = (newPage: number, newPerPage: number) => {
     LookupTablesActions.searchPaginated(newPage, newPerPage, pagination.query);
   };
@@ -135,10 +131,6 @@ const LookupTablesOverview = ({ tables, caches, dataAdapters, pagination, errorS
 
   const onReset = () => {
     LookupTablesActions.searchPaginated(1, pagination.per_page, null);
-  };
-
-  const goCreateLUT = () => {
-    history.push(Routes.SYSTEM.LOOKUPTABLES.CREATE);
   };
 
   return (
@@ -153,11 +145,6 @@ const LookupTablesOverview = ({ tables, caches, dataAdapters, pagination, errorS
                        onChange={onPageChange}
                        totalItems={pagination.total}>
           <SearchForm onSearch={onSearch} onReset={onReset}>
-            <Button bsStyle="success"
-                    style={{ marginLeft: 5 }}
-                    onClick={goCreateLUT}>
-              Create lookup table
-            </Button>
             <OverlayTrigger trigger="click" rootClose placement="right" overlay={getHelpPopover()}>
               <Button bsStyle="link" className={Styles.searchHelpButton}><Icon name="question-circle" fixedWidth /></Button>
             </OverlayTrigger>

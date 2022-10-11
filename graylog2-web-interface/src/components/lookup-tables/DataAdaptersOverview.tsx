@@ -15,10 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
-import Routes from 'routing/Routes';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
 import { useGetAllDataAdapters, useGetDataAdapterErrors } from 'hooks/lookup-tables/useLookupTableDataAdaptersAPI';
@@ -73,7 +71,6 @@ const getHelpPopover = () => {
 };
 
 const DataAdaptersOverview = () => {
-  const history = useHistory();
   const queryClient = useQueryClient();
 
   const [localPagination, setLocalPagination] = React.useState({ page: 1, perPage: 10, query: null });
@@ -96,10 +93,6 @@ const DataAdaptersOverview = () => {
     queryClient.invalidateQueries(['all-data-adapters']);
   };
 
-  const toCreateView = () => {
-    history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE);
-  };
-
   return (
     <Row className="content">
       <Col md={12}>
@@ -114,11 +107,6 @@ const DataAdaptersOverview = () => {
                        onChange={onPageChange}
                        totalItems={pagination.total}>
           <SearchForm onSearch={onSearch} onReset={onReset}>
-            <Button bsStyle="success"
-                    onClick={toCreateView}
-                    style={{ marginLeft: 5 }}>
-              Create data adapter
-            </Button>
             <OverlayTrigger trigger="click" rootClose placement="right" overlay={getHelpPopover()}>
               <Button bsStyle="link"
                       className={Styles.searchHelpButton}>

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { HelpBlock } from 'components/bootstrap';
@@ -30,8 +29,8 @@ const HelpMessage = styled.span<{ hasError: boolean }>(({ theme, hasError }) => 
 
 type Props = {
   className?: string,
-  error?: React.ReactElement,
-  help?: React.ReactNode,
+  error?: React.ReactElement | string,
+  help?: React.ReactNode | string,
 };
 
 /**
@@ -58,18 +57,6 @@ const InputDescription = ({ className, error, help }: Props) => {
       )}
     </HelpBlock>
   );
-};
-
-InputDescription.propTypes = {
-  className: PropTypes.string,
-  error: PropTypes.oneOfType([
-    PropTypes.element,
-    PropTypes.string,
-  ]),
-  help: PropTypes.oneOfType([
-    PropTypes.element,
-    PropTypes.string,
-  ]),
 };
 
 InputDescription.defaultProps = {

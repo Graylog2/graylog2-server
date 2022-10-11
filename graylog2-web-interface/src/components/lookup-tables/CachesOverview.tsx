@@ -15,10 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
-import Routes from 'routing/Routes';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
 import { useGetAllCaches } from 'hooks/lookup-tables/useLookupTableCachesAPI';
@@ -75,7 +73,6 @@ const getHelpPopover = () => {
 };
 
 const CachesOverview = () => {
-  const history = useHistory();
   const queryClient = useQueryClient();
 
   const [localPagination, setLocalPagination] = React.useState({ page: 1, perPage: 10, query: null });
@@ -97,10 +94,6 @@ const CachesOverview = () => {
     queryClient.invalidateQueries(['all-caches']);
   };
 
-  const toCreateView = () => {
-    history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE);
-  };
-
   return (
     <Row className="content">
       <Col md={12}>
@@ -112,11 +105,6 @@ const CachesOverview = () => {
                        onChange={onPageChange}
                        totalItems={pagination.total}>
           <SearchForm onSearch={onSearch} onReset={onReset}>
-            <Button bsStyle="success"
-                    onClick={toCreateView}
-                    style={{ marginLeft: 5 }}>
-              Create cache
-            </Button>
             <OverlayTrigger trigger="click" rootClose placement="right" overlay={getHelpPopover()}>
               <Button bsStyle="link"
                       className={Styles.searchHelpButton}>

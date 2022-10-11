@@ -105,8 +105,9 @@ const DataAdapterForm = ({ type, title, saved, create, dataAdapter, validate, va
       if (name in values.config && !values.config[name]) errors[name] = ['Required'];
     });
 
+    setFormErrors({ ...validationErrors, ...errors });
+
     if (Object.keys(errors).length === 0) validate(values);
-    setFormErrors(errors);
 
     return errors;
   };
