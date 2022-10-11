@@ -17,7 +17,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { Table, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
@@ -56,11 +56,12 @@ const SecondaryText = styled.div`
   margin-bottom: -2px;
 `;
 
-const TableRow = styled.tr`
-  cursor: pointer;
+const TableRow = styled.tr(({ disabled = false }: {disabled?: boolean}) => css`
+  cursor: ${disabled ? 'auto' : 'pointer'};
+  background-color: ${disabled ? '#E8E8E8' : 'initial'};
   border-bottom: 1px solid lightgray;
   height: 49px;
-`;
+`);
 
 const StickyTableRowFooter = styled.tr`
   height: 32px;
@@ -138,7 +139,7 @@ const CollectorConfigurationModal = ({
 
     return (
       <TableRow key={configName}
-                style={isAssignedFromTags ? { backgroundColor: '#E8E8E8', cursor: 'auto' } : undefined}
+                disabled={isAssignedFromTags}
                 onClick={() => {
                   if (!isAssignedFromTags) {
                     if (partiallySelected) {
