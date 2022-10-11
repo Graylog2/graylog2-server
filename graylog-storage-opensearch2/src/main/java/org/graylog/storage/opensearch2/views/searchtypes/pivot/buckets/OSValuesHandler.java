@@ -39,9 +39,9 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.support.MultiTermsValuesSourceConfig;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.PivotBucket;
 import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.SearchVersion;
-import org.jooq.lambda.tuple.Tuple2;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -129,25 +129,24 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values, Terms> {
     }
 
     @Override
-    public Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> extractBuckets(List<BucketSpec> bucketSpecs,
-                                                                                                Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket> initialBucket) {
-        final ImmutableList<String> previousKeys = initialBucket.v1();
-        final MultiBucketsAggregation.Bucket previousBucket = initialBucket.v2();
+    public Stream<PivotBucket> extractBuckets(List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
+        final ImmutableList<String> previousKeys = initialBucket.keys();
+        final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final ParsedFilters filterAggregation = previousBucket.getAggregations().get(AGG_NAME);
         final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
         final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
-        final Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> bucketStream = termsAggregation.getBuckets().stream()
+        final Stream<PivotBucket> bucketStream = termsAggregation.getBuckets().stream()
                 .map(bucket -> {
                     final ImmutableList<String> keys = ImmutableList.<String>builder()
                             .addAll(previousKeys)
                             .addAll(extractKeys(bucket))
                             .build();
 
-                    return new Tuple2<>(keys, bucket);
+                    return PivotBucket.create(keys, bucket);
                 });
 
         return otherBucket.getDocCount() > 0
-                ? Stream.concat(bucketStream, Stream.of(new Tuple2<>(MISSING_BUCKET_KEYS, otherBucket)))
+                ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(MISSING_BUCKET_KEYS, otherBucket)))
                 : bucketStream;
     }
 

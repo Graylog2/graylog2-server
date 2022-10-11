@@ -201,8 +201,8 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
 
         retrieveBuckets(pivot.rowGroups(), initialBucket)
                 .forEach(tuple -> {
-                    final ImmutableList<String> keys = tuple.v1();
-                    final MultiBucketsAggregation.Bucket bucket = tuple.v2();
+                    final ImmutableList<String> keys = tuple.keys();
+                    final MultiBucketsAggregation.Bucket bucket = tuple.bucket();
                     final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder()
                             .key(keys)
                             .source("leaf");
@@ -212,8 +212,8 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                     if (!pivot.columnGroups().isEmpty()){
                         retrieveBuckets(pivot.columnGroups(), bucket)
                                 .forEach(columnBucketTuple -> {
-                                    final ImmutableList<String> columnKeys = columnBucketTuple.v1();
-                                    final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.v2();
+                                    final ImmutableList<String> columnKeys = columnBucketTuple.keys();
+                                    final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.bucket();
 
                                     processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
                                 });
@@ -230,8 +230,8 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         return resultBuilder.build();
     }
 
-    private Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> retrieveBuckets(List<BucketSpec> pivots, MultiBucketsAggregation.Bucket initialBucket) {
-        Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> result = Stream.of(new Tuple2<>(ImmutableList.of(), initialBucket));
+    private Stream<PivotBucket> retrieveBuckets(List<BucketSpec> pivots, MultiBucketsAggregation.Bucket initialBucket) {
+        Stream<PivotBucket> result = Stream.of(PivotBucket.create(ImmutableList.of(), initialBucket));
 
         for (Tuple2<String, List<BucketSpec>> group : groupByConsecutiveType(pivots)) {
             result = result.flatMap((tuple) -> {

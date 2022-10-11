@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivot;
 
-import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -29,10 +28,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.BucketOrder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.HasAggregations;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.jooq.lambda.tuple.Tuple2;
 
 import java.util.List;
 import java.util.Objects;
@@ -80,28 +76,5 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec, AGG
         return ordering.isEmpty() ? List.of(defaultOrder) : ordering;
     }
 
-    public abstract Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> extractBuckets(List<BucketSpec> bucketSpecs, Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket> initialBucket);
-
-    public static class Bucket {
-
-        private final String key;
-        private final MultiBucketsAggregation.Bucket bucket;
-
-        public Bucket(String key, MultiBucketsAggregation.Bucket bucket) {
-            this.key = key;
-            this.bucket = bucket;
-        }
-
-        public static Bucket create(String key, MultiBucketsAggregation.Bucket aggregation) {
-            return new Bucket(key, aggregation);
-        }
-
-        public String key() {
-            return key;
-        }
-
-        public MultiBucketsAggregation.Bucket aggregation() {
-            return bucket;
-        }
-    }
+    public abstract Stream<PivotBucket> extractBuckets(List<BucketSpec> bucketSpecs, PivotBucket initialBucket);
 }

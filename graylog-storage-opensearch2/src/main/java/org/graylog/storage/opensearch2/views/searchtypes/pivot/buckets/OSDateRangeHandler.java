@@ -28,8 +28,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.range.ParsedDateRange;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.PivotBucket;
 import org.joda.time.base.AbstractDateTime;
-import org.jooq.lambda.tuple.Tuple2;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -75,13 +75,12 @@ public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket
     }
 
     @Override
-    public Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> extractBuckets(List<BucketSpec> bucketSpecs,
-                                                                                                Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket> initialBucket) {
+    public Stream<PivotBucket> extractBuckets(List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
         if (bucketSpecs.isEmpty()) {
             return Stream.empty();
         }
-        final ImmutableList<String> previousKeys = initialBucket.v1();
-        final MultiBucketsAggregation.Bucket previousBucket = initialBucket.v2();
+        final ImmutableList<String> previousKeys = initialBucket.keys();
+        final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final ParsedDateRange aggregation = previousBucket.getAggregations().get(AGG_NAME);
         final DateRangeBucket dateRangeBucket = (DateRangeBucket) bucketSpecs.get(0);
 
@@ -96,10 +95,10 @@ public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket
                             .build();
 
                     if (bucketSpecs.size() == 1) {
-                        return Stream.of(new Tuple2<>(keys, bucket));
+                        return Stream.of(PivotBucket.create(keys, bucket));
                     }
 
-                    return extractBuckets(bucketSpecs.subList(0, bucketSpecs.size()), new Tuple2<>(keys, bucket));
+                    return extractBuckets(bucketSpecs.subList(0, bucketSpecs.size()), PivotBucket.create(keys, bucket));
                 });
     }
 }

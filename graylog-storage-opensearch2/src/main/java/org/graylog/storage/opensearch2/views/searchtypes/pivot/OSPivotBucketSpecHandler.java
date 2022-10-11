@@ -80,28 +80,5 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec, AGG
         return ordering.isEmpty() ? List.of(defaultOrder) : ordering;
     }
 
-    public abstract Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> extractBuckets(List<BucketSpec> bucketSpecs, Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket> previousBucket);
-
-    public static class Bucket {
-
-        private final String key;
-        private final MultiBucketsAggregation.Bucket bucket;
-
-        public Bucket(String key, MultiBucketsAggregation.Bucket bucket) {
-            this.key = key;
-            this.bucket = bucket;
-        }
-
-        public static Bucket create(String key, MultiBucketsAggregation.Bucket aggregation) {
-            return new Bucket(key, aggregation);
-        }
-
-        public String key() {
-            return key;
-        }
-
-        public MultiBucketsAggregation.Bucket aggregation() {
-            return bucket;
-        }
-    }
+    public abstract Stream<PivotBucket> extractBuckets(List<BucketSpec> bucketSpecs, PivotBucket previousBucket);
 }
