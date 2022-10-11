@@ -69,7 +69,9 @@ public class MappedFieldTypesServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        this.mappedFieldTypesService = new MappedFieldTypesServiceImpl(new Configuration(), streamService, indexFieldTypesService, new FieldTypeMapper(), indexLookup);
+        final Configuration withStreamAwarenessOff = spy(new Configuration());
+        doReturn(false).when(withStreamAwarenessOff).maintainsStreamBasedFieldLists();
+        this.mappedFieldTypesService = new MappedFieldTypesServiceImpl(withStreamAwarenessOff, streamService, indexFieldTypesService, new FieldTypeMapper(), indexLookup);
         when(streamService.indexSetIdsByIds(Collections.singleton("stream1"))).thenReturn(Collections.singleton("indexSetId"));
         when(streamService.indexSetIdsByIds(Collections.singleton("stream2"))).thenReturn(Collections.singleton("indexSetId"));
     }
