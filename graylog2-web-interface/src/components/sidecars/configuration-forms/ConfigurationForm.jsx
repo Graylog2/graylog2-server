@@ -136,6 +136,7 @@ const ConfigurationForm = createReactClass({
     };
   },
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   replaceConfigurationVariableName(oldname, newname) {
     const { formData } = this.state;
 
@@ -159,6 +160,7 @@ const ConfigurationForm = createReactClass({
     const storedTemplate = this.defaultTemplates[collectorId];
 
     if (storedTemplate !== undefined) {
+      // eslint-disable-next-line no-promise-executor-return
       return new Promise((resolve) => resolve(storedTemplate));
     }
 
@@ -242,7 +244,7 @@ const ConfigurationForm = createReactClass({
 
     return options;
   },
-
+  // eslint-disable-next-line react/no-unstable-nested-components
   _formatValidationMessage(fieldName, defaultText) {
     const { validation_errors: validationErrors } = this.state;
 
@@ -262,7 +264,7 @@ const ConfigurationForm = createReactClass({
 
     return null;
   },
-
+  // eslint-disable-next-line react/no-unstable-nested-components
   _renderCollectorTypeField(collectorId, collectors, configurationSidecars) {
     const isConfigurationInUse = configurationSidecars.sidecar_ids && configurationSidecars.sidecar_ids.length > 0;
 

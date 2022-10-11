@@ -35,6 +35,7 @@ import {
   Label,
   MenuItem,
 } from 'components/bootstrap';
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
 import EventDefinitionDescription from './EventDefinitionDescription';
 
@@ -108,11 +109,11 @@ const EventDefinitionEntry = ({
   }
 
   const actions = (
-    <React.Fragment key={`actions-${eventDefinition.id}`}>
+    <ButtonToolbar key={`actions-${eventDefinition.id}`}>
       {showActions() && (
         <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
           <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
-            <Button bsStyle="info" data-testid="edit-button">
+            <Button data-testid="edit-button">
               <Icon name="edit" /> Edit
             </Button>
           </LinkContainer>
@@ -132,7 +133,7 @@ const EventDefinitionEntry = ({
           )}
         </DropdownButton>
       </IfPermitted>
-    </React.Fragment>
+    </ButtonToolbar>
   );
 
   const plugin = getConditionPlugin(eventDefinition.config.type);
