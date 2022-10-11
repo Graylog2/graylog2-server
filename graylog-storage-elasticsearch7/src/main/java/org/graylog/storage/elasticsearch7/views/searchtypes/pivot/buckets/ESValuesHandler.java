@@ -38,7 +38,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotBucketSpecHandler;
-import org.jooq.lambda.tuple.Tuple2;
+import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.PivotBucket;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -108,14 +108,13 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, Terms> {
     }
 
     @Override
-    public Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> extractBuckets(List<BucketSpec> bucketSpecs,
-                                                                                                Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket> initialBucket) {
-        final ImmutableList<String> previousKeys = initialBucket.v1();
-        final MultiBucketsAggregation.Bucket previousBucket = initialBucket.v2();
+    public Stream<PivotBucket> extractBuckets(List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
+        final ImmutableList<String> previousKeys = initialBucket.keys();
+        final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final ParsedFilters filterAggregation = previousBucket.getAggregations().get(AGG_NAME);
         final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
         final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
-        final Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> bucketStream = termsAggregation.getBuckets()
+        final Stream<PivotBucket> bucketStream = termsAggregation.getBuckets()
                 .stream()
                 .map(bucket -> {
                     final ImmutableList<String> keys = ImmutableList.<String>builder()
@@ -123,11 +122,11 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, Terms> {
                             .addAll(splitKeys(bucket.getKeyAsString()))
                             .build();
 
-                    return new Tuple2<>(keys, bucket);
+                    return PivotBucket.create(keys, bucket);
                 });
 
         return otherBucket.getDocCount() > 0
-                ? Stream.concat(bucketStream, Stream.of(new Tuple2<>(MISSING_BUCKET_KEYS, otherBucket)))
+                ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(MISSING_BUCKET_KEYS, otherBucket)))
                 : bucketStream;
     }
 
