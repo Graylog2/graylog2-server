@@ -28,13 +28,20 @@ const ConfigurationSummary = styled.div`
   word-break: break-all;
 `;
 
-const CollectorConfigurationModalContainer = (props) => {
+const CollectorConfigurationModalContainer = ({
+  collectors,
+  configurations,
+  selectedSidecarCollectorPairs,
+  onConfigurationSelectionChange,
+  show,
+  onCancel,
+}) => {
   const [nextAssignedConfigurations, setNextAssignedConfigurations] = useState([]);
   const [nextPartiallyAssignedConfigurations, setNextPartiallyAssignedConfigurations] = useState([]);
   const modalConfirm = useRef(null);
 
   const getSelectedLogCollector = () => {
-    return (lodash.uniq<any>(props.selectedSidecarCollectorPairs.map(({ collector }) => collector)))[0];
+    return (lodash.uniq<any>(selectedSidecarCollectorPairs.map(({ collector }) => collector)))[0];
   };
 
   const sortConfigurationNames = (configs) => {
@@ -45,14 +52,14 @@ const CollectorConfigurationModalContainer = (props) => {
   const getAssignedConfigurations = (_selectedSidecarCollectorPairs, selectedCollector) => {
     const assignments = _selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar).reduce((accumulator, sidecar) => accumulator.concat(sidecar.assignments), []);
 
-    const filteredAssignments = assignments.map((assignment) => props.configurations.find((configuration) => configuration.id === assignment.configuration_id))
+    const filteredAssignments = assignments.map((assignment) => configurations.find((configuration) => configuration.id === assignment.configuration_id))
       .filter((configuration) => selectedCollector?.id === configuration.collector_id);
 
     return sortConfigurationNames(filteredAssignments);
   };
 
   const getUnassignedConfigurations = (assignedConfigurations: string[], selectedCollector) => {
-    const filteredConfigs = props.configurations.filter((config) => !assignedConfigurations.includes(config.name) && (selectedCollector?.id === config.collector_id));
+    const filteredConfigs = configurations.filter((config) => !assignedConfigurations.includes(config.name) && (selectedCollector?.id === config.collector_id));
 
     return sortConfigurationNames(filteredConfigs);
   };
@@ -61,8 +68,8 @@ const CollectorConfigurationModalContainer = (props) => {
     const occurrences = lodash.countBy(_assignedConfigurations);
 
     return [
-      lodash.uniq<any>(_assignedConfigurations.filter((config) => occurrences[config] === props.selectedSidecarCollectorPairs.length)),
-      lodash.uniq<any>(_assignedConfigurations.filter((config) => occurrences[config] < props.selectedSidecarCollectorPairs.length)),
+      lodash.uniq<any>(_assignedConfigurations.filter((config) => occurrences[config] === selectedSidecarCollectorPairs.length)),
+      lodash.uniq<any>(_assignedConfigurations.filter((config) => occurrences[config] < selectedSidecarCollectorPairs.length)),
     ];
   };
 
@@ -73,23 +80,23 @@ const CollectorConfigurationModalContainer = (props) => {
   };
 
   const confirmConfigurationChange = (doneCallback: () => void) => {
-    const assignedConfigurationsToSave = props.configurations.filter((config) => nextAssignedConfigurations.includes(config.name));
+    const assignedConfigurationsToSave = configurations.filter((config) => nextAssignedConfigurations.includes(config.name));
 
-    props.selectedSidecarCollectorPairs.forEach((sidecarCollectorPair) => {
+    selectedSidecarCollectorPairs.forEach((sidecarCollectorPair) => {
       let configs = assignedConfigurationsToSave;
 
       if (nextPartiallyAssignedConfigurations.length) {
         const selectedLogCollector = getSelectedLogCollector();
         const assignments = getAssignedConfigurations([sidecarCollectorPair], selectedLogCollector);
         const assignmentsToKeep = lodash.intersection(assignments, nextPartiallyAssignedConfigurations);
-        const assignedConfigurationsToKeep = props.configurations.filter((config) => assignmentsToKeep.includes(config.name));
+        const assignedConfigurationsToKeep = configurations.filter((config) => assignmentsToKeep.includes(config.name));
         configs = [...assignedConfigurationsToSave, ...assignedConfigurationsToKeep];
       }
 
-      props.onConfigurationSelectionChange([sidecarCollectorPair], configs, doneCallback);
+      onConfigurationSelectionChange([sidecarCollectorPair], configs, doneCallback);
     });
 
-    props.onCancel();
+    onCancel();
   };
 
   const cancelConfigurationChange = () => {
@@ -97,19 +104,19 @@ const CollectorConfigurationModalContainer = (props) => {
   };
 
   const getConfiguration = (configName: string) => {
-    return props.configurations.find((config) => config.name === configName);
+    return configurations.find((config) => config.name === configName);
   };
 
   const getCollector = (configName: string) => {
     const configuration = getConfiguration(configName);
 
-    return props.collectors.find((collector) => collector.id === configuration.collector_id);
+    return collectors.find((collector) => collector.id === configuration.collector_id);
   };
 
   const getSidecars = (configName: string) => {
     const configuration = getConfiguration(configName);
 
-    return props.selectedSidecarCollectorPairs.filter(({ sidecar }) => sidecar.assignments.map((assignment) => assignment.configuration_id).includes(configuration.id)).map((assignment) => assignment.sidecar);
+    return selectedSidecarCollectorPairs.filter(({ sidecar }) => sidecar.assignments.map((assignment) => assignment.configuration_id).includes(configuration.id)).map((assignment) => assignment.sidecar);
   };
 
   const getAssignedFromTags = (configId: string, collectorId: string, sidecars) => {
@@ -132,9 +139,9 @@ const CollectorConfigurationModalContainer = (props) => {
   };
 
   const renderConfigurationSummary = () => {
-    const sidecarsSummary = props.selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name).join(', ');
-    const numberOfSidecarsSummary = `${props.selectedSidecarCollectorPairs.length} sidecars`;
-    const summary = props.selectedSidecarCollectorPairs.length <= 5 ? sidecarsSummary : numberOfSidecarsSummary;
+    const sidecarsSummary = selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name).join(', ');
+    const numberOfSidecarsSummary = `${selectedSidecarCollectorPairs.length} sidecars`;
+    const summary = selectedSidecarCollectorPairs.length <= 5 ? sidecarsSummary : numberOfSidecarsSummary;
 
     return (
       <BootstrapModalConfirm ref={modalConfirm}
@@ -151,18 +158,18 @@ const CollectorConfigurationModalContainer = (props) => {
   const MemoizedConfigurationModal = React.useMemo(() => {
     const renderConfigurationModal = () => {
       const selectedCollector = getSelectedLogCollector();
-      const assignedConfigurations = getAssignedConfigurations(props.selectedSidecarCollectorPairs, selectedCollector);
+      const assignedConfigurations = getAssignedConfigurations(selectedSidecarCollectorPairs, selectedCollector);
       const unassignedConfigurations = getUnassignedConfigurations(assignedConfigurations, selectedCollector);
       const [initialAssignedConfigs, initialPartiallyAssignedConfigs] = getFullyAndPartiallyAssignments(assignedConfigurations);
 
       return (
-        <CollectorConfigurationModal show={props.show}
+        <CollectorConfigurationModal show={show}
                                      selectedCollectorName={selectedCollector?.name || ''}
-                                     selectedSidecarNames={props.selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name)}
+                                     selectedSidecarNames={selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name)}
                                      initialAssignedConfigs={initialAssignedConfigs}
                                      initialPartiallyAssignedConfigs={initialPartiallyAssignedConfigs}
                                      unassignedConfigs={unassignedConfigurations}
-                                     onCancel={props.onCancel}
+                                     onCancel={onCancel}
                                      onSave={onSave}
                                      getRowData={getRowData} />
       );
@@ -170,7 +177,7 @@ const CollectorConfigurationModalContainer = (props) => {
 
     return renderConfigurationModal;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.show]);
+  }, [show]);
 
   return (
     <>
