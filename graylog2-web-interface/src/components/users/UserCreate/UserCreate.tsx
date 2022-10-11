@@ -27,10 +27,11 @@ import User from 'logic/users/User';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import PaginatedItem from 'components/common/PaginatedItemOverview/PaginatedItem';
 import RolesSelector from 'components/permissions/RolesSelector';
-import { Alert, Col, Row, Button, ButtonToolbar, Input } from 'components/bootstrap';
+import { Alert, Col, Row, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { UsersActions } from 'stores/users/UsersStore';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
+import { FormSubmit } from 'components/common';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
@@ -196,7 +197,7 @@ const UserCreate = () => {
                        labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9"
                        label="Assign Roles">
-                  <RolesSelector onSubmit={_onAssignRole} assignedRolesIds={user.roles} identifier={(role) => role.name} />
+                  <RolesSelector onSubmit={_onAssignRole} assignedRolesIds={user.roles} identifier={(role) => role.name} submitOnSelect />
                 </Input>
 
                 <Input id="selected-roles-overview"
@@ -229,15 +230,12 @@ const UserCreate = () => {
               )}
               <Row>
                 <Col md={9} mdOffset={3}>
-                  <ButtonToolbar>
-                    <Button bsStyle="success"
-                            disabled={isSubmitting || !isValid || !hasValidRole}
-                            title="Create User"
-                            type="submit">
-                      Create User
-                    </Button>
-                    <Button type="button" onClick={_handleCancel}>Cancel</Button>
-                  </ButtonToolbar>
+                  <FormSubmit disabledSubmit={!isValid || !hasValidRole}
+                              submitButtonText="Create user"
+                              submitLoadingText="Creating user..."
+                              isSubmitting={isSubmitting}
+                              isAsyncSubmit
+                              onCancel={_handleCancel} />
                 </Col>
               </Row>
             </Form>

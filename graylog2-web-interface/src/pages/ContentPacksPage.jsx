@@ -33,7 +33,6 @@ import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/Con
 const ConfigurationBundles = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.body};
   font-weight: normal;
-  line-height: 20px;
   margin-top: 15px;
 `);
 
@@ -83,7 +82,15 @@ const ContentPacksPage = createReactClass({
     return (
       <DocumentTitle title="Content Packs">
         <span>
-          <PageHeader title="Content Packs">
+          <PageHeader title="Content Packs"
+                      subactions={(
+                        <ButtonToolbar>
+                          <ContentPackUploadControls />
+                          <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.CREATE}>
+                            <Button bsStyle="success">Create a content pack</Button>
+                          </LinkContainer>
+                        </ButtonToolbar>
+                      )}>
             <span>
               Content Packs accelerate the set up process for a specific data source. A Content Pack can include inputs/extractors, streams, and dashboards.
             </span>
@@ -92,14 +99,7 @@ const ContentPacksPage = createReactClass({
               Find more Content Packs in {' '}
               <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
             </span>
-
-            <ButtonToolbar>
-              <ContentPackUploadControls />
-              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.CREATE}>
-                <Button bsStyle="success">Create a Content Pack</Button>
-              </LinkContainer>
-              <Button bsStyle="info" active>Content Packs</Button>
-            </ButtonToolbar>
+            <Button bsStyle="info" active>Content Packs</Button>
           </PageHeader>
 
           <Row className="content">

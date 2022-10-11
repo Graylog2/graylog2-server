@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import { Field, useFormikContext } from 'formik';
 import styled from 'styled-components';
+import { isFunction } from 'lodash';
 
 import { Input, Checkbox } from 'components/bootstrap';
 import Select from 'components/common/Select';
@@ -73,6 +74,13 @@ const VisualizationConfiguration = () => {
   const isTimelineChart = isTimeline(values);
   const supportsEventAnnotations = currentVisualizationType.capabilities?.includes('event-annotations') ?? false;
 
+  const configurationOptionFields = useMemo(() => {
+    const fields = currentVisualizationType.config?.fields;
+    if (!isFunction(fields)) return fields ?? [];
+
+    return fields({ formValues: values });
+  }, [currentVisualizationType.config?.fields, values]);
+
   return (
     <ElementConfigurationContainer elementTitle={VisualizationElement.title}>
       <Field name="visualization.type">
@@ -115,7 +123,7 @@ const VisualizationConfiguration = () => {
         </Field>
 
       )}
-      <VisualizationConfigurationOptions name="visualization.config" fields={currentVisualizationType.config?.fields ?? []} />
+      <VisualizationConfigurationOptions name="visualization.config" fields={configurationOptionFields} />
     </ElementConfigurationContainer>
   );
 };

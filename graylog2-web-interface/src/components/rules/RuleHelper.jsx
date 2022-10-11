@@ -22,6 +22,7 @@ import connect from 'stores/connect';
 import { Icon, PaginatedList, Spinner, SearchForm } from 'components/common';
 import { Row, Col, Panel, Table, Tabs, Tab } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import DocsHelper from 'util/DocsHelper';
 import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
 
@@ -36,26 +37,44 @@ then
   set_field("transaction_year", new_date.year);
 end`;
 
+const _niceType = (typeName) => {
+  return typeName.replace(/^.*\.(.*?)$/, '$1');
+};
+
+const _functionSignature = (descriptor) => {
+  const args = descriptor.params.map((p) => (p.optional ? `[${p.name}]` : p.name));
+
+  return `${descriptor.name}(${args.join(', ')}) : ${_niceType(descriptor.return_type)}`;
+};
+
+const _parameters = (descriptor) => {
+  return descriptor.params.map((p) => {
+    return (
+      <tr key={p.name}>
+        <td className={RuleHelperStyle.adjustedTableCellWidth}>{p.name}</td>
+        <td className={RuleHelperStyle.adjustedTableCellWidth}>{_niceType(p.type)}</td>
+        <td className={`${RuleHelperStyle.adjustedTableCellWidth} text-centered`}>{p.optional ? null : <Icon name="check" />}</td>
+        <td>{p.description}</td>
+      </tr>
+    );
+  });
+};
+
 class RuleHelper extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       expanded: {},
-      currentPage: 1,
+      currentPage: props.paginationQueryParameter.page,
       pageSize: 10,
       filteredDescriptors: undefined,
-      pageBeforeFilter: undefined,
     };
   }
 
   componentDidMount() {
     RulesActions.loadFunctions();
   }
-
-  _niceType = (typeName) => {
-    return typeName.replace(/^.*\.(.*?)$/, '$1');
-  };
 
   _toggleFunctionDetail = (functionName) => {
     const { expanded } = this.state;
@@ -64,25 +83,6 @@ class RuleHelper extends React.Component {
     newState[functionName] = !newState[functionName];
 
     this.setState({ expanded: newState });
-  };
-
-  _functionSignature = (descriptor) => {
-    const args = descriptor.params.map((p) => (p.optional ? `[${p.name}]` : p.name));
-
-    return `${descriptor.name}(${args.join(', ')}) : ${this._niceType(descriptor.return_type)}`;
-  };
-
-  _parameters = (descriptor) => {
-    return descriptor.params.map((p) => {
-      return (
-        <tr key={p.name}>
-          <td className={RuleHelperStyle.adjustedTableCellWidth}>{p.name}</td>
-          <td className={RuleHelperStyle.adjustedTableCellWidth}>{this._niceType(p.type)}</td>
-          <td className={`${RuleHelperStyle.adjustedTableCellWidth} text-centered`}>{p.optional ? null : <Icon name="check" />}</td>
-          <td>{p.description}</td>
-        </tr>
-      );
-    });
   };
 
   _renderFunctions = (descriptors) => {
@@ -109,7 +109,7 @@ class RuleHelper extends React.Component {
                   </tr>
                 </thead>
                 <tbody>
-                  {this._parameters(d)}
+                  {_parameters(d)}
                 </tbody>
               </Table>
             </td>
@@ -120,7 +120,7 @@ class RuleHelper extends React.Component {
       return (
         <tbody key={d.name}>
           <tr onClick={() => this._toggleFunctionDetail(d.name)} className={RuleHelperStyle.clickableRow}>
-            <td className={RuleHelperStyle.functionTableCell}><code>{this._functionSignature(d)}</code></td>
+            <td className={RuleHelperStyle.functionTableCell}><code>{_functionSignature(d)}</code></td>
             <td>{d.description}</td>
           </tr>
           {details}
@@ -134,8 +134,9 @@ class RuleHelper extends React.Component {
   };
 
   _filterDescriptors = (filter) => {
-    const { currentPage, pageBeforeFilter } = this.state;
-    const { functionDescriptors } = this.props;
+    const { functionDescriptors, paginationQueryParameter } = this.props;
+
+    paginationQueryParameter.resetPage();
 
     if (!functionDescriptors) {
       return;
@@ -144,8 +145,7 @@ class RuleHelper extends React.Component {
     if (filter.length <= 0) {
       this.setState({
         filteredDescriptors: functionDescriptors,
-        currentPage: pageBeforeFilter || 1,
-        pageBeforeFilter: undefined,
+        currentPage: 1,
       });
 
       return;
@@ -154,24 +154,23 @@ class RuleHelper extends React.Component {
     const filteredDescriptiors = functionDescriptors.filter((descriptor) => {
       const regexp = RegExp(filter);
 
-      return regexp.test(this._functionSignature(descriptor)) || regexp.test(descriptor.description);
+      return regexp.test(_functionSignature(descriptor)) || regexp.test(descriptor.description);
     });
 
     this.setState({
       filteredDescriptors: filteredDescriptiors,
-      pageBeforeFilter: this.pageBeforeFilter || currentPage,
       currentPage: 1,
     });
   };
 
   _onFilterReset = () => {
-    const { pageBeforeFilter } = this.state;
-    const { functionDescriptors } = this.props;
+    const { functionDescriptors, paginationQueryParameter } = this.props;
+
+    paginationQueryParameter.resetPage();
 
     this.setState({
       filteredDescriptors: functionDescriptors,
-      currentPage: pageBeforeFilter || 1,
-      pageBeforeFilter: undefined,
+      currentPage: 1,
     });
   };
 
@@ -220,7 +219,6 @@ class RuleHelper extends React.Component {
                       <PaginatedList totalItems={ruleDescriptors.length}
                                      pageSize={pageSize}
                                      onChange={this._onPageChange}
-                                     activePage={currentPage}
                                      showPageSizeSelect={false}>
                         <Table condensed>
                           <thead>
@@ -254,12 +252,13 @@ class RuleHelper extends React.Component {
 
 RuleHelper.propTypes = {
   functionDescriptors: PropTypes.array,
+  paginationQueryParameter: PropTypes.object.isRequired,
 };
 
 RuleHelper.defaultProps = {
   functionDescriptors: undefined,
 };
 
-export default connect(RuleHelper,
+export default connect(withPaginationQueryParameter(RuleHelper),
   { ruleStore: RulesStore },
   ({ ruleStore }) => ({ ...ruleStore }));

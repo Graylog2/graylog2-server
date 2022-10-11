@@ -80,7 +80,7 @@ describe('<Scratchpad />', () => {
 
     fireEvent.click(btnClose);
 
-    expect(setScratchpadVisibility).toBeCalledWith(false);
+    expect(setScratchpadVisibility).toHaveBeenCalledWith(false);
   });
 
   it('changes textarea & shows auto saved message', async () => {

@@ -2,7 +2,7 @@
 
 exports[`<Pagination /> should display Pagination 1`] = `
 .c0.pagination {
-  font-size: 0.889rem;
+  font-size: 0.878rem;
   margin-top: 10px;
   margin-bottom: 0;
 }
@@ -11,16 +11,16 @@ exports[`<Pagination /> should display Pagination 1`] = `
 .c0.pagination > li > span {
   color: rgb(81,81,81);
   background-color: #fff;
-  border-color: #a6a6a6;
+  border-color: #b5bfcd;
 }
 
 .c0.pagination > li > a:hover,
 .c0.pagination > li > span:hover,
 .c0.pagination > li > a:focus,
 .c0.pagination > li > span:focus {
-  color: rgb(47,47,47);
-  background-color: #d0d0d0;
-  border-color: #a6a6a6;
+  color: rgb(48,49,51);
+  background-color: #d7dce4;
+  border-color: #b5bfcd;
 }
 
 .c0.pagination > li.active > a,
@@ -29,9 +29,9 @@ exports[`<Pagination /> should display Pagination 1`] = `
 .c0.pagination > li.active > span:hover,
 .c0.pagination > li.active > a:focus,
 .c0.pagination > li.active > span:focus {
-  color: rgb(76,77,78);
-  background-color: #eff2f8;
-  border-color: #bdc8e4;
+  color: rgb(76,77,79);
+  background-color: #f1f4f9;
+  border-color: #c6d3e9;
   z-index: 1;
 }
 
@@ -41,9 +41,9 @@ exports[`<Pagination /> should display Pagination 1`] = `
 .c0.pagination > li.disabled > span,
 .c0.pagination > li.disabled > span:hover,
 .c0.pagination > li.disabled > span:focus {
-  color: #a6a6a6;
+  color: #b5bfcd;
   background-color: #fff;
-  border-color: #d0d0d0;
+  border-color: #d7dce4;
 }
 
 <ul

@@ -92,12 +92,6 @@ class DecoratorSummary extends React.Component<Props, State> {
     this._closeEditForm();
   };
 
-  _decoratorTypeNotPresent = () => {
-    return {
-      name: 'Unknown decorator type',
-    };
-  };
-
   // Attempts to resolve ID values in the decorator configuration against the type definition.
   // This allows users to see actual names for entities in drop-downs, instead of their IDs.
   _resolveConfigurationIds = (config) => {
@@ -136,7 +130,7 @@ class DecoratorSummary extends React.Component<Props, State> {
     const { disableMenu = false, decorator, decoratorTypes, typeDefinition } = this.props;
     const { editing } = this.state;
     const config = this._resolveConfigurationIds(decorator.config);
-    const decoratorType = decoratorTypes[decorator.type] || this._decoratorTypeNotPresent();
+    const decoratorType = decoratorTypes[decorator.type] || { name: 'Unknown decorator type' };
 
     const decoratorActionsMenu = disableMenu || this._formatActionsMenu();
     const { name, requested_configuration: requestedConfiguration } = typeDefinition;
@@ -165,7 +159,7 @@ class DecoratorSummary extends React.Component<Props, State> {
     return (
       <span className={DecoratorStyles.fixedWidth}>
         <div className={DecoratorStyles.decoratorBox}>
-          <h6 className={DecoratorStyles.decoratorType}>{decoratorType.name}</h6>
+          <h6>{decoratorType.name}</h6>
           {decoratorActionsMenu}
         </div>
         {content}

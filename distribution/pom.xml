@@ -23,7 +23,7 @@
     <parent>
         <artifactId>graylog-parent</artifactId>
         <groupId>org.graylog</groupId>
-        <version>4.4.0-SNAPSHOT</version>
+        <version>5.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -75,12 +75,12 @@
     <dependencies>
         <dependency>
             <groupId>org.graylog</groupId>
-            <artifactId>graylog-storage-elasticsearch6</artifactId>
+            <artifactId>graylog-storage-elasticsearch7</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.graylog</groupId>
-            <artifactId>graylog-storage-elasticsearch7</artifactId>
+            <artifactId>graylog-storage-opensearch2</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

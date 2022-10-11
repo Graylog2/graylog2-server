@@ -35,7 +35,7 @@ const StreamMetaData = ({ isDefaultStream, stream, streamRuleTypes, permissions 
   const toggleText = expanded ? 'Hide' : 'Show';
 
   if (stream.is_default) {
-    return 'The default stream contains all messages.';
+    return 'The default stream cannot have rules.';
   }
 
   if (stream.rules.length === 0) {
@@ -43,9 +43,12 @@ const StreamMetaData = ({ isDefaultStream, stream, streamRuleTypes, permissions 
   }
 
   switch (stream.matching_type) {
-    case 'OR': verbalMatchingType = 'at least one'; break;
+    case 'OR':
+      verbalMatchingType = 'at least one';
+      break;
+    case 'AND':
     default:
-    case 'AND': verbalMatchingType = 'all'; break;
+      verbalMatchingType = 'all';
   }
 
   const _onHandleToggle = () => {

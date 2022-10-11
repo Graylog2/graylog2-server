@@ -27,17 +27,6 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
   box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
   margin-bottom: 0;
 
-  .navbar-brand {
-    color: ${theme.colors.variant.default};
-    padding: 12px 15px 0 15px;
-
-    &:hover,
-    &:focus {
-      color: ${theme.colors.variant.dark.default};
-      background-color: transparent;
-    }
-  }
-
   .navbar-text {
     color: ${theme.colors.global.textDefault};
   }
@@ -67,10 +56,13 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       color: ${theme.colors.variant.darkest.default};
       background-color: ${theme.colors.gray[90]};
       
-      &:hover,
-      &:focus {
+      &:hover {
         color: ${theme.colors.variant.darkest.default};
         background-color: ${theme.colors.gray[80]};
+      }
+
+      &:focus {
+        background-color: ${theme.colors.gray[90]};
       }
     }
 

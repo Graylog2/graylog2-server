@@ -24,17 +24,20 @@ import { booleanField } from 'fixtures/configurationforms';
 import BooleanField from './BooleanField';
 
 describe('<BooleanField>', () => {
+  const SUT = (props: Partial<React.ComponentProps<typeof BooleanField>>) => (
+    <BooleanField field={booleanField}
+                  onChange={() => {}}
+                  title="example_boolean_field"
+                  typeName="boolean"
+                  {...props} />
+  );
+
   afterEach(() => {
     jest.resetAllMocks();
   });
 
   it('should render an unchecked field by default', () => {
-    const { container } = render(
-      <BooleanField field={booleanField}
-                    onChange={() => {}}
-                    title="example_boolean_field"
-                    typeName="boolean" />,
-    );
+    render(<SUT />);
 
     const fieldLabel = screen.getByText(booleanField.human_name, { exact: false });
     const optionalMarker = screen.queryByText(/(optional)/);
@@ -44,36 +47,20 @@ describe('<BooleanField>', () => {
     expect(optionalMarker).not.toBeInTheDocument();
     expect(input).toBeInTheDocument();
     expect(input).not.toBeChecked();
-
-    expect(container).toMatchSnapshot();
   });
 
   it('should render a checked field', () => {
-    const { container } = render(
-      <BooleanField field={booleanField}
-                    onChange={() => {}}
-                    title="example_boolean_field"
-                    typeName="boolean"
-                    value />,
-    );
+    render(<SUT value />);
 
     const input = screen.getByLabelText(booleanField.human_name, { exact: false });
 
     expect(input).toBeInTheDocument();
     expect(input).toBeChecked();
-
-    expect(container).toMatchSnapshot();
   });
 
   it('should call onChange when input value changes', async () => {
     const changeFunction = jest.fn();
-
-    const { rerender } = render(
-      <BooleanField field={booleanField}
-                    onChange={changeFunction}
-                    title="example_boolean_field"
-                    typeName="boolean" />,
-    );
+    const { rerender } = render(<SUT onChange={changeFunction} />);
 
     const input = screen.getByLabelText(booleanField.human_name, { exact: false });
 
@@ -84,13 +71,7 @@ describe('<BooleanField>', () => {
 
     await waitFor(() => expect(changeFunction).toHaveBeenCalledWith('example_boolean_field', true));
 
-    rerender(
-      <BooleanField field={booleanField}
-                    onChange={changeFunction}
-                    title="example_boolean_field"
-                    typeName="boolean"
-                    value />,
-    );
+    rerender(<SUT onChange={changeFunction} value />);
 
     expect(input).toBeChecked();
 

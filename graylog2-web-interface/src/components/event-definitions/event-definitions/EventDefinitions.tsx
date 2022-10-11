@@ -69,6 +69,8 @@ type Props = {
   onDisable: (eventDefinition: EventDefinition) => void,
 };
 
+export const PAGE_SIZES = [10, 25, 50];
+
 const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPageChange, onQueryChange, onDelete, onCopy, onEnable, onDisable }: Props) => {
   if (pagination.grandTotal === 0) {
     return <EmptyContent />;
@@ -95,17 +97,9 @@ const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPage
                     queryHelpComponent={<QueryHelper entityName="event definition" />}
                     queryWidth={200}
                     topMargin={0}
-                    useLoadingState>
-          <IfPermitted permissions="eventdefinitions:create">
-            <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
-              <Button bsStyle="success" className={styles.createButton}>Create Event Definition</Button>
-            </LinkContainer>
-          </IfPermitted>
-        </SearchForm>
+                    useLoadingState />
 
-        <PaginatedList activePage={pagination.page}
-                       pageSize={pagination.pageSize}
-                       pageSizes={[10, 25, 50]}
+        <PaginatedList pageSizes={PAGE_SIZES}
                        totalItems={pagination.total}
                        onChange={onPageChange}>
           <div className={styles.definitionList}>

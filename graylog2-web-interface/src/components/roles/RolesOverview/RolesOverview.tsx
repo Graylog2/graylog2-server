@@ -24,16 +24,12 @@ import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 import RolesOverviewItem from './RolesOverviewItem';
 import RolesFilter from './RolesFilter';
 
 const TABLE_HEADERS = ['Name', 'Description', 'Users', 'Actions'];
-const DEFAULT_PAGINATION = {
-  page: 1,
-  perPage: 10,
-  query: '',
-};
 
 const Container = styled.div`
   .data-table {
@@ -76,7 +72,10 @@ const _loadRoles = (pagination, setLoading, setPaginatedRoles) => {
   });
 };
 
-const _updateListOnRoleDelete = (perPage, query, setPagination) => AuthzRolesActions.delete.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
+const _updateListOnRoleDelete = (pagination, setLoading, setPaginatedRoles, callback: () => void) => AuthzRolesActions.delete.completed.listen(() => {
+  _loadRoles(pagination, setLoading, setPaginatedRoles);
+  callback();
+});
 
 const getUseTeamMembersHook = () => {
   const defaultHook = () => ({ loading: false, users: [] });
@@ -86,16 +85,21 @@ const getUseTeamMembersHook = () => {
 };
 
 const RolesOverview = () => {
+  const { page, pageSize: perPage, resetPage } = usePaginationQueryParameter();
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined | null>();
   const [loading, setLoading] = useState(false);
-  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
+  const [query, setQuery] = useState('');
   const { list: roles } = paginatedRoles || {};
-  const { page, perPage, query } = pagination;
   const useTeamMembersByRole = getUseTeamMembersHook();
   const teamMembersByRole = useTeamMembersByRole();
 
-  useEffect(() => _loadRoles(pagination, setLoading, setPaginatedRoles), [pagination]);
-  useEffect(() => _updateListOnRoleDelete(perPage, query, setPagination), [perPage, query]);
+  useEffect(() => _loadRoles({ page, perPage, query }, setLoading, setPaginatedRoles), [page, perPage, query]);
+  useEffect(() => _updateListOnRoleDelete({ page, perPage, query }, setLoading, setPaginatedRoles, resetPage), [page, perPage, query, resetPage]);
+
+  const handleSearch = (newQuery) => {
+    resetPage();
+    setQuery(newQuery);
+  };
 
   const _rolesOverviewItem = useCallback((role) => {
     const { id: roleId } = role;
@@ -111,7 +115,7 @@ const RolesOverview = () => {
     return <Spinner />;
   }
 
-  const searchFilter = <RolesFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />;
+  const searchFilter = <RolesFilter onSearch={handleSearch} />;
 
   return (
     <Container>
@@ -124,9 +128,7 @@ const RolesOverview = () => {
           <p className="description">
             Found {paginatedRoles.pagination.total} roles on the system.
           </p>
-          <StyledPaginatedList activePage={page}
-                               totalItems={paginatedRoles.pagination.total}
-                               onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}>
+          <StyledPaginatedList totalItems={paginatedRoles.pagination.total}>
             <DataTable id="roles-overview"
                        className="table-hover"
                        rowClassName="no-bm"

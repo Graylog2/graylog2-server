@@ -25,13 +25,12 @@ import MessageFieldRow from 'views/components/messagelist/MessageFieldRow';
 
 const TableRow = styled.tr(({ theme }) => css`
   && {
-    margin-bottom: 5px;
     cursor: pointer;
   
     td {
       border-top: 0;
       padding-top: 0;
-      padding-bottom: 5px;
+      padding-bottom: 4px;
       font-family: ${theme.fonts.family.monospace};
       color: ${theme.colors.variant.dark.info};
     }

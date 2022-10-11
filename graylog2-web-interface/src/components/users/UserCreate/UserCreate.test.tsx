@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import { act } from 'react-dom/test-utils';
 import userEvent from '@testing-library/user-event';
@@ -65,6 +65,8 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
 const extendedTimeout = applyTimeoutMultiplier(15000);
 
 describe('<UserCreate />', () => {
+  const findSubmitButton = () => screen.findByRole('button', { name: /create user/i });
+
   it('should create user', async () => {
     const { findByLabelText, findByPlaceholderText, findByText } = render(<UserCreate />);
 
@@ -75,9 +77,10 @@ describe('<UserCreate />', () => {
     const timeoutAmountInput = await findByPlaceholderText('Timeout amount');
     // const timeoutUnitSelect = getByTestId('Timeout unit');
     const timezoneSelect = await findByLabelText('Time Zone');
+    const roleSelect = await findByText(/search for roles/i);
     const passwordInput = await findByPlaceholderText('Password');
     const passwordRepeatInput = await findByPlaceholderText('Repeat password');
-    const submitButton = await findByText('Create User');
+    const submitButton = await findSubmitButton();
 
     fireEvent.change(usernameInput, { target: { value: 'The username' } });
     fireEvent.change(firstNameInput, { target: { value: 'The first name' } });
@@ -88,6 +91,8 @@ describe('<UserCreate />', () => {
     // await act(async () => { await selectEvent.select(timeoutUnitSelect, 'Seconds'); });
     await selectEvent.openMenu(timezoneSelect);
     await act(async () => { await selectEvent.select(timezoneSelect, 'Berlin'); });
+    await selectEvent.openMenu(roleSelect);
+    await act(async () => { await selectEvent.select(roleSelect, 'Manager'); });
     fireEvent.change(passwordInput, { target: { value: 'thepassword' } });
     fireEvent.change(passwordRepeatInput, { target: { value: 'thepassword' } });
 
@@ -98,7 +103,7 @@ describe('<UserCreate />', () => {
       first_name: 'The first name',
       last_name: 'The last name',
       timezone: 'Europe/Berlin',
-      roles: ['Reader'],
+      roles: ['Reader', 'Manager'],
       email: 'username@example.org',
       permissions: [],
       session_timeout_ms: 144000000,
@@ -107,7 +112,7 @@ describe('<UserCreate />', () => {
   }, extendedTimeout);
 
   it('should trim the username', async () => {
-    const { findByLabelText, findByPlaceholderText, findByText } = render(<UserCreate />);
+    const { findByLabelText, findByPlaceholderText } = render(<UserCreate />);
 
     const usernameInput = await findByLabelText('Username');
     const firstNameInput = await findByLabelText('First Name');
@@ -115,7 +120,7 @@ describe('<UserCreate />', () => {
     const emailInput = await findByLabelText('E-Mail Address');
     const passwordInput = await findByPlaceholderText('Password');
     const passwordRepeatInput = await findByPlaceholderText('Repeat password');
-    const submitButton = await findByText('Create User');
+    const submitButton = await findSubmitButton();
 
     fireEvent.change(usernameInput, { target: { value: '   username   ' } });
     fireEvent.change(firstNameInput, { target: { value: 'The first name' } });

@@ -18,9 +18,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import $ from 'jquery';
 
+import ModalSubmit from 'components/common/ModalSubmit';
+
 import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
-import Button from './Button';
 
 /**
  * Encapsulates a form element inside a bootstrap modal, hiding some custom logic that this kind of component
@@ -43,8 +44,6 @@ class BootstrapModalForm extends React.Component {
     onCancel: PropTypes.func,
     /* Object with additional props to pass to the form */
     formProps: PropTypes.object,
-    /* Text to use in the cancel button. "Cancel" is the default */
-    cancelButtonText: PropTypes.string,
     /* Text to use in the submit button. "Submit" is the default */
     submitButtonText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     submitButtonDisabled: PropTypes.bool,
@@ -54,7 +53,6 @@ class BootstrapModalForm extends React.Component {
   static defaultProps = {
     backdrop: undefined,
     formProps: {},
-    cancelButtonText: 'Cancel',
     submitButtonText: 'Submit',
     submitButtonDisabled: false,
     onModalOpen: () => {},
@@ -104,7 +102,6 @@ class BootstrapModalForm extends React.Component {
       formProps,
       bsSize,
       onModalClose,
-      cancelButtonText,
       show,
       submitButtonText,
       onModalOpen,
@@ -136,8 +133,9 @@ class BootstrapModalForm extends React.Component {
             {body}
           </Modal.Body>
           <Modal.Footer>
-            <Button type="button" onClick={this.onModalCancel}>{cancelButtonText}</Button>
-            <Button type="submit" disabled={submitButtonDisabled} bsStyle="primary">{submitButtonText}</Button>
+            <ModalSubmit disabledSubmit={submitButtonDisabled}
+                         onCancel={this.onModalCancel}
+                         submitButtonText={submitButtonText} />
           </Modal.Footer>
         </form>
       </BootstrapModalWrapper>

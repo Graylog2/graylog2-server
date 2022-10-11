@@ -21,8 +21,9 @@ import * as Immutable from 'immutable';
 import type { Subtract } from 'utility-types';
 
 import { getValueFromInput } from 'util/FormsUtils';
-import { Select } from 'components/common';
-import { Col, Row, Button, Input } from 'components/bootstrap';
+import { Select, FormSubmit } from 'components/common';
+import { Col, Row, Input } from 'components/bootstrap';
+import history from 'util/History';
 import { BooleanField, DropdownField, NumberField, TextField } from 'components/configurationforms';
 import connect from 'stores/connect';
 import type { Message } from 'views/components/messagelist/Types';
@@ -336,9 +337,12 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
             </Input>
             {codecConfigurationOptions}
           </fieldset>
-          <Button type="submit" bsStyle="info" disabled={_isSubmitDisabled}>
-            {loading ? 'Loading message...' : 'Load message'}
-          </Button>
+          <FormSubmit submitButtonText="Load message"
+                      submitLoadingText="Loading message..."
+                      isSubmitting={loading}
+                      isAsyncSubmit
+                      disabledSubmit={_isSubmitDisabled}
+                      onCancel={() => history.goBack()} />
         </form>
       </Col>
     </Row>

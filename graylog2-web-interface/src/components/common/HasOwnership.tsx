@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import { createGRN } from 'logic/permissions/GRN';
 import useCurrentUser from 'hooks/useCurrentUser';
 
-type ChildFun = ({ disabled: boolean }) => React.ReactElement;
+type ChildFun = (props: { disabled: boolean }) => React.ReactElement;
 
 type Props = {
   children: React.ReactNode | ChildFun,

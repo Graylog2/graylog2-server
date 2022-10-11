@@ -78,7 +78,7 @@ describe('WidgetFocusProvider', () => {
 
     contextValue.setWidgetFocusing('widget-id');
 
-    expect(mockHistoryReplace).toBeCalledWith('?focusedId=widget-id&focusing=true');
+    expect(mockHistoryReplace).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true');
   });
 
   it('should update url on widget focus close', () => {
@@ -97,7 +97,7 @@ describe('WidgetFocusProvider', () => {
 
     contextValue.unsetWidgetFocusing();
 
-    expect(mockHistoryReplace).toBeCalledWith('');
+    expect(mockHistoryReplace).toHaveBeenCalledWith('');
   });
 
   it('should set widget focus based on url', () => {
@@ -128,7 +128,7 @@ describe('WidgetFocusProvider', () => {
 
     contextValue.setWidgetEditing('widget-id');
 
-    expect(mockHistoryReplace).toBeCalledWith('?focusedId=widget-id&editing=true');
+    expect(mockHistoryReplace).toHaveBeenCalledWith('?focusedId=widget-id&editing=true');
   });
 
   it('should update url on widget edit close', () => {
@@ -147,7 +147,7 @@ describe('WidgetFocusProvider', () => {
 
     contextValue.unsetWidgetEditing();
 
-    expect(mockHistoryReplace).toBeCalledWith('');
+    expect(mockHistoryReplace).toHaveBeenCalledWith('');
   });
 
   it('should set widget edit and focused based on url', () => {
@@ -183,11 +183,11 @@ describe('WidgetFocusProvider', () => {
 
     contextValue.setWidgetEditing('widget-id');
 
-    expect(mockHistoryReplace).toBeCalledWith('?focusedId=widget-id&focusing=true&editing=true');
+    expect(mockHistoryReplace).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true&editing=true');
 
     contextValue.unsetWidgetEditing();
 
-    expect(mockHistoryReplace).toBeCalledWith('?focusedId=widget-id&focusing=true');
+    expect(mockHistoryReplace).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true');
   });
 
   it('should not set focused widget from url and cleanup url if the widget does not exist', () => {
@@ -208,7 +208,7 @@ describe('WidgetFocusProvider', () => {
 
     expect(contextValue.focusedWidget).toBe(undefined);
 
-    expect(mockHistoryReplace).toBeCalledWith('');
+    expect(mockHistoryReplace).toHaveBeenCalledWith('');
   });
 
   it('should not trigger search execution when no focus mode was requested', async () => {

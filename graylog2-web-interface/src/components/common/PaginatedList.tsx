@@ -16,9 +16,9 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useState, useEffect } from 'react';
 
 import IfInteractive from 'views/components/dashboard/IfInteractive';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 import Pagination from './Pagination';
 import PageSizeSelect from './PageSizeSelect';
@@ -32,11 +32,12 @@ type Props = {
   className?: string,
   hideFirstAndLastPageLinks?: boolean
   hidePreviousAndNextPageLinks?: boolean
-  onChange: (currentPage: number, pageSize: number) => void,
-  pageSize?: number,
+  onChange?: (currentPage: number, pageSize: number) => void,
   pageSizes?: Array<number>,
+  pageSize?: number,
   showPageSizeSelect?: boolean,
   totalItems: number,
+  useQueryParameter?: boolean,
 };
 
 /**
@@ -52,38 +53,39 @@ const PaginatedList = ({
   hideFirstAndLastPageLinks,
   hidePreviousAndNextPageLinks,
   onChange,
-  pageSize: propsPageSize,
+  pageSize: propPageSize,
   pageSizes,
   showPageSizeSelect,
   totalItems,
+  useQueryParameter,
 }: Props) => {
-  const initialPage = activePage > 0 ? activePage : INITIAL_PAGE;
-  const [pageSize, setPageSize] = useState(propsPageSize);
-  const [currentPage, setCurrentPage] = useState(initialPage);
+  const { page, setPage, pageSize: queryParamPageSize, setPageSize } = usePaginationQueryParameter(pageSizes);
+  const currentPage = useQueryParameter ? page : Math.max(activePage, INITIAL_PAGE);
+  const pageSize = (useQueryParameter && showPageSizeSelect) ? queryParamPageSize : propPageSize;
+
   const numberPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 0;
-
-  useEffect(() => {
-    if (activePage > 0) {
-      setCurrentPage(activePage);
-    }
-  }, [activePage]);
-
-  useEffect(() => {
-    setPageSize(propsPageSize);
-  }, [propsPageSize]);
 
   const _onChangePageSize = (event: React.ChangeEvent<HTMLOptionElement>) => {
     event.preventDefault();
     const newPageSize = Number(event.target.value);
 
-    setCurrentPage(INITIAL_PAGE);
-    setPageSize(newPageSize);
-    onChange(INITIAL_PAGE, newPageSize);
+    if (useQueryParameter) {
+      setPageSize(newPageSize);
+    }
+
+    if (onChange) {
+      onChange(INITIAL_PAGE, newPageSize);
+    }
   };
 
   const _onChangePage = (pageNum: number) => {
-    setCurrentPage(pageNum);
-    onChange(pageNum, pageSize);
+    if (useQueryParameter) {
+      setPage(pageNum);
+    }
+
+    if (onChange) {
+      onChange(pageNum, pageSize);
+    }
   };
 
   return (
@@ -116,29 +118,33 @@ PaginatedList.propTypes = {
    * Function that will be called when the page changes.
    * It receives the current page and the page size as arguments.
    */
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
   /** boolean flag to hide first and last page links */
   hideFirstAndLastPageLinks: PropTypes.bool,
   /**  boolean flag to hide previous and next page links */
   hidePreviousAndNextPageLinks: PropTypes.bool,
-  /** Number of items per page. */
-  pageSize: PropTypes.number,
   /** Array of different items per page that are allowed. */
   pageSizes: PropTypes.arrayOf(PropTypes.number),
+  /** Number of items per page. */
+  pageSize: PropTypes.number,
   /** Whether to show the page size selector or not. */
   showPageSizeSelect: PropTypes.bool,
   /** Total amount of items in all pages. */
   totalItems: PropTypes.number.isRequired,
+  /** boolean flag that enables saving and using page and pageSize from query parameters. Enabled by default. */
+  useQueryParameter: PropTypes.bool,
 };
 
 PaginatedList.defaultProps = {
-  activePage: 0,
+  activePage: 1,
   className: undefined,
   hideFirstAndLastPageLinks: false,
   hidePreviousAndNextPageLinks: false,
-  pageSize: DEFAULT_PAGE_SIZES[0],
   pageSizes: DEFAULT_PAGE_SIZES,
+  pageSize: DEFAULT_PAGE_SIZES[0],
   showPageSizeSelect: true,
+  onChange: undefined,
+  useQueryParameter: true,
 };
 
 export default PaginatedList;

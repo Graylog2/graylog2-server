@@ -1,11 +1,14 @@
-Upgrading to Graylog 4.4.x
+Upgrading to Graylog 5.0.x
 ==========================
 
 :::(Warning) Warning
-Please make sure to create a MongoDB database backup before starting the upgrade to Graylog 4.4!
+Please make sure to create a MongoDB database backup before starting the upgrade to Graylog 5.0!
 :::
 
 ## Breaking Changes
+
+* Graylog 5 is Java 17 only. We no longer support earlier versions starting with 5.0
+* Support for Elasticsearch 6.X has been removed! Please use either Elasticsearch 7.10.2 or, preferably, latest OpenSearch.
 
 ## Disallowing embedding the frontend by default
 
@@ -31,7 +34,7 @@ Existing setups keep the former default order for backwards compatibility.
 
 ## API Endpoint Deprecations
 
-The following API endpoints are deprecated beginning with 4.4.
+The following API endpoints are deprecated beginning with 5.0.
 
 | Endpoint                                    | Description                 |
 | ------------------------------------------- | --------------------------- |
@@ -39,11 +42,34 @@ The following API endpoints are deprecated beginning with 4.4.
 
 ## API Endpoint Removals
 
-The following API endpoints have been removed in 4.4.
+The following API endpoints have been removed in 5.0.
+
+### Legacy Alert API
+5.0 eliminates all of the previously deprecated legacy alert APIs. 
+Content packs that include legacy alerts can still be installed, but the alerts will be silently ignored.
+
+| Endpoint                                                        | Description                         |
+|-----------------------------------------------------------------|-------------------------------------|
+| `GET /alerts/conditions`                                        | Removed deprecated legacy alert API |
+| `GET /alerts/conditions/types`                                  | Removed deprecated legacy alert API |
+| `GET /streams/{streamId}/alerts/conditions`                     | Removed deprecated legacy alert API |
+| `POST /streams/{streamId}/alerts/conditions`                    | Removed deprecated legacy alert API |
+| `GET /streams/{streamId}/alerts/conditions/{conditionId}`       | Removed deprecated legacy alert API |    
+| `PUT /streams/{streamId}/alerts/conditions/{conditionId}`       | Removed deprecated legacy alert API |    
+| `DELETE /streams/{streamId}/alerts/conditions/{conditionId}`    | Removed deprecated legacy alert API |    
+| `POST /streams/{streamId}/alerts/conditions/test`               | Removed deprecated legacy alert API |    
+| `POST /streams/{streamId}/alerts/conditions/{conditionId}/test` | Removed deprecated legacy alert API |    
+| `GET /streams/{streamId}/alerts`                                | Removed deprecated legacy alert API |
+| `GET /streams/{streamId}/alerts/paginated`                      | Removed deprecated legacy alert API |
+| `GET /streams/{streamId}/alerts/check`                          | Removed deprecated legacy alert API |
+| `POST /streams/{streamId}/alerts/receivers`                     | Removed deprecated legacy alert API |
+| `DELETE /streams/{streamId}/alerts/receivers`                   | Removed deprecated legacy alert API |
+| `POST /streams/{streamId}/alerts/sendDummyAlert`                | Removed deprecated legacy alert API |
+
 
 | Endpoint                                    | Description                 |
 | ------------------------------------------- | --------------------------- |
-| `PUT /example/placeholder`                  | TODO placeholder comment    |
+| `GET /system/metrics/{metricName}/history`  | Remove unused and dysfunctional endpoint. (part of [#2443](https://github.com/Graylog2/graylog2-server/pull/2443)) |
 
 
 ## API Endpoint Changes
@@ -54,7 +80,7 @@ The following API endpoints have been removed in 4.4.
 
 ## Java Code API Deprecations
 
-The following Java Code API deprecations have been made in 4.4.
+The following Java Code API deprecations have been made in 5.0.
 
 - The `org.graylog2.plugin.PluginModule.addNotificationType(name, notificationClass, handlerClass, factoryClass)`
   method has been deprecated in favor of a new/preferred version, which also properly registers the notification 
@@ -64,12 +90,18 @@ The following Java Code API deprecations have been made in 4.4.
 
 ## Java Code API Changes
 
-The following Java Code API changes have been made in 4.4.
+The following Java Code API changes have been made in 5.0.
 
 | File                                                                                                   | Description                                              |
 |--------------------------------------------------------------------------------------------------------|----------------------------------------------------------|
 | `PaginatedPipelineService.java` | Concrete implementation has been changed to an interface |
 | `PaginatedRuleService.java`     | Concrete implementation has been changed to an interface |
+
+## Configuration File Changes
+
+| Option                                        | Action       | Description                                                     |
+|-----------------------------------------------|--------------|-----------------------------------------------------------------|
+| `mongodb_threads_allowed_to_block_multiplier` | **removed**  | Configuring this is not supported by the official MongoDB driver anymore. |
 
 ## Behaviour Changes
 
@@ -99,6 +131,7 @@ UTF-8 encoding.
 cannot handle multiple log sources with different encodings.
 - The permissions for which options are populated in the System dropdown menu were updated to more closely match the page that they link to. See [graylog2-server#13188](https://github.com/Graylog2/graylog2-server/pull/13188) for details.
 The Page permissions remain unchanged but this could affect the workflow for users with legacy permissions.
+- Newly created aggregation widgets will now have rollup disabled by default. Existing widgets are unchanged.
 
 ### Changed archived default path
 On new Graylog installations, the default archiving configuration will now 

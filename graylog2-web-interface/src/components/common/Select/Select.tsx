@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import type { Theme as SelectTheme } from 'react-select';
+import type { Theme as SelectTheme, InputActionMeta } from 'react-select';
 import ReactSelect, { components as Components, createFilter } from 'react-select';
 import { isEqual } from 'lodash';
 import type { DefaultTheme } from 'styled-components';
@@ -26,6 +26,9 @@ import CreatableSelect from 'react-select/creatable';
 import { themePropTypes } from 'theme';
 import CustomMenuList from 'components/common/Select/CustomMenuList';
 import Icon from 'components/common/Icon';
+import { INPUT_BORDER_RADIUS } from 'theme/constants';
+
+import AsyncCustomMenuList from './AsyncCustomMenuList';
 
 export const CONTROL_CLASS = 'common-select-control';
 
@@ -168,6 +171,7 @@ const controlFocus = ({ size, theme }) => (base, { isFocused }) => {
     borderWidth,
     boxShadow,
     outline,
+    borderRadius: INPUT_BORDER_RADIUS,
     alignItems: 'center',
   };
 };
@@ -219,6 +223,7 @@ export type Props<OptionValue> = {
   delimiter?: string,
   disabled?: boolean,
   displayKey: string,
+  forwardedRef?: React.Ref<React.ComponentType>,
   id?: string,
   ignoreAccents?: boolean,
   inputId?: string,
@@ -241,6 +246,10 @@ export type Props<OptionValue> = {
   value?: OptionValue,
   valueKey: string,
   valueRenderer?: (option: Option) => React.ReactElement,
+  async?: boolean,
+  total?: number,
+  onInputChange?: (newValue:string, actionMeta: InputActionMeta) => void,
+  loadOptions?: () => void
 };
 
 type CustomComponents = {
@@ -255,7 +264,7 @@ type State = {
 };
 
 const getCustomComponents = (inputProps?: { [key: string]: any }, optionRenderer?: (option: Option) => React.ReactElement,
-  valueRenderer?: (option: Option) => React.ReactElement): any => {
+  valueRenderer?: (option: Option) => React.ReactElement, async?: boolean): any => {
   const customComponents: { [key: string]: any } = {};
 
   if (inputProps) {
@@ -270,7 +279,7 @@ const getCustomComponents = (inputProps?: { [key: string]: any }, optionRenderer
     customComponents.SingleValue = CustomSingleValue(valueRenderer);
   }
 
-  customComponents.MenuList = CustomMenuList;
+  customComponents.MenuList = async ? AsyncCustomMenuList : CustomMenuList;
 
   return customComponents;
 };
@@ -318,6 +327,10 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
      */
     onChange: PropTypes.func.isRequired,
     /**
+     * Callback when select input changes.
+     */
+    onInputChange: PropTypes.func,
+    /**
      * Available options shown in the select field. It should be an array of objects,
      * each one with a display key (specified in `displayKey`), and a value key
      * (specified in `valueKey`).
@@ -358,6 +371,12 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     menuPlacement: PropTypes.oneOf(['top', 'bottom', 'auto']),
     /** Max height of the menu */
     maxMenuHeight: PropTypes.number,
+    /** Specifies if option are loaded asynchronously */
+    async: PropTypes.bool,
+    /** Specifies total number of options when using async */
+    total: PropTypes.number,
+    /** Specifies total number of options when using async */
+    loadOptions: PropTypes.func,
   };
 
   static defaultProps = {
@@ -387,22 +406,27 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     valueRenderer: undefined,
     menuPlacement: 'auto',
     maxMenuHeight: 300,
+    async: false,
+    total: 0,
+    onInputChange: undefined,
+    loadOptions: undefined,
     // ref: undefined,
     menuPortalTarget: undefined,
+    forwardedRef: undefined,
   };
 
   constructor(props: Props<OptionValue>) {
     super(props);
-    const { inputProps, optionRenderer, value, valueRenderer } = props;
+    const { inputProps, optionRenderer, value, valueRenderer, async } = props;
 
     this.state = {
-      customComponents: getCustomComponents(inputProps, optionRenderer, valueRenderer),
+      customComponents: getCustomComponents(inputProps, optionRenderer, valueRenderer, async),
       value,
     };
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    const { inputProps, optionRenderer, value, valueRenderer } = this.props;
+    const { inputProps, optionRenderer, value, valueRenderer, async } = this.props;
 
     if (value !== nextProps.value) {
       this.setState({ value: nextProps.value });
@@ -411,7 +435,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     if (!isEqual(inputProps, nextProps.inputProps)
       || optionRenderer !== nextProps.optionRenderer
       || valueRenderer !== nextProps.valueRenderer) {
-      this.setState({ customComponents: getCustomComponents(inputProps, optionRenderer, valueRenderer) });
+      this.setState({ customComponents: getCustomComponents(inputProps, optionRenderer, valueRenderer, async) });
     }
   }
 
@@ -451,13 +475,13 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
   // Using ReactSelect.Creatable now needs to get values as objects or they are not display
   // This method takes care of formatting a string value into options react-select supports.
   _formatInputValue = (value: OptionValue): Array<Option> => {
-    const { options, displayKey, valueKey, delimiter, allowCreate } = this.props;
+    const { options, displayKey, valueKey, delimiter, allowCreate, async } = this.props;
 
     if (value === undefined || value === null || (typeof value === 'string' && value === '')) {
       return [];
     }
 
-    if (allowCreate && typeof value === 'string') {
+    if ((allowCreate || async) && typeof value === 'string') {
       return value.split(delimiter).map((optionValue: string) => {
         const predicate = {
           [valueKey]: optionValue,
@@ -540,6 +564,10 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       valueRenderer, // Do not pass down prop
       menuPortalTarget,
+      async,
+      total,
+      onInputChange,
+      loadOptions,
       ...rest
     } = this.props;
 
@@ -555,9 +583,12 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     const selectProps: React.ComponentProps<typeof ReactSelect> | React.ComponentProps<typeof CreatableSelect> = {
       ...rest,
       onChange: onReactSelectChange || this._onChange,
+      onInputChange,
+      async,
       isMulti,
       isDisabled,
       isClearable,
+      loadOptions,
       getOptionLabel: (option) => option[displayKey] || option.label,
       getOptionValue: (option) => option[valueKey],
       filterOption: customFilter,
@@ -566,14 +597,15 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       isOptionDisabled: (option) => !!option.disabled,
       styles: _styles({ size, theme }),
       theme: this._selectTheme,
+      total,
       value: formattedValue,
     };
 
     if (allowCreate) {
-      return <CreatableSelect {...selectProps} />;
+      return <CreatableSelect ref={rest.forwardedRef} {...selectProps} />;
     }
 
-    return <ReactSelect {...selectProps} />;
+    return <ReactSelect ref={rest.forwardedRef} {...selectProps} />;
   }
 }
 

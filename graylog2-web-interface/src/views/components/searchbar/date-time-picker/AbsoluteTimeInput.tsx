@@ -97,7 +97,7 @@ const StyledInputAddon = styled(InputGroup.Addon)(({ theme }) => css`
 
 const StyledButton = styled(Button)`
   padding: 6px 9px;
-  line-height: 1.1;
+  line-height: 1;
 `;
 
 const FormGroupGrid = styled(FormGroup)`

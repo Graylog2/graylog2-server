@@ -98,7 +98,7 @@ describe('DashboardSearchBar', () => {
 
     userEvent.click(timeRangeInput);
     userEvent.click(await screen.findByRole('tab', { name: 'Relative' }));
-    userEvent.click(await screen.findByRole('button', { name: 'Apply' }));
+    userEvent.click(await screen.findByRole('button', { name: 'Update time range' }));
 
     const searchButton = await screen.findByRole('button', {
       name: /perform search \(changes were made after last search execution\)/i,

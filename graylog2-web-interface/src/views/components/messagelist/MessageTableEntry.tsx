@@ -54,18 +54,19 @@ export const TableBody = styled.tbody<{ expanded?: boolean, highlighted?: boolea
   }
 `);
 
-const FieldsRow = styled.tr(({ theme }) => `
+const FieldsRow = styled.tr`
   cursor: pointer;
 
-  td {
+  && td {
     min-width: 50px;
     word-break: break-word;
+    padding: 4px 5px 2px 5px; 
   }
 
   time {
-    font-size: ${theme.fonts.size.body};
+    line-height: 1;
   }
-`);
+`;
 
 const MessageDetailRow = styled.tr`
   td {
@@ -129,7 +130,11 @@ const MessageTableEntry = ({
   const inputs = Immutable.Map<string, Input>(inputsList.map((input) => [input.id, input]));
 
   const _toggleDetail = () => {
-    toggleDetail(`${message.index}-${message.id}`);
+    const isSelectingText = !!window.getSelection()?.toString();
+
+    if (!isSelectingText) {
+      toggleDetail(`${message.index}-${message.id}`);
+    }
   };
 
   const colSpanFixup = selectedFields.size + 1;

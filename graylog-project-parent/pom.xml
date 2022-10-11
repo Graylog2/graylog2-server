@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-parent</artifactId>
-        <version>4.4.0-SNAPSHOT</version>
+        <version>5.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>graylog-project-parent</artifactId>
@@ -126,7 +126,7 @@
             <!-- Always check mongojack dependencies to see if we need to adjust our mongodb-driver dependencies -->
             <dependency>
                 <groupId>org.mongodb</groupId>
-                <artifactId>mongodb-driver</artifactId>
+                <artifactId>mongodb-driver-sync</artifactId>
                 <version>${mongodb-driver.version}</version>
             </dependency>
             <dependency>
@@ -135,7 +135,7 @@
                 <version>${mongodb-driver.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.mongojack</groupId>
+                <groupId>org.graylog.repackaged.mongojack</groupId>
                 <artifactId>mongojack</artifactId>
                 <version>${mongojack.version}</version>
             </dependency>
@@ -206,7 +206,7 @@
 
             <!-- Cmdline and configuration -->
             <dependency>
-                <groupId>com.github.joschi</groupId>
+                <groupId>org.graylog</groupId>
                 <artifactId>jadconfig</artifactId>
                 <version>${jadconfig.version}</version>
             </dependency>
@@ -561,7 +561,7 @@
             </dependency>
             <dependency>
                 <groupId>org.jooq</groupId>
-                <artifactId>jool-java-8</artifactId>
+                <artifactId>jool</artifactId>
                 <version>${jool.version}</version>
             </dependency>
             <dependency>

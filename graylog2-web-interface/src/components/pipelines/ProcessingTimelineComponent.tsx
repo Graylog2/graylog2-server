@@ -30,8 +30,11 @@ import StreamsStore from 'stores/streams/StreamsStore';
 import type { PaginatedPipelines } from 'stores/pipelines/PipelinesStore';
 import { PipelinesActions } from 'stores/pipelines/PipelinesStore';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
-import useLocationSearchPagination from 'hooks/useLocationSearchPagination';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
 import PipelineConnectionsList from './PipelineConnectionsList';
 
@@ -99,21 +102,20 @@ const _loadPipelines = (pagination, setLoading, setPaginatedPipelines) => {
 };
 
 const ProcessingTimelineComponent = () => {
+  const currentUser = useCurrentUser();
   const { connections } = useStore(PipelineConnectionsStore);
+  const { page, pageSize: perPage, resetPage, setPage } = usePaginationQueryParameter();
+  const [query, setQuery] = useState('');
   const [streams, setStreams] = useState<Stream[] | undefined>();
   const [paginatedPipelines, setPaginatedPipelines] = useState<PaginatedPipelines|undefined>();
   const [loading, setLoading] = useState(false);
   const { list: pipelines = Immutable.List(), pagination: { total = 0, count = 0 } = {} } = paginatedPipelines || {};
-  const { isInitialized: isPaginationReady, pagination, setPagination } = useLocationSearchPagination(DEFAULT_PAGINATION);
-  const { page, query, perPage } = pagination;
 
   useEffect(() => {
-    if (isPaginationReady) {
-      _loadPipelines(pagination, setLoading, setPaginatedPipelines);
-      PipelineConnectionsActions.list();
-      StreamsStore.listStreams().then(setStreams);
-    }
-  }, [isPaginationReady, pagination]);
+    _loadPipelines({ page, perPage, query }, setLoading, setPaginatedPipelines);
+    PipelineConnectionsActions.list();
+    StreamsStore.listStreams().then(setStreams);
+  }, [page, perPage, query]);
 
   const isLoading = !pipelines || !streams || !connections;
 
@@ -121,17 +123,19 @@ const ProcessingTimelineComponent = () => {
     return <Spinner />;
   }
 
-  const handlePaginationChange = (nextPagination) => {
-    setPagination(nextPagination);
+  const handleSearch = (newQuery) => {
+    resetPage();
+    setQuery(newQuery);
   };
 
   const searchFilter = (
     <Header>
-      <PipelineFilter query={query} onSearch={(newQuery) => handlePaginationChange({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />
+      <PipelineFilter query={query} onSearch={handleSearch} />
       {loading && <SpinnerWrapper><Spinner text="" delay={0} /></SpinnerWrapper>}
     </Header>
   );
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   const _headerCellFormatter = (header) => {
     let className;
 
@@ -168,17 +172,18 @@ const ProcessingTimelineComponent = () => {
       if (window.confirm(`Do you really want to delete pipeline "${pipeline.title}"? This action cannot be undone.`)) {
         PipelinesActions.delete(pipeline.id).then(() => {
           if (count > 1) {
-            _loadPipelines(pagination, setLoading, setPaginatedPipelines);
+            _loadPipelines({ page, perPage, query }, setLoading, setPaginatedPipelines);
 
             return;
           }
 
-          setPagination({ page: Math.max(DEFAULT_PAGINATION.page, pagination.page - 1), perPage, query });
+          setPage(Math.max(DEFAULT_PAGINATION.page, page - 1));
         });
       }
     };
   };
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   const _pipelineFormatter = (pipeline) => {
     const { id, title, description, stages } = pipeline;
 
@@ -202,11 +207,12 @@ const ProcessingTimelineComponent = () => {
         </StreamListTD>
         <td>{_formatStages(pipeline, stages)}</td>
         <td>
-          <Button bsStyle="primary" bsSize="xsmall" onClick={_deletePipeline(pipeline)}>Delete</Button>
-          &nbsp;
-          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(id)}>
-            <Button bsStyle="info" bsSize="xsmall">Edit</Button>
-          </LinkContainer>
+          <ButtonToolbar>
+            <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(id)}>
+              <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')} bsSize="xsmall">Edit</Button>
+            </LinkContainer>
+            <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:delete')} bsStyle="danger" bsSize="xsmall" onClick={_deletePipeline(pipeline)}>Delete</Button>
+          </ButtonToolbar>
         </td>
       </tr>
     );
@@ -216,9 +222,7 @@ const ProcessingTimelineComponent = () => {
 
   return (
     <div>
-      <StyledPaginatedList onChange={(newPage, newPerPage) => handlePaginationChange({ ...pagination, page: newPage, perPage: newPerPage })}
-                           activePage={page}
-                           totalItems={total}>
+      <StyledPaginatedList totalItems={total}>
         <DataTable id="processing-timeline"
                    className="table-hover"
                    headers={headers}

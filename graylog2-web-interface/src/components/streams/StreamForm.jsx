@@ -47,6 +47,7 @@ class StreamForm extends React.Component {
     onSubmit: PropTypes.func.isRequired,
     stream: PropTypes.object,
     title: PropTypes.string.isRequired,
+    submitButtonText: PropTypes.string.isRequired,
     indexSets: PropTypes.array.isRequired,
   };
 
@@ -138,14 +139,14 @@ class StreamForm extends React.Component {
   };
 
   render() {
+    const { title: propTitle, submitButtonText } = this.props;
     const { title, description, removeMatchesFromDefaultStream } = this.state;
-    const { title: propTitle } = this.props;
 
     return (
       <BootstrapModalForm ref={(c) => { this.modal = c; }}
                           title={propTitle}
                           onSubmitForm={this._onSubmit}
-                          submitButtonText="Save">
+                          submitButtonText={submitButtonText}>
         <Input id="Title"
                type="text"
                required
@@ -165,11 +166,11 @@ class StreamForm extends React.Component {
         {this._indexSetSelect()}
         <Input id="RemoveFromDefaultStream"
                type="checkbox"
-               label="Remove matches from &lsquo;All messages&rsquo; stream"
+               label="Remove matches from &lsquo;Default Stream&rsquo;"
                name="removeMatchesFromDefaultStream"
                checked={removeMatchesFromDefaultStream}
                onChange={this.handleChange}
-               help={<span>Remove messages that match this stream from the &lsquo;All messages&rsquo; stream which is assigned to every message by default.</span>} />
+               help={<span>Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.</span>} />
       </BootstrapModalForm>
     );
   }

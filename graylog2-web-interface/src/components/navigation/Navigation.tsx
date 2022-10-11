@@ -85,7 +85,7 @@ const formatPluginRoute = (pluginRoute: PluginNavigation, currentUserPermissions
     }
 
     return (
-      <NavDropdown key={title} title={title} id="enterprise-dropdown">
+      <NavDropdown key={title} title={title} id="enterprise-dropdown" inactiveTitle={pluginRoute.description}>
         {pluginRoute.children.map((child) => formatSinglePluginRoute(child, currentUserPermissions, false))}
       </NavDropdown>
     );
@@ -131,10 +131,10 @@ const Navigation = React.memo(({ pathname }: Props) => {
   const pluginItems = PluginStore.exports('navigationItems');
 
   return (
-    <StyledNavbar fluid fixedTop>
+    <StyledNavbar fluid fixedTop collapseOnSelect>
       <Navbar.Header>
         <Navbar.Brand>
-          <LinkContainer to={Routes.STARTPAGE}>
+          <LinkContainer relativeActive to={Routes.STARTPAGE}>
             <NavigationBrand />
           </LinkContainer>
         </Navbar.Brand>
@@ -142,22 +142,21 @@ const Navigation = React.memo(({ pathname }: Props) => {
         <DevelopmentHeaderBadge smallScreen />
         {pluginItems.map(({ key, component: Item }) => <Item key={key} smallScreen />)}
       </Navbar.Header>
-
       <Navbar.Collapse>
-        <Nav navbar>
-          <LinkContainer to={Routes.SEARCH}>
+        <Nav className="navbar-main">
+          <LinkContainer relativeActive to={Routes.SEARCH}>
             <NavItem to="search">Search</NavItem>
           </LinkContainer>
 
-          <LinkContainer to={Routes.STREAMS}>
+          <LinkContainer relativeActive to={Routes.STREAMS}>
             <NavItem>Streams</NavItem>
           </LinkContainer>
 
-          <LinkContainer to={Routes.ALERTS.LIST}>
+          <LinkContainer relativeActive to={Routes.ALERTS.LIST}>
             <NavItem>Alerts</NavItem>
           </LinkContainer>
 
-          <LinkContainer to={Routes.DASHBOARDS}>
+          <LinkContainer relativeActive to={Routes.DASHBOARDS}>
             <NavItem>Dashboards</NavItem>
           </LinkContainer>
 
@@ -168,7 +167,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
         <NotificationBadge />
 
-        <Nav navbar pullRight className="header-meta-nav">
+        <Nav pullRight className="header-meta-nav">
           {AppConfig.isCloud() ? (
             <GlobalThroughput disabled />
           ) : (

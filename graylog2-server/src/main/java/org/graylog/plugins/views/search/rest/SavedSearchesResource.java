@@ -43,9 +43,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import static java.util.Locale.ENGLISH;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Search/Saved")
+@Api(value = "Search/Saved", tags = {CLOUD_VISIBLE})
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/search/saved")
 public class SavedSearchesResource extends RestResource {

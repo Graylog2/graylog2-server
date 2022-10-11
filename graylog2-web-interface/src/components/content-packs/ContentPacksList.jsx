@@ -21,15 +21,16 @@ import { LinkContainer, Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import {
   Button,
-  ButtonToolbar,
   Col,
   DropdownButton,
   MenuItem,
   Modal,
   Row,
+  ButtonToolbar,
 } from 'components/bootstrap';
 import {
   Pagination, PageSizeSelect,
+  ModalSubmit,
 } from 'components/common';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
@@ -94,7 +95,7 @@ class ContentPacksList extends React.Component {
     const modal = (
       <BootstrapModalWrapper ref={(node) => { modalRef = node; }} bsSize="large">
         <Modal.Header closeButton>
-          <Modal.Title>Install</Modal.Title>
+          <Modal.Title>Install Content Pack</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <ContentPackInstall ref={(node) => { installRef = node; }}
@@ -102,12 +103,7 @@ class ContentPacksList extends React.Component {
                               onInstall={onInstallProp} />
         </Modal.Body>
         <Modal.Footer>
-          <div className="pull-right">
-            <ButtonToolbar>
-              <Button bsStyle="primary" onClick={onInstall}>Install</Button>
-              <Button onClick={closeModal}>Close</Button>
-            </ButtonToolbar>
-          </div>
+          <ModalSubmit submitButtonText="Install" onSubmit={onInstall} onCancel={closeModal} />
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
@@ -144,23 +140,23 @@ class ContentPacksList extends React.Component {
               </h3>
             </Col>
             <Col md={3} className="text-right">
-              {updateButton}
-              &nbsp;
-              <Button bsStyle="info" bsSize="small" onClick={openFunc}>Install</Button>
-              {installModal}
-              &nbsp;
-              <DropdownButton id={`more-actions-${item.id}`} title="More Actions" bsSize="small" pullRight>
-                <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>
-                  <MenuItem>Show</MenuItem>
-                </LinkContainer>
-                <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(item.id), encodeURIComponent(item.rev))}>
-                  <MenuItem>Create New Version</MenuItem>
-                </LinkContainer>
-                <MenuItem onSelect={() => { downloadRef.open(); }}>Download</MenuItem>
-                <MenuItem divider />
-                <MenuItem onSelect={() => { onDeletePack(item.id); }}>Delete All Versions</MenuItem>
-              </DropdownButton>
-              {downloadModal}
+              <ButtonToolbar className="pull-right">
+                {updateButton}
+                <Button bsSize="small" onClick={openFunc}>Install</Button>
+                {installModal}
+                <DropdownButton id={`more-actions-${item.id}`} title="More Actions" bsSize="small" pullRight>
+                  <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>
+                    <MenuItem>Show</MenuItem>
+                  </LinkContainer>
+                  <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(item.id), encodeURIComponent(item.rev))}>
+                    <MenuItem>Create New Version</MenuItem>
+                  </LinkContainer>
+                  <MenuItem onSelect={() => { downloadRef.open(); }}>Download</MenuItem>
+                  <MenuItem divider />
+                  <MenuItem onSelect={() => { onDeletePack(item.id); }}>Delete All Versions</MenuItem>
+                </DropdownButton>
+                {downloadModal}
+              </ButtonToolbar>
             </Col>
           </Row>
           <Row className="row-sm content-packs-summary">

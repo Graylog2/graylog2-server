@@ -18,6 +18,7 @@ import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
 import 'helpers/mocking/react-dom_mock';
+import { Form, Formik } from 'formik';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
@@ -26,8 +27,24 @@ import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DataTable from 'views/components/datatable/DataTable';
+import Widget from 'views/logic/widgets/Widget';
+import WidgetContext from 'views/components/contexts/WidgetContext';
+import { WidgetActions } from 'views/stores/WidgetStore';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import Direction from 'views/logic/aggregationbuilder/Direction';
+import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
+import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+
+const mockUpdateWidget = jest.fn();
+
+jest.mock('views/stores/WidgetStore', () => ({
+  WidgetActions: {
+    update: mockUpdateWidget,
+    updateConfig: jest.fn(() => Promise.resolve()),
+  },
+}));
 
 describe('DataTable', () => {
   const currentView = { activeQuery: 'deadbeef-23' };
@@ -51,25 +68,68 @@ describe('DataTable', () => {
     chart: rows,
   };
 
+  const dataWithMoreSeries = {
+    chart:
+      [{
+        key: ['2018-10-04T09:43:50.000Z'],
+        source: 'leaf',
+        values: [{
+          key: ['hulud.net', 'count()'],
+          rollup: false,
+          source: 'col-leaf',
+          value: 408,
+        }, {
+          key: ['count()'],
+          rollup: true,
+          source: 'row-leaf',
+          value: 408,
+        }, {
+          key: ['hulud.net', 'avg(bytes)'],
+          rollup: false,
+          source: 'col-leaf',
+          value: 1430,
+        }, {
+          key: ['avg(bytes)'],
+          rollup: true,
+          source: 'row-leaf',
+          value: 927,
+        }, {
+          key: ['hulud.net', 'max(timestamp)'],
+          rollup: false,
+          source: 'col-leaf',
+          value: 1553862602136,
+        }, {
+          key: ['max(timestamp)'],
+          rollup: true,
+          source: 'row-leaf',
+          value: 1553862613857,
+        }],
+      }],
+  };
+
   const columnPivot = new Pivot('source', 'values', { limit: 15 });
   const rowPivot = new Pivot('timestamp', 'time', { interval: { type: 'auto', scaling: 1.0 } });
   const series = new Series('count()');
 
   const SimplifiedDataTable = (props) => (
-    <DataTable config={AggregationWidgetConfig.builder().build()}
-               currentView={currentView}
-               data={{}}
-               fields={Immutable.List([])}
-               effectiveTimerange={{
-                 from: '2020-01-10T13:23:42.000Z',
-                 to: '2020-01-10T14:23:42.000Z',
-                 type: 'absolute',
-               }}
-               toggleEdit={() => {}}
-               onChange={() => {}}
-               height={200}
-               width={300}
-               {...props} />
+    <Formik initialValues={{}} onSubmit={() => {}}>
+      <Form>
+        <DataTable config={AggregationWidgetConfig.builder().build()}
+                   currentView={currentView}
+                   data={{}}
+                   fields={Immutable.List([])}
+                   effectiveTimerange={{
+                     from: '2020-01-10T13:23:42.000Z',
+                     to: '2020-01-10T14:23:42.000Z',
+                     type: 'absolute',
+                   }}
+                   toggleEdit={() => {}}
+                   onChange={() => {}}
+                   height={200}
+                   width={300}
+                   {...props} />
+      </Form>
+    </Formik>
   );
 
   it('should render with empty data', () => {
@@ -163,44 +223,6 @@ describe('DataTable', () => {
   });
 
   it('passes inferred types to fields', () => {
-    const dataWithMoreSeries = {
-      chart:
-        [{
-          key: ['2018-10-04T09:43:50.000Z'],
-          source: 'leaf',
-          values: [{
-            key: ['hulud.net', 'count()'],
-            rollup: false,
-            source: 'col-leaf',
-            value: 408,
-          }, {
-            key: ['count()'],
-            rollup: true,
-            source: 'row-leaf',
-            value: 408,
-          }, {
-            key: ['hulud.net', 'avg(bytes)'],
-            rollup: false,
-            source: 'col-leaf',
-            value: 1430,
-          }, {
-            key: ['avg(bytes)'],
-            rollup: true,
-            source: 'row-leaf',
-            value: 927,
-          }, {
-            key: ['hulud.net', 'max(timestamp)'],
-            rollup: false,
-            source: 'col-leaf',
-            value: 1553862602136,
-          }, {
-            key: ['max(timestamp)'],
-            rollup: true,
-            source: 'row-leaf',
-            value: 1553862613857,
-          }],
-        }],
-    };
     const avgSeries = new Series('avg(bytes)');
     const maxTimestampSeries = new Series('max(timestamp)');
 
@@ -250,5 +272,139 @@ describe('DataTable', () => {
     ));
 
     expect(onRenderComplete).toHaveBeenCalled();
+  });
+
+  describe('trigger updateConfig on sorting', () => {
+    const avgSeries = new Series('avg(bytes)');
+    const maxTimestampSeries = new Series('max(timestamp)');
+    const widget = Widget.builder()
+      .id('deadbeef')
+      .type('dummy')
+      .config({})
+      .build();
+    const getConfig = ({ sort }) => AggregationWidgetConfig.builder()
+      .rowPivots([rowPivot])
+      .columnPivots([columnPivot])
+      .series([series, avgSeries, maxTimestampSeries])
+      .sort(sort)
+      .visualization('table')
+      .rollup(false)
+      .build();
+    const fields = Immutable.List([
+      FieldTypeMapping.create('bytes', FieldTypes.LONG()),
+      FieldTypeMapping.create('timestamp', FieldTypes.DATE()),
+    ]);
+
+    it('from inactive to asc', () => {
+      const config = getConfig({ sort: [] });
+      const wrapper = mount(
+        <WidgetContext.Provider value={widget}>
+          <SimplifiedDataTable config={config}
+                               fields={fields}
+                               data={dataWithMoreSeries} />
+        </WidgetContext.Provider>);
+
+      const sortButton = wrapper
+        .find('FieldSortIcon[fieldName="timestamp"]')
+        .find('button[data-testid="sort-icon-timestamp"]');
+      sortButton.simulate('click');
+
+      expect(WidgetActions.updateConfig)
+        .toHaveBeenCalledWith('deadbeef', config.toBuilder().sort([new SortConfig('pivot', 'timestamp', Direction.Ascending)]).build());
+    });
+
+    it('from asc to dsc', () => {
+      const config = getConfig({ sort: [new SortConfig('pivot', 'timestamp', Direction.Ascending)] });
+      const wrapper = mount(
+        <WidgetContext.Provider value={widget}>
+          <SimplifiedDataTable config={config}
+                               fields={fields}
+                               data={dataWithMoreSeries} />
+        </WidgetContext.Provider>);
+
+      const sortButton = wrapper
+        .find('FieldSortIcon[fieldName="timestamp"]')
+        .find('button[data-testid="sort-icon-timestamp"]');
+      sortButton.simulate('click');
+
+      expect(WidgetActions.updateConfig)
+        .toHaveBeenCalledWith('deadbeef', config.toBuilder().sort([new SortConfig('pivot', 'timestamp', Direction.Descending)]).build());
+    });
+
+    it('from dsc to inactive', () => {
+      const config = getConfig({ sort: [new SortConfig('pivot', 'timestamp', Direction.Descending)] });
+      const wrapper = mount(
+        <WidgetContext.Provider value={widget}>
+          <SimplifiedDataTable config={config}
+                               fields={fields}
+                               data={dataWithMoreSeries} />
+        </WidgetContext.Provider>);
+
+      const sortButton = wrapper
+        .find('FieldSortIcon[fieldName="timestamp"]')
+        .find('button[data-testid="sort-icon-timestamp"]');
+
+      sortButton.simulate('click');
+
+      expect(WidgetActions.updateConfig)
+        .toHaveBeenCalledWith('deadbeef', config.toBuilder().sort([]).build());
+    });
+  });
+
+  describe('trigger updateConfig on pinning column', () => {
+    const avgSeries = Series.forFunction('avg(bytes)');
+    const maxTimestampSeries = new Series('max(timestamp)');
+    const getWidget = ({ config }: { config: WidgetConfig }) => Widget.builder()
+      .id('deadbeef')
+      .type('dummy')
+      .config(config)
+      .build();
+    const getConfig = ({ sort = [], pinnedColumns = [] }) => AggregationWidgetConfig.builder()
+      .rowPivots([rowPivot])
+      .columnPivots([columnPivot])
+      .series([series, avgSeries, maxTimestampSeries])
+      .sort(sort)
+      .visualization('table')
+      .visualizationConfig(DataTableVisualizationConfig.create(pinnedColumns).toBuilder().build())
+      .rollup(false)
+      .build();
+    const fields = Immutable.List([
+      FieldTypeMapping.create('bytes', FieldTypes.LONG()),
+      FieldTypeMapping.create('timestamp', FieldTypes.DATE()),
+    ]);
+
+    it('from unpinned to pinned', () => {
+      const config = getConfig({ pinnedColumns: [] });
+      const wrapper = mount(
+        <WidgetContext.Provider value={getWidget({ config })}>
+          <SimplifiedDataTable config={config}
+                               fields={fields}
+                               data={dataWithMoreSeries} />
+        </WidgetContext.Provider>);
+
+      const pinnedButton = wrapper
+        .find('button[data-testid="pin-timestamp"]');
+      pinnedButton.simulate('click');
+
+      expect(WidgetActions.updateConfig)
+        .toHaveBeenCalledWith('deadbeef', config.toBuilder().visualizationConfig(DataTableVisualizationConfig.create(['timestamp']).toBuilder().build()).build());
+    });
+
+    it('from pinned to unpinned', () => {
+      const config = getConfig({ pinnedColumns: ['timestamp', 'bytes'] });
+      const wrapper = mount(
+        <WidgetContext.Provider value={getWidget({ config })}>
+          <SimplifiedDataTable config={config}
+                               fields={fields}
+                               data={dataWithMoreSeries} />
+        </WidgetContext.Provider>);
+
+      const pinnedButton = wrapper
+        .find('button[data-testid="pin-timestamp"]');
+      pinnedButton.simulate('click');
+
+      expect(WidgetActions.updateConfig)
+        .toHaveBeenCalledWith('deadbeef', config.toBuilder().visualizationConfig(DataTableVisualizationConfig.create(['bytes']).toBuilder().build()).build());
+    });
   });
 });

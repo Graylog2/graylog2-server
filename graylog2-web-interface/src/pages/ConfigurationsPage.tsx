@@ -33,7 +33,7 @@ import type { Store } from 'stores/StoreTypes';
 import usePluginEntities from 'hooks/usePluginEntities';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import ConfigletContainer from './configurations/ConfigletContainer';
 import PluginConfigRows from './configurations/PluginConfigRows';
@@ -67,7 +67,7 @@ const ConfigurationsPage = () => {
   const [loaded, setLoaded] = useState(false);
   const pluginSystemConfigs = usePluginEntities('systemConfigurations');
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
-  const permissions = useStore(CurrentUserStore as Store<{ currentUser: { permissions: Array<string> } }>, (state) => state?.currentUser?.permissions);
+  const currentUser = useCurrentUser();
 
   useEffect(() => {
     const promises = [
@@ -79,7 +79,7 @@ const ConfigurationsPage = () => {
       ConfigurationsActions.listPermissionsConfig(PERMISSIONS_CONFIG),
     ];
 
-    if (isPermitted(permissions, ['urlwhitelist:read'])) {
+    if (isPermitted(currentUser.permissions, ['urlwhitelist:read'])) {
       promises.push(ConfigurationsActions.listWhiteListConfig(URL_WHITELIST_CONFIG));
     }
 
@@ -87,7 +87,7 @@ const ConfigurationsPage = () => {
       .map((systemConfig) => ConfigurationsActions.list(systemConfig.configType));
 
     Promise.allSettled([...promises, ...pluginPromises]).then(() => setLoaded(true));
-  }, [permissions, pluginSystemConfigs]);
+  }, [currentUser.permissions, pluginSystemConfigs]);
 
   let Output = (
     <Col md={12}>
@@ -129,7 +129,7 @@ const ConfigurationsPage = () => {
                           updateConfig={_onUpdate(EVENTS_CONFIG)} />
           </ConfigletContainer>
         )}
-        {isPermitted(permissions, ['urlwhitelist:read']) && urlWhiteListConfig && (
+        {isPermitted(currentUser.permissions, ['urlwhitelist:read']) && urlWhiteListConfig && (
           <ConfigletContainer title="URL Whitelist Configuration">
             <UrlWhiteListConfig config={urlWhiteListConfig}
                                 updateConfig={_onUpdate(URL_WHITELIST_CONFIG)} />

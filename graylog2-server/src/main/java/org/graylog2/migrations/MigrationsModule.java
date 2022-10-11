@@ -35,8 +35,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20161116172200_CreateDefaultStreamMigration.class);
         addMigration(V20161122174500_AssignIndexSetsToStreamsMigration.class);
         addMigration(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.class);
-        addMigration(V20161125142400_EmailAlarmCallbackMigration.class);
-        addMigration(V20161125161400_AlertReceiversMigration.class);
         addMigration(V20161215163900_MoveIndexSetDefaultConfig.class);
         addMigration(V20161216123500_DefaultIndexSetMigration.class);
         addMigration(V20170110150100_FixAlertConditionsMigration.class);

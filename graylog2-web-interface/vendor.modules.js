@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 module.exports = [
+  '@tanstack/react-query',
   '@emotion/react',
   'chroma-js',
   'create-react-class',
@@ -25,7 +26,6 @@ module.exports = [
   'moment',
   'react-bootstrap',
   'react-dom',
-  'react-query',
   'react-router-bootstrap',
   'react-router',
   'react',

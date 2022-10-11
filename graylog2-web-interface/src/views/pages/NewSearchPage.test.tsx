@@ -112,7 +112,7 @@ describe('NewSearchPage', () => {
     it('should create new view with type search', async () => {
       render(<SimpleNewSearchPage />);
 
-      await waitFor(() => expect(ViewActions.create).toBeCalledTimes(1));
+      await waitFor(() => expect(ViewActions.create).toHaveBeenCalledTimes(1));
 
       expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, undefined, undefined, undefined);
     });
@@ -122,7 +122,7 @@ describe('NewSearchPage', () => {
 
       render(<SimpleNewSearchPage location={mockLocation} />);
 
-      await waitFor(() => expect(processHooksAction).toBeCalledTimes(1));
+      await waitFor(() => expect(processHooksAction).toHaveBeenCalledTimes(1));
 
       await waitFor(() => expect(processHooksAction.mock.calls[0][3]).toStrictEqual({
         q: '',
@@ -177,7 +177,7 @@ describe('NewSearchPage', () => {
       const viewCreateButton = await findByText('Load new view');
       fireEvent.click(viewCreateButton);
 
-      await waitFor(() => expect(loadNewView).toBeCalled());
+      await waitFor(() => expect(loadNewView).toHaveBeenCalled());
     });
 
     it('should process hooks with query', async () => {

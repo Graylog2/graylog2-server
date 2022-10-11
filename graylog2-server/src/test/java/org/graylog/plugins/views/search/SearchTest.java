@@ -16,18 +16,14 @@
  */
 package org.graylog.plugins.views.search;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
-import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
-import org.graylog.plugins.views.search.searchfilters.model.ReferencedQueryStringSearchFilter;
-import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,14 +35,14 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.graylog.plugins.views.search.TestData.validQueryBuilder;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class SearchTest {
+
     @Test
-    public void addsDefaultStreamsToQueriesWithoutStreams() {
+    void addsDefaultStreamsToQueriesWithoutStreams() {
         Search before = searchWithQueriesWithStreams("");
 
         Search after = before.addStreamsToQueriesWithoutStreams(() -> ImmutableSet.of("one", "two", "three"));
@@ -55,7 +51,7 @@ public class SearchTest {
     }
 
     @Test
-    public void leavesQueriesWithDefinedStreamsUntouched() {
+    void leavesQueriesWithDefinedStreamsUntouched() {
         Search before = searchWithQueriesWithStreams("a,b,c", "");
 
         Search after = before.addStreamsToQueriesWithoutStreams(() -> ImmutableSet.of("one", "two", "three"));
@@ -64,7 +60,7 @@ public class SearchTest {
     }
 
     @Test
-    public void doesNothingIfAllQueriesHaveDefinedStreams() {
+    void doesNothingIfAllQueriesHaveDefinedStreams() {
         Search before = searchWithQueriesWithStreams("a,b,c", "a,d,f");
 
         Search after = before.addStreamsToQueriesWithoutStreams(() -> ImmutableSet.of("one", "two", "three"));
@@ -73,7 +69,7 @@ public class SearchTest {
     }
 
     @Test
-    public void throwsExceptionIfQueryHasNoStreamsAndThereAreNoDefaultStreams() {
+    void throwsExceptionIfQueryHasNoStreamsAndThereAreNoDefaultStreams() {
         Search search = searchWithQueriesWithStreams("a,b,c", "");
 
         assertThatExceptionOfType(MissingStreamPermissionException.class)
@@ -82,7 +78,7 @@ public class SearchTest {
     }
 
     @Test
-    public void usedStreamIdsReturnsStreamIdsOfSearchTypes() {
+    void usedStreamIdsReturnsStreamIdsOfSearchTypes() {
         final Query query1 = queryWithStreams("a,b,d").toBuilder()
                 .searchTypes(ImmutableSet.of(
                         searchTypeWithStreams("e,f,g"),
@@ -95,14 +91,14 @@ public class SearchTest {
     }
 
     @Test
-    public void usedStreamIdsReturnsEmptySetForMissingQueries() {
+    void usedStreamIdsReturnsEmptySetForMissingQueries() {
         final Search search = Search.builder().build();
 
         assertThat(search.usedStreamIds()).isEmpty();
     }
 
     @Test
-    public void usedStreamIdsReturnsQueryStreamsWhenSearchTypesAreMissing() {
+    void usedStreamIdsReturnsQueryStreamsWhenSearchTypesAreMissing() {
         final Search search = searchWithQueriesWithStreams("c,d,e");
 
         assertThat(search.usedStreamIds()).containsExactlyInAnyOrder("c", "d", "e");
@@ -111,7 +107,7 @@ public class SearchTest {
     private static final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
 
     @Test
-    public void keepsSingleSearchTypeWhenOverridden() {
+    void keepsSingleSearchTypeWhenOverridden() {
         Search before = Search.builder().queries(queriesWithSearchTypes("oans,zwoa")).build();
 
         ExecutionState executionState = partialResultsMapWithSearchTypes("oans");
@@ -122,7 +118,7 @@ public class SearchTest {
     }
 
     @Test
-    public void keepsMultipleSearchTypesWhenOverridden() {
+    void keepsMultipleSearchTypesWhenOverridden() {
         Search before = Search.builder().queries(queriesWithSearchTypes("oans,zwoa", "gsuffa")).build();
 
         ExecutionState executionState = partialResultsMapWithSearchTypes("oans", "gsuffa");
@@ -133,63 +129,30 @@ public class SearchTest {
     }
 
     @Test
-    public void testGetReferencedSearchFiltersIdsReturnsEmptyCollectionOnEmptyQueries() {
-        final Search search = Search.builder().queries(ImmutableSet.of()).build();
-        final Set<String> referencedSearchFiltersIds = search.getReferencedSearchFiltersIds();
-        assertTrue(referencedSearchFiltersIds.isEmpty());
-    }
+    void collectsStreamIdsForPermissionsCheckFromQueries() {
+        Query query1 = mock(Query.class);
+        doReturn(Set.of("x", "y", "z")).when(query1).streamIdsForPermissionsCheck();
+        Query query2 = mock(Query.class);
+        doReturn(Set.of("x", "a", "b")).when(query2).streamIdsForPermissionsCheck();
+        Query query3 = mock(Query.class);
+        doReturn(Set.of()).when(query3).streamIdsForPermissionsCheck();
 
-    @Test
-    public void testGetReferencedSearchFiltersIdsReturnsEmptyCollectionOnQueriesWithoutFilters() {
-        final Query query1 = TestData.validQueryBuilder().build();
-        final Query query2 = TestData.validQueryBuilder().build();
-        final Search search = Search.builder().queries(ImmutableSet.of(query1, query2)).build();
-        final Set<String> referencedSearchFiltersIds = search.getReferencedSearchFiltersIds();
-        assertTrue(referencedSearchFiltersIds.isEmpty());
-    }
-
-    @Test
-    public void testGetReferencedSearchFiltersIdsDoesNotReturnInlinedSearchFilters() {
-        final Query query = TestData.validQueryBuilder()
-                .filters(ImmutableList.of(
-                        InlineQueryStringSearchFilter.builder().queryString("nvmd").build(),
-                        InlineQueryStringSearchFilter.builder().queryString("nvmd2").build())
-                )
+        Search search = Search.builder()
+                .id("Test search")
+                .queries(ImmutableSet.of(query1, query2, query3))
                 .build();
 
-        final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
-        final Set<String> referencedSearchFiltersIds = search.getReferencedSearchFiltersIds();
-        assertTrue(referencedSearchFiltersIds.isEmpty());
-    }
+        assertThat(search.streamIdsForPermissionsCheck())
+                .isNotNull()
+                .hasSize(5)
+                .contains("a", "b", "x", "y", "z");
 
-    @Test
-    public void testGetReferencedSearchFiltersIdsReturnsProperIds() {
-        final ReferencedSearchFilter filter1 = ReferencedQueryStringSearchFilter.builder().id("r_id_1").build();
-        final ReferencedSearchFilter filter2 = ReferencedQueryStringSearchFilter.builder().id("r_id_2").build();
-        final Query query = TestData.validQueryBuilder()
-                .filters(ImmutableList.of(filter1, filter2))
-                .build();
-        final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
-        final Set<String> referencedSearchFiltersIds = search.getReferencedSearchFiltersIds();
-        assertEquals(ImmutableSet.of("r_id_1", "r_id_2"), referencedSearchFiltersIds);
     }
 
     private Set<String> searchTypeIdsFrom(Search search) {
         return search.queries().stream()
                 .flatMap(q -> q.searchTypes().stream().map(SearchType::id))
                 .collect(Collectors.toSet());
-    }
-
-    private String idOfQueryWithSearchType(ImmutableSet<Query> queries, @SuppressWarnings("SameParameterValue") String searchTypeId) {
-        return queries.stream()
-                .filter(q -> hasSearchType(q, searchTypeId))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("no matching query for search type " + searchTypeId))
-                .id();
-    }
-
-    private boolean hasSearchType(Query q, String searchTypeId) {
-        return q.searchTypes().stream().map(SearchType::id).anyMatch(id -> id.equals(searchTypeId));
     }
 
     private ExecutionState partialResultsMapWithSearchTypes(String... searchTypeIds) {
