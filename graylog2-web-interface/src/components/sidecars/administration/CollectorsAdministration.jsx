@@ -51,10 +51,6 @@ const DisabledCollector = styled.div(({ theme }) => css`
   color: ${theme.colors.variant.light.default};
 `);
 
-const StyledColorLabel = styled(ColorLabel)`
-  display: flex;
-`;
-
 export const PAGE_SIZES = [10, 25, 50, 100];
 
 const CollectorsAdministration = createReactClass({
@@ -296,9 +292,10 @@ const CollectorsAdministration = createReactClass({
                 key={configuration.id} 
                 to={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(configuration.id)}
               >
-                <StyledColorLabel 
+                <ColorLabel 
                   color={configuration.color} 
-                  text={configuration.name}
+                  text={configuration.name} 
+                  style={{ display: 'flex' }}
                 />
               </Link>
             )}
