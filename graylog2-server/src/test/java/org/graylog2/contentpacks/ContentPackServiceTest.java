@@ -49,6 +49,8 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog.scheduler.DBJobDefinitionService;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
+import org.graylog2.alerts.AlertService;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
@@ -179,7 +181,7 @@ public class ContentPackServiceTest {
         outputFactories2 = new HashMap<>();
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = ImmutableMap.of(
                 ModelTypes.GROK_PATTERN_V1, new GrokPatternFacade(objectMapper, patternService),
-                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, legacyAlertConditionMigration, indexSetService, userService),
+                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, alertService, alarmCallbackConfigurationService, legacyAlertConditionMigration, indexSetService, userService),
                 ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories, outputFactories2),
                 ModelTypes.SEARCH_V1, new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService),
                 ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService)
@@ -432,7 +434,6 @@ public class ContentPackServiceTest {
         final WidgetEntity widgetEntity = WidgetEntity.builder()
                 .id("widget-id")
                 .type(MessageListConfigDTO.NAME)
-                .filters(Collections.emptyList())
                 .timerange(KeywordRange.create("last 5 minutes", "Etc/UTC"))
                 .query(ElasticsearchQueryString.of("author: Talon Karrde"))
                 .streams(Stream.ALL_SYSTEM_STREAM_IDS)
