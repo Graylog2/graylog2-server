@@ -75,18 +75,24 @@ public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket
     }
 
     @Override
-    public Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> extractBuckets(List<BucketSpec> bucketSpecs, Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket> initialBucket) {
+    public Stream<Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket>> extractBuckets(List<BucketSpec> bucketSpecs,
+                                                                                                Tuple2<ImmutableList<String>, MultiBucketsAggregation.Bucket> initialBucket) {
         if (bucketSpecs.isEmpty()) {
             return Stream.empty();
         }
         final ImmutableList<String> previousKeys = initialBucket.v1();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.v2();
-        final MultiBucketsAggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
+        final ParsedDateRange aggregation = previousBucket.getAggregations().get(AGG_NAME);
+        final DateRangeBucket dateRangeBucket = (DateRangeBucket) bucketSpecs.get(0);
+
         return aggregation.getBuckets().stream()
                 .flatMap(bucket -> {
+                    final String bucketKey = dateRangeBucket.bucketKey().equals(DateRangeBucket.BucketKey.TO)
+                            ? bucket.getToAsString()
+                            : bucket.getFromAsString();
                     final ImmutableList<String> keys = ImmutableList.<String>builder()
                             .addAll(previousKeys)
-                            .add(bucket.getKeyAsString())
+                            .add(bucketKey)
                             .build();
 
                     if (bucketSpecs.size() == 1) {
