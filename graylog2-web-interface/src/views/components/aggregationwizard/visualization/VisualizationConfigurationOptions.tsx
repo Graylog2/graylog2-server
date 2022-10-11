@@ -25,6 +25,7 @@ import { HoverForHelp } from 'components/common';
 import BooleanField from './configurationFields/BooleanField';
 import NumericField from './configurationFields/NumericField';
 import SelectField from './configurationFields/SelectField';
+import MultiSelectField from './configurationFields/MultiSelectField';
 
 type Props = {
   name: string,
@@ -45,6 +46,7 @@ const componentForType = (type: string) => {
     case 'select': return SelectField;
     case 'boolean': return BooleanField;
     case 'numeric': return NumericField;
+    case 'multi-select': return MultiSelectField;
     default: throw new Error(`Invalid configuration field type: ${type}`);
   }
 };
@@ -71,28 +73,37 @@ export type FieldComponentProps = {
   value: any,
   onChange: (e: React.ChangeEvent<any>) => void,
   error: string | undefined,
+  values: any,
 }
 
 const VisualizationConfigurationOptions = ({ name: namePrefix, fields = [] }: Props) => {
   const { values } = useFormikContext();
   const visualizationConfig: VisualizationConfigFormValues = getIn(values, namePrefix);
-  const configurationFields = fields
-    .filter((field) => (field.isShown ? field.isShown(visualizationConfig) : true))
-    .map((field) => {
-      const Component = componentForType(field.type);
 
-      const title = titleForField(field);
+  return (
+    <>{fields
+      .filter((field) => (field.isShown ? field.isShown(visualizationConfig) : true))
+      .map((field) => {
+        const Component = componentForType(field.type);
+        const title = titleForField(field);
 
-      return (
-        <Field key={`${namePrefix}.${field.name}`} name={`${namePrefix}.${field.name}`}>
-          {({ field: { name, value, onChange }, meta: { error } }) => (
-            <Component key={`${namePrefix}.${field.name}`} name={name} value={value} onChange={onChange} error={error} field={field} title={title} />
-          )}
-        </Field>
-      );
-    });
-
-  return <>{configurationFields}</>;
+        return (
+          <Field key={`${namePrefix}.${field.name}`} name={`${namePrefix}.${field.name}`}>
+            {({ field: { name, value, onChange }, meta: { error } }) => (
+              <Component key={`${namePrefix}.${field.name}`}
+                         name={name}
+                         value={value}
+                         values={values}
+                         onChange={onChange}
+                         error={error}
+                         field={field}
+                         title={title} />
+            )}
+          </Field>
+        );
+      })}
+    </>
+  );
 };
 
 export default VisualizationConfigurationOptions;
