@@ -38,6 +38,7 @@ import type { ViewStoreState } from 'views/stores/ViewStore';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import viewsBindings from 'views/bindings';
 import DataTable from 'views/components/datatable/DataTable';
+import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -100,7 +101,7 @@ describe('Aggregation Widget', () => {
 
   const dataTableWidget = WidgetModel.builder().newId()
     .type('AGGREGATION')
-    .config(AggregationWidgetConfig.builder().visualization(DataTable.type).build())
+    .config(AggregationWidgetConfig.builder().visualization(DataTable.type).visualizationConfig(DataTableVisualizationConfig.create([]).toBuilder().build()).build())
     .query(createElasticsearchQueryString(''))
     .timerange({ type: 'relative', from: 300 })
     .build();
