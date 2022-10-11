@@ -17,12 +17,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
 import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import DataAdapterTableEntry from 'components/lookup-tables/DataAdapterTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
-import Routes from 'routing/Routes';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 
 import Styles from './Overview.css';

@@ -17,8 +17,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
-import Routes from 'routing/Routes';
 import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import CacheTableEntry from 'components/lookup-tables/CacheTableEntry';

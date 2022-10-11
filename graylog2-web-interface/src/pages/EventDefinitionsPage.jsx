@@ -24,8 +24,6 @@ import EventDefinitionsContainer from 'components/event-definitions/event-defini
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 
-import styles from '../components/event-definitions/event-definitions/EventDefinitions.css';
-
 const EventDefinitionsPage = () => {
   return (
     <DocumentTitle title="Event Definitions">
