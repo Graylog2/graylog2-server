@@ -29,7 +29,12 @@ import { IndexerClusterHealth } from 'components/indexers';
 const IndicesPage = () => (
   <DocumentTitle title="Indices and Index Sets">
     <span>
-      <PageHeader title="Indices & Index Sets">
+      <PageHeader title="Indices & Index Sets"
+                  subactions={(
+                    <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CREATE}>
+                      <Button bsStyle="success">Create index set</Button>
+                    </LinkContainer>
+                  )}>
         <span>
           A Graylog stream write messages to an index set, which is a configuration for retention, sharding, and
           replication of the stored data.
@@ -39,12 +44,6 @@ const IndicesPage = () => (
         <span>
           You can learn more about the index model in the{' '}
           <DocumentationLink page={DocsHelper.PAGES.INDEX_MODEL} text="documentation" />
-        </span>
-
-        <span>
-          <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CREATE}>
-            <Button bsStyle="success" bsSize="lg">Create index set</Button>
-          </LinkContainer>
         </span>
       </PageHeader>
 
