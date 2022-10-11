@@ -110,6 +110,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 
         this.objectMapper = mapper
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
                 .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 .disable(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY)
                 .setPropertyNamingStrategy(new PropertyNamingStrategy.SnakeCaseStrategy())
