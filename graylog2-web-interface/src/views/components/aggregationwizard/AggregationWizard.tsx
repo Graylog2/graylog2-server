@@ -41,7 +41,6 @@ const Controls = styled.div`
   max-width: 500px;
   flex: 1.2;
   padding-right: 15px;
-  overflow-y: auto;
 `;
 
 const Section = styled.div`
