@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import styled from 'styled-components';
@@ -155,7 +155,7 @@ const CollectorConfigurationModalContainer = ({
     );
   };
 
-  const MemoizedConfigurationModal = React.useMemo(() => {
+  const MemoizedConfigurationModal = useMemo(() => {
     const renderConfigurationModal = () => {
       const selectedCollector = getSelectedLogCollector();
       const assignedConfigurations = getAssignedConfigurations(selectedSidecarCollectorPairs, selectedCollector);
