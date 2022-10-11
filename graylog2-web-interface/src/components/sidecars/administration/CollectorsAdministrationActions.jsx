@@ -29,11 +29,16 @@ const ConfigurationButton = styled(Button)`
   margin-right: 6px
 `;
 
-const CollectorsAdministrationActions = (props) => {
+const CollectorsAdministrationActions = ({ 
+  collectors, 
+  configurations,
+  selectedSidecarCollectorPairs,
+  onConfigurationSelectionChange,
+  onProcessAction
+}) => {
   const [showConfigurationModal, setShowConfigurationModal] = React.useState(false);
   const onCancelConfigurationModal = React.useCallback(() => setShowConfigurationModal(false), []);
 
-  const { collectors, configurations, selectedSidecarCollectorPairs, onConfigurationSelectionChange, onProcessAction } = props;
   const selectedLogCollectorsNames = lodash.uniq(selectedSidecarCollectorPairs.map(({ collector }) => collector.name));
 
   return (
