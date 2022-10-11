@@ -168,22 +168,25 @@ class LUTTablesPage extends React.Component {
     return (
       <DocumentTitle title="Lookup Tables">
         <span>
-          <PageHeader title="Lookup Tables">
+          <PageHeader title="Lookup Tables"
+                      subactions={(
+                        <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
+                          <Button bsStyle="success" style={{ marginLeft: 5 }}>Create lookup table</Button>
+                        </LinkContainer>
+                      )}>
             <span>Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages.</span>
             {null}
-            <span>
-              <ButtonToolbar>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
-                  <Button bsStyle="info">Lookup Tables</Button>
-                </LinkContainer>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW}>
-                  <Button bsStyle="info">Caches</Button>
-                </LinkContainer>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}>
-                  <Button bsStyle="info">Data Adapters</Button>
-                </LinkContainer>
-              </ButtonToolbar>
-            </span>
+            <ButtonToolbar>
+              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
+                <Button bsStyle="info">Lookup Tables</Button>
+              </LinkContainer>
+              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW}>
+                <Button bsStyle="info">Caches</Button>
+              </LinkContainer>
+              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}>
+                <Button bsStyle="info">Data Adapters</Button>
+              </LinkContainer>
+            </ButtonToolbar>
           </PageHeader>
 
           {content}

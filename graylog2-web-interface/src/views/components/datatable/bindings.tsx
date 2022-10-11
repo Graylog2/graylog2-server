@@ -14,13 +14,35 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import type { VisualizationType } from 'views/types';
 import DataTable from 'views/components/datatable/DataTable';
+import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
+import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 
+type DataTableVisualizationConfigFormValues = {
+  pinnedColumns: Array<string>,
+};
 const dataTable: VisualizationType<typeof DataTable.type> = {
   type: DataTable.type,
   displayName: 'Data Table',
   component: DataTable,
+  config: {
+    createConfig: () => ({ pinnedColumns: [] }),
+    fromConfig: (config: DataTableVisualizationConfig | undefined) => ({ pinnedColumns: config?.pinnedColumns.toJS() ?? [] }),
+    toConfig: (formValues: DataTableVisualizationConfigFormValues) => DataTableVisualizationConfig.create(formValues.pinnedColumns),
+    fields: [{
+      name: 'pinnedColumns',
+      title: 'Pinned Columns',
+      type: 'multi-select',
+      options: ({ formValues }: { formValues: WidgetConfigFormValues }) => {
+        return formValues?.groupBy?.groupings.filter((grouping) => (grouping?.direction === 'row' && grouping?.field?.field))
+          .map((grouping) => grouping.field.field) ?? [];
+      },
+      required: false,
+    }],
+  },
+
 };
 
 export default dataTable;

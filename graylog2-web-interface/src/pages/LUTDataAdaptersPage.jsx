@@ -127,7 +127,12 @@ class LUTDataAdaptersPage extends React.Component {
     return (
       <DocumentTitle title="Lookup Tables - Data Adapters">
         <span>
-          <PageHeader title="Data adapters for Lookup Tables">
+          <PageHeader title="Data adapters for Lookup Tables"
+                      subactions={(
+                        <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}>
+                          <Button bsStyle="success" style={{ marginLeft: 5 }}>Create data adapter</Button>
+                        </LinkContainer>
+                      )}>
             <span>Data adapters provide the actual values for lookup tables</span>
             {null}
             <span>

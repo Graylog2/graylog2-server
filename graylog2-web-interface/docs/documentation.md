@@ -1,12 +1,3 @@
-Please help us to keep this documentation updated!
-
-We all benefit from documenting our processes and components, as it help us to
-use them without expending too much time reading at the source code, and also
-to think twice about how we solved a certain problem.
-
-
-## How to document your components
-
 This guide was created using [React Styleguidist](https://react-styleguidist.js.org),
 so that is a good place to get started if you want to know how to contribute to
 this document.

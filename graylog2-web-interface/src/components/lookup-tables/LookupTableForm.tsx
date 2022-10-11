@@ -223,7 +223,6 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
                               isAsyncSubmit
                               onCancel={onCancel} />
                 )}
-
                 {updatable && (
                   <FormSubmit submitButtonText="Update lookup table"
                               submitLoadingText="Updating lookup table..."

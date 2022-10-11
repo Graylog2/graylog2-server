@@ -37,7 +37,7 @@ const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { 
   ${$stickyHeader
     ? `position: sticky;
     top: 0;
-    z-index: 1` : ''}
+    z-index: 2` : ''}
   }
   
   thead > tr {

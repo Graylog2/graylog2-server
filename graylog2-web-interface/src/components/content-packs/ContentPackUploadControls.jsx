@@ -89,7 +89,7 @@ class ContentPackUploadControls extends React.Component {
         <Button className={style.button}
                 active={isOpen}
                 id="upload-content-pack-button"
-                bsStyle="success"
+                bsStyle="info"
                 onClick={this._openModal}>Upload
         </Button>
         <BootstrapModalForm onModalClose={() => { this.setState({ isOpen: false }); }}
