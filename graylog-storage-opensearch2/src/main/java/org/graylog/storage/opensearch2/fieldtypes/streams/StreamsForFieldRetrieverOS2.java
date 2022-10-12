@@ -38,6 +38,8 @@ import java.util.stream.Collectors;
 
 public class StreamsForFieldRetrieverOS2 implements StreamsForFieldRetriever {
 
+    private static final int SEARCH_MAX_BUCKETS_OS = 65_535;
+    
     private final OpenSearchClient client;
 
     @Inject
@@ -107,7 +109,7 @@ public class StreamsForFieldRetrieverOS2 implements StreamsForFieldRetriever {
         searchSourceBuilder.aggregation(AggregationBuilders
                 .terms(Message.FIELD_STREAMS)
                 .field(Message.FIELD_STREAMS)
-                .size(10_000));//MAX_BUCKETS...
+                .size(SEARCH_MAX_BUCKETS_OS));
         return searchSourceBuilder;
     }
 }

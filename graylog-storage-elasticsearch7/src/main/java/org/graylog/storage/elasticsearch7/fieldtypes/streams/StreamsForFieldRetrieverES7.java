@@ -38,6 +38,8 @@ import java.util.stream.Collectors;
 
 public class StreamsForFieldRetrieverES7 implements StreamsForFieldRetriever {
 
+    private static final int SEARCH_MAX_BUCKETS_ES = 10_000;
+
     private final ElasticsearchClient client;
 
     @Inject
@@ -107,7 +109,7 @@ public class StreamsForFieldRetrieverES7 implements StreamsForFieldRetriever {
         searchSourceBuilder.aggregation(AggregationBuilders
                 .terms(Message.FIELD_STREAMS)
                 .field(Message.FIELD_STREAMS)
-                .size(10_000));//MAX_BUCKETS...
+                .size(SEARCH_MAX_BUCKETS_ES));
         return searchSourceBuilder;
     }
 
