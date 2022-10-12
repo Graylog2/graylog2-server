@@ -17,12 +17,11 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
+import EventsSubareaNavigation from 'components/events/EventsSubareaNavigation';
 import useScopePermissions from 'hooks/useScopePermissions';
-import { LinkContainer } from 'components/common/router';
-import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
-import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
-import EventDefinitionFormContainer
-  from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
+import { Col, Row } from 'components/bootstrap';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import EventDefinitionFormContainer from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
 import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
@@ -93,54 +92,38 @@ const EditEventDefinitionPage = () => {
 
   return (
     <DocumentTitle title={`Edit "${eventDefinition.title}" Event Definition`}>
-      <span>
-        <PageHeader title={`Edit "${eventDefinition.title}" Event Definition`}>
-          <span>
-            Event Definitions allow you to create Events from different Conditions and alert on them.
-          </span>
+      <EventsSubareaNavigation />
+      <PageHeader title={`Edit "${eventDefinition.title}" Event Definition`}>
+        <span>
+          Event Definitions allow you to create Events from different Conditions and alert on them.
+        </span>
 
-          <span>
-            Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
-            <DocumentationLink page={DocsHelper.PAGES.ALERTS}
-                               text="documentation" />
-          </span>
+        <span>
+          Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
+          <DocumentationLink page={DocsHelper.PAGES.ALERTS}
+                             text="documentation" />
+        </span>
+      </PageHeader>
+      {scopePermissions.is_mutable ? (
+        <Row className="content">
+          <Col md={12}>
+            <EventDefinitionFormContainer action="edit" eventDefinition={eventDefinition} />
+          </Col>
+        </Row>
+      ) : (
+        <Row className="content">
+          <Col md={12}>
+            <Row>
+              <Col md={6} mdOffset={3} lg={4} lgOffset={4}>
+                <div style={{ textAlign: 'center' }}>
+                  <p>This particular Event Definition has been marked as immutable when it was created, therefore it cannot be edited.</p>
+                </div>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+      )}
 
-          <ButtonToolbar>
-            <LinkContainer to={Routes.ALERTS.LIST}>
-              <Button bsStyle="info">Alerts & Events</Button>
-            </LinkContainer>
-            <IfPermitted permissions="eventdefinitions:read">
-              <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
-                <Button bsStyle="info">Event Definitions</Button>
-              </LinkContainer>
-            </IfPermitted>
-            <IfPermitted permissions="eventnotifications:read">
-              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
-                <Button bsStyle="info">Notifications</Button>
-              </LinkContainer>
-            </IfPermitted>
-          </ButtonToolbar>
-        </PageHeader>
-        {scopePermissions.is_mutable ? (
-          <Row className="content">
-            <Col md={12}>
-              <EventDefinitionFormContainer action="edit" eventDefinition={eventDefinition} />
-            </Col>
-          </Row>
-        ) : (
-          <Row className="content">
-            <Col md={12}>
-              <Row>
-                <Col md={6} mdOffset={3} lg={4} lgOffset={4}>
-                  <div style={{ textAlign: 'center' }}>
-                    <p>This particular Event Definition has been marked as immutable when it was created, therefore it cannot be edited.</p>
-                  </div>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        )}
-      </span>
     </DocumentTitle>
   );
 };

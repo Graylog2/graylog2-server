@@ -17,9 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { LinkContainer } from 'components/common/router';
-import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
-import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
+import { Col, Row } from 'components/bootstrap';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
@@ -31,6 +30,7 @@ import EventNotificationActionLinks from 'components/event-notifications/event-n
 import withParams from 'routing/withParams';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import EventsSubareaNavigation from 'components/events/EventsSubareaNavigation';
 
 const { isPermitted } = PermissionsMixin;
 
@@ -86,42 +86,26 @@ class EditEventDefinitionPage extends React.Component {
 
     return (
       <DocumentTitle title={`Edit "${notification.title}" Notification`}>
-        <span>
-          <PageHeader title={`Edit "${notification.title}" Notification`} subactions={<EventNotificationActionLinks notificationId={notification.id} />}>
-            <span>
-              Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
-              to you or to other systems you use for that purpose.
-            </span>
+        <EventsSubareaNavigation />
+        <PageHeader title={`Edit "${notification.title}" Notification`} subactions={<EventNotificationActionLinks notificationId={notification.id} />}>
+          <span>
+            Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
+            to you or to other systems you use for that purpose.
+          </span>
 
-            <span>
-              Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
-              <DocumentationLink page={DocsHelper.PAGES.ALERTS}
-                                 text="documentation" />
-            </span>
+          <span>
+            Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
+            <DocumentationLink page={DocsHelper.PAGES.ALERTS}
+                               text="documentation" />
+          </span>
+        </PageHeader>
 
-            <ButtonToolbar>
-              <LinkContainer to={Routes.ALERTS.LIST}>
-                <Button bsStyle="info">Alerts & Events</Button>
-              </LinkContainer>
-              <IfPermitted permissions="eventdefinitions:read">
-                <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
-                  <Button bsStyle="info">Event Definitions</Button>
-                </LinkContainer>
-              </IfPermitted>
-              <IfPermitted permissions="eventnotifications:read">
-                <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
-                  <Button bsStyle="info">Notifications</Button>
-                </LinkContainer>
-              </IfPermitted>
-            </ButtonToolbar>
-          </PageHeader>
+        <Row className="content">
+          <Col md={12}>
+            <EventNotificationFormContainer action="edit" notification={notification} />
+          </Col>
+        </Row>
 
-          <Row className="content">
-            <Col md={12}>
-              <EventNotificationFormContainer action="edit" notification={notification} />
-            </Col>
-          </Row>
-        </span>
       </DocumentTitle>
     );
   }
