@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
-import AuthenticationOverviewLinks from 'components/authentication/AuthenticationOverviewLinks';
+import AuthenticationSubareaNavigation from 'components/authentication/AuthenticationSubareaNavigation';
 import GettingStarted from 'components/authentication/BackendCreate/GettingStarted';
 import { DocumentTitle, PageHeader } from 'components/common';
 import useActiveBackend from 'components/authentication/useActiveBackend';
@@ -30,6 +30,7 @@ const AuthenticationCreatePage = () => {
 
   return (
     <DocumentTitle title="Create Authentication Service">
+      <AuthenticationSubareaNavigation />
       <PageHeader title="Create Authentication Service"
                   subactions={(
                     <BackendActionLinks activeBackend={activeBackend}
@@ -39,7 +40,6 @@ const AuthenticationCreatePage = () => {
         <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                                  text="documentation" />.
         </span>
-        <AuthenticationOverviewLinks />
       </PageHeader>
 
       <GettingStarted title="Create New Authentication Service" />

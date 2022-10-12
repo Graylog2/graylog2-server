@@ -16,15 +16,16 @@
  */
 import React from 'react';
 
-import AuthenticationOverviewLinks from 'components/authentication/AuthenticationOverviewLinks';
 import AuthenticatorActionLinks from 'components/authentication/AuthenticatorActionLinks';
 import AuthenticatorsEdit from 'components/authentication/AuthenticatorsEdit';
 import { PageHeader, DocumentTitle } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
+import AuthenticationSubareaNavigation from 'components/authentication/AuthenticationSubareaNavigation';
 
 const AuthenticatorsEditPage = () => (
   <DocumentTitle title="Edit Authenticators">
+    <AuthenticationSubareaNavigation />
     <PageHeader title="Edit Authenticators" subactions={<AuthenticatorActionLinks />}>
       <span>
         Configure the trusted header authentication.
@@ -35,9 +36,6 @@ const AuthenticatorsEditPage = () => (
         <DocumentationLink page={DocsHelper.PAGES.AUTHENTICATORS}
                            text="documentation" />
       </span>
-
-      <AuthenticationOverviewLinks />
-
     </PageHeader>
 
     <AuthenticatorsEdit />

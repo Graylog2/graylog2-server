@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import AuthenticationOverviewLinks from 'components/authentication/AuthenticationOverviewLinks';
+import AuthenticationSubareaNavigation from 'components/authentication/AuthenticationSubareaNavigation';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
@@ -46,19 +46,20 @@ const WizardPageHeader = ({ authenticationBackend: authBackend, title }: Props) 
   const pageTitle = _pageTitle(authBackend, title);
 
   return (
-    <PageHeader title={pageTitle}
-                subactions={(
-                  <BackendActionLinks activeBackend={activeBackend}
-                                      finishedLoading={finishedLoading} />
+    <>
+      <AuthenticationSubareaNavigation />
+      <PageHeader title={pageTitle}
+                  subactions={(
+                    <BackendActionLinks activeBackend={activeBackend}
+                                        finishedLoading={finishedLoading} />
                 )}>
-      <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
-      <span>
-        Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                                                           text="documentation" />.
-      </span>
-
-      <AuthenticationOverviewLinks />
-    </PageHeader>
+        <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
+        <span>
+          Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
+                                                             text="documentation" />.
+        </span>
+      </PageHeader>
+    </>
   );
 };
 

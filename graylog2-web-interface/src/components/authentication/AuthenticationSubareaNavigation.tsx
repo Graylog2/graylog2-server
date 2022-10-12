@@ -17,23 +17,18 @@
 import * as React from 'react';
 
 import Routes from 'routing/Routes';
-import { LinkContainer } from 'components/common/router';
-import { ButtonToolbar, Button } from 'components/bootstrap';
+import SubareaNavigation from 'components/common/SubareaNavigation';
+import { Row } from 'components/bootstrap';
 
-const AuthenticationOverviewLinks = () => (
-  <ButtonToolbar className="pull-right">
-    <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW}>
-      <Button bsStyle="info">
-        Authentication Services
-      </Button>
-    </LinkContainer>
-    <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW}>
-      <Button bsStyle="info"
-              type="button">
-        Authenticators
-      </Button>
-    </LinkContainer>
-  </ButtonToolbar>
+const NAV_ITEMS = [
+  { title: 'Authentication Services', path: Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW },
+  { title: 'Authenticators', path: Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW },
+];
+
+const AuthenticationSubareaNavigation = () => (
+  <Row>
+    <SubareaNavigation items={NAV_ITEMS} />
+  </Row>
 );
 
-export default AuthenticationOverviewLinks;
+export default AuthenticationSubareaNavigation;
