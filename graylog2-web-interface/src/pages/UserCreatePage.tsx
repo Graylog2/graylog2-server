@@ -30,7 +30,7 @@ const UserCreatePage = () => (
     <PageHeader title="Create New User"
                 subactions={(
                   <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
-                    <Button bsStyle="success">Create User</Button>
+                    <Button bsStyle="success">Create user</Button>
                   </LinkContainer>
                 )}>
       <span>

@@ -17,12 +17,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
 import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import DataAdapterTableEntry from 'components/lookup-tables/DataAdapterTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
-import Routes from 'routing/Routes';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 
 import Styles from './Overview.css';
@@ -131,9 +129,6 @@ class DataAdaptersOverview extends React.Component {
             </h2>
             <PaginatedList onChange={this._onPageChange} totalItems={pagination.total}>
               <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}>
-                  <Button bsStyle="success" style={{ marginLeft: 5 }}>Create data adapter</Button>
-                </LinkContainer>
                 <OverlayTrigger trigger="click" rootClose placement="right" overlay={_helpPopover()}>
                   <Button bsStyle="link" className={Styles.searchHelpButton}><Icon name="question-circle" fixedWidth /></Button>
                 </OverlayTrigger>
