@@ -84,7 +84,7 @@ const EditMessageList = ({ children, config, fields, onChange, onCancel, onSubmi
     <FullHeightRow>
       <FullHeightCol md={3}>
         <StickyBottomActions actions={<SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />}
-                                   alignActionsAtBottom>
+                             alignActionsAtBottom>
           <DescriptionBox description="Fields">
             <FieldSelect fields={fields}
                          onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)}
