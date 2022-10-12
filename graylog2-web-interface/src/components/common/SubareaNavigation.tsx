@@ -15,31 +15,52 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled, { css } from 'styled-components';
 
 import { Button, ButtonToolbar } from 'components/bootstrap';
 import { LinkContainer } from 'components/common/router';
 import { IfPermitted } from 'components/common';
+
+const Container = styled(ButtonToolbar)`
+  margin-bottom: 10px;
+`;
+
+const StyledButton = styled(Button)(({ theme }) => css`
+  &&&& {
+    color: ${theme.colors.variant.darker.default};
+    
+    :hover, :focus {
+      text-decoration: none;  
+    }
+    
+    &.active {
+      color: ${theme.colors.global.textDefault};
+      border-bottom: 1px solid ${theme.colors.variant.primary};
+    }
+  }
+`);
+
+StyledButton.displayName = 'Button';
 
 type Props = {
   items: Array<{
     title: string,
     path: string,
     permissions?: string | Array<string>
+    exactPathMatch?: boolean,
   }>
 }
 
-const SubareaNavigation = ({ items }: Props) => {
-  return (
-    <ButtonToolbar>
-      {items.map(({ path, title, permissions }) => (
-        <IfPermitted permissions={permissions}>
-          <LinkContainer to={path} relativeActive>
-            <Button>{title}</Button>
-          </LinkContainer>
-        </IfPermitted>
-      ))}
-    </ButtonToolbar>
-  );
-};
+const SubareaNavigation = ({ items }: Props) => (
+  <Container>
+    {items.map(({ path, title, permissions, exactPathMatch }) => (
+      <IfPermitted permissions={permissions}>
+        <LinkContainer to={path} relativeActive={!exactPathMatch}>
+          <StyledButton bsStyle="link">{title}</StyledButton>
+        </LinkContainer>
+      </IfPermitted>
+    ))}
+  </Container>
+);
 
 export default SubareaNavigation;

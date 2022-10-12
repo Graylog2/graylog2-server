@@ -18,15 +18,18 @@ import * as React from 'react';
 
 import SubareaNavigation from 'components/common/SubareaNavigation';
 import Routes from 'routing/Routes';
+import { Row } from 'components/bootstrap';
 
 const NAV_ITEMS = [
-  { title: 'Alerts & Events', path: Routes.ALERTS.LIST },
+  { title: 'Alerts & Events', path: Routes.ALERTS.LIST, exactPathMatch: true },
   { title: 'Event Definitions', path: Routes.ALERTS.DEFINITIONS.LIST, permissions: 'eventdefinitions:read' },
   { title: 'Notifications', path: Routes.ALERTS.NOTIFICATIONS.LIST, permissions: 'eventnotifications:read' },
 ];
 
-const EventsSubareaNavigation = () => {
-  return (<SubareaNavigation items={NAV_ITEMS} />);
-};
+const EventsSubareaNavigation = () => (
+  <Row>
+    <SubareaNavigation items={NAV_ITEMS} />
+  </Row>
+);
 
 export default EventsSubareaNavigation;
