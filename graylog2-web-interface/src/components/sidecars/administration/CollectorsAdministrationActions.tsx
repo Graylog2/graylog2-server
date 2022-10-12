@@ -29,21 +29,22 @@ const ConfigurationButton = styled(Button)`
   margin-right: 6px
 `;
 
-const CollectorsAdministrationActions = ({ 
-  collectors, 
+const CollectorsAdministrationActions = ({
+  collectors,
   configurations,
   selectedSidecarCollectorPairs,
   onConfigurationSelectionChange,
-  onProcessAction
+  onProcessAction,
 }) => {
   const [showConfigurationModal, setShowConfigurationModal] = React.useState(false);
   const onCancelConfigurationModal = React.useCallback(() => setShowConfigurationModal(false), []);
 
   const selectedLogCollectorsNames = lodash.uniq(selectedSidecarCollectorPairs.map(({ collector }) => collector.name));
+  const configButtonTooltip = `Cannot change configurations of ${selectedLogCollectorsNames.join(', ')} collectors simultaneously`;
 
   return (
     <ButtonToolbar>
-      <ConfigurationButton title={(selectedLogCollectorsNames.length > 1) ? `Cannot change configurations of ${selectedLogCollectorsNames.join(', ')} collectors simultaneously` : undefined}
+      <ConfigurationButton title={(selectedLogCollectorsNames.length > 1) ? configButtonTooltip : undefined}
                            bsStyle="primary"
                            bsSize="small"
                            disabled={selectedLogCollectorsNames.length !== 1}
