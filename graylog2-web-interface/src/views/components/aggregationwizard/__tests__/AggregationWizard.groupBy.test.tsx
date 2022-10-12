@@ -31,6 +31,7 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import dataTable from 'views/components/datatable/bindings';
+import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 
 import AggregationWizard from '../AggregationWizard';
 
@@ -43,6 +44,7 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
 const widgetConfig = AggregationWidgetConfig
   .builder()
   .visualization(DataTable.type)
+  .visualizationConfig(DataTableVisualizationConfig.empty())
   .build();
 
 const fieldType = new FieldType('field_type', ['numeric'], []);
@@ -85,6 +87,7 @@ describe('AggregationWizard', () => {
                          fields={Immutable.List([])}
                          onChange={() => {}}
                          {...props}>
+        {/* eslint-disable-next-line react/jsx-no-useless-fragment */}
         <>The Visualization</>
       </AggregationWizard>,
     </FieldTypesContext.Provider>,
@@ -211,7 +214,7 @@ describe('AggregationWizard', () => {
 
     const configureElementsSection = await screen.findByTestId('configure-elements-section');
 
-    expect(within(configureElementsSection).queryByText('Group By')).toBeInTheDocument();
+    expect(within(configureElementsSection).getByText('Group By')).toBeInTheDocument();
   });
 
   it('should correctly change config', async () => {

@@ -16,20 +16,37 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import lodash from 'lodash';
 
-import { Select, SourceCodeEditor } from 'components/common';
-import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
+import { FormSubmit, Select, SourceCodeEditor } from 'components/common';
+import { Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
 import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
 
+const ValidationMessage = ({ validationErrors, fieldName, defaultText }) => {
+  if (validationErrors[fieldName]) {
+    return <span>{validationErrors[fieldName][0]}</span>;
+  }
+
+  return <span>{defaultText}</span>;
+};
+
+ValidationMessage.propTypes = {
+  validationErrors: PropTypes.object.isRequired,
+  fieldName: PropTypes.string.isRequired,
+  defaultText: PropTypes.string.isRequired,
+};
+
 const CollectorForm = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'CollectorForm',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     action: PropTypes.oneOf(['create', 'edit']),
     collector: PropTypes.object,
@@ -155,16 +172,6 @@ const CollectorForm = createReactClass({
     return options;
   },
 
-  _formatValidationMessage(fieldName, defaultText) {
-    const { validation_errors: validationErrors } = this.state;
-
-    if (validationErrors[fieldName]) {
-      return <span>{validationErrors[fieldName][0]}</span>;
-    }
-
-    return <span>{defaultText}</span>;
-  },
-
   _validationState(fieldName) {
     const { validation_errors: validationErrors } = this.state;
 
@@ -177,7 +184,7 @@ const CollectorForm = createReactClass({
 
   render() {
     const { action } = this.props;
-    const { formData } = this.state;
+    const { formData, validation_errors: validationErrors } = this.state;
 
     let validationParameters = '';
     let executeParameters = '';
@@ -199,7 +206,11 @@ const CollectorForm = createReactClass({
                    label="Name"
                    onChange={this._onNameChange}
                    bsStyle={this._validationState('name')}
-                   help={this._formatValidationMessage('name', 'Name for this collector')}
+                   help={(
+                     <ValidationMessage fieldName="name"
+                                        defaultText="Name for this collector"
+                                        validationErrors={validationErrors} />
+                   )}
                    value={formData.name || ''}
                    autoFocus
                    required />
@@ -213,7 +224,11 @@ const CollectorForm = createReactClass({
                       onChange={this._formDataUpdate('service_type')}
                       placeholder="Service Type"
                       required />
-              <HelpBlock>{this._formatValidationMessage('service_type', 'Choose the service type this collector is meant for.')}</HelpBlock>
+              <HelpBlock>
+                <ValidationMessage fieldName="service_type"
+                                   defaultText="Choose the service type this collector is meant for."
+                                   validationErrors={validationErrors} />
+              </HelpBlock>
             </FormGroup>
 
             <FormGroup controlId="node_operating_system"
@@ -225,7 +240,11 @@ const CollectorForm = createReactClass({
                       onChange={this._formDataUpdate('node_operating_system')}
                       placeholder="Name"
                       required />
-              <HelpBlock>{this._formatValidationMessage('node_operating_system', 'Choose the operating system this collector is meant for.')}</HelpBlock>
+              <HelpBlock>
+                <ValidationMessage fieldName="node_operating_system"
+                                   defaultText="Choose the operating system this collector is meant for."
+                                   validationErrors={validationErrors} />
+              </HelpBlock>
             </FormGroup>
 
             <Input type="text"
@@ -233,7 +252,11 @@ const CollectorForm = createReactClass({
                    label="Executable Path"
                    onChange={this._onInputChange('executable_path')}
                    bsStyle={this._validationState('executable_path')}
-                   help={this._formatValidationMessage('executable_path', 'Path to the collector executable')}
+                   help={(
+                     <ValidationMessage fieldName="executable_path"
+                                        defaultText="Path to the collector executable"
+                                        validationErrors={validationErrors} />
+                   )}
                    value={formData.executable_path || ''}
                    required />
 
@@ -262,16 +285,9 @@ const CollectorForm = createReactClass({
 
           <Row>
             <Col md={12}>
-              <FormGroup>
-                <ButtonToolbar>
-                  <Button type="submit" bsStyle="primary" disabled={this.hasErrors()}>
-                    {action === 'create' ? 'Create' : 'Update'}
-                  </Button>
-                  <Button type="button" onClick={this._onCancel}>
-                    {action === 'create' ? 'Cancel' : 'Back'}
-                  </Button>
-                </ButtonToolbar>
-              </FormGroup>
+              <FormSubmit submitButtonText={`${action === 'create' ? 'Create' : 'Update'} collector`}
+                          disabledSubmit={this.hasErrors()}
+                          onCancel={this._onCancel} />
             </Col>
           </Row>
         </form>

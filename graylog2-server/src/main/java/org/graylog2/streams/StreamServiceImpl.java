@@ -19,7 +19,6 @@ package org.graylog2.streams;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -28,12 +27,6 @@ import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityOwnershipService;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationImpl;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
-import org.graylog2.alarmcallbacks.EmailAlarmCallback;
-import org.graylog2.alerts.Alert;
-import org.graylog2.alerts.AlertService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
@@ -45,8 +38,6 @@ import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.alarms.AlertCondition;
-import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.streams.Output;
@@ -61,7 +52,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.ws.rs.BadRequestException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -71,7 +61,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -81,36 +70,30 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class StreamServiceImpl extends PersistedServiceImpl implements StreamService {
     private static final Logger LOG = LoggerFactory.getLogger(StreamServiceImpl.class);
     private final StreamRuleService streamRuleService;
-    private final AlertService alertService;
     private final OutputService outputService;
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory indexSetFactory;
     private final NotificationService notificationService;
     private final EntityOwnershipService entityOwnershipService;
     private final ClusterEventBus clusterEventBus;
-    private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
 
     @Inject
     public StreamServiceImpl(MongoConnection mongoConnection,
                              StreamRuleService streamRuleService,
-                             AlertService alertService,
                              OutputService outputService,
                              IndexSetService indexSetService,
                              MongoIndexSet.Factory indexSetFactory,
                              NotificationService notificationService,
                              EntityOwnershipService entityOwnershipService,
-                             ClusterEventBus clusterEventBus,
-                             AlarmCallbackConfigurationService alarmCallbackConfigurationService) {
+                             ClusterEventBus clusterEventBus) {
         super(mongoConnection);
         this.streamRuleService = streamRuleService;
-        this.alertService = alertService;
         this.outputService = outputService;
         this.indexSetService = indexSetService;
         this.indexSetFactory = indexSetFactory;
         this.notificationService = notificationService;
         this.entityOwnershipService = entityOwnershipService;
         this.clusterEventBus = clusterEventBus;
-        this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
     }
 
     @Nullable
@@ -283,16 +266,6 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                 .collect(Collectors.toSet());
     }
 
-    @Override
-    public List<Stream> loadAllWithConfiguredAlertConditions() {
-        final DBObject query = QueryBuilder.start().and(
-                QueryBuilder.start(StreamImpl.EMBEDDED_ALERT_CONDITIONS).exists(true).get(),
-                QueryBuilder.start(StreamImpl.EMBEDDED_ALERT_CONDITIONS).not().size(0).get()
-        ).get();
-
-        return loadAll(query);
-    }
-
     protected Set<Output> loadOutputsForRawStream(DBObject stream) {
         List<ObjectId> outputIds = outputIdsForRawStream(stream);
 
@@ -361,129 +334,6 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         final String streamId = save(stream);
         clusterEventBus.post(StreamsChangedEvent.create(streamId));
     }
-
-    @Override
-    public List<StreamRule> getStreamRules(Stream stream) throws NotFoundException {
-        return streamRuleService.loadForStream(stream);
-    }
-
-    @Override
-    public List<AlertCondition> getAlertConditions(Stream stream) {
-        List<AlertCondition> conditions = Lists.newArrayList();
-
-        if (stream.getFields().containsKey(StreamImpl.EMBEDDED_ALERT_CONDITIONS)) {
-            @SuppressWarnings("unchecked")
-            final List<BasicDBObject> alertConditions = (List<BasicDBObject>) stream.getFields().get(StreamImpl.EMBEDDED_ALERT_CONDITIONS);
-            for (BasicDBObject conditionFields : alertConditions) {
-                try {
-                    conditions.add(alertService.fromPersisted(conditionFields, stream));
-                } catch (Exception e) {
-                    LOG.error("Skipping alert condition.", e);
-                }
-            }
-        }
-
-        return conditions;
-    }
-
-    @Override
-    public AlertCondition getAlertCondition(Stream stream, String conditionId) throws NotFoundException {
-        if (stream.getFields().containsKey(StreamImpl.EMBEDDED_ALERT_CONDITIONS)) {
-            @SuppressWarnings("unchecked")
-            final List<BasicDBObject> alertConditions = (List<BasicDBObject>) stream.getFields().get(StreamImpl.EMBEDDED_ALERT_CONDITIONS);
-            for (BasicDBObject conditionFields : alertConditions) {
-                try {
-                    if (conditionFields.get("id").equals(conditionId)) {
-                        return alertService.fromPersisted(conditionFields, stream);
-                    }
-                } catch (Exception e) {
-                    LOG.error("Skipping alert condition.", e);
-                }
-            }
-        }
-
-        throw new NotFoundException("Alert condition <" + conditionId + "> for stream <" + stream.getId() + "> not found");
-    }
-
-    @Override
-    public void addAlertCondition(Stream stream, AlertCondition condition) throws ValidationException {
-        embed(stream, StreamImpl.EMBEDDED_ALERT_CONDITIONS, (EmbeddedPersistable) condition);
-    }
-
-    @Override
-    public void updateAlertCondition(Stream stream, AlertCondition condition) throws ValidationException {
-        removeAlertCondition(stream, condition.getId());
-        addAlertCondition(stream, condition);
-    }
-
-    @Override
-    public void removeAlertCondition(Stream stream, String conditionId) {
-        // Before deleting alert condition, resolve all its alerts.
-        final List<Alert> alerts = alertService.listForStreamIds(Collections.singletonList(stream.getId()), Alert.AlertState.UNRESOLVED, 0, 0);
-        alerts.stream()
-                .filter(alert -> alert.getConditionId().equals(conditionId))
-                .forEach(alertService::resolveAlert);
-
-        removeEmbedded(stream, StreamImpl.EMBEDDED_ALERT_CONDITIONS, conditionId);
-    }
-
-    @Override
-    public void addAlertReceiver(Stream stream, String type, String name) {
-        final List<AlarmCallbackConfiguration> streamCallbacks = alarmCallbackConfigurationService.getForStream(stream);
-        updateCallbackConfiguration("add", type, name, streamCallbacks);
-    }
-
-    @Override
-    public void removeAlertReceiver(Stream stream, String type, String name) {
-        final List<AlarmCallbackConfiguration> streamCallbacks = alarmCallbackConfigurationService.getForStream(stream);
-        updateCallbackConfiguration("remove", type, name, streamCallbacks);
-    }
-
-    // I tried to be sorry, really. https://www.youtube.com/watch?v=3KVyRqloGmk
-    private void updateCallbackConfiguration(String action, String type, String entity, List<AlarmCallbackConfiguration> streamCallbacks) {
-        final AtomicBoolean ran = new AtomicBoolean(false);
-
-        streamCallbacks.stream()
-                .filter(callback -> callback.getType().equals(EmailAlarmCallback.class.getCanonicalName()))
-                .forEach(callback -> {
-                    ran.set(true);
-                    final Map<String, Object> configuration = callback.getConfiguration();
-                    String key;
-
-                    if ("users".equals(type)) {
-                        key = EmailAlarmCallback.CK_USER_RECEIVERS;
-                    } else {
-                        key = EmailAlarmCallback.CK_EMAIL_RECEIVERS;
-                    }
-
-                    @SuppressWarnings("unchecked")
-                    final List<String> recipients = (List<String>) configuration.get(key);
-                    if ("add".equals(action)) {
-                        if (!recipients.contains(entity)) {
-                            recipients.add(entity);
-                        }
-                    } else {
-                        if (recipients.contains(entity)) {
-                            recipients.remove(entity);
-                        }
-                    }
-                    configuration.put(key, recipients);
-
-                    final AlarmCallbackConfiguration updatedConfig = ((AlarmCallbackConfigurationImpl) callback).toBuilder()
-                            .setConfiguration(configuration)
-                            .build();
-                    try {
-                        alarmCallbackConfigurationService.save(updatedConfig);
-                    } catch (ValidationException e) {
-                        throw new BadRequestException("Unable to save alarm callback configuration", e);
-                    }
-                });
-
-        if (!ran.get()) {
-            throw new BadRequestException("Unable to " + action + " receiver: Stream has no email alarm callback.");
-        }
-    }
-
 
     @Override
     public void addOutput(Stream stream, Output output) {

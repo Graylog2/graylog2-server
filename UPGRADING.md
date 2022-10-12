@@ -44,9 +44,32 @@ The following API endpoints are deprecated beginning with 5.0.
 
 The following API endpoints have been removed in 5.0.
 
+### Legacy Alert API
+5.0 eliminates all of the previously deprecated legacy alert APIs. 
+Content packs that include legacy alerts can still be installed, but the alerts will be silently ignored.
+
+| Endpoint                                                        | Description                         |
+|-----------------------------------------------------------------|-------------------------------------|
+| `GET /alerts/conditions`                                        | Removed deprecated legacy alert API |
+| `GET /alerts/conditions/types`                                  | Removed deprecated legacy alert API |
+| `GET /streams/{streamId}/alerts/conditions`                     | Removed deprecated legacy alert API |
+| `POST /streams/{streamId}/alerts/conditions`                    | Removed deprecated legacy alert API |
+| `GET /streams/{streamId}/alerts/conditions/{conditionId}`       | Removed deprecated legacy alert API |    
+| `PUT /streams/{streamId}/alerts/conditions/{conditionId}`       | Removed deprecated legacy alert API |    
+| `DELETE /streams/{streamId}/alerts/conditions/{conditionId}`    | Removed deprecated legacy alert API |    
+| `POST /streams/{streamId}/alerts/conditions/test`               | Removed deprecated legacy alert API |    
+| `POST /streams/{streamId}/alerts/conditions/{conditionId}/test` | Removed deprecated legacy alert API |    
+| `GET /streams/{streamId}/alerts`                                | Removed deprecated legacy alert API |
+| `GET /streams/{streamId}/alerts/paginated`                      | Removed deprecated legacy alert API |
+| `GET /streams/{streamId}/alerts/check`                          | Removed deprecated legacy alert API |
+| `POST /streams/{streamId}/alerts/receivers`                     | Removed deprecated legacy alert API |
+| `DELETE /streams/{streamId}/alerts/receivers`                   | Removed deprecated legacy alert API |
+| `POST /streams/{streamId}/alerts/sendDummyAlert`                | Removed deprecated legacy alert API |
+
+
 | Endpoint                                    | Description                 |
 | ------------------------------------------- | --------------------------- |
-| `PUT /example/placeholder`                  | TODO placeholder comment    |
+| `GET /system/metrics/{metricName}/history`  | Remove unused and dysfunctional endpoint. (part of [#2443](https://github.com/Graylog2/graylog2-server/pull/2443)) |
 
 
 ## API Endpoint Changes
@@ -108,6 +131,7 @@ UTF-8 encoding.
 cannot handle multiple log sources with different encodings.
 - The permissions for which options are populated in the System dropdown menu were updated to more closely match the page that they link to. See [graylog2-server#13188](https://github.com/Graylog2/graylog2-server/pull/13188) for details.
 The Page permissions remain unchanged but this could affect the workflow for users with legacy permissions.
+- Newly created aggregation widgets will now have rollup disabled by default. Existing widgets are unchanged.
 
 ### Changed archived default path
 On new Graylog installations, the default archiving configuration will now 

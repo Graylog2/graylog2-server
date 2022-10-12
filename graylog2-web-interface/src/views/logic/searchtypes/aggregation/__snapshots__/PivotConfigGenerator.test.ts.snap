@@ -5,7 +5,7 @@ exports[`PivotConfigGenerator should add a event annotation config when configur
   "config": {
     "column_groups": [],
     "id": "vals",
-    "rollup": true,
+    "rollup": false,
     "row_groups": [
       {
         "field": "field",
@@ -38,7 +38,7 @@ exports[`PivotConfigGenerator should generate a chart config 1`] = `
 {
   "column_groups": [],
   "id": Any<String>,
-  "rollup": true,
+  "rollup": false,
   "row_groups": [
     {
       "field": "field",
@@ -60,7 +60,7 @@ exports[`PivotConfigGenerator should generate a number config with trend 1`] = `
   "config": {
     "column_groups": [],
     "id": "vals",
-    "rollup": true,
+    "rollup": false,
     "row_groups": [
       {
         "field": "field",
@@ -86,7 +86,7 @@ exports[`PivotConfigGenerator should generate a number config with trend 2`] = `
   "config": {
     "column_groups": [],
     "id": "vals",
-    "rollup": true,
+    "rollup": false,
     "row_groups": [
       {
         "field": "field",

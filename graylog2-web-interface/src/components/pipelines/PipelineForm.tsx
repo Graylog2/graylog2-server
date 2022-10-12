@@ -17,17 +17,13 @@
 import PropTypes from 'prop-types';
 import React, { useRef, useState } from 'react';
 import { cloneDeep } from 'lodash';
-import styled from 'styled-components';
 
 import { Row, Col, Button, BootstrapModalForm, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import type { PipelineType } from 'stores/pipelines/PipelinesStore';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
-
-const SaveButton = styled(Button)`
-  margin-right: 10px;
-`;
+import { FormSubmit } from 'components/common';
 
 type Props = {
   pipeline: PipelineType,
@@ -107,7 +103,7 @@ const PipelineForm = ({ pipeline, create, modal, save, onCancel }: Props) => {
         <BootstrapModalForm ref={modalRef}
                             title={`${create ? 'Add new' : 'Edit'} pipeline ${nextPipeline.title}`}
                             onSubmitForm={_handleSubmit}
-                            submitButtonText="Save">
+                            submitButtonText={create ? 'Add pipeline' : 'Update pipeline'}>
           {content}
         </BootstrapModalForm>
       </span>
@@ -119,8 +115,7 @@ const PipelineForm = ({ pipeline, create, modal, save, onCancel }: Props) => {
       {content}
       <Row>
         <Col md={12}>
-          <SaveButton type="submit" bsStyle="primary">Save</SaveButton>
-          <Button type="button" onClick={onCancel}>Cancel</Button>
+          <FormSubmit submitButtonText={create ? 'Create pipeline' : 'Update pipeline'} onCancel={onCancel} />
         </Col>
       </Row>
     </form>

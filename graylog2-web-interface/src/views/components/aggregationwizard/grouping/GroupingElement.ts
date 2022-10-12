@@ -195,7 +195,7 @@ const GroupByElement: AggregationElement = {
   onCreate: (formValues: WidgetConfigFormValues): WidgetConfigFormValues => ({
     ...formValues,
     groupBy: {
-      columnRollup: formValues.groupBy ? formValues.groupBy.columnRollup : true,
+      columnRollup: formValues.groupBy ? formValues.groupBy.columnRollup : false,
       groupings: [
         ...(formValues.groupBy?.groupings ?? []),
         createEmptyGrouping(),
@@ -209,7 +209,7 @@ const GroupByElement: AggregationElement = {
     return ({
       ...newFormValues,
       groupBy: {
-        columnRollup: newFormValues.groupBy.columnRollup ?? true,
+        columnRollup: newFormValues.groupBy.columnRollup ?? false,
         groupings: newGroupings,
       },
     });

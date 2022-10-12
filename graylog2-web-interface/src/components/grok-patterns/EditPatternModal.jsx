@@ -152,7 +152,7 @@ class EditPatternModal extends React.Component {
     return (
       <span>
         <Button onClick={this.openModal}
-                bsStyle={create ? 'success' : 'info'}
+                bsStyle={create ? 'success' : 'default'}
                 bsSize={create ? undefined : 'xs'}>
           {triggerButtonContent}
         </Button>
@@ -160,7 +160,7 @@ class EditPatternModal extends React.Component {
                             title={`${create ? 'Create' : 'Edit'} Grok Pattern ${name}`}
                             bsSize="large"
                             onSubmitForm={this._save}
-                            submitButtonText="Save">
+                            submitButtonText={`${create ? 'Create' : 'Update'} pattern`}>
           <fieldset>
             <Input type="text"
                    id={this._getId('pattern-name')}

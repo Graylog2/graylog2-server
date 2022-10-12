@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Form, Formik } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
@@ -164,15 +164,12 @@ const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword, tab
   });
 
 const dateTimeValidate = (nextTimeRange, limitDuration, formatTime: (dateTime: DateTime, format: string) => string) => {
-  let errors = {};
   const timeRange = normalizeIfClassifiedRelativeTimeRange(nextTimeRange);
   const timeRangeErrors = validateTimeRange(timeRange, limitDuration, formatTime);
 
-  if (Object.keys(timeRangeErrors).length !== 0) {
-    errors = { ...errors, nextTimeRange: timeRangeErrors };
-  }
-
-  return errors;
+  return Object.keys(timeRangeErrors).length !== 0
+    ? { nextTimeRange: timeRangeErrors }
+    : {};
 };
 
 const onInitializingNextTimeRange = (currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => {
@@ -181,6 +178,41 @@ const onInitializingNextTimeRange = (currentTimeRange: SearchBarFormValues['time
   }
 
   return currentTimeRange;
+};
+
+type TimeRangeTabsProps = {
+  handleActiveTab: (nextTab: AbsoluteTimeRange['type'] | RelativeTimeRange['type'] | KeywordTimeRange['type']) => void,
+  currentTimeRange: NoTimeRangeOverride | TimeRange,
+  limitDuration: number,
+  validTypes: Array<'absolute' | 'relative' | 'keyword'>,
+  setValidatingKeyword: (validating: boolean) => void,
+};
+
+const TimeRangeTabs = ({ handleActiveTab, currentTimeRange, limitDuration, validTypes, setValidatingKeyword }: TimeRangeTabsProps) => {
+  const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
+
+  const onSelect = useCallback((nextTab: AbsoluteTimeRange['type'] | RelativeTimeRange['type'] | KeywordTimeRange['type']) => {
+    handleActiveTab(nextTab);
+    setActiveTab(nextTab);
+  }, [handleActiveTab]);
+
+  const tabs = useMemo(() => timeRangeTypeTabs({
+    activeTab,
+    limitDuration,
+    setValidatingKeyword,
+    tabs: validTypes,
+  }), [activeTab, limitDuration, setValidatingKeyword, validTypes]);
+
+  return (
+    <StyledTabs id="dateTimeTypes"
+                defaultActiveKey={availableTimeRangeTypes[0].type}
+                activeKey={activeTab ?? -1}
+                onSelect={onSelect}
+                animation={false}>
+      {tabs}
+      {!activeTab && (<TabDisabledTimeRange />)}
+    </StyledTabs>
+  );
 };
 
 const TimeRangeDropdown = ({
@@ -194,25 +226,24 @@ const TimeRangeDropdown = ({
 }: TimeRangeDropdownProps) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const [validatingKeyword, setValidatingKeyword] = useState(false);
-  const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
 
   const positionIsBottom = position === 'bottom';
-  const defaultRanges = createDefaultRanges(formatTime);
+  const defaultRanges = useMemo(() => createDefaultRanges(formatTime), [formatTime]);
 
-  const handleNoOverride = () => {
+  const handleNoOverride = useCallback(() => {
     setCurrentTimeRange({});
     toggleDropdownShow();
-  };
+  }, [setCurrentTimeRange, toggleDropdownShow]);
 
   const handleCancel = useCallback(() => {
     toggleDropdownShow();
   }, [toggleDropdownShow]);
 
-  const handleSubmit = ({ nextTimeRange }: { nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange'] }) => {
+  const handleSubmit = useCallback(({ nextTimeRange }: { nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange'] }) => {
     setCurrentTimeRange(normalizeIfAllMessagesRange(normalizeIfClassifiedRelativeTimeRange(nextTimeRange)));
 
     toggleDropdownShow();
-  };
+  }, [setCurrentTimeRange, toggleDropdownShow]);
 
   const title = (
     <PopoverTitle>
@@ -226,6 +257,9 @@ const TimeRangeDropdown = ({
     </PopoverTitle>
   );
 
+  const _validateTimeRange = useCallback(({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration, formatTime), [formatTime, limitDuration]);
+  const initialTimeRange = useMemo(() => ({ nextTimeRange: onInitializingNextTimeRange(currentTimeRange) }), [currentTimeRange]);
+
   return (
     <StyledPopover id="timerange-type"
                    data-testid="timerange-type"
@@ -235,8 +269,8 @@ const TimeRangeDropdown = ({
                    arrowOffsetTop={positionIsBottom ? undefined : 25}
                    arrowOffsetLeft={positionIsBottom ? 34 : -11}
                    title={title}>
-      <Formik<TimeRangeDropDownFormValues> initialValues={{ nextTimeRange: onInitializingNextTimeRange(currentTimeRange) }}
-                                           validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration, formatTime)}
+      <Formik<TimeRangeDropDownFormValues> initialValues={initialTimeRange}
+                                           validate={_validateTimeRange}
                                            onSubmit={handleSubmit}
                                            validateOnMount>
         {(({ values: { nextTimeRange }, isValid, setFieldValue, submitForm }) => {
@@ -246,8 +280,6 @@ const TimeRangeDropdown = ({
             } else {
               setFieldValue('nextTimeRange', defaultRanges[nextTab]);
             }
-
-            setActiveTab(nextTab);
           };
 
           return (
@@ -257,21 +289,11 @@ const TimeRangeDropdown = ({
                   <Col md={12}>
                     <TimeRangeLivePreview timerange={normalizeIfClassifiedRelativeTimeRange(nextTimeRange)} />
 
-                    <StyledTabs id="dateTimeTypes"
-                                defaultActiveKey={availableTimeRangeTypes[0].type}
-                                activeKey={activeTab ?? -1}
-                                onSelect={handleActiveTab}
-                                animation={false}>
-                      {timeRangeTypeTabs({
-                        activeTab,
-                        limitDuration,
-                        setValidatingKeyword,
-                        tabs: validTypes,
-                      })}
-
-                      {!activeTab && (<TabDisabledTimeRange />)}
-
-                    </StyledTabs>
+                    <TimeRangeTabs currentTimeRange={currentTimeRange}
+                                   handleActiveTab={handleActiveTab}
+                                   limitDuration={limitDuration}
+                                   validTypes={validTypes}
+                                   setValidatingKeyword={setValidatingKeyword} />
                   </Col>
                 </Row>
 

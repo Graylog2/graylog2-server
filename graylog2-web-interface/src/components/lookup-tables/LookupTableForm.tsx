@@ -20,11 +20,13 @@ import PropTypes from 'prop-types';
 import _omit from 'lodash/omit';
 import type { LookupTable } from 'src/logic/lookup-tables/types';
 
+import history from 'util/History';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
-import { Col, Row, Button, Input } from 'components/bootstrap';
-import { FormikFormGroup, JSONValueInput } from 'components/common';
+import { Col, Row, Input } from 'components/bootstrap';
+import { FormikFormGroup, JSONValueInput, FormSubmit } from 'components/common';
 import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker } from 'components/lookup-tables';
 import useScopePermissions from 'hooks/useScopePermissions';
+import Routes from 'routing/Routes';
 
 type LookupTableType = LookupTable & {
   enable_single_value: boolean,
@@ -90,9 +92,7 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
       promise = LookupTablesActions.update(valuesToSave);
     }
 
-    promise.then(() => {
-      saved();
-    });
+    return promise.then(() => saved());
   };
 
   const initialValues: LookupTableType = {
@@ -102,6 +102,9 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
     enable_multi_value: table.default_multi_value !== '',
   };
 
+  const onCancel = () => history.push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
+  const updatable = !create && !loadingScopePermissions && scopePermissions?.is_mutable;
+
   return (
     <Formik initialValues={initialValues}
             validate={validate}
@@ -110,10 +113,12 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
               const errors = await formikHelpers.validateForm();
 
               if (Object.keys(errors).length === 0) {
-                handleSubmit(values);
+                return handleSubmit(values);
               }
+
+              return Promise.resolve();
             }}>
-      {({ values, errors, touched, setFieldValue, setFieldTouched, setValues }) => (
+      {({ values, errors, touched, setFieldValue, setFieldTouched, setValues, isSubmitting }) => (
         <Form className="form form-horizontal">
           <fieldset>
             <FormikFormGroup type="text"
@@ -217,10 +222,19 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
           <fieldset>
             <Row>
               <Col mdOffset={3} md={9}>
-                {create ? (
-                  <Button type="submit" bsStyle="success">Create Lookup Table</Button>
-                ) : (!loadingScopePermissions && scopePermissions?.is_mutable) && (
-                  <Button type="submit" bsStyle="success">Update Lookup Table</Button>
+                {create && (
+                  <FormSubmit submitButtonText="Create lookup table"
+                              submitLoadingText="Creating lookup table..."
+                              isSubmitting={isSubmitting}
+                              isAsyncSubmit
+                              onCancel={onCancel} />
+                )}
+                {updatable && (
+                  <FormSubmit submitButtonText="Update lookup table"
+                              submitLoadingText="Updating lookup table..."
+                              isSubmitting={isSubmitting}
+                              isAsyncSubmit
+                              onCancel={onCancel} />
                 )}
               </Col>
             </Row>

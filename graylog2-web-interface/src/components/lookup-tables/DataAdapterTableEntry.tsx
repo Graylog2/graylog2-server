@@ -21,14 +21,14 @@ import styled from 'styled-components';
 import { Link } from 'components/common/router';
 import { Spinner } from 'components/common';
 import Routes from 'routing/Routes';
-import { Button } from 'components/bootstrap';
+import { Button, ButtonToolbar } from 'components/bootstrap';
 import { ErrorPopover } from 'components/lookup-tables';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 import useScopePermissions from 'hooks/useScopePermissions';
 
-const Actions = styled.div`
+const Actions = styled(ButtonToolbar)`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -74,15 +74,13 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
           {loadingScopePermissions ? <Spinner /> : scopePermissions.is_mutable && (
             <Actions>
               <Button bsSize="xsmall"
-                      bsStyle="info"
                       onClick={_onEdit}
                       role="button"
                       name="edit">
                 Edit
               </Button>
-              <Button style={{ marginLeft: '6px' }}
-                      bsSize="xsmall"
-                      bsStyle="primary"
+              <Button bsSize="xsmall"
+                      bsStyle="danger"
                       onClick={_onDelete}
                       role="button"
                       name="delete">

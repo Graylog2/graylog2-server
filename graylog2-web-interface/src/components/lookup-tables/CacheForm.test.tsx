@@ -75,6 +75,8 @@ const renderedCache = ({
 };
 
 describe('CacheForm', () => {
+  const findSubmitButton = () => screen.findByRole('button', { name: /update cache/i });
+
   beforeAll(() => {
     asMock(useScopePermissions).mockImplementation(
       (entity: GenericEntityType) => {
@@ -164,7 +166,7 @@ describe('CacheForm', () => {
 
     const titleEle = await screen.findByLabelText('* Title');
     const nameEle = await screen.findByLabelText('* Name');
-    const submitButton = await screen.findByText('Update Cache');
+    const submitButton = await findSubmitButton();
 
     fireEvent.change(titleEle, { target: { value: '' } });
     fireEvent.change(nameEle, { target: { value: '' } });
@@ -193,7 +195,7 @@ describe('CacheForm', () => {
 
     const titleEle = await screen.findByLabelText('* Title');
     const nameEle = await screen.findByLabelText('* Name');
-    const submitButton = await screen.findByText('Update Cache');
+    const submitButton = await findSubmitButton();
 
     fireEvent.change(titleEle, { target: { value: 'Test title' } });
     fireEvent.change(nameEle, { target: { value: 'test-title' } });
