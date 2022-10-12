@@ -19,17 +19,14 @@ package org.graylog2.validation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 class SizeInBytesValidatorTest {
-
-    @Mock
-    SizeInBytes annotation;
 
     SizeInBytesValidator toTest;
 
@@ -45,33 +42,34 @@ class SizeInBytesValidatorTest {
 
     @Test
     void tooShortObjectIsInvalid() {
-        doReturn(3).when(annotation).min();
-        toTest.initialize(annotation);
+        toTest.initialize(mockSizeInBytesAnnotation(3, 1000));
         assertThat(toTest.isValid("oh", null)).isFalse();
     }
 
     @Test
     void tooLongObjectIsInvalid() {
-        doReturn(7).when(annotation).max();
-        toTest.initialize(annotation);
+        toTest.initialize(mockSizeInBytesAnnotation(0, 7));
         assertThat(toTest.isValid("Caramba!", null)).isFalse();
     }
 
     @Test
     void properObjectIsValid() {
-        doReturn(10).when(annotation).max();
-        doReturn(5).when(annotation).min();
-        toTest.initialize(annotation);
+        toTest.initialize(mockSizeInBytesAnnotation(5, 10));
         assertThat(toTest.isValid("Caramba!", null)).isTrue();
     }
 
     @Test
     void validatesByteLengthNotStringLength() {
-        doReturn(10).when(annotation).max();
-        doReturn(5).when(annotation).min();
-        toTest.initialize(annotation);
+        toTest.initialize(mockSizeInBytesAnnotation(5, 10));
         //4 Polish letters used, increasing byte-size by 4 bytes
         assertThat(toTest.isValid("Gżegżółka", null)).isFalse();
+    }
+
+    private SizeInBytes mockSizeInBytesAnnotation(final int minValue, final int maxValue) {
+        final SizeInBytes mock = mock(SizeInBytes.class);
+        doReturn(minValue).when(mock).min();
+        doReturn(maxValue).when(mock).max();
+        return mock;
     }
 
 }
