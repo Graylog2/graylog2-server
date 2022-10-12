@@ -53,13 +53,19 @@ type Props = {
 
 const SubareaNavigation = ({ items }: Props) => (
   <Container>
-    {items.map(({ path, title, permissions, exactPathMatch }) => (
-      <IfPermitted permissions={permissions}>
-        <LinkContainer to={path} relativeActive={!exactPathMatch}>
-          <StyledButton bsStyle="link">{title}</StyledButton>
-        </LinkContainer>
-      </IfPermitted>
-    ))}
+    {items.map(({ path, title, permissions, exactPathMatch }) => {
+      if (!path) {
+        return null;
+      }
+
+      return (
+        <IfPermitted permissions={permissions} key={path}>
+          <LinkContainer to={path} relativeActive={!exactPathMatch}>
+            <StyledButton bsStyle="link">{title}</StyledButton>
+          </LinkContainer>
+        </IfPermitted>
+      );
+    })}
   </Container>
 );
 

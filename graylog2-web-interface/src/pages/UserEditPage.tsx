@@ -24,7 +24,7 @@ import UsersDomain from 'domainActions/users/UsersDomain';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UserEdit from 'components/users/UserEdit';
 import DocumentationLink from 'components/support/DocumentationLink';
-import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
+import UsersSubareaNavigation from 'components/users/navigation/UsersSubareaNavigation';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
 import type User from 'logic/users/User';
 
@@ -79,7 +79,7 @@ const UserEditPage = ({ params }: Props) => {
                              text="documentation" />
         </span>
 
-        <UserOverviewLinks />
+        <UsersSubareaNavigation />
       </PageHeader>
       <UserEdit user={userToEdit} />
     </DocumentTitle>
