@@ -62,7 +62,14 @@ const DashboardsPage = () => {
   return (
     <DocumentTitle title="Dashboards">
       <span>
-        <PageHeader title="Dashboards">
+        <PageHeader title="Dashboards"
+                    subactions={(
+                      <IfPermitted permissions="dashboards:create">
+                        <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
+                          <Button bsStyle="success">Create new dashboard</Button>
+                        </LinkContainer>
+                      </IfPermitted>
+                    )}>
           <span>
             Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or
             chart you create in other parts of Graylog with one click.
@@ -73,14 +80,6 @@ const DashboardsPage = () => {
             {' '}<DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="dashboard tutorial" />{' '}
             for lots of other useful tips.
           </span>
-
-          <IfPermitted permissions="dashboards:create">
-            <span>
-              <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
-                <Button bsStyle="success" bsSize="lg">Create new dashboard</Button>
-              </LinkContainer>
-            </span>
-          </IfPermitted>
         </PageHeader>
 
         <Row className="content">

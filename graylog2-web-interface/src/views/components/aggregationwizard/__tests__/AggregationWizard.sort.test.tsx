@@ -32,6 +32,7 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import dataTable from 'views/components/datatable/bindings';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 
 import AggregationWizard from '../AggregationWizard';
 
@@ -50,6 +51,7 @@ const widgetConfig = AggregationWidgetConfig
   .builder()
   .visualization(DataTable.type)
   .rowPivots([pivot0, pivot1])
+  .visualizationConfig(DataTableVisualizationConfig.empty())
   .build();
 
 const selectEventConfig = { container: document.body };
@@ -95,6 +97,7 @@ describe('AggregationWizard', () => {
                          type="AGGREGATION"
                          fields={Immutable.List([])}
                          {...props}>
+        {/* eslint-disable-next-line react/jsx-no-useless-fragment */}
         <>The Visualization</>
       </AggregationWizard>
     </FieldTypesContext.Provider>,
@@ -201,7 +204,8 @@ describe('AggregationWizard', () => {
     const newSortContainer = await screen.findByTestId('sort-element-0');
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Field is required.')).toBeInTheDocument());
-    await waitFor(() => expect(expect(applyButton).toBeDisabled()));
+
+    await waitFor(() => expect(applyButton).toBeDisabled());
   });
 
   it('should require direction when creating a sort element', async () => {
@@ -212,7 +216,8 @@ describe('AggregationWizard', () => {
     const newSortContainer = await screen.findByTestId('sort-element-0');
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Direction is required.')).toBeInTheDocument());
-    await waitFor(() => expect(expect(applyButton).toBeDisabled()));
+
+    await waitFor(() => expect(applyButton).toBeDisabled());
   });
 
   it('should remove all sorts', async () => {

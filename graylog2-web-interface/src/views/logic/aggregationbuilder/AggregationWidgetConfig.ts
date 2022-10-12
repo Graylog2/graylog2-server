@@ -131,7 +131,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       .series([])
       .sort([])
       .eventAnnotation(false)
-      .rollup(true);
+      .rollup(false);
   }
 
   toBuilder() {
@@ -282,7 +282,7 @@ class Builder {
     const availableSorts = [].concat(rowPivots, columnPivots, series);
     const filteredSorts = sort.filter((s) => availableSorts
       .find((availableSort) => (s.field === availableSort.function || s.field === availableSort.field)));
-    const computedRollup = columnPivots.length > 0 ? rollup : true;
+    const computedRollup = columnPivots.length > 0 ? rollup : false;
 
     return new AggregationWidgetConfig(
       columnPivots,

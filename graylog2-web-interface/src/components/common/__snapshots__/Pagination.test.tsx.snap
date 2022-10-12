@@ -2,7 +2,7 @@
 
 exports[`<Pagination /> should display Pagination 1`] = `
 .c0.pagination {
-  font-size: 0.889rem;
+  font-size: 0.878rem;
   margin-top: 10px;
   margin-bottom: 0;
 }

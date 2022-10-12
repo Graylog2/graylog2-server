@@ -97,13 +97,7 @@ const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPage
                     queryHelpComponent={<QueryHelper entityName="event definition" />}
                     queryWidth={200}
                     topMargin={0}
-                    useLoadingState>
-          <IfPermitted permissions="eventdefinitions:create">
-            <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
-              <Button bsStyle="success" className={styles.createButton}>Create Event Definition</Button>
-            </LinkContainer>
-          </IfPermitted>
-        </SearchForm>
+                    useLoadingState />
 
         <PaginatedList pageSizes={PAGE_SIZES}
                        totalItems={pagination.total}

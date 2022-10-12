@@ -18,7 +18,7 @@ import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
 import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import EventNotificationsContainer from 'components/event-notifications/event-notifications/EventNotificationsContainer';
 import Routes from 'routing/Routes';
 
@@ -26,7 +26,14 @@ const EventNotificationsPage = () => {
   return (
     <DocumentTitle title="Notifications">
       <span>
-        <PageHeader title="Notifications">
+        <PageHeader title="Notifications"
+                    subactions={(
+                      <IfPermitted permissions="eventnotifications:create">
+                        <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
+                          <Button bsStyle="success">Create notification</Button>
+                        </LinkContainer>
+                      </IfPermitted>
+          )}>
           <span>
             Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
             to you or to other systems you use for that purpose.
