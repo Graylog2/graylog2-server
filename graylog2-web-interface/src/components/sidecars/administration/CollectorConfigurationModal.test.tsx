@@ -35,8 +35,24 @@ describe('CollectorConfigurationModal', () => {
                                  onCancel={() => {}}
                                  onSave={() => {}}
                                  getRowData={() => ({
-                                   configuration: { id: 'id', name: 'name', color: 'black' },
-                                   collector: { id: 'id', name: 'name', node_operating_system: 'mac' },
+                                   configuration: {
+                                     id: 'id',
+                                     name: 'name',
+                                     color: 'black',
+                                     template: '',
+                                     collector_id: '',
+                                     tags: [],
+                                   },
+                                   collector: {
+                                     id: 'id',
+                                     name: 'name',
+                                     node_operating_system: 'mac',
+                                     service_type: '',
+                                     validation_parameters: '',
+                                     executable_path: '',
+                                     execute_parameters: '',
+                                     default_template: '',
+                                   },
                                    sidecars: [],
                                    autoAssignedTags: [],
                                  })} />

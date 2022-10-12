@@ -24,9 +24,20 @@ import { BootstrapModalConfirm } from 'components/bootstrap';
 
 import CollectorConfigurationModal from './CollectorConfigurationModal';
 
+import type { Collector, Configuration, SidecarSummary } from '../types';
+
 const ConfigurationSummary = styled.div`
   word-break: break-all;
 `;
+
+type Props = {
+  collectors: Collector[],
+  configurations: Configuration[],
+  selectedSidecarCollectorPairs: { collector: Collector, sidecar: SidecarSummary }[],
+  onConfigurationSelectionChange: (pairs: { collector: Collector, sidecar: SidecarSummary }[], configs: Configuration[], callback: () => void) => void,
+  show: boolean,
+  onCancel: () => void,
+};
 
 const CollectorConfigurationModalContainer = ({
   collectors,
@@ -35,21 +46,21 @@ const CollectorConfigurationModalContainer = ({
   onConfigurationSelectionChange,
   show,
   onCancel,
-}) => {
+}: Props) => {
   const [nextAssignedConfigurations, setNextAssignedConfigurations] = useState([]);
   const [nextPartiallyAssignedConfigurations, setNextPartiallyAssignedConfigurations] = useState([]);
   const modalConfirm = useRef(null);
 
   const getSelectedLogCollector = () => {
-    return (lodash.uniq<any>(selectedSidecarCollectorPairs.map(({ collector }) => collector)))[0];
+    return (lodash.uniq<Collector>(selectedSidecarCollectorPairs.map(({ collector }) => collector)))[0];
   };
 
-  const sortConfigurationNames = (configs) => {
+  const sortConfigurationNames = (configs: Configuration[]) => {
     return configs.sort((config1, config2) => naturalSortIgnoreCase(config1.name, config2.name))
       .map((config) => config.name);
   };
 
-  const getAssignedConfigurations = (_selectedSidecarCollectorPairs, selectedCollector) => {
+  const getAssignedConfigurations = (_selectedSidecarCollectorPairs: { collector: Collector, sidecar: SidecarSummary }[], selectedCollector: Collector) => {
     const assignments = _selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar).reduce((accumulator, sidecar) => accumulator.concat(sidecar.assignments), []);
 
     const filteredAssignments = assignments.map((assignment) => configurations.find((configuration) => configuration.id === assignment.configuration_id))
@@ -58,7 +69,7 @@ const CollectorConfigurationModalContainer = ({
     return sortConfigurationNames(filteredAssignments);
   };
 
-  const getUnassignedConfigurations = (assignedConfigurations: string[], selectedCollector) => {
+  const getUnassignedConfigurations = (assignedConfigurations: string[], selectedCollector: Collector) => {
     const filteredConfigs = configurations.filter((config) => !assignedConfigurations.includes(config.name) && (selectedCollector?.id === config.collector_id));
 
     return sortConfigurationNames(filteredConfigs);
@@ -68,8 +79,8 @@ const CollectorConfigurationModalContainer = ({
     const occurrences = lodash.countBy(_assignedConfigurations);
 
     return [
-      lodash.uniq<any>(_assignedConfigurations.filter((config) => occurrences[config] === selectedSidecarCollectorPairs.length)),
-      lodash.uniq<any>(_assignedConfigurations.filter((config) => occurrences[config] < selectedSidecarCollectorPairs.length)),
+      lodash.uniq<string>(_assignedConfigurations.filter((config) => occurrences[config] === selectedSidecarCollectorPairs.length)),
+      lodash.uniq<string>(_assignedConfigurations.filter((config) => occurrences[config] < selectedSidecarCollectorPairs.length)),
     ];
   };
 
@@ -119,7 +130,7 @@ const CollectorConfigurationModalContainer = ({
     return selectedSidecarCollectorPairs.filter(({ sidecar }) => sidecar.assignments.map((assignment) => assignment.configuration_id).includes(configuration.id)).map((assignment) => assignment.sidecar);
   };
 
-  const getAssignedFromTags = (configId: string, collectorId: string, sidecars) => {
+  const getAssignedFromTags = (configId: string, collectorId: string, sidecars: SidecarSummary[]) => {
     const assigned_from_tags = sidecars.reduce((accumulator, sidecar) => {
       return accumulator.concat(
         sidecar.assignments.find((assignment) => (assignment.collector_id === collectorId) && (assignment.configuration_id === configId)).assigned_from_tags,

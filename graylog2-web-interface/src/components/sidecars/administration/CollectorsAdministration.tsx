@@ -35,6 +35,7 @@ import CollectorsAdministrationFilters from './CollectorsAdministrationFilters';
 import CollectorConfigurationModalContainer from './CollectorConfigurationModalContainer';
 import FiltersSummary from './FiltersSummary';
 import style from './CollectorsAdministration.css';
+import { SidecarSummary } from '../types';
 
 const HeaderComponentsWrapper = styled.div(({ theme }) => css`
   float: right;
@@ -297,7 +298,7 @@ const CollectorsAdministration = ({
       </ControlledTableList.Item>
     );
   } else {
-    const sidecars = lodash.uniq<any>(sidecarCollectorPairs.map(({ sidecar }) => sidecar));
+    const sidecars = lodash.uniq<SidecarSummary>(sidecarCollectorPairs.map(({ sidecar }) => sidecar));
 
     formattedCollectors = sidecars.map((sidecarToMap) => {
       const sidecarCollectors = sidecarCollectorPairs

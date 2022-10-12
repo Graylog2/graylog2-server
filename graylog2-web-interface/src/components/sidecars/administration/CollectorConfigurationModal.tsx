@@ -26,6 +26,8 @@ import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import { Link } from 'components/common/router';
 
+import type { Collector, Configuration, SidecarSummary } from '../types';
+
 const ConfigurationContainer = styled.div`
   overflow: auto;
   height: 360px;
@@ -102,6 +104,23 @@ const ModalSubTitle = styled.div`
   text-overflow: ellipsis;
 `;
 
+type Props = {
+  show: boolean,
+  onCancel: () => void,
+  onSave: (selectedConfigurations: string[], partiallySelectedConfigurations: string[]) => void,
+  selectedCollectorName: string,
+  selectedSidecarNames: string[],
+  initialAssignedConfigs: string[],
+  initialPartiallyAssignedConfigs: string[],
+  unassignedConfigs: string[],
+  getRowData: (configName: string) => {
+    configuration: Configuration,
+    collector: Collector,
+    sidecars: SidecarSummary[],
+    autoAssignedTags: string[],
+  }
+};
+
 const CollectorConfigurationModal = ({
   show,
   onCancel,
@@ -112,7 +131,7 @@ const CollectorConfigurationModal = ({
   initialPartiallyAssignedConfigs,
   unassignedConfigs,
   getRowData,
-}) => {
+}: Props) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedConfigurations, setSelectedConfigurations] = useState<string[]>(initialAssignedConfigs);
   const [partiallySelectedConfigurations, setPartiallySelectedConfigurations] = useState<string[]>(initialPartiallyAssignedConfigs);
