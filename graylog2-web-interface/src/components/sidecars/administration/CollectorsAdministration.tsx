@@ -35,7 +35,8 @@ import CollectorsAdministrationFilters from './CollectorsAdministrationFilters';
 import CollectorConfigurationModalContainer from './CollectorConfigurationModalContainer';
 import FiltersSummary from './FiltersSummary';
 import style from './CollectorsAdministration.css';
-import { SidecarSummary } from '../types';
+
+import type { SidecarSummary } from '../types';
 
 const HeaderComponentsWrapper = styled.div(({ theme }) => css`
   float: right;
