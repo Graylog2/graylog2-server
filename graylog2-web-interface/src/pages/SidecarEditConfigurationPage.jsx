@@ -18,8 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 
-import { LinkContainer } from 'components/common/router';
-import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
+import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import ConfigurationForm from 'components/sidecars/configuration-forms/ConfigurationForm';
@@ -27,6 +26,8 @@ import ConfigurationHelper from 'components/sidecars/configuration-forms/Configu
 import history from 'util/History';
 import withParams from 'routing/withParams';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
+
+import SidecarsSubareaNavigation from '../components/sidecars/common/SidecarsSubareaNavigation';
 
 const SidecarEditConfigurationPage = createReactClass({
   displayName: 'SidecarEditConfigurationPage',
@@ -78,40 +79,27 @@ const SidecarEditConfigurationPage = createReactClass({
 
     return (
       <DocumentTitle title="Collector Configuration">
-        <span>
-          <PageHeader title="Collector Configuration">
-            <span>
-              Some words about collector configurations.
-            </span>
+        <SidecarsSubareaNavigation />
+        <PageHeader title="Collector Configuration">
+          <span>
+            Some words about collector configurations.
+          </span>
 
-            <span>
-              Read more about the Graylog Sidecar in the documentation.
-            </span>
+          <span>
+            Read more about the Graylog Sidecar in the documentation.
+          </span>
+        </PageHeader>
 
-            <ButtonToolbar>
-              <LinkContainer to={Routes.SYSTEM.SIDECARS.OVERVIEW}>
-                <Button bsStyle="info">Overview</Button>
-              </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.SIDECARS.ADMINISTRATION}>
-                <Button bsStyle="info">Administration</Button>
-              </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.SIDECARS.CONFIGURATION}>
-                <Button bsStyle="info" className="active">Configuration</Button>
-              </LinkContainer>
-            </ButtonToolbar>
-          </PageHeader>
-
-          <Row className="content">
-            <Col md={6}>
-              <ConfigurationForm ref={(c) => { this.configurationForm = c; }}
-                                 configuration={this.state.configuration}
-                                 configurationSidecars={this.state.configurationSidecars} />
-            </Col>
-            <Col md={6}>
-              <ConfigurationHelper onVariableRename={this._variableRenameHandler} />
-            </Col>
-          </Row>
-        </span>
+        <Row className="content">
+          <Col md={6}>
+            <ConfigurationForm ref={(c) => { this.configurationForm = c; }}
+                               configuration={this.state.configuration}
+                               configurationSidecars={this.state.configurationSidecars} />
+          </Col>
+          <Col md={6}>
+            <ConfigurationHelper onVariableRename={this._variableRenameHandler} />
+          </Col>
+        </Row>
       </DocumentTitle>
     );
   },
