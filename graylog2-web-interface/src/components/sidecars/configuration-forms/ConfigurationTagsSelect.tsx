@@ -22,7 +22,7 @@ import MultiSelect from 'components/common/MultiSelect';
 type Props = {
   tags: string[],
   availableTags: { name: string }[],
-  onChange: () => void,
+  onChange: (tagsAsString: string) => void,
 };
 
 const ConfigurationTagsSelect = ({

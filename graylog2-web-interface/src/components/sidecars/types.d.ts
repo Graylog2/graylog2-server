@@ -87,3 +87,8 @@ export type NodeDetails = {
   readonly status: CollectorStatusList;
   readonly tags: string[];
 }
+
+export type ConfigurationSidecarsResponse = {
+  readonly sidecar_ids: string[];
+  readonly configuration_id: string;
+}
