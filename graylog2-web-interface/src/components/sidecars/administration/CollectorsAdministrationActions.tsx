@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import styled from 'styled-components';
@@ -25,9 +25,19 @@ import { Icon } from 'components/common';
 import CollectorConfigurationModalContainer from './CollectorConfigurationModalContainer';
 import CollectorProcessControl from './CollectorProcessControl';
 
+import type { Collector, Configuration, SidecarSummary } from '../types';
+
 const ConfigurationButton = styled(Button)`
   margin-right: 6px
 `;
+
+type Props = {
+  collectors: Collector[],
+  configurations: Configuration[],
+  selectedSidecarCollectorPairs: { collector: Collector, sidecar: SidecarSummary }[],
+  onConfigurationSelectionChange: (pairs: { collector: Collector, sidecar: SidecarSummary }[], configs: Configuration[], callback: () => void) => void,
+  onProcessAction: (action: string, pairs: { collector: Collector, sidecar: SidecarSummary }[], callback: () => void) => void,
+};
 
 const CollectorsAdministrationActions = ({
   collectors,
@@ -35,9 +45,9 @@ const CollectorsAdministrationActions = ({
   selectedSidecarCollectorPairs,
   onConfigurationSelectionChange,
   onProcessAction,
-}) => {
-  const [showConfigurationModal, setShowConfigurationModal] = React.useState(false);
-  const onCancelConfigurationModal = React.useCallback(() => setShowConfigurationModal(false), []);
+}: Props) => {
+  const [showConfigurationModal, setShowConfigurationModal] = useState(false);
+  const onCancelConfigurationModal = useCallback(() => setShowConfigurationModal(false), []);
 
   const selectedLogCollectorsNames = lodash.uniq(selectedSidecarCollectorPairs.map(({ collector }) => collector.name));
   const configButtonTooltip = `Cannot change configurations of ${selectedLogCollectorsNames.join(', ')} collectors simultaneously`;
