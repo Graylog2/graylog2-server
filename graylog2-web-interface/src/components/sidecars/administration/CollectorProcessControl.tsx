@@ -21,9 +21,16 @@ import lodash from 'lodash';
 import { Button, Panel, BootstrapModalConfirm } from 'components/bootstrap';
 import { Pluralize, SelectPopover } from 'components/common';
 
+import type { Collector, SidecarSummary } from '../types';
+
 const PROCESS_ACTIONS = ['start', 'restart', 'stop'];
 
-const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessAction }) => {
+type Props = {
+  selectedSidecarCollectorPairs: { collector: Collector, sidecar: SidecarSummary }[],
+  onProcessAction: (action: string, pairs: { collector: Collector, sidecar: SidecarSummary }[], callback: () => void) => void,
+};
+
+const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessAction }: Props) => {
   const [selectedAction, setSelectedAction] = useState(undefined);
   const [isConfigurationWarningHidden, setIsConfigurationWarningHidden] = useState(false);
   const modalRef = useRef(null);
