@@ -123,18 +123,6 @@ const ConfigurationForm = ({
     _formDataUpdate('template')(nextTemplate);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const replaceConfigurationVariableName = (oldname, newname) => {
-    if (oldname === '' || oldname === newname) {
-      return;
-    }
-
-    // replaceAll without having to use a Regex
-    const updatedTemplate = formData.template.split(`\${user.${oldname}}`).join(`\${user.${newname}}`);
-
-    _onTemplateChange(updatedTemplate);
-  };
-
   const _onNameChange = (event) => {
     const nextName = event.target.value;
 
