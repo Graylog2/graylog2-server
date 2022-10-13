@@ -238,9 +238,19 @@ class Events extends React.Component {
       return renderEmptyContent();
     }
 
-    const filter = parameters.filter.alerts;
+    const { query, filter: { alerts: filter } } = parameters;
     const excludedFile = filter === 'exclude' ? 'Events' : 'Alerts & Events';
     const entity = (filter === 'only' ? 'Alerts' : excludedFile);
+
+    const emptyListComponent = query ? (
+      <Alert bsStyle="info">
+        <Icon name="info-circle" />&nbsp;No {entity} found for the current search criteria.
+      </Alert>
+    ) : (
+      <Alert bsStyle="info">
+        <Icon name="info-circle" />&nbsp;No {entity} exist.
+      </Alert>
+    );
 
     return (
       <Row>
@@ -257,7 +267,7 @@ class Events extends React.Component {
                          totalItems={totalEvents}
                          onChange={onPageChange}>
             {eventList.length === 0 ? (
-              <Alert bsStyle="info">No {entity} found for the current search criteria.</Alert>
+              emptyListComponent
             ) : (
               <EventsTable id="events-table">
                 <thead>
