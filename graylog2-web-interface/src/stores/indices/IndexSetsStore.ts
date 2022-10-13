@@ -16,6 +16,7 @@
  */
 import Reflux from 'reflux';
 import PropTypes from 'prop-types';
+import isArray from 'lodash/isArray';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
@@ -278,6 +279,10 @@ export const IndexSetsStore = singletonStore(
 
     _errorMessage(error) {
       try {
+        if (isArray(error.additional.body)) {
+          return error.additional.body.map(({ message, path }) => `${path ?? ''} ${message}`).join(' ; ');
+        }
+
         return error.additional.body.message;
       } catch (e) {
         return error.message;
