@@ -23,7 +23,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import connect from 'stores/connect';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
 import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 import EventNotificationActionLinks from 'components/event-notifications/event-notification-details/EventNotificationActionLinks';
@@ -31,8 +31,6 @@ import withParams from 'routing/withParams';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import EventsSubareaNavigation from 'components/events/EventsSubareaNavigation';
-
-const { isPermitted } = PermissionsMixin;
 
 class EditEventDefinitionPage extends React.Component {
   static propTypes = {

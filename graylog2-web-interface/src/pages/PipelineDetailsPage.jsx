@@ -47,8 +47,10 @@ function filterConnections(state) {
 }
 
 const PipelineDetailsPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'PipelineDetailsPage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     params: PropTypes.object.isRequired,
   },

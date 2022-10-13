@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
 import { Col, Row } from 'components/bootstrap';
@@ -24,6 +25,7 @@ import ConfigurationHelper from 'components/sidecars/configuration-forms/Configu
 import SidecarsSubareaNavigation from 'components/sidecars/common/SidecarsSubareaNavigation';
 
 const SidecarNewConfigurationPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'SidecarNewConfigurationPage',
 
   _variableRenameHandler(oldname, newname) {

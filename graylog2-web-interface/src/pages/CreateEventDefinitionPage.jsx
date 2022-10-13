@@ -25,7 +25,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import connect from 'stores/connect';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import EventsSubareaNavigation from 'components/events/EventsSubareaNavigation';
@@ -57,7 +57,7 @@ class CreateEventDefinitionPage extends React.Component {
 
     const { currentUser } = this.props;
 
-    if (!PermissionsMixin.isPermitted(currentUser.permissions, 'eventdefinitions:create')) {
+    if (!isPermitted(currentUser.permissions, 'eventdefinitions:create')) {
       history.push(Routes.NOTFOUND);
     }
 

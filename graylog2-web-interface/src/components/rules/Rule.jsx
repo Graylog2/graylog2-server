@@ -17,12 +17,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
 import { PageHeader } from 'components/common';
-import { Row, Col, Button } from 'components/bootstrap';
+import { Row, Col } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import Routes from 'routing/Routes';
 
 import RuleForm from './RuleForm';
 import RuleHelper from './RuleHelper';

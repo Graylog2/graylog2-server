@@ -31,7 +31,6 @@ import withParams from 'routing/withParams';
 import EventNotificationDetails from 'components/event-notifications/event-notification-details/EventNotificationDetails';
 import EventNotificationActionLinks from 'components/event-notifications/event-notification-details/EventNotificationActionLinks';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
-
 import {} from 'components/event-notifications/event-notification-types';
 import EventsSubareaNavigation from 'components/events/EventsSubareaNavigation';
 

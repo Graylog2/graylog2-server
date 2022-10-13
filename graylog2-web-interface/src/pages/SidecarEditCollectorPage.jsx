@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
 import { Col, Row } from 'components/bootstrap';
@@ -28,8 +29,10 @@ import withParams from 'routing/withParams';
 import SidecarsSubareaNavigation from 'components/sidecars/common/SidecarsSubareaNavigation';
 
 const SidecarEditCollectorPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'SidecarEditCollectorPage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     params: PropTypes.object.isRequired,
   },
