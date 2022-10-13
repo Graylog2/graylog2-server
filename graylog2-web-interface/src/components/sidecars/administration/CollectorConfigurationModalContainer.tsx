@@ -47,8 +47,8 @@ const CollectorConfigurationModalContainer = ({
   show,
   onCancel,
 }: Props) => {
-  const [nextAssignedConfigurations, setNextAssignedConfigurations] = useState([]);
-  const [nextPartiallyAssignedConfigurations, setNextPartiallyAssignedConfigurations] = useState([]);
+  const [nextAssignedConfigurations, setNextAssignedConfigurations] = useState<string[]>([]);
+  const [nextPartiallyAssignedConfigurations, setNextPartiallyAssignedConfigurations] = useState<string[]>([]);
   const modalConfirm = useRef(null);
 
   const getSelectedLogCollector = () => {

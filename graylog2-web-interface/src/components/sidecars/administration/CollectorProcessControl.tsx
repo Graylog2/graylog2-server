@@ -31,7 +31,7 @@ type Props = {
 };
 
 const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessAction }: Props) => {
-  const [selectedAction, setSelectedAction] = useState(undefined);
+  const [selectedAction, setSelectedAction] = useState<string>('');
   const [isConfigurationWarningHidden, setIsConfigurationWarningHidden] = useState(false);
   const modalRef = useRef(null);
 
@@ -39,13 +39,13 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
     setSelectedAction(undefined);
   };
 
-  const handleProcessActionSelect = (processAction, hideCallback) => {
+  const handleProcessActionSelect = (processAction: string[], hideCallback: () => void) => {
     hideCallback();
     setSelectedAction(processAction ? processAction[0] : undefined);
     modalRef.current?.open();
   };
 
-  const confirmProcessAction = (doneCallback) => {
+  const confirmProcessAction = (doneCallback: () => void) => {
     const callback = () => {
       doneCallback();
       resetSelectedAction();
@@ -62,7 +62,7 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
     setIsConfigurationWarningHidden(true);
   };
 
-  const renderSummaryContent = (selectedSidecars) => {
+  const renderSummaryContent = (selectedSidecars: string[]) => {
     return (
       <>
         <p>
@@ -93,7 +93,7 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
   };
 
   const renderProcessActionSummary = () => {
-    const selectedSidecars = lodash.uniq(selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name));
+    const selectedSidecars = lodash.uniq<string>(selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name));
 
     // Check if all selected collectors have assigned configurations
     const allHaveConfigurationsAssigned = selectedSidecarCollectorPairs.every(({ collector, sidecar }) => {
@@ -117,7 +117,7 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
     );
   };
 
-  const actionFormatter = (action) => lodash.capitalize(action);
+  const actionFormatter = (action: string) => lodash.capitalize(action);
 
   return (
     <span>

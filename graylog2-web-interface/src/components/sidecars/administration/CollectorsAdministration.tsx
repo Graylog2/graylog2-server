@@ -82,17 +82,17 @@ const CollectorsAdministration = ({
   onProcessAction,
 }: Props) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(false);
-  const [selected, setSelected] = useState([]);
+  const [selected, setSelected] = useState<string[]>([]);
   const selectAllInput = useRef(null);
 
   // Filter out sidecars with no compatible collectors
   const enabledCollectors = sidecarCollectorPairs.filter(({ collector }) => !lodash.isEmpty(collector));
 
-  const sidecarCollectorId = (sidecar, collector) => {
+  const sidecarCollectorId = (sidecar: SidecarSummary, collector: Collector) => {
     return `${sidecar.node_id}-${collector.name}`;
   };
 
-  const isAllSelected = (_collectors, _selected) => {
+  const isAllSelected = (_collectors: ({ collector: Collector, sidecar: SidecarSummary }|Collector)[], _selected: string[]) => {
     return _collectors.length > 0 && _collectors.length === _selected.length;
   };
 
@@ -105,11 +105,11 @@ const CollectorsAdministration = ({
     }
   }, [selectAllInput, collectors, selected]);
 
-  const handleConfigurationChange = (selectedSidecars, selectedConfigurations, doneCallback) => {
+  const handleConfigurationChange = (selectedSidecars: { collector: Collector, sidecar: SidecarSummary }[], selectedConfigurations: Configuration[], doneCallback: () => void) => {
     onConfigurationChange(selectedSidecars, selectedConfigurations, doneCallback);
   };
 
-  const handleProcessAction = (action, selectedSidecarCollectorPairs, doneCallback) => {
+  const handleProcessAction = (action: string, selectedSidecarCollectorPairs: { collector: Collector, sidecar: SidecarSummary }[], doneCallback: () => void) => {
     const selectedCollectors = {};
 
     selectedSidecarCollectorPairs.forEach(({ sidecar, collector }) => {
@@ -131,7 +131,7 @@ const CollectorsAdministration = ({
     setSelected(newSelection);
   };
 
-  const formatHeader = (selectedSidecarCollectorPairs) => {
+  const formatHeader = (selectedSidecarCollectorPairs: { collector: Collector, sidecar: SidecarSummary }[]) => {
     const selectedItems = selected.length;
 
     let headerMenu;
@@ -169,7 +169,7 @@ const CollectorsAdministration = ({
     );
   };
 
-  const handleSidecarCollectorSelect = (collectorId) => {
+  const handleSidecarCollectorSelect = (collectorId: string) => {
     return (event) => {
       const newSelection = (event.target.checked
         ? lodash.union(selected, [collectorId])
@@ -179,7 +179,7 @@ const CollectorsAdministration = ({
     };
   };
 
-  const formatSidecarNoCollectors = (sidecar) => {
+  const formatSidecarNoCollectors = (sidecar: SidecarSummary) => {
     return (
       <ControlledTableList.Item key={`sidecar-${sidecar.node_id}`}>
         <DisabledCollector className={`${style.collectorEntry} ${style.alignedInformation}`}>
@@ -203,7 +203,7 @@ const CollectorsAdministration = ({
     );
   };
 
-  const formatCollector = (sidecar, collector, _configurations) => {
+  const formatCollector = (sidecar: SidecarSummary, collector: Collector, _configurations: Configuration[]) => {
     const collectorId = sidecarCollectorId(sidecar, collector);
     const configAssignmentIDs = sidecar.assignments.filter((assignment) => assignment.collector_id === collector.id).map((assignment) => assignment.configuration_id);
     const configAssignments = _configurations.filter((config) => configAssignmentIDs.includes(config.id)).sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name));
@@ -267,7 +267,7 @@ const CollectorsAdministration = ({
     );
   };
 
-  const formatSidecar = (sidecar, _collectors, _configurations) => {
+  const formatSidecar = (sidecar: SidecarSummary, _collectors: Collector[], _configurations: Configuration[]) => {
     if (_collectors.length === 0) {
       return formatSidecarNoCollectors(sidecar);
     }
@@ -289,8 +289,8 @@ const CollectorsAdministration = ({
     );
   };
 
-  const handleSearch = (_query, callback) => {
-    onQueryChange(_query, callback());
+  const handleSearch = (_query: string, callback: () => void) => {
+    onQueryChange(_query, callback);
   };
 
   const handleReset = () => {
