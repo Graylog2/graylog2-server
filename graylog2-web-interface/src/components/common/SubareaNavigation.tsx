@@ -26,6 +26,9 @@ const Container = styled(ButtonToolbar)`
 `;
 
 const StyledButton = styled(Button)(({ theme }) => css`
+  font-family: ${theme.fonts.family.navigation};
+  font-size: ${theme.fonts.size.navigation};
+
   &&&& {
     color: ${theme.colors.variant.darker.default};
     
