@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useLayoutEffect, useRef } from 'react';
-import { get, isEqual, last } from 'lodash';
+import { flatten, get, isEqual, last } from 'lodash';
 import styled, { css } from 'styled-components';
 import type { OrderedMap } from 'immutable';
 import Immutable from 'immutable';
@@ -44,22 +44,6 @@ const CenteredTh = styled.th`
   text-align: center;
 `;
 
-type HeaderFilterProps = {
-  activeQuery: string;
-  fields: (FieldTypeMappingsList | Array<FieldTypeMapping>);
-  field: string;
-  prefix?: (string | number);
-  span?: number;
-  title?: string;
-  onSortChange: (sortConfig: Array<SortConfig>) => Promise<Widgets>;
-  sortConfigMap: OrderedMap<string, SortConfig>;
-  sortable?: boolean;
-  sortType?: 'pivot' | 'series' | undefined
-  onSetColumnsWidth?: (props: { field: string, offsetWidth: number }) => void
-  isPinned?: boolean | undefined,
-  showPinIcon?: boolean,
-  togglePin: (field: string) => void,
-}
 const PinIcon = styled.button(({ theme }) => {
   return css`
     border: 0;
@@ -73,6 +57,23 @@ const PinIcon = styled.button(({ theme }) => {
     }
 `;
 });
+
+type HeaderFilterProps = {
+  activeQuery: string;
+  fields: (FieldTypeMappingsList | Array<FieldTypeMapping>);
+  field: string;
+  prefix?: (string | number);
+  span?: number;
+  title?: string;
+  onSortChange: (sortConfig: Array<SortConfig>) => Promise<Widgets>;
+  sortConfigMap: OrderedMap<string, SortConfig>;
+  sortable: boolean;
+  sortType?: 'pivot' | 'series' | undefined
+  onSetColumnsWidth?: (props: { field: string, offsetWidth: number }) => void
+  isPinned?: boolean | undefined,
+  showPinIcon?: boolean,
+  togglePin: (field: string) => void,
+}
 
 const HeaderField = ({ activeQuery, fields, field, prefix = '', span = 1, title = field, onSortChange, sortConfigMap, sortable, sortType, onSetColumnsWidth, isPinned, showPinIcon = false, togglePin }: HeaderFilterProps) => {
   const type = fieldTypeFor(field, fields);
@@ -128,6 +129,11 @@ const HeaderFieldForValue = ({ activeQuery, field, value, span = 1, prefix = '',
   </CenteredTh>
 );
 
+HeaderFieldForValue.defaultProps = {
+  span: 1,
+  prefix: '',
+};
+
 const Spacer = ({ span }: { span: number }) => <th aria-label="spacer" colSpan={span} className={styles.leftAligned} />;
 
 type ColumnHeadersProps = {
@@ -175,7 +181,12 @@ const ColumnPivotFieldsHeaders = ({ activeQuery, fields, pivots, values, series,
     );
   });
 
+  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{headerRows}</>;
+};
+
+ColumnPivotFieldsHeaders.defaultProps = {
+  offset: 1,
 };
 
 type Props = {
