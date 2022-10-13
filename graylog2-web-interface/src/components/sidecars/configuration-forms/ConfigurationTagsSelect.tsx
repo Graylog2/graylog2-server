@@ -19,31 +19,39 @@ import React from 'react';
 
 import MultiSelect from 'components/common/MultiSelect';
 
-class ConfigurationTagsSelect extends React.Component {
-  static propTypes = {
-    tags: PropTypes.arrayOf(PropTypes.string),
-    availableTags: PropTypes.array.isRequired,
-    onChange: PropTypes.func.isRequired,
-  };
+type Props = {
+  tags: string[],
+  availableTags: { name: string }[],
+  onChange: () => void,
+};
 
-  static defaultProps = {
-    tags: [],
-  };
+const ConfigurationTagsSelect = ({
+  tags,
+  availableTags,
+  onChange,
+}: Props) => {
+  const tagsValue = tags.join(',');
+  const tagsOptions = availableTags.map((tag) => {
+    return { value: tag.name, label: tag.name };
+  });
 
-  render() {
-    const tagsValue = this.props.tags.join(',');
-    const tagsOptions = this.props.availableTags.map((tag) => {
-      return { value: tag.name, label: tag.name };
-    });
+  return (
+    <MultiSelect options={tagsOptions}
+                 value={tagsValue}
+                 onChange={onChange}
+                 placeholder="Choose tags..."
+                 allowCreate />
+  );
+};
 
-    return (
-      <MultiSelect options={tagsOptions}
-                   value={tagsValue}
-                   onChange={this.props.onChange}
-                   placeholder="Choose tags..."
-                   allowCreate />
-    );
-  }
-}
+ConfigurationTagsSelect.propTypes = {
+  tags: PropTypes.arrayOf(PropTypes.string),
+  availableTags: PropTypes.array.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
+ConfigurationTagsSelect.defaultProps = {
+  tags: [],
+};
 
 export default ConfigurationTagsSelect;
