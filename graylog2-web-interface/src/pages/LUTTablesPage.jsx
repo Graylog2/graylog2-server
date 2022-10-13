@@ -21,13 +21,14 @@ import { LinkContainer } from 'components/common/router';
 import connect from 'stores/connect';
 import Routes from 'routing/Routes';
 import history from 'util/History';
-import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
+import { Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { LookupTableView, LookupTableCreate, LookupTableForm, LookupTablesOverview } from 'components/lookup-tables';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
+import LUTSubareaNavigation from 'components/lookup-tables/LUTSubareaNavigation';
 
 const _saved = () => {
   // reset detail state
@@ -167,30 +168,17 @@ class LUTTablesPage extends React.Component {
 
     return (
       <DocumentTitle title="Lookup Tables">
-        <span>
-          <PageHeader title="Lookup Tables"
-                      subactions={(
-                        <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
-                          <Button bsStyle="success" style={{ marginLeft: 5 }}>Create lookup table</Button>
-                        </LinkContainer>
+        <LUTSubareaNavigation />
+        <PageHeader title="Lookup Tables"
+                    subactions={(
+                      <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
+                        <Button bsStyle="success" style={{ marginLeft: 5 }}>Create lookup table</Button>
+                      </LinkContainer>
                       )}>
-            <span>Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages.</span>
-            {null}
-            <ButtonToolbar>
-              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
-                <Button bsStyle="info">Lookup Tables</Button>
-              </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW}>
-                <Button bsStyle="info">Caches</Button>
-              </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}>
-                <Button bsStyle="info">Data Adapters</Button>
-              </LinkContainer>
-            </ButtonToolbar>
-          </PageHeader>
+          <span>Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages.</span>
+        </PageHeader>
 
-          {content}
-        </span>
+        {content}
       </DocumentTitle>
     );
   }
