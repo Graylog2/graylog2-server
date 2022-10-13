@@ -29,6 +29,7 @@ import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon'
 import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';
 import StatusIndicator from 'components/sidecars/common/StatusIndicator';
 import commonStyle from 'components/sidecars/common/CommonSidecarStyles.css';
+import type { Pagination } from 'views/stores/DashboardsStore';
 
 import CollectorsAdministrationActions from './CollectorsAdministrationActions';
 import CollectorsAdministrationFilters from './CollectorsAdministrationFilters';
@@ -36,7 +37,7 @@ import CollectorConfigurationModalContainer from './CollectorConfigurationModalC
 import FiltersSummary from './FiltersSummary';
 import style from './CollectorsAdministration.css';
 
-import type { SidecarSummary } from '../types';
+import type { Collector, Configuration, SidecarSummary } from '../types';
 
 const HeaderComponentsWrapper = styled.div(({ theme }) => css`
   float: right;
@@ -53,6 +54,20 @@ const DisabledCollector = styled.div(({ theme }) => css`
 
 export const PAGE_SIZES = [10, 25, 50, 100];
 
+type Props = {
+  collectors: Collector[],
+  configurations: Configuration[],
+  sidecarCollectorPairs: { collector: Collector, sidecar: SidecarSummary }[],
+  query: string,
+  filters: { [_key: string]: string },
+  pagination: Pagination,
+  onPageChange: (currentPage: number, pageSize: number) => void,
+  onFilter: (collectorIds?: string[], callback?: () => void) => void,
+  onQueryChange: (query?: string, callback?: () => void) => void,
+  onConfigurationChange: (pairs: { collector: Collector, sidecar: SidecarSummary }[], configs: Configuration[], callback: () => void) => void,
+  onProcessAction: (action: string, collectorDict: { [sidecarId: string]: string[] }, callback: () => void) => void,
+};
+
 const CollectorsAdministration = ({
   configurations,
   collectors,
@@ -65,13 +80,13 @@ const CollectorsAdministration = ({
   onQueryChange,
   onConfigurationChange,
   onProcessAction,
-}) => {
+}: Props) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(false);
   const [selected, setSelected] = useState([]);
   const selectAllInput = useRef(null);
 
   // Filter out sidecars with no compatible collectors
-  const enabledCollectors = collectors.filter(({ collector }) => !lodash.isEmpty(collector));
+  const enabledCollectors = sidecarCollectorPairs.filter(({ collector }) => !lodash.isEmpty(collector));
 
   const sidecarCollectorId = (sidecar, collector) => {
     return `${sidecar.node_id}-${collector.name}`;
