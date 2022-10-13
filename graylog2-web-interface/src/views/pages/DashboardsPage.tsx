@@ -20,8 +20,8 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import DocsHelper from 'util/DocsHelper';
 import { LinkContainer } from 'components/common/router';
-import { Col, Row, Button } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, IfPermitted } from 'components/common';
+import { Alert, Col, Row, Button } from 'components/bootstrap';
+import { DocumentTitle, PageHeader, IfPermitted, Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import DashboardList from 'views/components/views/DashboardList';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
@@ -58,6 +58,20 @@ const DashboardsPage = () => {
 
   const { list, pagination } = useDashboards(searchQuery, page, pageSize);
 
+  const createDashboardButtonText = (
+    <IfPermitted permissions="dashboards:create">
+      <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
+        <Button bsSize="small" bsStyle="success" className="btn-text">Create one now</Button>
+      </LinkContainer>
+    </IfPermitted>
+  );
+
+  const noDashboardsFound = (
+    <Alert bsStyle="warning">
+      <Icon name="info-circle" />&nbsp;No dashboards have been created yet. {createDashboardButtonText}
+    </Alert>
+  );
+
   return (
     <DocumentTitle title="Dashboards">
       <PageHeader title="Dashboards"
@@ -76,20 +90,23 @@ const DashboardsPage = () => {
           Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or
           chart you create in other parts of Graylog with one click.
         </span>
+
       </PageHeader>
 
       <Row className="content">
         <Col md={12}>
-          <DashboardList dashboards={list}
-                         pagination={pagination}
-                         handleSearch={handleSearch}
-                         handleDashboardDelete={handleDashboardDelete} />
+          {list !== undefined && list.length === 0 && !searchQuery
+            ? noDashboardsFound
+            : (
+              <DashboardList dashboards={list}
+                             pagination={pagination}
+                             handleSearch={handleSearch}
+                             handleDashboardDelete={handleDashboardDelete} />
+            )}
         </Col>
       </Row>
     </DocumentTitle>
   );
 };
-
-DashboardsPage.propTypes = {};
 
 export default DashboardsPage;
