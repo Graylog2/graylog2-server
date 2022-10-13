@@ -64,6 +64,7 @@ const UserEditPage = ({ params }: Props) => {
 
   return (
     <DocumentTitle title={`Edit User ${fullName}`}>
+      <UsersSubareaNavigation />
       <PageHeader title={<PageTitle fullName={fullName} />}
                   subactions={(
                     <UserActionLinks userId={userId}
@@ -78,8 +79,6 @@ const UserEditPage = ({ params }: Props) => {
           <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                              text="documentation" />
         </span>
-
-        <UsersSubareaNavigation />
       </PageHeader>
       <UserEdit user={userToEdit} />
     </DocumentTitle>

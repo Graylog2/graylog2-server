@@ -43,6 +43,11 @@ const StyledButton = styled(Button)(({ theme }) => css`
 StyledButton.displayName = 'Button';
 
 type Props = {
+  /**
+   * List of nav items. Define permissions, if the item should only be displayed for users with specific permissions.
+   * By default, an item is active if the current URL starts with the item URL.
+   * If you only want to display an item as active only when its path matches exactly, set `exactPathMatch` to true.
+   */
   items: Array<{
     title: string,
     path: string,
@@ -51,6 +56,9 @@ type Props = {
   }>
 }
 
+/**
+ * Simple tab navigation to allow navigating to subareas of a page.
+ */
 const SubareaNavigation = ({ items }: Props) => (
   <Container>
     {items.map(({ path, title, permissions, exactPathMatch }) => {
@@ -59,7 +67,7 @@ const SubareaNavigation = ({ items }: Props) => (
       }
 
       return (
-        <IfPermitted permissions={permissions} key={path}>
+        <IfPermitted permissions={permissions ?? []} key={path}>
           <LinkContainer to={path} relativeActive={!exactPathMatch}>
             <StyledButton bsStyle="link">{title}</StyledButton>
           </LinkContainer>

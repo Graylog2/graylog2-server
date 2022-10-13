@@ -26,10 +26,10 @@ const NAV_ITEMS = [
   { title: 'Configuration', path: Routes.SYSTEM.SIDECARS.CONFIGURATION },
 ];
 
-const EventsSubareaNavigation = () => (
+const SidecarsSubareaNavigation = () => (
   <Row>
     <SubareaNavigation items={NAV_ITEMS} />
   </Row>
 );
 
-export default EventsSubareaNavigation;
+export default SidecarsSubareaNavigation;
