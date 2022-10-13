@@ -20,19 +20,19 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { LinkContainer } from 'components/common/router';
-import { Button, Col, Row } from 'components/bootstrap';
+import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Pipeline from 'components/pipelines/Pipeline';
 import NewPipeline from 'components/pipelines/NewPipeline';
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import ObjectUtils from 'util/ObjectUtils';
-import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import { StreamsStore } from 'stores/streams/StreamsStore';
 import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
 import { PipelinesStore, PipelinesActions } from 'stores/pipelines/PipelinesStore';
 import { RulesStore } from 'stores/rules/RulesStore';
+
+import PipelinesSubareaNavigation from '../components/pipelines/PipelinesSubareaNavigation';
 
 function filterPipeline(state) {
   return state.pipelines ? state.pipelines.filter((p) => p.id === this.props.params.pipelineId)[0] : undefined;
@@ -159,6 +159,7 @@ const PipelineDetailsPage = createReactClass({
     return (
       <DocumentTitle title={pageTitle}>
         <div>
+          <PipelinesSubareaNavigation />
           <PageHeader title={title}>
             <span>
               Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where
@@ -167,20 +168,6 @@ const PipelineDetailsPage = createReactClass({
             <span>
               After each stage is completed, you can decide if messages matching all or one of the rules continue to
               the next stage.
-            </span>
-
-            <span>
-              <LinkContainer to={Routes.SYSTEM.PIPELINES.OVERVIEW}>
-                <Button bsStyle="info">Manage pipelines</Button>
-              </LinkContainer>
-              &nbsp;
-              <LinkContainer to={Routes.SYSTEM.PIPELINES.RULES}>
-                <Button bsStyle="info">Manage rules</Button>
-              </LinkContainer>
-              &nbsp;
-              <LinkContainer to={Routes.SYSTEM.PIPELINES.SIMULATOR}>
-                <Button bsStyle="info">Simulator</Button>
-              </LinkContainer>
             </span>
           </PageHeader>
 
