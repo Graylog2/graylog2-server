@@ -61,36 +61,32 @@ const DashboardsPage = () => {
 
   return (
     <DocumentTitle title="Dashboards">
-      <span>
-        <PageHeader title="Dashboards"
-                    subactions={(
-                      <IfPermitted permissions="dashboards:create">
-                        <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
-                          <Button bsStyle="success">Create new dashboard</Button>
-                        </LinkContainer>
-                      </IfPermitted>
-                    )}>
-          <span>
-            Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or
-            chart you create in other parts of Graylog with one click.
-          </span>
+      <PageHeader title="Dashboards"
+                  subactions={(
+                    <IfPermitted permissions="dashboards:create">
+                      <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
+                        <Button bsStyle="success">Create new dashboard</Button>
+                      </LinkContainer>
+                    </IfPermitted>
+                    )}
+                  documentationLink={{
+                    title: 'Dashboard documentation',
+                    path: DocsHelper.PAGES.DASHBOARDS,
+                  }}>
+        <span>
+          Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or
+          chart you create in other parts of Graylog with one click.
+        </span>
+      </PageHeader>
 
-          <span>
-            Take a look at the
-            {' '}<DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="dashboard tutorial" />{' '}
-            for lots of other useful tips.
-          </span>
-        </PageHeader>
-
-        <Row className="content">
-          <Col md={12}>
-            <DashboardList dashboards={list}
-                           pagination={pagination}
-                           handleSearch={handleSearch}
-                           handleDashboardDelete={handleDashboardDelete} />
-          </Col>
-        </Row>
-      </span>
+      <Row className="content">
+        <Col md={12}>
+          <DashboardList dashboards={list}
+                         pagination={pagination}
+                         handleSearch={handleSearch}
+                         handleDashboardDelete={handleDashboardDelete} />
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };

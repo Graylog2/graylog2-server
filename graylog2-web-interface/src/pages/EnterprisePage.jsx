@@ -47,8 +47,6 @@ const EnterprisePage = () => {
     <DocumentTitle title="Try Graylog Enterprise">
       <div>
         <PageHeader title="Try Graylog Enterprise">
-          {null}
-
           <span>
             Graylog Enterprise adds commercial functionality to the Open Source Graylog core. You can learn more
             about Graylog Enterprise on the <EnterpriseProductLink>product page</EnterpriseProductLink>.
