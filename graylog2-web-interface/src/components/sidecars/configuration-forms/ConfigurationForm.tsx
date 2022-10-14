@@ -58,12 +58,11 @@ const ConfigurationForm = ({
   const [validationErrors, setValidationErrors] = useState({});
   const previewModal = useRef(null);
   const uploadsModal = useRef(null);
+  const defaultTemplates = useRef({});
 
   useEffect(() => {
     CollectorsActions.all().then((response) => setCollectors(response.collectors));
   }, []);
-
-  const defaultTemplates = {};
 
   const _isTemplateSet = (template) => {
     return template !== undefined && template !== '';
@@ -136,7 +135,7 @@ const ConfigurationForm = ({
   };
 
   const _getCollectorDefaultTemplate = (collectorId) => {
-    const storedTemplate = defaultTemplates[collectorId];
+    const storedTemplate = defaultTemplates.current[collectorId];
 
     if (storedTemplate !== undefined) {
       // eslint-disable-next-line no-promise-executor-return
@@ -144,15 +143,15 @@ const ConfigurationForm = ({
     }
 
     return CollectorsActions.getCollector(collectorId).then((collector) => {
-      defaultTemplates[collectorId] = collector.default_template;
+      defaultTemplates.current[collectorId] = collector.default_template;
 
       return collector.default_template;
     });
   };
 
-  const _onCollectorChange = (nextId) => {
+  const _onCollectorChange = async (nextId) => {
     // Start loading the request to get the default template, so it is available asap.
-    const defaultTemplatePromise = _getCollectorDefaultTemplate(nextId);
+    const defaultTemplate = await _getCollectorDefaultTemplate(nextId);
 
     const nextFormData = lodash.cloneDeep(formData);
 
@@ -160,11 +159,8 @@ const ConfigurationForm = ({
 
     // eslint-disable-next-line no-alert
     if (!nextFormData.template || window.confirm('Do you want to use the default template for the selected Configuration?')) {
-      // Wait for the promise to resolve and then update the whole formData state
-      defaultTemplatePromise.then((defaultTemplate) => {
-        _onTemplateChange(defaultTemplate);
-        nextFormData.template = defaultTemplate;
-      });
+      _onTemplateChange(defaultTemplate);
+      nextFormData.template = defaultTemplate;
     }
 
     setFormData(nextFormData);
