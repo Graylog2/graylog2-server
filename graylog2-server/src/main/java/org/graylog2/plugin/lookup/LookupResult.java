@@ -101,6 +101,14 @@ public abstract class LookupResult {
         return DEFAULT_ERROR_LOOKUP_RESULT;
     }
 
+    public static LookupResult withError(String errorMsg) {
+        return builder()
+                .cacheTTL(ERROR_CACHE_TTL)
+                .hasError(true)
+                .singleValue(errorMsg)
+                .build();
+    }
+
     public static LookupResult withError(long errorTTL) {
         return builder().hasError(true).cacheTTL(errorTTL).build();
     }
@@ -108,6 +116,7 @@ public abstract class LookupResult {
     public static LookupResult single(final CharSequence singleValue) {
         return multi(singleValue, Collections.singletonMap(SINGLE_VALUE_KEY, singleValue));
     }
+
     public static LookupResult single(final Number singleValue) {
         return multi(singleValue, Collections.singletonMap(SINGLE_VALUE_KEY, singleValue));
     }
@@ -186,12 +195,16 @@ public abstract class LookupResult {
     }
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public abstract static class Builder {
         // We don't want users of this class to set a generic Object single value
         abstract Builder singleValue(Object singleValue);
+
         public abstract Builder multiValue(Map<Object, Object> multiValue);
+
         public abstract Builder stringListValue(List<String> stringListValue);
+
         public abstract Builder cacheTTL(long cacheTTL);
+
         public abstract Builder hasError(boolean hasError);
 
         public Builder single(CharSequence singleValue) {
