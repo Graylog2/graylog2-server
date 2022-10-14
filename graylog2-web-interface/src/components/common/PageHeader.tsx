@@ -21,6 +21,7 @@ import styled, { css } from 'styled-components';
 
 import { Col, Label, Tooltip } from 'components/bootstrap';
 import { OverlayTrigger } from 'components/common';
+import DocumentationLink from 'components/support/DocumentationLink';
 import ContentHeadRow from 'components/common/ContentHeadRow';
 import SupportLink from 'components/support/SupportLink';
 
@@ -45,6 +46,16 @@ const ActionsSM = styled.div`
   > :not(:last-child) {
     margin-right: 5px;
   }
+`;
+
+const FlexRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const Subactions = styled.div`
+  display: flex !important;
+  align-items: flex-end;
 `;
 
 const LIFECYCLE_DEFAULT_MESSAGES = {
@@ -83,6 +94,7 @@ type Props = {
   lifecycle?: 'experimental' | 'legacy',
   lifecycleMessage?: React.ReactNode,
   subpage: boolean,
+  documentationLink?: { title: string, path: string }
 };
 
 /**
@@ -90,7 +102,7 @@ type Props = {
  * This ensures all pages look and feel the same way across the product, so
  * please use it in your pages.
  */
-const PageHeader = ({ children: childList, subpage, title, subactions, lifecycle, lifecycleMessage }: Props) => {
+const PageHeader = ({ children: childList, subpage, title, subactions, lifecycle, lifecycleMessage, documentationLink }: Props) => {
   const children = (childList !== undefined && 'length' in childList ? childList : [childList]);
 
   const topLevelClassNames = subpage ? '' : 'content';
@@ -99,43 +111,46 @@ const PageHeader = ({ children: childList, subpage, title, subactions, lifecycle
     <div>
       <ContentHeadRow className={topLevelClassNames}>
         <Col sm={12}>
-          {children[2] && (
-          <div className="actions-lg visible-lg visible-md">
-            <div className="actions-container">
-              {children[2]}
-            </div>
-          </div>
-          )}
+          <FlexRow>
+            <H1>
+              {title} <small><LifecycleIndicator lifecycle={lifecycle} lifecycleMessage={lifecycleMessage} /></small>
+            </H1>
+            {(children[1] || children[2] || documentationLink) && (
+              <div>
+                {children[2] && (
+                  <div className="actions-lg visible-lg visible-md">
+                    <div className="actions-container">
+                      {children[2]}
+                    </div>
+                  </div>
+                )}
+                {children[1]}
+                {documentationLink && <DocumentationLink text={documentationLink.title} page={documentationLink.path} displayIcon />}
+              </div>
+            )}
+          </FlexRow>
 
-          <H1>
-            {title} <small><LifecycleIndicator lifecycle={lifecycle} lifecycleMessage={lifecycleMessage} /></small>
-          </H1>
+          <FlexRow>
+            {children[0] && (
+              <p className="description no-bm">
+                {children[0]}
+              </p>
+            )}
 
-          {children[0] && (
-          <p className="description">
-            {children[0]}
-          </p>
-          )}
-
-          {children[1] && (
-          <SupportLink>
-            {children[1]}
-          </SupportLink>
-          )}
-
-          {subactions && (
-          <div className="pull-right visible-lg visible-md">
-            {subactions}
-          </div>
-          )}
+            {subactions && (
+              <Subactions>
+                {subactions}
+              </Subactions>
+            )}
+          </FlexRow>
         </Col>
 
         {children[2] && (
-        <Col sm={12} lgHidden mdHidden className="actions-sm">
-          <ActionsSM>
-            {children[2]}{subactions}
-          </ActionsSM>
-        </Col>
+          <Col sm={12} lgHidden mdHidden className="actions-sm">
+            <ActionsSM>
+              {children[2]}{subactions}
+            </ActionsSM>
+          </Col>
         )}
       </ContentHeadRow>
     </div>
@@ -162,6 +177,8 @@ PageHeader.propTypes = {
   lifecycleMessage: PropTypes.node,
   /** Specifies if the page header is children of a content `Row` or not. */
   subpage: PropTypes.bool,
+  /** Specifies a specific link fir the documentation. The title should be short. */
+  documentationLink: PropTypes.object,
 };
 
 PageHeader.defaultProps = {
@@ -170,6 +187,7 @@ PageHeader.defaultProps = {
   lifecycleMessage: undefined,
   subactions: undefined,
   subpage: false,
+  documentationLink: undefined,
 };
 
 export default PageHeader;
