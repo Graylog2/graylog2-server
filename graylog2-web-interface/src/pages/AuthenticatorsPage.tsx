@@ -20,21 +20,19 @@ import AuthenticationSubareaNavigation from 'components/authentication/Authentic
 import AuthenticatorActionLinks from 'components/authentication/AuthenticatorActionLinks';
 import AuthenticatorsDetails from 'components/authentication/AuthenticatorsDetails';
 import { PageHeader, DocumentTitle } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 
 const AuthenticatorsPage = () => (
   <DocumentTitle title="Authenticators Details">
     <AuthenticationSubareaNavigation />
-    <PageHeader title="Authenticators Details" subactions={<AuthenticatorActionLinks />}>
+    <PageHeader title="Authenticators Details"
+                subactions={<AuthenticatorActionLinks />}
+                documentationLink={{
+                  title: 'Authenticators documentation',
+                  path: DocsHelper.PAGES.AUTHENTICATORS,
+                }}>
       <span>
         Configure the trusted header authentication.
-      </span>
-
-      <span>
-        Learn more in the{' '}
-        <DocumentationLink page={DocsHelper.PAGES.AUTHENTICATORS}
-                           text="documentation" />
       </span>
     </PageHeader>
 
