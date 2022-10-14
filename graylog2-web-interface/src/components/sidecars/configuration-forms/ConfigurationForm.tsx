@@ -25,6 +25,7 @@ import Routes from 'routing/Routes';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
 import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
+import ConfigurationHelper from 'components/sidecars/configuration-forms/ConfigurationHelper';
 
 import SourceViewModal from './SourceViewModal';
 import ImportsViewModal from './ImportsViewModal';
@@ -120,6 +121,17 @@ const ConfigurationForm = ({
 
   const _onTemplateChange = (nextTemplate) => {
     _formDataUpdate('template')(nextTemplate);
+  };
+
+  const replaceConfigurationVariableName = (oldname: string, newname: string) => {
+    if (oldname === '' || oldname === newname) {
+      return;
+    }
+
+    // replaceAll without having to use a Regex
+    const updatedTemplate = formData.template.split(`\${user.${oldname}}`).join(`\${user.${newname}}`);
+
+    _onTemplateChange(updatedTemplate);
   };
 
   const _onNameChange = (event) => {
@@ -257,89 +269,95 @@ const ConfigurationForm = ({
   };
 
   return (
-    <div>
-      <form onSubmit={_onSubmit}>
-        <fieldset>
-          <Input type="text"
-                 id="name"
-                 label="Name"
-                 onChange={_onNameChange}
-                 bsStyle={_validationState('name')}
-                 help={_formatValidationMessage('name', 'Required. Name for this configuration')}
-                 value={formData.name || ''}
-                 autoFocus
-                 required />
+    <Row className="content">
+      <Col md={6}>
+        <div>
+          <form onSubmit={_onSubmit}>
+            <fieldset>
+              <Input type="text"
+                     id="name"
+                     label="Name"
+                     onChange={_onNameChange}
+                     bsStyle={_validationState('name')}
+                     help={_formatValidationMessage('name', 'Required. Name for this configuration')}
+                     value={formData.name || ''}
+                     autoFocus
+                     required />
+              <FormGroup controlId="color">
+                <ControlLabel>Configuration color</ControlLabel>
+                <div>
+                  <ColorLabel color={formData.color} />
+                  <div style={{ display: 'inline-block', marginLeft: 15 }}>
+                    <ColorPickerPopover id="color"
+                                        placement="right"
+                                        color={formData.color}
+                                        triggerNode={<Button bsSize="xsmall">Change color</Button>}
+                                        onChange={_formDataUpdate('color')} />
+                  </div>
+                </div>
+                <HelpBlock>Choose a color to use for this configuration.</HelpBlock>
+              </FormGroup>
 
-          <FormGroup controlId="color">
-            <ControlLabel>Configuration color</ControlLabel>
-            <div>
-              <ColorLabel color={formData.color} />
-              <div style={{ display: 'inline-block', marginLeft: 15 }}>
-                <ColorPickerPopover id="color"
-                                    placement="right"
-                                    color={formData.color}
-                                    triggerNode={<Button bsSize="xsmall">Change color</Button>}
-                                    onChange={_formDataUpdate('color')} />
-              </div>
-            </div>
-            <HelpBlock>Choose a color to use for this configuration.</HelpBlock>
-          </FormGroup>
+              <FormGroup controlId="tags">
+                <ControlLabel>Configuration Tags</ControlLabel>
+                <div>
+                  <ConfigurationTagsSelect availableTags={formData.tags.map((tag) => ({ name: tag }))}
+                                           tags={formData.tags}
+                                           onChange={_onTagsChange} />
+                </div>
+                <HelpBlock>Choose tags to use for this configuration.</HelpBlock>
+              </FormGroup>
 
-          <FormGroup controlId="tags">
-            <ControlLabel>Configuration Tags</ControlLabel>
-            <div>
-              <ConfigurationTagsSelect availableTags={formData.tags.map((tag) => ({ name: tag }))}
-                                       tags={formData.tags}
-                                       onChange={_onTagsChange} />
-            </div>
-            <HelpBlock>Choose tags to use for this configuration.</HelpBlock>
-          </FormGroup>
+              <FormGroup controlId="collector_id">
+                <ControlLabel>Collector</ControlLabel>
+                {_renderCollectorTypeField(formData.collector_id, collectors, configurationSidecars)}
+              </FormGroup>
 
-          <FormGroup controlId="collector_id">
-            <ControlLabel>Collector</ControlLabel>
-            {_renderCollectorTypeField(formData.collector_id, collectors, configurationSidecars)}
-          </FormGroup>
+              <FormGroup controlId="template"
+                         validationState={_validationState('template')}>
+                <ControlLabel>Configuration</ControlLabel>
+                {/* TODO: Figure out issue with props */}
+                {/* @ts-ignore */}
+                <SourceCodeEditor id="template"
+                                  height={400}
+                                  value={formData.template || ''}
+                                  onChange={_onTemplateChange} />
+                <Button className="pull-right"
+                        bsStyle="link"
+                        bsSize="sm"
+                        onClick={_onShowSource}>
+                  Preview
+                </Button>
+                <Button className="pull-right"
+                        bsStyle="link"
+                        bsSize="sm"
+                        onClick={_onShowImports}>
+                  Migrate
+                </Button>
+                <HelpBlock>
+                  {_formatValidationMessage('template', 'Required. Collector configuration, see quick reference for more information.')}
+                </HelpBlock>
+              </FormGroup>
+            </fieldset>
 
-          <FormGroup controlId="template"
-                     validationState={_validationState('template')}>
-            <ControlLabel>Configuration</ControlLabel>
-            {/* TODO: Figure out issue with props */}
-            {/* @ts-ignore */}
-            <SourceCodeEditor id="template"
-                              height={400}
-                              value={formData.template || ''}
-                              onChange={_onTemplateChange} />
-            <Button className="pull-right"
-                    bsStyle="link"
-                    bsSize="sm"
-                    onClick={_onShowSource}>
-              Preview
-            </Button>
-            <Button className="pull-right"
-                    bsStyle="link"
-                    bsSize="sm"
-                    onClick={_onShowImports}>
-              Migrate
-            </Button>
-            <HelpBlock>
-              {_formatValidationMessage('template', 'Required. Collector configuration, see quick reference for more information.')}
-            </HelpBlock>
-          </FormGroup>
-        </fieldset>
-
-        <Row>
-          <Col md={12}>
-            <FormSubmit submitButtonText={`${action === 'create' ? 'Create' : 'Update'} configuration`}
-                        disabledSubmit={_hasErrors()}
-                        onCancel={_onCancel} />
-          </Col>
-        </Row>
-      </form>
-      <SourceViewModal ref={previewModal}
-                       templateString={formData.template} />
-      <ImportsViewModal ref={uploadsModal}
-                        onApply={_onTemplateImport} />
-    </div>
+            <Row>
+              <Col md={12}>
+                <FormSubmit submitButtonText={`${action === 'create' ? 'Create' : 'Update'} configuration`}
+                            disabledSubmit={_hasErrors()}
+                            onCancel={_onCancel} />
+              </Col>
+            </Row>
+          </form>
+          <SourceViewModal ref={previewModal}
+                           templateString={formData.template} />
+          <ImportsViewModal ref={uploadsModal}
+                            onApply={_onTemplateImport} />
+        </div>
+      </Col>
+      <Col md={6}>
+        <ConfigurationHelper onVariableRename={replaceConfigurationVariableName} />
+      </Col>
+    </Row>
   );
 };
 
