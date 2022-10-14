@@ -45,7 +45,6 @@ module.exports = {
     'jsx',
   ],
   moduleNameMapper: {
-    c3: require.resolve('./lib/mocking/c3_mock.js'),
     '^file-loader(\\?esModule=false)?!(.+)$': '$2',
     '(\\.lazy|leaflet)\\.css$': require.resolve('./lib/mocking/useable-css-proxy.js'),
     '\\.(css|less)$': 'identity-obj-proxy',
