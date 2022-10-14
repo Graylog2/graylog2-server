@@ -61,6 +61,7 @@ const FlexRow = styled.div`
 const Subactions = styled.div`
   display: flex !important;
   align-items: flex-end;
+  margin-top: 5px;
 `;
 
 const LIFECYCLE_DEFAULT_MESSAGES = {

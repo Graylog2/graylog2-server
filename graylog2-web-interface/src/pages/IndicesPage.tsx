@@ -22,41 +22,37 @@ import { Col, Row, Button } from 'components/bootstrap';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, PageHeader } from 'components/common';
-import { DocumentationLink } from 'components/support';
 import { IndexSetsComponent } from 'components/indices';
 import { IndexerClusterHealth } from 'components/indexers';
 
 const IndicesPage = () => (
   <DocumentTitle title="Indices and Index Sets">
-    <span>
-      <PageHeader title="Indices & Index Sets"
-                  subactions={(
-                    <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CREATE}>
-                      <Button bsStyle="success">Create index set</Button>
-                    </LinkContainer>
-                  )}>
-        <span>
-          A Graylog stream write messages to an index set, which is a configuration for retention, sharding, and
-          replication of the stored data.
-          By configuring index sets, you could, for example, have different retention times for certain streams.
-        </span>
+    <PageHeader title="Indices & Index Sets"
+                subactions={(
+                  <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CREATE}>
+                    <Button bsStyle="success">Create index set</Button>
+                  </LinkContainer>
+                )}
+                documentationLink={{
+                  title: 'Index model documentation',
+                  path: DocsHelper.PAGES.INDEX_MODEL,
+                }}>
+      <span>
+        A Graylog stream write messages to an index set, which is a configuration for retention, sharding, and
+        replication of the stored data.
+        By configuring index sets, you could, for example, have different retention times for certain streams.
+      </span>
+    </PageHeader>
 
-        <span>
-          You can learn more about the index model in the{' '}
-          <DocumentationLink page={DocsHelper.PAGES.INDEX_MODEL} text="documentation" />
-        </span>
-      </PageHeader>
+    <HideOnCloud>
+      <IndexerClusterHealth minimal />
+    </HideOnCloud>
 
-      <HideOnCloud>
-        <IndexerClusterHealth minimal />
-      </HideOnCloud>
-
-      <Row className="content">
-        <Col md={12}>
-          <IndexSetsComponent />
-        </Col>
-      </Row>
-    </span>
+    <Row className="content">
+      <Col md={12}>
+        <IndexSetsComponent />
+      </Col>
+    </Row>
   </DocumentTitle>
 );
 
