@@ -73,4 +73,9 @@ class OutputList extends React.Component {
   }
 }
 
+OutputList.defaultProps = {
+  streamId: '',
+  outputs: [],
+};
+
 export default OutputList;
