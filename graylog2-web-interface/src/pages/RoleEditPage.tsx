@@ -26,7 +26,6 @@ import { Button } from 'components/bootstrap';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import DocsHelper from 'util/DocsHelper';
 import { PageHeader, DocumentTitle } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import type Role from 'logic/roles/Role';
 
 type Props = {
@@ -56,14 +55,13 @@ const RoleEditPage = ({ params }: Props) => {
   return (
     <DocumentTitle title={`Edit Role ${loadedRole?.name ?? ''}`}>
       <PageHeader title={<PageTitle name={loadedRole?.name} />}
-                  subactions={<RoleActionLinks roleId={roleId} />}>
+                  subactions={<RoleActionLinks roleId={roleId} />}
+                  documentationLink={{
+                    title: 'Permissions documentation',
+                    path: DocsHelper.PAGES.USERS_ROLES,
+                  }}>
         <span>
           You can assign the role to users.
-        </span>
-        <span>
-          Learn more in the{' '}
-          <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                             text="documentation" />
         </span>
         <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
           <Button bsStyle="info">Roles Overview</Button>
