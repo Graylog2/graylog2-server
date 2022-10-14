@@ -345,7 +345,14 @@ const ConfigurationForm = ({
 
 ConfigurationForm.propTypes = {
   action: PropTypes.oneOf(['create', 'edit']),
-  configuration: PropTypes.object,
+  configuration: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    color: PropTypes.string.isRequired,
+    collector_id: PropTypes.string.isRequired,
+    template: PropTypes.string.isRequired,
+    tags: PropTypes.array.isRequired,
+  }),
   configurationSidecars: PropTypes.object,
 };
 
