@@ -19,7 +19,6 @@ import PropTypes from 'prop-types';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import EventsContainer from 'components/events/events/EventsContainer';
 import DocsHelper from 'util/DocsHelper';
 import withLocation from 'routing/withLocation';
@@ -31,15 +30,14 @@ const EventsPage = ({ location }) => {
   return (
     <DocumentTitle title="Alerts &amp; Events">
       <EventsSubareaNavigation />
-      <PageHeader title="Alerts &amp; Events">
+      <PageHeader title="Alerts &amp; Events"
+                  documentationLink={{
+                    title: 'Alerts documentation',
+                    path: DocsHelper.PAGES.ALERTS,
+                  }}>
         <span>
           Define Events through different conditions. Add Notifications to Events that require your attention
-          to create Alerts.
-        </span>
-        <span>
-          Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
-          <DocumentationLink page={DocsHelper.PAGES.ALERTS}
-                             text="documentation" />
+          to create Alerts. Graylog&apos;s new Alerting system let you define more flexible and powerful rules.
         </span>
       </PageHeader>
 

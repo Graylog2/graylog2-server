@@ -23,7 +23,6 @@ import { Col, Label, Tooltip } from 'components/bootstrap';
 import { OverlayTrigger } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import ContentHeadRow from 'components/common/ContentHeadRow';
-import SupportLink from 'components/support/SupportLink';
 
 const LifecycleIndicatorContainer = styled.span(({ theme }) => css`
   cursor: help;
