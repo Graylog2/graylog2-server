@@ -282,7 +282,6 @@ class Builder {
     const availableSorts = [].concat(rowPivots, columnPivots, series);
     const filteredSorts = sort.filter((s) => availableSorts
       .find((availableSort) => (s.field === availableSort.function || s.field === availableSort.field)));
-    const computedRollup = columnPivots.length > 0 ? rollup : false;
 
     return new AggregationWidgetConfig(
       columnPivots,
@@ -290,7 +289,7 @@ class Builder {
       series,
       filteredSorts,
       visualization,
-      computedRollup,
+      rollup,
       visualizationConfig,
       formattingSettings,
       eventAnnotation,

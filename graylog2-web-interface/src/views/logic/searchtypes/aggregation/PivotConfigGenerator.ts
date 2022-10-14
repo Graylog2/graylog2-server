@@ -103,7 +103,7 @@ const generateConfig = (id: string, name: string, {
   type: 'pivot',
   config: {
     id: 'vals',
-    rollup,
+    rollup: columnPivots.length > 0 ? rollup : true,
     row_groups: rowPivots.map(formatPivot),
     column_groups: columnPivots.map(formatPivot),
     series: series.map<FormattedSeries>((s) => ({ id: s.effectiveName, ...parseSeries(s.function) })),
