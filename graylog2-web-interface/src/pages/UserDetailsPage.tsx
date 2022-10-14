@@ -24,7 +24,6 @@ import UsersDomain from 'domainActions/users/UsersDomain';
 import UserDetails from 'components/users/UserDetails';
 import UsersSubareaNavigation from 'components/users/navigation/UsersSubareaNavigation';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
-import DocumentationLink from 'components/support/DocumentationLink';
 import type User from 'logic/users/User';
 
 type Props = {
@@ -58,15 +57,13 @@ const UserDetailsPage = ({ params }: Props) => {
                   subactions={(
                     <UserActionLinks userId={userId}
                                      userIsReadOnly={loadedUser?.readOnly ?? false} />
-                  )}>
+                  )}
+                  documentationLink={{
+                    title: 'Permissions documentation',
+                    path: DocsHelper.PAGES.USERS_ROLES,
+                  }}>
         <span>
           Overview of details like profile information, settings, teams and roles.
-        </span>
-
-        <span>
-          Learn more in the{' '}
-          <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                             text="documentation" />
         </span>
       </PageHeader>
 
