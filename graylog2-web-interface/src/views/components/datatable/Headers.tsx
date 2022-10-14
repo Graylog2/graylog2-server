@@ -14,14 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useLayoutEffect, useRef } from 'react';
+import * as React from 'react';
+import { useCallback, useLayoutEffect, useRef } from 'react';
 import { flatten, get, isEqual, last } from 'lodash';
 import styled, { css } from 'styled-components';
 import type { OrderedMap } from 'immutable';
 import Immutable from 'immutable';
 
 import Field from 'views/components/Field';
-import FieldType from 'views/logic/fieldtypes/FieldType';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
 import Value from 'views/components/Value';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type Series from 'views/logic/aggregationbuilder/Series';
@@ -43,6 +44,20 @@ const CenteredTh = styled.th`
   text-align: center;
 `;
 
+const PinIcon = styled.button(({ theme }) => {
+  return css`
+    border: 0;
+    background: transparent;
+    padding: 5px;
+    cursor: pointer;
+    position: relative;
+    color: ${theme.colors.gray[70]};
+    &.active {
+      color: ${theme.colors.gray[20]};
+    }
+`;
+});
+
 type HeaderFilterProps = {
   activeQuery: string;
   fields: (FieldTypeMappingsList | Array<FieldTypeMapping>);
@@ -59,19 +74,6 @@ type HeaderFilterProps = {
   showPinIcon?: boolean,
   togglePin: (field: string) => void,
 }
-const PinIcon = styled.button(({ theme }) => {
-  return css`
-    border: 0;
-    background: transparent;
-    padding: 5px;
-    cursor: pointer;
-    position: relative;
-    color: ${theme.colors.gray[70]};
-    &.active {
-      color: ${theme.colors.gray[20]};
-    }
-`;
-});
 
 const HeaderField = ({ activeQuery, fields, field, prefix = '', span = 1, title = field, onSortChange, sortConfigMap, sortable, sortType, onSetColumnsWidth, isPinned, showPinIcon = false, togglePin }: HeaderFilterProps) => {
   const type = fieldTypeFor(field, fields);
@@ -113,18 +115,39 @@ HeaderField.defaultProps = {
   showPinIcon: undefined,
 };
 
-const _headerFieldForValue = (activeQuery: string, field, value, span = 1, prefix = '') => (
+type HeaderFieldForValueProps = {
+  activeQuery: string,
+  field: string,
+  value: any,
+  span?: number,
+  prefix?: string,
+  type: FieldType,
+};
+const HeaderFieldForValue = ({ activeQuery, field, value, span = 1, prefix = '', type }: HeaderFieldForValueProps) => (
   <CenteredTh key={`${prefix}${field}-${value}`} colSpan={span} className={styles.leftAligned}>
-    <Value field={field} value={value} queryId={activeQuery} type={FieldType.Unknown}>{value}</Value>
+    <Value field={field} value={value} queryId={activeQuery} type={type} />
   </CenteredTh>
 );
 
-// eslint-disable-next-line jsx-a11y/control-has-associated-label
-const _spacer = (idx, span = 1) => <th colSpan={span} key={`spacer-${idx}`} className={styles.leftAligned} />;
+HeaderFieldForValue.defaultProps = {
+  span: 1,
+  prefix: '',
+};
 
-const columnPivotFieldsHeaders = (activeQuery: string, columnPivots: string[], actualColumnPivotValues: any[], series: Series[], offset = 1) => {
-  return columnPivots.map((columnPivot, idx) => {
-    const actualValues = actualColumnPivotValues.map((key) => ({ path: key.slice(0, idx).join('-'), key: key[idx] || '', count: 1 }));
+const Spacer = ({ span }: { span: number }) => <th aria-label="spacer" colSpan={span} className={styles.leftAligned} />;
+
+type ColumnHeadersProps = {
+  activeQuery: string,
+  fields: (FieldTypeMappingsList | Array<FieldTypeMapping>);
+  pivots: string[],
+  values: any[][],
+  series: Series[],
+  offset?: number,
+};
+
+const ColumnPivotFieldsHeaders = ({ activeQuery, fields, pivots, values, series, offset = 1 }: ColumnHeadersProps) => {
+  const headerRows = pivots.map((columnPivot, idx) => {
+    const actualValues = values.map((key) => ({ path: key.slice(0, idx).join('-'), key: key[idx] || '', count: 1 }));
     const actualValuesWithoutDuplicates = actualValues.reduce((prev, cur) => {
       const lastKey = get(last(prev), 'key');
       const lastPath = get(last(prev), 'path');
@@ -140,13 +163,30 @@ const columnPivotFieldsHeaders = (activeQuery: string, columnPivots: string[], a
       return [].concat(prev, [cur]);
     }, []);
 
+    const type = fieldTypeFor(columnPivot, fields);
+
     return (
       <tr key={`header-table-row-${columnPivot}`}>
-        {offset > 0 && _spacer(1, offset)}
-        {actualValuesWithoutDuplicates.map((value) => _headerFieldForValue(activeQuery, columnPivot, value.key, value.count * series.length, value.path))}
+        {offset > 0 && <Spacer span={offset} />}
+        {actualValuesWithoutDuplicates.map((value) => (
+          <HeaderFieldForValue key={`header-field-value-${value.key}`}
+                               activeQuery={activeQuery}
+                               field={columnPivot}
+                               value={value.key}
+                               span={value.count * series.length}
+                               prefix={value.path}
+                               type={type} />
+        ))}
       </tr>
     );
   });
+
+  // eslint-disable-next-line react/jsx-no-useless-fragment
+  return <>{headerRows}</>;
+};
+
+ColumnPivotFieldsHeaders.defaultProps = {
+  offset: 1,
 };
 
 type Props = {
@@ -195,7 +235,12 @@ const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup,
 
   return (
     <>
-      {columnPivotFieldsHeaders(activeQuery, columnFieldNames, actualColumnPivotFields, series, offset)}
+      <ColumnPivotFieldsHeaders activeQuery={activeQuery}
+                                fields={fields}
+                                pivots={columnFieldNames}
+                                values={actualColumnPivotFields}
+                                series={series}
+                                offset={offset} />
       <tr className="pivot-header-row">
         {rowPivotFields}
         {rollup && seriesFields}
