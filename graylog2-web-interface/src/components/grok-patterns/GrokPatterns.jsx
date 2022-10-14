@@ -197,26 +197,27 @@ class GrokPatterns extends React.Component {
 
     return (
       <div>
-        <PageHeader title="Grok patterns">
+        <PageHeader title="Grok patterns"
+                    subactions={(
+                      <IfPermitted permissions="inputs:edit">
+                        <ButtonToolbar>
+                          <BulkLoadPatternModal onSuccess={this.loadData} />
+                          <EditPatternModal id=""
+                                            name=""
+                                            pattern=""
+                                            patterns={patterns}
+                                            create
+                                            testPattern={testPattern}
+                                            reload={this.loadData}
+                                            savePattern={this.savePattern}
+                                            validPatternName={this.validPatternName} />
+                        </ButtonToolbar>
+                      </IfPermitted>
+                    )}>
           <span>
             This is a list of grok patterns you can use in your Graylog grok extractors. You can add
             your own manually or import a whole list of patterns from a so called pattern file.
           </span>
-          {null}
-          <IfPermitted permissions="inputs:edit">
-            <span>
-              <BulkLoadPatternModal onSuccess={this.loadData} />
-              <EditPatternModal id=""
-                                name=""
-                                pattern=""
-                                patterns={patterns}
-                                create
-                                testPattern={testPattern}
-                                reload={this.loadData}
-                                savePattern={this.savePattern}
-                                validPatternName={this.validPatternName} />
-            </span>
-          </IfPermitted>
         </PageHeader>
 
         <Row className="content">

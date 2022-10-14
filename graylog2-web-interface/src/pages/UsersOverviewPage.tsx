@@ -30,7 +30,7 @@ const UsersOverviewPage = () => (
     <PageHeader title="Users Overview"
                 subactions={(
                   <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
-                    <Button bsStyle="success">Create User</Button>
+                    <Button bsStyle="success">Create user</Button>
                   </LinkContainer>
                 )}>
       <span>Overview of Graylog&apos;s registered users.</span>

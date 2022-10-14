@@ -179,13 +179,7 @@ class EventNotifications extends React.Component {
                         queryHelpComponent={<QueryHelper entityName="notification" />}
                         queryWidth={200}
                         topMargin={0}
-                        useLoadingState>
-              <IfPermitted permissions="eventnotifications:create">
-                <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
-                  <Button bsStyle="success" className={styles.createButton}>Create Notification</Button>
-                </LinkContainer>
-              </IfPermitted>
-            </SearchForm>
+                        useLoadingState />
 
             <PaginatedList pageSizes={PAGE_SIZES}
                            totalItems={pagination.total}

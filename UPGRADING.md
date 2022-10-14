@@ -131,6 +131,7 @@ UTF-8 encoding.
 cannot handle multiple log sources with different encodings.
 - The permissions for which options are populated in the System dropdown menu were updated to more closely match the page that they link to. See [graylog2-server#13188](https://github.com/Graylog2/graylog2-server/pull/13188) for details.
 The Page permissions remain unchanged but this could affect the workflow for users with legacy permissions.
+- Newly created aggregation widgets will now have rollup disabled by default. Existing widgets are unchanged.
 
 ### Changed archived default path
 On new Graylog installations, the default archiving configuration will now 
