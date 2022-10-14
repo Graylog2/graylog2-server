@@ -15,80 +15,80 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export type Configuration = {
-  readonly template: string;
-  readonly color: string;
-  readonly collector_id: string;
-  readonly name: string;
-  readonly id: string;
-  readonly tags: string[];
+  template: string;
+  color: string;
+  collector_id: string;
+  name: string;
+  id: string;
+  tags: string[];
 }
 
 export type Collector = {
-  readonly service_type: string;
-  readonly node_operating_system: string;
-  readonly name: string;
-  readonly validation_parameters: string;
-  readonly executable_path: string;
-  readonly execute_parameters: string;
-  readonly default_template: string;
-  readonly id: string;
+  service_type: string;
+  node_operating_system: string;
+  name: string;
+  validation_parameters: string;
+  executable_path: string;
+  execute_parameters: string;
+  default_template: string;
+  id: string;
 }
 
 export type CollectorStatus = {
-  readonly verbose_message: string;
-  readonly collector_id: string;
-  readonly message: string;
-  readonly configuration_id: string;
-  readonly status: number;
+  verbose_message: string;
+  collector_id: string;
+  message: string;
+  configuration_id: string;
+  status: number;
 }
 
 export type ConfigurationAssignment = {
-  readonly assigned_from_tags: string[];
-  readonly collector_id: string;
-  readonly configuration_id: string;
+  assigned_from_tags: string[];
+  collector_id: string;
+  configuration_id: string;
 }
 
 export type NodeLogFile = {
-  readonly path: string;
-  readonly mod_time: string;
-  readonly size: number;
-  readonly is_dir: boolean;
+  path: string;
+  mod_time: string;
+  size: number;
+  is_dir: boolean;
 }
 
 export type SidecarSummary = {
-  readonly node_details: NodeDetails;
-  readonly assignments: ConfigurationAssignment[];
-  readonly collectors: string[];
-  readonly last_seen: string;
-  readonly sidecar_version: string;
-  readonly node_name: string;
-  readonly active: boolean;
-  readonly node_id: string;
+  node_details: NodeDetails;
+  assignments: ConfigurationAssignment[];
+  collectors: string[];
+  last_seen: string;
+  sidecar_version: string;
+  node_name: string;
+  active: boolean;
+  node_id: string;
 }
 
 export type NodeMetrics = {
-  readonly cpu_idle: number;
-  readonly disks_75: string[];
-  readonly load_1: number;
+  cpu_idle: number;
+  disks_75: string[];
+  load_1: number;
 }
 
 export type CollectorStatusList = {
-  readonly collectors: CollectorStatus[];
-  readonly message: string;
-  readonly status: number;
+  collectors: CollectorStatus[];
+  message: string;
+  status: number;
 }
 
 export type NodeDetails = {
-  readonly ip: string;
-  readonly collector_configuration_directory: string;
-  readonly operating_system: string;
-  readonly metrics: NodeMetrics;
-  readonly log_file_list: NodeLogFile[];
-  readonly status: CollectorStatusList;
-  readonly tags: string[];
+  ip: string;
+  collector_configuration_directory: string;
+  operating_system: string;
+  metrics: NodeMetrics;
+  log_file_list: NodeLogFile[];
+  status: CollectorStatusList;
+  tags: string[];
 }
 
 export type ConfigurationSidecarsResponse = {
-  readonly sidecar_ids: string[];
-  readonly configuration_id: string;
+  sidecar_ids: string[];
+  configuration_id: string;
 }
