@@ -80,7 +80,21 @@ const ExtractorsPage = createReactClass({
     return (
       <DocumentTitle title={`Extractors of ${input.title}`}>
         <div>
-          <PageHeader title={<span>Extractors of <em>{input.title}</em></span>}>
+          <PageHeader title={<span>Extractors of <em>{input.title}</em></span>}
+                      subactions={(
+                        <DropdownButton bsStyle="info" id="extractor-actions-dropdown" title="Actions" pullRight>
+                          <LinkContainer to={Routes.import_extractors(node.node_id, input.id)}>
+                            <MenuItem>Import extractors</MenuItem>
+                          </LinkContainer>
+                          <LinkContainer to={Routes.export_extractors(node.node_id, input.id)}>
+                            <MenuItem>Export extractors</MenuItem>
+                          </LinkContainer>
+                        </DropdownButton>
+                      )}
+                      documentationLink={{
+                        title: 'Extractors documentation',
+                        path: DocsHelper.PAGES.EXTRACTORS,
+                      }}>
             <span>
               Extractors are applied on every message that is received by this input. Use them to extract and transform{' '}
               any text data into fields that allow you easy filtering and analysis later on.{' '}
@@ -88,19 +102,6 @@ const ExtractorsPage = createReactClass({
               as <em>http_response_code</em> to the message.
             </span>
 
-            <span>
-              Find more information about extractors in the
-              {' '}<DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation" />.
-            </span>
-
-            <DropdownButton bsStyle="info" bsSize="large" id="extractor-actions-dropdown" title="Actions" pullRight>
-              <LinkContainer to={Routes.import_extractors(node.node_id, input.id)}>
-                <MenuItem>Import extractors</MenuItem>
-              </LinkContainer>
-              <LinkContainer to={Routes.export_extractors(node.node_id, input.id)}>
-                <MenuItem>Export extractors</MenuItem>
-              </LinkContainer>
-            </DropdownButton>
           </PageHeader>
           <ExtractorsList input={input} node={node} />
         </div>

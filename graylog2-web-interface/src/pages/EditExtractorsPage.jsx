@@ -92,24 +92,22 @@ const EditExtractorsPage = createReactClass({
 
     return (
       <DocumentTitle title={`Edit extractor ${extractor.title}`}>
-        <div>
-          <PageHeader title={<span>Edit extractor <em>{extractor.title}</em> for input <em>{input.title}</em></span>}>
-            <span>
-              Extractors are applied on every message that is received by an input. Use them to extract and transform{' '}
-              any text data into fields that allow you easy filtering and analysis later on.
-            </span>
+        <PageHeader title={<span>Edit extractor <em>{extractor.title}</em> for input <em>{input.title}</em></span>}
+                    documentationLink={{
+                      title: 'Extractors documentation',
+                      path: DocsHelper.PAGES.EXTRACTORS,
+                    }}>
+          <span>
+            Extractors are applied on every message that is received by an input. Use them to extract and transform{' '}
+            any text data into fields that allow you easy filtering and analysis later on.
+          </span>
+        </PageHeader>
+        <EditExtractor action="edit"
+                       extractor={extractor}
+                       inputId={input.id}
+                       exampleMessage={exampleMessage.fields ? exampleMessage.fields[extractor.source_field] : undefined}
+                       onSave={this._extractorSaved} />
 
-            <span>
-              Find more information about extractors in the
-              {' '}<DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation" />.
-            </span>
-          </PageHeader>
-          <EditExtractor action="edit"
-                         extractor={extractor}
-                         inputId={input.id}
-                         exampleMessage={exampleMessage.fields ? exampleMessage.fields[extractor.source_field] : undefined}
-                         onSave={this._extractorSaved} />
-        </div>
       </DocumentTitle>
     );
   },

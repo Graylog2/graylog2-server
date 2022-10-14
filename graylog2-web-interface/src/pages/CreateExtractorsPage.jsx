@@ -96,15 +96,14 @@ const CreateExtractorsPage = createReactClass({
     return (
       <DocumentTitle title={`New extractor for input ${input.title}`}>
         <div>
-          <PageHeader title={<span>New extractor for input <em>{input.title}</em></span>}>
+          <PageHeader title={<span>New extractor for input <em>{input.title}</em></span>}
+                      documentationLink={{
+                        title: 'Extractors documentation',
+                        path: DocsHelper.PAGES.EXTRACTORS,
+                      }}>
             <span>
               Extractors are applied on every message that is received by an input. Use them to extract and
               transform any text data into fields that allow you easy filtering and analysis later on.
-            </span>
-
-            <span>
-              Find more information about extractors in the
-              {' '}<DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation" />.
             </span>
           </PageHeader>
           <EditExtractor action="create"

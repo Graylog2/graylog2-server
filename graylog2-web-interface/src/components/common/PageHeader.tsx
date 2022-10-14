@@ -47,9 +47,15 @@ const ActionsSM = styled.div`
   }
 `;
 
+const DocumentationLinkContainer = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
 const FlexRow = styled.div`
   display: flex;
   justify-content: space-between;
+  gap: 10px;
 `;
 
 const Subactions = styled.div`
@@ -115,7 +121,8 @@ const PageHeader = ({ children: childList, subpage, title, subactions, lifecycle
               {title} <small><LifecycleIndicator lifecycle={lifecycle} lifecycleMessage={lifecycleMessage} /></small>
             </H1>
             {(children[1] || children[2] || documentationLink) && (
-              <div>
+              <DocumentationLinkContainer>
+                {documentationLink && <DocumentationLink text={documentationLink.title} page={documentationLink.path} displayIcon />}
                 {children[2] && (
                   <div className="actions-lg visible-lg visible-md">
                     <div className="actions-container">
@@ -124,8 +131,7 @@ const PageHeader = ({ children: childList, subpage, title, subactions, lifecycle
                   </div>
                 )}
                 {children[1]}
-                {documentationLink && <DocumentationLink text={documentationLink.title} page={documentationLink.path} displayIcon />}
-              </div>
+              </DocumentationLinkContainer>
             )}
           </FlexRow>
 

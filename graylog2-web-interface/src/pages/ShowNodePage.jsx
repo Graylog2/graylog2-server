@@ -101,9 +101,7 @@ const ShowNodePage = createReactClass({
         <div>
           <PageHeader title={title}>
             <span>
-              This page shows details of a Graylog server node that is active and reachable in your cluster.
-            </span>
-            <span>
+              This page shows details of a Graylog server node that is active and reachable in your cluster.<br />
               {node.is_leader ? <span>This is the leader node.</span> : <span>This is <em>not</em> the leader node.</span>}
             </span>
             <span><NodeMaintenanceDropdown node={node} /></span>
