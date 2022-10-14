@@ -37,7 +37,7 @@ import CollectorConfigurationModalContainer from './CollectorConfigurationModalC
 import FiltersSummary from './FiltersSummary';
 import style from './CollectorsAdministration.css';
 
-import type { Collector, Configuration, SidecarSummary } from '../types';
+import type { Collector, Configuration, SidecarCollectorPairType, SidecarSummary } from '../types';
 
 const HeaderComponentsWrapper = styled.div(({ theme }) => css`
   float: right;
@@ -57,14 +57,14 @@ export const PAGE_SIZES = [10, 25, 50, 100];
 type Props = {
   collectors: Collector[],
   configurations: Configuration[],
-  sidecarCollectorPairs: { collector: Collector, sidecar: SidecarSummary }[],
+  sidecarCollectorPairs: SidecarCollectorPairType[],
   query: string,
   filters: { [_key: string]: string },
   pagination: Pagination,
   onPageChange: (currentPage: number, pageSize: number) => void,
   onFilter: (collectorIds?: string[], callback?: () => void) => void,
   onQueryChange: (query?: string, callback?: () => void) => void,
-  onConfigurationChange: (pairs: { collector: Collector, sidecar: SidecarSummary }[], configs: Configuration[], callback: () => void) => void,
+  onConfigurationChange: (pairs: SidecarCollectorPairType[], configs: Configuration[], callback: () => void) => void,
   onProcessAction: (action: string, collectorDict: { [sidecarId: string]: string[] }, callback: () => void) => void,
 };
 
@@ -92,7 +92,7 @@ const CollectorsAdministration = ({
     return `${sidecar.node_id}-${collector.name}`;
   };
 
-  const isAllSelected = (_collectors: ({ collector: Collector, sidecar: SidecarSummary }|Collector)[], _selected: string[]) => {
+  const isAllSelected = (_collectors: (SidecarCollectorPairType|Collector)[], _selected: string[]) => {
     return _collectors.length > 0 && _collectors.length === _selected.length;
   };
 
@@ -105,11 +105,11 @@ const CollectorsAdministration = ({
     }
   }, [selectAllInput, collectors, selected]);
 
-  const handleConfigurationChange = (selectedSidecars: { collector: Collector, sidecar: SidecarSummary }[], selectedConfigurations: Configuration[], doneCallback: () => void) => {
+  const handleConfigurationChange = (selectedSidecars: SidecarCollectorPairType[], selectedConfigurations: Configuration[], doneCallback: () => void) => {
     onConfigurationChange(selectedSidecars, selectedConfigurations, doneCallback);
   };
 
-  const handleProcessAction = (action: string, selectedSidecarCollectorPairs: { collector: Collector, sidecar: SidecarSummary }[], doneCallback: () => void) => {
+  const handleProcessAction = (action: string, selectedSidecarCollectorPairs: SidecarCollectorPairType[], doneCallback: () => void) => {
     const selectedCollectors = {};
 
     selectedSidecarCollectorPairs.forEach(({ sidecar, collector }) => {
@@ -131,7 +131,7 @@ const CollectorsAdministration = ({
     setSelected(newSelection);
   };
 
-  const formatHeader = (selectedSidecarCollectorPairs: { collector: Collector, sidecar: SidecarSummary }[]) => {
+  const formatHeader = (selectedSidecarCollectorPairs: SidecarCollectorPairType[]) => {
     const selectedItems = selected.length;
 
     let headerMenu;

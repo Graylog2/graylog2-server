@@ -24,7 +24,7 @@ import { BootstrapModalConfirm } from 'components/bootstrap';
 
 import CollectorConfigurationModal from './CollectorConfigurationModal';
 
-import type { Collector, Configuration, SidecarSummary } from '../types';
+import type { Collector, Configuration, SidecarCollectorPairType, SidecarSummary } from '../types';
 
 const ConfigurationSummary = styled.div`
   word-break: break-all;
@@ -33,8 +33,8 @@ const ConfigurationSummary = styled.div`
 type Props = {
   collectors: Collector[],
   configurations: Configuration[],
-  selectedSidecarCollectorPairs: { collector: Collector, sidecar: SidecarSummary }[],
-  onConfigurationSelectionChange: (pairs: { collector: Collector, sidecar: SidecarSummary }[], configs: Configuration[], callback: () => void) => void,
+  selectedSidecarCollectorPairs: SidecarCollectorPairType[],
+  onConfigurationSelectionChange: (pairs: SidecarCollectorPairType[], configs: Configuration[], callback: () => void) => void,
   show: boolean,
   onCancel: () => void,
 };
@@ -60,7 +60,7 @@ const CollectorConfigurationModalContainer = ({
       .map((config) => config.name);
   };
 
-  const getAssignedConfigurations = (_selectedSidecarCollectorPairs: { collector: Collector, sidecar: SidecarSummary }[], selectedCollector: Collector) => {
+  const getAssignedConfigurations = (_selectedSidecarCollectorPairs: SidecarCollectorPairType[], selectedCollector: Collector) => {
     const assignments = _selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar).reduce((accumulator, sidecar) => accumulator.concat(sidecar.assignments), []);
 
     const filteredAssignments = assignments.map((assignment) => configurations.find((configuration) => configuration.id === assignment.configuration_id))

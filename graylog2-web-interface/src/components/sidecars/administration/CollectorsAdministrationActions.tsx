@@ -25,7 +25,7 @@ import { Icon } from 'components/common';
 import CollectorConfigurationModalContainer from './CollectorConfigurationModalContainer';
 import CollectorProcessControl from './CollectorProcessControl';
 
-import type { Collector, Configuration, SidecarSummary } from '../types';
+import type { Collector, Configuration, SidecarCollectorPairType } from '../types';
 
 const ConfigurationButton = styled(Button)`
   margin-right: 6px
@@ -34,9 +34,9 @@ const ConfigurationButton = styled(Button)`
 type Props = {
   collectors: Collector[],
   configurations: Configuration[],
-  selectedSidecarCollectorPairs: { collector: Collector, sidecar: SidecarSummary }[],
-  onConfigurationSelectionChange: (pairs: { collector: Collector, sidecar: SidecarSummary }[], configs: Configuration[], callback: () => void) => void,
-  onProcessAction: (action: string, pairs: { collector: Collector, sidecar: SidecarSummary }[], callback: () => void) => void,
+  selectedSidecarCollectorPairs: SidecarCollectorPairType[],
+  onConfigurationSelectionChange: (pairs: SidecarCollectorPairType[], configs: Configuration[], callback: () => void) => void,
+  onProcessAction: (action: string, pairs: SidecarCollectorPairType[], callback: () => void) => void,
 };
 
 const CollectorsAdministrationActions = ({

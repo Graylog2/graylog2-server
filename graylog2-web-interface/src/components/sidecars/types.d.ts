@@ -92,3 +92,8 @@ export type ConfigurationSidecarsResponse = {
   sidecar_ids: string[];
   configuration_id: string;
 }
+
+export type SidecarCollectorPairType = {
+  collector: Collector;
+  sidecar: SidecarSummary;
+}

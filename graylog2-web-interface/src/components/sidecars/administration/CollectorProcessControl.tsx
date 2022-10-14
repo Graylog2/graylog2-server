@@ -21,13 +21,13 @@ import lodash from 'lodash';
 import { Button, Panel, BootstrapModalConfirm } from 'components/bootstrap';
 import { Pluralize, SelectPopover } from 'components/common';
 
-import type { Collector, SidecarSummary } from '../types';
+import type { SidecarCollectorPairType } from '../types';
 
 const PROCESS_ACTIONS = ['start', 'restart', 'stop'];
 
 type Props = {
-  selectedSidecarCollectorPairs: { collector: Collector, sidecar: SidecarSummary }[],
-  onProcessAction: (action: string, pairs: { collector: Collector, sidecar: SidecarSummary }[], callback: () => void) => void,
+  selectedSidecarCollectorPairs: SidecarCollectorPairType[],
+  onProcessAction: (action: string, pairs: SidecarCollectorPairType[], callback: () => void) => void,
 };
 
 const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessAction }: Props) => {
