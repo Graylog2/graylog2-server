@@ -93,7 +93,12 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
         return Optional.ofNullable(parameterIndex.get(parameterName));
     }
 
-    public Search applyExecutionState(ExecutionState executionState) {
+    public Search applyExecutionState(final ExecutionState executionState) {
+        if (executionState.parameterBindings().isEmpty()
+                && executionState.queries() == null
+                && executionState.globalOverride() == null) {
+            return this;
+        }
         final Builder builder = toBuilder();
 
         if (!executionState.parameterBindings().isEmpty()) {
