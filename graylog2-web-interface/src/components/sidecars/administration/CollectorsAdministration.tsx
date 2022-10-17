@@ -257,7 +257,7 @@ const CollectorsAdministration = ({
                     to={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(configuration.id)}>
                 <ColorLabel color={configuration.color}
                             text={configuration.name}
-                            style={{ display: 'flex' }} />
+                            className="flex-color-label" />
               </Link>
             ),
             )}

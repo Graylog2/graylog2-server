@@ -33,3 +33,7 @@
 :local(.paginatedList) .search {
   margin-bottom: 15px;
 }
+
+.flex-color-label {
+  display: flex;
+}
