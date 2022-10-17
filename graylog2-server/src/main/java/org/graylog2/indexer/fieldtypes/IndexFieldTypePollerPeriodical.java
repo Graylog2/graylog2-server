@@ -16,9 +16,11 @@
  */
 package org.graylog2.indexer.fieldtypes;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.apache.mina.util.ConcurrentHashSet;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Cluster;
@@ -44,6 +46,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
@@ -66,6 +69,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     private volatile Set<IndexSetConfig> allIndexSetConfigs;
     private volatile Instant lastFullRefresh = Instant.MIN;
     private final ConcurrentHashMap<String, Instant> lastPoll = new ConcurrentHashMap<>();
+    private final ConcurrentHashSet<String> pollInProgress = new ConcurrentHashSet<>();
 
     @Inject
     public IndexFieldTypePollerPeriodical(final IndexFieldTypePoller poller,
@@ -164,13 +168,15 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         indexSetConfigs.stream()
                 .filter(config -> !config.fieldTypeRefreshInterval().equals(Duration.ZERO))
                 .filter(IndexSetConfig::isWritable)
-                .filter(config -> {
+                .forEach(config -> {
                     final Instant previousPoll = lastPoll.getOrDefault(config.id(), Instant.MIN);
                     final Instant nextPoll = previousPoll.plusSeconds(
                             config.fieldTypeRefreshInterval().getStandardSeconds());
-                    return !Instant.now().isBefore(nextPoll);
-                })
-                .forEach(this::poll);
+                    if (!Instant.now().isBefore(nextPoll)) {
+                        LOG.debug("Index set <{}> needs update, current polls in progress: {}", config.title(), this.pollInProgress);
+                        this.poll(config);
+                    }
+                });
     }
 
     private void poll(IndexSetConfig indexSetConfig) {
@@ -178,6 +184,14 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         final String indexSetId = indexSetConfig.id();
 
         scheduler.submit(() -> {
+            if (this.pollInProgress.contains(indexSetId)) {
+                LOG.info("Poll for index set <{}> is already in progress", indexSetTitle);
+                return;
+            }
+            LOG.info("Starting poll for index set <{}>, current polls in progress {}", indexSetTitle, this.pollInProgress);
+            this.pollInProgress.add(indexSetId);
+
+            final Stopwatch stopwatch = Stopwatch.createStarted();
             try {
                 final MongoIndexSet indexSet = mongoIndexSetFactory.create(indexSetConfig);
                 // Only check the active write index on a regular basis, the others don't change anymore
@@ -195,7 +209,10 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
             } catch (Exception e) {
                 LOG.error("Couldn't update field types for index set <{}/{}>", indexSetTitle, indexSetId, e);
             } finally {
+                this.pollInProgress.remove(indexSetId);
                 lastPoll.put(indexSetId, Instant.now());
+                stopwatch.stop();
+                LOG.debug("Polling index set <{}> took {}ms", indexSetTitle, stopwatch.elapsed(TimeUnit.MILLISECONDS));
             }
         });
     }
