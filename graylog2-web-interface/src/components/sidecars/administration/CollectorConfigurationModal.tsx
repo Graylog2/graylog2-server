@@ -104,6 +104,14 @@ const ModalSubTitle = styled.div`
   text-overflow: ellipsis;
 `;
 
+const getFilterQuery = (_query: string) => {
+  try {
+    return new RegExp(_query, 'i');
+  } catch (error) {
+    return ' ';
+  }
+};
+
 type Props = {
   show: boolean,
   onCancel: () => void,
@@ -144,9 +152,7 @@ const CollectorConfigurationModal = ({
 
   const isNotDirty = lodash.isEqual(selectedConfigurations, initialAssignedConfigs) && lodash.isEqual(partiallySelectedConfigurations, initialPartiallyAssignedConfigs);
 
-  const searchQueryRegexPattern = new RegExp(searchQuery, 'i');
-
-  const filteredOptions = [...initialAssignedConfigs, ...initialPartiallyAssignedConfigs, ...unassignedConfigs].filter((configuration) => configuration.match(searchQueryRegexPattern));
+  const filteredOptions = [...initialAssignedConfigs, ...initialPartiallyAssignedConfigs, ...unassignedConfigs].filter((configuration) => configuration.match(getFilterQuery(searchQuery)));
 
   const rows = filteredOptions.map((configName) => {
     const { configuration, collector, sidecars, autoAssignedTags } = getRowData(configName);
