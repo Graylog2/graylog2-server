@@ -45,13 +45,9 @@ const ConfigurationTagsSelect = ({
 };
 
 ConfigurationTagsSelect.propTypes = {
-  tags: PropTypes.arrayOf(PropTypes.string),
+  tags: PropTypes.arrayOf(PropTypes.string).isRequired,
   availableTags: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
-};
-
-ConfigurationTagsSelect.defaultProps = {
-  tags: [],
 };
 
 export default ConfigurationTagsSelect;
