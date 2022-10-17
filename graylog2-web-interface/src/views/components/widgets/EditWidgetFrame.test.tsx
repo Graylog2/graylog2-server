@@ -80,10 +80,10 @@ describe('EditWidgetFrame', () => {
       .timerange({ type: 'relative', from: 300 })
       .config({})
       .build();
-    const renderSUT = () => render((
+    const renderSUT = (props?: Partial<React.ComponentProps<typeof EditWidgetFrame>>) => render((
       <ViewTypeContext.Provider value="DASHBOARD">
         <WidgetContext.Provider value={widget}>
-          <EditWidgetFrame onCancel={() => {}} onFinish={() => {}}>
+          <EditWidgetFrame onSubmit={() => {}} onCancel={() => {}} {...props}>
             Hello World!
             These are some buttons!
           </EditWidgetFrame>
@@ -122,6 +122,31 @@ describe('EditWidgetFrame', () => {
       await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
         streams: ['5c2e27d6ba33a9681ad62775'],
       })));
+    });
+
+    it('calls onSubmit', async () => {
+      const onSubmit = jest.fn();
+      renderSUT({ onSubmit });
+
+      fireEvent.click(await screen.findByRole('button', { name: /update widget/i }));
+
+      await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+    });
+
+    it('calls onCancel', async () => {
+      const onCancel = jest.fn();
+      renderSUT({ onCancel });
+
+      fireEvent.click(await screen.findByRole('button', { name: /cancel/i }));
+
+      await waitFor(() => expect(onCancel).toHaveBeenCalledTimes(1));
+    });
+
+    it('does not display submit and cancel button when `displaySubmitActions` is false', async () => {
+      renderSUT({ displaySubmitActions: false });
+
+      expect(screen.queryByRole('button', { name: /update widget/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /cancel/i })).not.toBeInTheDocument();
     });
   });
 });
