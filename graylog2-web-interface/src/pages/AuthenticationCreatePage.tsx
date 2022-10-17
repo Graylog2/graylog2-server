@@ -22,7 +22,6 @@ import GettingStarted from 'components/authentication/BackendCreate/GettingStart
 import { DocumentTitle, PageHeader } from 'components/common';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 import DocsHelper from 'util/DocsHelper';
-import DocumentationLink from 'components/support/DocumentationLink';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 
 const AuthenticationCreatePage = () => {

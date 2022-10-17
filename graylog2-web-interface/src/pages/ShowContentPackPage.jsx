@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import Reflux from 'reflux';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
@@ -36,8 +37,10 @@ import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/Con
 import ShowContentPackStyle from './ShowContentPackPage.css';
 
 const ShowContentPackPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'ShowContentPackPage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     params: PropTypes.object.isRequired,
   },

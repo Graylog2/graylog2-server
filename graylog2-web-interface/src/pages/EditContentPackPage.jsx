@@ -17,6 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Reflux from 'reflux';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import { cloneDeep, groupBy } from 'lodash';
 
@@ -34,8 +35,10 @@ import { CatalogActions, CatalogStore } from 'stores/content-packs/CatalogStore'
 import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/ContentPacksStore';
 
 const EditContentPackPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'EditContentPackPage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     params: PropTypes.object.isRequired,
   },

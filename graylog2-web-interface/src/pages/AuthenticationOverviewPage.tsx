@@ -21,7 +21,6 @@ import {} from 'components/authentication/bindings'; // Bind all authentication 
 import { Alert, Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Icon } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
-import DocumentationLink from 'components/support/DocumentationLink';
 import BackendsOverview from 'components/authentication/BackendsOverview';
 import AuthenticationSubareaNavigation from 'components/authentication/AuthenticationSubareaNavigation';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';

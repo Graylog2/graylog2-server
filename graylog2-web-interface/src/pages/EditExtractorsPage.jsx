@@ -16,11 +16,11 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import EditExtractor from 'components/extractors/EditExtractor';
 import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';
@@ -31,8 +31,10 @@ import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import { UniversalSearchStore } from 'stores/search/UniversalSearchStore';
 
 const EditExtractorsPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'EditExtractorsPage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     params: PropTypes.object.isRequired,
   },

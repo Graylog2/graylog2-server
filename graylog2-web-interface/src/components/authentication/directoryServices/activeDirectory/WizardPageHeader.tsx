@@ -19,7 +19,6 @@ import * as React from 'react';
 import AuthenticationSubareaNavigation from 'components/authentication/AuthenticationSubareaNavigation';
 import { PageHeader } from 'components/common';
 import useActiveBackend from 'components/authentication/useActiveBackend';
-import DocumentationLink from 'components/support/DocumentationLink';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';

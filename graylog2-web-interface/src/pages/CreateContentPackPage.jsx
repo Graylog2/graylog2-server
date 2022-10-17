@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import Reflux from 'reflux';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
 import { LinkContainer } from 'components/common/router';
@@ -31,6 +32,7 @@ import { CatalogStore, CatalogActions } from 'stores/content-packs/CatalogStore'
 import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
 
 const CreateContentPackPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'CreateContentPackPage',
   mixins: [Reflux.connect(CatalogStore)],
 

@@ -23,7 +23,6 @@ import { LinkContainer } from 'components/common/router';
 import { Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';
-import DocumentationLink from 'components/support/DocumentationLink';
 import DashboardList from 'views/components/views/DashboardList';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import useDashboards from 'views/logic/dashboards/useDashboards';

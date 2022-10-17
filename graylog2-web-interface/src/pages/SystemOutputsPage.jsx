@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
@@ -23,6 +24,7 @@ import OutputsComponent from 'components/outputs/OutputsComponent';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 const SystemOutputsPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'SystemOutputsPage',
   mixins: [Reflux.connect(CurrentUserStore)],
 

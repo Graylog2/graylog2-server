@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
@@ -38,8 +39,10 @@ function clusterOverviewFilter(state) {
 }
 
 const ShowNodePage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'ShowNodePage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     params: PropTypes.object.isRequired,
   },

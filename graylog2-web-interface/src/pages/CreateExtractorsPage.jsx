@@ -16,11 +16,11 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import EditExtractor from 'components/extractors/EditExtractor';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
@@ -33,8 +33,10 @@ import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import { MessagesActions } from 'stores/messages/MessagesStore';
 
 const CreateExtractorsPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'CreateExtractorsPage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     params: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,

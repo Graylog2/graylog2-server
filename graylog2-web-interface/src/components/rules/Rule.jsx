@@ -19,7 +19,6 @@ import React from 'react';
 
 import { PageHeader } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
-import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 
 import RuleForm from './RuleForm';

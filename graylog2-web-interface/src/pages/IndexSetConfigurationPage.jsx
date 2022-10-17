@@ -22,7 +22,6 @@ import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
 import connect from 'stores/connect';
-import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';
 import Routes from 'routing/Routes';
