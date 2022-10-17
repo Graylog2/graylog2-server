@@ -26,6 +26,7 @@ import UsersDomain from 'domainActions/users/UsersDomain';
 import SidecarListContainer from 'components/sidecars/sidecars/SidecarListContainer';
 import Routes from 'routing/Routes';
 import SidecarsSubareaNavigation from 'components/sidecars/common/SidecarsSubareaNavigation';
+import DocsHelper from 'util/DocsHelper';
 
 const SidecarsPage = () => {
   const [sidecarUser, setSidecarUser] = useState();
@@ -41,20 +42,25 @@ const SidecarsPage = () => {
   return (
     <DocumentTitle title="Sidecars">
       <SidecarsSubareaNavigation />
-      <PageHeader title="Sidecars Overview">
+      <PageHeader title="Sidecars Overview"
+                  documentationLink={{
+                    title: 'Sidecar documentation',
+                    path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+                  }}>
         <span>
           The Graylog sidecars can reliably forward contents of log files or Windows EventLog from your servers.
+          {canCreateSidecarUserTokens && (
+            sidecarUser ? (
+              <span>
+                <br />
+                Do you need an API token for a sidecar?&ensp;
+                <Link to={Routes.SYSTEM.USERS.TOKENS.edit(sidecarUser.id)}>
+                  Create or reuse a token for the <em>graylog-sidecar</em> user
+                </Link>
+              </span>
+            ) : <Spinner />
+          )}
         </span>
-        {canCreateSidecarUserTokens && (
-          sidecarUser ? (
-            <span>
-              Do you need an API token for a sidecar?&ensp;
-              <Link to={Routes.SYSTEM.USERS.TOKENS.edit(sidecarUser.id)}>
-                Create or reuse a token for the <em>graylog-sidecar</em> user
-              </Link>
-            </span>
-          ) : <Spinner />
-        )}
       </PageHeader>
 
       <Row className="content">

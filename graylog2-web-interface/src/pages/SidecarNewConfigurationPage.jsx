@@ -23,6 +23,7 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import ConfigurationForm from 'components/sidecars/configuration-forms/ConfigurationForm';
 import ConfigurationHelper from 'components/sidecars/configuration-forms/ConfigurationHelper';
 import SidecarsSubareaNavigation from 'components/sidecars/common/SidecarsSubareaNavigation';
+import DocsHelper from 'util/DocsHelper';
 
 const SidecarNewConfigurationPage = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -36,13 +37,13 @@ const SidecarNewConfigurationPage = createReactClass({
     return (
       <DocumentTitle title="New Collector Configuration">
         <SidecarsSubareaNavigation />
-        <PageHeader title="New Collector Configuration">
+        <PageHeader title="New Collector Configuration"
+                    documentationLink={{
+                      title: 'Sidecar documentation',
+                      path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+                    }}>
           <span>
             Some words about collector configurations.
-          </span>
-
-          <span>
-            Read more about the Graylog Sidecar in the documentation.
           </span>
         </PageHeader>
 

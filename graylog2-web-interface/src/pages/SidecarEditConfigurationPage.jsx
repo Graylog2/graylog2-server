@@ -27,6 +27,7 @@ import ConfigurationHelper from 'components/sidecars/configuration-forms/Configu
 import history from 'util/History';
 import withParams from 'routing/withParams';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
+import DocsHelper from 'util/DocsHelper';
 
 import SidecarsSubareaNavigation from '../components/sidecars/common/SidecarsSubareaNavigation';
 
@@ -83,13 +84,13 @@ const SidecarEditConfigurationPage = createReactClass({
     return (
       <DocumentTitle title="Collector Configuration">
         <SidecarsSubareaNavigation />
-        <PageHeader title="Collector Configuration">
+        <PageHeader title="Collector Configuration"
+                    documentationLink={{
+                      title: 'Sidecar documentation',
+                      path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+                    }}>
           <span>
             Some words about collector configurations.
-          </span>
-
-          <span>
-            Read more about the Graylog Sidecar in the documentation.
           </span>
         </PageHeader>
 

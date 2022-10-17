@@ -18,7 +18,6 @@ import React from 'react';
 
 import { Col, Row } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
-import DocumentationLink from 'components/support/DocumentationLink';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ConfigurationListContainer from 'components/sidecars/configurations/ConfigurationListContainer';
 import CollectorListContainer from 'components/sidecars/configurations/CollectorListContainer';
@@ -27,15 +26,14 @@ import SidecarsSubareaNavigation from 'components/sidecars/common/SidecarsSubare
 const SidecarConfigurationPage = () => (
   <DocumentTitle title="Collectors Configuration">
     <SidecarsSubareaNavigation />
-    <PageHeader title="Collectors Configuration">
+    <PageHeader title="Collectors Configuration"
+                documentationLink={{
+                  title: 'Sidecar documentation',
+                  path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+                }}>
       <span>
         The Collector Sidecar runs next to your favourite log collector and configures it for you. Here you can
         manage the Sidecar configurations.
-      </span>
-
-      <span>
-        Read more about the collector sidecar in the{' '}
-        <DocumentationLink page={DocsHelper.PAGES.COLLECTOR_SIDECAR} text="Graylog documentation" />.
       </span>
     </PageHeader>
 
