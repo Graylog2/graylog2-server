@@ -2843,15 +2843,15 @@ react-is@^16.13.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
-react-simple-code-editor@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/react-simple-code-editor/-/react-simple-code-editor-0.10.0.tgz#73e7ac550a928069715482aeb33ccba36efe2373"
-  integrity sha512-bL5W5mAxSW6+cLwqqVWY47Silqgy2DKDTR4hDBrLrUqC5BXc29YVx17l2IZk5v36VcDEq1Bszu2oHm1qBwKqBA==
+react-simple-code-editor@^0.13.1:
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/react-simple-code-editor/-/react-simple-code-editor-0.13.1.tgz#4514553fa132dcaffec33a6612c58f1613c52416"
+  integrity sha512-XYeVwRZwgyKtjNIYcAEgg2FaQcCZwhbarnkJIV20U2wkCU9q/CPFBo8nRXrK4GXUz3AvbqZFsZRrpUTkqqEYyQ==
 
-react-styleguidist@^12.0.1:
-  version "12.0.1"
-  resolved "https://registry.yarnpkg.com/react-styleguidist/-/react-styleguidist-12.0.1.tgz#bc8bec6a28fb0404f9d66ca53e6a56f01133e60c"
-  integrity sha512-qM0uWE1T6efskoK1Dnqh01byLRRXF2+9goxC+k3HotoTp55h8JTugMbqpPYm07TG9vLp9qln1kyAJ0WW03ksqA==
+react-styleguidist@^13.0.0:
+  version "13.0.0"
+  resolved "https://registry.yarnpkg.com/react-styleguidist/-/react-styleguidist-13.0.0.tgz#e5057a11cb06e907c22fe5db43af95bb8dd954fc"
+  integrity sha512-F8e9aeB9kx5nMRdjAGble8m6GkgO0GPLVKT+EzoedxnnQfenKZB07agnn5klW2Uo4uyu1Ezl1iZbKFISxSbH3g==
   dependencies:
     "@tippyjs/react" "4.1.0"
     "@vxna/mini-html-webpack-template" "^2.0.0"
@@ -2904,7 +2904,7 @@ react-styleguidist@^12.0.1:
     react-docgen-displayname-handler "^3.0.0"
     react-group "^3.0.2"
     react-icons "^3.8.0"
-    react-simple-code-editor "^0.10.0"
+    react-simple-code-editor "^0.13.1"
     recast "~0.18.5"
     remark "^13.0.0"
     strip-html-comments "^1.0.0"
