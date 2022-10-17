@@ -50,6 +50,7 @@ const ActionsSM = styled.div`
 const DocumentationLinkContainer = styled.div`
   display: flex;
   gap: 10px;
+  align-items: flex-start;
 `;
 
 const FlexRow = styled.div`

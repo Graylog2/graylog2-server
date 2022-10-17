@@ -22,6 +22,11 @@ import DocsHelper from 'util/DocsHelper';
 
 import Icon from '../common/Icon';
 
+const Container = styled.a`
+  display: inline-flex;
+  align-items: center;
+`;
+
 const StyledIcon = styled(Icon)`
   margin-left: 5px
 `;
@@ -35,10 +40,10 @@ type Props = {
 
 const DocumentationLink = ({ page, title = '', text, displayIcon }: Props) => {
   return (
-    <a href={DocsHelper.toString(page)} title={title} target="_blank" rel="noreferrer">
+    <Container href={DocsHelper.toString(page)} title={title} target="_blank" rel="noreferrer">
       {text}
-      {displayIcon && <StyledIcon name="lightbulb" type="regular" />}
-    </a>
+      {displayIcon && <StyledIcon name="lightbulb" type="regular" size="lg" />}
+    </Container>
   );
 };
 
