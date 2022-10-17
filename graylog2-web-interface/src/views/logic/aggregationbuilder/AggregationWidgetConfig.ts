@@ -123,6 +123,10 @@ export default class AggregationWidgetConfig extends WidgetConfig {
     return empty(this.rowPivots) && empty(this.columnPivots) && empty(this.series);
   }
 
+  get rollupForBackendQuery(): boolean {
+    return this.columnPivots.length > 0 ? this.rollup : true;
+  }
+
   static builder() {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder()

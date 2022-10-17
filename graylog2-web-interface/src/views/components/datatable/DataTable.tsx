@@ -200,8 +200,7 @@ const DataTable = ({
     return Promise.reject();
   }, [widget, editing, formContext]);
 
-  const { columnPivots, rowPivots, series, rollup: rollupFromConfig } = config;
-  const rollup = columnPivots.length > 0 ? rollupFromConfig : true;
+  const { columnPivots, rowPivots, series, rollupForBackendQuery: rollup } = config;
 
   const rows = retrieveChartData(data) ?? [];
 
