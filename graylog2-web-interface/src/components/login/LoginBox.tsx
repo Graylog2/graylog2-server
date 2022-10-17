@@ -48,7 +48,11 @@ const LoginCol = styled(Col)(({ theme }) => css`
   box-shadow: 0 0 21px ${theme.colors.global.navigationBoxShadow};
 `);
 
-const LoginBox = ({ children }) => (
+type Props = {
+  children: React.ReactNode,
+};
+
+const LoginBox = ({ children }: Props) => (
   <Wrapper className="container">
     <Row>
       <Col md={8} mdOffset={2}>

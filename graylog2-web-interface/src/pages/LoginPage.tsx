@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled, { createGlobalStyle } from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
@@ -48,7 +47,7 @@ const StyledPre = styled.pre`
   white-space: pre-line;
 `;
 
-const useActiveBackend = (isCloud) => {
+const useActiveBackend = (isCloud: boolean) => {
   const cloudBackendLoader = () => {
     if (isCloud) {
       return Promise.resolve('oidc-v1');
@@ -62,7 +61,12 @@ const useActiveBackend = (isCloud) => {
   return [data, isSuccess];
 };
 
-const ErrorFallback = ({ error, resetErrorBoundary }) => {
+type ErrorFallbackProps = {
+  error: Error;
+  resetErrorBoundary: (...args: Array<unknown>) => void;
+};
+
+const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
   const isCloud = AppConfig.isCloud();
 
   return (
@@ -83,16 +87,9 @@ const ErrorFallback = ({ error, resetErrorBoundary }) => {
   );
 };
 
-ErrorFallback.propTypes = {
-  error: PropTypes.shape({
-    message: PropTypes.string.isRequired,
-  }).isRequired,
-  resetErrorBoundary: PropTypes.func.isRequired,
-};
-
 const LoginPage = () => {
   const [didValidateSession, setDidValidateSession] = useState(false);
-  const [lastError, setLastError] = useState(undefined);
+  const [lastError, setLastError] = useState<string | undefined>(undefined);
   const [useFallback, setUseFallback] = useState(false);
   const [enableExternalBackend, setEnableExternalBackend] = useState(true);
   const [loginFormState, setLoginFormState] = useState(LOGIN_INITIALIZING_STATE);
@@ -123,7 +120,7 @@ const LoginPage = () => {
     setLastError(undefined);
   };
 
-  const formatLastError = () => {
+  const LastError = () => {
     if (lastError) {
       return (
         <div className="form-group">
@@ -137,7 +134,7 @@ const LoginPage = () => {
     return null;
   };
 
-  const renderLoginForm = () => {
+  const PluggableLoginForm = () => {
     if (!useFallback && hasCustomLogin) {
       const { formComponent: PluginLoginForm } = loginComponent;
 
@@ -169,8 +166,8 @@ const LoginPage = () => {
       <LoginBox>
         <LoginHeader />
         <LoginPageStyles />
-        {formatLastError()}
-        {renderLoginForm()}
+        <LastError />
+        <PluggableLoginForm />
         {shouldDisplayFallbackLink && (
         <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
           {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}

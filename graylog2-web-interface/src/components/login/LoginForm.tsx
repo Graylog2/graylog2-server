@@ -14,14 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { ModalSubmit } from 'components/common';
 import { Input } from 'components/bootstrap';
 import { SessionActions } from 'stores/sessions/SessionStore';
 
-const LoginForm = ({ onErrorChange }) => {
+type Props = {
+  onErrorChange: (message?: string) => void,
+};
+
+const LoginForm = ({ onErrorChange }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   let promise;
   let usernameInput;
