@@ -41,6 +41,7 @@ export { default as DropdownMenu } from './DropdownMenu';
 export { default as DropdownSubmenu } from './DropdownSubmenu';
 export { default as ElementDimensions } from './ElementDimensions';
 export { default as EmptyEntity } from './EmptyEntity';
+export { default as NoEntitiesExist } from './NoEntitiesExist';
 export { default as NoSearchResult } from './NoSearchResult';
 export { default as EnterprisePluginNotFound } from './EnterprisePluginNotFound';
 export { default as EntityList } from './EntityList';

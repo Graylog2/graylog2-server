@@ -18,9 +18,6 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Alert } from 'components/bootstrap';
-import { Icon } from 'components/common';
-
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -49,7 +46,7 @@ type Props = {
 const EmptyEntity = ({ children, title }: Props) => (
   <Container>
     <Headline>{title}</Headline>
-    <Alert><Icon name="info-circle" />&nbsp;{children}</Alert>
+    {children}
   </Container>
 );
 

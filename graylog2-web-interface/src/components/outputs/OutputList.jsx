@@ -19,7 +19,7 @@ import React from 'react';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Alert, Col, Row } from 'components/bootstrap';
-import { Icon, Spinner } from 'components/common';
+import { Icon, Spinner, NoEntitiesExist } from 'components/common';
 import Output from 'components/outputs/Output';
 
 class OutputList extends React.Component {
@@ -59,9 +59,9 @@ class OutputList extends React.Component {
       return (
         <Row className="content">
           <Col md={12}>
-            <Alert bsStyle="info">
-              <Icon name="info-circle" />&nbsp;No outputs configured.
-            </Alert>
+            <NoEntitiesExist>
+              No outputs configured.
+            </NoEntitiesExist>
           </Col>
         </Row>
       );

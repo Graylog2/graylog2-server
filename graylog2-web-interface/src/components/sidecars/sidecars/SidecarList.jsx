@@ -18,8 +18,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Button, Alert, Col, Row, Table } from 'components/bootstrap';
-import { Icon, PaginatedList } from 'components/common';
+import { Button, Col, Row, Table } from 'components/bootstrap';
+import { Icon, PaginatedList, NoSearchResults, NoEntitiesExist } from 'components/common';
 import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';
 
 import SidecarRow from './SidecarRow';
@@ -107,9 +107,9 @@ class SidecarList extends React.Component {
     const showInactiveHint = (onlyActive ? ' and/or click on "Include inactive sidecars"' : null);
 
     return (
-      <Alert bsStyle="warning">
+      <NoSearchResults>
         <Icon name="info-circle" />&nbsp;There are no sidecars matching the search criteria. Try adjusting your search filter{showInactiveHint}.
-      </Alert>
+      </NoSearchResults>
     );
   };
 
@@ -121,9 +121,9 @@ class SidecarList extends React.Component {
     }
 
     return (
-      <Alert bsStyle="warning">
-        <Icon name="info-circle" />&nbsp;There are no sidecars configured.
-      </Alert>
+      <NoEntitiesExist>
+        There are no sidecars configured.
+      </NoEntitiesExist>
     );
   };
 

@@ -20,8 +20,8 @@ import lodash from 'lodash';
 import styled, { css } from 'styled-components';
 
 import { Link, LinkContainer } from 'components/common/router';
-import { OverlayTrigger, EmptyEntity, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
-import { Alert, Col, Label, Row, Table, Tooltip, Button } from 'components/bootstrap';
+import { OverlayTrigger, EmptyEntity, NoSearchResults, NoEntitiesExist, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
+import { Col, Label, Row, Table, Tooltip, Button } from 'components/bootstrap';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import Routes from 'routing/Routes';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
@@ -243,13 +243,13 @@ class Events extends React.Component {
     const entity = (filter === 'only' ? 'Alerts' : excludedFile);
 
     const emptyListComponent = query ? (
-      <Alert bsStyle="info">
-        <Icon name="info-circle" />&nbsp;No {entity} found for the current search criteria.
-      </Alert>
+      <NoSearchResults>
+        No {entity} found for the current search criteria.
+      </NoSearchResults>
     ) : (
-      <Alert bsStyle="info">
-        <Icon name="info-circle" />&nbsp;No {entity} exist.
-      </Alert>
+      <NoEntitiesExist>
+        No {entity} exist.
+      </NoEntitiesExist>
     );
 
     return (
