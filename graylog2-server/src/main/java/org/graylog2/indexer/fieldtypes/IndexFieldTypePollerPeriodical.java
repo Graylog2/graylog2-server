@@ -185,14 +185,14 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
 
         scheduler.submit(() -> {
             if (this.pollInProgress.contains(indexSetId)) {
-                LOG.info("Poll for index set <{}> is already in progress", indexSetTitle);
+                LOG.debug("Poll for index set <{}> is already in progress", indexSetTitle);
                 return;
             }
-            LOG.info("Starting poll for index set <{}>, current polls in progress {}", indexSetTitle, this.pollInProgress);
-            this.pollInProgress.add(indexSetId);
+            LOG.debug("Starting poll for index set <{}>, current polls in progress {}", indexSetTitle, this.pollInProgress);
 
             final Stopwatch stopwatch = Stopwatch.createStarted();
             try {
+                this.pollInProgress.add(indexSetId);
                 final MongoIndexSet indexSet = mongoIndexSetFactory.create(indexSetConfig);
                 // Only check the active write index on a regular basis, the others don't change anymore
                 final String activeWriteIndex = indexSet.getActiveWriteIndex();
