@@ -18,24 +18,25 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import { Alert } from 'components/bootstrap';
+import { Icon } from 'components/common';
 
 type Props = {
   children: React.ReactNode,
   className: string | null | undefined,
 };
 
-const EmptyResult = ({ children, className }: Props) => (
-  <Alert className={`${className ?? ''} no-bm`}>{children}</Alert>
+const NoSearchResult = ({ children, className }: Props) => (
+  <Alert className={`${className ?? ''} no-bm`}><Icon name="info-circle" />&nbsp;{children}</Alert>
 );
 
-EmptyResult.propTypes = {
+NoSearchResult.propTypes = {
   children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   className: PropTypes.string,
 };
 
-EmptyResult.defaultProps = {
+NoSearchResult.defaultProps = {
   children: 'No data available.',
   className: undefined,
 };
 
-export default EmptyResult;
+export default NoSearchResult;
