@@ -36,11 +36,11 @@ const H1 = styled.h1`
   margin-bottom: 0.2em;
 `;
 
-const DocumentationLinkContainer = styled.div`
+const TopActions = styled.div<{ $hasMultipleChildren: boolean }>(({ $hasMultipleChildren }) => `
   display: flex;
   gap: 10px;
-  align-items: flex-start;
-`;
+  align-items: ${$hasMultipleChildren ? 'center' : 'flex-start'};
+`);
 
 const FlexRow = styled.div`
   display: flex;
@@ -48,7 +48,7 @@ const FlexRow = styled.div`
   gap: 10px;
 `;
 
-const Subactions = styled.div`
+const BottomActions = styled.div`
   display: flex !important;
   align-items: flex-end;
   margin-top: 5px;
@@ -103,49 +103,39 @@ type Props = {
  * This ensures all pages look and feel the same way across the product, so
  * please use it in your pages.
  */
-const PageHeader = ({ children: childList, subpage, title, subactions, mainActions, lifecycle, lifecycleMessage, documentationLink }: Props) => {
-  const children = (childList !== undefined && 'length' in childList ? childList : [childList]);
-
+const PageHeader = ({ children, subpage, title, subactions, mainActions, lifecycle, lifecycleMessage, documentationLink }: Props) => {
   const topLevelClassNames = subpage ? '' : 'content';
 
   return (
-    <div>
-      <ContentHeadRow className={topLevelClassNames}>
-        <Col sm={12}>
-          <FlexRow>
-            <H1>
-              {title} <small><LifecycleIndicator lifecycle={lifecycle} lifecycleMessage={lifecycleMessage} /></small>
-            </H1>
-            {(documentationLink || mainActions) && (
-              <DocumentationLinkContainer>
-                {documentationLink && <DocumentationLink text={documentationLink.title} page={documentationLink.path} displayIcon />}
-                {mainActions && (
-                  <div className="actions-lg visible-lg visible-md">
-                    <div className="actions-container">
-                      {mainActions}
-                    </div>
-                  </div>
-                )}
-              </DocumentationLinkContainer>
-            )}
-          </FlexRow>
+    <ContentHeadRow className={topLevelClassNames}>
+      <Col sm={12}>
+        <FlexRow>
+          <H1>
+            {title} <small><LifecycleIndicator lifecycle={lifecycle} lifecycleMessage={lifecycleMessage} /></small>
+          </H1>
+          {(documentationLink || mainActions) && (
+            <TopActions $hasMultipleChildren={!!documentationLink && !!mainActions}>
+              {documentationLink && <DocumentationLink text={documentationLink.title} page={documentationLink.path} displayIcon />}
+              {mainActions}
+            </TopActions>
+          )}
+        </FlexRow>
 
-          <FlexRow>
-            {children && (
-              <p className="description no-bm">
-                {children}
-              </p>
-            )}
+        <FlexRow>
+          {children && (
+            <p className="description no-bm">
+              {children}
+            </p>
+          )}
 
-            {subactions && (
-              <Subactions>
-                {subactions}
-              </Subactions>
-            )}
-          </FlexRow>
-        </Col>
-      </ContentHeadRow>
-    </div>
+          {subactions && (
+            <BottomActions>
+              {subactions}
+            </BottomActions>
+          )}
+        </FlexRow>
+      </Col>
+    </ContentHeadRow>
   );
 };
 
