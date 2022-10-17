@@ -39,16 +39,15 @@ const Rule = ({ create, title }) => {
   return (
     <div>
       <PipelinesSubareaNavigation />
-      <PageHeader title={pageTitle}>
+      <PageHeader title={pageTitle}
+                  documentationLink={{
+                    title: 'Pipeline rules documentation',
+                    path: DocsHelper.PAGES.PIPELINE_RULES,
+                  }}>
         <span>
           Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list{' '}
           of actions.{' '}
           Graylog evaluates the condition against a message and executes the actions if the condition is satisfied.
-        </span>
-
-        <span>
-          Read more about Graylog pipeline rules in the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES}
-                                                                           text="documentation" />.
         </span>
       </PageHeader>
 

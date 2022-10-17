@@ -31,6 +31,7 @@ import { StreamsStore } from 'stores/streams/StreamsStore';
 import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
 import { PipelinesStore, PipelinesActions } from 'stores/pipelines/PipelinesStore';
 import { RulesStore } from 'stores/rules/RulesStore';
+import DocsHelper from 'util/DocsHelper';
 
 import PipelinesSubareaNavigation from '../components/pipelines/PipelinesSubareaNavigation';
 
@@ -162,12 +163,15 @@ const PipelineDetailsPage = createReactClass({
       <DocumentTitle title={pageTitle}>
         <div>
           <PipelinesSubareaNavigation />
-          <PageHeader title={title}>
+          <PageHeader title={title}
+                      documentationLink={{
+                        title: 'Pipelines documentation',
+                        path: DocsHelper.PAGES.PIPELINES,
+                      }}>
             <span>
               Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where
               rules are evaluated and applied. Messages can go through one or more stages.
-            </span>
-            <span>
+              <br />
               After each stage is completed, you can decide if messages matching all or one of the rules continue to
               the next stage.
             </span>

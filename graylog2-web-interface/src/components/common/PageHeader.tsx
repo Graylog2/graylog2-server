@@ -62,6 +62,10 @@ const Subactions = styled.div`
   display: flex !important;
   align-items: flex-end;
   margin-top: 5px;
+  
+  .btn-toolbar {
+    display: flex;
+  }
 `;
 
 const LIFECYCLE_DEFAULT_MESSAGES = {

@@ -156,9 +156,7 @@ const ShowContentPackPage = createReactClass({
           <PageHeader title="Content packs">
             <span>
               Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.
-            </span>
-
-            <span>
+              <br />
               Find more content packs in {' '}
               <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
             </span>
