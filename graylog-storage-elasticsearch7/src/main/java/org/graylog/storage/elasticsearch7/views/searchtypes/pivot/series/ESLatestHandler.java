@@ -59,6 +59,6 @@ public class ESLatestHandler extends ESPivotSeriesSpecHandler<Latest, TopHits> {
                 .map(SearchHit::getSourceAsMap)
                 .map(source -> source.get(pivotSpec.field()))
                 .map(value -> Value.create(pivotSpec.id(), Latest.NAME, value));
-        return latestValue.stream();
+        return latestValue.map(Stream::of).orElse(Stream.empty());
     }
 }
