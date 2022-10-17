@@ -19,23 +19,24 @@ import { useContext, useState } from 'react';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import { ModalSubmit } from 'components/common';
+import DisableSubmissionStateContext from 'views/components/contexts/DisableSubmissionStateContext';
 
 type Props = {
   onCancel: () => void,
-  onFinish: () => void,
-  disableSave?: boolean,
+  onSubmit: () => void,
 };
 
-const SaveOrCancelButtons = ({ onFinish, onCancel, disableSave = false }: Props) => {
+const SaveOrCancelButtons = ({ onSubmit, onCancel }: Props) => {
   const { applyAllWidgetChanges } = useContext(WidgetEditApplyAllChangesContext);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { disabled: disabledSubmit } = useContext(DisableSubmissionStateContext);
 
-  const _onFinish = () => {
+  const _onSubmit = () => {
     setIsSubmitting(true);
 
     return applyAllWidgetChanges().then(() => {
       setIsSubmitting(false);
-      onFinish();
+      onSubmit();
     }).catch(() => {
       setIsSubmitting(false);
     });
@@ -43,19 +44,15 @@ const SaveOrCancelButtons = ({ onFinish, onCancel, disableSave = false }: Props)
 
   return (
     <ModalSubmit isAsyncSubmit
-                 submitButtonText="Apply changes"
-                 submitLoadingText="Applying changes..."
-                 onSubmit={_onFinish}
+                 submitButtonText="Update widget"
+                 submitLoadingText="Updating widget..."
+                 onSubmit={_onSubmit}
                  submitButtonType="button"
-                 disabledSubmit={disableSave}
+                 disabledSubmit={disabledSubmit}
                  isSubmitting={isSubmitting}
                  displayCancel
                  onCancel={onCancel} />
   );
-};
-
-SaveOrCancelButtons.defaultProps = {
-  disableSave: false,
 };
 
 export default SaveOrCancelButtons;

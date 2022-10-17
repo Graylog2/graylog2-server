@@ -152,7 +152,7 @@ class EditPatternModal extends React.Component {
     return (
       <span>
         <Button onClick={this.openModal}
-                bsStyle={create ? 'success' : 'info'}
+                bsStyle={create ? 'success' : 'default'}
                 bsSize={create ? undefined : 'xs'}>
           {triggerButtonContent}
         </Button>

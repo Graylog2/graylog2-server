@@ -40,23 +40,7 @@ module.exports = {
       content: 'docs/introduction.md',
     },
     {
-      name: 'Style Guide',
-      content: 'docs/styleguide.md',
-    },
-    {
-      name: 'Documentation',
-      content: 'docs/documentation.md',
-    },
-    {
-      name: 'Tests',
-      content: 'docs/tests.md',
-    },
-    {
-      name: 'Util Objects',
-      content: 'docs/util-objects.md',
-    },
-    {
-      name: 'Theming Details',
+      name: 'Theming',
       content: 'src/theme/docs/Details.md',
       sections: [
         {
@@ -82,8 +66,16 @@ module.exports = {
       ],
     },
     {
+      name: 'UX Patterns - Best Practices',
+      content: 'docs/ux-patterns.md',
+    },
+    {
       name: 'Shared Components',
       sections: [
+        {
+          name: 'How to document your components',
+          content: 'docs/documentation.md',
+        },
         {
           name: 'Bootstrap',
           components: 'src/components/bootstrap/[A-Z]*.{jsx,tsx}',

@@ -31,6 +31,7 @@ import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 import type View from '../logic/views/View';
+import { DashboardsActions } from '../stores/DashboardsStore';
 
 // eslint-disable-next-line no-alert
 const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
@@ -45,13 +46,15 @@ const DashboardsPage = () => {
   };
 
   const handleDashboardDelete = async (view: View) => {
-    resetPage();
-
     const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingDashboard');
 
     const result = await iterateConfirmationHooks([...pluginDashboardDeletionHooks, defaultDashboardDeletionHook], view);
 
-    return result === true ? ViewManagementActions.delete(view) : Promise.reject();
+    if (result) {
+      await ViewManagementActions.delete(view);
+      await DashboardsActions.search(searchQuery, page, pageSize);
+      resetPage();
+    }
   };
 
   const { list, pagination } = useDashboards(searchQuery, page, pageSize);
@@ -59,7 +62,14 @@ const DashboardsPage = () => {
   return (
     <DocumentTitle title="Dashboards">
       <span>
-        <PageHeader title="Dashboards">
+        <PageHeader title="Dashboards"
+                    subactions={(
+                      <IfPermitted permissions="dashboards:create">
+                        <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
+                          <Button bsStyle="success">Create new dashboard</Button>
+                        </LinkContainer>
+                      </IfPermitted>
+                    )}>
           <span>
             Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or
             chart you create in other parts of Graylog with one click.
@@ -70,14 +80,6 @@ const DashboardsPage = () => {
             {' '}<DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="dashboard tutorial" />{' '}
             for lots of other useful tips.
           </span>
-
-          <IfPermitted permissions="dashboards:create">
-            <span>
-              <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
-                <Button bsStyle="success" bsSize="lg">Create new dashboard</Button>
-              </LinkContainer>
-            </span>
-          </IfPermitted>
         </PageHeader>
 
         <Row className="content">

@@ -24,6 +24,7 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
+import org.graylog2.validation.SizeInBytes;
 import org.joda.time.Duration;
 
 import javax.annotation.Nullable;
@@ -61,6 +62,7 @@ public abstract class IndexSetSummary {
 
     @JsonProperty("index_prefix")
     @Pattern(regexp = IndexSetConfig.INDEX_PREFIX_REGEX)
+    @SizeInBytes(message = "Index prefix must have a length in bytes between {min} and {max}", min = 1, max = 250)
     public abstract String indexPrefix();
 
     @JsonProperty("shards")

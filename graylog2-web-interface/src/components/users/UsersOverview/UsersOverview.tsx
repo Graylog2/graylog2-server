@@ -76,7 +76,10 @@ const _loadUsers = (pagination, setLoading, setPaginatedUsers) => {
   });
 };
 
-const _updateListOnUserDelete = (callback: () => void) => UsersActions.delete.completed.listen(() => callback());
+const _updateListOnUserDelete = (pagination, setLoading, setPaginatedUsers, callback: () => void) => UsersActions.delete.completed.listen(() => {
+  _loadUsers(pagination, setLoading, setPaginatedUsers);
+  callback();
+});
 const _updateListOnUserSetStatus = (pagination, setLoading, setPaginatedUsers) => UsersActions.setStatus.completed.listen(() => _loadUsers(pagination, setLoading, setPaginatedUsers));
 
 const buildUsersOverviewItem = (currentUser: any) => (user: UserOverview) => {
@@ -94,7 +97,7 @@ const UsersOverview = () => {
   const { list: users, adminUser, pagination: { total = 0 } = {} } = paginatedUsers || {};
 
   useEffect(() => _loadUsers({ page, perPage, query }, setLoading, setPaginatedUsers), [page, perPage, query]);
-  useEffect(() => _updateListOnUserDelete(resetPage), [resetPage]);
+  useEffect(() => _updateListOnUserDelete({ page, perPage, query }, setLoading, setPaginatedUsers, resetPage), [page, perPage, query, resetPage]);
   useEffect(() => _updateListOnUserSetStatus({ page, perPage, query }, setLoading, setPaginatedUsers), [page, perPage, query]);
 
   if (!users) {

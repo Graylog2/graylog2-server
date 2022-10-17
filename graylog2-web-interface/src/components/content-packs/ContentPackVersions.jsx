@@ -94,7 +94,7 @@ class ContentPackVersions extends React.Component {
         <td className="text-right">
           <ButtonToolbar className="pull-right">
             <Button bsStyle="success" bsSize="small" onClick={() => { downloadRef.open(); }}>Download</Button>
-            <DropdownButton id={`action-${pack.rev}`} bsStyle="info" title="Actions" bsSize="small">
+            <DropdownButton id={`action-${pack.rev}`} title="Actions" bsSize="small">
               <MenuItem onClick={openFunc}>Install</MenuItem>
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}>
                 <MenuItem>Create New From Revision</MenuItem>

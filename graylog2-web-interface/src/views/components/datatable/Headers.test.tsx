@@ -31,7 +31,7 @@ import Headers from './Headers';
 
 jest.mock('components/common/Timestamp', () => 'Timestamp');
 const onSortChange = jest.fn();
-const seriesWithName = (fn, name) => Series.forFunction(fn)
+const seriesWithName = (fn: string, name: string) => Series.forFunction(fn)
   .toBuilder()
   .config(SeriesConfig.empty()
     .toBuilder()
@@ -71,7 +71,9 @@ describe('Headers', () => {
                  actualColumnPivotFields={actualColumnPivotFields}
                  fields={Immutable.List(fields)}
                  sortConfigMap={sortConfigMap}
-                 onSortChange={onSortChange} />
+                 onSortChange={onSortChange}
+                 onSetColumnsWidth={() => {}}
+                 togglePin={() => {}} />
       </thead>
     </table>
   );

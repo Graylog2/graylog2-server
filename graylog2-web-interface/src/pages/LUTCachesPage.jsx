@@ -124,7 +124,12 @@ class LUTCachesPage extends React.Component {
     return (
       <DocumentTitle title="Lookup Tables - Caches">
         <span>
-          <PageHeader title="Caches for Lookup Tables">
+          <PageHeader title="Caches for Lookup Tables"
+                      subactions={(
+                        <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}>
+                          <Button bsStyle="success" style={{ marginLeft: 5 }}>Create cache</Button>
+                        </LinkContainer>
+                      )}>
             <span>Caches provide the actual values for lookup tables</span>
             {null}
             <span>

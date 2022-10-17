@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-parent</artifactId>
-        <version>4.4.0-SNAPSHOT</version>
+        <version>5.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>graylog-project-parent</artifactId>
@@ -206,7 +206,7 @@
 
             <!-- Cmdline and configuration -->
             <dependency>
-                <groupId>com.github.joschi</groupId>
+                <groupId>org.graylog</groupId>
                 <artifactId>jadconfig</artifactId>
                 <version>${jadconfig.version}</version>
             </dependency>

@@ -17,8 +17,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
-import Routes from 'routing/Routes';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import { OverlayTrigger, PaginatedList, SearchForm, Icon } from 'components/common';
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
@@ -157,9 +155,6 @@ class LookupTablesOverview extends React.Component {
             </h2>
             <PaginatedList onChange={this._onPageChange} totalItems={this.props.pagination.total}>
               <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
-                  <Button bsStyle="success" style={{ marginLeft: 5 }}>Create lookup table</Button>
-                </LinkContainer>
                 <OverlayTrigger trigger="click" rootClose placement="right" overlay={_helpPopover()}>
                   <Button bsStyle="link" className={Styles.searchHelpButton}><Icon name="question-circle" fixedWidth /></Button>
                 </OverlayTrigger>

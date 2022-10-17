@@ -109,7 +109,7 @@ const visualizationPlugin: PluginRegistration = {
 };
 
 const selectEventConfig = { container: document.body };
-const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: 'Update Preview' });
+const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
 
 const expectSubmitButtonToBeDisabled = async () => {
   const submitButton = await findWidgetConfigSubmitButton();
