@@ -56,6 +56,11 @@ const RoleEditPage = ({ params }: Props) => {
     <DocumentTitle title={`Edit Role ${loadedRole?.name ?? ''}`}>
       <PageHeader title={<PageTitle name={loadedRole?.name} />}
                   subactions={<RoleActionLinks roleId={roleId} />}
+                  mainActions={(
+                    <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
+                      <Button bsStyle="info">Roles Overview</Button>
+                    </LinkContainer>
+                  )}
                   documentationLink={{
                     title: 'Permissions documentation',
                     path: DocsHelper.PAGES.USERS_ROLES,
@@ -63,9 +68,6 @@ const RoleEditPage = ({ params }: Props) => {
         <span>
           You can assign the role to users.
         </span>
-        <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
-          <Button bsStyle="info">Roles Overview</Button>
-        </LinkContainer>
       </PageHeader>
       <RoleEdit role={roleId === loadedRole?.id ? loadedRole : undefined} />
     </DocumentTitle>

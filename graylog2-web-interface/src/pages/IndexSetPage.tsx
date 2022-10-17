@@ -20,11 +20,10 @@ import numeral from 'numeral';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { LinkContainer } from 'components/common/router';
-import { Alert, Row, Col, Panel, Button } from 'components/bootstrap';
+import { Alert, Row, Col, Panel, Button, ButtonToolbar } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
 import { IndicesMaintenanceDropdown, IndicesOverview, IndexSetDetails } from 'components/indices';
 import { IndexerClusterHealthSummary } from 'components/indexers';
-import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
@@ -148,27 +147,27 @@ class IndexSetPage extends React.Component<Props, State> {
     const { indexSet, indexerOverview, indexerOverviewError, params: { indexSetId }, indexDetails: { indices: indexDetailsIndices, closedIndices: indexDetailsClosedIndices } } = this.props;
 
     const pageHeader = indexSet && (
-      <PageHeader title={`Index Set: ${indexSet.title}`}>
+      <PageHeader title={`Index Set: ${indexSet.title}`}
+                  mainActions={(
+                    <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
+                      <Button bsStyle="info">Index sets overview</Button>
+                    </LinkContainer>
+                  )}
+                  documentationLink={{
+                    title: 'Index model documentation',
+                    path: DocsHelper.PAGES.INDEX_MODEL,
+                  }}
+                  subactions={(
+                    <ButtonToolbar>
+                      <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id, 'details')}>
+                        <Button bsStyle="info">Edit Index Set</Button>
+                      </LinkContainer>
+                      <IndicesMaintenanceDropdown indexSetId={indexSetId} indexSet={indexSet} />
+                    </ButtonToolbar>
+                  )}>
         <span>
           This is an overview of all indices (message stores) in this index set Graylog is currently taking in account
           for searches and analysis.
-        </span>
-
-        <span>
-          You can learn more about the index model in the{' '}
-          <DocumentationLink page={DocsHelper.PAGES.INDEX_MODEL} text="documentation" />
-        </span>
-
-        <span>
-          <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-            <Button bsStyle="info">Index sets overview</Button>
-          </LinkContainer>
-          &nbsp;
-          <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id, 'details')}>
-            <Button bsStyle="info">Edit Index Set</Button>
-          </LinkContainer>
-          &nbsp;
-          <IndicesMaintenanceDropdown indexSetId={indexSetId} indexSet={indexSet} />
         </span>
       </PageHeader>
     );

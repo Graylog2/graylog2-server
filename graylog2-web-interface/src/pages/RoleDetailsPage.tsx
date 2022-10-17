@@ -59,13 +59,15 @@ const RoleDetailsPage = ({ params }: Props) => {
                   documentationLink={{
                     title: 'Permissions documentation',
                     path: DocsHelper.PAGES.USERS_ROLES,
-                  }}>
+                  }}
+                  mainActions={(
+                    <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
+                      <Button bsStyle="info">Roles Overview</Button>
+                    </LinkContainer>
+                  )}>
         <span>
           Overview of details like name, description and assigned users.
         </span>
-        <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
-          <Button bsStyle="info">Roles Overview</Button>
-        </LinkContainer>
       </PageHeader>
       <RoleDetails role={roleId === loadedRole?.id ? loadedRole : undefined} />
     </DocumentTitle>

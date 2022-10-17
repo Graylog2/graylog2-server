@@ -104,7 +104,6 @@ const ExtractorsPage = createReactClass({
               Example: Extract the HTTP response code from a log message, transform it to a numeric field and attach it{' '}
               as <em>http_response_code</em> to the message.
             </span>
-
           </PageHeader>
           <ExtractorsList input={input} node={node} />
         </div>

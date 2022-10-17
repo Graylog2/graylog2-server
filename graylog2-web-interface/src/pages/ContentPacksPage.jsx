@@ -83,6 +83,7 @@ const ContentPacksPage = createReactClass({
       <DocumentTitle title="Content Packs">
         <span>
           <PageHeader title="Content Packs"
+                      mainActions={<Button bsStyle="info" active>Content Packs</Button>}
                       subactions={(
                         <ButtonToolbar>
                           <ContentPackUploadControls />
@@ -97,7 +98,6 @@ const ContentPacksPage = createReactClass({
               Find more Content Packs in {' '}
               <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
             </span>
-            <Button bsStyle="info" active>Content Packs</Button>
           </PageHeader>
 
           <Row className="content">

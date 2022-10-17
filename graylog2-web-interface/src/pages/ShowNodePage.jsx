@@ -102,12 +102,11 @@ const ShowNodePage = createReactClass({
     return (
       <DocumentTitle title={`Node ${node.short_node_id} / ${node.hostname}`}>
         <div>
-          <PageHeader title={title}>
+          <PageHeader title={title} subactions={<NodeMaintenanceDropdown node={node} />}>
             <span>
               This page shows details of a Graylog server node that is active and reachable in your cluster.<br />
               {node.is_leader ? <span>This is the leader node.</span> : <span>This is <em>not</em> the leader node.</span>}
             </span>
-            <span><NodeMaintenanceDropdown node={node} /></span>
           </PageHeader>
           <NodeOverview node={node}
                         systemOverview={this.state.systemOverview}

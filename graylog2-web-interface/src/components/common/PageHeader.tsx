@@ -36,17 +36,6 @@ const H1 = styled.h1`
   margin-bottom: 0.2em;
 `;
 
-const ActionsSM = styled.div`
-  > * {
-    display: inline-block;
-    vertical-align: top;
-  }
-
-  > :not(:last-child) {
-    margin-right: 5px;
-  }
-`;
-
 const DocumentationLinkContainer = styled.div`
   display: flex;
   gap: 10px;
@@ -102,6 +91,7 @@ type Props = {
   title: React.ReactNode,
   children: React.ReactElement | Array<React.ReactElement>,
   subactions?: React.ReactElement,
+  mainActions?: React.ReactElement,
   lifecycle?: 'experimental' | 'legacy',
   lifecycleMessage?: React.ReactNode,
   subpage: boolean,
@@ -113,7 +103,7 @@ type Props = {
  * This ensures all pages look and feel the same way across the product, so
  * please use it in your pages.
  */
-const PageHeader = ({ children: childList, subpage, title, subactions, lifecycle, lifecycleMessage, documentationLink }: Props) => {
+const PageHeader = ({ children: childList, subpage, title, subactions, mainActions, lifecycle, lifecycleMessage, documentationLink }: Props) => {
   const children = (childList !== undefined && 'length' in childList ? childList : [childList]);
 
   const topLevelClassNames = subpage ? '' : 'content';
@@ -126,25 +116,24 @@ const PageHeader = ({ children: childList, subpage, title, subactions, lifecycle
             <H1>
               {title} <small><LifecycleIndicator lifecycle={lifecycle} lifecycleMessage={lifecycleMessage} /></small>
             </H1>
-            {(children[1] || children[2] || documentationLink) && (
+            {(documentationLink || mainActions) && (
               <DocumentationLinkContainer>
                 {documentationLink && <DocumentationLink text={documentationLink.title} page={documentationLink.path} displayIcon />}
-                {children[2] && (
+                {mainActions && (
                   <div className="actions-lg visible-lg visible-md">
                     <div className="actions-container">
-                      {children[2]}
+                      {mainActions}
                     </div>
                   </div>
                 )}
-                {children[1]}
               </DocumentationLinkContainer>
             )}
           </FlexRow>
 
           <FlexRow>
-            {children[0] && (
+            {children && (
               <p className="description no-bm">
-                {children[0]}
+                {children}
               </p>
             )}
 
@@ -155,14 +144,6 @@ const PageHeader = ({ children: childList, subpage, title, subactions, lifecycle
             )}
           </FlexRow>
         </Col>
-
-        {children[2] && (
-          <Col sm={12} lgHidden mdHidden className="actions-sm">
-            <ActionsSM>
-              {children[2]}{subactions}
-            </ActionsSM>
-          </Col>
-        )}
       </ContentHeadRow>
     </div>
   );
@@ -171,14 +152,7 @@ const PageHeader = ({ children: childList, subpage, title, subactions, lifecycle
 PageHeader.propTypes = {
   /** Page header heading. */
   title: PropTypes.node.isRequired,
-  /**
-   * One or more children, they will be used in the header in this order:
-   *  1. Page description
-   *  2. Support information or link
-   *  3. Action buttons
-   *
-   * Please see the examples to see how to use this in practice.
-   */
+  /** Provide a page description */
   children: PropTypes.node,
   /** Section for subactions like create or edit */
   subactions: PropTypes.node,
@@ -188,7 +162,7 @@ PageHeader.propTypes = {
   lifecycleMessage: PropTypes.node,
   /** Specifies if the page header is children of a content `Row` or not. */
   subpage: PropTypes.bool,
-  /** Specifies a specific link fir the documentation. The title should be short. */
+  /** Specifies a specific link for the documentation. The title should be short. */
   documentationLink: PropTypes.object,
 };
 
@@ -196,6 +170,7 @@ PageHeader.defaultProps = {
   children: [],
   lifecycle: undefined,
   lifecycleMessage: undefined,
+  mainActions: undefined,
   subactions: undefined,
   subpage: false,
   documentationLink: undefined,

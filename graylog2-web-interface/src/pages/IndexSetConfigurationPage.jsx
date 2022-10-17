@@ -74,15 +74,15 @@ class IndexSetConfigurationPage extends React.Component {
                       documentationLink={{
                         title: 'Index model documentation',
                         path: DocsHelper.PAGES.INDEX_MODEL,
-                      }}>
+                      }}
+                      mainActions={(
+                        <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
+                          <Button bsStyle="info">Index sets overview</Button>
+                        </LinkContainer>
+                      )}>
             <span>
               Modify the current configuration for this index set, allowing you to customize the retention, sharding,
               and replication of messages coming from one or more streams.
-            </span>
-            <span>
-              <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-                <Button bsStyle="info">Index sets overview</Button>
-              </LinkContainer>
             </span>
           </PageHeader>
 

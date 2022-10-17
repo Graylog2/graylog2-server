@@ -19,7 +19,6 @@ import React from 'react';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
-import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import SidecarStatus from 'components/sidecars/sidecars/SidecarStatus';
@@ -80,14 +79,13 @@ class SidecarStatusPage extends React.Component {
     return (
       <DocumentTitle title={`Sidecar ${sidecar.node_name} status`}>
         <SidecarsSubareaNavigation />
-        <PageHeader title={<span>Sidecar <em>{sidecar.node_name} status</em></span>}>
+        <PageHeader title={<span>Sidecar <em>{sidecar.node_name} status</em></span>}
+                    documentationLink={{
+                      title: 'Sidecars documentation',
+                      path: DocsHelper.PAGES.COLLECTOR_STATUS,
+                    }}>
           <span>
             A status overview of the Graylog Sidecar.
-          </span>
-
-          <span>
-            Read more about sidecars and how to set them up in the
-            {' '}<DocumentationLink page={DocsHelper.PAGES.COLLECTOR_STATUS} text="Graylog documentation" />.
           </span>
         </PageHeader>
 
