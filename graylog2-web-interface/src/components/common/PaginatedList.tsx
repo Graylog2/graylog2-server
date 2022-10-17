@@ -69,14 +69,14 @@ const PaginatedList = ({
     currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
   ), [currentPageSize, totalItems]);
 
-  const _onChangePageSize = (event: React.ChangeEvent<HTMLOptionElement>) => {
+  const _onChangePageSize = React.useCallback((event: React.ChangeEvent<HTMLOptionElement>) => {
     event.preventDefault();
     const newPageSize = Number(event.target.value);
 
     setPagination({ currentPage: INITIAL_PAGE, currentPageSize: newPageSize });
     if (useQueryParameter) setPageSize(newPageSize);
     if (onChange) onChange(INITIAL_PAGE, newPageSize);
-  };
+  }, [onChange, setPageSize, useQueryParameter]);
 
   const _onChangePage = React.useCallback((pageNum: number) => {
     setPagination({ currentPage: pageNum, currentPageSize });
