@@ -24,7 +24,7 @@ import org.joda.time.DateTime;
 import javax.inject.Inject;
 import java.util.Set;
 
-import static org.graylog2.system.processing.DBProcessingStatusService.*;
+import static org.graylog2.system.processing.DBProcessingStatusService.ProcessingNodesState;
 
 /**
  * This can be used by an event processor to check if required event definitions have already processed a specific

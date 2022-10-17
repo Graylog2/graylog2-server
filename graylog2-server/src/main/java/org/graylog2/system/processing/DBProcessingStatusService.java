@@ -145,36 +145,39 @@ public class DBProcessingStatusService {
         final DateTime updateThresholdTimestamp = clock.nowUTC().minus(updateThreshold.toMilliseconds());
 
         try (DBCursor<ProcessingStatusDto> statusCursor = db.find(activeNodes(updateThresholdTimestamp))) {
-            if (!statusCursor.hasNext()) return ProcessingNodesState.NO_ACTIVE;
+            if (!statusCursor.hasNext()) {
+                return ProcessingNodesState.NO_ACTIVE; // -> freeze time range
+            }
+
+
             int activeNodes = 0;
-            int behindNodes = 0;
+            int idleNodes = 0;
             while (statusCursor.hasNext()) {
                 activeNodes++;
                 ProcessingStatusDto nodeProcessingStatus = statusCursor.next();
-                DateTime postIndexing = nodeProcessingStatus.receiveTimes().postIndexing();
-                if (postIndexingBehind(timeRange.getTo(), postIndexing)) {
-                    if (isBusy(nodeProcessingStatus)) {
-                        return ProcessingNodesState.SOME_BUSY;
-                    }
-                    if (postIndexing.isBefore(timeRange.getFrom())) {
-                        behindNodes++;
-                    }
+                DateTime lastIndexedMessage = nodeProcessingStatus.receiveTimes().postIndexing();
+                // If node is behind and is busy, it is overloaded -> freeze time range
+                if (lastIndexedMessage.isBefore(timeRange.getTo()) && isBusy(nodeProcessingStatus)) {
+                    return ProcessingNodesState.SOME_OVERLOADED;
+                }
+                // Only if the time range is after the last indexed message, the node is idle.
+                // This leads to the fact that if all nodes are idle at a certain time,
+                // we still process the last message and only freeze the time range afterwards.
+                if (lastIndexedMessage.isBefore(timeRange.getFrom())) {
+                    idleNodes++;
                 }
             }
-            if (activeNodes == behindNodes) {
-                return ProcessingNodesState.NO_MESSAGES;
+            // if all nodes are idle -> freeze time range
+            if (activeNodes == idleNodes) {
+                return ProcessingNodesState.ALL_IDLE;
             }
         }
 
-        return ProcessingNodesState.ALL_UP_TO_DATE;
+        return ProcessingNodesState.ALL_UP_TO_DATE; // -> move time range
     }
 
     private boolean isBusy(ProcessingStatusDto nodeProcessingStatus) {
         return nodeProcessingStatus.inputJournal().uncommittedEntries() > 0L;
-    }
-
-    private boolean postIndexingBehind(DateTime timeRangeTo, DateTime postIndexing) {
-        return timeRangeTo.isAfter(postIndexing);
     }
 
     private DBQuery.Query activeNodes(DateTime updateThresholdTimestamp) {
@@ -183,8 +186,8 @@ public class DBProcessingStatusService {
 
     public enum ProcessingNodesState {
         NO_ACTIVE,
-        NO_MESSAGES,
+        ALL_IDLE,
         ALL_UP_TO_DATE,
-        SOME_BUSY
+        SOME_OVERLOADED
     }
 }

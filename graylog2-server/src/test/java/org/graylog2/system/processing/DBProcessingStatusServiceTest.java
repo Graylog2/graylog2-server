@@ -245,13 +245,13 @@ public class DBProcessingStatusServiceTest {
     }
 
     @Test
-    @MongoDBFixtures("processing-status-busy-node.json")
-    public void processingStateBusyNodes() {
+    @MongoDBFixtures("processing-status-overloaded-node.json")
+    public void processingStateOverloadedNode() {
         when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T04:00:00.000Z"));
         when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(1).toMilliseconds());
 
         TimeRange timeRange = AbsoluteRange.create("2019-01-01T02:00:00.000Z", "2019-01-01T03:00:00.000Z");
-        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.SOME_BUSY);
+        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.SOME_OVERLOADED);
     }
 
     @Test
@@ -266,7 +266,7 @@ public class DBProcessingStatusServiceTest {
 
     @Test
     @MongoDBFixtures("processing-status-idle-nodes.json")
-    public void processingStateIdleNodesWithinTimeRange() {
+    public void processingStateIdleNodesWhereLastMessageWithinTimeRange() {
         when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T04:00:00.000Z"));
         when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(1).toMilliseconds());
 
@@ -276,11 +276,11 @@ public class DBProcessingStatusServiceTest {
 
     @Test
     @MongoDBFixtures("processing-status-idle-nodes.json")
-    public void processingStateIdleNodes() {
+    public void processingStateIdleNodesWhereLastMessageBeforeTimeRange() {
         when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T04:00:00.000Z"));
         when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(1).toMilliseconds());
 
         TimeRange timeRange = AbsoluteRange.create("2019-01-01T02:45:00.000Z", "2019-01-01T03:00:00.000Z");
-        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.NO_MESSAGES);
+        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.ALL_IDLE);
     }
 }
