@@ -73,7 +73,7 @@ const selectField = async (fieldName) => {
 };
 
 const submitWidgetConfigForm = async () => {
-  const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
+  const applyButton = await screen.findByRole('button', { name: /update preview/i });
   fireEvent.click(applyButton);
 };
 
@@ -84,12 +84,13 @@ describe('AggregationWizard', () => {
                          editing
                          id="widget-id"
                          type="AGGREGATION"
+                         onSubmit={() => {}}
+                         onCancel={() => {}}
                          fields={Immutable.List([])}
                          onChange={() => {}}
                          {...props}>
-        {/* eslint-disable-next-line react/jsx-no-useless-fragment */}
-        <>The Visualization</>
-      </AggregationWizard>,
+        <div>The Visualization</div>
+      </AggregationWizard>
     </FieldTypesContext.Provider>,
   );
 
