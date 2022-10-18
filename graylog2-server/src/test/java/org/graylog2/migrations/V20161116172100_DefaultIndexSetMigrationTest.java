@@ -111,15 +111,15 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
         assertThat(capturedIndexSetConfig.id()).isNull();
         assertThat(capturedIndexSetConfig.title()).isEqualTo("Default index set");
         assertThat(capturedIndexSetConfig.description()).isEqualTo("The Graylog default index set");
-        assertThat(capturedIndexSetConfig.indexPrefix()).isEqualTo(elasticsearchConfiguration.getIndexPrefix());
-        assertThat(capturedIndexSetConfig.shards()).isEqualTo(elasticsearchConfiguration.getShards());
-        assertThat(capturedIndexSetConfig.replicas()).isEqualTo(elasticsearchConfiguration.getReplicas());
+        assertThat(capturedIndexSetConfig.indexPrefix()).isEqualTo("graylog");
+        assertThat(capturedIndexSetConfig.shards()).isEqualTo(4);
+        assertThat(capturedIndexSetConfig.replicas()).isEqualTo(0);
         assertThat(capturedIndexSetConfig.rotationStrategy()).isInstanceOf(StubRotationStrategyConfig.class);
         assertThat(capturedIndexSetConfig.retentionStrategy()).isInstanceOf(StubRetentionStrategyConfig.class);
-        assertThat(capturedIndexSetConfig.indexAnalyzer()).isEqualTo(elasticsearchConfiguration.getAnalyzer());
-        assertThat(capturedIndexSetConfig.indexTemplateName()).isEqualTo(elasticsearchConfiguration.getTemplateName());
-        assertThat(capturedIndexSetConfig.indexOptimizationMaxNumSegments()).isEqualTo(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments());
-        assertThat(capturedIndexSetConfig.indexOptimizationDisabled()).isEqualTo(elasticsearchConfiguration.isDisableIndexOptimization());
+        assertThat(capturedIndexSetConfig.indexAnalyzer()).isEqualTo("standard");
+        assertThat(capturedIndexSetConfig.indexTemplateName()).isEqualTo("graylog-internal");
+        assertThat(capturedIndexSetConfig.indexOptimizationMaxNumSegments()).isEqualTo(1);
+        assertThat(capturedIndexSetConfig.indexOptimizationDisabled()).isEqualTo(false);
     }
 
     @Test

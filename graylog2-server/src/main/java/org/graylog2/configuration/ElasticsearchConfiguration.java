@@ -43,50 +43,14 @@ public class ElasticsearchConfiguration {
     private boolean disableVersionCheck = false;
 
     @Deprecated // Should be removed in Graylog 3.0
-    @Parameter(value = "elasticsearch_index_prefix", required = true)
-    private String indexPrefix = "graylog";
-
-    @Deprecated // Should be removed in Graylog 3.0
-    @Parameter(value = "elasticsearch_max_number_of_indices", required = true, validator = PositiveIntegerValidator.class)
-    private int maxNumberOfIndices = 20;
-
-    @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "elasticsearch_max_docs_per_index", validator = PositiveIntegerValidator.class, required = true)
     private int maxDocsPerIndex = 20000000;
-
-    @Deprecated // Should be removed in Graylog 3.0
-    @Parameter(value = "elasticsearch_max_size_per_index", validator = PositiveLongValidator.class, required = true)
-    private long maxSizePerIndex = 1L * 1024 * 1024 * 1024; // 1GB
-
-    @Deprecated // Should be removed in Graylog 3.0
-    @Parameter(value = "elasticsearch_max_time_per_index", required = true)
-    private Period maxTimePerIndex = Period.days(1);
 
     @Parameter(value = "elasticsearch_max_write_index_age")
     private Period maxWriteIndexAge = null;
 
-    @Deprecated // Should be removed in Graylog 3.0
-    @Parameter(value = "elasticsearch_shards", validator = PositiveIntegerValidator.class, required = true)
-    private int shards = 4;
-
-    @Deprecated // Should be removed in Graylog 3.0
-    @Parameter(value = "elasticsearch_replicas", validator = PositiveIntegerValidator.class, required = true)
-    private int replicas = 0;
-
-    @Deprecated // Should be removed in Graylog 3.0
-    @Parameter(value = "elasticsearch_analyzer", required = true)
-    private String analyzer = "standard";
-
-    @Deprecated // Should be removed in Graylog 3.0
-    @Parameter(value = "elasticsearch_template_name")
-    private String templateName = "graylog-internal";
-
     @Parameter(value = "no_retention")
     private boolean noRetention = false;
-
-    @Deprecated // Should be removed in Graylog 3.0
-    @Parameter(value = "retention_strategy", required = true)
-    private String retentionStrategy = "delete";
 
     @Parameter(value = "enabled_index_rotation_strategies", converter = StringListConverter.class, validators = RotationStrategyValidator.class)
     private List<String> enabledRotationStrategies = Arrays.asList(TimeBasedRotationStrategy.NAME, MessageCountRotationStrategy.NAME, SizeBasedRotationStrategy.NAME);
@@ -109,18 +73,6 @@ public class ElasticsearchConfiguration {
         return maxIndexRetentionPeriod;
     }
 
-    @Deprecated // Should be removed in Graylog 3.0
-    @Parameter(value = "rotation_strategy")
-    private String rotationStrategy = MessageCountRotationStrategy.NAME;
-
-    @Deprecated // Should be removed in Graylog 3.0
-    @Parameter(value = "disable_index_optimization")
-    private boolean disableIndexOptimization = false;
-
-    @Deprecated // Should be removed in Graylog 3.0
-    @Parameter(value = "index_optimization_max_num_segments", validator = PositiveIntegerValidator.class)
-    private int indexOptimizationMaxNumSegments = 1;
-
     @Parameter(value = "elasticsearch_index_optimization_timeout", validator = DurationCastedToIntegerValidator.class)
     private Duration indexOptimizationTimeout = Duration.hours(1L);
 
@@ -140,81 +92,16 @@ public class ElasticsearchConfiguration {
         return disableVersionCheck;
     }
 
-    @Deprecated // Should be removed in Graylog 3.0
-    public String getIndexPrefix() {
-        return indexPrefix.toLowerCase(Locale.ENGLISH);
-    }
-
-    @Deprecated // Should be removed in Graylog 3.0
-    public int getMaxNumberOfIndices() {
-        return maxNumberOfIndices;
-    }
-
-    @Deprecated // Should be removed in Graylog 3.0
-    public int getMaxDocsPerIndex() {
-        return maxDocsPerIndex;
-    }
-
-    @Deprecated // Should be removed in Graylog 3.0
-    public long getMaxSizePerIndex() {
-        return maxSizePerIndex;
-    }
-
-    @Deprecated // Should be removed in Graylog 3.0
-    public Period getMaxTimePerIndex() {
-        return maxTimePerIndex;
-    }
-
     public Period getMaxWriteIndexAge() {
         return maxWriteIndexAge;
-    }
-
-    @Deprecated // Should be removed in Graylog 3.0
-    public int getShards() {
-        return shards;
-    }
-
-    @Deprecated // Should be removed in Graylog 3.0
-    public int getReplicas() {
-        return replicas;
-    }
-
-    @Deprecated // Should be removed in Graylog 3.0
-    public String getAnalyzer() {
-        return analyzer;
-    }
-
-    @Deprecated // Should be removed in Graylog 3.0
-    public String getTemplateName() {
-        return templateName;
     }
 
     public List<String> getEnabledRotationStrategies() {
         return enabledRotationStrategies;
     }
 
-    @Deprecated // Should be removed in Graylog 3.0
-    public String getRotationStrategy() {
-        return rotationStrategy;
-    }
-
     public boolean performRetention() {
         return !noRetention;
-    }
-
-    @Deprecated // Should be removed in Graylog 3.0
-    public String getRetentionStrategy() {
-        return retentionStrategy;
-    }
-
-    @Deprecated // Should be removed in Graylog 3.0
-    public int getIndexOptimizationMaxNumSegments() {
-        return indexOptimizationMaxNumSegments;
-    }
-
-    @Deprecated // Should be removed in Graylog 3.0
-    public boolean isDisableIndexOptimization() {
-        return disableIndexOptimization;
     }
 
     public Duration getIndexOptimizationTimeout() {

@@ -44,6 +44,13 @@ import static java.util.Objects.requireNonNull;
  */
 public class V20161116172100_DefaultIndexSetMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20161116172100_DefaultIndexSetMigration.class);
+    // hardcoded when removing outdated elasticsearch configuration values
+    public static final int DEFAULT_INDEX_OPTIMIZATION_MAX_NUM_SEGMENTS = 1;
+    public static final int DEFAULT_SHARDS_COUNT = 4;
+    public static final int DEFAULT_REPLICAS_COUNT = 0;
+    public static final String DEFAULT_ANALYZER = "standard";
+    public static final String DEFAULT_TEMPLATE_NAME = "graylog-internal";
+    public static final String DEFAULT_INDEX_PREFIX = "graylog";
 
     private final ElasticsearchConfiguration elasticsearchConfiguration;
     private final Map<String, Provider<RotationStrategy>> rotationStrategies;
@@ -84,16 +91,16 @@ public class V20161116172100_DefaultIndexSetMigration extends Migration {
                 .title("Default index set")
                 .description("The Graylog default index set")
                 .isRegular(true)
-                .indexPrefix(elasticsearchConfiguration.getIndexPrefix())
-                .shards(elasticsearchConfiguration.getShards())
-                .replicas(elasticsearchConfiguration.getReplicas())
+                .indexPrefix(DEFAULT_INDEX_PREFIX)
+                .shards(DEFAULT_SHARDS_COUNT)
+                .replicas(DEFAULT_REPLICAS_COUNT)
                 .rotationStrategy(getRotationStrategyConfig(indexManagementConfig))
                 .retentionStrategy(getRetentionStrategyConfig(indexManagementConfig))
                 .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
-                .indexAnalyzer(elasticsearchConfiguration.getAnalyzer())
-                .indexTemplateName(elasticsearchConfiguration.getTemplateName())
-                .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
-                .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
+                .indexAnalyzer(DEFAULT_ANALYZER)
+                .indexTemplateName(DEFAULT_TEMPLATE_NAME)
+                .indexOptimizationMaxNumSegments(DEFAULT_INDEX_OPTIMIZATION_MAX_NUM_SEGMENTS)
+                .indexOptimizationDisabled(false) // hardcoded when removing outdated elasticsearch configuration values
                 .build();
 
         final IndexSetConfig savedConfig = indexSetService.save(config);

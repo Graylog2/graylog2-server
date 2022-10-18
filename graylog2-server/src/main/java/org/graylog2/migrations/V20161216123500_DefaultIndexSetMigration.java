@@ -38,6 +38,9 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public class V20161216123500_DefaultIndexSetMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20161216123500_DefaultIndexSetMigration.class);
+    public static final int DEFAULT_INDEX_OPTIMIZATION_MAX_NUM_SEGMENTS = 1;
+    public static final String DEFAULT_ANALYZER = "standard";
+    public static final String DEFAULT_TEMPLATE_NAME = "graylog-internal";
 
     private final ElasticsearchConfiguration elasticsearchConfiguration;
     private final IndexSetService indexSetService;
@@ -67,7 +70,7 @@ public class V20161216123500_DefaultIndexSetMigration extends Migration {
         checkState(clusterConfigService.get(DefaultIndexSetCreated.class) != null, "The default index set hasn't been created yet. This is a bug!");
 
         final IndexSetConfig defaultIndexSet= indexSetService.getDefault();
-        migrateIndexSet(defaultIndexSet, elasticsearchConfiguration.getTemplateName());
+        migrateIndexSet(defaultIndexSet, DEFAULT_TEMPLATE_NAME);
 
         final List<IndexSetConfig> allWithoutDefault = indexSetService.findAll()
                 .stream()
@@ -83,12 +86,11 @@ public class V20161216123500_DefaultIndexSetMigration extends Migration {
     }
 
     private void migrateIndexSet(IndexSetConfig indexSetConfig, String templateName) {
-        final String analyzer = elasticsearchConfiguration.getAnalyzer();
         final IndexSetConfig updatedConfig = indexSetConfig.toBuilder()
-                .indexAnalyzer(analyzer)
+                .indexAnalyzer(DEFAULT_ANALYZER)
                 .indexTemplateName(templateName)
-                .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
-                .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
+                .indexOptimizationMaxNumSegments(DEFAULT_INDEX_OPTIMIZATION_MAX_NUM_SEGMENTS)
+                .indexOptimizationDisabled(false) // hardcoded when removing outdated elasticsearch configuration values
                 .build();
 
         final IndexSetConfig savedConfig = indexSetService.save(updatedConfig);

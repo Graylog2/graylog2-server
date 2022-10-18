@@ -55,6 +55,10 @@ import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYP
 
 public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20190705071400_AddEventIndexSetsMigration.class);
+    public static final int DEFAULT_INDEX_OPTIMIZATION_MAX_NUM_SEGMENTS = 1;
+    public static final int DEFAULT_SHARDS_COUNT = 4;
+    public static final int DEFAULT_REPLICAS_COUNT = 0;
+    public static final String DEFAULT_ANALYZER = "standard";
 
     private final ElasticsearchConfiguration elasticsearchConfiguration;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
@@ -153,17 +157,17 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                 .isWritable(true)
                 .isRegular(false)
                 .indexPrefix(indexPrefix)
-                .shards(elasticsearchConfiguration.getShards())
-                .replicas(elasticsearchConfiguration.getReplicas())
+                .shards(DEFAULT_SHARDS_COUNT)
+                .replicas(DEFAULT_REPLICAS_COUNT)
                 .rotationStrategyClass(TimeBasedRotationStrategy.class.getCanonicalName())
-                .rotationStrategy(TimeBasedRotationStrategyConfig.builder().rotationPeriod(Period.months(1)).build())
+                .rotationStrategy(TimeBasedRotationStrategyConfig.builder().rotationPeriod(Period.months(DEFAULT_INDEX_OPTIMIZATION_MAX_NUM_SEGMENTS)).build())
                 .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
                 .retentionStrategy(DeletionRetentionStrategyConfig.create(12))
                 .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
-                .indexAnalyzer(elasticsearchConfiguration.getAnalyzer())
+                .indexAnalyzer(DEFAULT_ANALYZER)
                 .indexTemplateName(indexPrefix+ "-template")
-                .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
-                .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
+                .indexOptimizationMaxNumSegments(DEFAULT_INDEX_OPTIMIZATION_MAX_NUM_SEGMENTS)
+                .indexOptimizationDisabled(false) // hardcoded when removing outdated elasticsearch configuration values
                 .fieldTypeRefreshInterval(Duration.standardMinutes(1))
                 .build();
 

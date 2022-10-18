@@ -95,16 +95,16 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
                 .indexPrefix("foo")
                 .build();
         final IndexSetConfig savedDefaultConfig = defaultConfig.toBuilder()
-                .indexAnalyzer(elasticsearchConfiguration.getAnalyzer())
-                .indexTemplateName(elasticsearchConfiguration.getTemplateName())
-                .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
-                .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
+                .indexAnalyzer("standard")
+                .indexTemplateName("graylog-internal")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
         final IndexSetConfig savedAdditionalConfig = additionalConfig.toBuilder()
-                .indexAnalyzer(elasticsearchConfiguration.getAnalyzer())
+                .indexAnalyzer("standard")
                 .indexTemplateName("foo-template")
-                .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
-                .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
 
         when(indexSetService.save(any(IndexSetConfig.class))).thenReturn(savedAdditionalConfig, savedDefaultConfig);
@@ -131,10 +131,10 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
         assertThat(capturedDefaultIndexSetConfig.replicas()).isEqualTo(0);
         assertThat(capturedDefaultIndexSetConfig.rotationStrategy()).isEqualTo(rotationStrategyConfig);
         assertThat(capturedDefaultIndexSetConfig.retentionStrategy()).isEqualTo(retentionStrategyConfig);
-        assertThat(capturedDefaultIndexSetConfig.indexAnalyzer()).isEqualTo(elasticsearchConfiguration.getAnalyzer());
-        assertThat(capturedDefaultIndexSetConfig.indexTemplateName()).isEqualTo(elasticsearchConfiguration.getTemplateName());
-        assertThat(capturedDefaultIndexSetConfig.indexOptimizationMaxNumSegments()).isEqualTo(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments());
-        assertThat(capturedDefaultIndexSetConfig.indexOptimizationDisabled()).isEqualTo(elasticsearchConfiguration.isDisableIndexOptimization());
+        assertThat(capturedDefaultIndexSetConfig.indexAnalyzer()).isEqualTo("standard");
+        assertThat(capturedDefaultIndexSetConfig.indexTemplateName()).isEqualTo("graylog-internal");
+        assertThat(capturedDefaultIndexSetConfig.indexOptimizationMaxNumSegments()).isEqualTo(1);
+        assertThat(capturedDefaultIndexSetConfig.indexOptimizationDisabled()).isEqualTo(false);
 
         final IndexSetConfig capturedAdditionalIndexSetConfig = allValues.get(1);
         assertThat(capturedAdditionalIndexSetConfig.id()).isEqualTo("foo");
@@ -145,10 +145,10 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
         assertThat(capturedAdditionalIndexSetConfig.replicas()).isEqualTo(0);
         assertThat(capturedAdditionalIndexSetConfig.rotationStrategy()).isEqualTo(rotationStrategyConfig);
         assertThat(capturedAdditionalIndexSetConfig.retentionStrategy()).isEqualTo(retentionStrategyConfig);
-        assertThat(capturedAdditionalIndexSetConfig.indexAnalyzer()).isEqualTo(elasticsearchConfiguration.getAnalyzer());
+        assertThat(capturedAdditionalIndexSetConfig.indexAnalyzer()).isEqualTo("standard");
         assertThat(capturedAdditionalIndexSetConfig.indexTemplateName()).isEqualTo("foo-template");
-        assertThat(capturedAdditionalIndexSetConfig.indexOptimizationMaxNumSegments()).isEqualTo(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments());
-        assertThat(capturedAdditionalIndexSetConfig.indexOptimizationDisabled()).isEqualTo(elasticsearchConfiguration.isDisableIndexOptimization());
+        assertThat(capturedAdditionalIndexSetConfig.indexOptimizationMaxNumSegments()).isEqualTo(1);
+        assertThat(capturedAdditionalIndexSetConfig.indexOptimizationDisabled()).isEqualTo(false);
     }
 
     @Test
