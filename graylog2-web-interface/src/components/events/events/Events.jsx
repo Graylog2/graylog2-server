@@ -20,7 +20,7 @@ import lodash from 'lodash';
 import styled, { css } from 'styled-components';
 
 import { Link, LinkContainer } from 'components/common/router';
-import { OverlayTrigger, EmptyEntity, NoSearchResults, NoEntitiesExist, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
+import { OverlayTrigger, EmptyEntity, NoSearchResult, NoEntitiesExist, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
 import { Col, Label, Row, Table, Tooltip, Button } from 'components/bootstrap';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import Routes from 'routing/Routes';
@@ -243,9 +243,9 @@ class Events extends React.Component {
     const entity = (filter === 'only' ? 'Alerts' : excludedFile);
 
     const emptyListComponent = query ? (
-      <NoSearchResults>
+      <NoSearchResult>
         No {entity} found for the current search criteria.
-      </NoSearchResults>
+      </NoSearchResult>
     ) : (
       <NoEntitiesExist>
         No {entity} exist.
