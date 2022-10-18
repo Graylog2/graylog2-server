@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -30,7 +30,8 @@ import AppConfig from 'util/AppConfig';
 import { LOGIN_INITIALIZING_STATE, LOGIN_INITIALIZED_STATE } from 'logic/authentication/constants';
 import { SessionActions } from 'stores/sessions/SessionStore';
 import usePluginEntities from 'hooks/usePluginEntities';
-import LoginHeader from 'components/login/LoginHeader';
+import bgImage from 'images/auth/banner-bg.jpeg';
+import graylogLogo from 'images/auth/gl_logo_horiz.svg';
 
 import LoadingPage from './LoadingPage';
 
@@ -106,6 +107,73 @@ const useValidateSession = () => {
   return didValidateSession;
 };
 
+const Logo = styled.img`
+  display: block;
+  height: 3rem;
+  width: auto;
+`;
+
+const Background = styled.div`
+  position: relative;
+  height: 100vh;
+  width: 100%;
+`;
+
+const BackgroundText = styled.div`
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  vertical-align: middle;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+`;
+
+const BackgroundImage = styled.img`
+  height: 100%;
+  width: 100%;
+`;
+
+const LoginContainer = styled.div`
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: row;
+  min-width: 100%;
+  min-height: 100%;
+`;
+
+const TextContainer = styled.div`
+  vertical-align: middle;
+  justify-content: center;
+  justify-self: center;
+  align-self: center;
+  height: auto;
+  width: 50%;
+`;
+
+const WelcomeMessage = styled.strong(({ theme }) => css`
+  display: block;
+  font-size: ${theme.fonts.size.huge};
+  font-weight: 800;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+`);
+
+const BrandName = styled.h3(({ theme }) => css`
+  color: ${theme.colors.gray['60']};
+  font-size: 1.5rem;
+  line-height: 2rem;
+`);
+const Claim = styled.h1(({ theme }) => css`
+  color: ${theme.colors.brand.secondary};
+  text-transform: uppercase;
+  font-size: 2.5rem;
+  line-height: 1;
+`);
+const Highlight = styled.span(({ theme }) => css`
+  color: ${theme.colors.brand.primary};
+`);
+
 const LoginPage = () => {
   const didValidateSession = useValidateSession();
   const [lastError, setLastError] = useState<string | undefined>(undefined);
@@ -169,17 +237,28 @@ const LoginPage = () => {
 
   return (
     <DocumentTitle title="Sign in">
-      <LoginBox>
-        <LoginHeader />
-        <LoginPageStyles />
-        <LastError />
-        <PluggableLoginForm />
-        {shouldDisplayFallbackLink && (
-        <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
-          {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}
-        </StyledButton>
-        )}
-      </LoginBox>
+      <LoginContainer>
+        <LoginBox>
+          <Logo alt="logo" src={graylogLogo} />
+          <WelcomeMessage>Welcome to Graylog</WelcomeMessage>
+          <LastError />
+          <PluggableLoginForm />
+          {shouldDisplayFallbackLink && (
+          <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
+            {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}
+          </StyledButton>
+          )}
+        </LoginBox>
+        <Background>
+          <BackgroundText>
+            <TextContainer>
+              <BrandName>Graylog</BrandName>
+              <Claim><Highlight>Log Management</Highlight> Done Right</Claim>
+            </TextContainer>T
+          </BackgroundText>
+          <BackgroundImage alt="background" src={bgImage} />
+        </Background>
+      </LoginContainer>
     </DocumentTitle>
   );
 };

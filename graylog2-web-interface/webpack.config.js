@@ -121,7 +121,7 @@ const webpackConfig = {
         type: 'asset/resource',
       },
       {
-        test: /\.(png|gif|jpg)(\?.+)?$/,
+        test: /\.(png|gif|jpg|jpeg)(\?.+)?$/,
         type: 'asset',
       },
       {
