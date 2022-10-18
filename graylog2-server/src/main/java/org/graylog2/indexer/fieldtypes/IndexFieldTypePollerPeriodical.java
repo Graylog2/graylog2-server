@@ -218,6 +218,9 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     }
 
     private boolean needsFullRefresh() {
+        if (fullRefreshInterval.toSeconds() == 0) {
+            return false;
+        }
         Instant nextFullRefresh = lastFullRefresh.plusSeconds(fullRefreshInterval.toSeconds());
         return !Instant.now().isBefore(nextFullRefresh);
     }
