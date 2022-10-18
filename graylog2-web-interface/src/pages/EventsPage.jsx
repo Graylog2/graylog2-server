@@ -37,7 +37,7 @@ const EventsPage = ({ location }) => {
                   }}>
         <span>
           Define Events through different conditions. Add Notifications to Events that require your attention
-          to create Alerts. Graylog&apos;s new Alerting system let you define more flexible and powerful rules.
+          to create Alerts.
         </span>
       </PageHeader>
 

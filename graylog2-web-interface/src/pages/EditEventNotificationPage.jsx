@@ -92,7 +92,7 @@ class EditEventDefinitionPage extends React.Component {
                     }}>
           <span>
             Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
-            to you or to other systems you use for that purpose. Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
+            to you or to other systems you use for that purpose.
           </span>
         </PageHeader>
 
