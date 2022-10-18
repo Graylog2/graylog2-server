@@ -31,7 +31,7 @@ const AuthenticationCreatePage = () => {
     <DocumentTitle title="Create Authentication Service">
       <AuthenticationSubareaNavigation />
       <PageHeader title="Create Authentication Service"
-                  subactions={(
+                  actions={(
                     <BackendActionLinks activeBackend={activeBackend}
                                         finishedLoading={finishedLoading} />
                   )}

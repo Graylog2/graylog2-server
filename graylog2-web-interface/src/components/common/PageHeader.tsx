@@ -48,7 +48,7 @@ const FlexRow = styled.div`
   gap: 10px;
 `;
 
-const BottomActions = styled.div`
+const Actions = styled.div`
   display: flex !important;
   align-items: flex-end;
   margin-top: 5px;
@@ -90,7 +90,7 @@ const LifecycleIndicator = ({
 type Props = {
   title: React.ReactNode,
   children: React.ReactElement | Array<React.ReactElement>,
-  subactions?: React.ReactElement,
+  actions?: React.ReactElement,
   mainActions?: React.ReactElement,
   lifecycle?: 'experimental' | 'legacy',
   lifecycleMessage?: React.ReactNode,
@@ -103,7 +103,7 @@ type Props = {
  * This ensures all pages look and feel the same way across the product, so
  * please use it in your pages.
  */
-const PageHeader = ({ children, subpage, title, subactions, mainActions, lifecycle, lifecycleMessage, documentationLink }: Props) => {
+const PageHeader = ({ children, subpage, title, actions, mainActions, lifecycle, lifecycleMessage, documentationLink }: Props) => {
   const topLevelClassNames = subpage ? '' : 'content';
 
   return (
@@ -128,10 +128,10 @@ const PageHeader = ({ children, subpage, title, subactions, mainActions, lifecyc
             </p>
           )}
 
-          {subactions && (
-            <BottomActions>
-              {subactions}
-            </BottomActions>
+          {actions && (
+            <Actions>
+              {actions}
+            </Actions>
           )}
         </FlexRow>
       </Col>
@@ -144,8 +144,8 @@ PageHeader.propTypes = {
   title: PropTypes.node.isRequired,
   /** Provide a page description */
   children: PropTypes.node,
-  /** Section for subactions like create or edit */
-  subactions: PropTypes.node,
+  /** Section for actions like create or edit */
+  actions: PropTypes.node,
   /** Indicates the lifecycle of the current page, which will display an indicator right next to the page title. */
   lifecycle: PropTypes.oneOf(['experimental', 'legacy']),
   /** Text to customize the default message for the given lifecycle. */
@@ -161,7 +161,7 @@ PageHeader.defaultProps = {
   lifecycle: undefined,
   lifecycleMessage: undefined,
   mainActions: undefined,
-  subactions: undefined,
+  actions: undefined,
   subpage: false,
   documentationLink: undefined,
 };

@@ -71,10 +71,10 @@ const AuthenticationPage = () => {
     <DocumentTitle title={_pageTitle(activeBackend, true)}>
       <AuthenticationSubareaNavigation />
       <PageHeader title={_pageTitle(activeBackend)}
-                  subactions={(
+                  actions={(
                     <BackendActionLinks activeBackend={activeBackend}
                                         finishedLoading={finishedLoading} />
-                    )}
+                  )}
                   documentationLink={{
                     title: 'Authentication documentation',
                     path: DocsHelper.PAGES.USERS_ROLES,

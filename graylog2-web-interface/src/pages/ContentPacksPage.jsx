@@ -84,7 +84,7 @@ const ContentPacksPage = createReactClass({
         <span>
           <PageHeader title="Content Packs"
                       mainActions={<Button bsStyle="info" active>Content Packs</Button>}
-                      subactions={(
+                      actions={(
                         <ButtonToolbar>
                           <ContentPackUploadControls />
                           <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.CREATE}>

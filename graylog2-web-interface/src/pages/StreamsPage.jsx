@@ -56,7 +56,7 @@ const StreamsPage = () => {
                       title: 'Streams documentation',
                       path: DocsHelper.PAGES.STREAMS,
                     }}
-                    subactions={(
+                    actions={(
                       <IfPermitted permissions="streams:create">
                         <CreateStreamButton bsStyle="success"
                                             onSave={onSave}

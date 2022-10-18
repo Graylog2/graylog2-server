@@ -68,7 +68,7 @@ const ShowEventDefinitionPage = ({ params: { notificationId } }) => {
     <DocumentTitle title={`View "${notification.title}" Notification`}>
       <EventsSubareaNavigation />
       <PageHeader title={`View "${notification.title}" Notification`}
-                  subactions={notification && <EventNotificationActionLinks notificationId={notification.id} />}
+                  actions={notification && <EventNotificationActionLinks notificationId={notification.id} />}
                   documentationLink={{
                     title: 'Alerts documentation',
                     path: DocsHelper.PAGES.ALERTS,

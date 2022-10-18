@@ -55,7 +55,7 @@ const RoleDetailsPage = ({ params }: Props) => {
   return (
     <DocumentTitle title={`Role Details ${loadedRole?.name ?? ''}`}>
       <PageHeader title={<PageTitle fullName={loadedRole?.name} />}
-                  subactions={<RoleActionLinks roleId={roleId} />}
+                  actions={<RoleActionLinks roleId={roleId} />}
                   documentationLink={{
                     title: 'Permissions documentation',
                     path: DocsHelper.PAGES.USERS_ROLES,

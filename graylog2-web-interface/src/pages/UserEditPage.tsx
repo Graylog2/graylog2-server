@@ -65,7 +65,7 @@ const UserEditPage = ({ params }: Props) => {
     <DocumentTitle title={`Edit User ${fullName}`}>
       <UsersSubareaNavigation />
       <PageHeader title={<PageTitle fullName={fullName} />}
-                  subactions={(
+                  actions={(
                     <UserActionLinks userId={userId}
                                      userIsReadOnly={readOnly} />
                   )}

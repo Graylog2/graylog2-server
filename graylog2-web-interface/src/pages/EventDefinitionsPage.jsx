@@ -29,7 +29,7 @@ const EventDefinitionsPage = () => {
     <DocumentTitle title="Event Definitions">
       <EventsSubareaNavigation />
       <PageHeader title="Event Definitions"
-                  subactions={(
+                  actions={(
                     <IfPermitted permissions="eventdefinitions:create">
                       <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
                         <Button bsStyle="success">Create event definition</Button>

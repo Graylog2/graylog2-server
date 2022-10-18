@@ -137,7 +137,7 @@ const RulesPage = () => {
     <DocumentTitle title="Pipeline rules">
       <PipelinesSubareaNavigation />
       <PageHeader title="Pipeline Rules"
-                  subactions={<RulesButtonToolbar />}
+                  actions={<RulesButtonToolbar />}
                   documentationLink={{
                     title: 'Pipeline rules documentation',
                     path: DocsHelper.PAGES.PIPELINE_RULES,

@@ -28,7 +28,7 @@ const UsersOverviewPage = () => (
   <DocumentTitle title="Users Overview">
     <UsersSubareaNavigation />
     <PageHeader title="Users Overview"
-                subactions={(
+                actions={(
                   <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
                     <Button bsStyle="success">Create user</Button>
                   </LinkContainer>

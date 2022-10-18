@@ -26,7 +26,7 @@ const AuthenticatorsPage = () => (
   <DocumentTitle title="Authenticators Details">
     <AuthenticationSubareaNavigation />
     <PageHeader title="Authenticators Details"
-                subactions={<AuthenticatorActionLinks />}
+                actions={<AuthenticatorActionLinks />}
                 documentationLink={{
                   title: 'Authenticators documentation',
                   path: DocsHelper.PAGES.AUTHENTICATORS,

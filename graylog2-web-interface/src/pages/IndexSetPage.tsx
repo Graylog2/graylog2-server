@@ -157,7 +157,7 @@ class IndexSetPage extends React.Component<Props, State> {
                     title: 'Index model documentation',
                     path: DocsHelper.PAGES.INDEX_MODEL,
                   }}
-                  subactions={(
+                  actions={(
                     <ButtonToolbar>
                       <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id, 'details')}>
                         <Button bsStyle="info">Edit Index Set</Button>

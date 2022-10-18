@@ -29,7 +29,7 @@ const EventNotificationsPage = () => {
     <DocumentTitle title="Notifications">
       <EventsSubareaNavigation />
       <PageHeader title="Notifications"
-                  subactions={(
+                  actions={(
                     <IfPermitted permissions="eventnotifications:create">
                       <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
                         <Button bsStyle="success">Create notification</Button>

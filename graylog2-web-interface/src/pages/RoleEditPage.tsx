@@ -55,7 +55,7 @@ const RoleEditPage = ({ params }: Props) => {
   return (
     <DocumentTitle title={`Edit Role ${loadedRole?.name ?? ''}`}>
       <PageHeader title={<PageTitle name={loadedRole?.name} />}
-                  subactions={<RoleActionLinks roleId={roleId} />}
+                  actions={<RoleActionLinks roleId={roleId} />}
                   mainActions={(
                     <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
                       <Button bsStyle="info">Roles Overview</Button>

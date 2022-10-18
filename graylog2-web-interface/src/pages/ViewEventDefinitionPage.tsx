@@ -78,7 +78,7 @@ const ViewEventDefinitionPage = () => {
     <DocumentTitle title={`View "${eventDefinition.title}" Event Definition`}>
       <EventsSubareaNavigation />
       <PageHeader title={`View "${eventDefinition.title}" Event Definition`}
-                  subactions={(
+                  actions={(
                     <ButtonToolbar>
                       <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
                         <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(params.definitionId)}>

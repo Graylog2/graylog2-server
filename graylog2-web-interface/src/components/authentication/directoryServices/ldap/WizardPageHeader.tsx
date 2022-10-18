@@ -48,7 +48,7 @@ const WizardPageHeader = ({ authenticationBackend: authBackend, title }: Props) 
     <>
       <AuthenticationSubareaNavigation />
       <PageHeader title={pageTitle}
-                  subactions={(
+                  actions={(
                     <BackendActionLinks activeBackend={activeBackend}
                                         finishedLoading={finishedLoading} />
                   )}

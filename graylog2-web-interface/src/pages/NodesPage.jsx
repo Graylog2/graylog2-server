@@ -71,7 +71,7 @@ const NodesPage = createReactClass({
     return (
       <DocumentTitle title="Nodes">
         <div>
-          <PageHeader title="Nodes" subactions={<GlobalAPIButton nodes={nodes} />}>
+          <PageHeader title="Nodes" actions={<GlobalAPIButton nodes={nodes} />}>
             <span>
               This page provides a real-time overview of the nodes in your Graylog cluster.
               You can pause message processing at any time. The process buffers will not accept any new messages until

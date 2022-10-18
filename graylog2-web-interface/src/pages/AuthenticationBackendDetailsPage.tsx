@@ -62,7 +62,7 @@ const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
     <DocumentTitle title={_pageTitle(authBackend.title, true)}>
       <AuthenticationSubareaNavigation />
       <PageHeader title={_pageTitle(authBackend.title)}
-                  subactions={(
+                  actions={(
                     <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authBackend?.id)}>
                       <Button bsStyle="success"
                               type="button">

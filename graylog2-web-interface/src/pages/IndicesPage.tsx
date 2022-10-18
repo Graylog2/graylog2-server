@@ -28,7 +28,7 @@ import { IndexerClusterHealth } from 'components/indexers';
 const IndicesPage = () => (
   <DocumentTitle title="Indices and Index Sets">
     <PageHeader title="Indices & Index Sets"
-                subactions={(
+                actions={(
                   <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CREATE}>
                     <Button bsStyle="success">Create index set</Button>
                   </LinkContainer>

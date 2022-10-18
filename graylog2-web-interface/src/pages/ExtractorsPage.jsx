@@ -84,7 +84,7 @@ const ExtractorsPage = createReactClass({
       <DocumentTitle title={`Extractors of ${input.title}`}>
         <div>
           <PageHeader title={<span>Extractors of <em>{input.title}</em></span>}
-                      subactions={(
+                      actions={(
                         <DropdownButton bsStyle="info" id="extractor-actions-dropdown" title="Actions" pullRight>
                           <LinkContainer to={Routes.import_extractors(node.node_id, input.id)}>
                             <MenuItem>Import extractors</MenuItem>

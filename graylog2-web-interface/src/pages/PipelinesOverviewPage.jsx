@@ -27,7 +27,7 @@ const PipelinesOverviewPage = () => (
   <DocumentTitle title="Pipelines">
     <PipelinesSubareaNavigation />
     <PageHeader title="Pipelines overview"
-                subactions={(<CreatePipelineButton />)}
+                actions={<CreatePipelineButton />}
                 documentationLink={{
                   title: 'Pipelines documentation',
                   path: DocsHelper.PAGES.PIPELINES,

@@ -54,7 +54,7 @@ const UserDetailsPage = ({ params }: Props) => {
     <DocumentTitle title={`User Details ${loadedUser?.fullName ?? ''}`}>
       <UsersSubareaNavigation />
       <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}
-                  subactions={(
+                  actions={(
                     <UserActionLinks userId={userId}
                                      userIsReadOnly={loadedUser?.readOnly ?? false} />
                   )}

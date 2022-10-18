@@ -33,7 +33,7 @@ const AuthenticationOverviewPage = () => {
     <DocumentTitle title="All Authentication Services">
       <AuthenticationSubareaNavigation />
       <PageHeader title="All Authentication Services"
-                  subactions={(
+                  actions={(
                     <BackendActionLinks activeBackend={activeBackend}
                                         finishedLoading={finishedLoading} />
                   )}

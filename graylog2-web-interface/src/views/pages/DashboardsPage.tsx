@@ -61,7 +61,7 @@ const DashboardsPage = () => {
   return (
     <DocumentTitle title="Dashboards">
       <PageHeader title="Dashboards"
-                  subactions={(
+                  actions={(
                     <IfPermitted permissions="dashboards:create">
                       <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
                         <Button bsStyle="success">Create new dashboard</Button>

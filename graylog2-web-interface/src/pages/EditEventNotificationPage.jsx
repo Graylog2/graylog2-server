@@ -85,7 +85,7 @@ class EditEventDefinitionPage extends React.Component {
       <DocumentTitle title={`Edit "${notification.title}" Notification`}>
         <EventsSubareaNavigation />
         <PageHeader title={`Edit "${notification.title}" Notification`}
-                    subactions={<EventNotificationActionLinks notificationId={notification.id} />}
+                    actions={<EventNotificationActionLinks notificationId={notification.id} />}
                     documentationLink={{
                       title: 'Alerts documentation',
                       path: DocsHelper.PAGES.ALERTS,
