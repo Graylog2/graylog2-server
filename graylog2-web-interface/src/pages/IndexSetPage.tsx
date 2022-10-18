@@ -148,7 +148,7 @@ class IndexSetPage extends React.Component<Props, State> {
 
     const pageHeader = indexSet && (
       <PageHeader title={`Index Set: ${indexSet.title}`}
-                  mainActions={(
+                  topActions={(
                     <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
                       <Button bsStyle="info">Index sets overview</Button>
                     </LinkContainer>

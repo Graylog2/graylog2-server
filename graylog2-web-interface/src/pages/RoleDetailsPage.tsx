@@ -60,7 +60,7 @@ const RoleDetailsPage = ({ params }: Props) => {
                     title: 'Permissions documentation',
                     path: DocsHelper.PAGES.USERS_ROLES,
                   }}
-                  mainActions={(
+                  topActions={(
                     <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
                       <Button bsStyle="info">Roles Overview</Button>
                     </LinkContainer>

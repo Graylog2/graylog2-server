@@ -104,7 +104,7 @@ const CreateContentPackPage = createReactClass({
       <DocumentTitle title="Content packs">
         <span>
           <PageHeader title="Create content packs"
-                      mainActions={(
+                      topActions={(
                         <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
                           <Button bsStyle="info">Content Packs</Button>
                         </LinkContainer>

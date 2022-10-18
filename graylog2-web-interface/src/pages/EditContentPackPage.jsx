@@ -198,7 +198,7 @@ const EditContentPackPage = createReactClass({
       <DocumentTitle title="Content packs">
         <span>
           <PageHeader title="Edit content pack"
-                      mainActions={(
+                      topActions={(
                         <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
                           <Button bsStyle="info">Content Packs</Button>
                         </LinkContainer>

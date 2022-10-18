@@ -75,7 +75,7 @@ class IndexSetConfigurationPage extends React.Component {
                         title: 'Index model documentation',
                         path: DocsHelper.PAGES.INDEX_MODEL,
                       }}
-                      mainActions={(
+                      topActions={(
                         <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
                           <Button bsStyle="info">Index sets overview</Button>
                         </LinkContainer>

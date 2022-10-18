@@ -83,7 +83,7 @@ const ContentPacksPage = createReactClass({
       <DocumentTitle title="Content Packs">
         <span>
           <PageHeader title="Content Packs"
-                      mainActions={<Button bsStyle="info" active>Content Packs</Button>}
+                      topActions={<Button bsStyle="info" active>Content Packs</Button>}
                       actions={(
                         <ButtonToolbar>
                           <ContentPackUploadControls />

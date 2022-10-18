@@ -36,7 +36,7 @@ const H1 = styled.h1`
   margin-bottom: 0.2em;
 `;
 
-const TopActions = styled.div<{ $hasMultipleChildren: boolean }>(({ $hasMultipleChildren }) => `
+const TopActions = styled.div<{ $hasMultipleChildren: boolean }>(({ $hasMultipleChildren }) => css`
   display: flex;
   gap: 10px;
   align-items: ${$hasMultipleChildren ? 'center' : 'flex-start'};
@@ -91,7 +91,7 @@ type Props = {
   title: React.ReactNode,
   children: React.ReactElement | Array<React.ReactElement>,
   actions?: React.ReactElement,
-  mainActions?: React.ReactElement,
+  topActions?: React.ReactElement,
   lifecycle?: 'experimental' | 'legacy',
   lifecycleMessage?: React.ReactNode,
   subpage: boolean,
@@ -103,7 +103,7 @@ type Props = {
  * This ensures all pages look and feel the same way across the product, so
  * please use it in your pages.
  */
-const PageHeader = ({ children, subpage, title, actions, mainActions, lifecycle, lifecycleMessage, documentationLink }: Props) => {
+const PageHeader = ({ children, subpage, title, actions, topActions, lifecycle, lifecycleMessage, documentationLink }: Props) => {
   const topLevelClassNames = subpage ? '' : 'content';
 
   return (
@@ -113,10 +113,10 @@ const PageHeader = ({ children, subpage, title, actions, mainActions, lifecycle,
           <H1>
             {title} <small><LifecycleIndicator lifecycle={lifecycle} lifecycleMessage={lifecycleMessage} /></small>
           </H1>
-          {(documentationLink || mainActions) && (
-            <TopActions $hasMultipleChildren={!!documentationLink && !!mainActions}>
+          {(documentationLink || topActions) && (
+            <TopActions $hasMultipleChildren={!!documentationLink && !!topActions}>
               {documentationLink && <DocumentationLink text={documentationLink.title} page={documentationLink.path} displayIcon />}
-              {mainActions}
+              {topActions}
             </TopActions>
           )}
         </FlexRow>
@@ -160,7 +160,7 @@ PageHeader.defaultProps = {
   children: [],
   lifecycle: undefined,
   lifecycleMessage: undefined,
-  mainActions: undefined,
+  topActions: undefined,
   actions: undefined,
   subpage: false,
   documentationLink: undefined,
