@@ -111,7 +111,7 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
     className,
     disabled,
     editorProps,
-    fontSize: theme.fonts.size.large,
+    fontSize: theme.fonts.size.small,
     highlightActiveLine: false,
     markers,
     maxLines,
