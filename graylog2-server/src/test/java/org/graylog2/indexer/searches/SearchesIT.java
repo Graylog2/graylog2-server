@@ -34,6 +34,7 @@ import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.MongoIndexRange;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
+import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
@@ -504,7 +505,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         assertThat(scrollResult.getQueryHash()).isNotEmpty();
         assertThat(scrollResult.totalHits()).isEqualTo(10L);
 
-        final ScrollResult.ScrollChunk firstChunk = scrollResult.nextChunk();
+        final ResultChunk firstChunk = scrollResult.nextChunk();
         assertThat(firstChunk).isNotNull();
         assertThat(firstChunk.getMessages()).hasSize(5);
         assertThat(firstChunk.isFirstChunk()).isTrue();
@@ -522,7 +523,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         assertThat(scrollResult).isNotNull();
         assertThat(scrollResult.totalHits()).isEqualTo(10L);
 
-        ScrollResult.ScrollChunk scrollChunk = scrollResult.nextChunk();
+        ResultChunk scrollChunk = scrollResult.nextChunk();
         assertThat(scrollChunk.isFirstChunk()).isTrue();
 
         final Set<ResultMessage> resultMessages = new HashSet<>(5);
@@ -548,7 +549,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         assertThat(scrollResult).isNotNull();
         assertThat(scrollResult.totalHits()).isEqualTo(10L);
 
-        ScrollResult.ScrollChunk scrollChunk = scrollResult.nextChunk();
+        ResultChunk scrollChunk = scrollResult.nextChunk();
         assertThat(scrollChunk.isFirstChunk()).isTrue();
 
         final Set<ResultMessage> resultMessages = new HashSet<>(5);

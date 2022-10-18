@@ -17,8 +17,8 @@
 package org.graylog2.rest;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,17 +39,17 @@ import java.util.List;
 
 @Provider
 @Produces(MoreMediaTypes.TEXT_CSV)
-public class ScrollChunkWriter implements MessageBodyWriter<ScrollResult.ScrollChunk> {
+public class ScrollChunkWriter implements MessageBodyWriter<ResultChunk> {
     private static final Logger LOG = LoggerFactory.getLogger(ScrollChunkWriter.class);
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return ScrollResult.ScrollChunk.class.isAssignableFrom(type) && MoreMediaTypes.TEXT_CSV_TYPE.isCompatible(mediaType);
+        return ResultChunk.class.isAssignableFrom(type) && MoreMediaTypes.TEXT_CSV_TYPE.isCompatible(mediaType);
 
     }
 
     @Override
-    public long getSize(ScrollResult.ScrollChunk scrollChunk,
+    public long getSize(ResultChunk scrollChunk,
                         Class<?> type,
                         Type genericType,
                         Annotation[] annotations,
@@ -58,7 +58,7 @@ public class ScrollChunkWriter implements MessageBodyWriter<ScrollResult.ScrollC
     }
 
     @Override
-    public void writeTo(ScrollResult.ScrollChunk scrollChunk,
+    public void writeTo(ResultChunk scrollChunk,
                         Class<?> type,
                         Type genericType,
                         Annotation[] annotations,

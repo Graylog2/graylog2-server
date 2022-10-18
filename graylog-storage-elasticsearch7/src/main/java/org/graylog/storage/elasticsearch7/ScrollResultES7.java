@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.elasticsearch7;
 
-import com.google.auto.value.AutoValue;
 import com.google.common.collect.Streams;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -26,6 +25,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchScrollRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
 import org.graylog2.indexer.results.IndexQueryResult;
+import org.graylog2.indexer.results.ResultChunk;
+import org.graylog2.indexer.results.ResultChunkImpl;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.slf4j.Logger;
@@ -81,7 +82,7 @@ public class ScrollResultES7 extends IndexQueryResult implements ScrollResult {
     }
 
     @Override
-    public ScrollChunk nextChunk() throws IOException {
+    public ResultChunk nextChunk() throws IOException {
         if (limit != -1 && resultCount >= limit) {
             LOG.debug("[{}] Reached limit for query {}", queryHash, getOriginalQuery());
             return null;
@@ -110,7 +111,7 @@ public class ScrollResultES7 extends IndexQueryResult implements ScrollResult {
 
         this.scrollId = result.getScrollId();
 
-        return ScrollChunkES7.create(fields, chunkId++, resultMessagesSlice);
+        return ResultChunkImpl.create(fields, chunkId++, resultMessagesSlice);
     }
 
     private SearchResponse nextSearchResult() throws IOException {
@@ -139,19 +140,5 @@ public class ScrollResultES7 extends IndexQueryResult implements ScrollResult {
                 "Unable to cancel scrolling search request");
     }
 
-    @AutoValue
-    abstract static class ScrollChunkES7 implements ScrollResult.ScrollChunk {
-        @Override
-        public abstract List<String> getFields();
 
-        @Override
-        public abstract int getChunkNumber();
-
-        @Override
-        public abstract List<ResultMessage> getMessages();
-
-        static ScrollChunk create(List<String> fields, int chunkNumber, List<ResultMessage> messages) {
-            return new AutoValue_ScrollResultES7_ScrollChunkES7(fields, chunkNumber, messages);
-        }
-    }
 }

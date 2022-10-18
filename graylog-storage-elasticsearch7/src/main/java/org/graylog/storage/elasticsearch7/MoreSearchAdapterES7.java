@@ -29,6 +29,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.ToXCo
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.ScrollCommand;
@@ -142,7 +143,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
 
         final Stopwatch stopwatch = Stopwatch.createStarted();
         try {
-            ScrollResult.ScrollChunk scrollChunk = scrollResult.nextChunk();
+            ResultChunk scrollChunk = scrollResult.nextChunk();
             while (continueScrolling.get() && scrollChunk != null) {
                 final List<ResultMessage> messages = scrollChunk.getMessages();
 

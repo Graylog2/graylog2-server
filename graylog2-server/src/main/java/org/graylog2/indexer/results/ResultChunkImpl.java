@@ -16,17 +16,22 @@
  */
 package org.graylog2.indexer.results;
 
-import java.io.IOException;
+import com.google.auto.value.AutoValue;
 
-public interface ScrollResult {
-    ResultChunk nextChunk() throws IOException;
+import java.util.List;
 
-    String getQueryHash();
+@AutoValue
+public abstract class ResultChunkImpl implements ResultChunk {
+    @Override
+    public abstract List<String> getFields();
 
-    long totalHits();
+    @Override
+    public abstract int getChunkNumber();
 
-    void cancel() throws IOException;
+    @Override
+    public abstract List<ResultMessage> getMessages();
 
-    long tookMs();
-
+    public static ResultChunk create(List<String> fields, int chunkNumber, List<ResultMessage> messages) {
+        return new AutoValue_ResultChunkImpl(fields, chunkNumber, messages);
+    }
 }

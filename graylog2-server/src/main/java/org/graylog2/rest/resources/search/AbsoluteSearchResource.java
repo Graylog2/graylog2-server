@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.decorators.DecoratorProcessor;
+import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -105,13 +106,13 @@ public class AbsoluteSearchResource extends SearchResource {
     @GET
     @Timed
     @ApiOperation(value = "Message search with absolute timerange.",
-            notes = "Search for messages using an absolute timerange, specified as from/to " +
-                    "with format yyyy-MM-ddTHH:mm:ss.SSSZ (e.g. 2014-01-23T15:34:49.000Z) or yyyy-MM-dd HH:mm:ss.")
+                  notes = "Search for messages using an absolute timerange, specified as from/to " +
+                          "with format yyyy-MM-ddTHH:mm:ss.SSSZ (e.g. 2014-01-23T15:34:49.000Z) or yyyy-MM-dd HH:mm:ss.")
     @Produces(MoreMediaTypes.TEXT_CSV)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
     })
-    public ChunkedOutput<ScrollResult.ScrollChunk> searchAbsoluteChunked(
+    public ChunkedOutput<ResultChunk> searchAbsoluteChunked(
             @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "from", value = "Timerange start. See description for date format", required = true)

@@ -36,6 +36,7 @@ import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
@@ -240,7 +241,7 @@ public abstract class SearchResource extends RestResource {
                 .values()
                 .stream()
                 .findFirst()
-                .map(searchTypeResult -> (MessageList.Result)searchTypeResult)
+                .map(searchTypeResult -> (MessageList.Result) searchTypeResult)
                 .orElseThrow(() -> new IllegalStateException("Missing search type result!"));
 
         final long tookMs = queryResult.executionStats().duration();
@@ -248,8 +249,8 @@ public abstract class SearchResource extends RestResource {
         return buildSearchResponse(query, result, fieldList, tookMs, timeRange, decorate, streamId);
     }
 
-    protected ChunkedOutput<ScrollResult.ScrollChunk> buildChunkedOutput(final ScrollResult scroll) {
-        final ChunkedOutput<ScrollResult.ScrollChunk> output = new ChunkedOutput<>(ScrollResult.ScrollChunk.class);
+    protected ChunkedOutput<ResultChunk> buildChunkedOutput(final ScrollResult scroll) {
+        final ChunkedOutput<ResultChunk> output = new ChunkedOutput<>(ResultChunk.class);
 
         LOG.debug("[{}] Scroll result contains a total of {} messages", scroll.getQueryHash(), scroll.totalHits());
         Runnable scrollIterationAction = createScrollChunkProducer(scroll, output);
@@ -288,17 +289,17 @@ public abstract class SearchResource extends RestResource {
     }
 
     protected Runnable createScrollChunkProducer(final ScrollResult scroll,
-                                                 final ChunkedOutput<ScrollResult.ScrollChunk> output) {
+                                                 final ChunkedOutput<ResultChunk> output) {
         return () -> {
             try {
-                ScrollResult.ScrollChunk chunk = scroll.nextChunk();
+                ResultChunk chunk = scroll.nextChunk();
                 while (chunk != null) {
                     LOG.debug("[{}] Writing scroll chunk with {} messages",
-                        scroll.getQueryHash(),
-                        chunk.getMessages().size());
+                            scroll.getQueryHash(),
+                            chunk.getMessages().size());
                     if (output.isClosed()) {
                         LOG.debug("[{}] Client connection is closed, client disconnected. Aborting scroll.",
-                            scroll.getQueryHash());
+                                scroll.getQueryHash());
                         scroll.cancel();
                         return;
                     }

@@ -16,17 +16,20 @@
  */
 package org.graylog2.indexer.results;
 
-import java.io.IOException;
+import java.util.List;
 
-public interface ScrollResult {
-    ResultChunk nextChunk() throws IOException;
+/**
+ * A part/chunk of search results for messages.
+ * Retrieval method of the chunk (scrolling, search_after pagination...) should not affect this interface implementations.
+ */
+public interface ResultChunk {
+    List<String> getFields();
 
-    String getQueryHash();
+    int getChunkNumber();
 
-    long totalHits();
+    default boolean isFirstChunk() {
+        return getChunkNumber() == 0;
+    }
 
-    void cancel() throws IOException;
-
-    long tookMs();
-
+    List<ResultMessage> getMessages();
 }
