@@ -34,7 +34,6 @@ interface ColorLabelProps {
   size?: Size,
   text?: string | React.ReactNode,
   theme: DefaultTheme,
-  className?: string,
 }
 
 const ColorLabelWrap = styled.span(({ size, theme }: ColorLabelWrapProps) => {
@@ -47,12 +46,12 @@ const ColorLabelWrap = styled.span(({ size, theme }: ColorLabelWrapProps) => {
   `;
 });
 
-const ColorLabel = ({ color, size, text, theme, className }: ColorLabelProps) => {
+const ColorLabel = ({ color, size, text, theme }: ColorLabelProps) => {
   const borderColor = theme.utils.colorLevel(color, 5);
   const textColor = theme.utils.contrastingColor(color);
 
   return (
-    <ColorLabelWrap size={size} className={className}>
+    <ColorLabelWrap size={size} className="color-label-wrapper">
       <Label style={{
         backgroundColor: color,
         border: `1px solid ${borderColor}`,
@@ -74,13 +73,11 @@ ColorLabel.propTypes = {
   text: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   size: PropTypes.oneOf(['normal', 'small', 'xsmall']),
   theme: themePropTypes.isRequired,
-  className: PropTypes.string,
 };
 
 ColorLabel.defaultProps = {
   text: <span>&emsp;</span>,
   size: 'normal',
-  className: '',
 };
 
 export default withTheme(ColorLabel);

@@ -88,8 +88,10 @@ const PaginatedListContainer = styled.div`
   }
 `;
 
-const StyledColorLabel = styled(ColorLabel)`
-  display: flex;
+const StyledColorLabelContainer = styled.span`
+  .color-label-wrapper {
+    display: flex;
+  }
 `;
 
 export const PAGE_SIZES = [10, 25, 50, 100];
@@ -295,8 +297,10 @@ const CollectorsAdministration = ({
             {configAssignments.map((configuration) => (
               <Link key={configuration.id}
                     to={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(configuration.id)}>
-                <StyledColorLabel color={configuration.color}
-                                  text={configuration.name} />
+                <StyledColorLabelContainer>
+                  <ColorLabel color={configuration.color}
+                              text={configuration.name} />
+                </StyledColorLabelContainer>
               </Link>
             ),
             )}
