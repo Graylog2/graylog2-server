@@ -70,7 +70,7 @@ public class Beats2Codec extends AbstractCodec {
         final JsonNode event;
         try {
             event = objectMapper.readTree(payload);
-            if (event == null) {
+            if (event == null || event.isMissingNode()) {
                 throw new IOException("null result");
             }
         } catch (IOException e) {
