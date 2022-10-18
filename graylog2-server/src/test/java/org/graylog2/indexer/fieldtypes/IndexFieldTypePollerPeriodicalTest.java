@@ -65,7 +65,7 @@ class IndexFieldTypePollerPeriodicalTest {
     @SuppressWarnings("UnstableApiUsage")
     private final EventBus eventBus = mock(EventBus.class);
     private final ServerStatus serverStatus = mock(ServerStatus.class);
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2,
             new ThreadFactoryBuilder().setNameFormat("index-field-type-poller-periodical-test-%d").build()
     );
 
