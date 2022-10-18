@@ -64,7 +64,7 @@ const addSortElement = async () => {
 };
 
 const findWidgetConfigFormSubmitButton = async () => {
-  const button = await screen.findByRole('button', { name: 'Update Preview' });
+  const button = await screen.findByRole('button', { name: /update preview/i });
 
   return button;
 };
@@ -91,14 +91,15 @@ describe('AggregationWizard', () => {
   const renderSUT = (props = {}) => render(
     <FieldTypesContext.Provider value={fieldTypes}>
       <AggregationWizard onChange={() => {}}
+                         onSubmit={() => {}}
+                         onCancel={() => {}}
                          config={widgetConfig}
                          editing
                          id="widget-id"
                          type="AGGREGATION"
                          fields={Immutable.List([])}
                          {...props}>
-        {/* eslint-disable-next-line react/jsx-no-useless-fragment */}
-        <>The Visualization</>
+        <div>The Visualization</div>
       </AggregationWizard>
     </FieldTypesContext.Provider>,
   );
@@ -204,7 +205,6 @@ describe('AggregationWizard', () => {
     const newSortContainer = await screen.findByTestId('sort-element-0');
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Field is required.')).toBeInTheDocument());
-
     await waitFor(() => expect(applyButton).toBeDisabled());
   });
 
@@ -216,7 +216,6 @@ describe('AggregationWizard', () => {
     const newSortContainer = await screen.findByTestId('sort-element-0');
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Direction is required.')).toBeInTheDocument());
-
     await waitFor(() => expect(applyButton).toBeDisabled());
   });
 

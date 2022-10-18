@@ -133,7 +133,7 @@ describe('<Widget />', () => {
     </WidgetFocusContext.Provider>
   );
 
-  const getWidgetUpdateButton = () => screen.getByRole('button', { name: /apply changes/i });
+  const getWidgetUpdateButton = () => screen.getByRole('button', { name: /update widget/i });
 
   it('should render with empty props', async () => {
     asMock(useWidgetResults).mockReturnValue({ widgetData: undefined, error: undefined });
@@ -311,7 +311,7 @@ describe('<Widget />', () => {
     expect(WidgetActions.update).toHaveBeenCalledWith('widgetId', widgetWithConfig);
   });
 
-  it('does not restore original state of widget config when clicking "Apply Changes"', async () => {
+  it('does not restore original state of widget config when clicking "Update widget"', async () => {
     const widgetWithConfig = WidgetModel.builder()
       .id('widgetId')
       .type('dummy')
