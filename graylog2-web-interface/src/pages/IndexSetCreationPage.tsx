@@ -53,6 +53,9 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
     index_optimization_disabled: false,
     field_type_refresh_interval: 5,
     field_type_refresh_interval_unit: 'seconds',
+    rotation_strategy_class: '',
+    rotation_strategy_config: '',
+
   };
   const { config } = useIndexDefaults(fallbackDefaults);
 
