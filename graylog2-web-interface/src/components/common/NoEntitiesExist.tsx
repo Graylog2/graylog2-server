@@ -34,7 +34,7 @@ const NoEntitiesExist = ({ children, className }: Props) => (
 );
 
 NoEntitiesExist.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+  children: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   className: PropTypes.string,
 };
 

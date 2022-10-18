@@ -21,7 +21,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import DocsHelper from 'util/DocsHelper';
 import { LinkContainer } from 'components/common/router';
 import { Col, Row, Button } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, IfPermitted, Icon, NoEntitiesExist } from 'components/common';
+import { DocumentTitle, PageHeader, IfPermitted, NoEntitiesExist } from 'components/common';
 import Routes from 'routing/Routes';
 import DashboardList from 'views/components/views/DashboardList';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
@@ -68,7 +68,7 @@ const DashboardsPage = () => {
 
   const noDashboardsFound = (
     <NoEntitiesExist>
-      <Icon name="info-circle" />&nbsp;No dashboards have been created yet. {createDashboardButtonText}
+      No dashboards have been created yet. {createDashboardButtonText}
     </NoEntitiesExist>
   );
 
