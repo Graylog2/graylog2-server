@@ -19,33 +19,26 @@ package org.graylog2.indexer.fieldtypes;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
-import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.ServerStatus;
-import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.locks.ReentrantLock;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -79,7 +72,7 @@ class IndexFieldTypePollerPeriodicalTest {
                 cluster,
                 eventBus,
                 serverStatus,
-                Duration.minutes(5),
+                Duration.seconds(0),
                 scheduler);
         when(serverStatus.getLifecycle()).thenReturn(Lifecycle.RUNNING);
         when(cluster.isConnected()).thenReturn(true);
@@ -95,7 +88,7 @@ class IndexFieldTypePollerPeriodicalTest {
     }
 
     @Test
-    void noConcurrentPollingForFieldTypes() {
+    void noConcurrentPollingForFieldTypes() throws InterruptedException {
         final IndexSetConfig indexSet = IndexSetConfig.builder()
                 .id("indexSet1")
                 .title("Test Index Set")
@@ -118,18 +111,26 @@ class IndexFieldTypePollerPeriodicalTest {
         when(mongoIndexSet.getActiveWriteIndex()).thenReturn("test_0");
         when(mongoIndexSetFactory.create(eq(indexSet))).thenReturn(mongoIndexSet);
 
-        final ReentrantLock lock = new ReentrantLock();
-        lock.lock();
+        final CountDownLatch start = new CountDownLatch(1);
+        final CountDownLatch done = new CountDownLatch(1);
         when(indexFieldTypePoller.pollIndex(anyString(), anyString()))
                 .thenAnswer((Answer<Optional<IndexFieldTypesDTO>>) invocationOnMock -> {
-                    lock.lock();
+                    start.countDown();
+                    done.await();
                     return Optional.empty();
                 });
 
         periodical.doRun();
-        periodical.doRun();
-        lock.unlock();
 
-        verify(indexFieldTypePoller, times(1)).poll(any(IndexSet.class), anySet());
+        // Wait until first job is waiting for index field type poller
+        start.await();
+
+        // Then start second job
+        periodical.doRun();
+
+        // And release first job
+        done.countDown();
+
+        verify(indexFieldTypePoller, times(1)).pollIndex(anyString(), anyString());
     }
 }
