@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.validation.constraints.Min;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -73,7 +74,7 @@ public class CaffeineLookupCache extends LookupCache {
     }
 
     private Expiry<LookupCacheKey, LookupResult> buildExpiry(Config config) {
-       return new Expiry<LookupCacheKey, LookupResult>() {
+       return new Expiry<>() {
            @Override
            public long expireAfterCreate(@NonNull LookupCacheKey lookupCacheKey, @NonNull LookupResult lookupResult, long currentTime) {
                if (lookupResult.hasTTL()) {
@@ -86,6 +87,7 @@ public class CaffeineLookupCache extends LookupCache {
                    return Long.MAX_VALUE;
                }
            }
+
            @Override
            public long expireAfterUpdate(@NonNull LookupCacheKey lookupCacheKey, @NonNull LookupResult lookupResult, long currentTime, long currentDuration) {
                return currentDuration;
@@ -126,7 +128,8 @@ public class CaffeineLookupCache extends LookupCache {
                 return loader.call();
             } catch (Exception e) {
                 LOG.warn("Loading value from data adapter failed for key {}, returning empty result", key, e);
-                return LookupResult.withError();
+                return LookupResult.withError(
+                        String.format(Locale.ENGLISH, "Loading value from data adapter failed for key <%s>: %s", key.toString(), e.getMessage()));
             }
         };
         try (final Timer.Context ignored = lookupTimer()) {

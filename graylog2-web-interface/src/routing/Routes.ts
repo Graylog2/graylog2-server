@@ -32,6 +32,14 @@ type RoutesKeywordTimeRange = {
   keyword: string
 };
 type RoutesTimeRange = RoutesRelativeTimeRange | RoutesAbsoluteTimeRange | RoutesKeywordTimeRange;
+type SearchQueryParams = {
+  q: string,
+  relative?: number,
+  from?: string,
+  to?: string,
+  keyword?: string,
+  streams?: string,
+}
 
 const Routes = {
   STARTPAGE: '/',
@@ -170,14 +178,31 @@ const Routes = {
     VIEWID: (id: string) => `${viewsPath}/${id}`,
   },
   EXTENDEDSEARCH: extendedSearchPath,
-  search_with_query: (query: string, rangeType: TimeRangeTypes, timeRange: RoutesTimeRange) => {
+  search_with_query: (query: string, rangeType: TimeRangeTypes, timeRange: RoutesTimeRange, streams?: string[]) => {
     const route = new URI(Routes.SEARCH);
-    const queryParams = {
+    const queryParams: SearchQueryParams = {
       q: query,
     };
 
     if (rangeType && timeRange) {
-      queryParams[rangeType] = timeRange;
+      switch (rangeType) {
+        case 'relative':
+          queryParams.relative = (<RoutesRelativeTimeRange>timeRange).relative;
+          break;
+        case 'absolute':
+          queryParams.from = (<RoutesAbsoluteTimeRange>timeRange).from;
+          queryParams.to = (<RoutesAbsoluteTimeRange>timeRange).to;
+          break;
+        case 'keyword':
+          queryParams.keyword = (<RoutesKeywordTimeRange>timeRange).keyword;
+          break;
+        default:
+          throw new Error(`Invalid range type: ${rangeType}.`);
+      }
+    }
+
+    if (streams) {
+      queryParams.streams = streams.join(',');
     }
 
     route.query(queryParams);

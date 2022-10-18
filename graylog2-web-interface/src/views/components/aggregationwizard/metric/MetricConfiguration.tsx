@@ -25,6 +25,7 @@ import { useStore } from 'stores/connect';
 import AggregationFunctionsStore from 'views/stores/AggregationFunctionsStore';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { InputOptionalInfo as Opt, FormikInput } from 'components/common';
+import { Properties } from 'views/logic/fieldtypes/FieldType';
 
 import FieldSelect from '../FieldSelect';
 
@@ -49,6 +50,11 @@ const Metric = ({ index }: Props) => {
   const isFieldRequired = currentFunction !== 'count';
 
   const isPercentile = currentFunction === 'percentile';
+  const requiresNumericField = !['card', 'count', 'latest'].includes(currentFunction);
+  const requiredProperties = requiresNumericField
+    ? [Properties.Numeric]
+    : [];
+
   const [functionIsSettled, setFunctionIsSettled] = useState<boolean>(false);
   const onFunctionChange = useCallback((newValue) => {
     setFieldValue(`metrics.${index}.function`, newValue);
@@ -91,6 +97,7 @@ const Metric = ({ index }: Props) => {
                        onChange={onChange}
                        error={error}
                        clearable={!isFieldRequired}
+                       properties={requiredProperties}
                        name={name}
                        value={value}
                        ariaLabel="Select a field" />

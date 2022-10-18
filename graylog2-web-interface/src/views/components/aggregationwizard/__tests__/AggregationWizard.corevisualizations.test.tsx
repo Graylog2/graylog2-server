@@ -52,7 +52,7 @@ const SimpleAggregationWizard = (props) => (
   </FieldTypesContext.Provider>
 );
 
-const submitButton = async () => screen.findByText('Update Preview');
+const submitButton = async () => screen.findByRole('button', { name: /update preview/i });
 
 const expectSubmitButtonToBeDisabled = async () => {
   expect(await submitButton()).toBeDisabled();
