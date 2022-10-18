@@ -24,6 +24,22 @@ import { OverlayTrigger } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import ContentHeadRow from 'components/common/ContentHeadRow';
 
+const Container = styled.div`
+  display: flex;
+  gap: 3px;
+  flex-direction: column;
+`;
+
+const FlexRow = styled.div(({ theme }) => css`
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+
+  @media (max-width: ${theme.breakpoints.max.md}) {
+    flex-wrap: wrap;
+  }
+`);
+
 const LifecycleIndicatorContainer = styled.span(({ theme }) => css`
   cursor: help;
   margin-left: 5px;
@@ -32,29 +48,24 @@ const LifecycleIndicatorContainer = styled.span(({ theme }) => css`
   vertical-align: text-top;
 `);
 
-const H1 = styled.h1`
-  margin-bottom: 0.2em;
-`;
-
 const TopActions = styled.div<{ $hasMultipleChildren: boolean }>(({ $hasMultipleChildren }) => css`
   display: flex;
   gap: 10px;
   align-items: ${$hasMultipleChildren ? 'center' : 'flex-start'};
 `);
 
-const FlexRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-`;
-
 const Actions = styled.div`
   display: flex !important;
   align-items: flex-end;
-  margin-top: 5px;
   
   .btn-toolbar {
     display: flex;
+  }
+`;
+
+const Description = styled.p`
+  &&&& {
+    margin-top: 0;
   }
 `;
 
@@ -109,31 +120,33 @@ const PageHeader = ({ children, subpage, title, actions, topActions, lifecycle, 
   return (
     <ContentHeadRow className={topLevelClassNames}>
       <Col sm={12}>
-        <FlexRow>
-          <H1>
-            {title} <small><LifecycleIndicator lifecycle={lifecycle} lifecycleMessage={lifecycleMessage} /></small>
-          </H1>
-          {(documentationLink || topActions) && (
-            <TopActions $hasMultipleChildren={!!documentationLink && !!topActions}>
-              {documentationLink && <DocumentationLink text={documentationLink.title} page={documentationLink.path} displayIcon />}
-              {topActions}
-            </TopActions>
-          )}
-        </FlexRow>
+        <Container>
+          <FlexRow>
+            <h1>
+              {title} <small><LifecycleIndicator lifecycle={lifecycle} lifecycleMessage={lifecycleMessage} /></small>
+            </h1>
+            {(documentationLink || topActions) && (
+              <TopActions $hasMultipleChildren={!!documentationLink && !!topActions}>
+                {documentationLink && <DocumentationLink text={documentationLink.title} page={documentationLink.path} displayIcon />}
+                {topActions}
+              </TopActions>
+            )}
+          </FlexRow>
 
-        <FlexRow>
-          {children && (
-            <p className="description no-bm">
-              {children}
-            </p>
-          )}
+          <FlexRow>
+            {children && (
+              <Description className="description no-bm">
+                  {children}
+              </Description>
+            )}
 
-          {actions && (
-            <Actions>
-              {actions}
-            </Actions>
-          )}
-        </FlexRow>
+            {actions && (
+              <Actions>
+                {actions}
+              </Actions>
+            )}
+          </FlexRow>
+        </Container>
       </Col>
     </ContentHeadRow>
   );
