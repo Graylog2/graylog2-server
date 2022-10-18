@@ -35,7 +35,6 @@ import CollectorsAdministrationActions from './CollectorsAdministrationActions';
 import CollectorsAdministrationFilters from './CollectorsAdministrationFilters';
 import CollectorConfigurationModalContainer from './CollectorConfigurationModalContainer';
 import FiltersSummary from './FiltersSummary';
-import style from './CollectorsAdministration.css';
 
 import type { Collector, Configuration, SidecarCollectorPairType, SidecarSummary } from '../types';
 
@@ -48,9 +47,50 @@ const HeaderComponentsWrapper = styled.div(({ theme }) => css`
   }
 `);
 
-const DisabledCollector = styled.div(({ theme }) => css`
+const CollectorEntry = styled.div`
+  .row {
+    margin-bottom: 5px;
+  }
+  .form-group {
+    display: inline-block;
+    margin: 0 10px 0 0;
+  }
+  .checkbox {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  .checkbox label {
+    font-size: 1rem; /* theme.fonts.size.body */
+  }
+`;
+
+const DisabledCollector = styled(CollectorEntry)(({ theme }) => css`
   color: ${theme.colors.variant.light.default};
+  margin-left: 20px;
 `);
+
+const AdditionalContent = styled.span`
+  display: flex;
+  margin-top: 5px;
+  flex-wrap: wrap;
+`;
+
+const AlignedInformation = styled.span`
+  margin-left: 20px;
+`;
+
+const PaginatedListContainer = styled.div`
+  .page-size {
+    padding-top: 4px;
+  }
+  .search {
+    margin-bottom: 15px;
+  }
+`;
+
+const StyledColorLabel = styled(ColorLabel)`
+  display: flex;
+`;
 
 export const PAGE_SIZES = [10, 25, 50, 100];
 
@@ -182,7 +222,7 @@ const CollectorsAdministration = ({
   const formatSidecarNoCollectors = (sidecar: SidecarSummary) => {
     return (
       <ControlledTableList.Item key={`sidecar-${sidecar.node_id}`}>
-        <DisabledCollector className={`${style.collectorEntry} ${style.alignedInformation}`}>
+        <DisabledCollector>
           <Row>
             <Col md={12}>
               <h4 className="list-group-item-heading">
@@ -233,17 +273,17 @@ const CollectorsAdministration = ({
                  onChange={handleSidecarCollectorSelect(collectorId)} />
         </Col>
         <Col lg={1} md={2} xs={3}>
-          <span className={style.additionalContent}>
+          <AdditionalContent>
             {(configAssignments.length > 0) && (
               <StatusIndicator status={collectorStatus.status}
                                message={collectorStatus.message}
                                id={collectorStatus.id}
                                lastSeen={sidecar.last_seen} />
             )}
-          </span>
+          </AdditionalContent>
         </Col>
         <Col lg={10} md={8} xs={6}>
-          <span className={style.additionalContent}>
+          <AdditionalContent>
             {(configAssignments.length > 0)
               && (
               <IconButton name="edit"
@@ -255,13 +295,12 @@ const CollectorsAdministration = ({
             {configAssignments.map((configuration) => (
               <Link key={configuration.id}
                     to={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(configuration.id)}>
-                <ColorLabel color={configuration.color}
-                            text={configuration.name}
-                            className="flex-color-label" />
+                <StyledColorLabel color={configuration.color}
+                                  text={configuration.name} />
               </Link>
             ),
             )}
-          </span>
+          </AdditionalContent>
         </Col>
       </Row>
     );
@@ -274,17 +313,17 @@ const CollectorsAdministration = ({
 
     return (
       <ControlledTableList.Item key={`sidecar-${sidecar.node_id}`}>
-        <div className={style.collectorEntry}>
+        <CollectorEntry>
           <Row>
             <Col md={12}>
-              <h4 className={`list-group-item-heading ${style.alignedInformation} ${!sidecar.active && commonStyle.greyedOut}`}>
+              <AlignedInformation className={`list-group-item-heading ${!sidecar.active && commonStyle.greyedOut}`}>
                 {sidecar.node_name} <OperatingSystemIcon operatingSystem={sidecar.node_details.operating_system} />
                 &emsp;<small>{sidecar.node_id} {!sidecar.active && <b>&mdash; inactive</b>}</small>
-              </h4>
+              </AlignedInformation>
             </Col>
           </Row>
           {_collectors.map((collector) => formatCollector(sidecar, collector, _configurations))}
-        </div>
+        </CollectorEntry>
       </ControlledTableList.Item>
     );
   };
@@ -327,7 +366,7 @@ const CollectorsAdministration = ({
   }
 
   return (
-    <div className={style.paginatedList}>
+    <PaginatedListContainer>
       <PaginatedList pageSizes={PAGE_SIZES}
                      totalItems={pagination.total}
                      onChange={onPageChange}>
@@ -354,7 +393,7 @@ const CollectorsAdministration = ({
                                               setSelected([]);
                                               setShowConfigurationModal(false);
                                             }} />
-    </div>
+    </PaginatedListContainer>
   );
 };
 
