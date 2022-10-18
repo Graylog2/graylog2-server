@@ -37,6 +37,26 @@ import { IndicesActions, IndicesStore } from 'stores/indices/IndicesStore';
 
 const REFRESH_INTERVAL = 2000;
 
+const ElasticsearchUnavailableInformation = () => (
+  <Row className="content">
+    <Col md={8} mdOffset={2}>
+      <div className="top-margin">
+        <Panel bsStyle="danger"
+               header={<span><Icon name="exclamation-triangle" /> Indices overview unavailable</span>}>
+          <p>
+            We could not get the indices overview information. This usually means there was a problem
+            connecting to Elasticsearch, and <strong>you should ensure Elasticsearch is up and reachable from Graylog</strong>.
+          </p>
+          <p>
+            Graylog will continue storing your messages in its journal, but you will not be able to search on them
+            until Elasticsearch is reachable again.
+          </p>
+        </Panel>
+      </div>
+    </Col>
+  </Row>
+);
+
 type Props = {
   params: {
     indexSetId?: string,
@@ -109,30 +129,6 @@ class IndexSetPage extends React.Component<Props, State> {
     return indices ? Object.keys(indices).length : null;
   };
 
-  _renderElasticsearchUnavailableInformation = () => {
-    return (
-      <Row className="content">
-        <Col md={8} mdOffset={2}>
-          <div className="top-margin">
-            <Panel bsStyle="danger"
-                   header={<span><Icon name="exclamation-triangle" /> Indices overview unavailable</span>}>
-              <p>
-                We could not get the indices overview information. This usually means there was a problem
-                connecting to Elasticsearch, and <strong>you should ensure Elasticsearch is up and reachable from
-                  Graylog
-                                                 </strong>.
-              </p>
-              <p>
-                Graylog will continue storing your messages in its journal, but you will not be able to search on them
-                until Elasticsearch is reachable again.
-              </p>
-            </Panel>
-          </div>
-        </Col>
-      </Row>
-    );
-  };
-
   _isLoading = () => {
     const { indexSet } = this.props;
 
@@ -176,7 +172,7 @@ class IndexSetPage extends React.Component<Props, State> {
       return (
         <span>
           {pageHeader}
-          {this._renderElasticsearchUnavailableInformation()}
+          <ElasticsearchUnavailableInformation />
         </span>
       );
     }

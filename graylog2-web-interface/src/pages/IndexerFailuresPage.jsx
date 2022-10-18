@@ -22,7 +22,6 @@ import moment from 'moment';
 import { Col, Row } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, Spinner, PageHeader, PaginatedList } from 'components/common';
-import { DocumentationLink } from 'components/support';
 import { IndexerFailuresList } from 'components/indexers';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { IndexerFailuresStore } from 'stores/indexers/IndexerFailuresStore';
