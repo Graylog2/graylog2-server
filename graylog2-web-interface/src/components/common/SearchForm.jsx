@@ -44,6 +44,18 @@ const HelpFeedback = styled.span`
   }
 `;
 
+const StyledContainer = styled.div(({ topMargin }) => `
+  margin-top: ${topMargin};
+`);
+
+const StyledInput = styled.input(({ queryWidth }) => `
+  width: ${queryWidth};
+`);
+
+const StyledInputContainer = styled.div(({ queryWidth }) => `
+  width: ${queryWidth};
+`);
+
 /**
  * Component that renders a customizable search form. The component
  * supports a loading state, adding children next to the form, and
@@ -238,30 +250,30 @@ class SearchForm extends React.Component {
     const { query, isLoading } = this.state;
 
     return (
-      <div className={`${wrapperClass} ${className}`} style={{ marginTop: topMargin }}>
+      <StyledContainer className={`${wrapperClass} ${className}`} topMargin={topMargin}>
         <form className="form-inline" onSubmit={this._onSearch}>
           <FormContent buttonLeftMargin={buttonLeftMargin}>
-            <div style={{ width: queryWidth }} className={`form-group ${queryHelpComponent ? 'has-feedback' : ''}`}>
+            <StyledInputContainer className={`form-group ${queryHelpComponent ? 'has-feedback' : ''}`} queryWidth={queryWidth}>
               {label && (
                 <label htmlFor="common-search-form-query-input" className="control-label">
                   {label}
                 </label>
               )}
-              <input id="common-search-form-query-input"
-                   /* eslint-disable-next-line jsx-a11y/no-autofocus */
-                     autoFocus={focusAfterMount}
-                     onChange={this.handleQueryChange}
-                     value={query}
-                     placeholder={placeholder}
-                     type="text"
-                     style={{ width: queryWidth }}
-                     className="query form-control"
-                     autoComplete="off"
-                     spellCheck="false" />
+              <StyledInput id="common-search-form-query-input"
+                           /* eslint-disable-next-line jsx-a11y/no-autofocus */
+                           autoFocus={focusAfterMount}
+                           onChange={this.handleQueryChange}
+                           value={query}
+                           placeholder={placeholder}
+                           type="text"
+                           queryWidth={queryWidth}
+                           className="query form-control"
+                           autoComplete="off"
+                           spellCheck="false" />
               {queryHelpComponent && (
                 <HelpFeedback className="form-control-feedback">{queryHelpComponent}</HelpFeedback>
               )}
-            </div>
+            </StyledInputContainer>
 
             {onSearch && (
               <Button bsStyle={searchBsStyle}
@@ -280,7 +292,7 @@ class SearchForm extends React.Component {
             {children}
           </FormContent>
         </form>
-      </div>
+      </StyledContainer>
     );
   }
 }
