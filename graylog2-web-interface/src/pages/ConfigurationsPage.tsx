@@ -103,6 +103,7 @@ const ConfigurationsPage = () => {
     const urlWhiteListConfig = _getConfig(URL_WHITELIST_CONFIG, configuration);
     const indexSetsDefaultsConfig = _getConfig(INDEX_SETS_DEFAULTS_CONFIG, configuration);
     const permissionsConfig = _getConfig(PERMISSIONS_CONFIG, configuration);
+
     Output = (
       <>
         {searchesConfig && (

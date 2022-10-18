@@ -16,6 +16,7 @@
  */
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
 import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button } from 'components/bootstrap';
@@ -26,15 +27,14 @@ import history from 'util/History';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import connect from 'stores/connect';
-import { IndexSetPropType, IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 import { RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
 import type { RetentionStrategy, RotationStrategy, RetentionStrategyContext } from 'components/indices/Types';
 import { adjustFormat } from 'util/DateTime';
-import {IndexConfig} from 'components/configurations/IndexSetsDefaultsConfig';
+import type { IndexConfig } from 'components/configurations/IndexSetsDefaultsConfig';
 import useIndexDefaults from 'pages/useIndexDefaults';
-import moment from 'moment';
 
 type Props = {
   indexSet: Partial<IndexSet> | null | undefined,
@@ -43,8 +43,7 @@ type Props = {
   retentionStrategiesContext?: RetentionStrategyContext | null | undefined,
 }
 
-const IndexSetCreationPage = ({retentionStrategies, rotationStrategies, retentionStrategiesContext}: Props) => {
-
+const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retentionStrategiesContext }: Props) => {
   const fallbackDefaults: IndexConfig = {
     index_prefix: '',
     index_analyzer: 'standard',
@@ -55,7 +54,7 @@ const IndexSetCreationPage = ({retentionStrategies, rotationStrategies, retentio
     field_type_refresh_interval: 5,
     field_type_refresh_interval_unit: 'seconds',
   };
-  const {config} = useIndexDefaults(fallbackDefaults);
+  const { config } = useIndexDefaults(fallbackDefaults);
 
   const indexSet: IndexSet = {
     title: '',
@@ -75,7 +74,7 @@ const IndexSetCreationPage = ({retentionStrategies, rotationStrategies, retentio
     index_analyzer: config.index_analyzer,
     index_optimization_max_num_segments: config.index_optimization_max_num_segments,
     index_optimization_disabled: config.index_optimization_disabled,
-    field_type_refresh_interval: moment.duration(config.field_type_refresh_interval,config.field_type_refresh_interval_unit ).asMilliseconds(),
+    field_type_refresh_interval: moment.duration(config.field_type_refresh_interval, config.field_type_refresh_interval_unit).asMilliseconds(),
   };
 
   useEffect(() => {

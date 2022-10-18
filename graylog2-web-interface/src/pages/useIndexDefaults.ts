@@ -14,21 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import {useQuery} from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
-import {qualifyUrl} from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-
-import {IndexConfig} from 'components/configurations/IndexSetsDefaultsConfig';
+import type { IndexConfig } from 'components/configurations/IndexSetsDefaultsConfig';
 
 const fetchIndexDefaults: () => Promise<IndexConfig> = () => {
-  return fetch('GET', qualifyUrl(ApiRoutes.ClusterConfigResource.config().url + '/org.graylog2.configuration.IndexSetsDefaultsConfiguration'));
+  return fetch('GET', qualifyUrl(`${ApiRoutes.ClusterConfigResource.config().url}/org.graylog2.configuration.IndexSetsDefaultsConfiguration`));
 };
 
 const useIndexDefaults = (fallbackDefaults: IndexConfig) => {
-  const {data, isLoading} = useQuery(
+  const { data, isLoading } = useQuery(
     ['scope-permissions'],
     fetchIndexDefaults,
     {
@@ -42,7 +41,7 @@ const useIndexDefaults = (fallbackDefaults: IndexConfig) => {
   const config: IndexConfig = isLoading ? fallbackDefaults : data;
 
   return {
-    config
+    config,
   };
 };
 
