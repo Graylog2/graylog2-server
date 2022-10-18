@@ -57,8 +57,12 @@ public class SearchRequestFactory {
         return create(SearchCommand.from(config));
     }
 
-    public SearchSourceBuilder create(ScrollCommand scrollCommand) {
-        return create(SearchCommand.from(scrollCommand));
+    public SearchSourceBuilder create(final ScrollCommand scrollCommand) {
+        final SearchSourceBuilder searchSourceBuilder = create(SearchCommand.from(scrollCommand));
+        searchSourceBuilder.fetchSource(scrollCommand.fields().toArray(new String[0]), new String[0]);
+        scrollCommand.batchSize()
+                .ifPresent(batchSize -> searchSourceBuilder.size(Math.toIntExact(batchSize)));
+        return searchSourceBuilder;
     }
 
     public SearchSourceBuilder create(SearchCommand searchCommand) {
