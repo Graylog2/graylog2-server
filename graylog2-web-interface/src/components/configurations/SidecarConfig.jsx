@@ -16,18 +16,21 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
 import { Button, BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted, ISODurationInput } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 import ISODurationUtils from 'util/ISODurationUtils';
-import FormUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import StringUtils from 'util/StringUtils';
 
 const SidecarConfig = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'SidecarConfig',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     config: PropTypes.shape({
       sidecar_expiration_threshold: PropTypes.string,
@@ -62,10 +65,12 @@ const SidecarConfig = createReactClass({
   },
 
   _openModal() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.configModal.open();
   },
 
   _closeModal() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.configModal.close();
   },
 
@@ -82,15 +87,17 @@ const SidecarConfig = createReactClass({
 
   _onUpdate(field) {
     return (value) => {
-      const update = ObjectUtils.clone(this.state.config);
+      this.setState(({ config }) => {
+        const update = ObjectUtils.clone(config);
 
-      if (typeof value === 'object') {
-        update[field] = FormUtils.getValueFromInput(value.target);
-      } else {
-        update[field] = value;
-      }
+        if (typeof value === 'object') {
+          update[field] = getValueFromInput(value.target);
+        } else {
+          update[field] = value;
+        }
 
-      this.setState({ config: update });
+        return ({ config: update });
+      });
     };
   },
 
@@ -132,14 +139,15 @@ const SidecarConfig = createReactClass({
         </dl>
 
         <IfPermitted permissions="clusterconfigentry:edit">
-          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
+          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
+        {/* eslint-disable-next-line react/no-string-refs */}
         <BootstrapModalForm ref="configModal"
                             title="Update Sidecars System Configuration"
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}
-                            submitButtonText="Save">
+                            submitButtonText="Update configuration">
           <fieldset>
             <ISODurationInput id="inactive-threshold-field"
                               duration={this.state.config.sidecar_inactive_threshold}

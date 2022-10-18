@@ -14,5 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const c3 = {};
-export default c3;
+import * as React from 'react';
+
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+
+export type PaginationQueryParameterObject = {
+  pageSizes?: number[];
+};
+
+function withPaginationQueryParameter(Component: React.ComponentType, obj?: PaginationQueryParameterObject) {
+  return function WrappedComponent(props) {
+    const result = usePaginationQueryParameter(obj?.pageSizes);
+
+    return <Component {...props} paginationQueryParameter={result} />;
+  };
+}
+
+export default withPaginationQueryParameter;

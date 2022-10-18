@@ -15,63 +15,103 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
-import { Button, ButtonToolbar } from 'components/bootstrap';
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
+import Button from 'components/bootstrap/Button';
 import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
 
-type Props = {
-  className?: string,
-  disableCancel?: boolean,
-  disabledSubmit?: boolean,
-  isSubmitting?: boolean,
-  leftCol?: React.ReactNode,
+const StyledIcon = styled(Icon)`
+  margin-right: 0.2em;
+`;
+
+type WithCancelProps = {
+  displayCancel: true,
+  disabledCancel?: boolean,
   onCancel: () => void,
-  onSubmit?: () => void,
-  submitButtonText: string,
-  submitIcon?: IconName,
-  submitButtonType?: 'submit' | 'button',
-  submitLoadingText?: string,
 }
 
-const FormSubmit = ({
-  className,
-  disableCancel,
-  disabledSubmit,
-  isSubmitting,
-  leftCol,
-  onCancel,
-  onSubmit,
-  submitButtonText,
-  submitButtonType,
-  submitIcon,
-  submitLoadingText,
-}: Props) => (
-  <ButtonToolbar className={`${className} pull-right`}>
-    {leftCol}
-    <Button type="button" onClick={onCancel} disabled={disableCancel}>Cancel</Button>
-    <Button bsStyle="success"
-            disabled={disabledSubmit}
-            title={submitButtonText}
-            type={submitButtonType}
-            onClick={onSubmit}>
-      {(submitIcon && !isSubmitting) && <><Icon name={submitIcon} /> </>}
-      {isSubmitting ? <Spinner text={submitLoadingText} delay={0} /> : submitButtonText}
-    </Button>
-  </ButtonToolbar>
-);
+type WithoutCancelProps = {
+  displayCancel: false
+}
+
+type WithAsyncSubmit = {
+  isAsyncSubmit: true,
+  submitLoadingText: string,
+  isSubmitting: boolean,
+}
+
+type WithSyncSubmit = {
+  isAsyncSubmit: false,
+}
+
+type Props = {
+  bsSize?: 'large' | 'small' | 'xsmall',
+  centerCol?: React.ReactNode,
+  className?: string,
+  disabledSubmit?: boolean,
+  displayCancel?: boolean,
+  formId?: string,
+  isAsyncSubmit?: boolean,
+  onSubmit?: () => void,
+  submitButtonText: string,
+  submitButtonType?: 'submit' | 'button',
+  submitIcon?: IconName,
+} & (WithCancelProps | WithoutCancelProps) & (WithAsyncSubmit | WithSyncSubmit);
+
+const FormSubmit = (props: Props) => {
+  const {
+    bsSize,
+    className,
+    centerCol,
+    displayCancel,
+    disabledSubmit,
+    formId,
+    isAsyncSubmit,
+    onSubmit,
+    submitButtonText,
+    submitButtonType,
+    submitIcon,
+  } = props;
+
+  return (
+    <ButtonToolbar className={className}>
+      <Button bsStyle="success"
+              bsSize={bsSize}
+              disabled={disabledSubmit || (isAsyncSubmit && props.isSubmitting)}
+              form={formId}
+              title={submitButtonText}
+              type={submitButtonType}
+              onClick={onSubmit}>
+        {(submitIcon && !(isAsyncSubmit && props.isSubmitting)) && <StyledIcon name={submitIcon} />}
+        {(isAsyncSubmit && props.isSubmitting) ? <Spinner text={props.submitLoadingText} delay={0} /> : submitButtonText}
+      </Button>
+      {centerCol}
+      {displayCancel === true && (
+        <Button type="button"
+                bsSize={bsSize}
+                onClick={props.onCancel}
+                disabled={props.disabledCancel || (isAsyncSubmit && props.isSubmitting)}>
+          Cancel
+        </Button>
+      )}
+    </ButtonToolbar>
+  );
+};
 
 FormSubmit.defaultProps = {
+  bsSize: undefined,
+  centerCol: undefined,
   className: undefined,
-  disableCancel: false,
   disabledSubmit: false,
-  isSubmitting: false,
-  leftCol: undefined,
+  displayCancel: true,
+  formId: undefined,
+  isAsyncSubmit: false,
   onSubmit: undefined,
   submitButtonType: 'submit',
   submitIcon: undefined,
-  submitLoadingText: undefined,
 };
 
 export default FormSubmit;

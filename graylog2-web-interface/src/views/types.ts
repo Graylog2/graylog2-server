@@ -65,6 +65,8 @@ export interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetCo
   type: string;
   fields: Immutable.List<FieldTypeMapping>,
   onChange: (newConfig: Config) => void,
+  onSubmit: () => void,
+  onCancel: () => void,
 }
 
 export interface WidgetResults {
@@ -93,6 +95,7 @@ export interface WidgetExport {
   defaultWidth?: number;
   visualizationComponent: React.ComponentType<WidgetComponentProps>;
   editComponent: React.ComponentType<EditWidgetComponentProps>;
+  hasEditSubmitButton?: boolean,
   needsControlledHeight: (widget: { config: Widget['config'] }) => boolean;
   searchResultTransformer?: (data: Array<unknown>) => unknown;
   searchTypes: (widget: Widget) => Array<any>;
@@ -123,6 +126,11 @@ type SelectField = BaseRequiredField & {
   options: ReadonlyArray<string | [string, any]>,
 };
 
+type MultiSelectField = BaseRequiredField & {
+  type: 'multi-select',
+  options: ((props: any) => ReadonlyArray<string | [string, any]>) | ReadonlyArray<string | [string, any]>,
+};
+
 type BooleanField = BaseField & {
   type: 'boolean',
 };
@@ -132,7 +140,7 @@ export type NumericField = BaseRequiredField & {
   step?: string,
 };
 
-export type ConfigurationField = SelectField | BooleanField | NumericField;
+export type ConfigurationField = SelectField | BooleanField | NumericField | MultiSelectField;
 
 export interface VisualizationCapabilities {
   'event-annotations': undefined,

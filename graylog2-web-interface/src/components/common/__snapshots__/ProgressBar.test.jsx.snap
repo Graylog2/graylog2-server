@@ -20,8 +20,7 @@ exports[`<ProgressBar /> properly renders with animated 1`] = `
 
 .c1 {
   height: 100%;
-  font-size: 0.889rem;
-  line-height: 20px;
+  font-size: 0.878rem;
   text-align: center;
   box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1);
   -webkit-transition: width 500ms ease-in-out;
@@ -73,8 +72,7 @@ exports[`<ProgressBar /> properly renders with bsStyle variant 1`] = `
 
 .c1 {
   height: 100%;
-  font-size: 0.889rem;
-  line-height: 20px;
+  font-size: 0.878rem;
   text-align: center;
   box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1);
   -webkit-transition: width 500ms ease-in-out;
@@ -122,8 +120,7 @@ exports[`<ProgressBar /> properly renders with label 1`] = `
 
 .c1 {
   height: 100%;
-  font-size: 0.889rem;
-  line-height: 20px;
+  font-size: 0.878rem;
   text-align: center;
   box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1);
   -webkit-transition: width 500ms ease-in-out;
@@ -174,8 +171,7 @@ exports[`<ProgressBar /> properly renders with multiple bars 1`] = `
 
 .c1 {
   height: 100%;
-  font-size: 0.889rem;
-  line-height: 20px;
+  font-size: 0.878rem;
   text-align: center;
   box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1);
   -webkit-transition: width 500ms ease-in-out;
@@ -189,8 +185,7 @@ exports[`<ProgressBar /> properly renders with multiple bars 1`] = `
 
 .c2 {
   height: 100%;
-  font-size: 0.889rem;
-  line-height: 20px;
+  font-size: 0.878rem;
   text-align: center;
   box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1);
   -webkit-transition: width 500ms ease-in-out;
@@ -246,8 +241,7 @@ exports[`<ProgressBar /> properly renders with no props 1`] = `
 
 .c1 {
   height: 100%;
-  font-size: 0.889rem;
-  line-height: 20px;
+  font-size: 0.878rem;
   text-align: center;
   box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1);
   -webkit-transition: width 500ms ease-in-out;
@@ -295,8 +289,7 @@ exports[`<ProgressBar /> properly renders with one bar 1`] = `
 
 .c1 {
   height: 100%;
-  font-size: 0.889rem;
-  line-height: 20px;
+  font-size: 0.878rem;
   text-align: center;
   box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1);
   -webkit-transition: width 500ms ease-in-out;
@@ -344,8 +337,7 @@ exports[`<ProgressBar /> properly renders with striped 1`] = `
 
 .c1 {
   height: 100%;
-  font-size: 0.889rem;
-  line-height: 20px;
+  font-size: 0.878rem;
   text-align: center;
   box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1);
   -webkit-transition: width 500ms ease-in-out;

@@ -16,13 +16,14 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import lodash from 'lodash';
 import moment from 'moment';
 
 import { Button, FormGroup, HelpBlock, BootstrapModalForm } from 'components/bootstrap';
 import { IfPermitted, TimeUnitInput } from 'components/common';
-import FormUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import Input from 'components/bootstrap/Input';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 
@@ -30,8 +31,10 @@ const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 const DEFAULT_CATCH_UP_WINDOW = 3600000;
 
 const EventsConfig = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'EventsConfig',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     config: PropTypes.shape({
       events_search_timeout: PropTypes.number,
@@ -120,7 +123,7 @@ const EventsConfig = createReactClass({
   },
 
   _onBacklogUpdate(event) {
-    const value = FormUtils.getValueFromInput(event.target);
+    const value = getValueFromInput(event.target);
 
     this._propagateChanges('events_notification_default_backlog', value);
   },
@@ -166,14 +169,14 @@ const EventsConfig = createReactClass({
         </dl>
 
         <IfPermitted permissions="clusterconfigentry:edit">
-          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
+          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
         <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                             title="Update Events System Configuration"
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}
-                            submitButtonText="Save">
+                            submitButtonText="Update configuration">
           <fieldset>
             <FormGroup controlId="search-timeout-field">
               <TimeUnitInput label="Search Timeout"
@@ -213,7 +216,7 @@ const EventsConfig = createReactClass({
                              enabled={eventsCatchupWindow.duration > 0}
                              units={TIME_UNITS} />
               <HelpBlock>If Event processor execution is behind schedule, queries on older data will be run with this window size to speed up processing.
-                (If the &quot;search within the last&quot; setting of an event definiton is greater, this setting will be ignored)
+                (If the &quot;search within the last&quot; setting of an event definition is greater, this setting will be ignored)
               </HelpBlock>
             </FormGroup>
           </fieldset>

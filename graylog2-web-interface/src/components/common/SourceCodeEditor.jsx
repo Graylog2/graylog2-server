@@ -112,6 +112,8 @@ class SourceCodeEditor extends React.Component {
     onLoad: PropTypes.func,
     /** Function called when the value of the text changes. It receives the new value and an event as arguments. */
     onChange: PropTypes.func,
+    /** Function called when the editor loses focus. */
+    onBlur: PropTypes.func,
     /** Specifies if the editor should be in read-only mode. */
     readOnly: PropTypes.bool,
     /** Specifies if the editor should be resizable by the user. */
@@ -132,6 +134,7 @@ class SourceCodeEditor extends React.Component {
     innerRef: undefined,
     mode: 'text',
     onChange: () => {},
+    onBlur: () => {},
     onLoad: () => {},
     readOnly: false,
     resizable: true,
@@ -238,6 +241,7 @@ class SourceCodeEditor extends React.Component {
       innerRef,
       onLoad,
       onChange,
+      onBlur,
       readOnly,
       value,
     } = this.props;
@@ -305,6 +309,7 @@ class SourceCodeEditor extends React.Component {
                        height="100%"
                        onLoad={onLoad}
                        onChange={onChange}
+                       onBlur={onBlur}
                        onSelectionChange={this.handleSelectionChange}
                        readOnly={readOnly}
                        value={value}

@@ -44,7 +44,7 @@ const WidgetContainer = React.forwardRef<HTMLDivElement, Props>(({ children, cla
       ...containerStyle,
       height: '100%',
       width: '100%',
-      zIndex: 2,
+      zIndex: 3,
       top: 0,
       left: 0,
     };

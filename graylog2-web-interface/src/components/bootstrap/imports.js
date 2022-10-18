@@ -19,7 +19,6 @@
 export {
   /* 👇 no custom theme colors needed 👇 */
   ButtonGroup,
-  ButtonToolbar,
   Checkbox, // NOTE: do we want custom or keep OS styles
   Clearfix,
   Col,

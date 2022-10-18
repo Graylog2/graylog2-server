@@ -30,7 +30,7 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => css`
     padding: 3px 20px;
     clear: both;
     font-weight: normal;
-    line-height: 1.42857143;
+    line-height: 1;
     color: ${theme.colors.global.textDefault};
     white-space: nowrap;
 

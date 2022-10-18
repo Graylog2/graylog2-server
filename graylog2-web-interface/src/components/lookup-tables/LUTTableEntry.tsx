@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import { Link } from 'components/common/router';
 import { Spinner } from 'components/common';
 import Routes from 'routing/Routes';
-import { Button } from 'components/bootstrap';
+import { Button, ButtonToolbar } from 'components/bootstrap';
 import { ErrorPopover } from 'components/lookup-tables';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import useScopePermissions from 'hooks/useScopePermissions';
@@ -38,7 +38,7 @@ type Props = {
   },
 };
 
-const Actions = styled.div`
+const Actions = styled(ButtonToolbar)`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -91,15 +91,13 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
           {loadingScopePermissions ? <Spinner /> : scopePermissions.is_mutable && (
             <Actions>
               <Button bsSize="xsmall"
-                      bsStyle="info"
                       onClick={handleEdit(table.name)}
                       role="button"
                       name="edit">
                 Edit
               </Button>
-              <Button style={{ marginLeft: '6px' }}
-                      bsSize="xsmall"
-                      bsStyle="primary"
+              <Button bsSize="xsmall"
+                      bsStyle="danger"
                       onClick={handleDelete(table)}
                       role="button"
                       name="delete">

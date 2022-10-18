@@ -14,17 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.alarmcallbacks;
+// eslint-disable-next-line no-restricted-imports
+import { ButtonToolbar as BootstrapButtonToolbar } from 'react-bootstrap';
 
-import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackResult;
-import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackSummary;
-import org.joda.time.DateTime;
+const ButtonToolbar = BootstrapButtonToolbar;
 
-public interface AlarmCallbackHistory {
-    String id();
-    AlarmCallbackSummary alarmcallbackConfiguration();
-    String alertId();
-    String alertConditionId();
-    AlarmCallbackResult result();
-    DateTime createdAt();
-}
+/** @component */
+export default ButtonToolbar;

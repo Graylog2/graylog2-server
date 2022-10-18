@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, fireEvent } from 'wrappedTestingLibrary';
+import { render, fireEvent, screen } from 'wrappedTestingLibrary';
 
 import mockAction from 'helpers/mocking/MockAction';
 import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
@@ -55,6 +55,11 @@ describe('CopyToDashboardForm', () => {
     },
   };
 
+  const submitModal = () => {
+    const submitButton = screen.getByRole('button', { name: /copy widget/i, hidden: true });
+    fireEvent.click(submitButton);
+  };
+
   it('should render the modal minimal', () => {
     // @ts-ignore
     const { baseElement } = render(<CopyToDashboardForm />);
@@ -86,13 +91,13 @@ describe('CopyToDashboardForm', () => {
 
   it('should not handle onSubmit without selection', () => {
     const onSubmit = jest.fn();
-    const { getByText } = render(<CopyToDashboardForm dashboards={dashboardState}
-                                                      widgetId="widget-id"
-                                                      onCancel={() => {}}
-                                                      onSubmit={onSubmit} />);
-    const submitButton = getByText('Select');
 
-    fireEvent.click(submitButton);
+    render(<CopyToDashboardForm dashboards={dashboardState}
+                                widgetId="widget-id"
+                                onCancel={() => {}}
+                                onSubmit={onSubmit} />);
+
+    submitModal();
 
     expect(onSubmit).not.toHaveBeenCalled();
   });
@@ -106,9 +111,7 @@ describe('CopyToDashboardForm', () => {
     const firstView = getByText('view 1');
 
     fireEvent.click(firstView);
-    const submitButton = getByText('Select');
-
-    fireEvent.click(submitButton);
+    submitModal();
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSubmit).toHaveBeenCalledWith('widget-id', 'view-1');

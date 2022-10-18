@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import {
@@ -26,9 +27,10 @@ import {
   SearchForm,
   OverlayTrigger,
 } from 'components/common';
-import { Button, Col, Row } from 'components/bootstrap';
+import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { GrokPatternsStore } from 'stores/grok-patterns/GrokPatternsStore';
 
 import GrokPatternQueryHelper from './GrokPatternQueryHelper';
@@ -43,15 +45,38 @@ const GrokPatternsList = styled(DataTable)`
   }
 `;
 
+const testPattern = (pattern, callback, errCallback) => {
+  GrokPatternsStore.testPattern(pattern, callback, errCallback);
+};
+
+const _headerCellFormatter = (header) => {
+  let formattedHeaderCell;
+
+  switch (header.toLocaleLowerCase()) {
+    case 'name':
+      formattedHeaderCell = <th className="name">{header}</th>;
+      break;
+    case 'actions':
+      formattedHeaderCell = <th className="actions">{header}</th>;
+      break;
+    default:
+      formattedHeaderCell = <th>{header}</th>;
+  }
+
+  return formattedHeaderCell;
+};
+
 class GrokPatterns extends React.Component {
+  static propTypes = {
+    paginationQueryParameter: PropTypes.object.isRequired,
+  };
+
   constructor(props) {
     super(props);
 
     this.state = {
       patterns: [],
       pagination: {
-        page: 1,
-        perPage: 10,
         count: 0,
         total: 0,
         query: '',
@@ -69,8 +94,8 @@ class GrokPatterns extends React.Component {
     }
   }
 
-  loadData = (callback) => {
-    const { pagination: { page, perPage, query } } = this.state;
+  loadData = (callback, page = this.props.paginationQueryParameter.page, perPage = this.props.paginationQueryParameter.pageSize) => {
+    const { pagination: { query } } = this.state;
 
     this.loadPromise = GrokPatternsStore.searchPaginated(page, perPage, query)
       .then(({ patterns, pagination }) => {
@@ -78,7 +103,7 @@ class GrokPatterns extends React.Component {
           callback();
         }
 
-        if (!this.loadPromise.isCancelled()) {
+        if (!this.loadPromise?.isCancelled()) {
           this.loadPromise = undefined;
 
           this.setState({ patterns, pagination });
@@ -100,28 +125,21 @@ class GrokPatterns extends React.Component {
     });
   };
 
-  testPattern = (pattern, callback, errCallback) => {
-    GrokPatternsStore.testPattern(pattern, callback, errCallback);
-  };
-
   _onPageChange = (newPage, newPerPage) => {
-    const { pagination } = this.state;
-    const newPagination = Object.assign(pagination, {
-      page: newPage,
-      perPage: newPerPage,
-    });
-    this.setState({ pagination: newPagination }, this.loadData);
+    this.loadData(null, newPage, newPerPage);
   };
 
   _onSearch = (query, resetLoadingCallback) => {
     const { pagination } = this.state;
     const newPagination = Object.assign(pagination, { query: query });
+    this.props.paginationQueryParameter.resetPage();
     this.setState({ pagination: newPagination }, () => this.loadData(resetLoadingCallback));
   };
 
   _onReset = () => {
     const { pagination } = this.state;
     const newPagination = Object.assign(pagination, { query: '' });
+    this.props.paginationQueryParameter.resetPage();
     this.setState({ pagination: newPagination }, this.loadData);
   };
 
@@ -130,23 +148,6 @@ class GrokPatterns extends React.Component {
     if (window.confirm(`Really delete the grok pattern ${pattern.name}?\nIt will be removed from the system and unavailable for any extractor. If it is still in use by extractors those will fail to work.`)) {
       GrokPatternsStore.deletePattern(pattern, this.loadData);
     }
-  };
-
-  _headerCellFormatter = (header) => {
-    let formattedHeaderCell;
-
-    switch (header.toLocaleLowerCase()) {
-      case 'name':
-        formattedHeaderCell = <th className="name">{header}</th>;
-        break;
-      case 'actions':
-        formattedHeaderCell = <th className="actions">{header}</th>;
-        break;
-      default:
-        formattedHeaderCell = <th>{header}</th>;
-    }
-
-    return formattedHeaderCell;
   };
 
   _patternFormatter = (pattern) => {
@@ -158,23 +159,25 @@ class GrokPatterns extends React.Component {
         <td>{pattern.name}</td>
         <td>{pattern.pattern}</td>
         <td>
-          <IfPermitted permissions="inputs:edit">
-            <Button style={{ marginRight: 5 }}
-                    bsStyle="primary"
-                    bsSize="xs"
-                    onClick={() => this.confirmedRemove(pattern)}>
-              Delete
-            </Button>
-            <EditPatternModal id={pattern.id}
-                              name={pattern.name}
-                              pattern={pattern.pattern}
-                              testPattern={this.testPattern}
-                              patterns={patterns}
-                              create={false}
-                              reload={this.loadData}
-                              savePattern={this.savePattern}
-                              validPatternName={this.validPatternName} />
-          </IfPermitted>
+          <ButtonToolbar>
+            <IfPermitted permissions="inputs:edit">
+              <EditPatternModal id={pattern.id}
+                                name={pattern.name}
+                                pattern={pattern.pattern}
+                                testPattern={testPattern}
+                                patterns={patterns}
+                                create={false}
+                                reload={this.loadData}
+                                savePattern={this.savePattern}
+                                validPatternName={this.validPatternName} />
+              <Button style={{ marginRight: 5 }}
+                      bsStyle="danger"
+                      bsSize="xs"
+                      onClick={() => this.confirmedRemove(pattern)}>
+                Delete
+              </Button>
+            </IfPermitted>
+          </ButtonToolbar>
         </td>
       </tr>
     );
@@ -194,26 +197,27 @@ class GrokPatterns extends React.Component {
 
     return (
       <div>
-        <PageHeader title="Grok patterns">
+        <PageHeader title="Grok patterns"
+                    subactions={(
+                      <IfPermitted permissions="inputs:edit">
+                        <ButtonToolbar>
+                          <BulkLoadPatternModal onSuccess={this.loadData} />
+                          <EditPatternModal id=""
+                                            name=""
+                                            pattern=""
+                                            patterns={patterns}
+                                            create
+                                            testPattern={testPattern}
+                                            reload={this.loadData}
+                                            savePattern={this.savePattern}
+                                            validPatternName={this.validPatternName} />
+                        </ButtonToolbar>
+                      </IfPermitted>
+                    )}>
           <span>
             This is a list of grok patterns you can use in your Graylog grok extractors. You can add
             your own manually or import a whole list of patterns from a so called pattern file.
           </span>
-          {null}
-          <IfPermitted permissions="inputs:edit">
-            <span>
-              <BulkLoadPatternModal onSuccess={this.loadData} />
-              <EditPatternModal id=""
-                                name=""
-                                pattern=""
-                                patterns={patterns}
-                                create
-                                testPattern={this.testPattern}
-                                reload={this.loadData}
-                                savePattern={this.savePattern}
-                                validPatternName={this.validPatternName} />
-            </span>
-          </IfPermitted>
         </PageHeader>
 
         <Row className="content">
@@ -234,7 +238,7 @@ class GrokPatterns extends React.Component {
                     <GrokPatternsList id="grok-pattern-list"
                                       className="table-striped table-hover"
                                       headers={headers}
-                                      headerCellFormatter={this._headerCellFormatter}
+                                      headerCellFormatter={_headerCellFormatter}
                                       sortByKey="name"
                                       rows={patterns}
                                       dataRowFormatter={this._patternFormatter} />
@@ -249,4 +253,4 @@ class GrokPatterns extends React.Component {
   }
 }
 
-export default GrokPatterns;
+export default withPaginationQueryParameter(GrokPatterns);

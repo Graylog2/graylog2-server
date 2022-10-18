@@ -133,6 +133,8 @@ describe('<Widget />', () => {
     </WidgetFocusContext.Provider>
   );
 
+  const getWidgetUpdateButton = () => screen.getByRole('button', { name: /update widget/i });
+
   it('should render with empty props', async () => {
     asMock(useWidgetResults).mockReturnValue({ widgetData: undefined, error: undefined });
     render(<DummyWidget />);
@@ -266,10 +268,10 @@ describe('<Widget />', () => {
   it('updates focus mode, on widget edit save', async () => {
     const mockUnsetWidgetEditing = jest.fn();
     render(<DummyWidget editing unsetWidgetEditing={mockUnsetWidgetEditing} />);
-    const saveButton = screen.getByText('Apply Changes');
-    fireEvent.click(saveButton);
+    const updateWidgetButton = getWidgetUpdateButton();
+    fireEvent.click(updateWidgetButton);
 
-    await waitFor(() => expect(saveButton).not.toBeDisabled());
+    await waitFor(() => expect(updateWidgetButton).not.toBeDisabled());
 
     expect(mockUnsetWidgetEditing).toHaveBeenCalledTimes(1);
   });
@@ -309,7 +311,7 @@ describe('<Widget />', () => {
     expect(WidgetActions.update).toHaveBeenCalledWith('widgetId', widgetWithConfig);
   });
 
-  it('does not restore original state of widget config when clicking "Apply Changes"', async () => {
+  it('does not restore original state of widget config when clicking "Update widget"', async () => {
     const widgetWithConfig = WidgetModel.builder()
       .id('widgetId')
       .type('dummy')
@@ -325,11 +327,10 @@ describe('<Widget />', () => {
 
     expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 
-    const saveButton = screen.getByText('Apply Changes');
+    const updateWidgetButton = getWidgetUpdateButton();
+    fireEvent.click(updateWidgetButton);
 
-    fireEvent.click(saveButton);
-
-    await waitFor(() => expect(saveButton).not.toBeDisabled());
+    await waitFor(() => expect(updateWidgetButton).not.toBeDisabled());
 
     expect(WidgetActions.update).not.toHaveBeenCalledWith('widgetId', { config: { foo: 42 }, id: 'widgetId', type: 'dummy' });
   });

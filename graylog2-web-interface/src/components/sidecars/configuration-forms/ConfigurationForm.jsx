@@ -16,12 +16,13 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import lodash from 'lodash';
 
-import { ColorPickerPopover, Select, SourceCodeEditor } from 'components/common';
-import { Button, ButtonToolbar, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
+import { ColorPickerPopover, FormSubmit, Select, SourceCodeEditor } from 'components/common';
+import { Button, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
@@ -32,8 +33,10 @@ import SourceViewModal from './SourceViewModal';
 import ImportsViewModal from './ImportsViewModal';
 
 const ConfigurationForm = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'ConfigurationForm',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     action: PropTypes.oneOf(['create', 'edit']),
     configuration: PropTypes.object,
@@ -134,6 +137,7 @@ const ConfigurationForm = createReactClass({
     };
   },
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   replaceConfigurationVariableName(oldname, newname) {
     const { formData } = this.state;
 
@@ -157,6 +161,7 @@ const ConfigurationForm = createReactClass({
     const storedTemplate = this.defaultTemplates[collectorId];
 
     if (storedTemplate !== undefined) {
+      // eslint-disable-next-line no-promise-executor-return
       return new Promise((resolve) => resolve(storedTemplate));
     }
 
@@ -240,7 +245,7 @@ const ConfigurationForm = createReactClass({
 
     return options;
   },
-
+  // eslint-disable-next-line react/no-unstable-nested-components
   _formatValidationMessage(fieldName, defaultText) {
     const { validation_errors: validationErrors } = this.state;
 
@@ -260,7 +265,7 @@ const ConfigurationForm = createReactClass({
 
     return null;
   },
-
+  // eslint-disable-next-line react/no-unstable-nested-components
   _renderCollectorTypeField(collectorId, collectors, configurationSidecars) {
     const isConfigurationInUse = configurationSidecars.sidecar_ids && configurationSidecars.sidecar_ids.length > 0;
 
@@ -356,16 +361,9 @@ const ConfigurationForm = createReactClass({
 
           <Row>
             <Col md={12}>
-              <FormGroup>
-                <ButtonToolbar>
-                  <Button type="submit" bsStyle="primary" disabled={this._hasErrors()}>
-                    {action === 'create' ? 'Create' : 'Update'}
-                  </Button>
-                  <Button type="button" onClick={this._onCancel}>
-                    {action === 'create' ? 'Cancel' : 'Back'}
-                  </Button>
-                </ButtonToolbar>
-              </FormGroup>
+              <FormSubmit submitButtonText={`${action === 'create' ? 'Create' : 'Update'} configuration`}
+                          disabledSubmit={this._hasErrors()}
+                          onCancel={this._onCancel} />
             </Col>
           </Row>
         </form>

@@ -86,6 +86,13 @@ const StreamControls = ({
             Clone this stream
           </MenuItem>
         </IfPermitted>
+        <IfPermitted permissions={`streams:edit:${stream.id}`}>
+          <LinkContainer to={Routes.stream_alerts(stream.id)}>
+            <MenuItem key={`manageAlerts-${stream.id}`}>
+              Manage Alerts
+            </MenuItem>
+          </LinkContainer>
+        </IfPermitted>
         <HideOnCloud>
           <IfPermitted permissions="stream_outputs:read">
             <LinkContainer to={Routes.stream_outputs(stream.id)}>
@@ -111,11 +118,13 @@ const StreamControls = ({
       <StreamForm ref={streamForm}
                   title="Editing Stream"
                   onSubmit={onUpdate}
+                  submitButtonText="Update stream"
                   stream={stream}
                   indexSets={indexSets} />
       <StreamForm ref={cloneForm}
                   title="Cloning Stream"
                   onSubmit={_onCloneSubmit}
+                  submitButtonText="Clone stream"
                   indexSets={indexSets} />
     </>
   );

@@ -38,6 +38,7 @@ import type { ViewStoreState } from 'views/stores/ViewStore';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import viewsBindings from 'views/bindings';
 import DataTable from 'views/components/datatable/DataTable';
+import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -100,7 +101,7 @@ describe('Aggregation Widget', () => {
 
   const dataTableWidget = WidgetModel.builder().newId()
     .type('AGGREGATION')
-    .config(AggregationWidgetConfig.builder().visualization(DataTable.type).build())
+    .config(AggregationWidgetConfig.builder().visualization(DataTable.type).visualizationConfig(DataTableVisualizationConfig.create([]).toBuilder().build()).build())
     .query(createElasticsearchQueryString(''))
     .timerange({ type: 'relative', from: 300 })
     .build();
@@ -161,10 +162,15 @@ describe('Aggregation Widget', () => {
     </ViewTypeContext.Provider>
   );
 
-  const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: 'Update Preview' });
+  const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
+
+  const submitWidgetChanges = () => {
+    const saveButton = screen.getByRole('button', { name: /update widget/i });
+    fireEvent.click(saveButton);
+  };
 
   describe('on a dashboard', () => {
-    it('should apply not submitted widget search controls and aggregation elements changes when clicking on "Apply Changes"', async () => {
+    it('should apply not submitted widget search controls and aggregation elements changes when clicking on "Update widget"', async () => {
       const newSeries = Series.create('count').toBuilder().config(SeriesConfig.empty().toBuilder().name('Metric name').build()).build();
       const updatedConfig = dataTableWidget.config
         .toBuilder()
@@ -199,16 +205,14 @@ describe('Aggregation Widget', () => {
         name: /perform search \(changes were made after last search execution\)/i,
       });
 
-      // Submit all changes
-      const saveButton = screen.getByText('Apply Changes');
-      fireEvent.click(saveButton);
+      submitWidgetChanges();
 
       await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledTimes(1));
 
       expect(WidgetActions.update).toHaveBeenCalledWith(expect.any(String), updatedWidget);
     }, testTimeout);
 
-    it('should apply not submitted widget time range changes in correct format when clicking on "Apply Changes"', async () => {
+    it('should apply not submitted widget time range changes in correct format when clicking on "Update widget"', async () => {
       // Displayed times are based on time zone defined in moment-timezone mock.
       const updatedWidget = dataTableWidget
         .toBuilder()
@@ -231,15 +235,14 @@ describe('Aggregation Widget', () => {
       const timeRangeLivePreview = await screen.findByTestId('time-range-live-preview');
       await within(timeRangeLivePreview).findByText('2020-01-01 00:55:00.000');
 
-      const applyTimeRangeChangesButton = await screen.findByRole('button', { name: 'Apply' });
+      const applyTimeRangeChangesButton = await screen.findByRole('button', { name: 'Update time range' });
       userEvent.click(applyTimeRangeChangesButton);
 
       const timeRangeDisplay = await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
       await within(timeRangeDisplay).findByText('2020-01-01 00:55:00.000');
 
       // Submit all changes
-      const saveButton = screen.getByText('Apply Changes');
-      fireEvent.click(saveButton);
+      submitWidgetChanges();
 
       await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledTimes(1));
 
@@ -248,7 +251,7 @@ describe('Aggregation Widget', () => {
   });
 
   describe('on a search', () => {
-    it('should apply not submitted aggregation elements changes when clicking on "Apply Changes"', async () => {
+    it('should apply not submitted aggregation elements changes when clicking on "Update widget"', async () => {
       const newSeries = Series.create('count').toBuilder().config(SeriesConfig.empty().toBuilder().name('Metric name').build()).build();
       const updatedConfig = dataTableWidget.config
         .toBuilder()
@@ -273,9 +276,7 @@ describe('Aggregation Widget', () => {
 
       await findWidgetConfigSubmitButton();
 
-      // Submit all changes
-      const saveButton = screen.getByText('Apply Changes');
-      fireEvent.click(saveButton);
+      submitWidgetChanges();
 
       await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledTimes(1));
 

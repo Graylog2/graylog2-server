@@ -42,6 +42,9 @@ export type Fonts = {
     h5: string,
     h6: string,
   },
+  lineHeight: {
+    body: number,
+  }
 };
 
 export const fontsPropTypes = PropTypes.shape({
@@ -63,6 +66,9 @@ export const fontsPropTypes = PropTypes.shape({
     h5: PropTypes.string,
     h6: PropTypes.string,
   }),
+  lineHeight: PropTypes.shape({
+    body: PropTypes.number,
+  }),
 });
 
 const family = {
@@ -77,9 +83,9 @@ const size = {
   body: '1rem',
   huge: '1.383rem',
   large: '1.067rem',
-  small: '0.889rem',
+  small: '0.878rem',
   tiny: '0.823rem',
-  navigation: '0.938em',
+  navigation: '0.937rem',
   h1: '1.575rem',
   h2: '1.296rem',
   h3: '1.215rem',
@@ -88,9 +94,14 @@ const size = {
   h6: '1rem',
 };
 
+const lineHeight = {
+  body: 1.24, // This value is also being maintained as @line-height-base in bootstrap-config.js
+};
+
 const fonts: Fonts = {
   family,
   size,
+  lineHeight,
 };
 
 export default fonts;

@@ -37,31 +37,31 @@ jest.mock('views/stores/SearchConfigStore', () => ({
 
 jest.mock('stores/tools/ToolsStore', () => ({}));
 
-const defaultProps = {
-  currentTimeRange: {
-    type: 'relative',
-    from: 300,
-  },
-  noOverride: false,
-  setCurrentTimeRange: jest.fn(),
-  toggleDropdownShow: jest.fn(),
-  position: 'bottom',
-  limitDuration: 259200,
-} as const;
-
-const TimeRangeDropdown = (allProps: TimeRangeDropdownProps) => (
-  <OriginalTimeRangeDropDown {...allProps} />
-);
-
 describe('TimeRangeDropdown relative time range', () => {
+  const defaultProps = {
+    currentTimeRange: {
+      type: 'relative',
+      from: 300,
+    },
+    noOverride: false,
+    setCurrentTimeRange: jest.fn(),
+    toggleDropdownShow: jest.fn(),
+    position: 'bottom',
+    limitDuration: 259200,
+  } as const;
+
+  const TimeRangeDropdown = (allProps: Partial<TimeRangeDropdownProps>) => (
+    <OriginalTimeRangeDropDown {...defaultProps} {...allProps} />
+  );
+
+  const getSubmitButton = () => screen.getByRole('button', { name: /Update time range/i });
+
   it('display warning when emptying from range value input', async () => {
-    render(<TimeRangeDropdown {...defaultProps} />);
+    render(<TimeRangeDropdown />);
 
     const fromRangeValueInput = screen.getByTitle('Set the from value');
-    const submitButton = screen.getByRole('button', {
-      name: /apply/i,
-    });
 
+    const submitButton = getSubmitButton();
     userEvent.type(fromRangeValueInput, '{backspace}');
 
     await screen.findByText('Cannot be empty.');
@@ -70,20 +70,15 @@ describe('TimeRangeDropdown relative time range', () => {
   });
 
   it('display warning when emptying to range value input', async () => {
-    const props = {
-      ...defaultProps,
-      currentTimeRange: {
-        type: 'relative',
-        from: 300,
-        to: 240,
-      },
+    const currentTimeRange = {
+      type: 'relative',
+      from: 300,
+      to: 240,
     };
-    render(<TimeRangeDropdown {...props} />);
+    render(<TimeRangeDropdown currentTimeRange={currentTimeRange} />);
 
     const toRangeValueInput = screen.getByTitle('Set the to value');
-    const submitButton = screen.getByRole('button', {
-      name: /apply/i,
-    });
+    const submitButton = getSubmitButton();
 
     userEvent.type(toRangeValueInput, '{backspace}');
 
@@ -94,26 +89,20 @@ describe('TimeRangeDropdown relative time range', () => {
 
   it('allow emptying from and to ranges and typing in completely new values', async () => {
     const setCurrentTimeRangeStub = jest.fn();
-    const props = {
-      ...defaultProps,
-      currentTimeRange: {
-        type: 'relative',
-        from: 300,
-        to: 240,
-      },
-      setCurrentTimeRange: setCurrentTimeRangeStub,
+    const currentTimeRange = {
+      type: 'relative',
+      from: 300,
+      to: 240,
     };
-    render(<TimeRangeDropdown {...props} />);
+    render(<TimeRangeDropdown currentTimeRange={currentTimeRange} setCurrentTimeRange={setCurrentTimeRangeStub} />);
 
-    const fromRangeValueInput = screen.getByTitle('Set the from value');
+    const fromRangeValueInput = await screen.findByTitle('Set the from value');
     const toRangeValueInput = screen.getByTitle('Set the to value');
-    const submitButton = screen.getByRole('button', {
-      name: /apply/i,
-    });
+    const submitButton = getSubmitButton();
 
-    userEvent.type(fromRangeValueInput, '{backspace}7');
-    userEvent.type(toRangeValueInput, '{backspace}6');
-    userEvent.click(submitButton);
+    await userEvent.type(fromRangeValueInput, '{backspace}7');
+    await userEvent.type(toRangeValueInput, '{backspace}6');
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(setCurrentTimeRangeStub).toHaveBeenCalledTimes(1));
 

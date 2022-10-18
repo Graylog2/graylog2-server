@@ -19,7 +19,7 @@ import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { DataTable } from 'components/common';
+import { DataTable, ModalSubmit } from 'components/common';
 import { BootstrapModalWrapper, Button, DropdownButton, ButtonToolbar, MenuItem, Modal } from 'components/bootstrap';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
@@ -94,7 +94,7 @@ class ContentPackVersions extends React.Component {
         <td className="text-right">
           <ButtonToolbar className="pull-right">
             <Button bsStyle="success" bsSize="small" onClick={() => { downloadRef.open(); }}>Download</Button>
-            <DropdownButton id={`action-${pack.rev}`} bsStyle="info" title="Actions" bsSize="small">
+            <DropdownButton id={`action-${pack.rev}`} title="Actions" bsSize="small">
               <MenuItem onClick={openFunc}>Install</MenuItem>
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}>
                 <MenuItem>Create New From Revision</MenuItem>
@@ -140,12 +140,10 @@ class ContentPackVersions extends React.Component {
                               onInstall={onInstallProp} />
         </Modal.Body>
         <Modal.Footer>
-          <div className="pull-right">
-            <ButtonToolbar>
-              <Button bsStyle="primary" onClick={onInstall}>Install</Button>
-              <Button onClick={closeModal}>Close</Button>
-            </ButtonToolbar>
-          </div>
+          <ModalSubmit onSubmit={onInstall}
+                       submitButtonType="button"
+                       onCancel={closeModal}
+                       submitButtonText="Install" />
         </Modal.Footer>
       </BootstrapModalWrapper>
     );

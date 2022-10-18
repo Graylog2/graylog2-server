@@ -263,7 +263,7 @@ describe('<WidgetActionsMenu />', () => {
       const view1ListItem = screen.getByText('view 1');
 
       fireEvent.click(view1ListItem);
-      const selectBtn = screen.getByText('Select');
+      const selectBtn = screen.getByRole('button', { name: /copy widget/i, hidden: true });
 
       fireEvent.click(selectBtn);
     };

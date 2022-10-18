@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
@@ -30,8 +31,10 @@ import { InputsActions } from 'stores/inputs/InputsStore';
 import { InputTypesStore } from 'stores/inputs/InputTypesStore';
 
 const InputListItem = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'InputListItem',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     input: PropTypes.object.isRequired,
     currentNode: PropTypes.object.isRequired,
@@ -41,6 +44,7 @@ const InputListItem = createReactClass({
   mixins: [PermissionsMixin, Reflux.connect(InputTypesStore)],
 
   _deleteInput() {
+    // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete input '${this.props.input.title}'?`)) {
       InputsActions.delete(this.props.input);
     }
@@ -80,7 +84,7 @@ const InputListItem = createReactClass({
       actions.push(
         <LinkContainer key={`received-messages-${this.props.input.id}`}
                        to={Routes.search(`gl2_source_input:${this.props.input.id}`, { relative: 0 })}>
-          <Button bsStyle="info">Show received messages</Button>
+          <Button>Show received messages</Button>
         </LinkContainer>,
       );
     }
@@ -96,7 +100,7 @@ const InputListItem = createReactClass({
 
       actions.push(
         <LinkContainer key={`manage-extractors-${this.props.input.id}`} to={extractorRoute}>
-          <Button bsStyle="info">Manage extractors</Button>
+          <Button>Manage extractors</Button>
         </LinkContainer>,
       );
 
@@ -163,6 +167,7 @@ const InputListItem = createReactClass({
                    typeName={input.type}
                    includeTitleField
                    submitAction={this._updateInput}
+                   submitButtonText="Update input"
                    values={input.attributes} />
       ) : null;
 

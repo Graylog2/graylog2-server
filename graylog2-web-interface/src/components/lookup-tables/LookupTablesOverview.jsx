@@ -17,14 +17,68 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
-import Routes from 'routing/Routes';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import { OverlayTrigger, PaginatedList, SearchForm, Icon } from 'components/common';
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
 import Styles from './Overview.css';
+
+const _lookupName = (id, map) => {
+  const empty = { title: 'None' };
+
+  if (!map) {
+    return empty;
+  }
+
+  return map[id] || empty;
+};
+
+const _helpPopover = () => {
+  return (
+    <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">
+      <p><strong>Available search fields</strong></p>
+      <Table condensed>
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>id</td>
+            <td>Lookup Table ID</td>
+          </tr>
+          <tr>
+            <td>title</td>
+            <td>The title of the lookup table</td>
+          </tr>
+          <tr>
+            <td>name</td>
+            <td>The reference name of the lookup table</td>
+          </tr>
+          <tr>
+            <td>description</td>
+            <td>The description of lookup table</td>
+          </tr>
+        </tbody>
+      </Table>
+      <p><strong>Examples</strong></p>
+      <p>
+        Find lookup tables by parts of their names:<br />
+        <kbd>name:geoip</kbd><br />
+        <kbd>name:geo</kbd>
+      </p>
+      <p>
+        Searching without a field name matches against the <code>title</code> field:<br />
+        <kbd>geoip</kbd> <br />is the same as<br />
+        <kbd>title:geoip</kbd>
+      </p>
+    </Popover>
+  );
+};
 
 class LookupTablesOverview extends React.Component {
   static propTypes = {
@@ -33,6 +87,7 @@ class LookupTablesOverview extends React.Component {
     dataAdapters: PropTypes.objectOf(PropTypes.object).isRequired,
     pagination: PropTypes.object.isRequired,
     errorStates: PropTypes.object.isRequired,
+    paginationQueryParameter: PropTypes.object.isRequired,
   };
 
   _onPageChange = (newPage, newPerPage) => {
@@ -40,24 +95,21 @@ class LookupTablesOverview extends React.Component {
   };
 
   _onSearch = (query, resetLoadingStateCb) => {
+    const { resetPage, pageSize } = this.props.paginationQueryParameter;
+
+    resetPage();
+
     LookupTablesActions
-      .searchPaginated(this.props.pagination.page, this.props.pagination.per_page, query)
+      .searchPaginated(1, pageSize, query)
       .then(resetLoadingStateCb);
   };
 
   _onReset = () => {
-    LookupTablesActions.searchPaginated(this.props.pagination.page, this.props.pagination.per_page);
-  };
+    const { resetPage, pageSize } = this.props.paginationQueryParameter;
 
-  // eslint-disable-next-line
-  _lookupName = (id, map) => {
-    const empty = { title: 'None' };
+    resetPage();
 
-    if (!map) {
-      return empty;
-    }
-
-    return map[id] || empty;
+    LookupTablesActions.searchPaginated(1, pageSize);
   };
 
   _lookupAdapterError = (table) => {
@@ -74,56 +126,10 @@ class LookupTablesOverview extends React.Component {
     return null;
   };
 
-  // eslint-disable-next-line
-  _helpPopover = () => {
-    return (
-      <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">
-        <p><strong>Available search fields</strong></p>
-        <Table condensed>
-          <thead>
-            <tr>
-              <th>Field</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>id</td>
-              <td>Lookup Table ID</td>
-            </tr>
-            <tr>
-              <td>title</td>
-              <td>The title of the lookup table</td>
-            </tr>
-            <tr>
-              <td>name</td>
-              <td>The reference name of the lookup table</td>
-            </tr>
-            <tr>
-              <td>description</td>
-              <td>The description of lookup table</td>
-            </tr>
-          </tbody>
-        </Table>
-        <p><strong>Examples</strong></p>
-        <p>
-          Find lookup tables by parts of their names:<br />
-          <kbd>name:geoip</kbd><br />
-          <kbd>name:geo</kbd>
-        </p>
-        <p>
-          Searching without a field name matches against the <code>title</code> field:<br />
-          <kbd>geoip</kbd> <br />is the same as<br />
-          <kbd>title:geoip</kbd>
-        </p>
-      </Popover>
-    );
-  };
-
   render() {
     const lookupTables = this.props.tables.map((table) => {
-      const cache = this._lookupName(table.cache_id, this.props.caches);
-      const dataAdapter = this._lookupName(table.data_adapter_id, this.props.dataAdapters);
+      const cache = _lookupName(table.cache_id, this.props.caches);
+      const dataAdapter = _lookupName(table.data_adapter_id, this.props.dataAdapters);
       const errors = {
         table: this.props.errorStates.tables[table.name],
         cache: null,
@@ -149,10 +155,7 @@ class LookupTablesOverview extends React.Component {
             </h2>
             <PaginatedList onChange={this._onPageChange} totalItems={this.props.pagination.total}>
               <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
-                  <Button bsStyle="success" style={{ marginLeft: 5 }}>Create lookup table</Button>
-                </LinkContainer>
-                <OverlayTrigger trigger="click" rootClose placement="right" overlay={this._helpPopover()}>
+                <OverlayTrigger trigger="click" rootClose placement="right" overlay={_helpPopover()}>
                   <Button bsStyle="link" className={Styles.searchHelpButton}><Icon name="question-circle" fixedWidth /></Button>
                 </OverlayTrigger>
               </SearchForm>
@@ -177,4 +180,4 @@ class LookupTablesOverview extends React.Component {
   }
 }
 
-export default LookupTablesOverview;
+export default withPaginationQueryParameter(LookupTablesOverview);

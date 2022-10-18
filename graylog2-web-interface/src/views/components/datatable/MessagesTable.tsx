@@ -18,7 +18,6 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
-import chroma from 'chroma-js';
 
 import { Table } from 'components/bootstrap';
 
@@ -38,7 +37,7 @@ const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { 
   ${$stickyHeader
     ? `position: sticky;
     top: 0;
-    z-index: 1` : ''}
+    z-index: 2` : ''}
   }
   
   thead > tr {
@@ -57,11 +56,7 @@ const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { 
     background-color: ${theme.colors.gray[90]};
     color: ${theme.utils.readableColor(theme.colors.gray[90])};
     white-space: nowrap;
-    ${
-  $borderedHeader ? `
-            border: 1px solid ${theme.colors.table.backgroundAlt}
-        ` : ''
-}
+    ${$borderedHeader ? `border: 1px solid ${theme.colors.table.backgroundAlt}` : ''}
   }
 
   > tbody td {
@@ -111,24 +106,6 @@ const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { 
   tr.message-row {
     margin-bottom: 5px;
     cursor: pointer;
-
-    .message-wrapper {
-      line-height: 1.5em;
-      white-space: pre-line;
-      max-height: 6em; /* show 4 lines: line-height * 4 */
-      overflow: hidden;
-
-      &::after {
-        content: "";
-        text-align: right;
-        position: absolute;
-        width: 99%;
-        left: 5px;
-        top: 4.5em;
-        height: 1.5em;
-        background: linear-gradient(to bottom, ${chroma(theme.colors.global.contentBackground).alpha(0).css()}, ${chroma(theme.colors.global.contentBackground).alpha(1).css()} 95%);
-      }
-    }
   }
 
   tr.message-detail-row {

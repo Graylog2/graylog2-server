@@ -104,7 +104,7 @@ const PipelineConnectionsForm = ({ pipeline, connections, streams, save }: Props
       <BootstrapModalForm ref={modalRef}
                           title={<span>Edit connections for <em>{pipeline.title}</em></span>}
                           onSubmitForm={_save}
-                          submitButtonText="Save">
+                          submitButtonText="Update connections">
         <fieldset>
           <FormGroup id="streamsConnections">
             <ControlLabel>Streams</ControlLabel>

@@ -15,50 +15,44 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 import { useContext, useState } from 'react';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
-import { Spinner } from 'components/common';
-import { Button, ButtonToolbar } from 'components/bootstrap';
-
-const StyledButtonToolbar = styled(ButtonToolbar)`
-  margin-top: 6px;
-`;
+import { ModalSubmit } from 'components/common';
+import DisableSubmissionStateContext from 'views/components/contexts/DisableSubmissionStateContext';
 
 type Props = {
   onCancel: () => void,
-  onFinish: () => void,
-  disableSave?: boolean,
+  onSubmit: () => void,
 };
 
-const SaveOrCancelButtons = ({ onFinish, onCancel, disableSave = false }: Props) => {
+const SaveOrCancelButtons = ({ onSubmit, onCancel }: Props) => {
   const { applyAllWidgetChanges } = useContext(WidgetEditApplyAllChangesContext);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { disabled: disabledSubmit } = useContext(DisableSubmissionStateContext);
 
-  const _onFinish = () => {
+  const _onSubmit = () => {
     setIsSubmitting(true);
 
     return applyAllWidgetChanges().then(() => {
       setIsSubmitting(false);
-      onFinish();
+      onSubmit();
     }).catch(() => {
       setIsSubmitting(false);
     });
   };
 
   return (
-    <StyledButtonToolbar className="pull-right">
-      <Button onClick={_onFinish} bsStyle="primary" disabled={disableSave}>
-        {isSubmitting ? <Spinner text="Applying Changes" delay={0} /> : 'Apply Changes'}
-      </Button>
-      <Button onClick={onCancel}>Cancel</Button>
-    </StyledButtonToolbar>
+    <ModalSubmit isAsyncSubmit
+                 submitButtonText="Update widget"
+                 submitLoadingText="Updating widget..."
+                 onSubmit={_onSubmit}
+                 submitButtonType="button"
+                 disabledSubmit={disabledSubmit}
+                 isSubmitting={isSubmitting}
+                 displayCancel
+                 onCancel={onCancel} />
   );
-};
-
-SaveOrCancelButtons.defaultProps = {
-  disableSave: false,
 };
 
 export default SaveOrCancelButtons;

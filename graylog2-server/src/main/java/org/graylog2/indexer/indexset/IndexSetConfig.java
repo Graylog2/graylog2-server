@@ -27,6 +27,7 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
+import org.graylog2.validation.SizeInBytes;
 import org.joda.time.Duration;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -85,6 +86,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @JsonProperty(FIELD_INDEX_PREFIX)
     @NotBlank
     @Pattern(regexp = INDEX_PREFIX_REGEX)
+    @SizeInBytes(message = "Index prefix must have a length in bytes between {min} and {max}", min = 1, max = 250)
     public abstract String indexPrefix();
 
     @JsonProperty("index_match_pattern")
