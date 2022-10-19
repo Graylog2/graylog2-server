@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import styled, { css } from 'styled-components';
 
 import { ModalSubmit } from 'components/common';
 import { Input } from 'components/bootstrap';
@@ -25,6 +26,13 @@ import { SessionActions } from 'stores/sessions/SessionStore';
 type Props = {
   onErrorChange: (message?: string) => void,
 };
+
+const SigninButton = styled(ModalSubmit)(({ theme }) => css`
+  button.btn-success {
+    background-color: ${theme.colors.brand.primary};
+    border-color: ${theme.colors.brand.primary};
+  }
+`);
 
 const LoginForm = ({ onErrorChange }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -80,11 +88,11 @@ const LoginForm = ({ onErrorChange }: Props) => {
              placeholder="Password"
              required />
 
-      <ModalSubmit displayCancel={false}
-                   isSubmitting={isLoading}
-                   isAsyncSubmit
-                   submitLoadingText="Signing in..."
-                   submitButtonText="Sign in" />
+      <SigninButton displayCancel={false}
+                    isSubmitting={isLoading}
+                    isAsyncSubmit
+                    submitLoadingText="Signing in..."
+                    submitButtonText="Sign in" />
     </form>
   );
 };
