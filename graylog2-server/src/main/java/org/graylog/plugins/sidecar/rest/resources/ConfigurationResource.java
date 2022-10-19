@@ -17,8 +17,9 @@
 package org.graylog.plugins.sidecar.rest.resources;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.hash.Hashing;
+import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -26,6 +27,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.sidecar.audit.SidecarAuditEventTypes;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
+import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.rest.models.CollectorUpload;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.ConfigurationSummary;
@@ -36,6 +38,7 @@ import org.graylog.plugins.sidecar.rest.responses.CollectorUploadListResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationListResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationPreviewRenderResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationSidecarsResponse;
+import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog.plugins.sidecar.services.ImportService;
@@ -77,6 +80,7 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -98,6 +102,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     private final SidecarService sidecarService;
     private final EtagService etagService;
     private final ImportService importService;
+    private final CollectorService collectorService;
     private final SearchQueryParser searchQueryParser;
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(Configuration.FIELD_ID))
@@ -109,12 +114,14 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     public ConfigurationResource(ConfigurationService configurationService,
                                  SidecarService sidecarService,
                                  EtagService etagService,
-                                 ImportService importService) {
+                                 ImportService importService,
+                                 CollectorService collectorService) {
         this.configurationService = configurationService;
         this.sidecarService = sidecarService;
         this.etagService = etagService;
         this.importService = importService;
-        this.searchQueryParser = new SearchQueryParser(Configuration.FIELD_NAME, SEARCH_FIELD_MAPPING);;
+        this.collectorService = collectorService;
+        this.searchQueryParser = new SearchQueryParser(Configuration.FIELD_NAME, SEARCH_FIELD_MAPPING);
     }
 
     @GET
@@ -207,15 +214,15 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                         @ApiParam(name = "sidecarId", required = true)
                                         @PathParam("sidecarId") String sidecarId,
                                         @ApiParam(name = "configurationId", required = true)
-                                        @PathParam("configurationId") String configurationId) throws RenderTemplateException {
+                                        @PathParam("configurationId") String configurationId) throws RenderTemplateException, JsonProcessingException {
         String ifNoneMatch = httpHeaders.getHeaderString("If-None-Match");
-        Boolean etagCached = false;
+        boolean etagCached = false;
         Response.ResponseBuilder builder = Response.noContent();
 
-        // check if client is up to date with a known valid etag
+        // check if client is up-to-date with a known valid etag
         if (ifNoneMatch != null) {
             EntityTag etag = new EntityTag(ifNoneMatch.replaceAll("\"", ""));
-            if (etagService.isPresent(etag.toString())) {
+            if (etagService.configurationsAreCached(etag.toString())) {
                 etagCached = true;
                 builder = Response.notModified();
                 builder.tag(etag);
@@ -236,13 +243,10 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             Configuration collectorConfiguration = this.configurationService.renderConfigurationForCollector(sidecar, configuration);
 
             // add new etag to cache
-            String etagString = configurationToEtag(collectorConfiguration);
-
-            EntityTag collectorConfigurationEtag = new EntityTag(etagString);
+            EntityTag collectorConfigurationEtag = etagService.buildEntityTagForResponse(collectorConfiguration);
             builder = Response.ok(collectorConfiguration);
             builder.tag(collectorConfigurationEtag);
-            etagService.put(collectorConfigurationEtag.toString());
-
+            etagService.registerConfiguration(collectorConfigurationEtag.toString());
         }
 
         // set cache control
@@ -283,7 +287,16 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
 
-        return Response.ok().entity(configurationService.save(configuration)).build();
+        final Configuration config = configurationService.save(configuration);
+        if (!config.tags().isEmpty()) {
+            final String os = Optional.ofNullable(collectorService.find(request.collectorId()))
+                    .map(Collector::nodeOperatingSystem).orElse("");
+            sidecarService.findByTagsAndOS(config.tags(), os)
+                    .map(Sidecar::nodeId)
+                    .forEach(etagService::invalidateRegistration);
+        }
+
+        return Response.ok().entity(config).build();
     }
 
     @POST
@@ -330,7 +343,16 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
-        etagService.invalidateAll();
+        etagService.invalidateAllConfigurations();
+
+        if (! previousConfiguration.tags().equals(updatedConfiguration.tags())) {
+            final Set<String> tags = Sets.symmetricDifference(previousConfiguration.tags(), updatedConfiguration.tags());
+            final String os = Optional.ofNullable(collectorService.find(request.collectorId()))
+                    .map(Collector::nodeOperatingSystem).orElse("");
+            sidecarService.findByTagsAndOS(tags, os)
+                    .map(Sidecar::nodeId)
+                    .forEach(etagService::invalidateRegistration);
+        }
 
         return Response.ok().entity(configurationService.save(updatedConfiguration)).build();
     }
@@ -351,7 +373,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         if (deleted == 0) {
             return Response.notModified().build();
         }
-        etagService.invalidateAll();
+        etagService.invalidateAllConfigurations();
         return Response.accepted().build();
     }
 
@@ -403,12 +425,6 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     private boolean isConfigurationAssignedToSidecar(String configurationId, Sidecar sidecar) {
         final List<ConfigurationAssignment> assignments = firstNonNull(sidecar.assignments(), new ArrayList<>());
         return assignments.stream().anyMatch(assignment -> assignment.configurationId().equals(configurationId));
-    }
-
-    private String configurationToEtag(Configuration configuration) {
-        return Hashing.md5()
-                .hashInt(configuration.hashCode())  // avoid negative values
-                .toString();
     }
 
     private Configuration configurationFromRequest(String id, Configuration request) {
