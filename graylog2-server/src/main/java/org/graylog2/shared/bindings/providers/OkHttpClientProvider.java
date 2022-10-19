@@ -37,6 +37,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.net.SocketFactory;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -90,6 +91,7 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
                 .retryOnConnectionFailure(true)
                 .connectTimeout(connectTimeout.getQuantity(), connectTimeout.getUnit())
                 .writeTimeout(writeTimeout.getQuantity(), writeTimeout.getUnit())
+                .socketFactory(new TcpKeepAliveSocketFactory(SocketFactory.getDefault()))
                 .readTimeout(readTimeout.getQuantity(), readTimeout.getUnit());
 
         if (httpProxyUri != null) {
@@ -135,7 +137,8 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
             }
         }
 
-        return clientBuilder.build();
+        final OkHttpClient client = clientBuilder.build();
+        return client;
     }
 
     public static class ProxyAuthenticator implements Authenticator {
