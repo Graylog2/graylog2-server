@@ -12,12 +12,10 @@
         {
           "data": {
             "source": "example.org",
-            "message": "Hello world 1",
-            "timestamp": "2015-01-01 01:00:00.000",
-            "http_status": "GET",
-            "http_response_time": 32,
+            "message": "Present in all streams, no interesting fields",
             "streams": [
-              "000000000000000000000001"
+              "000000000000000000000001",
+              "000000000000000000000002"
             ]
           }
         }
@@ -35,11 +33,8 @@
         {
           "data": {
             "source": "example.org",
-            "message": "Hello world 2",
-            "timestamp": "2015-01-01 01:00:00.000",
-            "http_status": "GET",
-            "http_response_time": 32,
-            "http_stream2_only" : 42,
+            "message": "Present in stream 2 with additional field",
+            "stream2_only" : 42,
             "streams": [
               "000000000000000000000002"
             ]
@@ -51,7 +46,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog_1",
+            "indexName": "graylog_0",
             "indexType": "message",
             "indexId": "2"
           }
@@ -59,13 +54,8 @@
         {
           "data": {
             "source": "example.org",
-            "message": "Hello world 3",
-            "timestamp": "2015-01-02 01:00:00.000",
-            "http_status": "GET",
-            "http_response_time": 12,
-            "nested": {
-              "key": "very nested"
-            },
+            "message": "Present in stream 1 with additional field",
+            "stream1_only" : 13,
             "streams": [
               "000000000000000000000001"
             ]
@@ -77,7 +67,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog_1",
+            "indexName": "graylog_0",
             "indexType": "message",
             "indexId": "3"
           }
@@ -85,13 +75,10 @@
         {
           "data": {
             "source": "example.org",
-            "message": "Hello world 4",
-            "timestamp": "2015-01-01 01:00:00.000",
-            "http_status": "GET",
-            "http_response_time": 32,
-            "http_stream2_only" : 42,
-            "http_stream2_and_graylog1_only" : 42,
+            "message": "Present in both streams with additional field",
+            "additional_field" : 42,
             "streams": [
+              "000000000000000000000001",
               "000000000000000000000002"
             ]
           }
