@@ -137,3 +137,7 @@ The Page permissions remain unchanged but this could affect the workflow for use
 On new Graylog installations, the default archiving configuration will now 
 store archives under the `data_dir` instead of `/tmp/graylog-archives`. 
 (The `data_dir` is configured in graylog.conf and defaults to `/var/lib/graylog-server`)
+
+### Configuring archive retention Time and max value
+It is now possible to configure default archive retention time and a limit via config flags
+`default_archive_retention_time` & `max_archive_retention_time`.
