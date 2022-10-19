@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.utilities.AssertJsonPath.assertJsonPath;
@@ -65,5 +66,38 @@ class SearchRequestFactoryTest {
                 .build());
 
         assertThat(search.toString()).doesNotContain("\"highlight\":");
+    }
+
+    @Test
+    void searchIncludesProperSourceFields() {
+        final SearchSourceBuilder search = this.searchRequestFactory.create(ScrollCommand.builder()
+                .indices(Collections.singleton("graylog_0"))
+                .range(AbsoluteRange.create(
+                        DateTime.parse("2020-07-23T11:03:32.243Z"),
+                        DateTime.parse("2020-07-23T11:08:32.243Z")
+                ))
+                .fields(List.of("foo", "bar"))
+                .build());
+
+        assertJsonPath(search, request -> {
+            request.jsonPathAsListOf("$._source.includes", String.class)
+                    .containsExactly("foo", "bar");
+            request.jsonPathAsListOf("$._source.excludes", String.class)
+                    .isEmpty();
+        });
+    }
+
+    @Test
+    void searchIncludesSize() {
+        final SearchSourceBuilder search = this.searchRequestFactory.create(ScrollCommand.builder()
+                .indices(Collections.singleton("graylog_0"))
+                .range(AbsoluteRange.create(
+                        DateTime.parse("2020-07-23T11:03:32.243Z"),
+                        DateTime.parse("2020-07-23T11:08:32.243Z")
+                ))
+                .batchSize(42)
+                .build());
+
+        assertThat(search.toString()).contains("\"size\":42");
     }
 }

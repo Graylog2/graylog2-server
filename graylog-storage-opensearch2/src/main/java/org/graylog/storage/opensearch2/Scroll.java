@@ -42,14 +42,8 @@ public class Scroll {
 
     public ScrollResult scroll(ScrollCommand scrollCommand) {
         final SearchSourceBuilder searchQuery = searchRequestFactory.create(scrollCommand);
-
-        searchQuery.fetchSource(scrollCommand.fields().toArray(new String[0]), new String[0]);
-        scrollCommand.batchSize()
-                .ifPresent(batchSize -> searchQuery.size(Math.toIntExact(batchSize)));
         final SearchRequest request = scrollBuilder(searchQuery, scrollCommand.indices());
-
         final SearchResponse result = client.singleSearch(request, "Unable to perform scroll search");
-
         return scrollResultFactory.create(result, searchQuery.toString(), DEFAULT_SCROLLTIME, scrollCommand.fields(), scrollCommand.limit().orElse(-1));
     }
 
