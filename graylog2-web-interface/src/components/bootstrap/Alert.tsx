@@ -76,7 +76,7 @@ const Alert = ({ bsStyle, ...rest }: Props) => {
 
 Alert.defaultProps = {
   bsStyle: 'default',
-  onDismiss: () => {},
+  onDismiss: undefined,
 };
 
 export default Alert;

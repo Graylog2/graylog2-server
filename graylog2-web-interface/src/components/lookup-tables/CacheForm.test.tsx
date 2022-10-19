@@ -50,10 +50,8 @@ const renderedCache = ({
   inCache = { ...createLookupTableCache() },
   create = false,
   withConfig = true,
-  // eslint-disable-next-line no-console
-  validate = () => { console.log('validation called'); },
-  // eslint-disable-next-line no-console
-  saved = () => { console.log('saved called'); },
+  validate = () => {},
+  saved = () => {},
   validationErrors = {},
 }) => {
   const mockCache = {

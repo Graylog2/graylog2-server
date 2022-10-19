@@ -20,7 +20,7 @@ import styled from 'styled-components';
 
 import { Alert, Button, Col, Row } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
-import {ColorVariants} from 'theme/colors';
+import type { ColorVariants } from 'theme/colors';
 
 const StyledRow = styled(Row)`
   margin-bottom: 0 !important;
