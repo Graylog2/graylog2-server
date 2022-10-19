@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 public class StreamsForFieldRetrieverOS2 implements StreamsForFieldRetriever {
 
     private static final int SEARCH_MAX_BUCKETS_OS = 65_535;
-    
+
     private final OpenSearchClient client;
 
     @Inject
@@ -59,7 +59,7 @@ public class StreamsForFieldRetrieverOS2 implements StreamsForFieldRetriever {
                 .map(item -> retrieveStreamsFromAggregationInResponse(item.getResponse()))
                 .toList();
 
-        Map<String, Set<String>> result = new HashMap<>();
+        Map<String, Set<String>> result = new HashMap<>(fieldNames.size());
         for (int i = 0; i < fieldNames.size(); i++) {
             result.put(fieldNames.get(i), streamsPerField.get(i));
         }

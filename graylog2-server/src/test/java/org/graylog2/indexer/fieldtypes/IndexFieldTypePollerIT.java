@@ -101,10 +101,10 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
                 createIndicesAdapter()
         );
         final Configuration withStreamAwarenessOff = spy(new Configuration());
-        doReturn(false).when(withStreamAwarenessOff).maintainsStreamBasedFieldLists();
+        doReturn(false).when(withStreamAwarenessOff).maintainsStreamAwareFieldTypes();
         pollerWithoutStreamAwareness = new IndexFieldTypePoller(indices, new MetricRegistry(), createIndexFieldTypePollerAdapter(withStreamAwarenessOff));
         final Configuration withStreamAwarenessOn = spy(new Configuration());
-        doReturn(true).when(withStreamAwarenessOn).maintainsStreamBasedFieldLists();
+        doReturn(true).when(withStreamAwarenessOn).maintainsStreamAwareFieldTypes();
         pollerWithStreamAwareness = new IndexFieldTypePoller(indices, new MetricRegistry(), createIndexFieldTypePollerAdapter(withStreamAwarenessOn));
 
         indexSet = new TestIndexSet(indexSetConfig);

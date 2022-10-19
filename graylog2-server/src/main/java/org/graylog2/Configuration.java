@@ -56,8 +56,8 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "is_master")
     private boolean isMaster = true;
 
-    @Parameter(value = "maintain_stream_based_field_lists")
-    private boolean maintainStreamBasedFieldLists = true;
+    @Parameter(value = "stream_aware_field_types")
+    private boolean streamAwareFieldTypes = false;
 
     /**
      * Used for initializing static leader election. You shouldn't use this for other purposes, but if you must, don't
@@ -223,8 +223,8 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "max_archive_retention_time", validators = {PositiveIntegerValidator.class})
     private int maxArchiveRetentionTime = 0;
 
-    public boolean maintainsStreamBasedFieldLists() {
-        return maintainStreamBasedFieldLists;
+    public boolean maintainsStreamAwareFieldTypes() {
+        return streamAwareFieldTypes;
     }
 
     /**

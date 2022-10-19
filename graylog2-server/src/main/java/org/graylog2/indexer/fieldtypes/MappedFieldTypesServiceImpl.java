@@ -27,7 +27,6 @@ import org.graylog2.streams.StreamService;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,7 +42,7 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
     private final IndexFieldTypesService indexFieldTypesService;
     private final FieldTypeMapper fieldTypeMapper;
     private final IndexLookup indexLookup;
-    private final boolean maintainsStreamBasedFieldLists;
+    private final boolean streamAwareFieldTypes;
 
 
     @Inject
@@ -56,7 +55,7 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
         this.indexFieldTypesService = indexFieldTypesService;
         this.fieldTypeMapper = fieldTypeMapper;
         this.indexLookup = indexLookup;
-        this.maintainsStreamBasedFieldLists = configuration.maintainsStreamBasedFieldLists();
+        this.streamAwareFieldTypes = configuration.maintainsStreamAwareFieldTypes();
     }
 
     @Override
@@ -67,11 +66,11 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
                 .stream()
                 .filter(fieldTypes -> indexNames.contains(fieldTypes.indexName()))
                 .flatMap(fieldTypes -> fieldTypes.fields().stream())
-                .filter(fieldTypeDTO -> !maintainsStreamBasedFieldLists || !Collections.disjoint(fieldTypeDTO.streams(), streamIds))
+                .filter(fieldTypeDTO -> !streamAwareFieldTypes || !Collections.disjoint(fieldTypeDTO.streams(), streamIds))
                 .collect(Collectors.toSet());
 
-        return new HashSet<>(mergeCompoundFieldTypes(fieldTypeDTOs.stream()
-                .map(this::mapPhysicalFieldType)));
+        return mergeCompoundFieldTypes(fieldTypeDTOs.stream()
+                .map(this::mapPhysicalFieldType));
     }
 
     private MappedFieldTypeDTO mapPhysicalFieldType(FieldTypeDTO fieldType) {

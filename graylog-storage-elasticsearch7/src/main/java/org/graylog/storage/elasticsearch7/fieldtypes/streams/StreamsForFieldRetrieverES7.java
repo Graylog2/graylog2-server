@@ -59,7 +59,7 @@ public class StreamsForFieldRetrieverES7 implements StreamsForFieldRetriever {
                 .map(item -> retrieveStreamsFromAggregationInResponse(item.getResponse()))
                 .toList();
 
-        Map<String, Set<String>> result = new HashMap<>();
+        Map<String, Set<String>> result = new HashMap<>(fieldNames.size());
         for (int i = 0; i < fieldNames.size(); i++) {
             result.put(fieldNames.get(i), streamsPerField.get(i));
         }

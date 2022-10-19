@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 public class IndexFieldTypePollerAdapterOS2 implements IndexFieldTypePollerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndexFieldTypePollerAdapterOS2.class);
     private final FieldMappingApi fieldMappingApi;
-    private final boolean maintainsStreamBasedFieldLists;
+    private final boolean streamAwareFieldTypes;
     private final StreamsForFieldRetriever streamsForFieldRetriever;
 
     @Inject
@@ -48,7 +48,7 @@ public class IndexFieldTypePollerAdapterOS2 implements IndexFieldTypePollerAdapt
                                           final Configuration configuration,
                                           final StreamsForFieldRetriever streamsForFieldRetriever) {
         this.fieldMappingApi = fieldMappingApi;
-        this.maintainsStreamBasedFieldLists = configuration.maintainsStreamBasedFieldLists();
+        this.streamAwareFieldTypes = configuration.maintainsStreamAwareFieldTypes();
         this.streamsForFieldRetriever = streamsForFieldRetriever;
     }
 
@@ -73,7 +73,7 @@ public class IndexFieldTypePollerAdapterOS2 implements IndexFieldTypePollerAdapt
                 .filter(field -> !field.getValue().type().isEmpty())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        if (!maintainsStreamBasedFieldLists) {
+        if (!streamAwareFieldTypes) {
             return Optional.of(filteredFieldTypes.entrySet()
                     .stream()
                     .map(field -> fromFieldNameAndMapping(field.getKey(), field.getValue())
@@ -110,6 +110,6 @@ public class IndexFieldTypePollerAdapterOS2 implements IndexFieldTypePollerAdapt
 
     @Override
     public boolean maintainsStreamBasedFieldLists() {
-        return maintainsStreamBasedFieldLists;
+        return streamAwareFieldTypes;
     }
 }
