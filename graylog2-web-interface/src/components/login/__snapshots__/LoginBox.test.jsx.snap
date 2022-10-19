@@ -45,11 +45,6 @@ exports[`LoginBox renders a button after the input if buttonAfter is passed 1`] 
   box-shadow: 0 0 21px rgba(245,246,248,0.5);
 }
 
-.c2 legend {
-  color: #67717f;
-  border-color: #8894a7;
-}
-
 <div>
   <div
     class="c0 container"
