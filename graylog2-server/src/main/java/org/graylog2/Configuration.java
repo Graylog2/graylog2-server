@@ -216,13 +216,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "lock_service_lock_ttl", converter = JavaDurationConverter.class)
     private java.time.Duration lockServiceLockTTL = MongoLockService.MIN_LOCK_TTL;
 
-
-    @Parameter(value = "default_archive_retention_time", validators = {PositiveIntegerValidator.class})
-    private int defaultArchiveRetentionTime = 0;
-
-    @Parameter(value = "max_archive_retention_time", validators = {PositiveIntegerValidator.class})
-    private int maxArchiveRetentionTime = 0;
-
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;
     }
@@ -457,14 +450,6 @@ public class Configuration extends BaseConfiguration {
     @Deprecated
     public Set<String> getEnabledTlsProtocols() {
         return enabledTlsProtocols;
-    }
-
-    public int getDefaultArchiveRetentionTime() {
-        return defaultArchiveRetentionTime;
-    }
-
-    public int getMaxArchiveRetentionTime() {
-        return maxArchiveRetentionTime;
     }
 
     @ValidatorMethod
