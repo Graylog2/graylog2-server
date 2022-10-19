@@ -3447,10 +3447,10 @@ accepts@~1.3.5, accepts@~1.3.8:
     mime-types "~2.1.34"
     negotiator "0.6.3"
 
-ace-builds@1.12.1, ace-builds@^1.4.14:
-  version "1.12.1"
-  resolved "https://registry.yarnpkg.com/ace-builds/-/ace-builds-1.12.1.tgz#4937a1857b856203d266d987eddf4941f8cca802"
-  integrity sha512-irh8sJ9Hp2AkeCunX00BEWdGVoz3Rclp6RRMGbhRnFWv8tfalgTEEiBOuua0S/OIUwu7NHaPtPkXs7jgz/S3tA==
+ace-builds@1.12.3, ace-builds@^1.4.14:
+  version "1.12.3"
+  resolved "https://registry.yarnpkg.com/ace-builds/-/ace-builds-1.12.3.tgz#db77530a5854ee38a0c660e9904d2cb29a247c2f"
+  integrity sha512-LHAsa5oOaRqmIlb8gBe81nj2kOqlfbV0XkWkFZL4mIfPXL4zoeTUcandHvBgHQCyjif3tGfoLTXelWSlnCT/dA==
 
 acorn-globals@^4.1.0:
   version "4.3.4"
@@ -6048,7 +6048,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.2"
     eslint-plugin-compat "4.0.2"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-a29a1ab4-f50d-4331-a7b1-6e3a4ca291ea-1666095007172/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.1.2"
     eslint-plugin-jest-dom "4.0.2"
@@ -6056,7 +6056,7 @@ eslint-config-airbnb@19.0.4:
     eslint-plugin-jsx-a11y "6.6.1"
     eslint-plugin-react "7.31.10"
     eslint-plugin-react-hooks "4.6.0"
-    eslint-plugin-testing-library "5.7.2"
+    eslint-plugin-testing-library "5.7.3"
 
 eslint-import-resolver-node@^0.3.6:
   version "0.3.6"
@@ -6193,10 +6193,10 @@ eslint-plugin-react@7.31.10:
     semver "^6.3.0"
     string.prototype.matchall "^4.0.7"
 
-eslint-plugin-testing-library@5.7.2:
-  version "5.7.2"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-5.7.2.tgz#c1b2112a40aab61f93e10859e8b2d81e54f0ce84"
-  integrity sha512-0ZmHeR/DUUgEzW8rwUBRWxuqntipDtpvxK0hymdHnLlABryJkzd+CAHr+XnISaVsTisZ5MLHp6nQF+8COHLLTA==
+eslint-plugin-testing-library@5.7.3:
+  version "5.7.3"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-5.7.3.tgz#2397e162f18899f13cee1d70a98238c1365a29bd"
+  integrity sha512-uLMVBkBI3rNOrV3mbtjLsm76X0cPac+cBNYn8ZwwvsYiDKKBXHAjZGtbjvRHEwNxwrsJm+rx4RtGWDjFRTWNuw==
   dependencies:
     "@typescript-eslint/utils" "^5.13.0"
 
@@ -7309,12 +7309,12 @@ grapheme-splitter@^1.0.4:
     "@types/create-react-class" "15.6.3"
     "@types/jquery" "3.5.14"
     "@types/react" "18.0.21"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.0.0-SNAPSHOT-65694957-041f-4af1-9b49-28196b241f9a-1666095006974/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.0.0-SNAPSHOT-65694957-041f-4af1-9b49-28196b241f9a-1666095006974/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.0.0-SNAPSHOT-65694957-041f-4af1-9b49-28196b241f9a-1666095006974/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.6.1"
     moment "2.29.4"
     moment-timezone "0.5.38"
