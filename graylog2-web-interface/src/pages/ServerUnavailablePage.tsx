@@ -16,20 +16,29 @@
  */
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled from 'styled-components';
 
-import { Button, Modal, Well } from 'components/bootstrap';
+import Button from 'components/bootstrap/Button';
+import Modal from 'components/bootstrap/Modal';
+import Well from 'components/bootstrap/Well';
 import Icon from 'components/common/Icon';
 import DocumentTitle from 'components/common/DocumentTitle';
 import { qualifyUrl } from 'util/URLUtils';
-
-import LoginChrome from '../components/login/LoginChrome';
+import LoginChrome from 'components/login/LoginChrome';
+import type { ServerError } from 'stores/sessions/ServerAvailabilityStore';
 
 const StyledIcon = styled(Icon)`
   margin-left: 6px;
 `;
 
-const ServerUnavailablePage = ({ server }) => {
+type Props = {
+  server: {
+    up: false,
+    error?: ServerError,
+  },
+};
+
+const ServerUnavailablePage = ({ server }: Props) => {
   const [showDetails, setShowDetails] = useState(false);
 
   const _toggleDetails = () => setShowDetails(!showDetails);
