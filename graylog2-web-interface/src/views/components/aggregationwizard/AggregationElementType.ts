@@ -32,6 +32,7 @@ export type AggregationElement = {
   fromConfig?: (config: AggregationWidgetConfig) => Partial<WidgetConfigFormValues>,
   onCreate?: (formValues: WidgetConfigFormValues) => WidgetConfigFormValues,
   onDeleteAll?: (formValues: WidgetConfigFormValues) => WidgetConfigFormValues,
+  isEmpty: (formValues: WidgetConfigFormValues) => boolean,
   component: React.ComponentType<{
     config: AggregationWidgetConfig,
     onConfigChange: (newConfig: AggregationWidgetConfig) => void

@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useFormikContext } from 'formik';
-import { isEmpty } from 'lodash';
 import styled from 'styled-components';
 
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -70,15 +69,14 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
       )}>
         <div>
           {_sortConfiguredElements(values, aggregationElementsByKey).map(([elementKey, elementFormValues]) => {
-            const empty = isEmpty(elementFormValues);
-
             const aggregationElement = aggregationElementsByKey[elementKey];
 
             if (!aggregationElement) {
               throw new Error(`Aggregation element with key ${elementKey} is missing but configured for this widget.`);
             }
 
-            const ConfigurationSection = aggregationElement.component;
+            const { component: ConfigurationSection, isEmpty } = aggregationElement;
+            const empty = isEmpty(elementFormValues);
 
             return (
               <ElementConfigurationSection allowCreate={aggregationElement.allowCreate(values)}

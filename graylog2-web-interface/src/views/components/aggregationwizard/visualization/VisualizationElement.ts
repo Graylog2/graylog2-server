@@ -110,6 +110,7 @@ const VisualizationElement: AggregationElement = {
   fromConfig,
   toConfig,
   validate,
+  isEmpty: () => false,
 };
 
 export default VisualizationElement;

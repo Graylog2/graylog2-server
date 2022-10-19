@@ -108,6 +108,7 @@ const MetricElement: AggregationElement = {
   })),
   component: MetricsConfiguration,
   validate: validateMetrics,
+  isEmpty: (formValues: WidgetConfigFormValues) => (formValues?.metrics ?? []).length === 0,
 };
 
 export default MetricElement;

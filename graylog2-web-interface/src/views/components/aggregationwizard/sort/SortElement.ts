@@ -119,6 +119,7 @@ const SortElement: AggregationElement = {
     sort: formValues.sort.filter((_value, i) => index !== i),
   })),
   validate: validateSorts,
+  isEmpty: (formValues: WidgetConfigFormValues) => (formValues?.sort ?? []).length === 0,
 };
 
 export default SortElement;

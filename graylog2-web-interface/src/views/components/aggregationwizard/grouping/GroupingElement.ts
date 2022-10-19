@@ -258,6 +258,7 @@ const GroupByElement: AggregationElement = {
   toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => groupByToConfig(formValues.groupBy, configBuilder),
   component: GroupingsConfiguration,
   validate: validateGroupings,
+  isEmpty: (formValues: WidgetConfigFormValues) => (formValues?.groupBy?.groupings ?? []).length === 0,
 };
 
 export default GroupByElement;
