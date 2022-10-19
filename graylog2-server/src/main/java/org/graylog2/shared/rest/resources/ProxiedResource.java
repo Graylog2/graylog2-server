@@ -29,6 +29,7 @@ import retrofit2.Response;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
@@ -49,7 +50,7 @@ import java.util.stream.Collectors;
 public abstract class ProxiedResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(ProxiedResource.class);
 
-    protected final String authenticationToken;
+    private final String authenticationToken;
     protected final NodeService nodeService;
 
     protected final RemoteInterfaceProvider remoteInterfaceProvider;
@@ -80,6 +81,22 @@ public abstract class ProxiedResource extends RestResource {
         }
 
         return null;
+    }
+
+    /**
+     * Gets an authentication token to be used in an Authorization header of forwarded requests by extracting
+     * authentication information from the original request.
+     *
+     * @return An authentication token if one could be extracted from the original requeest. Null otherwise.
+     * @throws NotAuthorizedException if the original request was authenticated, but no authentication token could
+     *                                be created from the request headers.
+     */
+    @Nullable
+    protected String getAuthenticationToken() {
+        if (getSubject().isAuthenticated() && authenticationToken == null) {
+            throw new NotAuthorizedException("Basic realm=\"Graylog Server\"");
+        }
+        return authenticationToken;
     }
 
     /**
@@ -140,7 +157,7 @@ public abstract class ProxiedResource extends RestResource {
         return nodeId -> {
             try {
                 final Node targetNode = nodeService.byNodeId(nodeId);
-                return Optional.of(this.remoteInterfaceProvider.get(targetNode, this.authenticationToken, interfaceClass));
+                return Optional.of(this.remoteInterfaceProvider.get(targetNode, getAuthenticationToken(), interfaceClass));
             } catch (NodeNotFoundException e) {
                 LOG.warn("Node <" + nodeId + "> not found while trying to call " + interfaceClass.getName() + " on it.");
                 return Optional.empty();
