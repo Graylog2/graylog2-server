@@ -21,11 +21,11 @@ import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ConfigurationListContainer from 'components/sidecars/configurations/ConfigurationListContainer';
 import CollectorListContainer from 'components/sidecars/configurations/CollectorListContainer';
-import SidecarsSubareaNavigation from 'components/sidecars/common/SidecarsSubareaNavigation';
+import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 
 const SidecarConfigurationPage = () => (
   <DocumentTitle title="Collectors Configuration">
-    <SidecarsSubareaNavigation />
+    <SidecarsPageNavigation />
     <PageHeader title="Collectors Configuration"
                 documentationLink={{
                   title: 'Sidecar documentation',

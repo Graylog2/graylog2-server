@@ -17,7 +17,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
-import EventsSubareaNavigation from 'components/events/EventsSubareaNavigation';
+import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import useScopePermissions from 'hooks/useScopePermissions';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -91,7 +91,7 @@ const EditEventDefinitionPage = () => {
 
   return (
     <DocumentTitle title={`Edit "${eventDefinition.title}" Event Definition`}>
-      <EventsSubareaNavigation />
+      <EventsPageNavigation />
       <PageHeader title={`Edit "${eventDefinition.title}" Event Definition`}
                   documentationLink={{
                     title: 'Alerts documentation',

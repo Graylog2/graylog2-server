@@ -16,20 +16,20 @@
  */
 import * as React from 'react';
 
-import SubareaNavigation from 'components/common/SubareaNavigation';
+import PageNavigation from 'components/common/PageNavigation';
 import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
 
 const NAV_ITEMS = [
-  { title: 'Manage pipelines', path: Routes.SYSTEM.PIPELINES.OVERVIEW, exactPathMatch: true },
-  { title: 'Manage rules', path: Routes.SYSTEM.PIPELINES.RULES },
-  { title: 'Simulator', path: Routes.SYSTEM.PIPELINES.SIMULATOR },
+  { title: 'Lookup Tables', path: Routes.SYSTEM.LOOKUPTABLES.OVERVIEW, exactPathMatch: true },
+  { title: 'Caches', path: Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW },
+  { title: 'Data Adapters', path: Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW },
 ];
 
-const EventsSubareaNavigation = () => (
+const LUTPageNavigation = () => (
   <Row>
-    <SubareaNavigation items={NAV_ITEMS} />
+    <PageNavigation items={NAV_ITEMS} />
   </Row>
 );
 
-export default EventsSubareaNavigation;
+export default LUTPageNavigation;

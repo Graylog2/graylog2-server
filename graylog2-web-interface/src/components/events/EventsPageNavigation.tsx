@@ -16,21 +16,20 @@
  */
 import * as React from 'react';
 
+import PageNavigation from 'components/common/PageNavigation';
 import Routes from 'routing/Routes';
-import SubareaNavigation from 'components/common/SubareaNavigation';
 import { Row } from 'components/bootstrap';
 
-const UsersSubareaNavigation = () => {
-  const NAV_ITEMS = [
-    { title: 'Users Overview', path: Routes.SYSTEM.USERS.OVERVIEW, permissions: 'users:list' },
-    { title: 'Teams Overview', path: Routes.getPluginRoute('SYSTEM_TEAMS'), permissions: 'teams:list' },
-  ];
+const NAV_ITEMS = [
+  { title: 'Alerts & Events', path: Routes.ALERTS.LIST, exactPathMatch: true },
+  { title: 'Event Definitions', path: Routes.ALERTS.DEFINITIONS.LIST, permissions: 'eventdefinitions:read' },
+  { title: 'Notifications', path: Routes.ALERTS.NOTIFICATIONS.LIST, permissions: 'eventnotifications:read' },
+];
 
-  return (
-    <Row>
-      <SubareaNavigation items={NAV_ITEMS} />
-    </Row>
-  );
-};
+const EventsPageNavigation = () => (
+  <Row>
+    <PageNavigation items={NAV_ITEMS} />
+  </Row>
+);
 
-export default UsersSubareaNavigation;
+export default EventsPageNavigation;

@@ -19,12 +19,12 @@ import React from 'react';
 import AuthenticatorActionLinks from 'components/authentication/AuthenticatorActionLinks';
 import AuthenticatorsEdit from 'components/authentication/AuthenticatorsEdit';
 import { PageHeader, DocumentTitle } from 'components/common';
-import AuthenticationSubareaNavigation from 'components/authentication/AuthenticationSubareaNavigation';
 import DocsHelper from 'util/DocsHelper';
+import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 
 const AuthenticatorsEditPage = () => (
   <DocumentTitle title="Edit Authenticators">
-    <AuthenticationSubareaNavigation />
+    <AuthenticationPageNavigation />
     <PageHeader title="Edit Authenticators"
                 actions={<AuthenticatorActionLinks />}
                 documentationLink={{

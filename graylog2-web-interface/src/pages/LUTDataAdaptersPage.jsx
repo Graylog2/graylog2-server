@@ -29,7 +29,7 @@ import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 import { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
-import LUTSubareaNavigation from 'components/lookup-tables/LUTSubareaNavigation';
+import LUTPageNavigation from 'components/lookup-tables/LUTPageNavigation';
 
 const _saved = () => {
   // reset detail state
@@ -163,7 +163,7 @@ class LUTDataAdaptersPage extends React.Component {
 
     return (
       <DocumentTitle title="Lookup Tables - Data Adapters">
-        <LUTSubareaNavigation />
+        <LUTPageNavigation />
         <PageHeader title="Data adapters for Lookup Tables"
                     actions={(
                       <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}>

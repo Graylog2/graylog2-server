@@ -28,7 +28,7 @@ import withPaginationQueryParameter from 'components/common/withPaginationQueryP
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { LookupTableCachesActions, LookupTableCachesStore } from 'stores/lookup-tables/LookupTableCachesStore';
-import LUTSubareaNavigation from 'components/lookup-tables/LUTSubareaNavigation';
+import LUTPageNavigation from 'components/lookup-tables/LUTPageNavigation';
 
 const _saved = () => {
   history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
@@ -124,7 +124,7 @@ class LUTCachesPage extends React.Component {
 
     return (
       <DocumentTitle title="Lookup Tables - Caches">
-        <LUTSubareaNavigation />
+        <LUTPageNavigation />
         <PageHeader title="Caches for Lookup Tables"
                     actions={(
                       <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}>

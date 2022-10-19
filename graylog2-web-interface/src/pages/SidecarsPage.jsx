@@ -25,8 +25,8 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import SidecarListContainer from 'components/sidecars/sidecars/SidecarListContainer';
 import Routes from 'routing/Routes';
-import SidecarsSubareaNavigation from 'components/sidecars/common/SidecarsSubareaNavigation';
 import DocsHelper from 'util/DocsHelper';
+import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 
 const SidecarsPage = () => {
   const [sidecarUser, setSidecarUser] = useState();
@@ -41,7 +41,7 @@ const SidecarsPage = () => {
 
   return (
     <DocumentTitle title="Sidecars">
-      <SidecarsSubareaNavigation />
+      <SidecarsPageNavigation />
       <PageHeader title="Sidecars Overview"
                   documentationLink={{
                     title: 'Sidecar documentation',

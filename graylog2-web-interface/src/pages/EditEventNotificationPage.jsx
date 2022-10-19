@@ -29,7 +29,7 @@ import EventNotificationActionLinks from 'components/event-notifications/event-n
 import withParams from 'routing/withParams';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
-import EventsSubareaNavigation from 'components/events/EventsSubareaNavigation';
+import EventsPageNavigation from 'components/events/EventsPageNavigation';
 
 class EditEventDefinitionPage extends React.Component {
   static propTypes = {
@@ -83,7 +83,7 @@ class EditEventDefinitionPage extends React.Component {
 
     return (
       <DocumentTitle title={`Edit "${notification.title}" Notification`}>
-        <EventsSubareaNavigation />
+        <EventsPageNavigation />
         <PageHeader title={`Edit "${notification.title}" Notification`}
                     actions={<EventNotificationActionLinks notificationId={notification.id} />}
                     documentationLink={{
@@ -101,7 +101,6 @@ class EditEventDefinitionPage extends React.Component {
             <EventNotificationFormContainer action="edit" notification={notification} />
           </Col>
         </Row>
-
       </DocumentTitle>
     );
   }

@@ -26,7 +26,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
 import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-import EventsSubareaNavigation from 'components/events/EventsSubareaNavigation';
+import EventsPageNavigation from 'components/events/EventsPageNavigation';
 
 const CreateEventDefinitionPage = ({ currentUser }) => {
   if (!isPermitted(currentUser.permissions, 'eventnotifications:create')) {
@@ -35,7 +35,7 @@ const CreateEventDefinitionPage = ({ currentUser }) => {
 
   return (
     <DocumentTitle title="New Notification">
-      <EventsSubareaNavigation />
+      <EventsPageNavigation />
       <PageHeader title="New Notification"
                   documentationLink={{
                     title: 'Alerts documentation',

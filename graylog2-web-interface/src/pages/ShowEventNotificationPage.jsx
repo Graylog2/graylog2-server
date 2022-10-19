@@ -31,7 +31,7 @@ import EventNotificationDetails from 'components/event-notifications/event-notif
 import EventNotificationActionLinks from 'components/event-notifications/event-notification-details/EventNotificationActionLinks';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import {} from 'components/event-notifications/event-notification-types';
-import EventsSubareaNavigation from 'components/events/EventsSubareaNavigation';
+import EventsPageNavigation from 'components/events/EventsPageNavigation';
 
 const ShowEventDefinitionPage = ({ params: { notificationId } }) => {
   const currentUser = useCurrentUser();
@@ -66,7 +66,7 @@ const ShowEventDefinitionPage = ({ params: { notificationId } }) => {
 
   return (
     <DocumentTitle title={`View "${notification.title}" Notification`}>
-      <EventsSubareaNavigation />
+      <EventsPageNavigation />
       <PageHeader title={`View "${notification.title}" Notification`}
                   actions={notification && <EventNotificationActionLinks notificationId={notification.id} />}
                   documentationLink={{

@@ -21,13 +21,13 @@ import { Button, Col, Row } from 'components/bootstrap';
 import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import EventNotificationsContainer from 'components/event-notifications/event-notifications/EventNotificationsContainer';
 import Routes from 'routing/Routes';
-import EventsSubareaNavigation from 'components/events/EventsSubareaNavigation';
 import DocsHelper from 'util/DocsHelper';
+import EventsPageNavigation from 'components/events/EventsPageNavigation';
 
 const EventNotificationsPage = () => {
   return (
     <DocumentTitle title="Notifications">
-      <EventsSubareaNavigation />
+      <EventsPageNavigation />
       <PageHeader title="Notifications"
                   actions={(
                     <IfPermitted permissions="eventnotifications:create">

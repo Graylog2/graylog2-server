@@ -27,7 +27,7 @@ import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-import EventsSubareaNavigation from 'components/events/EventsSubareaNavigation';
+import EventsPageNavigation from 'components/events/EventsPageNavigation';
 
 class CreateEventDefinitionPage extends React.Component {
   static propTypes = {
@@ -62,7 +62,7 @@ class CreateEventDefinitionPage extends React.Component {
 
     return (
       <DocumentTitle title={pageTitle}>
-        <EventsSubareaNavigation />
+        <EventsPageNavigation />
 
         <PageHeader title={pageTitle}
                     documentationLink={{

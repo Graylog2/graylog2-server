@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
 
-import AuthenticationSubareaNavigation from 'components/authentication/AuthenticationSubareaNavigation';
+import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import DocsHelper from 'util/DocsHelper';
 import withParams from 'routing/withParams';
 import StringUtils from 'util/StringUtils';
@@ -69,7 +69,7 @@ const AuthenticationPage = () => {
 
   return (
     <DocumentTitle title={_pageTitle(activeBackend, true)}>
-      <AuthenticationSubareaNavigation />
+      <AuthenticationPageNavigation />
       <PageHeader title={_pageTitle(activeBackend)}
                   actions={(
                     <BackendActionLinks activeBackend={activeBackend}

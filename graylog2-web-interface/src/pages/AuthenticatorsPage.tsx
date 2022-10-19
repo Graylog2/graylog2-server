@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import AuthenticationSubareaNavigation from 'components/authentication/AuthenticationSubareaNavigation';
+import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import AuthenticatorActionLinks from 'components/authentication/AuthenticatorActionLinks';
 import AuthenticatorsDetails from 'components/authentication/AuthenticatorsDetails';
 import { PageHeader, DocumentTitle } from 'components/common';
@@ -24,7 +24,7 @@ import DocsHelper from 'util/DocsHelper';
 
 const AuthenticatorsPage = () => (
   <DocumentTitle title="Authenticators Details">
-    <AuthenticationSubareaNavigation />
+    <AuthenticationPageNavigation />
     <PageHeader title="Authenticators Details"
                 actions={<AuthenticatorActionLinks />}
                 documentationLink={{

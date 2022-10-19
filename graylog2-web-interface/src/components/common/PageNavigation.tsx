@@ -62,7 +62,7 @@ type Props = {
 /**
  * Simple tab navigation to allow navigating to subareas of a page.
  */
-const SubareaNavigation = ({ items }: Props) => (
+const PageNavigation = ({ items }: Props) => (
   <Container>
     {items.map(({ path, title, permissions, exactPathMatch }) => {
       if (!path) {
@@ -80,4 +80,4 @@ const SubareaNavigation = ({ items }: Props) => (
   </Container>
 );
 
-export default SubareaNavigation;
+export default PageNavigation;

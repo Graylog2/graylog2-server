@@ -33,7 +33,7 @@ import { PipelinesStore, PipelinesActions } from 'stores/pipelines/PipelinesStor
 import { RulesStore } from 'stores/rules/RulesStore';
 import DocsHelper from 'util/DocsHelper';
 
-import PipelinesSubareaNavigation from '../components/pipelines/PipelinesSubareaNavigation';
+import PipelinesPageNavigation from '../components/pipelines/PipelinesPageNavigation';
 
 function filterPipeline(state) {
   return state.pipelines ? state.pipelines.filter((p) => p.id === this.props.params.pipelineId)[0] : undefined;
@@ -162,7 +162,7 @@ const PipelineDetailsPage = createReactClass({
     return (
       <DocumentTitle title={pageTitle}>
         <div>
-          <PipelinesSubareaNavigation />
+          <PipelinesPageNavigation />
           <PageHeader title={title}
                       documentationLink={{
                         title: 'Pipelines documentation',

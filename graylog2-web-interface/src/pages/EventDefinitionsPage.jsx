@@ -22,12 +22,12 @@ import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import EventDefinitionsContainer from 'components/event-definitions/event-definitions/EventDefinitionsContainer';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import EventsSubareaNavigation from 'components/events/EventsSubareaNavigation';
+import EventsPageNavigation from 'components/events/EventsPageNavigation';
 
 const EventDefinitionsPage = () => {
   return (
     <DocumentTitle title="Event Definitions">
-      <EventsSubareaNavigation />
+      <EventsPageNavigation />
       <PageHeader title="Event Definitions"
                   actions={(
                     <IfPermitted permissions="eventdefinitions:create">

@@ -26,7 +26,7 @@ import UsersDomain from 'domainActions/users/UsersDomain';
 import { PageHeader, DocumentTitle, Spinner } from 'components/common';
 import { Headline } from 'components/common/Section/SectionComponent';
 import TokenList from 'components/users/TokenList';
-import UsersSubareaNavigation from 'components/users/navigation/UsersSubareaNavigation';
+import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
 import useCurrentUser from 'hooks/useCurrentUser';
 
@@ -98,7 +98,7 @@ const UserEditPage = ({ params }: Props) => {
 
   return (
     <DocumentTitle title={`Edit Tokens Of User ${loadedUser?.fullName ?? ''}`}>
-      <UsersSubareaNavigation />
+      <UsersPageNavigation />
       <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}
                   actions={(
                     <UserActionLinks userId={userId}

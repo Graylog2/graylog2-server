@@ -22,8 +22,8 @@ import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ConfigurationForm from 'components/sidecars/configuration-forms/ConfigurationForm';
 import ConfigurationHelper from 'components/sidecars/configuration-forms/ConfigurationHelper';
-import SidecarsSubareaNavigation from 'components/sidecars/common/SidecarsSubareaNavigation';
 import DocsHelper from 'util/DocsHelper';
+import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 
 const SidecarNewConfigurationPage = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -36,7 +36,7 @@ const SidecarNewConfigurationPage = createReactClass({
   render() {
     return (
       <DocumentTitle title="New Collector Configuration">
-        <SidecarsSubareaNavigation />
+        <SidecarsPageNavigation />
         <PageHeader title="New Collector Configuration"
                     documentationLink={{
                       title: 'Sidecar documentation',

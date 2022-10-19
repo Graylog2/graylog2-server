@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
-import AuthenticationSubareaNavigation from 'components/authentication/AuthenticationSubareaNavigation';
+import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import GettingStarted from 'components/authentication/BackendCreate/GettingStarted';
 import { DocumentTitle, PageHeader } from 'components/common';
 import useActiveBackend from 'components/authentication/useActiveBackend';
@@ -29,7 +29,7 @@ const AuthenticationCreatePage = () => {
 
   return (
     <DocumentTitle title="Create Authentication Service">
-      <AuthenticationSubareaNavigation />
+      <AuthenticationPageNavigation />
       <PageHeader title="Create Authentication Service"
                   actions={(
                     <BackendActionLinks activeBackend={activeBackend}

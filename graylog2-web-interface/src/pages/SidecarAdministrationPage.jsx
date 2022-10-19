@@ -21,12 +21,12 @@ import { Col, Row } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, PageHeader } from 'components/common';
 import CollectorsAdministrationContainer from 'components/sidecars/administration/CollectorsAdministrationContainer';
-import SidecarsSubareaNavigation from 'components/sidecars/common/SidecarsSubareaNavigation';
+import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 import withLocation from 'routing/withLocation';
 
 const SidecarAdministrationPage = ({ location: { query: { node_id: nodeId } } }) => (
   <DocumentTitle title="Collectors Administration">
-    <SidecarsSubareaNavigation />
+    <SidecarsPageNavigation />
     <PageHeader title="Collectors Administration"
                 documentationLink={{
                   title: 'Sidecar documentation',

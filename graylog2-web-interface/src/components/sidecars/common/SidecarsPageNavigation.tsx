@@ -16,20 +16,20 @@
  */
 import * as React from 'react';
 
-import SubareaNavigation from 'components/common/SubareaNavigation';
+import PageNavigation from 'components/common/PageNavigation';
 import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
 
 const NAV_ITEMS = [
-  { title: 'Alerts & Events', path: Routes.ALERTS.LIST, exactPathMatch: true },
-  { title: 'Event Definitions', path: Routes.ALERTS.DEFINITIONS.LIST, permissions: 'eventdefinitions:read' },
-  { title: 'Notifications', path: Routes.ALERTS.NOTIFICATIONS.LIST, permissions: 'eventnotifications:read' },
+  { title: 'Overview', path: Routes.SYSTEM.SIDECARS.OVERVIEW, exactPathMatch: true },
+  { title: 'Administration', path: Routes.SYSTEM.SIDECARS.ADMINISTRATION },
+  { title: 'Configuration', path: Routes.SYSTEM.SIDECARS.CONFIGURATION },
 ];
 
-const EventsSubareaNavigation = () => (
+const SidecarsPageNavigation = () => (
   <Row>
-    <SubareaNavigation items={NAV_ITEMS} />
+    <PageNavigation items={NAV_ITEMS} />
   </Row>
 );
 
-export default EventsSubareaNavigation;
+export default SidecarsPageNavigation;

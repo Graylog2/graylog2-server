@@ -30,7 +30,7 @@ import history from 'util/History';
 import EventDefinitionSummary from 'components/event-definitions/event-definition-form/EventDefinitionSummary';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
-import EventsSubareaNavigation from 'components/events/EventsSubareaNavigation';
+import EventsPageNavigation from 'components/events/EventsPageNavigation';
 
 const ViewEventDefinitionPage = () => {
   const params = useParams<{definitionId?: string}>();
@@ -76,7 +76,7 @@ const ViewEventDefinitionPage = () => {
 
   return (
     <DocumentTitle title={`View "${eventDefinition.title}" Event Definition`}>
-      <EventsSubareaNavigation />
+      <EventsPageNavigation />
       <PageHeader title={`View "${eventDefinition.title}" Event Definition`}
                   actions={(
                     <ButtonToolbar>
