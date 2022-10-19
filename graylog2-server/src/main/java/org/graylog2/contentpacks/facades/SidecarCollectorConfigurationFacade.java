@@ -23,6 +23,7 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -37,6 +38,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.SidecarCollectorConfigurationEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.shared.utilities.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,13 +85,13 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
                                                           Map<EntityDescriptor, Object> nativeEntities,
                                                           String username) {
         if (entity instanceof EntityV1) {
-            return decode((EntityV1) entity, parameters);
+            return decode((EntityV1) entity, parameters, nativeEntities);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private NativeEntity<Configuration> decode(EntityV1 entity, Map<String, ValueReference> parameters) {
+    private NativeEntity<Configuration> decode(EntityV1 entity, Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         final SidecarCollectorConfigurationEntity configurationEntity = objectMapper.convertValue(entity.data(), SidecarCollectorConfigurationEntity.class);
         // Configuration needs to reference the DB ID of the Collector and not the logical ID
         String collectorEntityId = configurationEntity.collectorId().asString(parameters);
