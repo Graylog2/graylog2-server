@@ -16,41 +16,22 @@
  */
 package org.graylog.storage.opensearch2;
 
-import com.google.common.collect.Streams;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.apache.shiro.crypto.hash.Md5Hash;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.ClearScrollRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchScrollRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
-import org.graylog2.indexer.results.IndexQueryResult;
-import org.graylog2.indexer.results.ResultChunk;
-import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.indexer.results.ScrollResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class ScrollResultOS2 extends IndexQueryResult implements ScrollResult {
-    private static final Logger LOG = LoggerFactory.getLogger(ScrollResult.class);
+public class ScrollResultOS2 extends ChunkedQueryResultOS2 {
     private static final TimeValue DEFAULT_SCROLL = TimeValue.timeValueMinutes(1);
 
-    private final OpenSearchClient client;
-    private final long totalHits;
-    private final int limit;
     private final String scroll;
-    private final List<String> fields;
-    private final String queryHash;
-    private String scrollId;
-    private SearchResponse initialResult;
-    private int chunkId = 0;
-    private int resultCount = 0;
 
     public interface Factory {
         ScrollResultOS2 create(SearchResponse initialResult, @Assisted("query") String query, @Assisted("scroll") String scroll, List<String> fields, int limit);
@@ -63,80 +44,32 @@ public class ScrollResultOS2 extends IndexQueryResult implements ScrollResult {
                            @Assisted("scroll") String scroll,
                            @Assisted List<String> fields,
                            @Assisted int limit) {
-        super(query, null, initialResult.getTook().getMillis());
-
-        this.client = client;
-        this.totalHits = initialResult.getHits().getTotalHits().value;
+        super(client, initialResult, query, fields, limit);
         checkArgument(initialResult.getScrollId() != null, "Unable to extract scroll id from supplied search result!");
-        this.limit = limit;
-        this.scrollId = initialResult.getScrollId();
-        this.initialResult = initialResult;
         this.scroll = scroll;
-        this.fields = fields;
 
-        final Md5Hash md5Hash = new Md5Hash(getOriginalQuery());
-        queryHash = md5Hash.toHex();
-
-        LOG.debug("[{}] Starting scroll request for query {}", queryHash, getOriginalQuery());
     }
 
     @Override
-    public ResultChunk nextChunk() throws IOException {
-        if (limit != -1 && resultCount >= limit) {
-            LOG.debug("[{}] Reached limit for query {}", queryHash, getOriginalQuery());
-            return null;
-        }
-
-        final SearchResponse result = this.initialResult != null ? this.initialResult : nextSearchResult();
-        this.initialResult = null;
-
-        final List<ResultMessage> resultMessages = Streams.stream(result.getHits())
-                .map(hit -> ResultMessage.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap()))
-                .collect(Collectors.toList());
-
-        if (resultMessages.size() == 0) {
-            // scroll exhausted
-            LOG.debug("[{}] Reached end of scroll results for query {}", queryHash, getOriginalQuery());
-            return null;
-        }
-
-        final int remainingResultsForLimit = limit - resultCount;
-
-        final List<ResultMessage> resultMessagesSlice = (limit != -1 && remainingResultsForLimit < resultMessages.size())
-                ? resultMessages.subList(0, remainingResultsForLimit)
-                : resultMessages;
-
-        resultCount += resultMessagesSlice.size();
-
-        this.scrollId = result.getScrollId();
-
-        return new ResultChunk(fields, chunkId++, resultMessagesSlice);
-    }
-
-    private SearchResponse nextSearchResult() throws IOException {
-        final SearchScrollRequest scrollRequest = new SearchScrollRequest(this.scrollId);
+    protected SearchResponse nextSearchResult() throws IOException {
+        final SearchScrollRequest scrollRequest = new SearchScrollRequest(this.lastSearchResponse.getScrollId());
         scrollRequest.scroll(TimeValue.parseTimeValue(this.scroll, DEFAULT_SCROLL, "scroll time"));
         return client.executeWithIOException((c, requestOptions) -> c.scroll(scrollRequest, requestOptions),
                 "Unable to retrieve next chunk from search: ");
     }
 
     @Override
-    public String getQueryHash() {
-        return this.queryHash;
-    }
-
-    @Override
-    public long totalHits() {
-        return this.totalHits;
-    }
-
-    @Override
     public void cancel() throws IOException {
         final ClearScrollRequest request = new ClearScrollRequest();
-        request.addScrollId(scrollId);
+        request.addScrollId(this.lastSearchResponse.getScrollId());
 
         client.executeWithIOException((c, requestOptions) -> c.clearScroll(request, requestOptions),
                 "Unable to cancel scrolling search request");
+    }
+
+    @Override
+    protected String getChunkingMethodName() {
+        return "scroll";
     }
 
 }

@@ -16,22 +16,9 @@
  */
 package org.graylog2.indexer.results;
 
-public abstract class IndexQueryResult {
-    private final String originalQuery;
-    private final String builtQuery;
+import org.graylog2.indexer.searches.ChunkCommand;
 
-    public IndexQueryResult(final String originalQuery, final String builtQuery) {
-        this.originalQuery = originalQuery;
-        this.builtQuery = builtQuery;
-    }
+public interface MultiChunkResultRetriever {
 
-    public String getOriginalQuery() {
-        return originalQuery;
-    }
-
-    public String getBuiltQuery() {
-        return builtQuery;
-    }
-
-    public abstract long tookMs();
+    ChunkedResult retrieveChunkedResult(ChunkCommand chunkCommand);
 }
