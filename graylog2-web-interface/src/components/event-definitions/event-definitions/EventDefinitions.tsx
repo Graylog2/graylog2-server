@@ -69,7 +69,7 @@ type Props = {
   onDisable: (eventDefinition: EventDefinition) => void,
 };
 
-export const PAGE_SIZES = [10, 25, 50];
+export const PAGE_SIZES = [10, 50, 100];
 
 const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPageChange, onQueryChange, onDelete, onCopy, onEnable, onDisable }: Props) => {
   if (pagination.grandTotal === 0) {

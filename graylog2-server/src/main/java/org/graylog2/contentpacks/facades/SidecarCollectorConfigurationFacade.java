@@ -91,8 +91,16 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
 
     private NativeEntity<Configuration> decode(EntityV1 entity, Map<String, ValueReference> parameters) {
         final SidecarCollectorConfigurationEntity configurationEntity = objectMapper.convertValue(entity.data(), SidecarCollectorConfigurationEntity.class);
+        // Configuration needs to reference the DB ID of the Collector and not the logical ID
+        String collectorEntityId = configurationEntity.collectorId().asString(parameters);
+        String collectorDbId = nativeEntities.entrySet().stream()
+                .filter(entry -> entry.getKey().id().id().equals(collectorEntityId))
+                .map(Map.Entry::getValue)
+                .map(collector -> ((Collector) collector).id())
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(StringUtils.f("Unable to find database ID of Collector with logical ID [%s]", collectorEntityId)));
         final Configuration configuration = Configuration.createWithoutId(
-                configurationEntity.collectorId().asString(parameters),
+                collectorDbId,
                 configurationEntity.title().asString(parameters),
                 configurationEntity.color().asString(parameters),
                 configurationEntity.template().asString(parameters),

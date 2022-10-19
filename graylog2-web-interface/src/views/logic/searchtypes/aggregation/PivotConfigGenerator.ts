@@ -92,7 +92,7 @@ type FormattedSeries = $Shape<{
 } & Definition>;
 
 const generateConfig = (id: string, name: string, {
-  rollup,
+  rollupForBackendQuery,
   rowPivots,
   columnPivots,
   series,
@@ -103,7 +103,7 @@ const generateConfig = (id: string, name: string, {
   type: 'pivot',
   config: {
     id: 'vals',
-    rollup,
+    rollup: rollupForBackendQuery,
     row_groups: rowPivots.map(formatPivot),
     column_groups: columnPivots.map(formatPivot),
     series: series.map<FormattedSeries>((s) => ({ id: s.effectiveName, ...parseSeries(s.function) })),

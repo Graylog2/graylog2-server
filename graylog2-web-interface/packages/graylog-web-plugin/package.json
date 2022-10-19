@@ -37,7 +37,7 @@
     "extends": "graylog"
   },
   "dependencies": {
-    "@tanstack/react-query": "4.10.3",
+    "@tanstack/react-query": "4.12.0",
     "@types/create-react-class": "15.6.3",
     "@types/jquery": "3.5.14",
     "@types/react": "18.0.21",
@@ -49,7 +49,7 @@
     "jest-preset-graylog": "file:../jest-preset-graylog",
     "jquery": "3.6.1",
     "moment": "2.29.4",
-    "moment-timezone": "0.5.37",
+    "moment-timezone": "0.5.38",
     "prop-types": "15.8.1",
     "react": "16.14.0",
     "react-bootstrap": "0.33.1",

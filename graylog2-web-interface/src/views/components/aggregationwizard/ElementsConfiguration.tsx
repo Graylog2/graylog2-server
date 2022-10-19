@@ -20,6 +20,8 @@ import { isEmpty } from 'lodash';
 import styled from 'styled-components';
 
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import StickyBottomActions from 'views/components/widgets/StickyBottomActions';
+import SaveOrCancelButtons from 'views/components/widgets/SaveOrCancelButtons';
 
 import ElementConfigurationSection from './ElementConfigurationSection';
 import ElementsConfigurationActions from './ElementsConfigurationActions';
@@ -28,6 +30,7 @@ import type { WidgetConfigFormValues } from './WidgetConfigForm';
 
 const Container = styled.div`
   position: relative;
+  height: 100%;
 `;
 
 const _sortConfiguredElements = (
@@ -50,38 +53,46 @@ type Props = {
     values: WidgetConfigFormValues,
     setValues: (formValues: WidgetConfigFormValues) => void,
   ) => void,
+  onSubmit: () => void,
+  onCancel: () => void,
 }
 
-const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChange, onCreate }: Props) => {
+const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChange, onCreate, onSubmit, onCancel }: Props) => {
   const { values, setValues } = useFormikContext<WidgetConfigFormValues>();
 
   return (
     <Container>
-      <div>
-        {_sortConfiguredElements(values, aggregationElementsByKey).map(([elementKey, elementFormValues]) => {
-          const empty = isEmpty(elementFormValues);
+      <StickyBottomActions actions={(
+        <>
+          <ElementsConfigurationActions />
+          <SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />
+        </>
+      )}>
+        <div>
+          {_sortConfiguredElements(values, aggregationElementsByKey).map(([elementKey, elementFormValues]) => {
+            const empty = isEmpty(elementFormValues);
 
-          const aggregationElement = aggregationElementsByKey[elementKey];
+            const aggregationElement = aggregationElementsByKey[elementKey];
 
-          if (!aggregationElement) {
-            throw new Error(`Aggregation element with key ${elementKey} is missing but configured for this widget.`);
-          }
+            if (!aggregationElement) {
+              throw new Error(`Aggregation element with key ${elementKey} is missing but configured for this widget.`);
+            }
 
-          const ConfigurationSection = aggregationElement.component;
+            const ConfigurationSection = aggregationElement.component;
 
-          return (
-            <ElementConfigurationSection allowCreate={aggregationElement.allowCreate(values)}
-                                         isEmpty={empty}
-                                         onCreate={() => onCreate(aggregationElement.key, values, setValues)}
-                                         elementTitle={aggregationElement.title}
-                                         sectionTitle={aggregationElement.sectionTitle}
-                                         key={aggregationElement.key}>
-              <ConfigurationSection config={config} onConfigChange={onConfigChange} />
-            </ElementConfigurationSection>
-          );
-        })}
-      </div>
-      <ElementsConfigurationActions />
+            return (
+              <ElementConfigurationSection allowCreate={aggregationElement.allowCreate(values)}
+                                           isEmpty={empty}
+                                           onCreate={() => onCreate(aggregationElement.key, values, setValues)}
+                                           elementTitle={aggregationElement.title}
+                                           sectionTitle={aggregationElement.sectionTitle}
+                                           key={aggregationElement.key}>
+                <ConfigurationSection config={config} onConfigChange={onConfigChange} />
+              </ElementConfigurationSection>
+            );
+          })}
+        </div>
+      </StickyBottomActions>
     </Container>
   );
 };
