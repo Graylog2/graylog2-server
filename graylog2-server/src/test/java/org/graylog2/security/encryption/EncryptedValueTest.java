@@ -203,7 +203,7 @@ class EncryptedValueTest {
         }
 
         @JsonCreator
-        public static TestDTO create(@JsonProperty("id") String id, @JsonProperty("password_value") EncryptedValue passwordValue) {
+        public static TestDTO create(@JsonProperty("id") @Id String id, @JsonProperty("password_value") EncryptedValue passwordValue) {
             return new AutoValue_EncryptedValueTest_TestDTO(id, passwordValue);
         }
     }

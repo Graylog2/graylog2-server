@@ -200,7 +200,8 @@ const DataTable = ({
     return Promise.reject();
   }, [widget, editing, formContext]);
 
-  const { columnPivots, rowPivots, series, rollup } = config;
+  const { columnPivots, rowPivots, series, rollupForBackendQuery: rollup } = config;
+
   const rows = retrieveChartData(data) ?? [];
 
   const rowFieldNames = rowPivots.map<string>((pivot) => pivot.field);
