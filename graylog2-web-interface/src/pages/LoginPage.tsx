@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { createGlobalStyle, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -24,7 +24,6 @@ import { DocumentTitle } from 'components/common';
 import { Alert, Button } from 'components/bootstrap';
 import LoginForm from 'components/login/LoginForm';
 import LoginBox from 'components/login/LoginBox';
-import authStyles from 'theme/styles/authStyles';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AppConfig from 'util/AppConfig';
 import { LOGIN_INITIALIZING_STATE, LOGIN_INITIALIZED_STATE } from 'logic/authentication/constants';
@@ -32,12 +31,9 @@ import { SessionActions } from 'stores/sessions/SessionStore';
 import usePluginEntities from 'hooks/usePluginEntities';
 import bgImage from 'images/auth/banner-bg.jpeg';
 import graylogLogo from 'images/auth/gl_logo_horiz.svg';
+import PublicNotifications from 'components/common/PublicNotifications';
 
 import LoadingPage from './LoadingPage';
-
-const LoginPageStyles = createGlobalStyle`
-  ${authStyles}
-`;
 
 const StyledButton = styled(Button)`
   margin-top: 1em;
@@ -254,7 +250,8 @@ const LoginPage = () => {
             <TextContainer>
               <BrandName>Graylog</BrandName>
               <Claim><Highlight>Log Management</Highlight> Done Right</Claim>
-            </TextContainer>T
+            </TextContainer>
+            <PublicNotifications />
           </BackgroundText>
           <BackgroundImage alt="background" src={bgImage} />
         </Background>

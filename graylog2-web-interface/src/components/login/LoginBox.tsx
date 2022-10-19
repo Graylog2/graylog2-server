@@ -18,8 +18,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import PublicNotifications from '../common/PublicNotifications';
-
 const Wrapper = styled.div(({ theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
   display: flex;
@@ -39,7 +37,6 @@ type Props = {
 const LoginBox = ({ children }: Props) => (
   <Wrapper className="container">
     <Container>
-      <PublicNotifications />
       {children}
     </Container>
   </Wrapper>
