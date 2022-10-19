@@ -216,6 +216,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
   }
 
   .dropdown-header {
+    margin-top: 4px;
     text-transform: uppercase;
     padding: 0 15px !important;
     font-weight: bold;
