@@ -33,7 +33,7 @@ public class SidecarPluginConfiguration implements PluginConfigBean {
     private Duration cacheTime = Duration.hours(1L);
 
     @Parameter(value = PREFIX + "cache_max_size", validator = PositiveIntegerValidator.class)
-    private int cacheMaxSize = 100;
+    private int cacheMaxSize = 5000;
 
     public Duration getCacheTime() {
         return cacheTime;

@@ -101,11 +101,12 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
                 .map(collector -> ((Collector) collector).id())
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(StringUtils.f("Unable to find database ID of Collector with logical ID [%s]", collectorEntityId)));
-        final Configuration configuration = Configuration.create(
+        final Configuration configuration = Configuration.createWithoutId(
                 collectorDbId,
                 configurationEntity.title().asString(parameters),
                 configurationEntity.color().asString(parameters),
-                configurationEntity.template().asString(parameters));
+                configurationEntity.template().asString(parameters),
+                Set.of());
 
         final Configuration savedConfiguration = configurationService.save(configuration);
         return NativeEntity.create(entity.id(), savedConfiguration.id(), TYPE_V1, configuration.name(), savedConfiguration);
