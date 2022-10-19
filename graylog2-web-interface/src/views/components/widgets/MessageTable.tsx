@@ -37,7 +37,7 @@ import InteractiveContext from '../contexts/InteractiveContext';
 
 const Table = styled.table(({ theme }) => css`
   position: relative;
-  font-size: ${theme.fonts.size.tiny};
+  font-size: ${theme.fonts.size.small};
   margin: 0;
   border-collapse: collapse;
   width: 100%;
