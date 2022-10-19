@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-// import PropTypes from 'prop-types';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
@@ -28,8 +27,8 @@ interface AlertProps {
   theme: DefaultTheme
 }
 
-interface Props {
-  bsStyle: ColorVariants,
+type Props = React.ComponentProps<typeof StyledAlert> & {
+  bsStyle?: ColorVariants,
   children: React.ReactNode,
   onDismiss?: () => void,
 }
@@ -76,7 +75,8 @@ const Alert = ({ bsStyle, ...rest }: Props) => {
 };
 
 Alert.defaultProps = {
-  onDismiss: undefined,
+  bsStyle: 'default',
+  onDismiss: () => {},
 };
 
 export default Alert;

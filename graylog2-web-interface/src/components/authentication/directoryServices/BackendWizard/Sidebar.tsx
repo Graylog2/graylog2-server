@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import type { $PropertyType } from 'utility-types';
 
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { PanelGroup, Panel } from 'components/bootstrap';
@@ -57,7 +56,7 @@ type Props = {
 };
 
 const Sidebar = ({ prepareSubmitPayload }: Props) => {
-  const [activeKey, setActiveKey] = useState<$PropertyType<Step, 'key'>>(SERVER_CONFIG_KEY);
+  const [activeKey, setActiveKey] = useState<Step['key']>(SERVER_CONFIG_KEY);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
 
@@ -69,7 +68,7 @@ const Sidebar = ({ prepareSubmitPayload }: Props) => {
     <StyledPanelGroup accordion
                       activeKey={activeKey}
                       id="sidebar-server-response"
-                      onSelect={setActiveKey}>
+                      onSelect={(key) => setActiveKey(key)}>
       <Panel eventKey={SERVER_CONFIG_KEY}>
         <Panel.Heading>
           <Panel.Title toggle>Server Connection Check</Panel.Title>

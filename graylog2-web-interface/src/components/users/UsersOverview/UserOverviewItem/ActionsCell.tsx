@@ -34,16 +34,20 @@ const ActionsWrapper = styled(ButtonToolbar)`
   justify-content: flex-end;
 `;
 
+type WrapperComponentProps = {
+  id: string,
+  title: string,
+};
+
 const EditTokensAction = ({
   user: { fullName, id },
   wrapperComponent: WrapperComponent,
 }: {
   user: UserOverview,
-  wrapperComponent: Button | MenuItem,
+  wrapperComponent: React.ComponentType<WrapperComponentProps>,
 }) => (
   <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(id)}>
     <WrapperComponent id={`edit-tokens-${id}`}
-                      bsSize="xs"
                       title={`Edit tokens of user ${fullName}`}>
       Edit tokens
     </WrapperComponent>
@@ -108,8 +112,6 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
             </MenuItem>
           )}
           <MenuItem id={`delete-user-${id}`}
-                    bsStyle="primary"
-                    bsSize="xs"
                     title={`Delete user ${fullName}`}
                     onClick={_deleteUser}>
             Delete

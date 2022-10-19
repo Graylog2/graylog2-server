@@ -215,7 +215,7 @@ const WidgetActionsMenu = ({
               Move to Page
             </MenuItem>
           </IfDashboard>
-          <ExtraWidgetActions widget={widget} onSelect={() => {}} />
+          <ExtraWidgetActions widget={widget} />
           <MenuItem divider />
           <MenuItem onSelect={onDelete}>
             Delete
