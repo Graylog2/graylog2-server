@@ -28,7 +28,7 @@ import { LookupTableView, LookupTableCreate, LookupTableForm, LookupTablesOvervi
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
-import LUTSubareaNavigation from 'components/lookup-tables/LUTSubareaNavigation';
+import LUTPageNavigation from 'components/lookup-tables/LUTPageNavigation';
 
 const _saved = () => {
   // reset detail state
@@ -168,7 +168,7 @@ class LUTTablesPage extends React.Component {
 
     return (
       <DocumentTitle title="Lookup Tables">
-        <LUTSubareaNavigation />
+        <LUTPageNavigation />
         <PageHeader title="Lookup Tables"
                     subactions={(
                       <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CREATE}>

@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 
-import AuthenticationSubareaNavigation from 'components/authentication/AuthenticationSubareaNavigation';
+import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import withParams from 'routing/withParams';
 import { LinkContainer } from 'components/common/router';
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
@@ -61,7 +61,7 @@ const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
 
   return (
     <DocumentTitle title={_pageTitle(authBackend.title, true)}>
-      <AuthenticationSubareaNavigation />
+      <AuthenticationPageNavigation />
       <PageHeader title={_pageTitle(authBackend.title)}
                   subactions={(
                     <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authBackend?.id)}>

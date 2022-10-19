@@ -23,7 +23,7 @@ import { DocumentTitle, PageHeader, Icon } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
 import BackendsOverview from 'components/authentication/BackendsOverview';
-import AuthenticationSubareaNavigation from 'components/authentication/AuthenticationSubareaNavigation';
+import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 
@@ -32,7 +32,7 @@ const AuthenticationOverviewPage = () => {
 
   return (
     <DocumentTitle title="All Authentication Services">
-      <AuthenticationSubareaNavigation />
+      <AuthenticationPageNavigation />
       <PageHeader title="All Authentication Services"
                   subactions={(
                     <BackendActionLinks activeBackend={activeBackend}

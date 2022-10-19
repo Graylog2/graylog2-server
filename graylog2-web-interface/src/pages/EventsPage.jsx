@@ -23,14 +23,14 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import EventsContainer from 'components/events/events/EventsContainer';
 import DocsHelper from 'util/DocsHelper';
 import withLocation from 'routing/withLocation';
-import EventsSubareaNavigation from 'components/events/EventsSubareaNavigation';
+import EventsPageNavigation from 'components/events/EventsPageNavigation';
 
 const EventsPage = ({ location }) => {
   const filteredSourceStream = location.query.stream_id;
 
   return (
     <DocumentTitle title="Alerts &amp; Events">
-      <EventsSubareaNavigation />
+      <EventsPageNavigation />
       <PageHeader title="Alerts &amp; Events">
         <span>
           Define Events through different conditions. Add Notifications to Events that require your attention

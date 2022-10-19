@@ -32,7 +32,7 @@ import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pip
 import { PipelinesStore, PipelinesActions } from 'stores/pipelines/PipelinesStore';
 import { RulesStore } from 'stores/rules/RulesStore';
 
-import PipelinesSubareaNavigation from '../components/pipelines/PipelinesSubareaNavigation';
+import PipelinesPageNavigation from '../components/pipelines/PipelinesPageNavigation';
 
 function filterPipeline(state) {
   return state.pipelines ? state.pipelines.filter((p) => p.id === this.props.params.pipelineId)[0] : undefined;
@@ -161,7 +161,7 @@ const PipelineDetailsPage = createReactClass({
     return (
       <DocumentTitle title={pageTitle}>
         <div>
-          <PipelinesSubareaNavigation />
+          <PipelinesPageNavigation />
           <PageHeader title={title}>
             <span>
               Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where

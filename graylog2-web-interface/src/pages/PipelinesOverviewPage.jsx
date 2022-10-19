@@ -22,11 +22,11 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import ProcessingTimelineComponent from 'components/pipelines/ProcessingTimelineComponent';
 import DocsHelper from 'util/DocsHelper';
 import CreatePipelineButton from 'components/pipelines/CreatePipelineButton';
-import PipelinesSubareaNavigation from 'components/pipelines/PipelinesSubareaNavigation';
+import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
 
 const PipelinesOverviewPage = () => (
   <DocumentTitle title="Pipelines">
-    <PipelinesSubareaNavigation />
+    <PipelinesPageNavigation />
     <PageHeader title="Pipelines overview"
                 subactions={(<CreatePipelineButton />)}>
       <span>

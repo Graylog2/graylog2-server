@@ -16,19 +16,20 @@
  */
 import * as React from 'react';
 
+import PageNavigation from 'components/common/PageNavigation';
 import Routes from 'routing/Routes';
-import SubareaNavigation from 'components/common/SubareaNavigation';
 import { Row } from 'components/bootstrap';
 
 const NAV_ITEMS = [
-  { title: 'Authentication Services', path: Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW },
-  { title: 'Authenticators', path: Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW },
+  { title: 'Manage pipelines', path: Routes.SYSTEM.PIPELINES.OVERVIEW, exactPathMatch: true },
+  { title: 'Manage rules', path: Routes.SYSTEM.PIPELINES.RULES },
+  { title: 'Simulator', path: Routes.SYSTEM.PIPELINES.SIMULATOR },
 ];
 
-const AuthenticationSubareaNavigation = () => (
+const EventsPageNavigation = () => (
   <Row>
-    <SubareaNavigation items={NAV_ITEMS} />
+    <PageNavigation items={NAV_ITEMS} />
   </Row>
 );
 
-export default AuthenticationSubareaNavigation;
+export default EventsPageNavigation;

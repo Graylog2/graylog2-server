@@ -23,11 +23,11 @@ import { Button } from 'components/bootstrap';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UserCreate from 'components/users/UserCreate';
 import DocumentationLink from 'components/support/DocumentationLink';
-import UsersSubareaNavigation from 'components/users/navigation/UsersSubareaNavigation';
+import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 
 const UserCreatePage = () => (
   <DocumentTitle title="Create New User">
-    <UsersSubareaNavigation />
+    <UsersPageNavigation />
     <PageHeader title="Create New User"
                 subactions={(
                   <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>

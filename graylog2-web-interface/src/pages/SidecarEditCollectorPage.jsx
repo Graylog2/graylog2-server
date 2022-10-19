@@ -26,7 +26,7 @@ import history from 'util/History';
 import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
 import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm';
 import withParams from 'routing/withParams';
-import SidecarsSubareaNavigation from 'components/sidecars/common/SidecarsSubareaNavigation';
+import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 
 const SidecarEditCollectorPage = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -69,7 +69,7 @@ const SidecarEditCollectorPage = createReactClass({
 
     return (
       <DocumentTitle title="Log Collector">
-        <SidecarsSubareaNavigation />
+        <SidecarsPageNavigation />
         <PageHeader title="Log Collector">
           <span>
             Some words about log collectors.

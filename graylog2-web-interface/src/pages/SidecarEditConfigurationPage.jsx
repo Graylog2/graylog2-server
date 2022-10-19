@@ -28,7 +28,7 @@ import history from 'util/History';
 import withParams from 'routing/withParams';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
 
-import SidecarsSubareaNavigation from '../components/sidecars/common/SidecarsSubareaNavigation';
+import SidecarsPageNavigation from '../components/sidecars/common/SidecarsPageNavigation';
 
 const SidecarEditConfigurationPage = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -82,7 +82,7 @@ const SidecarEditConfigurationPage = createReactClass({
 
     return (
       <DocumentTitle title="Collector Configuration">
-        <SidecarsSubareaNavigation />
+        <SidecarsPageNavigation />
         <PageHeader title="Collector Configuration">
           <span>
             Some words about collector configurations.

@@ -25,7 +25,7 @@ import DocsHelper from 'util/DocsHelper';
 import RuleForm from './RuleForm';
 import RuleHelper from './RuleHelper';
 
-import PipelinesSubareaNavigation from '../pipelines/PipelinesSubareaNavigation';
+import PipelinesPageNavigation from '../pipelines/PipelinesPageNavigation';
 
 const Rule = ({ create, title }) => {
   let pageTitle;
@@ -38,7 +38,7 @@ const Rule = ({ create, title }) => {
 
   return (
     <div>
-      <PipelinesSubareaNavigation />
+      <PipelinesPageNavigation />
       <PageHeader title={pageTitle}>
         <span>
           Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list{' '}

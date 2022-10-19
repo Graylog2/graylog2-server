@@ -19,11 +19,11 @@ import React from 'react';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm';
-import SidecarsSubareaNavigation from 'components/sidecars/common/SidecarsSubareaNavigation';
+import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 
 const SidecarNewCollectorPage = () => (
   <DocumentTitle title="New Log Collector">
-    <SidecarsSubareaNavigation />
+    <SidecarsPageNavigation />
     <PageHeader title="New Log Collector">
       <span>
         Some words about log collectors.

@@ -21,11 +21,11 @@ import AuthenticatorsEdit from 'components/authentication/AuthenticatorsEdit';
 import { PageHeader, DocumentTitle } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import AuthenticationSubareaNavigation from 'components/authentication/AuthenticationSubareaNavigation';
+import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 
 const AuthenticatorsEditPage = () => (
   <DocumentTitle title="Edit Authenticators">
-    <AuthenticationSubareaNavigation />
+    <AuthenticationPageNavigation />
     <PageHeader title="Edit Authenticators" subactions={<AuthenticatorActionLinks />}>
       <span>
         Configure the trusted header authentication.

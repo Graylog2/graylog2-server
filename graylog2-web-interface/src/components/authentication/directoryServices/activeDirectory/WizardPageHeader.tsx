@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import AuthenticationSubareaNavigation from 'components/authentication/AuthenticationSubareaNavigation';
+import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import { PageHeader } from 'components/common';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -45,7 +45,7 @@ const WizardPageHeader = ({ authenticationBackend: authBackend }: Props) => {
 
   return (
     <>
-      <AuthenticationSubareaNavigation />
+      <AuthenticationPageNavigation />
       <PageHeader title={pageTitle}
                   subactions={(
                     <BackendActionLinks activeBackend={activeBackend}

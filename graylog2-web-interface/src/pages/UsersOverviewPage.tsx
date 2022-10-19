@@ -22,12 +22,12 @@ import DocsHelper from 'util/DocsHelper';
 import { Button } from 'components/bootstrap';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UsersOverview from 'components/users/UsersOverview';
-import UsersSubareaNavigation from 'components/users/navigation/UsersSubareaNavigation';
+import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 const UsersOverviewPage = () => (
   <DocumentTitle title="Users Overview">
-    <UsersSubareaNavigation />
+    <UsersPageNavigation />
     <PageHeader title="Users Overview"
                 subactions={(
                   <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>

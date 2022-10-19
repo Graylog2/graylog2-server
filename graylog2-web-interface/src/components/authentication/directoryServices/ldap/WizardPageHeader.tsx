@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import AuthenticationSubareaNavigation from 'components/authentication/AuthenticationSubareaNavigation';
+import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
@@ -47,7 +47,7 @@ const WizardPageHeader = ({ authenticationBackend: authBackend, title }: Props) 
 
   return (
     <>
-      <AuthenticationSubareaNavigation />
+      <AuthenticationPageNavigation />
       <PageHeader title={pageTitle}
                   subactions={(
                     <BackendActionLinks activeBackend={activeBackend}

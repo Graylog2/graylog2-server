@@ -22,11 +22,11 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ConfigurationListContainer from 'components/sidecars/configurations/ConfigurationListContainer';
 import CollectorListContainer from 'components/sidecars/configurations/CollectorListContainer';
-import SidecarsSubareaNavigation from 'components/sidecars/common/SidecarsSubareaNavigation';
+import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 
 const SidecarConfigurationPage = () => (
   <DocumentTitle title="Collectors Configuration">
-    <SidecarsSubareaNavigation />
+    <SidecarsPageNavigation />
     <PageHeader title="Collectors Configuration">
       <span>
         The Collector Sidecar runs next to your favourite log collector and configures it for you. Here you can

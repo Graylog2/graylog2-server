@@ -26,7 +26,7 @@ import SidecarStatus from 'components/sidecars/sidecars/SidecarStatus';
 import withParams from 'routing/withParams';
 import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
 import { SidecarsActions } from 'stores/sidecars/SidecarsStore';
-import SidecarsSubareaNavigation from 'components/sidecars/common/SidecarsSubareaNavigation';
+import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 
 class SidecarStatusPage extends React.Component {
   static propTypes = {
@@ -79,7 +79,7 @@ class SidecarStatusPage extends React.Component {
 
     return (
       <DocumentTitle title={`Sidecar ${sidecar.node_name} status`}>
-        <SidecarsSubareaNavigation />
+        <SidecarsPageNavigation />
         <PageHeader title={<span>Sidecar <em>{sidecar.node_name} status</em></span>}>
           <span>
             A status overview of the Graylog Sidecar.

@@ -22,7 +22,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import ProcessorSimulator from 'components/simulator/ProcessorSimulator';
 import DocsHelper from 'util/DocsHelper';
 import StreamsStore from 'stores/streams/StreamsStore';
-import PipelinesSubareaNavigation from 'components/pipelines/PipelinesSubareaNavigation';
+import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
 
 class SimulatorPage extends React.Component {
   constructor(props) {
@@ -54,7 +54,7 @@ class SimulatorPage extends React.Component {
 
     return (
       <DocumentTitle title="Simulate processing">
-        <PipelinesSubareaNavigation />
+        <PipelinesPageNavigation />
         <PageHeader title="Simulate processing">
           <span>
             Processing messages can be complex. Use this page to simulate the result of processing an incoming

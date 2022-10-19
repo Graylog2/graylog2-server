@@ -17,7 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import PipelinesSubareaNavigation from 'components/pipelines/PipelinesSubareaNavigation';
+import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
 import DocsHelper from 'util/DocsHelper';
 import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button, ButtonToolbar } from 'components/bootstrap';
@@ -136,7 +136,7 @@ const RulesPage = () => {
 
   return (
     <DocumentTitle title="Pipeline rules">
-      <PipelinesSubareaNavigation />
+      <PipelinesPageNavigation />
       <PageHeader title="Pipeline Rules" subactions={<RulesButtonToolbar />}>
         <span>
           Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of actions.

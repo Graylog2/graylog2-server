@@ -22,7 +22,7 @@ import { PageHeader, DocumentTitle } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import UserDetails from 'components/users/UserDetails';
-import UsersSubareaNavigation from 'components/users/navigation/UsersSubareaNavigation';
+import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
 import DocumentationLink from 'components/support/DocumentationLink';
 import type User from 'logic/users/User';
@@ -53,7 +53,7 @@ const UserDetailsPage = ({ params }: Props) => {
 
   return (
     <DocumentTitle title={`User Details ${loadedUser?.fullName ?? ''}`}>
-      <UsersSubareaNavigation />
+      <UsersPageNavigation />
       <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}
                   subactions={(
                     <UserActionLinks userId={userId}
