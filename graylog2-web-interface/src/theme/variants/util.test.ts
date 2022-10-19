@@ -91,81 +91,12 @@ describe('Theme Color Generators', () => {
   it('generates table colors', () => {
     const output = generateTableColors('teint', teint.variant);
 
-    expect(output).toEqual({
-      background: '#fbfbfc',
-      backgroundAlt: '#f3f4f6',
-      backgroundHover: '#f7f8f9',
-      variant: {
-        active: '#eaecf0',
-        danger: '#fae1e1',
-        info: '#e1e8f3',
-        primary: '#fae8e0',
-        success: '#e8f0e2',
-        warning: '#f6f0e0',
-      },
-      variantHover: {
-        active: '#d7dce4',
-        danger: '#f6c5c5',
-        info: '#c6d3e9',
-        primary: '#f6d5c3',
-        success: '#d4e4c8',
-        warning: '#efe4c3',
-      },
-    });
+    expect(output).toMatchSnapshot();
   });
 
   it('generates variant colors', () => {
     const output = generateVariantColors('teint', teint.variant);
 
-    expect(output).toEqual({
-      dark: {
-        danger: '#d04a4a',
-        default: '#8894a7',
-        info: '#4d7db4',
-        primary: '#d0803d',
-        success: '#7fa757',
-        warning: '#c0a73f',
-      },
-      darker: {
-        danger: '#9e3838',
-        default: '#67717f',
-        info: '#3a5f89',
-        primary: '#9e612e',
-        success: '#617f42',
-        warning: '#927f30',
-      },
-      darkest: {
-        danger: '#511d1d',
-        default: '#353a41',
-        info: '#1e3147',
-        primary: '#513218',
-        success: '#324122',
-        warning: '#4b4119',
-      },
-      light: {
-        danger: '#f08d8d',
-        default: '#b5bfcd',
-        info: '#8eadd8',
-        primary: '#f0af86',
-        success: '#afcd94',
-        warning: '#e2cd87',
-      },
-      lighter: {
-        danger: '#f6c5c5',
-        default: '#d7dce4',
-        info: '#c6d3e9',
-        primary: '#f6d5c3',
-        success: '#d4e4c8',
-        warning: '#efe4c3',
-      },
-      lightest: {
-        danger: '#fdf1f1',
-        default: '#f5f6f8',
-        info: '#f1f4f9',
-        primary: '#fdf4f0',
-        success: '#f4f8f2',
-        warning: '#fbf8f0',
-      },
-    });
+    expect(output).toMatchSnapshot();
   });
 });
