@@ -280,7 +280,7 @@ export const IndexSetsStore = singletonStore(
     _errorMessage(error) {
       try {
         if (isArray(error.additional.body)) {
-          return error.additional.body.map(({ message, path }) => `${path ?? ''} ${message}`).join(' ; ');
+          return error.additional.body.map(({ message, path }) => `${path ?? ''} ${message}.`).join(' ');
         }
 
         return error.additional.body.message;
