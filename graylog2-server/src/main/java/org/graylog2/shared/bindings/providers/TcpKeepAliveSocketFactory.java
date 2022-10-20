@@ -22,6 +22,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Objects;
 
 /**
  * This socket factory wrapper sets the SO_KEEPALIVE flag for every created socket. The timeouts for the socket
@@ -32,7 +33,7 @@ public class TcpKeepAliveSocketFactory extends SocketFactory {
     private final SocketFactory delegate;
 
     public TcpKeepAliveSocketFactory(SocketFactory delegate) {
-        this.delegate = delegate;
+        this.delegate = Objects.requireNonNull(delegate);
     }
 
     @Override
