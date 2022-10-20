@@ -46,29 +46,22 @@ const LoginCol = styled(Col)(({ theme }) => css`
   border: 1px solid ${theme.colors.variant.light.default};
   border-radius: 4px;
   box-shadow: 0 0 21px ${theme.colors.global.navigationBoxShadow};
-  
-  legend {
-    color: ${theme.colors.variant.darker.default};
-    border-color: ${theme.colors.variant.dark.default};
-  }
 `);
 
-const LoginBox = ({ children }) => {
-  return (
-    <Wrapper className="container">
-      <Row>
-        <Col md={8} mdOffset={2}>
-          <PublicNotifications readFromConfig />
-        </Col>
-      </Row>
-      <Row>
-        <LoginCol md={4} mdOffset={4} xs={6} xsOffset={3}>
-          {children}
-        </LoginCol>
-      </Row>
-    </Wrapper>
-  );
-};
+const LoginBox = ({ children }) => (
+  <Wrapper className="container">
+    <Row>
+      <Col md={8} mdOffset={2}>
+        <PublicNotifications readFromConfig />
+      </Col>
+    </Row>
+    <Row>
+      <LoginCol md={4} mdOffset={4} xs={6} xsOffset={3}>
+        {children}
+      </LoginCol>
+    </Row>
+  </Wrapper>
+);
 
 LoginBox.propTypes = {
   children: PropTypes.node.isRequired,

@@ -53,10 +53,11 @@ public class OSLatestHandler extends OSPivotSeriesSpecHandler<Latest, TopHits> {
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
         final Optional<Value> latestValue = Optional.ofNullable(latestAggregation.getHits())
                 .map(SearchHits::getHits)
+                .filter(hits -> hits.length > 0)
                 .map(hits -> hits[0])
                 .map(SearchHit::getSourceAsMap)
                 .map(source -> source.get(pivotSpec.field()))
                 .map(value -> Value.create(pivotSpec.id(), Latest.NAME, value));
-        return latestValue.map(Stream::of).orElse(Stream.empty());
+        return latestValue.stream();
     }
 }

@@ -14,5 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const c3 = {};
-export default c3;
+import * as React from 'react';
+
+import PageNavigation from 'components/common/PageNavigation';
+import Routes from 'routing/Routes';
+import { Row } from 'components/bootstrap';
+
+const NAV_ITEMS = [
+  { title: 'Alerts & Events', path: Routes.ALERTS.LIST, exactPathMatch: true },
+  { title: 'Event Definitions', path: Routes.ALERTS.DEFINITIONS.LIST, permissions: 'eventdefinitions:read' },
+  { title: 'Notifications', path: Routes.ALERTS.NOTIFICATIONS.LIST, permissions: 'eventnotifications:read' },
+];
+
+const EventsPageNavigation = () => (
+  <Row>
+    <PageNavigation items={NAV_ITEMS} />
+  </Row>
+);
+
+export default EventsPageNavigation;

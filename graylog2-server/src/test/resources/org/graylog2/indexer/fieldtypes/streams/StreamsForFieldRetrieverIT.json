@@ -1,0 +1,89 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "0"
+          }
+        },
+        {
+          "data": {
+            "source": "example.org",
+            "message": "Present in all streams, no interesting fields",
+            "streams": [
+              "000000000000000000000001",
+              "000000000000000000000002"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "1"
+          }
+        },
+        {
+          "data": {
+            "source": "example.org",
+            "message": "Present in stream 2 with additional field",
+            "stream2_only" : 42,
+            "streams": [
+              "000000000000000000000002"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "2"
+          }
+        },
+        {
+          "data": {
+            "source": "example.org",
+            "message": "Present in stream 1 with additional field",
+            "stream1_only" : 13,
+            "streams": [
+              "000000000000000000000001"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "3"
+          }
+        },
+        {
+          "data": {
+            "source": "example.org",
+            "message": "Present in both streams with additional field",
+            "additional_field" : 42,
+            "streams": [
+              "000000000000000000000001",
+              "000000000000000000000002"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

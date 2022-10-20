@@ -17,6 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
+import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
 import DocsHelper from 'util/DocsHelper';
 import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button, ButtonToolbar } from 'components/bootstrap';
@@ -135,50 +136,35 @@ const RulesPage = () => {
 
   return (
     <DocumentTitle title="Pipeline rules">
-      <span>
-        <PageHeader title="Pipeline Rules" subactions={<RulesButtonToolbar />}>
-          <span>
-            Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of actions.
-            Graylog evaluates the condition against a message and executes the actions if the condition is satisfied.
-          </span>
+      <PipelinesPageNavigation />
+      <PageHeader title="Pipeline Rules" subactions={<RulesButtonToolbar />}>
+        <span>
+          Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of actions.
+          Graylog evaluates the condition against a message and executes the actions if the condition is satisfied.
+        </span>
 
-          <span>
-            Read more about Graylog pipeline rules in the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES}
-                                                                             text="documentation" />.
-          </span>
+        <span>
+          Read more about Graylog pipeline rules in the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES}
+                                                                           text="documentation" />.
+        </span>
+      </PageHeader>
 
-          <span>
-            <LinkContainer to={Routes.SYSTEM.PIPELINES.OVERVIEW}>
-              <Button bsStyle="info">Manage pipelines</Button>
-            </LinkContainer>
-              &nbsp;
-            <LinkContainer to={Routes.SYSTEM.PIPELINES.RULES}>
-              <Button bsStyle="info">Manage rules</Button>
-            </LinkContainer>
-              &nbsp;
-            <LinkContainer to={Routes.SYSTEM.PIPELINES.SIMULATOR}>
-              <Button bsStyle="info">Simulator</Button>
-            </LinkContainer>
-          </span>
-        </PageHeader>
-
-        <Row className="content">
-          <Col md={12}>
-            {isLoading ? (
-              <Spinner />
-            ) : (
-              <Row>
-                <Col md={12}>
-                  <PaginatedList totalItems={total}>
-                    <RuleList rules={rules} rulesContext={rulesContext} onDelete={handleDelete} searchFilter={searchFilter} />
-                    {openMetricsConfig && <RuleMetricsConfigContainer onClose={onCloseMetricsConfig} />}
-                  </PaginatedList>
-                </Col>
-              </Row>
-            )}
-          </Col>
-        </Row>
-      </span>
+      <Row className="content">
+        <Col md={12}>
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            <Row>
+              <Col md={12}>
+                <PaginatedList totalItems={total}>
+                  <RuleList rules={rules} rulesContext={rulesContext} onDelete={handleDelete} searchFilter={searchFilter} />
+                  {openMetricsConfig && <RuleMetricsConfigContainer onClose={onCloseMetricsConfig} />}
+                </PaginatedList>
+              </Col>
+            </Row>
+          )}
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };

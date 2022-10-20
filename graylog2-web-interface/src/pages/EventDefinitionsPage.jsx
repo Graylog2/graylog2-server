@@ -17,54 +17,42 @@
 import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
-import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
+import { Button, Col, Row } from 'components/bootstrap';
 import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EventDefinitionsContainer from 'components/event-definitions/event-definitions/EventDefinitionsContainer';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
+import EventsPageNavigation from 'components/events/EventsPageNavigation';
 
 const EventDefinitionsPage = () => {
   return (
     <DocumentTitle title="Event Definitions">
-      <span>
-        <PageHeader title="Event Definitions"
-                    subactions={(
-                      <IfPermitted permissions="eventdefinitions:create">
-                        <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
-                          <Button bsStyle="success">Create event definition</Button>
-                        </LinkContainer>
-                      </IfPermitted>
+      <EventsPageNavigation />
+      <PageHeader title="Event Definitions"
+                  subactions={(
+                    <IfPermitted permissions="eventdefinitions:create">
+                      <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
+                        <Button bsStyle="success">Create event definition</Button>
+                      </LinkContainer>
+                    </IfPermitted>
                     )}>
-          <span>
-            Create new Event Definitions that will allow you to search for different Conditions and alert on them.
-          </span>
+        <span>
+          Create new Event Definitions that will allow you to search for different Conditions and alert on them.
+        </span>
 
-          <span>
-            Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
-            <DocumentationLink page={DocsHelper.PAGES.ALERTS}
-                               text="documentation" />
-          </span>
+        <span>
+          Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
+          <DocumentationLink page={DocsHelper.PAGES.ALERTS}
+                             text="documentation" />
+        </span>
+      </PageHeader>
 
-          <ButtonToolbar>
-            <LinkContainer to={Routes.ALERTS.LIST}>
-              <Button bsStyle="info">Alerts & Events</Button>
-            </LinkContainer>
-            <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
-              <Button bsStyle="info">Event Definitions</Button>
-            </LinkContainer>
-            <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
-              <Button bsStyle="info">Notifications</Button>
-            </LinkContainer>
-          </ButtonToolbar>
-        </PageHeader>
-
-        <Row className="content">
-          <Col md={12}>
-            <EventDefinitionsContainer />
-          </Col>
-        </Row>
-      </span>
+      <Row className="content">
+        <Col md={12}>
+          <EventDefinitionsContainer />
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };

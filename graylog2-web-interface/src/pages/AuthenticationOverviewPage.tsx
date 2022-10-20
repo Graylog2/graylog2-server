@@ -23,7 +23,7 @@ import { DocumentTitle, PageHeader, Icon } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
 import BackendsOverview from 'components/authentication/BackendsOverview';
-import AuthenticationOverviewLinks from 'components/authentication/AuthenticationOverviewLinks';
+import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 
@@ -32,19 +32,18 @@ const AuthenticationOverviewPage = () => {
 
   return (
     <DocumentTitle title="All Authentication Services">
-      <>
-        <PageHeader title="All Authentication Services"
-                    subactions={(
-                      <BackendActionLinks activeBackend={activeBackend}
-                                          finishedLoading={finishedLoading} />
+      <AuthenticationPageNavigation />
+      <PageHeader title="All Authentication Services"
+                  subactions={(
+                    <BackendActionLinks activeBackend={activeBackend}
+                                        finishedLoading={finishedLoading} />
                   )}>
-          <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
-          <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                                                                   text="documentation" />.
-          </span>
-          <AuthenticationOverviewLinks />
-        </PageHeader>
-        {!!(backendsTotal && backendsTotal >= 1 && !activeBackend) && (
+        <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
+        <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
+                                                                 text="documentation" />.
+        </span>
+      </PageHeader>
+      {!!(backendsTotal && backendsTotal >= 1 && !activeBackend) && (
         <Row className="content">
           <Col xs={12}>
             <Alert bsStyle="warning">
@@ -52,9 +51,8 @@ const AuthenticationOverviewPage = () => {
             </Alert>
           </Col>
         </Row>
-        )}
-        <BackendsOverview />
-      </>
+      )}
+      <BackendsOverview />
     </DocumentTitle>
   );
 };

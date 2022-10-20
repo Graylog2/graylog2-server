@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
 
-import AuthenticationOverviewLinks from 'components/authentication/AuthenticationOverviewLinks';
+import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import DocsHelper from 'util/DocsHelper';
 import withParams from 'routing/withParams';
 import StringUtils from 'util/StringUtils';
@@ -70,23 +70,21 @@ const AuthenticationPage = () => {
 
   return (
     <DocumentTitle title={_pageTitle(activeBackend, true)}>
-      <>
-        <PageHeader title={_pageTitle(activeBackend)}
-                    subactions={(
-                      <BackendActionLinks activeBackend={activeBackend}
-                                          finishedLoading={finishedLoading} />
+      <AuthenticationPageNavigation />
+      <PageHeader title={_pageTitle(activeBackend)}
+                  subactions={(
+                    <BackendActionLinks activeBackend={activeBackend}
+                                        finishedLoading={finishedLoading} />
                     )}>
-          <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
-          <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                                                                   text="documentation" />.
-          </span>
-          <AuthenticationOverviewLinks />
-        </PageHeader>
+        <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
+        <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
+                                                                 text="documentation" />.
+        </span>
+      </PageHeader>
 
-        {finishedLoading && activeBackend && (
-          <BackendDetails authenticationBackend={activeBackend} />
-        )}
-      </>
+      {finishedLoading && activeBackend && (
+      <BackendDetails authenticationBackend={activeBackend} />
+      )}
     </DocumentTitle>
   );
 };

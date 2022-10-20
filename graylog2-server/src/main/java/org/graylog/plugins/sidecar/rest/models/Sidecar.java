@@ -92,7 +92,6 @@ public abstract class Sidecar {
     public abstract NodeDetails nodeDetails();
 
     @JsonProperty
-    @Nullable
     public abstract List<ConfigurationAssignment> assignments();
 
     @JsonProperty
@@ -133,7 +132,7 @@ public abstract class Sidecar {
                 .nodeId(nodeId)
                 .nodeName(nodeName)
                 .nodeDetails(nodeDetails)
-                .assignments(assignments)
+                .assignments(assignments == null ? List.of() : assignments)
                 .sidecarVersion(sidecarVersion)
                 .lastSeen(lastSeen)
                 .build();
@@ -151,6 +150,7 @@ public abstract class Sidecar {
                 .nodeDetails(nodeDetails)
                 .sidecarVersion(sidecarVersion)
                 .lastSeen(DateTime.now(DateTimeZone.UTC))
+                .assignments(List.of())
                 .build();
     }
 
