@@ -49,11 +49,11 @@ const StyledContainer = styled.div(({ topMargin }) => `
 `);
 
 const StyledInput = styled.input(({ queryWidth }) => `
-  width: ${queryWidth};
+  width: ${queryWidth} !important;
 `);
 
-const StyledInputContainer = styled.div(({ queryWidth }) => `
-  width: ${queryWidth};
+const StyledInputContainer = styled.div(({ queryContainerWidth }) => `
+  width: ${queryContainerWidth} !important;
 `);
 
 /**
@@ -87,6 +87,8 @@ class SearchForm extends React.Component {
     wrapperClass: PropTypes.string,
     /** Width to use in the search field. */
     queryWidth: PropTypes.any,
+    /** Width to use in the search field container. */
+    queryContainerWidth: PropTypes.any,
     /** Top margin to use in the search form container. */
     topMargin: PropTypes.number,
     /** Separation between search field and buttons. */
@@ -138,6 +140,7 @@ class SearchForm extends React.Component {
     placeholder: 'Enter search query...',
     wrapperClass: 'search',
     queryWidth: 'auto',
+    queryContainerWidth: 'auto',
     topMargin: 15,
     buttonLeftMargin: 5,
     searchBsStyle: 'default',
@@ -232,6 +235,7 @@ class SearchForm extends React.Component {
     const {
       queryHelpComponent,
       queryWidth,
+      queryContainerWidth,
       focusAfterMount,
       children,
       className,
@@ -253,7 +257,7 @@ class SearchForm extends React.Component {
       <StyledContainer className={`${wrapperClass} ${className}`} topMargin={topMargin}>
         <form className="form-inline" onSubmit={this._onSearch}>
           <FormContent buttonLeftMargin={buttonLeftMargin}>
-            <StyledInputContainer className={`form-group ${queryHelpComponent ? 'has-feedback' : ''}`} queryWidth={queryWidth}>
+            <StyledInputContainer className={`form-group ${queryHelpComponent ? 'has-feedback' : ''}`} queryContainerWidth={queryContainerWidth}>
               {label && (
                 <label htmlFor="common-search-form-query-input" className="control-label">
                   {label}
