@@ -32,9 +32,9 @@ type Props = {
   cache: LookupTableCache,
   dataAdapter: LookupTableAdapter,
   errors?: {
-    table: LookupTable,
-    cache: LookupTableCache,
-    dataAdapter: LookupTableAdapter,
+    table?: string,
+    cache?: string,
+    dataAdapter?: string,
   },
 };
 

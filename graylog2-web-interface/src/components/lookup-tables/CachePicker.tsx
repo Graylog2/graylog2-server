@@ -14,25 +14,35 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 import { useField } from 'formik';
-import type { LookupTableCache } from 'src/logic/lookup-tables/types';
 
-import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
+import type { LookupTableCache } from 'logic/lookup-tables/types';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
 type Props = {
   caches: LookupTableCache[],
-}
+};
+
+type OptionType = {
+  label: string,
+  value: string,
+};
 
 const CachePicker = ({ caches }: Props) => {
-  const [, { value, touched, error }, { setTouched, setValue }] = useField('cache_id');
-  const sortedCaches = caches.map((cache) => {
-    return { value: cache.id, label: `${cache.title} (${cache.name})` };
-  }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
+  const sortedCaches = React.useMemo(() => {
+    return caches.map((cache: LookupTableCache) => (
+      { value: cache.id, label: `${cache.title} (${cache.name})` }
+    )).sort((a: OptionType, b: OptionType) => {
+      if (a.label.toLowerCase() > b.label.toLowerCase()) return 1;
+      if (a.label.toLowerCase() < b.label.toLowerCase()) return -1;
 
+      return 0;
+    });
+  }, [caches]);
+
+  const [, { value, touched, error }, { setTouched, setValue }] = useField('cache_id');
   const errorMessage = touched ? error : '';
 
   return (
@@ -55,14 +65,6 @@ const CachePicker = ({ caches }: Props) => {
       </Input>
     </fieldset>
   );
-};
-
-CachePicker.propTypes = {
-  caches: PropTypes.array,
-};
-
-CachePicker.defaultProps = {
-  caches: [],
 };
 
 export default CachePicker;

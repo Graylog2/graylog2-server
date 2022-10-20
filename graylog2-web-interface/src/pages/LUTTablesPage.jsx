@@ -225,7 +225,11 @@ LUTTablesPage.defaultProps = {
   action: undefined,
 };
 
-export default connect(withParams(withLocation(withPaginationQueryParameter(LUTTablesPage))), { lookupTableStore: LookupTablesStore }, ({ lookupTableStore, ...otherProps }) => ({
-  ...otherProps,
-  ...lookupTableStore,
-}));
+export default connect(
+  withParams(withLocation(withPaginationQueryParameter(LUTTablesPage))),
+  { lookupTableStore: LookupTablesStore },
+  ({ lookupTableStore, ...otherProps }) => ({
+    ...otherProps,
+    ...lookupTableStore,
+  }),
+);

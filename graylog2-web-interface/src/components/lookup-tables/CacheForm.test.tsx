@@ -50,10 +50,8 @@ const renderedCache = ({
   inCache = { ...createLookupTableCache() },
   create = false,
   withConfig = true,
-  // eslint-disable-next-line no-console
-  validate = () => { console.log('validation called'); },
-  // eslint-disable-next-line no-console
-  saved = () => { console.log('saved called'); },
+  validate = () => {},
+  saved = () => {},
   validationErrors = {},
 }) => {
   const mockCache = {
@@ -118,7 +116,7 @@ describe('CacheForm', () => {
 
     renderedCache({ scope: 'DEFAULT', inCache: cache, withConfig: false });
 
-    const titleInput = screen.queryByLabelText('* Title');
+    const titleInput = screen.queryByLabelText('Title');
     fireEvent.blur(titleInput);
     const requiredErrorMessages = await screen.findAllByText('Required');
 
@@ -140,7 +138,7 @@ describe('CacheForm', () => {
       validationErrors: { name: ['The cache name is already in use.'] },
     });
 
-    const titleInput = screen.queryByLabelText('* Title');
+    const titleInput = screen.queryByLabelText('Title');
     fireEvent.blur(titleInput);
 
     const dupNameError = await screen.findByText('The cache name is already in use.');
@@ -164,8 +162,8 @@ describe('CacheForm', () => {
       saved: mockSaved,
     });
 
-    const titleEle = await screen.findByLabelText('* Title');
-    const nameEle = await screen.findByLabelText('* Name');
+    const titleEle = await screen.findByLabelText('Title');
+    const nameEle = await screen.findByLabelText('Name');
     const submitButton = await findSubmitButton();
 
     fireEvent.change(titleEle, { target: { value: '' } });
@@ -193,8 +191,8 @@ describe('CacheForm', () => {
       saved: mockSaved,
     });
 
-    const titleEle = await screen.findByLabelText('* Title');
-    const nameEle = await screen.findByLabelText('* Name');
+    const titleEle = await screen.findByLabelText('Title');
+    const nameEle = await screen.findByLabelText('Name');
     const submitButton = await findSubmitButton();
 
     fireEvent.change(titleEle, { target: { value: 'Test title' } });

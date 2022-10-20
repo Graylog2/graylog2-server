@@ -27,11 +27,10 @@ import { DataAdapter, DataAdapterCreate, DataAdapterForm, DataAdaptersOverview }
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
-import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
+import { LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 import { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 
 const _saved = () => {
-  // reset detail state
   history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
 };
 
@@ -44,10 +43,6 @@ const _validateAdapter = (adapter) => {
 };
 
 class LUTDataAdaptersPage extends React.Component {
-  errorStatesTimer = undefined;
-
-  errorStatesInterval = 1000;
-
   componentDidMount() {
     this._loadData(this.props);
   }
@@ -65,35 +60,9 @@ class LUTDataAdaptersPage extends React.Component {
     clearInterval(this.errorStatesTimer);
   }
 
-  _startErrorStatesTimer = () => {
-    this._stopErrorStatesTimer();
-
-    this.errorStatesTimer = setInterval(() => {
-      const { dataAdapters } = this.props;
-      let names = null;
-
-      if (dataAdapters) {
-        names = dataAdapters.map((t) => t.name);
-      }
-
-      if (names) {
-        LookupTablesActions.getErrors(null, null, names || null);
-      }
-    }, this.errorStatesInterval);
-  };
-
-  _stopErrorStatesTimer = () => {
-    if (this.errorStatesTimer) {
-      clearInterval(this.errorStatesTimer);
-      this.errorStatesTimer = undefined;
-    }
-  };
-
   _loadData = (props) => {
     const { pagination } = props;
     const { page, pageSize } = this.props.paginationQueryParameter;
-
-    this._stopErrorStatesTimer();
 
     if (props.params && props.params.adapterName) {
       LookupTableDataAdaptersActions.get(props.params.adapterName);
@@ -101,19 +70,16 @@ class LUTDataAdaptersPage extends React.Component {
       LookupTableDataAdaptersActions.getTypes();
     } else {
       LookupTableDataAdaptersActions.searchPaginated(page, pageSize, pagination.query);
-      this._startErrorStatesTimer();
     }
   };
 
   render() {
     const {
       action,
-      errorStates,
       dataAdapter,
       validationErrors,
       types,
       dataAdapters,
-      pagination,
     } = this.props;
     let content;
     const isShowing = action === 'show';
@@ -154,9 +120,7 @@ class LUTDataAdaptersPage extends React.Component {
       content = <Spinner text="Loading data adapters" />;
     } else {
       content = (
-        <DataAdaptersOverview dataAdapters={dataAdapters}
-                              pagination={pagination}
-                              errorStates={errorStates} />
+        <DataAdaptersOverview />
       );
     }
 
@@ -194,11 +158,9 @@ class LUTDataAdaptersPage extends React.Component {
 }
 
 LUTDataAdaptersPage.propTypes = {
-  errorStates: PropTypes.object,
   dataAdapter: PropTypes.object,
   validationErrors: PropTypes.object,
   types: PropTypes.object,
-  pagination: PropTypes.object,
   dataAdapters: PropTypes.array,
   location: PropTypes.object.isRequired,
   action: PropTypes.string,
@@ -206,17 +168,19 @@ LUTDataAdaptersPage.propTypes = {
 };
 
 LUTDataAdaptersPage.defaultProps = {
-  errorStates: null,
   validationErrors: {},
   dataAdapters: null,
   types: null,
-  pagination: null,
   dataAdapter: null,
   action: undefined,
 };
 
-export default connect(withParams(withLocation(withPaginationQueryParameter(LUTDataAdaptersPage))), { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore }, ({ dataAdaptersStore, lookupTableStore, ...otherProps }) => ({
-  ...otherProps,
-  ...dataAdaptersStore,
-  errorStates: lookupTableStore.errorStates,
-}));
+export default connect(
+  withParams(withLocation(withPaginationQueryParameter(LUTDataAdaptersPage))),
+  { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore },
+  ({ dataAdaptersStore, lookupTableStore, ...otherProps }) => ({
+    ...otherProps,
+    ...dataAdaptersStore,
+    errorStates: lookupTableStore.errorStates,
+  }),
+);

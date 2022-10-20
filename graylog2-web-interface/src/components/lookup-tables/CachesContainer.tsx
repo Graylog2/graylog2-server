@@ -16,26 +16,29 @@
  */
 import * as React from 'react';
 
-import { TimeUnit } from 'components/common';
-import type { LookupTableCache } from 'logic/lookup-tables/types';
+import { useGetAllCaches } from 'hooks/lookup-tables/useLookupTableCachesAPI';
+import { Spinner } from 'components/common';
 
 type Props = {
-  cache: LookupTableCache,
+  children: React.ReactChild[],
 };
 
-const CaffeineCacheSummary = ({ cache }: Props) => {
+const CachesContainer = ({ children }: Props) => {
+  const { caches, pagination, loadingCaches } = useGetAllCaches({ page: 1, perPage: 10000 });
+
   return (
-    <dl>
-      <dt>Maximum entries:</dt>
-      <dd>{cache.config.max_size}</dd>
-
-      <dt>Expire after access:</dt>
-      <dd><TimeUnit value={cache.config.expire_after_access} unit={cache.config.expire_after_access_unit} /></dd>
-
-      <dt>Expire after write:</dt>
-      <dd><TimeUnit value={cache.config.expire_after_write} unit={cache.config.expire_after_write_unit} /></dd>
-    </dl>
+    loadingCaches ? <Spinner /> : (
+      <div>
+        {React.Children.map(
+          children,
+          (child: React.ReactElement) => React.cloneElement(
+            child,
+            { caches, pagination },
+          ),
+        )}
+      </div>
+    )
   );
 };
 
-export default CaffeineCacheSummary;
+export default CachesContainer;

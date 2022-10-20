@@ -16,10 +16,9 @@
  */
 import React from 'react';
 import { Formik, Form } from 'formik';
-import PropTypes from 'prop-types';
 import _omit from 'lodash/omit';
-import type { LookupTable } from 'src/logic/lookup-tables/types';
 
+import type { LookupTable } from 'logic/lookup-tables/types';
 import history from 'util/History';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import { Col, Row, Input } from 'components/bootstrap';
@@ -51,8 +50,8 @@ const INIT_TABLE_VALUES: LookupTableType = {
 
 type Props = {
   saved: () => void,
-  create: boolean,
-  table: LookupTableType,
+  create?: boolean,
+  table?: LookupTableType,
 };
 
 const LookupTableForm = ({ saved, create, table }: Props) => {
@@ -82,17 +81,12 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
   };
 
   const handleSubmit = (values: LookupTableType) => {
-    let promise: Promise<any>;
-
     const valuesToSave: LookupTable = _omit(values, ['enable_single_value', 'enable_multi_value']);
+    const promise = create
+      ? LookupTablesActions.create(valuesToSave)
+      : LookupTablesActions.update(valuesToSave);
 
-    if (create) {
-      promise = LookupTablesActions.create(valuesToSave);
-    } else {
-      promise = LookupTablesActions.update(valuesToSave);
-    }
-
-    return promise.then(() => saved());
+    promise.then(() => saved());
   };
 
   const initialValues: LookupTableType = {
@@ -243,12 +237,6 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
       )}
     </Formik>
   );
-};
-
-LookupTableForm.propTypes = {
-  saved: PropTypes.func.isRequired,
-  create: PropTypes.bool,
-  table: PropTypes.object,
 };
 
 LookupTableForm.defaultProps = {

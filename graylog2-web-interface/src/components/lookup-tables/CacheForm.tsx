@@ -17,9 +17,9 @@
 import * as React from 'react';
 import _ from 'lodash';
 import { Formik, Form } from 'formik';
-import { PluginStore } from 'graylog-web-plugin/plugin';
-import type { LookupTableCache, validationErrorsType } from 'src/logic/lookup-tables/types';
 
+import usePluginEntities from 'hooks/usePluginEntities';
+import type { LookupTableCache, validationErrorsType } from 'logic/lookup-tables/types';
 import { Col, Row } from 'components/bootstrap';
 import { FormikFormGroup, FormSubmit } from 'components/common';
 import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
@@ -48,30 +48,28 @@ const INIT_CACHE: LookupTableCache = {
   title: '',
   description: '',
   name: '',
-  config: {},
+  config: { type: 'none' },
 };
 
 type Props = {
   type: string,
-  saved: () => void,
   title: string,
+  saved: () => void,
   create?: boolean,
   cache?: LookupTableCache,
   validate?: (arg: LookupTableCache) => void,
   validationErrors?: validationErrorsType,
 };
 
-const CacheForm = ({ type, saved, title, create, cache, validate, validationErrors }: Props) => {
+const CacheForm = ({ type, title, saved, create, cache, validate, validationErrors }: Props) => {
   const configRef = React.useRef(null);
   const [generateName, setGenerateName] = React.useState<boolean>(create);
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
 
-  const plugin = React.useMemo(() => {
-    return PluginStore.exports('lookupTableCaches').find((p) => p.type === type);
-  }, [type]);
-
+  const plugin = usePluginEntities('lookupTableCaches').find((p) => p.type === type);
   const pluginName = React.useMemo(() => (plugin.displayName || type), [plugin, type]);
   const DocComponent = React.useMemo(() => (plugin.documentationComponent), [plugin]);
+
   const configFieldSet = React.useMemo(() => {
     if (plugin) {
       return React.createElement(
@@ -108,7 +106,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
       validate(values);
     }
 
-    if (values.config.type !== 'none') {
+    if (values.config.type !== 'none' && configRef.current && typeof configRef.current.validate !== 'undefined') {
       const confErrors = configRef.current?.validate() || {};
       if (!_.isEmpty(confErrors)) errors.config = confErrors;
     }
@@ -121,7 +119,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
       ? LookupTableCachesActions.create(values)
       : LookupTableCachesActions.update(values);
 
-    return promise.then(() => saved());
+    promise.then(() => saved());
   };
 
   const onCancel = () => history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
@@ -144,7 +142,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
                 <fieldset>
                   <FormikFormGroup type="text"
                                    name="title"
-                                   label="* Title"
+                                   label="Title"
                                    required
                                    help={errors.title ? null : 'A short title for this cache.'}
                                    onChange={handleTitleChange(values, setValues)}
@@ -159,7 +157,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
                                    wrapperClassName="col-sm-9" />
                   <FormikFormGroup type="text"
                                    name="name"
-                                   label="* Name"
+                                   label="Name"
                                    required
                                    error={validationErrors.name ? validationErrors.name[0] : null}
                                    onChange={() => setGenerateName(false)}
@@ -167,10 +165,9 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
                                     (errors.name || validationErrors.name)
                                       ? null
                                       : 'The name that is being used to refer to this cache. Must be unique.'
-                                  }
+                                   }
                                    labelClassName="col-sm-3"
                                    wrapperClassName="col-sm-9" />
-
                 </fieldset>
                 {configFieldSet}
                 <fieldset>

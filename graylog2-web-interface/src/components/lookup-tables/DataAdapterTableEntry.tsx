@@ -38,21 +38,24 @@ const Actions = styled(ButtonToolbar)`
 type Props = {
   adapter: LookupTableAdapter,
   error: string,
+  onDelete?: () => void
 };
 
-const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
+const DataAdapterTableEntry = ({ adapter, error = null, onDelete }: Props) => {
   const history = useHistory();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(adapter);
   const { name: adapterName, title: adapterTitle, description: adapterDescription, id: adapterId } = adapter;
 
-  const _onEdit = () => {
+  const handleEdit = () => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName));
   };
 
-  const _onDelete = () => {
+  const handleDelete = () => {
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Are you sure you want to delete data adapter "${adapterTitle}"?`)) {
-      LookupTableDataAdaptersActions.delete(adapter.id).then(() => LookupTableDataAdaptersActions.reloadPage());
+    const shouldDelete = window.confirm(`Are you sure you want to delete data adapter "${adapterTitle}"?`);
+
+    if (shouldDelete) {
+      LookupTableDataAdaptersActions.delete(adapter.id).then(() => onDelete());
     }
   };
 
@@ -74,14 +77,16 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
           {loadingScopePermissions ? <Spinner /> : scopePermissions.is_mutable && (
             <Actions>
               <Button bsSize="xsmall"
-                      onClick={_onEdit}
+                      bsStyle="info"
+                      onClick={handleEdit}
                       role="button"
                       name="edit">
                 Edit
               </Button>
-              <Button bsSize="xsmall"
+              <Button style={{ marginLeft: '6px' }}
+                      bsSize="xsmall"
                       bsStyle="danger"
-                      onClick={_onDelete}
+                      onClick={handleDelete}
                       role="button"
                       name="delete">
                 Delete
@@ -92,6 +97,10 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
       </tr>
     </tbody>
   );
+};
+
+DataAdapterTableEntry.defaultProps = {
+  onDelete: () => {},
 };
 
 export default DataAdapterTableEntry;

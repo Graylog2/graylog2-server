@@ -14,27 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled from 'styled-components';
 
-export const SummaryContainer = styled.div`
-  display: inline-block;
-  margin: 16px 0;
-`;
+import fetch from 'logic/rest/FetchProvider';
+import URLUtils from 'util/URLUtils';
 
-export const SummaryRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-`;
+const getURL = (path: string = '') => (URLUtils.qualifyUrl(`/system/lookup${path}`));
 
-export const Title = styled.span`
-  font-weight: bold;
-  min-width: 180px;
-`;
+// eslint-disable-next-line import/prefer-default-export
+export const fetchAll = async (page = 1, perPage = 100, query = null) => {
+  let url = getURL(`/caches?sort=title&order=asc&page=${page}&per_page=${perPage}`);
+  if (query) url += `&query=${encodeURI(query)}`;
 
-export const Value = styled.span`
-  padding: 6px 10px;
-  width: 100%;
-  min-width: 130px;
-`;
+  return fetch('GET', url);
+};

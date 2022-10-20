@@ -31,6 +31,7 @@ import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
 type Props = {
   cache: LookupTableCache,
+  onDelete?: () => void,
 };
 
 const Actions = styled(ButtonToolbar)`
@@ -40,7 +41,7 @@ const Actions = styled(ButtonToolbar)`
   justify-content: flex-start;
 `;
 
-const CacheTableEntry = ({ cache }: Props) => {
+const CacheTableEntry = ({ cache, onDelete }: Props) => {
   const history = useHistory();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
 
@@ -84,12 +85,12 @@ const CacheTableEntry = ({ cache }: Props) => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cacheName));
   };
 
-  const handleDelete = (inCache: LookupTableCache) => {
+  const handleDelete = () => {
     // eslint-disable-next-line no-alert
-    const shouldDelete = window.confirm(`Are you sure you want to delete cache "${inCache.title}"?`);
+    const shouldDelete = window.confirm(`Are you sure you want to delete cache "${cache.title}"?`);
 
     if (shouldDelete) {
-      LookupTableCachesActions.delete(inCache.id).then(() => LookupTableCachesActions.reloadPage());
+      LookupTableCachesActions.delete(cache.id).then(() => onDelete());
     }
   };
 
@@ -134,6 +135,10 @@ const CacheTableEntry = ({ cache }: Props) => {
       </tr>
     </tbody>
   );
+};
+
+CacheTableEntry.defaultProps = {
+  onDelete: () => {},
 };
 
 export default CacheTableEntry;

@@ -75,7 +75,6 @@ class LUTCachesPage extends React.Component {
       validationErrors,
       types,
       caches,
-      pagination,
     } = this.props;
     let content;
     const isShowing = action === 'show';
@@ -115,10 +114,7 @@ class LUTCachesPage extends React.Component {
     } else if (!caches) {
       content = <Spinner text="Loading caches" />;
     } else {
-      content = (
-        <CachesOverview caches={caches}
-                        pagination={pagination} />
-      );
+      content = <CachesOverview />;
     }
 
     return (
@@ -146,7 +142,6 @@ class LUTCachesPage extends React.Component {
               </ButtonToolbar>
             </span>
           </PageHeader>
-
           {content}
         </span>
       </DocumentTitle>
@@ -160,7 +155,6 @@ LUTCachesPage.propTypes = {
   types: PropTypes.object,
   caches: PropTypes.array,
   location: PropTypes.object.isRequired,
-  pagination: PropTypes.object.isRequired,
   action: PropTypes.string,
   paginationQueryParameter: PropTypes.object.isRequired,
 };

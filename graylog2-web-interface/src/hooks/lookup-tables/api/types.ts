@@ -14,38 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled from 'styled-components';
+import type { LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 
-const ConfigSummaryDefinitionListWrapper = styled.div`
-  width: 100%;
+type paginatedResposeType = {
+  count: number,
+  total: number,
+  page: number,
+  per_page: number,
+  query?: string,
+};
 
-  dl {
-    margin-top: 10px;
+export type LUTErrorsAPIResponseType = {
+  tables: { [key: string]: string }
+  caches: { [key: string]: string }
+  data_adapters: { [key: string]: string }
+};
 
-    dt {
-      float: left;
-      clear: left;
-      min-width: 200px;
-      min-height: 33px;
-      padding: 7px 0;
-    }
+export type LUTCacheAPIResponseType = paginatedResposeType & {
+  caches: LookupTableCache[],
+};
 
-    dd {
-      margin-left: 200px;
-      word-wrap: break-word;
-      width: 55%;
-      min-height: 33px;
-      padding: 7px 10px;
-
-      :not(:last-child) {
-        border-bottom: 1px solid ${(props) => props.theme.colors.terniary};
-      }
-
-      code {
-        margin-left: -3px;
-      }
-    }
-  }
-`;
-
-export default ConfigSummaryDefinitionListWrapper;
+export type LUTDataAdapterAPIResponseType = paginatedResposeType & {
+  data_adapters: LookupTableAdapter[],
+};
