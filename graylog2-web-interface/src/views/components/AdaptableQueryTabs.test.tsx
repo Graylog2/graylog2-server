@@ -155,6 +155,7 @@ describe('AdaptableQueryTabs', () => {
         name: 'Tab 4',
       });
 
+      // eslint-disable-next-line testing-library/no-node-access
       expect(newActiveTab.parentNode).toHaveClass('active');
     });
 
@@ -185,6 +186,7 @@ describe('AdaptableQueryTabs', () => {
     });
 
     expect(tab2).toBeVisible();
+    // eslint-disable-next-line testing-library/no-node-access
     expect(tab2.parentNode).toHaveClass('active');
   });
 
@@ -223,7 +225,7 @@ describe('AdaptableQueryTabs', () => {
     const onSelectStub = jest.fn((id: string) => Promise.resolve(id));
     render(<AdaptableQueryTabs {...DEFAULT_PROPS} onSelect={onSelectStub} />);
 
-    const createTabButton = await screen.findByTitle('Create New Tab');
+    const createTabButton = await screen.findByTitle('Create New Page');
     userEvent.click(createTabButton);
 
     await waitFor(() => expect(onSelectStub).toHaveBeenCalledTimes(1));

@@ -50,7 +50,7 @@ describe('AdaptableQueryTabsConfiguration', () => {
   it('display modal window', async () => {
     renderConfiguration();
 
-    await expect(await screen.findByText('Update Dashboard Tabs Configuration')).toBeInTheDocument();
+    await screen.findByText('Update Dashboard Pages Configuration');
   });
 
   it('display list of tabs', async () => {

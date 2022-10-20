@@ -20,12 +20,12 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useCallback, useState } from 'react';
 import { OrderedSet, Map, Set } from 'immutable';
 
-import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
+import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 import { QueriesActions } from 'views/actions/QueriesActions';
 import { SortableList } from 'components/common';
 import type { ListItemType } from 'components/common/SortableList/ListItem';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
-import type { TitlesMap, TitleType } from 'views/stores/TitleTypes';
+import type { TitleType } from 'views/stores/TitleTypes';
 import type { QueryId } from 'views/logic/queries/Query';
 import TitleTypes from 'views/stores/TitleTypes';
 
@@ -37,37 +37,38 @@ type Props = {
 
 const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList }: Props) => {
   const [orderedQueriesList, setOrderedQueriesList] = useState<Array<ListItemType>>(queriesList);
-  const onSubmitTabsConfiguration = useCallback(() => {
+  const onConfirmPagesConfiguration = useCallback(() => {
     QueriesActions.setOrder(OrderedSet(orderedQueriesList)).then(() => {
-      let newTitles = Set<{ queryId: QueryId, titlesMap: TitlesMap}>([]);
-
-      orderedQueriesList.forEach(({ id: queryId, title }: {
+      const newTitles = orderedQueriesList.map(({ id: queryId, title }: {
         id: QueryId, title: string
       }) => {
         const titleMap = Map<string, string>({ title });
         const titlesMap = Map<TitleType, Map<string, string>>({ [TitleTypes.Tab]: titleMap });
-        newTitles = newTitles.add({ queryId, titlesMap });
+
+        return ({ queryId, titlesMap });
       });
 
-      ViewStatesActions.patchQueriesTitle(newTitles);
+      ViewStatesActions.patchQueriesTitle(Set(newTitles));
       setShow(false);
     });
   }, [orderedQueriesList, setShow]);
-  const onTabsConfigurationModalClose = useCallback(() => setShow(false), [setShow]);
+  const onPagesConfigurationModalClose = useCallback(() => setShow(false), [setShow]);
   const updateTabSorting = useCallback((order) => {
     setOrderedQueriesList(order);
   }, [setOrderedQueriesList]);
 
   return (
-    <BootstrapModalForm show={show}
-                        title="Update Dashboard Tabs Configuration"
-                        onSubmitForm={onSubmitTabsConfiguration}
-                        onModalClose={onTabsConfigurationModalClose}
-                        submitButtonText="Update configuration">
-      <h3>Order</h3>
-      <p>Use drag and drop to change the execution order of the dashboard tabs.</p>
-      <SortableList items={orderedQueriesList} onMoveItem={updateTabSorting} displayOverlayInPortal />
-    </BootstrapModalForm>
+    <BootstrapModalConfirm showModal={show}
+                           title="Update Dashboard Pages Configuration"
+                           onConfirm={onConfirmPagesConfiguration}
+                           onModalClose={onPagesConfigurationModalClose}
+                           confirmButtonText="Update configuration">
+      <>
+        <h3>Order</h3>
+        <p>Use drag and drop to change the execution order of the dashboard pages.</p>
+        <SortableList items={orderedQueriesList} onMoveItem={updateTabSorting} displayOverlayInPortal />
+      </>
+    </BootstrapModalConfirm>
   );
 };
 

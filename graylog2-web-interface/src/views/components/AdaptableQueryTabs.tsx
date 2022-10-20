@@ -252,7 +252,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
                      title={<Icon name="ellipsis-h" />}
                      className="query-tabs-more"
                      id="query-tabs-more"
-                     aria-label="More Dashboard Tabs"
+                     aria-label="More Dashboard Pages"
                      noCaret
                      pullRight
                      active={openedMore}
@@ -265,13 +265,13 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
 
         <NavItem key="new"
                  eventKey="new"
-                 title="Create New Tab"
+                 title="Create New Page"
                  onClick={() => onSelect('new')}
                  className="query-tabs-new">
           <Icon name="plus" />
         </NavItem>
       </StyledQueryNav>
-      <IconButton name="cog" onClick={() => setShowConfigurationModal(true)} />
+      <IconButton title="Open pages configuration" name="cog" onClick={() => setShowConfigurationModal(true)} />
       {showConfigurationModal && (
       <AdaptableQueryTabsConfiguration show={showConfigurationModal}
                                        setShow={setShowConfigurationModal}
