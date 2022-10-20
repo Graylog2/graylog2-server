@@ -32,6 +32,12 @@ The new default Message Processing order will run the
 This applies only to new Graylog installations.
 Existing setups keep the former default order for backwards compatibility.
 
+## Stream aware field types
+
+So far, when listing fields for a query, Graylog has been showing fields for all streams.
+For some systems, this list may be extremely long and contain many fields which are not present in the query results.
+It is now possible to change this behavior. When configuration property `stream_aware_field_types` is set to true, Graylog will periodically collect information on stream-field relation from Elasticsearch/Opensearch and use it to provide only those fields which are present in the streams used in the query.
+
 ## API Endpoint Deprecations
 
 The following API endpoints are deprecated beginning with 5.0.
