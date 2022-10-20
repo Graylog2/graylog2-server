@@ -35,6 +35,7 @@ type QueriesActionsType = RefluxActions<{
   timerange: (queryId: QueryId, newTimeRange: TimeRange) => Promise<QueriesList>,
   update: (queryId: QueryId, query: Query) => Promise<QueriesList>,
   forceUpdate: (queryId: QueryId, query: Query) => Promise<QueriesList>,
+  setOrder: (newOrder: Immutable.OrderedSet<{ id: QueryId}>) => Promise<QueriesList>,
 }>;
 
 // eslint-disable-next-line import/prefer-default-export
@@ -50,5 +51,6 @@ export const QueriesActions: QueriesActionsType = singletonActions(
     timerange: { asyncResult: true },
     update: { asyncResult: true },
     forceUpdate: { asyncResult: true },
+    setOrder: { asyncResult: true },
   }),
 );

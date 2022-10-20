@@ -94,6 +94,16 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       return promise;
     },
 
+    setOrder(newOrder: Immutable.OrderedSet<{ id: QueryId }>) {
+      const newQueries = newOrder.map(({ id }) => {
+        return this.queries.get(id);
+      });
+      const promise: Promise<QueriesList> = this._propagateQueryChange(newQueries).then(() => newQueries);
+
+      QueriesActions.setOrder.promise(promise);
+
+      return promise;
+    },
     // Similar to the update action, but it is skipping the equality check.
     forceUpdate(queryId: QueryId, query: Query) {
       const newQueries = this.queries.set(queryId, query);
