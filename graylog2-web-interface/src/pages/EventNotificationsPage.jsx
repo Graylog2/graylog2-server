@@ -17,51 +17,39 @@
 import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
-import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
+import { Button, Col, Row } from 'components/bootstrap';
 import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import EventNotificationsContainer from 'components/event-notifications/event-notifications/EventNotificationsContainer';
 import Routes from 'routing/Routes';
+import EventsPageNavigation from 'components/events/EventsPageNavigation';
 
 const EventNotificationsPage = () => {
   return (
     <DocumentTitle title="Notifications">
-      <span>
-        <PageHeader title="Notifications"
-                    subactions={(
-                      <IfPermitted permissions="eventnotifications:create">
-                        <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
-                          <Button bsStyle="success">Create notification</Button>
-                        </LinkContainer>
-                      </IfPermitted>
+      <EventsPageNavigation />
+      <PageHeader title="Notifications"
+                  subactions={(
+                    <IfPermitted permissions="eventnotifications:create">
+                      <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
+                        <Button bsStyle="success">Create notification</Button>
+                      </LinkContainer>
+                    </IfPermitted>
           )}>
-          <span>
-            Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
-            to you or to other systems you use for that purpose.
-          </span>
+        <span>
+          Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
+          to you or to other systems you use for that purpose.
+        </span>
 
-          <span>
-            Remember to assign Notifications while creating or editing an Event Definition.
-          </span>
+        <span>
+          Remember to assign Notifications while creating or editing an Event Definition.
+        </span>
+      </PageHeader>
 
-          <ButtonToolbar>
-            <LinkContainer to={Routes.ALERTS.LIST}>
-              <Button bsStyle="info">Alerts & Events</Button>
-            </LinkContainer>
-            <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
-              <Button bsStyle="info">Event Definitions</Button>
-            </LinkContainer>
-            <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
-              <Button bsStyle="info">Notifications</Button>
-            </LinkContainer>
-          </ButtonToolbar>
-        </PageHeader>
-
-        <Row className="content">
-          <Col md={12}>
-            <EventNotificationsContainer />
-          </Col>
-        </Row>
-      </span>
+      <Row className="content">
+        <Col md={12}>
+          <EventNotificationsContainer />
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };

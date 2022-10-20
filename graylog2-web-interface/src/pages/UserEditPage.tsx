@@ -24,7 +24,7 @@ import UsersDomain from 'domainActions/users/UsersDomain';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UserEdit from 'components/users/UserEdit';
 import DocumentationLink from 'components/support/DocumentationLink';
-import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
+import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
 import type User from 'logic/users/User';
 
@@ -64,6 +64,7 @@ const UserEditPage = ({ params }: Props) => {
 
   return (
     <DocumentTitle title={`Edit User ${fullName}`}>
+      <UsersPageNavigation />
       <PageHeader title={<PageTitle fullName={fullName} />}
                   subactions={(
                     <UserActionLinks userId={userId}
@@ -78,8 +79,6 @@ const UserEditPage = ({ params }: Props) => {
           <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                              text="documentation" />
         </span>
-
-        <UserOverviewLinks />
       </PageHeader>
       <UserEdit user={userToEdit} />
     </DocumentTitle>

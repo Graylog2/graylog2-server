@@ -17,15 +17,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
 import { PageHeader } from 'components/common';
-import { Row, Col, Button } from 'components/bootstrap';
+import { Row, Col } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import Routes from 'routing/Routes';
 
 import RuleForm from './RuleForm';
 import RuleHelper from './RuleHelper';
+
+import PipelinesPageNavigation from '../pipelines/PipelinesPageNavigation';
 
 const Rule = ({ create, title }) => {
   let pageTitle;
@@ -38,6 +38,7 @@ const Rule = ({ create, title }) => {
 
   return (
     <div>
+      <PipelinesPageNavigation />
       <PageHeader title={pageTitle}>
         <span>
           Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list{' '}
@@ -48,20 +49,6 @@ const Rule = ({ create, title }) => {
         <span>
           Read more about Graylog pipeline rules in the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES}
                                                                            text="documentation" />.
-        </span>
-
-        <span>
-          <LinkContainer to={Routes.SYSTEM.PIPELINES.OVERVIEW}>
-            <Button bsStyle="info">Manage pipelines</Button>
-          </LinkContainer>
-            &nbsp;
-          <LinkContainer to={Routes.SYSTEM.PIPELINES.RULES}>
-            <Button bsStyle="info">Manage rules</Button>
-          </LinkContainer>
-            &nbsp;
-          <LinkContainer to={Routes.SYSTEM.PIPELINES.SIMULATOR}>
-            <Button bsStyle="info">Simulator</Button>
-          </LinkContainer>
         </span>
       </PageHeader>
 

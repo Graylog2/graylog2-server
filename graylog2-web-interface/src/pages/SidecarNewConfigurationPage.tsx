@@ -16,41 +16,24 @@
  */
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
-import { ButtonToolbar, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
-import Routes from 'routing/Routes';
 import ConfigurationForm from 'components/sidecars/configuration-forms/ConfigurationForm';
+import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 
-const SidecarNewConfigurationPage = () => {
-  return (
-    <DocumentTitle title="New Collector Configuration">
+const SidecarNewConfigurationPage = () => (
+  <DocumentTitle title="New Collector Configuration">
+    <SidecarsPageNavigation />
+    <PageHeader title="New Collector Configuration">
       <span>
-        <PageHeader title="New Collector Configuration">
-          <span>
-            Some words about collector configurations.
-          </span>
-
-          <span>
-            Read more about the Graylog Sidecar in the documentation.
-          </span>
-
-          <ButtonToolbar>
-            <LinkContainer to={Routes.SYSTEM.SIDECARS.OVERVIEW}>
-              <Button bsStyle="info">Overview</Button>
-            </LinkContainer>
-            <LinkContainer to={Routes.SYSTEM.SIDECARS.ADMINISTRATION}>
-              <Button bsStyle="info">Administration</Button>
-            </LinkContainer>
-            <LinkContainer to={Routes.SYSTEM.SIDECARS.CONFIGURATION}>
-              <Button bsStyle="info" className="active">Configuration</Button>
-            </LinkContainer>
-          </ButtonToolbar>
-        </PageHeader>
-        <ConfigurationForm action="create" />
+        Some words about collector configurations.
       </span>
-    </DocumentTitle>
-  );
-};
+
+      <span>
+        Read more about the Graylog Sidecar in the documentation.
+      </span>
+    </PageHeader>
+    <ConfigurationForm action="create" />
+  </DocumentTitle>
+);
 
 export default SidecarNewConfigurationPage;
