@@ -23,6 +23,10 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+/**
+ * This socket factory wrapper sets the SO_KEEPALIVE flag for every created socket. The timeouts for the socket
+ * depend on the configuration of the underlying operating system. See {@link #configure(Socket)}.
+ */
 public class TcpKeepAliveSocketFactory extends SocketFactory {
 
     private final SocketFactory delegate;
