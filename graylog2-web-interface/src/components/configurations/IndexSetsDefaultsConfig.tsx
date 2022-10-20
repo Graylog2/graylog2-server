@@ -30,6 +30,7 @@ import {RotationStrategy} from 'components/indices/Types';
 import {IndicesConfigurationActions} from 'stores/indices/IndicesConfigurationStore';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import {PluginStore} from 'graylog-web-plugin/plugin';
+import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
 
 {/* Matches backend index defaults persistence configuration. */
 }
@@ -122,6 +123,11 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
           <dd>{config.index_optimization_disabled ? 'Yes' : 'No'}</dd>
           <dt>Field type refresh interval:</dt>
           <dd>{config.field_type_refresh_interval} {lodash.capitalize(config.field_type_refresh_interval_unit)}</dd>
+          <dt>Index optimization disabled:</dt>
+          <dd>{config.index_optimization_disabled ? 'Yes' : 'No'}</dd>
+          <IndexMaintenanceStrategiesSummary config={activeConfig}
+                                             pluginExports={PluginStore.exports('indexRotationConfig')} />
+
         </StyledDefList>
 
         <p>
