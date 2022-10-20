@@ -87,7 +87,7 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
             <li key={`${idx}-${title}`}>
               <Checkbox inline
                         checked={queryTabs.includes(idx)}
-                        onChange={(event) => (event.target.checked ? addQueryTab(idx) : removeQueryTab(idx))}>
+                        onChange={(event) => ((event.target as HTMLInputElement).checked ? addQueryTab(idx) : removeQueryTab(idx))}>
                 {title}
               </Checkbox>
             </li>

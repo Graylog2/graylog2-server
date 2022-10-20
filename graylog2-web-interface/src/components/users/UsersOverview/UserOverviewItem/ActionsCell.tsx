@@ -39,12 +39,14 @@ type WrapperComponentProps = {
   title: string,
 };
 
+export type WrapperComponentType = React.ComponentType<WrapperComponentProps>;
+
 const EditTokensAction = ({
   user: { fullName, id },
   wrapperComponent: WrapperComponent,
 }: {
   user: UserOverview,
-  wrapperComponent: React.ComponentType<WrapperComponentProps>,
+  wrapperComponent: WrapperComponentType,
 }) => (
   <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(id)}>
     <WrapperComponent id={`edit-tokens-${id}`}
@@ -102,7 +104,7 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
         </LinkContainer>
       </IfPermitted>
       <DropdownButton bsSize="xs" title="More actions" pullRight id={`delete-user-${id}`}>
-        <EditTokensAction user={user} wrapperComponent={MenuItem} />
+        <EditTokensAction user={user} wrapperComponent={MenuItem as WrapperComponentType} />
         <IfPermitted permissions={[`users:edit:${username}`]}>
           {showEnableDisable && (
             <MenuItem id={`set-status-user-${id}`}
