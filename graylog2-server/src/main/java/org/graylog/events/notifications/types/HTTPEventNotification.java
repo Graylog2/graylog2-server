@@ -30,18 +30,19 @@ import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationModelData;
 import org.graylog.events.notifications.EventNotificationService;
-import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.notifications.NotificationTestData;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.security.encryption.EncryptedValueService;
+import org.graylog2.shared.bindings.providers.OkHttpClientProvider;
 import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -66,12 +67,14 @@ public class HTTPEventNotification implements EventNotification {
 
     @Inject
     public HTTPEventNotification(EventNotificationService notificationCallbackService, ObjectMapper objectMapper,
-                                 final OkHttpClient httpClient, UrlWhitelistService whitelistService,
+                                 final OkHttpClientProvider httpClient, UrlWhitelistService whitelistService,
                                  UrlWhitelistNotificationService urlWhitelistNotificationService,
-                                 EncryptedValueService encryptedValueService) {
+                                 EncryptedValueService encryptedValueService,
+                                 @Named("http_enable_tcp_keepalive") boolean httpEnableTcpKeepAlive
+                                 ) {
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapper = objectMapper;
-        this.httpClient = httpClient;
+        this.httpClient = httpEnableTcpKeepAlive ? httpClient.getWithTcpKeepAlive() : httpClient.get();
         this.whitelistService = whitelistService;
         this.urlWhitelistNotificationService = urlWhitelistNotificationService;
         this.encryptedValueService = encryptedValueService;

@@ -91,7 +91,6 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
                 .retryOnConnectionFailure(true)
                 .connectTimeout(connectTimeout.getQuantity(), connectTimeout.getUnit())
                 .writeTimeout(writeTimeout.getQuantity(), writeTimeout.getUnit())
-                .socketFactory(new TcpKeepAliveSocketFactory(SocketFactory.getDefault()))
                 .readTimeout(readTimeout.getQuantity(), readTimeout.getUnit());
 
         if (httpProxyUri != null) {
@@ -136,9 +135,13 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
                 }
             }
         }
+        return clientBuilder.build();
+    }
 
-        final OkHttpClient client = clientBuilder.build();
-        return client;
+    public OkHttpClient getWithTcpKeepAlive() {
+        return get().newBuilder()
+                .socketFactory(new TcpKeepAliveSocketFactory(SocketFactory.getDefault()))
+                .build();
     }
 
     public static class ProxyAuthenticator implements Authenticator {
