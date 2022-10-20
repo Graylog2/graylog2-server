@@ -214,7 +214,11 @@ const CollectorConfigurationModal = ({
         </ModalTitle>
       </Modal.Header>
       <Modal.Body>
-        <SearchForm query={searchQuery} onQueryChange={(q) => setSearchQuery(q)} topMargin={0} queryWidth="100%" />
+        <SearchForm query={searchQuery}
+                    queryWidth="100%"
+                    queryContainerWidth="100%"
+                    onQueryChange={(q) => setSearchQuery(q)}
+                    topMargin={0} />
         <ConfigurationContainer>
           <ConfigurationTable className="table-condensed table-hover">
             <tbody>
