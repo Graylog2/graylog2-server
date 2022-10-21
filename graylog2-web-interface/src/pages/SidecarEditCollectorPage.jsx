@@ -16,20 +16,23 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
-import { LinkContainer } from 'components/common/router';
-import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
+import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
 import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm';
 import withParams from 'routing/withParams';
+import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 
 const SidecarEditCollectorPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'SidecarEditCollectorPage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     params: PropTypes.object.isRequired,
   },
@@ -66,35 +69,22 @@ const SidecarEditCollectorPage = createReactClass({
 
     return (
       <DocumentTitle title="Log Collector">
-        <span>
-          <PageHeader title="Log Collector">
-            <span>
-              Some words about log collectors.
-            </span>
+        <SidecarsPageNavigation />
+        <PageHeader title="Log Collector">
+          <span>
+            Some words about log collectors.
+          </span>
 
-            <span>
-              Read more about the Graylog Sidecar in the documentation.
-            </span>
+          <span>
+            Read more about the Graylog Sidecar in the documentation.
+          </span>
+        </PageHeader>
 
-            <ButtonToolbar>
-              <LinkContainer to={Routes.SYSTEM.SIDECARS.OVERVIEW}>
-                <Button bsStyle="info">Overview</Button>
-              </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.SIDECARS.ADMINISTRATION}>
-                <Button bsStyle="info">Administration</Button>
-              </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.SIDECARS.CONFIGURATION}>
-                <Button bsStyle="info" className="active">Configuration</Button>
-              </LinkContainer>
-            </ButtonToolbar>
-          </PageHeader>
-
-          <Row className="content">
-            <Col md={6}>
-              <CollectorForm action="edit" collector={this.state.collector} />
-            </Col>
-          </Row>
-        </span>
+        <Row className="content">
+          <Col md={6}>
+            <CollectorForm action="edit" collector={this.state.collector} />
+          </Col>
+        </Row>
       </DocumentTitle>
     );
   },

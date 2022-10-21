@@ -33,6 +33,8 @@ import DescriptionBox from 'views/components/aggregationbuilder/DescriptionBox';
 import DecoratorSidebar from 'views/components/messagelist/decorators/DecoratorSidebar';
 import { HoverForHelp } from 'components/common';
 import { defaultCompare } from 'logic/DefaultCompare';
+import SaveOrCancelButtons from 'views/components/widgets/SaveOrCancelButtons';
+import StickyBottomActions from 'views/components/widgets/StickyBottomActions';
 
 const FullHeightRow = styled(Row)`
   height: 100%;
@@ -42,7 +44,6 @@ const FullHeightRow = styled(Row)`
 
 const FullHeightCol = styled(Col)`
   height: 100%;
-  padding-bottom: 10px;
   overflow: auto;
 `;
 
@@ -71,47 +72,49 @@ const _onSortDirectionChange = (direction: SortConfig['direction'], config, onCh
   return onChange(newConfig);
 };
 
-const EditMessageList = ({ children, config, fields, onChange }: EditWidgetComponentProps<MessagesWidgetConfig>) => {
+const EditMessageList = ({ children, config, fields, onChange, onCancel, onSubmit }: EditWidgetComponentProps<MessagesWidgetConfig>) => {
   const { sort } = config;
   const [sortDirection] = (sort || []).map((s) => s.direction);
   const selectedFieldsForSelect = config.fields.map((fieldName) => ({ field: fieldName }));
   const onDecoratorsChange = (newDecorators) => onChange(config.toBuilder().decorators(newDecorators).build());
-
   const messagePreviewOptions = usePluginEntities('views.components.widgets.messageTable.previewOptions');
   const sortedMessagePreviewOptions = messagePreviewOptions.sort((o1, o2) => defaultCompare(o1.sort, o2.sort));
 
   return (
     <FullHeightRow>
       <FullHeightCol md={3}>
-        <DescriptionBox description="Fields">
-          <FieldSelect fields={fields}
-                       onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)}
-                       value={selectedFieldsForSelect} />
-        </DescriptionBox>
-        <DescriptionBox description="Message Preview">
-          {sortedMessagePreviewOptions.map((option) => (
-            <PreviewOptionCheckbox key={option.title} checked={option.isChecked(config)} onChange={() => option.onChange(config, onChange)} disabled={option.isDisabled(config)}>
-              {option.title}
-              {option.help && (
-                <HoverForHelp title={option.title}>
-                  {option.help}
-                </HoverForHelp>
-              )}
-            </PreviewOptionCheckbox>
-          ))}
-        </DescriptionBox>
-        <DescriptionBox description="Sorting">
-          <FieldSortSelect fields={fields} sort={sort} onChange={(data) => _onSortChange(data, config, onChange)} />
-        </DescriptionBox>
-        <DescriptionBox description="Direction">
-          <SortDirectionSelect disabled={!sort || sort.length === 0}
-                               direction={sortDirection && sortDirection.direction}
-                               onChange={(data) => _onSortDirectionChange(data, config, onChange)} />
-        </DescriptionBox>
-        <DescriptionBox description="Decorators">
-          <DecoratorSidebar decorators={config.decorators}
-                            onChange={onDecoratorsChange} />
-        </DescriptionBox>
+        <StickyBottomActions actions={<SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />}
+                             alignActionsAtBottom>
+          <DescriptionBox description="Fields">
+            <FieldSelect fields={fields}
+                         onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)}
+                         value={selectedFieldsForSelect} />
+          </DescriptionBox>
+          <DescriptionBox description="Message Preview">
+            {sortedMessagePreviewOptions.map((option) => (
+              <PreviewOptionCheckbox key={option.title} checked={option.isChecked(config)} onChange={() => option.onChange(config, onChange)} disabled={option.isDisabled(config)}>
+                {option.title}
+                {option.help && (
+                  <HoverForHelp title={option.title}>
+                    {option.help}
+                  </HoverForHelp>
+                )}
+              </PreviewOptionCheckbox>
+            ))}
+          </DescriptionBox>
+          <DescriptionBox description="Sorting">
+            <FieldSortSelect fields={fields} sort={sort} onChange={(data) => _onSortChange(data, config, onChange)} />
+          </DescriptionBox>
+          <DescriptionBox description="Direction">
+            <SortDirectionSelect disabled={!sort || sort.length === 0}
+                                 direction={sortDirection && sortDirection.direction}
+                                 onChange={(data) => _onSortDirectionChange(data, config, onChange)} />
+          </DescriptionBox>
+          <DescriptionBox description="Decorators">
+            <DecoratorSidebar decorators={config.decorators}
+                              onChange={onDecoratorsChange} />
+          </DescriptionBox>
+        </StickyBottomActions>
       </FullHeightCol>
       <FullHeightCol md={9}>
         {children}

@@ -27,7 +27,7 @@ import {
   SearchForm,
   OverlayTrigger,
 } from 'components/common';
-import { Button, Col, Row } from 'components/bootstrap';
+import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
@@ -159,23 +159,25 @@ class GrokPatterns extends React.Component {
         <td>{pattern.name}</td>
         <td>{pattern.pattern}</td>
         <td>
-          <IfPermitted permissions="inputs:edit">
-            <Button style={{ marginRight: 5 }}
-                    bsStyle="primary"
-                    bsSize="xs"
-                    onClick={() => this.confirmedRemove(pattern)}>
-              Delete
-            </Button>
-            <EditPatternModal id={pattern.id}
-                              name={pattern.name}
-                              pattern={pattern.pattern}
-                              testPattern={testPattern}
-                              patterns={patterns}
-                              create={false}
-                              reload={this.loadData}
-                              savePattern={this.savePattern}
-                              validPatternName={this.validPatternName} />
-          </IfPermitted>
+          <ButtonToolbar>
+            <IfPermitted permissions="inputs:edit">
+              <EditPatternModal id={pattern.id}
+                                name={pattern.name}
+                                pattern={pattern.pattern}
+                                testPattern={testPattern}
+                                patterns={patterns}
+                                create={false}
+                                reload={this.loadData}
+                                savePattern={this.savePattern}
+                                validPatternName={this.validPatternName} />
+              <Button style={{ marginRight: 5 }}
+                      bsStyle="danger"
+                      bsSize="xs"
+                      onClick={() => this.confirmedRemove(pattern)}>
+                Delete
+              </Button>
+            </IfPermitted>
+          </ButtonToolbar>
         </td>
       </tr>
     );
@@ -195,26 +197,27 @@ class GrokPatterns extends React.Component {
 
     return (
       <div>
-        <PageHeader title="Grok patterns">
+        <PageHeader title="Grok patterns"
+                    subactions={(
+                      <IfPermitted permissions="inputs:edit">
+                        <ButtonToolbar>
+                          <BulkLoadPatternModal onSuccess={this.loadData} />
+                          <EditPatternModal id=""
+                                            name=""
+                                            pattern=""
+                                            patterns={patterns}
+                                            create
+                                            testPattern={testPattern}
+                                            reload={this.loadData}
+                                            savePattern={this.savePattern}
+                                            validPatternName={this.validPatternName} />
+                        </ButtonToolbar>
+                      </IfPermitted>
+                    )}>
           <span>
             This is a list of grok patterns you can use in your Graylog grok extractors. You can add
             your own manually or import a whole list of patterns from a so called pattern file.
           </span>
-          {null}
-          <IfPermitted permissions="inputs:edit">
-            <span>
-              <BulkLoadPatternModal onSuccess={this.loadData} />
-              <EditPatternModal id=""
-                                name=""
-                                pattern=""
-                                patterns={patterns}
-                                create
-                                testPattern={testPattern}
-                                reload={this.loadData}
-                                savePattern={this.savePattern}
-                                validPatternName={this.validPatternName} />
-            </span>
-          </IfPermitted>
         </PageHeader>
 
         <Row className="content">

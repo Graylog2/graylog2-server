@@ -23,14 +23,15 @@ import { Button } from 'components/bootstrap';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UserCreate from 'components/users/UserCreate';
 import DocumentationLink from 'components/support/DocumentationLink';
-import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
+import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 
 const UserCreatePage = () => (
   <DocumentTitle title="Create New User">
+    <UsersPageNavigation />
     <PageHeader title="Create New User"
                 subactions={(
                   <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
-                    <Button bsStyle="success">Create User</Button>
+                    <Button bsStyle="success">Create user</Button>
                   </LinkContainer>
                 )}>
       <span>
@@ -43,8 +44,6 @@ const UserCreatePage = () => (
         <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                            text="documentation" />
       </span>
-
-      <UserOverviewLinks />
     </PageHeader>
 
     <UserCreate />

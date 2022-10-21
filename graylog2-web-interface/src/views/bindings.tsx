@@ -83,6 +83,7 @@ import { AggregationWizard } from 'views/components/aggregationwizard';
 import { filterCloudValueActions } from 'util/conditional/filterValueActions';
 import CopyValueToClipboard from 'views/logic/valueactions/CopyValueToClipboard';
 import CopyFieldToClipboard from 'views/logic/fieldactions/CopyFieldToClipboard';
+import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import ViewHeader from 'views/components/views/ViewHeader';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
@@ -104,6 +105,7 @@ VisualizationConfig.registerSubtype(NumberVisualization.type, NumberVisualizatio
 VisualizationConfig.registerSubtype(LineVisualization.type, LineVisualizationConfig);
 VisualizationConfig.registerSubtype(AreaVisualization.type, AreaVisualizationConfig);
 VisualizationConfig.registerSubtype(HeatmapVisualization.type, HeatmapVisualizationConfig);
+VisualizationConfig.registerSubtype(DataTable.type, DataTableVisualizationConfig);
 
 Parameter.registerSubtype(ValueParameter.type, ValueParameter);
 Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
@@ -141,6 +143,7 @@ const exports: PluginExports = {
       // TODO: Subtyping needs to be taken into account
       visualizationComponent: MessageList as unknown as React.ComponentType<WidgetComponentProps>,
       editComponent: EditMessageList,
+      hasEditSubmitButton: true,
       needsControlledHeight: () => false,
       searchResultTransformer: (data: Array<unknown>) => data[0],
       searchTypes: MessageConfigGenerator,
@@ -154,6 +157,7 @@ const exports: PluginExports = {
       reportStyle: () => ({ width: 600 }),
       visualizationComponent: AggregationBuilder,
       editComponent: AggregationWizard,
+      hasEditSubmitButton: true,
       needsControlledHeight: (widget: Widget) => {
         const widgetVisualization = get(widget, 'config.visualization');
         const flexibleHeightWidgets = [

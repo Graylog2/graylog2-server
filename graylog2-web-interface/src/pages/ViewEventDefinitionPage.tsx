@@ -31,6 +31,7 @@ import history from 'util/History';
 import EventDefinitionSummary from 'components/event-definitions/event-definition-form/EventDefinitionSummary';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
+import EventsPageNavigation from 'components/events/EventsPageNavigation';
 
 const ViewEventDefinitionPage = () => {
   const params = useParams<{definitionId?: string}>();
@@ -76,48 +77,35 @@ const ViewEventDefinitionPage = () => {
 
   return (
     <DocumentTitle title={`View "${eventDefinition.title}" Event Definition`}>
-      <span>
-        <PageHeader title={`View "${eventDefinition.title}" Event Definition`}
-                    subactions={(
-                      <ButtonToolbar>
-                        <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
-                          <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(params.definitionId)}>
-                            <Button bsStyle="success">Edit Event Definition</Button>
-                          </LinkContainer>
-                        </IfPermitted>
-                      </ButtonToolbar>
+      <EventsPageNavigation />
+      <PageHeader title={`View "${eventDefinition.title}" Event Definition`}
+                  subactions={(
+                    <ButtonToolbar>
+                      <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
+                        <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(params.definitionId)}>
+                          <Button bsStyle="success">Edit Event Definition</Button>
+                        </LinkContainer>
+                      </IfPermitted>
+                    </ButtonToolbar>
           )}>
-          <span>
-            Event Definitions allow you to create Events from different Conditions and alert on them.
-          </span>
+        <span>
+          Event Definitions allow you to create Events from different Conditions and alert on them.
+        </span>
 
-          <span>
-            Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
-            <DocumentationLink page={DocsHelper.PAGES.ALERTS}
-                               text="documentation" />
-          </span>
+        <span>
+          Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
+          <DocumentationLink page={DocsHelper.PAGES.ALERTS}
+                             text="documentation" />
+        </span>
+      </PageHeader>
 
-          <ButtonToolbar>
-            <LinkContainer to={Routes.ALERTS.LIST}>
-              <Button bsStyle="info">Alerts & Events</Button>
-            </LinkContainer>
-            <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
-              <Button bsStyle="info">Event Definitions</Button>
-            </LinkContainer>
-            <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
-              <Button bsStyle="info">Notifications</Button>
-            </LinkContainer>
-          </ButtonToolbar>
-        </PageHeader>
-
-        <Row className="content">
-          <Col md={12}>
-            <EventDefinitionSummary eventDefinition={eventDefinition}
-                                    currentUser={currentUser}
-                                    notifications={notifications} />
-          </Col>
-        </Row>
-      </span>
+      <Row className="content">
+        <Col md={12}>
+          <EventDefinitionSummary eventDefinition={eventDefinition}
+                                  currentUser={currentUser}
+                                  notifications={notifications} />
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };

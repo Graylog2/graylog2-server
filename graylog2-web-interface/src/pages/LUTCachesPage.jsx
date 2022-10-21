@@ -19,7 +19,7 @@ import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
 import connect from 'stores/connect';
-import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
+import { Col, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -28,6 +28,7 @@ import withPaginationQueryParameter from 'components/common/withPaginationQueryP
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { LookupTableCachesActions, LookupTableCachesStore } from 'stores/lookup-tables/LookupTableCachesStore';
+import LUTPageNavigation from 'components/lookup-tables/LUTPageNavigation';
 
 const _saved = () => {
   history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
@@ -123,27 +124,16 @@ class LUTCachesPage extends React.Component {
 
     return (
       <DocumentTitle title="Lookup Tables - Caches">
-        <span>
-          <PageHeader title="Caches for Lookup Tables">
-            <span>Caches provide the actual values for lookup tables</span>
-            {null}
-            <span>
-              <ButtonToolbar>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
-                  <Button bsStyle="info">Lookup Tables</Button>
-                </LinkContainer>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW}>
-                  <Button bsStyle="info">Caches</Button>
-                </LinkContainer>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}>
-                  <Button bsStyle="info">Data Adapters</Button>
-                </LinkContainer>
-              </ButtonToolbar>
-            </span>
-          </PageHeader>
-
-          {content}
-        </span>
+        <LUTPageNavigation />
+        <PageHeader title="Caches for Lookup Tables"
+                    subactions={(
+                      <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}>
+                        <Button bsStyle="success" style={{ marginLeft: 5 }}>Create cache</Button>
+                      </LinkContainer>
+                    )}>
+          <span>Caches provide the actual values for lookup tables</span>
+        </PageHeader>
+        {content}
       </DocumentTitle>
     );
   }

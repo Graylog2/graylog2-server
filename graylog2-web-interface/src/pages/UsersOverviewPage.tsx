@@ -22,15 +22,16 @@ import DocsHelper from 'util/DocsHelper';
 import { Button } from 'components/bootstrap';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UsersOverview from 'components/users/UsersOverview';
-import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
+import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 const UsersOverviewPage = () => (
   <DocumentTitle title="Users Overview">
+    <UsersPageNavigation />
     <PageHeader title="Users Overview"
                 subactions={(
                   <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
-                    <Button bsStyle="success">Create User</Button>
+                    <Button bsStyle="success">Create user</Button>
                   </LinkContainer>
                 )}>
       <span>Overview of Graylog&apos;s registered users.</span>
@@ -40,8 +41,6 @@ const UsersOverviewPage = () => (
         <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                            text="documentation" />
       </span>
-
-      <UserOverviewLinks />
     </PageHeader>
 
     <UsersOverview />

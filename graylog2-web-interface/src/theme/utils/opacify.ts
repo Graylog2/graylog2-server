@@ -16,11 +16,9 @@
  */
 import chroma from 'chroma-js';
 
-export type Opacify = {
-  (string, number): string,
-};
+export type Opacify = (color: string, amount:number) => string;
 
-function opacify(color: string, amount: number): string {
+const opacify: Opacify = (color, amount) => {
   /**
    * Increases the opacity of a color. Its range for the amount is between 0 to 1.
    *
@@ -33,9 +31,14 @@ function opacify(color: string, amount: number): string {
   }
 
   const parsedAlpha = chroma(color).alpha();
-  const newAlpha = (parsedAlpha * 100 + amount * 100) / 100;
+
+  /*
+   * NOTE: the reason for the over complication of the math is to account for rounding issues.
+   * example: without the multiplier and divisor 1 - .7 returns 0.30000000000000004
+  */
+  const newAlpha = ((parsedAlpha * 100) - (amount * 100)) / 100;
 
   return chroma(color).alpha(newAlpha).css();
-}
+};
 
 export default opacify;

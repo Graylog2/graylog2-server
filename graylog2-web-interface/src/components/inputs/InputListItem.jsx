@@ -84,7 +84,7 @@ const InputListItem = createReactClass({
       actions.push(
         <LinkContainer key={`received-messages-${this.props.input.id}`}
                        to={Routes.search(`gl2_source_input:${this.props.input.id}`, { relative: 0 })}>
-          <Button bsStyle="info">Show received messages</Button>
+          <Button>Show received messages</Button>
         </LinkContainer>,
       );
     }
@@ -100,7 +100,7 @@ const InputListItem = createReactClass({
 
       actions.push(
         <LinkContainer key={`manage-extractors-${this.props.input.id}`} to={extractorRoute}>
-          <Button bsStyle="info">Manage extractors</Button>
+          <Button>Manage extractors</Button>
         </LinkContainer>,
       );
 

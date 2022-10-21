@@ -100,14 +100,14 @@ public class EventDefinitionFacadeTest {
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
-    private ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    private ObjectMapper objectMapper;
 
     private EventDefinitionFacade facade;
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+    private MongoJackObjectMapperProvider mapperProvider;
 
     @Mock
     private DBEventProcessorStateService stateService;
@@ -129,11 +129,14 @@ public class EventDefinitionFacadeTest {
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
+        objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(
                 AggregationEventProcessorConfig.class,
                 PersistToStreamsStorageHandler.Config.class,
                 TemplateFieldValueProvider.Config.class,
                 AggregationEventProcessorConfigEntity.class);
+        mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+
         stateService = mock(DBEventProcessorStateService.class);
         jobDefinitionService = mock(DBJobDefinitionService.class);
         jobTriggerService = mock(DBJobTriggerService.class);
