@@ -52,10 +52,6 @@ const StyledInput = styled.input(({ queryWidth }) => `
   width: ${queryWidth} !important;
 `);
 
-const StyledInputContainer = styled.div(({ queryContainerWidth }) => `
-  width: ${queryContainerWidth} !important;
-`);
-
 /**
  * Component that renders a customizable search form. The component
  * supports a loading state, adding children next to the form, and
@@ -87,8 +83,6 @@ class SearchForm extends React.Component {
     wrapperClass: PropTypes.string,
     /** Width to use in the search field. */
     queryWidth: PropTypes.any,
-    /** Width to use in the search field container. */
-    queryContainerWidth: PropTypes.any,
     /** Top margin to use in the search form container. */
     topMargin: PropTypes.number,
     /** Separation between search field and buttons. */
@@ -140,7 +134,6 @@ class SearchForm extends React.Component {
     placeholder: 'Enter search query...',
     wrapperClass: 'search',
     queryWidth: 'auto',
-    queryContainerWidth: 'auto',
     topMargin: 15,
     buttonLeftMargin: 5,
     searchBsStyle: 'default',
@@ -235,7 +228,6 @@ class SearchForm extends React.Component {
     const {
       queryHelpComponent,
       queryWidth,
-      queryContainerWidth,
       focusAfterMount,
       children,
       className,
@@ -257,7 +249,7 @@ class SearchForm extends React.Component {
       <StyledContainer className={`${wrapperClass} ${className}`} topMargin={topMargin}>
         <form className="form-inline" onSubmit={this._onSearch}>
           <FormContent buttonLeftMargin={buttonLeftMargin}>
-            <StyledInputContainer className={`form-group ${queryHelpComponent ? 'has-feedback' : ''}`} queryContainerWidth={queryContainerWidth}>
+            <div className={`form-group ${queryHelpComponent ? 'has-feedback' : ''}`}>
               {label && (
                 <label htmlFor="common-search-form-query-input" className="control-label">
                   {label}
@@ -277,7 +269,7 @@ class SearchForm extends React.Component {
               {queryHelpComponent && (
                 <HelpFeedback className="form-control-feedback">{queryHelpComponent}</HelpFeedback>
               )}
-            </StyledInputContainer>
+            </div>
 
             {onSearch && (
               <Button bsStyle={searchBsStyle}
