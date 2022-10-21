@@ -51,7 +51,7 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
 
     copy.creation_date = adjustFormat(new Date(), 'internal');
 
-    IndexSetsActions.create(copy).then(() => {
+    return IndexSetsActions.create(copy).then(() => {
       history.push(Routes.SYSTEM.INDICES.LIST);
     });
   };

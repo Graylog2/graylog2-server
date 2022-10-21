@@ -32,11 +32,9 @@ import { IndexSetsActions, IndexSetsStore, IndexSetPropType } from 'stores/indic
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 import { RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
 
-const _saveConfiguration = (indexSet) => {
-  IndexSetsActions.update(indexSet).then(() => {
-    history.push(Routes.SYSTEM.INDICES.LIST);
-  });
-};
+const _saveConfiguration = (indexSet) => IndexSetsActions.update(indexSet).then(() => {
+  history.push(Routes.SYSTEM.INDICES.LIST);
+});
 
 class IndexSetConfigurationPage extends React.Component {
   componentDidMount() {
