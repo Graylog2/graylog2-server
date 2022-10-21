@@ -108,12 +108,6 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
     field_type_refresh_interval: moment.duration(config.field_type_refresh_interval, config.field_type_refresh_interval_unit).asMilliseconds(),
   };
 
-  const defaultIndexSet = {
-    ...indexSet,
-    rotation_strategy_class: rotationStrategies[0].type,
-    rotation_strategy: rotationStrategies[0].default_config,
-  };
-
   return (
     <DocumentTitle title="Create Index Set">
       <div>
@@ -135,7 +129,7 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
 
         <Row className="content">
           <Col md={12}>
-            <IndexSetConfigurationForm indexSet={defaultIndexSet}
+            <IndexSetConfigurationForm indexSet={indexSet}
                                        retentionStrategiesContext={retentionStrategiesContext}
                                        rotationStrategies={rotationStrategies}
                                        retentionStrategies={retentionStrategies}
