@@ -67,21 +67,21 @@ const Nav = styled(BootstrapNav)(({ theme }) => css`
     &.nav-sm {
       > li > a {
         padding: 8px 12px;
-        font-size: 12px;
+        font-size: ${theme.fonts.size.small};
       }
     };
 
     &.nav-xs {
       > li > a {
         padding: 2px 6px;
-        font-size: 12px;
+        font-size: ${theme.fonts.size.small};
       }
     };
 
     &.nav-lg {
       > li > a {
         padding: 14px 18px;
-        font-size: 18px;
+        font-size: ${theme.fonts.size.large};
       }
     };
 

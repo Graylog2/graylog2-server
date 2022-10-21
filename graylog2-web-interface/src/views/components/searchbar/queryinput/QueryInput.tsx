@@ -111,9 +111,6 @@ const _onLoadEditor = (editor, isInitialTokenizerUpdate: React.MutableRefObject<
         isInitialTokenizerUpdate.current = false;
       }
     });
-
-    editor.renderer.setScrollMargin(6, 5);
-    editor.renderer.setPadding(12);
   }
 };
 

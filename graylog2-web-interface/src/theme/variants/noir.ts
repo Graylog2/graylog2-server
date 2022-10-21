@@ -47,12 +47,12 @@ const globalDefault: $PropertyType<Colors, 'global'> = {
 };
 
 const variantDefault = {
-  danger: '#E74C3C',
+  danger: '#e74c3c',
   default: '#595959',
-  info: '#578DCC',
-  primary: '#aa6b37',
-  success: '#73994c',
-  warning: '#D9BD47',
+  info: '#578dcc',
+  primary: '#697586',
+  success: '#709e4c',
+  warning: '#E3D45F',
 };
 
 const variant: $PropertyType<Colors, 'variant'> = {

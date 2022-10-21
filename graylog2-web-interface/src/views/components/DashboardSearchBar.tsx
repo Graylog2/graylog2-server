@@ -63,7 +63,7 @@ const Container = styled.div`
 const TopRow = styled.div(({ theme }) => css`
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  gap: 10px;
 
   @media (max-width: ${theme.breakpoints.max.sm}) {
     flex-direction: column;
@@ -84,7 +84,6 @@ const RefreshControlsWrapper = styled.div(({ theme }) => css`
   margin-left: 18px;
 
   @media (max-width: ${theme.breakpoints.max.sm}) {
-    margin-top: 10px;
     display: flex;
     justify-content: flex-end;
   }

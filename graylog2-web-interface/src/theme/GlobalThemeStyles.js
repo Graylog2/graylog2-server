@@ -507,23 +507,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-right: 5px;
   }
 
-  nav.navbar-fixed-top ul.dropdown-menu li a {
-    font-size: ${theme.fonts.size.body};
-  }
-
-  nav.navbar-fixed-top ul.dropdown-menu {
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-
-  nav.navbar-fixed-top ul.dropdown-menu li {
-    padding: 2px 2px 2px 0;
-  }
-
-  nav.navbar-fixed-top ul.dropdown-menu li.divider {
-    padding: 0;
-  }
-
   table.indexer-failures {
     margin-top: 10px;
   }
