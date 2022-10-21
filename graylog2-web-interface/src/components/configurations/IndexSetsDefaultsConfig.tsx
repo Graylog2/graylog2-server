@@ -202,22 +202,21 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
                                          enabled={true}
                                          hideCheckbox
                                          units={TIME_UNITS} />
+                          <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
+                                                                   key="rotation"
+                                                                   selectPlaceholder="Select rotation strategy"
+                                                                   pluginExports={PluginStore.exports('indexRotationConfig')}
+                                                                   strategies={rotationStrategies.strategies}
+                                                                   activeConfig={activeRotationConfig}
+                                                                   getState={getRotationConfigState} />
 
-                                <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
-                                                                         key="rotation"
-                                                                         selectPlaceholder="Select rotation strategy"
-                                                                         pluginExports={PluginStore.exports('indexRotationConfig')}
-                                                                         strategies={rotationStrategies.strategies}
-                                                                         activeConfig={activeRotationConfig}
-                                                                         getState={getRotationConfigState} />
-
-                                  <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
-                                                                           key="retention"
-                                                                           selectPlaceholder="Select rotation strategy"
-                                                                           pluginExports={PluginStore.exports('indexRetentionConfig')}
-                                                                           strategies={retentionStrategies.strategies}
-                                                                           activeConfig={activeRetentionConfig}
-                                                                           getState={getRetentionConfigState} />
+                          <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
+                                                                   key="retention"
+                                                                   selectPlaceholder="Select rotation strategy"
+                                                                   pluginExports={PluginStore.exports('indexRetentionConfig')}
+                                                                   strategies={retentionStrategies.strategies}
+                                                                   activeConfig={activeRetentionConfig}
+                                                                   getState={getRetentionConfigState} />
                         </Col>
                       </Row>
                     </div>

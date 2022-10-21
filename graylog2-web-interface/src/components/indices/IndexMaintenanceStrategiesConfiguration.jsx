@@ -17,10 +17,10 @@
 import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useCallback, useState } from 'react';
-import { useFormikContext, Field } from 'formik';
+import { useFormikContext } from 'formik';
 import styled from 'styled-components';
 
-import { Alert, Input } from 'components/bootstrap';
+import { Alert, Col, Input, Row } from 'components/bootstrap';
 import { Icon, Select } from 'components/common';
 
 const TIME_BASED_ROTATION_STRATEGY = 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy';
@@ -29,7 +29,9 @@ const NOOP_RETENTION_STRATEGY = 'org.graylog2.indexer.retention.strategies.NoopR
 const StyledH3 = styled.h3`
   margin-bottom: 10px;
 `;
-
+const StyledSelect = styled(Select)`
+  margin-bottom: 10px;
+`;
 const StyledAlert = styled(Alert)`
   overflow: auto;
   margin-right: 15px;
@@ -156,27 +158,41 @@ const IndexMaintenanceStrategiesConfiguration = ({
         <Icon name="info-circle" />{' '} {description}
       </StyledAlert>;
     }
-
     return null;
   }
 
   return (
-    <>
-    <Field name="settings.aws_region">
-      {({ meta }) => (
-        <Input id="strategy-select"
-
-               label={selectPlaceholder}>
-          <Select placeholder={selectPlaceholder}
-                  options={_availableSelectOptions()}
-                  matchProp="label"
-                  value={_activeSelection()}
-                  onChange={_onSelect} />
-        </Input>
+    <span>
+      <StyledH3>{title}</StyledH3>
+      {getDescription()}
+      {shouldShowMaxRetentionWarning && (
+        <StyledAlert bsStyle="warning">
+          <Icon name="exclamation-triangle" />{' '} The effective retention period value calculated from the <b>Rotation
+          period</b> and the
+          <b> max number of indices</b> should not be greater than the <b>Max retention
+          period</b> of <b>{maxRetentionPeriod}</b> set by the Administrator.
+        </StyledAlert>
       )}
-    </Field>
-      {_getConfigurationComponent(_activeSelection(), pluginExports, strategies, strategy, config, _onConfigUpdate)}
-    </>
+      <Row>
+        <Col md={12}>
+        <Input id="strategy-select"
+               labelClassName="col-sm-3"
+               wrapperClassName="col-sm-9"
+               label={selectPlaceholder}>
+          <StyledSelect placeholder={selectPlaceholder}
+                        options={_availableSelectOptions()}
+                        matchProp="label"
+                        value={_activeSelection()}
+                        onChange={_onSelect} />
+        </Input>
+          </Col>
+        </Row>
+      <Row>
+        <Col md={12}>
+          {_getConfigurationComponent(_activeSelection(), pluginExports, strategies, strategy, config, _onConfigUpdate)}
+        </Col>
+      </Row>
+    </span>
   );
 };
 
