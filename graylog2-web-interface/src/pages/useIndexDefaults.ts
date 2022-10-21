@@ -26,7 +26,8 @@ const fetchIndexDefaults: () => Promise<IndexConfig> = () => {
   return fetch('GET', qualifyUrl(`${ApiRoutes.ClusterConfigResource.config().url}/org.graylog2.configuration.IndexSetsDefaultsConfiguration`));
 };
 
-const useIndexDefaults = (fallbackDefaults: IndexConfig) => {
+const useIndexDefaults = () => {
+
   const { data, isLoading } = useQuery(
     ['scope-permissions'],
     fetchIndexDefaults,
@@ -38,10 +39,9 @@ const useIndexDefaults = (fallbackDefaults: IndexConfig) => {
     },
   );
 
-  const config: IndexConfig = isLoading ? fallbackDefaults : data;
-
   return {
-    config,
+    loadingIndexDefaultsConfig: isLoading,
+    indexDefaultsConfig: data,
   };
 };
 

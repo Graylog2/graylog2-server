@@ -30,7 +30,12 @@ import connect from 'stores/connect';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
-import { RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
+import {
+  RetentionStrategyPropType,
+  RotationStrategyPropType,
+  RetentionStrategyConfig,
+  RotationStrategyConfig,
+} from 'components/indices/Types';
 import type { RetentionStrategy, RotationStrategy, RetentionStrategyContext } from 'components/indices/Types';
 import { adjustFormat } from 'util/DateTime';
 import type { IndexConfig } from 'components/configurations/IndexSetsDefaultsConfig';
@@ -44,41 +49,6 @@ type Props = {
 }
 
 const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retentionStrategiesContext }: Props) => {
-  const fallbackDefaults: IndexConfig = {
-    index_prefix: '',
-    index_analyzer: 'standard',
-    shards: 4,
-    replicas: 0,
-    index_optimization_max_num_segments: 1,
-    index_optimization_disabled: false,
-    field_type_refresh_interval: 5,
-    field_type_refresh_interval_unit: 'seconds',
-    rotation_strategy_class: '',
-    rotation_strategy_config: '',
-
-  };
-  const { config } = useIndexDefaults(fallbackDefaults);
-
-  const indexSet: IndexSet = {
-    title: '',
-    description: '',
-    index_prefix: config.index_prefix,
-    writable: true,
-    can_be_default: true,
-    shards: config.shards,
-    replicas: config.replicas,
-    retention_strategy_class: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy',
-    retention_strategy: {
-      max_number_of_indices: 20,
-      type: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig',
-    },
-    rotation_strategy: undefined,
-    rotation_strategy_class: '',
-    index_analyzer: config.index_analyzer,
-    index_optimization_max_num_segments: config.index_optimization_max_num_segments,
-    index_optimization_disabled: config.index_optimization_disabled,
-    field_type_refresh_interval: moment.duration(config.field_type_refresh_interval, config.field_type_refresh_interval_unit).asMilliseconds(),
-  };
 
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies();
@@ -95,13 +65,48 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
     });
   };
 
+  const { loadingIndexDefaultsConfig, indexDefaultsConfig:config } = useIndexDefaults();
+
   const _isLoading = () => {
-    return !rotationStrategies || !retentionStrategies;
+    return !rotationStrategies || !retentionStrategies || loadingIndexDefaultsConfig;
   };
 
   if (_isLoading()) {
     return <Spinner />;
   }
+
+  const fallbackDefaults: IndexConfig = {
+    index_prefix: '',
+    index_analyzer: 'standard',
+    shards: 4,
+    replicas: 0,
+    index_optimization_max_num_segments: 1,
+    index_optimization_disabled: false,
+    field_type_refresh_interval: 5,
+    field_type_refresh_interval_unit: 'seconds',
+    rotation_strategy_class: '',
+    rotation_strategy_config: null,
+    retention_strategy_class: '',
+    retention_strategy_config: null,
+  };
+
+  const indexSet: IndexSet = {
+    title: '',
+    description: '',
+    index_prefix: config.index_prefix,
+    writable: true,
+    can_be_default: true,
+    shards: config.shards,
+    replicas: config.replicas,
+    rotation_strategy_class: config.rotation_strategy_class,
+    rotation_strategy: config.rotation_strategy_config as RotationStrategyConfig,
+    retention_strategy_class: config.retention_strategy_class,
+    retention_strategy: config.retention_strategy_config as RetentionStrategyConfig,
+    index_analyzer: config.index_analyzer,
+    index_optimization_max_num_segments: config.index_optimization_max_num_segments,
+    index_optimization_disabled: config.index_optimization_disabled,
+    field_type_refresh_interval: moment.duration(config.field_type_refresh_interval, config.field_type_refresh_interval_unit).asMilliseconds(),
+  };
 
   const defaultIndexSet = {
     ...indexSet,

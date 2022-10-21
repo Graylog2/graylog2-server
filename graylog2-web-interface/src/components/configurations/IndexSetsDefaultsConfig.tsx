@@ -43,9 +43,9 @@ export type IndexConfig = {
   index_optimization_disabled: boolean,
   field_type_refresh_interval: number,
   field_type_refresh_interval_unit: 'seconds' | 'minutes',
-  rotation_strategy_config: string,
+  rotation_strategy_config: object,
   rotation_strategy_class: string,
-  retention_strategy_config: string,
+  retention_strategy_config: object,
   retention_strategy_class: string,
 }
 
