@@ -21,7 +21,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.mongodb.lang.Nullable;
+import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
@@ -43,9 +45,9 @@ public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean
     public static final Integer DEFAULT_INDEX_OPTIMIZATION_MAX_SEGMENTS = 1;
     public static final int DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = 5;
     public static final TimeUnit DEFAULT_FIELD_TYPE_REFRESH_INTERVAL_UNIT = TimeUnit.SECONDS;
-    public static final String DEFAULT_ROTATION_STRATEGY_CLASS = SizeBasedRotationStrategyConfig.class.getCanonicalName();
+    public static final String DEFAULT_ROTATION_STRATEGY_CLASS = SizeBasedRotationStrategy.class.getCanonicalName();
     public static final RotationStrategyConfig DEFAULT_ROTATION_STRATEGY_CONFIG = SizeBasedRotationStrategyConfig.createDefault();
-    public static final String DEFAULT_RETENTION_STRATEGY_CLASS = SizeBasedRotationStrategyConfig.class.getCanonicalName();
+    public static final String DEFAULT_RETENTION_STRATEGY_CLASS = DeletionRetentionStrategy.class.getCanonicalName();
     public static final RetentionStrategyConfig DEFAULT_RETENTION_STRATEGY_CONFIG = DeletionRetentionStrategyConfig.createDefault();
 
     // Fields

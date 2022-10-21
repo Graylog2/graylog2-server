@@ -16,9 +16,13 @@
  */
 import PropTypes from 'prop-types';
 
+export type MaintenanceOptions = {
+  strategies: Array<unknown>
+}
+
 export type IndicesConfigurationActionsType = {
-  loadRotationStrategies: () => Promise<unknown>,
-  loadRetentionStrategies: () => Promise<unknown>,
+  loadRotationStrategies: () => Promise<MaintenanceOptions>,
+  loadRetentionStrategies: () => Promise<MaintenanceOptions>,
 };
 export type IndicesConfigurationStoreState = {
   activeRotationConfig: any,

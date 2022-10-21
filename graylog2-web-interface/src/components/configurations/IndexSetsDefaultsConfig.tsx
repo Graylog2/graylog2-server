@@ -26,7 +26,7 @@ import styled, {DefaultTheme, css} from 'styled-components';
 
 import 'components/indices/rotation';
 import 'components/indices/retention';
-import {RotationStrategy} from 'components/indices/Types';
+import {RotationStrategy, MaintenanceOptions} from 'components/indices/Types';
 import {IndicesConfigurationActions} from 'stores/indices/IndicesConfigurationStore';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import {PluginStore} from 'graylog-web-plugin/plugin';
@@ -45,6 +45,8 @@ export type IndexConfig = {
   field_type_refresh_interval_unit: 'seconds' | 'minutes',
   rotation_strategy_config: string,
   rotation_strategy_class: string,
+  retention_strategy_config: string,
+  retention_strategy_class: string,
 }
 
 export type LegacyRetentionConfig = {
@@ -75,9 +77,14 @@ const getRotationConfigState = (strategy: string, data: string) => {
   return {rotation_strategy_class: strategy, rotation_strategy_config: data};
 };
 
+const getRetentionConfigState = (strategy: string, data: string) => {
+  return {retention_strategy_class: strategy, retention_strategy_config: data};
+};
+
 const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [rotationStrategies, setRotationStrategies] = useState<unknown>(false);
+  const [rotationStrategies, setRotationStrategies] = useState<MaintenanceOptions>();
+  const [retentionStrategies, setRetentionStrategies] = useState<MaintenanceOptions>();
   const handleSaveConfig = async (config: IndexConfig) => updateConfig(config);
   const saveConfig = (values) => {
     handleSaveConfig(values).then(() => {
@@ -89,19 +96,26 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
     setShowModal(false);
   };
 
-  // The component expects a different structure - legacy
-  const activeConfig: LegacyRetentionConfig = {
+  const activeRotationConfig: LegacyRetentionConfig = {
     config: config.rotation_strategy_config,
     strategy: config.rotation_strategy_class,
+  };
+
+  const activeRetentionConfig: LegacyRetentionConfig = {
+    config: config.retention_strategy_config,
+    strategy: config.retention_strategy_class,
   };
 
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies().then((rotationStrategies) => {
       setRotationStrategies(rotationStrategies);
     });
+    IndicesConfigurationActions.loadRetentionStrategies().then((retentionStrategies) => {
+      setRetentionStrategies(retentionStrategies);
+    });
   }, []);
 
-  if (!rotationStrategies) {
+  if (!rotationStrategies || !rotationStrategies) {
     return <Spinner />;
   } else {
     return (
@@ -125,9 +139,11 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
           <dd>{config.field_type_refresh_interval} {lodash.capitalize(config.field_type_refresh_interval_unit)}</dd>
           <dt>Index optimization disabled:</dt>
           <dd>{config.index_optimization_disabled ? 'Yes' : 'No'}</dd>
-          <IndexMaintenanceStrategiesSummary config={activeConfig}
+          <br />
+          <IndexMaintenanceStrategiesSummary config={activeRotationConfig}
                                              pluginExports={PluginStore.exports('indexRotationConfig')} />
-
+          <IndexMaintenanceStrategiesSummary config={activeRetentionConfig}
+                                             pluginExports={PluginStore.exports('indexRetentionConfig')} />
         </StyledDefList>
 
         <p>
@@ -153,7 +169,7 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
                   <Modal.Body>
                     <div>
                       <Row>
-                        <Col sm={12}>
+                        <Col md={12}>
                           {/* TODO: Descriptions and help text <InputDescription help={<>A relevant description</>} />*/}
                           {/* TODO: Analyzer validation? Dropdown?*/}
                           <FormikInput label="Index Prefix"
@@ -187,14 +203,21 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
                                          hideCheckbox
                                          units={TIME_UNITS} />
 
-                          <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
-                                                                   key="rotation"
-                                                                   description="Graylog uses multiple indices to store documents in. You can configure the strategy it uses to determine when to rotate the currently active write index."
-                                                                   selectPlaceholder="Select rotation strategy"
-                                                                   pluginExports={PluginStore.exports('indexRotationConfig')}
-                                                                   strategies={rotationStrategies.strategies}
-                                                                   activeConfig={activeConfig}
-                                                                   getState={getRotationConfigState} />
+                                <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
+                                                                         key="rotation"
+                                                                         selectPlaceholder="Select rotation strategy"
+                                                                         pluginExports={PluginStore.exports('indexRotationConfig')}
+                                                                         strategies={rotationStrategies.strategies}
+                                                                         activeConfig={activeRotationConfig}
+                                                                         getState={getRotationConfigState} />
+
+                                  <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
+                                                                           key="retention"
+                                                                           selectPlaceholder="Select rotation strategy"
+                                                                           pluginExports={PluginStore.exports('indexRetentionConfig')}
+                                                                           strategies={retentionStrategies.strategies}
+                                                                           activeConfig={activeRetentionConfig}
+                                                                           getState={getRetentionConfigState} />
                         </Col>
                       </Row>
                     </div>

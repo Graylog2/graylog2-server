@@ -281,17 +281,8 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
                     </Field>
                   </Col>
                 </Row>
-                <Row>
-                  <Col md={12}>
                     {indexSet.writable && rotationConfig}
-                  </Col>
-                </Row>
-                <Row>
-                  <Col md={12}>
                     {indexSet.writable && retentionConfig}
-                  </Col>
-                </Row>
-
                 <Row>
                   <Col md={9} mdOffset={3}>
                     <StyledFormSubmit disabledSubmit={!isValid}

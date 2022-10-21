@@ -16,12 +16,12 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useState, useCallback } from 'react';
-import { useFormikContext } from 'formik';
+import { useCallback, useState } from 'react';
+import { useFormikContext, Field } from 'formik';
 import styled from 'styled-components';
 
-import { Input, Alert } from 'components/bootstrap';
-import { Select, Icon } from 'components/common';
+import { Alert, Input } from 'components/bootstrap';
+import { Icon, Select } from 'components/common';
 
 const TIME_BASED_ROTATION_STRATEGY = 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy';
 const NOOP_RETENTION_STRATEGY = 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy';
@@ -29,9 +29,7 @@ const NOOP_RETENTION_STRATEGY = 'org.graylog2.indexer.retention.strategies.NoopR
 const StyledH3 = styled.h3`
   margin-bottom: 10px;
 `;
-const StyledSelect = styled(Select)`
-  margin-bottom: 10px;
-`;
+
 const StyledAlert = styled(Alert)`
   overflow: auto;
   margin-right: 15px;
@@ -88,15 +86,15 @@ const _getConfigurationComponent = (selectedStrategy, pluginExports, strategies,
 };
 
 const IndexMaintenanceStrategiesConfiguration = ({
-  title,
-  description,
-  selectPlaceholder,
-  pluginExports,
-  strategies,
-  retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod },
-  activeConfig: { strategy, config },
-  getState,
-}) => {
+                                                   title,
+                                                   description,
+                                                   selectPlaceholder,
+                                                   pluginExports,
+                                                   strategies,
+                                                   retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod },
+                                                   activeConfig: { strategy, config },
+                                                   getState,
+                                                 }) => {
   const [newStrategy, setNewStrategy] = useState(strategy);
   const {
     setValues,
@@ -122,7 +120,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
 
   const _onConfigUpdate = useCallback((newConfig) => {
     const _addConfigType = (selectedStrategy, data) => {
-    // The config object needs to have the "type" field set to the "default_config.type" to make the REST call work.
+      // The config object needs to have the "type" field set to the "default_config.type" to make the REST call work.
       const result = strategies.filter((s) => s.type === selectedStrategy)[0];
       const copy = data;
 
@@ -152,30 +150,33 @@ const IndexMaintenanceStrategiesConfiguration = ({
   const retentionIsNotNoop = retentionStrategyClass !== NOOP_RETENTION_STRATEGY;
   const shouldShowMaxRetentionWarning = maxRetentionPeriod && rotationStrategyClass === TIME_BASED_ROTATION_STRATEGY && retentionIsNotNoop;
 
-  return (
-    <span>
-      <StyledH3>{title}</StyledH3>
-      <StyledAlert>
+  function getDescription() {
+    if (description) {
+      return <StyledAlert>
         <Icon name="info-circle" />{' '} {description}
-      </StyledAlert>
-      {shouldShowMaxRetentionWarning && (
-      <StyledAlert bsStyle="warning">
-        <Icon name="exclamation-triangle" />{' '} The effective retention period value calculated from the <b>Rotation period</b> and the
-        <b> max number of indices</b> should not be greater than the <b>Max retention period</b> of <b>{maxRetentionPeriod}</b> set by the Administrator.
-      </StyledAlert>
+      </StyledAlert>;
+    }
+
+    return null;
+  }
+
+  return (
+    <>
+    <Field name="settings.aws_region">
+      {({ meta }) => (
+        <Input id="strategy-select"
+
+               label={selectPlaceholder}>
+          <Select placeholder={selectPlaceholder}
+                  options={_availableSelectOptions()}
+                  matchProp="label"
+                  value={_activeSelection()}
+                  onChange={_onSelect} />
+        </Input>
       )}
-      <Input id="strategy-select"
-             labelClassName="col-sm-3"
-             wrapperClassName="col-sm-9"
-             label={selectPlaceholder}>
-        <StyledSelect placeholder={selectPlaceholder}
-                      options={_availableSelectOptions()}
-                      matchProp="label"
-                      value={_activeSelection()}
-                      onChange={_onSelect} />
-      </Input>
+    </Field>
       {_getConfigurationComponent(_activeSelection(), pluginExports, strategies, strategy, config, _onConfigUpdate)}
-    </span>
+    </>
   );
 };
 
