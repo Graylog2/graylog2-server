@@ -175,18 +175,18 @@ const IndexMaintenanceStrategiesConfiguration = ({
       )}
       <Row>
         <Col md={12}>
-        <Input id="strategy-select"
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9"
-               label={selectPlaceholder}>
-          <StyledSelect placeholder={selectPlaceholder}
-                        options={_availableSelectOptions()}
-                        matchProp="label"
-                        value={_activeSelection()}
-                        onChange={_onSelect} />
-        </Input>
-          </Col>
-        </Row>
+          <Input id="strategy-select"
+                 labelClassName="col-sm-3"
+                 wrapperClassName="col-sm-9"
+                 label={selectPlaceholder}>
+            <StyledSelect placeholder={selectPlaceholder}
+                          options={_availableSelectOptions()}
+                          matchProp="label"
+                          value={_activeSelection()}
+                          onChange={_onSelect} />
+          </Input>
+        </Col>
+      </Row>
       <Row>
         <Col md={12}>
           {_getConfigurationComponent(_activeSelection(), pluginExports, strategies, strategy, config, _onConfigUpdate)}
