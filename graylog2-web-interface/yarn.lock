@@ -2192,15 +2192,15 @@
   resolved "https://registry.yarnpkg.com/@openfonts/dm-sans_latin/-/dm-sans_latin-1.0.2.tgz#c666fc8f9c4bfc368bd8bfbb3d8a077ea132bb0a"
   integrity sha512-tETeHmw04BVBS2ZZCniMOCF2iEj6t49j/WNSGqFEtJHm5HwT+D+Bpw1jb9FNWgu8Ze/bnriJOSqpEFF+1j/gQA==
 
-"@openfonts/source-code-pro_latin@^1.44.1":
-  version "1.44.2"
-  resolved "https://registry.yarnpkg.com/@openfonts/source-code-pro_latin/-/source-code-pro_latin-1.44.2.tgz#e7daec6a7eccfc96ff9aff33ac36fc6953e74c8e"
-  integrity sha512-RIivG6F3674+6SvXLu2WdkjHZ3gmBvuj7cO8fl5T3v9yph2MmCV/QZWXf+9dkYQYNf8OFKbWVjp2x4KdlioZrg==
-
 "@openfonts/source-sans-pro_latin@^1.44.2":
   version "1.44.2"
   resolved "https://registry.yarnpkg.com/@openfonts/source-sans-pro_latin/-/source-sans-pro_latin-1.44.2.tgz#46f01915dc62545cc3e0596c55cd49b4906b022d"
   integrity sha512-/NMcdO9K8a1b1+IKjpeD+YC+hTaVnzghcRljHeFnjZtjnYnw01NWRxladEE0TY99w3GnOSz1LaKuupfirJJlOQ==
+
+"@openfonts/ubuntu-mono_latin@^1.44.1":
+  version "1.44.1"
+  resolved "https://registry.yarnpkg.com/@openfonts/ubuntu-mono_latin/-/ubuntu-mono_latin-1.44.1.tgz#cbb8f3d820c6fee419699724654c2d4b4e0da9b8"
+  integrity sha512-yqSfwLAwBk9gpmVBC/LjcJGuJA2RsgYopLOhueHZDrwhxhnaWwgBOtjWiLYKeAhH0qDyoMh/q8DJJ9e2VxA0yA==
 
 "@plotly/d3-sankey-circular@0.33.1":
   version "0.33.1"

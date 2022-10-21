@@ -106,7 +106,7 @@ describe('Trend', () => {
 
       const background = await screen.findByTestId('trend-background');
 
-      expect(background).toHaveStyleRule('background-color', '#90bd63 !important');
+      expect(background).toHaveStyleRule('background-color', '#7eb356 !important');
     });
 
     it('shows good background if current value and preference are lower', async () => {
@@ -114,7 +114,7 @@ describe('Trend', () => {
 
       const background = await screen.findByTestId('trend-background');
 
-      expect(background).toHaveStyleRule('background-color', '#90bd63 !important');
+      expect(background).toHaveStyleRule('background-color', '#7eb356 !important');
     });
 
     it('shows bad background if current value is lower but preference is higher', async () => {

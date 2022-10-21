@@ -60,6 +60,10 @@ const StreamListItem = styled.li(({ theme }) => css`
   }
 `);
 
+const StreamTitle = styled.h2(({ theme }) => `
+  font-family: ${theme.fonts.family.body};
+`);
+
 const ToggleButton = styled(Button)`
   min-width: 8.8em;
 `;
@@ -236,11 +240,11 @@ class Stream extends React.Component {
           {streamControls}
         </ButtonToolbar>
 
-        <h2>
+        <StreamTitle>
           <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
           {' '}
           <small>{indexSetDetails}<StreamStateBadge stream={stream} /></small>
-        </h2>
+        </StreamTitle>
 
         <div className="stream-data">
           <div className="stream-description">

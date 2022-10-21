@@ -137,7 +137,7 @@ const EventDefinitionEntry = ({
   );
 
   const plugin = getConditionPlugin(eventDefinition.config.type);
-  let titleSuffix = <div>{plugin?.displayName ?? eventDefinition.config.type}</div>;
+  let titleSuffix = <span>{plugin?.displayName ?? eventDefinition.config.type}</span>;
 
   if (!isScheduled) {
     titleSuffix = (<span>{titleSuffix} <Label bsStyle="warning">disabled</Label></span>);

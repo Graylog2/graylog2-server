@@ -176,6 +176,8 @@ public class MessagesAdapterOS2 implements MessagesAdapter {
             for (OpenSearchException cause : e.guessRootCauses()) {
                 if (cause.status().equals(RestStatus.REQUEST_ENTITY_TOO_LARGE)) {
                     throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully);
+                } else if (cause.status().equals(RestStatus.TOO_MANY_REQUESTS)) {
+                    throw new ChunkedBulkIndexer.TooManyRequestsException(indexedSuccessfully);
                 }
             }
             throw new org.graylog2.indexer.ElasticsearchException(e);
