@@ -26,7 +26,12 @@ import styled, {DefaultTheme, css} from 'styled-components';
 
 import 'components/indices/rotation';
 import 'components/indices/retention';
-import {RotationStrategy, MaintenanceOptions} from 'components/indices/Types';
+import {
+  RotationStrategy,
+  MaintenanceOptions,
+  RotationStrategyConfig,
+  RetentionStrategyConfig,
+} from 'components/indices/Types';
 import {IndicesConfigurationActions} from 'stores/indices/IndicesConfigurationStore';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import {PluginStore} from 'graylog-web-plugin/plugin';
@@ -43,15 +48,10 @@ export type IndexConfig = {
   index_optimization_disabled: boolean,
   field_type_refresh_interval: number,
   field_type_refresh_interval_unit: 'seconds' | 'minutes',
-  rotation_strategy_config: object,
+  rotation_strategy_config: RotationStrategyConfig,
   rotation_strategy_class: string,
-  retention_strategy_config: object,
+  retention_strategy_config: RetentionStrategyConfig,
   retention_strategy_class: string,
-}
-
-export type LegacyRetentionConfig = {
-  config: string,
-  strategy: string,
 }
 
 const TIME_UNITS = ['SECONDS', 'MINUTES'];
@@ -96,12 +96,11 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
     setShowModal(false);
   };
 
-  const activeRotationConfig: LegacyRetentionConfig = {
+  const rotationConfig = {
     config: config.rotation_strategy_config,
     strategy: config.rotation_strategy_class,
   };
-
-  const activeRetentionConfig: LegacyRetentionConfig = {
+  const retentionConfig = {
     config: config.retention_strategy_config,
     strategy: config.retention_strategy_class,
   };
@@ -140,9 +139,9 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
           <dt>Index optimization disabled:</dt>
           <dd>{config.index_optimization_disabled ? 'Yes' : 'No'}</dd>
           <br />
-          <IndexMaintenanceStrategiesSummary config={activeRotationConfig}
+          <IndexMaintenanceStrategiesSummary config={rotationConfig}
                                              pluginExports={PluginStore.exports('indexRotationConfig')} />
-          <IndexMaintenanceStrategiesSummary config={activeRetentionConfig}
+          <IndexMaintenanceStrategiesSummary config={retentionConfig}
                                              pluginExports={PluginStore.exports('indexRetentionConfig')} />
         </StyledDefList>
 
@@ -207,7 +206,7 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
                                                                    selectPlaceholder="Select rotation strategy"
                                                                    pluginExports={PluginStore.exports('indexRotationConfig')}
                                                                    strategies={rotationStrategies.strategies}
-                                                                   activeConfig={activeRotationConfig}
+                                                                   activeConfig={retentionConfig}
                                                                    getState={getRotationConfigState} />
 
                           <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
@@ -215,7 +214,7 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
                                                                    selectPlaceholder="Select rotation strategy"
                                                                    pluginExports={PluginStore.exports('indexRetentionConfig')}
                                                                    strategies={retentionStrategies.strategies}
-                                                                   activeConfig={activeRetentionConfig}
+                                                                   activeConfig={rotationConfig}
                                                                    getState={getRetentionConfigState} />
                         </Col>
                       </Row>
