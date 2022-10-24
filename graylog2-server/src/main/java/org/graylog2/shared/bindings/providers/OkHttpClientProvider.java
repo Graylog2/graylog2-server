@@ -43,12 +43,14 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.ProxySelector;
+import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -138,9 +140,9 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
         return clientBuilder.build();
     }
 
-    public OkHttpClient getWithTcpKeepAlive() {
+    public OkHttpClient getWithTcpKeepAlive(Predicate<Socket> keepAlivePredicate) {
         return get().newBuilder()
-                .socketFactory(new TcpKeepAliveSocketFactory(SocketFactory.getDefault()))
+                .socketFactory(new TcpKeepAliveSocketFactory(SocketFactory.getDefault(), keepAlivePredicate))
                 .build();
     }
 

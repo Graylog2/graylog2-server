@@ -27,13 +27,13 @@ class TcpKeepAliveSocketFactoryTest {
 
     @Test
     void testNullDelegate() {
-        Assertions.assertThatThrownBy(() -> new TcpKeepAliveSocketFactory(null))
+        Assertions.assertThatThrownBy(() -> new TcpKeepAliveSocketFactory(null, s -> false))
                 .isInstanceOf(NullPointerException.class);
     }
 
     @Test
     void keepAliveFlagIsSet() throws IOException {
-        final TcpKeepAliveSocketFactory factory = new TcpKeepAliveSocketFactory(SocketFactory.getDefault());
+        final TcpKeepAliveSocketFactory factory = new TcpKeepAliveSocketFactory(SocketFactory.getDefault(), s -> true);
         final Socket socket = factory.createSocket();
         Assertions.assertThat(socket.getKeepAlive()).isTrue();
         socket.close();

@@ -86,10 +86,6 @@ public class HttpConfiguration {
     @Parameter(value = "http_allow_embedding")
     private boolean httpAllowEmbedding = false;
 
-    @Parameter(value = "http_enable_tcp_keepalive")
-    private boolean httpEnableTcpKeepAlive = false;
-
-
     public HostAndPort getHttpBindAddress() {
         return httpBindAddress
                 .requireBracketsForIPv6()

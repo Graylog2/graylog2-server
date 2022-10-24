@@ -41,6 +41,7 @@ const EventsConfig = createReactClass({
       events_notification_retry_period: PropTypes.number,
       events_notification_default_backlog: PropTypes.number,
       events_catchup_window: PropTypes.number,
+      events_notification_tcp_keepalive: PropTypes.bool,
     }),
     updateConfig: PropTypes.func.isRequired,
   },
@@ -52,6 +53,7 @@ const EventsConfig = createReactClass({
         events_notification_retry_period: 300000,
         events_notification_default_backlog: 50,
         events_catchup_window: DEFAULT_CATCH_UP_WINDOW,
+        events_notification_tcp_keepalive: false,
       },
     };
   },
@@ -142,6 +144,11 @@ const EventsConfig = createReactClass({
     this._propagateChanges('events_catchup_window', catchupWindowinMs);
   },
 
+  _onNotificationTcpKeepAliveUpdate(event) {
+    const value = getValueFromInput(event.target);
+    this._propagateChanges('events_notification_tcp_keepalive', value);
+  },
+
   _titleCase(str) {
     return lodash.capitalize(str);
   },
@@ -152,6 +159,7 @@ const EventsConfig = createReactClass({
     const eventsNotificationRetryPeriod = extractDurationAndUnit(config.events_notification_retry_period, TIME_UNITS);
     const eventsCatchupWindow = extractDurationAndUnit(config.events_catchup_window, TIME_UNITS);
     const eventsNotificationDefaultBacklog = config.events_notification_default_backlog;
+    const eventsNotificationTcpKeepalive = config.events_notification_tcp_keepalive;
 
     return (
       <div>
@@ -166,6 +174,8 @@ const EventsConfig = createReactClass({
           <dd>{eventsNotificationDefaultBacklog}</dd>
           <dt>Catch Up Window:</dt>
           <dd>{eventsCatchupWindow.duration > 0 ? eventsCatchupWindow.duration : 'disabled'} {eventsCatchupWindow.duration > 0 ? this._titleCase(eventsCatchupWindow.unit) : ''}</dd>
+          <dt>TCP keep-alive probes:</dt>
+          <dd>{eventsNotificationTcpKeepalive ? 'enabled' : 'disabled'}</dd>
         </dl>
 
         <IfPermitted permissions="clusterconfigentry:edit">
@@ -217,6 +227,18 @@ const EventsConfig = createReactClass({
                              units={TIME_UNITS} />
               <HelpBlock>If Event processor execution is behind schedule, queries on older data will be run with this window size to speed up processing.
                 (If the &quot;search within the last&quot; setting of an event definition is greater, this setting will be ignored)
+              </HelpBlock>
+            </FormGroup>
+            <FormGroup controlId="notification-tcp-keepalive-field">
+              <Input
+                id="notification-tcp-keepalive-field"
+                label="Send TCP keep-alive probes for notification connections"
+                type="checkbox"
+                onChange={this._onNotificationTcpKeepAliveUpdate}
+                checked={eventsNotificationTcpKeepalive}
+              />
+              <HelpBlock>
+                If enabled, http connections for notifications will send TCP keep-alive probes
               </HelpBlock>
             </FormGroup>
           </fieldset>

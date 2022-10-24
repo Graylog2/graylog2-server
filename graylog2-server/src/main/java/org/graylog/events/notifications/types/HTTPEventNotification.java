@@ -26,6 +26,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationModelData;
@@ -64,20 +65,22 @@ public class HTTPEventNotification implements EventNotification {
     private final UrlWhitelistService whitelistService;
     private final UrlWhitelistNotificationService urlWhitelistNotificationService;
     private final EncryptedValueService encryptedValueService;
+    private EventsConfigurationProvider configurationProvider;
 
     @Inject
     public HTTPEventNotification(EventNotificationService notificationCallbackService, ObjectMapper objectMapper,
                                  final OkHttpClientProvider httpClient, UrlWhitelistService whitelistService,
                                  UrlWhitelistNotificationService urlWhitelistNotificationService,
                                  EncryptedValueService encryptedValueService,
-                                 @Named("http_enable_tcp_keepalive") boolean httpEnableTcpKeepAlive
+                                 EventsConfigurationProvider configurationProvider
                                  ) {
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapper = objectMapper;
-        this.httpClient = httpEnableTcpKeepAlive ? httpClient.getWithTcpKeepAlive() : httpClient.get();
+        this.httpClient = httpClient.getWithTcpKeepAlive(socket -> configurationProvider.get().notificationsKeepAliveProbe());
         this.whitelistService = whitelistService;
         this.urlWhitelistNotificationService = urlWhitelistNotificationService;
         this.encryptedValueService = encryptedValueService;
+        this.configurationProvider = configurationProvider;
     }
 
     @Override
