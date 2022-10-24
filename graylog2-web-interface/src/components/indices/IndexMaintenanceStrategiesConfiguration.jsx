@@ -170,12 +170,9 @@ const IndexMaintenanceStrategiesConfiguration = ({
       {getDescription()}
       {shouldShowMaxRetentionWarning && (
         <StyledAlert bsStyle="warning">
-          <Icon name="exclamation-triangle" />{' '} The effective retention period value calculated from the <b>Rotation
-            period
-                                                                                                             </b> and the
-          <b> max number of indices</b> should not be greater than the <b>Max retention
-            period
-                                                                       </b> of <b>{maxRetentionPeriod}</b> set by the Administrator.
+          <Icon name="exclamation-triangle" />{' '} The effective retention period value calculated from the
+          <b>Rotation period</b> and the <b>max number of indices</b> should not be greater than the
+          <b>Max retention period </b> of <b>{maxRetentionPeriod}</b> set by the Administrator.
         </StyledAlert>
       )}
       <Row>

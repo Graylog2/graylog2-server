@@ -42,6 +42,7 @@ const SizeBasedRotationStrategyConfiguration = ({ config, updateConfig }) => {
   };
 
   return (
+    <div>
     <Input type="number"
            id="max-size"
            label="Max size per index (in bytes)"
@@ -52,6 +53,7 @@ const SizeBasedRotationStrategyConfiguration = ({ config, updateConfig }) => {
            help="Maximum size of an index before it gets rotated"
            addonAfter={_formatSize()}
            required />
+    </div>
   );
 };
 

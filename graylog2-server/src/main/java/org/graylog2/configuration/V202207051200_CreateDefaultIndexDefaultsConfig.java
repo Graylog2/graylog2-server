@@ -16,22 +16,35 @@
  */
 package org.graylog2.configuration;
 
+import org.graylog2.indexer.management.IndexManagementConfig;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.indexer.retention.RetentionStrategy;
+import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
+import org.graylog2.plugin.indexer.rotation.RotationStrategy;
+import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.time.ZonedDateTime;
+
+import static com.google.common.base.Preconditions.checkState;
+import static org.graylog2.configuration.IndexSetsDefaultsConfiguration.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL;
+import static org.graylog2.configuration.IndexSetsDefaultsConfiguration.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL_UNIT;
 
 public class V202207051200_CreateDefaultIndexDefaultsConfig extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V202207051200_CreateDefaultIndexDefaultsConfig.class);
 
     private final ClusterConfigService clusterConfigService;
+    private final ElasticsearchConfiguration elasticsearchConfig;
 
     @Inject
-    public V202207051200_CreateDefaultIndexDefaultsConfig(ClusterConfigService clusterConfigService) {
+    public V202207051200_CreateDefaultIndexDefaultsConfig(final ClusterConfigService clusterConfigService,
+                                                          final ElasticsearchConfiguration elasticsearchConfig) {
         this.clusterConfigService = clusterConfigService;
+        this.elasticsearchConfig = elasticsearchConfig;
     }
 
     @Override
@@ -46,8 +59,25 @@ public class V202207051200_CreateDefaultIndexDefaultsConfig extends Migration {
             LOG.debug("Migration already completed.");
             return;
         }
+
+        final IndexManagementConfig legacyConfig = clusterConfigService.get(IndexManagementConfig.class);
+
         try {
-            clusterConfigService.write(IndexSetsDefaultsConfiguration.createDefault());
+            final IndexSetsDefaultsConfiguration config = IndexSetsDefaultsConfiguration.builder()
+                    .indexPrefix(elasticsearchConfig.getIndexPrefix())
+                    .indexAnalyzer(elasticsearchConfig.getAnalyzer())
+                    .shards(elasticsearchConfig.getShards())
+                    .replicas(elasticsearchConfig.getReplicas())
+                    .indexOptimizationDisabled(elasticsearchConfig.isDisableIndexOptimization())
+                    .indexOptimizationMaxNumSegments(elasticsearchConfig.getIndexOptimizationMaxNumSegments())
+                    .fieldTypeRefreshInterval(DEFAULT_FIELD_TYPE_REFRESH_INTERVAL)
+                    .fieldTypeRefreshIntervalUnit(DEFAULT_FIELD_TYPE_REFRESH_INTERVAL_UNIT)
+//                    .rotationStrategyClass(DEFAULT_ROTATION_STRATEGY_CLASS)
+//                    .rotationStrategyConfig(DEFAULT_ROTATION_STRATEGY_CONFIG)
+//                    .retentionStrategyClass(DEFAULT_RETENTION_STRATEGY_CLASS)
+//                    .retentionStrategyConfig(DEFAULT_RETENTION_STRATEGY_CONFIG)
+                    .build();
+            clusterConfigService.write(config);
             LOG.debug("Index defaults config saved.");
         } catch (Exception e) {
             LOG.error("Unable to write index defaults configuration.", e);

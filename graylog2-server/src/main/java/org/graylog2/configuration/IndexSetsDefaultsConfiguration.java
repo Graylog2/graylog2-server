@@ -59,9 +59,9 @@ public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean
     public static final String INDEX_OPTIMIZATION_MAX_SEGMENTS = "index_optimization_max_num_segments";
     public static final String FIELD_TYPE_REFRESH_INTERVAL = "field_type_refresh_interval";
     public static final String FIELD_TYPE_REFRESH_INTERVAL_UNIT = "field_type_refresh_interval_unit";
-    public static final String ROTATION_STRATEGY_CLASS = "rotation_strategy_class";
+    public static final String ROTATION_STRATEGY_CLASS = "rotation_strategy";
     public static final String ROTATION_STRATEGY_CONFIG = "rotation_strategy_config";
-    public static final String RETENTION_STRATEGY_CLASS = "retention_strategy_class";
+    public static final String RETENTION_STRATEGY_CLASS = "retention_strategy";
     public static final String RETENTION_STRATEGY_CONFIG = "retention_strategy_config";
 
     @Nullable
