@@ -24,6 +24,7 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import StreamsStore from 'stores/streams/StreamsStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useQuery from 'routing/useQuery';
+import DocsHelper from 'util/DocsHelper';
 
 const StreamEditPage = () => {
   const params = useParams<{ streamId: string }>();
@@ -65,7 +66,11 @@ const StreamEditPage = () => {
   return (
     <DocumentTitle title={`Rules of Stream ${stream.title}`}>
       <div>
-        <PageHeader title={<span>Rules of Stream &raquo;{stream.title}&raquo;</span>}>
+        <PageHeader title={<span>Rules of Stream &raquo;{stream.title}&raquo;</span>}
+                    documentationLink={{
+                      title: 'Streams documentation',
+                      path: DocsHelper.PAGES.STREAMS,
+                    }}>
           <span>
             This screen is dedicated to an easy and comfortable creation and manipulation of stream rules. You can{' '}
             see the effect configured stream rules have on message matching here.

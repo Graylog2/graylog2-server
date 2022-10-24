@@ -22,7 +22,6 @@ import ErrorsActions from 'actions/errors/ErrorsActions';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -68,16 +67,15 @@ const ShowEventDefinitionPage = ({ params: { notificationId } }) => {
   return (
     <DocumentTitle title={`View "${notification.title}" Notification`}>
       <EventsPageNavigation />
-      <PageHeader title={`View "${notification.title}" Notification`} subactions={notification && <EventNotificationActionLinks notificationId={notification.id} />}>
+      <PageHeader title={`View "${notification.title}" Notification`}
+                  actions={notification && <EventNotificationActionLinks notificationId={notification.id} />}
+                  documentationLink={{
+                    title: 'Alerts documentation',
+                    path: DocsHelper.PAGES.ALERTS,
+                  }}>
         <span>
           Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
           to you or to other systems you use for that purpose.
-        </span>
-
-        <span>
-          Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
-          <DocumentationLink page={DocsHelper.PAGES.ALERTS}
-                             text="documentation" />
         </span>
       </PageHeader>
 

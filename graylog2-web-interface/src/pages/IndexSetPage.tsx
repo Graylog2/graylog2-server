@@ -20,11 +20,10 @@ import numeral from 'numeral';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { LinkContainer } from 'components/common/router';
-import { Alert, Row, Col, Panel, Button } from 'components/bootstrap';
+import { Alert, Row, Col, Panel, Button, ButtonToolbar } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
 import { IndicesMaintenanceDropdown, IndicesOverview, IndexSetDetails } from 'components/indices';
 import { IndexerClusterHealthSummary } from 'components/indexers';
-import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
@@ -37,6 +36,26 @@ import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore'
 import { IndicesActions, IndicesStore } from 'stores/indices/IndicesStore';
 
 const REFRESH_INTERVAL = 2000;
+
+const ElasticsearchUnavailableInformation = () => (
+  <Row className="content">
+    <Col md={8} mdOffset={2}>
+      <div className="top-margin">
+        <Panel bsStyle="danger"
+               header={<span><Icon name="exclamation-triangle" /> Indices overview unavailable</span>}>
+          <p>
+            We could not get the indices overview information. This usually means there was a problem
+            connecting to Elasticsearch, and <strong>you should ensure Elasticsearch is up and reachable from Graylog</strong>.
+          </p>
+          <p>
+            Graylog will continue storing your messages in its journal, but you will not be able to search on them
+            until Elasticsearch is reachable again.
+          </p>
+        </Panel>
+      </div>
+    </Col>
+  </Row>
+);
 
 type Props = {
   params: {
@@ -110,30 +129,6 @@ class IndexSetPage extends React.Component<Props, State> {
     return indices ? Object.keys(indices).length : null;
   };
 
-  _renderElasticsearchUnavailableInformation = () => {
-    return (
-      <Row className="content">
-        <Col md={8} mdOffset={2}>
-          <div className="top-margin">
-            <Panel bsStyle="danger"
-                   header={<span><Icon name="exclamation-triangle" /> Indices overview unavailable</span>}>
-              <p>
-                We could not get the indices overview information. This usually means there was a problem
-                connecting to Elasticsearch, and <strong>you should ensure Elasticsearch is up and reachable from
-                  Graylog
-                                                 </strong>.
-              </p>
-              <p>
-                Graylog will continue storing your messages in its journal, but you will not be able to search on them
-                until Elasticsearch is reachable again.
-              </p>
-            </Panel>
-          </div>
-        </Col>
-      </Row>
-    );
-  };
-
   _isLoading = () => {
     const { indexSet } = this.props;
 
@@ -148,27 +143,27 @@ class IndexSetPage extends React.Component<Props, State> {
     const { indexSet, indexerOverview, indexerOverviewError, params: { indexSetId }, indexDetails: { indices: indexDetailsIndices, closedIndices: indexDetailsClosedIndices } } = this.props;
 
     const pageHeader = indexSet && (
-      <PageHeader title={`Index Set: ${indexSet.title}`}>
+      <PageHeader title={`Index Set: ${indexSet.title}`}
+                  topActions={(
+                    <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
+                      <Button bsStyle="info">Index sets overview</Button>
+                    </LinkContainer>
+                  )}
+                  documentationLink={{
+                    title: 'Index model documentation',
+                    path: DocsHelper.PAGES.INDEX_MODEL,
+                  }}
+                  actions={(
+                    <ButtonToolbar>
+                      <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id, 'details')}>
+                        <Button bsStyle="info">Edit Index Set</Button>
+                      </LinkContainer>
+                      <IndicesMaintenanceDropdown indexSetId={indexSetId} indexSet={indexSet} />
+                    </ButtonToolbar>
+                  )}>
         <span>
           This is an overview of all indices (message stores) in this index set Graylog is currently taking in account
           for searches and analysis.
-        </span>
-
-        <span>
-          You can learn more about the index model in the{' '}
-          <DocumentationLink page={DocsHelper.PAGES.INDEX_MODEL} text="documentation" />
-        </span>
-
-        <span>
-          <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-            <Button bsStyle="info">Index sets overview</Button>
-          </LinkContainer>
-          &nbsp;
-          <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id, 'details')}>
-            <Button bsStyle="info">Edit Index Set</Button>
-          </LinkContainer>
-          &nbsp;
-          <IndicesMaintenanceDropdown indexSetId={indexSetId} indexSet={indexSet} />
         </span>
       </PageHeader>
     );
@@ -177,7 +172,7 @@ class IndexSetPage extends React.Component<Props, State> {
       return (
         <span>
           {pageHeader}
-          {this._renderElasticsearchUnavailableInformation()}
+          <ElasticsearchUnavailableInformation />
         </span>
       );
     }

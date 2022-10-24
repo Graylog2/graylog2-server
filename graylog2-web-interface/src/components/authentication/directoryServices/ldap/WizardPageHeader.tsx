@@ -24,7 +24,6 @@ import type { OktaBackend } from 'logic/authentication/okta/types';
 import { PageHeader } from 'components/common';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
-import DocumentationLink from 'components/support/DocumentationLink';
 
 type Props = {
   authenticationBackend?: DirectoryServiceBackend | OktaBackend,
@@ -49,15 +48,15 @@ const WizardPageHeader = ({ authenticationBackend: authBackend, title }: Props) 
     <>
       <AuthenticationPageNavigation />
       <PageHeader title={pageTitle}
-                  subactions={(
+                  actions={(
                     <BackendActionLinks activeBackend={activeBackend}
                                         finishedLoading={finishedLoading} />
-                )}>
+                  )}
+                  documentationLink={{
+                    title: 'Authentication documentation',
+                    path: DocsHelper.PAGES.USERS_ROLES,
+                  }}>
         <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
-        <span>
-          Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                                                             text="documentation" />.
-        </span>
       </PageHeader>
     </>
   );

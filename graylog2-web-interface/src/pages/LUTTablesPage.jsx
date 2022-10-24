@@ -170,7 +170,7 @@ class LUTTablesPage extends React.Component {
       <DocumentTitle title="Lookup Tables">
         <LUTPageNavigation />
         <PageHeader title="Lookup Tables"
-                    subactions={(
+                    actions={(
                       <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
                         <Button bsStyle="success" style={{ marginLeft: 5 }}>Create lookup table</Button>
                       </LinkContainer>

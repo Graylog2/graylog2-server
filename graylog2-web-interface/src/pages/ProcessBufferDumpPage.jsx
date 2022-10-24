@@ -73,9 +73,7 @@ const ProcessBufferDumpPage = createReactClass({
     return (
       <DocumentTitle title={`Process-buffer dump of node ${node.short_node_id} / ${node.hostname}`}>
         <div>
-          <PageHeader title={title}>
-            <span />
-          </PageHeader>
+          <PageHeader title={title} />
           <Row className="content">
             <Col md={12}>
               {content}

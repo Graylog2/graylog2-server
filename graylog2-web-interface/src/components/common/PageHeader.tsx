@@ -21,10 +21,26 @@ import styled, { css } from 'styled-components';
 
 import { Col, Label, Tooltip } from 'components/bootstrap';
 import { OverlayTrigger } from 'components/common';
+import DocumentationLink from 'components/support/DocumentationLink';
 import ContentHeadRow from 'components/common/ContentHeadRow';
-import SupportLink from 'components/support/SupportLink';
 
-const LifecycleIndicator = styled.span(({ theme }) => css`
+const Container = styled.div`
+  display: flex;
+  gap: 3px;
+  flex-direction: column;
+`;
+
+const FlexRow = styled.div(({ theme }) => css`
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+
+  @media (max-width: ${theme.breakpoints.max.md}) {
+    flex-wrap: wrap;
+  }
+`);
+
+const LifecycleIndicatorContainer = styled.span(({ theme }) => css`
   cursor: help;
   margin-left: 5px;
   font-size: ${theme.fonts.size.body};
@@ -32,18 +48,24 @@ const LifecycleIndicator = styled.span(({ theme }) => css`
   vertical-align: text-top;
 `);
 
-const H1 = styled.h1`
-  margin-bottom: 0.2em;
+const TopActions = styled.div<{ $hasMultipleChildren: boolean }>(({ $hasMultipleChildren }) => css`
+  display: flex;
+  gap: 10px;
+  align-items: ${$hasMultipleChildren ? 'center' : 'flex-start'};
+`);
+
+const Actions = styled.div`
+  display: flex !important;
+  align-items: flex-end;
+  
+  .btn-toolbar {
+    display: flex;
+  }
 `;
 
-const ActionsSM = styled.div`
-  > * {
-    display: inline-block;
-    vertical-align: top;
-  }
-
-  > :not(:last-child) {
-    margin-right: 5px;
+const Description = styled.p`
+  &&&& {
+    margin-top: 0;
   }
 `;
 
@@ -52,13 +74,39 @@ const LIFECYCLE_DEFAULT_MESSAGES = {
   legacy: 'This feature has been discontinued and will be removed in a future Graylog version.',
 };
 
+const LifecycleIndicator = ({
+  lifecycle,
+  lifecycleMessage,
+}: {
+  lifecycle: 'experimental' | 'legacy' | undefined,
+  lifecycleMessage: React.ReactNode | undefined
+}) => {
+  if (lifecycle === undefined) {
+    return null;
+  }
+
+  const label = lodash.upperFirst(lifecycle);
+  const defaultMessage = lifecycle === 'experimental' ? LIFECYCLE_DEFAULT_MESSAGES.experimental : LIFECYCLE_DEFAULT_MESSAGES.legacy;
+  const tooltip = <Tooltip id={lifecycle}>{lifecycleMessage || defaultMessage}</Tooltip>;
+
+  return (
+    <LifecycleIndicatorContainer>
+      <OverlayTrigger placement="bottom" overlay={tooltip}>
+        <Label bsStyle="primary">{label}</Label>
+      </OverlayTrigger>
+    </LifecycleIndicatorContainer>
+  );
+};
+
 type Props = {
   title: React.ReactNode,
   children: React.ReactElement | Array<React.ReactElement>,
-  subactions?: React.ReactElement,
+  actions?: React.ReactElement,
+  topActions?: React.ReactElement,
   lifecycle?: 'experimental' | 'legacy',
   lifecycleMessage?: React.ReactNode,
   subpage: boolean,
+  documentationLink?: { title: string, path: string }
 };
 
 /**
@@ -66,109 +114,69 @@ type Props = {
  * This ensures all pages look and feel the same way across the product, so
  * please use it in your pages.
  */
-class PageHeader extends React.Component<Props> {
-  static propTypes = {
-    /** Page header heading. */
-    title: PropTypes.node.isRequired,
-    /**
-     * One or more children, they will be used in the header in this order:
-     *  1. Page description
-     *  2. Support information or link
-     *  3. Action buttons
-     *
-     * Please see the examples to see how to use this in practice.
-     */
-    children: PropTypes.node,
-    /** Section for subactions like create or edit */
-    subactions: PropTypes.node,
-    /** Indicates the lifecycle of the current page, which will display an indicator right next to the page title. */
-    lifecycle: PropTypes.oneOf(['experimental', 'legacy']),
-    /** Text to customize the default message for the given lifecycle. */
-    lifecycleMessage: PropTypes.node,
-    /** Specifies if the page header is children of a content `Row` or not. */
-    subpage: PropTypes.bool,
-  };
+const PageHeader = ({ children, subpage, title, actions, topActions, lifecycle, lifecycleMessage, documentationLink }: Props) => {
+  const topLevelClassNames = subpage ? '' : 'content';
 
-  static defaultProps = {
-    children: [],
-    lifecycle: undefined,
-    lifecycleMessage: undefined,
-    subactions: undefined,
-    subpage: false,
-  };
+  return (
+    <ContentHeadRow className={topLevelClassNames}>
+      <Col sm={12}>
+        <Container>
+          <FlexRow>
+            <h1>
+              {title} <small><LifecycleIndicator lifecycle={lifecycle} lifecycleMessage={lifecycleMessage} /></small>
+            </h1>
+            {(documentationLink || topActions) && (
+              <TopActions $hasMultipleChildren={!!documentationLink && !!topActions}>
+                {documentationLink && <DocumentationLink text={documentationLink.title} page={documentationLink.path} displayIcon />}
+                {topActions}
+              </TopActions>
+            )}
+          </FlexRow>
 
-  renderLifecycleIndicator = () => {
-    const { lifecycle, lifecycleMessage } = this.props;
-
-    if (lifecycle === undefined) {
-      return null;
-    }
-
-    const label = lodash.upperFirst(lifecycle);
-    const defaultMessage = lifecycle === 'experimental' ? LIFECYCLE_DEFAULT_MESSAGES.experimental : LIFECYCLE_DEFAULT_MESSAGES.legacy;
-    const tooltip = <Tooltip id={lifecycle}>{lifecycleMessage || defaultMessage}</Tooltip>;
-
-    return (
-      <LifecycleIndicator>
-        <OverlayTrigger placement="bottom" overlay={tooltip}>
-          <Label bsStyle="primary">{label}</Label>
-        </OverlayTrigger>
-      </LifecycleIndicator>
-    );
-  };
-
-  render() {
-    const { children: childList, subpage, title, subactions } = this.props;
-    const children = (childList !== undefined && 'length' in childList ? childList : [childList]);
-
-    const topLevelClassNames = subpage ? '' : 'content';
-
-    return (
-      <div>
-        <ContentHeadRow className={topLevelClassNames}>
-          <Col sm={12}>
-            {children[2] && (
-              <div className="actions-lg visible-lg visible-md">
-                <div className="actions-container">
-                  {children[2]}
-                </div>
-              </div>
+          <FlexRow>
+            {children && (
+              <Description className="description no-bm">
+                  {children}
+              </Description>
             )}
 
-            <H1>
-              {title} <small>{this.renderLifecycleIndicator()}</small>
-            </H1>
-
-            {children[0] && (
-              <p className="description">
-                {children[0]}
-              </p>
+            {actions && (
+              <Actions>
+                {actions}
+              </Actions>
             )}
+          </FlexRow>
+        </Container>
+      </Col>
+    </ContentHeadRow>
+  );
+};
 
-            {children[1] && (
-              <SupportLink>
-                {children[1]}
-              </SupportLink>
-            )}
+PageHeader.propTypes = {
+  /** Page header heading. */
+  title: PropTypes.node.isRequired,
+  /** Provide a page description */
+  children: PropTypes.node,
+  /** Section for actions like create or edit */
+  actions: PropTypes.node,
+  /** Indicates the lifecycle of the current page, which will display an indicator right next to the page title. */
+  lifecycle: PropTypes.oneOf(['experimental', 'legacy']),
+  /** Text to customize the default message for the given lifecycle. */
+  lifecycleMessage: PropTypes.node,
+  /** Specifies if the page header is children of a content `Row` or not. */
+  subpage: PropTypes.bool,
+  /** Specifies a specific link for the documentation. The title should be short. */
+  documentationLink: PropTypes.object,
+};
 
-            {subactions && (
-              <div className="pull-right visible-lg visible-md">
-                {subactions}
-              </div>
-            )}
-          </Col>
-
-          {children[2] && (
-            <Col sm={12} lgHidden mdHidden className="actions-sm">
-              <ActionsSM>
-                {children[2]}{subactions}
-              </ActionsSM>
-            </Col>
-          )}
-        </ContentHeadRow>
-      </div>
-    );
-  }
-}
+PageHeader.defaultProps = {
+  children: [],
+  lifecycle: undefined,
+  lifecycleMessage: undefined,
+  topActions: undefined,
+  actions: undefined,
+  subpage: false,
+  documentationLink: undefined,
+};
 
 export default PageHeader;

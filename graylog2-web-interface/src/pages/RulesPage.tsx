@@ -22,7 +22,6 @@ import DocsHelper from 'util/DocsHelper';
 import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button, ButtonToolbar } from 'components/bootstrap';
 import { SearchForm, PaginatedList, DocumentTitle, PageHeader, Spinner, QueryHelper } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import RuleList from 'components/rules/RuleList';
 import RuleMetricsConfigContainer from 'components/rules/RuleMetricsConfigContainer';
 import Routes from 'routing/Routes';
@@ -137,15 +136,15 @@ const RulesPage = () => {
   return (
     <DocumentTitle title="Pipeline rules">
       <PipelinesPageNavigation />
-      <PageHeader title="Pipeline Rules" subactions={<RulesButtonToolbar />}>
+      <PageHeader title="Pipeline Rules"
+                  actions={<RulesButtonToolbar />}
+                  documentationLink={{
+                    title: 'Pipeline rules documentation',
+                    path: DocsHelper.PAGES.PIPELINE_RULES,
+                  }}>
         <span>
           Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of actions.
           Graylog evaluates the condition against a message and executes the actions if the condition is satisfied.
-        </span>
-
-        <span>
-          Read more about Graylog pipeline rules in the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES}
-                                                                           text="documentation" />.
         </span>
       </PageHeader>
 

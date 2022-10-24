@@ -20,17 +20,18 @@ import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
+import DocsHelper from 'util/DocsHelper';
 
 const SidecarNewCollectorPage = () => (
   <DocumentTitle title="New Log Collector">
     <SidecarsPageNavigation />
-    <PageHeader title="New Log Collector">
+    <PageHeader title="New Log Collector"
+                documentationLink={{
+                  title: 'Sidecar documentation',
+                  path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+                }}>
       <span>
         Some words about log collectors.
-      </span>
-
-      <span>
-        Read more about the Graylog Sidecar in the documentation.
       </span>
     </PageHeader>
 
