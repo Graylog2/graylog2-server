@@ -83,7 +83,8 @@ const ContentPacksPage = createReactClass({
       <DocumentTitle title="Content Packs">
         <span>
           <PageHeader title="Content Packs"
-                      subactions={(
+                      topActions={<Button bsStyle="info" active>Content Packs</Button>}
+                      actions={(
                         <ButtonToolbar>
                           <ContentPackUploadControls />
                           <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.CREATE}>
@@ -93,13 +94,10 @@ const ContentPacksPage = createReactClass({
                       )}>
             <span>
               Content Packs accelerate the set up process for a specific data source. A Content Pack can include inputs/extractors, streams, and dashboards.
-            </span>
-
-            <span>
+              <br />
               Find more Content Packs in {' '}
               <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
             </span>
-            <Button bsStyle="info" active>Content Packs</Button>
           </PageHeader>
 
           <Row className="content">

@@ -27,6 +27,7 @@ import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
 import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm';
 import withParams from 'routing/withParams';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
+import DocsHelper from 'util/DocsHelper';
 
 const SidecarEditCollectorPage = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -70,13 +71,13 @@ const SidecarEditCollectorPage = createReactClass({
     return (
       <DocumentTitle title="Log Collector">
         <SidecarsPageNavigation />
-        <PageHeader title="Log Collector">
+        <PageHeader title="Log Collector"
+                    documentationLink={{
+                      title: 'Sidecar documentation',
+                      path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+                    }}>
           <span>
             Some words about log collectors.
-          </span>
-
-          <span>
-            Read more about the Graylog Sidecar in the documentation.
           </span>
         </PageHeader>
 

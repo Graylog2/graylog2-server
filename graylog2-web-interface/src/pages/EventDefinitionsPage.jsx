@@ -19,7 +19,6 @@ import React from 'react';
 import { LinkContainer } from 'components/common/router';
 import { Button, Col, Row } from 'components/bootstrap';
 import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import EventDefinitionsContainer from 'components/event-definitions/event-definitions/EventDefinitionsContainer';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
@@ -30,21 +29,19 @@ const EventDefinitionsPage = () => {
     <DocumentTitle title="Event Definitions">
       <EventsPageNavigation />
       <PageHeader title="Event Definitions"
-                  subactions={(
+                  actions={(
                     <IfPermitted permissions="eventdefinitions:create">
                       <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
                         <Button bsStyle="success">Create event definition</Button>
                       </LinkContainer>
                     </IfPermitted>
-                    )}>
+                  )}
+                  documentationLink={{
+                    title: 'Alerts documentation',
+                    path: DocsHelper.PAGES.ALERTS,
+                  }}>
         <span>
           Create new Event Definitions that will allow you to search for different Conditions and alert on them.
-        </span>
-
-        <span>
-          Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
-          <DocumentationLink page={DocsHelper.PAGES.ALERTS}
-                             text="documentation" />
         </span>
       </PageHeader>
 

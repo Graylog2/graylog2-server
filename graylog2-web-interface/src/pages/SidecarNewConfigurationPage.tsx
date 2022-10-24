@@ -19,17 +19,18 @@ import React from 'react';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ConfigurationForm from 'components/sidecars/configuration-forms/ConfigurationForm';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
+import DocsHelper from 'util/DocsHelper';
 
 const SidecarNewConfigurationPage = () => (
   <DocumentTitle title="New Collector Configuration">
     <SidecarsPageNavigation />
-    <PageHeader title="New Collector Configuration">
+    <PageHeader title="New Collector Configuration"
+                documentationLink={{
+                  title: 'Sidecar documentation',
+                  path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+                }}>
       <span>
         Some words about collector configurations.
-      </span>
-
-      <span>
-        Read more about the Graylog Sidecar in the documentation.
       </span>
     </PageHeader>
     <ConfigurationForm action="create" />

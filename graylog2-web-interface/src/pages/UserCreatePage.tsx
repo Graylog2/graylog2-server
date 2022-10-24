@@ -22,27 +22,24 @@ import DocsHelper from 'util/DocsHelper';
 import { Button } from 'components/bootstrap';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UserCreate from 'components/users/UserCreate';
-import DocumentationLink from 'components/support/DocumentationLink';
 import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 
 const UserCreatePage = () => (
   <DocumentTitle title="Create New User">
     <UsersPageNavigation />
     <PageHeader title="Create New User"
-                subactions={(
+                actions={(
                   <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
                     <Button bsStyle="success">Create user</Button>
                   </LinkContainer>
-                )}>
+                )}
+                documentationLink={{
+                  title: 'Permissions documentation',
+                  path: DocsHelper.PAGES.USERS_ROLES,
+                }}>
       <span>
         Use this page to create new Graylog users. The users and their permissions created here are not limited
         to the web interface but valid and required for the REST APIs of your Graylog server nodes, too.
-      </span>
-
-      <span>
-        Learn more in the{' '}
-        <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                           text="documentation" />
       </span>
     </PageHeader>
 

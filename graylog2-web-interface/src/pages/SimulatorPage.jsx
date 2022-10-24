@@ -18,7 +18,6 @@ import React from 'react';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import ProcessorSimulator from 'components/simulator/ProcessorSimulator';
 import DocsHelper from 'util/DocsHelper';
 import StreamsStore from 'stores/streams/StreamsStore';
@@ -55,13 +54,14 @@ class SimulatorPage extends React.Component {
     return (
       <DocumentTitle title="Simulate processing">
         <PipelinesPageNavigation />
-        <PageHeader title="Simulate processing">
+        <PageHeader title="Simulate processing"
+                    documentationLink={{
+                      title: 'Pipelines documentation',
+                      path: DocsHelper.PAGES.PIPELINE_RULES,
+                    }}>
           <span>
             Processing messages can be complex. Use this page to simulate the result of processing an incoming
             message using your current set of pipelines and rules.
-          </span>
-          <span>
-            Read more about Graylog pipelines in the <DocumentationLink page={DocsHelper.PAGES.PIPELINES} text="documentation" />.
           </span>
         </PageHeader>
 

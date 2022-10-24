@@ -19,7 +19,6 @@ import * as React from 'react';
 import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import { PageHeader } from 'components/common';
 import useActiveBackend from 'components/authentication/useActiveBackend';
-import DocumentationLink from 'components/support/DocumentationLink';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
@@ -47,15 +46,15 @@ const WizardPageHeader = ({ authenticationBackend: authBackend }: Props) => {
     <>
       <AuthenticationPageNavigation />
       <PageHeader title={pageTitle}
-                  subactions={(
+                  actions={(
                     <BackendActionLinks activeBackend={activeBackend}
                                         finishedLoading={finishedLoading} />
-                )}>
+                  )}
+                  documentationLink={{
+                    title: 'Authentication documentation',
+                    path: DocsHelper.PAGES.USERS_ROLES,
+                  }}>
         <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
-        <span>
-          Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                                                             text="documentation" />.
-        </span>
       </PageHeader>
     </>
   );

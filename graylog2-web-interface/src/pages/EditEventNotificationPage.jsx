@@ -19,7 +19,6 @@ import PropTypes from 'prop-types';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import connect from 'stores/connect';
@@ -85,16 +84,15 @@ class EditEventDefinitionPage extends React.Component {
     return (
       <DocumentTitle title={`Edit "${notification.title}" Notification`}>
         <EventsPageNavigation />
-        <PageHeader title={`Edit "${notification.title}" Notification`} subactions={<EventNotificationActionLinks notificationId={notification.id} />}>
+        <PageHeader title={`Edit "${notification.title}" Notification`}
+                    actions={<EventNotificationActionLinks notificationId={notification.id} />}
+                    documentationLink={{
+                      title: 'Alerts documentation',
+                      path: DocsHelper.PAGES.ALERTS,
+                    }}>
           <span>
             Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
             to you or to other systems you use for that purpose.
-          </span>
-
-          <span>
-            Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
-            <DocumentationLink page={DocsHelper.PAGES.ALERTS}
-                               text="documentation" />
           </span>
         </PageHeader>
 
@@ -103,7 +101,6 @@ class EditEventDefinitionPage extends React.Component {
             <EventNotificationFormContainer action="edit" notification={notification} />
           </Col>
         </Row>
-
       </DocumentTitle>
     );
   }

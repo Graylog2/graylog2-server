@@ -22,7 +22,6 @@ import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
 import connect from 'stores/connect';
-import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';
 import Routes from 'routing/Routes';
@@ -69,19 +68,19 @@ class IndexSetConfigurationPage extends React.Component {
     return (
       <DocumentTitle title="Configure Index Set">
         <div>
-          <PageHeader title="Configure Index Set">
+          <PageHeader title="Configure Index Set"
+                      documentationLink={{
+                        title: 'Index model documentation',
+                        path: DocsHelper.PAGES.INDEX_MODEL,
+                      }}
+                      topActions={(
+                        <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
+                          <Button bsStyle="info">Index sets overview</Button>
+                        </LinkContainer>
+                      )}>
             <span>
               Modify the current configuration for this index set, allowing you to customize the retention, sharding,
               and replication of messages coming from one or more streams.
-            </span>
-            <span>
-              You can learn more about the index model in the{' '}
-              <DocumentationLink page={DocsHelper.PAGES.INDEX_MODEL} text="documentation" />
-            </span>
-            <span>
-              <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-                <Button bsStyle="info">Index sets overview</Button>
-              </LinkContainer>
             </span>
           </PageHeader>
 

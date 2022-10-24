@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import Reflux from 'reflux';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
@@ -36,8 +37,10 @@ import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/Con
 import ShowContentPackStyle from './ShowContentPackPage.css';
 
 const ShowContentPackPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'ShowContentPackPage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     params: PropTypes.object.isRequired,
   },
@@ -153,21 +156,20 @@ const ShowContentPackPage = createReactClass({
     return (
       <DocumentTitle title="Content packs">
         <span>
-          <PageHeader title="Content packs">
+          <PageHeader title="Content packs"
+                      topActions={(
+                        <ButtonToolbar>
+                          <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
+                            <Button bsStyle="info">Content Packs</Button>
+                          </LinkContainer>
+                        </ButtonToolbar>
+                      )}>
             <span>
               Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.
-            </span>
-
-            <span>
+              <br />
               Find more content packs in {' '}
               <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
             </span>
-
-            <ButtonToolbar>
-              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
-                <Button bsStyle="info">Content Packs</Button>
-              </LinkContainer>
-            </ButtonToolbar>
           </PageHeader>
 
           <Row>

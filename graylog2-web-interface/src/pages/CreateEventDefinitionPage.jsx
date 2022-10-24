@@ -21,7 +21,6 @@ import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import EventDefinitionFormContainer
   from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
-import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import connect from 'stores/connect';
@@ -65,15 +64,13 @@ class CreateEventDefinitionPage extends React.Component {
       <DocumentTitle title={pageTitle}>
         <EventsPageNavigation />
 
-        <PageHeader title={pageTitle}>
+        <PageHeader title={pageTitle}
+                    documentationLink={{
+                      title: 'Alerts documentation',
+                      path: DocsHelper.PAGES.ALERTS,
+                    }}>
           <span>
             Event Definitions allow you to create Alerts from different Conditions and alert on them.
-          </span>
-
-          <span>
-            Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
-            <DocumentationLink page={DocsHelper.PAGES.ALERTS}
-                               text="documentation" />
           </span>
         </PageHeader>
 

@@ -20,7 +20,6 @@ import PropTypes from 'prop-types';
 import { Col, Row } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, PageHeader } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import CollectorsAdministrationContainer from 'components/sidecars/administration/CollectorsAdministrationContainer';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 import withLocation from 'routing/withLocation';
@@ -28,14 +27,13 @@ import withLocation from 'routing/withLocation';
 const SidecarAdministrationPage = ({ location: { query: { node_id: nodeId } } }) => (
   <DocumentTitle title="Collectors Administration">
     <SidecarsPageNavigation />
-    <PageHeader title="Collectors Administration">
+    <PageHeader title="Collectors Administration"
+                documentationLink={{
+                  title: 'Sidecar documentation',
+                  path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+                }}>
       <span>
         The Graylog collectors can reliably forward contents of log files or Windows EventLog from your servers.
-      </span>
-
-      <span>
-        Read more about collectors and how to set them up in the
-        {' '}<DocumentationLink page={DocsHelper.PAGES.COLLECTOR_SIDECAR} text="Graylog documentation" />.
       </span>
     </PageHeader>
 

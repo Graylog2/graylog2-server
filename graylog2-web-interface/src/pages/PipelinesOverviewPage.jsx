@@ -18,7 +18,6 @@ import React from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import ProcessingTimelineComponent from 'components/pipelines/ProcessingTimelineComponent';
 import DocsHelper from 'util/DocsHelper';
 import CreatePipelineButton from 'components/pipelines/CreatePipelineButton';
@@ -28,16 +27,16 @@ const PipelinesOverviewPage = () => (
   <DocumentTitle title="Pipelines">
     <PipelinesPageNavigation />
     <PageHeader title="Pipelines overview"
-                subactions={(<CreatePipelineButton />)}>
+                actions={<CreatePipelineButton />}
+                documentationLink={{
+                  title: 'Pipelines documentation',
+                  path: DocsHelper.PAGES.PIPELINES,
+                }}>
       <span>
         Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where
         rules are evaluated and applied. Messages can go through one or more stages.
       </span>
-      <span>
-        Read more about Graylog pipelines in the <DocumentationLink page={DocsHelper.PAGES.PIPELINES} text="documentation" />.
-      </span>
     </PageHeader>
-
     <Row className="content">
       <Col md={12}>
         <ProcessingTimelineComponent />

@@ -24,7 +24,6 @@ import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
@@ -79,7 +78,7 @@ const ViewEventDefinitionPage = () => {
     <DocumentTitle title={`View "${eventDefinition.title}" Event Definition`}>
       <EventsPageNavigation />
       <PageHeader title={`View "${eventDefinition.title}" Event Definition`}
-                  subactions={(
+                  actions={(
                     <ButtonToolbar>
                       <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
                         <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(params.definitionId)}>
@@ -87,15 +86,13 @@ const ViewEventDefinitionPage = () => {
                         </LinkContainer>
                       </IfPermitted>
                     </ButtonToolbar>
-          )}>
+                  )}
+                  documentationLink={{
+                    title: 'Alerts documentation',
+                    path: DocsHelper.PAGES.ALERTS,
+                  }}>
         <span>
           Event Definitions allow you to create Events from different Conditions and alert on them.
-        </span>
-
-        <span>
-          Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
-          <DocumentationLink page={DocsHelper.PAGES.ALERTS}
-                             text="documentation" />
         </span>
       </PageHeader>
 

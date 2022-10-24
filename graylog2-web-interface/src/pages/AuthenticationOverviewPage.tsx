@@ -21,7 +21,6 @@ import {} from 'components/authentication/bindings'; // Bind all authentication 
 import { Alert, Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Icon } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
-import DocumentationLink from 'components/support/DocumentationLink';
 import BackendsOverview from 'components/authentication/BackendsOverview';
 import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
@@ -34,14 +33,15 @@ const AuthenticationOverviewPage = () => {
     <DocumentTitle title="All Authentication Services">
       <AuthenticationPageNavigation />
       <PageHeader title="All Authentication Services"
-                  subactions={(
+                  actions={(
                     <BackendActionLinks activeBackend={activeBackend}
                                         finishedLoading={finishedLoading} />
-                  )}>
+                  )}
+                  documentationLink={{
+                    title: 'Authentication documentation',
+                    path: DocsHelper.PAGES.USERS_ROLES,
+                  }}>
         <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
-        <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                                                                 text="documentation" />.
-        </span>
       </PageHeader>
       {!!(backendsTotal && backendsTotal >= 1 && !activeBackend) && (
         <Row className="content">

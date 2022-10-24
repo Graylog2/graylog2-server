@@ -25,6 +25,7 @@ import withParams from 'routing/withParams';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
 import type { Configuration, ConfigurationSidecarsResponse } from 'components/sidecars/types';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
+import DocsHelper from 'util/DocsHelper';
 
 const SidecarEditConfigurationPage = ({ params }) => {
   const [configuration, setConfiguration] = useState<Configuration>(null);
@@ -63,13 +64,13 @@ const SidecarEditConfigurationPage = ({ params }) => {
   return (
     <DocumentTitle title="Collector Configuration">
       <SidecarsPageNavigation />
-      <PageHeader title="Collector Configuration">
+      <PageHeader title="Collector Configuration"
+                  documentationLink={{
+                    title: 'Sidecar documentation',
+                    path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+                  }}>
         <span>
           Some words about collector configurations.
-        </span>
-
-        <span>
-          Read more about the Graylog Sidecar in the documentation.
         </span>
       </PageHeader>
       <ConfigurationForm configuration={configuration}

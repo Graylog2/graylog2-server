@@ -170,10 +170,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     }
   }
 
-  .content p.description-tooltips {
-    margin-top: 10px;
-  }
-
   .notifications-none {
     margin-top: 10px;
   }

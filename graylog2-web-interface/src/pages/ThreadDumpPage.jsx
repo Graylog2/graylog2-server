@@ -68,9 +68,7 @@ const ThreadDumpPage = createReactClass({
     return (
       <DocumentTitle title={`Thread dump of node ${this.state.node.short_node_id} / ${this.state.node.hostname}`}>
         <div>
-          <PageHeader title={title}>
-            <span />
-          </PageHeader>
+          <PageHeader title={title} />
           <Row className="content">
             <Col md={12}>
               {threadDump}
