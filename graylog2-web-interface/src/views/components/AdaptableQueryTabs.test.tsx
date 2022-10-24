@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import React from 'react';
 import Immutable, { Map } from 'immutable';
 import userEvent from '@testing-library/user-event';
@@ -171,10 +171,10 @@ describe('AdaptableQueryTabs', () => {
         name: 'Page#5',
       });
 
-      expect(screen.getByRole(mainTabRole, {
+      await screen.findByRole(mainTabRole, {
         name: 'Page#5',
         hidden: true,
-      })).toBeInTheDocument();
+      });
     });
   });
 
@@ -199,7 +199,7 @@ describe('AdaptableQueryTabs', () => {
     });
     userEvent.click(tab2);
 
-    await waitFor(() => expect(onSelectStub).toHaveBeenCalledTimes(1));
+    await expect(onSelectStub).toHaveBeenCalledTimes(1);
 
     expect(onSelectStub).toHaveBeenCalledWith('query-id-2');
   });
@@ -216,7 +216,7 @@ describe('AdaptableQueryTabs', () => {
     });
     userEvent.click(tab4);
 
-    await waitFor(() => expect(onSelectStub).toHaveBeenCalledTimes(1));
+    await expect(onSelectStub).toHaveBeenCalledTimes(1);
 
     expect(onSelectStub).toHaveBeenCalledWith('query-id-4');
   });
@@ -228,7 +228,7 @@ describe('AdaptableQueryTabs', () => {
     const createTabButton = await screen.findByTitle('Create New Page');
     userEvent.click(createTabButton);
 
-    await waitFor(() => expect(onSelectStub).toHaveBeenCalledTimes(1));
+    await expect(onSelectStub).toHaveBeenCalledTimes(1);
 
     expect(onSelectStub).toHaveBeenCalledWith('new');
   });
