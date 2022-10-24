@@ -25,6 +25,10 @@ type Props = {
   className: string | null | undefined,
 };
 
+/**
+ * Component used to display a simple alert message for a search that returned no matching results.
+ * Usage should include utilizing the `children` props to supply the user with a descriptive message.
+*/
 const NoSearchResult = ({ children, className }: Props) => (
   <Alert className={`${className ?? ''} no-bm`}><Icon name="info-circle" />&nbsp;{children}</Alert>
 );
