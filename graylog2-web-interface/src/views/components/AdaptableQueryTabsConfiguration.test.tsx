@@ -47,20 +47,20 @@ describe('AdaptableQueryTabsConfiguration', () => {
     ViewStatesActions.patchQueriesTitle = mockAction(jest.fn(() => Promise.resolve(ViewState.create())));
   });
 
-  it('display modal window', async () => {
+  it('should display modal window', async () => {
     renderConfiguration();
 
     await screen.findByText('Update Dashboard Pages Configuration');
   });
 
-  it('display list of tabs', async () => {
+  it('should display list of tabs', async () => {
     renderConfiguration();
 
-    await expect(await screen.findByText('Query Title 1')).toBeInTheDocument();
-    await expect(await screen.findByText('Query Title 2')).toBeInTheDocument();
+    await screen.findByText('Query Title 1');
+    await screen.findByText('Query Title 2');
   });
 
-  it('on submit run setOrder and patchQueriesTitle with correct tab order and titles', async () => {
+  it('should run setOrder and patchQueriesTitle with correct tab order and titles on submit', async () => {
     renderConfiguration();
     const submitButton = await screen.findByTitle('Update configuration');
     userEvent.click(submitButton);
