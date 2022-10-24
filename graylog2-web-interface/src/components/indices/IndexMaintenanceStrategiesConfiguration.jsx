@@ -88,15 +88,15 @@ const _getConfigurationComponent = (selectedStrategy, pluginExports, strategies,
 };
 
 const IndexMaintenanceStrategiesConfiguration = ({
-                                                   title,
-                                                   description,
-                                                   selectPlaceholder,
-                                                   pluginExports,
-                                                   strategies,
-                                                   retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod },
-                                                   activeConfig: { strategy, config },
-                                                   getState,
-                                                 }) => {
+  title,
+  description,
+  selectPlaceholder,
+  pluginExports,
+  strategies,
+  retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod },
+  activeConfig: { strategy, config },
+  getState,
+}) => {
   const [newStrategy, setNewStrategy] = useState(strategy);
   const {
     setValues,
@@ -154,10 +154,13 @@ const IndexMaintenanceStrategiesConfiguration = ({
 
   function getDescription() {
     if (description) {
-      return <StyledAlert>
-        <Icon name="info-circle" />{' '} {description}
-      </StyledAlert>;
+      return (
+        <StyledAlert>
+          <Icon name="info-circle" />{' '} {description}
+        </StyledAlert>
+      );
     }
+
     return null;
   }
 
@@ -168,9 +171,11 @@ const IndexMaintenanceStrategiesConfiguration = ({
       {shouldShowMaxRetentionWarning && (
         <StyledAlert bsStyle="warning">
           <Icon name="exclamation-triangle" />{' '} The effective retention period value calculated from the <b>Rotation
-          period</b> and the
+            period
+                                                                                                             </b> and the
           <b> max number of indices</b> should not be greater than the <b>Max retention
-          period</b> of <b>{maxRetentionPeriod}</b> set by the Administrator.
+            period
+                                                                       </b> of <b>{maxRetentionPeriod}</b> set by the Administrator.
         </StyledAlert>
       )}
       <Row>
