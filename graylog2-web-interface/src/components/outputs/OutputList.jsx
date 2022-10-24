@@ -18,8 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
-import { Alert, Col, Row } from 'components/bootstrap';
-import { Icon, Spinner, NoEntitiesExist } from 'components/common';
+import { Col, Row } from 'components/bootstrap';
+import { Spinner, NoEntitiesExist } from 'components/common';
 import Output from 'components/outputs/Output';
 
 class OutputList extends React.Component {
@@ -33,6 +33,7 @@ class OutputList extends React.Component {
     types: PropTypes.object.isRequired,
   };
 
+  // eslint-disable-next-line class-methods-use-this
   _sortByTitle = (output1, output2) => {
     return naturalSort(output1.title.toLowerCase(), output2.title.toLowerCase());
   };
