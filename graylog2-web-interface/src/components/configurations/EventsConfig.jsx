@@ -230,13 +230,11 @@ const EventsConfig = createReactClass({
               </HelpBlock>
             </FormGroup>
             <FormGroup controlId="notification-tcp-keepalive-field">
-              <Input
-                id="notification-tcp-keepalive-field"
-                label="Send TCP keep-alive probes for notification connections"
-                type="checkbox"
-                onChange={this._onNotificationTcpKeepAliveUpdate}
-                checked={eventsNotificationTcpKeepalive}
-              />
+              <Input id="notification-tcp-keepalive-field"
+                     label="Send TCP keep-alive probes for notification connections"
+                     type="checkbox"
+                     onChange={this._onNotificationTcpKeepAliveUpdate}
+                     checked={eventsNotificationTcpKeepalive} />
               <HelpBlock>
                 If enabled, http connections for notifications will send TCP keep-alive probes
               </HelpBlock>
