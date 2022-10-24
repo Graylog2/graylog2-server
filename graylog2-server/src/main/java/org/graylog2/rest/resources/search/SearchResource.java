@@ -296,7 +296,7 @@ public abstract class SearchResource extends RestResource {
                 while (chunk != null) {
                     LOG.debug("[{}] Writing scroll chunk with {} messages",
                             scroll.getQueryHash(),
-                            chunk.getMessages().size());
+                            chunk.messages().size());
                     if (output.isClosed()) {
                         LOG.debug("[{}] Client connection is closed, client disconnected. Aborting scroll.",
                                 scroll.getQueryHash());

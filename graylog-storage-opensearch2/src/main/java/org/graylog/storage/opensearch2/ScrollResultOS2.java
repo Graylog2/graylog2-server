@@ -26,7 +26,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchScrollR
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
 import org.graylog2.indexer.results.IndexQueryResult;
 import org.graylog2.indexer.results.ResultChunk;
-import org.graylog2.indexer.results.ResultChunkImpl;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.slf4j.Logger;
@@ -111,7 +110,7 @@ public class ScrollResultOS2 extends IndexQueryResult implements ScrollResult {
 
         this.scrollId = result.getScrollId();
 
-        return ResultChunkImpl.create(fields, chunkId++, resultMessagesSlice);
+        return new ResultChunk(fields, chunkId++, resultMessagesSlice);
     }
 
     private SearchResponse nextSearchResult() throws IOException {

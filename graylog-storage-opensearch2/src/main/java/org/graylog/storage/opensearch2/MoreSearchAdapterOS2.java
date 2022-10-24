@@ -145,7 +145,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
         try {
             ResultChunk scrollChunk = scrollResult.nextChunk();
             while (continueScrolling.get() && scrollChunk != null) {
-                final List<ResultMessage> messages = scrollChunk.getMessages();
+                final List<ResultMessage> messages = scrollChunk.messages();
 
                 LOG.debug("Passing <{}> messages to callback", messages.size());
                 resultCallback.accept(Collections.unmodifiableList(messages), continueScrolling);

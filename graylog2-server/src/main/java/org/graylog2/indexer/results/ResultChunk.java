@@ -22,14 +22,9 @@ import java.util.List;
  * A part/chunk of search results for messages.
  * Retrieval method of the chunk (scrolling, search_after pagination...) should not affect this interface implementations.
  */
-public interface ResultChunk {
-    List<String> getFields();
+public record ResultChunk(List<String> fields, int chunkNumber, List<ResultMessage> messages) {
 
-    int getChunkNumber();
-
-    default boolean isFirstChunk() {
-        return getChunkNumber() == 0;
+    public boolean isFirstChunk() {
+        return chunkNumber() == 0;
     }
-
-    List<ResultMessage> getMessages();
 }

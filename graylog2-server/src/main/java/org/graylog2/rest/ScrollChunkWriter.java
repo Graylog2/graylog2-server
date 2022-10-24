@@ -66,10 +66,10 @@ public class ScrollChunkWriter implements MessageBodyWriter<ResultChunk> {
                         MultivaluedMap<String, Object> httpHeaders,
                         OutputStream entityStream) throws IOException, WebApplicationException {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("[{}] Writing chunk {}", Thread.currentThread().getId(), scrollChunk.getChunkNumber());
+            LOG.debug("[{}] Writing chunk {}", Thread.currentThread().getId(), scrollChunk.chunkNumber());
         }
 
-        final List<String> fields = scrollChunk.getFields();
+        final List<String> fields = scrollChunk.fields();
         final int numberOfFields = fields.size();
 
         try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8))) {
@@ -79,7 +79,7 @@ public class ScrollChunkWriter implements MessageBodyWriter<ResultChunk> {
             }
             // write result set in same order as the header row
             final String[] fieldValues = new String[numberOfFields];
-            for (ResultMessage resultMessage : scrollChunk.getMessages()) {
+            for (ResultMessage resultMessage : scrollChunk.messages()) {
                 final Message message = resultMessage.getMessage();
 
                 // first collect all values from the current message

@@ -507,9 +507,9 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         final ResultChunk firstChunk = scrollResult.nextChunk();
         assertThat(firstChunk).isNotNull();
-        assertThat(firstChunk.getMessages()).hasSize(5);
+        assertThat(firstChunk.messages()).hasSize(5);
         assertThat(firstChunk.isFirstChunk()).isTrue();
-        assertThat(firstChunk.getFields()).containsExactly("source");
+        assertThat(firstChunk.fields()).containsExactly("source");
     }
 
     @Test
@@ -527,11 +527,11 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         assertThat(scrollChunk.isFirstChunk()).isTrue();
 
         final Set<ResultMessage> resultMessages = new HashSet<>(5);
-        while (scrollChunk != null && !scrollChunk.getMessages().isEmpty()) {
-            assertThat(scrollChunk.getMessages()).hasSize(2);
-            assertThat(scrollChunk.getFields()).containsExactly("source");
+        while (scrollChunk != null && !scrollChunk.messages().isEmpty()) {
+            assertThat(scrollChunk.messages()).hasSize(2);
+            assertThat(scrollChunk.fields()).containsExactly("source");
 
-            resultMessages.addAll(scrollChunk.getMessages());
+            resultMessages.addAll(scrollChunk.messages());
             scrollChunk = scrollResult.nextChunk();
         }
 
@@ -553,8 +553,8 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         assertThat(scrollChunk.isFirstChunk()).isTrue();
 
         final Set<ResultMessage> resultMessages = new HashSet<>(5);
-        while (scrollChunk != null && !scrollChunk.getMessages().isEmpty()) {
-            resultMessages.addAll(scrollChunk.getMessages());
+        while (scrollChunk != null && !scrollChunk.messages().isEmpty()) {
+            resultMessages.addAll(scrollChunk.messages());
             scrollChunk = scrollResult.nextChunk();
         }
 
