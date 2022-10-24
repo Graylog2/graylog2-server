@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import DocsHelper from 'util/DocsHelper';
 import { LinkContainer } from 'components/common/router';
 import { Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, IfPermitted, NoEntitiesExist } from 'components/common';
@@ -31,6 +30,8 @@ import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 import type View from '../logic/views/View';
 import { DashboardsActions } from '../stores/DashboardsStore';
+
+import DocsHelper from 'util/DocsHelper';
 
 // eslint-disable-next-line no-alert
 const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
@@ -81,7 +82,7 @@ const DashboardsPage = () => {
                         <Button bsStyle="success">Create new dashboard</Button>
                       </LinkContainer>
                     </IfPermitted>
-                    )}
+                  )}
                   documentationLink={{
                     title: 'Dashboard documentation',
                     path: DocsHelper.PAGES.DASHBOARDS,
