@@ -104,6 +104,12 @@ const ModalSubTitle = styled.div`
   text-overflow: ellipsis;
 `;
 
+const StyledSearchForm = styled(SearchForm)`
+  .form-group, .query {
+    width: 100% !important;
+  }
+`;
+
 const getFilterQuery = (_query: string) => {
   try {
     return new RegExp(_query, 'i');
@@ -214,7 +220,9 @@ const CollectorConfigurationModal = ({
         </ModalTitle>
       </Modal.Header>
       <Modal.Body>
-        <SearchForm query={searchQuery} onQueryChange={(q) => setSearchQuery(q)} topMargin={0} queryWidth="100%" />
+        <StyledSearchForm query={searchQuery}
+                          onQueryChange={(q) => setSearchQuery(q)}
+                          topMargin={0} />
         <ConfigurationContainer>
           <ConfigurationTable className="table-condensed table-hover">
             <tbody>

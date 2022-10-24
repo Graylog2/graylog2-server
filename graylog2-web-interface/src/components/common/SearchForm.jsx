@@ -49,11 +49,7 @@ const StyledContainer = styled.div(({ topMargin }) => `
 `);
 
 const StyledInput = styled.input(({ queryWidth }) => `
-  width: ${queryWidth};
-`);
-
-const StyledInputContainer = styled.div(({ queryWidth }) => `
-  width: ${queryWidth};
+  width: ${queryWidth} !important;
 `);
 
 /**
@@ -253,7 +249,7 @@ class SearchForm extends React.Component {
       <StyledContainer className={`${wrapperClass} ${className}`} topMargin={topMargin}>
         <form className="form-inline" onSubmit={this._onSearch}>
           <FormContent buttonLeftMargin={buttonLeftMargin}>
-            <StyledInputContainer className={`form-group ${queryHelpComponent ? 'has-feedback' : ''}`} queryWidth={queryWidth}>
+            <div className={`form-group ${queryHelpComponent ? 'has-feedback' : ''}`}>
               {label && (
                 <label htmlFor="common-search-form-query-input" className="control-label">
                   {label}
@@ -273,7 +269,7 @@ class SearchForm extends React.Component {
               {queryHelpComponent && (
                 <HelpFeedback className="form-control-feedback">{queryHelpComponent}</HelpFeedback>
               )}
-            </StyledInputContainer>
+            </div>
 
             {onSearch && (
               <Button bsStyle={searchBsStyle}
