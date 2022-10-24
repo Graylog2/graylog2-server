@@ -27,7 +27,6 @@ const fetchIndexDefaults: () => Promise<IndexConfig> = () => {
 };
 
 const useIndexDefaults = () => {
-
   const { data, isLoading } = useQuery(
     ['scope-permissions'],
     fetchIndexDefaults,

@@ -33,23 +33,22 @@ import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/i
 import {
   RetentionStrategyPropType,
   RotationStrategyPropType,
+} from 'components/indices/Types';
+import type {
+  RetentionStrategy, RotationStrategy, RetentionStrategyContext,
   RetentionStrategyConfig,
   RotationStrategyConfig,
 } from 'components/indices/Types';
-import type { RetentionStrategy, RotationStrategy, RetentionStrategyContext } from 'components/indices/Types';
 import { adjustFormat } from 'util/DateTime';
-import type { IndexConfig } from 'components/configurations/IndexSetsDefaultsConfig';
 import useIndexDefaults from 'pages/useIndexDefaults';
 
 type Props = {
-  indexSet: Partial<IndexSet> | null | undefined,
   retentionStrategies?: Array<RetentionStrategy> | null | undefined,
   rotationStrategies?: Array<RotationStrategy> | null | undefined,
   retentionStrategiesContext?: RetentionStrategyContext | null | undefined,
 }
 
 const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retentionStrategiesContext }: Props) => {
-
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies();
     IndicesConfigurationActions.loadRetentionStrategies();
@@ -65,7 +64,7 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
     });
   };
 
-  const { loadingIndexDefaultsConfig, indexDefaultsConfig:config } = useIndexDefaults();
+  const { loadingIndexDefaultsConfig, indexDefaultsConfig: config } = useIndexDefaults();
 
   const _isLoading = () => {
     return !rotationStrategies || !retentionStrategies || loadingIndexDefaultsConfig;
@@ -74,21 +73,6 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
   if (_isLoading()) {
     return <Spinner />;
   }
-
-  const fallbackDefaults: IndexConfig = {
-    index_prefix: '',
-    index_analyzer: 'standard',
-    shards: 4,
-    replicas: 0,
-    index_optimization_max_num_segments: 1,
-    index_optimization_disabled: false,
-    field_type_refresh_interval: 5,
-    field_type_refresh_interval_unit: 'seconds',
-    rotation_strategy_class: '',
-    rotation_strategy_config: null,
-    retention_strategy_class: '',
-    retention_strategy_config: null,
-  };
 
   const indexSet: IndexSet = {
     title: '',
