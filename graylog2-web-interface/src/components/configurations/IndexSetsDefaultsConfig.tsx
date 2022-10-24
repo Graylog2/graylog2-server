@@ -19,13 +19,11 @@ import { Form, Formik } from 'formik';
 import lodash from 'lodash';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
-
 import 'components/indices/rotation';
 import 'components/indices/retention';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type {
-  RotationStrategy,
   MaintenanceOptions,
   RotationStrategyConfig,
   RetentionStrategyConfig,
@@ -37,9 +35,6 @@ import { IfPermitted, TimeUnitInput, Spinner } from 'components/common';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
 
 import FormikInput from '../common/FormikInput';
-
-{ /* Matches backend index defaults persistence configuration. */
-}
 
 export type IndexConfig = {
   index_prefix: string,
@@ -61,7 +56,6 @@ const TIME_UNITS = ['SECONDS', 'MINUTES'];
 type Props = {
   config: IndexConfig,
   updateConfig: (arg: IndexConfig) => void,
-  rotationStrategies?: Array<RotationStrategy> | null | undefined,
 };
 
 const StyledDefList = styled.dl.attrs({
@@ -87,7 +81,7 @@ const IndexSetsDefaultsConfig = ({ config, updateConfig }: Props) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [rotationStrategies, setRotationStrategies] = useState<MaintenanceOptions>();
   const [retentionStrategies, setRetentionStrategies] = useState<MaintenanceOptions>();
-  const handleSaveConfig = async (config: IndexConfig) => updateConfig(config);
+  const handleSaveConfig = async (configToSave: IndexConfig) => updateConfig(configToSave);
 
   const saveConfig = (values) => {
     handleSaveConfig(values).then(() => {
@@ -109,12 +103,12 @@ const IndexSetsDefaultsConfig = ({ config, updateConfig }: Props) => {
   };
 
   useEffect(() => {
-    IndicesConfigurationActions.loadRotationStrategies().then((rotationStrategies) => {
-      setRotationStrategies(rotationStrategies);
+    IndicesConfigurationActions.loadRotationStrategies().then((loadedRotationStrategies) => {
+      setRotationStrategies(loadedRotationStrategies);
     });
 
-    IndicesConfigurationActions.loadRetentionStrategies().then((retentionStrategies) => {
-      setRetentionStrategies(retentionStrategies);
+    IndicesConfigurationActions.loadRetentionStrategies().then((loadedRetentionStrategies) => {
+      setRetentionStrategies(loadedRetentionStrategies);
     });
   }, []);
 
