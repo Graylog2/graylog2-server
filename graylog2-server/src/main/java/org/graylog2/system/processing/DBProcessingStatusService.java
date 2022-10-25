@@ -186,7 +186,7 @@ public class DBProcessingStatusService {
     }
 
     private boolean isBusy(ProcessingStatusDto nodeProcessingStatus) {
-        return nodeProcessingStatus.inputJournal().uncommittedEntries() > 0L;
+        return nodeProcessingStatus.inputJournal().uncommittedEntries() > 0L || nodeProcessingStatus.processBufferUsage() > 0;
     }
 
     private DBQuery.Query activeNodes(DateTime updateThresholdTimestamp) {
