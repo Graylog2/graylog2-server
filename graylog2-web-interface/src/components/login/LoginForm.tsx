@@ -31,6 +31,11 @@ const SigninButton = styled(ModalSubmit)(({ theme }) => css`
   button.btn-success {
     background-color: ${theme.colors.brand.primary};
     border-color: ${theme.colors.brand.primary};
+    
+    :hover {
+      background-color: ${theme.colors.brand.primary};
+      border-color: ${theme.colors.brand.primary};
+    }
   }
 `);
 
