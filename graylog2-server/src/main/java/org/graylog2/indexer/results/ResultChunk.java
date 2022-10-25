@@ -14,14 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bootstrap.preflight;
+package org.graylog2.indexer.results;
 
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.mongodb.MongoDBExtension;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import java.util.List;
 
-public class MongoDBPreflightCheckTest3 extends MongoDBPreflightCheckTest {
-    @RegisterExtension
-    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.MONGO3);
+/**
+ * A part/chunk of search results for messages.
+ * Retrieval method of the chunk (scrolling, search_after pagination...) should not affect this interface implementations.
+ */
+public record ResultChunk(List<String> fields, int chunkNumber, List<ResultMessage> messages) {
 
+    public boolean isFirstChunk() {
+        return chunkNumber() == 0;
+    }
 }

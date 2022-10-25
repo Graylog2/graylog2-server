@@ -70,7 +70,7 @@ public class ClusterNodeMetricsResource extends ProxiedResource {
 
     private RemoteMetricsResource getResourceForNode(String nodeId) throws NodeNotFoundException {
         final Node targetNode = nodeService.byNodeId(nodeId);
-        return remoteInterfaceProvider.get(targetNode, this.authenticationToken, RemoteMetricsResource.class);
+        return remoteInterfaceProvider.get(targetNode, getAuthenticationToken(), RemoteMetricsResource.class);
     }
 
     @GET
