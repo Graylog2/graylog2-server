@@ -34,7 +34,7 @@ jobs:
         run: |
           PROBLEM_COUNT=`jq '. | map(.errorCount + .warningCount)|add' /tmp/report.json`
           CURRENT_REF=`git rev-parse HEAD`
-          PAYLOAD=$(cat <<- 'EOF'
+          PAYLOAD=$(cat <<- EOF
             '{
               "version": "1.1",
               "host": "developermetrics",
