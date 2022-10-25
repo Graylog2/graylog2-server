@@ -150,3 +150,10 @@ store archives under the `data_dir` instead of `/tmp/graylog-archives`.
 ### Configuring archive retention Time and max value
 It is now possible to configure default archive retention time and a limit via config flags:
 `default_archive_retention_time` & `max_archive_retention_time` using a duration in days. e.g. 365d.
+
+## Microsoft Teams Notification Template Changes
+Microsoft Teams notification template parsing no longer parses each line in the template and tries to form a key-value
+pair using a colon delimiter. This will result in Teams notifications with a templated custom message lacking any
+formatting. Existing custom templates should be updated to use HTML or Markdown in order to display properly. If using
+the old default template, it can be replaced with the one found when creating a new Teams notification. It can also be
+found in this [pull request](https://github.com/Graylog2/graylog-plugin-integrations/pull/1202).
