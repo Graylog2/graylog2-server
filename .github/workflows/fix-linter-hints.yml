@@ -47,7 +47,7 @@ jobs:
              }
           EOF
           )
-          curl -X POST -H 'Content-Type: application/json' -d $PAYLOAD ${{ secrets.DEV_METRICS_URL }}
+          curl -X POST -H 'Content-Type: application/json' -d "$PAYLOAD" ${{ secrets.DEV_METRICS_URL }}
       - name: Create/Update Pull Request
         uses: Graylog2/create-pull-request@7380612b49221684fefa025244f2ef4008ae50ad
         with:
