@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import LoginBox from './LoginBox';
 
 describe('LoginBox', () => {
-  it('renders a button after the input if buttonAfter is passed', () => {
-    const { container } = render(<LoginBox><div /></LoginBox>);
+  it('renders a button after the input if buttonAfter is passed', async () => {
+    render(<LoginBox><button type="button">Click me</button></LoginBox>);
 
-    expect(container).toMatchSnapshot();
+    await screen.findByRole('button', { name: 'Click me' });
   });
 });
