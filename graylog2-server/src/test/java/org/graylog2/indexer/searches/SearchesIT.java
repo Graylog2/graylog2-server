@@ -34,6 +34,7 @@ import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.MongoIndexRange;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
+import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
@@ -504,11 +505,11 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         assertThat(scrollResult.getQueryHash()).isNotEmpty();
         assertThat(scrollResult.totalHits()).isEqualTo(10L);
 
-        final ScrollResult.ScrollChunk firstChunk = scrollResult.nextChunk();
+        final ResultChunk firstChunk = scrollResult.nextChunk();
         assertThat(firstChunk).isNotNull();
-        assertThat(firstChunk.getMessages()).hasSize(5);
+        assertThat(firstChunk.messages()).hasSize(5);
         assertThat(firstChunk.isFirstChunk()).isTrue();
-        assertThat(firstChunk.getFields()).containsExactly("source");
+        assertThat(firstChunk.fields()).containsExactly("source");
     }
 
     @Test
@@ -522,15 +523,15 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         assertThat(scrollResult).isNotNull();
         assertThat(scrollResult.totalHits()).isEqualTo(10L);
 
-        ScrollResult.ScrollChunk scrollChunk = scrollResult.nextChunk();
+        ResultChunk scrollChunk = scrollResult.nextChunk();
         assertThat(scrollChunk.isFirstChunk()).isTrue();
 
         final Set<ResultMessage> resultMessages = new HashSet<>(5);
-        while (scrollChunk != null && !scrollChunk.getMessages().isEmpty()) {
-            assertThat(scrollChunk.getMessages()).hasSize(2);
-            assertThat(scrollChunk.getFields()).containsExactly("source");
+        while (scrollChunk != null && !scrollChunk.messages().isEmpty()) {
+            assertThat(scrollChunk.messages()).hasSize(2);
+            assertThat(scrollChunk.fields()).containsExactly("source");
 
-            resultMessages.addAll(scrollChunk.getMessages());
+            resultMessages.addAll(scrollChunk.messages());
             scrollChunk = scrollResult.nextChunk();
         }
 
@@ -548,12 +549,12 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         assertThat(scrollResult).isNotNull();
         assertThat(scrollResult.totalHits()).isEqualTo(10L);
 
-        ScrollResult.ScrollChunk scrollChunk = scrollResult.nextChunk();
+        ResultChunk scrollChunk = scrollResult.nextChunk();
         assertThat(scrollChunk.isFirstChunk()).isTrue();
 
         final Set<ResultMessage> resultMessages = new HashSet<>(5);
-        while (scrollChunk != null && !scrollChunk.getMessages().isEmpty()) {
-            resultMessages.addAll(scrollChunk.getMessages());
+        while (scrollChunk != null && !scrollChunk.messages().isEmpty()) {
+            resultMessages.addAll(scrollChunk.messages());
             scrollChunk = scrollResult.nextChunk();
         }
 

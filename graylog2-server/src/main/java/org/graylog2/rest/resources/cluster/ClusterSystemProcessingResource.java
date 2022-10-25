@@ -66,7 +66,7 @@ public class ClusterSystemProcessingResource extends ProxiedResource {
         final Node targetNode = nodeService.byNodeId(nodeId);
 
         return remoteInterfaceProvider.get(targetNode,
-                this.authenticationToken,
+                getAuthenticationToken(),
                 RemoteSystemProcessingResource.class);
     }
 
