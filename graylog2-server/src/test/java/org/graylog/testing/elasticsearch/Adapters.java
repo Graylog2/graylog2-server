@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.elasticsearch;
 
+import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
@@ -38,4 +39,6 @@ public interface Adapters {
     MessagesAdapter messagesAdapter();
 
     IndexFieldTypePollerAdapter indexFieldTypePollerAdapter();
+
+    IndexFieldTypePollerAdapter indexFieldTypePollerAdapter(final Configuration configuration);
 }

@@ -30,8 +30,10 @@ import org.graylog.storage.opensearch2.ScrollResultOS2;
 import org.graylog.storage.opensearch2.SearchRequestFactory;
 import org.graylog.storage.opensearch2.SearchesAdapterOS2;
 import org.graylog.storage.opensearch2.SortOrderMapper;
+import org.graylog.storage.opensearch2.fieldtypes.streams.StreamsForFieldRetrieverOS2;
 import org.graylog.storage.opensearch2.mapping.FieldMappingApi;
 import org.graylog.testing.elasticsearch.Adapters;
+import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
@@ -100,6 +102,12 @@ public class AdaptersOS2 implements Adapters {
 
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter() {
-        return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(objectMapper, client));
+        return indexFieldTypePollerAdapter(new Configuration());
     }
+
+    @Override
+    public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter(final Configuration configuration) {
+        return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(objectMapper, client), configuration, new StreamsForFieldRetrieverOS2(client));
+    }
+
 }

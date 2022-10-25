@@ -44,6 +44,14 @@ const HelpFeedback = styled.span`
   }
 `;
 
+const StyledContainer = styled.div(({ topMargin }) => `
+  margin-top: ${topMargin};
+`);
+
+const StyledInput = styled.input(({ queryWidth }) => `
+  width: ${queryWidth} !important;
+`);
+
 /**
  * Component that renders a customizable search form. The component
  * supports a loading state, adding children next to the form, and
@@ -62,7 +70,7 @@ class SearchForm extends React.Component {
      * Callback when a search was submitted. The function receives the query
      * and a callback to reset the loading state of the form as arguments.
      */
-    onSearch: PropTypes.func.isRequired,
+    onSearch: PropTypes.func,
     /** Callback when the input was reset. The function is called with no arguments. */
     onReset: PropTypes.func,
     /** Search field label. */
@@ -120,6 +128,7 @@ class SearchForm extends React.Component {
     query: '',
     className: '',
     onQueryChange: () => {},
+    onSearch: null,
     onReset: null,
     label: null,
     placeholder: 'Enter search query...',
@@ -227,6 +236,7 @@ class SearchForm extends React.Component {
       buttonLeftMargin,
       label,
       onReset,
+      onSearch,
       wrapperClass,
       topMargin,
       searchButtonLabel,
@@ -236,7 +246,7 @@ class SearchForm extends React.Component {
     const { query, isLoading } = this.state;
 
     return (
-      <div className={`${wrapperClass} ${className}`} style={{ marginTop: topMargin }}>
+      <StyledContainer className={`${wrapperClass} ${className}`} topMargin={topMargin}>
         <form className="form-inline" onSubmit={this._onSearch}>
           <FormContent buttonLeftMargin={buttonLeftMargin}>
             <div className={`form-group ${queryHelpComponent ? 'has-feedback' : ''}`}>
@@ -245,28 +255,30 @@ class SearchForm extends React.Component {
                   {label}
                 </label>
               )}
-              <input id="common-search-form-query-input"
-                   /* eslint-disable-next-line jsx-a11y/no-autofocus */
-                     autoFocus={focusAfterMount}
-                     onChange={this.handleQueryChange}
-                     value={query}
-                     placeholder={placeholder}
-                     type="text"
-                     style={{ width: queryWidth }}
-                     className="query form-control"
-                     autoComplete="off"
-                     spellCheck="false" />
+              <StyledInput id="common-search-form-query-input"
+                           /* eslint-disable-next-line jsx-a11y/no-autofocus */
+                           autoFocus={focusAfterMount}
+                           onChange={this.handleQueryChange}
+                           value={query}
+                           placeholder={placeholder}
+                           type="text"
+                           queryWidth={queryWidth}
+                           className="query form-control"
+                           autoComplete="off"
+                           spellCheck="false" />
               {queryHelpComponent && (
                 <HelpFeedback className="form-control-feedback">{queryHelpComponent}</HelpFeedback>
               )}
             </div>
 
-            <Button bsStyle={searchBsStyle}
-                    type="submit"
-                    disabled={isLoading}
-                    className="submit-button">
-              {isLoading ? <Spinner text={loadingLabel} delay={0} /> : searchButtonLabel}
-            </Button>
+            {onSearch && (
+              <Button bsStyle={searchBsStyle}
+                      type="submit"
+                      disabled={isLoading}
+                      className="submit-button">
+                {isLoading ? <Spinner text={loadingLabel} delay={0} /> : searchButtonLabel}
+              </Button>
+            )}
 
             {onReset && (
               <Button type="reset" className="reset-button" onClick={this._onReset}>
@@ -276,7 +288,7 @@ class SearchForm extends React.Component {
             {children}
           </FormContent>
         </form>
-      </div>
+      </StyledContainer>
     );
   }
 }

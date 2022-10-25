@@ -56,6 +56,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "is_master")
     private boolean isMaster = true;
 
+    @Parameter(value = "stream_aware_field_types")
+    private boolean streamAwareFieldTypes = false;
+
     /**
      * Used for initializing static leader election. You shouldn't use this for other purposes, but if you must, don't
      * use @{@link javax.inject.Named} injection but the getter isLeader() instead.
@@ -212,6 +215,10 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "lock_service_lock_ttl", converter = JavaDurationConverter.class)
     private java.time.Duration lockServiceLockTTL = MongoLockService.MIN_LOCK_TTL;
+
+    public boolean maintainsStreamAwareFieldTypes() {
+        return streamAwareFieldTypes;
+    }
 
     /**
      * @deprecated Use {@link #isLeader()} instead.

@@ -25,8 +25,10 @@ import { ModifiedNavDropdown as NavDropdown } from 'components/bootstrap/NavDrop
 import type { QueryId } from 'views/logic/queries/Query';
 import type QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
 import { Nav, NavItem, MenuItem } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import { Icon, IconButton } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
+import type { ListItemType } from 'components/common/SortableList/ListItem';
+import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
 
 import type { QueryTabsProps } from './QueryTabs';
 
@@ -38,13 +40,20 @@ interface Props extends QueryTabsProps {
 interface TabsTypes {
   navItems: Array<ReactNode>,
   menuItems: Array<ReactNode>,
-  lockedItems: Array<ReactNode>
+  lockedItems: Array<ReactNode>,
+  queriesList: Array<ListItemType>,
 }
 
 const CLASS_HIDDEN = 'hidden';
 const CLASS_LOCKED = 'locked';
 const CLASS_ACTIVE = 'active';
 const NAV_PADDING = 15;
+
+const Container = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
 
 const StyledQueryNav = styled(Nav)(({ theme }) => css`
   &.nav.nav-tabs {
@@ -164,11 +173,12 @@ const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
 const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemove, onSelect, queryTitleEditModal }: Props) => {
   const [openedMore, setOpenedMore] = useState<boolean>(false);
   const [lockedTab, setLockedTab] = useState<QueryId>();
-
+  const [showConfigurationModal, setShowConfigurationModal] = useState<boolean>(false);
   const currentTabs = useMemo((): TabsTypes => {
     const navItems = [];
     const menuItems = [];
     const lockedItems = [];
+    const queriesList = [];
 
     queries.keySeq().forEach((id, idx) => {
       const openTitleEditModal = (activeQueryTitle: string) => {
@@ -219,9 +229,14 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
           {tabTitle}
         </NavItem>
       ));
+
+      queriesList.push({
+        id,
+        title,
+      });
     });
 
-    return { navItems, menuItems, lockedItems };
+    return { navItems, menuItems, lockedItems, queriesList };
   }, [lockedTab, onRemove, onSelect, queries, queryTitleEditModal, selectedQueryId, titles]);
 
   useEffect(() => {
@@ -229,32 +244,40 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
   }, [maxWidth, lockedTab, selectedQueryId]);
 
   return (
-    <StyledQueryNav bsStyle="tabs" activeKey={selectedQueryId} id="dashboard-tabs">
-      {currentTabs.navItems}
+    <Container>
+      <StyledQueryNav bsStyle="tabs" activeKey={selectedQueryId} id="dashboard-tabs">
+        {currentTabs.navItems}
 
-      <NavDropdown eventKey="more"
-                   title={<Icon name="ellipsis-h" />}
-                   className="query-tabs-more"
-                   id="query-tabs-more"
-                   aria-label="More Dashboard Tabs"
-                   noCaret
-                   pullRight
-                   active={openedMore}
-                   open={openedMore}
-                   onToggle={(isOpened) => setOpenedMore(isOpened)}>
-        {currentTabs.menuItems}
-      </NavDropdown>
+        <NavDropdown eventKey="more"
+                     title={<Icon name="ellipsis-h" />}
+                     className="query-tabs-more"
+                     id="query-tabs-more"
+                     aria-label="More Dashboard Pages"
+                     noCaret
+                     pullRight
+                     active={openedMore}
+                     open={openedMore}
+                     onToggle={(isOpened) => setOpenedMore(isOpened)}>
+          {currentTabs.menuItems}
+        </NavDropdown>
 
-      {currentTabs.lockedItems}
+        {currentTabs.lockedItems}
 
-      <NavItem key="new"
-               eventKey="new"
-               title="Create New Tab"
-               onClick={() => onSelect('new')}
-               className="query-tabs-new">
-        <Icon name="plus" />
-      </NavItem>
-    </StyledQueryNav>
+        <NavItem key="new"
+                 eventKey="new"
+                 title="Create New Page"
+                 onClick={() => onSelect('new')}
+                 className="query-tabs-new">
+          <Icon name="plus" />
+        </NavItem>
+      </StyledQueryNav>
+      <IconButton title="Open pages configuration" name="cog" onClick={() => setShowConfigurationModal(true)} />
+      {showConfigurationModal && (
+      <AdaptableQueryTabsConfiguration show={showConfigurationModal}
+                                       setShow={setShowConfigurationModal}
+                                       queriesList={currentTabs.queriesList} />
+      )}
+    </Container>
   );
 };
 

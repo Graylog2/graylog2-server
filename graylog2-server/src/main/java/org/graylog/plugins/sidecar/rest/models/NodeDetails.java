@@ -18,6 +18,7 @@ package org.graylog.plugins.sidecar.rest.models;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
@@ -25,9 +26,11 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class NodeDetails {
     @JsonProperty("operating_system")
     @NotNull
@@ -50,12 +53,21 @@ public abstract class NodeDetails {
     @Nullable
     public abstract CollectorStatusList statusList();
 
+    @JsonProperty("tags")
+    public abstract Set<String> tags();
+
+    @JsonProperty("collector_configuration_directory")
+    @Nullable
+    public abstract String collectorConfigurationDirectory();
+
     @JsonCreator
     public static NodeDetails create(@JsonProperty("operating_system") String operatingSystem,
                                      @JsonProperty("ip") @Nullable String ip,
                                      @JsonProperty("metrics") @Nullable NodeMetrics metrics,
                                      @JsonProperty("log_file_list") @Nullable List<NodeLogFile> logFileList,
-                                     @JsonProperty("status") @Nullable CollectorStatusList statusList) {
-        return new AutoValue_NodeDetails(operatingSystem, ip, metrics, logFileList, statusList);
+                                     @JsonProperty("status") @Nullable CollectorStatusList statusList,
+                                     @JsonProperty("tags") @Nullable Set<String> tags,
+                                     @JsonProperty("collector_configuration_directory") @Nullable String configDir) {
+        return new AutoValue_NodeDetails(operatingSystem, ip, metrics, logFileList, statusList, tags == null ? Set.of() : tags, configDir);
     }
 }

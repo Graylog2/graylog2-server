@@ -92,7 +92,7 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
   const markers = useMemo(() => getMarkers(error, warning), [error, warning]);
   const _onLoad = useCallback((editor) => {
     if (editor) {
-      editor.renderer.setScrollMargin(6, 5);
+      editor.renderer.setScrollMargin(7, 6);
       editor.renderer.setPadding(12);
 
       if (inputId) {
@@ -111,7 +111,7 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
     className,
     disabled,
     editorProps,
-    fontSize: theme.fonts.size.large,
+    fontSize: theme.fonts.size.small,
     highlightActiveLine: false,
     markers,
     maxLines,

@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
@@ -80,7 +81,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
     private final LoadingCache<DateTimeZone, ObjectMapper> mapperByTimeZone = CacheBuilder.newBuilder()
             .maximumSize(DateTimeZone.getAvailableIDs().size())
             .build(
-                    new CacheLoader<DateTimeZone, ObjectMapper>() {
+                    new CacheLoader<>() {
                         @Override
                         public ObjectMapper load(@Nonnull DateTimeZone key) {
                             return objectMapper.copy().setTimeZone(key.toTimeZone());
@@ -109,11 +110,13 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 
         this.objectMapper = mapper
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
                 .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 .disable(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY)
                 .setPropertyNamingStrategy(new PropertyNamingStrategy.SnakeCaseStrategy())
                 .setSubtypeResolver(subtypeResolver)
                 .setTypeFactory(typeFactory)
+                .setDateFormat(new StdDateFormat().withColonInTimeZone(false))
                 .registerModule(new GuavaModule())
                 .registerModule(new JodaModule())
                 .registerModule(new Jdk8Module())

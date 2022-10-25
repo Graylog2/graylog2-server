@@ -17,6 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Reflux from 'reflux';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import { cloneDeep, groupBy } from 'lodash';
 
@@ -34,8 +35,10 @@ import { CatalogActions, CatalogStore } from 'stores/content-packs/CatalogStore'
 import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/ContentPacksStore';
 
 const EditContentPackPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'EditContentPackPage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     params: PropTypes.object.isRequired,
   },
@@ -194,21 +197,18 @@ const EditContentPackPage = createReactClass({
     return (
       <DocumentTitle title="Content packs">
         <span>
-          <PageHeader title="Edit content pack">
+          <PageHeader title="Edit content pack"
+                      topActions={(
+                        <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
+                          <Button bsStyle="info">Content Packs</Button>
+                        </LinkContainer>
+                      )}>
             <span>
               Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.
-            </span>
-
-            <span>
+              <br />
               Find more content packs in {' '}
               <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
             </span>
-
-            <div>
-              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
-                <Button bsStyle="info">Content Packs</Button>
-              </LinkContainer>
-            </div>
           </PageHeader>
           <ContentPackEdit contentPack={contentPack}
                            onGetEntities={this._getEntities}

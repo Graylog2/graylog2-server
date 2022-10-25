@@ -132,7 +132,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
             configurationService.replaceVariableNames(previousConfigurationVariable.fullName(), request.fullName());
         }
         final ConfigurationVariable updatedConfigurationVariable = persistConfigurationVariable(id, request);
-        etagService.invalidateAll();
+        etagService.invalidateAllConfigurations();
 
         return Response.ok().entity(updatedConfigurationVariable).build();
     }
@@ -168,7 +168,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
         if (deleted == 0) {
             return Response.notModified().build();
         }
-        etagService.invalidateAll();
+        etagService.invalidateAllConfigurations();
         return Response.accepted().build();
     }
 

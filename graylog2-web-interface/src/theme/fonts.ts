@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 
 import { ROOT_FONT_SIZE } from './constants';
 
-import '@openfonts/source-code-pro_latin/index.css';
+import '@openfonts/ubuntu-mono_latin/index.css';
 import '@openfonts/source-sans-pro_latin/index.css';
 import '@openfonts/dm-sans_latin/index.css';
 
@@ -73,7 +73,7 @@ export const fontsPropTypes = PropTypes.shape({
 
 const family = {
   body: '"Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif',
-  monospace: '"Source Code Pro", Menlo, Monaco, Consolas, "Courier New", monospace',
+  monospace: '"Ubuntu Mono", Menlo, Monaco, Consolas, "Courier New", monospace',
   navigation: '"DM Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
 };
 

@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -23,7 +24,6 @@ import { LinkContainer } from 'components/common/router';
 import { DocumentTitle, Spinner } from 'components/common';
 import PageHeader from 'components/common/PageHeader';
 import ExtractorsList from 'components/extractors/ExtractorsList';
-import DocumentationLink from 'components/support/DocumentationLink';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
@@ -32,8 +32,10 @@ import { InputsActions } from 'stores/inputs/InputsStore';
 import { NodesActions, NodesStore } from 'stores/nodes/NodesStore';
 
 const ExtractorsPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'ExtractorsPage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     params: PropTypes.object.isRequired,
   },
@@ -53,6 +55,7 @@ const ExtractorsPage = createReactClass({
     NodesActions.list();
   },
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   onNodesChange(nodes) {
     const { params } = this.props;
     const newNode = params.nodeId ? nodes.nodes[params.nodeId] : Object.values(nodes.nodes).filter((node) => node.is_leader);
@@ -80,27 +83,27 @@ const ExtractorsPage = createReactClass({
     return (
       <DocumentTitle title={`Extractors of ${input.title}`}>
         <div>
-          <PageHeader title={<span>Extractors of <em>{input.title}</em></span>}>
+          <PageHeader title={<span>Extractors of <em>{input.title}</em></span>}
+                      actions={(
+                        <DropdownButton bsStyle="info" id="extractor-actions-dropdown" title="Actions" pullRight>
+                          <LinkContainer to={Routes.import_extractors(node.node_id, input.id)}>
+                            <MenuItem>Import extractors</MenuItem>
+                          </LinkContainer>
+                          <LinkContainer to={Routes.export_extractors(node.node_id, input.id)}>
+                            <MenuItem>Export extractors</MenuItem>
+                          </LinkContainer>
+                        </DropdownButton>
+                      )}
+                      documentationLink={{
+                        title: 'Extractors documentation',
+                        path: DocsHelper.PAGES.EXTRACTORS,
+                      }}>
             <span>
               Extractors are applied on every message that is received by this input. Use them to extract and transform{' '}
               any text data into fields that allow you easy filtering and analysis later on.{' '}
               Example: Extract the HTTP response code from a log message, transform it to a numeric field and attach it{' '}
               as <em>http_response_code</em> to the message.
             </span>
-
-            <span>
-              Find more information about extractors in the
-              {' '}<DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation" />.
-            </span>
-
-            <DropdownButton bsStyle="info" bsSize="large" id="extractor-actions-dropdown" title="Actions" pullRight>
-              <LinkContainer to={Routes.import_extractors(node.node_id, input.id)}>
-                <MenuItem>Import extractors</MenuItem>
-              </LinkContainer>
-              <LinkContainer to={Routes.export_extractors(node.node_id, input.id)}>
-                <MenuItem>Export extractors</MenuItem>
-              </LinkContainer>
-            </DropdownButton>
           </PageHeader>
           <ExtractorsList input={input} node={node} />
         </div>

@@ -21,7 +21,7 @@ import styled, { createGlobalStyle } from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 
-import { DocumentTitle, Icon } from 'components/common';
+import { DocumentTitle } from 'components/common';
 import { Alert, Button } from 'components/bootstrap';
 import LoginForm from 'components/login/LoginForm';
 import LoginBox from 'components/login/LoginBox';
@@ -30,6 +30,7 @@ import AuthenticationDomain from 'domainActions/authentication/AuthenticationDom
 import AppConfig from 'util/AppConfig';
 import { LOGIN_INITIALIZING_STATE, LOGIN_INITIALIZED_STATE } from 'logic/authentication/constants';
 import { SessionActions } from 'stores/sessions/SessionStore';
+import LoginHeader from 'components/login/LoginHeader';
 
 import LoadingPage from './LoadingPage';
 
@@ -166,7 +167,7 @@ const LoginPage = () => {
   return (
     <DocumentTitle title="Sign in">
       <LoginBox>
-        <legend><Icon name="users" /> Welcome to Graylog</legend>
+        <LoginHeader />
         <LoginPageStyles />
         {formatLastError()}
         {renderLoginForm()}

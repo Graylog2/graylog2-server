@@ -49,9 +49,9 @@ const variantDefault = {
   danger: '#eb5454',
   default: '#9aa8bd',
   info: '#578dcc',
-  primary: '#eb9145',
-  success: '#90bd63',
-  warning: '#d9bd47',
+  primary: '#697586',
+  success: '#7eb356',
+  warning: '#eedf64',
 };
 
 const variant: $PropertyType<Colors, 'variant'> = {

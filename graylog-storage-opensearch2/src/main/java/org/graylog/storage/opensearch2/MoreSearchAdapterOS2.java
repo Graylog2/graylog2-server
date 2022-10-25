@@ -29,6 +29,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.ToXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.ScrollCommand;
@@ -142,9 +143,9 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
 
         final Stopwatch stopwatch = Stopwatch.createStarted();
         try {
-            ScrollResult.ScrollChunk scrollChunk = scrollResult.nextChunk();
+            ResultChunk scrollChunk = scrollResult.nextChunk();
             while (continueScrolling.get() && scrollChunk != null) {
-                final List<ResultMessage> messages = scrollChunk.getMessages();
+                final List<ResultMessage> messages = scrollChunk.messages();
 
                 LOG.debug("Passing <{}> messages to callback", messages.size());
                 resultCallback.accept(Collections.unmodifiableList(messages), continueScrolling);
