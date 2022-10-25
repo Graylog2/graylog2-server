@@ -21,9 +21,9 @@ import { NavDropdown as BootstrapNavDropdown } from 'react-bootstrap';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
-import menuItemStyles from './styles/menuItem';
+import NavItemStateIndicator from 'components/common/NavItemStateIndicator';
 
-import NavItemStateIndicator from '../common/NavItemStateIndicator';
+import menuItemStyles from './styles/menuItem';
 
 class ModifiedBootstrapNavDropdown extends BootstrapNavDropdown {
   // eslint-disable-next-line class-methods-use-this
