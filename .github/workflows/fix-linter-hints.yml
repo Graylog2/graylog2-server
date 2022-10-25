@@ -28,7 +28,24 @@ jobs:
         run: git checkout yarn.lock
       - name: Run lint --fix
         continue-on-error: true
-        run: yarn lint --fix
+        run: yarn lint --fix -o /tmp/report.json -f json
+      - name: Submit Results
+        continue-on-error: true
+        run: |
+          PROBLEM_COUNT=`jq '. | map(.errorCount + .warningCount)|add' /tmp/report.json`
+          CURRENT_REF=`git rev-parse HEAD`
+          PAYLOAD=$(cat <<- 'EOF'
+            '{
+              "version": "1.1",
+              "host": "developermetrics",
+              "job": "fix-linter-hints",
+              "short_message": "Found ${PROBLEM_COUNT} problems in commit ${CURRENT_REF}"
+              "_problems": ${PROBLEM_COUNT}
+              "_current_ref": "${CURRENT_REF}"
+             }'
+          EOF
+          )
+          curl -X POST -H 'Content-Type: application/json' -d $PAYLOAD ${{ secrets.DEV_METRICS_URL }}
       - name: Create/Update Pull Request
         uses: Graylog2/create-pull-request@7380612b49221684fefa025244f2ef4008ae50ad
         with:
