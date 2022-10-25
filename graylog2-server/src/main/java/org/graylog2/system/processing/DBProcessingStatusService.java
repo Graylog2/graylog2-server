@@ -203,7 +203,7 @@ public class DBProcessingStatusService {
          */
         ALL_IDLE,
         /**
-         * All nodes in the cluster have processed the given timerange already.
+         * Some or all nodes in the cluster have processed the given timerange already.
          */
         SOME_UP_TO_DATE,
         /**
