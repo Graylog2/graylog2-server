@@ -44,10 +44,6 @@ const StyledButton = styled(Button)(({ theme }) => css`
       ${hoverIndicatorStyles(theme)}
     }
 
-    .state-indicator {
-      position: relative;
-    }
-
     &.active {
       color: ${theme.colors.global.textDefault};
 
