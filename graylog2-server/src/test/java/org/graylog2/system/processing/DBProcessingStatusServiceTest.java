@@ -156,6 +156,7 @@ public class DBProcessingStatusServiceTest {
         statusRecorder.uncommittedMessages.set(123);
         statusRecorder.readMessages1m.set(1);
         statusRecorder.writtenMessages1m.set(2);
+        statusRecorder.processBufferUsage.set(23);
 
         assertThat(dbService.save(statusRecorder, now)).satisfies(dto -> {
             assertThat(dto.id()).isNotBlank();
@@ -174,6 +175,8 @@ public class DBProcessingStatusServiceTest {
                 assertThat(inputJournal.readMessages1mRate()).isEqualTo(1.0d);
                 assertThat(inputJournal.writtenMessages1mRate()).isEqualTo(2.0d);
             });
+
+            assertThat(dto.processBufferUsage()).isEqualTo(23);
         });
 
         assertThat(dbService.all()).hasSize(1);
@@ -203,6 +206,7 @@ public class DBProcessingStatusServiceTest {
                 assertThat(inputJournal.readMessages1mRate()).isEqualTo(1.0d);
                 assertThat(inputJournal.writtenMessages1mRate()).isEqualTo(2.0d);
             });
+            assertThat(dto.processBufferUsage()).isEqualTo(23);
         });
 
         // The save() should be an upsert so we should only have one document
@@ -222,7 +226,7 @@ public class DBProcessingStatusServiceTest {
     @MongoDBFixtures("processing-status-no-nodes.json")
     public void processingStateNoActiveNodesBecauseNoNodesExists() {
         TimeRange timeRange = AbsoluteRange.create("2019-01-01T00:00:00.000Z", "2019-01-01T00:00:30.000Z");
-        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.NO_ACTIVE);
+        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.NONE_ACTIVE);
     }
 
     @Test
@@ -232,7 +236,7 @@ public class DBProcessingStatusServiceTest {
         when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(1).toMilliseconds());
 
         TimeRange timeRange = AbsoluteRange.create("2019-01-01T00:00:00.000Z", "2019-01-01T00:00:30.000Z");
-        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.NO_ACTIVE);
+        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.NONE_ACTIVE);
     }
 
     @Test
@@ -241,12 +245,22 @@ public class DBProcessingStatusServiceTest {
         when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T04:00:00.000Z"));
         when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(1).toMilliseconds());
         TimeRange timeRange = AbsoluteRange.create("2019-01-01T02:00:00.000Z", "2019-01-01T03:00:00.000Z");
-        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.ALL_UP_TO_DATE);
+        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.SOME_UP_TO_DATE);
     }
 
     @Test
     @MongoDBFixtures("processing-status-overloaded-node.json")
     public void processingStateOverloadedNode() {
+        when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T04:00:00.000Z"));
+        when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(1).toMilliseconds());
+
+        TimeRange timeRange = AbsoluteRange.create("2019-01-01T02:00:00.000Z", "2019-01-01T03:00:00.000Z");
+        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.SOME_OVERLOADED);
+    }
+
+    @Test
+    @MongoDBFixtures("processing-status-overloaded-processbuffer-node.json")
+    public void processingStateOverloadedProcessBufferNode() {
         when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T04:00:00.000Z"));
         when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(1).toMilliseconds());
 
@@ -261,7 +275,7 @@ public class DBProcessingStatusServiceTest {
         when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(1).toMilliseconds());
 
         TimeRange timeRange = AbsoluteRange.create("2019-01-01T02:00:00.000Z", "2019-01-01T03:00:00.000Z");
-        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.ALL_UP_TO_DATE);
+        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.SOME_UP_TO_DATE);
     }
 
     @Test
@@ -271,7 +285,7 @@ public class DBProcessingStatusServiceTest {
         when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(1).toMilliseconds());
 
         TimeRange timeRange = AbsoluteRange.create("2019-01-01T02:00:00.000Z", "2019-01-01T03:00:00.000Z");
-        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.ALL_UP_TO_DATE);
+        assertThat(dbService.calculateProcessingState(timeRange)).isEqualTo(ProcessingNodesState.SOME_UP_TO_DATE);
     }
 
     @Test

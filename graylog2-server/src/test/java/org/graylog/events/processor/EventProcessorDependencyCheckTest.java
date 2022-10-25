@@ -110,7 +110,7 @@ public class EventProcessorDependencyCheckTest {
     @Test
     public void hasMessagesIndexedUpTo() {
         TimeRange any = AbsoluteRange.create("2019-01-01T00:00:00.000Z", "2019-01-01T00:00:30.000Z");
-        when(dbProcessingStatusService.calculateProcessingState(any)).thenReturn(ProcessingNodesState.ALL_UP_TO_DATE);
+        when(dbProcessingStatusService.calculateProcessingState(any)).thenReturn(ProcessingNodesState.SOME_UP_TO_DATE);
 
         assertThat(dependencyCheck.hasMessagesIndexedUpTo(any)).isTrue();
     }

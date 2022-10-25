@@ -37,6 +37,8 @@ public abstract class ProcessingStatusDto {
     static final String FIELD_RECEIVE_TIMES = "receive_times";
     static final String FIELD_INPUT_JOURNAL = "input_journal";
 
+    static final String FIELD_PROCESS_BUFFER_USAGE = "process_buffer_usage";
+
     @Id
     @ObjectId
     @Nullable
@@ -58,11 +60,15 @@ public abstract class ProcessingStatusDto {
     @JsonProperty(FIELD_INPUT_JOURNAL)
     public abstract JournalInfo inputJournal();
 
+    @JsonProperty(FIELD_PROCESS_BUFFER_USAGE)
+    public abstract long processBufferUsage();
+
     public static ProcessingStatusDto of(String nodeId, ProcessingStatusRecorder processingStatusRecorder, DateTime updatedAt, boolean messageJournalEnabled) {
         return builder()
                 .nodeId(nodeId)
                 .updatedAt(updatedAt)
                 .nodeLifecycleStatus(processingStatusRecorder.getNodeLifecycleStatus())
+                .processBufferUsage(processingStatusRecorder.getProcessBufferUsage())
                 .receiveTimes(ReceiveTimes.builder()
                         .ingest(processingStatusRecorder.getIngestReceiveTime())
                         .postProcessing(processingStatusRecorder.getPostProcessingReceiveTime())
@@ -91,6 +97,7 @@ public abstract class ProcessingStatusDto {
                     // 3.1.0-beta/rc setups didn't have the lifecycle status and journal info so we need to have a default for them.
                     // TODO: The lifecycle status and journal info defaults can be removed at some point after 3.1.0
                     .nodeLifecycleStatus(Lifecycle.RUNNING)
+                    .processBufferUsage(0)
                     .inputJournal(JournalInfo.builder().build());
         }
 
@@ -113,6 +120,9 @@ public abstract class ProcessingStatusDto {
 
         @JsonProperty(FIELD_INPUT_JOURNAL)
         public abstract Builder inputJournal(JournalInfo inputJournal);
+
+        @JsonProperty(FIELD_PROCESS_BUFFER_USAGE)
+        public abstract Builder processBufferUsage(long usage);
 
         public abstract ProcessingStatusDto build();
     }

@@ -66,9 +66,9 @@ public class EventProcessorDependencyCheck {
      * into account!
      *
      * @param timeRange the timestamp to check
-     * @return true if messages up to the given latestTimestamp have already been indexed, false otherwise
+     * @return true if messages up to the given timeRange have already been indexed, false otherwise
      */
     public boolean hasMessagesIndexedUpTo(TimeRange timeRange) {
-        return ProcessingNodesState.ALL_UP_TO_DATE == processingStatusService.calculateProcessingState(timeRange);
+        return ProcessingNodesState.SOME_UP_TO_DATE == processingStatusService.calculateProcessingState(timeRange);
     }
 }
