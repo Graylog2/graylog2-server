@@ -48,6 +48,7 @@ const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }: { them
         color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
         background-color: ${theme.colors.global.contentBackground};
         border-color: ${theme.colors.variant.light.default};
+        border-radius: 0;
 
         &:hover,
         &:focus {

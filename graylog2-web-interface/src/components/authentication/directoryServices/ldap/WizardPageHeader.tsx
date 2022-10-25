@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import AuthenticationOverviewLinks from 'components/authentication/AuthenticationOverviewLinks';
+import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
@@ -24,7 +24,6 @@ import type { OktaBackend } from 'logic/authentication/okta/types';
 import { PageHeader } from 'components/common';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
-import DocumentationLink from 'components/support/DocumentationLink';
 
 type Props = {
   authenticationBackend?: DirectoryServiceBackend | OktaBackend,
@@ -46,19 +45,20 @@ const WizardPageHeader = ({ authenticationBackend: authBackend, title }: Props) 
   const pageTitle = _pageTitle(authBackend, title);
 
   return (
-    <PageHeader title={pageTitle}
-                subactions={(
-                  <BackendActionLinks activeBackend={activeBackend}
-                                      finishedLoading={finishedLoading} />
-                )}>
-      <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
-      <span>
-        Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                                                           text="documentation" />.
-      </span>
-
-      <AuthenticationOverviewLinks />
-    </PageHeader>
+    <>
+      <AuthenticationPageNavigation />
+      <PageHeader title={pageTitle}
+                  actions={(
+                    <BackendActionLinks activeBackend={activeBackend}
+                                        finishedLoading={finishedLoading} />
+                  )}
+                  documentationLink={{
+                    title: 'Authentication documentation',
+                    path: DocsHelper.PAGES.USERS_ROLES,
+                  }}>
+        <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
+      </PageHeader>
+    </>
   );
 };
 

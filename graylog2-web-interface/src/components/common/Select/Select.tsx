@@ -119,8 +119,8 @@ const multiValueRemove = ({ theme }) => (base) => ({
 });
 
 const controlSmall = {
-  minHeight: '30px',
-  height: '30px',
+  minHeight: '29px',
+  height: '29px',
 };
 
 const controlNormal = {

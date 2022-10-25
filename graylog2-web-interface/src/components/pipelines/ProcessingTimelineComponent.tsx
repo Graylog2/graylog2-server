@@ -109,7 +109,7 @@ const ProcessingTimelineComponent = () => {
   const [streams, setStreams] = useState<Stream[] | undefined>();
   const [paginatedPipelines, setPaginatedPipelines] = useState<PaginatedPipelines|undefined>();
   const [loading, setLoading] = useState(false);
-  const { list: pipelines = Immutable.List(), pagination: { total = 0, count = 0 } = {} } = paginatedPipelines || {};
+  const { list: pipelines = Immutable.List(), pagination: { total = 0 } = {} } = paginatedPipelines || {};
 
   useEffect(() => {
     _loadPipelines({ page, perPage, query }, setLoading, setPaginatedPipelines);
@@ -171,12 +171,7 @@ const ProcessingTimelineComponent = () => {
       // eslint-disable-next-line no-alert
       if (window.confirm(`Do you really want to delete pipeline "${pipeline.title}"? This action cannot be undone.`)) {
         PipelinesActions.delete(pipeline.id).then(() => {
-          if (count > 1) {
-            _loadPipelines({ page, perPage, query }, setLoading, setPaginatedPipelines);
-
-            return;
-          }
-
+          _loadPipelines({ page, perPage, query }, setLoading, setPaginatedPipelines);
           setPage(Math.max(DEFAULT_PAGINATION.page, page - 1));
         });
       }

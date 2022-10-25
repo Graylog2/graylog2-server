@@ -44,22 +44,25 @@ const Content = styled.div(({ theme }) => css`
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  padding-bottom: ${theme.spacings.sm};
+  margin-bottom: ${theme.spacings.xs};
   gap: 4px;
-  margin: 0;
 `);
+
 const EditButton = styled.div(({ theme }) => css`
   color: ${theme.colors.gray[60]};
   font-size: ${theme.fonts.size.tiny};
   cursor: pointer;
 `);
+
 const TitleWrapper = styled.span`
   display: flex;
   gap: 4px;
   align-items: center;
+
   & ${EditButton} {
     display: none;
   }
+
   &:hover ${EditButton} {
     display: block;
   }

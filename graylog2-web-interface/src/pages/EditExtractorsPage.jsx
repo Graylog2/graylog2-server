@@ -16,11 +16,11 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import EditExtractor from 'components/extractors/EditExtractor';
 import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';
@@ -31,8 +31,10 @@ import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import { UniversalSearchStore } from 'stores/search/UniversalSearchStore';
 
 const EditExtractorsPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'EditExtractorsPage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     params: PropTypes.object.isRequired,
   },
@@ -92,24 +94,22 @@ const EditExtractorsPage = createReactClass({
 
     return (
       <DocumentTitle title={`Edit extractor ${extractor.title}`}>
-        <div>
-          <PageHeader title={<span>Edit extractor <em>{extractor.title}</em> for input <em>{input.title}</em></span>}>
-            <span>
-              Extractors are applied on every message that is received by an input. Use them to extract and transform{' '}
-              any text data into fields that allow you easy filtering and analysis later on.
-            </span>
+        <PageHeader title={<span>Edit extractor <em>{extractor.title}</em> for input <em>{input.title}</em></span>}
+                    documentationLink={{
+                      title: 'Extractors documentation',
+                      path: DocsHelper.PAGES.EXTRACTORS,
+                    }}>
+          <span>
+            Extractors are applied on every message that is received by an input. Use them to extract and transform{' '}
+            any text data into fields that allow you easy filtering and analysis later on.
+          </span>
+        </PageHeader>
+        <EditExtractor action="edit"
+                       extractor={extractor}
+                       inputId={input.id}
+                       exampleMessage={exampleMessage.fields ? exampleMessage.fields[extractor.source_field] : undefined}
+                       onSave={this._extractorSaved} />
 
-            <span>
-              Find more information about extractors in the
-              {' '}<DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation" />.
-            </span>
-          </PageHeader>
-          <EditExtractor action="edit"
-                         extractor={extractor}
-                         inputId={input.id}
-                         exampleMessage={exampleMessage.fields ? exampleMessage.fields[extractor.source_field] : undefined}
-                         onSave={this._extractorSaved} />
-        </div>
       </DocumentTitle>
     );
   },

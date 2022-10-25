@@ -170,10 +170,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     }
   }
 
-  .content p.description-tooltips {
-    margin-top: 10px;
-  }
-
   .notifications-none {
     margin-top: 10px;
   }
@@ -505,23 +501,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .message-loader-form input {
     margin-right: 5px;
-  }
-
-  nav.navbar-fixed-top ul.dropdown-menu li a {
-    font-size: ${theme.fonts.size.body};
-  }
-
-  nav.navbar-fixed-top ul.dropdown-menu {
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-
-  nav.navbar-fixed-top ul.dropdown-menu li {
-    padding: 2px 2px 2px 0;
-  }
-
-  nav.navbar-fixed-top ul.dropdown-menu li.divider {
-    padding: 0;
   }
 
   table.indexer-failures {

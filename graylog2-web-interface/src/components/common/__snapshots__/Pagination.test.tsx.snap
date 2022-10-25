@@ -12,6 +12,7 @@ exports[`<Pagination /> should display Pagination 1`] = `
   color: rgb(81,81,81);
   background-color: #fff;
   border-color: #b5bfcd;
+  border-radius: 0;
 }
 
 .c0.pagination > li > a:hover,

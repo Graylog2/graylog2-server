@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -243,8 +242,12 @@ public class EventDefinitionHandler {
 
     private void createJobDefinitionAndTrigger(EventDefinitionDto eventDefinition,
                                                EventProcessorSchedulerConfig schedulerConfig) {
-        final JobDefinitionDto jobDefinition = createJobDefinition(eventDefinition, schedulerConfig);
+        if (getJobDefinition(eventDefinition).isPresent()) {
+            LOG.warn("Not creating a second job definition for EventDefinition <{}>", eventDefinition);
+            return;
+        }
 
+        final JobDefinitionDto jobDefinition = createJobDefinition(eventDefinition, schedulerConfig);
         try {
             createJobTrigger(eventDefinition, jobDefinition, schedulerConfig);
         } catch (Exception e) {

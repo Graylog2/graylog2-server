@@ -17,26 +17,28 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
-import { ButtonToolbar, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
-import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import SidecarStatus from 'components/sidecars/sidecars/SidecarStatus';
 import withParams from 'routing/withParams';
 import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
 import { SidecarsActions } from 'stores/sidecars/SidecarsStore';
+import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 
 class SidecarStatusPage extends React.Component {
   static propTypes = {
     params: PropTypes.object.isRequired,
   };
 
-  state = {
-    sidecar: undefined,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      sidecar: undefined,
+    };
+  }
 
   componentDidMount() {
     this.reloadSidecar();
@@ -76,32 +78,18 @@ class SidecarStatusPage extends React.Component {
 
     return (
       <DocumentTitle title={`Sidecar ${sidecar.node_name} status`}>
-        <span>
-          <PageHeader title={<span>Sidecar <em>{sidecar.node_name} status</em></span>}>
-            <span>
-              A status overview of the Graylog Sidecar.
-            </span>
+        <SidecarsPageNavigation />
+        <PageHeader title={<span>Sidecar <em>{sidecar.node_name} status</em></span>}
+                    documentationLink={{
+                      title: 'Sidecars documentation',
+                      path: DocsHelper.PAGES.COLLECTOR_STATUS,
+                    }}>
+          <span>
+            A status overview of the Graylog Sidecar.
+          </span>
+        </PageHeader>
 
-            <span>
-              Read more about sidecars and how to set them up in the
-              {' '}<DocumentationLink page={DocsHelper.PAGES.COLLECTOR_STATUS} text="Graylog documentation" />.
-            </span>
-
-            <ButtonToolbar>
-              <LinkContainer to={Routes.SYSTEM.SIDECARS.OVERVIEW}>
-                <Button bsStyle="info" className="active">Overview</Button>
-              </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.SIDECARS.ADMINISTRATION}>
-                <Button bsStyle="info">Administration</Button>
-              </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.SIDECARS.CONFIGURATION}>
-                <Button bsStyle="info">Configuration</Button>
-              </LinkContainer>
-            </ButtonToolbar>
-          </PageHeader>
-
-          <SidecarStatus sidecar={sidecar} collectors={collectors} />
-        </span>
+        <SidecarStatus sidecar={sidecar} collectors={collectors} />
       </DocumentTitle>
     );
   }

@@ -198,7 +198,7 @@ class GrokPatterns extends React.Component {
     return (
       <div>
         <PageHeader title="Grok patterns"
-                    subactions={(
+                    actions={(
                       <IfPermitted permissions="inputs:edit">
                         <ButtonToolbar>
                           <BulkLoadPatternModal onSuccess={this.loadData} />

@@ -33,6 +33,19 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
     font-family: ${theme.fonts.family.navigation};
     font-size: ${theme.fonts.size.navigation};
   }
+  
+  .dropdown-menu li {
+    &:not(.dropdown-header) {
+      font-family: ${theme.fonts.family.navigation};
+      font-size: ${theme.fonts.size.navigation};
+    }
+
+    a {
+      padding: 6px 20px;
+    }
+  }  
+
+  
 
   @media (max-width: 991px) {
     .small-scrn-badge {

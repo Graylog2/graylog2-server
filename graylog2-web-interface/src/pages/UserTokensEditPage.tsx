@@ -26,9 +26,8 @@ import UsersDomain from 'domainActions/users/UsersDomain';
 import { PageHeader, DocumentTitle, Spinner } from 'components/common';
 import { Headline } from 'components/common/Section/SectionComponent';
 import TokenList from 'components/users/TokenList';
-import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
+import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
-import DocumentationLink from 'components/support/DocumentationLink';
 import useCurrentUser from 'hooks/useCurrentUser';
 
 type Props = {
@@ -99,22 +98,19 @@ const UserEditPage = ({ params }: Props) => {
 
   return (
     <DocumentTitle title={`Edit Tokens Of User ${loadedUser?.fullName ?? ''}`}>
+      <UsersPageNavigation />
       <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}
-                  subactions={(
+                  actions={(
                     <UserActionLinks userId={userId}
                                      userIsReadOnly={loadedUser?.readOnly ?? false} />
-                  )}>
+                  )}
+                  documentationLink={{
+                    title: 'Permissions documentation',
+                    path: DocsHelper.PAGES.USERS_ROLES,
+                  }}>
         <span>
           You can create new tokens or delete old ones.
         </span>
-
-        <span>
-          Learn more in the{' '}
-          <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                             text="documentation" />
-        </span>
-
-        <UserOverviewLinks />
       </PageHeader>
 
       <Row className="content">
