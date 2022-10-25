@@ -39,8 +39,8 @@ jobs:
               "version": "1.1",
               "host": "developermetrics",
               "job": "fix-linter-hints",
-              "short_message": "Found ${PROBLEM_COUNT} problems in commit ${CURRENT_REF}"
-              "_problems": ${PROBLEM_COUNT}
+              "short_message": "Found ${PROBLEM_COUNT} problems in commit ${CURRENT_REF}",
+              "_problems": ${PROBLEM_COUNT},
               "_current_ref": "${CURRENT_REF}"
              }'
           EOF
