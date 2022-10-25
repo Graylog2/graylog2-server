@@ -141,14 +141,22 @@ public class DBProcessingStatusService {
                 true));
     }
 
+    /**
+     * Calculates the processing state of all active Graylog nodes in the cluster.
+     * This can be used to find out if a certain timerange is already searchable in Elastic / OpenSearch.
+     * <p>
+     * Beware: This only takes the message receive time into account. It doesn't help when log sources send their
+     * messages late.
+     *
+     * @return A combined state of all processing nodes in this cluster. See {@link  ProcessingNodesState}
+     */
     public ProcessingNodesState calculateProcessingState(TimeRange timeRange) {
         final DateTime updateThresholdTimestamp = clock.nowUTC().minus(updateThreshold.toMilliseconds());
 
         try (DBCursor<ProcessingStatusDto> statusCursor = db.find(activeNodes(updateThresholdTimestamp))) {
             if (!statusCursor.hasNext()) {
-                return ProcessingNodesState.NO_ACTIVE; // -> freeze time range
+                return ProcessingNodesState.NONE_ACTIVE;
             }
-
 
             int activeNodes = 0;
             int idleNodes = 0;
@@ -156,24 +164,25 @@ public class DBProcessingStatusService {
                 activeNodes++;
                 ProcessingStatusDto nodeProcessingStatus = statusCursor.next();
                 DateTime lastIndexedMessage = nodeProcessingStatus.receiveTimes().postIndexing();
-                // If node is behind and is busy, it is overloaded -> freeze time range
+                // If node is behind and is busy, it is overloaded.
                 if (lastIndexedMessage.isBefore(timeRange.getTo()) && isBusy(nodeProcessingStatus)) {
                     return ProcessingNodesState.SOME_OVERLOADED;
                 }
-                // Only if the time range is after the last indexed message, the node is idle.
-                // This leads to the fact that if all nodes are idle at a certain time,
-                // we still process the last message and only freeze the time range afterwards.
+                // If a node did not index a message that is at least at the start of the time range,
+                // we consider it idle.
                 if (lastIndexedMessage.isBefore(timeRange.getFrom())) {
                     idleNodes++;
                 }
             }
-            // if all nodes are idle -> freeze time range
+
+            // Only if all nodes are idle, we stop the processing.
             if (activeNodes == idleNodes) {
                 return ProcessingNodesState.ALL_IDLE;
             }
         }
 
-        return ProcessingNodesState.ALL_UP_TO_DATE; // -> move time range
+        // If none of the above checks return, we can assume that some nodes have already indexed the given timerange.
+        return ProcessingNodesState.SOME_UP_TO_DATE;
     }
 
     private boolean isBusy(ProcessingStatusDto nodeProcessingStatus) {
@@ -185,9 +194,21 @@ public class DBProcessingStatusService {
     }
 
     public enum ProcessingNodesState {
-        NO_ACTIVE,
+        /**
+         * No active nodes in this cluster found. Should never happen.
+         */
+        NONE_ACTIVE,
+        /**
+         * Cluster has active nodes, but none have been processing any messages for the given timerange
+         */
         ALL_IDLE,
-        ALL_UP_TO_DATE,
+        /**
+         * All nodes in the cluster have processed the given timerange already.
+         */
+        SOME_UP_TO_DATE,
+        /**
+         * Some or all nodes of the cluster, are currently overloaded and have not processed the timerange yet.
+         */
         SOME_OVERLOADED
     }
 }
