@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.not;
 
-@ContainerMatrixTestsConfiguration(searchVersions = {SearchServer.OS1}, mongoVersions = {MongodbServer.MONGO4})
+@ContainerMatrixTestsConfiguration(searchVersions = {SearchServer.OS1}, mongoVersions = {MongodbServer.MONGO5})
 public class SessionsResourceIT {
     private static final String SESSIONS_RESOURCE = "/system/sessions";
     private static final String AUTHENTICATION_COOKIE = "authentication";
