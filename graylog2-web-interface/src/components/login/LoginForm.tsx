@@ -83,14 +83,14 @@ const LoginForm = ({ onErrorChange }: Props) => {
       <Input ref={(username) => { usernameInput = username; }}
              id="username"
              type="text"
-             placeholder="Username"
+             label="Username"
              autoFocus
              required />
 
       <Input ref={(password) => { passwordInput = password; }}
              id="password"
              type="password"
-             placeholder="Password"
+             label="Password"
              required />
 
       <SigninButton displayCancel={false}
