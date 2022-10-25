@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.decorators.DecoratorProcessor;
+import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -104,12 +105,12 @@ public class KeywordSearchResource extends SearchResource {
     @GET
     @Timed
     @ApiOperation(value = "Message search with keyword as timerange.",
-            notes = "Search for messages in a timerange defined by a keyword like \"yesterday\" or \"2 weeks ago to wednesday\".")
+                  notes = "Search for messages in a timerange defined by a keyword like \"yesterday\" or \"2 weeks ago to wednesday\".")
     @Produces(MoreMediaTypes.TEXT_CSV)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid keyword provided.")
     })
-    public ChunkedOutput<ScrollResult.ScrollChunk> searchKeywordChunked(
+    public ChunkedOutput<ResultChunk> searchKeywordChunked(
             @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "keyword", value = "Range keyword", required = true)

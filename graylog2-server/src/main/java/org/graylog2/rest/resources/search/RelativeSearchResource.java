@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.decorators.DecoratorProcessor;
+import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -105,13 +106,13 @@ public class RelativeSearchResource extends SearchResource {
     @GET
     @Timed
     @ApiOperation(value = "Message search with relative timerange.",
-            notes = "Search for messages in a relative timerange, specified as seconds from now. " +
-                    "Example: 300 means search from 5 minutes ago to now.")
+                  notes = "Search for messages in a relative timerange, specified as seconds from now. " +
+                          "Example: 300 means search from 5 minutes ago to now.")
     @Produces(MoreMediaTypes.TEXT_CSV)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
     })
-    public ChunkedOutput<ScrollResult.ScrollChunk> searchRelativeChunked(
+    public ChunkedOutput<ResultChunk> searchRelativeChunked(
             @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "range", value = "Relative timeframe to search in. See method description.", required = true)
