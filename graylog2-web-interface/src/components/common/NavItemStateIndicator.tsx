@@ -50,8 +50,7 @@ const Container = styled.div`
 `;
 
 /**
- * Component that wraps and render a `Select` where multiple options can be selected. It passes all
- * props to the underlying `Select` component, so please look there to find more information about them.
+ * This component provides styling for navigation item states like active and hover.
  */
 const NavItemStateIndicator = ({ children }: { children: React.ReactNode }) => (
   <Container className={indicatorClassName}>
