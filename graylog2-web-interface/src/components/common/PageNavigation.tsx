@@ -20,6 +20,10 @@ import styled, { css } from 'styled-components';
 import { Button, ButtonToolbar } from 'components/bootstrap';
 import { LinkContainer } from 'components/common/router';
 import { IfPermitted } from 'components/common';
+import NavItemStateIndicator, {
+  hoverIndicatorStyles,
+  activeIndicatorStyles,
+} from 'components/common/NavItemStateIndicator';
 
 const Container = styled(ButtonToolbar)`
   margin-bottom: 10px;
@@ -35,10 +39,23 @@ const StyledButton = styled(Button)(({ theme }) => css`
     :hover, :focus {
       text-decoration: none;  
     }
-    
+
+    :hover {
+      ${hoverIndicatorStyles(theme)}
+    }
+
+    .state-indicator {
+      position: relative;
+    }
+
     &.active {
       color: ${theme.colors.global.textDefault};
-      border-bottom: 1px solid ${theme.colors.variant.primary};
+
+      ${activeIndicatorStyles(theme)}
+
+      :hover, :focus {
+        ${activeIndicatorStyles(theme)}
+      }
     }
   }
 `);
@@ -72,7 +89,11 @@ const PageNavigation = ({ items }: Props) => (
       return (
         <IfPermitted permissions={permissions ?? []} key={path}>
           <LinkContainer to={path} relativeActive={!exactPathMatch}>
-            <StyledButton bsStyle="link">{title}</StyledButton>
+            <StyledButton bsStyle="link">
+              <NavItemStateIndicator>
+                {title}
+              </NavItemStateIndicator>
+            </StyledButton>
           </LinkContainer>
         </IfPermitted>
       );

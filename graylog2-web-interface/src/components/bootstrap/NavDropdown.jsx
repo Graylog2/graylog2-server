@@ -23,6 +23,8 @@ import PropTypes from 'prop-types';
 
 import menuItemStyles from './styles/menuItem';
 
+import NavItemStateIndicator from '../common/NavItemStateIndicator';
+
 class ModifiedBootstrapNavDropdown extends BootstrapNavDropdown {
   // eslint-disable-next-line class-methods-use-this
   isActive({ props }, activeKey, activeHref) {
@@ -50,7 +52,11 @@ const StyledNavDropdown = styled(BootstrapNavDropdown)`
 const NavDropdown = ({ inactiveTitle, title, ...props }) => {
   const isActive = inactiveTitle ? inactiveTitle !== title : undefined;
 
-  return <StyledNavDropdown {...props} title={title} active={isActive} />;
+  return (
+    <StyledNavDropdown {...props}
+                       title={<NavItemStateIndicator>{title}</NavItemStateIndicator>}
+                       active={isActive} />
+  );
 };
 
 NavDropdown.propTypes = {
