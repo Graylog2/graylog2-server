@@ -17,11 +17,13 @@
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { get, isEqualWith } from 'lodash';
+import type { Set } from 'immutable';
 
 import type { RefluxActions } from 'stores/StoreTypes';
 import type { QueryId } from 'views/logic/queries/Query';
 import type ViewState from 'views/logic/views/ViewState';
 import { singletonActions, singletonStore } from 'logic/singleton';
+import type { TitlesMap } from 'views/stores/TitleTypes';
 
 import { ViewActions, ViewStore } from './ViewStore';
 
@@ -30,6 +32,7 @@ type ViewStatesActionsTypes = RefluxActions<{
   duplicate: (queryId: QueryId) => Promise<ViewState>,
   remove: (queryId: QueryId) => Promise<ViewState>,
   update: (queryId: QueryId, viewState: ViewState) => Promise<ViewState>,
+  patchQueriesTitle: (newQueriesTitle: Set<{ queryId: QueryId, titlesMap: TitlesMap}>) => Promise<ViewState>,
 }>;
 
 export const ViewStatesActions: ViewStatesActionsTypes = singletonActions(
@@ -39,6 +42,7 @@ export const ViewStatesActions: ViewStatesActionsTypes = singletonActions(
     duplicate: { asyncResult: true },
     remove: { asyncResult: true },
     update: { asyncResult: true },
+    patchQueriesTitle: { asyncResult: true },
   }),
 );
 
@@ -100,6 +104,28 @@ export const ViewStatesStore = singletonStore(
       const promise = ViewActions.state(newState).then(() => viewState);
 
       ViewStatesActions.update.promise(promise);
+
+      return promise;
+    },
+    patchQueriesTitle(newQueriesTitle: Set<{ queryId: QueryId, titlesMap: TitlesMap}>) {
+      let newStates = this.states;
+
+      newQueriesTitle.forEach(({ titlesMap: newQueryTitle, queryId }) => {
+        const newViewState = newStates.get(queryId);
+        let newViewStateTitles = newViewState.titles;
+
+        newQueryTitle.forEach((titles, titleType) => {
+          titles.forEach((titleValue, titleID) => {
+            newViewStateTitles = newViewStateTitles.setIn([titleType, titleID], titleValue);
+          });
+        });
+
+        newStates = newStates.set(queryId, newViewState.toBuilder().titles(newViewStateTitles).build());
+      });
+
+      const promise = ViewActions.state(newStates).then(() => newStates);
+
+      ViewStatesActions.patchQueriesTitle.promise(promise);
 
       return promise;
     },
