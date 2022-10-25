@@ -34,15 +34,17 @@ jobs:
         run: |
           PROBLEM_COUNT=`jq '. | map(.errorCount + .warningCount)|add' /tmp/report.json`
           CURRENT_REF=`git rev-parse HEAD`
+          TIMESTAMP=`git show --date=iso-strict $CURRENT_REF|grep -E '^Date:'|awk '{ print $2; }'`
           PAYLOAD=$(cat <<- EOF
-            '{
+            {
               "version": "1.1",
               "host": "developermetrics",
               "job": "fix-linter-hints",
               "short_message": "Found ${PROBLEM_COUNT} problems in commit ${CURRENT_REF}",
               "_problems": ${PROBLEM_COUNT},
-              "_current_ref": "${CURRENT_REF}"
-             }'
+              "_current_ref": "${CURRENT_REF}",
+              "timestamp": "${TIMESTAMP}"
+             }
           EOF
           )
           curl -X POST -H 'Content-Type: application/json' -d $PAYLOAD ${{ secrets.DEV_METRICS_URL }}
