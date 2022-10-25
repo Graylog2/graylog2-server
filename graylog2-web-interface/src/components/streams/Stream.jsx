@@ -202,7 +202,7 @@ class Stream extends React.Component {
           <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream} className="overlay-trigger">
             <ToggleButton bsStyle="primary"
                           onClick={this._onPause}
-                          disabled={loading || isNotEditable}>
+                          disabled={isDefaultStream || loading || isNotEditable}>
               <Icon name="pause" /> {loading ? 'Pausing...' : 'Pause Stream'}
             </ToggleButton>
           </OverlayElement>
