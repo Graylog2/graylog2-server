@@ -16,8 +16,6 @@
  */
 package org.graylog.integrations.notifications.types.microsoftteams;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -50,7 +48,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -110,6 +107,17 @@ public class TeamsEventNotificationTest {
                 .build();
     }
 
+    private TeamsEventNotificationConfig getTemplatedTimestampConfig() {
+        return TeamsEventNotificationConfig.builder()
+                .type(TeamsEventNotificationConfig.TYPE_NAME)
+                .color(expectedColor)
+                .webhookUrl("axzzzz")
+                .backlogSize(1)
+                .iconUrl(expectedImage)
+                .customMessage("Timestamp: ${event.timestamp}")
+                .build();
+    }
+
     private NotificationDto getHttpNotification() {
         return NotificationDto.builder()
                 .title("Foobar")
@@ -134,7 +142,7 @@ public class TeamsEventNotificationTest {
         TeamsMessage.Sections section = actual.sections().iterator().next();
         assertThat(section.activitySubtitle()).isEqualTo(expectedSubtitle);
         assertThat(section.activityImage()).isEqualTo(expectedImage);
-        assertThat(section.facts().toString().contains("\"name\":\"a custom message\"")).isTrue();
+        assertThat(section.text().contains("a custom message")).isTrue();
     }
 
     @After
@@ -206,7 +214,7 @@ public class TeamsEventNotificationTest {
                 .fields(ImmutableMap.of("hello", "world"))
                 .build();
 
-        //uses the eventDEfinitionDto from NotificationTestData.getDummyContext in the setup method
+        //uses the eventDefinitionDto from NotificationTestData.getDummyContext in the setup method
         EventDefinitionDto eventDefinitionDto = eventNotificationContext.eventDefinition().orElseThrow(NullPointerException::new);
         return EventNotificationContext.builder()
                 .notificationId("1234")
@@ -237,7 +245,7 @@ public class TeamsEventNotificationTest {
 
     @Test
     public void buildCustomMessage() throws PermanentEventNotificationException {
-        JsonNode expectedCustomMessage = teamsEventNotification.buildCustomMessage(eventNotificationContext, teamsEventNotificationConfig, "test");
+        String expectedCustomMessage = teamsEventNotification.buildCustomMessage(eventNotificationContext, teamsEventNotificationConfig, "test");
         assertThat(expectedCustomMessage).isNotEmpty();
 
     }
@@ -255,15 +263,8 @@ public class TeamsEventNotificationTest {
         TeamsEventNotificationConfig TeamsConfig = TeamsEventNotificationConfig.builder()
                 .backlogSize(5)
                 .build();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode message = teamsEventNotification.buildCustomMessage(eventNotificationContext, TeamsConfig, "Title:       ${event_definition_title}");
-        Map<String, String> fact = new HashMap<>();
-        fact.put("name", "Title");
-        fact.put("value", "Event Definition Test Title");
-        List<Map<String, String>> facts = new ArrayList<>();
-        facts.add(fact);
-
-        assertThat(message).isEqualTo(objectMapper.convertValue(facts, JsonNode.class));
+        String message = teamsEventNotification.buildCustomMessage(eventNotificationContext, TeamsConfig, "Title: ${event_definition_title}");
+        assertThat(message).isEqualTo("Title: Event Definition Test Title");
     }
 
 
@@ -305,7 +306,7 @@ public class TeamsEventNotificationTest {
 
         List<MessageSummary> messageSummaries = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            MessageSummary summary = new MessageSummary("graylog_" + i, new Message("Test message_" + i, "source" + i, new DateTime(2020, 9, 6, 17, 0, DateTimeZone.UTC)));
+            MessageSummary summary = new MessageSummary("graylog_" + i, new Message("Test message_" + i + " : with a colon and another colon : just for good measure", "source" + i, new DateTime(2020, 9, 6, 17, 0, DateTimeZone.UTC)));
             messageSummaries.add(summary);
         }
         return ImmutableList.copyOf(messageSummaries);

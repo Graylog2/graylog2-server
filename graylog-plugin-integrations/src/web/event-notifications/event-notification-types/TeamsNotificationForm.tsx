@@ -27,9 +27,9 @@ import ColorLabel from 'components/sidecars/common/ColorLabel';
 import type { ConfigType, ValidationType } from '../types';
 
 type TeamsNotificationFormType = {
-      config: ConfigType,
-      validation: ValidationType
-      onChange: any
+  config: ConfigType,
+  validation: ValidationType
+  onChange: any
 }
 
 class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, any> {
@@ -38,31 +38,37 @@ class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, a
     webhook_url: '',
     /* eslint-disable no-template-curly-in-string */
     custom_message: ''
-                      + '--- [Event Definition] ----\n'
-                      + 'Title:       ${event_definition_title}\n'
-                      + 'Type:        ${event_definition_type}\n'
-                      + '--- [Event] ----\n'
-                      + 'Timestamp:            ${event.timestamp}\n'
-                      + 'Message:              ${event.message}\n'
-                      + 'Source:               ${event.source}\n'
-                      + 'Key:                  ${event.key}\n'
-                      + 'Priority:             ${event.priority}\n'
-                      + 'Alert:                ${event.alert}\n'
-                      + 'Timestamp Processing: ${event.timestamp}\n'
-                      + 'Timerange Start:      ${event.timerange_start}\n'
-                      + 'Timerange End:        ${event.timerange_end}\n'
-                      + 'Event Fields:\n'
-                      + '${foreach event.fields field}\n'
-                      + '${field.key}: ${field.value}\n'
-                      + '${end}\n'
-                      + '${if backlog}\n'
-                      + '--- [Backlog] ----------\n'
-                      + 'Last messages accounting for this alert:\n'
-                      + '${foreach backlog message}\n'
-                      + '${message.timestamp}  ::  ${message.source}  ::  ${message.message}\n'
-                      + '${message.message}\n'
-                      + '${end}'
-                      + '${end}\n',
+      + '<b>--- [Event Definition] ---</b>\n'
+      + '<table>\n'
+      + '<tr><td><b>Title:</b></td><td>${event_definition_title}</td></tr>\n'
+      + '<tr><td><b>Type:</b></td><td>${event_definition_type}</td></tr>\n'
+      + '<table>\n'
+      + '\n'
+      + '<b>--- [Event] ---</b>\n'
+      + '<table>\n'
+      + '<tr><td><b>Timestamp:</b></td><td>${event.timestamp}</td></tr>\n'
+      + '<tr><td><b>Message:</b></td><td>${event.message}</td></tr>\n'
+      + '<tr><td><b>Source:</b></td><td>${event.source}</td></tr>\n'
+      + '<tr><td><b>Key:</b></td><td>${event.key}</td></tr>\n'
+      + '<tr><td><b>Priority:</b></td><td>${event.priority}</td></tr>\n'
+      + '<tr><td><b>Alert:</b></td><td>${event.alert}</td></tr>\n'
+      + '<tr><td><b>Timestamp Processing:</b></td><td>${event.timestamp}</td></tr>\n'
+      + '<tr><td><b>Timerange Start:</b></td><td>${event.timerange_start}</td></tr>\n'
+      + '<tr><td><b>Timerange End:</b></td><td>${event.timerange_end}</td></tr>\n'
+      + '<table>\n'
+      + '\n'
+      + '<b>Event Fields:</b>\n'
+      + '<table>\n'
+      + '${foreach event.fields field}\n'
+      + '<tr><td><b>${field.key}:</b></td><td>${field.value}</td></tr>\n'
+      + '${end}\n'
+      + '</table>\n'
+      + '\n'
+      + '${if backlog}\n'
+      + '<b>--- [Backlog] ---</b>\n'
+      + '${foreach backlog message}\n'
+      + '<p><code>${message.timestamp}  ::  ${message.source}  ::  ${message.message}</code></p>\n'
+      + '${end}${end}',
     /* eslint-enable no-template-curly-in-string */
     icon_url: '',
     backlog_size: 0,

@@ -18,7 +18,6 @@ package org.graylog.integrations.notifications.types.microsoftteams;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
@@ -39,7 +38,6 @@ public abstract class TeamsMessage {
     static final String FIELD_SECTIONS = "sections";
     static final String FIELD_ACTIVITY_SUBTITLE = "activitySubtitle";
     static final String FIELD_ACTIVITY_IMAGE = "activityImage";
-    static final String FIELD_FACTS = "facts";
 
     @JsonProperty(FIELD_TYPE)
     public abstract String type();
@@ -101,8 +99,8 @@ public abstract class TeamsMessage {
         @JsonProperty(FIELD_ACTIVITY_IMAGE)
         public abstract String activityImage();
 
-        @JsonProperty(FIELD_FACTS)
-        public abstract JsonNode facts();
+        @JsonProperty(FIELD_TEXT)
+        public abstract String text();
 
         public abstract Builder toBuilder();
 
@@ -119,8 +117,8 @@ public abstract class TeamsMessage {
             @JsonProperty(FIELD_ACTIVITY_IMAGE)
             public abstract Builder activityImage(String activityImage);
 
-            @JsonProperty(FIELD_FACTS)
-            public abstract Builder facts(JsonNode facts);
+            @JsonProperty(FIELD_TEXT)
+            public abstract Builder text(String text);
 
             public abstract Sections build();
         }

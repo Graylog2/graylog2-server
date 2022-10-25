@@ -16,7 +16,6 @@
  */
 package org.graylog.integrations.notifications.types.microsoftteams;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.floreysoft.jmte.Engine;
 import com.google.common.annotations.VisibleForTesting;
@@ -38,9 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -114,7 +111,7 @@ public class TeamsEventNotification implements EventNotification {
     TeamsMessage createTeamsMessage(EventNotificationContext ctx, TeamsEventNotificationConfig config) throws PermanentEventNotificationException {
         String messageTitle = buildDefaultMessage(ctx);
         String description = buildMessageDescription(ctx);
-        JsonNode customMessage = null;
+        String customMessage = null;
         String template = config.customMessage();
         if (!isNullOrEmpty(template)) {
             customMessage = buildCustomMessage(ctx, config, template);
@@ -123,7 +120,7 @@ public class TeamsEventNotification implements EventNotification {
         TeamsMessage.Sections section = TeamsMessage.Sections.builder()
                 .activityImage(config.iconUrl())
                 .activitySubtitle(description)
-                .facts(customMessage)
+                .text(customMessage)
                 .build();
 
         return TeamsMessage.builder()
@@ -146,34 +143,16 @@ public class TeamsEventNotification implements EventNotification {
     }
 
 
-    JsonNode buildCustomMessage(EventNotificationContext ctx, TeamsEventNotificationConfig config, String template) throws PermanentEventNotificationException {
+    String buildCustomMessage(EventNotificationContext ctx, TeamsEventNotificationConfig config, String template) throws PermanentEventNotificationException {
         final List<MessageSummary> backlog = getMessageBacklog(ctx, config);
         Map<String, Object> model = getCustomMessageModel(ctx, config.type(), backlog);
         try {
-            String facts = templateEngine.transform(template, model);
-            JsonNode factsNode = getMessageDetails(facts);
-            LOG.debug("customMessage: template = {} model = {}", template, model);
-            return factsNode;
+            return templateEngine.transform(template, model);
         } catch (Exception e) {
             String error = "Invalid Custom Message template.";
             LOG.error("{} [{}]", error, e.toString());
             throw new PermanentEventNotificationException(error + e, e.getCause());
         }
-    }
-
-    public JsonNode getMessageDetails(String eventFields) {
-        String[] fields = eventFields.split("\\r?\\n");
-        List<Map<String, String>> event = new ArrayList<>();
-        for (String field : fields) {
-            Map<String, String> facts = new HashMap<>();
-            String[] factFields = field.split(":");
-            facts.put("name", factFields[0]);
-            facts.put("value", factFields.length == 1 ? "" : factFields[1].trim());
-            event.add(facts);
-        }
-        LOG.debug("Created list of facts");
-        return objectMapper.convertValue(event, JsonNode.class);
-
     }
 
     @VisibleForTesting
