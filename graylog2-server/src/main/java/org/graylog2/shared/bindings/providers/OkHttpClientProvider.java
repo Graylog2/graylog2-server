@@ -140,12 +140,6 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
         return clientBuilder.build();
     }
 
-    public OkHttpClient getWithTcpKeepAlive(Predicate<Socket> keepAlivePredicate) {
-        return get().newBuilder()
-                .socketFactory(new TcpKeepAliveSocketFactory(SocketFactory.getDefault(), keepAlivePredicate))
-                .build();
-    }
-
     public static class ProxyAuthenticator implements Authenticator {
         private static final Logger LOG = LoggerFactory.getLogger(ProxyAuthenticator.class);
         private static final String AUTH_BASIC = "basic";

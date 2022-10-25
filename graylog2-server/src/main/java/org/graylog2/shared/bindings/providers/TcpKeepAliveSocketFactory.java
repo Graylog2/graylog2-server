@@ -27,20 +27,13 @@ import java.util.function.Predicate;
 /**
  * This socket factory wrapper sets the SO_KEEPALIVE flag for every created socket. The timeouts for the socket
  * depend on the configuration of the underlying operating system. See {@link #configure(Socket)}.
- *
- * Caution! The {@code shouldSetTcpKeepAlive} configures only new sockets. It's possible that there
- * will be still some older sockets waiting in the thread pool and will be reused with the original tcp keep-alive
- * setting before the change.
  */
 public class TcpKeepAliveSocketFactory extends SocketFactory {
 
     private final SocketFactory delegate;
-    private final Predicate<Socket> shouldSetTcpKeepAlive;
 
-    public
-    TcpKeepAliveSocketFactory(SocketFactory delegate, Predicate<Socket> shouldSendTcpKeepAliveProbe) {
+    public TcpKeepAliveSocketFactory(SocketFactory delegate) {
         this.delegate = Objects.requireNonNull(delegate);
-        this.shouldSetTcpKeepAlive = shouldSendTcpKeepAliveProbe;
     }
 
     @Override
@@ -69,9 +62,7 @@ public class TcpKeepAliveSocketFactory extends SocketFactory {
     }
 
     private Socket configure(Socket socket) throws SocketException {
-        if (shouldSetTcpKeepAlive.test(socket)) {
-            socket.setKeepAlive(true);
-        }
+        socket.setKeepAlive(true);
         return socket;
     }
 }

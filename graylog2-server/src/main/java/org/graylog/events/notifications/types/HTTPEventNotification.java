@@ -36,14 +36,13 @@ import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.security.encryption.EncryptedValueService;
-import org.graylog2.shared.bindings.providers.OkHttpClientProvider;
+import org.graylog2.shared.bindings.providers.TcpKeepAliveHttpClientProvider;
 import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -65,22 +64,30 @@ public class HTTPEventNotification implements EventNotification {
     private final UrlWhitelistService whitelistService;
     private final UrlWhitelistNotificationService urlWhitelistNotificationService;
     private final EncryptedValueService encryptedValueService;
-    private EventsConfigurationProvider configurationProvider;
 
     @Inject
     public HTTPEventNotification(EventNotificationService notificationCallbackService, ObjectMapper objectMapper,
-                                 final OkHttpClientProvider httpClient, UrlWhitelistService whitelistService,
+                                 final OkHttpClient httpClient, UrlWhitelistService whitelistService,
                                  UrlWhitelistNotificationService urlWhitelistNotificationService,
                                  EncryptedValueService encryptedValueService,
-                                 EventsConfigurationProvider configurationProvider
+                                 EventsConfigurationProvider configurationProvider,
+                                 final TcpKeepAliveHttpClientProvider tcpKeepAliveHttpClientProvider
                                  ) {
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapper = objectMapper;
-        this.httpClient = httpClient.getWithTcpKeepAlive(socket -> configurationProvider.get().notificationsKeepAliveProbe());
+        this.httpClient = selectClient(configurationProvider, httpClient, tcpKeepAliveHttpClientProvider);
         this.whitelistService = whitelistService;
         this.urlWhitelistNotificationService = urlWhitelistNotificationService;
         this.encryptedValueService = encryptedValueService;
-        this.configurationProvider = configurationProvider;
+    }
+
+    /**
+     * Depending on the configuration, either a default HTTP client will be returned or an instance
+     * with {@link org.graylog2.shared.bindings.providers.TcpKeepAliveSocketFactory} configured.
+     */
+    private OkHttpClient selectClient(EventsConfigurationProvider configurationProvider, OkHttpClient defaultHttpClient, TcpKeepAliveHttpClientProvider tcpKeepAliveHttpClientProvider) {
+        final boolean withKeepAlive = configurationProvider.get().notificationsKeepAliveProbe();
+        return withKeepAlive ? tcpKeepAliveHttpClientProvider.get() : defaultHttpClient;
     }
 
     @Override

@@ -16,26 +16,27 @@
  */
 package org.graylog2.shared.bindings.providers;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
+import com.google.common.base.Suppliers;
+import okhttp3.OkHttpClient;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.net.SocketFactory;
-import java.io.IOException;
-import java.net.Socket;
+import java.util.function.Supplier;
 
-class TcpKeepAliveSocketFactoryTest {
+@Singleton
+public class TcpKeepAliveHttpClientProvider {
 
-    @Test
-    void testNullDelegate() {
-        Assertions.assertThatThrownBy(() -> new TcpKeepAliveSocketFactory(null))
-                .isInstanceOf(NullPointerException.class);
+    private final Supplier<OkHttpClient> supplier;
+
+    @Inject
+    public TcpKeepAliveHttpClientProvider(OkHttpClientProvider provider) {
+        this.supplier = Suppliers.memoize(() -> provider.get().newBuilder()
+                .socketFactory(new TcpKeepAliveSocketFactory(SocketFactory.getDefault()))
+                .build());
     }
 
-    @Test
-    void keepAliveFlagIsSet() throws IOException {
-        final TcpKeepAliveSocketFactory factory = new TcpKeepAliveSocketFactory(SocketFactory.getDefault());
-        final Socket socket = factory.createSocket();
-        Assertions.assertThat(socket.getKeepAlive()).isTrue();
-        socket.close();
+    public OkHttpClient get() {
+        return supplier.get();
     }
 }
