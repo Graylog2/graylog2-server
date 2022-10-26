@@ -27,6 +27,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoDBUpsertRetryer;
 import org.graylog2.plugin.BaseConfiguration;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -37,7 +38,6 @@ import org.mongojack.JacksonDBCollection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,12 +50,10 @@ public class DBProcessingStatusService {
     public static final String COLLECTION_NAME = "processing_status";
     private static final String FIELD_WRITTEN_MESSAGES_1M = ProcessingStatusDto.FIELD_INPUT_JOURNAL + "." + ProcessingStatusDto.JournalInfo.FIELD_WRITTEN_MESSAGES_1M_RATE;
     private static final String FIELD_UNCOMMITTED_ENTRIES = ProcessingStatusDto.FIELD_INPUT_JOURNAL + "." + ProcessingStatusDto.JournalInfo.FIELD_UNCOMMITTED_ENTRIES;
-    private static final String FIELD_JOURNAL_ENABLED = ProcessingStatusDto.FIELD_INPUT_JOURNAL + "." + ProcessingStatusDto.JournalInfo.FIELD_JOURNAL_ENABLED;
 
     private final String nodeId;
     private final JobSchedulerClock clock;
     private final Duration updateThreshold;
-    private final double journalWriteRateThreshold;
     private final JacksonDBCollection<ProcessingStatusDto, ObjectId> db;
     private final BaseConfiguration baseConfiguration;
 
@@ -70,7 +68,6 @@ public class DBProcessingStatusService {
         this.nodeId = nodeId.toString();
         this.clock = clock;
         this.updateThreshold = updateThreshold;
-        this.journalWriteRateThreshold = ((Number) journalWriteRateThreshold).doubleValue();
         this.baseConfiguration = baseConfiguration;
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 ProcessingStatusDto.class,
@@ -119,58 +116,6 @@ public class DBProcessingStatusService {
     }
 
     /**
-     * Returns the earliest post-indexing receive timestamp of all active Graylog nodes in the cluster.
-     * This can be used to find out if a certain timerange is already searchable in Elasticsearch.
-     * <p>
-     * Beware: This only takes the message receive time into account. It doesn't help when log sources send their
-     * messages late.
-     *
-     * @return earliest post-indexing timestamp or empty optional if no processing status entries exist
-     */
-    public Optional<DateTime> earliestPostIndexingTimestamp() {
-        final String sortField = ProcessingStatusDto.FIELD_RECEIVE_TIMES + "." + ProcessingStatusDto.ReceiveTimes.FIELD_POST_INDEXING;
-        final DateTime updateThresholdTimestamp = clock.nowUTC().minus(updateThreshold.toMilliseconds());
-        final DBQuery.Query queryWithoutMetrics = DBQuery.greaterThan(FIELD_UPDATED_AT, updateThresholdTimestamp);
-        final DBQuery.Query queryWithMetrics = getDataSelectionQuery(clock, updateThreshold, journalWriteRateThreshold);
-
-        // First try to query processing status from nodes that are active (include journal metrics restrictions).
-        // If no result is found, query the processing status again, but without weeding out nodes with a low input volume.
-        // This prevents to completely stall the event processing if the ingestion volume is too low.
-        for (DBQuery.Query query: Arrays.asList(queryWithMetrics, queryWithoutMetrics)) {
-            // Get the earliest timestamp of the post-indexing receive timestamp by sorting and returning the first one.
-            // We use the earliest timestamp because some nodes can be faster than others and we need to make sure
-            // to return the timestamp of the slowest one.
-            try (DBCursor<ProcessingStatusDto> cursor = db.find(query).sort(DBSort.asc(sortField)).limit(1)) {
-                if (cursor.hasNext()) {
-                    return Optional.of(cursor.next().receiveTimes().postIndexing());
-                }
-            }
-        }
-        return Optional.empty();
-    }
-
-    // This has been put into a static method to simplify testing the processing status selection
-    @VisibleForTesting
-    static DBQuery.Query getDataSelectionQuery(JobSchedulerClock clock, Duration updateThreshold, double journalWriteRateThreshold) {
-        final DateTime updateThresholdTimestamp = clock.nowUTC().minus(updateThreshold.toMilliseconds());
-
-        return DBQuery.and(
-                // Only select processing status for a node ...
-                // ... that has been updated recently
-                DBQuery.greaterThan(FIELD_UPDATED_AT, updateThresholdTimestamp),
-                // ... and either ...
-                DBQuery.or(
-                        // ... received a certain amount of messages in the last minute
-                        DBQuery.greaterThanEquals(FIELD_WRITTEN_MESSAGES_1M, journalWriteRateThreshold),
-                        // ... or has messages left in the journal
-                        DBQuery.greaterThanEquals(FIELD_UNCOMMITTED_ENTRIES, 1L),
-                        // ... or has journaling disabled
-                        DBQuery.is(FIELD_JOURNAL_ENABLED, false)
-                )
-        );
-    }
-
-    /**
      * Create or update (upsert) a processing status entry for the given {@link ProcessingStatusRecorder} using the
      * caller's node ID.
      *
@@ -194,5 +139,76 @@ public class DBProcessingStatusService {
                 ProcessingStatusDto.of(nodeId, processingStatusRecorder, updatedAt, baseConfiguration.isMessageJournalEnabled()),
                 true, // We want to return the updated document to the caller
                 true));
+    }
+
+    /**
+     * Calculates the processing state of all active Graylog nodes in the cluster.
+     * This can be used to find out if a certain timerange is already searchable in Elastic / OpenSearch.
+     * <p>
+     * Beware: This only takes the message receive time into account. It doesn't help when log sources send their
+     * messages late.
+     *
+     * @return A combined state of all processing nodes in this cluster. See {@link  ProcessingNodesState}
+     */
+    public ProcessingNodesState calculateProcessingState(TimeRange timeRange) {
+        final DateTime updateThresholdTimestamp = clock.nowUTC().minus(updateThreshold.toMilliseconds());
+
+        try (DBCursor<ProcessingStatusDto> statusCursor = db.find(activeNodes(updateThresholdTimestamp))) {
+            if (!statusCursor.hasNext()) {
+                return ProcessingNodesState.NONE_ACTIVE;
+            }
+
+            int activeNodes = 0;
+            int idleNodes = 0;
+            while (statusCursor.hasNext()) {
+                activeNodes++;
+                ProcessingStatusDto nodeProcessingStatus = statusCursor.next();
+                DateTime lastIndexedMessage = nodeProcessingStatus.receiveTimes().postIndexing();
+                // If node is behind and is busy, it is overloaded.
+                if (lastIndexedMessage.isBefore(timeRange.getTo()) && isBusy(nodeProcessingStatus)) {
+                    return ProcessingNodesState.SOME_OVERLOADED;
+                }
+                // If a node did not index a message that is at least at the start of the time range,
+                // we consider it idle.
+                if (lastIndexedMessage.isBefore(timeRange.getFrom())) {
+                    idleNodes++;
+                }
+            }
+
+            // Only if all nodes are idle, we stop the processing.
+            if (activeNodes == idleNodes) {
+                return ProcessingNodesState.ALL_IDLE;
+            }
+        }
+
+        // If none of the above checks return, we can assume that some nodes have already indexed the given timerange.
+        return ProcessingNodesState.SOME_UP_TO_DATE;
+    }
+
+    private boolean isBusy(ProcessingStatusDto nodeProcessingStatus) {
+        return nodeProcessingStatus.inputJournal().uncommittedEntries() > 0L || nodeProcessingStatus.processBufferUsage() > 0;
+    }
+
+    private DBQuery.Query activeNodes(DateTime updateThresholdTimestamp) {
+        return DBQuery.greaterThan(FIELD_UPDATED_AT, updateThresholdTimestamp);
+    }
+
+    public enum ProcessingNodesState {
+        /**
+         * No active nodes in this cluster found. Should never happen.
+         */
+        NONE_ACTIVE,
+        /**
+         * Cluster has active nodes, but none have been processing any messages for the given timerange
+         */
+        ALL_IDLE,
+        /**
+         * Some or all nodes in the cluster have processed the given timerange already.
+         */
+        SOME_UP_TO_DATE,
+        /**
+         * Some or all nodes of the cluster, are currently overloaded and have not processed the timerange yet.
+         */
+        SOME_OVERLOADED
     }
 }
