@@ -20,6 +20,11 @@ import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.events.processor.EventDefinitionDto;
+import org.graylog.events.processor.EventProcessorEngine;
+import org.graylog.events.processor.EventProcessorException;
+import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorParameters;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.cluster.Node;
@@ -45,12 +50,18 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
 
     private final NodeId nodeId;
     private final AuditEventSender auditEventSender;
+    private final EventProcessorEngine eventProcessorEngine;
+    private final DBEventDefinitionService dbEventDefinitionService;
 
     @Inject
-    public NotificationServiceImpl(NodeId nodeId, MongoConnection mongoConnection, AuditEventSender auditEventSender) {
+    public NotificationServiceImpl(
+            NodeId nodeId, MongoConnection mongoConnection, AuditEventSender auditEventSender,
+            EventProcessorEngine eventProcessorEngine, DBEventDefinitionService dbEventDefinitionService) {
         super(mongoConnection);
         this.nodeId = checkNotNull(nodeId);
         this.auditEventSender = auditEventSender;
+        this.eventProcessorEngine = eventProcessorEngine;
+        this.dbEventDefinitionService = dbEventDefinitionService;
         collection(NotificationImpl.class).createIndex(NotificationImpl.FIELD_TYPE);
     }
 
@@ -126,10 +137,19 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
         try {
             save(notification);
             auditEventSender.success(AuditActor.system(nodeId), SYSTEM_NOTIFICATION_CREATE, notification.asMap());
-        } catch(ValidationException e) {
+
+            final EventDefinitionDto systemEventDefinition =
+                    dbEventDefinitionService.getSystemEventDefinitions().stream().findFirst()
+                            .orElseThrow(() -> new IllegalStateException("System notification event definition not found"));
+            SystemNotificationEventProcessorParameters parameters = SystemNotificationEventProcessorParameters.builder().build();
+            eventProcessorEngine.execute(systemEventDefinition.id(), parameters);
+        } catch (ValidationException e) {
             // We have no validations, but just in case somebody adds some...
             LOG.error("Validating user warning failed.", e);
             auditEventSender.failure(AuditActor.system(nodeId), SYSTEM_NOTIFICATION_CREATE, notification.asMap());
+            return false;
+        } catch (EventProcessorException processorException) {
+            LOG.error("Failed to create event for system notification {}", notification, processorException);
             return false;
         }
 
