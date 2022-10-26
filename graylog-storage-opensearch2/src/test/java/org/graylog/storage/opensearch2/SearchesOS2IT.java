@@ -31,4 +31,16 @@ public class SearchesOS2IT extends SearchesIT {
     protected SearchServerInstance searchServer() {
         return this.openSearchInstance;
     }
+
+    @Override
+    public Searches createSearches() {
+        return new Searches(
+                indexRangeService,
+                metricRegistry,
+                streamService,
+                indices,
+                indexSetRegistry,
+                createSearchesAdapter()
+        );
+    }
 }

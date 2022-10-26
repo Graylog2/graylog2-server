@@ -278,16 +278,15 @@ public class DashboardWidgetConverter {
         if (showChart) {
             result.add(widgetEntityBuilder
                     .config(aggregationConfigBuilder
-                            .rowPivots(genPivotForPie(field, stackedFields))
-                            .rowLimit(limit)
+                            .rowPivots(genPivotForPie(field, stackedFields, limit))
                             .visualization("pie").build())
                     .build());
+
         }
         if (showTable) {
             result.add(widgetEntityBuilder.config(
                     aggregationConfigBuilder.visualization("table")
-                            .rowPivots(genPivotForPie(field, stackedFields))
-                            .rowLimit(dataTableLimit)
+                            .rowPivots(genPivotForPie(field, stackedFields, dataTableLimit))
                             .build())
                     .id(UUID.randomUUID().toString())
                     .build());
@@ -357,8 +356,7 @@ public class DashboardWidgetConverter {
                                         .config(TimeHistogramConfigDTO.Builder.builder().interval(AutoIntervalDTO.Builder.builder().build()).build())
                                         .build()
                         ))
-                        .columnPivots(genPivotForPie(field, stackedFields))
-                        .columnLimit(limit)
+                        .columnPivots(genPivotForPie(field, stackedFields, limit))
                         .build())
                 .id(UUID.randomUUID().toString())
                 .build());
@@ -369,7 +367,7 @@ public class DashboardWidgetConverter {
         final String field = config.getString("field");
         final PivotDTO fieldPivot = PivotDTO.Builder.builder()
                 .type("values")
-                .config(ValueConfigDTO.create())
+                .config(ValueConfigDTO.Builder.builder().build())
                 .field(field)
                 .build();
         final AggregationConfigDTO widgetConfig = AggregationConfigDTO.Builder.builder()
@@ -388,11 +386,11 @@ public class DashboardWidgetConverter {
         return ImmutableList.of(widgetEntityBuilder.build());
     }
 
-    private List<PivotDTO> genPivotForPie(String field, String stackedFields) {
+    private List<PivotDTO> genPivotForPie(String field, String stackedFields, int limit) {
         final PivotDTO fieldPivot = PivotDTO.Builder.builder()
                 .type("values")
                 .field(field)
-                .config(ValueConfigDTO.create())
+                .config(ValueConfigDTO.Builder.builder().limit(limit).build())
                 .build();
         final List<PivotDTO> rowPivots = new ArrayList<>(stackedFieldPivots(stackedFields));
         rowPivots.add(fieldPivot);
@@ -409,7 +407,7 @@ public class DashboardWidgetConverter {
                 .map(fieldName -> PivotDTO.Builder.builder()
                         .field(fieldName)
                         .type("values")
-                        .config(ValueConfigDTO.create())
+                        .config(ValueConfigDTO.Builder.builder().limit(15).build())
                         .build())
                 .collect(Collectors.toList());
     }

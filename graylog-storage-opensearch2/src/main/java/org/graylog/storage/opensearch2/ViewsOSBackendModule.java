@@ -53,9 +53,9 @@ import org.graylog.storage.opensearch2.views.export.RequestStrategy;
 import org.graylog.storage.opensearch2.views.searchtypes.OSEventList;
 import org.graylog.storage.opensearch2.views.searchtypes.OSMessageList;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSDateRangeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSTimeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSValuesHandler;
@@ -120,16 +120,16 @@ public class ViewsOSBackendModule extends ViewsModule {
         return bindExportBackend(supportedSearchVersion);
     }
 
-    private MapBinder<String, OSPivotBucketSpecHandler<? extends BucketSpec>> pivotBucketHandlerBinder() {
+    private MapBinder<String, OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> pivotBucketHandlerBinder() {
         return MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
-                new TypeLiteral<OSPivotBucketSpecHandler<? extends BucketSpec>>() {});
+                new TypeLiteral<OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>>() {});
 
     }
 
     private void registerPivotBucketHandler(
             String name,
-            Class<? extends OSPivotBucketSpecHandler<? extends BucketSpec>> implementation
+            Class<? extends OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> implementation
     ) {
         pivotBucketHandlerBinder().addBinding(name).to(implementation);
     }
@@ -137,7 +137,7 @@ public class ViewsOSBackendModule extends ViewsModule {
     protected MapBinder<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> pivotSeriesHandlerBinder() {
         return MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
-                new TypeLiteral<>() {});
+                new TypeLiteral<OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>>() {});
 
     }
 

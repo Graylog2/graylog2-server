@@ -162,7 +162,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                             .map(this::translateQueryString)
                             .forEach(searchTypeOverrides::must);
 
-                    searchTypeSourceBuilder.query(searchTypeOverrides);
+            searchTypeSourceBuilder.query(searchTypeOverrides);
 
                     searchTypeHandler.get().generateQueryPart(query, searchType, queryContext);
                 });

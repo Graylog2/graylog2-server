@@ -16,69 +16,63 @@
  */
 package org.graylog.storage.opensearch2.views.searchtypes.pivot;
 
-import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
-import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
-import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketOrder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.jooq.lambda.tuple.Tuple2;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
-        implements BucketSpecHandler<SPEC_TYPE, AggregationBuilder, OSGeneratedQueryContext> {
+public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_RESULT extends Aggregation>
+        implements BucketSpecHandler<SPEC_TYPE, AggregationBuilder, SearchResponse, AGGREGATION_RESULT, OSGeneratedQueryContext> {
 
-    protected AggTypes aggTypes(OSGeneratedQueryContext queryContext, Pivot pivot) {
-        return (AggTypes) queryContext.contextMap().get(pivot.id());
+    protected OSPivot.AggTypes aggTypes(OSGeneratedQueryContext queryContext, Pivot pivot) {
+        return (OSPivot.AggTypes) queryContext.contextMap().get(pivot.id());
     }
 
     protected void record(OSGeneratedQueryContext queryContext, Pivot pivot, PivotSpec spec, String name, Class<? extends Aggregation> aggregationClass) {
         aggTypes(queryContext, pivot).record(spec, name, aggregationClass);
     }
 
-    protected List<BucketOrder> orderListForPivot(Pivot pivot, OSGeneratedQueryContext queryContext, BucketOrder defaultOrder) {
-        final List<BucketOrder> ordering = pivot.sort()
-                .stream()
-                .map(sortSpec -> {
-                    if (sortSpec instanceof PivotSort) {
-                        return BucketOrder.key(sortSpec.direction().equals(SortSpec.Direction.Ascending));
-                    }
-                    if (sortSpec instanceof SeriesSort) {
-                        final Optional<SeriesSpec> matchingSeriesSpec = pivot.series()
-                                .stream()
-                                .filter(series -> series.literal().equals(sortSpec.field()))
-                                .findFirst();
-                        return matchingSeriesSpec
-                                .map(seriesSpec -> {
-                                    if (seriesSpec.literal().equals("count()")) {
-                                        return BucketOrder.count(sortSpec.direction().equals(SortSpec.Direction.Ascending));
-                                    }
-                                    return BucketOrder.aggregation(queryContext.seriesName(seriesSpec, pivot), sortSpec.direction().equals(SortSpec.Direction.Ascending));
-                                })
-                                .orElse(null);
-                    }
-
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        return ordering.isEmpty() ? List.of(defaultOrder) : ordering;
+    protected Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, OSGeneratedQueryContext queryContext) {
+        return aggTypes(queryContext, pivot).getSubAggregation(spec, aggregations);
     }
 
-    public abstract Stream<PivotBucket> extractBuckets(List<BucketSpec> bucketSpecs, PivotBucket previousBucket);
+    @SuppressWarnings("unchecked")
+    @Override
+    public Stream<Bucket> handleResult(BucketSpec bucketSpec, Object aggregationResult) {
+        return doHandleResult((SPEC_TYPE) bucketSpec, (AGGREGATION_RESULT) aggregationResult);
+    }
+
+    @Override
+    public abstract Stream<Bucket> doHandleResult(SPEC_TYPE bucketSpec, AGGREGATION_RESULT aggregationResult);
+
+    public static class Bucket {
+
+        private final String key;
+        private final MultiBucketsAggregation.Bucket bucket;
+
+        public Bucket(String key, MultiBucketsAggregation.Bucket bucket) {
+            this.key = key;
+            this.bucket = bucket;
+        }
+
+        public static Bucket create(String key, MultiBucketsAggregation.Bucket aggregation) {
+            return new Bucket(key, aggregation);
+        }
+
+        public String key() {
+            return key;
+        }
+
+        public MultiBucketsAggregation.Bucket aggregation() {
+            return bucket;
+        }
+    }
 }

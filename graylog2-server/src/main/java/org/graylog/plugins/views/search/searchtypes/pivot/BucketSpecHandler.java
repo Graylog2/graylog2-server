@@ -20,47 +20,33 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 
 /**
  * Implementations of this class contribute handlers for buckets concrete implementations of {@link Pivot the pivot search type}.
  *
  * @param <SPEC_TYPE>           the type of bucket spec this handler deals with
  * @param <AGGREGATION_BUILDER> implementation specific type for building up the aggregation when generating a backend query
+ * @param <QUERY_RESULT>        the backend specific type holding the overall result from the backend
+ * @param <AGGREGATION_RESULT>  the backend specific type holding the partial result for the generated aggregation
  * @param <QUERY_CONTEXT>       an opaque context object to pass around information between query generation and result handling
  */
-public interface BucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_BUILDER, QUERY_CONTEXT> {
-    public enum Direction {
-        Row,
-        Column
-    }
+public interface BucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_BUILDER, QUERY_RESULT, AGGREGATION_RESULT, QUERY_CONTEXT> {
 
     @SuppressWarnings("unchecked")
     @Nonnull
-    default CreatedAggregations<AGGREGATION_BUILDER> createAggregation(Direction direction,
-                                                                       String name,
-                                                                       Pivot pivot,
-                                                                       List<BucketSpec> pivotSpec,
-                                                                       GeneratedQueryContext queryContext,
-                                                                       Query query) {
-        return doCreateAggregation(direction, name, pivot, (List<SPEC_TYPE>) pivotSpec, (QUERY_CONTEXT) queryContext, query);
+    default Optional<AGGREGATION_BUILDER> createAggregation(String name, Pivot pivot, PivotSpec pivotSpec, GeneratedQueryContext queryContext, Query query) {
+        return doCreateAggregation(name, pivot, (SPEC_TYPE) pivotSpec, (QUERY_CONTEXT) queryContext, query);
     }
 
     @Nonnull
-    CreatedAggregations<AGGREGATION_BUILDER> doCreateAggregation(Direction direction, String name, Pivot pivot, List<SPEC_TYPE> bucketSpec, QUERY_CONTEXT queryContext, Query query);
+    Optional<AGGREGATION_BUILDER> doCreateAggregation(String name, Pivot pivot, SPEC_TYPE bucketSpec, QUERY_CONTEXT queryContext, Query query);
 
-    record CreatedAggregations<T>(T root, T leaf, List<T> metrics) {
-        public static <T> CreatedAggregations<T> create(T singleAggregation) {
-            return new CreatedAggregations<>(singleAggregation, singleAggregation, List.of(singleAggregation));
-        }
-
-        public static <T> CreatedAggregations<T> create(T rootAggregation, T leafAggregation) {
-            return new CreatedAggregations<>(rootAggregation, leafAggregation, List.of(leafAggregation));
-        }
-
-        public static <T> CreatedAggregations<T> create(T rootAggregation, T leafAggregation, List<T> metricsAggregations) {
-            return new CreatedAggregations<>(rootAggregation, leafAggregation, metricsAggregations == null ? Collections.emptyList() : metricsAggregations);
-        }
+    @SuppressWarnings("unchecked")
+    default Object handleResult(BucketSpec bucketSpec, Object aggregationResult) {
+        return doHandleResult((SPEC_TYPE) bucketSpec, (AGGREGATION_RESULT) aggregationResult);
     }
+
+    Object doHandleResult(SPEC_TYPE bucketSpec, AGGREGATION_RESULT result);
+
 }

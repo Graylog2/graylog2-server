@@ -55,8 +55,6 @@ describe('SortElement', () => {
               field: { field: 'time', type: 'time' },
               interval: { type: 'timeunit', value: 3, unit: 'seconds' },
             }],
-          rowLimit: undefined,
-          columnLimit: undefined,
         },
         visualization: { type: 'chart' },
       };

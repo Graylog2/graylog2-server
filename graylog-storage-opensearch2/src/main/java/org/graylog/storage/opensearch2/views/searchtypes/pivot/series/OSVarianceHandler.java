@@ -19,7 +19,7 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 public class OSVarianceHandler extends OSPivotSeriesSpecHandler<Variance, ExtendedStats> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Variance varianceSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Variance varianceSpec, OSPivot searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final ExtendedStatsAggregationBuilder variance = AggregationBuilders.extendedStats(name).field(varianceSpec.field());
         record(queryContext, pivot, varianceSpec, name, ExtendedStats.class);
         return Optional.of(variance);
@@ -44,7 +44,7 @@ public class OSVarianceHandler extends OSPivotSeriesSpecHandler<Variance, Extend
     public Stream<Value> doHandleResult(Pivot pivot, Variance pivotSpec,
                                         SearchResponse searchResult,
                                         ExtendedStats varianceAggregation,
-                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
+                                        OSPivot searchTypeHandler,
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
         return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Variance.NAME, varianceAggregation.getVariance()));
     }
