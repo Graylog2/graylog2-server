@@ -14,13 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.lock;
+package org.graylog2.indexer.results;
 
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.mongodb.MongoDBExtension;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import java.util.List;
 
-public class MongoLockServiceTest4 extends MongoLockServiceTest {
-    @RegisterExtension
-    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.MONGO4);
+/**
+ * A part/chunk of search results for messages.
+ * Retrieval method of the chunk (scrolling, search_after pagination...) should not affect this interface implementations.
+ */
+public record ResultChunk(List<String> fields, int chunkNumber, List<ResultMessage> messages) {
+
+    public boolean isFirstChunk() {
+        return chunkNumber() == 0;
+    }
 }

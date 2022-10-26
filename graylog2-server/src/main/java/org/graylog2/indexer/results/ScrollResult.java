@@ -17,10 +17,9 @@
 package org.graylog2.indexer.results;
 
 import java.io.IOException;
-import java.util.List;
 
 public interface ScrollResult {
-    ScrollChunk nextChunk() throws IOException;
+    ResultChunk nextChunk() throws IOException;
 
     String getQueryHash();
 
@@ -30,15 +29,4 @@ public interface ScrollResult {
 
     long tookMs();
 
-    interface ScrollChunk {
-        List<String> getFields();
-
-        int getChunkNumber();
-
-        default boolean isFirstChunk() {
-            return getChunkNumber() == 0;
-        }
-
-        List<ResultMessage> getMessages();
-    }
 }

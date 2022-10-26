@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 
-import AuthenticationOverviewLinks from 'components/authentication/AuthenticationOverviewLinks';
+import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import withParams from 'routing/withParams';
 import { LinkContainer } from 'components/common/router';
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
@@ -26,7 +26,6 @@ import StringUtils from 'util/StringUtils';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { Spinner, PageHeader, DocumentTitle } from 'components/common';
 import BackendDetails from 'components/authentication/BackendDetails';
-import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
@@ -61,24 +60,23 @@ const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
 
   return (
     <DocumentTitle title={_pageTitle(authBackend.title, true)}>
-      <>
-        <PageHeader title={_pageTitle(authBackend.title)}
-                    subactions={(
-                      <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authBackend?.id)}>
-                        <Button bsStyle="success"
-                                type="button">
-                          Edit Service
-                        </Button>
-                      </LinkContainer>
-                  )}>
-          <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
-          <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                                                                   text="documentation" />.
-          </span>
-          <AuthenticationOverviewLinks />
-        </PageHeader>
-        <BackendDetails authenticationBackend={authBackend} />
-      </>
+      <AuthenticationPageNavigation />
+      <PageHeader title={_pageTitle(authBackend.title)}
+                  actions={(
+                    <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authBackend?.id)}>
+                      <Button bsStyle="success"
+                              type="button">
+                        Edit Service
+                      </Button>
+                    </LinkContainer>
+                  )}
+                  documentationLink={{
+                    title: 'Authentication documentation',
+                    path: DocsHelper.PAGES.USERS_ROLES,
+                  }}>
+        <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
+      </PageHeader>
+      <BackendDetails authenticationBackend={authBackend} />
     </DocumentTitle>
   );
 };

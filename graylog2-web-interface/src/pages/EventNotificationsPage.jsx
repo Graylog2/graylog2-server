@@ -17,51 +17,40 @@
 import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
-import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
+import { Button, Col, Row } from 'components/bootstrap';
 import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import EventNotificationsContainer from 'components/event-notifications/event-notifications/EventNotificationsContainer';
 import Routes from 'routing/Routes';
+import DocsHelper from 'util/DocsHelper';
+import EventsPageNavigation from 'components/events/EventsPageNavigation';
 
 const EventNotificationsPage = () => {
   return (
     <DocumentTitle title="Notifications">
-      <span>
-        <PageHeader title="Notifications"
-                    subactions={(
-                      <IfPermitted permissions="eventnotifications:create">
-                        <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
-                          <Button bsStyle="success">Create notification</Button>
-                        </LinkContainer>
-                      </IfPermitted>
-          )}>
-          <span>
-            Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
-            to you or to other systems you use for that purpose.
-          </span>
+      <EventsPageNavigation />
+      <PageHeader title="Notifications"
+                  actions={(
+                    <IfPermitted permissions="eventnotifications:create">
+                      <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
+                        <Button bsStyle="success">Create notification</Button>
+                      </LinkContainer>
+                    </IfPermitted>
+                  )}
+                  documentationLink={{
+                    title: 'Alerts documentation',
+                    path: DocsHelper.PAGES.ALERTS,
+                  }}>
+        <span>
+          Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
+          to you or to other systems you use for that purpose. Remember to assign Notifications while creating or editing an Event Definition.
+        </span>
+      </PageHeader>
 
-          <span>
-            Remember to assign Notifications while creating or editing an Event Definition.
-          </span>
-
-          <ButtonToolbar>
-            <LinkContainer to={Routes.ALERTS.LIST}>
-              <Button bsStyle="info">Alerts & Events</Button>
-            </LinkContainer>
-            <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
-              <Button bsStyle="info">Event Definitions</Button>
-            </LinkContainer>
-            <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
-              <Button bsStyle="info">Notifications</Button>
-            </LinkContainer>
-          </ButtonToolbar>
-        </PageHeader>
-
-        <Row className="content">
-          <Col md={12}>
-            <EventNotificationsContainer />
-          </Col>
-        </Row>
-      </span>
+      <Row className="content">
+        <Col md={12}>
+          <EventNotificationsContainer />
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };

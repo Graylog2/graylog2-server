@@ -18,14 +18,14 @@ import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 
 import history from 'util/History';
-import { LinkContainer } from 'components/common/router';
-import { ButtonToolbar, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import ConfigurationForm from 'components/sidecars/configuration-forms/ConfigurationForm';
 import withParams from 'routing/withParams';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
 import type { Configuration, ConfigurationSidecarsResponse } from 'components/sidecars/types';
+import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
+import DocsHelper from 'util/DocsHelper';
 
 const SidecarEditConfigurationPage = ({ params }) => {
   const [configuration, setConfiguration] = useState<Configuration>(null);
@@ -63,31 +63,18 @@ const SidecarEditConfigurationPage = ({ params }) => {
 
   return (
     <DocumentTitle title="Collector Configuration">
-      <span>
-        <PageHeader title="Collector Configuration">
-          <span>
-            Some words about collector configurations.
-          </span>
-
-          <span>
-            Read more about the Graylog Sidecar in the documentation.
-          </span>
-
-          <ButtonToolbar>
-            <LinkContainer to={Routes.SYSTEM.SIDECARS.OVERVIEW}>
-              <Button bsStyle="info">Overview</Button>
-            </LinkContainer>
-            <LinkContainer to={Routes.SYSTEM.SIDECARS.ADMINISTRATION}>
-              <Button bsStyle="info">Administration</Button>
-            </LinkContainer>
-            <LinkContainer to={Routes.SYSTEM.SIDECARS.CONFIGURATION}>
-              <Button bsStyle="info" className="active">Configuration</Button>
-            </LinkContainer>
-          </ButtonToolbar>
-        </PageHeader>
-        <ConfigurationForm configuration={configuration}
-                           configurationSidecars={configurationSidecars} />
-      </span>
+      <SidecarsPageNavigation />
+      <PageHeader title="Collector Configuration"
+                  documentationLink={{
+                    title: 'Sidecar documentation',
+                    path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+                  }}>
+        <span>
+          Some words about collector configurations.
+        </span>
+      </PageHeader>
+      <ConfigurationForm configuration={configuration}
+                         configurationSidecars={configurationSidecars} />
     </DocumentTitle>
   );
 };

@@ -18,7 +18,15 @@ import * as React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { NavItem as BootstrapNavItem } from 'react-bootstrap';
 
-const NavItem = (props: React.ComponentProps<typeof NavItem>) => <BootstrapNavItem {...props} />;
+import NavItemStateIndicator from 'components/common/NavItemStateIndicator';
+
+const NavItem = ({ children, ...props }: React.ComponentProps<typeof NavItem>) => (
+  <BootstrapNavItem {...props}>
+    <NavItemStateIndicator>
+      {children}
+    </NavItemStateIndicator>
+  </BootstrapNavItem>
+);
 
 NavItem.displayName = 'NavItem';
 

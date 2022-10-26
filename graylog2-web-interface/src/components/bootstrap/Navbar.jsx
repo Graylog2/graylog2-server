@@ -47,22 +47,18 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       &:hover,
       &:focus {
         color: ${theme.colors.variant.darker.default};
-        background-color: ${theme.colors.variant.lightest.default};
+        background-color: transparent;
       }
     }
 
     > .active > a,
     > .active > .btn-link {
-      color: ${theme.colors.variant.darkest.default};
-      background-color: ${theme.colors.gray[90]};
+      color: ${theme.colors.global.textDefault};
+      background-color: transparent;
       
-      &:hover {
+      &:hover, &:focus {
         color: ${theme.colors.variant.darkest.default};
-        background-color: ${theme.colors.gray[80]};
-      }
-
-      &:focus {
-        background-color: ${theme.colors.gray[90]};
+        background-color: transparent;
       }
     }
 
@@ -82,7 +78,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       &:hover,
       &:focus {
         color: ${theme.colors.variant.darkest.default};
-        background-color: ${theme.colors.gray[90]};
+        background-color: transparent;
       }
     }
 
@@ -94,7 +90,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
         &:hover,
         &:focus {
           color: ${theme.colors.variant.darker.default};
-          background-color: ${theme.colors.variant.lightest.default};
+          background-color: transparent;
         }
       }
 
@@ -216,6 +212,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
   }
 
   .dropdown-header {
+    margin-top: 4px;
     text-transform: uppercase;
     padding: 0 15px !important;
     font-weight: bold;

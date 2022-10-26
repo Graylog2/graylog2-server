@@ -1239,3 +1239,9 @@ metric_mappings:
     additional_labels:
       success: "false"
       type: "graylog"
+
+  - metric_name: "illuminate_status"
+    match_pattern: "org.graylog.plugins.illuminate.status.IlluminateStatusService.*.*"
+    wildcard_extract_labels:
+      - "type"
+      - "enabled"

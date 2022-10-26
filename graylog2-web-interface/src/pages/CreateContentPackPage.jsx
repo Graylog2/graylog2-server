@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import Reflux from 'reflux';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
 import { LinkContainer } from 'components/common/router';
@@ -31,6 +32,7 @@ import { CatalogStore, CatalogActions } from 'stores/content-packs/CatalogStore'
 import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
 
 const CreateContentPackPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'CreateContentPackPage',
   mixins: [Reflux.connect(CatalogStore)],
 
@@ -101,21 +103,17 @@ const CreateContentPackPage = createReactClass({
     return (
       <DocumentTitle title="Content packs">
         <span>
-          <PageHeader title="Create content packs">
+          <PageHeader title="Create content packs"
+                      topActions={(
+                        <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
+                          <Button bsStyle="info">Content Packs</Button>
+                        </LinkContainer>
+                      )}>
             <span>
               Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.
+              <br />
+              Find more content packs in {' '} <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
             </span>
-
-            <span>
-              Find more content packs in {' '}
-              <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
-            </span>
-
-            <div>
-              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
-                <Button bsStyle="info">Content Packs</Button>
-              </LinkContainer>
-            </div>
           </PageHeader>
           <ContentPackEdit contentPack={contentPack}
                            onGetEntities={this._getEntities}

@@ -21,7 +21,7 @@ import { LinkContainer } from 'components/common/router';
 import connect from 'stores/connect';
 import Routes from 'routing/Routes';
 import history from 'util/History';
-import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
+import { Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { DataAdapter, DataAdapterCreate, DataAdapterForm, DataAdaptersOverview } from 'components/lookup-tables';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
@@ -29,6 +29,7 @@ import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 import { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
+import LUTPageNavigation from 'components/lookup-tables/LUTPageNavigation';
 
 const _saved = () => {
   // reset detail state
@@ -162,32 +163,17 @@ class LUTDataAdaptersPage extends React.Component {
 
     return (
       <DocumentTitle title="Lookup Tables - Data Adapters">
-        <span>
-          <PageHeader title="Data adapters for Lookup Tables"
-                      subactions={(
-                        <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}>
-                          <Button bsStyle="success" style={{ marginLeft: 5 }}>Create data adapter</Button>
-                        </LinkContainer>
-                      )}>
-            <span>Data adapters provide the actual values for lookup tables</span>
-            {null}
-            <span>
-              <ButtonToolbar>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
-                  <Button bsStyle="info">Lookup Tables</Button>
-                </LinkContainer>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW}>
-                  <Button bsStyle="info">Caches</Button>
-                </LinkContainer>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}>
-                  <Button bsStyle="info">Data Adapters</Button>
-                </LinkContainer>
-              </ButtonToolbar>
-            </span>
-          </PageHeader>
+        <LUTPageNavigation />
+        <PageHeader title="Data adapters for Lookup Tables"
+                    actions={(
+                      <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}>
+                        <Button bsStyle="success" style={{ marginLeft: 5 }}>Create data adapter</Button>
+                      </LinkContainer>
+                    )}>
+          <span>Data adapters provide the actual values for lookup tables</span>
+        </PageHeader>
 
-          {content}
-        </span>
+        {content}
       </DocumentTitle>
     );
   }

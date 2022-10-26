@@ -14,14 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bootstrap.preflight;
+import * as React from 'react';
 
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.mongodb.MongoDBExtension;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import Routes from 'routing/Routes';
+import PageNavigation from 'components/common/PageNavigation';
+import { Row } from 'components/bootstrap';
 
-public class MongoDBPreflightCheckTest4 extends MongoDBPreflightCheckTest {
-    @RegisterExtension
-    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.MONGO4);
+const NAV_ITEMS = [
+  { title: 'Authentication Services', path: Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW },
+  { title: 'Authenticators', path: Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW },
+];
 
-}
+const AuthenticationPageNavigation = () => (
+  <Row>
+    <PageNavigation items={NAV_ITEMS} />
+  </Row>
+);
+
+export default AuthenticationPageNavigation;

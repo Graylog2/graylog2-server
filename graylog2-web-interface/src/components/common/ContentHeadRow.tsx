@@ -36,10 +36,6 @@ const StyledRow = styled(Row)(({ theme }) => css`
     padding-bottom: 15px;
   }
 
-  .description-tooltips .fa-stack {
-    margin-right: 3px;
-  }
-
   .btn-lg {
     font-size: ${theme.fonts.size.large};
   }

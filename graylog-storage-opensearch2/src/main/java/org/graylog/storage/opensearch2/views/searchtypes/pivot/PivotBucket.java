@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.lock;
+package org.graylog.storage.opensearch2.views.searchtypes.pivot;
 
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.mongodb.MongoDBExtension;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import com.google.common.collect.ImmutableList;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 
-public class MongoLockServiceTest3 extends MongoLockServiceTest {
-    @RegisterExtension
-    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.MONGO3);
+public record PivotBucket(ImmutableList<String> keys, MultiBucketsAggregation.Bucket bucket) {
+    public static PivotBucket create(ImmutableList<String> keys, MultiBucketsAggregation.Bucket bucket) {
+        return new PivotBucket(keys, bucket);
+    }
 }

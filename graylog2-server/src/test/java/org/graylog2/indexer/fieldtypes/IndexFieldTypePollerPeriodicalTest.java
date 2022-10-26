@@ -36,9 +36,10 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
+import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -58,7 +59,7 @@ class IndexFieldTypePollerPeriodicalTest {
     @SuppressWarnings("UnstableApiUsage")
     private final EventBus eventBus = mock(EventBus.class);
     private final ServerStatus serverStatus = mock(ServerStatus.class);
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2,
+    private final ScheduledThreadPoolExecutor scheduler = new ScheduledThreadPoolExecutor(2,
             new ThreadFactoryBuilder().setNameFormat("index-field-type-poller-periodical-test-%d").build()
     );
 
@@ -101,8 +102,8 @@ class IndexFieldTypePollerPeriodicalTest {
                 .indexOptimizationDisabled(false)
                 .fieldTypeRefreshInterval(org.joda.time.Duration.standardSeconds(1))
                 .retentionStrategy(NoopRetentionStrategyConfig.createDefault())
-                .replicas(1)
                 .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
+                .replicas(1)
                 .build();
         final List<IndexSetConfig> indexSets = List.of(indexSet);
         when(indexSetService.findAll()).thenReturn(indexSets);
@@ -128,8 +129,13 @@ class IndexFieldTypePollerPeriodicalTest {
         // Then start second job
         periodical.doRun();
 
+        // Waiting for second job to complete
+        await().atMost(1, TimeUnit.MINUTES).until(() -> scheduler.getCompletedTaskCount() == 1);
+
         // And release first job
         done.countDown();
+
+        await().atMost(1, TimeUnit.MINUTES).until(() -> scheduler.getCompletedTaskCount() == 2);
 
         verify(indexFieldTypePoller, times(1)).pollIndex(anyString(), anyString());
     }

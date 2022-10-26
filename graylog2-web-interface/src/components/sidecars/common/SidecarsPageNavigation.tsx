@@ -16,24 +16,20 @@
  */
 import * as React from 'react';
 
+import PageNavigation from 'components/common/PageNavigation';
 import Routes from 'routing/Routes';
-import { LinkContainer } from 'components/common/router';
-import { ButtonToolbar, Button } from 'components/bootstrap';
+import { Row } from 'components/bootstrap';
 
-const AuthenticationOverviewLinks = () => (
-  <ButtonToolbar className="pull-right">
-    <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW}>
-      <Button bsStyle="info">
-        Authentication Services
-      </Button>
-    </LinkContainer>
-    <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW}>
-      <Button bsStyle="info"
-              type="button">
-        Authenticators
-      </Button>
-    </LinkContainer>
-  </ButtonToolbar>
+const NAV_ITEMS = [
+  { title: 'Overview', path: Routes.SYSTEM.SIDECARS.OVERVIEW, exactPathMatch: true },
+  { title: 'Administration', path: Routes.SYSTEM.SIDECARS.ADMINISTRATION },
+  { title: 'Configuration', path: Routes.SYSTEM.SIDECARS.CONFIGURATION },
+];
+
+const SidecarsPageNavigation = () => (
+  <Row>
+    <PageNavigation items={NAV_ITEMS} />
+  </Row>
 );
 
-export default AuthenticationOverviewLinks;
+export default SidecarsPageNavigation;

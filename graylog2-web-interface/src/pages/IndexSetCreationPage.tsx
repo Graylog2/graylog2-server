@@ -22,7 +22,6 @@ import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
-import { DocumentationLink } from 'components/support';
 import history from 'util/History';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
@@ -59,7 +58,7 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
 
     copy.creation_date = adjustFormat(new Date(), 'internal');
 
-    IndexSetsActions.create(copy).then(() => {
+    return IndexSetsActions.create(copy).then(() => {
       history.push(Routes.SYSTEM.INDICES.LIST);
     });
   };
@@ -95,19 +94,19 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
   return (
     <DocumentTitle title="Create Index Set">
       <div>
-        <PageHeader title="Create Index Set">
+        <PageHeader title="Create Index Set"
+                    documentationLink={{
+                      title: 'Index model documentation',
+                      path: DocsHelper.PAGES.INDEX_MODEL,
+                    }}
+                    topActions={(
+                      <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
+                        <Button bsStyle="info">Index sets overview</Button>
+                      </LinkContainer>
+                    )}>
           <span>
             Create a new index set that will let you configure the retention, sharding, and replication of messages
             coming from one or more streams.
-          </span>
-          <span>
-            You can learn more about the index model in the{' '}
-            <DocumentationLink page={DocsHelper.PAGES.INDEX_MODEL} text="documentation" />
-          </span>
-          <span>
-            <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-              <Button bsStyle="info">Index sets overview</Button>
-            </LinkContainer>
           </span>
         </PageHeader>
 

@@ -42,7 +42,7 @@ import java.util.Iterator;
 public class MongoDbPipelineService implements PipelineService {
     private static final Logger log = LoggerFactory.getLogger(MongoDbPipelineService.class);
 
-    private static final String COLLECTION = "pipeline_processor_pipelines";
+    public static final String COLLECTION = "pipeline_processor_pipelines";
 
     private final JacksonDBCollection<PipelineDao, String> dbCollection;
     private final ClusterEventBus clusterBus;
@@ -103,5 +103,10 @@ public class MongoDbPipelineService implements PipelineService {
     public void delete(String id) {
         dbCollection.removeById(id);
         clusterBus.post(PipelinesChangedEvent.deletedPipelineId(id));
+    }
+
+    @Override
+    public long count(DBQuery.Query query) {
+        return dbCollection.getCount(query);
     }
 }

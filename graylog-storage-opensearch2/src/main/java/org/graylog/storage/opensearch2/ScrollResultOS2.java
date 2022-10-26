@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.opensearch2;
 
-import com.google.auto.value.AutoValue;
 import com.google.common.collect.Streams;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -26,6 +25,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRespons
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchScrollRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
 import org.graylog2.indexer.results.IndexQueryResult;
+import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.slf4j.Logger;
@@ -81,7 +81,7 @@ public class ScrollResultOS2 extends IndexQueryResult implements ScrollResult {
     }
 
     @Override
-    public ScrollChunk nextChunk() throws IOException {
+    public ResultChunk nextChunk() throws IOException {
         if (limit != -1 && resultCount >= limit) {
             LOG.debug("[{}] Reached limit for query {}", queryHash, getOriginalQuery());
             return null;
@@ -110,7 +110,7 @@ public class ScrollResultOS2 extends IndexQueryResult implements ScrollResult {
 
         this.scrollId = result.getScrollId();
 
-        return ScrollChunkOS2.create(fields, chunkId++, resultMessagesSlice);
+        return new ResultChunk(fields, chunkId++, resultMessagesSlice);
     }
 
     private SearchResponse nextSearchResult() throws IOException {
@@ -139,19 +139,4 @@ public class ScrollResultOS2 extends IndexQueryResult implements ScrollResult {
                 "Unable to cancel scrolling search request");
     }
 
-    @AutoValue
-    abstract static class ScrollChunkOS2 implements ScrollResult.ScrollChunk {
-        @Override
-        public abstract List<String> getFields();
-
-        @Override
-        public abstract int getChunkNumber();
-
-        @Override
-        public abstract List<ResultMessage> getMessages();
-
-        static ScrollChunk create(List<String> fields, int chunkNumber, List<ResultMessage> messages) {
-            return new AutoValue_ScrollResultOS2_ScrollChunkOS2(fields, chunkNumber, messages);
-        }
-    }
 }

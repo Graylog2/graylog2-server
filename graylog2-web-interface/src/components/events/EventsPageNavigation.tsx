@@ -14,14 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bootstrap.preflight;
+import * as React from 'react';
 
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.mongodb.MongoDBExtension;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import PageNavigation from 'components/common/PageNavigation';
+import Routes from 'routing/Routes';
+import { Row } from 'components/bootstrap';
 
-public class MongoDBPreflightCheckTest3 extends MongoDBPreflightCheckTest {
-    @RegisterExtension
-    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.MONGO3);
+const NAV_ITEMS = [
+  { title: 'Alerts & Events', path: Routes.ALERTS.LIST, exactPathMatch: true },
+  { title: 'Event Definitions', path: Routes.ALERTS.DEFINITIONS.LIST, permissions: 'eventdefinitions:read' },
+  { title: 'Notifications', path: Routes.ALERTS.NOTIFICATIONS.LIST, permissions: 'eventnotifications:read' },
+];
 
-}
+const EventsPageNavigation = () => (
+  <Row>
+    <PageNavigation items={NAV_ITEMS} />
+  </Row>
+);
+
+export default EventsPageNavigation;

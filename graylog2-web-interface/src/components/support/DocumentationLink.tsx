@@ -16,25 +16,40 @@
  */
 import * as React from 'react';
 import type { ReactNode } from 'react';
+import styled from 'styled-components';
 
 import DocsHelper from 'util/DocsHelper';
+
+import Icon from '../common/Icon';
+
+const Container = styled.a`
+  display: inline-flex;
+  align-items: center;
+`;
+
+const StyledIcon = styled(Icon)`
+  margin-left: 5px
+`;
 
 type Props = {
   page: string;
   text: ReactNode;
   title?: string;
+  displayIcon?: boolean
 }
 
-const DocumentationLink = ({ page, title = '', text }: Props) => {
+const DocumentationLink = ({ page, title = '', text, displayIcon }: Props) => {
   return (
-    <a href={DocsHelper.toString(page)} title={title} target="_blank" rel="noreferrer">
+    <Container href={DocsHelper.toString(page)} title={title} target="_blank" rel="noreferrer">
       {text}
-    </a>
+      {displayIcon && <StyledIcon name="lightbulb" type="regular" size="lg" />}
+    </Container>
   );
 };
 
 DocumentationLink.defaultProps = {
   title: '',
+  displayIcon: false,
 };
 
 export default DocumentationLink;

@@ -17,14 +17,16 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
-import { LinkContainer, Link } from 'components/common/router';
-import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
+import { Link } from 'components/common/router';
+import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import SidecarListContainer from 'components/sidecars/sidecars/SidecarListContainer';
 import Routes from 'routing/Routes';
+import DocsHelper from 'util/DocsHelper';
+import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 
 const SidecarsPage = () => {
   const [sidecarUser, setSidecarUser] = useState();
@@ -39,14 +41,18 @@ const SidecarsPage = () => {
 
   return (
     <DocumentTitle title="Sidecars">
-      <span>
-        <PageHeader title="Sidecars Overview">
-          <span>
-            The Graylog sidecars can reliably forward contents of log files or Windows EventLog from your servers.
-          </span>
+      <SidecarsPageNavigation />
+      <PageHeader title="Sidecars Overview"
+                  documentationLink={{
+                    title: 'Sidecar documentation',
+                    path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+                  }}>
+        <span>
+          The Graylog sidecars can reliably forward contents of log files or Windows EventLog from your servers.
           {canCreateSidecarUserTokens && (
             sidecarUser ? (
               <span>
+                <br />
                 Do you need an API token for a sidecar?&ensp;
                 <Link to={Routes.SYSTEM.USERS.TOKENS.edit(sidecarUser.id)}>
                   Create or reuse a token for the <em>graylog-sidecar</em> user
@@ -54,25 +60,14 @@ const SidecarsPage = () => {
               </span>
             ) : <Spinner />
           )}
-          <ButtonToolbar>
-            <LinkContainer to={Routes.SYSTEM.SIDECARS.OVERVIEW}>
-              <Button bsStyle="info">Overview</Button>
-            </LinkContainer>
-            <LinkContainer to={Routes.SYSTEM.SIDECARS.ADMINISTRATION}>
-              <Button bsStyle="info">Administration</Button>
-            </LinkContainer>
-            <LinkContainer to={Routes.SYSTEM.SIDECARS.CONFIGURATION}>
-              <Button bsStyle="info">Configuration</Button>
-            </LinkContainer>
-          </ButtonToolbar>
-        </PageHeader>
+        </span>
+      </PageHeader>
 
-        <Row className="content">
-          <Col md={12}>
-            <SidecarListContainer />
-          </Col>
-        </Row>
-      </span>
+      <Row className="content">
+        <Col md={12}>
+          <SidecarListContainer />
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };

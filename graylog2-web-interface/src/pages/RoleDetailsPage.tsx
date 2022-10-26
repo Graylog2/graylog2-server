@@ -25,7 +25,6 @@ import RoleActionLinks from 'components/roles/navigation/RoleActionLinks';
 import DocsHelper from 'util/DocsHelper';
 import { PageHeader, DocumentTitle } from 'components/common';
 import { Button } from 'components/bootstrap';
-import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import type Role from 'logic/roles/Role';
 
@@ -56,18 +55,19 @@ const RoleDetailsPage = ({ params }: Props) => {
   return (
     <DocumentTitle title={`Role Details ${loadedRole?.name ?? ''}`}>
       <PageHeader title={<PageTitle fullName={loadedRole?.name} />}
-                  subactions={<RoleActionLinks roleId={roleId} />}>
+                  actions={<RoleActionLinks roleId={roleId} />}
+                  documentationLink={{
+                    title: 'Permissions documentation',
+                    path: DocsHelper.PAGES.USERS_ROLES,
+                  }}
+                  topActions={(
+                    <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
+                      <Button bsStyle="info">Roles Overview</Button>
+                    </LinkContainer>
+                  )}>
         <span>
           Overview of details like name, description and assigned users.
         </span>
-        <span>
-          Learn more in the{' '}
-          <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                             text="documentation" />
-        </span>
-        <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
-          <Button bsStyle="info">Roles Overview</Button>
-        </LinkContainer>
       </PageHeader>
       <RoleDetails role={roleId === loadedRole?.id ? loadedRole : undefined} />
     </DocumentTitle>
