@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfi
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalInt;
 
 @AutoValue
@@ -76,10 +77,10 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     public abstract boolean eventAnnotation();
 
     @JsonProperty(FIELD_ROW_LIMIT)
-    public abstract OptionalInt rowLimit();
+    public abstract Optional<Integer> rowLimit();
 
     @JsonProperty(FIELD_COLUMN_LIMIT)
-    public abstract OptionalInt columnLimit();
+    public abstract Optional<Integer> columnLimit();
 
     @AutoValue.Builder
     public static abstract class Builder {
@@ -116,10 +117,10 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
         public abstract Builder eventAnnotation(boolean eventAnnotation);
 
         @JsonProperty(FIELD_ROW_LIMIT)
-        public abstract Builder rowLimit(int limit);
+        public abstract Builder rowLimit(@Nullable Integer limit);
 
         @JsonProperty(FIELD_COLUMN_LIMIT)
-        public abstract Builder columnLimit(int limit);
+        public abstract Builder columnLimit(@Nullable Integer limit);
 
         public abstract AggregationConfigDTO build();
 

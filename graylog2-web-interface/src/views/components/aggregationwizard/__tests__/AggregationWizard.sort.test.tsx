@@ -44,12 +44,13 @@ const fieldTypeMapping2 = new FieldTypeMapping('http_method', fieldType);
 const fields = Immutable.List([fieldTypeMapping1, fieldTypeMapping2]);
 const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }) };
 
-const pivot0 = Pivot.create(fieldTypeMapping1.name, 'values', { limit: 15 });
-const pivot1 = Pivot.create(fieldTypeMapping2.name, 'values', { limit: 15 });
+const pivot0 = Pivot.create(fieldTypeMapping1.name, 'values');
+const pivot1 = Pivot.create(fieldTypeMapping2.name, 'values');
 
 const widgetConfig = AggregationWidgetConfig
   .builder()
   .visualization(DataTable.type)
+  .rowLimit(15)
   .rowPivots([pivot0, pivot1])
   .visualizationConfig(DataTableVisualizationConfig.empty())
   .build();
@@ -63,11 +64,7 @@ const addSortElement = async () => {
   await userEvent.click(await screen.findByRole('menuitem', { name: 'Sort' }));
 };
 
-const findWidgetConfigFormSubmitButton = async () => {
-  const button = await screen.findByRole('button', { name: /update preview/i });
-
-  return button;
-};
+const findWidgetConfigFormSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
 
 const submitWidgetConfigForm = async () => {
   const applyButton = await findWidgetConfigFormSubmitButton();
@@ -99,7 +96,7 @@ describe('AggregationWizard', () => {
                          type="AGGREGATION"
                          fields={Immutable.List([])}
                          {...props}>
-        <div>The Visualization</div>
+        <span>The Visualization</span>
       </AggregationWizard>
     </FieldTypesContext.Provider>,
   );
