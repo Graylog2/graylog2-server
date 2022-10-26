@@ -16,8 +16,8 @@
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <includes>
                 <include>org.graylog:graylog-storage-opensearch2</include>
-                <include>org.graylog.shaded:opensearch22-rest-high-level-client</include>
-                <include>org.graylog.shaded:opensearch22-rest-client-sniffer</include>
+                <include>org.graylog.shaded:opensearch20-rest-high-level-client</include>
+                <include>org.graylog.shaded:opensearch20-rest-client-sniffer</include>
             </includes>
         </dependencySet>
     </dependencySets>

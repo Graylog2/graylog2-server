@@ -27,15 +27,14 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.HasAggregations;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 
 import java.util.stream.Stream;
 
 public abstract class ESPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_RESULT extends Aggregation>
-        implements SeriesSpecHandler<SPEC_TYPE, AggregationBuilder, SearchResponse, AGGREGATION_RESULT, ESSearchTypeHandler<Pivot>, ESGeneratedQueryContext> {
+        implements SeriesSpecHandler<SPEC_TYPE, AggregationBuilder, SearchResponse, AGGREGATION_RESULT, ESPivot, ESGeneratedQueryContext> {
 
-    protected AggTypes aggTypes(ESGeneratedQueryContext queryContext, Pivot pivot) {
-        return (AggTypes) queryContext.contextMap().get(pivot.id());
+    protected ESPivot.AggTypes aggTypes(ESGeneratedQueryContext queryContext, Pivot pivot) {
+        return (ESPivot.AggTypes) queryContext.contextMap().get(pivot.id());
     }
 
     protected void record(ESGeneratedQueryContext queryContext, Pivot pivot, PivotSpec spec, String name, Class<? extends Aggregation> aggregationClass) {
@@ -49,11 +48,11 @@ public abstract class ESPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
     @SuppressWarnings("unchecked")
     @Override
     public Stream<Value> handleResult(Pivot pivot, SeriesSpec seriesSpec, Object queryResult, Object aggregationResult, SearchTypeHandler searchTypeHandler, GeneratedQueryContext queryContext) {
-        return doHandleResult(pivot, (SPEC_TYPE) seriesSpec, (SearchResponse) queryResult, (AGGREGATION_RESULT) aggregationResult, (ESSearchTypeHandler<Pivot>) searchTypeHandler, (ESGeneratedQueryContext) queryContext);
+        return doHandleResult(pivot, (SPEC_TYPE) seriesSpec, (SearchResponse) queryResult, (AGGREGATION_RESULT) aggregationResult, (ESPivot) searchTypeHandler, (ESGeneratedQueryContext) queryContext);
     }
 
     @Override
-    public abstract Stream<Value> doHandleResult(Pivot pivot, SPEC_TYPE seriesSpec, SearchResponse searchResult, AGGREGATION_RESULT aggregationResult, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext);
+    public abstract Stream<Value> doHandleResult(Pivot pivot, SPEC_TYPE seriesSpec, SearchResponse searchResult, AGGREGATION_RESULT aggregationResult, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext);
 
     public static class Value {
 
