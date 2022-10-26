@@ -66,6 +66,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     private static final String FIELD_KEY_SPEC = "key_spec";
     private static final String FIELD_NOTIFICATION_SETTINGS = "notification_settings";
     private static final String FIELD_STORAGE = "storage";
+    public static final String FIELD_IS_SYSTEM_EVENT = "is_system_event";
 
     @Override
     @Id
@@ -114,6 +115,10 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     @JsonProperty(FIELD_STORAGE)
     public abstract ImmutableList<EventStorageHandler.Config> storage();
 
+    @Override
+    @JsonProperty(FIELD_IS_SYSTEM_EVENT)
+    public abstract boolean isSystemEvent();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -156,9 +161,11 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
             return new AutoValue_EventDefinitionDto.Builder()
                     .fieldSpec(ImmutableMap.of())
                     .notifications(ImmutableList.of())
-                    .storage(ImmutableList.of());
+                    .storage(ImmutableList.of())
+                    .isSystemEvent(false);
         }
 
+        @Override
         @Id
         @ObjectId
         @JsonProperty(FIELD_ID)
@@ -194,12 +201,19 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
         @JsonProperty(FIELD_STORAGE)
         public abstract Builder storage(ImmutableList<EventStorageHandler.Config> storageHandlers);
 
+        @JsonProperty(FIELD_IS_SYSTEM_EVENT)
+        public abstract Builder isSystemEvent(boolean isSystemEvent);
+
         abstract EventDefinitionDto autoBuild();
 
         public EventDefinitionDto build() {
             final EventDefinitionDto dto = autoBuild();
-            final PersistToStreamsStorageHandler.Config withDefaultEventsStream = PersistToStreamsStorageHandler.Config.createWithDefaultEventsStream();
+            final PersistToStreamsStorageHandler.Config withSystemEventsStream = PersistToStreamsStorageHandler.Config.createWithSystemEventsStream();
+            if (dto.storage().stream().anyMatch(withSystemEventsStream::equals)) {
+                return dto;
+            }
 
+            final PersistToStreamsStorageHandler.Config withDefaultEventsStream = PersistToStreamsStorageHandler.Config.createWithDefaultEventsStream();
             if (dto.storage().stream().noneMatch(withDefaultEventsStream::equals)) {
                 final List<EventStorageHandler.Config> handlersWithoutPersistToStreams = dto.storage().stream()
                         // We don't allow custom persist-to-streams handlers at the moment
@@ -207,10 +221,10 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
                         .collect(Collectors.toList());
 
                 return dto.toBuilder()
-                        // Right now we always want to persist events into the default events stream
                         .storage(ImmutableList.<EventStorageHandler.Config>builder()
                                 .addAll(handlersWithoutPersistToStreams)
                                 .add(withDefaultEventsStream)
+                                .add(withSystemEventsStream)
                                 .build())
                         .build();
             }
@@ -219,27 +233,28 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
         }
     }
 
+    @Override
     public EventDefinitionEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         final EventProcessorConfig config = config();
         final EventProcessorConfigEntity eventProcessorConfigEntity = config.toContentPackEntity(entityDescriptorIds);
         final ImmutableList<EventNotificationHandlerConfigEntity> notificationList = ImmutableList.copyOf(
-            notifications().stream()
-                .map(notification -> notification.toContentPackEntity(entityDescriptorIds))
-                .collect(Collectors.toList()));
+                notifications().stream()
+                        .map(notification -> notification.toContentPackEntity(entityDescriptorIds))
+                        .collect(Collectors.toList()));
 
         return EventDefinitionEntity.builder()
-            .scope(ValueReference.of(scope()))
-            .title(ValueReference.of(title()))
-            .description(ValueReference.of(description()))
-            .priority(ValueReference.of(priority()))
-            .alert(ValueReference.of(alert()))
-            .config(eventProcessorConfigEntity)
-            .notifications(notificationList)
-            .notificationSettings(notificationSettings())
-            .fieldSpec(fieldSpec())
-            .keySpec(keySpec())
-            .storage(storage())
-            .build();
+                .scope(ValueReference.of(scope()))
+                .title(ValueReference.of(title()))
+                .description(ValueReference.of(description()))
+                .priority(ValueReference.of(priority()))
+                .alert(ValueReference.of(alert()))
+                .config(eventProcessorConfigEntity)
+                .notifications(notificationList)
+                .notificationSettings(notificationSettings())
+                .fieldSpec(fieldSpec())
+                .keySpec(keySpec())
+                .storage(storage())
+                .build();
     }
 
     @Override

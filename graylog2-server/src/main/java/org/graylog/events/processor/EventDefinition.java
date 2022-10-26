@@ -53,4 +53,6 @@ public interface EventDefinition {
     default Set<String> requiredPermissions() {
         return config().requiredPermissions();
     }
+
+    boolean isSystemEvent();
 }

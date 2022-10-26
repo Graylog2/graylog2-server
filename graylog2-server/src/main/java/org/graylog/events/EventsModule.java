@@ -49,6 +49,9 @@ import org.graylog.events.processor.aggregation.AggregationSearch;
 import org.graylog.events.processor.aggregation.PivotAggregationSearch;
 import org.graylog.events.processor.storage.EventStorageHandlerEngine;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessor;
+import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorConfig;
+import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorParameters;
 import org.graylog.events.rest.AvailableEntityTypesResource;
 import org.graylog.events.rest.EventDefinitionsResource;
 import org.graylog.events.rest.EventNotificationsResource;
@@ -92,13 +95,18 @@ public class EventsModule extends PluginModule {
         addAuditEventTypes(EventsAuditEventTypes.class);
 
         registerJacksonSubtype(AggregationEventProcessorConfigEntity.class,
-            AggregationEventProcessorConfigEntity.TYPE_NAME);
+                AggregationEventProcessorConfigEntity.TYPE_NAME);
 
         addEventProcessor(AggregationEventProcessorConfig.TYPE_NAME,
                 AggregationEventProcessor.class,
                 AggregationEventProcessor.Factory.class,
                 AggregationEventProcessorConfig.class,
                 AggregationEventProcessorParameters.class);
+        addEventProcessor(SystemNotificationEventProcessorConfig.TYPE_NAME,
+                SystemNotificationEventProcessor.class,
+                SystemNotificationEventProcessor.Factory.class,
+                SystemNotificationEventProcessorConfig.class,
+                SystemNotificationEventProcessorParameters.class);
 
         addEventStorageHandler(PersistToStreamsStorageHandler.Config.TYPE_NAME,
                 PersistToStreamsStorageHandler.class,

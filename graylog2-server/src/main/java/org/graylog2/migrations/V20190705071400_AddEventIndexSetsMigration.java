@@ -16,9 +16,16 @@
  */
 package org.graylog2.migrations;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
+import org.graylog.events.notifications.EventNotificationHandler;
+import org.graylog.events.notifications.EventNotificationSettings;
+import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.events.processor.EventDefinitionDto;
+import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorConfig;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexSet;
@@ -52,6 +59,7 @@ import java.util.Optional;
 import static java.util.Locale.US;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
 
 public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20190705071400_AddEventIndexSetsMigration.class);
@@ -61,18 +69,21 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     private final IndexSetService indexSetService;
     private final IndexSetValidator indexSetValidator;
     private final StreamService streamService;
+    private final DBEventDefinitionService dbService;
 
     @Inject
     public V20190705071400_AddEventIndexSetsMigration(ElasticsearchConfiguration elasticsearchConfiguration,
                                                       MongoIndexSet.Factory mongoIndexSetFactory,
                                                       IndexSetService indexSetService,
                                                       IndexSetValidator indexSetValidator,
-                                                      StreamService streamService) {
+                                                      StreamService streamService,
+                                                      DBEventDefinitionService dbService) {
         this.elasticsearchConfiguration = elasticsearchConfiguration;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.indexSetService = indexSetService;
         this.indexSetValidator = indexSetValidator;
         this.streamService = streamService;
+        this.dbService = dbService;
     }
 
     @Override
@@ -96,10 +107,34 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                 "Stores Graylog system events.",
                 elasticsearchConfiguration.getDefaultSystemEventsIndexPrefix(),
                 ElasticsearchConfiguration.DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX,
-                Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID,
+                DEFAULT_SYSTEM_EVENTS_STREAM_ID,
                 "All system events",
                 "Stream containing all system events created by Graylog"
         );
+        ensureSystemNotificationEventsDefinition();
+    }
+
+    private void ensureSystemNotificationEventsDefinition() {
+        if (dbService.getSystemEventDefinitions().isEmpty()) {
+            EventDefinitionDto eventDto =
+                    EventDefinitionDto.builder()
+                            .title("System notification events")
+                            .description("Reserved event definition for system notification events")
+                            .isSystemEvent(true)
+                            .alert(false)
+                            .priority(1)
+                            .keySpec(ImmutableList.of())
+                            .notificationSettings(EventNotificationSettings.builder()
+                                    .gracePeriodMs(0) // Defaults to 0 in the UI
+                                    .backlogSize(0) // Defaults to 0 in the UI
+                                    .build())
+                            // Empty notifications list by default. The user will specify later in the UI.
+                            .notifications(ImmutableList.<EventNotificationHandler.Config>builder().build())
+                            .config(SystemNotificationEventProcessorConfig.builder().build())
+                            .storage(ImmutableList.of(PersistToStreamsStorageHandler.Config.createWithSystemEventsStream()))
+                            .build();
+            dbService.save(eventDto);
+        }
     }
 
     private void ensureEventsStreamAndIndexSet(String indexSetTitle,
