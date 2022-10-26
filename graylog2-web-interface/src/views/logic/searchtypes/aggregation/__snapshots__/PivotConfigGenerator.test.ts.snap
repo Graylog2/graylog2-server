@@ -4,16 +4,15 @@ exports[`PivotConfigGenerator should add a event annotation config when configur
 {
   "config": {
     "column_groups": [],
-    "column_limit": undefined,
     "id": "vals",
     "rollup": true,
     "row_groups": [
       {
         "field": "field",
+        "limit": 15,
         "type": "type",
       },
     ],
-    "row_limit": undefined,
     "series": [
       {
         "id": "count",
@@ -38,16 +37,15 @@ exports[`PivotConfigGenerator should add a event annotation config when configur
 exports[`PivotConfigGenerator should generate a chart config 1`] = `
 {
   "column_groups": [],
-  "column_limit": undefined,
   "id": Any<String>,
   "rollup": true,
   "row_groups": [
     {
       "field": "field",
+      "limit": 15,
       "type": "type",
     },
   ],
-  "row_limit": undefined,
   "series": [
     {
       "id": "count",
@@ -61,16 +59,15 @@ exports[`PivotConfigGenerator should generate a number config with trend 1`] = `
 {
   "config": {
     "column_groups": [],
-    "column_limit": undefined,
     "id": "vals",
     "rollup": true,
     "row_groups": [
       {
         "field": "field",
+        "limit": 15,
         "type": "type",
       },
     ],
-    "row_limit": undefined,
     "series": [
       {
         "id": "count",
@@ -88,16 +85,15 @@ exports[`PivotConfigGenerator should generate a number config with trend 2`] = `
 {
   "config": {
     "column_groups": [],
-    "column_limit": undefined,
     "id": "vals",
     "rollup": true,
     "row_groups": [
       {
         "field": "field",
+        "limit": 15,
         "type": "type",
       },
     ],
-    "row_limit": undefined,
     "series": [
       {
         "id": "count",

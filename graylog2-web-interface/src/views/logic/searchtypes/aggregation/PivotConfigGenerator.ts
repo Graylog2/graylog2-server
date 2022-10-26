@@ -97,8 +97,6 @@ const generateConfig = (id: string, name: string, {
   columnPivots,
   series,
   sort,
-  rowLimit,
-  columnLimit,
 }: AggregationWidgetConfig) => ({
   id,
   name,
@@ -110,8 +108,6 @@ const generateConfig = (id: string, name: string, {
     column_groups: columnPivots.map(formatPivot),
     series: series.map<FormattedSeries>((s) => ({ id: s.effectiveName, ...parseSeries(s.function) })),
     sort: sort,
-    row_limit: rowLimit,
-    column_limit: columnLimit,
   },
 });
 

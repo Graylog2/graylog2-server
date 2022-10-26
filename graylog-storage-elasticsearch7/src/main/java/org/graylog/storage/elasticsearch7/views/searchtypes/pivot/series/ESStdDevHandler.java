@@ -24,7 +24,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ExtendedStats;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ExtendedStatsAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
+import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 
 import javax.annotation.Nonnull;
@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 public class ESStdDevHandler extends ESPivotSeriesSpecHandler<StdDev, ExtendedStats> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, StdDev stddevSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, StdDev stddevSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
         final ExtendedStatsAggregationBuilder stddev = AggregationBuilders.extendedStats(name).field(stddevSpec.field());
         record(queryContext, pivot, stddevSpec, name, ExtendedStats.class);
         return Optional.of(stddev);
@@ -44,7 +44,7 @@ public class ESStdDevHandler extends ESPivotSeriesSpecHandler<StdDev, ExtendedSt
     public Stream<Value> doHandleResult(Pivot pivot, StdDev pivotSpec,
                                         SearchResponse searchResult,
                                         ExtendedStats stddevAggregation,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
+                                        ESPivot searchTypeHandler,
                                         ESGeneratedQueryContext esGeneratedQueryContext) {
         return Stream.of(ESPivotSeriesSpecHandler.Value.create(pivotSpec.id(), StdDev.NAME, stddevAggregation.getStdDeviation()));
     }

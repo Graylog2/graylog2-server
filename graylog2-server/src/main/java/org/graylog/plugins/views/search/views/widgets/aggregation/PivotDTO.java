@@ -23,15 +23,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
-import java.util.OptionalInt;
-
 @AutoValue
 @JsonDeserialize(builder = PivotDTO.Builder.class)
 @WithBeanGetter
 public abstract class PivotDTO {
-    private static final String FIELD_FIELD_NAME = "field";
-    private static final String FIELD_TYPE = "type";
-    private static final String FIELD_CONFIG = "config";
+    static final String FIELD_FIELD_NAME = "field";
+    static final String FIELD_TYPE = "type";
+    static final String FIELD_CONFIG = "config";
 
     @JsonProperty(FIELD_FIELD_NAME)
     public abstract String field();

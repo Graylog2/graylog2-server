@@ -34,17 +34,14 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.EffectiveTimeRangeExtractor;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSTimeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSAverageHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSMaxHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.storage.SearchVersion;
 import org.junit.Before;
 import org.junit.Rule;
 import org.mockito.ArgumentCaptor;
@@ -88,11 +85,11 @@ public class OpenSearchBackendGeneratedRequestTestBase {
     @Before
     public void setUpSUT() {
         this.elasticSearchTypeHandlers = new HashMap<>();
-        final Map<String, OSPivotBucketSpecHandler<? extends BucketSpec>> bucketHandlers = Collections.emptyMap();
+        final Map<String, OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers = Collections.emptyMap();
         final Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers = new HashMap<>();
         seriesHandlers.put(Average.NAME, new OSAverageHandler());
         seriesHandlers.put(Max.NAME, new OSMaxHandler());
-        elasticSearchTypeHandlers.put(Pivot.NAME, () -> new OSPivot(bucketHandlers, seriesHandlers, new EffectiveTimeRangeExtractor()));
+        elasticSearchTypeHandlers.put(Pivot.NAME, () -> new OSPivot(bucketHandlers, seriesHandlers));
 
         this.openSearchBackend = new OpenSearchBackend(elasticSearchTypeHandlers,
                 client,

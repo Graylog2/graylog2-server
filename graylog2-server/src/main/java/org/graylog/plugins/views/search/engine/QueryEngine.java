@@ -123,6 +123,7 @@ public class QueryEngine {
         LOG.debug("[{}] Query returned {}", query.id(), result);
         if (!generatedQueryContext.errors().isEmpty()) {
             generatedQueryContext.errors().forEach(searchJob::addError);
+
         }
         return result;
     }
