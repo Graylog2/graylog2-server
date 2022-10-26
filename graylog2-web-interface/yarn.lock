@@ -2981,10 +2981,10 @@
     "@types/scheduler" "*"
     csstype "^3.0.2"
 
-"@types/react@18.0.22":
-  version "18.0.22"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.22.tgz#97782d995d999617de116cf61f437f1351036fc7"
-  integrity sha512-4yWc5PyCkZN8ke8K9rQHkTXxHIWHxLzzW6RI1kXVoepkD3vULpKzC2sDtAMKn78h92BRYuzf+7b/ms7ajE6hFw==
+"@types/react@18.0.23":
+  version "18.0.23"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.23.tgz#4190ecd58b99fa79fe2e67832bdcb287e5f893e4"
+  integrity sha512-R1wTULtCiJkudAN2DJGoYYySbGtOdzZyUWAACYinKdiQC8auxso4kLDUhQ7AJ2kh3F6A6z4v69U6tNY39hihVQ==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
@@ -5405,6 +5405,11 @@ devtools-protocol@0.0.1045489:
   resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.1045489.tgz#f959ad560b05acd72d55644bc3fb8168a83abf28"
   integrity sha512-D+PTmWulkuQW4D1NTiCRCFxF7pQPn0hgp4YyX4wAQ6xYXKOadSWPR3ENGDQ47MW/Ewc9v2rpC/UEEGahgBYpSQ==
 
+devtools-protocol@0.0.1056733:
+  version "0.0.1056733"
+  resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.1056733.tgz#55bb1d56761014cc221131cca5e6bad94eefb2b9"
+  integrity sha512-CmTu6SQx2g3TbZzDCAV58+LTxVdKplS7xip0g5oDXpZ+isr0rv5dDP8ToyVRywzPHkCCPKgKgScEcwz4uPWDIA==
+
 diff-match-patch@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/diff-match-patch/-/diff-match-patch-1.0.5.tgz#abb584d5f10cd1196dfc55aa03701592ae3f7b37"
@@ -6069,7 +6074,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.2"
     eslint-plugin-compat "4.0.2"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-47d7fa87-a7c4-4790-879b-51a3ec32b77d-1666743808895/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.1.3"
     eslint-plugin-jest-dom "4.0.2"
@@ -7330,13 +7335,13 @@ grapheme-splitter@^1.0.4:
     "@tanstack/react-query" "4.13.0"
     "@types/create-react-class" "15.6.3"
     "@types/jquery" "3.5.14"
-    "@types/react" "18.0.22"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.0.0-SNAPSHOT-6cf570e3-7ce8-4d87-b02b-704c09abe182-1666743808465/node_modules/babel-preset-graylog"
+    "@types/react" "18.0.23"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.0.0-SNAPSHOT-6cf570e3-7ce8-4d87-b02b-704c09abe182-1666743808465/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.0.0-SNAPSHOT-6cf570e3-7ce8-4d87-b02b-704c09abe182-1666743808465/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.6.1"
     moment "2.29.4"
     moment-timezone "0.5.38"
@@ -10885,11 +10890,12 @@ puppeteer-core@19.1.1:
     ws "8.9.0"
 
 puppeteer@^19.0.0:
-  version "19.1.1"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-19.1.1.tgz#1b1092babb58b484d1d4488cad2b549060fc5af4"
-  integrity sha512-nyIytOp1mYagiVeKkWODuMAGJoeQkcGNy7utkm2BN2d2r90n1ezO1tM4ld2V3vpP4u2kGk20obqv/Lj0Icd3KA==
+  version "19.1.2"
+  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-19.1.2.tgz#47b5fff531719fec77c20287754e4e897ab9e5c0"
+  integrity sha512-paX23NEpQRoJzz6g/q6A8PwSeAoa+WM263IFQL/ArJcyfotF1WvCBiZkzEcGD864Xm2rFvFuopBWYQjSBfeaQw==
   dependencies:
     cosmiconfig "7.0.1"
+    devtools-protocol "0.0.1056733"
     https-proxy-agent "5.0.1"
     progress "2.0.3"
     proxy-from-env "1.1.0"
