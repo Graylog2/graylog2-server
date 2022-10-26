@@ -18,6 +18,10 @@ import styled, { css } from 'styled-components';
 
 import { Navbar } from 'components/bootstrap';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
+import {
+  hoverIndicatorStyles,
+  activeIndicatorStyles,
+} from 'components/common/NavItemStateIndicator';
 
 const StyledNavbar = styled(Navbar)(({ theme }) => css`
   .dev-badge-wrap > a {
@@ -29,11 +33,25 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
     margin: 0 10px;
   }
 
-  &.navbar-default .navbar-main > li > a {
-    font-family: ${theme.fonts.family.navigation};
-    font-size: ${theme.fonts.size.navigation};
+  &.navbar-default .navbar-main > li {
+    > a {
+      font-family: ${theme.fonts.family.navigation};
+      font-size: ${theme.fonts.size.navigation};
+    }
+
+    &:hover {
+      ${hoverIndicatorStyles(theme)}
+    }
+
+    &.active {
+      ${activeIndicatorStyles(theme)}
+
+      :hover, :focus {
+        ${activeIndicatorStyles(theme)}
+      }
+    }
   }
-  
+
   .dropdown-menu li {
     &:not(.dropdown-header) {
       font-family: ${theme.fonts.family.navigation};
@@ -43,9 +61,7 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
     a {
       padding: 6px 20px;
     }
-  }  
-
-  
+  }
 
   @media (max-width: 991px) {
     .small-scrn-badge {
