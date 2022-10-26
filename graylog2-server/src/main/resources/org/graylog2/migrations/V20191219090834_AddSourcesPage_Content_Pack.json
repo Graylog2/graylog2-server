@@ -86,8 +86,7 @@
                   "row_groups": [
                     {
                       "type": "values",
-                      "field": "source",
-                      "limit": 10
+                      "field": "source"
                     }
                   ],
                   "type": "pivot",
@@ -121,8 +120,7 @@
                   "row_groups": [
                     {
                       "type": "values",
-                      "field": "source",
-                      "limit": 15
+                      "field": "source"
                     }
                   ],
                   "type": "pivot",
@@ -179,7 +177,6 @@
                       "field": "source",
                       "type": "values",
                       "config": {
-                        "limit": 15
                       }
                     }
                   ],
@@ -262,7 +259,6 @@
                       "field": "source",
                       "type": "values",
                       "config": {
-                        "limit": 10
                       }
                     }
                   ],
