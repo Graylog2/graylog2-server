@@ -224,7 +224,7 @@ const exports: PluginExports = {
         field,
         type,
         contexts: { analysisDisabledFields },
-      }) => (!isFunction(field) && !type.isCompound() && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
+      }) => (!isFunction(field) && type.isEnumerable() && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
       resetFocus: true,
     },
     {
