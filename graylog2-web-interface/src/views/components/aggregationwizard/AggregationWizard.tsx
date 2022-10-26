@@ -20,7 +20,7 @@ import styled from 'styled-components';
 import type { EditWidgetComponentProps } from 'views/types';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-import type { WidgetConfigFormValues, WidgetConfigValidationErrors } from './WidgetConfigForm';
+import type { WidgetConfigFormValues } from './WidgetConfigForm';
 import WidgetConfigForm from './WidgetConfigForm';
 import ElementsConfiguration from './ElementsConfiguration';
 import aggregationElements from './aggregationElementDefinitions';
@@ -95,7 +95,7 @@ const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfi
 };
 
 const validateForm = (formValues: WidgetConfigFormValues) => {
-  const elementValidations = aggregationElements.map((element) => element.validate ?? (() => ({}) as WidgetConfigValidationErrors));
+  const elementValidations = aggregationElements.map((element) => element.validate ?? (() => ({})));
 
   const elementValidationResults = elementValidations.map((validate) => validate(formValues));
 

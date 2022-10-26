@@ -17,31 +17,43 @@
 package org.graylog.storage.opensearch2.views.searchtypes.pivots;
 
 import com.google.common.collect.ImmutableList;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.revinate.assertj.json.JsonPathAssert;
+import org.assertj.core.api.AbstractCharSequenceAssert;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.shaded.opensearch2.org.apache.lucene.search.TotalHits;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHits;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Max;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min;
+import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.EffectiveTimeRangeExtractor;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSTimeHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSValuesHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSCountHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.storage.SearchVersion;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.junit.After;
@@ -57,9 +69,15 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class OSPivotTest {
@@ -79,11 +97,15 @@ public class OSPivotTest {
     @Mock
     private OSGeneratedQueryContext queryContext;
 
-    private OSSearchTypeHandler<Pivot> esPivot;
+    private OSPivot esPivot;
+    private Map<String, OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers;
+    private Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
 
     @Before
     public void setUp() throws Exception {
-        this.esPivot = new OSPivot(Collections.emptyMap(), Collections.emptyMap(), new EffectiveTimeRangeExtractor());
+        bucketHandlers = new HashMap<>();
+        seriesHandlers = new HashMap<>();
+        this.esPivot = new OSPivot(bucketHandlers, seriesHandlers);
         when(pivot.id()).thenReturn("dummypivot");
     }
 
@@ -111,7 +133,7 @@ public class OSPivotTest {
     }
 
     @Test
-    public void searchResultIncludesDocumentCount() {
+    public void searchResultIncludesDocumentCount() throws InvalidRangeParametersException {
         final long documentCount = 424242;
         returnDocumentCount(queryResult, documentCount);
         final Aggregations mockMetricAggregation = createTimestampRangeAggregations((double) new Date().getTime(), (double) new Date().getTime());
@@ -126,7 +148,182 @@ public class OSPivotTest {
     }
 
     @Test
+    public void generatesQueryWhenOnlyColumnPivotsArePresent() {
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> bucketHandler = mock(OSValuesHandler.class);
+
+        bucketHandlers.put(Values.NAME, bucketHandler);
+
+        when(queryContext.searchSourceBuilder(pivot)).thenReturn(searchSourceBuilder);
+        when(queryContext.nextName()).thenReturn("agg-1");
+        final Values values = Values.builder().field("action").limit(10).build();
+        when(pivot.columnGroups()).thenReturn(Collections.singletonList(values));
+
+        this.esPivot.doGenerateQueryPart(query, pivot, queryContext);
+
+        verify(bucketHandler, times(1)).createAggregation(eq("agg-1"), eq(pivot), eq(values), eq(queryContext), eq(query));
+    }
+
+    private void mockBucketSpecGeneratesComparableString(OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> bucketHandler) {
+        when(bucketHandler.createAggregation(any(), any(), any(), any(), any()))
+                .thenAnswer(invocation -> Optional.of(AggregationBuilders.filter(invocation.getArgument(0), QueryBuilders.existsQuery(invocation.getArgument(2).toString()))));
+    }
+
+    @Test
+    public void columnPivotsShouldBeNested() {
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> valuesBucketHandler = mock(OSValuesHandler.class);
+        mockBucketSpecGeneratesComparableString(valuesBucketHandler);
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> timeBucketHandler = mock(OSTimeHandler.class);
+        mockBucketSpecGeneratesComparableString(timeBucketHandler);
+
+        bucketHandlers.put(Values.NAME, valuesBucketHandler);
+        bucketHandlers.put(Time.NAME, timeBucketHandler);
+
+        when(queryContext.searchSourceBuilder(pivot)).thenReturn(searchSourceBuilder);
+        when(queryContext.nextName()).thenReturn("values-agg", "time-agg");
+
+        final Values values = Values.builder().field("action").limit(10).build();
+        final Time time = Time.builder().field("timestamp").interval(AutoInterval.create()).build();
+        when(pivot.columnGroups()).thenReturn(ImmutableList.of(values, time));
+
+        this.esPivot.doGenerateQueryPart(query, pivot, queryContext);
+
+        verify(valuesBucketHandler, times(1)).createAggregation(eq("values-agg"), eq(pivot), eq(values), eq(queryContext), eq(query));
+        verify(timeBucketHandler, times(1)).createAggregation(eq("time-agg"), eq(pivot), eq(time), eq(queryContext), eq(query));
+
+        final DocumentContext context = JsonPath.parse(searchSourceBuilder.toString());
+        extractAggregation(context, "values-agg")
+                .isEqualTo("Values{type=values, field=action, limit=10}");
+        extractAggregation(context, "values-agg.time-agg")
+                .isEqualTo("Time{type=time, field=timestamp, interval=AutoInterval{type=auto, scaling=1.0}}");
+    }
+
+    @Test
+    public void rowPivotsShouldBeNested() {
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> valuesBucketHandler = mock(OSValuesHandler.class);
+        mockBucketSpecGeneratesComparableString(valuesBucketHandler);
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> timeBucketHandler = mock(OSTimeHandler.class);
+        mockBucketSpecGeneratesComparableString(timeBucketHandler);
+
+        bucketHandlers.put(Values.NAME, valuesBucketHandler);
+        bucketHandlers.put(Time.NAME, timeBucketHandler);
+
+        when(queryContext.searchSourceBuilder(pivot)).thenReturn(searchSourceBuilder);
+        when(queryContext.nextName()).thenReturn("time-agg", "values-agg");
+
+        final Time time = Time.builder().field("timestamp").interval(AutoInterval.create()).build();
+        final Values values = Values.builder().field("action").limit(10).build();
+        when(pivot.rowGroups()).thenReturn(ImmutableList.of(time, values));
+
+        this.esPivot.doGenerateQueryPart(query, pivot, queryContext);
+
+        verify(valuesBucketHandler, times(1)).createAggregation(eq("values-agg"), eq(pivot), eq(values), eq(queryContext), eq(query));
+        verify(timeBucketHandler, times(1)).createAggregation(eq("time-agg"), eq(pivot), eq(time), eq(queryContext), eq(query));
+
+        final DocumentContext context = JsonPath.parse(searchSourceBuilder.toString());
+        extractAggregation(context, "time-agg")
+                .isEqualTo("Time{type=time, field=timestamp, interval=AutoInterval{type=auto, scaling=1.0}}");
+        extractAggregation(context, "time-agg.values-agg")
+                .isEqualTo("Values{type=values, field=action, limit=10}");
+    }
+
+    @Test
+    public void mixedPivotsShouldBeNested() {
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> valuesBucketHandler = mock(OSValuesHandler.class);
+        mockBucketSpecGeneratesComparableString(valuesBucketHandler);
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> timeBucketHandler = mock(OSTimeHandler.class);
+        mockBucketSpecGeneratesComparableString(timeBucketHandler);
+
+        bucketHandlers.put(Values.NAME, valuesBucketHandler);
+        bucketHandlers.put(Time.NAME, timeBucketHandler);
+
+        when(queryContext.searchSourceBuilder(pivot)).thenReturn(searchSourceBuilder);
+        when(queryContext.nextName()).thenReturn("time-agg", "values-agg");
+
+        final Time time = Time.builder().field("timestamp").interval(AutoInterval.create()).build();
+        final Values values = Values.builder().field("action").limit(10).build();
+        when(pivot.rowGroups()).thenReturn(Collections.singletonList(time));
+        when(pivot.columnGroups()).thenReturn(Collections.singletonList(values));
+
+        this.esPivot.doGenerateQueryPart(query, pivot, queryContext);
+
+        verify(valuesBucketHandler, times(1)).createAggregation(eq("values-agg"), eq(pivot), eq(values), eq(queryContext), eq(query));
+        verify(timeBucketHandler, times(1)).createAggregation(eq("time-agg"), eq(pivot), eq(time), eq(queryContext), eq(query));
+
+        final DocumentContext context = JsonPath.parse(searchSourceBuilder.toString());
+        extractAggregation(context, "time-agg")
+                .isEqualTo("Time{type=time, field=timestamp, interval=AutoInterval{type=auto, scaling=1.0}}");
+        extractAggregation(context, "time-agg.values-agg")
+                .isEqualTo("Values{type=values, field=action, limit=10}");
+    }
+
+    private void mockSeriesSpecGeneratesComparableString(OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler) {
+        when(seriesHandler.createAggregation(any(), any(), any(), any(), any()))
+                .thenAnswer(invocation -> Optional.of(AggregationBuilders.filter(invocation.getArgument(0), QueryBuilders.existsQuery(invocation.getArgument(2).toString()))));
+    }
+
+    @Test
+    public void mixedPivotsAndSeriesShouldBeNested() {
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> valuesBucketHandler = mock(OSValuesHandler.class);
+        mockBucketSpecGeneratesComparableString(valuesBucketHandler);
+        final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> timeBucketHandler = mock(OSTimeHandler.class);
+        mockBucketSpecGeneratesComparableString(timeBucketHandler);
+        final OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> countHandler = mock(OSCountHandler.class);
+        mockSeriesSpecGeneratesComparableString(countHandler);
+
+        bucketHandlers.put(Values.NAME, valuesBucketHandler);
+        bucketHandlers.put(Time.NAME, timeBucketHandler);
+
+        seriesHandlers.put(Count.NAME, countHandler);
+
+        when(queryContext.searchSourceBuilder(pivot)).thenReturn(searchSourceBuilder);
+        when(queryContext.nextName()).thenReturn("rowPivot1", "rowPivot2", "columnPivot1", "columnPivot2");
+
+        final BucketSpec rowPivot1 = Time.builder().field("timestamp").interval(AutoInterval.create()).build();
+        final BucketSpec rowPivot2 = Values.builder().field("http_method").limit(10).build();
+        final BucketSpec columnPivot1 = Values.builder().field("controller").limit(10).build();
+        final BucketSpec columnPivot2 = Values.builder().field("action").limit(10).build();
+        final Count count = Count.builder().build();
+        when(pivot.rowGroups()).thenReturn(ImmutableList.of(rowPivot1, rowPivot2));
+        when(pivot.columnGroups()).thenReturn(ImmutableList.of(columnPivot1, columnPivot2));
+        when(pivot.series()).thenReturn(Collections.singletonList(count));
+        when(pivot.rollup()).thenReturn(false);
+        when(queryContext.seriesName(any(), any())).thenCallRealMethod();
+
+        this.esPivot.doGenerateQueryPart(query, pivot, queryContext);
+
+        verify(timeBucketHandler).createAggregation(eq("rowPivot1"), eq(pivot), eq(rowPivot1), eq(queryContext), eq(query));
+        verify(valuesBucketHandler).createAggregation(eq("rowPivot2"), eq(pivot), eq(rowPivot2), eq(queryContext), eq(query));
+        verify(valuesBucketHandler).createAggregation(eq("columnPivot1"), eq(pivot), eq(columnPivot1), eq(queryContext), eq(query));
+        verify(valuesBucketHandler).createAggregation(eq("columnPivot2"), eq(pivot), eq(columnPivot2), eq(queryContext), eq(query));
+
+        final DocumentContext context = JsonPath.parse(searchSourceBuilder.toString());
+        extractAggregation(context, "rowPivot1")
+                .isEqualTo("Time{type=time, field=timestamp, interval=AutoInterval{type=auto, scaling=1.0}}");
+        extractAggregation(context, "rowPivot1.rowPivot2")
+                .isEqualTo("Values{type=values, field=http_method, limit=10}");
+        extractAggregation(context, "rowPivot1.rowPivot2.columnPivot1")
+                .isEqualTo("Values{type=values, field=controller, limit=10}");
+        extractAggregation(context, "rowPivot1.rowPivot2.columnPivot1.columnPivot2")
+                .isEqualTo("Values{type=values, field=action, limit=10}");
+        extractAggregation(context, "rowPivot1.rowPivot2.dummypivot-series-count()")
+                .isEqualTo("Count{type=count, id=count(), field=null}");
+        extractAggregation(context, "rowPivot1.rowPivot2.columnPivot1.columnPivot2.dummypivot-series-count()")
+                .isEqualTo("Count{type=count, id=count(), field=null}");
+    }
+
+    private AbstractCharSequenceAssert<?, String> extractAggregation(DocumentContext context, String path) {
+        final String fullPath = Stream.of(path.split("\\.")).map(s -> "['aggregations']['" + s + "']").reduce("$", (s1, s2) -> s1 + s2) + "['filter']['exists']['field']";
+        return JsonPathAssert.assertThat(context).jsonPathAsString(fullPath);
+    }
+
+    @Test
     public void includesCustomNameinResultIfPresent() throws InvalidRangeParametersException {
+        final OSPivot esPivot = new OSPivot(Collections.emptyMap(), Collections.emptyMap());
         final Pivot pivot = Pivot.builder()
                 .id("somePivotId")
                 .name("customPivot")

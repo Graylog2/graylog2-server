@@ -69,7 +69,7 @@ const FormikInput = ({ name, type, help, validate, onChange: propagateOnChange, 
         const displayValidationError = validateOnChange ? !!(validationError && touched) : !!validationError;
         const error = displayValidationError ? validationError : errorProp;
 
-        const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const _handleChange = (e) => {
           if (typeof propagateOnChange === 'function') {
             propagateOnChange(e);
           }

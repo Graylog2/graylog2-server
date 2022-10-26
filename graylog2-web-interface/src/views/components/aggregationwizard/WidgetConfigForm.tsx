@@ -60,6 +60,7 @@ export type DateGrouping = BaseGrouping & {
 
 export type ValuesGrouping = BaseGrouping & {
   field: GroupingField<'values'>,
+  limit: number,
 };
 
 export type GroupByFormValues = DateGrouping | ValuesGrouping;
@@ -89,29 +90,19 @@ export type SortFormValues = {
   id: string,
 }
 
-type Required<T, K extends keyof T> = Pick<T, K> & Partial<T>;
-
 export interface WidgetConfigFormValues {
   metrics?: Array<MetricFormValues>,
   groupBy?: {
     columnRollup: boolean,
-    groupings: Array<Required<GroupByFormValues, 'id'>>,
-    rowLimit: string | number | undefined,
-    columnLimit: string | number | undefined,
+    groupings: Array<GroupByFormValues>,
   },
   visualization?: VisualizationFormValues,
   sort?: Array<SortFormValues>,
-  rowLimit?: string,
-  columnLimit?: string,
 }
 
 export interface WidgetConfigValidationErrors {
   metrics?: Array<{ [key: string]: string }>,
-  groupBy?: {
-    groupings?: Array<{ [key: string]: string }>,
-    rowLimit?: string,
-    columnLimit?: string,
-  },
+  groupBy?: { groupings: Array<{ [key: string]: string }> },
   visualization?: { [key: string]: string | any },
   sort?: Array<{ [key: string]: string }>,
 }
@@ -120,7 +111,7 @@ type Props = {
   children: ((props: FormikProps<WidgetConfigFormValues>) => React.ReactNode) | React.ReactNode,
   initialValues: WidgetConfigFormValues,
   onSubmit: (formValues: WidgetConfigFormValues) => void,
-  validate: (formValues: WidgetConfigFormValues) => WidgetConfigValidationErrors,
+  validate: (formValues: WidgetConfigFormValues) => { [key: string]: string },
   config: AggregationWidgetConfig,
 }
 

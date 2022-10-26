@@ -20,7 +20,6 @@ import { useContext } from 'react';
 
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
-import parseNumber from 'views/components/aggregationwizard/grouping/parseNumber';
 
 import FieldSelect from '../../FieldSelect';
 
@@ -29,22 +28,19 @@ type Props = {
   fieldType: string,
 };
 
-const numberNotSet = (value: string | number | undefined) => parseNumber(value) === undefined;
-
-const defaultLimit = 15;
-
 const FieldComponent = ({ index, fieldType }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
-  const { setFieldValue, values } = useFormikContext<WidgetConfigFormValues>();
-  const grouping = values.groupBy.groupings[index];
+  const { setFieldValue } = useFormikContext<WidgetConfigFormValues>();
 
-  const onChangeField = (e: { target: { name: string, value: string } }, name: string, onChange) => {
+  const onChangeField = (e, name, onChange) => {
     const fieldName = e.target.value;
     const newField = fieldTypes.all.find((field) => field.name === fieldName);
     const newFieldType = newField?.type.type === 'date' ? 'time' : 'values';
 
     if (fieldType !== newFieldType) {
       if (newFieldType === 'time') {
+        setFieldValue(`groupBy.groupings.${index}.limit`, undefined, false);
+
         setFieldValue(`groupBy.groupings.${index}.interval`, {
           type: 'auto',
           scaling: 1.0,
@@ -53,14 +49,7 @@ const FieldComponent = ({ index, fieldType }: Props) => {
 
       if (newFieldType === 'values') {
         setFieldValue(`groupBy.groupings.${index}.interval`, undefined, false);
-
-        if (grouping.direction === 'row' && numberNotSet(values.groupBy.rowLimit)) {
-          setFieldValue('groupBy.rowLimit', defaultLimit);
-        }
-
-        if (grouping.direction === 'column' && numberNotSet(values.groupBy.columnLimit)) {
-          setFieldValue('groupBy.columnLimit', defaultLimit);
-        }
+        setFieldValue(`groupBy.groupings.${index}.limit`, 15);
       }
     }
 
