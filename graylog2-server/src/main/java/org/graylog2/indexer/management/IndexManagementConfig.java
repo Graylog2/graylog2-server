@@ -39,8 +39,8 @@ public abstract class IndexManagementConfig {
     public static final String REPLICAS = "replicas";
     public static final String INDEX_OPTIMIZATION_DISABLED = "index_optimization_disabled";
     public static final String INDEX_OPTIMIZATION_MAX_SEGMENTS = "index_optimization_max_num_segments";
-    public static final String FIELD_TYPE_REFRESH_INTERVAL = "field_type_refresh_interval";
-    public static final String FIELD_TYPE_REFRESH_INTERVAL_UNIT = "field_type_refresh_interval_unit";
+    public static final String FIELD_TYPE_REFRESH_INTERVAL = "field_type_refresh_Integererval";
+    public static final String FIELD_TYPE_REFRESH_INTERVAL_UNIT = "field_type_refresh_Integererval_unit";
     public static final String ROTATION_STRATEGY = "rotation_strategy";
     public static final String RETENTION_STRATEGY = "retention_strategy";
     public static final String ROTATION_STRATEGY_CONFIG = "rotation_strategy_config";
@@ -50,36 +50,47 @@ public abstract class IndexManagementConfig {
     @JsonProperty(INDEX_PREFIX)
     public abstract String indexPrefix();
 
+    @Nullable
     @JsonProperty(INDEX_ANALYZER)
     public abstract String indexAnalyzer();
 
+    @Nullable
     @JsonProperty(SHARDS)
-    public abstract int shards();
+    public abstract Integer shards();
 
+    @Nullable
     @JsonProperty(REPLICAS)
-    public abstract int replicas();
+    public abstract Integer replicas();
 
+    @Nullable
     @JsonProperty(INDEX_OPTIMIZATION_MAX_SEGMENTS)
-    public abstract int indexOptimizationMaxNumSegments();
+    public abstract Integer indexOptimizationMaxNumSegments();
 
+    @Nullable
     @JsonProperty(INDEX_OPTIMIZATION_DISABLED)
-    public abstract boolean indexOptimizationDisabled();
+    public abstract Boolean indexOptimizationDisabled();
 
+    @Nullable
     @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL)
-    public abstract long fieldTypeRefreshInterval();
+    public abstract Long fieldTypeRefreshInterval();
 
+    @Nullable
     @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL_UNIT)
     public abstract TimeUnit fieldTypeRefreshIntervalUnit();
 
+    @Nullable
     @JsonProperty(ROTATION_STRATEGY)
     public abstract String retentionStrategy();
 
+    @Nullable
     @JsonProperty(RETENTION_STRATEGY)
     public abstract String rotationStrategy();
 
+    @Nullable
     @JsonProperty(ROTATION_STRATEGY_CONFIG)
     public abstract RotationStrategyConfig rotationStrategyConfig();
 
+    @Nullable
     @JsonProperty(RETENTION_STRATEGY_CONFIG)
     public abstract RetentionStrategyConfig retentionStrategyConfig();
 
@@ -105,19 +116,19 @@ public abstract class IndexManagementConfig {
         public abstract Builder indexAnalyzer(String indexAnalyzer);
 
         @JsonProperty(SHARDS)
-        public abstract Builder shards(int shards);
+        public abstract Builder shards(Integer shards);
 
         @JsonProperty(REPLICAS)
-        public abstract Builder replicas(int replicas);
+        public abstract Builder replicas(Integer replicas);
 
         @JsonProperty(INDEX_OPTIMIZATION_MAX_SEGMENTS)
-        public abstract Builder indexOptimizationMaxNumSegments(int indexOptimizationMaxNumSegments);
+        public abstract Builder indexOptimizationMaxNumSegments(Integer indexOptimizationMaxNumSegments);
 
         @JsonProperty(INDEX_OPTIMIZATION_DISABLED)
-        public abstract Builder indexOptimizationDisabled(boolean indexOptimizationDisabled);
+        public abstract Builder indexOptimizationDisabled(Boolean indexOptimizationDisabled);
 
         @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL)
-        public abstract Builder fieldTypeRefreshInterval(long fieldTypeRefreshInterval);
+        public abstract Builder fieldTypeRefreshInterval(Long fieldTypeRefreshInterval);
 
         @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL_UNIT)
         public abstract Builder fieldTypeRefreshIntervalUnit(TimeUnit fieldTypeRefreshIntervalUnit);
