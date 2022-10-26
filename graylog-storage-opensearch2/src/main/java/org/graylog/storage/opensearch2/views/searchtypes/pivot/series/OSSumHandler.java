@@ -19,7 +19,7 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
+import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 public class OSSumHandler extends OSPivotSeriesSpecHandler<Sum, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Sum> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Sum sumSpec, OSPivot searchTypeHandler, OSGeneratedQueryContext queryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Sum sumSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final SumAggregationBuilder sum = AggregationBuilders.sum(name).field(sumSpec.field());
         record(queryContext, pivot, sumSpec, name, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Sum.class);
         return Optional.of(sum);
@@ -43,7 +43,7 @@ public class OSSumHandler extends OSPivotSeriesSpecHandler<Sum, org.graylog.shad
     public Stream<Value> doHandleResult(Pivot pivot, Sum pivotSpec,
                                         SearchResponse searchResult,
                                         org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Sum sumAggregation,
-                                        OSPivot searchTypeHandler,
+                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
         return Stream.of(Value.create(pivotSpec.id(), Sum.NAME, sumAggregation.getValue()));
     }

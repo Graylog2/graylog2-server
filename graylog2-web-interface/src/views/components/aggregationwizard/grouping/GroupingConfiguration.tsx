@@ -18,7 +18,6 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
-import { FormikFormGroup } from 'components/common';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 
 import Direction from './configuration/Direction';
@@ -40,12 +39,6 @@ const GroupingConfiguration = React.memo(({ index }: Props) => {
       <Direction index={index} />
       <FieldComponent index={index} fieldType={fieldType} />
       {fieldType === 'time' && (<Time index={index} />)}
-      {fieldType === 'values' && (
-        <FormikFormGroup label="Limit"
-                         name={`groupBy.groupings.${index}.limit`}
-                         type="number"
-                         bsSize="small" />
-      )}
     </Wrapper>
   );
 });

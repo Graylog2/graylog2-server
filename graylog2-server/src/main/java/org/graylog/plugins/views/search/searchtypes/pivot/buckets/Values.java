@@ -30,7 +30,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.TypedBuilder;
 @JsonDeserialize(builder = Values.Builder.class)
 public abstract class Values implements BucketSpec {
     public static final String NAME = "values";
-    private static final int DEFAULT_LIMIT = 5;
+    public static final int DEFAULT_LIMIT = 15;
 
     @Override
     public abstract String type();

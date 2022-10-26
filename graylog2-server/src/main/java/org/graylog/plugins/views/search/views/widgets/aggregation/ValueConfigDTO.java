@@ -27,21 +27,18 @@ import com.google.auto.value.AutoValue;
 @JsonDeserialize(builder = ValueConfigDTO.Builder.class)
 public abstract class ValueConfigDTO implements PivotConfigDTO {
     public static final String NAME = "values";
-    static final String FIELD_LIMIT = "limit";
 
-    @JsonProperty(FIELD_LIMIT)
-    public abstract int limit();
+    public static ValueConfigDTO create() {
+        return Builder.builder().build();
+    }
 
     @AutoValue.Builder
     public abstract static class Builder {
-        @JsonProperty(FIELD_LIMIT)
-        public abstract Builder limit(int limit);
-
         public abstract ValueConfigDTO build();
 
         @JsonCreator
         public static Builder builder() {
-            return new AutoValue_ValueConfigDTO.Builder().limit(15);
+            return new AutoValue_ValueConfigDTO.Builder();
         }
     }
 }
